@@ -1,5 +1,8 @@
-LightKurve: A beautiful package for astronomical flux time series analysis in Python.
-========================================================================================
+lightkurve
+==========
+
+**A beautiful package for astronomical flux time series analysis in Python.**
+
 |pypi-badge| |ci-badge| |appveyor-badge| |cov-badge| |doi-badge|
 
 .. |pypi-badge| image:: https://img.shields.io/pypi/v/lightkurve.svg
@@ -14,12 +17,9 @@ LightKurve: A beautiful package for astronomical flux time series analysis in Py
               :target: https://doi.org/10.5281/zenodo.835584
 
 
-**LightKurve offers a user-friendly way to inspect and analyze astronomical flux time series data, in particular the pixels and lightcurves obtained by NASA's Kepler, K2, and TESS missions.**
+LightKurve offers a user-friendly way to inspect and analyze astronomical flux time series data, in particular the pixels and lightcurves obtained by NASA's Kepler, K2, and TESS missions.
 
-Documentation
--------------
-
-Documentation is hosted at `lightkurve.keplerscience.org <http://lightkurve.keplerscience.org>`_.
+Read the documentation at `lightkurve.keplerscience.org <http://lightkurve.keplerscience.org>`_.
 
 Quickstart
 ----------
