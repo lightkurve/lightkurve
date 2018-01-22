@@ -17,9 +17,13 @@ lightkurve
               :target: https://doi.org/10.5281/zenodo.835584
 
 
-LightKurve offers a user-friendly way to inspect and analyze astronomical flux time series data, in particular the pixels and lightcurves obtained by NASA's Kepler, K2, and TESS missions.
+*lightkurve* offers a user-friendly way to inspect and analyze astronomical flux time series data.
+In particular, it is well-suited to analyze the pixels and lightcurves obtained by NASA's Kepler, K2, and TESS missions.
 
-Read the documentation at `lightkurve.keplerscience.org <http://lightkurve.keplerscience.org>`_.
+Documentation
+-------------
+
+Read the documentation at `http://lightkurve.keplerscience.org <http://lightkurve.keplerscience.org>`_.
 
 Quickstart
 ----------
