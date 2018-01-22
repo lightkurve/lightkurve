@@ -1,0 +1,518 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Utilities &mdash; lightkurve 1.0.0dev documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="lightkurve 1.0.0dev documentation" href="../index.html"/>
+        <link rel="up" title="API documentation" href="index.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> lightkurve
+          
+
+          
+            
+            <img src="../_static/lightkurve.gif" class="logo" />
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0dev
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="targetpixelfile.html">Target Pixel File</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lightcurve.html">Lightcurve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prf.html">Point Spread Function Photometry</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Utilities</a><ul class="simple">
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">lightkurve</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">API documentation</a> &raquo;</li>
+        
+      <li>Utilities</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/api/utils.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+/* nice headers on first paragraph of info/warning boxes */
+.admonition .first {
+    margin: -12px;
+    padding: 6px 12px;
+    margin-bottom: 12px;
+    color: #fff;
+    line-height: 1;
+    display: block;
+}
+.admonition.warning .first {
+    background: #f0b37e;
+}
+.admonition.note .first {
+    background: #6ab0de;
+}
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+</style>
+<div class="section" id="module-lightkurve.utils">
+<span id="utilities"></span><h1>Utilities<a class="headerlink" href="#module-lightkurve.utils" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="lightkurve.utils.KeplerQualityFlags">
+<em class="property">class </em><code class="descclassname">lightkurve.utils.</code><code class="descname">KeplerQualityFlags</code><a class="reference internal" href="../_modules/lightkurve/utils.html#KeplerQualityFlags"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class encodes the meaning of the various Kepler QUALITY bitmask flags,
+as documented in the Kepler Archive Manual (Table 2.3).</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.utils.KeplerQualityFlags.decode" title="lightkurve.utils.KeplerQualityFlags.decode"><code class="xref py py-obj docutils literal"><span class="pre">decode</span></code></a>(quality)</td>
+<td>Converts a Kepler QUALITY value into a list of human-readable strings.</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="lightkurve.utils.KeplerQualityFlags.ApertureCosmic">
+<code class="descname">ApertureCosmic</code><em class="property"> = 128</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.ApertureCosmic" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="lightkurve.utils.KeplerQualityFlags.Argabrightening">
+<code class="descname">Argabrightening</code><em class="property"> = 64</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.Argabrightening" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="lightkurve.utils.KeplerQualityFlags.ArgabrighteningOnCCD">
+<code class="descname">ArgabrighteningOnCCD</code><em class="property"> = 4096</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.ArgabrighteningOnCCD" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="lightkurve.utils.KeplerQualityFlags.AttitudeTweak">
+<code class="descname">AttitudeTweak</code><em class="property"> = 1</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.AttitudeTweak" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="lightkurve.utils.KeplerQualityFlags.CoarsePoint">
+<code class="descname">CoarsePoint</code><em class="property"> = 4</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.CoarsePoint" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="lightkurve.utils.KeplerQualityFlags.CollateralCosmic">
+<code class="descname">CollateralCosmic</code><em class="property"> = 8192</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.CollateralCosmic" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="lightkurve.utils.KeplerQualityFlags.DEFAULT_BITMASK">
+<code class="descname">DEFAULT_BITMASK</code><em class="property"> = 1130927</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.DEFAULT_BITMASK" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="lightkurve.utils.KeplerQualityFlags.Desat">
+<code class="descname">Desat</code><em class="property"> = 32</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.Desat" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="lightkurve.utils.KeplerQualityFlags.DetectorAnomaly">
+<code class="descname">DetectorAnomaly</code><em class="property"> = 16384</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.DetectorAnomaly" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="lightkurve.utils.KeplerQualityFlags.EarthPoint">
+<code class="descname">EarthPoint</code><em class="property"> = 8</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.EarthPoint" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="lightkurve.utils.KeplerQualityFlags.HARDEST_BITMASK">
+<code class="descname">HARDEST_BITMASK</code><em class="property"> = 2096639</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.HARDEST_BITMASK" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="lightkurve.utils.KeplerQualityFlags.HARD_BITMASK">
+<code class="descname">HARD_BITMASK</code><em class="property"> = 1664431</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.HARD_BITMASK" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="lightkurve.utils.KeplerQualityFlags.ImpulsiveOutlier">
+<code class="descname">ImpulsiveOutlier</code><em class="property"> = 2048</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.ImpulsiveOutlier" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="lightkurve.utils.KeplerQualityFlags.ManualExclude">
+<code class="descname">ManualExclude</code><em class="property"> = 256</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.ManualExclude" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="lightkurve.utils.KeplerQualityFlags.NoData">
+<code class="descname">NoData</code><em class="property"> = 65536</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.NoData" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="lightkurve.utils.KeplerQualityFlags.NoFinePoint">
+<code class="descname">NoFinePoint</code><em class="property"> = 32768</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.NoFinePoint" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="lightkurve.utils.KeplerQualityFlags.OPTIONS">
+<code class="descname">OPTIONS</code><em class="property"> = {'default': 1130927, 'hard': 1664431, 'hardest': 2096639}</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.OPTIONS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="lightkurve.utils.KeplerQualityFlags.PossibleThrusterFiring">
+<code class="descname">PossibleThrusterFiring</code><em class="property"> = 524288</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.PossibleThrusterFiring" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="lightkurve.utils.KeplerQualityFlags.RollingBandInAperture">
+<code class="descname">RollingBandInAperture</code><em class="property"> = 131072</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.RollingBandInAperture" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="lightkurve.utils.KeplerQualityFlags.RollingBandInMask">
+<code class="descname">RollingBandInMask</code><em class="property"> = 262144</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.RollingBandInMask" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="lightkurve.utils.KeplerQualityFlags.STRINGS">
+<code class="descname">STRINGS</code><em class="property"> = {1: 'Attitude tweak', 2: 'Safe mode', 4: 'Coarse point', 8: 'Earth point', 16: 'Zero crossing', 32: 'Desaturation event', 64: 'Argabrightening', 128: 'Cosmic ray in optimal aperture', 256: 'Manual exclude', 1024: 'Sudden sensitivity dropout', 2048: 'Impulsive outlier', 4096: 'Argabrightening on CCD', 8192: 'Cosmic ray in collateral data', 16384: 'Detector anomaly', 32768: 'No fine point', 65536: 'No data', 131072: 'Rolling band in optimal aperture', 262144: 'Rolling band in full mask', 524288: 'Possible thruster firing', 1048576: 'Thruster firing'}</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.STRINGS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="lightkurve.utils.KeplerQualityFlags.SafeMode">
+<code class="descname">SafeMode</code><em class="property"> = 2</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.SafeMode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="lightkurve.utils.KeplerQualityFlags.SensitivityDropout">
+<code class="descname">SensitivityDropout</code><em class="property"> = 1024</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.SensitivityDropout" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="lightkurve.utils.KeplerQualityFlags.ThrusterFiring">
+<code class="descname">ThrusterFiring</code><em class="property"> = 1048576</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.ThrusterFiring" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="lightkurve.utils.KeplerQualityFlags.ZeroCrossing">
+<code class="descname">ZeroCrossing</code><em class="property"> = 16</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.ZeroCrossing" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="lightkurve.utils.KeplerQualityFlags.decode">
+<em class="property">classmethod </em><code class="descname">decode</code><span class="sig-paren">(</span><em>quality</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/utils.html#KeplerQualityFlags.decode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.decode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts a Kepler QUALITY value into a list of human-readable strings.</p>
+<p>This function takes the QUALITY bitstring that can be found for each
+cadence in Kepler/K2’s pixel and light curve files and converts into
+a list of human-readable strings explaining the flags raised (if any).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>quality</strong> : int</p>
+<blockquote>
+<div><p>Value from the ‘QUALITY’ column of a Kepler/K2 pixel or lightcurve file.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>flags</strong> : list of str</p>
+<blockquote class="last">
+<div><p>List of human-readable strings giving a short description of the
+quality flags raised.  Returns an empty list if no flags raised.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="lightkurve.utils.module_output_to_channel">
+<code class="descclassname">lightkurve.utils.</code><code class="descname">module_output_to_channel</code><span class="sig-paren">(</span><em>module</em>, <em>output</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/utils.html#module_output_to_channel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.utils.module_output_to_channel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the CCD channel number for a given module and output pair.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>module</strong> : int</p>
+<blockquote>
+<div><p>Module number</p>
+</div></blockquote>
+<p><strong>output</strong> : int</p>
+<blockquote>
+<div><p>Output number</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>channel</strong> : int</p>
+<blockquote class="last">
+<div><p>Channel number</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="lightkurve.utils.channel_to_module_output">
+<code class="descclassname">lightkurve.utils.</code><code class="descname">channel_to_module_output</code><span class="sig-paren">(</span><em>channel</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/utils.html#channel_to_module_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.utils.channel_to_module_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a (module, output) pair given a CCD channel number.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>channel</strong> : int</p>
+<blockquote>
+<div><p>Channel number</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>module, output</strong> : tuple of ints</p>
+<blockquote class="last">
+<div><p>Module and Output number</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="lightkurve.utils.running_mean">
+<code class="descclassname">lightkurve.utils.</code><code class="descname">running_mean</code><span class="sig-paren">(</span><em>data</em>, <em>window_size</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/utils.html#running_mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.utils.running_mean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the moving average of an array <cite>data</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>data</strong> : array of numbers</p>
+<blockquote>
+<div><p>The running mean will be computed on this data.</p>
+</div></blockquote>
+<p><strong>window_size</strong> : int</p>
+<blockquote class="last">
+<div><p>Window length used to compute the running mean.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright lightkurve Developers and Contributors.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'1.0.0dev',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

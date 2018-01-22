@@ -1,0 +1,688 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>lightkurve.prf &mdash; lightkurve 1.0.0dev documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="lightkurve 1.0.0dev documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> lightkurve
+          
+
+          
+            
+            <img src="../../_static/lightkurve.gif" class="logo" />
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0dev
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api/index.html">API documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">lightkurve</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>lightkurve.prf</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for lightkurve.prf</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">abc</span> <span class="k">import</span> <span class="n">abstractmethod</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">scipy</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">tqdm</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">astropy.io</span> <span class="k">import</span> <span class="n">fits</span> <span class="k">as</span> <span class="n">pyfits</span>
+<span class="kn">from</span> <span class="nn">oktopus.posterior</span> <span class="k">import</span> <span class="n">PoissonPosterior</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="k">import</span> <span class="n">channel_to_module_output</span><span class="p">,</span> <span class="n">plot_image</span>
+
+<span class="c1"># This is a workaround to get the number of arguments of</span>
+<span class="c1"># a given function.</span>
+<span class="c1"># In Python 2, this works by using getargspec.</span>
+<span class="c1"># Note that `self` is accounted as an argument,</span>
+<span class="c1"># which is unwanted, hence the subtraction by 1.</span>
+<span class="c1"># On the other hand, Python 3 handles that trivially with the</span>
+<span class="c1"># signature function.</span>
+<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">inspect</span> <span class="k">import</span> <span class="n">getargspec</span>
+    <span class="k">def</span> <span class="nf">_get_number_of_arguments</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+        <span class="n">list_of_args</span> <span class="o">=</span> <span class="n">getargspec</span><span class="p">(</span><span class="n">func</span><span class="p">)</span><span class="o">.</span><span class="n">args</span>
+        <span class="k">if</span> <span class="s1">&#39;self&#39;</span> <span class="ow">in</span> <span class="n">list_of_args</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">list_of_args</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">list_of_args</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">inspect</span> <span class="k">import</span> <span class="n">signature</span>
+    <span class="k">def</span> <span class="nf">_get_number_of_arguments</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">signature</span><span class="p">(</span><span class="n">func</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="p">)</span>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;PRFPhotometry&#39;</span><span class="p">,</span> <span class="s1">&#39;SceneModel&#39;</span><span class="p">,</span> <span class="s1">&#39;KeplerPRF&#39;</span><span class="p">,</span> <span class="s1">&#39;SimpleKeplerPRF&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;get_initial_guesses&#39;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="PRFPhotometry"><a class="viewcode-back" href="../../api/prf.html#lightkurve.prf.PRFPhotometry">[docs]</a><span class="k">class</span> <span class="nc">PRFPhotometry</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class performs PRF Photometry on TPF-like files.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    scene_model : instance of SceneModel</span>
+<span class="sd">        Model which will be fit to the data</span>
+<span class="sd">    priors : instance of oktopus.JointPrior</span>
+<span class="sd">        Priors on the parameters that will be estimated</span>
+<span class="sd">    loss_function : subclass of oktopus.LossFunction</span>
+<span class="sd">        Noise distribution associated with each random measurement</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from lightkurve import KeplerTargetPixelFile, SimpleKeplerPRF, SceneModel, PRFPhotometry</span>
+<span class="sd">    &gt;&gt;&gt; from oktopus import UniformPrior</span>
+<span class="sd">    &gt;&gt;&gt; tpf = KeplerTargetPixelFile(&quot;https://archive.stsci.edu/missions/kepler/&quot;</span>
+<span class="sd">    ...                             &quot;target_pixel_files/0084/008462852/&quot;</span>
+<span class="sd">    ...                             &quot;kplr008462852-2013098041711_lpd-targ.fits.gz&quot;) # doctest: +SKIP</span>
+<span class="sd">    Downloading https://archive.stsci.edu/missions/kepler/target_pixel_files/0084/008462852/kplr008462852-2013098041711_lpd-targ.fits.gz [Done]</span>
+<span class="sd">    &gt;&gt;&gt; prf = SimpleKeplerPRF(tpf.channel, tpf.shape[1:], tpf.column, tpf.row) # doctest: +SKIP</span>
+<span class="sd">    Downloading http://archive.stsci.edu/missions/kepler/fpc/prf/extracted/kplr16.4_2011265_prf.fits [Done]</span>
+<span class="sd">    &gt;&gt;&gt; scene = SceneModel(prfs=prf) # doctest: +SKIP</span>
+<span class="sd">    &gt;&gt;&gt; prior = UniformPrior(lb=[1.2e5, 230., 128.,1e2], ub=[3.4e5, 235., 133., 1e3]) # doctest: +SKIP</span>
+<span class="sd">    &gt;&gt;&gt; phot = PRFPhotometry(scene, prior) # doctest: +SKIP</span>
+<span class="sd">    &gt;&gt;&gt; results = phot.fit(tpf.flux) # doctest: +SKIP</span>
+<span class="sd">    &gt;&gt;&gt; flux_fit = results[:, 0] # doctest: +SKIP</span>
+<span class="sd">    &gt;&gt;&gt; x_fit = results[:, 1] # doctest: +SKIP</span>
+<span class="sd">    &gt;&gt;&gt; y_fit = results[:, 2] # doctest: +SKIP</span>
+<span class="sd">    &gt;&gt;&gt; bkg_fit = results[:, 3] # doctest: +SKIP</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scene_model</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">loss_function</span><span class="o">=</span><span class="n">PoissonPosterior</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scene_model</span> <span class="o">=</span> <span class="n">scene_model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prior</span> <span class="o">=</span> <span class="n">prior</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loss_function</span> <span class="o">=</span> <span class="n">loss_function</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loss_kwargs</span> <span class="o">=</span> <span class="n">kwargs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">opt_params</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">residuals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loss_value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uncertainties</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+
+<div class="viewcode-block" id="PRFPhotometry.fit"><a class="viewcode-back" href="../../api/prf.html#lightkurve.prf.PRFPhotometry.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tpf_flux</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cadences</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;powell&#39;</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fits the scene model to the given data in ``tpf_flux``.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tpf_flux : array-like</span>
+<span class="sd">            A pixel flux time-series, i.e., the pixel data, e.g,</span>
+<span class="sd">            KeplerTargetPixelFile.flux, such that (time, row, column) represents</span>
+<span class="sd">            the shape of ``tpf_flux``.</span>
+<span class="sd">        x0 : array-like or None</span>
+<span class="sd">            Initial guesses on the parameters. The default is to use the mean</span>
+<span class="sd">            of the prior distribution.</span>
+<span class="sd">        cadences : array-like of ints or str</span>
+<span class="sd">            A list or array that contains the cadences which will be fitted.</span>
+<span class="sd">            Default is to fit all cadences.</span>
+<span class="sd">        kwargs : dict</span>
+<span class="sd">            Dictionary of additional parameters to be passed to</span>
+<span class="sd">            `scipy.optimize.minimize`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        opt_params : array-like</span>
+<span class="sd">            Matrix with the optimized parameter values. The i-th line contain</span>
+<span class="sd">            the best parameter values at the i-th cadence. The order of the parameters</span>
+<span class="sd">            in every line follows the order of the ``scene_model``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">opt_params</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">residuals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loss_value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uncertainties</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+
+        <span class="k">if</span> <span class="n">x0</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">x0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prior</span><span class="o">.</span><span class="n">mean</span>
+
+        <span class="k">if</span> <span class="n">cadences</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span><span class="p">:</span>
+            <span class="n">cadences</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">tpf_flux</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="o">.</span><span class="n">tqdm</span><span class="p">(</span><span class="n">cadences</span><span class="p">):</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_function</span><span class="p">(</span><span class="n">tpf_flux</span><span class="p">[</span><span class="n">t</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene_model</span><span class="p">,</span>
+                                      <span class="n">prior</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prior</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">loss_kwargs</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">loss</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x0</span><span class="o">=</span><span class="n">x0</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;powell&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">opt_params</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">x</span>
+            <span class="n">residuals</span> <span class="o">=</span> <span class="n">tpf_flux</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene_model</span><span class="p">(</span><span class="o">*</span><span class="n">opt_params</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">loss_value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loss_value</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">fun</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">opt_params</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">opt_params</span><span class="p">,</span> <span class="n">opt_params</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">residuals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">residuals</span><span class="p">,</span> <span class="n">residuals</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">opt_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">opt_params</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">tpf_flux</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">x0</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">residuals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">residuals</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">tpf_flux</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">opt_params</span></div>
+
+<div class="viewcode-block" id="PRFPhotometry.get_residuals"><a class="viewcode-back" href="../../api/prf.html#lightkurve.prf.PRFPhotometry.get_residuals">[docs]</a>    <span class="k">def</span> <span class="nf">get_residuals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">residuals</span></div></div>
+
+
+<div class="viewcode-block" id="SceneModel"><a class="viewcode-back" href="../../api/prf.html#lightkurve.prf.SceneModel">[docs]</a><span class="k">class</span> <span class="nc">SceneModel</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class builds a generic model for a scene.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    prfs : list of callables</span>
+<span class="sd">        A list of prfs</span>
+<span class="sd">    bkg_model : callable</span>
+<span class="sd">        A function that models the background variation.</span>
+<span class="sd">        Default is a constant background</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prfs</span><span class="p">,</span> <span class="n">bkg_model</span><span class="o">=</span><span class="k">lambda</span> <span class="n">bkg</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">bkg</span><span class="p">])):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prfs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">prfs</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bkg_model</span> <span class="o">=</span> <span class="n">bkg_model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_scene_model</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="o">*</span><span class="n">params</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_prepare_scene_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_models</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prfs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bkg_order</span> <span class="o">=</span> <span class="n">_get_number_of_arguments</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bkg_model</span><span class="p">)</span>
+
+        <span class="n">model_orders</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_models</span><span class="p">):</span>
+            <span class="n">model_orders</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_get_number_of_arguments</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prfs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">evaluate</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_params</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">model_orders</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SceneModel.evaluate"><a class="viewcode-back" href="../../api/prf.html#lightkurve.prf.SceneModel.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        flux : scalar or array-like</span>
+<span class="sd">            Total integrated flux of the PRF model</span>
+<span class="sd">        center_col, center_row : scalar or array-like</span>
+<span class="sd">            Column and row coordinates of the center</span>
+<span class="sd">        scale_col, scale_row : scalar or array-like</span>
+<span class="sd">            Pixel scale in the column and row directions</span>
+<span class="sd">        rotation_angle : float</span>
+<span class="sd">            Rotation angle in radians</span>
+<span class="sd">        bkg_params : scalar or array-like</span>
+<span class="sd">            Parameters for the background model</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mm</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_models</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mm</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prfs</span><span class="p">[</span><span class="n">i</span><span class="p">](</span><span class="o">*</span><span class="n">params</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">n_params</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span><span class="bp">self</span><span class="o">.</span><span class="n">n_params</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scene_model</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mm</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">bkg_model</span><span class="p">(</span><span class="o">*</span><span class="n">params</span><span class="p">[</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">bkg_order</span><span class="p">:])</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene_model</span></div>
+
+<div class="viewcode-block" id="SceneModel.gradient"><a class="viewcode-back" href="../../api/prf.html#lightkurve.prf.SceneModel.gradient">[docs]</a>    <span class="k">def</span> <span class="nf">gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">):</span>
+        <span class="n">grad</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_models</span><span class="p">):</span>
+            <span class="n">grad</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prfs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="o">*</span><span class="n">params</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">n_params</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span><span class="bp">self</span><span class="o">.</span><span class="n">n_params</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]]))</span>
+        <span class="n">grad</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bkg_model</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="o">*</span><span class="n">params</span><span class="p">[</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">bkg_order</span><span class="p">:]))</span>
+        <span class="n">grad</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">grad</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">return</span> <span class="n">grad</span></div>
+
+<div class="viewcode-block" id="SceneModel.plot"><a class="viewcode-back" href="../../api/prf.html#lightkurve.prf.SceneModel.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">pflux</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="o">*</span><span class="n">params</span><span class="p">)</span>
+        <span class="n">plot_image</span><span class="p">(</span><span class="n">pflux</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Scene Model, Channel: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prfs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">channel</span><span class="p">),</span>
+                   <span class="n">extent</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prfs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">prfs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">column</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">prfs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                           <span class="bp">self</span><span class="o">.</span><span class="n">prfs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">row</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">prfs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">row</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">prfs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="KeplerPRF"><a class="viewcode-back" href="../../api/prf.html#lightkurve.prf.KeplerPRF">[docs]</a><span class="k">class</span> <span class="nc">KeplerPRF</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Kepler&#39;s Pixel Response Function as designed by [1]_.</span>
+
+<span class="sd">    This class provides the necessary interface to load Kepler PRF</span>
+<span class="sd">    calibration files and to create a model that can be fit as a function</span>
+<span class="sd">    of flux, center positions, width, and rotation angle.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    channel : int</span>
+<span class="sd">        KeplerTargetPixelFile.channel</span>
+<span class="sd">    shape : (int, int)</span>
+<span class="sd">        KeplerTargetPixelFile.shape[1:]</span>
+<span class="sd">    column : int</span>
+<span class="sd">        KeplerTargetPixelFile.column</span>
+<span class="sd">    row : int</span>
+<span class="sd">        KeplerTargetPixelFile.row</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Objects from the KeplerPRF class are defined by a channel number, a pair of</span>
+<span class="sd">    dimensions (the size of the image), and a reference coordinate (bottom left</span>
+<span class="sd">    corner). In this example, we create a KeplerPRF object located at channel</span>
+<span class="sd">    #44 with dimension equals 10 x 10, reference row and column coordinate</span>
+<span class="sd">    equals (5, 5). After the object has been created, we may translate it to a</span>
+<span class="sd">    given center coordinate. Additionally, we can specify total flux, pixel</span>
+<span class="sd">    scales, and rotation around the object&#39;s center.</span>
+
+<span class="sd">    &gt;&gt;&gt; import math</span>
+<span class="sd">    &gt;&gt;&gt; import matplotlib.pyplot as plt</span>
+<span class="sd">    &gt;&gt;&gt; from lightkurve import KeplerPRF</span>
+<span class="sd">    &gt;&gt;&gt; kepprf = KeplerPRF(channel=44, shape=(10, 10), column=5, row=5) # doctest: +SKIP</span>
+<span class="sd">    Downloading http://archive.stsci.edu/missions/kepler/fpc/prf/extracted/kplr13.4_2011265_prf.fits [Done]</span>
+<span class="sd">    &gt;&gt;&gt; prf = kepprf(flux=1000, center_col=10, center_row=10,</span>
+<span class="sd">    ...              scale_row=0.7, scale_col=0.7, rotation_angle=math.pi/2) # doctest: +SKIP</span>
+<span class="sd">    &gt;&gt;&gt; plt.imshow(prf, origin=&#39;lower&#39;) # doctest: +SKIP</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] S. T. Bryson. The Kepler Pixel Response Function, 2010.</span>
+<span class="sd">           &lt;https://arxiv.org/abs/1001.0331&gt;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="o">=</span> <span class="n">channel</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="n">shape</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">column</span> <span class="o">=</span> <span class="n">column</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">row</span> <span class="o">=</span> <span class="n">row</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">col_coord</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">row_coord</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_prf</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">center_col</span><span class="p">,</span> <span class="n">center_row</span><span class="p">,</span> <span class="n">scale_col</span><span class="p">,</span> <span class="n">scale_row</span><span class="p">,</span>
+                 <span class="n">rotation_angle</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">flux</span><span class="p">,</span> <span class="n">center_col</span><span class="p">,</span> <span class="n">center_row</span><span class="p">,</span>
+                             <span class="n">scale_col</span><span class="p">,</span> <span class="n">scale_row</span><span class="p">,</span> <span class="n">rotation_angle</span><span class="p">)</span>
+
+<div class="viewcode-block" id="KeplerPRF.evaluate"><a class="viewcode-back" href="../../api/prf.html#lightkurve.prf.KeplerPRF.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">center_col</span><span class="p">,</span> <span class="n">center_row</span><span class="p">,</span> <span class="n">scale_col</span><span class="p">,</span> <span class="n">scale_row</span><span class="p">,</span>
+                 <span class="n">rotation_angle</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Interpolates the PRF model onto detector coordinates.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        flux : float</span>
+<span class="sd">            Total integrated flux of the PRF</span>
+<span class="sd">        center_col, center_row : float</span>
+<span class="sd">            Column and row coordinates of the center</span>
+<span class="sd">        scale_col, scale_row : float</span>
+<span class="sd">            Pixel scale in the column and row directions</span>
+<span class="sd">        rotation_angle : float</span>
+<span class="sd">            Rotation angle in radians</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        prf_model : 2D array</span>
+<span class="sd">            Two dimensional array representing the PRF values parametrized</span>
+<span class="sd">            by flux, centroids, widths, and rotation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cosa</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">rotation_angle</span><span class="p">)</span>
+        <span class="n">sina</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">rotation_angle</span><span class="p">)</span>
+
+        <span class="n">delta_col</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">col_coord</span> <span class="o">-</span> <span class="n">center_col</span>
+        <span class="n">delta_row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">row_coord</span> <span class="o">-</span> <span class="n">center_row</span>
+        <span class="n">delta_col</span><span class="p">,</span> <span class="n">delta_row</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">delta_col</span><span class="p">,</span> <span class="n">delta_row</span><span class="p">)</span>
+
+        <span class="n">rot_row</span> <span class="o">=</span> <span class="n">delta_row</span> <span class="o">*</span> <span class="n">cosa</span> <span class="o">-</span> <span class="n">delta_col</span> <span class="o">*</span> <span class="n">sina</span>
+        <span class="n">rot_col</span> <span class="o">=</span> <span class="n">delta_row</span> <span class="o">*</span> <span class="n">sina</span> <span class="o">+</span> <span class="n">delta_col</span> <span class="o">*</span> <span class="n">cosa</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">prf_model</span> <span class="o">=</span> <span class="n">flux</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">rot_row</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="o">*</span> <span class="n">scale_row</span><span class="p">,</span>
+                                                 <span class="n">rot_col</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="o">*</span> <span class="n">scale_col</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">prf_model</span></div>
+
+    <span class="k">def</span> <span class="nf">_read_prf_calibration_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">ext</span><span class="p">):</span>
+        <span class="n">prf_cal_file</span> <span class="o">=</span> <span class="n">pyfits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">prf_cal_file</span><span class="p">[</span><span class="n">ext</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>
+        <span class="c1"># looks like these data below are the same for all prf calibration files</span>
+        <span class="n">crval1p</span> <span class="o">=</span> <span class="n">prf_cal_file</span><span class="p">[</span><span class="n">ext</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;CRVAL1P&#39;</span><span class="p">]</span>
+        <span class="n">crval2p</span> <span class="o">=</span> <span class="n">prf_cal_file</span><span class="p">[</span><span class="n">ext</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;CRVAL2P&#39;</span><span class="p">]</span>
+        <span class="n">cdelt1p</span> <span class="o">=</span> <span class="n">prf_cal_file</span><span class="p">[</span><span class="n">ext</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;CDELT1P&#39;</span><span class="p">]</span>
+        <span class="n">cdelt2p</span> <span class="o">=</span> <span class="n">prf_cal_file</span><span class="p">[</span><span class="n">ext</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;CDELT2P&#39;</span><span class="p">]</span>
+        <span class="n">prf_cal_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">crval1p</span><span class="p">,</span> <span class="n">crval2p</span><span class="p">,</span> <span class="n">cdelt1p</span><span class="p">,</span> <span class="n">cdelt2p</span>
+
+    <span class="k">def</span> <span class="nf">_prepare_prf</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">n_hdu</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="n">min_prf_weight</span> <span class="o">=</span> <span class="mf">1e-6</span>
+        <span class="n">module</span><span class="p">,</span> <span class="n">output</span> <span class="o">=</span> <span class="n">channel_to_module_output</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">)</span>
+        <span class="c1"># determine suitable PRF calibration file</span>
+        <span class="k">if</span> <span class="n">module</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="n">prefix</span> <span class="o">=</span> <span class="s1">&#39;kplr0&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">prefix</span> <span class="o">=</span> <span class="s1">&#39;kplr&#39;</span>
+        <span class="n">prfs_url_path</span> <span class="o">=</span> <span class="s2">&quot;http://archive.stsci.edu/missions/kepler/fpc/prf/extracted/&quot;</span>
+        <span class="n">prffile</span> <span class="o">=</span> <span class="n">prfs_url_path</span> <span class="o">+</span> <span class="n">prefix</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">module</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">output</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_2011265_prf.fits&#39;</span>
+
+        <span class="c1"># read PRF images</span>
+        <span class="n">prfn</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_hdu</span>
+        <span class="n">crval1p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_hdu</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span>
+        <span class="n">crval2p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_hdu</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span>
+        <span class="n">cdelt1p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_hdu</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span>
+        <span class="n">cdelt2p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_hdu</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_hdu</span><span class="p">):</span>
+            <span class="n">prfn</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">crval1p</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">crval2p</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">cdelt1p</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">cdelt2p</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_prf_calibration_file</span><span class="p">(</span><span class="n">prffile</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">prfn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">prfn</span><span class="p">)</span>
+        <span class="n">PRFcol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">prfn</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span>
+        <span class="n">PRFrow</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">prfn</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span>
+        <span class="n">PRFcol</span> <span class="o">=</span> <span class="p">(</span><span class="n">PRFcol</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">PRFcol</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">cdelt1p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">PRFrow</span> <span class="o">=</span> <span class="p">(</span><span class="n">PRFrow</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">PRFrow</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">cdelt2p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># interpolate the calibrated PRF shape to the target position</span>
+        <span class="n">rowdim</span><span class="p">,</span> <span class="n">coldim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">prf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">prfn</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span>
+        <span class="n">prf_weight</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_hdu</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float32&#39;</span><span class="p">)</span>
+        <span class="n">ref_column</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">column</span> <span class="o">+</span> <span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="n">coldim</span>
+        <span class="n">ref_row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">row</span> <span class="o">+</span> <span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="n">rowdim</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_hdu</span><span class="p">):</span>
+            <span class="n">prf_weight</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">ref_column</span> <span class="o">-</span> <span class="n">crval1p</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span>
+                                     <span class="o">+</span> <span class="p">(</span><span class="n">ref_row</span> <span class="o">-</span> <span class="n">crval2p</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">prf_weight</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">min_prf_weight</span><span class="p">:</span>
+                <span class="n">prf_weight</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">min_prf_weight</span>
+            <span class="n">prf</span> <span class="o">+=</span> <span class="n">prfn</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="n">prf_weight</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+        <span class="n">prf</span> <span class="o">/=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">prf</span><span class="p">)</span> <span class="o">*</span> <span class="n">cdelt1p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">cdelt2p</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="c1"># location of the data image centered on the PRF image (in PRF pixel units)</span>
+        <span class="n">col_coord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column</span> <span class="o">+</span> <span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">column</span> <span class="o">+</span> <span class="n">coldim</span> <span class="o">+</span> <span class="o">.</span><span class="mi">5</span><span class="p">)</span>
+        <span class="n">row_coord</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">row</span> <span class="o">+</span> <span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">row</span> <span class="o">+</span> <span class="n">rowdim</span> <span class="o">+</span> <span class="o">.</span><span class="mi">5</span><span class="p">)</span>
+        <span class="c1"># x-axis correspond to row-axis in scipy.RectBivariate</span>
+        <span class="c1"># not to be confused with our convention, in which the</span>
+        <span class="c1"># x-axis correspond to the column-axis</span>
+        <span class="n">interpolate</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">interpolate</span><span class="o">.</span><span class="n">RectBivariateSpline</span><span class="p">(</span><span class="n">PRFrow</span><span class="p">,</span> <span class="n">PRFcol</span><span class="p">,</span> <span class="n">prf</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">col_coord</span><span class="p">,</span> <span class="n">row_coord</span><span class="p">,</span> <span class="n">interpolate</span>
+
+<div class="viewcode-block" id="KeplerPRF.plot"><a class="viewcode-back" href="../../api/prf.html#lightkurve.prf.KeplerPRF.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">pflux</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="o">*</span><span class="n">params</span><span class="p">)</span>
+        <span class="n">plot_image</span><span class="p">(</span><span class="n">pflux</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Kepler PRF Model, Channel: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">),</span>
+                   <span class="n">extent</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">column</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                           <span class="bp">self</span><span class="o">.</span><span class="n">row</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">row</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="SimpleKeplerPRF"><a class="viewcode-back" href="../../api/prf.html#lightkurve.prf.SimpleKeplerPRF">[docs]</a><span class="k">class</span> <span class="nc">SimpleKeplerPRF</span><span class="p">(</span><span class="n">KeplerPRF</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Simple model of KeplerPRF.</span>
+
+<span class="sd">    This class provides identical functionality as in KeplerPRF, except that</span>
+<span class="sd">    it is parametrized only by flux and center positions. The width scales</span>
+<span class="sd">    and angle are fixed to 1.0 and 0, respectivelly.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">center_col</span><span class="p">,</span> <span class="n">center_row</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">flux</span><span class="p">,</span> <span class="n">center_col</span><span class="p">,</span> <span class="n">center_row</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SimpleKeplerPRF.evaluate"><a class="viewcode-back" href="../../api/prf.html#lightkurve.prf.SimpleKeplerPRF.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">center_col</span><span class="p">,</span> <span class="n">center_row</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Interpolates the PRF model onto detector coordinates.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        flux : float</span>
+<span class="sd">            Total integrated flux of the PRF</span>
+<span class="sd">        center_col, center_row : float</span>
+<span class="sd">            Column and row coordinates of the center</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        prf_model : 2D array</span>
+<span class="sd">            Two dimensional array representing the PRF values parametrized</span>
+<span class="sd">            by flux and centroids.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">delta_col</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">col_coord</span> <span class="o">-</span> <span class="n">center_col</span>
+        <span class="n">delta_row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">row_coord</span> <span class="o">-</span> <span class="n">center_row</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prf_model</span> <span class="o">=</span> <span class="n">flux</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">delta_row</span><span class="p">,</span> <span class="n">delta_col</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">prf_model</span></div>
+
+<div class="viewcode-block" id="SimpleKeplerPRF.gradient"><a class="viewcode-back" href="../../api/prf.html#lightkurve.prf.SimpleKeplerPRF.gradient">[docs]</a>    <span class="k">def</span> <span class="nf">gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">center_col</span><span class="p">,</span> <span class="n">center_row</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function returns the gradient of the SimpleKeplerPRF model with</span>
+<span class="sd">        respect to flux, center_col, and center_row.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        flux : float</span>
+<span class="sd">            Total integrated flux of the PRF</span>
+<span class="sd">        center_col, center_row : float</span>
+<span class="sd">            Column and row coordinates of the center</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        grad_prf : list</span>
+<span class="sd">            Returns a list of arrays where the elements are the derivative</span>
+<span class="sd">            of the KeplerPRF model with respect to flux, center_col, and</span>
+<span class="sd">            center_row, respectively.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">delta_col</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">col_coord</span> <span class="o">-</span> <span class="n">center_col</span>
+        <span class="n">delta_row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">row_coord</span> <span class="o">-</span> <span class="n">center_row</span>
+
+        <span class="n">deriv_flux</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">delta_row</span><span class="p">,</span> <span class="n">delta_col</span><span class="p">)</span>
+        <span class="n">deriv_center_col</span> <span class="o">=</span> <span class="o">-</span> <span class="n">flux</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">delta_row</span><span class="p">,</span> <span class="n">delta_col</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">deriv_center_row</span> <span class="o">=</span> <span class="o">-</span> <span class="n">flux</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">delta_row</span><span class="p">,</span> <span class="n">delta_col</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">deriv_flux</span><span class="p">,</span> <span class="n">deriv_center_col</span><span class="p">,</span> <span class="n">deriv_center_row</span><span class="p">]</span></div></div>
+
+
+<div class="viewcode-block" id="get_initial_guesses"><a class="viewcode-back" href="../../api/prf.html#lightkurve.prf.get_initial_guesses">[docs]</a><span class="k">def</span> <span class="nf">get_initial_guesses</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ref_col</span><span class="p">,</span> <span class="n">ref_row</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the initial guesses for total flux, centers position, and PSF</span>
+<span class="sd">    width using the sample moments of the data.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : 2D array-like</span>
+<span class="sd">        Image data</span>
+<span class="sd">    ref_col, ref_row : scalars</span>
+<span class="sd">        Reference column and row (coordinates of the bottom left corner)</span>
+
+<span class="sd">    Return</span>
+<span class="sd">    ------</span>
+<span class="sd">    flux0, col0, row0, sigma0: floats</span>
+<span class="sd">        Inital guesses for flux, center position, and width</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">flux0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">yy</span><span class="p">,</span> <span class="n">xx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">indices</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span>
+    <span class="n">yy</span> <span class="o">=</span> <span class="n">ref_row</span> <span class="o">+</span> <span class="n">yy</span>
+    <span class="n">xx</span> <span class="o">=</span> <span class="n">ref_col</span> <span class="o">+</span> <span class="n">xx</span>
+    <span class="n">col0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">xx</span> <span class="o">*</span> <span class="n">data</span><span class="p">)</span> <span class="o">/</span> <span class="n">flux0</span>
+    <span class="n">row0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">yy</span> <span class="o">*</span> <span class="n">data</span><span class="p">)</span> <span class="o">/</span> <span class="n">flux0</span>
+    <span class="n">marg_col</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">col0</span> <span class="o">-</span> <span class="n">ref_col</span><span class="p">))]</span>
+    <span class="n">marg_row</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">row0</span> <span class="o">-</span> <span class="n">ref_row</span><span class="p">)),</span> <span class="p">:]</span>
+    <span class="n">sigma_y</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">marg_row</span><span class="o">.</span><span class="n">size</span><span class="p">)</span> <span class="o">-</span> <span class="n">row0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">marg_row</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="n">marg_row</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+    <span class="n">sigma_x</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">marg_col</span><span class="o">.</span><span class="n">size</span><span class="p">)</span> <span class="o">-</span> <span class="n">col0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">marg_col</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="n">marg_col</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+    <span class="n">sigma0</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">sigma_x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">sigma_y</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="mf">2.0</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">flux0</span><span class="p">,</span> <span class="n">col0</span><span class="p">,</span> <span class="n">row0</span><span class="p">,</span> <span class="n">sigma0</span></div>
+
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright lightkurve Developers and Contributors.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'1.0.0dev',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
