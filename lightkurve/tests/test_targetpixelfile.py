@@ -15,6 +15,12 @@ def test_tpf_shapes():
     assert tpf.flux.shape == tpf.flux_err.shape
 
 
+def test_tpf_plot():
+    """Sanity check to verify that tpf plotting works"""
+    tpf = KeplerTargetPixelFile(filename_tpf_one_center)
+    tpf.plot()
+
+
 def test_tpf_zeros():
     """Does the LightCurve of a zero-flux TPF make sense?"""
     tpf = KeplerTargetPixelFile(filename_tpf_all_zeros, quality_bitmask=None)
