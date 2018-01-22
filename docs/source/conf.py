@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# LightKurve documentation build configuration file, created by
+# lightkurve documentation build configuration file, created by
 # sphinx-quickstart on Thu May 11 16:52:07 2017.
 #
 # This file is execfile()d with the current directory set to its
@@ -141,7 +141,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'lightkurve.tex', 'LightKurve Documentation',
+    (master_doc, 'lightkurve.tex', 'lightkurve Documentation',
      'Kepler/K2 Guest Observer Office', 'manual'),
 ]
 
@@ -151,7 +151,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'lightkurve', 'LightKurve Documentation',
+    (master_doc, 'lightkurve', 'lightkurve Documentation',
      [author], 1)
 ]
 
@@ -162,7 +162,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'LightKurve', 'LightKurve Documentation',
+    (master_doc, 'lightkurve', 'lightkurve Documentation',
      author, 'Kepler/K2 Guest Observer Office',
      'A beautiful package for astronomical flux time series analysis in Python',
      'Miscellaneous'),
