@@ -394,7 +394,7 @@ class LightCurve(object):
         """
         try:
             import pandas as pd
-        # PyKE does not require pandas, so check for import success.
+        # lightkurve does not require pandas, so check for import success.
         except ImportError:
             raise ImportError("You need to install pandas to use the "
                               "LightCurve.to_pandas() method.")
