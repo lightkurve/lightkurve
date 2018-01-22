@@ -1,12 +1,12 @@
 ..
 
 ========================
-LightKurve Documentation
+lightkurve Documentation
 ========================
 
-Welcome to **LightKurve** documentation!
+Welcome to **lightkurve** documentation!
 
-**LightKurve** offers a user-friendly way to inspect and analyze astronomical
+**lightkurve** offers a user-friendly way to inspect and analyze astronomical
 flux time series data, in particular the pixels and lightcurves obtained by
 NASA's Kepler, K2, and TESS missions.
 
