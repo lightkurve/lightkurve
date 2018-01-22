@@ -35,7 +35,8 @@ With `lightkurve` installed, you can... TBC.
 Contributing
 ------------
 
-Users are welcome to open `issues <https://github.com/KeplerGO/PyKE/issues>`_ or `pull requests <https://github.com/KeplerGO/PyKE/pulls>`_.
+Users are welcome to open `issues <https://github.com/KeplerGO/lightkurve/issues>`_
+or `pull requests <https://github.com/KeplerGO/lightkurve/pulls>`_.
 You can also contact the development team via keplergo@mail.arc.nasa.gov
 
 
