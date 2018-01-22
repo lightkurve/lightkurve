@@ -51,6 +51,15 @@ def test_lightcurve_fold():
     assert_almost_equal(lc.fold(period=1, phase=-0.1).time[0], 0.1)
 
 
+def test_lightcurve_stitch():
+    """Test the ``LightCurve.stitch()`` method."""
+    lc = LightCurve(time=[1, 2, 3], flux=[1, .5, 1])
+    lc = lc.stitch(lc)
+
+    assert_array_equal(lc.flux, 2*[1, .5, 1])
+    assert_array_equal(lc.time, 2*[1, 2, 3])
+
+
 def test_lightcurve_plot():
     """Sanity check to verify that lightcurve plotting works"""
     lcf = KeplerLightCurveFile(TABBY_Q8)
