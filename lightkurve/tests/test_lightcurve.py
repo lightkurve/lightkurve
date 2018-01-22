@@ -51,6 +51,13 @@ def test_lightcurve_fold():
     assert_almost_equal(lc.fold(period=1, phase=-0.1).time[0], 0.1)
 
 
+def test_lightcurve_plot():
+    """Sanity check to verify that lightcurve plotting works"""
+    lcf = KeplerLightCurveFile(TABBY_Q8)
+    lcf.plot()
+    lcf.SAP_FLUX.plot()
+
+
 def test_cdpp():
     """Test the basics of the CDPP noise metric."""
     # A flat lightcurve should have a CDPP close to zero
