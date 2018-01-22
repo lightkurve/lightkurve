@@ -68,13 +68,6 @@ def test_cdpp_tabby():
     assert(np.abs(lc.cdpp() - lcf.header(ext=1)['CDPP6_0']) < 30)
 
 
-def test_lightcurve_plot():
-    """Sanity check to verify that lightcurve plotting works"""
-    lcf = KeplerLightCurveFile(TABBY_Q8)
-    lcf.plot()
-    lcf.SAP_FLUX.plot()
-
-
 def test_sff_corrector():
     """Does our code agree with the example presented in Vanderburg
     and Jhonson (2014)?"""
