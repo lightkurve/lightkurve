@@ -19,6 +19,7 @@ def test_tpf_plot():
     """Sanity check to verify that tpf plotting works"""
     tpf = KeplerTargetPixelFile(filename_tpf_one_center)
     tpf.plot()
+    tpf.plot(aperture_mask=tpf.pipeline_mask)
 
 
 def test_tpf_zeros():
