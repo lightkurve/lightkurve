@@ -3,6 +3,7 @@ import numpy as np
 from numpy.testing import (assert_almost_equal, assert_array_equal,
                            assert_allclose)
 from astropy.utils.data import get_pkg_data_filename
+from astropy.io import fits as pyfits
 from ..lightcurve import (LightCurve, KeplerCBVCorrector, KeplerLightCurveFile,
                           SFFCorrector, KeplerLightCurve, box_period_search)
 
@@ -25,13 +26,15 @@ def test_kepler_cbv_fit():
 
 
 def test_KeplerLightCurve():
-    lcf = KeplerLightCurveFile(TABBY_Q8)
+    lcf = KeplerLightCurveFile(TABBY_Q8, quality_bitmask=None)
+    hdu = pyfits.open(TABBY_Q8)
     kplc = lcf.get_lightcurve('SAP_FLUX')
 
     assert kplc.channel == lcf.channel
     assert kplc.campaign is None
     assert kplc.quarter == lcf.quarter
     assert kplc.mission == 'Kepler'
+    assert_array_equal(kplc.time, hdu[1].data['TIME'])
 
 
 @pytest.mark.parametrize("quality_bitmask, answer", [('hardest', 2661),
@@ -106,6 +109,10 @@ def test_sff_corrector():
                                centroid_col=centroid_col,
                                centroid_row=centroid_row,
                                niters=1)
+    # do hidden plots execute smoothly?
+    ax = sff._plot_rotated_centroids()
+    ax = sff._plot_normflux_arclength()
+
     # the factor self.bspline(time-time[0]) accounts for
     # the long term trend which is divided out in order to get a "flat"
     # lightcurve.
@@ -150,7 +157,7 @@ def test_box_period_search():
     answer = 0.837
     klc = KeplerLightCurveFile(KEPLER10)
     pdc = klc.PDCSAP_FLUX
-    flat = pdc.flatten()
+    flat, trend = pdc.flatten(return_trend=True)
 
     _, _, kepler10b_period = box_period_search(flat, min_period=.5,
                                                max_period=1, nperiods=100)
