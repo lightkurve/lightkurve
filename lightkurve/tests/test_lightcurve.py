@@ -154,7 +154,7 @@ def test_normalize():
 
 def test_box_period_search():
     """Can we recover the orbital period of Kepler-10b?"""
-    answer = 0.837
+    answer = 0.837495 # wikipedia
     klc = KeplerLightCurveFile(KEPLER10)
     pdc = klc.PDCSAP_FLUX
     flat, trend = pdc.flatten(return_trend=True)

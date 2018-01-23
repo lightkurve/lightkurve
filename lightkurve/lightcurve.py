@@ -1121,7 +1121,7 @@ class SPLDCorrector(object):
 
 
 def box_period_search(lc, min_period=0.5, max_period=30, nperiods=2000,
-                      prior=None):
+                      prior=None, period_scale='linear'):
     """
     Implements a brute force search to find transit-like periodic events.
     This function fits a "box" model defined as:
@@ -1157,6 +1157,10 @@ def box_period_search(lc, min_period=0.5, max_period=30, nperiods=2000,
         Prior probability on the parameters of the box function,
         namely, `amplitude`, `depth`, `to` (time of the first discontinuity),
         and `width`.
+    period_scale : str
+        Type of the scale used to create the grid of periods between `min_period`
+        and `max_period` used to search for the best period.
+        Options are 'linear' or 'log'.
 
     Returns
     -------
@@ -1177,16 +1181,24 @@ def box_period_search(lc, min_period=0.5, max_period=30, nperiods=2000,
         t = np.linspace(-.5, .5, len(lc.time))
         val = np.zeros(len(lc.time))
         val[t < to] = amplitude
-        val[(t >= to) * (t < to + width)] = amplitude - depth
-        val[t >= to + width] = amplitude
+        val[(t == to) + (t == to + width)] = amplitude - .5 * depth
+        val[(t > to) * (t < to + width)] = amplitude - depth
+        val[t > to + width] = amplitude
         return val
 
     if prior is None:
-        prior = oktopus.UniformPrior(lb=[0.9, 0., -.4, 0.],
-                                     ub=[1.15, .5, .5, .3])
+        prior = oktopus.UniformPrior(lb=[0.98, 0., -.4, 0.],
+                                     ub=[1.02, .1, .5, .2])
     lc = lc.normalize()
     log_posterior = []
-    trial_periods = np.linspace(min_period, max_period, nperiods)
+
+    if period_scale == 'linear':
+        trial_periods = np.linspace(min_period, max_period, nperiods)
+    elif period_scale == 'log':
+        trial_periods = np.logspace(np.log10(min_period), np.log10(max_period), nperiods)
+    else:
+        raise ValueError("period_scale must be one of {}. Got {}."
+                         .format("{'linear', 'log'}", period_scale))
     for p in tqdm(trial_periods):
         folded = lc.fold(period=p)
         # var should be set to the uncertainty in the data point
