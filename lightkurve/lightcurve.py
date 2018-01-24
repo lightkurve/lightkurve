@@ -2,6 +2,7 @@ import copy
 import numpy as np
 import oktopus
 from scipy import linalg, signal, interpolate
+from scipy.optimize import minimize
 from astropy.io import fits as pyfits
 from astropy.stats import sigma_clip
 from astropy.table import Table
@@ -1174,16 +1175,15 @@ def box_period_search(lc, min_period=0.5, max_period=30, nperiods=2000,
         Best period.
     """
 
+    t = np.linspace(-.5, .5, len(lc.time))
+    val = np.zeros(len(lc.time))
     def box(amplitude, depth, to, width):
         """A simple box function defined in the interval [-.5, .5].
         `to` is the time of the first discontinuity.
         """
-        t = np.linspace(-.5, .5, len(lc.time))
-        val = np.zeros(len(lc.time))
         val[t < to] = amplitude
-        val[(t == to) + (t == to + width)] = amplitude - .5 * depth
-        val[(t > to) * (t < to + width)] = amplitude - depth
-        val[t > to + width] = amplitude
+        val[(t >= to) * (t < to + width)] = amplitude - depth
+        val[t >= to + width] = amplitude
         return val
 
     if prior is None:
@@ -1210,3 +1210,37 @@ def box_period_search(lc, min_period=0.5, max_period=30, nperiods=2000,
         log_posterior.append(-res.fun)
 
     return log_posterior, trial_periods, trial_periods[np.argmax(log_posterior)]
+
+
+def fast_box_period_search(lc, niters=5, min_period=0.5, max_period=30, nperiods=2000,
+                           period_scale='linear'):
+
+    data = lc.flux
+    t = np.linspace(-.5, .5, len(lc.time))
+
+    def lnlikelihood(args, amplitude=1, depth=.001):
+        to, width = args
+        ll = ((data - amplitude) ** 2 * ((t < to) + (t >= to + width))
+              + (data - (amplitude - depth)) ** 2 * ((t >= to) * (t < to + width)))
+        return np.nansum(ll)
+
+    def opt_amplitude(width, depth, data):
+        return width * depth + np.nanmean(data)
+
+    def opt_depth(to, width, data):
+        n = len(data)
+        m = np.nanmean(data)
+        w_range = (t < to + width) * (t >= to)
+        len_w = np.sum(w_range)
+        s = np.nansum(data * w_range) / len_w
+        return (m - s) * (1 - width)
+
+    for i in range(niters):
+        to_star, width_star = .2, .1
+        depth_star = opt_depth(to_star, width_star, data)
+        amplitude_star = opt_amplitude(width_star, depth_star, data)
+        res = minimize(lnlikelihood, x0=(to_star, width_star),
+                                       args=(amplitude_star, depth_star), method='powell')
+        to_star, width_star = res.x
+
+    return amplitude_star, depth_star, to_star, width_star
