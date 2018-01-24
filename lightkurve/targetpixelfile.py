@@ -105,6 +105,20 @@ class KeplerTargetPixelFile(TargetPixelFile):
         return self.header()['OUTPUT']
 
     @property
+    def ra(self):
+        try:
+            return self.header()['RA_OBJ']
+        except KeyError:
+            return None
+
+    @property
+    def dec(self):
+        try:
+            return self.header()['DEC_OBJ']
+        except KeyError:
+            return None
+
+    @property
     def column(self):
         return self.hdu['TARGETTABLES'].header['1CRV5P']
 
