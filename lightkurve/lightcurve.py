@@ -1174,16 +1174,14 @@ def box_period_search(lc, min_period=0.5, max_period=30, nperiods=2000,
         Best period.
     """
 
+    t = np.linspace(-.5, .5, len(lc.time))
     def box(amplitude, depth, to, width):
         """A simple box function defined in the interval [-.5, .5].
         `to` is the time of the first discontinuity.
         """
-        t = np.linspace(-.5, .5, len(lc.time))
-        val = np.zeros(len(lc.time))
-        val[t < to] = amplitude
+        val = amplitude * np.ones(len(lc.time))
         val[(t == to) + (t == to + width)] = amplitude - .5 * depth
         val[(t > to) * (t < to + width)] = amplitude - depth
-        val[t > to + width] = amplitude
         return val
 
     if prior is None:
