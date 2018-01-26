@@ -1,5 +1,5 @@
-import warnings
 import numpy as np
+import warnings
 import scipy
 import matplotlib.pyplot as plt
 from matplotlib import patches
@@ -51,12 +51,29 @@ class KeplerTargetPixelFile(TargetPixelFile):
         http://archive.stsci.edu/kepler/manuals/archive_manual.pdf
     """
 
+
     def __init__(self, path, quality_bitmask=KeplerQualityFlags.DEFAULT_BITMASK,
                  **kwargs):
         self.path = path
         self.hdu = fits.open(self.path, **kwargs)
         self.quality_bitmask = quality_bitmask
         self.quality_mask = self._quality_mask(quality_bitmask)
+
+    @property
+    def hdu(self):
+        return self._hdu
+
+    @hdu.setter
+    def hdu(self, value, keys=['FLUX', 'QUALITY']):
+        '''Raises a ValueError exception if value does not appear to be a Target Pixel File.
+        '''
+        for key in keys:
+            if ~(np.any([value[1].header[ttype] == key
+                for ttype in value[1].header['TTYPE*']])):
+                raise ValueError("File {} does not have a {} column, "
+                         "is this a target pixel file?".format(self.path, key))
+        else:
+            self._hdu = value
 
     def _quality_mask(self, bitmask):
         """Returns a boolean mask which flags all good-quality cadences.

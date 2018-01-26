@@ -531,6 +531,22 @@ class KeplerLightCurveFile(object):
         self.quality_bitmask = quality_bitmask
         self.quality_mask = self._quality_mask(quality_bitmask)
 
+    @property
+    def hdu(self):
+        return self._hdu
+
+    @hdu.setter
+    def hdu(self, value, keys=['SAP_FLUX', 'SAP_QUALITY']):
+        '''Raises a ValueError exception if value does not appear to be a Light Curve file.
+        '''
+        for key in keys:
+            if ~(np.any([value[1].header[ttype] == key
+                for ttype in value[1].header['TTYPE*']])):
+                raise ValueError("File {} does not have a {} column, "
+                         "is this a light curve file?".format(self.path, key))
+        else:
+            self._hdu = value
+
     def get_lightcurve(self, flux_type, centroid_type='MOM_CENTR'):
         if flux_type in self._flux_types():
             return KeplerLightCurve(self.hdu[1].data['TIME'][self.quality_mask],
@@ -1177,13 +1193,15 @@ def box_period_search(lc, min_period=0.5, max_period=30, nperiods=2000,
 
     t = np.linspace(-.5, .5, len(lc.time))
     val = np.zeros(len(lc.time))
+
     def box(amplitude, depth, to, width):
         """A simple box function defined in the interval [-.5, .5].
         `to` is the time of the first discontinuity.
         """
-        val[t < to] = amplitude
-        val[(t >= to) * (t < to + width)] = amplitude - depth
-        val[t >= to + width] = amplitude
+        out_of_transit = (t < to) + (t >= to + width)
+        in_transit = np.logical_not(out_of_transit)
+        val[out_of_transit] = amplitude
+        val[in_transit] = amplitude - depth
         return val
 
     if prior is None:
