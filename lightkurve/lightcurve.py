@@ -1212,23 +1212,26 @@ def box_period_search(lc, min_period=0.5, max_period=30, nperiods=2000,
     return log_posterior, trial_periods, trial_periods[np.argmax(log_posterior)]
 
 
-def fast_box_period_search(lc, niters=5, min_period=0.5, max_period=30, nperiods=2000,
+def fast_box_period_search(lc, niters=2, min_period=0.5, max_period=30, nperiods=2000,
                            period_scale='linear'):
 
     t = np.linspace(-.5, .5, len(lc.time))
+    prior_to = oktopus.prior.UniformPrior(lb=-.5, ub=.5)
+    prior_width = oktopus.prior.UniformPrior(lb=.05, ub=.2)
+    m, n = np.nanmean(lc.flux), len(lc.flux)
 
     def lnlikelihood(args, amplitude=None, depth=None, data=None):
         to, width = args
-        ll = ((data - amplitude) ** 2 * ((t < to) + (t >= to + width))
-              + (data - (amplitude - depth)) ** 2 * ((t >= to) * (t < to + width)))
-        return np.nansum(ll)
+        out_of_transit = (t < to) + (t >= to + width)
+        in_transit = np.logical_not(out_of_transit)
+        ll = ((data - amplitude) ** 2 * out_of_transit
+              + (data - (amplitude - depth)) ** 2 * in_transit)
+        return np.nansum(ll) + prior_to(to) + prior_width(width)
 
-    def opt_amplitude(width, depth, data):
-        return width * depth + np.nanmean(data)
+    def opt_amplitude(width, depth):
+        return width * depth + m
 
     def opt_depth(to, width, data):
-        n = len(data)
-        m = np.nanmean(data)
         w_range = (t < to + width) * (t >= to)
         len_w = np.sum(w_range)
         s = np.nansum(data * w_range) / len_w
@@ -1245,20 +1248,19 @@ def fast_box_period_search(lc, niters=5, min_period=0.5, max_period=30, nperiods
     log_likelihood = []
     for p in tqdm(trial_periods):
         folded = lc.fold(period=p)
+        amplitude_star, depth_star = 1., 1e-4
         width_star = .1
-
-        if np.mean(folded.flux[t < .0]) > np.mean(folded.flux[t > 0]):
-            to_star = -.2
+        if np.nanmean(folded.flux[t < 0]) > np.nanmean(folded.flux[t > 0]):
+            to_star = .25
         else:
-            to_star = .2
-
+            to_star = -.25
         for i in range(niters):
-            depth_star = opt_depth(to_star, width_star, folded.flux)
-            amplitude_star = opt_amplitude(width_star, depth_star, folded.flux)
             res = minimize(lnlikelihood, x0=(to_star, width_star),
                            args=(amplitude_star, depth_star, folded.flux), method='powell',
                            options={'ftol':1e-9, 'xtol':1e-9, 'maxfev': 2000})
             to_star, width_star = res.x
+            depth_star = opt_depth(to_star, width_star, folded.flux)
+            amplitude_star = opt_amplitude(width_star, depth_star)
         log_likelihood.append(-res.fun)
 
     return log_likelihood, trial_periods, trial_periods[np.argmax(log_likelihood)]
