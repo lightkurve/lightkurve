@@ -27,10 +27,9 @@ def test_kepler_cbv_fit():
 
 def test_load_bad_file():
     '''Test if a TPF can be opened without exception.'''
-    try:
+    with pytest.raises(ValueError) as exc:
         lcf = KeplerLightCurveFile(TABBY_TPF)
-    except ValueError:
-        assert True
+    assert('is this a light curve file?' in exc.value.args[0])
 
 def test_KeplerLightCurve():
     lcf = KeplerLightCurveFile(TABBY_Q8, quality_bitmask=None)

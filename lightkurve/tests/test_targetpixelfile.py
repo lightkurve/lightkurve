@@ -11,10 +11,9 @@ TABBY_Q8 = ("https://archive.stsci.edu/missions/kepler/lightcurves"
 
 def test_load_bad_file():
     '''Test if a light curve can be opened without exception.'''
-    try:
+    with pytest.raises(ValueError) as exc:
         tpf = KeplerTargetPixelFile(TABBY_Q8)
-    except ValueError:
-        assert True
+    assert('is this a target pixel file?' in exc.value.args[0])
 
 def test_tpf_shapes():
     """Are the data array shapes of the TargetPixelFile object consistent?"""
