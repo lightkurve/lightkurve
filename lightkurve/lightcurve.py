@@ -42,6 +42,9 @@ class LightCurve(object):
             self.flux_err = np.nan * np.ones_like(self.time)
         self.meta = meta
 
+    def __repr__(self):
+        return('LightCurve Object')
+
     def stitch(self, *others):
         """
         Stitches LightCurve objects.
@@ -472,6 +475,9 @@ class KeplerLightCurve(LightCurve):
         self.cadenceno = cadenceno
         self.keplerid = keplerid
 
+    def __repr__(self):
+        return('KeplerLightCurve Object (ID: {})'.format(self.keplerid))
+
     def correct(self, method='sff', **kwargs):
         """Corrects a lightcurve for motion-dependent systematic errors.
 
@@ -529,6 +535,9 @@ class KeplerLightCurveFile(object):
         self.hdu = pyfits.open(self.path, **kwargs)
         self.quality_bitmask = quality_bitmask
         self.quality_mask = self._quality_mask(quality_bitmask)
+
+    def __repr__(self):
+        return('KeplerLightCurveFile Object (ID: {})'.format(self.hdu[0].header['KEPLERID']))
 
     @property
     def hdu(self):
