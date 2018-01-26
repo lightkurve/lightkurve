@@ -1215,10 +1215,9 @@ def box_period_search(lc, min_period=0.5, max_period=30, nperiods=2000,
 def fast_box_period_search(lc, niters=5, min_period=0.5, max_period=30, nperiods=2000,
                            period_scale='linear'):
 
-    data = lc.flux
     t = np.linspace(-.5, .5, len(lc.time))
 
-    def lnlikelihood(args, amplitude=1, depth=.001):
+    def lnlikelihood(args, amplitude=None, depth=None, data=None):
         to, width = args
         ll = ((data - amplitude) ** 2 * ((t < to) + (t >= to + width))
               + (data - (amplitude - depth)) ** 2 * ((t >= to) * (t < to + width)))
@@ -1233,14 +1232,33 @@ def fast_box_period_search(lc, niters=5, min_period=0.5, max_period=30, nperiods
         w_range = (t < to + width) * (t >= to)
         len_w = np.sum(w_range)
         s = np.nansum(data * w_range) / len_w
-        return (m - s) * (1 - width)
+        return (m - s) / (1 - width)
 
-    for i in range(niters):
-        to_star, width_star = .2, .1
-        depth_star = opt_depth(to_star, width_star, data)
-        amplitude_star = opt_amplitude(width_star, depth_star, data)
-        res = minimize(lnlikelihood, x0=(to_star, width_star),
-                                       args=(amplitude_star, depth_star), method='powell')
-        to_star, width_star = res.x
+    if period_scale == 'linear':
+        trial_periods = np.linspace(min_period, max_period, nperiods)
+    elif period_scale == 'log':
+        trial_periods = np.logspace(np.log10(min_period), np.log10(max_period), nperiods)
+    else:
+        raise ValueError("period_scale must be one of {}. Got {}."
+                         .format("{'linear', 'log'}", period_scale))
 
-    return amplitude_star, depth_star, to_star, width_star
+    log_likelihood = []
+    for p in tqdm(trial_periods):
+        folded = lc.fold(period=p)
+        width_star = .1
+
+        if np.mean(folded.flux[t < .0]) > np.mean(folded.flux[t > 0]):
+            to_star = -.2
+        else:
+            to_star = .2
+
+        for i in range(niters):
+            depth_star = opt_depth(to_star, width_star, folded.flux)
+            amplitude_star = opt_amplitude(width_star, depth_star, folded.flux)
+            res = minimize(lnlikelihood, x0=(to_star, width_star),
+                           args=(amplitude_star, depth_star, folded.flux), method='powell',
+                           options={'ftol':1e-9, 'xtol':1e-9, 'maxfev': 2000})
+            to_star, width_star = res.x
+        log_likelihood.append(-res.fun)
+
+    return log_likelihood, trial_periods, trial_periods[np.argmax(log_likelihood)]
