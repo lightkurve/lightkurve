@@ -1138,21 +1138,14 @@ class SPLDCorrector(object):
 
 
 def box_period_search(lc, min_period=0.5, max_period=30, nperiods=2000,
-                      prior=None, period_scale='linear'):
+                      prior=None, period_scale='log'):
     """
     Implements a brute force search to find transit-like periodic events.
     This function fits a "box" model defined as:
 
     .. math::
 
-        \Pi (t) =
-            \left\{
-                \begin{array}{ll}
-                    a, & t < t_o,\\
-                    a - d, & t_o \leq t < t_o + w, \\
-                    a, & t \geq t_o + w
-                \end{array}
-            \right.
+        \Pi (t) = h - d\cdot \mathbb{I}(t_0 \leq t_i \leq t_0 + w)
 
     to a list of `nperiods` periods between `min_period` and `max_period`.
     It's assumed that the best period is the one that maximizes the posterior
@@ -1231,7 +1224,58 @@ def box_period_search(lc, min_period=0.5, max_period=30, nperiods=2000,
 
 
 def fast_box_period_search(lc, niters=2, min_period=0.5, max_period=30, nperiods=2000,
-                           period_scale='linear'):
+                           period_scale='log'):
+    """
+    Implements a routine to find box-like transit events.
+    This function fits a "box" model defined as:
+
+    .. math::
+
+        \Pi (t) = h - d\cdot \mathbb{I}(t_0 \leq t_i \leq t_0 + w)
+
+    in which :math:`\mathbb{I}` is the indicator function.
+
+    It turns out that, in a iid Gaussian noise setting, the parameters
+    :math:`h` and :math:`d`, respectively, the amplitude and the depth
+    of the box, can be solved analytically.
+
+    Hence, this function iterates between two procedures:
+    (i) compute :math:`h` and :math:`d` for given :math:`t_0` and :math:`w`
+    (ii) numerically optimize for :math:`t_0` and :math:`w` given :math:`h`
+    and :math:`d`.
+
+    This procedure is done to a list of `nperiods` periods between `min_period`
+    and `max_period`. It's assumed that the best period is the one that
+    maximizes the posterior probability of the fit.
+
+    Parameters
+    ----------
+    lc : LightCurve object
+        An object from KeplerLightCurve or LightCurve.
+        Note that flattening the lightcurve beforehand does aid the quest
+        for the transit period.
+    min_period : float
+        Minimum period to search for. Units must be the same as `lc.time`.
+    max_period : float
+        Maximum period to search for. Units must be the same as `lc.time`.
+    nperiods : int
+        Number of periods to search between `min_period` and `max_period`.
+    period_scale : str
+        Type of the scale used to create the grid of periods between `min_period`
+        and `max_period` used to search for the best period.
+        Options are 'linear' or 'log'.
+
+    Returns
+    -------
+    log_posterior : list
+        Log posterior (up to an additive constant) of the fit. The "best"
+        period is therefore the one that maximizes the log posterior
+        probability.
+    trial_periods : numpy array
+        List of trial periods.
+    best_period : float
+        Best period.
+    """
 
     t = np.linspace(-.5, .5, len(lc.time))
     prior_to = oktopus.prior.UniformPrior(lb=-.5, ub=.5)
