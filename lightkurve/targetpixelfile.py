@@ -56,17 +56,23 @@ class KeplerTargetPixelFile(TargetPixelFile):
                  **kwargs):
         self.path = path
         self.hdu = fits.open(self.path, **kwargs)
-        self._test_file()
         self.quality_bitmask = quality_bitmask
         self.quality_mask = self._quality_mask(quality_bitmask)
 
-    def _test_file(self, keys=['FLUX', 'QUALITY']):
-        """Tests if the file has FLUX and QUALITY data.
-        """
+    @property
+    def hdu(self):
+        return self._hdu
+
+    @hdu.setter
+    def hdu(self, value, keys=['FLUX','QUALITY']):
+        '''Raises a ValueError exception if self.hdu does not appear to be a Target Pixel File.
+        '''
         for key in keys:
-            if ~(np.any([self.hdu[1].header[ttype] == key for ttype in self.hdu[1].header['TTYPE*']])):
-                raise ValueError("File {} does not have a {} extension, "
+            if ~(np.any([value[1].header[ttype] == key for ttype in value[1].header['TTYPE*']])):
+                raise ValueError("File {} does not have a {} column, "
                          "is this a target pixel file?".format(self.path, key))
+        else:
+            self._hdu = value
 
     def _quality_mask(self, bitmask):
         """Returns a boolean mask which flags all good-quality cadences.
