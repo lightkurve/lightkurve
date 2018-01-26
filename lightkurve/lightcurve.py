@@ -1232,9 +1232,8 @@ def fast_box_period_search(lc, niters=2, min_period=0.5, max_period=30, nperiods
         return width * depth + m
 
     def opt_depth(to, width, data):
-        w_range = (t < to + width) * (t >= to)
-        len_w = np.sum(w_range)
-        s = np.nansum(data * w_range) / len_w
+        in_transit = (t < to + width) * (t >= to)
+        s = np.nanmean(data[in_transit])
         return (m - s) / (1 - width)
 
     if period_scale == 'linear':

@@ -166,7 +166,7 @@ def test_box_period_search():
 
     _, _, kepler10b_period = fast_box_period_search(flat, min_period=.5, max_period=1,
                                                     nperiods=100, period_scale='log')
-    assert abs(kepler10b_period - answer) < 1e-3
+    assert abs(kepler10b_period - answer) < 1e-2
 
 
 
