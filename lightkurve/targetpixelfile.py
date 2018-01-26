@@ -64,11 +64,12 @@ class KeplerTargetPixelFile(TargetPixelFile):
         return self._hdu
 
     @hdu.setter
-    def hdu(self, value, keys=['FLUX','QUALITY']):
+    def hdu(self, value, keys=['FLUX', 'QUALITY']):
         '''Raises a ValueError exception if value does not appear to be a Target Pixel File.
         '''
         for key in keys:
-            if ~(np.any([value[1].header[ttype] == key for ttype in value[1].header['TTYPE*']])):
+            if ~(np.any([value[1].header[ttype] == key
+                for ttype in value[1].header['TTYPE*']])):
                 raise ValueError("File {} does not have a {} column, "
                          "is this a target pixel file?".format(self.path, key))
         else:
