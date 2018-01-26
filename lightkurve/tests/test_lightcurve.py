@@ -10,7 +10,8 @@ from ..lightcurve import (LightCurve, KeplerCBVCorrector, KeplerLightCurveFile,
 # 8th Quarter of Tabby's star
 TABBY_Q8 = ("https://archive.stsci.edu/missions/kepler/lightcurves"
             "/0084/008462852/kplr008462852-2011073133259_llc.fits")
-
+TABBY_TPF = ("https://archive.stsci.edu/missions/kepler/target_pixel_files"
+            "/0084/008462852/kplr008462852-2011073133259_lpd-targ.fits.gz")
 KEPLER10 = ("https://archive.stsci.edu/missions/kepler/lightcurves/"
             "0119/011904151/kplr011904151-2010009091648_llc.fits")
 
@@ -24,6 +25,12 @@ def test_kepler_cbv_fit():
     cbv_lcf = lcf.compute_cotrended_lightcurve()
     assert_almost_equal(cbv_lc.flux, cbv_lcf.flux)
 
+def test_load_bad_file():
+    '''Test if a TPF can be opened without exception.'''
+    try:
+        lcf = KeplerLightCurveFile(TABBY_TPF)
+    except ValueError:
+        assert True
 
 def test_KeplerLightCurve():
     lcf = KeplerLightCurveFile(TABBY_Q8, quality_bitmask=None)
