@@ -533,11 +533,12 @@ class KeplerLightCurveFile(object):
                  **kwargs):
         self.path = path
         self.hdu = pyfits.open(self.path, **kwargs)
+        self.keplerid = self.hdu[0].header['KEPLERID']
         self.quality_bitmask = quality_bitmask
         self.quality_mask = self._quality_mask(quality_bitmask)
 
     def __repr__(self):
-        return('KeplerLightCurveFile Object (ID: {})'.format(self.hdu[0].header['KEPLERID']))
+        return('KeplerLightCurveFile Object (ID: {})'.format(self.keplerid))
 
     @property
     def hdu(self):
