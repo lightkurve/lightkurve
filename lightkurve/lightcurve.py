@@ -536,7 +536,7 @@ class KeplerLightCurveFile(object):
 
     @hdu.setter
     def hdu(self, value, keys=['SAP_FLUX','SAP_QUALITY']):
-        '''Raises a ValueError exception if self.hdu does not appear to be a Target Pixel File.
+        '''Raises a ValueError exception if value does not appear to be a Light Curve file.
         '''
         for key in keys:
             if ~(np.any([value[1].header[ttype] == key for ttype in value[1].header['TTYPE*']])):

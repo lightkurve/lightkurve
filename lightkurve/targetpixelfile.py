@@ -65,7 +65,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
     @hdu.setter
     def hdu(self, value, keys=['FLUX','QUALITY']):
-        '''Raises a ValueError exception if self.hdu does not appear to be a Target Pixel File.
+        '''Raises a ValueError exception if value does not appear to be a Target Pixel File.
         '''
         for key in keys:
             if ~(np.any([value[1].header[ttype] == key for ttype in value[1].header['TTYPE*']])):
