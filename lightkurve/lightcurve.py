@@ -544,7 +544,7 @@ class KeplerLightCurveFile(object):
                                     quarter=self.quarter,
                                     mission=self.mission,
                                     cadenceno=self.cadenceno,
-                                    keplerid=self.hdu[0].header['KEPLERID'])
+                                    keplerid=self.keplerid)
         else:
             raise KeyError("{} is not a valid flux type. Available types are: {}".
                            format(flux_type, self._flux_types))
@@ -592,6 +592,10 @@ class KeplerLightCurveFile(object):
     def channel(self):
         """Channel number"""
         return self.header(ext=0)['CHANNEL']
+
+    @property
+    def keplerid(self):
+        return self.header()['KEPLERID']
 
     @property
     def quarter(self):
