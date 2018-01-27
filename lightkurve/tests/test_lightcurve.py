@@ -55,9 +55,14 @@ def test_bitmasking(quality_bitmask, answer):
 
 def test_lightcurve_fold():
     """Test the ``LightCurve.fold()`` method."""
-    lc = LightCurve(time=[1, 2, 3], flux=[1, 1, 1])
-    assert_almost_equal(lc.fold(period=1).time[0], 0)
-    assert_almost_equal(lc.fold(period=1, phase=-0.1).time[0], 0.1)
+    lcf = KeplerLightCurveFile(TABBY_Q8, quality_bitmask=None)
+    lc = lcf.PDCSAP_FLUX.remove_nans()
+    fold = lc.fold(period=1)
+    assert_almost_equal(fold.time[0], -0.5, 2)
+    fold = lc.fold(period=1, phase=-0.1)
+    assert_almost_equal(np.min(fold.time), -0.5, 2)
+    assert_almost_equal(np.max(fold.time), 0.5, 2)
+    assert_almost_equal(fold.time[np.argmin(fold.flux)], 0.319, 2)
 
 
 def test_lightcurve_stitch():
