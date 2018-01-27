@@ -1182,6 +1182,11 @@ def box_period_search(lc, min_period=0.5, max_period=30, nperiods=2000,
         List of trial periods.
     best_period : float
         Best period.
+
+    Notes
+    -----
+    This function is experimental. Changes may be made in both its signature
+    and implementation.
     """
 
     t = np.linspace(-.5, .5, len(lc.time))
@@ -1275,6 +1280,11 @@ def fast_box_period_search(lc, niters=2, min_period=0.5, max_period=30, nperiods
         List of trial periods.
     best_period : float
         Best period.
+
+    Notes
+    -----
+    This function is experimental. Changes may be made in both its signature
+    and implementation.
     """
 
     t = np.linspace(-.5, .5, len(lc.time))
