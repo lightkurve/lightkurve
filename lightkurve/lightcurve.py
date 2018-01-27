@@ -472,6 +472,9 @@ class KeplerLightCurve(LightCurve):
         self.cadenceno = cadenceno
         self.keplerid = keplerid
 
+    def __repr__(self):
+        return('KeplerLightCurve Object (ID: {})'.format(self.keplerid))
+
     def correct(self, method='sff', **kwargs):
         """Corrects a lightcurve for motion-dependent systematic errors.
 
@@ -527,8 +530,28 @@ class KeplerLightCurveFile(object):
                  **kwargs):
         self.path = path
         self.hdu = pyfits.open(self.path, **kwargs)
+        self.keplerid = self.hdu[0].header['KEPLERID']
         self.quality_bitmask = quality_bitmask
         self.quality_mask = self._quality_mask(quality_bitmask)
+
+    def __repr__(self):
+        return('KeplerLightCurveFile Object (ID: {})'.format(self.keplerid))
+
+    @property
+    def hdu(self):
+        return self._hdu
+
+    @hdu.setter
+    def hdu(self, value, keys=['SAP_FLUX', 'SAP_QUALITY']):
+        '''Raises a ValueError exception if value does not appear to be a Light Curve file.
+        '''
+        for key in keys:
+            if ~(np.any([value[1].header[ttype] == key
+                for ttype in value[1].header['TTYPE*']])):
+                raise ValueError("File {} does not have a {} column, "
+                         "is this a light curve file?".format(self.path, key))
+        else:
+            self._hdu = value
 
     def get_lightcurve(self, flux_type, centroid_type='MOM_CENTR'):
         if flux_type in self._flux_types():
