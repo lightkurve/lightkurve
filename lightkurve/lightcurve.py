@@ -472,6 +472,9 @@ class KeplerLightCurve(LightCurve):
         self.cadenceno = cadenceno
         self.keplerid = keplerid
 
+    def __repr__(self):
+        return('KeplerLightCurve Object (ID: {})'.format(self.keplerid))
+
     def correct(self, method='sff', **kwargs):
         """Corrects a lightcurve for motion-dependent systematic errors.
 
@@ -527,8 +530,12 @@ class KeplerLightCurveFile(object):
                  **kwargs):
         self.path = path
         self.hdu = pyfits.open(self.path, **kwargs)
+        self.keplerid = self.hdu[0].header['KEPLERID']
         self.quality_bitmask = quality_bitmask
         self.quality_mask = self._quality_mask(quality_bitmask)
+
+    def __repr__(self):
+        return('KeplerLightCurveFile Object (ID: {})'.format(self.keplerid))
 
     @property
     def hdu(self):

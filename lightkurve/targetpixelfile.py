@@ -59,6 +59,10 @@ class KeplerTargetPixelFile(TargetPixelFile):
         self.quality_bitmask = quality_bitmask
         self.quality_mask = self._quality_mask(quality_bitmask)
 
+
+    def __repr__(self):
+        return('KeplerTargetPixelFile Object (ID: {})'.format(self.hdu[0].header['KEPLERID']))
+
     @property
     def hdu(self):
         return self._hdu
