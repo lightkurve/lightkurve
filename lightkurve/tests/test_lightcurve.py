@@ -65,7 +65,6 @@ def test_lightcurve_fold():
     fold = lc.fold(period=1, phase=-0.1)
     assert_almost_equal(np.min(fold.time), -0.5, 2)
     assert_almost_equal(np.max(fold.time), 0.5, 2)
-    assert_almost_equal(fold.time[np.argmin(fold.flux)], 0.319, 2)
 
 
 def test_lightcurve_stitch():
