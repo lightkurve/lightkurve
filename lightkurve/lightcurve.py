@@ -42,9 +42,6 @@ class LightCurve(object):
             self.flux_err = np.nan * np.ones_like(self.time)
         self.meta = meta
 
-    def __repr__(self):
-        return('LightCurve Object')
-
     def stitch(self, *others):
         """
         Stitches LightCurve objects.
