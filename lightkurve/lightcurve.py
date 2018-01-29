@@ -1289,8 +1289,8 @@ def fast_box_period_search(lc, niters=2, min_period=0.5, max_period=30, nperiods
 
     t = np.linspace(-.5, .5, len(lc.time))
     prior_to = oktopus.prior.UniformPrior(lb=-.5, ub=.5)
-    prior_width = oktopus.prior.UniformPrior(lb=.05, ub=.2)
-    m, n = np.nanmean(lc.flux), len(lc.flux)
+    prior_width = oktopus.prior.UniformPrior(lb=1e-3, ub=.2)
+    m = np.nanmean(lc.flux)
 
     def lnlikelihood(args, amplitude=None, depth=None, data=None):
         to, width = args
@@ -1305,13 +1305,15 @@ def fast_box_period_search(lc, niters=2, min_period=0.5, max_period=30, nperiods
 
     def opt_depth(to, width, data):
         in_transit = (t < to + width) * (t >= to)
-        s = np.nanmean(data[in_transit])
-        return (m - s) / (1 - width)
+        n = np.nanmean(data[in_transit])
+        return (m - n) / (1 - width)
 
     if period_scale == 'linear':
         trial_periods = np.linspace(min_period, max_period, nperiods)
     elif period_scale == 'log':
         trial_periods = np.logspace(np.log10(min_period), np.log10(max_period), nperiods)
+    elif period_scale == 'inverse':
+        trial_periods = 1/np.linspace(1/max_period, 1/min_period, nperiods)
     else:
         raise ValueError("period_scale must be one of {}. Got {}."
                          .format("{'linear', 'log'}", period_scale))
@@ -1319,7 +1321,7 @@ def fast_box_period_search(lc, niters=2, min_period=0.5, max_period=30, nperiods
     log_likelihood = []
     for p in tqdm(trial_periods):
         folded = lc.fold(period=p)
-        amplitude_star, depth_star = 1., 1e-4
+        amplitude_star, depth_star = m, 1e-4
         width_star = .1
         if np.nanmean(folded.flux[t < 0]) > np.nanmean(folded.flux[t > 0]):
             to_star = .25
