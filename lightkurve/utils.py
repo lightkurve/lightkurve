@@ -179,15 +179,19 @@ class KeplerQualityFlags(object):
         return result
 
 
-def plot_image(image, scale='linear', origin='lower',
+def plot_image(image, ax=None, scale='linear', origin='lower',
                xlabel='Pixel Column Number', ylabel='Pixel Row Number',
-               clabel='Flux ($e^{-}s^{-1}$)', title=None, **kwargs):
+               clabel='Flux ($e^{-}s^{-1}$)', title=None, colorbar=True,
+               **kwargs):
         """Utility function to plot a 2D image
 
         Parameters
         ----------
         image : 2d array
             Image data.
+        ax : matplotlib.axes._subplots.AxesSubplot
+            A matplotlib axes object to plot into. If no axes is provided,
+            a new one be generated.
         scale : str
             Scale used to stretch the colormap.
             Options: 'linear', 'sqrt', or 'log'.
@@ -201,10 +205,19 @@ def plot_image(image, scale='linear', origin='lower',
             Label for the color bar.
         title : str or None
             Title for the plot.
+        colorbar : bool
+            Whether or not to show the colorbar
         kwargs : dict
             Keyword arguments to be passed to `matplotlib.pyplot.imshow`.
+
+
+        Returns
+        -------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            The matplotlib axes object.
         """
-        fig, ax = plt.subplots()
+        if ax is None:
+            fig, ax = plt.subplots()
         vmin, vmax = PercentileInterval(95.).get_limits(image)
         if scale == 'linear':
             norm = ImageNormalize(vmin=vmin, vmax=vmax, stretch=LinearStretch())
@@ -219,8 +232,9 @@ def plot_image(image, scale='linear', origin='lower',
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
         ax.set_title(title)
-        cbar = fig.colorbar(cax, norm=norm, label=clabel)
-        return fig, ax
+        if colorbar:
+            cbar = plt.colorbar(cax, ax=ax, norm=norm, label=clabel)
+        return ax
 
 def running_mean(data, window_size):
     """Returns the moving average of an array `data`.
