@@ -181,7 +181,7 @@ class KeplerQualityFlags(object):
 
 def plot_image(image, ax=None, scale='linear', origin='lower',
                xlabel='Pixel Column Number', ylabel='Pixel Row Number',
-               clabel='Flux ($e^{-}s^{-1}$)', title=None, colorbar=True,
+               clabel='Flux ($e^{-}s^{-1}$)', title=None, show_colorbar=True,
                **kwargs):
         """Utility function to plot a 2D image
 
@@ -191,7 +191,7 @@ def plot_image(image, ax=None, scale='linear', origin='lower',
             Image data.
         ax : matplotlib.axes._subplots.AxesSubplot
             A matplotlib axes object to plot into. If no axes is provided,
-            a new one be generated.
+            a new one will be generated.
         scale : str
             Scale used to stretch the colormap.
             Options: 'linear', 'sqrt', or 'log'.
@@ -205,11 +205,10 @@ def plot_image(image, ax=None, scale='linear', origin='lower',
             Label for the color bar.
         title : str or None
             Title for the plot.
-        colorbar : bool
+        show_colorbar : bool
             Whether or not to show the colorbar
         kwargs : dict
             Keyword arguments to be passed to `matplotlib.pyplot.imshow`.
-
 
         Returns
         -------
@@ -217,7 +216,7 @@ def plot_image(image, ax=None, scale='linear', origin='lower',
             The matplotlib axes object.
         """
         if ax is None:
-            fig, ax = plt.subplots()
+            _, ax = plt.subplots()
         vmin, vmax = PercentileInterval(95.).get_limits(image)
         if scale == 'linear':
             norm = ImageNormalize(vmin=vmin, vmax=vmax, stretch=LinearStretch())
@@ -232,7 +231,7 @@ def plot_image(image, ax=None, scale='linear', origin='lower',
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
         ax.set_title(title)
-        if colorbar:
+        if show_colorbar:
             cbar = plt.colorbar(cax, ax=ax, norm=norm, label=clabel)
         return ax
 

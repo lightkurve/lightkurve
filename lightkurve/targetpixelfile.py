@@ -317,7 +317,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         return col_centr, row_centr
 
     def plot(self, ax=None, frame=0, cadenceno=None, bkg=False, aperture_mask=None,
-            colorbar=True, mask_color='pink', **kwargs):
+            show_colorbar=True, mask_color='pink', **kwargs):
         """
         Plot a target pixel file at a given frame (index) or cadence number.
 
@@ -325,7 +325,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         ----------
         ax : matplotlib.axes._subplots.AxesSubplot
             A matplotlib axes object to plot into. If no axes is provided,
-            a new one be generated.
+            a new one will be generated.
         frame : int
             Frame number. The default is 0, i.e. the first frame.
         cadenceno : int, optional
@@ -335,13 +335,12 @@ class KeplerTargetPixelFile(TargetPixelFile):
             If True, background will be added to the pixel values.
         aperture_mask : ndarray
             Highlight pixels selected by aperture_mask.
-        colorbar : bool
+        show_colorbar : bool
             Whether or not to show the colorbar
         mask_color : str
             Color to show the aperture mask
         kwargs : dict
             Keywords arguments passed to `lightkurve.utils.plot_image`.
-
 
         Returns
         -------
@@ -363,16 +362,10 @@ class KeplerTargetPixelFile(TargetPixelFile):
         except IndexError:
             raise ValueError("frame {} is out of bounds, must be in the range "
                              "0-{}.".format(frame, self.flux.shape[0]))
-        if ax is None:
-            ax = plot_image(pflux, title='Kepler ID: {}'.format(self.keplerid),
-                             extent=(self.column, self.column + self.shape[2],
-                             self.row, self.row + self.shape[1]), colorbar=colorbar,
-                             **kwargs)
-        else:
-            ax = plot_image(pflux, ax=ax, title='Kepler ID: {}'.format(self.keplerid),
-                             extent=(self.column, self.column + self.shape[2],
-                             self.row, self.row + self.shape[1]), colorbar=colorbar,
-                             **kwargs)
+        ax = plot_image(pflux, ax=ax, title='Kepler ID: {}'.format(self.keplerid),
+                extent=(self.column, self.column + self.shape[2], self.row,
+                self.row + self.shape[1]), show_colorbar=show_colorbar, **kwargs)
+
         if aperture_mask is not None:
             aperture_mask = self._parse_aperture_mask(aperture_mask)
             for i in range(self.shape[1]):
