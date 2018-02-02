@@ -323,7 +323,7 @@ class LightCurve(object):
         ----------
         ax : matplotlib.axes._subplots.AxesSubplot
             A matplotlib axes object to plot into. If no axes is provided,
-            a new one be generated.
+            a new one will be generated.
         normalize : bool
             Normalize the lightcurve before plotting?
         xlabel : str
@@ -338,7 +338,7 @@ class LightCurve(object):
             Shade the region between 0 and flux
         grid: bool
             Add a grid to the plot
-        **kwargs : dict
+        kwargs : dict
             Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
 
         Returns
@@ -472,6 +472,9 @@ class KeplerLightCurve(LightCurve):
         self.cadenceno = cadenceno
         self.keplerid = keplerid
 
+    def __repr__(self):
+        return('KeplerLightCurve Object (ID: {})'.format(self.keplerid))
+
     def correct(self, method='sff', **kwargs):
         """Corrects a lightcurve for motion-dependent systematic errors.
 
@@ -530,6 +533,25 @@ class KeplerLightCurveFile(object):
         self.quality_bitmask = quality_bitmask
         self.quality_mask = self._quality_mask(quality_bitmask)
 
+    def __repr__(self):
+        return('KeplerLightCurveFile Object (ID: {})'.format(self.keplerid))
+
+    @property
+    def hdu(self):
+        return self._hdu
+
+    @hdu.setter
+    def hdu(self, value, keys=['SAP_FLUX', 'SAP_QUALITY']):
+        '''Raises a ValueError exception if value does not appear to be a Light Curve file.
+        '''
+        for key in keys:
+            if ~(np.any([value[1].header[ttype] == key
+                for ttype in value[1].header['TTYPE*']])):
+                raise ValueError("File {} does not have a {} column, "
+                         "is this a light curve file?".format(self.path, key))
+        else:
+            self._hdu = value
+
     def get_lightcurve(self, flux_type, centroid_type='MOM_CENTR'):
         if flux_type in self._flux_types():
             return KeplerLightCurve(self.hdu[1].data['TIME'][self.quality_mask],
@@ -544,7 +566,7 @@ class KeplerLightCurveFile(object):
                                     quarter=self.quarter,
                                     mission=self.mission,
                                     cadenceno=self.cadenceno,
-                                    keplerid=self.hdu[0].header['KEPLERID'])
+                                    keplerid=self.keplerid)
         else:
             raise KeyError("{} is not a valid flux type. Available types are: {}".
                            format(flux_type, self._flux_types))
@@ -592,6 +614,10 @@ class KeplerLightCurveFile(object):
     def channel(self):
         """Channel number"""
         return self.header(ext=0)['CHANNEL']
+
+    @property
+    def keplerid(self):
+        return self.header(ext=0)['KEPLERID']
 
     @property
     def quarter(self):
@@ -1121,7 +1147,7 @@ class SPLDCorrector(object):
 
 
 def box_period_search(lc, min_period=0.5, max_period=30, nperiods=2000,
-                      prior=None):
+                      prior=None, period_scale='linear'):
     """
     Implements a brute force search to find transit-like periodic events.
     This function fits a "box" model defined as:
@@ -1157,6 +1183,10 @@ def box_period_search(lc, min_period=0.5, max_period=30, nperiods=2000,
         Prior probability on the parameters of the box function,
         namely, `amplitude`, `depth`, `to` (time of the first discontinuity),
         and `width`.
+    period_scale : str
+        Type of the scale used to create the grid of periods between `min_period`
+        and `max_period` used to search for the best period.
+        Options are 'linear' or 'log'.
 
     Returns
     -------
@@ -1170,23 +1200,29 @@ def box_period_search(lc, min_period=0.5, max_period=30, nperiods=2000,
         Best period.
     """
 
+    t = np.linspace(-.5, .5, len(lc.time))
     def box(amplitude, depth, to, width):
         """A simple box function defined in the interval [-.5, .5].
         `to` is the time of the first discontinuity.
         """
-        t = np.linspace(-.5, .5, len(lc.time))
-        val = np.zeros(len(lc.time))
-        val[t < to] = amplitude
-        val[(t >= to) * (t < to + width)] = amplitude - depth
-        val[t >= to + width] = amplitude
+        val = amplitude * np.ones(len(lc.time))
+        val[(t == to) + (t == to + width)] = amplitude - .5 * depth
+        val[(t > to) * (t < to + width)] = amplitude - depth
         return val
 
     if prior is None:
-        prior = oktopus.UniformPrior(lb=[0.9, 0., -.4, 0.],
-                                     ub=[1.15, .5, .5, .3])
+        prior = oktopus.UniformPrior(lb=[0.98, 0., -.4, 0.],
+                                     ub=[1.02, .1, .5, .2])
     lc = lc.normalize()
     log_posterior = []
-    trial_periods = np.linspace(min_period, max_period, nperiods)
+
+    if period_scale == 'linear':
+        trial_periods = np.linspace(min_period, max_period, nperiods)
+    elif period_scale == 'log':
+        trial_periods = np.logspace(np.log10(min_period), np.log10(max_period), nperiods)
+    else:
+        raise ValueError("period_scale must be one of {}. Got {}."
+                         .format("{'linear', 'log'}", period_scale))
     for p in tqdm(trial_periods):
         folded = lc.fold(period=p)
         # var should be set to the uncertainty in the data point
