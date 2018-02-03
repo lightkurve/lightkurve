@@ -129,9 +129,9 @@ class LightCurve(object):
             A new ``LightCurve`` in which the data are folded and sorted by
             phase.
         """
-        fold_time = (((self.time - ((phase) * period)) / period) % 1)
-        #Fold at -0.5 to 0.5 instead of 0 to 1
-        fold_time[fold_time>0.5]-=1
+        fold_time = (((self.time - phase * period) / period) % 1)
+        # fold time domain from -.5 to .5
+        fold_time[fold_time > 0.5] -= 1
         sorted_args = np.argsort(fold_time)
         if self.flux_err is None:
             return LightCurve(fold_time[sorted_args], self.flux[sorted_args])
