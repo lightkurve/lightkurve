@@ -19,6 +19,7 @@ help:
 %: Makefile
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
+# ghp-import can be installed with pip as pip install ghp-import
 upload:
 	ghp-import -m "Update docs" $(BUILDDIR)/html
 	git push origin gh-pages
