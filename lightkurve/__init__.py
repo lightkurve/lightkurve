@@ -7,3 +7,4 @@ from .prf import *
 from .lightcurve import *
 from .targetpixelfile import *
 from .utils import *
+from .convenience import *
