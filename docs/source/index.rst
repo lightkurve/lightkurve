@@ -20,6 +20,8 @@ Documentation
    :maxdepth: 1
 
    api/index
+   install
+   contributing
 
 *********
 Tutorials
@@ -33,3 +35,7 @@ Tutorials
 **************
 Acknowledgment
 **************
+
+**lightkurve** is a community project supported by the
+`Kepler/K2 Guest Observer Office <https://keplerscience.arc.nasa.gov>`_.
+The code development happens `on GitHub <https://github.com/KeplerGO/lightkurve>`_.
