@@ -69,7 +69,7 @@ Building documentation
     In general, building the documentation is not necessary unless you are
     writing new documentation or do not have internet access, because the
     latest (and archive) versions of lightkurve's documentation should be available
-    at `pyke.keplerscience.org/ <http://pyke.keplerscience.org/>`_ .
+    at `lightkurve.keplerscience.org/ <http://lightkurve.keplerscience.org/>`_ .
 
 .. note::
     **lightkurve** documentation requires the `numpydoc sphinx extension <https://github.com/numpy/numpydoc>`_
