@@ -95,6 +95,9 @@
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../api/index.html">API documentation</a></li>
 </ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">lightkurve tutorials</a></li>
+</ul>
 
             
           
@@ -339,15 +342,19 @@
         <span class="k">return</span> <span class="n">result</span></div></div>
 
 
-<span class="k">def</span> <span class="nf">plot_image</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">,</span>
+<span class="k">def</span> <span class="nf">plot_image</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">,</span>
                <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Pixel Column Number&#39;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;Pixel Row Number&#39;</span><span class="p">,</span>
-               <span class="n">clabel</span><span class="o">=</span><span class="s1">&#39;Flux ($e^{-}s^{-1}$)&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+               <span class="n">clabel</span><span class="o">=</span><span class="s1">&#39;Flux ($e^{-}s^{-1}$)&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show_colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+               <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Utility function to plot a 2D image</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        image : 2d array</span>
 <span class="sd">            Image data.</span>
+<span class="sd">        ax : matplotlib.axes._subplots.AxesSubplot</span>
+<span class="sd">            A matplotlib axes object to plot into. If no axes is provided,</span>
+<span class="sd">            a new one will be generated.</span>
 <span class="sd">        scale : str</span>
 <span class="sd">            Scale used to stretch the colormap.</span>
 <span class="sd">            Options: &#39;linear&#39;, &#39;sqrt&#39;, or &#39;log&#39;.</span>
@@ -361,10 +368,18 @@
 <span class="sd">            Label for the color bar.</span>
 <span class="sd">        title : str or None</span>
 <span class="sd">            Title for the plot.</span>
+<span class="sd">        show_colorbar : bool</span>
+<span class="sd">            Whether or not to show the colorbar</span>
 <span class="sd">        kwargs : dict</span>
 <span class="sd">            Keyword arguments to be passed to `matplotlib.pyplot.imshow`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ax : matplotlib.axes._subplots.AxesSubplot</span>
+<span class="sd">            The matplotlib axes object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
         <span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span> <span class="o">=</span> <span class="n">PercentileInterval</span><span class="p">(</span><span class="mf">95.</span><span class="p">)</span><span class="o">.</span><span class="n">get_limits</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">scale</span> <span class="o">==</span> <span class="s1">&#39;linear&#39;</span><span class="p">:</span>
             <span class="n">norm</span> <span class="o">=</span> <span class="n">ImageNormalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">,</span> <span class="n">stretch</span><span class="o">=</span><span class="n">LinearStretch</span><span class="p">())</span>
@@ -379,8 +394,9 @@
         <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">xlabel</span><span class="p">)</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">ylabel</span><span class="p">)</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
-        <span class="n">cbar</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">cax</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">clabel</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span>
+        <span class="k">if</span> <span class="n">show_colorbar</span><span class="p">:</span>
+            <span class="n">cbar</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">cax</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">clabel</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ax</span>
 
 <div class="viewcode-block" id="running_mean"><a class="viewcode-back" href="../../api/utils.html#lightkurve.utils.running_mean">[docs]</a><span class="k">def</span> <span class="nf">running_mean</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">window_size</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Returns the moving average of an array `data`.</span>

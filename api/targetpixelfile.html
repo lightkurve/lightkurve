@@ -104,6 +104,9 @@
 </ul>
 </li>
 </ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">lightkurve tutorials</a></li>
+</ul>
 
             
           
@@ -251,7 +254,7 @@ Enables extraction of raw lightcurves and centroid positions.</p>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.header" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.header"><code class="xref py py-obj docutils literal"><span class="pre">header</span></code></a>([ext])</td>
 <td>Returns the header for a given extension.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.plot" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.plot"><code class="xref py py-obj docutils literal"><span class="pre">plot</span></code></a>([frame,&nbsp;cadenceno,&nbsp;bkg,&nbsp;aperture_mask])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.plot" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.plot"><code class="xref py py-obj docutils literal"><span class="pre">plot</span></code></a>([ax,&nbsp;frame,&nbsp;cadenceno,&nbsp;bkg,&nbsp;…])</td>
 <td>Plot a target pixel file at a given frame (index) or cadence number.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.to_fits" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.to_fits"><code class="xref py py-obj docutils literal"><span class="pre">to_fits</span></code></a>()</td>
@@ -312,6 +315,11 @@ The default behaviour is to use the Kepler pipeline mask.</p>
 <dd></dd></dl>
 
 <dl class="attribute">
+<dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.dec">
+<code class="descname">dec</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.dec" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.flux">
 <code class="descname">flux</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.flux" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the flux for all good-quality cadences.</p>
@@ -353,6 +361,11 @@ necessary metadata in the tpf object.</p>
 </tbody>
 </table>
 </dd></dl>
+
+<dl class="attribute">
+<dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.hdu">
+<code class="descname">hdu</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.hdu" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.header">
@@ -401,13 +414,18 @@ necessary metadata in the tpf object.</p>
 
 <dl class="method">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.plot">
-<code class="descname">plot</code><span class="sig-paren">(</span><em>frame=0</em>, <em>cadenceno=None</em>, <em>bkg=False</em>, <em>aperture_mask=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/targetpixelfile.html#KeplerTargetPixelFile.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.plot" title="Permalink to this definition">¶</a></dt>
+<code class="descname">plot</code><span class="sig-paren">(</span><em>ax=None</em>, <em>frame=0</em>, <em>cadenceno=None</em>, <em>bkg=False</em>, <em>aperture_mask=None</em>, <em>show_colorbar=True</em>, <em>mask_color='pink'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/targetpixelfile.html#KeplerTargetPixelFile.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot a target pixel file at a given frame (index) or cadence number.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>frame</strong> : int</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>ax</strong> : matplotlib.axes._subplots.AxesSubplot</p>
+<blockquote>
+<div><p>A matplotlib axes object to plot into. If no axes is provided,
+a new one will be generated.</p>
+</div></blockquote>
+<p><strong>frame</strong> : int</p>
 <blockquote>
 <div><p>Frame number. The default is 0, i.e. the first frame.</p>
 </div></blockquote>
@@ -424,9 +442,23 @@ This argument has priority over frame number.</p>
 <blockquote>
 <div><p>Highlight pixels selected by aperture_mask.</p>
 </div></blockquote>
+<p><strong>show_colorbar</strong> : bool</p>
+<blockquote>
+<div><p>Whether or not to show the colorbar</p>
+</div></blockquote>
+<p><strong>mask_color</strong> : str</p>
+<blockquote>
+<div><p>Color to show the aperture mask</p>
+</div></blockquote>
 <p><strong>kwargs</strong> : dict</p>
-<blockquote class="last">
+<blockquote>
 <div><p>Keywords arguments passed to <cite>lightkurve.utils.plot_image</cite>.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>ax</strong> : matplotlib.axes._subplots.AxesSubplot</p>
+<blockquote class="last">
+<div><p>The matplotlib axes object.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -445,6 +477,11 @@ This argument has priority over frame number.</p>
 <code class="descname">quarter</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.quarter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Quarter number</p>
 </dd></dl>
+
+<dl class="attribute">
+<dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.ra">
+<code class="descname">ra</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.ra" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.row">

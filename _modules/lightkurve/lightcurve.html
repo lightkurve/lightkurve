@@ -95,6 +95,9 @@
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../api/index.html">API documentation</a></li>
 </ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">lightkurve tutorials</a></li>
+</ul>
 
             
           
@@ -289,7 +292,9 @@
 <span class="sd">            A new ``LightCurve`` in which the data are folded and sorted by</span>
 <span class="sd">            phase.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">fold_time</span> <span class="o">=</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">-</span> <span class="n">phase</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">period</span><span class="p">)</span> <span class="o">/</span> <span class="n">period</span><span class="p">)</span> <span class="o">%</span> <span class="mi">1</span> <span class="o">-</span> <span class="mf">0.5</span>
+        <span class="n">fold_time</span> <span class="o">=</span> <span class="p">(((</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">-</span> <span class="n">phase</span> <span class="o">*</span> <span class="n">period</span><span class="p">)</span> <span class="o">/</span> <span class="n">period</span><span class="p">)</span> <span class="o">%</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># fold time domain from -.5 to .5</span>
+        <span class="n">fold_time</span><span class="p">[</span><span class="n">fold_time</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
         <span class="n">sorted_args</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">fold_time</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux_err</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">LightCurve</span><span class="p">(</span><span class="n">fold_time</span><span class="p">[</span><span class="n">sorted_args</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="n">sorted_args</span><span class="p">])</span>
@@ -483,7 +488,7 @@
 <span class="sd">        ----------</span>
 <span class="sd">        ax : matplotlib.axes._subplots.AxesSubplot</span>
 <span class="sd">            A matplotlib axes object to plot into. If no axes is provided,</span>
-<span class="sd">            a new one be generated.</span>
+<span class="sd">            a new one will be generated.</span>
 <span class="sd">        normalize : bool</span>
 <span class="sd">            Normalize the lightcurve before plotting?</span>
 <span class="sd">        xlabel : str</span>
@@ -498,7 +503,7 @@
 <span class="sd">            Shade the region between 0 and flux</span>
 <span class="sd">        grid: bool</span>
 <span class="sd">            Add a grid to the plot</span>
-<span class="sd">        **kwargs : dict</span>
+<span class="sd">        kwargs : dict</span>
 <span class="sd">            Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.</span>
 
 <span class="sd">        Returns</span>
@@ -632,6 +637,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">cadenceno</span> <span class="o">=</span> <span class="n">cadenceno</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">keplerid</span> <span class="o">=</span> <span class="n">keplerid</span>
 
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span><span class="p">(</span><span class="s1">&#39;KeplerLightCurve Object (ID: </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keplerid</span><span class="p">))</span>
+
 <div class="viewcode-block" id="KeplerLightCurve.correct"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.KeplerLightCurve.correct">[docs]</a>    <span class="k">def</span> <span class="nf">correct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;sff&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Corrects a lightcurve for motion-dependent systematic errors.</span>
 
@@ -690,6 +698,25 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">quality_bitmask</span> <span class="o">=</span> <span class="n">quality_bitmask</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quality_mask</span><span class="p">(</span><span class="n">quality_bitmask</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span><span class="p">(</span><span class="s1">&#39;KeplerLightCurveFile Object (ID: </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keplerid</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">hdu</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdu</span>
+
+    <span class="nd">@hdu</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">hdu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;SAP_FLUX&#39;</span><span class="p">,</span> <span class="s1">&#39;SAP_QUALITY&#39;</span><span class="p">]):</span>
+        <span class="sd">&#39;&#39;&#39;Raises a ValueError exception if value does not appear to be a Light Curve file.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+            <span class="k">if</span> <span class="o">~</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">([</span><span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="n">ttype</span><span class="p">]</span> <span class="o">==</span> <span class="n">key</span>
+                <span class="k">for</span> <span class="n">ttype</span> <span class="ow">in</span> <span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;TTYPE*&#39;</span><span class="p">]])):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;File </span><span class="si">{}</span><span class="s2"> does not have a </span><span class="si">{}</span><span class="s2"> column, &quot;</span>
+                         <span class="s2">&quot;is this a light curve file?&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_hdu</span> <span class="o">=</span> <span class="n">value</span>
+
 <div class="viewcode-block" id="KeplerLightCurveFile.get_lightcurve"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.KeplerLightCurveFile.get_lightcurve">[docs]</a>    <span class="k">def</span> <span class="nf">get_lightcurve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flux_type</span><span class="p">,</span> <span class="n">centroid_type</span><span class="o">=</span><span class="s1">&#39;MOM_CENTR&#39;</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">flux_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flux_types</span><span class="p">():</span>
             <span class="k">return</span> <span class="n">KeplerLightCurve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;TIME&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">],</span>
@@ -704,7 +731,7 @@
                                     <span class="n">quarter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quarter</span><span class="p">,</span>
                                     <span class="n">mission</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mission</span><span class="p">,</span>
                                     <span class="n">cadenceno</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cadenceno</span><span class="p">,</span>
-                                    <span class="n">keplerid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;KEPLERID&#39;</span><span class="p">])</span>
+                                    <span class="n">keplerid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">keplerid</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> is not a valid flux type. Available types are: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span>
                            <span class="nb">format</span><span class="p">(</span><span class="n">flux_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flux_types</span><span class="p">))</span></div>
@@ -752,6 +779,10 @@
     <span class="k">def</span> <span class="nf">channel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Channel number&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="n">ext</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="s1">&#39;CHANNEL&#39;</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">keplerid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="n">ext</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="s1">&#39;KEPLERID&#39;</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">quarter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1281,7 +1312,7 @@
 
 
 <div class="viewcode-block" id="box_period_search"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.box_period_search">[docs]</a><span class="k">def</span> <span class="nf">box_period_search</span><span class="p">(</span><span class="n">lc</span><span class="p">,</span> <span class="n">min_period</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">max_period</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">nperiods</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span>
-                      <span class="n">prior</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                      <span class="n">prior</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">period_scale</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Implements a brute force search to find transit-like periodic events.</span>
 <span class="sd">    This function fits a &quot;box&quot; model defined as:</span>
@@ -1317,6 +1348,10 @@
 <span class="sd">        Prior probability on the parameters of the box function,</span>
 <span class="sd">        namely, `amplitude`, `depth`, `to` (time of the first discontinuity),</span>
 <span class="sd">        and `width`.</span>
+<span class="sd">    period_scale : str</span>
+<span class="sd">        Type of the scale used to create the grid of periods between `min_period`</span>
+<span class="sd">        and `max_period` used to search for the best period.</span>
+<span class="sd">        Options are &#39;linear&#39; or &#39;log&#39;.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -1330,23 +1365,29 @@
 <span class="sd">        Best period.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-.</span><span class="mi">5</span><span class="p">,</span> <span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="p">))</span>
     <span class="k">def</span> <span class="nf">box</span><span class="p">(</span><span class="n">amplitude</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">to</span><span class="p">,</span> <span class="n">width</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;A simple box function defined in the interval [-.5, .5].</span>
 <span class="sd">        `to` is the time of the first discontinuity.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-.</span><span class="mi">5</span><span class="p">,</span> <span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="p">))</span>
-        <span class="n">val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="p">))</span>
-        <span class="n">val</span><span class="p">[</span><span class="n">t</span> <span class="o">&lt;</span> <span class="n">to</span><span class="p">]</span> <span class="o">=</span> <span class="n">amplitude</span>
-        <span class="n">val</span><span class="p">[(</span><span class="n">t</span> <span class="o">&gt;=</span> <span class="n">to</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">t</span> <span class="o">&lt;</span> <span class="n">to</span> <span class="o">+</span> <span class="n">width</span><span class="p">)]</span> <span class="o">=</span> <span class="n">amplitude</span> <span class="o">-</span> <span class="n">depth</span>
-        <span class="n">val</span><span class="p">[</span><span class="n">t</span> <span class="o">&gt;=</span> <span class="n">to</span> <span class="o">+</span> <span class="n">width</span><span class="p">]</span> <span class="o">=</span> <span class="n">amplitude</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">amplitude</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="p">))</span>
+        <span class="n">val</span><span class="p">[(</span><span class="n">t</span> <span class="o">==</span> <span class="n">to</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">t</span> <span class="o">==</span> <span class="n">to</span> <span class="o">+</span> <span class="n">width</span><span class="p">)]</span> <span class="o">=</span> <span class="n">amplitude</span> <span class="o">-</span> <span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="n">depth</span>
+        <span class="n">val</span><span class="p">[(</span><span class="n">t</span> <span class="o">&gt;</span> <span class="n">to</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">t</span> <span class="o">&lt;</span> <span class="n">to</span> <span class="o">+</span> <span class="n">width</span><span class="p">)]</span> <span class="o">=</span> <span class="n">amplitude</span> <span class="o">-</span> <span class="n">depth</span>
         <span class="k">return</span> <span class="n">val</span>
 
     <span class="k">if</span> <span class="n">prior</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">prior</span> <span class="o">=</span> <span class="n">oktopus</span><span class="o">.</span><span class="n">UniformPrior</span><span class="p">(</span><span class="n">lb</span><span class="o">=</span><span class="p">[</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="o">-.</span><span class="mi">4</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
-                                     <span class="n">ub</span><span class="o">=</span><span class="p">[</span><span class="mf">1.15</span><span class="p">,</span> <span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="o">.</span><span class="mi">3</span><span class="p">])</span>
+        <span class="n">prior</span> <span class="o">=</span> <span class="n">oktopus</span><span class="o">.</span><span class="n">UniformPrior</span><span class="p">(</span><span class="n">lb</span><span class="o">=</span><span class="p">[</span><span class="mf">0.98</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="o">-.</span><span class="mi">4</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+                                     <span class="n">ub</span><span class="o">=</span><span class="p">[</span><span class="mf">1.02</span><span class="p">,</span> <span class="o">.</span><span class="mi">1</span><span class="p">,</span> <span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="o">.</span><span class="mi">2</span><span class="p">])</span>
     <span class="n">lc</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
     <span class="n">log_posterior</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">trial_periods</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">min_period</span><span class="p">,</span> <span class="n">max_period</span><span class="p">,</span> <span class="n">nperiods</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">period_scale</span> <span class="o">==</span> <span class="s1">&#39;linear&#39;</span><span class="p">:</span>
+        <span class="n">trial_periods</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">min_period</span><span class="p">,</span> <span class="n">max_period</span><span class="p">,</span> <span class="n">nperiods</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">period_scale</span> <span class="o">==</span> <span class="s1">&#39;log&#39;</span><span class="p">:</span>
+        <span class="n">trial_periods</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">min_period</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">max_period</span><span class="p">),</span> <span class="n">nperiods</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;period_scale must be one of </span><span class="si">{}</span><span class="s2">. Got </span><span class="si">{}</span><span class="s2">.&quot;</span>
+                         <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;{&#39;linear&#39;, &#39;log&#39;}&quot;</span><span class="p">,</span> <span class="n">period_scale</span><span class="p">))</span>
     <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">trial_periods</span><span class="p">):</span>
         <span class="n">folded</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="n">p</span><span class="p">)</span>
         <span class="c1"># var should be set to the uncertainty in the data point</span>

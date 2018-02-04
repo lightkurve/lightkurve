@@ -103,6 +103,9 @@
 </ul>
 </li>
 </ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">lightkurve tutorials</a></li>
+</ul>
 
             
           
@@ -490,7 +493,7 @@ by the median.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>ax</strong> : matplotlib.axes._subplots.AxesSubplot</p>
 <blockquote>
 <div><p>A matplotlib axes object to plot into. If no axes is provided,
-a new one be generated.</p>
+a new one will be generated.</p>
 </div></blockquote>
 <p><strong>normalize</strong> : bool</p>
 <blockquote>
@@ -520,7 +523,7 @@ a new one be generated.</p>
 <blockquote>
 <div><p>Add a grid to the plot</p>
 </div></blockquote>
-<p><strong>**kwargs</strong> : dict</p>
+<p><strong>kwargs</strong> : dict</p>
 <blockquote>
 <div><p>Dictionary of arguments to be passed to <cite>matplotlib.pyplot.plot</cite>.</p>
 </div></blockquote>
@@ -931,11 +934,21 @@ KeplerCBVCorrector.correct.</p>
 <code class="descname">get_lightcurve</code><span class="sig-paren">(</span><em>flux_type</em>, <em>centroid_type='MOM_CENTR'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#KeplerLightCurveFile.get_lightcurve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurveFile.get_lightcurve" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="attribute">
+<dt id="lightkurve.lightcurve.KeplerLightCurveFile.hdu">
+<code class="descname">hdu</code><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurveFile.hdu" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="lightkurve.lightcurve.KeplerLightCurveFile.header">
 <code class="descname">header</code><span class="sig-paren">(</span><em>ext=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#KeplerLightCurveFile.header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurveFile.header" title="Permalink to this definition">¶</a></dt>
 <dd><p>Header of the object at extension <cite>ext</cite></p>
 </dd></dl>
+
+<dl class="attribute">
+<dt id="lightkurve.lightcurve.KeplerLightCurveFile.keplerid">
+<code class="descname">keplerid</code><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurveFile.keplerid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.lightcurve.KeplerLightCurveFile.mission">
@@ -1348,7 +1361,7 @@ that describes the motion.</p>
 
 <dl class="function">
 <dt id="lightkurve.lightcurve.box_period_search">
-<code class="descclassname">lightkurve.lightcurve.</code><code class="descname">box_period_search</code><span class="sig-paren">(</span><em>lc</em>, <em>min_period=0.5</em>, <em>max_period=30</em>, <em>nperiods=2000</em>, <em>prior=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#box_period_search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.box_period_search" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">lightkurve.lightcurve.</code><code class="descname">box_period_search</code><span class="sig-paren">(</span><em>lc</em>, <em>min_period=0.5</em>, <em>max_period=30</em>, <em>nperiods=2000</em>, <em>prior=None</em>, <em>period_scale='linear'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#box_period_search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.box_period_search" title="Permalink to this definition">¶</a></dt>
 <dd><blockquote>
 <div><p>Implements a brute force search to find transit-like periodic events.
 This function fits a “box” model defined as:</p>
@@ -1391,6 +1404,11 @@ for the transit period.</p>
 <dd><p class="first last">Prior probability on the parameters of the box function,
 namely, <cite>amplitude</cite>, <cite>depth</cite>, <cite>to</cite> (time of the first discontinuity),
 and <cite>width</cite>.</p>
+</dd>
+<dt>period_scale <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">Type of the scale used to create the grid of periods between <cite>min_period</cite>
+and <cite>max_period</cite> used to search for the best period.
+Options are ‘linear’ or ‘log’.</p>
 </dd>
 </dl>
 </div></blockquote>
