@@ -55,9 +55,15 @@ def test_bitmasking(quality_bitmask, answer):
 
 def test_lightcurve_fold():
     """Test the ``LightCurve.fold()`` method."""
-    lc = LightCurve(time=[1, 2, 3], flux=[1, 1, 1])
-    assert_almost_equal(lc.fold(period=1).time[0], 0)
-    assert_almost_equal(lc.fold(period=1, phase=-0.1).time[0], 0.1)
+    lc = LightCurve(time=np.linspace(0,10,100), flux=np.zeros(100)+1)
+    fold = lc.fold(period=1)
+    assert_almost_equal(fold.time[0], -0.5, 2)
+    assert_almost_equal(np.min(fold.time), -0.5, 2)
+    assert_almost_equal(np.max(fold.time), 0.5, 2)
+    fold = lc.fold(period=1, phase=-0.1)
+    assert_almost_equal(fold.time[0], -0.5, 2)
+    assert_almost_equal(np.min(fold.time), -0.5, 2)
+    assert_almost_equal(np.max(fold.time), 0.5, 2)
 
 
 def test_lightcurve_stitch():
