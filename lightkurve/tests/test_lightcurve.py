@@ -6,7 +6,7 @@ from astropy.utils.data import get_pkg_data_filename
 from astropy.io import fits as pyfits
 from ..lightcurve import (LightCurve, KeplerCBVCorrector, KeplerLightCurveFile,
                           SFFCorrector, KeplerLightCurve, box_period_search,
-                          fast_box_period_search)
+                          iterative_box_period_search)
 
 # 8th Quarter of Tabby's star
 TABBY_Q8 = ("https://archive.stsci.edu/missions/kepler/lightcurves"
@@ -170,7 +170,7 @@ def test_box_period_search():
                                                nperiods=100, period_scale='log')
     assert abs(kepler10b_period - answer) < 1e-2
 
-    _, _, kepler10b_period = fast_box_period_search(flat, min_period=.5, max_period=1,
+    _, _, kepler10b_period = iterative_box_period_search(flat, min_period=.5, max_period=1,
                                                     nperiods=100, period_scale='log')
     assert abs(kepler10b_period - answer) < 1e-2
 
