@@ -15,7 +15,7 @@ from .utils import running_mean, channel_to_module_output, KeplerQualityFlags
 
 __all__ = ['LightCurve', 'KeplerLightCurve', 'KeplerLightCurveFile',
            'KeplerCBVCorrector', 'SPLDCorrector', 'SFFCorrector',
-           'box_period_search']
+           'box_period_search', 'iterative_box_period_search']
 
 
 class LightCurve(object):
@@ -1228,8 +1228,8 @@ def box_period_search(lc, min_period=0.5, max_period=30, nperiods=2000,
     return log_posterior, trial_periods, trial_periods[np.argmax(log_posterior)]
 
 
-def fast_box_period_search(lc, niters=2, min_period=0.5, max_period=30, nperiods=2000,
-                           period_scale='log'):
+def iterative_box_period_search(lc, niters=2, min_period=0.5, max_period=30,
+                                nperiods=2000, period_scale='log'):
     """
     Implements a routine to find box-like transit events.
     This function fits a "box" model defined as:
@@ -1288,17 +1288,17 @@ def fast_box_period_search(lc, niters=2, min_period=0.5, max_period=30, nperiods
     """
 
     t = np.linspace(-.5, .5, len(lc.time))
-    prior_to = oktopus.prior.UniformPrior(lb=-.5, ub=.5)
-    prior_width = oktopus.prior.UniformPrior(lb=1e-3, ub=.2)
+    logprior_to = oktopus.prior.UniformPrior(lb=-.5, ub=.5)
+    logprior_width = oktopus.prior.UniformPrior(lb=1e-3, ub=.2)
     m = np.nanmean(lc.flux)
 
-    def lnlikelihood(args, amplitude=None, depth=None, data=None):
+    def logposterior(args, amplitude=None, depth=None, data=None):
         to, width = args
         out_of_transit = (t < to) + (t >= to + width)
         in_transit = np.logical_not(out_of_transit)
         ll = ((data - amplitude) ** 2 * out_of_transit
               + (data - (amplitude - depth)) ** 2 * in_transit)
-        return np.nansum(ll) + prior_to(to) + prior_width(width)
+        return np.nansum(ll) + logprior_to(to) + logprior_width(width)
 
     def opt_amplitude(width, depth):
         return width * depth + m
@@ -1318,7 +1318,7 @@ def fast_box_period_search(lc, niters=2, min_period=0.5, max_period=30, nperiods
         raise ValueError("period_scale must be one of {}. Got {}."
                          .format("{'linear', 'log'}", period_scale))
 
-    log_likelihood = []
+    log_posterior = []
     for p in tqdm(trial_periods):
         folded = lc.fold(period=p)
         amplitude_star, depth_star = m, 1e-4
@@ -1328,12 +1328,12 @@ def fast_box_period_search(lc, niters=2, min_period=0.5, max_period=30, nperiods
         else:
             to_star = -.25
         for i in range(niters):
-            res = minimize(lnlikelihood, x0=(to_star, width_star),
+            res = minimize(logposterior, x0=(to_star, width_star),
                            args=(amplitude_star, depth_star, folded.flux), method='powell',
                            options={'ftol':1e-9, 'xtol':1e-9, 'maxfev': 2000})
             to_star, width_star = res.x
             depth_star = opt_depth(to_star, width_star, folded.flux)
             amplitude_star = opt_amplitude(width_star, depth_star)
-        log_likelihood.append(-res.fun)
+        log_posterior.append(-res.fun)
 
-    return log_likelihood, trial_periods, trial_periods[np.argmax(log_likelihood)]
+    return log_posterior, trial_periods, trial_periods[np.argmax(log_posterior)]
