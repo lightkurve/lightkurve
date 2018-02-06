@@ -1268,7 +1268,7 @@ def iterative_box_period_search(lc, niters=2, min_period=0.5, max_period=30,
     period_scale : str
         Type of the scale used to create the grid of periods between `min_period`
         and `max_period` used to search for the best period.
-        Options are 'linear' or 'log'.
+        Options are `linear`, `log`, or `inverse`.
 
     Returns
     -------
@@ -1293,6 +1293,9 @@ def iterative_box_period_search(lc, niters=2, min_period=0.5, max_period=30,
     m = np.nanmean(lc.flux)
 
     def logposterior(args, amplitude=None, depth=None, data=None):
+        """Defines the negative of log of the joint posterior distribution of
+        the start time of the transit `to` and the transit duration `w`.
+        """
         to, width = args
         out_of_transit = (t < to) + (t >= to + width)
         in_transit = np.logical_not(out_of_transit)
@@ -1301,9 +1304,15 @@ def iterative_box_period_search(lc, niters=2, min_period=0.5, max_period=30,
         return np.nansum(ll) + logprior_to(to) + logprior_width(width)
 
     def opt_amplitude(width, depth):
+        """The MAP estimator for the amplitude of the lightcurve given that
+        `to` and `w` have joint uniform prior distribution.
+        """
         return width * depth + m
 
     def opt_depth(to, width, data):
+        """The MAP estimator for the transit depth given that `to` and `w`
+        have joint uniform prior distribution.
+        """
         in_transit = (t < to + width) * (t >= to)
         n = np.nanmean(data[in_transit])
         return (m - n) / (1 - width)
@@ -1313,14 +1322,15 @@ def iterative_box_period_search(lc, niters=2, min_period=0.5, max_period=30,
     elif period_scale == 'log':
         trial_periods = np.logspace(np.log10(min_period), np.log10(max_period), nperiods)
     elif period_scale == 'inverse':
-        trial_periods = 1/np.linspace(1/max_period, 1/min_period, nperiods)
+        trial_periods = 1 / np.linspace(1/max_period, 1/min_period, nperiods)
     else:
         raise ValueError("period_scale must be one of {}. Got {}."
-                         .format("{'linear', 'log'}", period_scale))
+                         .format("{'linear', 'log', 'inverse'}", period_scale))
 
     log_posterior = []
     for p in tqdm(trial_periods):
         folded = lc.fold(period=p)
+        # heuristically define initial guesses for the parameters
         amplitude_star, depth_star = m, 1e-4
         width_star = .1
         if np.nanmean(folded.flux[t < 0]) > np.nanmean(folded.flux[t > 0]):
@@ -1328,10 +1338,12 @@ def iterative_box_period_search(lc, niters=2, min_period=0.5, max_period=30,
         else:
             to_star = -.25
         for i in range(niters):
+            # optimize the joint log posterior of to and width
             res = minimize(logposterior, x0=(to_star, width_star),
                            args=(amplitude_star, depth_star, folded.flux), method='powell',
                            options={'ftol':1e-9, 'xtol':1e-9, 'maxfev': 2000})
             to_star, width_star = res.x
+            # compute the depth and amplitude using MAP
             depth_star = opt_depth(to_star, width_star, folded.flux)
             amplitude_star = opt_amplitude(width_star, depth_star)
         log_posterior.append(-res.fun)
