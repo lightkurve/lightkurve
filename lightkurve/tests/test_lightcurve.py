@@ -161,7 +161,6 @@ def test_box_period_search():
     klc = KeplerLightCurveFile(KEPLER10)
     pdc = klc.PDCSAP_FLUX
     flat, trend = pdc.flatten(return_trend=True)
-
     _, _, kepler10b_period = box_period_search(flat, min_period=.5, max_period=1,
                                                nperiods=100, period_scale='log')
     assert abs(kepler10b_period - answer) < 1e-2
