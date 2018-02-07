@@ -5,7 +5,8 @@ from numpy.testing import (assert_almost_equal, assert_array_equal,
 from astropy.utils.data import get_pkg_data_filename
 from astropy.io import fits as pyfits
 from ..lightcurve import (LightCurve, KeplerCBVCorrector, KeplerLightCurveFile,
-                          SFFCorrector, KeplerLightCurve, box_period_search)
+                          SFFCorrector, KeplerLightCurve, box_period_search,
+                          iterative_box_period_search)
 
 # 8th Quarter of Tabby's star
 TABBY_Q8 = ("https://archive.stsci.edu/missions/kepler/lightcurves"
@@ -161,8 +162,8 @@ def test_box_period_search():
     pdc = klc.PDCSAP_FLUX
     flat, trend = pdc.flatten(return_trend=True)
 
-    _, _, kepler10b_period = box_period_search(flat, min_period=.5,
-                                               max_period=1, nperiods=100)
+    _, _, kepler10b_period = box_period_search(flat, min_period=.5, max_period=1,
+                                               nperiods=100, period_scale='log')
     assert abs(kepler10b_period - answer) < 1e-2
 
 def test_to_pandas():
