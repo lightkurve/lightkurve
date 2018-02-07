@@ -76,3 +76,12 @@ def test_bitmasking(quality_bitmask, answer):
     lc = tpf.to_lightcurve()
     flux = lc.flux
     assert len(flux) == answer
+
+def test_wcs():
+    '''Test the get_wcs function'''
+    tpf = KeplerTargetPixelFile(filename_tpf_one_center)
+    w = tpf.get_wcs()
+    ra, dec = tpf.get_radec()
+    assert ra.shape == tpf.shape
+    assert dec.shape == tpf.shape
+    assert type(w).__name__ == 'WCS'
