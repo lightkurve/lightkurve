@@ -21,13 +21,11 @@ def test_tpf_shapes():
     assert tpf.quality_mask.shape == tpf.hdu[1].data['TIME'].shape
     assert tpf.flux.shape == tpf.flux_err.shape
 
-
 def test_tpf_plot():
     """Sanity check to verify that tpf plotting works"""
     tpf = KeplerTargetPixelFile(filename_tpf_one_center)
     tpf.plot()
     tpf.plot(aperture_mask=tpf.pipeline_mask)
-
 
 def test_tpf_zeros():
     """Does the LightCurve of a zero-flux TPF make sense?"""
@@ -44,7 +42,6 @@ def test_tpf_zeros():
     # The default QUALITY bitmask should have removed all NaNs in the TIME
     assert ~np.any(np.isnan(tpf.time))
 
-
 def test_tpf_ones():
     """Does the LightCurve of a one-flux TPF make sense?"""
     tpf = KeplerTargetPixelFile(filename_tpf_one_center)
@@ -54,7 +51,6 @@ def test_tpf_ones():
                   * (lc.centroid_col > tpf.column).all())
     assert np.all((lc.centroid_row < tpf.row+tpf.shape[2]).all()
                   * (lc.centroid_row > tpf.row).all())
-
 
 def test_quality_flag_decoding():
     """Can the QUALITY flags be parsed correctly?"""
@@ -66,7 +62,6 @@ def test_quality_flag_decoding():
     assert KeplerQualityFlags.decode(flags[3][0] + flags[4][0] + flags[5][0]) \
         == [flags[3][1], flags[4][1], flags[5][1]]
 
-
 @pytest.mark.parametrize("quality_bitmask,answer",[('hardest', 1101),
     ('hard', 1101), ('default', 1233), (None, 1290),
     (1, 1290), (100, 1278), (2096639, 1101)])
@@ -76,3 +71,12 @@ def test_bitmasking(quality_bitmask, answer):
     lc = tpf.to_lightcurve()
     flux = lc.flux
     assert len(flux) == answer
+
+def test_date():
+    '''Test the lc.date() function'''
+    tpf = KeplerTargetPixelFile(filename_tpf_all_zeros)
+    date = tpf.date
+    assert len(date) == len(tpf.time)
+    print(date)
+    assert date[0] == '2016-04-22 14:19:41.510'
+    assert date[-1] == '2016-05-18 22:27:43.895'

@@ -10,6 +10,7 @@ import requests
 from bs4 import BeautifulSoup
 from matplotlib import pyplot as plt
 from .utils import running_mean, channel_to_module_output, KeplerQualityFlags
+from astropy.time import Time
 
 
 __all__ = ['LightCurve', 'KeplerLightCurve', 'KeplerLightCurveFile',
@@ -606,6 +607,15 @@ class KeplerLightCurveFile(object):
     def time(self):
         """Time measurements"""
         return self.hdu[1].data['TIME'][self.quality_mask]
+
+    @property
+    def date(self):
+        """Returns the human-readable date for all good-quality cadences."""
+        bjd = self.time + 2454833.
+        jd = bjd - self.hdu[1].data['TIMECORR'][self.quality_mask]
+        jd += (0.25 + 0.62 * (5 - self.hdu[1].header['TIMSLICE'])) / 86400.
+        date = Time(jd, format='jd').iso
+        return date
 
     @property
     def cadenceno(self):

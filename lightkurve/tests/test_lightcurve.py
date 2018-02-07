@@ -42,7 +42,6 @@ def test_KeplerLightCurve():
     assert kplc.mission == 'Kepler'
     assert_array_equal(kplc.time, hdu[1].data['TIME'])
 
-
 @pytest.mark.parametrize("quality_bitmask, answer", [('hardest', 2661),
     ('hard', 2706), ('default', 2917), (None, 3279),
     (1, 3279), (100, 3252), (2096639, 2661)])
@@ -51,7 +50,6 @@ def test_bitmasking(quality_bitmask, answer):
     lcf = KeplerLightCurveFile(TABBY_Q8, quality_bitmask=quality_bitmask)
     flux = lcf.get_lightcurve('SAP_FLUX').flux
     assert len(flux) == answer
-
 
 def test_lightcurve_fold():
     """Test the ``LightCurve.fold()`` method."""
@@ -65,7 +63,6 @@ def test_lightcurve_fold():
     assert_almost_equal(np.min(fold.time), -0.5, 2)
     assert_almost_equal(np.max(fold.time), 0.5, 2)
 
-
 def test_lightcurve_stitch():
     """Test the ``LightCurve.stitch()`` method."""
     lc = LightCurve(time=[1, 2, 3], flux=[1, .5, 1])
@@ -74,13 +71,11 @@ def test_lightcurve_stitch():
     assert_array_equal(lc.flux, 2*[1, .5, 1])
     assert_array_equal(lc.time, 2*[1, 2, 3])
 
-
 def test_lightcurve_plot():
     """Sanity check to verify that lightcurve plotting works"""
     lcf = KeplerLightCurveFile(TABBY_Q8)
     lcf.plot()
     lcf.SAP_FLUX.plot()
-
 
 def test_cdpp():
     """Test the basics of the CDPP noise metric."""
@@ -90,14 +85,12 @@ def test_cdpp():
     lc = LightCurve(np.arange(10000), np.random.normal(loc=1, scale=100e-6, size=10000))
     assert_almost_equal(lc.cdpp(transit_duration=1), 100, decimal=-0.5)
 
-
 def test_cdpp_tabby():
     """Compare the cdpp noise metric against the pipeline value."""
     lcf = KeplerLightCurveFile(TABBY_Q8)
     # Tabby's star shows dips after cadence 1000 which increase the cdpp
     lc = LightCurve(lcf.PDCSAP_FLUX.time[:1000], lcf.PDCSAP_FLUX.flux[:1000])
     assert(np.abs(lc.cdpp() - lcf.header(ext=1)['CDPP6_0']) < 30)
-
 
 def test_sff_corrector():
     """Does our code agree with the example presented in Vanderburg
@@ -148,7 +141,6 @@ def test_sff_corrector():
     assert_almost_equal(sff.interp(sff.s), correction, decimal=3)
     assert_array_equal(time, klc.time)
 
-
 def test_bin():
     lc = LightCurve(time=np.arange(10), flux=2*np.ones(10),
                     flux_err=2**.5*np.ones(10))
@@ -157,12 +149,10 @@ def test_bin():
     assert_allclose(binned_lc.flux_err, np.ones(5))
     assert len(binned_lc.time) == 5
 
-
 def test_normalize():
     """Does the `LightCurve.normalize()` method normalize the flux?"""
     lc = LightCurve(time=np.arange(10), flux=5*np.ones(10))
     assert_allclose(np.median(lc.normalize().flux), 1)
-
 
 def test_box_period_search():
     """Can we recover the orbital period of Kepler-10b?"""
@@ -174,7 +164,6 @@ def test_box_period_search():
     _, _, kepler10b_period = box_period_search(flat, min_period=.5,
                                                max_period=1, nperiods=100)
     assert abs(kepler10b_period - answer) < 1e-2
-
 
 def test_to_pandas():
     """Test the `LightCurve.to_pandas()` method."""
@@ -189,7 +178,6 @@ def test_to_pandas():
         # pandas is an optional dependency
         pass
 
-
 def test_to_table():
     """Test the `LightCurve.to_table()` method."""
     time, flux, flux_err = range(3), np.ones(3), np.zeros(3)
@@ -198,7 +186,6 @@ def test_to_table():
     assert_allclose(tbl['time'], time)
     assert_allclose(tbl['flux'], flux)
     assert_allclose(tbl['flux_err'], flux_err)
-
 
 def test_to_csv():
     """Test the `LightCurve.to_csv()` method."""
@@ -209,3 +196,11 @@ def test_to_csv():
     except ImportError:
         # pandas is an optional dependency
         pass
+
+def test_date():
+    '''Test the lc.date() function'''
+    lcf = KeplerLightCurveFile(TABBY_Q8)
+    date = lcf.date
+    assert len(date) == len(lcf.time)
+    assert date[0] == '2011-01-06 20:45:08.811'
+    assert date[-1] == '2011-03-14 20:18:16.734'
