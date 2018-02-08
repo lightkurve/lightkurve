@@ -22,6 +22,7 @@ Documentation
    api/index
    install
    contributing
+   community_software
 
 *********
 Tutorials

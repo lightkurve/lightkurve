@@ -102,6 +102,9 @@
 <li class="toctree-l2"><a class="reference internal" href="utils.html">Utilities</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../community_software.html">Kepler/K2-Related Community Software</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">lightkurve tutorials</a></li>
@@ -1361,79 +1364,142 @@ that describes the motion.</p>
 
 <dl class="function">
 <dt id="lightkurve.lightcurve.box_period_search">
-<code class="descclassname">lightkurve.lightcurve.</code><code class="descname">box_period_search</code><span class="sig-paren">(</span><em>lc</em>, <em>min_period=0.5</em>, <em>max_period=30</em>, <em>nperiods=2000</em>, <em>prior=None</em>, <em>period_scale='linear'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#box_period_search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.box_period_search" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-<div><p>Implements a brute force search to find transit-like periodic events.
+<code class="descclassname">lightkurve.lightcurve.</code><code class="descname">box_period_search</code><span class="sig-paren">(</span><em>lc</em>, <em>min_period=0.5</em>, <em>max_period=30</em>, <em>nperiods=2000</em>, <em>prior=None</em>, <em>period_scale='log'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#box_period_search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.box_period_search" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements a brute force search to find transit-like periodic events.
 This function fits a “box” model defined as:</p>
 <div class="math">
-\[\Pi (t) =
-    \left\{
-        egin{array}{ll}
-            a, &amp; t &lt; t_o,\
-            a - d, &amp; t_o \leq t &lt; t_o + w, \
-            a, &amp; t \geq t_o + w
-        \end{array}\]</div>
-</div></blockquote>
-<p>ight.</p>
-<blockquote>
-<div>to a list of <cite>nperiods</cite> periods between <cite>min_period</cite> and <cite>max_period</cite>.
+\[\Pi (t) = h - d\cdot \mathbb{I}(t_0 \leq t_i \leq t_0 + w)\]</div>
+<p>to a list of <cite>nperiods</cite> periods between <cite>min_period</cite> and <cite>max_period</cite>.
 It’s assumed that the best period is the one that maximizes the posterior
-probability of the fit.</div></blockquote>
+probability of the fit.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>lc</strong> : LightCurve object</p>
 <blockquote>
-<div><blockquote>
 <div><p>An object from KeplerLightCurve or LightCurve.
 Note that flattening the lightcurve beforehand does aid the quest
 for the transit period.</p>
 </div></blockquote>
-<dl class="docutils">
-<dt>min_period <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
-<dd><p class="first last">Minimum period to search for. Units must be the same as <cite>lc.time</cite>.</p>
-</dd>
-<dt>max_period <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
-<dd><p class="first last">Maximum period to search for. Units must be the same as <cite>lc.time</cite>.</p>
-</dd>
-<dt>nperiods <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
-<dd><p class="first last">Number of periods to search between <cite>min_period</cite> and <cite>max_period</cite>.</p>
-</dd>
-<dt>prior <span class="classifier-delimiter">:</span> <span class="classifier">oktopus.Prior object</span></dt>
-<dd><p class="first last">Prior probability on the parameters of the box function,
+<p><strong>min_period</strong> : float</p>
+<blockquote>
+<div><p>Minimum period to search for. Units must be the same as <cite>lc.time</cite>.</p>
+</div></blockquote>
+<p><strong>max_period</strong> : float</p>
+<blockquote>
+<div><p>Maximum period to search for. Units must be the same as <cite>lc.time</cite>.</p>
+</div></blockquote>
+<p><strong>nperiods</strong> : int</p>
+<blockquote>
+<div><p>Number of periods to search between <cite>min_period</cite> and <cite>max_period</cite>.</p>
+</div></blockquote>
+<p><strong>prior</strong> : oktopus.Prior object</p>
+<blockquote>
+<div><p>Prior probability on the parameters of the box function,
 namely, <cite>amplitude</cite>, <cite>depth</cite>, <cite>to</cite> (time of the first discontinuity),
 and <cite>width</cite>.</p>
-</dd>
-<dt>period_scale <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
-<dd><p class="first last">Type of the scale used to create the grid of periods between <cite>min_period</cite>
+</div></blockquote>
+<p><strong>period_scale</strong> : str</p>
+<blockquote>
+<div><p>Type of the scale used to create the grid of periods between <cite>min_period</cite>
 and <cite>max_period</cite> used to search for the best period.
 Options are ‘linear’ or ‘log’.</p>
-</dd>
-</dl>
 </div></blockquote>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>log_posterior</strong> : list</p>
-<blockquote class="last">
-<div><blockquote>
+<blockquote>
 <div><p>Log posterior (up to an additive constant) of the fit. The “best”
 period is therefore the one that maximizes the log posterior
 probability.</p>
 </div></blockquote>
-<dl class="docutils">
-<dt>trial_periods <span class="classifier-delimiter">:</span> <span class="classifier">numpy array</span></dt>
-<dd><p class="first last">List of trial periods.</p>
-</dd>
-<dt>best_period <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
-<dd><p class="first last">Best period.</p>
-</dd>
-</dl>
+<p><strong>trial_periods</strong> : numpy array</p>
+<blockquote>
+<div><p>List of trial periods.</p>
+</div></blockquote>
+<p><strong>best_period</strong> : float</p>
+<blockquote class="last">
+<div><p>Best period.</p>
 </div></blockquote>
 </td>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Notes</p>
+<p>This function is experimental. Changes may be made in both its signature
+and implementation.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="lightkurve.lightcurve.iterative_box_period_search">
+<code class="descclassname">lightkurve.lightcurve.</code><code class="descname">iterative_box_period_search</code><span class="sig-paren">(</span><em>lc</em>, <em>niters=2</em>, <em>min_period=0.5</em>, <em>max_period=30</em>, <em>nperiods=2000</em>, <em>period_scale='log'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#iterative_box_period_search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.iterative_box_period_search" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements a routine to find box-like transit events.
+This function fits a “box” model defined as:</p>
+<div class="math">
+\[\Pi (t) = h - d\cdot \mathbb{I}(t_0 \leq t_i \leq t_0 + w)\]</div>
+<p>in which <span class="math">\(\mathbb{I}\)</span> is the indicator function.</p>
+<p>It turns out that, in a iid Gaussian noise setting, the parameters
+<span class="math">\(h\)</span> and <span class="math">\(d\)</span>, respectively, the amplitude and the depth
+of the box, can be solved analytically.</p>
+<p>Hence, this function iterates between two procedures:
+(i) compute <span class="math">\(h\)</span> and <span class="math">\(d\)</span> for given <span class="math">\(t_0\)</span> and <span class="math">\(w\)</span>
+(ii) numerically optimize for <span class="math">\(t_0\)</span> and <span class="math">\(w\)</span> given <span class="math">\(h\)</span>
+and <span class="math">\(d\)</span>.</p>
+<p>This procedure is done to a list of <cite>nperiods</cite> periods between <cite>min_period</cite>
+and <cite>max_period</cite>. It’s assumed that the best period is the one that
+maximizes the posterior probability of the fit.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>lc</strong> : LightCurve object</p>
+<blockquote>
+<div><p>An object from KeplerLightCurve or LightCurve.
+Note that flattening the lightcurve beforehand does aid the quest
+for the transit period.</p>
+</div></blockquote>
+<p><strong>min_period</strong> : float</p>
+<blockquote>
+<div><p>Minimum period to search for. Units must be the same as <cite>lc.time</cite>.</p>
+</div></blockquote>
+<p><strong>max_period</strong> : float</p>
+<blockquote>
+<div><p>Maximum period to search for. Units must be the same as <cite>lc.time</cite>.</p>
+</div></blockquote>
+<p><strong>nperiods</strong> : int</p>
+<blockquote>
+<div><p>Number of periods to search between <cite>min_period</cite> and <cite>max_period</cite>.</p>
+</div></blockquote>
+<p><strong>period_scale</strong> : str</p>
+<blockquote>
+<div><p>Type of the scale used to create the grid of periods between <cite>min_period</cite>
+and <cite>max_period</cite> used to search for the best period.
+Options are <cite>linear</cite>, <cite>log</cite>, or <cite>inverse</cite>.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>log_posterior</strong> : list</p>
+<blockquote>
+<div><p>Log posterior (up to an additive constant) of the fit. The “best”
+period is therefore the one that maximizes the log posterior
+probability.</p>
+</div></blockquote>
+<p><strong>trial_periods</strong> : numpy array</p>
+<blockquote>
+<div><p>List of trial periods.</p>
+</div></blockquote>
+<p><strong>best_period</strong> : float</p>
+<blockquote class="last">
+<div><p>Best period.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This function is experimental. Changes may be made in both its signature
+and implementation.</p>
 </dd></dl>
 
 </div>

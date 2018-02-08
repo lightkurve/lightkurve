@@ -96,6 +96,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../api/index.html">API documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../community_software.html">Kepler/K2-Related Community Software</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">lightkurve tutorials</a></li>
@@ -167,6 +168,7 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">oktopus</span>
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="k">import</span> <span class="n">linalg</span><span class="p">,</span> <span class="n">signal</span><span class="p">,</span> <span class="n">interpolate</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="k">import</span> <span class="n">minimize</span>
 <span class="kn">from</span> <span class="nn">astropy.io</span> <span class="k">import</span> <span class="n">fits</span> <span class="k">as</span> <span class="n">pyfits</span>
 <span class="kn">from</span> <span class="nn">astropy.stats</span> <span class="k">import</span> <span class="n">sigma_clip</span>
 <span class="kn">from</span> <span class="nn">astropy.table</span> <span class="k">import</span> <span class="n">Table</span>
@@ -179,7 +181,7 @@
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;LightCurve&#39;</span><span class="p">,</span> <span class="s1">&#39;KeplerLightCurve&#39;</span><span class="p">,</span> <span class="s1">&#39;KeplerLightCurveFile&#39;</span><span class="p">,</span>
            <span class="s1">&#39;KeplerCBVCorrector&#39;</span><span class="p">,</span> <span class="s1">&#39;SPLDCorrector&#39;</span><span class="p">,</span> <span class="s1">&#39;SFFCorrector&#39;</span><span class="p">,</span>
-           <span class="s1">&#39;box_period_search&#39;</span><span class="p">]</span>
+           <span class="s1">&#39;box_period_search&#39;</span><span class="p">,</span> <span class="s1">&#39;iterative_box_period_search&#39;</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="LightCurve"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.LightCurve">[docs]</a><span class="k">class</span> <span class="nc">LightCurve</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -1314,21 +1316,14 @@
 
 
 <div class="viewcode-block" id="box_period_search"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.box_period_search">[docs]</a><span class="k">def</span> <span class="nf">box_period_search</span><span class="p">(</span><span class="n">lc</span><span class="p">,</span> <span class="n">min_period</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">max_period</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">nperiods</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span>
-                      <span class="n">prior</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">period_scale</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">):</span>
+                      <span class="n">prior</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">period_scale</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Implements a brute force search to find transit-like periodic events.</span>
 <span class="sd">    This function fits a &quot;box&quot; model defined as:</span>
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        \Pi (t) =</span>
-<span class="sd">            \left\{</span>
-<span class="sd">                \begin{array}{ll}</span>
-<span class="sd">                    a, &amp; t &lt; t_o,\\</span>
-<span class="sd">                    a - d, &amp; t_o \leq t &lt; t_o + w, \\</span>
-<span class="sd">                    a, &amp; t \geq t_o + w</span>
-<span class="sd">                \end{array}</span>
-<span class="sd">            \right.</span>
+<span class="sd">        \Pi (t) = h - d\cdot \mathbb{I}(t_0 \leq t_i \leq t_0 + w)</span>
 
 <span class="sd">    to a list of `nperiods` periods between `min_period` and `max_period`.</span>
 <span class="sd">    It&#39;s assumed that the best period is the one that maximizes the posterior</span>
@@ -1365,16 +1360,24 @@
 <span class="sd">        List of trial periods.</span>
 <span class="sd">    best_period : float</span>
 <span class="sd">        Best period.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This function is experimental. Changes may be made in both its signature</span>
+<span class="sd">    and implementation.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-.</span><span class="mi">5</span><span class="p">,</span> <span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="p">))</span>
+    <span class="n">val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="p">))</span>
+
     <span class="k">def</span> <span class="nf">box</span><span class="p">(</span><span class="n">amplitude</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">to</span><span class="p">,</span> <span class="n">width</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;A simple box function defined in the interval [-.5, .5].</span>
 <span class="sd">        `to` is the time of the first discontinuity.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">val</span> <span class="o">=</span> <span class="n">amplitude</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="p">))</span>
-        <span class="n">val</span><span class="p">[(</span><span class="n">t</span> <span class="o">==</span> <span class="n">to</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">t</span> <span class="o">==</span> <span class="n">to</span> <span class="o">+</span> <span class="n">width</span><span class="p">)]</span> <span class="o">=</span> <span class="n">amplitude</span> <span class="o">-</span> <span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="n">depth</span>
-        <span class="n">val</span><span class="p">[(</span><span class="n">t</span> <span class="o">&gt;</span> <span class="n">to</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">t</span> <span class="o">&lt;</span> <span class="n">to</span> <span class="o">+</span> <span class="n">width</span><span class="p">)]</span> <span class="o">=</span> <span class="n">amplitude</span> <span class="o">-</span> <span class="n">depth</span>
+        <span class="n">out_of_transit</span> <span class="o">=</span> <span class="p">(</span><span class="n">t</span> <span class="o">&lt;</span> <span class="n">to</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">t</span> <span class="o">&gt;=</span> <span class="n">to</span> <span class="o">+</span> <span class="n">width</span><span class="p">)</span>
+        <span class="n">in_transit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">out_of_transit</span><span class="p">)</span>
+        <span class="n">val</span><span class="p">[</span><span class="n">out_of_transit</span><span class="p">]</span> <span class="o">=</span> <span class="n">amplitude</span>
+        <span class="n">val</span><span class="p">[</span><span class="n">in_transit</span><span class="p">]</span> <span class="o">=</span> <span class="n">amplitude</span> <span class="o">-</span> <span class="n">depth</span>
         <span class="k">return</span> <span class="n">val</span>
 
     <span class="k">if</span> <span class="n">prior</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1398,6 +1401,129 @@
         <span class="n">res</span> <span class="o">=</span> <span class="n">ll</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x0</span><span class="o">=</span><span class="n">prior</span><span class="o">.</span><span class="n">mean</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;powell&#39;</span><span class="p">,</span>
                      <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;ftol&#39;</span><span class="p">:</span><span class="mf">1e-9</span><span class="p">,</span> <span class="s1">&#39;xtol&#39;</span><span class="p">:</span><span class="mf">1e-9</span><span class="p">,</span> <span class="s1">&#39;maxfev&#39;</span><span class="p">:</span> <span class="mi">2000</span><span class="p">})</span>
         <span class="c1"># fun is the negative log posterior</span>
+        <span class="n">log_posterior</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">-</span><span class="n">res</span><span class="o">.</span><span class="n">fun</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">log_posterior</span><span class="p">,</span> <span class="n">trial_periods</span><span class="p">,</span> <span class="n">trial_periods</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">log_posterior</span><span class="p">)]</span></div>
+
+
+<div class="viewcode-block" id="iterative_box_period_search"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.iterative_box_period_search">[docs]</a><span class="k">def</span> <span class="nf">iterative_box_period_search</span><span class="p">(</span><span class="n">lc</span><span class="p">,</span> <span class="n">niters</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">min_period</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">max_period</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+                                <span class="n">nperiods</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">period_scale</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Implements a routine to find box-like transit events.</span>
+<span class="sd">    This function fits a &quot;box&quot; model defined as:</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \Pi (t) = h - d\cdot \mathbb{I}(t_0 \leq t_i \leq t_0 + w)</span>
+
+<span class="sd">    in which :math:`\mathbb{I}` is the indicator function.</span>
+
+<span class="sd">    It turns out that, in a iid Gaussian noise setting, the parameters</span>
+<span class="sd">    :math:`h` and :math:`d`, respectively, the amplitude and the depth</span>
+<span class="sd">    of the box, can be solved analytically.</span>
+
+<span class="sd">    Hence, this function iterates between two procedures:</span>
+<span class="sd">    (i) compute :math:`h` and :math:`d` for given :math:`t_0` and :math:`w`</span>
+<span class="sd">    (ii) numerically optimize for :math:`t_0` and :math:`w` given :math:`h`</span>
+<span class="sd">    and :math:`d`.</span>
+
+<span class="sd">    This procedure is done to a list of `nperiods` periods between `min_period`</span>
+<span class="sd">    and `max_period`. It&#39;s assumed that the best period is the one that</span>
+<span class="sd">    maximizes the posterior probability of the fit.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lc : LightCurve object</span>
+<span class="sd">        An object from KeplerLightCurve or LightCurve.</span>
+<span class="sd">        Note that flattening the lightcurve beforehand does aid the quest</span>
+<span class="sd">        for the transit period.</span>
+<span class="sd">    min_period : float</span>
+<span class="sd">        Minimum period to search for. Units must be the same as `lc.time`.</span>
+<span class="sd">    max_period : float</span>
+<span class="sd">        Maximum period to search for. Units must be the same as `lc.time`.</span>
+<span class="sd">    nperiods : int</span>
+<span class="sd">        Number of periods to search between `min_period` and `max_period`.</span>
+<span class="sd">    period_scale : str</span>
+<span class="sd">        Type of the scale used to create the grid of periods between `min_period`</span>
+<span class="sd">        and `max_period` used to search for the best period.</span>
+<span class="sd">        Options are `linear`, `log`, or `inverse`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    log_posterior : list</span>
+<span class="sd">        Log posterior (up to an additive constant) of the fit. The &quot;best&quot;</span>
+<span class="sd">        period is therefore the one that maximizes the log posterior</span>
+<span class="sd">        probability.</span>
+<span class="sd">    trial_periods : numpy array</span>
+<span class="sd">        List of trial periods.</span>
+<span class="sd">    best_period : float</span>
+<span class="sd">        Best period.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This function is experimental. Changes may be made in both its signature</span>
+<span class="sd">    and implementation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-.</span><span class="mi">5</span><span class="p">,</span> <span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="p">))</span>
+    <span class="n">logprior_to</span> <span class="o">=</span> <span class="n">oktopus</span><span class="o">.</span><span class="n">prior</span><span class="o">.</span><span class="n">UniformPrior</span><span class="p">(</span><span class="n">lb</span><span class="o">=-.</span><span class="mi">5</span><span class="p">,</span> <span class="n">ub</span><span class="o">=.</span><span class="mi">5</span><span class="p">)</span>
+    <span class="n">logprior_width</span> <span class="o">=</span> <span class="n">oktopus</span><span class="o">.</span><span class="n">prior</span><span class="o">.</span><span class="n">UniformPrior</span><span class="p">(</span><span class="n">lb</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">ub</span><span class="o">=.</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">flux</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">logposterior</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">amplitude</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Defines the negative of log of the joint posterior distribution of</span>
+<span class="sd">        the start time of the transit `to` and the transit duration `w`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">to</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="n">args</span>
+        <span class="n">out_of_transit</span> <span class="o">=</span> <span class="p">(</span><span class="n">t</span> <span class="o">&lt;</span> <span class="n">to</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">t</span> <span class="o">&gt;=</span> <span class="n">to</span> <span class="o">+</span> <span class="n">width</span><span class="p">)</span>
+        <span class="n">in_transit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">out_of_transit</span><span class="p">)</span>
+        <span class="n">ll</span> <span class="o">=</span> <span class="p">((</span><span class="n">data</span> <span class="o">-</span> <span class="n">amplitude</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">out_of_transit</span>
+              <span class="o">+</span> <span class="p">(</span><span class="n">data</span> <span class="o">-</span> <span class="p">(</span><span class="n">amplitude</span> <span class="o">-</span> <span class="n">depth</span><span class="p">))</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">in_transit</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">ll</span><span class="p">)</span> <span class="o">+</span> <span class="n">logprior_to</span><span class="p">(</span><span class="n">to</span><span class="p">)</span> <span class="o">+</span> <span class="n">logprior_width</span><span class="p">(</span><span class="n">width</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">opt_amplitude</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">depth</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The MAP estimator for the amplitude of the lightcurve given that</span>
+<span class="sd">        `to` and `w` have joint uniform prior distribution.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">width</span> <span class="o">*</span> <span class="n">depth</span> <span class="o">+</span> <span class="n">m</span>
+
+    <span class="k">def</span> <span class="nf">opt_depth</span><span class="p">(</span><span class="n">to</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The MAP estimator for the transit depth given that `to` and `w`</span>
+<span class="sd">        have joint uniform prior distribution.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">in_transit</span> <span class="o">=</span> <span class="p">(</span><span class="n">t</span> <span class="o">&lt;</span> <span class="n">to</span> <span class="o">+</span> <span class="n">width</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">t</span> <span class="o">&gt;=</span> <span class="n">to</span><span class="p">)</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">in_transit</span><span class="p">])</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">m</span> <span class="o">-</span> <span class="n">n</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">width</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">period_scale</span> <span class="o">==</span> <span class="s1">&#39;linear&#39;</span><span class="p">:</span>
+        <span class="n">trial_periods</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">min_period</span><span class="p">,</span> <span class="n">max_period</span><span class="p">,</span> <span class="n">nperiods</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">period_scale</span> <span class="o">==</span> <span class="s1">&#39;log&#39;</span><span class="p">:</span>
+        <span class="n">trial_periods</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">min_period</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">max_period</span><span class="p">),</span> <span class="n">nperiods</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">period_scale</span> <span class="o">==</span> <span class="s1">&#39;inverse&#39;</span><span class="p">:</span>
+        <span class="n">trial_periods</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">max_period</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="n">min_period</span><span class="p">,</span> <span class="n">nperiods</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;period_scale must be one of </span><span class="si">{}</span><span class="s2">. Got </span><span class="si">{}</span><span class="s2">.&quot;</span>
+                         <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;{&#39;linear&#39;, &#39;log&#39;, &#39;inverse&#39;}&quot;</span><span class="p">,</span> <span class="n">period_scale</span><span class="p">))</span>
+
+    <span class="n">log_posterior</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">trial_periods</span><span class="p">):</span>
+        <span class="n">folded</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="n">p</span><span class="p">)</span>
+        <span class="c1"># heuristically define initial guesses for the parameters</span>
+        <span class="n">amplitude_star</span><span class="p">,</span> <span class="n">depth_star</span> <span class="o">=</span> <span class="n">m</span><span class="p">,</span> <span class="mf">1e-4</span>
+        <span class="n">width_star</span> <span class="o">=</span> <span class="o">.</span><span class="mi">1</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">folded</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="n">t</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">folded</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="n">t</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]):</span>
+            <span class="n">to_star</span> <span class="o">=</span> <span class="o">.</span><span class="mi">25</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">to_star</span> <span class="o">=</span> <span class="o">-.</span><span class="mi">25</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">niters</span><span class="p">):</span>
+            <span class="c1"># optimize the joint log posterior of to and width</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="n">logposterior</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="p">(</span><span class="n">to_star</span><span class="p">,</span> <span class="n">width_star</span><span class="p">),</span>
+                           <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">amplitude_star</span><span class="p">,</span> <span class="n">depth_star</span><span class="p">,</span> <span class="n">folded</span><span class="o">.</span><span class="n">flux</span><span class="p">),</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;powell&#39;</span><span class="p">,</span>
+                           <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;ftol&#39;</span><span class="p">:</span><span class="mf">1e-9</span><span class="p">,</span> <span class="s1">&#39;xtol&#39;</span><span class="p">:</span><span class="mf">1e-9</span><span class="p">,</span> <span class="s1">&#39;maxfev&#39;</span><span class="p">:</span> <span class="mi">2000</span><span class="p">})</span>
+            <span class="n">to_star</span><span class="p">,</span> <span class="n">width_star</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">x</span>
+            <span class="c1"># compute the depth and amplitude using MAP</span>
+            <span class="n">depth_star</span> <span class="o">=</span> <span class="n">opt_depth</span><span class="p">(</span><span class="n">to_star</span><span class="p">,</span> <span class="n">width_star</span><span class="p">,</span> <span class="n">folded</span><span class="o">.</span><span class="n">flux</span><span class="p">)</span>
+            <span class="n">amplitude_star</span> <span class="o">=</span> <span class="n">opt_amplitude</span><span class="p">(</span><span class="n">width_star</span><span class="p">,</span> <span class="n">depth_star</span><span class="p">)</span>
         <span class="n">log_posterior</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">-</span><span class="n">res</span><span class="o">.</span><span class="n">fun</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">log_posterior</span><span class="p">,</span> <span class="n">trial_periods</span><span class="p">,</span> <span class="n">trial_periods</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">log_posterior</span><span class="p">)]</span></div>
