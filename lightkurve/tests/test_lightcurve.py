@@ -18,7 +18,7 @@ KEPLER10 = ("https://archive.stsci.edu/missions/kepler/lightcurves/"
 
 
 def test_math_operators():
-    lc = LightCurve(time=np.arange(5), flux=np.arange(5), flux_err=np.arange(5))
+    lc = LightCurve(time=np.arange(1, 5), flux=np.arange(1, 5), flux_err=np.arange(1, 5))
     lc_add = lc + 1
     lc_sub = lc - 1
     lc_mul = lc * 2
@@ -30,7 +30,7 @@ def test_math_operators():
 
 
 def test_rmath_operators():
-    lc = LightCurve(time=np.arange(5), flux=np.arange(5), flux_err=np.arange(5))
+    lc = LightCurve(time=np.arange(1, 5), flux=np.arange(1, 5), flux_err=np.arange(1, 5))
     lc_add = 1 + lc
     lc_sub = 1 - lc
     lc_mul = 2 * lc
