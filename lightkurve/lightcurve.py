@@ -48,38 +48,44 @@ class LightCurve(object):
             self.flux_err = np.nan * np.ones_like(self.time)
         self.meta = meta
 
-    def __add__(self, c):
+    def __add__(self, other):
         copy_self = copy.copy(self)
-        copy_self.flux = copy_self.flux + c
+        copy_self.flux = copy_self.flux + other
         return copy_self
 
-    def __radd__(self, c):
-        return self.__add__(c)
+    def __radd__(self, other):
+        return self.__add__(other)
 
-    def __sub__(self, c):
-        return self.__add__(-c)
+    def __sub__(self, other):
+        return self.__add__(-other)
 
-    def __rsub__(self, c):
+    def __rsub__(self, other):
         copy_self = copy.copy(self)
-        copy_self.flux = c - copy_self.flux
+        copy_self.flux = other - copy_self.flux
         return copy_self
 
-    def __mul__(self, c):
+    def __mul__(self, other):
         copy_self = copy.copy(self)
-        copy_self.flux = c * copy_self.flux
-        copy_self.flux_err = abs(c) * copy_self.flux_err
+        copy_self.flux = other * copy_self.flux
+        copy_self.flux_err = abs(other) * copy_self.flux_err
         return copy_self
 
-    def __rmul__(self, c):
-        return self.__mul__(c)
+    def __rmul__(self, other):
+        return self.__mul__(other)
 
-    def __truediv__(self, c):
-        return self.__mul__(1/c)
+    def __truediv__(self, other):
+        return self.__mul__(1/other)
 
-    def __rtruediv__(self, c):
+    def __rtruediv__(self, other):
         copy_self = copy.copy(self)
-        copy_self.flux = c / copy_self.flux
+        copy_self.flux = other / copy_self.flux
         return copy_self
+
+    def __div__(self, other):
+        return self.__truediv__(other)
+
+    def __rdiv__(self, other):
+        return self.__rtruediv__(other)
 
     def stitch(self, *others):
         """
