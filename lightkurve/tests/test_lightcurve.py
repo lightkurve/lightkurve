@@ -17,6 +17,30 @@ KEPLER10 = ("https://archive.stsci.edu/missions/kepler/lightcurves/"
             "0119/011904151/kplr011904151-2010009091648_llc.fits")
 
 
+def test_math_operators():
+    lc = LightCurve(time=np.arange(5), flux=np.arange(5), flux_err=np.arange(5))
+    lc_add = lc + 1
+    lc_sub = lc - 1
+    lc_mul = lc * 2
+    lc_div = lc / 2
+    assert_array_equal(lc_add.flux, lc.flux + 1)
+    assert_array_equal(lc_sub.flux, lc.flux - 1)
+    assert_array_equal(lc_mul.flux, lc.flux * 2)
+    assert_array_equal(lc_div.flux, lc.flux / 2)
+
+
+def test_rmath_operators():
+    lc = LightCurve(time=np.arange(5), flux=np.arange(5), flux_err=np.arange(5))
+    lc_add = 1 + lc
+    lc_sub = 1 - lc
+    lc_mul = 2 * lc
+    lc_div = 2 / lc
+    assert_array_equal(lc_add.flux, lc.flux + 1)
+    assert_array_equal(lc_sub.flux, 1 - lc.flux)
+    assert_array_equal(lc_mul.flux, lc.flux * 2)
+    assert_array_equal(lc_div.flux, 2 / lc.flux)
+
+
 def test_kepler_cbv_fit():
     # comparing that the two methods to do cbv fit are the nearly the same
     cbv = KeplerCBVCorrector(TABBY_Q8)

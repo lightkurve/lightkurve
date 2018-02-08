@@ -1,15 +1,20 @@
 import copy
-import numpy as np
+import math
+import requests
+
+from bs4 import BeautifulSoup
+from tqdm import tqdm
+
 import oktopus
+import numpy as np
 from scipy import linalg, signal, interpolate
 from scipy.optimize import minimize
+from matplotlib import pyplot as plt
+
 from astropy.io import fits as pyfits
 from astropy.stats import sigma_clip
 from astropy.table import Table
-from tqdm import tqdm
-import requests
-from bs4 import BeautifulSoup
-from matplotlib import pyplot as plt
+
 from .utils import running_mean, channel_to_module_output, KeplerQualityFlags
 
 
@@ -42,6 +47,39 @@ class LightCurve(object):
         else:
             self.flux_err = np.nan * np.ones_like(self.time)
         self.meta = meta
+
+    def __add__(self, c):
+        copy_self = copy.copy(self)
+        copy_self.flux = copy_self.flux + c
+        return copy_self
+
+    def __radd__(self, c):
+        return self.__add__(c)
+
+    def __sub__(self, c):
+        return self.__add__(-c)
+
+    def __rsub__(self, c):
+        copy_self = copy.copy(self)
+        copy_self.flux = c - copy_self.flux
+        return copy_self
+
+    def __mul__(self, c):
+        copy_self = copy.copy(self)
+        copy_self.flux = c * copy_self.flux
+        copy_self.flux_err = abs(c) * copy_self.flux_err
+        return copy_self
+
+    def __rmul__(self, c):
+        return self.__mul__(c)
+
+    def __truediv__(self, c):
+        return self.__mul__(1/c)
+
+    def __rtruediv__(self, c):
+        copy_self = copy.copy(self)
+        copy_self.flux = c / copy_self.flux
+        return copy_self
 
     def stitch(self, *others):
         """
