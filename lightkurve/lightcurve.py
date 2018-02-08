@@ -60,9 +60,7 @@ class LightCurve(object):
         return self.__add__(-other)
 
     def __rsub__(self, other):
-        copy_self = copy.copy(self)
-        copy_self.flux = other - copy_self.flux
-        return copy_self
+        return self.__radd__(-other)
 
     def __mul__(self, other):
         copy_self = copy.copy(self)
@@ -74,12 +72,10 @@ class LightCurve(object):
         return self.__mul__(other)
 
     def __truediv__(self, other):
-        return self.__mul__(1/other)
+        return self.__mul__(1./other)
 
     def __rtruediv__(self, other):
-        copy_self = copy.copy(self)
-        copy_self.flux = other / copy_self.flux
-        return copy_self
+        return self.__rmul__(1./other)
 
     def __div__(self, other):
         return self.__truediv__(other)
