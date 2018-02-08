@@ -42,11 +42,11 @@ class LightCurve(object):
         if flux_err is not None:
             flux_err = np.asarray(flux_err)
         else:
-            flux_err = np.nan * np.ones_like(time)
+            flux_err = np.nan * np.ones_like(flux)
 
-        if ~(len(time) == len(flux) == len(flux_err)):
+        if not (len(time) == len(flux)):
             raise ValueError("Input arrays have different lengths."
-                             "len(time)={}, len(flux)={}, len(flux_err)={}"
+                             " len(time)={}, len(flux)={}, len(flux_err)={}"
                              .format(len(time), len(flux), len(flux_err)))
 
         return np.asarray(time), np.asarray(flux), flux_err

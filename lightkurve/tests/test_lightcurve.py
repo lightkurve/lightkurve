@@ -17,6 +17,17 @@ KEPLER10 = ("https://archive.stsci.edu/missions/kepler/lightcurves/"
             "0119/011904151/kplr011904151-2010009091648_llc.fits")
 
 
+def test_LightCurve():
+    err_string = ("Input arrays have different lengths."
+                  " len(time)=5, len(flux)=4, len(flux_err)=4")
+    time = np.array([1, 2, 3, 4, 5])
+    flux = np.array([1, 2, 3, 4])
+
+    with pytest.raises(ValueError) as err:
+        lc = LightCurve(time=time, flux=flux)
+    assert err_string == err.value.args[0]
+
+
 def test_kepler_cbv_fit():
     # comparing that the two methods to do cbv fit are the nearly the same
     cbv = KeplerCBVCorrector(TABBY_Q8)
@@ -26,11 +37,13 @@ def test_kepler_cbv_fit():
     cbv_lcf = lcf.compute_cotrended_lightcurve()
     assert_almost_equal(cbv_lc.flux, cbv_lcf.flux)
 
+
 def test_load_bad_file():
-    '''Test if a TPF can be opened without exception.'''
+    """Test if a TPF can be opened without exception."""
     with pytest.raises(ValueError) as exc:
         lcf = KeplerLightCurveFile(TABBY_TPF)
     assert('is this a light curve file?' in exc.value.args[0])
+
 
 def test_KeplerLightCurve():
     lcf = KeplerLightCurveFile(TABBY_Q8, quality_bitmask=None)
@@ -48,7 +61,7 @@ def test_KeplerLightCurve():
     ('hard', 2706), ('default', 2917), (None, 3279),
     (1, 3279), (100, 3252), (2096639, 2661)])
 def test_bitmasking(quality_bitmask, answer):
-    '''Test whether the bitmasking behaves like it should'''
+    """Test whether the bitmasking behaves like it should"""
     lcf = KeplerLightCurveFile(TABBY_Q8, quality_bitmask=quality_bitmask)
     flux = lcf.get_lightcurve('SAP_FLUX').flux
     assert len(flux) == answer
