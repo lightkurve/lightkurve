@@ -1,8 +1,8 @@
 .. _community_software:
 
-======================================
-Kepler/K2-Related Community Software
-======================================
+====================
+Community Software
+====================
 
 **lightkurve** provides general purpose tools for interacting with astronomical lightcurve data.
 Many other tools have been developed to solve related scientific and data analysis problems.
