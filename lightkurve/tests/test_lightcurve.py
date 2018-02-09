@@ -1,3 +1,5 @@
+from __future__ import division, print_function
+
 import pytest
 import numpy as np
 from numpy.testing import (assert_almost_equal, assert_array_equal,
@@ -15,6 +17,30 @@ TABBY_TPF = ("https://archive.stsci.edu/missions/kepler/target_pixel_files"
             "/0084/008462852/kplr008462852-2011073133259_lpd-targ.fits.gz")
 KEPLER10 = ("https://archive.stsci.edu/missions/kepler/lightcurves/"
             "0119/011904151/kplr011904151-2010009091648_llc.fits")
+
+
+def test_math_operators():
+    lc = LightCurve(time=np.arange(1, 5), flux=np.arange(1, 5), flux_err=np.arange(1, 5))
+    lc_add = lc + 1
+    lc_sub = lc - 1
+    lc_mul = lc * 2
+    lc_div = lc / 2
+    assert_array_equal(lc_add.flux, lc.flux + 1)
+    assert_array_equal(lc_sub.flux, lc.flux - 1)
+    assert_array_equal(lc_mul.flux, lc.flux * 2)
+    assert_array_equal(lc_div.flux, lc.flux / 2)
+
+
+def test_rmath_operators():
+    lc = LightCurve(time=np.arange(1, 5), flux=np.arange(1, 5), flux_err=np.arange(1, 5))
+    lc_add = 1 + lc
+    lc_sub = 1 - lc
+    lc_mul = 2 * lc
+    lc_div = 2 / lc
+    assert_array_equal(lc_add.flux, lc.flux + 1)
+    assert_array_equal(lc_sub.flux, 1 - lc.flux)
+    assert_array_equal(lc_mul.flux, lc.flux * 2)
+    assert_array_equal(lc_div.flux, 2 / lc.flux)
 
 
 def test_kepler_cbv_fit():
