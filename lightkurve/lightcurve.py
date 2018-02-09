@@ -42,13 +42,21 @@ class LightCurve(object):
     """
 
     def __init__(self, time, flux, flux_err=None, meta={}):
-        self.time = np.asarray(time)
-        self.flux = np.asarray(flux)
-        if flux_err is not None:
-            self.flux_err = np.asarray(flux_err)
-        else:
-            self.flux_err = np.nan * np.ones_like(self.time)
+        self.time, self.flux, self.flux_err = self._validate_inputs(time, flux, flux_err)
         self.meta = meta
+
+    def _validate_inputs(self, time, flux, flux_err):
+        if flux_err is not None:
+            flux_err = np.asarray(flux_err)
+        else:
+            flux_err = np.nan * np.ones_like(flux)
+
+        if not (len(time) == len(flux)):
+            raise ValueError("Input arrays have different lengths."
+                             " len(time)={}, len(flux)={}, len(flux_err)={}"
+                             .format(len(time), len(flux), len(flux_err)))
+
+        return np.asarray(time), np.asarray(flux), flux_err
 
     def __add__(self, other):
         copy_self = copy.copy(self)
