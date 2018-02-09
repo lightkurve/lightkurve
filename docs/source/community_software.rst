@@ -18,6 +18,7 @@ Detrending & Analysis
 - `skope <http://github.com/nksaunders/skope>`_ : Synthetic K2 Objects for PLD Experimentation
 - `k2phot <http://github.com/petigura/k2phot>`_ : public k2phot code from Erik Petigura
 - `K2-CPM <http://github.com/jvc2688/K2-CPM>`_ : K2 Causal Pixel Model
+- `halophot <https://github.com/hvidy/halophot/>`_ : K2 Halo Photometry for very bright stars
 - `cave <http://github.com/nksaunders/cave>`_ : Crowded Aperture Variability Extraction
 - `celerite-asteroseis <http://github.com/skgrunblatt/celerite-asteroseis>`_ : Transit fitting and basic time-domain asteroseismology using celerite and ktransit
 - `k2photometry <http://github.com/vincentvaneylen/k2photometry>`_ : Read, reduce and detrend K2 photometry and search for transiting planets
