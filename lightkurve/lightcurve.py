@@ -1406,8 +1406,8 @@ def iterative_box_period_search(lc, niters=2, min_period=0.5, max_period=30,
         for i in range(niters):
             # optimize the joint log posterior of to and width
             res = minimize(logposterior, x0=(to_star, width_star),
-                           args=(amplitude_star, depth_star, folded.flux), method='powell',
-                           options={'ftol':1e-9, 'xtol':1e-9, 'maxfev': 2000})
+                           args=(amplitude_star, depth_star, folded.flux),
+                           method='powell')
             to_star, width_star = res.x
             # compute the depth and amplitude using MAP
             depth_star = opt_depth(to_star, width_star, folded.flux)
