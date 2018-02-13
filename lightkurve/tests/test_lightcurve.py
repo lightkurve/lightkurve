@@ -215,7 +215,7 @@ def test_box_period_search():
                                                nperiods=100, period_scale='log')
     assert abs(kepler10b_period - answer) < 1e-2
 
-    _, _, kepler10b_period = iterative_box_period_search(flat, min_period=.5, max_period=1,
+    _, _, _, kepler10b_period = iterative_box_period_search(flat, min_period=.5, max_period=1,
                                                     nperiods=100, period_scale='log')
     assert abs(kepler10b_period - answer) < 1e-2
 

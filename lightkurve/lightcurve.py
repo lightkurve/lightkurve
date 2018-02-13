@@ -1393,7 +1393,7 @@ def iterative_box_period_search(lc, niters=2, min_period=0.5, max_period=30,
         raise ValueError("period_scale must be one of {}. Got {}."
                          .format("{'linear', 'log', 'inverse'}", period_scale))
 
-    log_posterior = []
+    log_posterior, snr_d = [], []
     for p in tqdm(trial_periods):
         folded = lc.fold(period=p)
         # heuristically define initial guesses for the parameters
@@ -1413,5 +1413,6 @@ def iterative_box_period_search(lc, niters=2, min_period=0.5, max_period=30,
             depth_star = opt_depth(to_star, width_star, folded.flux)
             amplitude_star = opt_amplitude(width_star, depth_star)
         log_posterior.append(-res.fun)
+        snr_d.append(depth_star * np.sqrt(width_star))
 
-    return log_posterior, trial_periods, trial_periods[np.argmax(log_posterior)]
+    return log_posterior, snr_d, trial_periods, trial_periods[np.argmax(log_posterior)]
