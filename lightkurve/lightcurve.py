@@ -1295,7 +1295,7 @@ def box_period_search(lc, min_period=0.5, max_period=30, nperiods=2000,
 
 
 def iterative_box_period_search(lc, niters=2, min_period=0.5, max_period=30,
-                                nperiods=2000, period_scale='log'):
+                                nperiods=501, period_scale='log'):
     """
     Implements a routine to find box-like transit events.
     This function fits a "box" model defined as:
@@ -1415,4 +1415,4 @@ def iterative_box_period_search(lc, niters=2, min_period=0.5, max_period=30,
         log_posterior.append(-res.fun)
         snr_d.append(depth_star * np.sqrt(width_star))
 
-    return log_posterior, snr_d, trial_periods, trial_periods[np.argmax(log_posterior)]
+    return log_posterior, trial_periods, trial_periods[np.argmax(log_posterior)]
