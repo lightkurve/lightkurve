@@ -4,17 +4,15 @@
 lightkurve Documentation
 ========================
 
-|pypi-badge| |ci-badge| |appveyor-badge| |cov-badge| |doi-badge|
-
-.. |pypi-badge| image:: https://img.shields.io/pypi/v/lightkurve.svg
+.. image:: https://img.shields.io/pypi/v/lightkurve.svg
                 :target: https://pypi.python.org/pypi/lightkurve
-.. |ci-badge| image:: https://travis-ci.org/KeplerGO/lightkurve.svg?branch=master
+.. image:: https://travis-ci.org/KeplerGO/lightkurve.svg?branch=master
               :target: https://travis-ci.org/KeplerGO/lightkurve
-.. |appveyor-badge| image:: https://ci.appveyor.com/api/projects/status/6jvv5d7a142gwm8a/branch/master?svg=true
+.. image:: https://ci.appveyor.com/api/projects/status/6jvv5d7a142gwm8a/branch/master?svg=true
                     :target: https://ci.appveyor.com/project/mirca/lightkurve
-.. |cov-badge| image:: https://codecov.io/gh/KeplerGO/lightkurve/branch/master/graph/badge.svg
+.. image:: https://codecov.io/gh/KeplerGO/lightkurve/branch/master/graph/badge.svg
               :target: https://codecov.io/gh/KeplerGO/lightkurve
-.. |doi-badge| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.835584.svg
+.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.835584.svg
               :target: https://doi.org/10.5281/zenodo.835584
 
 Welcome to **lightkurve** documentation!
