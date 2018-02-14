@@ -52,7 +52,7 @@
 
           
             
-            <img src="../../_static/lightkurve.gif" class="logo" alt="Logo"/>
+            <img src="../../_static/lightkurve.svg" class="logo" alt="Logo"/>
           
           </a>
 
@@ -1597,7 +1597,7 @@
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;period_scale must be one of </span><span class="si">{}</span><span class="s2">. Got </span><span class="si">{}</span><span class="s2">.&quot;</span>
                          <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;{&#39;linear&#39;, &#39;log&#39;, &#39;inverse&#39;}&quot;</span><span class="p">,</span> <span class="n">period_scale</span><span class="p">))</span>
 
-    <span class="n">log_posterior</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">log_posterior</span><span class="p">,</span> <span class="n">snr_d</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">trial_periods</span><span class="p">):</span>
         <span class="n">folded</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="n">p</span><span class="p">)</span>
         <span class="c1"># heuristically define initial guesses for the parameters</span>
@@ -1610,15 +1610,16 @@
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">niters</span><span class="p">):</span>
             <span class="c1"># optimize the joint log posterior of to and width</span>
             <span class="n">res</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="n">logposterior</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="p">(</span><span class="n">to_star</span><span class="p">,</span> <span class="n">width_star</span><span class="p">),</span>
-                           <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">amplitude_star</span><span class="p">,</span> <span class="n">depth_star</span><span class="p">,</span> <span class="n">folded</span><span class="o">.</span><span class="n">flux</span><span class="p">),</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;powell&#39;</span><span class="p">,</span>
-                           <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;ftol&#39;</span><span class="p">:</span><span class="mf">1e-9</span><span class="p">,</span> <span class="s1">&#39;xtol&#39;</span><span class="p">:</span><span class="mf">1e-9</span><span class="p">,</span> <span class="s1">&#39;maxfev&#39;</span><span class="p">:</span> <span class="mi">2000</span><span class="p">})</span>
+                           <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">amplitude_star</span><span class="p">,</span> <span class="n">depth_star</span><span class="p">,</span> <span class="n">folded</span><span class="o">.</span><span class="n">flux</span><span class="p">),</span>
+                           <span class="n">method</span><span class="o">=</span><span class="s1">&#39;powell&#39;</span><span class="p">)</span>
             <span class="n">to_star</span><span class="p">,</span> <span class="n">width_star</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">x</span>
             <span class="c1"># compute the depth and amplitude using MAP</span>
             <span class="n">depth_star</span> <span class="o">=</span> <span class="n">opt_depth</span><span class="p">(</span><span class="n">to_star</span><span class="p">,</span> <span class="n">width_star</span><span class="p">,</span> <span class="n">folded</span><span class="o">.</span><span class="n">flux</span><span class="p">)</span>
             <span class="n">amplitude_star</span> <span class="o">=</span> <span class="n">opt_amplitude</span><span class="p">(</span><span class="n">width_star</span><span class="p">,</span> <span class="n">depth_star</span><span class="p">)</span>
         <span class="n">log_posterior</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">-</span><span class="n">res</span><span class="o">.</span><span class="n">fun</span><span class="p">)</span>
+        <span class="n">snr_d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">depth_star</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">width_star</span><span class="p">))</span>
 
-    <span class="k">return</span> <span class="n">log_posterior</span><span class="p">,</span> <span class="n">trial_periods</span><span class="p">,</span> <span class="n">trial_periods</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">log_posterior</span><span class="p">)]</span></div>
+    <span class="k">return</span> <span class="n">log_posterior</span><span class="p">,</span> <span class="n">snr_d</span><span class="p">,</span> <span class="n">trial_periods</span><span class="p">,</span> <span class="n">trial_periods</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">log_posterior</span><span class="p">)]</span></div>
 </pre></div>
 
            </div>
