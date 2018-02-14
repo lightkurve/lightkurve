@@ -212,11 +212,11 @@ def test_box_period_search():
     flat, trend = pdc.flatten(return_trend=True)
 
     _, _, kepler10b_period = box_period_search(flat, min_period=.5, max_period=1,
-                                               nperiods=100, period_scale='log')
+                                               nperiods=101, period_scale='log')
     assert abs(kepler10b_period - answer) < 1e-2
 
-    _, _, _, kepler10b_period = iterative_box_period_search(flat, min_period=.5, max_period=1,
-                                                    nperiods=100, period_scale='log')
+    _, _, kepler10b_period = iterative_box_period_search(flat, min_period=.5, max_period=1,
+                                                         nperiods=101, period_scale='log')
     assert abs(kepler10b_period - answer) < 1e-2
 
 
