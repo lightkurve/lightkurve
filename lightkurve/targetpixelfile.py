@@ -1,12 +1,13 @@
-import numpy as np
 import warnings
-import scipy
-import matplotlib.pyplot as plt
-from matplotlib import patches
+
 from astropy.io import fits
+from matplotlib import patches
+import numpy as np
+
 from .lightcurve import KeplerLightCurve, LightCurve
 from .prf import SimpleKeplerPRF
 from .utils import KeplerQualityFlags, plot_image
+from .mast import search_kepler_tpf_products, download_products, ArchiveError
 
 
 __all__ = ['KeplerTargetPixelFile']
@@ -36,7 +37,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
     Attributes
     ----------
     path : str
-        Path to fits file.
+        Path to a Kepler Target Pixel (FITS) File.
     quality_bitmask : str or int
         Bitmask specifying quality flags of cadences that should be ignored.
         If a string is passed, it has the following meaning:
@@ -51,7 +52,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
         http://archive.stsci.edu/kepler/manuals/archive_manual.pdf
     """
 
-
     def __init__(self, path, quality_bitmask=KeplerQualityFlags.DEFAULT_BITMASK,
                  **kwargs):
         self.path = path
@@ -59,6 +59,37 @@ class KeplerTargetPixelFile(TargetPixelFile):
         self.quality_bitmask = quality_bitmask
         self.quality_mask = self._quality_mask(quality_bitmask)
 
+    @staticmethod
+    def from_archive(target, cadence='long', quarter=None, campaign=None):
+        """Fetch a Target Pixel File from the Kepler/K2 data archive at MAST.
+
+        Raises an `ArchiveError` if a unique TPF cannot be found.  For example,
+        this is the case if a target was observed in multiple Quarters and the
+        quarter parameter is unspecified.
+
+        Parameters
+        ----------
+        target : str or int
+            KIC/EPIC ID or object name.
+        cadence : str
+            'long' or 'short'.
+        quarter, campaign : int
+            Quarter of Campaign number.
+
+        Returns
+        -------
+        tpf : KeplerTargetPixelFile object.
+        """
+        products = search_kepler_tpf_products(target=target, cadence=cadence,
+                                              quarter=quarter, campaign=campaign)
+        if len(products) > 1:
+            raise ArchiveError("Found multiple Target Pixel Files for target {}. "
+                               "Please specify the quarter or campaign number."
+                               "".format(target))
+        elif len(products) < 1:
+            raise ArchiveError("Target {} not found at MAST.".format(target))
+        path = download_products(products)[0]
+        return KeplerTargetPixelFile(path)
 
     def __repr__(self):
         return('KeplerTargetPixelFile Object (ID: {})'.format(self.keplerid))

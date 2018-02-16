@@ -54,6 +54,7 @@ def test_rmath_operators():
     assert_array_equal(lc_div.flux, 2 / lc.flux)
 
 
+@pytest.mark.remote_data
 def test_kepler_cbv_fit():
     # comparing that the two methods to do cbv fit are the nearly the same
     cbv = KeplerCBVCorrector(TABBY_Q8)
@@ -64,6 +65,7 @@ def test_kepler_cbv_fit():
     assert_almost_equal(cbv_lc.flux, cbv_lcf.flux)
 
 
+@pytest.mark.remote_data
 def test_load_bad_file():
     """Test if a TPF can be opened without exception."""
     with pytest.raises(ValueError) as exc:
@@ -71,6 +73,7 @@ def test_load_bad_file():
     assert('is this a light curve file?' in exc.value.args[0])
 
 
+@pytest.mark.remote_data
 def test_KeplerLightCurve():
     lcf = KeplerLightCurveFile(TABBY_Q8, quality_bitmask=None)
     hdu = pyfits.open(TABBY_Q8)
@@ -83,6 +86,7 @@ def test_KeplerLightCurve():
     assert_array_equal(kplc.time, hdu[1].data['TIME'])
 
 
+@pytest.mark.remote_data
 @pytest.mark.parametrize("quality_bitmask, answer", [('hardest', 2661),
     ('hard', 2706), ('default', 2917), (None, 3279),
     (1, 3279), (100, 3252), (2096639, 2661)])
@@ -115,6 +119,7 @@ def test_lightcurve_stitch():
     assert_array_equal(lc.time, 2*[1, 2, 3])
 
 
+@pytest.mark.remote_data
 def test_lightcurve_plot():
     """Sanity check to verify that lightcurve plotting works"""
     lcf = KeplerLightCurveFile(TABBY_Q8)
@@ -131,6 +136,7 @@ def test_cdpp():
     assert_almost_equal(lc.cdpp(transit_duration=1), 100, decimal=-0.5)
 
 
+@pytest.mark.remote_data
 def test_cdpp_tabby():
     """Compare the cdpp noise metric against the pipeline value."""
     lcf = KeplerLightCurveFile(TABBY_Q8)
@@ -204,6 +210,7 @@ def test_normalize():
     assert_allclose(np.median(lc.normalize().flux), 1)
 
 
+@pytest.mark.remote_data
 def test_box_period_search():
     """Can we recover the orbital period of Kepler-10b?"""
     answer = 0.837495 # wikipedia
