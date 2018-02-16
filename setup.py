@@ -27,7 +27,7 @@ setup(name='lightkurve',
                         'matplotlib>=1.5.3', 'tqdm', 'oktopus', 'bs4',
                         'requests'],
       setup_requires=['pytest-runner'],
-      tests_require=['pytest', 'pytest-cov'],
+      tests_require=['pytest', 'pytest-cov', 'pytest-remotedata'],
       include_package_data=True,
       classifiers=[
           "Development Status :: 5 - Production/Stable",
