@@ -5,6 +5,7 @@ python:
 before_install:
   - pip install codecov
   - pip install pytest-cov
+  - pip install pytest-remotedata
   - pip install sphinx_rtd_theme
   - pip install numpydoc
 install:

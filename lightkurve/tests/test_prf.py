@@ -83,6 +83,7 @@ def test_simple_kepler_prf():
                             rtol=1e-5)
 
 
+@pytest.mark.remote_data
 def test_simple_kepler_prf_interpolation_consistency():
     """Ensures that the interpolated prf is consistent with calibration files.
     """
