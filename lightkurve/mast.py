@@ -14,11 +14,20 @@ def download_products(products):
 
     Downloads will be cached using astroquery.mast's caching system.
 
+    Parameters
+    ----------
+    products : astropy.Table
+        A table detailing the products to be downloaded, i.e. the output
+        of `search_kepler_products` or `search_kepler_tpf_products`.
+
     Returns
     -------
     paths : astropy.Table.Column
         Detailing the paths of the downloaded or cached products.
     """
+    # Note: by default, MAST will only let us download "Minimum Recommended
+    # Products" (MRPs), which do not include e.g. Target Pixel Files.
+    # We need to set `mrp=False` to ensure MAST downloads whatever we want.
     dl = Observations.download_products(products, mrp_only=False)
     return dl['Local Path']
 
