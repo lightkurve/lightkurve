@@ -88,13 +88,14 @@ def search_kepler_tpf_products(target, cadence='long', quarter=None, campaign=No
         Table detailing the available Target Pixel File products.
     """
     products = search_kepler_products(target)
-    # Identify short/long-cadence TPFs by their filename
+    # Because MAST doesn't let us query based on Kepler-specific meta data
+    # fields, we need to identify short/long-cadence TPFs by their filename.
     if cadence in ['short', 'sc']:
         suffix = "spd-targ"
     else:
         suffix = "lpd-targ"
     mask = np.array([suffix in fn for fn in products['productFilename']])
-    # Identify the campaign or quarter by the description
+    # Identify the campaign or quarter by the description.
     quarter_or_campaign = campaign if campaign is not None else quarter
     if quarter_or_campaign is not None:
         mask &= np.array([desc.endswith('Q{}'.format(quarter_or_campaign)) or
