@@ -49,6 +49,8 @@ def search_kepler_products(target):
         Table detailing the available data products.
     """
     try:
+        # If `target` looks like a KIC or EPIC ID, we will pass the exact
+        # `target_name` under which MAST will know the object.
         target = int(target)
         if (target > 0) and (target < 200000000):
             target_name = 'kplr{:09d}'.format(target)
@@ -59,7 +61,8 @@ def search_kepler_products(target):
         obs = Observations.query_criteria(target_name=target_name,
                                           project=["Kepler/Kepler", "K2/K2"])
     except ValueError:
-        # If querying by KIC or EPIC ID failed, then try to resolve the target name.
+        # If `target` did not look like a KIC or EPIC ID, then we let MAST
+        # resolve the target name to a sky position.
         try:
             obs = Observations.query_criteria(objectname=target, radius='1 arcsec',
                                               project=["Kepler/Kepler", "K2/K2"])
