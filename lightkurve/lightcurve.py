@@ -1,7 +1,6 @@
 from __future__ import division, print_function
 
 import copy
-import math
 import requests
 
 from bs4 import BeautifulSoup
@@ -19,6 +18,7 @@ from astropy.table import Table
 
 from .utils import (running_mean, channel_to_module_output, KeplerQualityFlags,
                     TessQualityFlags)
+from .mast import search_kepler_lightcurve_products, download_products, ArchiveError
 
 
 __all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve',
@@ -695,6 +695,50 @@ class KeplerLightCurveFile(LightCurveFile):
         super(KeplerLightCurveFile, self).__init__(path, **kwargs)
         self.quality_bitmask = quality_bitmask
         self.quality_mask = self._quality_mask(quality_bitmask)
+
+    @staticmethod
+    def from_archive(target, cadence='long', quarter=None, month=None, campaign=None):
+        """Fetch a Light Curve File from the Kepler/K2 data archive at MAST.
+
+        Raises an `ArchiveError` if a unique file cannot be found.  For example,
+        this is the case if a target was observed in multiple Quarters and the
+        quarter parameter is unspecified.
+
+        Parameters
+        ----------
+        target : str or int
+            KIC/EPIC ID or object name.
+        cadence : str
+            'long' or 'short'.
+        quarter, campaign : int
+            Kepler Quarter or K2 Campaign number.
+        month : 1, 2, or 3
+            For Kepler's prime mission, there are three short-cadence
+            lightcurve files for each quarter, each covering one month.
+            Hence, if cadence='short' you need to specify month=1, 2, or 3.
+
+        Returns
+        -------
+        tpf : KeplerLightCurveFile object.
+        """
+        products = search_kepler_lightcurve_products(target=target, cadence=cadence,
+                                                     quarter=quarter, campaign=campaign)
+        if cadence == 'short' and len(products) > 1:
+            if month is None:
+                raise ArchiveError("Found {} different lightcurve files "
+                                   "for target {} in Quarter {}."
+                                   "Please specify the month (1, 2, or 3)."
+                                   "".format(len(products), target, quarter))
+            products = Table(products[month+1])
+        elif len(products) > 1:
+            raise ArchiveError("Found {} different lightcurve files "
+                               "for target {}. Please specify quarter/month "
+                               "or campaign number."
+                               "".format(len(products), target))
+        elif len(products) < 1:
+            raise ArchiveError("No lightcurve file found for {} at MAST.".format(target))
+        path = download_products(products)[0]
+        return KeplerLightCurveFile(path)
 
     def __repr__(self):
         return('KeplerLightCurveFile Object (ID: {})'.format(self.keplerid))
