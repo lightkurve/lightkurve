@@ -531,7 +531,10 @@ class KeplerLightCurve(LightCurve):
         self.keplerid = keplerid
 
     def __repr__(self):
-        return('KeplerLightCurve Object (ID: {})'.format(self.keplerid))
+        if self.mission.lower() == 'kepler':
+            return('KeplerLightCurveFile(KIC: {})'.format(self.keplerid))
+        elif self.mission.lower() == 'k2':
+            return('KeplerLightCurveFile(EPIC: {})'.format(self.keplerid))
 
     def correct(self, method='sff', **kwargs):
         """Corrects a lightcurve for motion-dependent systematic errors.
@@ -601,7 +604,7 @@ class TessLightCurve(LightCurve):
         self.ticid = ticid
 
     def __repr__(self):
-        return('TessLightCurve Object (ID: {})'.format(self.ticid))
+        return('TessLightCurveFile(TICID: {})'.format(self.ticid))
 
     def to_fits(self):
         raise NotImplementedError()
@@ -862,7 +865,7 @@ class TessLightCurveFile(LightCurveFile):
         self.quality_mask = self._quality_mask(quality_bitmask)
 
     def __repr__(self):
-        return('TessLightCurveFile(TICID: {})'.format(self.keplerid))
+        return('TessLightCurveFile(TICID: {})'.format(self.ticid))
 
     @property
     def ticid(self):

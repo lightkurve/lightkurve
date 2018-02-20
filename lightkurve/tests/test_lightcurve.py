@@ -16,6 +16,8 @@ TABBY_TPF = ("https://archive.stsci.edu/missions/kepler/target_pixel_files"
             "/0084/008462852/kplr008462852-2011073133259_lpd-targ.fits.gz")
 KEPLER10 = ("https://archive.stsci.edu/missions/kepler/lightcurves/"
             "0119/011904151/kplr011904151-2010009091648_llc.fits")
+TESS_SIM = ("https://archive.stsci.edu/missions/tess/ete-6/tid/00/000/"
+            "004/104/tess2019128220341-0000000410458113-0016-s_lc.fits")
 
 
 def test_LightCurve():
@@ -212,7 +214,6 @@ def test_iterative_box_period_search():
     _, _, kepler10b_period = iterative_box_period_search(flat, min_period=.5, max_period=1,
                                                          nperiods=101, period_scale='log')
     assert abs(kepler10b_period - answer) < 1e-2
-
 
 
 def test_to_pandas():
