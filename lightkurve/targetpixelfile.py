@@ -1,6 +1,7 @@
 import warnings
 
 from astropy.io import fits
+from astropy.table import Table
 from matplotlib import patches
 import numpy as np
 
@@ -60,7 +61,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         self.quality_mask = self._quality_mask(quality_bitmask)
 
     @staticmethod
-    def from_archive(target, cadence='long', quarter=None, campaign=None):
+    def from_archive(target, cadence='long', quarter=None, month=None, campaign=None):
         """Fetch a Target Pixel File from the Kepler/K2 data archive at MAST.
 
         Raises an `ArchiveError` if a unique TPF cannot be found.  For example,
@@ -74,7 +75,11 @@ class KeplerTargetPixelFile(TargetPixelFile):
         cadence : str
             'long' or 'short'.
         quarter, campaign : int
-            Quarter of Campaign number.
+            Kepler Quarter or K2 Campaign number.
+        month : 1, 2, or 3
+            For Kepler's prime mission, there are three short-cadence
+            Target Pixel Files for each quarter, each covering one month.
+            Hence, if cadence='short' you need to specify month=1, 2, or 3.
 
         Returns
         -------
@@ -82,12 +87,20 @@ class KeplerTargetPixelFile(TargetPixelFile):
         """
         products = search_kepler_tpf_products(target=target, cadence=cadence,
                                               quarter=quarter, campaign=campaign)
-        if len(products) > 1:
-            raise ArchiveError("Found multiple Target Pixel Files for target {}. "
-                               "Please specify the quarter or campaign number."
-                               "".format(target))
+        if cadence == 'short' and len(products) > 1:
+            if month is None:
+                raise ArchiveError("Found {} different Target Pixel Files "
+                                   "for target {} in Quarter {}."
+                                   "Please specify the month (1, 2, or 3)."
+                                   "".format(len(products), target, quarter))
+            products = Table(products[month+1])
+        elif len(products) > 1:
+            raise ArchiveError("Found {} different Target Pixel Files "
+                               "for target {}. Please specify quarter/month "
+                               "or campaign number."
+                               "".format(len(products), target))
         elif len(products) < 1:
-            raise ArchiveError("Target {} not found at MAST.".format(target))
+            raise ArchiveError("No Target Pixel File found for {} at MAST.".format(target))
         path = download_products(products)[0]
         return KeplerTargetPixelFile(path)
 
