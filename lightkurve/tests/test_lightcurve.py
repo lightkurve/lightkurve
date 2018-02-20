@@ -7,8 +7,7 @@ from numpy.testing import (assert_almost_equal, assert_array_equal,
 from astropy.utils.data import get_pkg_data_filename
 from astropy.io import fits as pyfits
 from ..lightcurve import (LightCurve, KeplerCBVCorrector, KeplerLightCurveFile,
-                          SFFCorrector, KeplerLightCurve, box_period_search,
-                          iterative_box_period_search)
+                          SFFCorrector, KeplerLightCurve, iterative_box_period_search)
 
 # 8th Quarter of Tabby's star
 TABBY_Q8 = ("https://archive.stsci.edu/missions/kepler/lightcurves"
@@ -63,14 +62,6 @@ def test_kepler_cbv_fit():
     lcf = KeplerLightCurveFile(TABBY_Q8)
     cbv_lcf = lcf.compute_cotrended_lightcurve()
     assert_almost_equal(cbv_lc.flux, cbv_lcf.flux)
-
-
-@pytest.mark.remote_data
-def test_load_bad_file():
-    """Test if a TPF can be opened without exception."""
-    with pytest.raises(ValueError) as exc:
-        lcf = KeplerLightCurveFile(TABBY_TPF)
-    assert('is this a light curve file?' in exc.value.args[0])
 
 
 @pytest.mark.remote_data
@@ -211,16 +202,12 @@ def test_normalize():
 
 
 @pytest.mark.remote_data
-def test_box_period_search():
+def test_iterative_box_period_search():
     """Can we recover the orbital period of Kepler-10b?"""
     answer = 0.837495 # wikipedia
     klc = KeplerLightCurveFile(KEPLER10)
     pdc = klc.PDCSAP_FLUX
     flat, trend = pdc.flatten(return_trend=True)
-
-    _, _, kepler10b_period = box_period_search(flat, min_period=.5, max_period=1,
-                                               nperiods=101, period_scale='log')
-    assert abs(kepler10b_period - answer) < 1e-2
 
     _, _, kepler10b_period = iterative_box_period_search(flat, min_period=.5, max_period=1,
                                                          nperiods=101, period_scale='log')
