@@ -57,14 +57,16 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "Note: If you want to know details about the *KeplerTargetPixelFile* class, please see the target pixel file tutorial [ADD LINK FOR THE TUTORIAL]. In short, a *KeplerTargetPixelFile* takes a path (local or URL) and creates an object\n",
+    "Note: If you want to know details about the *KeplerTargetPixelFile* class, please see the [target pixel file tutorial](target-pixel-files.html). In short, a *KeplerTargetPixelFile* takes a path (local or URL) and creates an object\n",
     "which has properties and methods about a target pixel file such as `flux`, `header`, etc."
    ]
   },
   {
    "cell_type": "code",
    "execution_count": 3,
-   "metadata": {},
+   "metadata": {
+    "collapsed": true
+   },
    "outputs": [],
    "source": [
     "tpf = KeplerTargetPixelFile(\"https://archive.stsci.edu/missions/kepler/target_pixel_files/\"\n",
@@ -422,7 +424,7 @@
    "name": "python",
    "nbconvert_exporter": "python",
    "pygments_lexer": "ipython3",
-   "version": "3.6.3"
+   "version": "3.6.2"
   }
  },
  "nbformat": 4,

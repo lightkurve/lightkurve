@@ -11,29 +11,7 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "In this notebook we will replicate the K2SFF method from [Vanderburg and Johnson 2014](http://adsabs.harvard.edu/abs/2014PASP..126..948V).  The paper introduces a method for \"Self Flat Fielding\", by tracking how the lightcurve changes with motion of the spacecraft."
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 1,
-   "metadata": {
-    "collapsed": true
-   },
-   "outputs": [],
-   "source": [
-    "from pyke import KeplerTargetPixelFile\n",
-    "%matplotlib inline\n",
-    "%config InlineBackend.figure_format = 'retina'\n",
-    "import numpy as np\n",
-    "import matplotlib.pyplot as plt"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "metadata": {},
-   "source": [
-    "## Get data"
+    "In this notebook we will replicate the K2SFF method from [Vanderburg and Johnson 2014](http://adsabs.harvard.edu/abs/2014PASP..126..948V) (hereafter referred to as VJ).  The paper introduces a method for \"Self Flat Fielding\", by tracking how the lightcurve changes with motion of the spacecraft."
    ]
   },
   {
@@ -44,34 +22,40 @@
    },
    "outputs": [],
    "source": [
-    "#! wget https://www.cfa.harvard.edu/~avanderb/k2/ep60021426alldiagnostics.csv"
+    "from pyke import KeplerTargetPixelFile\n",
+    "%matplotlib inline\n",
+    "%config InlineBackend.figure_format = 'retina'\n",
+    "import numpy as np\n",
+    "import matplotlib.pyplot as plt\n",
+    "import pandas as pd"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Get data"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The example lightcurve used in the VJ paper can be downloaded from Andrew Vanderburg's website:"
    ]
   },
   {
    "cell_type": "code",
    "execution_count": 3,
-   "metadata": {
-    "collapsed": true
-   },
+   "metadata": {},
    "outputs": [],
    "source": [
-    "import pandas as pd"
+    "df = pd.read_csv('https://www.cfa.harvard.edu/~avanderb/k2/ep60021426alldiagnostics.csv',index_col=False)"
    ]
   },
   {
    "cell_type": "code",
    "execution_count": 4,
-   "metadata": {
-    "collapsed": true
-   },
-   "outputs": [],
-   "source": [
-    "df = pd.read_csv('ep60021426alldiagnostics.csv',index_col=False)"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 5,
    "metadata": {},
    "outputs": [
     {
@@ -181,7 +165,7 @@
        "4    1.460259     1.000636            0.0  "
       ]
      },
-     "execution_count": 5,
+     "execution_count": 4,
      "metadata": {},
      "output_type": "execute_result"
     }
@@ -194,7 +178,16 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "Let's use the provided $x-y$ centroids, but we could compute these on our own too."
+    "The data file provides us with several measurements for the star.  In this notebook, we will use the time (\"BJD - 2454833\"), the flux (\"Raw Flux\"), and the position measurements (\"X-centroid\" and \"Y-centroid\")."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Let's use the provided $x-y$ centroids, but we could compute these on our own too.\n",
+    "\n",
+    "We subtract the mean from the centroids to enable the axes of our figures to match those in the VJ paper:"
    ]
   },
   {
@@ -209,6 +202,13 @@
     "col = col - np.mean(col)\n",
     "row = df[' Y-centroid'].values \n",
     "row = row - np.mean(row)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Next, we define and execute two key functions which the SFF algorithm needs, one to compute the eigen vectors, and another one to rotate them:"
    ]
   },
   {
@@ -264,7 +264,14 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "The major axis is the last one."
+    "The major axis (i.e. the eigen vector with the most variance) is `v2` because numpy returns eigen vectors this way."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Next, let's plot the motion of the target (red circles) along with the eigen vectors we found (blue lines):"
    ]
   },
   {
@@ -1020,7 +1027,7 @@
    "name": "python",
    "nbconvert_exporter": "python",
    "pygments_lexer": "ipython3",
-   "version": "3.6.3"
+   "version": "3.6.2"
   }
  },
  "nbformat": 4,
