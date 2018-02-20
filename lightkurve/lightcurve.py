@@ -339,9 +339,10 @@ class LightCurve(object):
         Parameters
         ----------
         transit_duration : int, optional
-            The transit duration in cadences. This is the length of the window
-            used to compute the running mean. The default is 13, which
-            corresponds to a 6.5 hour transit in data sampled at 30-min cadence.
+            The transit duration in units of number of cadences. This is the
+            length of the window used to compute the running mean. The default
+            is 13, which corresponds to a 6.5 hour transit in data sampled at
+            30-min cadence.
         savgol_window : int, optional
             Width of Savitsky-Golay filter in cadences (odd number).
             Default value 101 (2.0 days in Kepler Long Cadence mode).
@@ -363,8 +364,12 @@ class LightCurve(object):
         Jeff van Cleve but lacks the normalization factor used there:
         svn+ssh://murzim/repo/so/trunk/Develop/jvc/common/compute_SG_noise.m
         """
-        if not isinstance(transit_duration, int):
-            raise TypeError("transit_duration must be an integer")
+        try:
+            transit_duration = int(transit_duration)
+        except Exception:
+            raise Exception("transit_duration must be an integer, got {}."
+                            .format(transit_duration))
+
         detrended_lc = self.flatten(window_length=savgol_window,
                                     polyorder=savgol_polyorder)
         cleaned_lc = detrended_lc.remove_outliers(sigma=sigma_clip)
