@@ -7,12 +7,14 @@ if no internet connection is available.
 """
 import pytest
 
-from ..mast import search_kepler_tpf_products, ArchiveError
-from .. import KeplerTargetPixelFile
+from ..mast import (search_kepler_tpf_products, search_kepler_lightcurve_products,
+                    ArchiveError)
+from .. import KeplerTargetPixelFile, KeplerLightCurveFile
 
 
 @pytest.mark.remote_data
 def test_search_kepler_tpf_products():
+    """Tests `lightkurve.mast.search_kepler_tpf_products`."""
     # EPIC 210634047 was observed twice in long cadence
     assert(len(search_kepler_tpf_products(210634047)) == 2)
     # ...including Campaign 4
@@ -27,18 +29,54 @@ def test_search_kepler_tpf_products():
 
 
 @pytest.mark.remote_data
-def test_tpf_from_archive():
+def test_search_kepler_lightcurve_products():
+    """Tests `lightkurve.mast.search_kepler_lightcurve_products`."""
+    assert(len(search_kepler_lightcurve_products('Kepler-10')) == 15)
+
+
+@pytest.mark.remote_data
+def test_kepler_tpf_from_archive():
     # Request an object name that does not exist
     with pytest.raises(ArchiveError) as exc:
-        KeplerTargetPixelFile.from_archive("InvalidTargetUnitTest")
+        KeplerTargetPixelFile.from_archive("LightKurve_Unit_Test_Invalid_Target")
     assert('not resolve' in str(exc))
     # Request an EPIC ID that was not observed
     with pytest.raises(ArchiveError) as exc:
         KeplerTargetPixelFile.from_archive(246000000)
-    assert('not found' in str(exc))
+    assert('No Target Pixel File found' in str(exc))
     # Request a valid target that has multiple TPFs
     with pytest.raises(ArchiveError) as exc:
         KeplerTargetPixelFile.from_archive('Kepler-10')
-    assert('multiple' in str(exc))
-    # This should work!
+    assert('Please specify quarter' in str(exc))
+    # But, if we specify the quarter for Kepler-10 it should work:
     KeplerTargetPixelFile.from_archive('Kepler-10', quarter=11)
+    # However, for short cadence there is one file per month in Kepler
+    with pytest.raises(ArchiveError) as exc:
+        KeplerTargetPixelFile.from_archive('Kepler-10', quarter=11, cadence='short')
+    assert('month' in str(exc))
+    # In short cadence, if we specify both quarter and month it should work:
+    KeplerTargetPixelFile.from_archive('Kepler-10', quarter=11, month=1, cadence='short')
+
+
+@pytest.mark.remote_data
+def test_kepler_lightcurve_from_archive():
+    # Request an object name that does not exist
+    with pytest.raises(ArchiveError) as exc:
+        KeplerLightCurveFile.from_archive("LightKurve_Unit_Test_Invalid_Target")
+    assert('not resolve' in str(exc))
+    # Request an EPIC ID that was not observed
+    with pytest.raises(ArchiveError) as exc:
+        KeplerLightCurveFile.from_archive(246000000)
+    assert('No lightcurve file found' in str(exc))
+    # Request a valid target that has multiple TPFs
+    with pytest.raises(ArchiveError) as exc:
+        KeplerLightCurveFile.from_archive('Kepler-10')
+    assert('Please specify quarter' in str(exc))
+    # But, if we specify the quarter for Kepler-10 it should work:
+    KeplerLightCurveFile.from_archive('Kepler-10', quarter=11)
+    # However, for short cadence there is one file per month in Kepler
+    with pytest.raises(ArchiveError) as exc:
+        KeplerLightCurveFile.from_archive('Kepler-10', quarter=11, cadence='short')
+    assert('month' in str(exc))
+    # In short cadence, if we specify both quarter and month it should work:
+    KeplerLightCurveFile.from_archive('Kepler-10', quarter=11, month=1, cadence='short')
