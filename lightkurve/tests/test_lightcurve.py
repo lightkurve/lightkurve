@@ -7,7 +7,8 @@ from numpy.testing import (assert_almost_equal, assert_array_equal,
 from astropy.utils.data import get_pkg_data_filename
 from astropy.io import fits as pyfits
 from ..lightcurve import (LightCurve, KeplerCBVCorrector, KeplerLightCurveFile,
-                          SFFCorrector, KeplerLightCurve, iterative_box_period_search)
+                          TessLightCurveFile, SFFCorrector, KeplerLightCurve,
+                          TessLightCurve, iterative_box_period_search)
 
 # 8th Quarter of Tabby's star
 TABBY_Q8 = ("https://archive.stsci.edu/missions/kepler/lightcurves"
@@ -77,6 +78,18 @@ def test_KeplerLightCurve():
     assert kplc.quarter == lcf.quarter
     assert kplc.mission == 'Kepler'
     assert_array_equal(kplc.time, hdu[1].data['TIME'])
+    assert_array_equal(kplc.flux, hdu[1].data['SAP_FLUX'])
+
+
+@pytest.mark.remote_data
+def test_TessLightCurveFile():
+    tess_file = TessLightCurveFile(TESS_SIM, quality_bitmask=None)
+    hdu = pyfits.open(TESS_SIM)
+    tlc = tess_file.SAP_FLUX
+
+    assert tlc.mission.lower() == 'tess'
+    assert_array_equal(tlc.time, hdu[1].data['TIME'])
+    assert_array_equal(tlc.flux, hdu[1].data['SAP_FLUX'])
 
 
 @pytest.mark.remote_data

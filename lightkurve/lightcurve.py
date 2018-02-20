@@ -611,6 +611,9 @@ class TessLightCurve(LightCurve):
 
 
 class LightCurveFile(object):
+    """Defines a generic class to handle light curve files.
+    """
+
     def __init__(self, path, **kwargs):
         self.path = path
         self.hdu = pyfits.open(self.path, **kwargs)
