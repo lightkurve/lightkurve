@@ -18,13 +18,109 @@ class TargetPixelFile(object):
     """
     TargetPixelFile class
     """
+    @property
+    def flux(self):
+        """Returns the flux for all good-quality cadences."""
+        return self.hdu[1].data['FLUX'][self.quality_mask]
+
+    @property
+    def flux_err(self):
+        """Returns the flux uncertainty for all good-quality cadences."""
+        return self.hdu[1].data['FLUX_ERR'][self.quality_mask]
+
+    @property
+    def flux_bkg(self):
+        """Returns the background flux for all good-quality cadences."""
+        return self.hdu[1].data['FLUX_BKG'][self.quality_mask]
+
+    @property
+    def flux_bkg_err(self):
+        return self.hdu[1].data['FLUX_BKG_ERR'][self.quality_mask]
+
+    @property
+    def quality(self):
+        """Returns the quality flag integer of every good cadence."""
+        return self.hdu[1].data['QUALITY'][self.quality_mask]
+
+    @property
+    def n_good_cadences(self):
+        """Returns the number of good-quality cadences."""
+        return self.quality_mask.sum()
+
+    @property
+    def shape(self):
+        """Return the cube dimension shape."""
+        return self.flux.shape
+
+    @property
+    def time(self):
+        """Returns the time for all good-quality cadences."""
+        return self.hdu[1].data['TIME'][self.quality_mask]
+
+    @property
+    def cadenceno(self):
+        """Return the cadence number for all good-quality cadences."""
+        return self.hdu[1].data['CADENCENO'][self.quality_mask]
+
+    @property
+    def nan_time_mask(self):
+        """Returns a boolean mask flagging cadences whose time is `nan`."""
+        return ~np.isfinite(self.time)
+
     def header(self, ext=0):
         """Returns the header for a given extension."""
         return self.hdu[ext].header
 
     @property
-    def hdu(self):
-        return self._hdu
+    def ra(self):
+        try:
+            return self.header()['RA_OBJ']
+        except KeyError:
+            return None
+
+    @property
+    def dec(self):
+        try:
+            return self.header()['DEC_OBJ']
+        except KeyError:
+            return None
+
+    def get_bkg_lightcurve(self, aperture_mask=None):
+        aperture_mask = self._parse_aperture_mask(aperture_mask)
+        return LightCurve(flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
+                          time=self.time, flux_err=self.flux_bkg_err)
+
+    def _parse_aperture_mask(self, aperture_mask):
+        """Parse the `aperture_mask` parameter as given by a user.
+
+        The `aperture_mask` parameter is accepted by a number of methods.
+        This method ensures that the parameter is always parsed in the same way.
+
+        Parameters
+        ----------
+        aperture_mask : array-like, 'pipeline', 'all', or None
+            A boolean array describing the aperture such that `False` means
+            that the pixel will be masked out.
+            If None or 'all' are passed, a mask that is `True` everywhere will
+            be returned.
+            If 'pipeline' is passed, the mask suggested by the Kepler pipeline
+            will be returned.
+
+        Returns
+        -------
+        aperture_mask : ndarray
+            2D boolean numpy array containing `True` for selected pixels.
+        """
+        with warnings.catch_warnings():
+            # `aperture_mask` supports both arrays and string values; these yield
+            # uninteresting FutureWarnings when compared, so let's ignore that.
+            warnings.simplefilter(action='ignore', category=FutureWarning)
+            if aperture_mask is None or aperture_mask == 'all':
+                aperture_mask = np.ones((self.shape[1], self.shape[2]), dtype=bool)
+            elif aperture_mask == 'pipeline':
+                aperture_mask = self.pipeline_mask
+        self._last_aperture_mask = aperture_mask
+        return aperture_mask
 
     def to_lightcurve(self):
         """Returns a raw light curve of the TPF.
@@ -39,8 +135,6 @@ class TargetPixelFile(object):
 
 
 class TessTargetPixelFile(TargetPixelFile):
-    def __repr__(self):
-        return('TessTargetPixelFile(TICID: {})'.format(self.ticid))
     """
     Defines a TargetPixelFile class for the TESS Mission.
     Enables extraction of raw lightcurves and centroid positions.
@@ -60,6 +154,52 @@ class TessTargetPixelFile(TargetPixelFile):
     References
     ----------
     """
+
+    def __repr__(self):
+        return('TessTargetPixelFile(TICID: {})'.format(self.ticid))
+
+    def _quality_mask(self, bitmask):
+        """Returns a boolean mask which flags all good-quality cadences.
+
+        Parameters
+        ----------
+        bitmask : str or int
+            Bitmask. See ref. [1], table 2-3.
+        """
+        if bitmask is None:
+            return np.ones(len(self.hdu[1].data['TIME']), dtype=bool)
+        elif isinstance(bitmask, str):
+            bitmask = TessQualityFlags.OPTIONS[bitmask]
+        return (self.hdu[1].data['QUALITY'] & bitmask) == 0
+
+    def to_lightcurve(self, aperture_mask='pipeline'):
+        """Performs aperture photometry.
+
+        Parameters
+        ----------
+        aperture_mask : array-like, 'pipeline', or 'all'
+            A boolean array describing the aperture such that `False` means
+            that the pixel will be masked out.
+            If the string 'all' is passed, all pixels will be used.
+            The default behaviour is to use the Kepler pipeline mask.
+
+        Returns
+        -------
+        lc : KeplerLightCurve object
+            Array containing the summed flux within the aperture for each
+            cadence.
+        """
+        aperture_mask = self._parse_aperture_mask(aperture_mask)
+        centroid_col, centroid_row = self.centroids(aperture_mask)
+
+        return TessLightCurve(flux=np.nansum(self.flux[:, aperture_mask], axis=1),
+                              time=self.time,
+                              flux_err=np.nansum(self.flux_err[:, aperture_mask]**2, axis=1)**0.5,
+                              centroid_col=centroid_col,
+                              centroid_row=centroid_row,
+                              quality=self.quality,
+                              mission=self.mission,
+                              cadenceno=self.cadenceno)
 
 
 class KeplerTargetPixelFile(TargetPixelFile):
@@ -139,18 +279,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
     def __repr__(self):
         return('KeplerTargetPixelFile(KEPLERID: {})'.format(self.keplerid))
 
-    @hdu.setter
-    def hdu(self, value, keys=['FLUX', 'QUALITY']):
-        '''Raises a ValueError exception if value does not appear to be a Target Pixel File.
-        '''
-        for key in keys:
-            if ~(np.any([value[1].header[ttype] == key
-                for ttype in value[1].header['TTYPE*']])):
-                raise ValueError("File {} does not have a {} column, "
-                         "is this a target pixel file?".format(self.path, key))
-        else:
-            self._hdu = value
-
     def _quality_mask(self, bitmask):
         """Returns a boolean mask which flags all good-quality cadences.
 
@@ -194,20 +322,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
         return self.header()['OUTPUT']
 
     @property
-    def ra(self):
-        try:
-            return self.header()['RA_OBJ']
-        except KeyError:
-            return None
-
-    @property
-    def dec(self):
-        try:
-            return self.header()['DEC_OBJ']
-        except KeyError:
-            return None
-
-    @property
     def column(self):
         return self.hdu['TARGETTABLES'].header['1CRV5P']
 
@@ -219,55 +333,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
     def pipeline_mask(self):
         """Returns the aperture mask used by the Kepler pipeline"""
         return self.hdu[-1].data > 2
-
-    @property
-    def n_good_cadences(self):
-        """Returns the number of good-quality cadences."""
-        return self.quality_mask.sum()
-
-    @property
-    def shape(self):
-        """Return the cube dimension shape."""
-        return self.flux.shape
-
-    @property
-    def time(self):
-        """Returns the time for all good-quality cadences."""
-        return self.hdu[1].data['TIME'][self.quality_mask]
-
-    @property
-    def cadenceno(self):
-        """Return the cadence number for all good-quality cadences."""
-        return self.hdu[1].data['CADENCENO'][self.quality_mask]
-
-    @property
-    def nan_time_mask(self):
-        """Returns a boolean mask flagging cadences whose time is `nan`."""
-        return ~np.isfinite(self.time)
-
-    @property
-    def flux(self):
-        """Returns the flux for all good-quality cadences."""
-        return self.hdu[1].data['FLUX'][self.quality_mask]
-
-    @property
-    def flux_err(self):
-        """Returns the flux uncertainty for all good-quality cadences."""
-        return self.hdu[1].data['FLUX_ERR'][self.quality_mask]
-
-    @property
-    def flux_bkg(self):
-        """Returns the background flux for all good-quality cadences."""
-        return self.hdu[1].data['FLUX_BKG'][self.quality_mask]
-
-    @property
-    def flux_bkg_err(self):
-        return self.hdu[1].data['FLUX_BKG_ERR'][self.quality_mask]
-
-    @property
-    def quality(self):
-        """Returns the quality flag integer of every good cadence."""
-        return self.hdu[1].data['QUALITY'][self.quality_mask]
 
     @property
     def quarter(self):
@@ -293,38 +358,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
     def to_fits(self):
         """Save the TPF to fits"""
         raise NotImplementedError
-
-    def _parse_aperture_mask(self, aperture_mask):
-        """Parse the `aperture_mask` parameter as given by a user.
-
-        The `aperture_mask` parameter is accepted by a number of methods.
-        This method ensures that the parameter is always parsed in the same way.
-
-        Parameters
-        ----------
-        aperture_mask : array-like, 'pipeline', 'all', or None
-            A boolean array describing the aperture such that `False` means
-            that the pixel will be masked out.
-            If None or 'all' are passed, a mask that is `True` everywhere will
-            be returned.
-            If 'pipeline' is passed, the mask suggested by the Kepler pipeline
-            will be returned.
-
-        Returns
-        -------
-        aperture_mask : ndarray
-            2D boolean numpy array containing `True` for selected pixels.
-        """
-        with warnings.catch_warnings():
-            # `aperture_mask` supports both arrays and string values; these yield
-            # uninteresting FutureWarnings when compared, so let's ignore that.
-            warnings.simplefilter(action='ignore', category=FutureWarning)
-            if aperture_mask is None or aperture_mask == 'all':
-                aperture_mask = np.ones((self.shape[1], self.shape[2]), dtype=bool)
-            elif aperture_mask == 'pipeline':
-                aperture_mask = self.pipeline_mask
-        self._last_aperture_mask = aperture_mask
-        return aperture_mask
 
     def to_lightcurve(self, aperture_mask='pipeline'):
         """Performs aperture photometry.
@@ -443,8 +476,3 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                                        1, 1, color=mask_color, fill=True,
                                                        alpha=.6))
         return ax
-
-    def get_bkg_lightcurve(self, aperture_mask=None):
-        aperture_mask = self._parse_aperture_mask(aperture_mask)
-        return LightCurve(flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
-                          time=self.time, flux_err=self.flux_bkg_err)
