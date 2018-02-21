@@ -653,34 +653,6 @@ class LightCurveFile(object):
         types = [n for n in types if not ('ERR' in n)]
         return types
 
-    def _quality_mask(self, bitmask):
-        """Returns a boolean mask which flags all good-quality cadences.
-
-        Parameters
-        ----------
-        bitmask : str or int
-            Bitmask. See ref. [1], table 2-3.
-
-        Returns
-        -------
-        boolean_mask : array of bool
-            Boolean array in which `True` means the data is of good quality.
-        """
-        if bitmask is None:
-            return np.ones(len(self.hdu[1].data['TIME']), dtype=bool)
-
-        try:
-            if isinstance(bitmask, str):
-                bitmask = KeplerQualityFlags.OPTIONS[bitmask]
-            return (self.hdu[1].data['SAP_QUALITY'] & bitmask) == 0
-        except KeyError:
-            try:
-                if isinstance(bitmask, str):
-                    bitmask = TessQualityFlags.OPTIONS[bitmask]
-                return (self.hdu[1].data['QUALITY'] & bitmask) == 0
-            except KeyError:
-                raise
-
 
 class KeplerLightCurveFile(LightCurveFile):
     """Defines a class for a given light curve FITS file from NASA's Kepler and
@@ -756,6 +728,26 @@ class KeplerLightCurveFile(LightCurveFile):
             return('KeplerLightCurveFile(KIC: {})'.format(self.keplerid))
         elif self.mission.lower() == 'k2':
             return('KeplerLightCurveFile(EPIC: {})'.format(self.keplerid))
+
+    def _quality_mask(self, bitmask):
+        """Returns a boolean mask which flags all good-quality cadences.
+
+        Parameters
+        ----------
+        bitmask : str or int
+            Bitmask. See ref. [1], table 2-3.
+
+        Returns
+        -------
+        boolean_mask : array of bool
+            Boolean array in which `True` means the data is of good quality.
+        """
+        if bitmask is None:
+            return np.ones(len(self.hdu[1].data['TIME']), dtype=bool)
+
+        if isinstance(bitmask, str):
+            bitmask = KeplerQualityFlags.OPTIONS[bitmask]
+        return (self.hdu[1].data['SAP_QUALITY'] & bitmask) == 0
 
     def get_lightcurve(self, flux_type, centroid_type='MOM_CENTR'):
         if flux_type in self._flux_types():
@@ -874,6 +866,26 @@ class TessLightCurveFile(LightCurveFile):
 
     def __repr__(self):
         return('TessLightCurveFile(TICID: {})'.format(self.ticid))
+
+    def _quality_mask(self, bitmask):
+        """Returns a boolean mask which flags all good-quality cadences.
+
+        Parameters
+        ----------
+        bitmask : str or int
+            Bitmask. See ref. [1], table 2-3.
+
+        Returns
+        -------
+        boolean_mask : array of bool
+            Boolean array in which `True` means the data is of good quality.
+        """
+        if bitmask is None:
+            return np.ones(len(self.hdu[1].data['TIME']), dtype=bool)
+
+        if isinstance(bitmask, str):
+            bitmask = TessQualityFlags.OPTIONS[bitmask]
+        return (self.hdu[1].data['QUALITY'] & bitmask) == 0
 
     @property
     def ticid(self):

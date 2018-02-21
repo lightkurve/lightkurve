@@ -90,8 +90,11 @@ def test_KeplerLightCurve(path, mission):
 
 
 @pytest.mark.remote_data
-def test_TessLightCurveFile():
-    tess_file = TessLightCurveFile(TESS_SIM, quality_bitmask=None)
+@pytest.mark.parametrize("quality_bitmask",
+                         ['hardest', 'hard', 'default', None,
+                          1, 100, 2096639])
+def test_TessLightCurveFile(quality_bitmask):
+    tess_file = TessLightCurveFile(TESS_SIM, quality_bitmask=quality_bitmask)
     hdu = pyfits.open(TESS_SIM)
     tlc = tess_file.SAP_FLUX
 
