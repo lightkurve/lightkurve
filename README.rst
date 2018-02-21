@@ -47,7 +47,7 @@ You can also contact the development team via keplergo@mail.arc.nasa.gov
 Citing
 ------
 
-If you find this package useful in your research, please cite (Vinícius et al. 2017) using the BibTeX provided below. Also, please give us a GitHub star!
+If you find this package useful in your research, please cite it using the DOI/BibTeX provided below. Also, please give us a GitHub star!
 
 ::
 
