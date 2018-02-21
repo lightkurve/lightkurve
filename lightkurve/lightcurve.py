@@ -625,9 +625,14 @@ class LightCurveFile(object):
     kwargs : dict
         Keyword arguments to be passed to astropy.io.fits.open.
     """
-    def __init__(self, path, **kwargs):
+    def __init__(self, path, quality_bitmask, **kwargs):
         self.path = path
         self.hdu = pyfits.open(self.path, **kwargs)
+        self.quality_bitmask = quality_bitmask
+        self.quality_mask = self._quality_mask(quality_bitmask)
+
+    def _quality_mask(self, quality_bitmask):
+        pass
 
     def header(self, ext=0):
         """Header of the object at extension `ext`"""
@@ -681,9 +686,7 @@ class KeplerLightCurveFile(LightCurveFile):
 
     def __init__(self, path, quality_bitmask=KeplerQualityFlags.DEFAULT_BITMASK,
                  **kwargs):
-        super(KeplerLightCurveFile, self).__init__(path, **kwargs)
-        self.quality_bitmask = quality_bitmask
-        self.quality_mask = self._quality_mask(quality_bitmask)
+        super(KeplerLightCurveFile, self).__init__(path, quality_bitmask, **kwargs)
 
     @staticmethod
     def from_archive(target, cadence='long', quarter=None, month=None, campaign=None):
@@ -866,9 +869,7 @@ class TessLightCurveFile(LightCurveFile):
 
     def __init__(self, path, quality_bitmask=TessQualityFlags.DEFAULT_BITMASK,
                  **kwargs):
-        super(TessLightCurveFile, self).__init__(path, **kwargs)
-        self.quality_bitmask = quality_bitmask
-        self.quality_mask = self._quality_mask(quality_bitmask)
+        super(TessLightCurveFile, self).__init__(path, quality_bitmask, **kwargs)
 
     def __repr__(self):
         return('TessLightCurveFile(TICID: {})'.format(self.ticid))

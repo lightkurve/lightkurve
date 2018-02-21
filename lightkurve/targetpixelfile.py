@@ -18,9 +18,14 @@ class TargetPixelFile(object):
     """
     TargetPixelFile class
     """
-    def __init__(self, path, **kwargs):
+    def __init__(self, path, quality_bitmask, **kwargs):
         self.path = path
         self.hdu = fits.open(self.path, **kwargs)
+        self.quality_bitmask = quality_bitmask
+        self.quality_mask = self._quality_mask(quality_bitmask)
+
+    def _quality_mask(self, quality_bitmask):
+        pass
 
     @property
     def flux(self):
@@ -224,79 +229,6 @@ class TargetPixelFile(object):
         pass
 
 
-class TessTargetPixelFile(TargetPixelFile):
-    """
-    Defines a TargetPixelFile class for the TESS Mission.
-    Enables extraction of raw lightcurves and centroid positions.
-
-    Attributes
-    ----------
-    path : str
-        Path to a Kepler Target Pixel (FITS) File.
-    quality_bitmask : str or int
-        Bitmask specifying quality flags of cadences that should be ignored.
-        If a string is passed, it has the following meaning:
-
-            * "default": recommended quality mask
-            * "hard": removes more flags, known to remove good data
-            * "hardest": removes all data that has been flagged
-
-    References
-    ----------
-    """
-    def __init__(self, path, quality_bitmask=TessQualityFlags.DEFAULT_BITMASK,
-                 **kwargs):
-        super(TessTargetPixelFile, self).__init__(path, **kwargs)
-        self.quality_bitmask = quality_bitmask
-        self.quality_mask = self._quality_mask(quality_bitmask)
-
-    def __repr__(self):
-        return('TessTargetPixelFile(TICID: {})'.format(self.ticid))
-
-    def _quality_mask(self, bitmask):
-        """Returns a boolean mask which flags all good-quality cadences.
-
-        Parameters
-        ----------
-        bitmask : str or int
-            Bitmask. See ref. [1], table 2-3.
-        """
-        if bitmask is None:
-            return np.ones(len(self.hdu[1].data['TIME']), dtype=bool)
-        elif isinstance(bitmask, str):
-            bitmask = TessQualityFlags.OPTIONS[bitmask]
-        return (self.hdu[1].data['QUALITY'] & bitmask) == 0
-
-    def to_lightcurve(self, aperture_mask='pipeline'):
-        """Performs aperture photometry.
-
-        Parameters
-        ----------
-        aperture_mask : array-like, 'pipeline', or 'all'
-            A boolean array describing the aperture such that `False` means
-            that the pixel will be masked out.
-            If the string 'all' is passed, all pixels will be used.
-            The default behaviour is to use the Kepler pipeline mask.
-
-        Returns
-        -------
-        lc : KeplerLightCurve object
-            Array containing the summed flux within the aperture for each
-            cadence.
-        """
-        aperture_mask = self._parse_aperture_mask(aperture_mask)
-        centroid_col, centroid_row = self.centroids(aperture_mask)
-
-        return TessLightCurve(flux=np.nansum(self.flux[:, aperture_mask], axis=1),
-                              time=self.time,
-                              flux_err=np.nansum(self.flux_err[:, aperture_mask]**2, axis=1)**0.5,
-                              centroid_col=centroid_col,
-                              centroid_row=centroid_row,
-                              quality=self.quality,
-                              mission=self.mission,
-                              cadenceno=self.cadenceno)
-
-
 class KeplerTargetPixelFile(TargetPixelFile):
     """
     Defines a TargetPixelFile class for the Kepler/K2 Mission.
@@ -313,12 +245,17 @@ class KeplerTargetPixelFile(TargetPixelFile):
             * "default": recommended quality mask
             * "hard": removes more flags, known to remove good data
             * "hardest": removes all data that has been flagged
+    kwargs : dict
+        Dictionary to be passed to astropy.io.fits.open.
 
     References
     ----------
     .. [1] Kepler: A Search for Terrestrial Planets. Kepler Archive Manual.
         http://archive.stsci.edu/kepler/manuals/archive_manual.pdf
     """
+    def __init__(self, path, quality_bitmask=KeplerQualityFlags.DEFAULT_BITMASK,
+                 **kwargs):
+        super(KeplerTargetPixelFile, self).__init__(path, quality_bitmask, **kwargs)
 
     @staticmethod
     def from_archive(target, cadence='long', quarter=None, month=None, campaign=None):
@@ -478,3 +415,75 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                 quarter=self.quarter,
                                 mission=self.mission,
                                 cadenceno=self.cadenceno)
+
+class TessTargetPixelFile(TargetPixelFile):
+    """
+    Defines a TargetPixelFile class for the TESS Mission.
+    Enables extraction of raw lightcurves and centroid positions.
+
+    Attributes
+    ----------
+    path : str
+        Path to a Tess Target Pixel (FITS) File.
+    quality_bitmask : str or int
+        Bitmask specifying quality flags of cadences that should be ignored.
+        If a string is passed, it has the following meaning:
+
+            * "default": recommended quality mask
+            * "hard": removes more flags, known to remove good data
+            * "hardest": removes all data that has been flagged
+    kwargs : dict
+        Dictionary to be passed to astropy.io.fits.open.
+
+    References
+    ----------
+    """
+    def __init__(self, path, quality_bitmask=TessQualityFlags.DEFAULT_BITMASK,
+                 **kwargs):
+        super(TessTargetPixelFile, self).__init__(path, quality_bitmask, **kwargs)
+
+    def __repr__(self):
+        return('TessTargetPixelFile(TICID: {})'.format(self.ticid))
+
+    def _quality_mask(self, bitmask):
+        """Returns a boolean mask which flags all good-quality cadences.
+
+        Parameters
+        ----------
+        bitmask : str or int
+            Bitmask. See ref. [1], table 2-3.
+        """
+        if bitmask is None:
+            return np.ones(len(self.hdu[1].data['TIME']), dtype=bool)
+        elif isinstance(bitmask, str):
+            bitmask = TessQualityFlags.OPTIONS[bitmask]
+        return (self.hdu[1].data['QUALITY'] & bitmask) == 0
+
+    def to_lightcurve(self, aperture_mask='pipeline'):
+        """Performs aperture photometry.
+
+        Parameters
+        ----------
+        aperture_mask : array-like, 'pipeline', or 'all'
+            A boolean array describing the aperture such that `False` means
+            that the pixel will be masked out.
+            If the string 'all' is passed, all pixels will be used.
+            The default behaviour is to use the Kepler pipeline mask.
+
+        Returns
+        -------
+        lc : KeplerLightCurve object
+            Array containing the summed flux within the aperture for each
+            cadence.
+        """
+        aperture_mask = self._parse_aperture_mask(aperture_mask)
+        centroid_col, centroid_row = self.centroids(aperture_mask)
+
+        return TessLightCurve(flux=np.nansum(self.flux[:, aperture_mask], axis=1),
+                              time=self.time,
+                              flux_err=np.nansum(self.flux_err[:, aperture_mask]**2, axis=1)**0.5,
+                              centroid_col=centroid_col,
+                              centroid_row=centroid_row,
+                              quality=self.quality,
+                              mission=self.mission,
+                              cadenceno=self.cadenceno)
