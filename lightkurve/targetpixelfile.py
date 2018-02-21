@@ -7,7 +7,7 @@ import numpy as np
 
 from .lightcurve import KeplerLightCurve, LightCurve
 from .prf import SimpleKeplerPRF
-from .utils import KeplerQualityFlags, plot_image
+from .utils import KeplerQualityFlags, TessQualityFlags, plot_image
 from .mast import search_kepler_tpf_products, download_products, ArchiveError
 
 
@@ -18,6 +18,10 @@ class TargetPixelFile(object):
     """
     TargetPixelFile class
     """
+    def __init__(self, path, **kwargs):
+        self.path = path
+        self.hdu = fits.open(self.path, **kwargs)
+
     @property
     def flux(self):
         """Returns the flux for all good-quality cadences."""
@@ -154,6 +158,11 @@ class TessTargetPixelFile(TargetPixelFile):
     References
     ----------
     """
+    def __init__(self, path, quality_bitmask=TessQualityFlags.DEFAULT_BITMASK,
+                 **kwargs):
+        super(TessTargetPixelFile, self).__init__(path, **kwargs)
+        self.quality_bitmask = quality_bitmask
+        self.quality_mask = self._quality_mask(quality_bitmask)
 
     def __repr__(self):
         return('TessTargetPixelFile(TICID: {})'.format(self.ticid))
@@ -224,13 +233,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
     .. [1] Kepler: A Search for Terrestrial Planets. Kepler Archive Manual.
         http://archive.stsci.edu/kepler/manuals/archive_manual.pdf
     """
-
-    def __init__(self, path, quality_bitmask=KeplerQualityFlags.DEFAULT_BITMASK,
-                 **kwargs):
-        self.path = path
-        self.hdu = fits.open(self.path, **kwargs)
-        self.quality_bitmask = quality_bitmask
-        self.quality_mask = self._quality_mask(quality_bitmask)
 
     @staticmethod
     def from_archive(target, cadence='long', quarter=None, month=None, campaign=None):
