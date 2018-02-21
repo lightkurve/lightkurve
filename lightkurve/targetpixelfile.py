@@ -11,13 +11,21 @@ from .utils import KeplerQualityFlags, plot_image
 from .mast import search_kepler_tpf_products, download_products, ArchiveError
 
 
-__all__ = ['KeplerTargetPixelFile']
+__all__ = ['KeplerTargetPixelFile', 'TessTargetPixelFile']
 
 
 class TargetPixelFile(object):
     """
     TargetPixelFile class
     """
+    def header(self, ext=0):
+        """Returns the header for a given extension."""
+        return self.hdu[ext].header
+
+    @property
+    def hdu(self):
+        return self._hdu
+
     def to_lightcurve(self):
         """Returns a raw light curve of the TPF.
 
@@ -28,6 +36,11 @@ class TargetPixelFile(object):
             for each cadence.
         """
         pass
+
+
+class TessTargetPixelFile(TargetPixelFile):
+    def __repr__(self):
+        return('TessTargetPixelFile(TICID: {})'.format(self.keplerid))
 
 
 class KeplerTargetPixelFile(TargetPixelFile):
@@ -105,11 +118,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         return KeplerTargetPixelFile(path)
 
     def __repr__(self):
-        return('KeplerTargetPixelFile Object (ID: {})'.format(self.keplerid))
-
-    @property
-    def hdu(self):
-        return self._hdu
+        return('KeplerTargetPixelFile(KEPLERID: {})'.format(self.keplerid))
 
     @hdu.setter
     def hdu(self, value, keys=['FLUX', 'QUALITY']):
@@ -136,10 +145,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
         elif isinstance(bitmask, str):
             bitmask = KeplerQualityFlags.OPTIONS[bitmask]
         return (self.hdu[1].data['QUALITY'] & bitmask) == 0
-
-    def header(self, ext=0):
-        """Returns the header for a given extension."""
-        return self.hdu[ext].header
 
     def get_prf_model(self):
         """Returns an object of SimpleKeplerPRF initialized using the
