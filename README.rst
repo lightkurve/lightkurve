@@ -13,8 +13,8 @@ lightkurve
                     :target: https://ci.appveyor.com/project/mirca/lightkurve
 .. |cov-badge| image:: https://codecov.io/gh/KeplerGO/lightkurve/branch/master/graph/badge.svg
               :target: https://codecov.io/gh/KeplerGO/lightkurve
-.. |doi-badge| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.835584.svg
-              :target: https://doi.org/10.5281/zenodo.835584
+.. |doi-badge| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.1181929.svg
+              :target: https://doi.org/10.5281/zenodo.1181929
 
 
 *lightkurve* offers a user-friendly way to inspect and analyze astronomical flux time series data.
@@ -47,4 +47,19 @@ You can also contact the development team via keplergo@mail.arc.nasa.gov
 Citing
 ------
 
-TBC
+If you find this package useful in your research, please cite (Vinícius et al. 2017) using the BibTeX provided below. Also, please give us a GitHub star!
+
+::
+
+    @misc{lightkurve,
+      author       = {Zé Vinícius and
+                      Geert Barentsen and
+                      Christina Hedges and
+                      Michael Gully-Santiago and
+                      Ann Marie Cody},
+      title        = {KeplerGO/lightkurve},
+      month        = feb,
+      year         = 2018,
+      doi          = {10.5281/zenodo.1181929},
+      url          = {http://doi.org/10.5281/zenodo.1181929}
+    }
