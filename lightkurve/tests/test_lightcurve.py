@@ -7,16 +7,20 @@ from numpy.testing import (assert_almost_equal, assert_array_equal,
 from astropy.utils.data import get_pkg_data_filename
 from astropy.io import fits as pyfits
 from ..lightcurve import (LightCurve, KeplerCBVCorrector, KeplerLightCurveFile,
-                          SFFCorrector, KeplerLightCurve, box_period_search,
-                          iterative_box_period_search)
+                          TessLightCurveFile, SFFCorrector, KeplerLightCurve,
+                          TessLightCurve, iterative_box_period_search)
 
 # 8th Quarter of Tabby's star
 TABBY_Q8 = ("https://archive.stsci.edu/missions/kepler/lightcurves"
             "/0084/008462852/kplr008462852-2011073133259_llc.fits")
 TABBY_TPF = ("https://archive.stsci.edu/missions/kepler/target_pixel_files"
             "/0084/008462852/kplr008462852-2011073133259_lpd-targ.fits.gz")
+K2_C08 = ("https://archive.stsci.edu/missions/k2/lightcurves/c8/"
+          "220100000/39000/ktwo220139473-c08_llc.fits")
 KEPLER10 = ("https://archive.stsci.edu/missions/kepler/lightcurves/"
             "0119/011904151/kplr011904151-2010009091648_llc.fits")
+TESS_SIM = ("https://archive.stsci.edu/missions/tess/ete-6/tid/00/000/"
+            "004/104/tess2019128220341-0000000410458113-0016-s_lc.fits")
 
 
 def test_LightCurve():
@@ -66,24 +70,37 @@ def test_kepler_cbv_fit():
 
 
 @pytest.mark.remote_data
-def test_load_bad_file():
-    """Test if a TPF can be opened without exception."""
-    with pytest.raises(ValueError) as exc:
-        lcf = KeplerLightCurveFile(TABBY_TPF)
-    assert('is this a light curve file?' in exc.value.args[0])
-
-
-@pytest.mark.remote_data
-def test_KeplerLightCurve():
-    lcf = KeplerLightCurveFile(TABBY_Q8, quality_bitmask=None)
-    hdu = pyfits.open(TABBY_Q8)
+@pytest.mark.parametrize("path, mission", [(TABBY_Q8, "Kepler"), (K2_C08, "K2")])
+def test_KeplerLightCurve(path, mission):
+    lcf = KeplerLightCurveFile(path, quality_bitmask=None)
+    hdu = pyfits.open(path)
     kplc = lcf.get_lightcurve('SAP_FLUX')
 
     assert kplc.channel == lcf.channel
-    assert kplc.campaign is None
-    assert kplc.quarter == lcf.quarter
-    assert kplc.mission == 'Kepler'
+    assert kplc.mission.lower() == mission.lower()
+    if kplc.mission.lower() == 'kepler':
+        assert kplc.campaign is None
+        assert kplc.quarter == 8
+    elif kplc.mission.lower() == 'k2':
+        assert kplc.campaign == 8
+        assert kplc.quarter is None
+
     assert_array_equal(kplc.time, hdu[1].data['TIME'])
+    assert_array_equal(kplc.flux, hdu[1].data['SAP_FLUX'])
+
+
+@pytest.mark.remote_data
+@pytest.mark.parametrize("quality_bitmask",
+                         ['hardest', 'hard', 'default', None,
+                          1, 100, 2096639])
+def test_TessLightCurveFile(quality_bitmask):
+    tess_file = TessLightCurveFile(TESS_SIM, quality_bitmask=quality_bitmask)
+    hdu = pyfits.open(TESS_SIM)
+    tlc = tess_file.SAP_FLUX
+
+    assert tlc.mission.lower() == 'tess'
+    assert_array_equal(tlc.time, hdu[1].data['TIME'])
+    assert_array_equal(tlc.flux, hdu[1].data['SAP_FLUX'])
 
 
 @pytest.mark.remote_data
@@ -211,21 +228,16 @@ def test_normalize():
 
 
 @pytest.mark.remote_data
-def test_box_period_search():
+def test_iterative_box_period_search():
     """Can we recover the orbital period of Kepler-10b?"""
     answer = 0.837495 # wikipedia
     klc = KeplerLightCurveFile(KEPLER10)
     pdc = klc.PDCSAP_FLUX
     flat, trend = pdc.flatten(return_trend=True)
 
-    _, _, kepler10b_period = box_period_search(flat, min_period=.5, max_period=1,
-                                               nperiods=101, period_scale='log')
-    assert abs(kepler10b_period - answer) < 1e-2
-
     _, _, kepler10b_period = iterative_box_period_search(flat, min_period=.5, max_period=1,
                                                          nperiods=101, period_scale='log')
     assert abs(kepler10b_period - answer) < 1e-2
-
 
 
 def test_to_pandas():

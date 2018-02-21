@@ -4,7 +4,7 @@ from astropy.visualization import (PercentileInterval, ImageNormalize,
                                    SqrtStretch, LogStretch, LinearStretch)
 
 
-__all__ = ['KeplerQualityFlags', 'module_output_to_channel',
+__all__ = ['KeplerQualityFlags', 'TessQualityFlags', 'module_output_to_channel',
            'channel_to_module_output', 'running_mean']
 
 
@@ -177,6 +177,10 @@ class KeplerQualityFlags(object):
             if quality & flag > 0:
                 result.append(cls.STRINGS[flag])
         return result
+
+
+class TessQualityFlags(KeplerQualityFlags):
+    pass
 
 
 def plot_image(image, ax=None, scale='linear', origin='lower',

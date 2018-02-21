@@ -30,6 +30,29 @@ class TargetPixelFile(object):
         pass
 
 
+class TessTargetPixelFile(TargetPixelFile):
+    """
+    Defines a TargetPixelFile class for the TESS Mission.
+    Enables extraction of raw lightcurves and centroid positions.
+
+    Attributes
+    ----------
+    path : str
+        Path to a Kepler Target Pixel (FITS) File.
+    quality_bitmask : str or int
+        Bitmask specifying quality flags of cadences that should be ignored.
+        If a string is passed, it has the following meaning:
+
+            * "default": recommended quality mask
+            * "hard": removes more flags, known to remove good data
+            * "hardest": removes all data that has been flagged
+
+    References
+    ----------
+    .. [1] Kepler: A Search for Terrestrial Planets. Kepler Archive Manual.
+        http://archive.stsci.edu/kepler/manuals/archive_manual.pdf
+    """
+
 class KeplerTargetPixelFile(TargetPixelFile):
     """
     Defines a TargetPixelFile class for the Kepler/K2 Mission.
