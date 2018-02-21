@@ -40,7 +40,26 @@ class TargetPixelFile(object):
 
 class TessTargetPixelFile(TargetPixelFile):
     def __repr__(self):
-        return('TessTargetPixelFile(TICID: {})'.format(self.keplerid))
+        return('TessTargetPixelFile(TICID: {})'.format(self.ticid))
+    """
+    Defines a TargetPixelFile class for the TESS Mission.
+    Enables extraction of raw lightcurves and centroid positions.
+
+    Attributes
+    ----------
+    path : str
+        Path to a Kepler Target Pixel (FITS) File.
+    quality_bitmask : str or int
+        Bitmask specifying quality flags of cadences that should be ignored.
+        If a string is passed, it has the following meaning:
+
+            * "default": recommended quality mask
+            * "hard": removes more flags, known to remove good data
+            * "hardest": removes all data that has been flagged
+
+    References
+    ----------
+    """
 
 
 class KeplerTargetPixelFile(TargetPixelFile):

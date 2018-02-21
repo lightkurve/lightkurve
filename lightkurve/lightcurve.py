@@ -16,13 +16,14 @@ from astropy.io import fits as pyfits
 from astropy.stats import sigma_clip
 from astropy.table import Table
 
-from .utils import running_mean, channel_to_module_output, KeplerQualityFlags
+from .utils import (running_mean, channel_to_module_output, KeplerQualityFlags,
+                    TessQualityFlags)
 from .mast import search_kepler_lightcurve_products, download_products, ArchiveError
 
 
-__all__ = ['LightCurve', 'KeplerLightCurve', 'KeplerLightCurveFile',
-           'KeplerCBVCorrector', 'SPLDCorrector', 'SFFCorrector',
-           'box_period_search', 'iterative_box_period_search']
+__all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve',
+           'KeplerLightCurveFile', 'TessLightCurveFile', 'KeplerCBVCorrector',
+           'SFFCorrector', 'iterative_box_period_search']
 
 
 class LightCurve(object):
@@ -338,9 +339,10 @@ class LightCurve(object):
         Parameters
         ----------
         transit_duration : int, optional
-            The transit duration in cadences. This is the length of the window
-            used to compute the running mean. The default is 13, which
-            corresponds to a 6.5 hour transit in data sampled at 30-min cadence.
+            The transit duration in units of number of cadences. This is the
+            length of the window used to compute the running mean. The default
+            is 13, which corresponds to a 6.5 hour transit in data sampled at
+            30-min cadence.
         savgol_window : int, optional
             Width of Savitsky-Golay filter in cadences (odd number).
             Default value 101 (2.0 days in Kepler Long Cadence mode).
@@ -362,8 +364,12 @@ class LightCurve(object):
         Jeff van Cleve but lacks the normalization factor used there:
         svn+ssh://murzim/repo/so/trunk/Develop/jvc/common/compute_SG_noise.m
         """
-        if not isinstance(transit_duration, int):
-            raise TypeError("transit_duration must be an integer")
+        try:
+            transit_duration = int(transit_duration)
+        except Exception:
+            raise Exception("transit_duration must be an integer, got {}."
+                            .format(transit_duration))
+
         detrended_lc = self.flatten(window_length=savgol_window,
                                     polyorder=savgol_polyorder)
         cleaned_lc = detrended_lc.remove_outliers(sigma=sigma_clip)
@@ -530,7 +536,10 @@ class KeplerLightCurve(LightCurve):
         self.keplerid = keplerid
 
     def __repr__(self):
-        return('KeplerLightCurve Object (ID: {})'.format(self.keplerid))
+        if self.mission.lower() == 'kepler':
+            return('KeplerLightCurveFile(KIC: {})'.format(self.keplerid))
+        elif self.mission.lower() == 'k2':
+            return('KeplerLightCurveFile(EPIC: {})'.format(self.keplerid))
 
     def correct(self, method='sff', **kwargs):
         """Corrects a lightcurve for motion-dependent systematic errors.
@@ -565,7 +574,93 @@ class KeplerLightCurve(LightCurve):
         raise NotImplementedError()
 
 
-class KeplerLightCurveFile(object):
+class TessLightCurve(LightCurve):
+    """Defines a light curve class for NASA's TESS mission.
+
+    Attributes
+    ----------
+    time : array-like
+        Time measurements
+    flux : array-like
+        Data flux for every time point
+    flux_err : array-like
+        Uncertainty on each flux data point
+    centroid_col, centroid_row : array-like, array-like
+        Centroid column and row coordinates as a function of time
+    quality : array-like
+        Array indicating the quality of each data point
+    quality_bitmask : int
+        Bitmask specifying quality flags of cadences that should be ignored
+    cadenceno : array-like
+        Cadence numbers corresponding to every time measurement
+    ticid : int
+        Tess Input Catalog ID number
+    """
+    def __init__(self, time, flux, flux_err=None, centroid_col=None,
+                 centroid_row=None, quality=None, quality_bitmask=None,
+                 cadenceno=None, ticid=None):
+        super(TessLightCurve, self).__init__(time, flux, flux_err)
+        self.centroid_col = centroid_col
+        self.centroid_row = centroid_row
+        self.quality = quality
+        self.quality_bitmask = quality_bitmask
+        self.mission = "TESS"
+        self.cadenceno = cadenceno
+        self.ticid = ticid
+
+    def __repr__(self):
+        return('TessLightCurveFile(TICID: {})'.format(self.ticid))
+
+    def to_fits(self):
+        raise NotImplementedError()
+
+
+class LightCurveFile(object):
+    """Defines a generic class to handle light curve files.
+
+    Attributes
+    ----------
+    path : str
+        Directory path or url to a lightcurve FITS file.
+    kwargs : dict
+        Keyword arguments to be passed to astropy.io.fits.open.
+    """
+    def __init__(self, path, **kwargs):
+        self.path = path
+        self.hdu = pyfits.open(self.path, **kwargs)
+
+    def header(self, ext=0):
+        """Header of the object at extension `ext`"""
+        return self.hdu[ext].header
+
+    @property
+    def time(self):
+        """Time measurements"""
+        return self.hdu[1].data['TIME'][self.quality_mask]
+
+    @property
+    def SAP_FLUX(self):
+        """Returns a LightCurve object for SAP_FLUX"""
+        return self.get_lightcurve('SAP_FLUX')
+
+    @property
+    def PDCSAP_FLUX(self):
+        """Returns a LightCurve object for PDCSAP_FLUX"""
+        return self.get_lightcurve('PDCSAP_FLUX')
+
+    @property
+    def cadenceno(self):
+        """Cadence number"""
+        return self.hdu[1].data['CADENCENO'][self.quality_mask]
+
+    def _flux_types(self):
+        """Returns a list of available flux types for this light curve file"""
+        types = [n for n in self.hdu[1].data.columns.names if 'FLUX' in n]
+        types = [n for n in types if not ('ERR' in n)]
+        return types
+
+
+class KeplerLightCurveFile(LightCurveFile):
     """Defines a class for a given light curve FITS file from NASA's Kepler and
     K2 missions.
 
@@ -583,10 +678,10 @@ class KeplerLightCurveFile(object):
     kwargs : dict
         Keyword arguments to be passed to astropy.io.fits.open.
     """
+
     def __init__(self, path, quality_bitmask=KeplerQualityFlags.DEFAULT_BITMASK,
                  **kwargs):
-        self.path = path
-        self.hdu = pyfits.open(self.path, **kwargs)
+        super(KeplerLightCurveFile, self).__init__(path, **kwargs)
         self.quality_bitmask = quality_bitmask
         self.quality_mask = self._quality_mask(quality_bitmask)
 
@@ -635,23 +730,30 @@ class KeplerLightCurveFile(object):
         return KeplerLightCurveFile(path)
 
     def __repr__(self):
-        return('KeplerLightCurveFile Object (ID: {})'.format(self.keplerid))
+        if self.mission.lower() == 'kepler':
+            return('KeplerLightCurveFile(KIC: {})'.format(self.keplerid))
+        elif self.mission.lower() == 'k2':
+            return('KeplerLightCurveFile(EPIC: {})'.format(self.keplerid))
 
-    @property
-    def hdu(self):
-        return self._hdu
+    def _quality_mask(self, bitmask):
+        """Returns a boolean mask which flags all good-quality cadences.
 
-    @hdu.setter
-    def hdu(self, value, keys=['SAP_FLUX', 'SAP_QUALITY']):
-        '''Raises a ValueError exception if value does not appear to be a Light Curve file.
-        '''
-        for key in keys:
-            if ~(np.any([value[1].header[ttype] == key
-                for ttype in value[1].header['TTYPE*']])):
-                raise ValueError("File {} does not have a {} column, "
-                         "is this a light curve file?".format(self.path, key))
-        else:
-            self._hdu = value
+        Parameters
+        ----------
+        bitmask : str or int
+            Bitmask. See ref. [1], table 2-3.
+
+        Returns
+        -------
+        boolean_mask : array of bool
+            Boolean array in which `True` means the data is of good quality.
+        """
+        if bitmask is None:
+            return np.ones(len(self.hdu[1].data['TIME']), dtype=bool)
+
+        if isinstance(bitmask, str):
+            bitmask = KeplerQualityFlags.OPTIONS[bitmask]
+        return (self.hdu[1].data['SAP_QUALITY'] & bitmask) == 0
 
     def get_lightcurve(self, flux_type, centroid_type='MOM_CENTR'):
         if flux_type in self._flux_types():
@@ -671,45 +773,6 @@ class KeplerLightCurveFile(object):
         else:
             raise KeyError("{} is not a valid flux type. Available types are: {}".
                            format(flux_type, self._flux_types))
-
-    def _quality_mask(self, bitmask):
-        """Returns a boolean mask which flags all good-quality cadences.
-
-        Parameters
-        ----------
-        bitmask : str or int
-            Bitmask. See ref. [1], table 2-3.
-
-        Returns
-        -------
-        boolean_mask : array of bool
-            Boolean array in which `True` means the data is of good quality.
-        """
-        if bitmask is None:
-            return np.ones(len(self.hdu[1].data['TIME']), dtype=bool)
-        elif isinstance(bitmask, str):
-            bitmask = KeplerQualityFlags.OPTIONS[bitmask]
-        return (self.hdu[1].data['SAP_QUALITY'] & bitmask) == 0
-
-    @property
-    def SAP_FLUX(self):
-        """Returns a KeplerLightCurve object for SAP_FLUX"""
-        return self.get_lightcurve('SAP_FLUX')
-
-    @property
-    def PDCSAP_FLUX(self):
-        """Returns a KeplerLightCurve object for PDCSAP_FLUX"""
-        return self.get_lightcurve('PDCSAP_FLUX')
-
-    @property
-    def time(self):
-        """Time measurements"""
-        return self.hdu[1].data['TIME'][self.quality_mask]
-
-    @property
-    def cadenceno(self):
-        """Cadence number"""
-        return self.hdu[1].data['CADENCENO'][self.quality_mask]
 
     @property
     def channel(self):
@@ -761,37 +824,90 @@ class KeplerLightCurveFile(object):
         """
         return KeplerCBVCorrector(self).correct(cbvs=cbvs, **kwargs)
 
-    def header(self, ext=0):
-        """Header of the object at extension `ext`"""
-        return self.hdu[ext].header
-
-    def _flux_types(self):
-        """Returns a list of available flux types for this light curve file"""
-        types = [n for n in self.hdu[1].data.columns.names if 'FLUX' in n]
-        types = [n for n in types if not ('ERR' in n)]
-        return types
-
-    def plot(self, plottype=None, **kwargs):
+    def plot(self, flux_types=None, **kwargs):
         """Plot all the flux types in a light curve.
 
         Parameters
         ----------
-        plottype : str or list of str
+        flux_types : str or list of str
             List of FLUX types to plot. Default is to plot all available.
         """
         if not ('ax' in kwargs):
             fig, ax = plt.subplots(1)
             kwargs['ax'] = ax
-        if not ('title' in kwargs):
-            kwargs['title'] = 'KeplerID: {}'.format(self.SAP_FLUX.keplerid)
-        if plottype is None:
-            plottype = self._flux_types()
-        if isinstance(plottype, str):
-            plottype = [plottype]
-        for idx, pl in enumerate(plottype):
-            lc = self.get_lightcurve(pl)
+        if flux_types is None:
+            flux_types = self._flux_types()
+        if isinstance(flux_types, str):
+            flux_types = [flux_types]
+        for idx, ft in enumerate(flux_types):
+            lc = self.get_lightcurve(ft)
             kwargs['color'] = 'C{}'.format(idx)
-            lc.plot(label=pl, **kwargs)
+            lc.plot(label=ft, **kwargs)
+
+
+class TessLightCurveFile(LightCurveFile):
+    """Defines a class for a given light curve FITS file from NASA's TESS
+    mission.
+
+    Attributes
+    ----------
+    path : str
+        Directory path or url to a lightcurve FITS file.
+    quality_bitmask : str or int
+        Bitmask specifying quality flags of cadences that should be ignored.
+        If a string is passed, it has the following meaning:
+
+            * default: recommended quality mask
+            * hard: removes more flags, known to remove good data
+            * hardest: removes all data that has been flagged
+    kwargs : dict
+        Keyword arguments to be passed to astropy.io.fits.open.
+    """
+
+    def __init__(self, path, quality_bitmask=TessQualityFlags.DEFAULT_BITMASK,
+                 **kwargs):
+        super(TessLightCurveFile, self).__init__(path, **kwargs)
+        self.quality_bitmask = quality_bitmask
+        self.quality_mask = self._quality_mask(quality_bitmask)
+
+    def __repr__(self):
+        return('TessLightCurveFile(TICID: {})'.format(self.ticid))
+
+    def _quality_mask(self, bitmask):
+        """Returns a boolean mask which flags all good-quality cadences.
+
+        Parameters
+        ----------
+        bitmask : str or int
+            Bitmask. See ref. [1], table 2-3.
+
+        Returns
+        -------
+        boolean_mask : array of bool
+            Boolean array in which `True` means the data is of good quality.
+        """
+        if bitmask is None:
+            return np.ones(len(self.hdu[1].data['TIME']), dtype=bool)
+
+        if isinstance(bitmask, str):
+            bitmask = TessQualityFlags.OPTIONS[bitmask]
+        return (self.hdu[1].data['QUALITY'] & bitmask) == 0
+
+    @property
+    def ticid(self):
+        return self.header(ext=0)['TICID']
+
+    def get_lightcurve(self, flux_type, centroid_type='MOM_CENTR'):
+        if flux_type in self._flux_types():
+            return TessLightCurve(self.hdu[1].data['TIME'][self.quality_mask],
+                                  self.hdu[1].data[flux_type][self.quality_mask],
+                                  flux_err=self.hdu[1].data[flux_type + "_ERR"][self.quality_mask],
+                                  centroid_col=self.hdu[1].data[centroid_type + "1"][self.quality_mask],
+                                  centroid_row=self.hdu[1].data[centroid_type + "2"][self.quality_mask],
+                                  quality=self.hdu[1].data['QUALITY'][self.quality_mask],
+                                  quality_bitmask=self.quality_bitmask,
+                                  cadenceno=self.cadenceno,
+                                  ticid=self.ticid)
 
 
 class SFFCorrector(object):
@@ -1181,161 +1297,6 @@ class KeplerCBVCorrector(object):
                     break
 
         return self.cbv_base_url + cbv_file
-
-
-class SPLDCorrector(object):
-    r"""
-    Implements the simple first order Pixel Level Decorrelation (PLD) proposed by
-    Deming et. al. [1]_ and Luger et. al. [2]_, [3]_.
-
-    Attributes
-    ----------
-
-
-    Notes
-    -----
-    This code serves only as a quick look into the PLD technique.
-    Users are encouraged to check out the GitHub repos
-    `everest <http://www.github.com/rodluger/everest>`_
-    and `everest3 <http://www.github.com/rodluger/everest3>`_.
-
-    References
-    ----------
-    .. [1] Deming et. al. Spitzer Secondary Eclipses of the Dense, \
-           Modestly-irradiated, Giant Exoplanet HAT-P-20b using Pixel-Level Decorrelation.
-    .. [2] Luger et. al. EVEREST: Pixel Level Decorrelation of K2 Light Curves.
-    .. [3] Luger et. al. An Update to the EVEREST K2 Pipeline: short cadence, \
-           saturated stars, and Kepler-like photometry down to K_p = 15.
-    """
-
-    def __init__(self):
-        pass
-
-    def correct(self, time, tpf_flux, window_length=None, polyorder=2):
-        """
-        Parameters
-        ----------
-        time : array-like
-            Time array
-        tpf_flux : array-like
-            Pixel values series
-        window_length : int
-        polyorder : int
-        """
-        k = window_length
-        if not k:
-            k = int(len(time) / 2) - 1
-        n_windows = int(len(time) / k)
-        flux_hat = np.array([])
-        for n in range(1, n_windows + 1):
-            flux_hat = np.append(flux_hat,
-                                 self._pld(tpf_flux[(n - 1) * k:n * k], polyorder))
-        flux_hat = np.append(flux_hat, self._pld(tpf_flux[n * k:], polyorder))
-        return LightCurve(time, flux_hat + np.nanmedian(np.nansum(tpf_flux, axis=(1, 2))))
-
-    def _pld(self, tpf_flux, polyorder=2):
-        if len(tpf_flux) == 0:
-            return np.array([])
-        pixels_series = tpf_flux.reshape((tpf_flux.shape[0], -1))
-        lightcurve = np.nansum(pixels_series, axis=1).reshape(-1, 1)
-        # design matrix
-        X = pixels_series / lightcurve
-        X = np.hstack((X, np.array([np.linspace(0, 1, tpf_flux.shape[0]) ** n for n in range(polyorder+1)]).T))
-        opt_weights = np.linalg.solve(np.dot(X.T, X), np.dot(X.T, lightcurve))
-        model = np.dot(X, opt_weights)
-        flux_hat = lightcurve - model
-        return flux_hat
-
-
-def box_period_search(lc, min_period=0.5, max_period=30, nperiods=2000,
-                      prior=None, period_scale='log'):
-    """
-    Implements a brute force search to find transit-like periodic events.
-    This function fits a "box" model defined as:
-
-    .. math::
-
-        \Pi (t) = h - d\cdot \mathbb{I}(t_0 \leq t_i \leq t_0 + w)
-
-    to a list of `nperiods` periods between `min_period` and `max_period`.
-    It's assumed that the best period is the one that maximizes the posterior
-    probability of the fit.
-
-    Parameters
-    ----------
-    lc : LightCurve object
-        An object from KeplerLightCurve or LightCurve.
-        Note that flattening the lightcurve beforehand does aid the quest
-        for the transit period.
-    min_period : float
-        Minimum period to search for. Units must be the same as `lc.time`.
-    max_period : float
-        Maximum period to search for. Units must be the same as `lc.time`.
-    nperiods : int
-        Number of periods to search between `min_period` and `max_period`.
-    prior : oktopus.Prior object
-        Prior probability on the parameters of the box function,
-        namely, `amplitude`, `depth`, `to` (time of the first discontinuity),
-        and `width`.
-    period_scale : str
-        Type of the scale used to create the grid of periods between `min_period`
-        and `max_period` used to search for the best period.
-        Options are 'linear' or 'log'.
-
-    Returns
-    -------
-    log_posterior : list
-        Log posterior (up to an additive constant) of the fit. The "best"
-        period is therefore the one that maximizes the log posterior
-        probability.
-    trial_periods : numpy array
-        List of trial periods.
-    best_period : float
-        Best period.
-
-    Notes
-    -----
-    This function is experimental. Changes may be made in both its signature
-    and implementation.
-    """
-
-    t = np.linspace(-.5, .5, len(lc.time))
-    val = np.zeros(len(lc.time))
-
-    def box(amplitude, depth, to, width):
-        """A simple box function defined in the interval [-.5, .5].
-        `to` is the time of the first discontinuity.
-        """
-        out_of_transit = (t < to) + (t >= to + width)
-        in_transit = np.logical_not(out_of_transit)
-        val[out_of_transit] = amplitude
-        val[in_transit] = amplitude - depth
-        return val
-
-    if prior is None:
-        prior = oktopus.UniformPrior(lb=[0.98, 0., -.4, 0.],
-                                     ub=[1.02, .1, .5, .2])
-    lc = lc.normalize()
-    log_posterior = []
-
-    if period_scale == 'linear':
-        trial_periods = np.linspace(min_period, max_period, nperiods)
-    elif period_scale == 'log':
-        trial_periods = np.logspace(np.log10(min_period), np.log10(max_period), nperiods)
-    else:
-        raise ValueError("period_scale must be one of {}. Got {}."
-                         .format("{'linear', 'log'}", period_scale))
-    for p in tqdm(trial_periods):
-        folded = lc.fold(period=p)
-        # var should be set to the uncertainty in the data point
-        ll = oktopus.GaussianPosterior(data=folded.flux, mean=box, var=1.,
-                                       prior=prior)
-        res = ll.fit(x0=prior.mean, method='powell',
-                     options={'ftol':1e-9, 'xtol':1e-9, 'maxfev': 2000})
-        # fun is the negative log posterior
-        log_posterior.append(-res.fun)
-
-    return log_posterior, trial_periods, trial_periods[np.argmax(log_posterior)]
 
 
 def iterative_box_period_search(lc, niters=2, min_period=0.5, max_period=30,
