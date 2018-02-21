@@ -617,8 +617,14 @@ class TessLightCurve(LightCurve):
 
 class LightCurveFile(object):
     """Defines a generic class to handle light curve files.
-    """
 
+    Attributes
+    ----------
+    path : str
+        Directory path or url to a lightcurve FITS file.
+    kwargs : dict
+        Keyword arguments to be passed to astropy.io.fits.open.
+    """
     def __init__(self, path, **kwargs):
         self.path = path
         self.hdu = pyfits.open(self.path, **kwargs)
