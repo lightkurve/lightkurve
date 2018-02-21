@@ -126,6 +126,92 @@ class TargetPixelFile(object):
         self._last_aperture_mask = aperture_mask
         return aperture_mask
 
+    def centroids(self, aperture_mask='pipeline'):
+        """Returns centroids based on sample moments.
+
+        Parameters
+        ----------
+        aperture_mask : array-like, 'pipeline', or 'all'
+            A boolean array describing the aperture such that `False` means
+            that the pixel will be masked out.
+            If the string 'all' is passed, all pixels will be used.
+            The default behaviour is to use the Kepler pipeline mask.
+
+        Returns
+        -------
+        col_centr, row_centr : tuple
+            Arrays containing centroids for column and row at each cadence
+        """
+        aperture_mask = self._parse_aperture_mask(aperture_mask)
+        yy, xx = np.indices(self.shape[1:]) + 0.5
+        yy = self.row + yy
+        xx = self.column + xx
+        total_flux = np.nansum(self.flux[:, aperture_mask], axis=1)
+        col_centr = np.nansum(xx * aperture_mask * self.flux, axis=(1, 2)) / total_flux
+        row_centr = np.nansum(yy * aperture_mask * self.flux, axis=(1, 2)) / total_flux
+
+        return col_centr, row_centr
+
+    def plot(self, ax=None, frame=0, cadenceno=None, bkg=False, aperture_mask=None,
+            show_colorbar=True, mask_color='pink', **kwargs):
+        """
+        Plot a target pixel file at a given frame (index) or cadence number.
+
+        Parameters
+        ----------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            A matplotlib axes object to plot into. If no axes is provided,
+            a new one will be generated.
+        frame : int
+            Frame number. The default is 0, i.e. the first frame.
+        cadenceno : int, optional
+            Alternatively, a cadence number can be provided.
+            This argument has priority over frame number.
+        bkg : bool
+            If True, background will be added to the pixel values.
+        aperture_mask : ndarray
+            Highlight pixels selected by aperture_mask.
+        show_colorbar : bool
+            Whether or not to show the colorbar
+        mask_color : str
+            Color to show the aperture mask
+        kwargs : dict
+            Keywords arguments passed to `lightkurve.utils.plot_image`.
+
+        Returns
+        -------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            The matplotlib axes object.
+        """
+        if cadenceno is not None:
+            try:
+                frame = np.argwhere(cadenceno == self.cadenceno)[0][0]
+            except IndexError:
+                raise ValueError("cadenceno {} is out of bounds, "
+                                 "must be in the range {}-{}.".format(
+                                    cadenceno, self.cadenceno[0], self.cadenceno[-1]))
+        try:
+            if bkg:
+                pflux = self.flux[frame] + self.flux_bkg[frame]
+            else:
+                pflux = self.flux[frame]
+        except IndexError:
+            raise ValueError("frame {} is out of bounds, must be in the range "
+                             "0-{}.".format(frame, self.flux.shape[0]))
+        ax = plot_image(pflux, ax=ax, title='Kepler ID: {}'.format(self.keplerid),
+                extent=(self.column, self.column + self.shape[2], self.row,
+                self.row + self.shape[1]), show_colorbar=show_colorbar, **kwargs)
+
+        if aperture_mask is not None:
+            aperture_mask = self._parse_aperture_mask(aperture_mask)
+            for i in range(self.shape[1]):
+                for j in range(self.shape[2]):
+                    if aperture_mask[i, j]:
+                        ax.add_patch(patches.Rectangle((j+self.column, i+self.row),
+                                                       1, 1, color=mask_color, fill=True,
+                                                       alpha=.6))
+        return ax
+
     def to_lightcurve(self):
         """Returns a raw light curve of the TPF.
 
@@ -392,89 +478,3 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                 quarter=self.quarter,
                                 mission=self.mission,
                                 cadenceno=self.cadenceno)
-
-    def centroids(self, aperture_mask='pipeline'):
-        """Returns centroids based on sample moments.
-
-        Parameters
-        ----------
-        aperture_mask : array-like, 'pipeline', or 'all'
-            A boolean array describing the aperture such that `False` means
-            that the pixel will be masked out.
-            If the string 'all' is passed, all pixels will be used.
-            The default behaviour is to use the Kepler pipeline mask.
-
-        Returns
-        -------
-        col_centr, row_centr : tuple
-            Arrays containing centroids for column and row at each cadence
-        """
-        aperture_mask = self._parse_aperture_mask(aperture_mask)
-        yy, xx = np.indices(self.shape[1:]) + 0.5
-        yy = self.row + yy
-        xx = self.column + xx
-        total_flux = np.nansum(self.flux[:, aperture_mask], axis=1)
-        col_centr = np.nansum(xx * aperture_mask * self.flux, axis=(1, 2)) / total_flux
-        row_centr = np.nansum(yy * aperture_mask * self.flux, axis=(1, 2)) / total_flux
-
-        return col_centr, row_centr
-
-    def plot(self, ax=None, frame=0, cadenceno=None, bkg=False, aperture_mask=None,
-            show_colorbar=True, mask_color='pink', **kwargs):
-        """
-        Plot a target pixel file at a given frame (index) or cadence number.
-
-        Parameters
-        ----------
-        ax : matplotlib.axes._subplots.AxesSubplot
-            A matplotlib axes object to plot into. If no axes is provided,
-            a new one will be generated.
-        frame : int
-            Frame number. The default is 0, i.e. the first frame.
-        cadenceno : int, optional
-            Alternatively, a cadence number can be provided.
-            This argument has priority over frame number.
-        bkg : bool
-            If True, background will be added to the pixel values.
-        aperture_mask : ndarray
-            Highlight pixels selected by aperture_mask.
-        show_colorbar : bool
-            Whether or not to show the colorbar
-        mask_color : str
-            Color to show the aperture mask
-        kwargs : dict
-            Keywords arguments passed to `lightkurve.utils.plot_image`.
-
-        Returns
-        -------
-        ax : matplotlib.axes._subplots.AxesSubplot
-            The matplotlib axes object.
-        """
-        if cadenceno is not None:
-            try:
-                frame = np.argwhere(cadenceno == self.cadenceno)[0][0]
-            except IndexError:
-                raise ValueError("cadenceno {} is out of bounds, "
-                                 "must be in the range {}-{}.".format(
-                                    cadenceno, self.cadenceno[0], self.cadenceno[-1]))
-        try:
-            if bkg:
-                pflux = self.flux[frame] + self.flux_bkg[frame]
-            else:
-                pflux = self.flux[frame]
-        except IndexError:
-            raise ValueError("frame {} is out of bounds, must be in the range "
-                             "0-{}.".format(frame, self.flux.shape[0]))
-        ax = plot_image(pflux, ax=ax, title='Kepler ID: {}'.format(self.keplerid),
-                extent=(self.column, self.column + self.shape[2], self.row,
-                self.row + self.shape[1]), show_colorbar=show_colorbar, **kwargs)
-
-        if aperture_mask is not None:
-            aperture_mask = self._parse_aperture_mask(aperture_mask)
-            for i in range(self.shape[1]):
-                for j in range(self.shape[2]):
-                    if aperture_mask[i, j]:
-                        ax.add_patch(patches.Rectangle((j+self.column, i+self.row),
-                                                       1, 1, color=mask_color, fill=True,
-                                                       alpha=.6))
-        return ax
