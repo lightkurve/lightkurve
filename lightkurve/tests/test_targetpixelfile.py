@@ -90,6 +90,7 @@ def test_wcs():
     assert type(w).__name__ == 'WCS'
 
 def test_wcs_tabby():
+    '''Test the centroids from Tabby's star against simbad values'''
     tpf = KeplerTargetPixelFile(TABBY_TPF)
     w = tpf.wcs
     ra, dec = tpf.get_coordinates(0)
