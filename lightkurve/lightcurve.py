@@ -542,7 +542,7 @@ class KeplerLightCurve(LightCurve):
         elif self.mission.lower() == 'k2':
             return('KeplerLightCurveFile(EPIC: {})'.format(self.keplerid))
 
-    def correct(self, method='sff', warn=False, **kwargs):
+    def correct(self, method='sff', **kwargs):
         """Corrects a lightcurve for motion-dependent systematic errors.
 
         Parameters
@@ -550,41 +550,28 @@ class KeplerLightCurve(LightCurve):
         method : str
             Method used to correct the lightcurve.
             Right now only 'sff' (Vanderburg's Self-Flat Fielding) is supported.
-        warn : bool
-            Turn off warnings for SFFCorrector
         kwargs : dict
             Dictionary of keyword arguments to be passed to the function
             defined by `method`.
-
 
         Returns
         -------
         new_lc : KeplerLightCurve object
             Corrected lightcurve
         """
-        ok = np.isfinite(self.flux)
+        not_nan = np.isfinite(self.flux)
         if method == 'sff':
-            if warn:
                 self.corrector = SFFCorrector()
-                corrected_lc = self.corrector.correct(time=self.time[ok], flux=self.flux[ok],
-                                                      centroid_col=self.centroid_col[ok],
-                                                      centroid_row=self.centroid_row[ok],
+                corrected_lc = self.corrector.correct(time=self.time[not_nan], flux=self.flux[not_nan],
+                                                      centroid_col=self.centroid_col[not_nan],
+                                                      centroid_row=self.centroid_row[not_nan],
                                                       **kwargs)
-            else:
-                with warnings.catch_warnings():
-                    # ignore warning messages related to polyfit being poorly conditioned
-                    warnings.simplefilter("ignore", action=RankWarning)
-                    self.corrector = SFFCorrector()
-                    corrected_lc = self.corrector.correct(time=self.time[ok], flux=self.flux[ok],
-                                                          centroid_col=self.centroid_col[ok],
-                                                          centroid_row=self.centroid_row[ok],
-                                                          **kwargs)
         else:
             raise ValueError("method {} is not available.".format(method))
         new_lc = copy.copy(self)
         new_lc.time = corrected_lc.time
         new_lc.flux = corrected_lc.flux
-        new_lc.flux_err = self.normalize().flux_err[ok]
+        new_lc.flux_err = self.normalize().flux_err[not_nan]
         return new_lc
 
     def to_fits(self):
@@ -953,6 +940,8 @@ class SFFCorrector(object):
                 sigma_2=5.):
         """Returns a systematics-corrected LightCurve.
 
+        Note that it is assumed that time and flux do not contain NaNs.
+
         Parameters
         ----------
         time : array-like
@@ -989,6 +978,7 @@ class SFFCorrector(object):
 
         flux_hat = np.array([])
         # The SFF algorithm is going to be run on each window independently
+
         for i in tqdm(range(windows)):
             # To make it easier (and more numerically stable) to fit a
             # characteristic polynomial that describes the spacecraft motion,
@@ -999,8 +989,12 @@ class SFFCorrector(object):
             # Next, we fit the motion polynomial after removing outliers
             self.outlier_cent = sigma_clip(data=self.rot_col,
                                            sigma=sigma_2).mask
-            coeffs = np.polyfit(self.rot_row[~self.outlier_cent],
-                                self.rot_col[~self.outlier_cent], polyorder)
+            with warnings.catch_warnings():
+                # ignore warning messages related to polyfit being poorly conditioned
+                warnings.simplefilter("ignore", category=np.RankWarning)
+                coeffs = np.polyfit(self.rot_row[~self.outlier_cent],
+                                   self.rot_col[~self.outlier_cent], polyorder)
+
             self.poly = np.poly1d(coeffs)
             self.polyprime = np.poly1d(coeffs).deriv()
 
