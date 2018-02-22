@@ -5,6 +5,7 @@ python:
 before_install:
   - pip install codecov
   - pip install pytest-cov
+  - pip install pytest-remotedata
   - pip install sphinx_rtd_theme
   - pip install numpydoc
 install:
@@ -16,7 +17,7 @@ before_script: # configure a headless display to test plot generation
   - sleep 3 # give xvfb some time to start
 # command to run tests
 script:
-  - pytest
+  - pytest --remote-data
 
 after_success:
   - codecov

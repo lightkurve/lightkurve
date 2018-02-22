@@ -4,6 +4,17 @@
 lightkurve Documentation
 ========================
 
+.. image:: https://img.shields.io/pypi/v/lightkurve.svg
+                :target: https://pypi.python.org/pypi/lightkurve
+.. image:: https://travis-ci.org/KeplerGO/lightkurve.svg?branch=master
+              :target: https://travis-ci.org/KeplerGO/lightkurve
+.. image:: https://ci.appveyor.com/api/projects/status/6jvv5d7a142gwm8a/branch/master?svg=true
+                    :target: https://ci.appveyor.com/project/mirca/lightkurve
+.. image:: https://codecov.io/gh/KeplerGO/lightkurve/branch/master/graph/badge.svg
+              :target: https://codecov.io/gh/KeplerGO/lightkurve
+.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.835584.svg
+              :target: https://doi.org/10.5281/zenodo.835584
+
 Welcome to **lightkurve** documentation!
 
 **lightkurve** offers a user-friendly way to inspect and analyze astronomical
@@ -22,6 +33,7 @@ Documentation
    api/index
    install
    contributing
+   community_software
 
 *********
 Tutorials
