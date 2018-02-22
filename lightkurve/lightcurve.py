@@ -17,7 +17,7 @@ from astropy.stats import sigma_clip
 from astropy.table import Table
 from astropy.time import Time
 
-from .utils import (running_mean, channel_to_module_output, KeplerQualityFlags,
+from .utils import (running_mean, channel_to_module_output, bkjd_to_time, KeplerQualityFlags,
                     TessQualityFlags)
 from .mast import search_kepler_lightcurve_products, download_products, ArchiveError
 
@@ -640,6 +640,11 @@ class LightCurveFile(object):
         return self.hdu[1].data['TIME'][self.quality_mask]
 
     @property
+    def timeobj(self):
+        """Returns the human-readable date for all good-quality cadences."""
+        return bkjd_to_time(self.time, self.hdu[1].data['TIMECORR'][self.quality_mask], self.hdu[1].header['TIMSLICE'])
+
+    @property
     def SAP_FLUX(self):
         """Returns a LightCurve object for SAP_FLUX"""
         return self.get_lightcurve('SAP_FLUX')
@@ -774,15 +779,6 @@ class KeplerLightCurveFile(LightCurveFile):
         else:
             raise KeyError("{} is not a valid flux type. Available types are: {}".
                            format(flux_type, self._flux_types))
-
-    @property
-    def date(self):
-        """Returns the human-readable date for all good-quality cadences."""
-        bjd = self.time + 2454833.
-        jd = bjd - self.hdu[1].data['TIMECORR'][self.quality_mask]
-        jd += (0.25 + 0.62 * (5 - self.hdu[1].header['TIMSLICE'])) / 86400.
-        date = Time(jd, format='jd').iso
-        return date
 
     @property
     def channel(self):

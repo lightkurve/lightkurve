@@ -76,7 +76,7 @@ def test_bitmasking(quality_bitmask, answer):
 def test_date():
     '''Test the lc.date() function'''
     tpf = KeplerTargetPixelFile(filename_tpf_all_zeros)
-    date = tpf.date
+    date = tpf.timeobj.iso
     assert len(date) == len(tpf.time)
     print(date)
     assert date[0] == '2016-04-22 14:19:41.510'

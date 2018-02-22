@@ -269,7 +269,7 @@ def test_to_csv():
 def test_date():
     '''Test the lc.date() function'''
     lcf = KeplerLightCurveFile(TABBY_Q8)
-    date = lcf.date
+    date = lcf.timeobj.iso
     assert len(date) == len(lcf.time)
     assert date[0] == '2011-01-06 20:45:08.811'
     assert date[-1] == '2011-03-14 20:18:16.734'
