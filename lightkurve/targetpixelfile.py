@@ -2,7 +2,7 @@ import warnings
 
 from astropy.io import fits
 from astropy.table import Table
-from astropy.wcs import WCS
+from astropy.wcs import WCS, FITSFixedWarning
 from matplotlib import patches
 import numpy as np
 
@@ -177,8 +177,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
         return SimpleKeplerPRF(channel=self.channel, shape=self.shape[1:],
                                column=self.column, row=self.row)
 
-
-    def get_wcs(self):
+    @property
+    def wcs(self):
         """Returns an astropy.wcs.WCS object with the World Coordinate System
         solution for the target pixel file.
 
@@ -188,23 +188,36 @@ class KeplerTargetPixelFile(TargetPixelFile):
             WCS solution
         """
         #Astropy.wcs.WCS has noisy warnings irrelevant for Kepler/K2
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            ok = []
-            #Find extensions with valid WCS solution
-            vals = ['CRPIX', 'CRVAL']
-            for idx, hdu in enumerate(self.hdu):
-                w = WCS(hdu.header)
-                if (np.any(np.asarray([v in k for k in hdu.header.keys() for v in vals]))):
-                    ok.append(idx)
-            #Use the first extention with a valid solution.
-            ok = ok[0]
-            w = WCS(self.hdu[ok].header)
-            return (w)
 
-    def get_radec(self):
-        """Returns two, 3D arrays of RA and Dec values, one for each pixel in each cadence.
+        wcs_keywords = {'1CTYP5': 'CTYPE1',
+                        '2CTYP5': 'CTYPE2',
+                        '1CRPX5': 'CRPIX1',
+                        '2CRPX5': 'CRPIX2',
+                        '1CRVL5': 'CRVAL1',
+                        '2CRVL5': 'CRVAL2',
+                        '1CUNI5': 'CUNIT1',
+                        '2CUNI5': 'CUNIT2',
+                        '1CDLT5': 'CDELT1',
+                        '2CDLT5': 'CDELT2',
+                        '11PC5': 'PC1_1',
+                        '12PC5': 'PC1_2',
+                        '21PC5': 'PC2_1',
+                        '22PC5': 'PC2_2'}
+        mywcs = {}
+        for oldkey, newkey in wcs_keywords.items():
+            mywcs[newkey] = self.hdu[1].header[oldkey]
+        return WCS(mywcs)
+
+    def get_coordinates(self, cadence='all'):
+        """Returns two, 3D arrays of RA and Dec values in decimal degrees
+
+        If cadence is 'all' returns one RA, Dec value for each pixel in every cadence.
         Uses the WCS solution and the POS_CORR arguments from TPF header file.
+
+        Parameters
+        ----------
+        cadence : 'all' or int
+            Which cadences to return the RA Dec coordinates for.
 
         Returns
         -------
@@ -213,24 +226,32 @@ class KeplerTargetPixelFile(TargetPixelFile):
         dec : 3D array, same shape as tpf.flux
             Array containing Dec values for every pixel, for every cadence.
         """
-        w = self.get_wcs()
-        #If the WCS is built from the FFI, the CRPIX values are the center of the module (~500).
-        if (w.wcs.crpix[0] > 450) & (w.wcs.crpix[0] > 450):
-            X,Y = np.meshgrid(np.arange(self.shape[2])+self.column, np.arange(self.shape[1])+self.row)
-        else:
-            X,Y = np.meshgrid(np.arange(self.shape[2]), np.arange(self.shape[1]))
+
+
+        w = self.wcs
+        X,Y = np.meshgrid(np.arange(self.shape[2]), np.arange(self.shape[1]))
         pos_corr1_pix, pos_corr2_pix = self.hdu[1].data['POS_CORR1'], self.hdu[1].data['POS_CORR2']
+
         #Any values where the poscorr is more than 50 pixels off are zero'd, as are infs.
+        #These are usually resat cadences
         bad = ~(np.isfinite(pos_corr1_pix) & np.isfinite(pos_corr2_pix))
         pos_corr1_pix[bad], pos_corr2_pix[bad] = 0, 0
         bad = ~((np.abs(pos_corr1_pix) < 50) & (np.abs(pos_corr2_pix) < 50))
         pos_corr1_pix[bad], pos_corr2_pix[bad] = 0, 0
-        X = (np.atleast_3d(X).transpose([2,0,1])+np.atleast_3d(pos_corr1_pix).transpose([1,2,0]))
-        Y = (np.atleast_3d(Y).transpose([2,0,1])+np.atleast_3d(pos_corr2_pix).transpose([1,2,0]))
+
+        #Add in POSCORRs
+        X = (np.atleast_3d(X).transpose([2,0,1]) + np.atleast_3d(pos_corr1_pix).transpose([1,2,0]))
+        Y = (np.atleast_3d(Y).transpose([2,0,1]) + np.atleast_3d(pos_corr2_pix).transpose([1,2,0]))
+
+        #Pass through WCS
         ra,dec = w.wcs_pix2world(X.ravel(), Y.ravel(), 1)
         ra = ra.reshape((pos_corr1_pix.shape[0], self.shape[1], self.shape[2]))
         dec = dec.reshape((pos_corr2_pix.shape[0], self.shape[1], self.shape[2]))
-        return ra[self.quality_mask], dec[self.quality_mask]
+        ra, dec = ra[self.quality_mask], dec[self.quality_mask]
+        if cadence is not 'all':
+            return ra[cadence], dec[cadence]
+        else:
+            return ra, dec
 
     @property
     def keplerid(self):

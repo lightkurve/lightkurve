@@ -8,6 +8,8 @@ filename_tpf_all_zeros = get_pkg_data_filename("data/test-tpf-all-zeros.fits")
 filename_tpf_one_center = get_pkg_data_filename("data/test-tpf-non-zero-center.fits")
 TABBY_Q8 = ("https://archive.stsci.edu/missions/kepler/lightcurves"
             "/0084/008462852/kplr008462852-2011073133259_llc.fits")
+TABBY_TPF = ("https://archive.stsci.edu/missions/kepler/target_pixel_files"
+            "/0084/008462852/kplr008462852-2011073133259_lpd-targ.fits.gz")
 
 @pytest.mark.remote_data
 def test_load_bad_file():
@@ -81,8 +83,20 @@ def test_bitmasking(quality_bitmask, answer):
 def test_wcs():
     '''Test the get_wcs function'''
     tpf = KeplerTargetPixelFile(filename_tpf_one_center)
-    w = tpf.get_wcs()
-    ra, dec = tpf.get_radec()
+    w = tpf.wcs
+    ra, dec = tpf.get_coordinates()
     assert ra.shape == tpf.shape
     assert dec.shape == tpf.shape
     assert type(w).__name__ == 'WCS'
+
+def test_wcs_tabby():
+    tpf = KeplerTargetPixelFile(TABBY_TPF)
+    w = tpf.wcs
+    ra, dec = tpf.get_coordinates(0)
+    col, row = tpf.centroids()
+    col -= tpf.column
+    row -= tpf.row
+    y, x = int(np.round(col[0])), int(np.round(row[1]))
+    #Compare with RA and Dec from Simbad
+    assert np.isclose(ra[x, y], 301.5643971, 1e-4)
+    assert np.isclose(dec[x, y], 44.4568869, 1e-4)
