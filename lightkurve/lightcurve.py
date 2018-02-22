@@ -550,9 +550,12 @@ class KeplerLightCurve(LightCurve):
         method : str
             Method used to correct the lightcurve.
             Right now only 'sff' (Vanderburg's Self-Flat Fielding) is supported.
+        warn : bool
+            Turn off warnings for SFFCorrector
         kwargs : dict
             Dictionary of keyword arguments to be passed to the function
             defined by `method`.
+
 
         Returns
         -------
