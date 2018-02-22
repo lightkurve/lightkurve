@@ -572,7 +572,8 @@ class KeplerLightCurve(LightCurve):
                                                       **kwargs)
             else:
                 with warnings.catch_warnings():
-                    warnings.simplefilter("ignore")
+                    # ignore warning messages related to polyfit being poorly conditioned
+                    warnings.simplefilter("ignore", action=RankWarning)
                     self.corrector = SFFCorrector()
                     corrected_lc = self.corrector.correct(time=self.time[ok], flux=self.flux[ok],
                                                           centroid_col=self.centroid_col[ok],
