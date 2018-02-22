@@ -16,8 +16,9 @@ from matplotlib import pyplot as plt
 from astropy.io import fits as pyfits
 from astropy.stats import sigma_clip
 from astropy.table import Table
+from astropy.time import Time
 
-from .utils import (running_mean, channel_to_module_output, KeplerQualityFlags,
+from .utils import (running_mean, channel_to_module_output, bkjd_to_time, KeplerQualityFlags,
                     TessQualityFlags)
 from .mast import search_kepler_lightcurve_products, download_products, ArchiveError
 
@@ -641,6 +642,11 @@ class LightCurveFile(object):
     def time(self):
         """Time measurements"""
         return self.hdu[1].data['TIME'][self.quality_mask]
+
+    @property
+    def timeobj(self):
+        """Returns the human-readable date for all good-quality cadences."""
+        return bkjd_to_time(self.time, self.hdu[1].data['TIMECORR'][self.quality_mask], self.hdu[1].header['TIMSLICE'])
 
     @property
     def SAP_FLUX(self):

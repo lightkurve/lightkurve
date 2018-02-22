@@ -113,7 +113,6 @@ def test_bitmasking(quality_bitmask, answer):
     flux = lcf.get_lightcurve('SAP_FLUX').flux
     assert len(flux) == answer
 
-
 def test_lightcurve_fold():
     """Test the ``LightCurve.fold()`` method."""
     lc = LightCurve(time=np.linspace(0,10,100), flux=np.zeros(100)+1)
@@ -125,7 +124,6 @@ def test_lightcurve_fold():
     assert_almost_equal(fold.time[0], -0.5, 2)
     assert_almost_equal(np.min(fold.time), -0.5, 2)
     assert_almost_equal(np.max(fold.time), 0.5, 2)
-
 
 def test_lightcurve_stitch():
     """Test the ``LightCurve.stitch()`` method."""
@@ -143,7 +141,6 @@ def test_lightcurve_plot():
     lcf.plot()
     lcf.SAP_FLUX.plot()
 
-
 def test_cdpp():
     """Test the basics of the CDPP noise metric."""
     # A flat lightcurve should have a CDPP close to zero
@@ -160,7 +157,6 @@ def test_cdpp_tabby():
     # Tabby's star shows dips after cadence 1000 which increase the cdpp
     lc = LightCurve(lcf.PDCSAP_FLUX.time[:1000], lcf.PDCSAP_FLUX.flux[:1000])
     assert(np.abs(lc.cdpp() - lcf.header(ext=1)['CDPP6_0']) < 30)
-
 
 def test_sff_corrector():
     """Does our code agree with the example presented in Vanderburg
@@ -211,7 +207,6 @@ def test_sff_corrector():
     assert_almost_equal(sff.interp(sff.s), correction, decimal=3)
     assert_array_equal(time, klc.time)
 
-
 def test_bin():
     lc = LightCurve(time=np.arange(10), flux=2*np.ones(10),
                     flux_err=2**.5*np.ones(10))
@@ -219,7 +214,6 @@ def test_bin():
     assert_allclose(binned_lc.flux, 2*np.ones(5))
     assert_allclose(binned_lc.flux_err, np.ones(5))
     assert len(binned_lc.time) == 5
-
 
 def test_normalize():
     """Does the `LightCurve.normalize()` method normalize the flux?"""
@@ -253,7 +247,6 @@ def test_to_pandas():
         # pandas is an optional dependency
         pass
 
-
 def test_to_table():
     """Test the `LightCurve.to_table()` method."""
     time, flux, flux_err = range(3), np.ones(3), np.zeros(3)
@@ -262,7 +255,6 @@ def test_to_table():
     assert_allclose(tbl['time'], time)
     assert_allclose(tbl['flux'], flux)
     assert_allclose(tbl['flux_err'], flux_err)
-
 
 def test_to_csv():
     """Test the `LightCurve.to_csv()` method."""
@@ -273,3 +265,11 @@ def test_to_csv():
     except ImportError:
         # pandas is an optional dependency
         pass
+
+def test_date():
+    '''Test the lc.date() function'''
+    lcf = KeplerLightCurveFile(TABBY_Q8)
+    date = lcf.timeobj.iso
+    assert len(date) == len(lcf.time)
+    assert date[0] == '2011-01-06 20:45:08.811'
+    assert date[-1] == '2011-03-14 20:18:16.734'
