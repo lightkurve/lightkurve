@@ -20,6 +20,7 @@ from .utils import (running_mean, channel_to_module_output, KeplerQualityFlags,
                     TessQualityFlags)
 from .mast import search_kepler_lightcurve_products, download_products, ArchiveError
 
+import warnings
 
 __all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve',
            'KeplerLightCurveFile', 'TessLightCurveFile', 'KeplerCBVCorrector',
@@ -541,7 +542,7 @@ class KeplerLightCurve(LightCurve):
         elif self.mission.lower() == 'k2':
             return('KeplerLightCurveFile(EPIC: {})'.format(self.keplerid))
 
-    def correct(self, method='sff', **kwargs):
+    def correct(self, method='sff', warn=False, **kwargs):
         """Corrects a lightcurve for motion-dependent systematic errors.
 
         Parameters
@@ -558,16 +559,28 @@ class KeplerLightCurve(LightCurve):
         new_lc : KeplerLightCurve object
             Corrected lightcurve
         """
+        ok = np.isfinite(self.flux)
         if method == 'sff':
-            self.corrector = SFFCorrector()
-            corrected_lc = self.corrector.correct(time=self.time, flux=self.flux,
-                                                  centroid_col=self.centroid_col,
-                                                  centroid_row=self.centroid_row,
-                                                  **kwargs)
+            if warn:
+                self.corrector = SFFCorrector()
+                corrected_lc = self.corrector.correct(time=self.time[ok], flux=self.flux[ok],
+                                                      centroid_col=self.centroid_col[ok],
+                                                      centroid_row=self.centroid_row[ok],
+                                                      **kwargs)
+            else:
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore")
+                    self.corrector = SFFCorrector()
+                    corrected_lc = self.corrector.correct(time=self.time[ok], flux=self.flux[ok],
+                                                          centroid_col=self.centroid_col[ok],
+                                                          centroid_row=self.centroid_row[ok],
+                                                          **kwargs)
         else:
             raise ValueError("method {} is not available.".format(method))
         new_lc = copy.copy(self)
+        new_lc.time = corrected_lc.time
         new_lc.flux = corrected_lc.flux
+        new_lc.flux_err = self.normalize().flux_err[ok]
         return new_lc
 
     def to_fits(self):
