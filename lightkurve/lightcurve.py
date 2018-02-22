@@ -15,6 +15,7 @@ from matplotlib import pyplot as plt
 from astropy.io import fits as pyfits
 from astropy.stats import sigma_clip
 from astropy.table import Table
+from astropy.time import Time
 
 from .utils import (running_mean, channel_to_module_output, KeplerQualityFlags,
                     TessQualityFlags)
