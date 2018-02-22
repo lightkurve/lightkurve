@@ -2,12 +2,13 @@ import warnings
 
 from astropy.io import fits
 from astropy.table import Table
+from astropy.time import Time
 from matplotlib import patches
 import numpy as np
 
 from .lightcurve import KeplerLightCurve, LightCurve
 from .prf import SimpleKeplerPRF
-from .utils import KeplerQualityFlags, plot_image
+from .utils import KeplerQualityFlags, plot_image, bkjd_to_time
 from .mast import search_kepler_tpf_products, download_products, ArchiveError
 
 
@@ -233,6 +234,11 @@ class KeplerTargetPixelFile(TargetPixelFile):
     def time(self):
         """Returns the time for all good-quality cadences."""
         return self.hdu[1].data['TIME'][self.quality_mask]
+
+    @property
+    def timeobj(self):
+        """Returns the human-readable date for all good-quality cadences."""
+        return bkjd_to_time(self.time, self.hdu[1].data['TIMECORR'][self.quality_mask], self.hdu[1].header['TIMSLICE'])
 
     @property
     def cadenceno(self):
