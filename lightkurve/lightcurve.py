@@ -1015,9 +1015,9 @@ class SFFCorrector(object):
                 # First, fit a spline to capture the long-term varation
                 # We don't want to fit the long-term trend because we know
                 # that the K2 motion noise is a high-frequency effect.
-                self.bspline = self.fit_bspline(time[i], flux[i])
+                self.bspline = self.fit_bspline(np.arange(len(flux[i])), flux[i])
                 # Remove the long-term variation by dividing the flux by the spline
-                self.normflux = flux[i] / self.bspline(time[i] - time[i][0])
+                self.normflux = flux[i] / self.bspline(np.arange(len(flux[i])))
                 # Bin and interpolate normalized flux to capture the dependency
                 # of the flux as a function of arclength
                 self.interp = self.bin_and_interpolate(self.s, self.normflux, bins,
