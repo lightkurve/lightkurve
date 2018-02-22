@@ -2,6 +2,7 @@ from __future__ import division, print_function
 
 import copy
 import requests
+import warnings
 
 from bs4 import BeautifulSoup
 from tqdm import tqdm
@@ -20,7 +21,6 @@ from .utils import (running_mean, channel_to_module_output, KeplerQualityFlags,
                     TessQualityFlags)
 from .mast import search_kepler_lightcurve_products, download_products, ArchiveError
 
-import warnings
 
 __all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve',
            'KeplerLightCurveFile', 'TessLightCurveFile', 'KeplerCBVCorrector',
