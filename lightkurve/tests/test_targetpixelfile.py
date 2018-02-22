@@ -9,6 +9,7 @@ filename_tpf_one_center = get_pkg_data_filename("data/test-tpf-non-zero-center.f
 TABBY_Q8 = ("https://archive.stsci.edu/missions/kepler/lightcurves"
             "/0084/008462852/kplr008462852-2011073133259_llc.fits")
 
+@pytest.mark.remote_data
 def test_load_bad_file():
     '''Test if a light curve can be opened without exception.'''
     with pytest.raises(ValueError) as exc:
