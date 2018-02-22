@@ -3,6 +3,7 @@ import warnings
 from astropy.io import fits
 from astropy.table import Table
 from astropy.time import Time
+from astropy.wcs import WCS, FITSFixedWarning
 from matplotlib import patches
 import numpy as np
 
@@ -10,7 +11,6 @@ from .lightcurve import KeplerLightCurve, LightCurve
 from .prf import SimpleKeplerPRF
 from .utils import KeplerQualityFlags, plot_image, bkjd_to_time
 from .mast import search_kepler_tpf_products, download_products, ArchiveError
-
 
 __all__ = ['KeplerTargetPixelFile']
 
@@ -176,6 +176,80 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
         return SimpleKeplerPRF(channel=self.channel, shape=self.shape[1:],
                                column=self.column, row=self.row)
+
+    @property
+    def wcs(self):
+        """Returns an astropy.wcs.WCS object with the World Coordinate System
+        solution for the target pixel file.
+
+        Returns
+        -------
+        w : astropy.wcs.WCS object
+            WCS solution
+        """
+        #Use WCS keywords of the 5th column (FLUX)
+        wcs_keywords = {'1CTYP5': 'CTYPE1',
+                        '2CTYP5': 'CTYPE2',
+                        '1CRPX5': 'CRPIX1',
+                        '2CRPX5': 'CRPIX2',
+                        '1CRVL5': 'CRVAL1',
+                        '2CRVL5': 'CRVAL2',
+                        '1CUNI5': 'CUNIT1',
+                        '2CUNI5': 'CUNIT2',
+                        '1CDLT5': 'CDELT1',
+                        '2CDLT5': 'CDELT2',
+                        '11PC5': 'PC1_1',
+                        '12PC5': 'PC1_2',
+                        '21PC5': 'PC2_1',
+                        '22PC5': 'PC2_2'}
+        mywcs = {}
+        for oldkey, newkey in wcs_keywords.items():
+            mywcs[newkey] = self.hdu[1].header[oldkey]
+        return WCS(mywcs)
+
+    def get_coordinates(self, cadence='all'):
+        """Returns two 3D arrays of RA and Dec values in decimal degrees.
+
+        If cadence number is given, returns 2D arrays for that cadence. If
+        cadence is 'all' returns one RA, Dec value for each pixel in every cadence.
+        Uses the WCS solution and the POS_CORR data from TPF header.
+
+        Parameters
+        ----------
+        cadence : 'all' or int
+            Which cadences to return the RA Dec coordinates for.
+
+        Returns
+        -------
+        ra : numpy array, same shape as tpf.flux[cadence]
+            Array containing RA values for every pixel, for every cadence.
+        dec : numpy array, same shape as tpf.flux[cadence]
+            Array containing Dec values for every pixel, for every cadence.
+        """
+        w = self.wcs
+        X,Y = np.meshgrid(np.arange(self.shape[2]), np.arange(self.shape[1]))
+        pos_corr1_pix, pos_corr2_pix = self.hdu[1].data['POS_CORR1'], self.hdu[1].data['POS_CORR2']
+
+        # Any values where the poscorr is more than 50 pixels off are zero'd, as are infs.
+        # These are usually resat cadences
+        bad = np.any([~np.isfinite(pos_corr1_pix),
+                      ~np.isfinite(pos_corr2_pix),
+                      np.abs(pos_corr1_pix) < 50,
+                      np.abs(pos_corr2_pix) < 50], axis=0)
+        pos_corr1_pix[bad], pos_corr2_pix[bad] = 0, 0
+
+        # Add in POSCORRs
+        X = (np.atleast_3d(X).transpose([2,0,1]) + np.atleast_3d(pos_corr1_pix).transpose([1,2,0]))
+        Y = (np.atleast_3d(Y).transpose([2,0,1]) + np.atleast_3d(pos_corr2_pix).transpose([1,2,0]))
+
+        # Pass through WCS
+        ra, dec = w.wcs_pix2world(X.ravel(), Y.ravel(), 1)
+        ra = ra.reshape((pos_corr1_pix.shape[0], self.shape[1], self.shape[2]))
+        dec = dec.reshape((pos_corr2_pix.shape[0], self.shape[1], self.shape[2]))
+        ra, dec = ra[self.quality_mask], dec[self.quality_mask]
+        if cadence is not 'all':
+            return ra[cadence], dec[cadence]
+        return ra, dec
 
     @property
     def keplerid(self):
