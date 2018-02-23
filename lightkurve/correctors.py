@@ -261,9 +261,10 @@ class SFFCorrector(object):
        (3) Compute the arclength of such polynomial
        (4) Fit a BSpline of the raw flux as a function of time
        (5) Normalize the raw flux by the fitted BSpline computed in step (4)
-       (6) Bin and interpolate the normalized flux as function of the arclength
-       (7) Divide the raw flux by the piecewise linear interpolation done in step [(6)
+       (6) Bin and interpolate the normalized flux as a function of the arclength
+       (7) Divide the raw flux by the piecewise linear interpolation done in step (6)
        (8) Set raw flux as the flux computed in step (7) and repeat
+       (9) Multiply back the fitted BSpline
     """
 
     def __init__(self):
@@ -345,7 +346,8 @@ class SFFCorrector(object):
                 # that the K2 motion noise is a high-frequency effect.
                 self.bspline = self.fit_bspline(time[i], flux[i])
                 # Remove the long-term variation by dividing the flux by the spline
-                self.normflux = flux[i] / self.bspline(time[i] - time[i][0])
+                self.trend = self.bspline(time[i] - time[i][0])
+                self.normflux = flux[i] / self.trend
                 # Bin and interpolate normalized flux to capture the dependency
                 # of the flux as a function of arclength
                 self.interp = self.bin_and_interpolate(self.s, self.normflux, bins,
