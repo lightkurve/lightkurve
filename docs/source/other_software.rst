@@ -1,8 +1,8 @@
-.. _community_software:
+.. _other_software:
 
-====================
-Community Software
-====================
+==============
+Other software
+==============
 
 **lightkurve** provides general purpose tools for interacting with astronomical lightcurve data.
 Many other tools have been developed to solve related scientific and data analysis problems.

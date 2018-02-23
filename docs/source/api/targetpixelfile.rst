@@ -1,4 +1,4 @@
-Target Pixel File
+TargetPixelFile classes
 =================
 
 .. automodule:: lightkurve.targetpixelfile

@@ -1,4 +1,4 @@
-Point Spread Function Photometry
+PSF photometry classes
 ================================
 
 .. automodule:: lightkurve.prf

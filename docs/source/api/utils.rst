@@ -1,4 +1,4 @@
-Utilities
+Utility functions
 =========
 
 .. automodule:: lightkurve.utils
