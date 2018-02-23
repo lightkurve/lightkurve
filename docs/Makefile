@@ -18,3 +18,8 @@ help:
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
 %: Makefile
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+
+# ghp-import can be installed with pip as pip install ghp-import
+upload:
+	ghp-import -m "Update docs" $(BUILDDIR)/html
+	git push origin gh-pages

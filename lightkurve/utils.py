@@ -2,9 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from astropy.visualization import (PercentileInterval, ImageNormalize,
                                    SqrtStretch, LogStretch, LinearStretch)
+from astropy.time import Time
 
 
-__all__ = ['KeplerQualityFlags', 'module_output_to_channel',
+__all__ = ['KeplerQualityFlags', 'TessQualityFlags', 'module_output_to_channel',
            'channel_to_module_output', 'running_mean']
 
 
@@ -179,6 +180,10 @@ class KeplerQualityFlags(object):
         return result
 
 
+class TessQualityFlags(KeplerQualityFlags):
+    pass
+
+
 def plot_image(image, ax=None, scale='linear', origin='lower',
                xlabel='Pixel Column Number', ylabel='Pixel Row Number',
                clabel='Flux ($e^{-}s^{-1}$)', title=None, show_colorbar=True,
@@ -247,3 +252,32 @@ def running_mean(data, window_size):
     """
     cumsum = np.cumsum(np.insert(data, 0, 0))
     return (cumsum[window_size:] - cumsum[:-window_size]) / float(window_size)
+
+
+def bkjd_to_time(bkjd, timecorr, timslice, bjdref=2454833.):
+        """Converts Barycentric Kepler Julian Day (BKJD) to an astropy.time.Time object.
+
+        Kepler Barycentric Julian Day is a Julian day minus 2454833.0 (UTC=January
+        1, 2009 12:00:00) and corrected to be the arrival times at the barycenter
+        of the Solar System. See Section 2.3.2 in the Kepler Archive Manual.
+
+        Parameters
+        ----------
+        bkjd : array of floats
+            Barycentric Kepler Julian Day
+        timecorr : array of floats
+            Kepler barycentric correction
+        timslice : array of floats
+            Kepler time-slice correction
+        bjdref : float
+            BJD reference date, for Kepler this is 2454833
+
+        Returns
+        -------
+        time : astropy.time.Time object
+            Resulting time object
+        """
+        bjd = bkjd + bjdref
+        jd = bjd - timecorr
+        jd += (0.25 + 0.62 * (5 - timslice)) / 86400.
+        return Time(jd, format='jd')
