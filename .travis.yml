@@ -17,7 +17,7 @@ before_script: # configure a headless display to test plot generation
   - sleep 3 # give xvfb some time to start
 # command to run tests
 script:
-  - pytest --remote-data
+  - pytest
 
 after_success:
   - codecov
