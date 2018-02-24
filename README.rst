@@ -29,11 +29,6 @@ and citizen scientists interested in analyzing Kepler and TESS space telescope d
 It does this by providing **high-quality building blocks and tutorials**
 which enable both hand-tailored data analyses and advanced automated pipelines.
 
-Lightkurve is an **open source community project** supported by
-`NASA's Kepler/K2 Guest Observer Office <https://keplerscience.arc.nasa.gov>`_.
-The development `takes place on GitHub <https://github.com/KeplerGO/lightkurve>`_
-and everyone is :ref:`invited to contribute<contributing>`.
-
 
 Documentation
 -------------
@@ -51,7 +46,7 @@ Contributing and reporting issues
 ---------------------------------
 
 We welcome community contributions!  
-Please read the contribution guide at `http://lightkurve.keplerscience.org/contributing.html <http://lightkurve.keplerscience.org/contributing.html>`.
+Please read the contribution guidelines at `http://lightkurve.keplerscience.org/contributing.html <http://lightkurve.keplerscience.org/contributing.html>`_.
 
 
 Citing
@@ -62,4 +57,6 @@ If you find this package useful in your research, please cite it using the DOI/B
 
 Contact
 -------
-You can contact the core development team via keplergo@mail.arc.nasa.gov
+Lightkurve is an open source community project supported by
+`NASA's Kepler/K2 Guest Observer Office <https://keplerscience.arc.nasa.gov>`_.
+You can contact the core development team via keplergo@mail.arc.nasa.gov.
