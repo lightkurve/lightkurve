@@ -42,17 +42,18 @@ Quickstart
 Visit the quickstart guide at `http://lightkurve.keplerscience.org/tutorials/quickstart.html <http://lightkurve.keplerscience.org/tutorials/quickstart.html>`_.
 
 
-Contributing and reporting issues
----------------------------------
+Contributing
+------------
 
-We welcome community contributions!  
+We welcome community contributions from everyone!  
 Please read the contribution guidelines at `http://lightkurve.keplerscience.org/contributing.html <http://lightkurve.keplerscience.org/contributing.html>`_.
 
 
 Citing
 ------
 
-If you find this package useful in your research, please cite it using the DOI/BibTeX provided below. Also, please give us a GitHub star! `Citation instructions are available in our documentation <http://lightkurve.keplerscience.org/citing.html>`_.
+If you find this package useful in your research, please cite it and give us a GitHub star!
+Please read the citation instructions at `http://lightkurve.keplerscience.org/citing.html <http://lightkurve.keplerscience.org/citing.html>`_.
 
 
 Contact
