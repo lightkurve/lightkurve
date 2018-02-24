@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>What are Target Pixel Files? &mdash; lightkurve 1.0.0dev documentation</title>
+  <title>What are target pixel files? &mdash; lightkurve 1.0.alpha documentation</title>
   
 
   
@@ -33,10 +33,9 @@
         <link rel="index" title="Index"
               href="../genindex.html"/>
         <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="lightkurve 1.0.0dev documentation" href="../index.html"/>
-        <link rel="up" title="lightkurve tutorials" href="index.html"/>
-        <link rel="next" title="What are Light Curve Files?" href="lightcurve-files.html"/>
-        <link rel="prev" title="lightkurve tutorials" href="index.html"/> 
+    <link rel="top" title="lightkurve 1.0.alpha documentation" href="../index.html"/>
+        <link rel="next" title="What are light curves?" href="lightcurve-files.html"/>
+        <link rel="prev" title="How to find a planet in Kepler data using the lightkurve package?" href="how-to-find-a-kepler-planet-with-lightkurve.html"/> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -67,7 +66,7 @@
             
             
               <div class="version">
-                1.0.0dev
+                1.0
               </div>
             
           
@@ -88,18 +87,26 @@
           
             
             
-                <ul>
-<li class="toctree-l1"><a class="reference internal" href="../api/index.html">API documentation</a></li>
+                <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../community_software.html">Community Software</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing and reporting issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../citing.html">Citing and acknowledging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../other_software.html">Other software</a></li>
 </ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">lightkurve tutorials</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">What are Target Pixel Files?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightcurve-files.html">What are Light Curve Files?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="how-to-find-a-kepler-planet-with-lightkurve.html">How to find a planet?</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">What are target pixel files?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lightcurve-files.html">What are light curves?</a></li>
 </ul>
-</li>
+<p class="caption"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/targetpixelfile.html">TargetPixelFile classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/lightcurve.html">LightCurve classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/prf.html">PSF photometry classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/utils.html">Utility functions</a></li>
 </ul>
 
             
@@ -130,9 +137,7 @@
   <ul class="wy-breadcrumbs">
     <li><a href="../index.html">Docs</a> &raquo;</li>
       
-          <li><a href="index.html">lightkurve tutorials</a> &raquo;</li>
-      
-    <li>What are Target Pixel Files?</li>
+    <li>What are target pixel files?</li>
       <li class="wy-breadcrumbs-aside">
         
           
@@ -344,8 +349,8 @@ div.nboutput div.output_area.stderr {
     margin-right: 4px;  /* make room for the exclamation icon */
 }
 </style>
-<div class="section" id="What-are-Target-Pixel-Files?">
-<h1>What are Target Pixel Files?<a class="headerlink" href="#What-are-Target-Pixel-Files?" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="What-are-target-pixel-files?">
+<h1>What are target pixel files?<a class="headerlink" href="#What-are-target-pixel-files?" title="Permalink to this headline">¶</a></h1>
 <p>Target Pixel Files (TPFs) contain the flux value for each pixel, for
 each time measurement. They can be thought of as stacks of images, with
 one image for every time stamp the telescope took data. Each time point
@@ -682,10 +687,10 @@ light curve in the next tutorial.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="lightcurve-files.html" class="btn btn-neutral float-right" title="What are Light Curve Files?" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="lightcurve-files.html" class="btn btn-neutral float-right" title="What are light curves?" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="index.html" class="btn btn-neutral" title="lightkurve tutorials" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="how-to-find-a-kepler-planet-with-lightkurve.html" class="btn btn-neutral" title="How to find a planet in Kepler data using the lightkurve package?" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -694,7 +699,7 @@ light curve in the next tutorial.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright lightkurve Developers and Contributors.
+        &copy; Copyright lightkurve developers and contributors.
 
     </p>
   </div>
@@ -716,7 +721,7 @@ light curve in the next tutorial.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'1.0.0dev',
+            VERSION:'1.0.alpha',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

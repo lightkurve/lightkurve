@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Utilities &mdash; lightkurve 1.0.0dev documentation</title>
+  <title>Utility functions &mdash; lightkurve 1.0.alpha documentation</title>
   
 
   
@@ -33,8 +33,7 @@
         <link rel="index" title="Index"
               href="../genindex.html"/>
         <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="lightkurve 1.0.0dev documentation" href="../index.html"/>
-        <link rel="up" title="API documentation" href="index.html"/> 
+    <link rel="top" title="lightkurve 1.0.alpha documentation" href="../index.html"/> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -65,7 +64,7 @@
             
             
               <div class="version">
-                1.0.0dev
+                1.0
               </div>
             
           
@@ -86,22 +85,28 @@
           
             
             
-                <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">API documentation</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="targetpixelfile.html">Target Pixel File</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightcurve.html">Lightcurve</a></li>
-<li class="toctree-l2"><a class="reference internal" href="prf.html">Point Spread Function Photometry</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Utilities</a><ul class="simple">
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../community_software.html">Community Software</a></li>
-</ul>
+                <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">lightkurve tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing and reporting issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../citing.html">Citing and acknowledging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../other_software.html">Other software</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/how-to-find-a-kepler-planet-with-lightkurve.html">How to find a planet?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/target-pixel-files.html">What are target pixel files?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/lightcurve-files.html">What are light curves?</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="targetpixelfile.html">TargetPixelFile classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lightcurve.html">LightCurve classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prf.html">PSF photometry classes</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Utility functions</a><ul class="simple">
+</ul>
+</li>
 </ul>
 
             
@@ -132,9 +137,7 @@
   <ul class="wy-breadcrumbs">
     <li><a href="../index.html">Docs</a> &raquo;</li>
       
-          <li><a href="index.html">API documentation</a> &raquo;</li>
-      
-    <li>Utilities</li>
+    <li>Utility functions</li>
       <li class="wy-breadcrumbs-aside">
         
           
@@ -182,9 +185,9 @@
     margin-right: 4px;  /* make room for the exclamation icon */
 }
 </style>
-<div class="section" id="module-lightkurve.utils">
-<span id="utilities"></span><h1>Utilities<a class="headerlink" href="#module-lightkurve.utils" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<div class="section" id="utility-functions">
+<h1>Utility functions<a class="headerlink" href="#utility-functions" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-lightkurve.utils"></span><dl class="class">
 <dt id="lightkurve.utils.KeplerQualityFlags">
 <em class="property">class </em><code class="descclassname">lightkurve.utils.</code><code class="descname">KeplerQualityFlags</code><a class="reference internal" href="../_modules/lightkurve/utils.html#KeplerQualityFlags"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class encodes the meaning of the various Kepler QUALITY bitmask flags,
@@ -356,6 +359,23 @@ quality flags raised.  Returns an empty list if no flags raised.</p>
 
 </dd></dl>
 
+<dl class="class">
+<dt id="lightkurve.utils.TessQualityFlags">
+<em class="property">class </em><code class="descclassname">lightkurve.utils.</code><code class="descname">TessQualityFlags</code><a class="reference internal" href="../_modules/lightkurve/utils.html#TessQualityFlags"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.utils.TessQualityFlags" title="Permalink to this definition">¶</a></dt>
+<dd><p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">decode</span></code>(quality)</td>
+<td>Converts a Kepler QUALITY value into a list of human-readable strings.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="function">
 <dt id="lightkurve.utils.module_output_to_channel">
 <code class="descclassname">lightkurve.utils.</code><code class="descname">module_output_to_channel</code><span class="sig-paren">(</span><em>module</em>, <em>output</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/utils.html#module_output_to_channel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.utils.module_output_to_channel" title="Permalink to this definition">¶</a></dt>
@@ -442,7 +462,7 @@ quality flags raised.  Returns an empty list if no flags raised.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright lightkurve Developers and Contributors.
+        &copy; Copyright lightkurve developers and contributors.
 
     </p>
   </div>
@@ -464,7 +484,7 @@ quality flags raised.  Returns an empty list if no flags raised.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'1.0.0dev',
+            VERSION:'1.0.alpha',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

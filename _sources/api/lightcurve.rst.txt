@@ -1,4 +1,4 @@
-Lightcurve
+LightCurve classes
 ==========
 
 .. automodule:: lightkurve.lightcurve

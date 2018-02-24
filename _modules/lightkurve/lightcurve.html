@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>lightkurve.lightcurve &mdash; lightkurve 1.0.0dev documentation</title>
+  <title>lightkurve.lightcurve &mdash; lightkurve 1.0.alpha documentation</title>
   
 
   
@@ -33,7 +33,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="lightkurve 1.0.0dev documentation" href="../../index.html"/>
+    <link rel="top" title="lightkurve 1.0.alpha documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                1.0.0dev
+                1.0
               </div>
             
           
@@ -86,14 +86,26 @@
           
             
             
-                <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../api/index.html">API documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../community_software.html">Community Software</a></li>
-</ul>
+                <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">lightkurve tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing and reporting issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../citing.html">Citing and acknowledging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../other_software.html">Other software</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/how-to-find-a-kepler-planet-with-lightkurve.html">How to find a planet?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/target-pixel-files.html">What are target pixel files?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/lightcurve-files.html">What are light curves?</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api/targetpixelfile.html">TargetPixelFile classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/lightcurve.html">LightCurve classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/prf.html">PSF photometry classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/utils.html">Utility functions</a></li>
 </ul>
 
             
@@ -143,6 +155,7 @@
 
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="kn">from</span> <span class="nn">bs4</span> <span class="k">import</span> <span class="n">BeautifulSoup</span>
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="k">import</span> <span class="n">tqdm</span>
@@ -156,14 +169,16 @@
 <span class="kn">from</span> <span class="nn">astropy.io</span> <span class="k">import</span> <span class="n">fits</span> <span class="k">as</span> <span class="n">pyfits</span>
 <span class="kn">from</span> <span class="nn">astropy.stats</span> <span class="k">import</span> <span class="n">sigma_clip</span>
 <span class="kn">from</span> <span class="nn">astropy.table</span> <span class="k">import</span> <span class="n">Table</span>
+<span class="kn">from</span> <span class="nn">astropy.time</span> <span class="k">import</span> <span class="n">Time</span>
 
-<span class="kn">from</span> <span class="nn">.utils</span> <span class="k">import</span> <span class="n">running_mean</span><span class="p">,</span> <span class="n">channel_to_module_output</span><span class="p">,</span> <span class="n">KeplerQualityFlags</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="k">import</span> <span class="p">(</span><span class="n">running_mean</span><span class="p">,</span> <span class="n">channel_to_module_output</span><span class="p">,</span> <span class="n">bkjd_to_time</span><span class="p">,</span> <span class="n">KeplerQualityFlags</span><span class="p">,</span>
+                    <span class="n">TessQualityFlags</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.mast</span> <span class="k">import</span> <span class="n">search_kepler_lightcurve_products</span><span class="p">,</span> <span class="n">download_products</span><span class="p">,</span> <span class="n">ArchiveError</span>
 
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;LightCurve&#39;</span><span class="p">,</span> <span class="s1">&#39;KeplerLightCurve&#39;</span><span class="p">,</span> <span class="s1">&#39;KeplerLightCurveFile&#39;</span><span class="p">,</span>
-           <span class="s1">&#39;KeplerCBVCorrector&#39;</span><span class="p">,</span> <span class="s1">&#39;SPLDCorrector&#39;</span><span class="p">,</span> <span class="s1">&#39;SFFCorrector&#39;</span><span class="p">,</span>
-           <span class="s1">&#39;box_period_search&#39;</span><span class="p">,</span> <span class="s1">&#39;iterative_box_period_search&#39;</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;LightCurve&#39;</span><span class="p">,</span> <span class="s1">&#39;KeplerLightCurve&#39;</span><span class="p">,</span> <span class="s1">&#39;TessLightCurve&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;KeplerLightCurveFile&#39;</span><span class="p">,</span> <span class="s1">&#39;TessLightCurveFile&#39;</span><span class="p">,</span> <span class="s1">&#39;KeplerCBVCorrector&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;SFFCorrector&#39;</span><span class="p">,</span> <span class="s1">&#39;iterative_box_period_search&#39;</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="LightCurve"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.LightCurve">[docs]</a><span class="k">class</span> <span class="nc">LightCurve</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -479,9 +494,10 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        transit_duration : int, optional</span>
-<span class="sd">            The transit duration in cadences. This is the length of the window</span>
-<span class="sd">            used to compute the running mean. The default is 13, which</span>
-<span class="sd">            corresponds to a 6.5 hour transit in data sampled at 30-min cadence.</span>
+<span class="sd">            The transit duration in units of number of cadences. This is the</span>
+<span class="sd">            length of the window used to compute the running mean. The default</span>
+<span class="sd">            is 13, which corresponds to a 6.5 hour transit in data sampled at</span>
+<span class="sd">            30-min cadence.</span>
 <span class="sd">        savgol_window : int, optional</span>
 <span class="sd">            Width of Savitsky-Golay filter in cadences (odd number).</span>
 <span class="sd">            Default value 101 (2.0 days in Kepler Long Cadence mode).</span>
@@ -503,8 +519,12 @@
 <span class="sd">        Jeff van Cleve but lacks the normalization factor used there:</span>
 <span class="sd">        svn+ssh://murzim/repo/so/trunk/Develop/jvc/common/compute_SG_noise.m</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transit_duration</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;transit_duration must be an integer&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">transit_duration</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">transit_duration</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;transit_duration must be an integer, got </span><span class="si">{}</span><span class="s2">.&quot;</span>
+                            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">transit_duration</span><span class="p">))</span>
+
         <span class="n">detrended_lc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">window_length</span><span class="o">=</span><span class="n">savgol_window</span><span class="p">,</span>
                                     <span class="n">polyorder</span><span class="o">=</span><span class="n">savgol_polyorder</span><span class="p">)</span>
         <span class="n">cleaned_lc</span> <span class="o">=</span> <span class="n">detrended_lc</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">(</span><span class="n">sigma</span><span class="o">=</span><span class="n">sigma_clip</span><span class="p">)</span>
@@ -671,7 +691,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">keplerid</span> <span class="o">=</span> <span class="n">keplerid</span>
 
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span><span class="p">(</span><span class="s1">&#39;KeplerLightCurve Object (ID: </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keplerid</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mission</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;kepler&#39;</span><span class="p">:</span>
+            <span class="k">return</span><span class="p">(</span><span class="s1">&#39;KeplerLightCurveFile(KIC: </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keplerid</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mission</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;k2&#39;</span><span class="p">:</span>
+            <span class="k">return</span><span class="p">(</span><span class="s1">&#39;KeplerLightCurveFile(EPIC: </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keplerid</span><span class="p">))</span>
 
 <div class="viewcode-block" id="KeplerLightCurve.correct"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.KeplerLightCurve.correct">[docs]</a>    <span class="k">def</span> <span class="nf">correct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;sff&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Corrects a lightcurve for motion-dependent systematic errors.</span>
@@ -690,23 +713,117 @@
 <span class="sd">        new_lc : KeplerLightCurve object</span>
 <span class="sd">            Corrected lightcurve</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">not_nan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;sff&#39;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">corrector</span> <span class="o">=</span> <span class="n">SFFCorrector</span><span class="p">()</span>
-            <span class="n">corrected_lc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">corrector</span><span class="o">.</span><span class="n">correct</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">flux</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span>
-                                                  <span class="n">centroid_col</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">centroid_col</span><span class="p">,</span>
-                                                  <span class="n">centroid_row</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">centroid_row</span><span class="p">,</span>
-                                                  <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">corrector</span> <span class="o">=</span> <span class="n">SFFCorrector</span><span class="p">()</span>
+                <span class="n">corrected_lc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">corrector</span><span class="o">.</span><span class="n">correct</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="n">not_nan</span><span class="p">],</span> <span class="n">flux</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="n">not_nan</span><span class="p">],</span>
+                                                      <span class="n">centroid_col</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">centroid_col</span><span class="p">[</span><span class="n">not_nan</span><span class="p">],</span>
+                                                      <span class="n">centroid_row</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">centroid_row</span><span class="p">[</span><span class="n">not_nan</span><span class="p">],</span>
+                                                      <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;method </span><span class="si">{}</span><span class="s2"> is not available.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">method</span><span class="p">))</span>
         <span class="n">new_lc</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">new_lc</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">corrected_lc</span><span class="o">.</span><span class="n">time</span>
         <span class="n">new_lc</span><span class="o">.</span><span class="n">flux</span> <span class="o">=</span> <span class="n">corrected_lc</span><span class="o">.</span><span class="n">flux</span>
+        <span class="n">new_lc</span><span class="o">.</span><span class="n">flux_err</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span><span class="o">.</span><span class="n">flux_err</span><span class="p">[</span><span class="n">not_nan</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">new_lc</span></div>
 
 <div class="viewcode-block" id="KeplerLightCurve.to_fits"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.KeplerLightCurve.to_fits">[docs]</a>    <span class="k">def</span> <span class="nf">to_fits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div></div>
 
 
-<div class="viewcode-block" id="KeplerLightCurveFile"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.KeplerLightCurveFile">[docs]</a><span class="k">class</span> <span class="nc">KeplerLightCurveFile</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="TessLightCurve"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.TessLightCurve">[docs]</a><span class="k">class</span> <span class="nc">TessLightCurve</span><span class="p">(</span><span class="n">LightCurve</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Defines a light curve class for NASA&#39;s TESS mission.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    time : array-like</span>
+<span class="sd">        Time measurements</span>
+<span class="sd">    flux : array-like</span>
+<span class="sd">        Data flux for every time point</span>
+<span class="sd">    flux_err : array-like</span>
+<span class="sd">        Uncertainty on each flux data point</span>
+<span class="sd">    centroid_col, centroid_row : array-like, array-like</span>
+<span class="sd">        Centroid column and row coordinates as a function of time</span>
+<span class="sd">    quality : array-like</span>
+<span class="sd">        Array indicating the quality of each data point</span>
+<span class="sd">    quality_bitmask : int</span>
+<span class="sd">        Bitmask specifying quality flags of cadences that should be ignored</span>
+<span class="sd">    cadenceno : array-like</span>
+<span class="sd">        Cadence numbers corresponding to every time measurement</span>
+<span class="sd">    ticid : int</span>
+<span class="sd">        Tess Input Catalog ID number</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">flux_err</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">centroid_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">centroid_row</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quality</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quality_bitmask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">cadenceno</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ticid</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TessLightCurve</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">flux_err</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">centroid_col</span> <span class="o">=</span> <span class="n">centroid_col</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">centroid_row</span> <span class="o">=</span> <span class="n">centroid_row</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">quality</span> <span class="o">=</span> <span class="n">quality</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">quality_bitmask</span> <span class="o">=</span> <span class="n">quality_bitmask</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mission</span> <span class="o">=</span> <span class="s2">&quot;TESS&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cadenceno</span> <span class="o">=</span> <span class="n">cadenceno</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ticid</span> <span class="o">=</span> <span class="n">ticid</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span><span class="p">(</span><span class="s1">&#39;TessLightCurveFile(TICID: </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ticid</span><span class="p">))</span>
+
+<div class="viewcode-block" id="TessLightCurve.to_fits"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.TessLightCurve.to_fits">[docs]</a>    <span class="k">def</span> <span class="nf">to_fits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div></div>
+
+
+<span class="k">class</span> <span class="nc">LightCurveFile</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Defines a generic class to handle light curve files.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path : str</span>
+<span class="sd">        Directory path or url to a lightcurve FITS file.</span>
+<span class="sd">    kwargs : dict</span>
+<span class="sd">        Keyword arguments to be passed to astropy.io.fits.open.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span> <span class="o">=</span> <span class="n">pyfits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Header of the object at extension `ext`&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="n">ext</span><span class="p">]</span><span class="o">.</span><span class="n">header</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Time measurements&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;TIME&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">timeobj</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the human-readable date for all good-quality cadences.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">bkjd_to_time</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;TIMECORR&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;TIMSLICE&#39;</span><span class="p">])</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">SAP_FLUX</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a LightCurve object for SAP_FLUX&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_lightcurve</span><span class="p">(</span><span class="s1">&#39;SAP_FLUX&#39;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">PDCSAP_FLUX</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a LightCurve object for PDCSAP_FLUX&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_lightcurve</span><span class="p">(</span><span class="s1">&#39;PDCSAP_FLUX&#39;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">cadenceno</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Cadence number&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;CADENCENO&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_flux_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a list of available flux types for this light curve file&quot;&quot;&quot;</span>
+        <span class="n">types</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">names</span> <span class="k">if</span> <span class="s1">&#39;FLUX&#39;</span> <span class="ow">in</span> <span class="n">n</span><span class="p">]</span>
+        <span class="n">types</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">types</span> <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="s1">&#39;ERR&#39;</span> <span class="ow">in</span> <span class="n">n</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="n">types</span>
+
+
+<div class="viewcode-block" id="KeplerLightCurveFile"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.KeplerLightCurveFile">[docs]</a><span class="k">class</span> <span class="nc">KeplerLightCurveFile</span><span class="p">(</span><span class="n">LightCurveFile</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Defines a class for a given light curve FITS file from NASA&#39;s Kepler and</span>
 <span class="sd">    K2 missions.</span>
 
@@ -716,6 +833,7 @@
 <span class="sd">        Directory path or url to a lightcurve FITS file.</span>
 <span class="sd">    quality_bitmask : str or int</span>
 <span class="sd">        Bitmask specifying quality flags of cadences that should be ignored.</span>
+<span class="sd">        If `None` is passed, then no cadences are ignored.</span>
 <span class="sd">        If a string is passed, it has the following meaning:</span>
 
 <span class="sd">            * default: recommended quality mask</span>
@@ -724,15 +842,16 @@
 <span class="sd">    kwargs : dict</span>
 <span class="sd">        Keyword arguments to be passed to astropy.io.fits.open.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">quality_bitmask</span><span class="o">=</span><span class="n">KeplerQualityFlags</span><span class="o">.</span><span class="n">DEFAULT_BITMASK</span><span class="p">,</span>
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span> <span class="o">=</span> <span class="n">pyfits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">KeplerLightCurveFile</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">quality_bitmask</span> <span class="o">=</span> <span class="n">quality_bitmask</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quality_mask</span><span class="p">(</span><span class="n">quality_bitmask</span><span class="p">)</span>
 
 <div class="viewcode-block" id="KeplerLightCurveFile.from_archive"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.KeplerLightCurveFile.from_archive">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">from_archive</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s1">&#39;long&#39;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">from_archive</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s1">&#39;long&#39;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">campaign</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Fetch a Light Curve File from the Kepler/K2 data archive at MAST.</span>
 
 <span class="sd">        Raises an `ArchiveError` if a unique file cannot be found.  For example,</span>
@@ -751,6 +870,8 @@
 <span class="sd">            For Kepler&#39;s prime mission, there are three short-cadence</span>
 <span class="sd">            lightcurve files for each quarter, each covering one month.</span>
 <span class="sd">            Hence, if cadence=&#39;short&#39; you need to specify month=1, 2, or 3.</span>
+<span class="sd">        kwargs : dict</span>
+<span class="sd">            Keywords arguments passed to `KeplerLightCurveFile`.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -773,26 +894,33 @@
         <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">products</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ArchiveError</span><span class="p">(</span><span class="s2">&quot;No lightcurve file found for </span><span class="si">{}</span><span class="s2"> at MAST.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">download_products</span><span class="p">(</span><span class="n">products</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">KeplerLightCurveFile</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">KeplerLightCurveFile</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span><span class="p">(</span><span class="s1">&#39;KeplerLightCurveFile Object (ID: </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keplerid</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mission</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;kepler&#39;</span><span class="p">:</span>
+            <span class="k">return</span><span class="p">(</span><span class="s1">&#39;KeplerLightCurveFile(KIC: </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keplerid</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mission</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;k2&#39;</span><span class="p">:</span>
+            <span class="k">return</span><span class="p">(</span><span class="s1">&#39;KeplerLightCurveFile(EPIC: </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keplerid</span><span class="p">))</span>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">hdu</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdu</span>
+    <span class="k">def</span> <span class="nf">_quality_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bitmask</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a boolean mask which flags all good-quality cadences.</span>
 
-    <span class="nd">@hdu</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">hdu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;SAP_FLUX&#39;</span><span class="p">,</span> <span class="s1">&#39;SAP_QUALITY&#39;</span><span class="p">]):</span>
-        <span class="sd">&#39;&#39;&#39;Raises a ValueError exception if value does not appear to be a Light Curve file.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
-            <span class="k">if</span> <span class="o">~</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">([</span><span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="n">ttype</span><span class="p">]</span> <span class="o">==</span> <span class="n">key</span>
-                <span class="k">for</span> <span class="n">ttype</span> <span class="ow">in</span> <span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;TTYPE*&#39;</span><span class="p">]])):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;File </span><span class="si">{}</span><span class="s2"> does not have a </span><span class="si">{}</span><span class="s2"> column, &quot;</span>
-                         <span class="s2">&quot;is this a light curve file?&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_hdu</span> <span class="o">=</span> <span class="n">value</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        bitmask : str or int</span>
+<span class="sd">            Bitmask. See ref. [1], table 2-3.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        boolean_mask : array of bool</span>
+<span class="sd">            Boolean array in which `True` means the data is of good quality.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">bitmask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;TIME&#39;</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bitmask</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">bitmask</span> <span class="o">=</span> <span class="n">KeplerQualityFlags</span><span class="o">.</span><span class="n">OPTIONS</span><span class="p">[</span><span class="n">bitmask</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;SAP_QUALITY&#39;</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">bitmask</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
 
 <div class="viewcode-block" id="KeplerLightCurveFile.get_lightcurve"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.KeplerLightCurveFile.get_lightcurve">[docs]</a>    <span class="k">def</span> <span class="nf">get_lightcurve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flux_type</span><span class="p">,</span> <span class="n">centroid_type</span><span class="o">=</span><span class="s1">&#39;MOM_CENTR&#39;</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">flux_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flux_types</span><span class="p">():</span>
@@ -812,45 +940,6 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> is not a valid flux type. Available types are: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span>
                            <span class="nb">format</span><span class="p">(</span><span class="n">flux_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flux_types</span><span class="p">))</span></div>
-
-    <span class="k">def</span> <span class="nf">_quality_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bitmask</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a boolean mask which flags all good-quality cadences.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        bitmask : str or int</span>
-<span class="sd">            Bitmask. See ref. [1], table 2-3.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        boolean_mask : array of bool</span>
-<span class="sd">            Boolean array in which `True` means the data is of good quality.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">bitmask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;TIME&#39;</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bitmask</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">bitmask</span> <span class="o">=</span> <span class="n">KeplerQualityFlags</span><span class="o">.</span><span class="n">OPTIONS</span><span class="p">[</span><span class="n">bitmask</span><span class="p">]</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;SAP_QUALITY&#39;</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">bitmask</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">SAP_FLUX</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a KeplerLightCurve object for SAP_FLUX&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_lightcurve</span><span class="p">(</span><span class="s1">&#39;SAP_FLUX&#39;</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">PDCSAP_FLUX</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a KeplerLightCurve object for PDCSAP_FLUX&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_lightcurve</span><span class="p">(</span><span class="s1">&#39;PDCSAP_FLUX&#39;</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Time measurements&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;TIME&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">]</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">cadenceno</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Cadence number&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;CADENCENO&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">channel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -902,37 +991,90 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">KeplerCBVCorrector</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">correct</span><span class="p">(</span><span class="n">cbvs</span><span class="o">=</span><span class="n">cbvs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="KeplerLightCurveFile.header"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.KeplerLightCurveFile.header">[docs]</a>    <span class="k">def</span> <span class="nf">header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Header of the object at extension `ext`&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="n">ext</span><span class="p">]</span><span class="o">.</span><span class="n">header</span></div>
-
-    <span class="k">def</span> <span class="nf">_flux_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a list of available flux types for this light curve file&quot;&quot;&quot;</span>
-        <span class="n">types</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">names</span> <span class="k">if</span> <span class="s1">&#39;FLUX&#39;</span> <span class="ow">in</span> <span class="n">n</span><span class="p">]</span>
-        <span class="n">types</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">types</span> <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="s1">&#39;ERR&#39;</span> <span class="ow">in</span> <span class="n">n</span><span class="p">)]</span>
-        <span class="k">return</span> <span class="n">types</span>
-
-<div class="viewcode-block" id="KeplerLightCurveFile.plot"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.KeplerLightCurveFile.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plottype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="KeplerLightCurveFile.plot"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.KeplerLightCurveFile.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flux_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Plot all the flux types in a light curve.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        plottype : str or list of str</span>
+<span class="sd">        flux_types : str or list of str</span>
 <span class="sd">            List of FLUX types to plot. Default is to plot all available.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="s1">&#39;ax&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">):</span>
             <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;ax&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ax</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="s1">&#39;title&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">):</span>
-            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;KeplerID: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SAP_FLUX</span><span class="o">.</span><span class="n">keplerid</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">plottype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">plottype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flux_types</span><span class="p">()</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">plottype</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">plottype</span> <span class="o">=</span> <span class="p">[</span><span class="n">plottype</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">pl</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">plottype</span><span class="p">):</span>
-            <span class="n">lc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_lightcurve</span><span class="p">(</span><span class="n">pl</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">flux_types</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">flux_types</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flux_types</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">flux_types</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">flux_types</span> <span class="o">=</span> <span class="p">[</span><span class="n">flux_types</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">ft</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">flux_types</span><span class="p">):</span>
+            <span class="n">lc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_lightcurve</span><span class="p">(</span><span class="n">ft</span><span class="p">)</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;color&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;C</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
-            <span class="n">lc</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="n">pl</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+            <span class="n">lc</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="n">ft</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="TessLightCurveFile"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.TessLightCurveFile">[docs]</a><span class="k">class</span> <span class="nc">TessLightCurveFile</span><span class="p">(</span><span class="n">LightCurveFile</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Defines a class for a given light curve FITS file from NASA&#39;s TESS</span>
+<span class="sd">    mission.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path : str</span>
+<span class="sd">        Directory path or url to a lightcurve FITS file.</span>
+<span class="sd">    quality_bitmask : str or int</span>
+<span class="sd">        Bitmask specifying quality flags of cadences that should be ignored.</span>
+<span class="sd">        If a string is passed, it has the following meaning:</span>
+
+<span class="sd">            * default: recommended quality mask</span>
+<span class="sd">            * hard: removes more flags, known to remove good data</span>
+<span class="sd">            * hardest: removes all data that has been flagged</span>
+<span class="sd">    kwargs : dict</span>
+<span class="sd">        Keyword arguments to be passed to astropy.io.fits.open.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">quality_bitmask</span><span class="o">=</span><span class="n">TessQualityFlags</span><span class="o">.</span><span class="n">DEFAULT_BITMASK</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TessLightCurveFile</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">quality_bitmask</span> <span class="o">=</span> <span class="n">quality_bitmask</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quality_mask</span><span class="p">(</span><span class="n">quality_bitmask</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span><span class="p">(</span><span class="s1">&#39;TessLightCurveFile(TICID: </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ticid</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_quality_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bitmask</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a boolean mask which flags all good-quality cadences.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        bitmask : str or int</span>
+<span class="sd">            Bitmask. See ref. [1], table 2-3.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        boolean_mask : array of bool</span>
+<span class="sd">            Boolean array in which `True` means the data is of good quality.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">bitmask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;TIME&#39;</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bitmask</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">bitmask</span> <span class="o">=</span> <span class="n">TessQualityFlags</span><span class="o">.</span><span class="n">OPTIONS</span><span class="p">[</span><span class="n">bitmask</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;QUALITY&#39;</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">bitmask</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ticid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="n">ext</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="s1">&#39;TICID&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="TessLightCurveFile.get_lightcurve"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.TessLightCurveFile.get_lightcurve">[docs]</a>    <span class="k">def</span> <span class="nf">get_lightcurve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flux_type</span><span class="p">,</span> <span class="n">centroid_type</span><span class="o">=</span><span class="s1">&#39;MOM_CENTR&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">flux_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flux_types</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">TessLightCurve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;TIME&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">],</span>
+                                  <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">flux_type</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">],</span>
+                                  <span class="n">flux_err</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">flux_type</span> <span class="o">+</span> <span class="s2">&quot;_ERR&quot;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">],</span>
+                                  <span class="n">centroid_col</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">centroid_type</span> <span class="o">+</span> <span class="s2">&quot;1&quot;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">],</span>
+                                  <span class="n">centroid_row</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">centroid_type</span> <span class="o">+</span> <span class="s2">&quot;2&quot;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">],</span>
+                                  <span class="n">quality</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;QUALITY&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">],</span>
+                                  <span class="n">quality_bitmask</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_bitmask</span><span class="p">,</span>
+                                  <span class="n">cadenceno</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cadenceno</span><span class="p">,</span>
+                                  <span class="n">ticid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ticid</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="SFFCorrector"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.SFFCorrector">[docs]</a><span class="k">class</span> <span class="nc">SFFCorrector</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -960,6 +1102,8 @@
                 <span class="n">polyorder</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">niters</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">windows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">sigma_1</span><span class="o">=</span><span class="mf">3.</span><span class="p">,</span>
                 <span class="n">sigma_2</span><span class="o">=</span><span class="mf">5.</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns a systematics-corrected LightCurve.</span>
+
+<span class="sd">        Note that it is assumed that time and flux do not contain NaNs.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -997,6 +1141,7 @@
 
         <span class="n">flux_hat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
         <span class="c1"># The SFF algorithm is going to be run on each window independently</span>
+
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">windows</span><span class="p">)):</span>
             <span class="c1"># To make it easier (and more numerically stable) to fit a</span>
             <span class="c1"># characteristic polynomial that describes the spacecraft motion,</span>
@@ -1007,8 +1152,12 @@
             <span class="c1"># Next, we fit the motion polynomial after removing outliers</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">outlier_cent</span> <span class="o">=</span> <span class="n">sigma_clip</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rot_col</span><span class="p">,</span>
                                            <span class="n">sigma</span><span class="o">=</span><span class="n">sigma_2</span><span class="p">)</span><span class="o">.</span><span class="n">mask</span>
-            <span class="n">coeffs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rot_row</span><span class="p">[</span><span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">outlier_cent</span><span class="p">],</span>
-                                <span class="bp">self</span><span class="o">.</span><span class="n">rot_col</span><span class="p">[</span><span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">outlier_cent</span><span class="p">],</span> <span class="n">polyorder</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+                <span class="c1"># ignore warning messages related to polyfit being poorly conditioned</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">RankWarning</span><span class="p">)</span>
+                <span class="n">coeffs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rot_row</span><span class="p">[</span><span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">outlier_cent</span><span class="p">],</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">rot_col</span><span class="p">[</span><span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">outlier_cent</span><span class="p">],</span> <span class="n">polyorder</span><span class="p">)</span>
+
             <span class="bp">self</span><span class="o">.</span><span class="n">poly</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">(</span><span class="n">coeffs</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">polyprime</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">(</span><span class="n">coeffs</span><span class="p">)</span><span class="o">.</span><span class="n">deriv</span><span class="p">()</span>
 
@@ -1324,161 +1473,6 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cbv_base_url</span> <span class="o">+</span> <span class="n">cbv_file</span></div></div>
 
 
-<div class="viewcode-block" id="SPLDCorrector"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.SPLDCorrector">[docs]</a><span class="k">class</span> <span class="nc">SPLDCorrector</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Implements the simple first order Pixel Level Decorrelation (PLD) proposed by</span>
-<span class="sd">    Deming et. al. [1]_ and Luger et. al. [2]_, [3]_.</span>
-
-<span class="sd">    Attributes</span>
-<span class="sd">    ----------</span>
-
-
-<span class="sd">    Notes</span>
-<span class="sd">    -----</span>
-<span class="sd">    This code serves only as a quick look into the PLD technique.</span>
-<span class="sd">    Users are encouraged to check out the GitHub repos</span>
-<span class="sd">    `everest &lt;http://www.github.com/rodluger/everest&gt;`_</span>
-<span class="sd">    and `everest3 &lt;http://www.github.com/rodluger/everest3&gt;`_.</span>
-
-<span class="sd">    References</span>
-<span class="sd">    ----------</span>
-<span class="sd">    .. [1] Deming et. al. Spitzer Secondary Eclipses of the Dense, \</span>
-<span class="sd">           Modestly-irradiated, Giant Exoplanet HAT-P-20b using Pixel-Level Decorrelation.</span>
-<span class="sd">    .. [2] Luger et. al. EVEREST: Pixel Level Decorrelation of K2 Light Curves.</span>
-<span class="sd">    .. [3] Luger et. al. An Update to the EVEREST K2 Pipeline: short cadence, \</span>
-<span class="sd">           saturated stars, and Kepler-like photometry down to K_p = 15.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">pass</span>
-
-<div class="viewcode-block" id="SPLDCorrector.correct"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.SPLDCorrector.correct">[docs]</a>    <span class="k">def</span> <span class="nf">correct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">tpf_flux</span><span class="p">,</span> <span class="n">window_length</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">polyorder</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        time : array-like</span>
-<span class="sd">            Time array</span>
-<span class="sd">        tpf_flux : array-like</span>
-<span class="sd">            Pixel values series</span>
-<span class="sd">        window_length : int</span>
-<span class="sd">        polyorder : int</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">k</span> <span class="o">=</span> <span class="n">window_length</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">k</span><span class="p">:</span>
-            <span class="n">k</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">time</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
-        <span class="n">n_windows</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">time</span><span class="p">)</span> <span class="o">/</span> <span class="n">k</span><span class="p">)</span>
-        <span class="n">flux_hat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
-        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_windows</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
-            <span class="n">flux_hat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">flux_hat</span><span class="p">,</span>
-                                 <span class="bp">self</span><span class="o">.</span><span class="n">_pld</span><span class="p">(</span><span class="n">tpf_flux</span><span class="p">[(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">k</span><span class="p">:</span><span class="n">n</span> <span class="o">*</span> <span class="n">k</span><span class="p">],</span> <span class="n">polyorder</span><span class="p">))</span>
-        <span class="n">flux_hat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">flux_hat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pld</span><span class="p">(</span><span class="n">tpf_flux</span><span class="p">[</span><span class="n">n</span> <span class="o">*</span> <span class="n">k</span><span class="p">:],</span> <span class="n">polyorder</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">LightCurve</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">flux_hat</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">tpf_flux</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))))</span></div>
-
-    <span class="k">def</span> <span class="nf">_pld</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tpf_flux</span><span class="p">,</span> <span class="n">polyorder</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tpf_flux</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
-        <span class="n">pixels_series</span> <span class="o">=</span> <span class="n">tpf_flux</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">tpf_flux</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
-        <span class="n">lightcurve</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">pixels_series</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="c1"># design matrix</span>
-        <span class="n">X</span> <span class="o">=</span> <span class="n">pixels_series</span> <span class="o">/</span> <span class="n">lightcurve</span>
-        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">X</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">tpf_flux</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">**</span> <span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">polyorder</span><span class="o">+</span><span class="mi">1</span><span class="p">)])</span><span class="o">.</span><span class="n">T</span><span class="p">))</span>
-        <span class="n">opt_weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">X</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">lightcurve</span><span class="p">))</span>
-        <span class="n">model</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">opt_weights</span><span class="p">)</span>
-        <span class="n">flux_hat</span> <span class="o">=</span> <span class="n">lightcurve</span> <span class="o">-</span> <span class="n">model</span>
-        <span class="k">return</span> <span class="n">flux_hat</span></div>
-
-
-<div class="viewcode-block" id="box_period_search"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.box_period_search">[docs]</a><span class="k">def</span> <span class="nf">box_period_search</span><span class="p">(</span><span class="n">lc</span><span class="p">,</span> <span class="n">min_period</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">max_period</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">nperiods</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span>
-                      <span class="n">prior</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">period_scale</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Implements a brute force search to find transit-like periodic events.</span>
-<span class="sd">    This function fits a &quot;box&quot; model defined as:</span>
-
-<span class="sd">    .. math::</span>
-
-<span class="sd">        \Pi (t) = h - d\cdot \mathbb{I}(t_0 \leq t_i \leq t_0 + w)</span>
-
-<span class="sd">    to a list of `nperiods` periods between `min_period` and `max_period`.</span>
-<span class="sd">    It&#39;s assumed that the best period is the one that maximizes the posterior</span>
-<span class="sd">    probability of the fit.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    lc : LightCurve object</span>
-<span class="sd">        An object from KeplerLightCurve or LightCurve.</span>
-<span class="sd">        Note that flattening the lightcurve beforehand does aid the quest</span>
-<span class="sd">        for the transit period.</span>
-<span class="sd">    min_period : float</span>
-<span class="sd">        Minimum period to search for. Units must be the same as `lc.time`.</span>
-<span class="sd">    max_period : float</span>
-<span class="sd">        Maximum period to search for. Units must be the same as `lc.time`.</span>
-<span class="sd">    nperiods : int</span>
-<span class="sd">        Number of periods to search between `min_period` and `max_period`.</span>
-<span class="sd">    prior : oktopus.Prior object</span>
-<span class="sd">        Prior probability on the parameters of the box function,</span>
-<span class="sd">        namely, `amplitude`, `depth`, `to` (time of the first discontinuity),</span>
-<span class="sd">        and `width`.</span>
-<span class="sd">    period_scale : str</span>
-<span class="sd">        Type of the scale used to create the grid of periods between `min_period`</span>
-<span class="sd">        and `max_period` used to search for the best period.</span>
-<span class="sd">        Options are &#39;linear&#39; or &#39;log&#39;.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    log_posterior : list</span>
-<span class="sd">        Log posterior (up to an additive constant) of the fit. The &quot;best&quot;</span>
-<span class="sd">        period is therefore the one that maximizes the log posterior</span>
-<span class="sd">        probability.</span>
-<span class="sd">    trial_periods : numpy array</span>
-<span class="sd">        List of trial periods.</span>
-<span class="sd">    best_period : float</span>
-<span class="sd">        Best period.</span>
-
-<span class="sd">    Notes</span>
-<span class="sd">    -----</span>
-<span class="sd">    This function is experimental. Changes may be made in both its signature</span>
-<span class="sd">    and implementation.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-.</span><span class="mi">5</span><span class="p">,</span> <span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="p">))</span>
-    <span class="n">val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="p">))</span>
-
-    <span class="k">def</span> <span class="nf">box</span><span class="p">(</span><span class="n">amplitude</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">to</span><span class="p">,</span> <span class="n">width</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;A simple box function defined in the interval [-.5, .5].</span>
-<span class="sd">        `to` is the time of the first discontinuity.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">out_of_transit</span> <span class="o">=</span> <span class="p">(</span><span class="n">t</span> <span class="o">&lt;</span> <span class="n">to</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">t</span> <span class="o">&gt;=</span> <span class="n">to</span> <span class="o">+</span> <span class="n">width</span><span class="p">)</span>
-        <span class="n">in_transit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">out_of_transit</span><span class="p">)</span>
-        <span class="n">val</span><span class="p">[</span><span class="n">out_of_transit</span><span class="p">]</span> <span class="o">=</span> <span class="n">amplitude</span>
-        <span class="n">val</span><span class="p">[</span><span class="n">in_transit</span><span class="p">]</span> <span class="o">=</span> <span class="n">amplitude</span> <span class="o">-</span> <span class="n">depth</span>
-        <span class="k">return</span> <span class="n">val</span>
-
-    <span class="k">if</span> <span class="n">prior</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">prior</span> <span class="o">=</span> <span class="n">oktopus</span><span class="o">.</span><span class="n">UniformPrior</span><span class="p">(</span><span class="n">lb</span><span class="o">=</span><span class="p">[</span><span class="mf">0.98</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="o">-.</span><span class="mi">4</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
-                                     <span class="n">ub</span><span class="o">=</span><span class="p">[</span><span class="mf">1.02</span><span class="p">,</span> <span class="o">.</span><span class="mi">1</span><span class="p">,</span> <span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="o">.</span><span class="mi">2</span><span class="p">])</span>
-    <span class="n">lc</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
-    <span class="n">log_posterior</span> <span class="o">=</span> <span class="p">[]</span>
-
-    <span class="k">if</span> <span class="n">period_scale</span> <span class="o">==</span> <span class="s1">&#39;linear&#39;</span><span class="p">:</span>
-        <span class="n">trial_periods</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">min_period</span><span class="p">,</span> <span class="n">max_period</span><span class="p">,</span> <span class="n">nperiods</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">period_scale</span> <span class="o">==</span> <span class="s1">&#39;log&#39;</span><span class="p">:</span>
-        <span class="n">trial_periods</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">min_period</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">max_period</span><span class="p">),</span> <span class="n">nperiods</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;period_scale must be one of </span><span class="si">{}</span><span class="s2">. Got </span><span class="si">{}</span><span class="s2">.&quot;</span>
-                         <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;{&#39;linear&#39;, &#39;log&#39;}&quot;</span><span class="p">,</span> <span class="n">period_scale</span><span class="p">))</span>
-    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">trial_periods</span><span class="p">):</span>
-        <span class="n">folded</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="n">p</span><span class="p">)</span>
-        <span class="c1"># var should be set to the uncertainty in the data point</span>
-        <span class="n">ll</span> <span class="o">=</span> <span class="n">oktopus</span><span class="o">.</span><span class="n">GaussianPosterior</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">folded</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="n">box</span><span class="p">,</span> <span class="n">var</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span>
-                                       <span class="n">prior</span><span class="o">=</span><span class="n">prior</span><span class="p">)</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">ll</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x0</span><span class="o">=</span><span class="n">prior</span><span class="o">.</span><span class="n">mean</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;powell&#39;</span><span class="p">,</span>
-                     <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;ftol&#39;</span><span class="p">:</span><span class="mf">1e-9</span><span class="p">,</span> <span class="s1">&#39;xtol&#39;</span><span class="p">:</span><span class="mf">1e-9</span><span class="p">,</span> <span class="s1">&#39;maxfev&#39;</span><span class="p">:</span> <span class="mi">2000</span><span class="p">})</span>
-        <span class="c1"># fun is the negative log posterior</span>
-        <span class="n">log_posterior</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">-</span><span class="n">res</span><span class="o">.</span><span class="n">fun</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">log_posterior</span><span class="p">,</span> <span class="n">trial_periods</span><span class="p">,</span> <span class="n">trial_periods</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">log_posterior</span><span class="p">)]</span></div>
-
-
 <div class="viewcode-block" id="iterative_box_period_search"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.iterative_box_period_search">[docs]</a><span class="k">def</span> <span class="nf">iterative_box_period_search</span><span class="p">(</span><span class="n">lc</span><span class="p">,</span> <span class="n">niters</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">min_period</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">max_period</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
                                 <span class="n">nperiods</span><span class="o">=</span><span class="mi">501</span><span class="p">,</span> <span class="n">period_scale</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -1612,7 +1606,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright lightkurve Developers and Contributors.
+        &copy; Copyright lightkurve developers and contributors.
 
     </p>
   </div>
@@ -1634,7 +1628,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'1.0.0dev',
+            VERSION:'1.0.alpha',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
