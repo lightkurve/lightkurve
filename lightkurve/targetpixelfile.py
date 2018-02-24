@@ -366,8 +366,12 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
     @property
     def mission(self):
-        """Mission name"""
-        return self.header(ext=0)['MISSION']
+        """Mission name, defaults to None if Not available"""
+        try:
+            out = self.header(ext=0)['MISSION']
+        except:
+            out = None
+        return
 
     def to_fits(self):
         """Save the TPF to fits"""
