@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>lightkurve.targetpixelfile &mdash; lightkurve 1.0.alpha documentation</title>
+  <title>lightkurve.targetpixelfile &mdash; lightkurve 1.0.a1 documentation</title>
   
 
   
@@ -33,7 +33,7 @@
         <link rel="index" title="Index"
               href="../../genindex.html"/>
         <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="lightkurve 1.0.alpha documentation" href="../../index.html"/>
+    <link rel="top" title="lightkurve 1.0.a1 documentation" href="../../index.html"/>
         <link rel="up" title="Module code" href="../index.html"/> 
 
   
@@ -96,9 +96,9 @@
 </ul>
 <p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../tutorials/how-to-find-a-kepler-planet-with-lightkurve.html">How to find a planet?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/how-to-find-a-kepler-planet-with-lightkurve.html">How to find a planet using lightkurve?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials/target-pixel-files.html">What are target pixel files?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../tutorials/lightcurve-files.html">What are light curves?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/lightcurve-files.html">What are light curve files?</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API Documentation</span></p>
 <ul>
@@ -523,8 +523,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">mission</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Mission name&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="n">ext</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="s1">&#39;MISSION&#39;</span><span class="p">]</span>
+        <span class="sd">&quot;&quot;&quot;Mission name, defaults to None if Not available&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="n">ext</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="s1">&#39;MISSION&#39;</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">out</span>
 
 <div class="viewcode-block" id="KeplerTargetPixelFile.to_fits"><a class="viewcode-back" href="../../api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.to_fits">[docs]</a>    <span class="k">def</span> <span class="nf">to_fits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Save the TPF to fits&quot;&quot;&quot;</span>
@@ -720,7 +724,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'1.0.alpha',
+            VERSION:'1.0.a1',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
