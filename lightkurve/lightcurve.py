@@ -100,13 +100,13 @@ class LightCurve(object):
     def __rdiv__(self, other):
         return self.__rtruediv__(other)
 
-    def stitch(self, *others):
+    def stitch(self, others):
         """
         Stitches LightCurve objects.
 
         Parameters
         ----------
-        *others : LightCurve objects
+        others : LightCurve object or list of LightCurve objects
             Light curves to be stitched.
 
         Returns
@@ -114,6 +114,8 @@ class LightCurve(object):
         stitched_lc : LightCurve object
             Stitched light curve.
         """
+        if not hasattr(others, '__iter__'):
+            others = [others]
         time = self.time
         flux = self.flux
         flux_err = self.flux_err
@@ -258,7 +260,10 @@ class LightCurve(object):
         new_lc.flux = self.flux[~outlier_mask]
         if new_lc.flux_err is not None:
             new_lc.flux_err = self.flux_err[~outlier_mask]
-
+        if hasattr(new_lc, 'centroid_col') and new_lc.centroid_col is not None:
+            new_lc.centroid_col = self.centroid_col[~outlier_mask]
+        if hasattr(new_lc, 'centroid_row') and new_lc.centroid_row is not None:
+            new_lc.centroid_row = self.centroid_row[~outlier_mask]
         if return_mask:
             return new_lc, outlier_mask
         return new_lc

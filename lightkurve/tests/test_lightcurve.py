@@ -125,13 +125,21 @@ def test_lightcurve_fold():
     assert_almost_equal(np.min(fold.time), -0.5, 2)
     assert_almost_equal(np.max(fold.time), 0.5, 2)
 
+
 def test_lightcurve_stitch():
-    """Test the ``LightCurve.stitch()`` method."""
+    """Test ``LightCurve.stitch()``."""
     lc = LightCurve(time=[1, 2, 3], flux=[1, .5, 1])
     lc = lc.stitch(lc)
-
     assert_array_equal(lc.flux, 2*[1, .5, 1])
     assert_array_equal(lc.time, 2*[1, 2, 3])
+
+
+def test_lightcurve_stitch_multiple():
+    """Test ``LightCurve.stitch()`` for multiple lightcurves at once."""
+    lc = LightCurve(time=[1, 2, 3], flux=[1, .5, 1])
+    lc = lc.stitch([lc, lc, lc])
+    assert_array_equal(lc.flux, 4*[1, .5, 1])
+    assert_array_equal(lc.time, 4*[1, 2, 3])
 
 
 @pytest.mark.remote_data
