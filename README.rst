@@ -13,8 +13,8 @@ lightkurve
                     :target: https://ci.appveyor.com/project/mirca/lightkurve
 .. |cov-badge| image:: https://codecov.io/gh/KeplerGO/lightkurve/branch/master/graph/badge.svg
               :target: https://codecov.io/gh/KeplerGO/lightkurve
-.. |doi-badge| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.1181929.svg
-              :target: https://doi.org/10.5281/zenodo.1181929
+.. |doi-badge| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.1181928.svg
+              :target: https://doi.org/10.5281/zenodo.1181928
 
 
 The **lightkurve** Python package offers a beautiful and user-friendly way
