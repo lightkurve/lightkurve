@@ -174,3 +174,8 @@ intersphinx_mapping = {'python': ('https://docs.python.org/', None),
                        'numpy': ('http://docs.scipy.org/doc/numpy/', None),
                        'scipy': ('http://docs.scipy.org/doc/scipy/reference', None),
                        'oktopus': ('http://keplergo.github.io/oktopus')}
+
+
+sys.path += ['exts']
+extensions += ['sphinxcontrib_rawfiles']
+rawfiles = ['CNAME']  # Files we want to copy
