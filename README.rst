@@ -38,8 +38,12 @@ Read the documentation at `http://lightkurve.keplerscience.org <http://lightkurv
 
 Quickstart
 ----------
+If you have a working version of Python 2 or 3 on your system, you can simply install this package using `pip`:
+::
 
-Visit the quickstart guide at `http://lightkurve.keplerscience.org/tutorials/quickstart.html <http://lightkurve.keplerscience.org/tutorials/quickstart.html>`_.
+  pip install lightkurve
+
+Once installed, visit our quickstart guide at `http://lightkurve.keplerscience.org/tutorials/quickstart.html <http://lightkurve.keplerscience.org/tutorials/quickstart.html>`_.
 
 
 Contributing
