@@ -17,49 +17,49 @@ lightkurve
               :target: https://doi.org/10.5281/zenodo.1181929
 
 
-*lightkurve* offers a user-friendly way to inspect and analyze astronomical flux time series data.
-In particular, it is well-suited to analyze the pixels and lightcurves obtained by NASA's Kepler, K2, and TESS missions.
+The **lightkurve** Python package offers a beautiful and user-friendly way
+to analyze astronomical flux time series data,
+in particular the pixels and lightcurves obtained by
+**NASA's Kepler, K2, and TESS missions**.
+
+.. image:: http://lightkurve.keplerscience.org/_images/lightkurve-teaser.gif
+
+This package aims to lower the barrier for both students, astronomers,
+and citizen scientists interested in analyzing Kepler and TESS space telescope data.
+It does this by providing **high-quality building blocks and tutorials**
+which enable both hand-tailored data analyses and advanced automated pipelines.
+
+Lightkurve is an **open source community project** supported by
+`NASA's Kepler/K2 Guest Observer Office <https://keplerscience.arc.nasa.gov>`_.
+The development `takes place on GitHub <https://github.com/KeplerGO/lightkurve>`_
+and everyone is :ref:`invited to contribute<contributing>`.
+
 
 Documentation
 -------------
 
 Read the documentation at `http://lightkurve.keplerscience.org <http://lightkurve.keplerscience.org>`_.
 
+
 Quickstart
 ----------
 
-If you have a working version of Python 2 or 3 on your system
-(we recommend `Anaconda Python <https://www.continuum.io/downloads>`_),
-you can simply install the latest stable release of `lightcurve` using ``pip``::
+Visit the quickstart guide at `http://lightkurve.keplerscience.org/tutorials/quickstart.html <http://lightkurve.keplerscience.org/tutorials/quickstart.html>`_.
 
-    $ pip install lightkurve
 
-With `lightkurve` installed, you can... TBC.
+Contributing and reporting issues
+---------------------------------
 
-Contributing
-------------
-
-Users are welcome to open `issues <https://github.com/KeplerGO/lightkurve/issues>`_
-or `pull requests <https://github.com/KeplerGO/lightkurve/pulls>`_.
-You can also contact the development team via keplergo@mail.arc.nasa.gov
+We welcome community contributions!  
+Please read the contribution guide at `http://lightkurve.keplerscience.org/contributing.html <http://lightkurve.keplerscience.org/contributing.html>`.
 
 
 Citing
 ------
 
-If you find this package useful in your research, please cite it using the DOI/BibTeX provided below. Also, please give us a GitHub star!
+If you find this package useful in your research, please cite it using the DOI/BibTeX provided below. Also, please give us a GitHub star! `Citation instructions are available in our documentation <http://lightkurve.keplerscience.org/citing.html>`_.
 
-::
 
-    @misc{lightkurve,
-      author       = {Zé Vinícius and
-                      Geert Barentsen and
-                      Christina Hedges and
-                      Michael Gully-Santiago and
-                      Ann Marie Cody},
-      title        = {KeplerGO/lightkurve},
-      month        = feb,
-      year         = 2018,
-      doi          = {10.5281/zenodo.1181929},
-      url          = {http://doi.org/10.5281/zenodo.1181929}
-    }
+Contact
+-------
+You can contact the core development team via keplergo@mail.arc.nasa.gov
