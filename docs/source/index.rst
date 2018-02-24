@@ -15,12 +15,17 @@ This is a community project supported by the
 `Kepler/K2 Guest Observer Office <https://keplerscience.arc.nasa.gov>`_.
 The development `takes place on GitHub <https://github.com/KeplerGO/lightkurve>`_ and everyone is :ref:`invited to contribute<contributing>`.
 
+.. raw:: html
+
+    <iframe width="355" height="200" src="https://www.youtube.com/embed/1XKTPCF6kYo" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+
 .. _user-docs:
 
 .. toctree::
    :caption: Getting started
    :maxdepth: 1
 
+   tutorials/quickstart.ipynb
    install
    contributing
    citing
@@ -30,6 +35,7 @@ The development `takes place on GitHub <https://github.com/KeplerGO/lightkurve>`
     :caption: Tutorials
     :maxdepth: 1
 
+    How to find a planet? <tutorials/how-to-find-a-kepler-planet-with-lightkurve.ipynb>
     tutorials/target-pixel-files.ipynb
     tutorials/lightcurve-files.ipynb
 
