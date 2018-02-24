@@ -1,7 +1,7 @@
 .. _citing:
 
 ======
-Citing and acknowledging
+Citing and acknowledging lightkurve
 ======
 
 
@@ -19,8 +19,8 @@ and BibTeX provided below.
       title        = {KeplerGO/lightkurve},
       month        = feb,
       year         = 2018,
-      doi          = {10.5281/zenodo.1181929},
-      url          = {http://doi.org/10.5281/zenodo.1181929}
+      doi          = {10.5281/zenodo.1181928},
+      url          = {http://doi.org/10.5281/zenodo.1181928}
     }
 
 Also, please give a star to `our GitHub repository <https://github.com/KeplerGO/lightkurve>`_!
