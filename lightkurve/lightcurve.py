@@ -680,6 +680,7 @@ class KeplerLightCurveFile(LightCurveFile):
         Directory path or url to a lightcurve FITS file.
     quality_bitmask : str or int
         Bitmask specifying quality flags of cadences that should be ignored.
+        If `None` is passed, then no cadences are ignored.
         If a string is passed, it has the following meaning:
 
             * default: recommended quality mask
@@ -696,7 +697,8 @@ class KeplerLightCurveFile(LightCurveFile):
         self.quality_mask = self._quality_mask(quality_bitmask)
 
     @staticmethod
-    def from_archive(target, cadence='long', quarter=None, month=None, campaign=None):
+    def from_archive(target, cadence='long', quarter=None, month=None,
+                     campaign=None, **kwargs):
         """Fetch a Light Curve File from the Kepler/K2 data archive at MAST.
 
         Raises an `ArchiveError` if a unique file cannot be found.  For example,
@@ -715,6 +717,8 @@ class KeplerLightCurveFile(LightCurveFile):
             For Kepler's prime mission, there are three short-cadence
             lightcurve files for each quarter, each covering one month.
             Hence, if cadence='short' you need to specify month=1, 2, or 3.
+        kwargs : dict
+            Keywords arguments passed to `KeplerLightCurveFile`.
 
         Returns
         -------
@@ -737,7 +741,7 @@ class KeplerLightCurveFile(LightCurveFile):
         elif len(products) < 1:
             raise ArchiveError("No lightcurve file found for {} at MAST.".format(target))
         path = download_products(products)[0]
-        return KeplerLightCurveFile(path)
+        return KeplerLightCurveFile(path, **kwargs)
 
     def __repr__(self):
         if self.mission.lower() == 'kepler':

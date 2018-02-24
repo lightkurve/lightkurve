@@ -65,6 +65,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         Path to a Kepler Target Pixel (FITS) File.
     quality_bitmask : str or int
         Bitmask specifying quality flags of cadences that should be ignored.
+        If `None` is passed, then no cadences are ignored.
         If a string is passed, it has the following meaning:
 
             * "default": recommended quality mask
@@ -85,7 +86,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
         self.quality_mask = self._quality_mask(quality_bitmask)
 
     @staticmethod
-    def from_archive(target, cadence='long', quarter=None, month=None, campaign=None):
+    def from_archive(target, cadence='long', quarter=None, month=None,
+                     campaign=None, **kwargs):
         """Fetch a Target Pixel File from the Kepler/K2 data archive at MAST.
 
         Raises an `ArchiveError` if a unique TPF cannot be found.  For example,
@@ -104,6 +106,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
             For Kepler's prime mission, there are three short-cadence
             Target Pixel Files for each quarter, each covering one month.
             Hence, if cadence='short' you need to specify month=1, 2, or 3.
+        kwargs : dict
+            Keywords arguments passed to `KeplerTargetPixelFile`.
 
         Returns
         -------
@@ -126,7 +130,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         elif len(products) < 1:
             raise ArchiveError("No Target Pixel File found for {} at MAST.".format(target))
         path = download_products(products)[0]
-        return KeplerTargetPixelFile(path)
+        return KeplerTargetPixelFile(path, **kwargs)
 
     def __repr__(self):
         return('KeplerTargetPixelFile Object (ID: {})'.format(self.keplerid))
@@ -458,8 +462,11 @@ class KeplerTargetPixelFile(TargetPixelFile):
         yy = self.row + yy
         xx = self.column + xx
         total_flux = np.nansum(self.flux[:, aperture_mask], axis=1)
-        col_centr = np.nansum(xx * aperture_mask * self.flux, axis=(1, 2)) / total_flux
-        row_centr = np.nansum(yy * aperture_mask * self.flux, axis=(1, 2)) / total_flux
+        with warnings.catch_warnings():
+            # RuntimeWarnings may occur below if total_flux contains zeros
+            warnings.simplefilter("ignore", RuntimeWarning)
+            col_centr = np.nansum(xx * aperture_mask * self.flux, axis=(1, 2)) / total_flux
+            row_centr = np.nansum(yy * aperture_mask * self.flux, axis=(1, 2)) / total_flux
 
         return col_centr, row_centr
 
