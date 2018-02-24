@@ -371,7 +371,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
             out = self.header(ext=0)['MISSION']
         except:
             out = None
-        return
+        return out
 
     def to_fits(self):
         """Save the TPF to fits"""
