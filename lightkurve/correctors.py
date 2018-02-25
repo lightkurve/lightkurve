@@ -17,7 +17,7 @@ from astropy.io import fits as pyfits
 from astropy.stats import sigma_clip
 
 from .utils import channel_to_module_output
-from . import lightcurve as lc
+from .lightcurve import LightCurve
 from .lightcurvefile import KeplerLightCurveFile
 
 
@@ -132,7 +132,7 @@ class SFFCorrector(object):
 
             flux_hat = np.append(flux_hat, flux[i])
 
-        return lc.LightCurve(time=timecopy, flux=flux_hat)
+        return LightCurve(time=timecopy, flux=flux_hat)
 
     def rotate_centroids(self, centroid_col, centroid_row):
         """Rotate the coordinate frame of the (col, row) centroids to a new (x,y)
@@ -354,7 +354,7 @@ class KeplerCBVCorrector(object):
                                          options=options)
         self._coeffs = self._opt_result.x
         flux_hat = sap_lc.flux - median_sap_flux * mean_model(self._coeffs)
-        return lc.LightCurve(time=sap_lc.time, flux=flux_hat.reshape(-1))
+        return LightCurve(time=sap_lc.time, flux=flux_hat.reshape(-1))
 
     def get_cbvs_list(self, method='bayes-factor'):
         """Returns the subsequence of subsequent CBVs that maximizes

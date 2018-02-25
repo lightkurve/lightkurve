@@ -15,7 +15,6 @@ from astropy.stats import sigma_clip
 from astropy.table import Table
 
 from .utils import running_mean
-from .correctors import SFFCorrector
 
 
 __all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve',
@@ -566,6 +565,7 @@ class KeplerLightCurve(LightCurve):
         """
         not_nan = np.isfinite(self.flux)
         if method == 'sff':
+                from .correctors import SFFCorrector
                 self.corrector = SFFCorrector()
                 corrected_lc = self.corrector.correct(time=self.time[not_nan],
                                                       flux=self.flux[not_nan],
