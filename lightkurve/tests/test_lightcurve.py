@@ -277,6 +277,15 @@ def test_slicing():
     assert_array_equal(lc[4:].centroid_row, centroid_row[4:])
     assert_array_equal(lc[10:2].quality, quality[10:2])
 
+    # The same is true for TessLightCurve
+    lc = TessLightCurve(time, flux, flux_err,
+                        centroid_col=centroid_col,
+                        centroid_row=centroid_row,
+                        quality=quality)
+    assert_array_equal(lc[::4].centroid_col, centroid_col[::4])
+    assert_array_equal(lc[5:].centroid_row, centroid_row[5:])
+    assert_array_equal(lc[10:3].quality, quality[10:3])
+
 
 def test_boolean_masking():
     lc = KeplerLightCurve(time=[1, 2, 3], flux=[1, 1, 10], quality=[0, 0, 200])
