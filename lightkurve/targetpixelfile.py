@@ -299,11 +299,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
         return self.hdu[-1].data > 2
 
     @property
-    def n_good_cadences(self):
-        """Returns the number of good-quality cadences."""
-        return self.quality_mask.sum()
-
-    @property
     def shape(self):
         """Return the cube dimension shape."""
         return self.flux.shape
@@ -372,10 +367,9 @@ class KeplerTargetPixelFile(TargetPixelFile):
     def mission(self):
         """Mission name, defaults to None if Not available"""
         try:
-            out = self.header(ext=0)['MISSION']
+            return self.header(ext=0)['MISSION']
         except:
-            out = None
-        return out
+            return None
 
     def to_fits(self):
         """Save the TPF to fits"""
