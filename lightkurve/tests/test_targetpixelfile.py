@@ -8,15 +8,7 @@ filename_tpf_all_zeros = get_pkg_data_filename("data/test-tpf-all-zeros.fits")
 filename_tpf_one_center = get_pkg_data_filename("data/test-tpf-non-zero-center.fits")
 TABBY_Q8 = ("https://archive.stsci.edu/missions/kepler/lightcurves"
             "/0084/008462852/kplr008462852-2011073133259_llc.fits")
-TABBY_TPF = ("https://archive.stsci.edu/missions/kepler/target_pixel_files"
-            "/0084/008462852/kplr008462852-2011073133259_lpd-targ.fits.gz")
 
-@pytest.mark.remote_data
-def test_load_bad_file():
-    '''Test if a light curve can be opened without exception.'''
-    with pytest.raises(ValueError) as exc:
-        tpf = KeplerTargetPixelFile(TABBY_Q8)
-    assert('is this a target pixel file?' in exc.value.args[0])
 
 def test_tpf_shapes():
     """Are the data array shapes of the TargetPixelFile object consistent?"""
