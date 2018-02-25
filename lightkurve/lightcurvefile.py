@@ -10,8 +10,6 @@ from astropy.table import Table
 
 from .utils import (bkjd_to_time, KeplerQualityFlags, TessQualityFlags)
 from .mast import search_kepler_lightcurve_products, download_products, ArchiveError
-from . import correctors
-from . import lightcurve as lc
 
 
 __all__ = ['KeplerLightCurveFile', 'TessLightCurveFile']
@@ -172,7 +170,9 @@ class KeplerLightCurveFile(LightCurveFile):
 
     def get_lightcurve(self, flux_type, centroid_type='MOM_CENTR'):
         if flux_type in self._flux_types():
-            return lc.KeplerLightCurve(
+            # We did not import lightcurve at the top to prevent circular imports
+            from .lightcurve import KeplerLightCurve
+            return KeplerLightCurve(
                         self.hdu[1].data['TIME'][self.quality_mask],
                         self.hdu[1].data[flux_type][self.quality_mask],
                         flux_err=self.hdu[1].data[flux_type + "_ERR"][self.quality_mask],
@@ -238,7 +238,8 @@ class KeplerLightCurveFile(LightCurveFile):
         lc : LightCurve object
             CBV flux-corrected lightcurve.
         """
-        return correctors.KeplerCBVCorrector(self).correct(cbvs=cbvs, **kwargs)
+        from .correctors import KeplerCBVCorrector
+        return KeplerCBVCorrector(self).correct(cbvs=cbvs, **kwargs)
 
     def plot(self, flux_types=None, **kwargs):
         """Plot all the flux types in a light curve.
@@ -315,7 +316,9 @@ class TessLightCurveFile(LightCurveFile):
 
     def get_lightcurve(self, flux_type, centroid_type='MOM_CENTR'):
         if flux_type in self._flux_types():
-            return lc.TessLightCurve(
+            # We did not import lightcurve at the top to prevent circular imports
+            from .lightcurve import TessLightCurve
+            return TessLightCurve(
                         self.hdu[1].data['TIME'][self.quality_mask],
                         self.hdu[1].data[flux_type][self.quality_mask],
                         flux_err=self.hdu[1].data[flux_type + "_ERR"][self.quality_mask],
