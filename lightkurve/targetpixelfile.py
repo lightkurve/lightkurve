@@ -231,20 +231,23 @@ class KeplerTargetPixelFile(TargetPixelFile):
             Array containing Dec values for every pixel, for every cadence.
         """
         w = self.wcs
-        X,Y = np.meshgrid(np.arange(self.shape[2]), np.arange(self.shape[1]))
+        X, Y = np.meshgrid(np.arange(self.shape[2]), np.arange(self.shape[1]))
         pos_corr1_pix, pos_corr2_pix = self.hdu[1].data['POS_CORR1'], self.hdu[1].data['POS_CORR2']
 
-        # Any values where the poscorr is more than 50 pixels off are zero'd, as are infs.
-        # These are usually resat cadences
-        bad = np.any([~np.isfinite(pos_corr1_pix),
-                      ~np.isfinite(pos_corr2_pix),
-                      np.abs(pos_corr1_pix) < 50,
-                      np.abs(pos_corr2_pix) < 50], axis=0)
+        # We zero POS_CORR* when the values are NaN or make no sense (>50px)
+        with warnings.catch_warnings():  # Comparing NaNs to numbers is OK here
+            warnings.simplefilter("ignore", RuntimeWarning)
+            bad = np.any([~np.isfinite(pos_corr1_pix),
+                          ~np.isfinite(pos_corr2_pix),
+                          np.abs(pos_corr1_pix) < 50,
+                          np.abs(pos_corr2_pix) < 50], axis=0)
         pos_corr1_pix[bad], pos_corr2_pix[bad] = 0, 0
 
         # Add in POSCORRs
-        X = (np.atleast_3d(X).transpose([2,0,1]) + np.atleast_3d(pos_corr1_pix).transpose([1,2,0]))
-        Y = (np.atleast_3d(Y).transpose([2,0,1]) + np.atleast_3d(pos_corr2_pix).transpose([1,2,0]))
+        X = (np.atleast_3d(X).transpose([2, 0, 1]) +
+             np.atleast_3d(pos_corr1_pix).transpose([1, 2, 0]))
+        Y = (np.atleast_3d(Y).transpose([2, 0, 1]) +
+             np.atleast_3d(pos_corr2_pix).transpose([1, 2, 0]))
 
         # Pass through WCS
         ra, dec = w.wcs_pix2world(X.ravel(), Y.ravel(), 1)
