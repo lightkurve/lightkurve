@@ -38,21 +38,30 @@ class LightCurve(object):
     """
 
     def __init__(self, time, flux, flux_err=None, meta={}):
-        self.time, self.flux, self.flux_err = self._validate_inputs(time, flux, flux_err)
+        self.time = np.asarray(time)
+        self.flux = self._validate_array(flux, name='flux')
+        self.flux_err = self._validate_array(flux_err, name='flux_err')
         self.meta = meta
 
-    def _validate_inputs(self, time, flux, flux_err):
-        if flux_err is not None:
-            flux_err = np.asarray(flux_err)
+    def _validate_array(self, arr, name='array'):
+        """Ensure the input arrays have the same length as `self.time`."""
+        if arr is not None:
+            arr = np.asarray(arr)
         else:
-            flux_err = np.nan * np.ones_like(flux)
+            arr = np.nan * np.ones_like(self.time)
 
-        if not (len(time) == len(flux)):
+        if not (len(self.time) == len(arr)):
             raise ValueError("Input arrays have different lengths."
-                             " len(time)={}, len(flux)={}, len(flux_err)={}"
-                             .format(len(time), len(flux), len(flux_err)))
+                             " len(time)={}, len({})={}"
+                             .format(len(self.time), name, len(arr)))
+        return arr
 
-        return np.asarray(time), np.asarray(flux), flux_err
+    def __getitem__(self, key):
+        copy_self = copy.copy(self)
+        copy_self.time = self.time[key]
+        copy_self.flux = self.flux[key]
+        copy_self.flux_err = self.flux_err[key]
+        return copy_self
 
     def __add__(self, other):
         copy_self = copy.copy(self)
@@ -216,12 +225,7 @@ class LightCurve(object):
         clean_lightcurve : LightCurve object
             A new ``LightCurve`` from which NaNs fluxes have been removed.
         """
-        lc = copy.copy(self)
-        nan_mask = np.isnan(lc.flux)
-        lc.time = self.time[~nan_mask]
-        lc.flux = self.flux[~nan_mask]
-        lc.flux_err = self.flux_err[~nan_mask]
-        return lc
+        return self[~np.isnan(self.flux)]  # This will return a sliced copy
 
     def remove_outliers(self, sigma=5., return_mask=False, **kwargs):
         """Removes outlier flux values using sigma-clipping.
@@ -246,18 +250,10 @@ class LightCurve(object):
         clean_lightcurve : LightCurve object
             A new ``LightCurve`` in which outliers have been removed.
         """
-        new_lc = copy.copy(self)
-        outlier_mask = sigma_clip(data=new_lc.flux, sigma=sigma, **kwargs).mask
-        new_lc.time = self.time[~outlier_mask]
-        new_lc.flux = self.flux[~outlier_mask]
-        new_lc.flux_err = self.flux_err[~outlier_mask]
-        if hasattr(new_lc, 'centroid_col') and new_lc.centroid_col is not None:
-            new_lc.centroid_col = self.centroid_col[~outlier_mask]
-        if hasattr(new_lc, 'centroid_row') and new_lc.centroid_row is not None:
-            new_lc.centroid_row = self.centroid_row[~outlier_mask]
+        outlier_mask = sigma_clip(data=self.flux, sigma=sigma, **kwargs).mask
         if return_mask:
-            return new_lc, outlier_mask
-        return new_lc
+            return self[~outlier_mask], outlier_mask
+        return self[~outlier_mask]
 
     def bin(self, binsize=13, method='mean'):
         """Bins a lightcurve using a function defined by `method`
@@ -520,9 +516,9 @@ class KeplerLightCurve(LightCurve):
                  channel=None, campaign=None, quarter=None, mission=None,
                  cadenceno=None, keplerid=None):
         super(KeplerLightCurve, self).__init__(time, flux, flux_err)
-        self.centroid_col = centroid_col
-        self.centroid_row = centroid_row
-        self.quality = quality
+        self.centroid_col = self._validate_array(centroid_col, name='centroid_col')
+        self.centroid_row = self._validate_array(centroid_row, name='centroid_row')
+        self.quality = self._validate_array(quality, name='quality')
         self.quality_bitmask = quality_bitmask
         self.channel = channel
         self.campaign = campaign
@@ -530,6 +526,14 @@ class KeplerLightCurve(LightCurve):
         self.mission = mission
         self.cadenceno = cadenceno
         self.keplerid = keplerid
+
+    def __getitem__(self, key):
+        lc = super(KeplerLightCurve, self).__getitem__(key)
+        # Compared to `LightCurve`, we need to slice a few additional arrays:
+        lc.quality = self.quality[key]
+        lc.centroid_col = self.centroid_col[key]
+        lc.centroid_row = self.centroid_row[key]
+        return lc
 
     def __repr__(self):
         if self.mission is None:
@@ -603,13 +607,21 @@ class TessLightCurve(LightCurve):
                  centroid_row=None, quality=None, quality_bitmask=None,
                  cadenceno=None, ticid=None):
         super(TessLightCurve, self).__init__(time, flux, flux_err)
-        self.centroid_col = centroid_col
-        self.centroid_row = centroid_row
-        self.quality = quality
+        self.centroid_col = self._validate_array(centroid_col, name='centroid_col')
+        self.centroid_row = self._validate_array(centroid_row, name='centroid_row')
+        self.quality = self._validate_array(quality, name='quality')
         self.quality_bitmask = quality_bitmask
         self.mission = "TESS"
         self.cadenceno = cadenceno
         self.ticid = ticid
+
+    def __getitem__(self, key):
+        lc = super(TessLightCurve, self).__getitem__(key)
+        # Compared to `LightCurve`, we need to slice a few additional arrays:
+        lc.quality = self.quality[key]
+        lc.centroid_col = self.centroid_col[key]
+        lc.centroid_row = self.centroid_row[key]
+        return lc
 
     def __repr__(self):
         return('TessLightCurve(TICID: {})'.format(self.ticid))

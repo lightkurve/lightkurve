@@ -24,12 +24,12 @@ TESS_SIM = ("https://archive.stsci.edu/missions/tess/ete-6/tid/00/000/"
 
 def test_LightCurve():
     err_string = ("Input arrays have different lengths."
-                  " len(time)=5, len(flux)=4, len(flux_err)=4")
+                  " len(time)=5, len(flux)=4")
     time = np.array([1, 2, 3, 4, 5])
     flux = np.array([1, 2, 3, 4])
 
     with pytest.raises(ValueError) as err:
-        lc = LightCurve(time=time, flux=flux)
+        LightCurve(time=time, flux=flux)
     assert err_string == err.value.args[0]
 
 
@@ -257,3 +257,47 @@ def test_lightcurvefile_repr():
     lcf = TessLightCurveFile(TESS_SIM)
     str(lcf)
     repr(lcf)
+
+
+def test_slicing():
+    """Does LightCurve.__getitem__() allow slicing?"""
+    time = np.linspace(0, 10, 10)
+    flux = np.linspace(100, 200, 10)
+    flux_err = np.linspace(5, 50, 10)
+    lc = LightCurve(time, flux, flux_err)
+    assert_array_equal(lc[0:5].time, time[0:5])
+    assert_array_equal(lc[2::2].flux, flux[2::2])
+    assert_array_equal(lc[5:9:-1].flux_err, flux_err[5:9:-1])
+
+    # KeplerLightCurves contain additional data arrays that need to be sliced
+    centroid_col = np.linspace(40, 50, 10)
+    centroid_row = np.linspace(50, 60, 10)
+    quality = np.linspace(70, 80, 10)
+    lc = KeplerLightCurve(time, flux, flux_err,
+                          centroid_col=centroid_col,
+                          centroid_row=centroid_row,
+                          quality=quality)
+    assert_array_equal(lc[::3].centroid_col, centroid_col[::3])
+    assert_array_equal(lc[4:].centroid_row, centroid_row[4:])
+    assert_array_equal(lc[10:2].quality, quality[10:2])
+
+
+def test_boolean_masking():
+    lc = KeplerLightCurve(time=[1, 2, 3], flux=[1, 1, 10], quality=[0, 0, 200])
+    assert_array_equal(lc[lc.flux < 5].time, [1, 2])
+    assert_array_equal(lc[lc.flux < 5].quality, [0, 0])
+
+
+def test_remove_nans():
+    """Does LightCurve.__getitem__() allow slicing?"""
+    time, flux = [1, 2, 3, 4], [100, np.nan, 102, np.nan]
+    lc_clean = LightCurve(time, flux).remove_nans()
+    assert_array_equal(lc_clean.time, [1, 3])
+    assert_array_equal(lc_clean.flux, [100, 102])
+
+
+def test_remove_outliers():
+    time, flux = [1, 2, 3, 4], [1, 1, 1000, 1]
+    lc_clean = LightCurve(time, flux).remove_outliers(sigma=1)
+    assert_array_equal(lc_clean.time, [1, 2, 4])
+    assert_array_equal(lc_clean.flux, [1, 1, 1])
