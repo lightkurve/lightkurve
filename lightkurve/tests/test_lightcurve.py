@@ -234,9 +234,22 @@ def test_date():
     assert date[-1] == '2011-03-14 20:18:16.734'
 
 
-def test_repr():
-    """Does __repr__ work?"""
+def test_lightcurve_repr():
+    """Do __str__ and __repr__ work?"""
     time, flux = range(3), np.ones(3)
     str(LightCurve(time, flux))
     str(KeplerLightCurve(time, flux))
     str(TessLightCurve(time, flux))
+    repr(LightCurve(time, flux))
+    repr(KeplerLightCurve(time, flux))
+    repr(TessLightCurve(time, flux))
+
+
+def test_lightcurvefile_repr():
+    """Do __str__ and __repr__ work?"""
+    lcf = KeplerLightCurveFile(TABBY_Q8)
+    str(lcf)
+    repr(lcf)
+    lcf = TessLightCurveFile(TESS_SIM)
+    str(lcf)
+    repr(lcf)

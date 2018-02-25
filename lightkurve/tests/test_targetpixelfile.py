@@ -141,9 +141,10 @@ def test_properties():
 
 
 def test_repr():
-    """Does __repr__ work?"""
+    """Do __str__ and __repr__ work?"""
     tpf = KeplerTargetPixelFile(filename_tpf_all_zeros)
     str(tpf)
+    repr(tpf)
 
 
 def test_to_lightcurve():
