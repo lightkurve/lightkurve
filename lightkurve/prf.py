@@ -6,6 +6,7 @@ import tqdm
 import sys
 from astropy.io import fits as pyfits
 from oktopus.posterior import PoissonPosterior
+from oktopus.models import ConstantModel
 from .utils import channel_to_module_output, plot_image
 
 # This is a workaround to get the number of arguments of
@@ -46,6 +47,17 @@ class PRFPhotometry(object):
     loss_function : subclass of oktopus.LossFunction
         Noise distribution associated with each random measurement
 
+    Notes
+    -----
+    Best fit values are returned by the ``fit`` method, but can also be
+    accessed on the ``opt_params`` attribute. Uncertainties on the best fit
+    parameters are reported on the ``uncertainties`` attribute.
+    Uncertainties are derived based on the Fisher Information Matrix.
+    Interested readers might find the following references useful:
+        * https://en.wikipedia.org/wiki/Fisher_information
+        * https://en.wikipedia.org/wiki/Cramer-Rao_bound
+        * https://en.wikipedia.org/wiki/Observed_information
+
     Examples
     --------
     >>> from lightkurve import KeplerTargetPixelFile, SimpleKeplerPRF, SceneModel, PRFPhotometry
@@ -77,7 +89,7 @@ class PRFPhotometry(object):
         self.uncertainties = np.array([])
 
     def fit(self, tpf_flux, x0=None, cadences='all', method='powell',
-            **kwargs):
+            return_uncertainties=False, **kwargs):
         """
         Fits the scene model to the given data in ``tpf_flux``.
 
@@ -93,6 +105,8 @@ class PRFPhotometry(object):
         cadences : array-like of ints or str
             A list or array that contains the cadences which will be fitted.
             Default is to fit all cadences.
+        return_uncertainties : bool
+            Return uncertainties on the fitted parameters.
         kwargs : dict
             Dictionary of additional parameters to be passed to
             `scipy.optimize.minimize`.
@@ -127,7 +141,14 @@ class PRFPhotometry(object):
         self.opt_params = self.opt_params.reshape((tpf_flux.shape[0], len(x0)))
         self.residuals = self.residuals.reshape(tpf_flux.shape)
 
-        return self.opt_params
+        if return_uncertainties:
+            for t in tqdm.tqdm(cadences):
+                uncertainties = loss.loglikelihood.uncertainties(self.opt_params[t])
+                self.uncertainties = np.append(self.uncertainties, uncertainties)
+            self.uncertainties = self.uncertainties.reshape((tpf_flux.shape[0], len(x0)))
+            return self.opt_params, self.uncertainties
+         else:
+             return self.opt_params
 
     def get_residuals(self):
         return self.residuals
@@ -143,10 +164,10 @@ class SceneModel(object):
         A list of prfs
     bkg_model : callable
         A function that models the background variation.
-        Default is a constant background
+        Default is a constant background.
     """
 
-    def __init__(self, prfs, bkg_model=lambda bkg: np.array([bkg])):
+    def __init__(self, prfs, bkg_model=ConstantModel()):
         self.prfs = np.asarray([prfs]).reshape(-1)
         self.bkg_model = bkg_model
         self._prepare_scene_model()
