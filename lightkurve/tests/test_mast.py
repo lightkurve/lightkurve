@@ -26,6 +26,8 @@ def test_search_kepler_tpf_products():
     assert(len(search_kepler_tpf_products(11904151, quarter=12)) == 0)
     # We should also be able to resolve it by its name instead of KIC ID
     assert(len(search_kepler_tpf_products('Kepler-10')) == 15)
+    # An invalid KIC/EPIC ID should be dealt with gracefully
+    assert(len(search_kepler_tpf_products(-999)) == 0)
 
 
 @pytest.mark.remote_data
