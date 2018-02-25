@@ -5,7 +5,8 @@ import numpy as np
 from numpy.testing import (assert_almost_equal, assert_array_equal,
                            assert_allclose)
 from astropy.io import fits as pyfits
-from ..lightcurve import (LightCurve, KeplerLightCurve, iterative_box_period_search)
+from ..lightcurve import (LightCurve, KeplerLightCurve, TessLightCurve,
+                          iterative_box_period_search)
 from ..lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
 
 # 8th Quarter of Tabby's star
@@ -145,6 +146,9 @@ def test_cdpp():
     # An artificial lightcurve with sigma=100ppm should have cdpp=100ppm
     lc = LightCurve(np.arange(10000), np.random.normal(loc=1, scale=100e-6, size=10000))
     assert_almost_equal(lc.cdpp(transit_duration=1), 100, decimal=-0.5)
+    # Transit_duration must be an integer (cadences)
+    with pytest.raises(ValueError):
+        lc.cdpp(transit_duration=6.5)
 
 
 @pytest.mark.remote_data
@@ -163,6 +167,8 @@ def test_bin():
     assert_allclose(binned_lc.flux, 2*np.ones(5))
     assert_allclose(binned_lc.flux_err, np.ones(5))
     assert len(binned_lc.time) == 5
+    with pytest.raises(ValueError):
+        lc.bin(method='doesnotexist')
 
 
 def test_normalize():
@@ -226,3 +232,11 @@ def test_date():
     assert len(date) == len(lcf.time)
     assert date[0] == '2011-01-06 20:45:08.811'
     assert date[-1] == '2011-03-14 20:18:16.734'
+
+
+def test_repr():
+    """Does __repr__ work?"""
+    time, flux = range(3), np.ones(3)
+    str(LightCurve(time, flux))
+    str(KeplerLightCurve(time, flux))
+    str(TessLightCurve(time, flux))

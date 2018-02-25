@@ -152,8 +152,7 @@ class LightCurve(object):
                                             polyorder=polyorder, **kwargs)
         flatten_lc = copy.copy(lc_clean)
         flatten_lc.flux = lc_clean.flux / trend_signal
-        if flatten_lc.flux_err is not None:
-            flatten_lc.flux_err = lc_clean.flux_err / trend_signal
+        flatten_lc.flux_err = lc_clean.flux_err / trend_signal
 
         if return_trend:
             trend_lc = copy.copy(lc_clean)
@@ -186,9 +185,6 @@ class LightCurve(object):
         # fold time domain from -.5 to .5
         fold_time[fold_time > 0.5] -= 1
         sorted_args = np.argsort(fold_time)
-        if self.flux_err is None:
-            return LightCurve(fold_time[sorted_args],
-                              self.flux[sorted_args])
         return LightCurve(fold_time[sorted_args],
                           self.flux[sorted_args],
                           flux_err=self.flux_err[sorted_args])
@@ -206,9 +202,8 @@ class LightCurve(object):
             by the median.
         """
         lc = copy.copy(self)
-        if lc.flux_err is not None:
-            lc.flux_err = lc.flux_err / np.nanmedian(lc.flux)
         lc.flux = lc.flux / np.nanmedian(lc.flux)
+        lc.flux_err = lc.flux_err / np.nanmedian(lc.flux)
         return lc
 
     def remove_nans(self):
@@ -223,8 +218,7 @@ class LightCurve(object):
         nan_mask = np.isnan(lc.flux)
         lc.time = self.time[~nan_mask]
         lc.flux = self.flux[~nan_mask]
-        if lc.flux_err is not None:
-            lc.flux_err = self.flux_err[~nan_mask]
+        lc.flux_err = self.flux_err[~nan_mask]
         return lc
 
     def remove_outliers(self, sigma=5., return_mask=False, **kwargs):
@@ -254,8 +248,7 @@ class LightCurve(object):
         outlier_mask = sigma_clip(data=new_lc.flux, sigma=sigma, **kwargs).mask
         new_lc.time = self.time[~outlier_mask]
         new_lc.flux = self.flux[~outlier_mask]
-        if new_lc.flux_err is not None:
-            new_lc.flux_err = self.flux_err[~outlier_mask]
+        new_lc.flux_err = self.flux_err[~outlier_mask]
         if hasattr(new_lc, 'centroid_col') and new_lc.centroid_col is not None:
             new_lc.centroid_col = self.centroid_col[~outlier_mask]
         if hasattr(new_lc, 'centroid_row') and new_lc.centroid_row is not None:
@@ -367,11 +360,9 @@ class LightCurve(object):
         Jeff van Cleve but lacks the normalization factor used there:
         svn+ssh://murzim/repo/so/trunk/Develop/jvc/common/compute_SG_noise.m
         """
-        try:
-            transit_duration = int(transit_duration)
-        except Exception:
-            raise Exception("transit_duration must be an integer, got {}."
-                            .format(transit_duration))
+        if not isinstance(transit_duration, int):
+            raise ValueError("transit_duration must be an integer in units "
+                             "number of cadences, got {}.".format(transit_duration))
 
         detrended_lc = self.flatten(window_length=savgol_window,
                                     polyorder=savgol_polyorder)
