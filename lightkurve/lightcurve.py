@@ -2,6 +2,7 @@ from __future__ import division, print_function
 
 import copy
 import requests
+import warnings
 
 from bs4 import BeautifulSoup
 from tqdm import tqdm
@@ -15,8 +16,9 @@ from matplotlib import pyplot as plt
 from astropy.io import fits as pyfits
 from astropy.stats import sigma_clip
 from astropy.table import Table
+from astropy.time import Time
 
-from .utils import (running_mean, channel_to_module_output, KeplerQualityFlags,
+from .utils import (running_mean, channel_to_module_output, bkjd_to_time, KeplerQualityFlags,
                     TessQualityFlags)
 from .mast import search_kepler_lightcurve_products, download_products, ArchiveError
 
@@ -98,13 +100,13 @@ class LightCurve(object):
     def __rdiv__(self, other):
         return self.__rtruediv__(other)
 
-    def stitch(self, *others):
+    def stitch(self, others):
         """
         Stitches LightCurve objects.
 
         Parameters
         ----------
-        *others : LightCurve objects
+        others : LightCurve object or list of LightCurve objects
             Light curves to be stitched.
 
         Returns
@@ -112,6 +114,8 @@ class LightCurve(object):
         stitched_lc : LightCurve object
             Stitched light curve.
         """
+        if not hasattr(others, '__iter__'):
+            others = [others]
         time = self.time
         flux = self.flux
         flux_err = self.flux_err
@@ -256,7 +260,10 @@ class LightCurve(object):
         new_lc.flux = self.flux[~outlier_mask]
         if new_lc.flux_err is not None:
             new_lc.flux_err = self.flux_err[~outlier_mask]
-
+        if hasattr(new_lc, 'centroid_col') and new_lc.centroid_col is not None:
+            new_lc.centroid_col = self.centroid_col[~outlier_mask]
+        if hasattr(new_lc, 'centroid_row') and new_lc.centroid_row is not None:
+            new_lc.centroid_row = self.centroid_row[~outlier_mask]
         if return_mask:
             return new_lc, outlier_mask
         return new_lc
@@ -558,16 +565,19 @@ class KeplerLightCurve(LightCurve):
         new_lc : KeplerLightCurve object
             Corrected lightcurve
         """
+        not_nan = np.isfinite(self.flux)
         if method == 'sff':
-            self.corrector = SFFCorrector()
-            corrected_lc = self.corrector.correct(time=self.time, flux=self.flux,
-                                                  centroid_col=self.centroid_col,
-                                                  centroid_row=self.centroid_row,
-                                                  **kwargs)
+                self.corrector = SFFCorrector()
+                corrected_lc = self.corrector.correct(time=self.time[not_nan], flux=self.flux[not_nan],
+                                                      centroid_col=self.centroid_col[not_nan],
+                                                      centroid_row=self.centroid_row[not_nan],
+                                                      **kwargs)
         else:
             raise ValueError("method {} is not available.".format(method))
         new_lc = copy.copy(self)
+        new_lc.time = corrected_lc.time
         new_lc.flux = corrected_lc.flux
+        new_lc.flux_err = self.normalize().flux_err[not_nan]
         return new_lc
 
     def to_fits(self):
@@ -644,6 +654,11 @@ class LightCurveFile(object):
         return self.hdu[1].data['TIME'][self.quality_mask]
 
     @property
+    def timeobj(self):
+        """Returns the human-readable date for all good-quality cadences."""
+        return bkjd_to_time(self.time, self.hdu[1].data['TIMECORR'][self.quality_mask], self.hdu[1].header['TIMSLICE'])
+
+    @property
     def SAP_FLUX(self):
         """Returns a LightCurve object for SAP_FLUX"""
         return self.get_lightcurve('SAP_FLUX')
@@ -675,6 +690,7 @@ class KeplerLightCurveFile(LightCurveFile):
         Directory path or url to a lightcurve FITS file.
     quality_bitmask : str or int
         Bitmask specifying quality flags of cadences that should be ignored.
+        If `None` is passed, then no cadences are ignored.
         If a string is passed, it has the following meaning:
 
             * default: recommended quality mask
@@ -689,7 +705,8 @@ class KeplerLightCurveFile(LightCurveFile):
         super(KeplerLightCurveFile, self).__init__(path, quality_bitmask, **kwargs)
 
     @staticmethod
-    def from_archive(target, cadence='long', quarter=None, month=None, campaign=None):
+    def from_archive(target, cadence='long', quarter=None, month=None,
+                     campaign=None, **kwargs):
         """Fetch a Light Curve File from the Kepler/K2 data archive at MAST.
 
         Raises an `ArchiveError` if a unique file cannot be found.  For example,
@@ -708,6 +725,8 @@ class KeplerLightCurveFile(LightCurveFile):
             For Kepler's prime mission, there are three short-cadence
             lightcurve files for each quarter, each covering one month.
             Hence, if cadence='short' you need to specify month=1, 2, or 3.
+        kwargs : dict
+            Keywords arguments passed to `KeplerLightCurveFile`.
 
         Returns
         -------
@@ -730,7 +749,7 @@ class KeplerLightCurveFile(LightCurveFile):
         elif len(products) < 1:
             raise ArchiveError("No lightcurve file found for {} at MAST.".format(target))
         path = download_products(products)[0]
-        return KeplerLightCurveFile(path)
+        return KeplerLightCurveFile(path, **kwargs)
 
     def __repr__(self):
         if self.mission.lower() == 'kepler':
@@ -937,6 +956,8 @@ class SFFCorrector(object):
                 sigma_2=5.):
         """Returns a systematics-corrected LightCurve.
 
+        Note that it is assumed that time and flux do not contain NaNs.
+
         Parameters
         ----------
         time : array-like
@@ -973,6 +994,7 @@ class SFFCorrector(object):
 
         flux_hat = np.array([])
         # The SFF algorithm is going to be run on each window independently
+
         for i in tqdm(range(windows)):
             # To make it easier (and more numerically stable) to fit a
             # characteristic polynomial that describes the spacecraft motion,
@@ -983,8 +1005,12 @@ class SFFCorrector(object):
             # Next, we fit the motion polynomial after removing outliers
             self.outlier_cent = sigma_clip(data=self.rot_col,
                                            sigma=sigma_2).mask
-            coeffs = np.polyfit(self.rot_row[~self.outlier_cent],
-                                self.rot_col[~self.outlier_cent], polyorder)
+            with warnings.catch_warnings():
+                # ignore warning messages related to polyfit being poorly conditioned
+                warnings.simplefilter("ignore", category=np.RankWarning)
+                coeffs = np.polyfit(self.rot_row[~self.outlier_cent],
+                                    self.rot_col[~self.outlier_cent], polyorder)
+
             self.poly = np.poly1d(coeffs)
             self.polyprime = np.poly1d(coeffs).deriv()
 

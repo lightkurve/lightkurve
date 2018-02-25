@@ -1,53 +1,53 @@
 ..
 
-========================
-lightkurve Documentation
-========================
+======================
+Welcome to lightkurve!
+======================
 
-.. image:: https://img.shields.io/pypi/v/lightkurve.svg
-                :target: https://pypi.python.org/pypi/lightkurve
-.. image:: https://travis-ci.org/KeplerGO/lightkurve.svg?branch=master
-              :target: https://travis-ci.org/KeplerGO/lightkurve
-.. image:: https://ci.appveyor.com/api/projects/status/6jvv5d7a142gwm8a/branch/master?svg=true
-                    :target: https://ci.appveyor.com/project/mirca/lightkurve
-.. image:: https://codecov.io/gh/KeplerGO/lightkurve/branch/master/graph/badge.svg
-              :target: https://codecov.io/gh/KeplerGO/lightkurve
-.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.835584.svg
-              :target: https://doi.org/10.5281/zenodo.835584
+The **lightkurve** Python package offers a beautiful and user-friendly way
+to analyze astronomical flux time series data,
+in particular the pixels and lightcurves obtained by
+**NASA's Kepler, K2, and TESS missions**.
 
-Welcome to **lightkurve** documentation!
+.. image:: _static/images/lightkurve-teaser.gif
+   :target: _static/images/lightkurve-teaser.gif
 
-**lightkurve** offers a user-friendly way to inspect and analyze astronomical
-flux time series data, in particular the pixels and lightcurves obtained by
-NASA's Kepler, K2, and TESS missions.
+This package aims to lower the barrier for both students, astronomers,
+and citizen scientists interested in analyzing Kepler and TESS space telescope data.
+It does this by providing **high-quality building blocks and tutorials**
+which enable both hand-tailored data analyses and advanced automated pipelines.
+
+Lightkurve is an **open source community project** supported by
+`NASA's Kepler/K2 Guest Observer Office <https://keplerscience.arc.nasa.gov>`_.
+The development `takes place on GitHub <https://github.com/KeplerGO/lightkurve>`_
+and everyone is :ref:`invited to contribute<contributing>`.
+
 
 .. _user-docs:
 
-*************
-Documentation
-*************
-
 .. toctree::
+   :caption: Getting started
    :maxdepth: 1
 
-   api/index
+   tutorials/quickstart.ipynb
    install
    contributing
-   community_software
-
-*********
-Tutorials
-*********
+   citing
+   other_software
 
 .. toctree::
-    :maxdepth: 2
+    :caption: Tutorials
+    :maxdepth: 1
 
-    tutorials/index
+    How to find a planet using lightkurve? <tutorials/how-to-find-a-kepler-planet-with-lightkurve.ipynb>
+    tutorials/target-pixel-files.ipynb
+    What are light curve files? <tutorials/lightcurve-files.ipynb>
 
-**************
-Acknowledgment
-**************
-
-**lightkurve** is a community project supported by the
-`Kepler/K2 Guest Observer Office <https://keplerscience.arc.nasa.gov>`_.
-The code development happens `on GitHub <https://github.com/KeplerGO/lightkurve>`_.
+.. toctree::
+    :caption: API Documentation
+    :maxdepth: 1
+    
+    api/targetpixelfile
+    api/lightcurve
+    api/prf
+    api/utils
