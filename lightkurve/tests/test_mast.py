@@ -35,6 +35,7 @@ def test_search_kepler_lightcurve_products():
 
 
 @pytest.mark.remote_data
+@pytest.mark.filterwarnings('ignore:Query returned no results')
 def test_kepler_tpf_from_archive():
     # Request an object name that does not exist
     with pytest.raises(ArchiveError) as exc:
@@ -59,6 +60,7 @@ def test_kepler_tpf_from_archive():
 
 
 @pytest.mark.remote_data
+@pytest.mark.filterwarnings('ignore:Query returned no results')
 def test_kepler_lightcurve_from_archive():
     # Request an object name that does not exist
     with pytest.raises(ArchiveError) as exc:
