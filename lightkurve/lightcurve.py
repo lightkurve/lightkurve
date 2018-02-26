@@ -93,32 +93,34 @@ class LightCurve(object):
     def __rdiv__(self, other):
         return self.__rtruediv__(other)
 
-    def stitch(self, others):
+    def append(self, others):
         """
-        Stitches LightCurve objects.
+        Append LightCurve objects.
 
         Parameters
         ----------
         others : LightCurve object or list of LightCurve objects
-            Light curves to be stitched.
+            Light curves to be appended to the current one.
 
         Returns
         -------
-        stitched_lc : LightCurve object
-            Stitched light curve.
+        new_lc : LightCurve object
+            Concatenated light curve.
         """
         if not hasattr(others, '__iter__'):
             others = [others]
-        time = self.time
-        flux = self.flux
-        flux_err = self.flux_err
-
+        new_lc = copy.copy(self)
         for i in range(len(others)):
-            time = np.append(time, others[i].time)
-            flux = np.append(flux, others[i].flux)
-            flux_err = np.append(flux_err, others[i].flux_err)
-
-        return LightCurve(time=time, flux=flux, flux_err=flux_err)
+            new_lc.time = np.append(new_lc.time, others[i].time)
+            new_lc.flux = np.append(new_lc.flux, others[i].flux)
+            new_lc.flux_err = np.append(new_lc.flux_err, others[i].flux_err)
+            if hasattr(new_lc, 'quality'):
+                new_lc.quality = np.append(new_lc.quality, others[i].quality)
+            if hasattr(new_lc, 'centroid_col'):
+                new_lc.centroid_col = np.append(new_lc.centroid_col, others[i].centroid_col)
+            if hasattr(new_lc, 'centroid_row'):
+                new_lc.centroid_row = np.append(new_lc.centroid_row, others[i].centroid_row)
+        return new_lc
 
     def flatten(self, window_length=101, polyorder=3, return_trend=False, **kwargs):
         """

@@ -115,18 +115,22 @@ def test_lightcurve_fold():
     assert_almost_equal(np.max(fold.time), 0.5, 2)
 
 
-def test_lightcurve_stitch():
-    """Test ``LightCurve.stitch()``."""
+def test_lightcurve_append():
+    """Test ``LightCurve.append()``."""
     lc = LightCurve(time=[1, 2, 3], flux=[1, .5, 1])
-    lc = lc.stitch(lc)
+    lc = lc.append(lc)
     assert_array_equal(lc.flux, 2*[1, .5, 1])
     assert_array_equal(lc.time, 2*[1, 2, 3])
+    # KeplerLightCurve has extra data
+    lc = KeplerLightCurve(time=[1, 2, 3], flux=[1, .5, 1], quality=[10, 20, 30])
+    lc = lc.append(lc)
+    assert_array_equal(lc.quality, 2*[10, 20, 30])
 
 
-def test_lightcurve_stitch_multiple():
-    """Test ``LightCurve.stitch()`` for multiple lightcurves at once."""
+def test_lightcurve_append_multiple():
+    """Test ``LightCurve.append()`` for multiple lightcurves at once."""
     lc = LightCurve(time=[1, 2, 3], flux=[1, .5, 1])
-    lc = lc.stitch([lc, lc, lc])
+    lc = lc.append([lc, lc, lc])
     assert_array_equal(lc.flux, 4*[1, .5, 1])
     assert_array_equal(lc.time, 4*[1, 2, 3])
 
