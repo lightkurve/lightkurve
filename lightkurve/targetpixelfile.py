@@ -56,6 +56,7 @@ class TessTargetPixelFile(TargetPixelFile):
         http://archive.stsci.edu/kepler/manuals/archive_manual.pdf
     """
 
+
 class KeplerTargetPixelFile(TargetPixelFile):
     """
     Defines a TargetPixelFile class for the Kepler/K2 Mission.
@@ -63,8 +64,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
     Attributes
     ----------
-    path : str
-        Path to a Kepler Target Pixel (FITS) File.
+    path : str or `astropy.io.fits.HDUList`
+        Path to a Kepler Target Pixel (FITS) File or a `HDUList` object.
     quality_bitmask : str or int
         Bitmask specifying quality flags of cadences that should be ignored.
         If `None` is passed, then no cadences are ignored.
@@ -84,7 +85,10 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
     def __init__(self, path, quality_bitmask='default', **kwargs):
         self.path = path
-        self.hdu = fits.open(self.path, **kwargs)
+        if isinstance(path, fits.HDUList):
+            self.hdu = path
+        else:
+            self.hdu = fits.open(self.path, **kwargs)
         self.quality_bitmask = quality_bitmask
         self.quality_mask = self._quality_mask(quality_bitmask)
 
