@@ -9,6 +9,7 @@ from astropy.wcs import WCS
 from matplotlib import patches
 import numpy as np
 
+from . import PACKAGEDIR
 from .lightcurve import KeplerLightCurve, LightCurve
 from .prf import SimpleKeplerPRF
 from .utils import KeplerQualityFlags, plot_image, bkjd_to_time
@@ -608,7 +609,7 @@ class TargetPixelFileFactory(object):
 
     def _header_template(self, extension):
         """Returns a template `fits.Header` object for a given extension."""
-        template_fn = os.path.join("/home/gb/dev/kadenza/kadenza/header-templates",
+        template_fn = os.path.join(PACKAGEDIR, "data",
                                    "tpf-ext{}-header.txt".format(extension))
         return fits.Header.fromtextfile(template_fn)
 
@@ -715,18 +716,7 @@ class TargetPixelFileFactory(object):
 
 
 def create_tpf_hdu(images, position, size=(10, 10), target_id="unnamed-target"):
-    """
-    Example use
-    -----------
-    >>> from lightkurve.targetpixelfile import create_tpf_hdu, KeplerTargetPixelFile
-    >>> from astropy.coordinates import SkyCoord
-    >>> import numpy as np
-    >>> import glob
-    >>> position = SkyCoord('18h04m10.10s -24d24m10.4s', frame='icrs')
-    >>> images = np.sort(glob.glob("/home/gb/proj/k2superstamp/lagoon/*fits"))
-    >>> hdu = create_tpf_hdu(images, position, size=(10, 10))
-    >>> tpf = KeplerTargetPixelFile(hdu)
-    """
+    """Returns a TPF HDUList cut out from a set of images."""
     from astropy.nddata import Cutout2D
     factory = TargetPixelFileFactory(n_cadences=len(images),
                                      n_rows=size[0], n_cols=size[1],
