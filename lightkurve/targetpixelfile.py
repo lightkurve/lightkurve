@@ -1,4 +1,4 @@
-from future import division, print_function
+from __future__ import division, print_function
 import warnings
 
 from astropy.io import fits
@@ -12,6 +12,7 @@ from .lightcurve import KeplerLightCurve, LightCurve
 from .prf import SimpleKeplerPRF
 from .utils import KeplerQualityFlags, plot_image, bkjd_to_time
 from .mast import search_kepler_tpf_products, download_products, ArchiveError
+
 
 __all__ = ['KeplerTargetPixelFile']
 
