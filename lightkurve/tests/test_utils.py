@@ -1,5 +1,7 @@
-import pytest
+from __future__ import division, print_function
+
 from numpy.testing import assert_almost_equal
+import pytest
 
 from ..utils import module_output_to_channel, channel_to_module_output
 from ..utils import running_mean

@@ -1,4 +1,4 @@
-from __future__ import divison, print_function
+from __future__ import division, print_function
 
 from astropy.visualization import (PercentileInterval, ImageNormalize,
                                    SqrtStretch, LogStretch, LinearStretch)

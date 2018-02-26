@@ -5,6 +5,8 @@ with the `@pytest.mark.remote_data` decorator below will only run if the
 `--remote-data` argument is passed to py.test.  This allows tests to pass
 if no internet connection is available.
 """
+from __future__ import division, print_function
+
 import pytest
 
 from ..mast import (search_kepler_tpf_products, search_kepler_lightcurve_products,
