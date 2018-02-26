@@ -4,19 +4,23 @@
 Welcome to lightkurve!
 ======================
 
-The **lightkurve** Python package offers a user-friendly way
-to inspect and analyze astronomical flux time series data,
+The **lightkurve** Python package offers a beautiful and user-friendly way
+to analyze astronomical flux time series data,
 in particular the pixels and lightcurves obtained by
 **NASA's Kepler, K2, and TESS missions**.
-It aims to provide the building blocks necessary to build
-custom analyses and pipelines.
 
 .. image:: _static/images/lightkurve-teaser.gif
    :target: _static/images/lightkurve-teaser.gif
 
-This is a community project supported by the
-`Kepler/K2 Guest Observer Office <https://keplerscience.arc.nasa.gov>`_.
-The development `takes place on GitHub <https://github.com/KeplerGO/lightkurve>`_ and everyone is :ref:`invited to contribute<contributing>`.
+This package aims to lower the barrier for both students, astronomers,
+and citizen scientists interested in analyzing Kepler and TESS space telescope data.
+It does this by providing **high-quality building blocks and tutorials**
+which enable both hand-tailored data analyses and advanced automated pipelines.
+
+Lightkurve is an **open source community project** supported by
+`NASA's Kepler/K2 Guest Observer Office <https://keplerscience.arc.nasa.gov>`_.
+The development `takes place on GitHub <https://github.com/KeplerGO/lightkurve>`_
+and everyone is :ref:`invited to contribute<contributing>`.
 
 
 .. _user-docs:
@@ -35,9 +39,9 @@ The development `takes place on GitHub <https://github.com/KeplerGO/lightkurve>`
     :caption: Tutorials
     :maxdepth: 1
 
-    How to find a planet? <tutorials/how-to-find-a-kepler-planet-with-lightkurve.ipynb>
+    How to find a planet using lightkurve? <tutorials/how-to-find-a-kepler-planet-with-lightkurve.ipynb>
     tutorials/target-pixel-files.ipynb
-    tutorials/lightcurve-files.ipynb
+    What are light curve files? <tutorials/lightcurve-files.ipynb>
 
 .. toctree::
     :caption: API Documentation

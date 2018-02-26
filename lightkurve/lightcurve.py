@@ -1,31 +1,24 @@
+"""Defines LightCurve, KeplerLightCurve, TessLightCurve, etc."""
+
 from __future__ import division, print_function
 
 import copy
-import requests
-import warnings
-
-from bs4 import BeautifulSoup
 from tqdm import tqdm
 
 import oktopus
 import numpy as np
-from scipy import linalg, signal, interpolate
+from scipy import signal
 from scipy.optimize import minimize
 from matplotlib import pyplot as plt
 
-from astropy.io import fits as pyfits
 from astropy.stats import sigma_clip
 from astropy.table import Table
-from astropy.time import Time
 
-from .utils import (running_mean, channel_to_module_output, bkjd_to_time, KeplerQualityFlags,
-                    TessQualityFlags)
-from .mast import search_kepler_lightcurve_products, download_products, ArchiveError
+from .utils import running_mean
 
 
 __all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve',
-           'KeplerLightCurveFile', 'TessLightCurveFile', 'KeplerCBVCorrector',
-           'SFFCorrector', 'iterative_box_period_search']
+           'iterative_box_period_search']
 
 
 class LightCurve(object):
@@ -45,21 +38,30 @@ class LightCurve(object):
     """
 
     def __init__(self, time, flux, flux_err=None, meta={}):
-        self.time, self.flux, self.flux_err = self._validate_inputs(time, flux, flux_err)
+        self.time = np.asarray(time)
+        self.flux = self._validate_array(flux, name='flux')
+        self.flux_err = self._validate_array(flux_err, name='flux_err')
         self.meta = meta
 
-    def _validate_inputs(self, time, flux, flux_err):
-        if flux_err is not None:
-            flux_err = np.asarray(flux_err)
+    def _validate_array(self, arr, name='array'):
+        """Ensure the input arrays have the same length as `self.time`."""
+        if arr is not None:
+            arr = np.asarray(arr)
         else:
-            flux_err = np.nan * np.ones_like(flux)
+            arr = np.nan * np.ones_like(self.time)
 
-        if not (len(time) == len(flux)):
+        if not (len(self.time) == len(arr)):
             raise ValueError("Input arrays have different lengths."
-                             " len(time)={}, len(flux)={}, len(flux_err)={}"
-                             .format(len(time), len(flux), len(flux_err)))
+                             " len(time)={}, len({})={}"
+                             .format(len(self.time), name, len(arr)))
+        return arr
 
-        return np.asarray(time), np.asarray(flux), flux_err
+    def __getitem__(self, key):
+        copy_self = copy.copy(self)
+        copy_self.time = self.time[key]
+        copy_self.flux = self.flux[key]
+        copy_self.flux_err = self.flux_err[key]
+        return copy_self
 
     def __add__(self, other):
         copy_self = copy.copy(self)
@@ -100,32 +102,34 @@ class LightCurve(object):
     def __rdiv__(self, other):
         return self.__rtruediv__(other)
 
-    def stitch(self, others):
+    def append(self, others):
         """
-        Stitches LightCurve objects.
+        Append LightCurve objects.
 
         Parameters
         ----------
         others : LightCurve object or list of LightCurve objects
-            Light curves to be stitched.
+            Light curves to be appended to the current one.
 
         Returns
         -------
-        stitched_lc : LightCurve object
-            Stitched light curve.
+        new_lc : LightCurve object
+            Concatenated light curve.
         """
         if not hasattr(others, '__iter__'):
             others = [others]
-        time = self.time
-        flux = self.flux
-        flux_err = self.flux_err
-
+        new_lc = copy.copy(self)
         for i in range(len(others)):
-            time = np.append(time, others[i].time)
-            flux = np.append(flux, others[i].flux)
-            flux_err = np.append(flux_err, others[i].flux_err)
-
-        return LightCurve(time=time, flux=flux, flux_err=flux_err)
+            new_lc.time = np.append(new_lc.time, others[i].time)
+            new_lc.flux = np.append(new_lc.flux, others[i].flux)
+            new_lc.flux_err = np.append(new_lc.flux_err, others[i].flux_err)
+            if hasattr(new_lc, 'quality'):
+                new_lc.quality = np.append(new_lc.quality, others[i].quality)
+            if hasattr(new_lc, 'centroid_col'):
+                new_lc.centroid_col = np.append(new_lc.centroid_col, others[i].centroid_col)
+            if hasattr(new_lc, 'centroid_row'):
+                new_lc.centroid_row = np.append(new_lc.centroid_row, others[i].centroid_row)
+        return new_lc
 
     def flatten(self, window_length=101, polyorder=3, return_trend=False, **kwargs):
         """
@@ -159,8 +163,7 @@ class LightCurve(object):
                                             polyorder=polyorder, **kwargs)
         flatten_lc = copy.copy(lc_clean)
         flatten_lc.flux = lc_clean.flux / trend_signal
-        if flatten_lc.flux_err is not None:
-            flatten_lc.flux_err = lc_clean.flux_err / trend_signal
+        flatten_lc.flux_err = lc_clean.flux_err / trend_signal
 
         if return_trend:
             trend_lc = copy.copy(lc_clean)
@@ -193,9 +196,9 @@ class LightCurve(object):
         # fold time domain from -.5 to .5
         fold_time[fold_time > 0.5] -= 1
         sorted_args = np.argsort(fold_time)
-        if self.flux_err is None:
-            return LightCurve(fold_time[sorted_args], self.flux[sorted_args])
-        return LightCurve(fold_time[sorted_args], self.flux[sorted_args], flux_err=self.flux_err[sorted_args])
+        return LightCurve(fold_time[sorted_args],
+                          self.flux[sorted_args],
+                          flux_err=self.flux_err[sorted_args])
 
     def normalize(self):
         """Returns a normalized version of the lightcurve.
@@ -210,9 +213,8 @@ class LightCurve(object):
             by the median.
         """
         lc = copy.copy(self)
-        if lc.flux_err is not None:
-            lc.flux_err = lc.flux_err / np.nanmedian(lc.flux)
         lc.flux = lc.flux / np.nanmedian(lc.flux)
+        lc.flux_err = lc.flux_err / np.nanmedian(lc.flux)
         return lc
 
     def remove_nans(self):
@@ -223,13 +225,7 @@ class LightCurve(object):
         clean_lightcurve : LightCurve object
             A new ``LightCurve`` from which NaNs fluxes have been removed.
         """
-        lc = copy.copy(self)
-        nan_mask = np.isnan(lc.flux)
-        lc.time = self.time[~nan_mask]
-        lc.flux = self.flux[~nan_mask]
-        if lc.flux_err is not None:
-            lc.flux_err = self.flux_err[~nan_mask]
-        return lc
+        return self[~np.isnan(self.flux)]  # This will return a sliced copy
 
     def remove_outliers(self, sigma=5., return_mask=False, **kwargs):
         """Removes outlier flux values using sigma-clipping.
@@ -254,19 +250,10 @@ class LightCurve(object):
         clean_lightcurve : LightCurve object
             A new ``LightCurve`` in which outliers have been removed.
         """
-        new_lc = copy.copy(self)
-        outlier_mask = sigma_clip(data=new_lc.flux, sigma=sigma, **kwargs).mask
-        new_lc.time = self.time[~outlier_mask]
-        new_lc.flux = self.flux[~outlier_mask]
-        if new_lc.flux_err is not None:
-            new_lc.flux_err = self.flux_err[~outlier_mask]
-        if hasattr(new_lc, 'centroid_col') and new_lc.centroid_col is not None:
-            new_lc.centroid_col = self.centroid_col[~outlier_mask]
-        if hasattr(new_lc, 'centroid_row') and new_lc.centroid_row is not None:
-            new_lc.centroid_row = self.centroid_row[~outlier_mask]
+        outlier_mask = sigma_clip(data=self.flux, sigma=sigma, **kwargs).mask
         if return_mask:
-            return new_lc, outlier_mask
-        return new_lc
+            return self[~outlier_mask], outlier_mask
+        return self[~outlier_mask]
 
     def bin(self, binsize=13, method='mean'):
         """Bins a lightcurve using a function defined by `method`
@@ -371,11 +358,9 @@ class LightCurve(object):
         Jeff van Cleve but lacks the normalization factor used there:
         svn+ssh://murzim/repo/so/trunk/Develop/jvc/common/compute_SG_noise.m
         """
-        try:
-            transit_duration = int(transit_duration)
-        except Exception:
-            raise Exception("transit_duration must be an integer, got {}."
-                            .format(transit_duration))
+        if not isinstance(transit_duration, int):
+            raise ValueError("transit_duration must be an integer in units "
+                             "number of cadences, got {}.".format(transit_duration))
 
         detrended_lc = self.flatten(window_length=savgol_window,
                                     polyorder=savgol_polyorder)
@@ -531,9 +516,9 @@ class KeplerLightCurve(LightCurve):
                  channel=None, campaign=None, quarter=None, mission=None,
                  cadenceno=None, keplerid=None):
         super(KeplerLightCurve, self).__init__(time, flux, flux_err)
-        self.centroid_col = centroid_col
-        self.centroid_row = centroid_row
-        self.quality = quality
+        self.centroid_col = self._validate_array(centroid_col, name='centroid_col')
+        self.centroid_row = self._validate_array(centroid_row, name='centroid_row')
+        self.quality = self._validate_array(quality, name='quality')
         self.quality_bitmask = quality_bitmask
         self.channel = channel
         self.campaign = campaign
@@ -542,8 +527,18 @@ class KeplerLightCurve(LightCurve):
         self.cadenceno = cadenceno
         self.keplerid = keplerid
 
+    def __getitem__(self, key):
+        lc = super(KeplerLightCurve, self).__getitem__(key)
+        # Compared to `LightCurve`, we need to slice a few additional arrays:
+        lc.quality = self.quality[key]
+        lc.centroid_col = self.centroid_col[key]
+        lc.centroid_row = self.centroid_row[key]
+        return lc
+
     def __repr__(self):
-        if self.mission.lower() == 'kepler':
+        if self.mission is None:
+            return('KeplerLightCurve(ID: {})'.format(self.keplerid))
+        elif self.mission.lower() == 'kepler':
             return('KeplerLightCurve(KIC: {})'.format(self.keplerid))
         elif self.mission.lower() == 'k2':
             return('KeplerLightCurve(EPIC: {})'.format(self.keplerid))
@@ -567,8 +562,10 @@ class KeplerLightCurve(LightCurve):
         """
         not_nan = np.isfinite(self.flux)
         if method == 'sff':
+                from .correctors import SFFCorrector
                 self.corrector = SFFCorrector()
-                corrected_lc = self.corrector.correct(time=self.time[not_nan], flux=self.flux[not_nan],
+                corrected_lc = self.corrector.correct(time=self.time[not_nan],
+                                                      flux=self.flux[not_nan],
                                                       centroid_col=self.centroid_col[not_nan],
                                                       centroid_row=self.centroid_row[not_nan],
                                                       **kwargs)
@@ -610,9 +607,9 @@ class TessLightCurve(LightCurve):
                  centroid_row=None, quality=None, quality_bitmask=None,
                  cadenceno=None, ticid=None):
         super(TessLightCurve, self).__init__(time, flux, flux_err)
-        self.centroid_col = centroid_col
-        self.centroid_row = centroid_row
-        self.quality = quality
+        self.centroid_col = self._validate_array(centroid_col, name='centroid_col')
+        self.centroid_row = self._validate_array(centroid_row, name='centroid_row')
+        self.quality = self._validate_array(quality, name='quality')
         self.quality_bitmask = quality_bitmask
         self.mission = "TESS"
         self.cadenceno = cadenceno
@@ -889,440 +886,19 @@ class TessLightCurveFile(LightCurveFile):
         self.quality_bitmask = quality_bitmask
         self.quality_mask = self._quality_mask(quality_bitmask)
 
+    def __getitem__(self, key):
+        lc = super(TessLightCurve, self).__getitem__(key)
+        # Compared to `LightCurve`, we need to slice a few additional arrays:
+        lc.quality = self.quality[key]
+        lc.centroid_col = self.centroid_col[key]
+        lc.centroid_row = self.centroid_row[key]
+        return lc
+
     def __repr__(self):
-        return('TessLightCurveFile(TICID: {})'.format(self.ticid))
+        return('TessLightCurve(TICID: {})'.format(self.ticid))
 
-    def _quality_mask(self, bitmask):
-        """Returns a boolean mask which flags all good-quality cadences.
-
-        Parameters
-        ----------
-        bitmask : str or int
-            Bitmask. See ref. [1], table 2-3.
-
-        Returns
-        -------
-        boolean_mask : array of bool
-            Boolean array in which `True` means the data is of good quality.
-        """
-        if bitmask is None:
-            return np.ones(len(self.hdu[1].data['TIME']), dtype=bool)
-
-        if isinstance(bitmask, str):
-            bitmask = TessQualityFlags.OPTIONS[bitmask]
-        return (self.hdu[1].data['QUALITY'] & bitmask) == 0
-
-    @property
-    def ticid(self):
-        return self.header(ext=0)['TICID']
-
-    def get_lightcurve(self, flux_type, centroid_type='MOM_CENTR'):
-        if flux_type in self._flux_types():
-            return TessLightCurve(self.hdu[1].data['TIME'][self.quality_mask],
-                                  self.hdu[1].data[flux_type][self.quality_mask],
-                                  flux_err=self.hdu[1].data[flux_type + "_ERR"][self.quality_mask],
-                                  centroid_col=self.hdu[1].data[centroid_type + "1"][self.quality_mask],
-                                  centroid_row=self.hdu[1].data[centroid_type + "2"][self.quality_mask],
-                                  quality=self.hdu[1].data['QUALITY'][self.quality_mask],
-                                  quality_bitmask=self.quality_bitmask,
-                                  cadenceno=self.cadenceno,
-                                  ticid=self.ticid)
-
-
-class SFFCorrector(object):
-    """Implements the Self-Flat-Fielding (SFF) systematics removal method.
-
-    This method is described in detail by Vanderburg and Johnson (2014).
-    Briefly, the algorithm implemented in this class can be described
-    as follows
-
-       (1) Rotate the centroid measurements onto the subspace spanned by the
-           eigenvectors of the centroid covariance matrix
-       (2) Fit a polynomial to the rotated centroids
-       (3) Compute the arclength of such polynomial
-       (4) Fit a BSpline of the raw flux as a function of time
-       (5) Normalize the raw flux by the fitted BSpline computed in step (4)
-       (6) Bin and interpolate the normalized flux as function of the arclength
-       (7) Divide the raw flux by the piecewise linear interpolation done in step [(6)
-       (8) Set raw flux as the flux computed in step (7) and repeat
-    """
-
-    def __init__(self):
-        pass
-
-    def correct(self, time, flux, centroid_col, centroid_row,
-                polyorder=5, niters=3, bins=15, windows=1, sigma_1=3.,
-                sigma_2=5.):
-        """Returns a systematics-corrected LightCurve.
-
-        Note that it is assumed that time and flux do not contain NaNs.
-
-        Parameters
-        ----------
-        time : array-like
-            Time measurements
-        flux : array-like
-            Data flux for every time point
-        centroid_col, centroid_row : array-like, array-like
-            Centroid column and row coordinates as a function of time
-        polyorder : int
-            Degree of the polynomial which will be used to fit one
-            centroid as a function of the other.
-        niters : int
-            Number of iterations of the aforementioned algorithm.
-        bins : int
-            Number of bins to be used in step (6) to create the
-            piece-wise interpolation of arclength vs flux correction.
-        windows : int
-            Number of windows to subdivide the data.  The SFF algorithm
-            is ran independently in each window.
-        sigma_1, sigma_2 : float, float
-            Sigma values which will be used to reject outliers
-            in steps (6) and (2), respectivelly.
-
-        Returns
-        -------
-        corrected_lightcurve : LightCurve object
-            Returns a corrected lightcurve object.
-        """
-        timecopy = time
-        time = np.array_split(time, windows)
-        flux = np.array_split(flux, windows)
-        centroid_col = np.array_split(centroid_col, windows)
-        centroid_row = np.array_split(centroid_row, windows)
-
-        flux_hat = np.array([])
-        # The SFF algorithm is going to be run on each window independently
-
-        for i in tqdm(range(windows)):
-            # To make it easier (and more numerically stable) to fit a
-            # characteristic polynomial that describes the spacecraft motion,
-            # we rotate the centroids to a new coordinate frame in which
-            # the dominant direction of motion is aligned with the x-axis.
-            self.rot_col, self.rot_row = self.rotate_centroids(centroid_col[i],
-                                                               centroid_row[i])
-            # Next, we fit the motion polynomial after removing outliers
-            self.outlier_cent = sigma_clip(data=self.rot_col,
-                                           sigma=sigma_2).mask
-            with warnings.catch_warnings():
-                # ignore warning messages related to polyfit being poorly conditioned
-                warnings.simplefilter("ignore", category=np.RankWarning)
-                coeffs = np.polyfit(self.rot_row[~self.outlier_cent],
-                                    self.rot_col[~self.outlier_cent], polyorder)
-
-            self.poly = np.poly1d(coeffs)
-            self.polyprime = np.poly1d(coeffs).deriv()
-
-            # Compute the arclength s.  It is the length of the polynomial
-            # (fitted above) that describes the typical motion.
-            x = np.linspace(np.min(self.rot_row[~self.outlier_cent]),
-                            np.max(self.rot_row[~self.outlier_cent]), 10000)
-            self.s = np.array([self.arclength(x1=xp, x=x) for xp in self.rot_row])
-
-            # Next, we find and apply the correction iteratively
-            for n in range(niters):
-                # First, fit a spline to capture the long-term varation
-                # We don't want to fit the long-term trend because we know
-                # that the K2 motion noise is a high-frequency effect.
-                self.bspline = self.fit_bspline(time[i], flux[i])
-                # Remove the long-term variation by dividing the flux by the spline
-                self.normflux = flux[i] / self.bspline(time[i] - time[i][0])
-                # Bin and interpolate normalized flux to capture the dependency
-                # of the flux as a function of arclength
-                self.interp = self.bin_and_interpolate(self.s, self.normflux, bins,
-                                                       sigma=sigma_1)
-                # Correct the raw flux
-                corrected_flux = self.normflux / self.interp(self.s)
-                flux[i] = corrected_flux
-
-            flux_hat = np.append(flux_hat, flux[i])
-
-        return LightCurve(time=timecopy, flux=flux_hat)
-
-    def rotate_centroids(self, centroid_col, centroid_row):
-        """Rotate the coordinate frame of the (col, row) centroids to a new (x,y)
-        frame in which the dominant motion of the spacecraft is aligned with
-        the x axis.  This makes it easier to fit a characteristic polynomial
-        that describes the motion."""
-        centroids = np.array([centroid_col, centroid_row])
-        _, eig_vecs = linalg.eigh(np.cov(centroids))
-        return np.dot(eig_vecs, centroids)
-
-    def _plot_rotated_centroids(self):
-        fig = plt.figure()
-        ax = fig.add_subplot(111)
-        ax.plot(self.rot_row[~self.outlier_cent], self.rot_col[~self.outlier_cent],
-                'ko', markersize=3)
-        ax.plot(self.rot_row[~self.outlier_cent], self.rot_col[~self.outlier_cent],
-                'bo', markersize=2)
-        ax.plot(self.rot_row[self.outlier_cent], self.rot_col[self.outlier_cent],
-                'ko', markersize=3)
-        ax.plot(self.rot_row[self.outlier_cent], self.rot_col[self.outlier_cent],
-                'ro', markersize=2)
-        x = np.linspace(min(self.rot_row), max(self.rot_row), 200)
-        ax.plot(x, self.poly(x), '--')
-        plt.xlabel("Rotated row centroid")
-        plt.ylabel("Rotated column centroid")
-        return ax
-
-    def _plot_normflux_arclength(self):
-        idx = np.argsort(self.s)
-        s_srtd = self.s[idx]
-        normflux_srtd = self.normflux[idx]
-
-        fig = plt.figure()
-        ax = fig.add_subplot(111)
-        ax.plot(s_srtd[~self.outlier_mask], normflux_srtd[~self.outlier_mask],
-                'ko', markersize=3)
-        ax.plot(s_srtd[~self.outlier_mask], normflux_srtd[~self.outlier_mask],
-                'bo', markersize=2)
-        ax.plot(s_srtd[self.outlier_mask], normflux_srtd[self.outlier_mask],
-                'ko', markersize=3)
-        ax.plot(s_srtd[self.outlier_mask], normflux_srtd[self.outlier_mask],
-                'ro', markersize=2)
-        ax.plot(s_srtd, self.interp(s_srtd), '--')
-        plt.xlabel(r"Arclength $(s)$")
-        plt.ylabel(r"Flux $(e^{-}s^{-1})$")
-        return ax
-
-    def arclength(self, x1, x):
-        """Compute the arclength of the polynomial used to fit the centroid
-        measurements.
-
-        Parameters
-        ----------
-        x1 : float
-            Upper limit of the integration domain.
-        x : ndarray
-            Domain at which the arclength integrand is defined.
-
-        Returns
-        -------
-        arclength : float
-            Result of the arclength integral from x[0] to x1.
-        """
-        mask = x < x1
-        return np.trapz(y=np.sqrt(1 + self.polyprime(x[mask]) ** 2), x=x[mask])
-
-    def fit_bspline(self, time, flux, s=0):
-        """s describes the "smoothness" of the spline"""
-        time = time - time[0]
-        knots = np.arange(0, time[-1], 1.5)
-        t, c, k = interpolate.splrep(time, flux, t=knots[1:], s=s, task=-1)
-        return interpolate.BSpline(t, c, k)
-
-    def bin_and_interpolate(self, s, normflux, bins, sigma):
-        idx = np.argsort(s)
-        s_srtd = s[idx]
-        normflux_srtd = normflux[idx]
-
-        self.outlier_mask = sigma_clip(data=normflux_srtd, sigma=sigma).mask
-        normflux_srtd = normflux_srtd[~self.outlier_mask]
-        s_srtd = s_srtd[~self.outlier_mask]
-
-        knots = np.array([np.min(s_srtd)]
-                         + [np.median(split) for split in np.array_split(s_srtd, bins)]
-                         + [np.max(s_srtd)])
-        bin_means = np.array([normflux_srtd[0]]
-                             + [np.mean(split) for split in np.array_split(normflux_srtd, bins)]
-                             + [normflux_srtd[-1]])
-        return interpolate.interp1d(knots, bin_means, bounds_error=False,
-                                    fill_value='extrapolate')
-
-    def breakpoints(self, campaign):
-        """Return a break point as a function of the campaign number.
-
-        The intention of this function is to implement a smart way to determine
-        the boundaries of the windows on which the SFF algorithm is applied
-        independently. However, this is not implemented yet in this version.
-        """
+    def to_fits(self):
         raise NotImplementedError()
-
-
-class KeplerCBVCorrector(object):
-    r"""Remove systematic trends from Kepler light curves by fitting
-    cotrending basis vectors.
-
-    .. math::
-
-        \arg \min_{\bm{\theta} \in \Theta} \sum_{t}|f_{SAP}(t) - \sum_{j=1}^{n}\theta_j v_{j}(t)|^p, p>0, p \in \mathbb{R}
-
-    Attributes
-    ----------
-    lc_file : KeplerLightCurveFile object or str
-        An instance from KeplerLightCurveFile or a path for the .fits
-        file of a NASA's Kepler/K2 light curve.
-    likelihood : oktopus.Likelihood subclass
-        A class that describes a cost function.
-        The default is :class:`oktopus.LaplacianLikelihood`, which is tantamount
-        to the L1 norm.
-
-    Examples
-    --------
-    >>> import matplotlib.pyplot as plt
-    >>> from lightkurve import KeplerCBVCorrector, KeplerLightCurveFile
-    >>> fn = ("https://archive.stsci.edu/missions/kepler/lightcurves/"
-    ...       "0084/008462852/kplr008462852-2011073133259_llc.fits") # doctest: +SKIP
-    >>> cbv = KeplerCBVCorrector(fn) # doctest: +SKIP
-    Downloading https://archive.stsci.edu/missions/kepler/lightcurves/0084/008462852/kplr008462852-2011073133259_llc.fits [Done]
-    >>> cbv_lc = cbv.correct() # doctest: +SKIP
-    Downloading http://archive.stsci.edu/missions/kepler/cbv/kplr2011073133259-q08-d25_lcbv.fits [Done]
-    >>> sap_lc = KeplerLightCurveFile(fn).SAP_FLUX # doctest: +SKIP
-    >>> plt.plot(sap_lc.time, sap_lc.flux, 'x', markersize=1, label='SAP_FLUX') # doctest: +SKIP
-    >>> plt.plot(cbv_lc.time, cbv_lc.flux, 'o', markersize=1, label='CBV_FLUX') # doctest: +SKIP
-    >>> plt.legend() # doctest: +SKIP
-    """
-
-    def __init__(self, lc_file, likelihood=oktopus.LaplacianLikelihood,
-                 prior=oktopus.LaplacianPrior):
-        self.lc_file = lc_file
-        self.likelihood = likelihood
-        self.prior = prior
-        self._ncbvs = 16 # number of cbvs for Kepler/K2
-
-        if self.lc_file.mission == 'Kepler':
-            self.cbv_base_url = "http://archive.stsci.edu/missions/kepler/cbv/"
-        elif self.lc_file.mission == 'K2':
-            self.cbv_base_url = "http://archive.stsci.edu/missions/k2/cbv/"
-
-    @property
-    def lc_file(self):
-        return self._lc_file
-
-    @lc_file.setter
-    def lc_file(self, value):
-        # this enables `lc_file` to be either a string
-        # or an object from KeplerLightCurveFile
-        if isinstance(value, str):
-            self._lc_file = KeplerLightCurveFile(value)
-        elif isinstance(value, KeplerLightCurveFile):
-            self._lc_file = value
-        else:
-            raise ValueError("lc_file must be either a string or a"
-                             " KeplerLightCurveFile instance, got {}.".format(value))
-
-    @property
-    def coeffs(self):
-        """
-        Returns the fitted coefficients.
-        """
-        return self._coeffs
-
-    @property
-    def opt_result(self):
-        """
-        Returns the result of the optimization process.
-        """
-        return self._opt_result
-
-    def correct(self, cbvs=[1, 2], method='powell', options={}):
-        """
-        Correct the SAP_FLUX by fitting a number of cotrending basis vectors
-        `cbvs`.
-
-        Parameters
-        ----------
-        cbvs : list of ints
-            The list of cotrending basis vectors to fit to the data. For example,
-            [1, 2] will fit the first two basis vectors.
-        method : str
-            Numerical optimization method. See scipy.optimize.minimize for the
-            full list of methods.
-        options : dict
-            Dictionary of options to be passed to scipy.optimize.minimize.
-        """
-        module, output = channel_to_module_output(self.lc_file.channel)
-        cbv_file = pyfits.open(self.get_cbv_url())
-        cbv_data = cbv_file['MODOUT_{0}_{1}'.format(module, output)].data
-
-        cbv_array = []
-        for i in cbvs:
-            cbv_array.append(cbv_data.field('VECTOR_{}'.format(i))[self.lc_file.quality_mask])
-        cbv_array = np.asarray(cbv_array)
-
-        sap_lc = self.lc_file.SAP_FLUX
-        median_sap_flux = np.nanmedian(sap_lc.flux)
-        norm_sap_flux = sap_lc.flux / median_sap_flux - 1
-        norm_err_sap_flux = sap_lc.flux_err / median_sap_flux
-
-        def mean_model(*theta):
-            coeffs = np.asarray(theta)
-            return np.dot(coeffs, cbv_array)
-
-        prior = self.prior(mean=np.zeros(len(cbvs)), var=16.)
-        likelihood = self.likelihood(data=norm_sap_flux, mean=mean_model,
-                                     var=norm_err_sap_flux)
-        x0 = likelihood.fit(x0=prior.mean, method=method, options=options).x
-        posterior = oktopus.Posterior(likelihood=likelihood, prior=prior)
-
-        self._opt_result = posterior.fit(x0=x0, method=method,
-                                         options=options)
-        self._coeffs = self._opt_result.x
-        flux_hat = sap_lc.flux - median_sap_flux * mean_model(self._coeffs)
-        return LightCurve(time=sap_lc.time, flux=flux_hat.reshape(-1))
-
-    def get_cbvs_list(self, method='bayes-factor'):
-        """Returns the subsequence of subsequent CBVs that maximizes
-        Bayes' factor [1]_.
-
-        Returns
-        -------
-        cbv_list : list
-            Subsequence of subsequent CBVs that maximizes the Bayes' factor.
-
-        References
-        ----------
-        .. [1] https://en.wikipedia.org/wiki/Bayes_factor
-        """
-
-        self.bayes_factor, cost = [], [] # bayes_factor here is actually the
-                                         # negative log of the bayes factor
-        self.correct(cbvs=[1], options={'xtol': 1e-6, 'ftol':1e-6, 'maxfev': 2000})
-        cost.append(self.opt_result.fun)
-        for n in tqdm(range(2, self._ncbvs+1)):
-            cbv_list = list(range(1, n+1))
-            self.correct(cbv_list, options={'xtol': 1e-6, 'ftol':1e-6, 'maxfev': 2000})
-            cost.append(self.opt_result.fun)
-            # cost is the negative log of the posterior evaluated at the
-            # Maximum A Posterior Probability (MAP) estimator
-            self.bayes_factor.append((cost[n-2] - cost[n-1]))
-            # so cost[n-2] - cost[n-1] = -log(p1) + log(p2) = log(p2/p1)
-            # where p1 is the posterior probability (evaluated at the MAP)
-            # for the model with n-2 cbvs and p2 is the posterior probability
-            # also evaluated at the MAP for the model with n-1 cbvs
-        k = np.argmin(self.bayes_factor)
-        # transform to get the actual Bayes factor
-        self.bayes_factor = np.exp(-np.array(self.bayes_factor))
-        # the k+2 here comes from the fact that Python indexes begin
-        # from 0 and we count CBVs starting from 1 and also
-        # note that range(1, k) equals the interval [1, k), which excludes k.
-        return list(range(1, k+2))
-
-    def get_cbv_url(self):
-        # gets the html page and finds all references to 'a' tag
-        # keeps the ones for which 'href' ends with 'fits'
-        # this might slow things down in case the user wants to fit 1e3 stars
-        soup = BeautifulSoup(requests.get(self.cbv_base_url).text, 'html.parser')
-        cbv_files = [fn['href'] for fn in soup.find_all('a') if fn['href'].endswith('fits')]
-
-        if self.lc_file.mission == 'Kepler':
-            if self.lc_file.quarter < 10:
-                quarter = 'q0' + str(self.lc_file.quarter)
-            else:
-                quarter = 'q' + str(self.lc_file.quarter)
-            for cbv_file in cbv_files:
-                if quarter + '-d25' in cbv_file:
-                    break
-        elif self.lc_file.mission == 'K2':
-            if self.lc_file.campaign <= 8:
-                campaign = 'c0' + str(self.lc_file.campaign)
-            else:
-                campaign = 'c' + str(self.lc_file.campaign)
-            for cbv_file in cbv_files:
-                if campaign in cbv_file:
-                    break
-
-        return self.cbv_base_url + cbv_file
 
 
 def iterative_box_period_search(lc, niters=2, min_period=0.5, max_period=30,
