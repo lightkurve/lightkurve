@@ -1,11 +1,14 @@
-from abc import abstractmethod
+from future import division, print_function
+
 import math
-import scipy
-import numpy as np
-import tqdm
 import sys
+
 from astropy.io import fits as pyfits
+import numpy as np
+import scipy
+import tqdm
 from oktopus.posterior import PoissonPosterior
+
 from .utils import channel_to_module_output, plot_image
 
 # This is a workaround to get the number of arguments of
@@ -53,9 +56,11 @@ class PRFPhotometry(object):
     >>> tpf = KeplerTargetPixelFile("https://archive.stsci.edu/missions/kepler/"
     ...                             "target_pixel_files/0084/008462852/"
     ...                             "kplr008462852-2013098041711_lpd-targ.fits.gz") # doctest: +SKIP
-    Downloading https://archive.stsci.edu/missions/kepler/target_pixel_files/0084/008462852/kplr008462852-2013098041711_lpd-targ.fits.gz [Done]
+    Downloading https://archive.stsci.edu/missions/kepler/target_pixel_files
+    /0084/008462852/kplr008462852-2013098041711_lpd-targ.fits.gz [Done]
     >>> prf = tpf.get_prf_model() # doctest: +SKIP
-    Downloading http://archive.stsci.edu/missions/kepler/fpc/prf/extracted/kplr16.4_2011265_prf.fits [Done]
+    Downloading http://archive.stsci.edu/missions/kepler/fpc/prf
+    /extracted/kplr16.4_2011265_prf.fits [Done]
     >>> scene = SceneModel(prfs=prf) # doctest: +SKIP
     >>> prior = UniformPrior(lb=[1.2e5, 230., 128.,1e2], ub=[3.4e5, 235., 133., 1e3]) # doctest: +SKIP
     >>> phot = PRFPhotometry(scene, prior) # doctest: +SKIP
@@ -66,7 +71,8 @@ class PRFPhotometry(object):
     >>> bkg_fit = results[:, 3] # doctest: +SKIP
     """
 
-    def __init__(self, scene_model, prior, loss_function=PoissonPosterior, **kwargs):
+    def __init__(self, scene_model, prior, loss_function=PoissonPosterior,
+                 **kwargs):
         self.scene_model = scene_model
         self.prior = prior
         self.loss_function = loss_function
@@ -232,7 +238,8 @@ class KeplerPRF(object):
     >>> import matplotlib.pyplot as plt
     >>> from lightkurve import KeplerPRF
     >>> kepprf = KeplerPRF(channel=44, shape=(10, 10), column=5, row=5) # doctest: +SKIP
-    Downloading http://archive.stsci.edu/missions/kepler/fpc/prf/extracted/kplr13.4_2011265_prf.fits [Done]
+    Downloading http://archive.stsci.edu/missions/kepler/fpc/prf
+    /extracted/kplr13.4_2011265_prf.fits [Done]
     >>> prf = kepprf(flux=1000, center_col=10, center_row=10,
     ...              scale_row=0.7, scale_col=0.7, rotation_angle=math.pi/2) # doctest: +SKIP
     >>> plt.imshow(prf, origin='lower') # doctest: +SKIP
