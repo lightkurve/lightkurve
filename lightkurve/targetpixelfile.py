@@ -1,3 +1,4 @@
+from future import division, print_function
 import warnings
 
 from astropy.io import fits

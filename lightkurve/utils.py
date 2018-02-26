@@ -1,8 +1,10 @@
-import numpy as np
-import matplotlib.pyplot as plt
+from future import divison, print_function
+
 from astropy.visualization import (PercentileInterval, ImageNormalize,
                                    SqrtStretch, LogStretch, LinearStretch)
 from astropy.time import Time
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 __all__ = ['KeplerQualityFlags', 'TessQualityFlags', 'module_output_to_channel',
@@ -239,6 +241,7 @@ def plot_image(image, ax=None, scale='linear', origin='lower',
         if show_colorbar:
             cbar = plt.colorbar(cax, ax=ax, norm=norm, label=clabel)
         return ax
+
 
 def running_mean(data, window_size):
     """Returns the moving average of an array `data`.
