@@ -177,8 +177,9 @@ def test_bin():
 
 def test_normalize():
     """Does the `LightCurve.normalize()` method normalize the flux?"""
-    lc = LightCurve(time=np.arange(10), flux=5*np.ones(10))
+    lc = LightCurve(time=np.arange(10), flux=5*np.ones(10), flux_err=0.05*np.ones(10))
     assert_allclose(np.median(lc.normalize().flux), 1)
+    assert_allclose(np.median(lc.normalize().flux_err), 0.05/5)
 
 
 @pytest.mark.remote_data
