@@ -1,6 +1,6 @@
 """Functions which wrap `astroquery.mast` to obtain Kepler/K2 data from MAST."""
 
-from future import division, print_function
+from __future__ import division, print_function
 
 import numpy as np
 from astroquery.mast import Observations
