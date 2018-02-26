@@ -1,12 +1,16 @@
-import pytest
+from __future__ import division, print_function
+
 import math
-import numpy as np
-from numpy.testing import assert_allclose
-from scipy.stats import mode
+
 from astropy.io import fits
 from astropy.utils.data import get_pkg_data_filename
-from oktopus import PoissonPosterior, UniformPrior, GaussianPrior, JointPrior
-from ..prf import SimpleKeplerPRF, KeplerPRF, SceneModel, PRFPhotometry, get_initial_guesses
+import numpy as np
+from numpy.testing import assert_allclose
+from oktopus import GaussianPrior, JointPrior, PoissonPosterior, UniformPrior
+import pytest
+from scipy.stats import mode
+
+from ..prf import KeplerPRF, PRFPhotometry, SceneModel, SimpleKeplerPRF, get_initial_guesses
 from ..targetpixelfile import KeplerTargetPixelFile
 
 

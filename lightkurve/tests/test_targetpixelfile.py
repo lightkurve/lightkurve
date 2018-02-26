@@ -1,7 +1,10 @@
+from __future__ import division, print_function
+
+from astropy.utils.data import get_pkg_data_filename
 import numpy as np
 from numpy.testing import assert_array_equal
 import pytest
-from astropy.utils.data import get_pkg_data_filename
+
 from ..targetpixelfile import KeplerTargetPixelFile, KeplerQualityFlags
 
 
