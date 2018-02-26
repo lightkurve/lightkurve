@@ -1,10 +1,11 @@
 from __future__ import division, print_function
+import datetime
+import os
 import warnings
 
 from astropy.io import fits
 from astropy.table import Table
-from astropy.time import Time
-from astropy.wcs import WCS, FITSFixedWarning
+from astropy.wcs import WCS
 from matplotlib import patches
 import numpy as np
 
@@ -542,3 +543,206 @@ class KeplerTargetPixelFile(TargetPixelFile):
         aperture_mask = self._parse_aperture_mask(aperture_mask)
         return LightCurve(flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
                           time=self.time, flux_err=self.flux_bkg_err)
+
+
+class TargetPixelFileFactory(object):
+
+    def __init__(self, n_cadences, n_rows, n_cols, target_id="unnamed-target",
+                 keywords={}):
+        self.n_cadences = n_cadences
+        self.n_rows = n_rows
+        self.n_cols = n_cols
+        self.target_id = target_id
+        self.keywords = keywords
+
+        # Initialize the 3D data structures
+        self.raw_cnts = np.empty((n_cadences, n_rows, n_cols), dtype='int')
+        self.flux = np.empty((n_cadences, n_rows, n_cols), dtype='float32')
+        self.flux_err = np.empty((n_cadences, n_rows, n_cols), dtype='float32')
+        self.flux_bkg = np.empty((n_cadences, n_rows, n_cols), dtype='float32')
+        self.flux_bkg_err = np.empty((n_cadences, n_rows, n_cols), dtype='float32')
+        self.cosmic_rays = np.empty((n_cadences, n_rows, n_cols), dtype='float32')
+
+        # Set 3D data defaults
+        self.raw_cnts[:, :, :] = -1
+        self.flux[:, :, :] = np.nan
+        self.flux_err[:, :, :] = np.nan
+        self.flux_bkg[:, :, :] = np.nan
+        self.flux_bkg_err[:, :, :] = np.nan
+        self.cosmic_rays[:, :, :] = np.nan
+
+        # Initialize the 1D data structures
+        self.mjd = np.zeros((n_cadences), dtype='float64')
+        self.time = np.zeros((n_cadences), dtype='float64')
+        self.timecorr = np.zeros((n_cadences), dtype='float32')
+        self.cadenceno = np.zeros((n_cadences), dtype='int')
+        self.quality = np.zeros((n_cadences), dtype='int')
+        self.pos_corr1 = np.zeros((n_cadences), dtype='float32')
+        self.pos_corr2 = np.zeros((n_cadences), dtype='float32')
+
+    def add_cadence(self, n, raw_cnts=None, flux=None, flux_err=None,
+                    flux_bkg=None, flux_bkg_err=None, cosmic_rays=None,
+                    mjd=None, time=None, timecorr=None, cadenceno=None,
+                    quality=None, pos_corr1=None, pos_corr2=None):
+        fields = ['raw_cnts', 'flux', 'flux_err', 'flux_bkg', 'flux_bkg_err',
+                  'cosmic_rays', 'mjd', 'time', 'timecorr', 'cadenceno',
+                  'quality', 'pos_corr1', 'pos_corr2']
+        for field in fields:
+            if locals()[field] is not None:
+                vars(self)[field][n] = locals()[field]
+
+    def get_tpf_object(self):
+        return KeplerTargetPixelFile(self._make_hdulist())
+
+    def write_fits(self, output_fn=None, overwrite=False):
+        """Creates and writes a TPF file to disk."""
+        if output_fn is None:
+            output_fn = "{}-targ.fits".format(self.target_id)
+        self._make_hdulist().writeto(output_fn, overwrite=overwrite, checksum=True)
+
+    def get_hdu(self):
+        """Returns an astropy.io.fits.HDUList object."""
+        return fits.HDUList([self._make_primary_hdu(),
+                             self._make_target_extension(),
+                             self._make_aperture_extension()])
+
+    def _header_template(self, extension):
+        """Returns a template `fits.Header` object for a given extension."""
+        template_fn = os.path.join("/home/gb/dev/kadenza/kadenza/header-templates",
+                                   "tpf-ext{}-header.txt".format(extension))
+        return fits.Header.fromtextfile(template_fn)
+
+    def _make_primary_hdu(self, keywords={}):
+        """Returns the primary extension of a Target Pixel File."""
+        hdu = fits.PrimaryHDU()
+        # Copy the default keywords from a template file from the MAST archive
+        tmpl = self._header_template(0)
+        for kw in tmpl:
+            hdu.header[kw] = (tmpl[kw], tmpl.comments[kw])
+        # Override the defaults where necessary
+        hdu.header['ORIGIN'] = "Unofficial data product"
+        hdu.header['DATE'] = datetime.datetime.now().strftime("%Y-%m-%d")
+        hdu.header['CREATOR'] = "lightkurve"
+        hdu.header['OBJECT'] = self.target_id
+        hdu.header['KEPLERID'] = self.target_id
+        # Empty a bunch of keywords rather than having incorrect info
+        for kw in ["PROCVER", "FILEVER", "CHANNEL", "MODULE", "OUTPUT",
+                   "TIMVERSN", "CAMPAIGN", "DATA_REL", "TTABLEID",
+                   "RA_OBJ", "DEC_OBJ"]:
+            hdu.header[kw] = ""
+        return hdu
+
+    def _make_target_extension(self):
+        """Create the 'TARGETTABLES' extension."""
+        # Turn the data arrays into fits columns and initialize the HDU
+        coldim = '({},{})'.format(self.n_cols, self.n_rows)
+        eformat = '{}E'.format(self.n_rows * self.n_cols)
+        jformat = '{}J'.format(self.n_rows * self.n_cols)
+        cols = []
+        cols.append(fits.Column(name='TIME', format='D', unit='BJD - 2454833',
+                                array=self.time))
+        cols.append(fits.Column(name='TIMECORR', format='E', unit='D',
+                                array=self.timecorr))
+        cols.append(fits.Column(name='CADENCENO', format='J',
+                                array=self.cadenceno))
+        cols.append(fits.Column(name='RAW_CNTS', format=jformat,
+                                unit='count', dim=coldim,
+                                array=self.raw_cnts))
+        cols.append(fits.Column(name='FLUX', format=eformat,
+                                unit='e-/s', dim=coldim,
+                                array=self.flux))
+        cols.append(fits.Column(name='FLUX_ERR', format=eformat,
+                                unit='e-/s', dim=coldim,
+                                array=self.flux_err))
+        cols.append(fits.Column(name='FLUX_BKG', format=eformat,
+                                unit='e-/s', dim=coldim,
+                                array=self.flux_bkg))
+        cols.append(fits.Column(name='FLUX_BKG_ERR', format=eformat,
+                                unit='e-/s', dim=coldim,
+                                array=self.flux_bkg_err))
+        cols.append(fits.Column(name='COSMIC_RAYS', format=eformat,
+                                unit='e-/s', dim=coldim,
+                                array=self.cosmic_rays))
+        cols.append(fits.Column(name='QUALITY', format='J',
+                                array=self.quality))
+        cols.append(fits.Column(name='POS_CORR1', format='E', unit='pixels',
+                                array=self.pos_corr1))
+        cols.append(fits.Column(name='POS_CORR2', format='E', unit='pixels',
+                                array=self.pos_corr2))
+        coldefs = fits.ColDefs(cols)
+        hdu = fits.BinTableHDU.from_columns(coldefs)
+
+        # Set the header with defaults
+        template = self._header_template(1)
+        for kw in template:
+            if kw not in ['XTENSION', 'NAXIS1', 'NAXIS2', 'CHECKSUM', 'BITPIX']:
+                try:
+                    hdu.header[kw] = (self.keywords[kw],
+                                      self.keywords.comments[kw])
+                except KeyError:
+                    hdu.header[kw] = (template[kw],
+                                      template.comments[kw])
+
+        # Override the defaults where necessary
+        hdu.header['EXTNAME'] = 'TARGETTABLES'
+        hdu.header['OBJECT'] = self.target_id
+        hdu.header['KEPLERID'] = self.target_id
+        for n in [5, 6, 7, 8, 9]:
+            hdu.header["TFORM{}".format(n)] = eformat
+            hdu.header["TDIM{}".format(n)] = coldim
+        hdu.header['TFORM4'] = jformat
+        hdu.header['TDIM4'] = coldim
+
+        return hdu
+
+    def _make_aperture_extension(self):
+        """Create the aperture mask extension."""
+        mask = 3 * np.ones((self.n_rows, self.n_cols), dtype='int32')
+        hdu = fits.ImageHDU(mask)
+
+        # Set the header from the template TPF again
+        template = self._header_template(2)
+        for kw in template:
+            if kw not in ['XTENSION', 'NAXIS1', 'NAXIS2', 'CHECKSUM', 'BITPIX']:
+                try:
+                    hdu.header[kw] = (self.keywords[kw],
+                                      self.keywords.comments[kw])
+                except KeyError:
+                    hdu.header[kw] = (template[kw],
+                                      template.comments[kw])
+        hdu.header['EXTNAME'] = 'APERTURE'
+        return hdu
+
+
+def create_tpf_hdu(images, position, size=(10, 10), target_id="unnamed-target"):
+    """
+    Example use
+    -----------
+    >>> from lightkurve.targetpixelfile import create_tpf_hdu, KeplerTargetPixelFile
+    >>> from astropy.coordinates import SkyCoord
+    >>> import numpy as np
+    >>> import glob
+    >>> position = SkyCoord('18h04m10.10s -24d24m10.4s', frame='icrs')
+    >>> images = np.sort(glob.glob("/home/gb/proj/k2superstamp/lagoon/*fits"))
+    >>> hdu = create_tpf_hdu(images, position, size=(10, 10))
+    >>> tpf = KeplerTargetPixelFile(hdu)
+    """
+    from astropy.nddata import Cutout2D
+    factory = TargetPixelFileFactory(n_cadences=len(images),
+                                     n_rows=size[0], n_cols=size[1],
+                                     target_id=target_id,
+                                     keywords=fits.open(images[0])[0].header)
+    for idx, img in enumerate(images):
+        f = fits.open(img)
+        wcs = WCS(f[0].header)
+        cutout = Cutout2D(f[0].data, position, wcs=wcs, size=size, mode='partial')
+        factory.add_cadence(n=idx, flux=cutout.data,
+                            mjd=f[0].header['MIDTIME'],
+                            time=f[0].header['MIDTIME'],
+                            timecorr=f[0].header['TIMECORR'],
+                            cadenceno=f[0].header['CADENCEN'],
+                            quality=f[0].header['QUALITY'],
+                            pos_corr1=f[0].header['POSCORR1'],
+                            pos_corr2=f[0].header['POSCORR2'])
+
+    return factory.get_hdu()
