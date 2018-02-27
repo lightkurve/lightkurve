@@ -39,14 +39,13 @@ and everyone is :ref:`invited to contribute<contributing>`.
     :caption: Tutorials
     :maxdepth: 1
 
-    How to find a planet using lightkurve? <tutorials/how-to-find-a-kepler-planet-with-lightkurve.ipynb>
-    tutorials/target-pixel-files.ipynb
-    What are light curve files? <tutorials/lightcurve-files.ipynb>
+    tutorials/section1.rst
+    tutorials/section2.rst
 
 .. toctree::
     :caption: API Documentation
     :maxdepth: 1
-    
+
     api/targetpixelfile
     api/lightcurve
     api/prf
