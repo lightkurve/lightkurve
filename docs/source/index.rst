@@ -37,7 +37,7 @@ and everyone is :ref:`invited to contribute<contributing>`.
 
 .. toctree::
     :caption: Tutorials
-    :maxdepth: 1
+    :maxdepth: 2
 
     tutorials/section1.rst
     tutorials/section2.rst
