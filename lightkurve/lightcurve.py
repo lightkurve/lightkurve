@@ -213,8 +213,8 @@ class LightCurve(object):
             by the median.
         """
         lc = copy.copy(self)
-        lc.flux = lc.flux / np.nanmedian(lc.flux)
         lc.flux_err = lc.flux_err / np.nanmedian(lc.flux)
+        lc.flux = lc.flux / np.nanmedian(lc.flux)
         return lc
 
     def remove_nans(self):
