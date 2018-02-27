@@ -6,8 +6,8 @@ In the previous section we covered the basics of how to work with each class in 
 .. toctree::
     :maxdepth: 1
 
-    2.01-how-to-detrend.ipynb
     2.02-recover-a-planet.ipynb
+    2.01-how-to-detrend.ipynb
     2.03-appending-lightcurves.ipynb
     2.04-removing-cbvs.ipynb
     2.05-making-custom-apertures.ipynb
