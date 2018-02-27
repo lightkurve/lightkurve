@@ -100,6 +100,19 @@ class KeplerCBVCorrector(object):
         """
         return self._opt_result
 
+    def _get_cbv_data(self, cbvs=[1, 2]):
+        '''Gets the CBV data for a channel and module
+        '''
+        module, output = channel_to_module_output(self.lc_file.channel)
+        cbv_file = pyfits.open(self.get_cbv_url())
+        cbv_data = cbv_file['MODOUT_{0}_{1}'.format(module, output)].data
+        time = cbv_file['MODOUT_{0}_{1}'.format(module, output)].data['TIME_MJD'][self.lc_file.quality_mask]
+        cbv_array = []
+        for i in cbvs:
+            cbv_array.append(cbv_data.field('VECTOR_{}'.format(i))[self.lc_file.quality_mask])
+        cbv_array = np.asarray(cbv_array)
+        return cbv_array, time
+
     def correct(self, cbvs=[1, 2], method='powell', options={}):
         """
         Correct the SAP_FLUX by fitting a number of cotrending basis vectors
@@ -116,14 +129,7 @@ class KeplerCBVCorrector(object):
         options : dict
             Dictionary of options to be passed to scipy.optimize.minimize.
         """
-        module, output = channel_to_module_output(self.lc_file.channel)
-        cbv_file = pyfits.open(self.get_cbv_url())
-        cbv_data = cbv_file['MODOUT_{0}_{1}'.format(module, output)].data
-
-        cbv_array = []
-        for i in cbvs:
-            cbv_array.append(cbv_data.field('VECTOR_{}'.format(i))[self.lc_file.quality_mask])
-        cbv_array = np.asarray(cbv_array)
+        cbv_array, _ = self._get_cbv_data(cbvs)
 
         sap_lc = self.lc_file.SAP_FLUX
         median_sap_flux = np.nanmedian(sap_lc.flux)
@@ -144,7 +150,8 @@ class KeplerCBVCorrector(object):
                                          options=options)
         self._coeffs = self._opt_result.x
         flux_hat = sap_lc.flux - median_sap_flux * mean_model(self._coeffs)
-        return LightCurve(time=sap_lc.time, flux=flux_hat.reshape(-1))
+        return LightCurve(time=sap_lc.time, flux=flux_hat.reshape(-1),
+                          flux_err=sap_lc.flux_err)
 
     def get_cbvs_list(self, method='bayes-factor'):
         """Returns the subsequence of subsequent CBVs that maximizes
@@ -208,6 +215,37 @@ class KeplerCBVCorrector(object):
                     break
 
         return self.cbv_base_url + cbv_file
+
+    def plot_cbvs(self, cbvs=[1, 2], ax=None):
+        '''Plot the CBVs for a given list of CBVs
+
+        Parameters
+        ----------
+        cbvs : list of ints
+            The list of cotrending basis vectors to fit to the data. For example,
+            [1, 2] will fit the first two basis vectors.
+        ax : matplotlib.pyplot.Axes.AxesSubplot
+            Matplotlib axis object. If none, one will be generated.
+        Returns
+        -------
+        ax : matplotlib.pyplot.Axes.AxesSubplot
+            Matplotlib axis object
+        '''
+        if ax is None:
+            _, ax = plt.subplots(1)
+        cbv_array, time = self._get_cbv_data(cbvs)
+        for idx, cbv in enumerate(cbv_array):
+            ax.plot(time, cbv+idx/10., label='{}'.format(idx + 1))
+        ax.set_yticks([])
+        ax.set_xlabel('Time (MJD)')
+        module, output = channel_to_module_output(self.lc_file.channel)
+        if self.lc_file.mission == 'Kepler':
+            ax.set_title('Kepler CBVs (Module : {}, Output : {}, Quarter : {})'.format(module, output, self.lc_file.quarter))
+        elif self.lc_file.mission == 'K2':
+            ax.set_title('K2 CBVs (Module : {}, Output : {}, Campaign : {})'.format(module, output, self.lc_file.campaign))
+        ax.grid(':', alpha=0.3)
+        ax.legend()
+        return ax
 
 
 class SFFCorrector(object):
@@ -418,4 +456,3 @@ class SFFCorrector(object):
         independently. However, this is not implemented yet in this version.
         """
         raise NotImplementedError()
-
