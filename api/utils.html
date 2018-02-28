@@ -33,7 +33,8 @@
         <link rel="index" title="Index"
               href="../genindex.html"/>
         <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="lightkurve 1.0.a1 documentation" href="../index.html"/> 
+    <link rel="top" title="lightkurve 1.0.a1 documentation" href="../index.html"/>
+        <link rel="up" title="API documentation" href="index.html"/> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -86,27 +87,29 @@
             
             
                 <p class="caption"><span class="caption-text">Getting started</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/quickstart.html">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing and reporting issues</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../citing.html">Citing and acknowledging</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../other_software.html">Other software</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="targetpixelfile.html">TargetPixelFile classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lightcurve.html">LightCurve classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prf.html">PSF photometry classes</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Utility functions</a><ul class="simple">
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 <p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/how-to-find-a-kepler-planet-with-lightkurve.html">How to find a planet using lightkurve?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/target-pixel-files.html">What are target pixel files?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/lightcurve-files.html">What are light curve files?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section1.html">Introduction to lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section2.html">Science with lightkurve</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API Documentation</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="targetpixelfile.html">TargetPixelFile classes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="lightcurve.html">LightCurve classes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="prf.html">PSF photometry classes</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Utility functions</a><ul class="simple">
-</ul>
-</li>
+<p class="caption"><span class="caption-text">About lightkurve</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing and reporting issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../citing.html">Citing and acknowledging lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../other_software.html">Other software</a></li>
 </ul>
 
             
@@ -136,6 +139,8 @@
 <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="index.html">API documentation</a> &raquo;</li>
       
     <li>Utility functions</li>
       <li class="wy-breadcrumbs-aside">
@@ -377,6 +382,30 @@ quality flags raised.  Returns an empty list if no flags raised.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="lightkurve.utils.channel_to_module_output">
+<code class="descclassname">lightkurve.utils.</code><code class="descname">channel_to_module_output</code><span class="sig-paren">(</span><em>channel</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/utils.html#channel_to_module_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.utils.channel_to_module_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a (module, output) pair given a CCD channel number.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>channel</strong> : int</p>
+<blockquote>
+<div><p>Channel number</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>module, output</strong> : tuple of ints</p>
+<blockquote class="last">
+<div><p>Module and Output number</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="lightkurve.utils.module_output_to_channel">
 <code class="descclassname">lightkurve.utils.</code><code class="descname">module_output_to_channel</code><span class="sig-paren">(</span><em>module</em>, <em>output</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/utils.html#module_output_to_channel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.utils.module_output_to_channel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the CCD channel number for a given module and output pair.</p>
@@ -397,30 +426,6 @@ quality flags raised.  Returns an empty list if no flags raised.</p>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>channel</strong> : int</p>
 <blockquote class="last">
 <div><p>Channel number</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="lightkurve.utils.channel_to_module_output">
-<code class="descclassname">lightkurve.utils.</code><code class="descname">channel_to_module_output</code><span class="sig-paren">(</span><em>channel</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/utils.html#channel_to_module_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.utils.channel_to_module_output" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a (module, output) pair given a CCD channel number.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>channel</strong> : int</p>
-<blockquote>
-<div><p>Channel number</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>module, output</strong> : tuple of ints</p>
-<blockquote class="last">
-<div><p>Module and Output number</p>
 </div></blockquote>
 </td>
 </tr>

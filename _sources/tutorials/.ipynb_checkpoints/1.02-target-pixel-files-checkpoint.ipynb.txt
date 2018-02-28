@@ -1,0 +1,470 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# What are Target Pixel Files?"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Target Pixel Files (TPFs) are a file common to Kepler/K2 and the TESS mission. They contain data that is usually centered around a single star.\n",
+    "\n",
+    "TPFs can be thought of as stacks of images, with one image for every timestamp the telescope took data. Each timestamp is referred to as a **cadence**. These images are cut out 'postage stamps' of the full observation to make them easier to work with. \n",
+    "\n",
+    "TPFs are given in FITS files, which you can read more about [here](https://fits.gsfc.nasa.gov/fits_primer.html). `lightkurve` includes tools for you to work directly with these files easily and intuitively.\n",
+    "\n",
+    "In this tutorial we'll cover the basics of working with TPFs. In lightcurve there are classes to work with each mission. For example `KeplerTargetPixelFile` is used to work with data from the Kepler (and K2) mission. `TessTargetPixelFile` is used to work with data from the TESS mission.\n",
+    "\n",
+    "We'll us a Kepler TPF as an example. First, let's open a file. We can do this easily with the `KeplerTargetPixelFile.from_archive` function. This will retrieve the data from the [MAST data archive](https://archive.stsci.edu/kepler/), which holds all of the Kepler and K2 data.\n",
+    "In this case we are downloading the Target Pixel File with the Kepler ID 6922244 for quarter 4 (Kepler's observations were split into quarters of a year).\n",
+    "You can also download a file with `from_archive` using the name of the target, or using the astronomical coordinates (Right Ascension and Declination, often referred to as \"RA\" and \"Dec\")."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Downloading URL https://mast.stsci.edu/api/v0/download/file?uri=mast:Kepler/url/missions/kepler/target_pixel_files/0069/006922244/kplr006922244-2010078095331_lpd-targ.fits.gz to ./mastDownload/Kepler/kplr006922244_lc_Q111111111111111111/kplr006922244-2010078095331_lpd-targ.fits.gz ... [Done]\n"
+     ]
+    }
+   ],
+   "source": [
+    "from lightkurve import KeplerTargetPixelFile\n",
+    "tpf = KeplerTargetPixelFile.from_archive(6922244, quarter=4)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can access lots of meta data using this object very simply with properties of the `KeplerTargetPixelFile` object. For example, we can find the mission name, and the quarter that the data was taken in by typing the following:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "'Kepler'"
+      ]
+     },
+     "execution_count": 3,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "tpf.mission"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "4"
+      ]
+     },
+     "execution_count": 4,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "tpf.quarter"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "You can find the full list of properties in the [API documentation](http://lightkurve.keplerscience.org/api/targetpixelfile.html)."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The most interesting data in a `KeplerTargetPixelFile` object are the `flux` and `time` values which give access to the brightness of the observed target over time. You can access the timestamps of the observations using the `time` property:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "metadata": {
+    "scrolled": true
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([ 352.37632485,  352.39675805,  352.43762445, ...,  442.16263546,\n",
+       "        442.18306983,  442.2035041 ])"
+      ]
+     },
+     "execution_count": 9,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "tpf.time"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "By default, `time` is in a Kepler-specific time frame (BKJD) in units of days. You can easily convert this into [AstroPy Time objects](http://docs.astropy.org/en/stable/time/) using the `timeobj` property:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 15,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "<Time object: scale='utc' format='jd' value=[ 2455185.37776712  2455185.39820072  2455185.43906792 ...,\n",
+       "  2455275.16300262  2455275.18343622  2455275.20386972]>"
+      ]
+     },
+     "execution_count": 15,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "tpf.timeobj"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "In turn, this gives you access to human-readable ISO timestamps using the `timeobj.iso` property:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 17,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array(['2009-12-19 21:03:59.079', '2009-12-19 21:33:24.542',\n",
+       "       '2009-12-19 22:32:15.468', ..., '2010-03-19 15:54:43.426',\n",
+       "       '2010-03-19 16:24:08.889', '2010-03-19 16:53:34.344'], \n",
+       "      dtype='<U23')"
+      ]
+     },
+     "execution_count": 17,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "tpf.timeobj.iso"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Next, let's look at the actual image data, which is available via the `flux` property:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(4020, 5, 5)"
+      ]
+     },
+     "execution_count": 7,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "tpf.flux.shape"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The `flux` data is a 4020x5x5 array in units electrons/second. The first axis is the time axis, and the images themselves are 5 pixels by 5 pixels. You can use the `plot` method on the `KeplerTargetPixelFile` object to view the data. (By default, this will show just one cadence of the data. But you can pass the cadence you want to look at to the `frame` keyword if you would like to check a particular flux point for thruster firings, cosmic rays or asteroids.)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 26,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "image/png": "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\n",
+      "text/plain": [
+       "<matplotlib.figure.Figure at 0x7f779f640f28>"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "%matplotlib inline\n",
+    "tpf.plot(frame=0);"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The values shown in this image are also directly accessible as an array:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 28,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([[             nan,   5.60793352e+00,   5.14911423e+01,\n",
+       "          8.42417450e+01,   3.02213345e+01],\n",
+       "       [  4.40456200e+01,   7.68612289e+01,   1.12277588e+03,\n",
+       "          3.22620288e+03,   4.54867767e+02],\n",
+       "       [  2.59111652e+01,   2.29075928e+02,   9.36265430e+03,\n",
+       "          2.36062734e+04,   1.20877502e+03],\n",
+       "       [  4.01008301e+01,   8.85439270e+02,   1.71021179e+03,\n",
+       "          2.62548706e+03,   7.07966064e+02],\n",
+       "       [  1.57194168e+02,   8.37134399e+02,   5.10215393e+02,\n",
+       "          1.15010413e+03,   1.83133698e+02]], dtype=float32)"
+      ]
+     },
+     "execution_count": 28,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "tpf.flux[0]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "You can use normal `numpy` methods on these to find the shape, mean etc!"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can now turn this Target Pixel File into a light curve, with a single flux value for every time value. Each of the pixels are 4 arcseconds ($4\"$) across. The point spread function (PSF) of the telescope causes the light from the star fall onto several different pixels, which can be seen in the image above. Because of this spreading, we have to sum up many pixels to collect all the light from the source. To do this we sum up all the pixels in an **aperture**. An aperture is a pixel mask, where we take only the pixels related to the target. "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The *Kepler* pipeline adds an aperture mask to each target pixel file. This aperture determines which pixels are summed to create a 1D light curve of the target. There are some science cases where you might want to create a different aperture. For example, there may be a nearby contaminant or you may want to measure the background. \n",
+    "\n",
+    "The standard pipeline aperture is easily accessed in a `KeplerTargetPixelFile` object using `tpf.pipeline_mask`, which is a boolean array:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 29,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([[False, False, False, False, False],\n",
+       "       [False, False,  True,  True, False],\n",
+       "       [False, False,  True,  True, False],\n",
+       "       [False,  True,  True,  True, False],\n",
+       "       [False, False, False,  True, False]], dtype=bool)"
+      ]
+     },
+     "execution_count": 29,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "tpf.pipeline_mask"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can also plot this aperture over the target pixel file above to see if the flux of the star is all contained within the aperture."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 30,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "<matplotlib.axes._subplots.AxesSubplot at 0x7f779f473eb8>"
+      ]
+     },
+     "execution_count": 30,
+     "metadata": {},
+     "output_type": "execute_result"
+    },
+    {
+     "data": {
+      "image/png": "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\nAAAASUVORK5CYII=\n",
+      "text/plain": [
+       "<matplotlib.figure.Figure at 0x7f779f55f3c8>"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "tpf.plot(aperture_mask=tpf.pipeline_mask)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Now that we have the aperture we can create a Simple Aperture Photometry light curve in the next tutorial."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Finally, note that you can inspect all the raw metadata of the target by taking a look at the 'header' of the FITS file, which contains information about the data set. Let's just print the first 10 lines:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 31,
+   "metadata": {
+    "scrolled": false
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "SIMPLE  =                    T / conforms to FITS standards                     \n",
+       "BITPIX  =                    8 / array data type                                \n",
+       "NAXIS   =                    0 / number of array dimensions                     \n",
+       "EXTEND  =                    T / file contains extensions                       \n",
+       "NEXTEND =                    2 / number of standard extensions                  \n",
+       "EXTNAME = 'PRIMARY '           / name of extension                              \n",
+       "EXTVER  =                    1 / extension version number (not format version)  \n",
+       "ORIGIN  = 'NASA/Ames'          / institution responsible for creating this file \n",
+       "DATE    = '2015-09-23'         / file creation date.                            \n",
+       "CREATOR = '917482 TargetPixelExporterPipelineModule' / pipeline job and program "
+      ]
+     },
+     "execution_count": 31,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "tpf.header()[:10]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "We can look at the values in the second extention of the fits file by passing an extention number to the `header` function. For example, to look at all the column titles:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 32,
+   "metadata": {
+    "scrolled": true
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "TTYPE1  = 'TIME    '           / column title: data time stamps                 \n",
+       "TTYPE2  = 'TIMECORR'           / column title: barycenter - timeslice correction\n",
+       "TTYPE3  = 'CADENCENO'          / column title: unique cadence number            \n",
+       "TTYPE4  = 'RAW_CNTS'           / column title: raw pixel counts                 \n",
+       "TTYPE5  = 'FLUX    '           / column title: calibrated pixel flux            \n",
+       "TTYPE6  = 'FLUX_ERR'           / column title: 1-sigma calibrated uncertainty   \n",
+       "TTYPE7  = 'FLUX_BKG'           / column title: calibrated background flux       \n",
+       "TTYPE8  = 'FLUX_BKG_ERR'       / column title: 1-sigma cal. background uncertain\n",
+       "TTYPE9  = 'COSMIC_RAYS'        / column title: cosmic ray detections            \n",
+       "TTYPE10 = 'QUALITY '           / column title: pixel quality flags              \n",
+       "TTYPE11 = 'POS_CORR1'          / column title: column position correction       \n",
+       "TTYPE12 = 'POS_CORR2'          / column title: row position correction          \n",
+       "TTYPE13 = 'RB_LEVEL'           / column title: rolling band level               "
+      ]
+     },
+     "execution_count": 32,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "tpf.header(1)['TTYPE*']"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.6.2"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}

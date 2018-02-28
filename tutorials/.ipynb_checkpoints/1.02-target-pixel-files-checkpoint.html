@@ -1,0 +1,793 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>What are Target Pixel Files? &mdash; lightkurve 1.0.a1 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="lightkurve 1.0.a1 documentation" href="../../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> lightkurve
+          
+
+          
+            
+            <img src="../../_static/lightkurve.png" class="logo" />
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/index.html">API documentation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../section1.html">Introduction to lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../section2.html">Science with lightkurve</a></li>
+</ul>
+<p class="caption"><span class="caption-text">About lightkurve</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing and reporting issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../citing.html">Citing and acknowledging lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../other_software.html">Other software</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">lightkurve</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+    <li>What are Target Pixel Files?</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../../_sources/tutorials/.ipynb_checkpoints/1.02-target-pixel-files-checkpoint.ipynb.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput div.prompt,
+div.nbinput div.input_area,
+div.nbinput div[class*=highlight],
+div.nbinput div[class*=highlight] pre,
+div.nboutput,
+div.nbinput div.prompt,
+div.nbinput div.output_area,
+div.nboutput div[class*=highlight],
+div.nboutput div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput,
+    div.nboutput {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput div.prompt pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput div.prompt pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput div.prompt,
+div.nboutput div.prompt {
+    min-width: 8ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+@media (max-width: 540px) {
+    div.nbinput div.prompt,
+    div.nboutput div.prompt {
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput div.prompt.empty {
+        padding: 0;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput div.prompt pre,
+div.nboutput div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput div.input_area,
+div.nboutput div.output_area {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput div.input_area,
+    div.nboutput div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput div.input_area {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+/* nice headers on first paragraph of info/warning boxes */
+.admonition .first {
+    margin: -12px;
+    padding: 6px 12px;
+    margin-bottom: 12px;
+    color: #fff;
+    line-height: 1;
+    display: block;
+}
+.admonition.warning .first {
+    background: #f0b37e;
+}
+.admonition.note .first {
+    background: #6ab0de;
+}
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+</style>
+<div class="section" id="What-are-Target-Pixel-Files?">
+<h1>What are Target Pixel Files?<a class="headerlink" href="#What-are-Target-Pixel-Files?" title="Permalink to this headline">¶</a></h1>
+<p>Target Pixel Files (TPFs) are a file common to Kepler/K2 and the TESS
+mission. They contain data that is usually centered around a single
+star.</p>
+<p>TPFs can be thought of as stacks of images, with one image for every
+timestamp the telescope took data. Each timestamp is referred to as a
+<strong>cadence</strong>. These images are cut out ‘postage stamps’ of the full
+observation to make them easier to work with.</p>
+<p>TPFs are given in FITS files, which you can read more about
+<a class="reference external" href="https://fits.gsfc.nasa.gov/fits_primer.html">here</a>. <code class="docutils literal"><span class="pre">lightkurve</span></code>
+includes tools for you to work directly with these files easily and
+intuitively.</p>
+<p>In this tutorial we’ll cover the basics of working with TPFs. In
+lightcurve there are classes to work with each mission. For example
+<code class="docutils literal"><span class="pre">KeplerTargetPixelFile</span></code> is used to work with data from the Kepler (and
+K2) mission. <code class="docutils literal"><span class="pre">TessTargetPixelFile</span></code> is used to work with data from the
+TESS mission.</p>
+<p>We’ll us a Kepler TPF as an example. First, let’s open a file. We can do
+this easily with the <code class="docutils literal"><span class="pre">KeplerTargetPixelFile.from_archive</span></code> function.
+This will retrieve the data from the <a class="reference external" href="https://archive.stsci.edu/kepler/">MAST data
+archive</a>, which holds all of the
+Kepler and K2 data. In this case we are downloading the Target Pixel
+File with the Kepler ID 6922244 for quarter 4 (Kepler’s observations
+were split into quarters of a year). You can also download a file with
+<code class="docutils literal"><span class="pre">from_archive</span></code> using the name of the target, or using the astronomical
+coordinates (Right Ascension and Declination, often referred to as “RA”
+and “Dec”).</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>from lightkurve import KeplerTargetPixelFile
+tpf = KeplerTargetPixelFile.from_archive(6922244, quarter=4)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Downloading URL https://mast.stsci.edu/api/v0/download/file?uri=mast:Kepler/url/missions/kepler/target_pixel_files/0069/006922244/kplr006922244-2010078095331_lpd-targ.fits.gz to ./mastDownload/Kepler/kplr006922244_lc_Q111111111111111111/kplr006922244-2010078095331_lpd-targ.fits.gz ... [Done]
+</pre></div></div>
+</div>
+<p>We can access lots of meta data using this object very simply with
+properties of the <code class="docutils literal"><span class="pre">KeplerTargetPixelFile</span></code> object. For example, we can
+find the mission name, and the quarter that the data was taken in by
+typing the following:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>tpf.mission
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[3]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>&#39;Kepler&#39;
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>tpf.quarter
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[4]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>4
+</pre></div>
+</div>
+</div>
+<p>You can find the full list of properties in the <a class="reference external" href="http://lightkurve.keplerscience.org/api/targetpixelfile.html">API
+documentation</a>.</p>
+<p>The most interesting data in a <code class="docutils literal"><span class="pre">KeplerTargetPixelFile</span></code> object are the
+<code class="docutils literal"><span class="pre">flux</span></code> and <code class="docutils literal"><span class="pre">time</span></code> values which give access to the brightness of the
+observed target over time. You can access the timestamps of the
+observations using the <code class="docutils literal"><span class="pre">time</span></code> property:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>tpf.time
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[9]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>array([ 352.37632485,  352.39675805,  352.43762445, ...,  442.16263546,
+        442.18306983,  442.2035041 ])
+</pre></div>
+</div>
+</div>
+<p>By default, <code class="docutils literal"><span class="pre">time</span></code> is in a Kepler-specific time frame (BKJD) in units
+of days. You can easily convert this into <a class="reference external" href="http://docs.astropy.org/en/stable/time/">AstroPy Time
+objects</a> using the
+<code class="docutils literal"><span class="pre">timeobj</span></code> property:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>tpf.timeobj
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[15]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>&lt;Time object: scale=&#39;utc&#39; format=&#39;jd&#39; value=[ 2455185.37776712  2455185.39820072  2455185.43906792 ...,
+  2455275.16300262  2455275.18343622  2455275.20386972]&gt;
+</pre></div>
+</div>
+</div>
+<p>In turn, this gives you access to human-readable ISO timestamps using
+the <code class="docutils literal"><span class="pre">timeobj.iso</span></code> property:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>tpf.timeobj.iso
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[17]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>array([&#39;2009-12-19 21:03:59.079&#39;, &#39;2009-12-19 21:33:24.542&#39;,
+       &#39;2009-12-19 22:32:15.468&#39;, ..., &#39;2010-03-19 15:54:43.426&#39;,
+       &#39;2010-03-19 16:24:08.889&#39;, &#39;2010-03-19 16:53:34.344&#39;],
+      dtype=&#39;&lt;U23&#39;)
+</pre></div>
+</div>
+</div>
+<p>Next, let’s look at the actual image data, which is available via the
+<code class="docutils literal"><span class="pre">flux</span></code> property:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>tpf.flux.shape
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[7]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>(4020, 5, 5)
+</pre></div>
+</div>
+</div>
+<p>The <code class="docutils literal"><span class="pre">flux</span></code> data is a 4020x5x5 array in units electrons/second. The
+first axis is the time axis, and the images themselves are 5 pixels by 5
+pixels. You can use the <code class="docutils literal"><span class="pre">plot</span></code> method on the <code class="docutils literal"><span class="pre">KeplerTargetPixelFile</span></code>
+object to view the data. (By default, this will show just one cadence of
+the data. But you can pass the cadence you want to look at to the
+<code class="docutils literal"><span class="pre">frame</span></code> keyword if you would like to check a particular flux point for
+thruster firings, cosmic rays or asteroids.)</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>%matplotlib inline
+tpf.plot(frame=0);
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_.ipynb_checkpoints_1.02-target-pixel-files-checkpoint_16_0.png" src="../../_images/tutorials_.ipynb_checkpoints_1.02-target-pixel-files-checkpoint_16_0.png" />
+</div>
+</div>
+<p>The values shown in this image are also directly accessible as an array:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>tpf.flux[0]
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[28]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>array([[             nan,   5.60793352e+00,   5.14911423e+01,
+          8.42417450e+01,   3.02213345e+01],
+       [  4.40456200e+01,   7.68612289e+01,   1.12277588e+03,
+          3.22620288e+03,   4.54867767e+02],
+       [  2.59111652e+01,   2.29075928e+02,   9.36265430e+03,
+          2.36062734e+04,   1.20877502e+03],
+       [  4.01008301e+01,   8.85439270e+02,   1.71021179e+03,
+          2.62548706e+03,   7.07966064e+02],
+       [  1.57194168e+02,   8.37134399e+02,   5.10215393e+02,
+          1.15010413e+03,   1.83133698e+02]], dtype=float32)
+</pre></div>
+</div>
+</div>
+<p>You can use normal <code class="docutils literal"><span class="pre">numpy</span></code> methods on these to find the shape, mean
+etc!</p>
+<p>We can now turn this Target Pixel File into a light curve, with a single
+flux value for every time value. Each of the pixels are 4 arcseconds
+(<span class="math">\(4&quot;\)</span>) across. The point spread function (PSF) of the telescope
+causes the light from the star fall onto several different pixels, which
+can be seen in the image above. Because of this spreading, we have to
+sum up many pixels to collect all the light from the source. To do this
+we sum up all the pixels in an <strong>aperture</strong>. An aperture is a pixel
+mask, where we take only the pixels related to the target.</p>
+<p>The <em>Kepler</em> pipeline adds an aperture mask to each target pixel file.
+This aperture determines which pixels are summed to create a 1D light
+curve of the target. There are some science cases where you might want
+to create a different aperture. For example, there may be a nearby
+contaminant or you may want to measure the background.</p>
+<p>The standard pipeline aperture is easily accessed in a
+<code class="docutils literal"><span class="pre">KeplerTargetPixelFile</span></code> object using <code class="docutils literal"><span class="pre">tpf.pipeline_mask</span></code>, which is a
+boolean array:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [29]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>tpf.pipeline_mask
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[29]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>array([[False, False, False, False, False],
+       [False, False,  True,  True, False],
+       [False, False,  True,  True, False],
+       [False,  True,  True,  True, False],
+       [False, False, False,  True, False]], dtype=bool)
+</pre></div>
+</div>
+</div>
+<p>We can also plot this aperture over the target pixel file above to see
+if the flux of the star is all contained within the aperture.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [30]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>tpf.plot(aperture_mask=tpf.pipeline_mask)
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[30]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f779f473eb8&gt;
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_.ipynb_checkpoints_1.02-target-pixel-files-checkpoint_24_1.png" src="../../_images/tutorials_.ipynb_checkpoints_1.02-target-pixel-files-checkpoint_24_1.png" />
+</div>
+</div>
+<p>Now that we have the aperture we can create a Simple Aperture Photometry
+light curve in the next tutorial.</p>
+<p>Finally, note that you can inspect all the raw metadata of the target by
+taking a look at the ‘header’ of the FITS file, which contains
+information about the data set. Let’s just print the first 10 lines:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [31]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>tpf.header()[:10]
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[31]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>SIMPLE  =                    T / conforms to FITS standards
+BITPIX  =                    8 / array data type
+NAXIS   =                    0 / number of array dimensions
+EXTEND  =                    T / file contains extensions
+NEXTEND =                    2 / number of standard extensions
+EXTNAME = &#39;PRIMARY &#39;           / name of extension
+EXTVER  =                    1 / extension version number (not format version)
+ORIGIN  = &#39;NASA/Ames&#39;          / institution responsible for creating this file
+DATE    = &#39;2015-09-23&#39;         / file creation date.
+CREATOR = &#39;917482 TargetPixelExporterPipelineModule&#39; / pipeline job and program
+</pre></div>
+</div>
+</div>
+<p>We can look at the values in the second extention of the fits file by
+passing an extention number to the <code class="docutils literal"><span class="pre">header</span></code> function. For example, to
+look at all the column titles:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [32]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>tpf.header(1)[&#39;TTYPE*&#39;]
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[32]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>TTYPE1  = &#39;TIME    &#39;           / column title: data time stamps
+TTYPE2  = &#39;TIMECORR&#39;           / column title: barycenter - timeslice correction
+TTYPE3  = &#39;CADENCENO&#39;          / column title: unique cadence number
+TTYPE4  = &#39;RAW_CNTS&#39;           / column title: raw pixel counts
+TTYPE5  = &#39;FLUX    &#39;           / column title: calibrated pixel flux
+TTYPE6  = &#39;FLUX_ERR&#39;           / column title: 1-sigma calibrated uncertainty
+TTYPE7  = &#39;FLUX_BKG&#39;           / column title: calibrated background flux
+TTYPE8  = &#39;FLUX_BKG_ERR&#39;       / column title: 1-sigma cal. background uncertain
+TTYPE9  = &#39;COSMIC_RAYS&#39;        / column title: cosmic ray detections
+TTYPE10 = &#39;QUALITY &#39;           / column title: pixel quality flags
+TTYPE11 = &#39;POS_CORR1&#39;          / column title: column position correction
+TTYPE12 = &#39;POS_CORR2&#39;          / column title: row position correction
+TTYPE13 = &#39;RB_LEVEL&#39;           / column title: rolling band level
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright lightkurve developers and contributors.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'1.0.a1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
