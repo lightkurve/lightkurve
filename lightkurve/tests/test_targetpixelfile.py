@@ -4,6 +4,7 @@ from astropy.utils.data import get_pkg_data_filename
 import numpy as np
 from numpy.testing import assert_array_equal
 import pytest
+import tempfile
 
 from ..targetpixelfile import KeplerTargetPixelFile, KeplerQualityFlags
 
@@ -156,3 +157,10 @@ def test_to_lightcurve():
     tpf.to_lightcurve(aperture_mask='all')
     tpf.get_bkg_lightcurve()
     tpf.get_bkg_lightcurve(aperture_mask='all')
+
+
+def test_tpf_to_fits():
+    """Can we write a TPF back to a fits file?"""
+    tpf = KeplerTargetPixelFile(filename_tpf_all_zeros)
+    tmpfile = tempfile.NamedTemporaryFile()
+    tpf.to_fits(tmpfile.name)
