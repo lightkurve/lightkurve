@@ -144,6 +144,24 @@ class KeplerTargetPixelFile(TargetPixelFile):
     def __repr__(self):
         return('KeplerTargetPixelFile Object (ID: {})'.format(self.keplerid))
 
+    def from_fits_images(self, images):
+        """
+        Attributes
+        ----------
+        images : list of str, or ImageHDU objects
+            Can be a list of FITS filenames (with suffix [ext] -- will use
+            the first image extension by default), or ImageHDU objects.
+        position : astropy.SkyCoord
+            Optional.  Position around which to cut out.
+        size : (int, int)
+            (cols, rows) to cut out.
+
+        Returns
+        -------
+        tpf : KeplerTargetPixelFile
+        """
+        pass
+
     @property
     def hdu(self):
         return self._hdu
