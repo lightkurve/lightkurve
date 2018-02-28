@@ -39,7 +39,6 @@ and everyone is :ref:`invited to contribute<contributing>`.
 
     tutorials/section1.rst
     tutorials/section2.rst
-    tutorials/section3.rst
 
 .. toctree::
     :caption: About lightkurve
