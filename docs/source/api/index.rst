@@ -1,5 +1,5 @@
 *****************
-API Documentation
+API documentation
 *****************
 
 .. toctree::

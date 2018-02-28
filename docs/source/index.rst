@@ -31,9 +31,7 @@ and everyone is :ref:`invited to contribute<contributing>`.
 
    tutorials/quickstart.ipynb
    install
-   contributing
-   citing
-   other_software
+   api/index
 
 .. toctree::
     :caption: Tutorials
@@ -44,10 +42,9 @@ and everyone is :ref:`invited to contribute<contributing>`.
     tutorials/section3.rst
 
 .. toctree::
-    :caption: API Documentation
+    :caption: About lightkurve
     :maxdepth: 1
 
-    api/targetpixelfile
-    api/lightcurve
-    api/prf
-    api/utils
+    contributing
+    citing
+    other_software
