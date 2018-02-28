@@ -4,6 +4,7 @@ import os
 import warnings
 
 from astropy.io import fits
+from astropy.nddata import Cutout2D
 from astropy.table import Table
 from astropy.wcs import WCS
 from matplotlib import patches
@@ -143,24 +144,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
     def __repr__(self):
         return('KeplerTargetPixelFile Object (ID: {})'.format(self.keplerid))
-
-    def from_fits_images(self, images):
-        """
-        Attributes
-        ----------
-        images : list of str, or ImageHDU objects
-            Can be a list of FITS filenames (with suffix [ext] -- will use
-            the first image extension by default), or ImageHDU objects.
-        position : astropy.SkyCoord
-            Optional.  Position around which to cut out.
-        size : (int, int)
-            (cols, rows) to cut out.
-
-        Returns
-        -------
-        tpf : KeplerTargetPixelFile
-        """
-        pass
 
     @property
     def hdu(self):
@@ -401,10 +384,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
         except:
             return None
 
-    def to_fits(self):
-        """Save the TPF to fits"""
-        raise NotImplementedError
-
     def _parse_aperture_mask(self, aperture_mask):
         """Parse the `aperture_mask` parameter as given by a user.
 
@@ -563,8 +542,67 @@ class KeplerTargetPixelFile(TargetPixelFile):
         return LightCurve(flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
                           time=self.time, flux_err=self.flux_bkg_err)
 
+    def to_fits(self, output_fn=None, overwrite=False):
+        """Writes the TPF to a FITS file on disk."""
+        if output_fn is None:
+            output_fn = "{}-targ.fits".format(self.keplerid)
+        self.hdu.writeto(output_fn, overwrite=overwrite, checksum=True)
 
-class TargetPixelFileFactory(object):
+    @staticmethod
+    def from_fits_images(images, position, size=(10, 10), extension=None,
+                         target_id="unnamed-target"):
+        """Creates a new Target Pixel File from a set of images.
+
+        This can be used to cut out a TPF from a series of FFI or superstamp
+        images.
+
+        Attributes
+        ----------
+        images : list of str, or list of fits.ImageHDU objects
+            Sorted list of FITS filename paths or ImageHDU objects to get
+            the data from.
+        position : astropy.SkyCoord
+            Position around which to cut out pixels.
+        size : (int, int)
+            Dimensions (cols, rows) to cut out around `position`.
+        extension : int or str
+            If `images` is a list of filenames, provide the extension number
+            or name to use. Default: 0.
+        target_id : int or str
+            Unique identifier of the target to be recorded in the TPF.
+
+        Returns
+        -------
+        tpf : KeplerTargetPixelFile
+            A new Target Pixel File assembled from the images.
+        """
+        if extension is None:
+            if isinstance(images[0], str) and images[0].endswith("ffic.fits"):
+                extension = 1  # TESS FFIs have the image data in extension #1
+            else:
+                extension = 0  # Default is to use the primary HDU
+
+        factory = KeplerTargetPixelFileFactory(n_cadences=len(images),
+                                               n_rows=size[0],
+                                               n_cols=size[1],
+                                               target_id=target_id)
+        for idx, img in enumerate(images):
+            if isinstance(img, fits.ImageHDU):
+                hdu = img
+            elif isinstance(img, fits.HDUList):
+                hdu = img[extension]
+            else:
+                hdu = fits.open(img)[extension]
+            if idx == 0:  # Get default keyword values from the first image
+                factory.keywords = hdu.header
+            cutout = Cutout2D(hdu.data, position, wcs=WCS(hdu.header),
+                              size=size, mode='partial')
+            factory.add_cadence(frameno=idx, flux=cutout.data, header=hdu.header)
+        return factory.get_tpf()
+
+
+class KeplerTargetPixelFileFactory(object):
+    """Class to create a KeplerTargetPixelFile."""
 
     def __init__(self, n_cadences, n_rows, n_cols, target_id="unnamed-target",
                  keywords={}):
@@ -591,35 +629,43 @@ class TargetPixelFileFactory(object):
         self.cosmic_rays[:, :, :] = np.nan
 
         # Initialize the 1D data structures
-        self.mjd = np.zeros((n_cadences), dtype='float64')
-        self.time = np.zeros((n_cadences), dtype='float64')
-        self.timecorr = np.zeros((n_cadences), dtype='float32')
-        self.cadenceno = np.zeros((n_cadences), dtype='int')
-        self.quality = np.zeros((n_cadences), dtype='int')
-        self.pos_corr1 = np.zeros((n_cadences), dtype='float32')
-        self.pos_corr2 = np.zeros((n_cadences), dtype='float32')
+        self.mjd = np.zeros(n_cadences, dtype='float64')
+        self.time = np.zeros(n_cadences, dtype='float64')
+        self.timecorr = np.zeros(n_cadences, dtype='float32')
+        self.cadenceno = np.zeros(n_cadences, dtype='int')
+        self.quality = np.zeros(n_cadences, dtype='int')
+        self.pos_corr1 = np.zeros(n_cadences, dtype='float32')
+        self.pos_corr2 = np.zeros(n_cadences, dtype='float32')
 
-    def add_cadence(self, n, raw_cnts=None, flux=None, flux_err=None,
+    def add_cadence(self, frameno, raw_cnts=None, flux=None, flux_err=None,
                     flux_bkg=None, flux_bkg_err=None, cosmic_rays=None,
-                    mjd=None, time=None, timecorr=None, cadenceno=None,
-                    quality=None, pos_corr1=None, pos_corr2=None):
-        fields = ['raw_cnts', 'flux', 'flux_err', 'flux_bkg', 'flux_bkg_err',
-                  'cosmic_rays', 'mjd', 'time', 'timecorr', 'cadenceno',
-                  'quality', 'pos_corr1', 'pos_corr2']
-        for field in fields:
-            if locals()[field] is not None:
-                vars(self)[field][n] = locals()[field]
+                    header={}):
+        """Populate the data for a single cadence."""
+        # 2D-data
+        for col in ['raw_cnts', 'flux', 'flux_err', 'flux_bkg',
+                    'flux_bkg_err', 'cosmic_rays']:
+            if locals()[col] is not None:
+                vars(self)[col][frameno] = locals()[col]
+        # 1D-data
+        if 'MIDTIME' in header:
+            self.mjd[frameno] = header['MIDTIME']
+            self.time[frameno] = header['MIDTIME']
+        if 'TIMECORR' in header:
+            self.timecorr[frameno] = header['TIMECORR']
+        if 'CADENCEN' in header:
+            self.cadenceno[frameno] = header['CADENCEN']
+        if 'QUALITY' in header:
+            self.quality[frameno] = header['QUALITY']
+        if 'POSCORR1' in header:
+            self.pos_corr1[frameno] = header['POSCORR1']
+        if 'POSCORR2' in header:
+            self.pos_corr2[frameno] = header['POSCORR2']
 
-    def get_tpf_object(self):
-        return KeplerTargetPixelFile(self._make_hdulist())
+    def get_tpf(self):
+        """Returns a KeplerTargetPixelFile object."""
+        return KeplerTargetPixelFile(self._hdulist())
 
-    def write_fits(self, output_fn=None, overwrite=False):
-        """Creates and writes a TPF file to disk."""
-        if output_fn is None:
-            output_fn = "{}-targ.fits".format(self.target_id)
-        self._make_hdulist().writeto(output_fn, overwrite=overwrite, checksum=True)
-
-    def get_hdu(self):
+    def _hdulist(self):
         """Returns an astropy.io.fits.HDUList object."""
         return fits.HDUList([self._make_primary_hdu(),
                              self._make_target_extension(),
@@ -632,7 +678,7 @@ class TargetPixelFileFactory(object):
         return fits.Header.fromtextfile(template_fn)
 
     def _make_primary_hdu(self, keywords={}):
-        """Returns the primary extension of a Target Pixel File."""
+        """Returns the primary extension (#0)."""
         hdu = fits.PrimaryHDU()
         # Copy the default keywords from a template file from the MAST archive
         tmpl = self._header_template(0)
@@ -652,7 +698,7 @@ class TargetPixelFileFactory(object):
         return hdu
 
     def _make_target_extension(self):
-        """Create the 'TARGETTABLES' extension."""
+        """Create the 'TARGETTABLES' extension (i.e. extension #1)."""
         # Turn the data arrays into fits columns and initialize the HDU
         coldim = '({},{})'.format(self.n_cols, self.n_rows)
         eformat = '{}E'.format(self.n_rows * self.n_cols)
@@ -715,7 +761,7 @@ class TargetPixelFileFactory(object):
         return hdu
 
     def _make_aperture_extension(self):
-        """Create the aperture mask extension."""
+        """Create the aperture mask extension (i.e. extension #2)."""
         mask = 3 * np.ones((self.n_rows, self.n_cols), dtype='int32')
         hdu = fits.ImageHDU(mask)
 
@@ -731,26 +777,3 @@ class TargetPixelFileFactory(object):
                                       template.comments[kw])
         hdu.header['EXTNAME'] = 'APERTURE'
         return hdu
-
-
-def create_tpf_hdu(images, position, size=(10, 10), target_id="unnamed-target"):
-    """Returns a TPF HDUList cut out from a set of images."""
-    from astropy.nddata import Cutout2D
-    factory = TargetPixelFileFactory(n_cadences=len(images),
-                                     n_rows=size[0], n_cols=size[1],
-                                     target_id=target_id,
-                                     keywords=fits.open(images[0])[0].header)
-    for idx, img in enumerate(images):
-        f = fits.open(img)
-        wcs = WCS(f[0].header)
-        cutout = Cutout2D(f[0].data, position, wcs=wcs, size=size, mode='partial')
-        factory.add_cadence(n=idx, flux=cutout.data,
-                            mjd=f[0].header['MIDTIME'],
-                            time=f[0].header['MIDTIME'],
-                            timecorr=f[0].header['TIMECORR'],
-                            cadenceno=f[0].header['CADENCEN'],
-                            quality=f[0].header['QUALITY'],
-                            pos_corr1=f[0].header['POSCORR1'],
-                            pos_corr2=f[0].header['POSCORR2'])
-
-    return factory.get_hdu()
