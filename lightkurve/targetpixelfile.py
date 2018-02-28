@@ -474,7 +474,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         return col_centr, row_centr
 
     def plot(self, ax=None, frame=0, cadenceno=None, bkg=False, aperture_mask=None,
-            show_colorbar=True, mask_color='pink', **kwargs):
+             show_colorbar=True, mask_color='pink', **kwargs):
         """
         Plot a target pixel file at a given frame (index) or cadence number.
 
