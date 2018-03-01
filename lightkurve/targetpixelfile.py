@@ -9,6 +9,7 @@ from astropy.table import Table
 from astropy.wcs import WCS
 from matplotlib import patches
 import numpy as np
+import pandas as pd
 from tqdm import tqdm
 
 from . import PACKAGEDIR
@@ -35,6 +36,51 @@ class TargetPixelFile(object):
             for each cadence.
         """
         pass
+
+    def describe(self):
+        '''Print out a description of each of the non-callable attributes of a
+        TargetPixelFile object.
+
+        Prints in order of type (ints, strings, lists, arrays and others)
+        Prints in alphabetical order.'''
+        attrs = {}
+        for attr in dir(self):
+            if not attr.startswith('_'):
+                res = getattr(self,attr)
+                if callable(res):
+                    continue
+                attrs[attr] = {'res':res}
+                if isinstance(res, int):
+                    attrs[attr]['print'] = '{}'.format(res)
+                    attrs[attr]['type'] = 'int'
+                elif isinstance(res, np.ndarray):
+                    attrs[attr]['print'] = 'np.ndarray shape {}'.format(res.shape)
+                    attrs[attr]['type'] = 'array'
+                elif isinstance(res, list):
+                    attrs[attr]['print'] = 'list length {}'.format(len(res))
+                    attrs[attr]['type'] = 'list'
+                elif isinstance(res, str):
+                    if res == '':
+                        attrs[attr]['print'] = '{}'.format('None')
+                    else:
+                        attrs[attr]['print'] = '{}'.format(res)
+                    attrs[attr]['type'] = 'str'
+                elif attr == 'wcs':
+                    attrs[attr]['print'] = 'astropy.wcs.wcs.WCS'.format(attr)
+                    attrs[attr]['type'] = 'other'
+                else:
+                    attrs[attr]['print'] = '{}'.format(res)
+                    attrs[attr]['type'] = 'other'
+        output = pd.DataFrame(columns=['Attribute', 'Description'], dtype=str)
+        idx = 0
+        types = ['int','str', 'list', 'array', 'other']
+        for typ in types:
+            for attr, dic in attrs.items():
+                if dic['type'] == typ:
+                    output.loc[idx, ['Attribute', 'Description']] = [attr, dic['print']]
+                    idx+=1
+        print (output.to_string(index=False))
+
 
 
 class TessTargetPixelFile(TargetPixelFile):
