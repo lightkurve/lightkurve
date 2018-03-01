@@ -74,14 +74,15 @@ class KeplerTargetPixelFile(TargetPixelFile):
             * "hard": removes more flags, known to remove good data
             * "hardest": removes all data that has been flagged
 
+        See the `KeplerQualityFlags` class for details on the bitmasks.
+
     References
     ----------
     .. [1] Kepler: A Search for Terrestrial Planets. Kepler Archive Manual.
         http://archive.stsci.edu/kepler/manuals/archive_manual.pdf
     """
 
-    def __init__(self, path, quality_bitmask=KeplerQualityFlags.DEFAULT_BITMASK,
-                 **kwargs):
+    def __init__(self, path, quality_bitmask='default', **kwargs):
         self.path = path
         self.hdu = fits.open(self.path, **kwargs)
         self.quality_bitmask = quality_bitmask

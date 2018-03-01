@@ -83,12 +83,13 @@ class KeplerLightCurveFile(LightCurveFile):
             * default: recommended quality mask
             * hard: removes more flags, known to remove good data
             * hardest: removes all data that has been flagged
+
+        See the `KeplerQualityFlags` class for details on the bitmasks.
     kwargs : dict
         Keyword arguments to be passed to astropy.io.fits.open.
     """
 
-    def __init__(self, path, quality_bitmask=KeplerQualityFlags.DEFAULT_BITMASK,
-                 **kwargs):
+    def __init__(self, path, quality_bitmask='default', **kwargs):
         super(KeplerLightCurveFile, self).__init__(path, **kwargs)
         self.quality_bitmask = quality_bitmask
         self.quality_mask = self._quality_mask(quality_bitmask)
@@ -277,12 +278,13 @@ class TessLightCurveFile(LightCurveFile):
             * default: recommended quality mask
             * hard: removes more flags, known to remove good data
             * hardest: removes all data that has been flagged
+
+        See the `TessQualityFlags` class for details on the bitmasks.
     kwargs : dict
         Keyword arguments to be passed to astropy.io.fits.open.
     """
 
-    def __init__(self, path, quality_bitmask=TessQualityFlags.DEFAULT_BITMASK,
-                 **kwargs):
+    def __init__(self, path, quality_bitmask='default', **kwargs):
         super(TessLightCurveFile, self).__init__(path, **kwargs)
         self.quality_bitmask = quality_bitmask
         self.quality_mask = self._quality_mask(quality_bitmask)
