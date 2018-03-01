@@ -562,8 +562,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
                          target_id="unnamed-target", **kwargs):
         """Creates a new Target Pixel File from a set of images.
 
-        This can be used to cut out a TPF from a series of FFI or superstamp
-        images.
+        This method is intended to make it easy to cut out targets from
+        Kepler/K2 "superstamp" regions or TESS FFI images.
 
         Attributes
         ----------
@@ -579,6 +579,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
             or name to use. Default: 0.
         target_id : int or str
             Unique identifier of the target to be recorded in the TPF.
+        **kwargs : dict
+            Extra arguments to be passed to the `KeplerTargetPixelFile` constructor.
 
         Returns
         -------
