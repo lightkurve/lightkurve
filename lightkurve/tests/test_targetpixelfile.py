@@ -6,7 +6,7 @@ import numpy as np
 from numpy.testing import assert_array_equal
 import pytest
 import tempfile
-
+import sys
 from ..targetpixelfile import KeplerTargetPixelFile, KeplerTargetPixelFileFactory
 from ..utils import KeplerQualityFlags
 
@@ -188,3 +188,11 @@ def test_tpf_factory():
     assert_array_equal(tpf.flux[9], flux_9)
     assert(tpf.time[0] == 5)
     assert(tpf.time[9] == 95)
+
+def test_properties(capfd):
+    '''Test if the describe function produces an output.
+    The output is 1870 characters at the moment, but we might add more properties.'''
+    tpf = KeplerTargetPixelFile(filename_tpf_all_zeros)
+    tpf.properties()
+    out, err = capfd.readouterr()
+    assert len(out) > 1000
