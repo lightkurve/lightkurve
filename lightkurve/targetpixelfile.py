@@ -596,7 +596,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                                n_cols=size[1],
                                                target_id=target_id)
         for idx, img in tqdm(enumerate(images), total=len(images)):
-            t0 = time.time()
             if isinstance(img, fits.ImageHDU):
                 hdu = img
             elif isinstance(img, fits.HDUList):
