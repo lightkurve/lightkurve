@@ -1,5 +1,6 @@
 from __future__ import division, print_function
 
+import os
 from astropy.utils.data import get_pkg_data_filename
 import numpy as np
 from numpy.testing import assert_array_equal
@@ -162,5 +163,11 @@ def test_to_lightcurve():
 def test_tpf_to_fits():
     """Can we write a TPF back to a fits file?"""
     tpf = KeplerTargetPixelFile(filename_tpf_all_zeros)
-    tmpfile = tempfile.NamedTemporaryFile()
-    tpf.to_fits(tmpfile.name)
+    # `delete=False` is necessary to enable writing to the file on Windows
+    # but it means we have to clean up the tmp file ourselves
+    tmp = tempfile.NamedTemporaryFile(delete=False)
+    try:
+        tpf.to_fits(tmp.name)
+    finally:
+        tmp.close()
+        os.remove(tmp.name)
