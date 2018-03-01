@@ -9,6 +9,7 @@ from astropy.table import Table
 from astropy.wcs import WCS
 from matplotlib import patches
 import numpy as np
+from tqdm import tqdm
 
 from . import PACKAGEDIR
 from .lightcurve import KeplerLightCurve, LightCurve
@@ -300,11 +301,19 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
     @property
     def column(self):
-        return self.hdu['TARGETTABLES'].header['1CRV5P']
+        try:
+            out = self.hdu['TARGETTABLES'].header['1CRV5P']
+        except:
+            out = 0
+        return out
 
     @property
     def row(self):
-        return self.hdu['TARGETTABLES'].header['2CRV5P']
+        try:
+            out = self.hdu['TARGETTABLES'].header['2CRV5P']
+        except:
+            out = 0
+        return out
 
     @property
     def pipeline_mask(self):
@@ -550,7 +559,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
     @staticmethod
     def from_fits_images(images, position, size=(10, 10), extension=None,
-                         target_id="unnamed-target"):
+                         target_id="unnamed-target", **kwargs):
         """Creates a new Target Pixel File from a set of images.
 
         This can be used to cut out a TPF from a series of FFI or superstamp
@@ -586,7 +595,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                                n_rows=size[0],
                                                n_cols=size[1],
                                                target_id=target_id)
-        for idx, img in enumerate(images):
+        for idx, img in tqdm(enumerate(images), total=len(images)):
+            t0 = time.time()
             if isinstance(img, fits.ImageHDU):
                 hdu = img
             elif isinstance(img, fits.HDUList):
@@ -598,7 +608,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
             cutout = Cutout2D(hdu.data, position, wcs=WCS(hdu.header),
                               size=size, mode='partial')
             factory.add_cadence(frameno=idx, flux=cutout.data, header=hdu.header)
-        return factory.get_tpf()
+        return factory.get_tpf(**kwargs)
 
 
 class KeplerTargetPixelFileFactory(object):
@@ -661,9 +671,9 @@ class KeplerTargetPixelFileFactory(object):
         if 'POSCORR2' in header:
             self.pos_corr2[frameno] = header['POSCORR2']
 
-    def get_tpf(self):
+    def get_tpf(self, **kwargs):
         """Returns a KeplerTargetPixelFile object."""
-        return KeplerTargetPixelFile(self._hdulist())
+        return KeplerTargetPixelFile(self._hdulist(), **kwargs)
 
     def _hdulist(self):
         """Returns an astropy.io.fits.HDUList object."""
