@@ -531,7 +531,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 pflux = self.flux[frame]
         except IndexError:
             raise ValueError("frame {} is out of bounds, must be in the range "
-                             "0-{}.".format(frame, self.flux.shape[0]))
+                             "0-{}.".format(frame, self.shape[0]))
         ax = plot_image(pflux, ax=ax, title='Kepler ID: {}'.format(self.keplerid),
                 extent=(self.column, self.column + self.shape[2], self.row,
                 self.row + self.shape[1]), show_colorbar=show_colorbar, **kwargs)

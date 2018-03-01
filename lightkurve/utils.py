@@ -268,14 +268,17 @@ def plot_image(image, ax=None, scale='linear', origin='lower',
     if ax is None:
         _, ax = plt.subplots()
     vmin, vmax = PercentileInterval(95.).get_limits(image)
-    if scale == 'linear':
-        norm = ImageNormalize(vmin=vmin, vmax=vmax, stretch=LinearStretch())
-    elif scale == 'sqrt':
-        norm = ImageNormalize(vmin=vmin, vmax=vmax, stretch=SqrtStretch())
-    elif scale == 'log':
-        norm = ImageNormalize(vmin=vmin, vmax=vmax, stretch=LogStretch())
-    else:
-        raise ValueError("scale {} is not available.".format(scale))
+
+    norm = None
+    if scale is not None:
+        if scale == 'linear':
+            norm = ImageNormalize(vmin=vmin, vmax=vmax, stretch=LinearStretch())
+        elif scale == 'sqrt':
+            norm = ImageNormalize(vmin=vmin, vmax=vmax, stretch=SqrtStretch())
+        elif scale == 'log':
+            norm = ImageNormalize(vmin=vmin, vmax=vmax, stretch=LogStretch())
+        else:
+            raise ValueError("scale {} is not available.".format(scale))
 
     cax = ax.imshow(image, origin=origin, norm=norm, **kwargs)
     ax.set_xlabel(xlabel)
