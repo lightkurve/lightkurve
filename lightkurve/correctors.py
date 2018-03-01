@@ -153,7 +153,7 @@ class KeplerCBVCorrector(object):
         return LightCurve(time=sap_lc.time, flux=flux_hat.reshape(-1),
                           flux_err=sap_lc.flux_err)
 
-    def get_cbvs_list(self, method='bayes-factor'):
+    def get_cbvs_list(self):
         """Returns the subsequence of subsequent CBVs that maximizes
         Bayes' factor [1]_.
 
