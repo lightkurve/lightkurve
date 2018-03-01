@@ -311,3 +311,13 @@ def test_remove_outliers():
     lc_clean = LightCurve(time, flux).remove_outliers(sigma=1)
     assert_array_equal(lc_clean.time, [1, 2, 4])
     assert_array_equal(lc_clean.flux, [1, 1, 1])
+
+@pytest.mark.remote_data
+def test_describe(capfd):
+    '''Test if the describe function produces an output.
+    The output is 624 characters at the moment, but we might add more properties.'''
+    lcf = KeplerLightCurveFile(TABBY_Q8)
+    kplc = lcf.get_lightcurve('SAP_FLUX')
+    kplc.describe()
+    out, err = capfd.readouterr()
+    assert len(out) > 500
