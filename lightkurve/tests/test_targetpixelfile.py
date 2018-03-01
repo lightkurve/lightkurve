@@ -7,7 +7,8 @@ from numpy.testing import assert_array_equal
 import pytest
 import tempfile
 
-from ..targetpixelfile import KeplerTargetPixelFile, KeplerQualityFlags
+from ..targetpixelfile import KeplerTargetPixelFile, KeplerTargetPixelFileFactory
+from ..utils import KeplerQualityFlags
 
 
 filename_tpf_all_zeros = get_pkg_data_filename("data/test-tpf-all-zeros.fits")
@@ -171,3 +172,19 @@ def test_tpf_to_fits():
     finally:
         tmp.close()
         os.remove(tmp.name)
+
+
+def test_tpf_factory():
+    """Can we create TPFs using KeplerTargetPixelFileFactory?"""
+    factory = KeplerTargetPixelFileFactory(n_cadences=10, n_rows=6, n_cols=8)
+    flux_0 = np.ones((6, 8))
+    factory.add_cadence(frameno=0, flux=flux_0,
+                        header={'TSTART': 0, 'TSTOP': 10})
+    flux_9 = 3 * np.ones((6, 8))
+    factory.add_cadence(frameno=9, flux=flux_9,
+                        header={'TSTART': 90, 'TSTOP': 100})
+    tpf = factory.get_tpf()
+    assert_array_equal(tpf.flux[0], flux_0)
+    assert_array_equal(tpf.flux[9], flux_9)
+    assert(tpf.time[0] == 5)
+    assert(tpf.time[9] == 95)
