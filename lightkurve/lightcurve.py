@@ -408,7 +408,7 @@ class LightCurve(object):
             flux, flux_err = normalized_lc.flux, normalized_lc.flux_err
         else:
             flux, flux_err = self.flux, self.flux_err
-        if (flux_err is None) or (np.nansum(flux_err)==0):
+        if np.any(np.isfinite(flux_err)):
             ax.plot(self.time, flux, marker='.', color=color,
                     linestyle=linestyle, **kwargs)
         else:
