@@ -111,7 +111,7 @@ class LightCurve(object):
         attrs = {}
         for attr in dir(self):
             if not attr.startswith('_'):
-                res = getattr(self,attr)
+                res = getattr(self, attr)
                 if callable(res):
                     continue
                 if attr == 'hdu':
@@ -122,7 +122,6 @@ class LightCurve(object):
                         else:
                             attrs[attr]['print'] = '{}, {}'.format(attrs[attr]['print'], '{}'.format(r.header['EXTNAME']))
                     continue
-
                 else:
                     attrs[attr] = {'res':res}
                 if isinstance(res, int):
