@@ -656,9 +656,8 @@ class KeplerTargetPixelFileFactory(object):
             if locals()[col] is not None:
                 vars(self)[col][frameno] = locals()[col]
         # 1D-data
-        if 'MIDTIME' in header:
-            self.mjd[frameno] = header['MIDTIME']
-            self.time[frameno] = header['MIDTIME']
+        if 'TSTART' in header and 'TSTOP' in header:
+            self.time[frameno] = (header['TSTART'] + header['TSTOP']) / 2.
         if 'TIMECORR' in header:
             self.timecorr[frameno] = header['TIMECORR']
         if 'CADENCEN' in header:
