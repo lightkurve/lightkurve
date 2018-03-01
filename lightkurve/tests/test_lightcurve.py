@@ -93,7 +93,7 @@ def test_TessLightCurveFile(quality_bitmask):
 
 @pytest.mark.remote_data
 @pytest.mark.parametrize("quality_bitmask, answer", [('hardest', 2661),
-    ('hard', 2706), ('default', 2917), (None, 3279),
+    ('hard', 2706), ('default', 3113), (None, 3279),
     (1, 3279), (100, 3252), (2096639, 2661)])
 def test_bitmasking(quality_bitmask, answer):
     """Test whether the bitmasking behaves like it should"""
