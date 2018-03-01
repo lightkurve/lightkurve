@@ -158,15 +158,24 @@ class LightCurve(object):
             Trend in the lightcurve data
         """
         lc_clean = self.remove_nans()  # The SG filter does not allow NaNs
-        trend_signal = signal.savgol_filter(x=lc_clean.flux,
-                                            window_length=window_length,
-                                            polyorder=polyorder, **kwargs)
-        flatten_lc = copy.copy(lc_clean)
-        flatten_lc.flux = lc_clean.flux / trend_signal
-        flatten_lc.flux_err = lc_clean.flux_err / trend_signal
+        #Find breaks in time
+        dt = lc_clean.time[1:]-lc_clean.time[0:-1]
+        cut = np.where(dt > 5*np.nanmedian(dt))[0]+1
+        low = np.append([0], cut)
+        high = np.append(cut, len(lc_clean.time))
+        trend_signal = np.zeros(len(lc_clean.time))
+        for l, h in zip(low, high):
+            trend_signal[l:h] = signal.savgol_filter(x=lc_clean.flux[l:h],
+                                                     window_length=window_length,
+                                                     polyorder=polyorder, **kwargs)
+
+        trend_signal = np.interp(self.time, lc_clean.time, trend_signal)
+        flatten_lc = copy.deepcopy(self)
+        flatten_lc.flux /= trend_signal
+        flatten_lc.flux_err /= trend_signal
 
         if return_trend:
-            trend_lc = copy.copy(lc_clean)
+            trend_lc = copy.deepcopy(self)
             trend_lc.flux = trend_signal
             return flatten_lc, trend_lc
         return flatten_lc
