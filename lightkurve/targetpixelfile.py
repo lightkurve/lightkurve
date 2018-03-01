@@ -9,7 +9,6 @@ from astropy.table import Table
 from astropy.wcs import WCS
 from matplotlib import patches
 import numpy as np
-import pandas as pd
 from tqdm import tqdm
 
 from . import PACKAGEDIR
@@ -37,7 +36,7 @@ class TargetPixelFile(object):
         """
         pass
 
-    def describe(self):
+    def properties(self):
         '''Print out a description of each of the non-callable attributes of a
         TargetPixelFile object.
 
@@ -49,12 +48,22 @@ class TargetPixelFile(object):
                 res = getattr(self,attr)
                 if callable(res):
                     continue
-                attrs[attr] = {'res':res}
+                if attr == 'hdu':
+                    attrs[attr] = {'res':res, 'type':'list'}
+                    for idx, r in enumerate(res):
+                        if idx == 0:
+                            attrs[attr]['print'] = '{}'.format(r.header['EXTNAME'])
+                        else:
+                            attrs[attr]['print'] = '{}, {}'.format(attrs[attr]['print'], '{}'.format(r.header['EXTNAME']))
+                    continue
+
+                else:
+                    attrs[attr] = {'res':res}
                 if isinstance(res, int):
                     attrs[attr]['print'] = '{}'.format(res)
                     attrs[attr]['type'] = 'int'
                 elif isinstance(res, np.ndarray):
-                    attrs[attr]['print'] = 'np.ndarray shape {}'.format(res.shape)
+                    attrs[attr]['print'] = 'array {}'.format(res.shape)
                     attrs[attr]['type'] = 'array'
                 elif isinstance(res, list):
                     attrs[attr]['print'] = 'list length {}'.format(len(res))
@@ -69,17 +78,17 @@ class TargetPixelFile(object):
                     attrs[attr]['print'] = 'astropy.wcs.wcs.WCS'.format(attr)
                     attrs[attr]['type'] = 'other'
                 else:
-                    attrs[attr]['print'] = '{}'.format(res)
+                    attrs[attr]['print'] = '{}'.format(type(res))
                     attrs[attr]['type'] = 'other'
-        output = pd.DataFrame(columns=['Attribute', 'Description'], dtype=str)
+        output = Table(names=['Attribute', 'Description'], dtype=[object, object])
         idx = 0
-        types = ['int','str', 'list', 'array', 'other']
+        types = ['int', 'str', 'list', 'array', 'other']
         for typ in types:
             for attr, dic in attrs.items():
                 if dic['type'] == typ:
-                    output.loc[idx, ['Attribute', 'Description']] = [attr, dic['print']]
+                    output.add_row([attr, dic['print']])
                     idx+=1
-        print (output.to_string(index=False))
+        output.pprint(max_lines=-1, max_width=-1)
 
 
 
