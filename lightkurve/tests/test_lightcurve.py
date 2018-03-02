@@ -106,13 +106,13 @@ def test_lightcurve_fold():
     """Test the ``LightCurve.fold()`` method."""
     lc = LightCurve(time=np.linspace(0, 10, 100), flux=np.zeros(100)+1)
     fold = lc.fold(period=1)
-    assert_almost_equal(fold.time[0], -0.5, 2)
-    assert_almost_equal(np.min(fold.time), -0.5, 2)
-    assert_almost_equal(np.max(fold.time), 0.5, 2)
+    assert_almost_equal(fold.phase[0], -0.5, 2)
+    assert_almost_equal(np.min(fold.phase), -0.5, 2)
+    assert_almost_equal(np.max(fold.phase), 0.5, 2)
     fold = lc.fold(period=1, phase=-0.1)
     assert_almost_equal(fold.time[0], -0.5, 2)
-    assert_almost_equal(np.min(fold.time), -0.5, 2)
-    assert_almost_equal(np.max(fold.time), 0.5, 2)
+    assert_almost_equal(np.min(fold.phase), -0.5, 2)
+    assert_almost_equal(np.max(fold.phase), 0.5, 2)
 
 
 def test_lightcurve_append():

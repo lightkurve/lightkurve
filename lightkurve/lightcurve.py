@@ -557,6 +557,10 @@ class FoldedLightCurve(LightCurve):
     def __init__(self, *args, **kwargs):
         super(FoldedLightCurve, self).__init__(*args, **kwargs)
 
+    @property
+    def phase(self):
+        return self.time
+
     def plot(self, **kwargs):
         ax = super(FoldedLightCurve, self).plot(**kwargs)
         if 'xlabel' not in kwargs:
