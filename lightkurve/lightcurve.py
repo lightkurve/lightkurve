@@ -268,9 +268,9 @@ class LightCurve(object):
         # fold time domain from -.5 to .5
         fold_time[fold_time > 0.5] -= 1
         sorted_args = np.argsort(fold_time)
-        return LightCurve(fold_time[sorted_args],
-                          self.flux[sorted_args],
-                          flux_err=self.flux_err[sorted_args])
+        return FoldedLightCurve(fold_time[sorted_args],
+                                self.flux[sorted_args],
+                                flux_err=self.flux_err[sorted_args])
 
     def normalize(self):
         """Returns a normalized version of the lightcurve.
@@ -550,6 +550,18 @@ class LightCurve(object):
             returns None otherwise.
         """
         return self.to_pandas().to_csv(path_or_buf=path_or_buf, **kwargs)
+
+
+class FoldedLightCurve(LightCurve):
+    """Defines a folded lightcurve with different plotting defaults."""
+    def __init__(self, *args, **kwargs):
+        super(FoldedLightCurve, self).__init__(*args, **kwargs)
+
+    def plot(self, **kwargs):
+        ax = super(FoldedLightCurve, self).plot(**kwargs)
+        if 'xlabel' not in kwargs:
+            ax.set_xlabel("Phase", {'color': 'k'})
+        return ax
 
 
 class KeplerLightCurve(LightCurve):
