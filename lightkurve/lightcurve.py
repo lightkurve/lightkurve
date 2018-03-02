@@ -10,6 +10,8 @@ import numpy as np
 from scipy import signal
 from scipy.optimize import minimize
 from matplotlib import pyplot as plt
+from cycler import cycler
+import matplotlib as mpl
 
 from astropy.stats import sigma_clip
 from astropy.table import Table
@@ -442,8 +444,8 @@ class LightCurve(object):
         return cdpp_ppm
 
     def plot(self, ax=None, normalize=True, xlabel='Time - 2454833 (days)',
-             ylabel='Normalized Flux', title=None, color='#363636', linestyle="",
-             fill=False, grid=True, **kwargs):
+             ylabel='Normalized Flux', title=None,
+             fill=False, grid=True, context='fast', **kwargs):
         """Plots the light curve.
 
         Parameters
@@ -459,12 +461,14 @@ class LightCurve(object):
             Plot y axis label
         title : str
             Plot set_title
-        color: str
-            Color to plot flux points
-        fill: bool
+        color : str
+            Color to plot line in
+        fill : bool
             Shade the region between 0 and flux
-        grid: bool
-            Add a grid to the plot
+        grid : bool
+            Plot with a grid
+        context : str
+            matplotlib.pyplot.style.context, default is 'fast'
         kwargs : dict
             Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
 
@@ -473,29 +477,29 @@ class LightCurve(object):
         ax : matplotlib.axes._subplots.AxesSubplot
             The matplotlib axes object.
         """
-        if ax is None:
-            fig, ax = plt.subplots(1)
         if normalize:
             normalized_lc = self.normalize()
             flux, flux_err = normalized_lc.flux, normalized_lc.flux_err
         else:
             flux, flux_err = self.flux, self.flux_err
-        if np.any(np.isfinite(flux_err)):
-            ax.plot(self.time, flux, marker='.', color=color,
-                    linestyle=linestyle, **kwargs)
-        else:
-            ax.errorbar(self.time, flux, flux_err, color=color,
-                        linestyle=linestyle, **kwargs)
-        if fill:
-            ax.fill(self.time, flux, fc='#a8a7a7', linewidth=0.0, alpha=0.3)
-        if grid:
-            ax.grid(alpha=0.3)
-        if 'label' in kwargs:
-            ax.legend()
-        if title is not None:
-            ax.set_title(title)
-        ax.set_xlabel(xlabel, {'color': 'k'})
-        ax.set_ylabel(ylabel, {'color': 'k'})
+        with plt.style.context(context):
+            if ax is None:
+                fig, ax = plt.subplots(1)
+            if ('color' not in kwargs) and (len(ax.lines)==0):
+                kwargs['color']='black'
+            if np.any(~np.isfinite(flux_err)):
+                ax.plot(self.time, flux, **kwargs)
+            else:
+                ax.errorbar(self.time, flux, flux_err, **kwargs)
+            if fill:
+                ax.fill(self.time, flux, linewidth=0.0, alpha=0.3)
+            if 'label' in kwargs:
+                ax.legend()
+            if title is not None:
+                ax.set_title(title)
+            ax.grid(grid, alpha=0.3)
+            ax.set_xlabel(xlabel)
+            ax.set_ylabel(ylabel)
         return ax
 
     def to_table(self):
