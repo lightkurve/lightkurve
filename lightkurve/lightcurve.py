@@ -449,7 +449,7 @@ class LightCurve(object):
         grid : bool
             Plot with a grid
         context : str
-            matplotlib.pyplot.style.context, default is 'default'
+            matplotlib.pyplot.style.context, default is 'fast'
         kwargs : dict
             Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
 
