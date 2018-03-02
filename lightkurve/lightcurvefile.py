@@ -3,6 +3,7 @@
 from __future__ import division, print_function
 
 import numpy as np
+import matplotlib as mpl
 from matplotlib import pyplot as plt
 
 from astropy.io import fits as pyfits
@@ -242,7 +243,7 @@ class KeplerLightCurveFile(LightCurveFile):
         from .correctors import KeplerCBVCorrector
         return KeplerCBVCorrector(self).correct(cbvs=cbvs, **kwargs)
 
-    def plot(self, flux_types=None, **kwargs):
+    def plot(self, flux_types=None, context='fast', **kwargs):
         """Plot all the flux types in a light curve.
 
         Parameters
@@ -250,17 +251,18 @@ class KeplerLightCurveFile(LightCurveFile):
         flux_types : str or list of str
             List of FLUX types to plot. Default is to plot all available.
         """
-        if not ('ax' in kwargs):
-            fig, ax = plt.subplots(1)
-            kwargs['ax'] = ax
-        if flux_types is None:
-            flux_types = self._flux_types()
-        if isinstance(flux_types, str):
-            flux_types = [flux_types]
-        for idx, ft in enumerate(flux_types):
-            lc = self.get_lightcurve(ft)
-            kwargs['color'] = 'C{}'.format(idx)
-            lc.plot(label=ft, **kwargs)
+        with plt.style.context(context):
+            if not ('ax' in kwargs):
+                fig, ax = plt.subplots(1)
+                kwargs['ax'] = ax
+            if flux_types is None:
+                flux_types = self._flux_types()
+            if isinstance(flux_types, str):
+                flux_types = [flux_types]
+            for idx, ft in enumerate(flux_types):
+                lc = self.get_lightcurve(ft)
+                kwargs['color'] = np.asarray(mpl.rcParams['axes.prop_cycle'])[idx]['color']
+                lc.plot(label=ft, **kwargs)
 
 
 class TessLightCurveFile(LightCurveFile):
