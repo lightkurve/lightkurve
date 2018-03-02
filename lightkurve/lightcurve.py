@@ -184,7 +184,7 @@ class LightCurve(object):
                 new_lc.centroid_row = np.append(new_lc.centroid_row, others[i].centroid_row)
         return new_lc
 
-    def flatten(self, window_length=101, polyorder=3, return_trend=False, **kwargs):
+    def flatten(self, window_length=101, polyorder=1, return_trend=False, **kwargs):
         """
         Removes low frequency trend using scipy's Savitzky-Golay filter.
 
