@@ -184,7 +184,8 @@ class LightCurve(object):
                 new_lc.centroid_row = np.append(new_lc.centroid_row, others[i].centroid_row)
         return new_lc
 
-    def flatten(self, window_length=101, polyorder=2, return_trend=False, **kwargs):
+    def flatten(self, window_length=101, polyorder=2, return_trend=False,
+                break_tolerance = 5, **kwargs):
         """
         Removes low frequency trend using scipy's Savitzky-Golay filter.
 
@@ -199,6 +200,11 @@ class LightCurve(object):
         return_trend : bool
             If `True`, the method will return a tuple of two elements
             (flattened_lc, trend_lc) where trend_lc is the removed trend.
+        break_tolerance : int
+            If there are large gaps in time, flatten will split the flux into several
+            sub-lightcurves and apply a savgol_filter to each individually. A gap is
+            defined as break_tolerance * the median gap in time. To turn off this feature,
+            set break_tolerance to None
         **kwargs : dict
             Dictionary of arguments to be passed to `scipy.signal.savgol_filter`.
 
@@ -210,10 +216,12 @@ class LightCurve(object):
         trend_lc : LightCurve object
             Trend in the lightcurve data
         """
-        lc_clean = self.remove_nans()  # The SG filter does not allow NaNs
+        if break_tolerance is None:
+            break_tolerance = np.nan
+        lc_clean = self.remove_nans()
         #Find breaks in time
-        dt = lc_clean.time[1:]-lc_clean.time[0:-1]
-        cut = np.where(dt > 5*np.nanmedian(dt))[0]+1
+        dt = lc_clean.time[1:] - lc_clean.time[0:-1]
+        cut = np.where(dt > break_tolerance * np.nanmedian(dt))[0] + 1
         low = np.append([0], cut)
         high = np.append(cut, len(lc_clean.time))
         trend_signal = np.zeros(len(lc_clean.time))
@@ -221,12 +229,10 @@ class LightCurve(object):
             trend_signal[l:h] = signal.savgol_filter(x=lc_clean.flux[l:h],
                                                      window_length=window_length,
                                                      polyorder=polyorder, **kwargs)
-
         trend_signal = np.interp(self.time, lc_clean.time, trend_signal)
         flatten_lc = copy.deepcopy(self)
         flatten_lc.flux /= trend_signal
         flatten_lc.flux_err /= trend_signal
-
         if return_trend:
             trend_lc = copy.deepcopy(self)
             trend_lc.flux = trend_signal
