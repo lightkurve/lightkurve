@@ -185,9 +185,11 @@ class LightCurve(object):
         return new_lc
 
     def flatten(self, window_length=101, polyorder=2, return_trend=False,
-                break_tolerance = 5, **kwargs):
+                break_tolerance=5, **kwargs):
         """
         Removes low frequency trend using scipy's Savitzky-Golay filter.
+
+        This method wraps `scipy.signal.savgol_filter`.
 
         Parameters
         ----------
@@ -201,10 +203,11 @@ class LightCurve(object):
             If `True`, the method will return a tuple of two elements
             (flattened_lc, trend_lc) where trend_lc is the removed trend.
         break_tolerance : int
-            If there are large gaps in time, flatten will split the flux into several
-            sub-lightcurves and apply a savgol_filter to each individually. A gap is
-            defined as break_tolerance * the median gap in time. To turn off this feature,
-            set break_tolerance to None
+            If there are large gaps in time, flatten will split the flux into
+            several sub-lightcurves and apply `savgol_filter` to each
+            individually. A gap is defined as a period in time larger than
+            `break_tolerance` times the median gap.  To disable this feature,
+            set `break_tolerance` to None.
         **kwargs : dict
             Dictionary of arguments to be passed to `scipy.signal.savgol_filter`.
 
@@ -219,11 +222,12 @@ class LightCurve(object):
         if break_tolerance is None:
             break_tolerance = np.nan
         lc_clean = self.remove_nans()
-        #Find breaks in time
+        # Split the lightcurve into segments by finding large gaps in time
         dt = lc_clean.time[1:] - lc_clean.time[0:-1]
         cut = np.where(dt > break_tolerance * np.nanmedian(dt))[0] + 1
         low = np.append([0], cut)
         high = np.append(cut, len(lc_clean.time))
+        # Then, apply the savgol_filter to each segment separately
         trend_signal = np.zeros(len(lc_clean.time))
         for l, h in zip(low, high):
             trend_signal[l:h] = signal.savgol_filter(x=lc_clean.flux[l:h],

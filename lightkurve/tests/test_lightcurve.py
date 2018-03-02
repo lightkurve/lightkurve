@@ -312,6 +312,7 @@ def test_remove_outliers():
     assert_array_equal(lc_clean.time, [1, 2, 4])
     assert_array_equal(lc_clean.flux, [1, 1, 1])
 
+
 @pytest.mark.remote_data
 def test_properties(capfd):
     '''Test if the describe function produces an output.
@@ -321,3 +322,14 @@ def test_properties(capfd):
     kplc.properties()
     out, err = capfd.readouterr()
     assert len(out) > 500
+
+
+def test_flatten():
+    """Flatten should not remove NaNs."""
+    lc = LightCurve(time=[1, 2, 3, 4, 5],
+                    flux=[np.nan, 1.1, 1.2, np.nan, 1.4],
+                    flux_err=[1.0, np.nan, 1.2, 1.3, np.nan])
+    flat_lc = lc.flatten(window_length=3)
+    assert(len(flat_lc.time) == 5)
+    assert(np.isfinite(flat_lc.flux).sum() == 3)
+    assert(np.isfinite(flat_lc.flux_err).sum() == 3)
