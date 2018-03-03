@@ -609,7 +609,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         return LightCurve(flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
                           time=self.time, flux_err=self.flux_bkg_err)
 
-    def to_fits(self, output_fn=None, overwrite=False):
+    def to_fits(self, output_fn='out.fits', overwrite=False):
         """Writes the TPF to a FITS file on disk."""
         if output_fn is None:
             output_fn = "{}-targ.fits".format(self.keplerid)
@@ -617,7 +617,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
     @staticmethod
     def from_fits_images(images, position, size=(10, 10), extension=None,
-                         target_id="unnamed-target", **kwargs):
+                         target_id="unnamed-target", keys={}, **kwargs):
         """Creates a new Target Pixel File from a set of images.
 
         This method is intended to make it easy to cut out targets from
@@ -637,6 +637,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
             or name to use. Default: 0.
         target_id : int or str
             Unique identifier of the target to be recorded in the TPF.
+        keys : dict
+            Additional keywords to add to the first header file.
         **kwargs : dict
             Extra arguments to be passed to the `KeplerTargetPixelFile` constructor.
 
@@ -645,16 +647,20 @@ class KeplerTargetPixelFile(TargetPixelFile):
         tpf : KeplerTargetPixelFile
             A new Target Pixel File assembled from the images.
         """
+        basic_keywords = ['MISSION', 'TELESCOP', 'INSTRUME', 'QUARTER',
+                          'CAMPAIGN', 'CHANNEL', 'MODULE', 'OUTPUT']
+        carry_keywords = {}
+
         if extension is None:
+            extension = 0
             if isinstance(images[0], str) and images[0].endswith("ffic.fits"):
                 extension = 1  # TESS FFIs have the image data in extension #1
-            else:
-                extension = 0  # Default is to use the primary HDU
 
         factory = KeplerTargetPixelFileFactory(n_cadences=len(images),
                                                n_rows=size[0],
                                                n_cols=size[1],
                                                target_id=target_id)
+
         for idx, img in tqdm(enumerate(images), total=len(images)):
             if isinstance(img, fits.ImageHDU):
                 hdu = img
@@ -662,12 +668,23 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 hdu = img[extension]
             else:
                 hdu = fits.open(img)[extension]
+
+            #Get some basic keywords
+            for kw in basic_keywords:
+                if kw in hdu.header:
+                    carry_keywords[kw] = hdu.header[kw]
+            if ('MISSION' not in carry_keywords) and ('TELESCOP' in carry_keywords):
+                carry_keywords['MISSION'] = carry_keywords['TELESCOP']
+
             if idx == 0:  # Get default keyword values from the first image
                 factory.keywords = hdu.header
             cutout = Cutout2D(hdu.data, position, wcs=WCS(hdu.header),
                               size=size, mode='partial')
             factory.add_cadence(frameno=idx, flux=cutout.data, header=hdu.header)
-        return factory.get_tpf(**kwargs)
+
+            allkeys = keys.copy()
+            allkeys.update(carry_keywords)
+        return factory.get_tpf(keys=allkeys, **kwargs)
 
 
 class KeplerTargetPixelFileFactory(object):
@@ -729,13 +746,13 @@ class KeplerTargetPixelFileFactory(object):
         if 'POSCORR2' in header:
             self.pos_corr2[frameno] = header['POSCORR2']
 
-    def get_tpf(self, **kwargs):
+    def get_tpf(self, keys={}, **kwargs):
         """Returns a KeplerTargetPixelFile object."""
-        return KeplerTargetPixelFile(self._hdulist(), **kwargs)
+        return KeplerTargetPixelFile(self._hdulist(keys=keys), **kwargs)
 
-    def _hdulist(self):
+    def _hdulist(self, keys={}):
         """Returns an astropy.io.fits.HDUList object."""
-        return fits.HDUList([self._make_primary_hdu(),
+        return fits.HDUList([self._make_primary_hdu(keywords=keys),
                              self._make_target_extension(),
                              self._make_aperture_extension()])
 
@@ -763,6 +780,18 @@ class KeplerTargetPixelFileFactory(object):
                    "TIMVERSN", "CAMPAIGN", "DATA_REL", "TTABLEID",
                    "RA_OBJ", "DEC_OBJ"]:
             hdu.header[kw] = ""
+
+        #Some keywords just shouldn't be passed to the new header.
+        bad_keys = ['ORIGIN', 'DATE', 'OBJECT', 'SIMPLE', 'BITPIX',
+                    'NAXIS' ,'EXTEND', 'NEXTEND', 'EXTNAME', 'NAXIS1',
+                    'NAXIS2', 'QUALITY']
+        for kw, val in keywords.items():
+            if kw in bad_keys:
+                continue
+            if kw in hdu.header:
+                hdu.header[kw] = val
+            else:
+                hdu.header.append((kw, val))
         return hdu
 
     def _make_target_extension(self):
