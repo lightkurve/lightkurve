@@ -272,7 +272,7 @@ class SFFCorrector(object):
 
     def correct(self, time, flux, centroid_col, centroid_row,
                 polyorder=5, niters=3, bins=15, windows=1, sigma_1=3.,
-                sigma_2=5.):
+                sigma_2=5., restore_trend=True):
         """Returns a systematics-corrected LightCurve.
 
         Note that it is assumed that time and flux do not contain NaNs.
@@ -299,6 +299,9 @@ class SFFCorrector(object):
         sigma_1, sigma_2 : float, float
             Sigma values which will be used to reject outliers
             in steps (6) and (2), respectivelly.
+        restore_trend : bool
+            If `True`, the long-term trend will be added back into the
+            lightcurve.
 
         Returns
         -------
@@ -340,14 +343,16 @@ class SFFCorrector(object):
             self.s = np.array([self.arclength(x1=xp, x=x) for xp in self.rot_row])
 
             # Next, we find and apply the correction iteratively
+            self.trend = np.ones(len(time[i]))
             for n in range(niters):
                 # First, fit a spline to capture the long-term varation
                 # We don't want to fit the long-term trend because we know
                 # that the K2 motion noise is a high-frequency effect.
                 self.bspline = self.fit_bspline(time[i], flux[i])
                 # Remove the long-term variation by dividing the flux by the spline
-                self.trend = self.bspline(time[i] - time[i][0])
-                self.normflux = flux[i] / self.trend
+                iter_trend = self.bspline(time[i] - time[i][0])
+                self.normflux = flux[i] / iter_trend
+                self.trend *= iter_trend
                 # Bin and interpolate normalized flux to capture the dependency
                 # of the flux as a function of arclength
                 self.interp = self.bin_and_interpolate(self.s, self.normflux, bins,
@@ -357,6 +362,8 @@ class SFFCorrector(object):
                 flux[i] = corrected_flux
 
             flux_hat = np.append(flux_hat, flux[i])
+            if restore_trend:
+                flux_hat += self.trend
 
         return LightCurve(time=timecopy, flux=flux_hat)
 
