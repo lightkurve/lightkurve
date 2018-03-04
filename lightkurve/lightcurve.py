@@ -477,6 +477,11 @@ class LightCurve(object):
         ax : matplotlib.axes._subplots.AxesSubplot
             The matplotlib axes object.
         """
+        # The "fast" style has only been in matplotlib since v2.1.
+        # Let's make it optional until >v2.1 is mainstream and can
+        # be made the minimum requirement.
+        if (context == "fast") and ("fast" not in mpl.style.available):
+            context = "default"
         if normalize:
             normalized_lc = self.normalize()
             flux, flux_err = normalized_lc.flux, normalized_lc.flux_err
