@@ -542,7 +542,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         return col_centr, row_centr
 
     def plot(self, ax=None, frame=0, cadenceno=None, bkg=False, aperture_mask=None,
-             show_colorbar=True, mask_color='pink', context='fast', **kwargs):
+             show_colorbar=True, mask_color='pink', style='fast', **kwargs):
         """
         Plot a target pixel file at a given frame (index) or cadence number.
 
@@ -564,8 +564,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
             Whether or not to show the colorbar
         mask_color : str
             Color to show the aperture mask
-        context : str
-            matplotlib.pyplot.style.context, default is ggplot
+        style : str
+            matplotlib.pyplot.style.context, default is 'fast'
         kwargs : dict
             Keywords arguments passed to `lightkurve.utils.plot_image`.
 
@@ -574,6 +574,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
         ax : matplotlib.axes._subplots.AxesSubplot
             The matplotlib axes object.
         """
+        if (style == "fast") and ("fast" not in plt.style.available):
+            style = "default"
         if cadenceno is not None:
             try:
                 frame = np.argwhere(cadenceno == self.cadenceno)[0][0]
@@ -589,7 +591,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         except IndexError:
             raise ValueError("frame {} is out of bounds, must be in the range "
                              "0-{}.".format(frame, self.shape[0]))
-        with plt.style.context(context):
+        with plt.style.context(style):
             ax = plot_image(pflux, ax=ax, title='Kepler ID: {}'.format(self.keplerid),
                     extent=(self.column, self.column + self.shape[2], self.row,
                     self.row + self.shape[1]), show_colorbar=show_colorbar, **kwargs)
