@@ -363,7 +363,7 @@ class SFFCorrector(object):
 
             flux_hat = np.append(flux_hat, flux[i])
             if restore_trend:
-                flux_hat += self.trend
+                flux_hat *= self.trend
 
         return LightCurve(time=timecopy, flux=flux_hat)
 
