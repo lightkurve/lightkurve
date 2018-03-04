@@ -445,7 +445,7 @@ class LightCurve(object):
 
     def plot(self, ax=None, normalize=True, xlabel='Time - 2454833 (days)',
              ylabel='Normalized Flux', title=None,
-             fill=False, grid=True, context='fast', **kwargs):
+             fill=False, grid=True, style='fast', **kwargs):
         """Plots the light curve.
 
         Parameters
@@ -467,7 +467,7 @@ class LightCurve(object):
             Shade the region between 0 and flux
         grid : bool
             Plot with a grid
-        context : str
+        style : str
             matplotlib.pyplot.style.context, default is 'fast'
         kwargs : dict
             Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
@@ -480,18 +480,18 @@ class LightCurve(object):
         # The "fast" style has only been in matplotlib since v2.1.
         # Let's make it optional until >v2.1 is mainstream and can
         # be made the minimum requirement.
-        if (context == "fast") and ("fast" not in mpl.style.available):
-            context = "default"
+        if (style == "fast") and ("fast" not in mpl.style.available):
+            style = "default"
         if normalize:
             normalized_lc = self.normalize()
             flux, flux_err = normalized_lc.flux, normalized_lc.flux_err
         else:
             flux, flux_err = self.flux, self.flux_err
-        with plt.style.context(context):
+        with plt.style.context(style):
             if ax is None:
                 fig, ax = plt.subplots(1)
-            if ('color' not in kwargs) and (len(ax.lines)==0):
-                kwargs['color']='black'
+            if ('color' not in kwargs) and (len(ax.lines) == 0):
+                kwargs['color'] = 'black'
             if np.any(~np.isfinite(flux_err)):
                 ax.plot(self.time, flux, **kwargs)
             else:
