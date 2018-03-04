@@ -243,15 +243,21 @@ class KeplerLightCurveFile(LightCurveFile):
         from .correctors import KeplerCBVCorrector
         return KeplerCBVCorrector(self).correct(cbvs=cbvs, **kwargs)
 
-    def plot(self, flux_types=None, context='fast', **kwargs):
-        """Plot all the flux types in a light curve.
+    def plot(self, flux_types=None, style='fast', **kwargs):
+        """Plot all the light curves contained in this light curve file.
 
         Parameters
         ----------
         flux_types : str or list of str
-            List of FLUX types to plot. Default is to plot all available.
+            List of flux types to plot. Default is to plot all available.
+            (For Kepler the default fluxes are 'SAP_FLUX' and 'PDCSAP-FLUX'.
+        style : str
+            matplotlib.pyplot.style.context, default is 'fast'
+        kwargs : dict
+            Dictionary of keyword arguments to be passed to
+            `KeplerLightCurve.plot()`.
         """
-        with plt.style.context(context):
+        with plt.style.context(style):
             if not ('ax' in kwargs):
                 fig, ax = plt.subplots(1)
                 kwargs['ax'] = ax
