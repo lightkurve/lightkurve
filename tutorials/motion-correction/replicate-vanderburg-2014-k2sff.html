@@ -1,0 +1,1090 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>How does the Vanderburg &amp; Johnson 2014 K2SFF method work? &mdash; lightkurve 1.0.a1 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="lightkurve 1.0.a1 documentation" href="../../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> lightkurve
+          
+
+          
+            
+            <img src="../../_static/lightkurve.png" class="logo" />
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/index.html">API documentation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../section1.html">Introduction to lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../section2.html">Science with lightkurve</a></li>
+</ul>
+<p class="caption"><span class="caption-text">About lightkurve</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing and reporting issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../citing.html">Citing and acknowledging lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../other_software.html">Other software</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">lightkurve</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+    <li>How does the Vanderburg &amp; Johnson 2014 K2SFF method work?</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../../_sources/tutorials/motion-correction/replicate-vanderburg-2014-k2sff.ipynb.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput div.prompt,
+div.nbinput div.input_area,
+div.nbinput div[class*=highlight],
+div.nbinput div[class*=highlight] pre,
+div.nboutput,
+div.nbinput div.prompt,
+div.nbinput div.output_area,
+div.nboutput div[class*=highlight],
+div.nboutput div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput,
+    div.nboutput {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput div.prompt pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput div.prompt pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput div.prompt,
+div.nboutput div.prompt {
+    min-width: 8ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+@media (max-width: 540px) {
+    div.nbinput div.prompt,
+    div.nboutput div.prompt {
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput div.prompt.empty {
+        padding: 0;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput div.prompt pre,
+div.nboutput div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput div.input_area,
+div.nboutput div.output_area {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput div.input_area,
+    div.nboutput div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput div.input_area {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+/* nice headers on first paragraph of info/warning boxes */
+.admonition .first {
+    margin: -12px;
+    padding: 6px 12px;
+    margin-bottom: 12px;
+    color: #fff;
+    line-height: 1;
+    display: block;
+}
+.admonition.warning .first {
+    background: #f0b37e;
+}
+.admonition.note .first {
+    background: #6ab0de;
+}
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+</style>
+<div class="section" id="How-does-the-Vanderburg-&amp;-Johnson-2014-K2SFF-method-work?">
+<h1>How does the Vanderburg &amp; Johnson 2014 K2SFF method work?<a class="headerlink" href="#How-does-the-Vanderburg-&-Johnson-2014-K2SFF-method-work?" title="Permalink to this headline">¶</a></h1>
+<p>Vanderburg and Johnson (2014) introduced a method for “Self Flat
+Fielding” by tracking how the lightcurve changes with motion of the
+spacecraft:</p>
+<p><a class="reference external" href="http://adsabs.harvard.edu/abs/2014PASP..126..948V">A Technique for Extracting Highly Precise Photometry for the
+Two-Wheeled Kepler
+Mission</a></p>
+<p>In this notebook we replicate the K2SFF method following the same
+example source, #60021426, as that in the publication. We aim to
+demystify the technique, which is extremely popular within the K2
+community. We have focused on reproducibility, so that we achieve the
+same result at the publication.</p>
+<p>The Vanderburg &amp; Johnson 2014 paper uses data from the Kepler two-wheel
+“Concept Engineering Test”, predating campaign 0, and sometimes called
+campaign <em>“eng”</em> or abbreviated CET. This vestigal “campaign” lacks some
+of the standardization of later K2 campaigns— it was much shorter,
+only about 9 days long, it lacks some of the standard quality flags,
+targets have non-traditional EPIC IDs, and other quirks.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>%matplotlib inline
+import numpy as np
+import matplotlib.pyplot as plt
+from astropy.io import fits
+import pandas as pd
+</pre></div>
+</div>
+</div>
+<div class="section" id="Retrieve-the-K2SFF-data-for-ENG-test-source-60021426">
+<h2>Retrieve the K2SFF data for ENG test source <code class="docutils literal"><span class="pre">60021426</span></code><a class="headerlink" href="#Retrieve-the-K2SFF-data-for-ENG-test-source-60021426" title="Permalink to this headline">¶</a></h2>
+<p>First we will retrieve data and inspect the mask used in the paper.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>#! wget -q http://archive.stsci.edu/hlsps/k2sff/cet/060000000/21426/hlsp_k2sff_k2_lightcurve_060021426-cet_kepler_v1_llc.fits
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>vdb_fits = fits.open(&#39;hlsp_k2sff_k2_lightcurve_060021426-cet_kepler_v1_llc.fits&#39;)
+</pre></div>
+</div>
+</div>
+<p>The <code class="docutils literal"><span class="pre">BESTAPER</span></code> keyword explains which aperture was chosen as the
+“best” by Vanderburg &amp; Johnson 2014. The FITS header for that slice
+contains the metadata needed to reproduce the mask.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>keys = [&#39;MASKTYPE&#39;, &#39;MASKINDE&#39;, &#39;NPIXSAP&#39;]
+_ = [print(key, &#39; : &#39;, vdb_fits[&#39;BESTAPER&#39;].header[key]) for key in keys]
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+MASKTYPE  :  PRF FIT
+MASKINDE  :  4
+NPIXSAP  :  29.0
+</pre></div></div>
+</div>
+<p>We want the <em>exact same</em> mask as Vanderburg &amp; Johnson 2014, but the
+publication version and MAST version differ!</p>
+<p>Publication version: <img alt="img" src="https://www.cfa.harvard.edu/~avanderb/k2/ep60021426image.png" /></p>
+<p>MAST Version: <img alt="MAST Version" src="http://archive.stsci.edu/hlsps/k2sff/cet/060000000/21426/hlsp_k2sff_k2_lightcurve_060021426-cet_kepler_v1_image.png" /></p>
+<p>Aperture 7 should yield a bigger mask, more similar to what was used in
+the paper.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>VDB_J_mask = vdb_fits[&#39;PRF_APER_TBL&#39;].data[7,:, :] == True
+VDB_J_mask.sum()
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[5]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>53
+</pre></div>
+</div>
+</div>
+<p>Save the mask for easy use in our next notebook.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>np.save(&#39;VDB_J_2014_mask.npy&#39;, VDB_J_mask)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Manually-reproduce-with-the-Vanderburg-provided-diagnostic-data">
+<h2>Manually reproduce with the Vanderburg-provided diagnostic data<a class="headerlink" href="#Manually-reproduce-with-the-Vanderburg-provided-diagnostic-data" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line">Retrieve the Vanderburg-provided diagnostic data for the Kepler ENG
+testing.</div>
+<div class="line">Uncomment the line below to retrieve the data programmatically, or
+manually get the linked file in a browser and save it to this
+directory.</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>#! wget https://www.cfa.harvard.edu/~avanderb/k2/ep60021426alldiagnostics.csv
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>df = pd.read_csv(&#39;ep60021426alldiagnostics.csv&#39;,index_col=False)
+df.head()
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[7]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>BJD - 2454833</th>
+      <th>Raw Flux</th>
+      <th>Corrected Flux</th>
+      <th>X-centroid</th>
+      <th>Y-centroid</th>
+      <th>arclength</th>
+      <th>Correction</th>
+      <th>Thrusters On</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1862.502368</td>
+      <td>0.995119</td>
+      <td>0.995985</td>
+      <td>25.135097</td>
+      <td>24.661074</td>
+      <td>2.327480</td>
+      <td>0.999130</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1862.522801</td>
+      <td>0.997313</td>
+      <td>0.996767</td>
+      <td>25.289752</td>
+      <td>24.418689</td>
+      <td>1.175322</td>
+      <td>1.000548</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1862.543235</td>
+      <td>0.996713</td>
+      <td>0.996136</td>
+      <td>25.288052</td>
+      <td>24.429406</td>
+      <td>1.214627</td>
+      <td>1.000580</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1862.563668</td>
+      <td>0.996930</td>
+      <td>0.996277</td>
+      <td>25.275216</td>
+      <td>24.448405</td>
+      <td>1.306617</td>
+      <td>1.000656</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1862.584102</td>
+      <td>0.996862</td>
+      <td>0.996228</td>
+      <td>25.253864</td>
+      <td>24.480184</td>
+      <td>1.460259</td>
+      <td>1.000636</td>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>We can mean-subtract the provided <span class="math">\(x-y\)</span> centroids, assigning them
+column and row identifiers, then rotate the coordinates into their major
+and minor axes.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>col = df[&#39; X-centroid&#39;].values
+col = col - np.mean(col)
+row = df[&#39; Y-centroid&#39;].values
+row = row - np.mean(row)
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>def _get_eigen_vectors(centroid_col, centroid_row):
+    &#39;&#39;&#39;get the eigenvalues and eigenvectors given centroid x, y positions&#39;&#39;&#39;
+    centroids = np.array([centroid_col, centroid_row])
+    eig_val, eig_vec = np.linalg.eigh(np.cov(centroids))
+    return eig_val, eig_vec
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>def _rotate(eig_vec, centroid_col, centroid_row):
+    &#39;&#39;&#39;rotate the centroids into their predominant linear axis&#39;&#39;&#39;
+    centroids = np.array([centroid_col, centroid_row])
+    return np.dot(eig_vec, centroids)
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>eig_val, eig_vec = _get_eigen_vectors(col, row)
+v1, v2 = eig_vec
+</pre></div>
+</div>
+</div>
+<p>The major axis is the latter.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>platescale = 4.0 # The Kepler plate scale; has units of arcseconds / pixel
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>plt.figure(figsize=(5, 6))
+plt.plot(col * platescale, row * platescale, &#39;ko&#39;, ms=4)
+plt.plot(col * platescale, row * platescale, &#39;ro&#39;, ms=1)
+plt.xticks([-2, -1,0, 1, 2])
+plt.yticks([-2, -1,0, 1, 2])
+plt.xlabel(&#39;X position [arcseconds]&#39;)
+plt.ylabel(&#39;Y position [arcseconds]&#39;)
+plt.xlim(-2, 2)
+plt.ylim(-2, 2)
+plt.plot([0, v1[0]], [0, v1[1]], color=&#39;blue&#39;, lw=3)
+plt.plot([0, v2[0]], [0, v2[1]], color=&#39;blue&#39;, lw=3);
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_motion-correction_replicate-vanderburg-2014-k2sff_25_0.png" src="../../_images/tutorials_motion-correction_replicate-vanderburg-2014-k2sff_25_0.png" />
+</div>
+</div>
+<p>Following the form of <strong>Figure 2</strong> of Vanderburg &amp; Johsnon 2014.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>rot_colp, rot_rowp = _rotate(eig_vec, col, row) #units in pixels
+</pre></div>
+</div>
+</div>
+<p>You can rotate into the new reference frame.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>plt.figure(figsize=(5, 6))
+plt.plot(rot_rowp * platescale, rot_colp * platescale, &#39;ko&#39;, ms=4)
+plt.plot(rot_rowp * platescale, rot_colp * platescale, &#39;ro&#39;, ms=1)
+plt.xticks([-2, -1,0, 1, 2])
+plt.yticks([-2, -1,0, 1, 2])
+plt.xlabel(&quot;X&#39; position [arcseconds]&quot;)
+plt.ylabel(&quot;Y&#39; position [arcseconds]&quot;)
+plt.xlim(-2, 2)
+plt.ylim(-2, 2)
+plt.plot([0, 1], [0, 0], color=&#39;blue&#39;)
+plt.plot([0, 0], [0, 1], color=&#39;blue&#39;);
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_motion-correction_replicate-vanderburg-2014-k2sff_29_0.png" src="../../_images/tutorials_motion-correction_replicate-vanderburg-2014-k2sff_29_0.png" />
+</div>
+</div>
+<p>We need to calculate the arclength using:</p>
+<div class="math">
+\[ \begin{align}\begin{aligned}s= \int_{x'_0}^{x'_1}\sqrt{1+\left( \frac{dy'_p}{dx'}\right)^2} dx'\\where :math:`x^\prime_0` is the transformed :math:`x` coordinate of
+the point with the smallest :math:`x^\prime` position, and
+:math:`y^\prime_p` is the best--fit polynomial function.\end{aligned}\end{align} \]</div>
+<p>Fit a <span class="math">\(5^{th}\)</span> order polynomial to the rotated coordinates.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>z = np.polyfit(rot_rowp, rot_colp, 5)
+p5 = np.poly1d(z)
+p5_deriv = p5.deriv()
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>x0_prime = np.min(rot_rowp)
+xmax_prime = np.max(rot_rowp)
+x_dense = np.linspace(x0_prime, xmax_prime, 2000)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>plt.plot(rot_rowp, rot_colp, &#39;.&#39;)
+plt.plot(x_dense, p5(x_dense))
+plt.ylabel(&#39;Position along minor axis (pixels)&#39;)
+plt.xlabel(&#39;Position along major axis (pixels)&#39;)
+plt.title(&#39;Performance of polynomial regression&#39;)
+plt.ylim(-0.1, 0.1);
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_motion-correction_replicate-vanderburg-2014-k2sff_34_0.png" src="../../_images/tutorials_motion-correction_replicate-vanderburg-2014-k2sff_34_0.png" />
+</div>
+</div>
+<p>We see evidence for a <a class="reference external" href="https://en.wikipedia.org/wiki/Bias%E2%80%93variance_tradeoff">bias-variance
+tradeoff</a>,
+suggesting some modest opportunity for improvement.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>@np.vectorize
+def arclength(x):
+    &#39;&#39;&#39;Input x1_prime, get out arclength&#39;&#39;&#39;
+    gi = x_dense &lt;x
+    s_integrand = np.sqrt(1 + p5_deriv(x_dense[gi]) ** 2)
+    s = np.trapz(s_integrand, x=x_dense[gi])
+    return s
+</pre></div>
+</div>
+</div>
+<p>Let’s double check that we compute the same arclength as the published
+paper.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>aspect_ratio = plt.figaspect(1)
+plt.figure(figsize=aspect_ratio)
+plt.plot(df[&#39; arclength&#39;], arclength(rot_rowp)*4.0, &#39;.&#39;)
+plt.xlabel(&#39;$s$  (Vanderburg &amp; Johnson 2014)&#39;)
+plt.ylabel(&#39;$s$  (This work)&#39;)
+plt.plot([0, 4], [0, 4], &#39;k--&#39;);
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_motion-correction_replicate-vanderburg-2014-k2sff_38_0.png" src="../../_images/tutorials_motion-correction_replicate-vanderburg-2014-k2sff_38_0.png" />
+</div>
+</div>
+<p>Yes, we compute arclength correctly.</p>
+<p>Now we apply a <strong>high-pass filter</strong> to the raw lightcurve data. We
+follow the original paper by using <em>BSplines</em> with 1.5 day breakpoints.
+You can also apply data exclusion at this stage.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>from scipy.interpolate import BSpline
+from scipy import interpolate
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>times, raw_fluxes = df[&#39;BJD - 2454833&#39;].values, df[&#39; Raw Flux&#39;].values
+</pre></div>
+</div>
+</div>
+<p>We find the weighted least square spline for a given set of knots,
+<span class="math">\(t\)</span>. We supply interior knots as knots on the ends are added
+automatically, as stated in the <code class="docutils literal"><span class="pre">interpolate.splrep()</span></code> docstring.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>interior_knots = np.arange(times[0]+1.5, times[0]+6, 1.5)
+t,c,k = interpolate.splrep(times, raw_fluxes, s=0, task=-1, t=interior_knots)
+bspl = BSpline(t,c,k)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>plt.plot(times, raw_fluxes, &#39;.&#39;)
+plt.plot(times, bspl(times))
+plt.xlabel(&#39;$t$ (days)&#39;)
+plt.ylabel(&#39;Raw Flux&#39;);
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_motion-correction_replicate-vanderburg-2014-k2sff_45_0.png" src="../../_images/tutorials_motion-correction_replicate-vanderburg-2014-k2sff_45_0.png" />
+</div>
+</div>
+<div class="line-block">
+<div class="line">The Spline fit looks good, so we can normalize the flux by the
+long-term trend.</div>
+<div class="line">Plot the normalized flux versus arclength to see the
+position-dependent flux.</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>fluxes = raw_fluxes/bspl(times)
+</pre></div>
+</div>
+</div>
+<p>Mask the data by keeping only the good samples.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>bi = df[&#39; Thrusters On&#39;].values == 1.0
+gi = df[&#39; Thrusters On&#39;].values == 0.0
+clean_fluxes = fluxes[gi]
+al = arclength(rot_rowp[gi]) * platescale
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>sorted_inds = np.argsort(al)
+</pre></div>
+</div>
+</div>
+<p>We will follow the paper by interpolating <strong>flux versus arclength
+position</strong> in 15 bins of means, which is a <em>piecewise linear fit</em>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>knots = np.array([np.min(al)]+
+                 [np.median(splt) for splt in np.array_split(al[sorted_inds], 15)]+
+                 [np.max(al)])
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [29]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>bin_means = np.array([clean_fluxes[sorted_inds][0]]+
+                     [np.mean(splt) for splt in np.array_split(clean_fluxes[sorted_inds], 15)]+
+                     [clean_fluxes[sorted_inds][-1]])
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [30]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>zz = np.polyfit(al, clean_fluxes,6)
+sff = np.poly1d(zz)
+al_dense = np.linspace(0, 4, 1000)
+interp_func = interpolate.interp1d(knots, bin_means)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [31]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>plt.figure(figsize=(5, 6))
+plt.plot(arclength(rot_rowp)*4.0, fluxes, &#39;ko&#39;, ms=4)
+plt.plot(arclength(rot_rowp)*4.0, fluxes, &#39;o&#39;, color=&#39;#3498db&#39;, ms=3)
+plt.plot(arclength(rot_rowp[bi])*4.0, fluxes[bi], &#39;o&#39;, color=&#39;r&#39;, ms=3)
+plt.plot(np.sort(al), interp_func(np.sort(al)), &#39;-&#39;, color=&#39;#e67e22&#39;)
+
+plt.xticks([0, 1,2, 3, 4])
+plt.minorticks_on()
+plt.xlabel(&#39;Arclength [arcseconds]&#39;)
+plt.ylabel(&#39;Relative Brightness&#39;)
+plt.title(&#39;EPIC 60021426, Kp =10.3&#39;)
+plt.xlim(0,4)
+plt.ylim(0.997, 1.002);
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_motion-correction_replicate-vanderburg-2014-k2sff_55_0.png" src="../../_images/tutorials_motion-correction_replicate-vanderburg-2014-k2sff_55_0.png" />
+</div>
+</div>
+<p>Following <strong>Figure 4</strong> of Vanderburg &amp; Johnson 2014.</p>
+<p>Apply the Self Flat Field (SFF) correction:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [32]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>corr_fluxes = clean_fluxes / interp_func(al)
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [33]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>plt.figure(figsize=(10,6))
+
+dy = 0.004
+plt.plot(df[&#39;BJD - 2454833&#39;], df[&#39; Raw Flux&#39;]+dy, &#39;ko&#39;, ms=4)
+plt.plot(df[&#39;BJD - 2454833&#39;], df[&#39; Raw Flux&#39;]+dy, &#39;o&#39;, color=&#39;#3498db&#39;, ms=3)
+plt.plot(df[&#39;BJD - 2454833&#39;][bi], df[&#39; Raw Flux&#39;][bi]+dy, &#39;o&#39;, color=&#39;r&#39;, ms=3)
+plt.plot(df[&#39;BJD - 2454833&#39;][gi], corr_fluxes*bspl(times[gi]), &#39;o&#39;, color=&#39;k&#39;, ms = 4)
+plt.plot(df[&#39;BJD - 2454833&#39;][gi], corr_fluxes*bspl(times[gi]), &#39;o&#39;, color=&#39;#e67e22&#39;, ms = 3)
+
+plt.xlabel(&#39;BJD - 2454833&#39;)
+plt.ylabel(&#39;Relative Brightness&#39;)
+
+plt.xlim(1862, 1870)
+plt.ylim(0.994, 1.008);
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_motion-correction_replicate-vanderburg-2014-k2sff_59_0.png" src="../../_images/tutorials_motion-correction_replicate-vanderburg-2014-k2sff_59_0.png" />
+</div>
+</div>
+<p>Following <strong>Figure 5</strong> of Vanderburg &amp; Johnson 2015.</p>
+<p><em>The end.</em></p>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright lightkurve developers and contributors.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'1.0.a1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

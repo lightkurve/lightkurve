@@ -96,6 +96,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials/section1.html">Introduction to lightkurve</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials/section2.html">Science with lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/section3.html">Advanced topics</a></li>
 </ul>
 <p class="caption"><span class="caption-text">About lightkurve</span></p>
 <ul>
@@ -188,13 +189,13 @@
 
     <span class="c1"># Which is the recommended QUALITY mask to identify bad data?</span>
     <span class="n">DEFAULT_BITMASK</span> <span class="o">=</span> <span class="p">(</span><span class="n">AttitudeTweak</span> <span class="o">|</span> <span class="n">SafeMode</span> <span class="o">|</span> <span class="n">CoarsePoint</span> <span class="o">|</span> <span class="n">EarthPoint</span> <span class="o">|</span>
-                       <span class="n">Desat</span> <span class="o">|</span> <span class="n">ApertureCosmic</span> <span class="o">|</span> <span class="n">ManualExclude</span> <span class="o">|</span>
+                       <span class="n">Desat</span> <span class="o">|</span> <span class="n">ManualExclude</span> <span class="o">|</span>
                        <span class="n">DetectorAnomaly</span> <span class="o">|</span> <span class="n">NoData</span> <span class="o">|</span> <span class="n">ThrusterFiring</span><span class="p">)</span>
 
     <span class="c1"># This bitmask includes flags that are known to identify both good and bad cadences.</span>
     <span class="c1"># Use it wisely.</span>
-    <span class="n">HARD_BITMASK</span> <span class="o">=</span> <span class="p">(</span><span class="n">DEFAULT_BITMASK</span> <span class="o">|</span> <span class="n">SensitivityDropout</span> <span class="o">|</span> <span class="n">CollateralCosmic</span> <span class="o">|</span>
-                    <span class="n">PossibleThrusterFiring</span><span class="p">)</span>
+    <span class="n">HARD_BITMASK</span> <span class="o">=</span> <span class="p">(</span><span class="n">DEFAULT_BITMASK</span> <span class="o">|</span> <span class="n">SensitivityDropout</span> <span class="o">|</span> <span class="n">ApertureCosmic</span> <span class="o">|</span>
+                    <span class="n">CollateralCosmic</span> <span class="o">|</span> <span class="n">PossibleThrusterFiring</span><span class="p">)</span>
 
     <span class="c1"># Using this bitmask only QUALITY == 0 cadences will remain</span>
     <span class="n">HARDEST_BITMASK</span> <span class="o">=</span> <span class="mi">2096639</span>
@@ -417,14 +418,17 @@
     <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
     <span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span> <span class="o">=</span> <span class="n">PercentileInterval</span><span class="p">(</span><span class="mf">95.</span><span class="p">)</span><span class="o">.</span><span class="n">get_limits</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">scale</span> <span class="o">==</span> <span class="s1">&#39;linear&#39;</span><span class="p">:</span>
-        <span class="n">norm</span> <span class="o">=</span> <span class="n">ImageNormalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">,</span> <span class="n">stretch</span><span class="o">=</span><span class="n">LinearStretch</span><span class="p">())</span>
-    <span class="k">elif</span> <span class="n">scale</span> <span class="o">==</span> <span class="s1">&#39;sqrt&#39;</span><span class="p">:</span>
-        <span class="n">norm</span> <span class="o">=</span> <span class="n">ImageNormalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">,</span> <span class="n">stretch</span><span class="o">=</span><span class="n">SqrtStretch</span><span class="p">())</span>
-    <span class="k">elif</span> <span class="n">scale</span> <span class="o">==</span> <span class="s1">&#39;log&#39;</span><span class="p">:</span>
-        <span class="n">norm</span> <span class="o">=</span> <span class="n">ImageNormalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">,</span> <span class="n">stretch</span><span class="o">=</span><span class="n">LogStretch</span><span class="p">())</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;scale </span><span class="si">{}</span><span class="s2"> is not available.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">scale</span><span class="p">))</span>
+
+    <span class="n">norm</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">scale</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">scale</span> <span class="o">==</span> <span class="s1">&#39;linear&#39;</span><span class="p">:</span>
+            <span class="n">norm</span> <span class="o">=</span> <span class="n">ImageNormalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">,</span> <span class="n">stretch</span><span class="o">=</span><span class="n">LinearStretch</span><span class="p">())</span>
+        <span class="k">elif</span> <span class="n">scale</span> <span class="o">==</span> <span class="s1">&#39;sqrt&#39;</span><span class="p">:</span>
+            <span class="n">norm</span> <span class="o">=</span> <span class="n">ImageNormalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">,</span> <span class="n">stretch</span><span class="o">=</span><span class="n">SqrtStretch</span><span class="p">())</span>
+        <span class="k">elif</span> <span class="n">scale</span> <span class="o">==</span> <span class="s1">&#39;log&#39;</span><span class="p">:</span>
+            <span class="n">norm</span> <span class="o">=</span> <span class="n">ImageNormalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">,</span> <span class="n">stretch</span><span class="o">=</span><span class="n">LogStretch</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;scale </span><span class="si">{}</span><span class="s2"> is not available.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">scale</span><span class="p">))</span>
 
     <span class="n">cax</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="n">origin</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">xlabel</span><span class="p">)</span>

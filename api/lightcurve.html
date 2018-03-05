@@ -234,7 +234,7 @@
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.cdpp" title="lightkurve.lightcurve.LightCurve.cdpp"><code class="xref py py-obj docutils literal"><span class="pre">cdpp</span></code></a>([transit_duration,&nbsp;savgol_window,&nbsp;…])</td>
 <td>Estimate the CDPP noise metric using the Savitzky-Golay (SG) method.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.flatten" title="lightkurve.lightcurve.LightCurve.flatten"><code class="xref py py-obj docutils literal"><span class="pre">flatten</span></code></a>([window_length,&nbsp;polyorder,&nbsp;return_trend])</td>
+<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.flatten" title="lightkurve.lightcurve.LightCurve.flatten"><code class="xref py py-obj docutils literal"><span class="pre">flatten</span></code></a>([window_length,&nbsp;polyorder,&nbsp;…])</td>
 <td>Removes low frequency trend using scipy’s Savitzky-Golay filter.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.fold" title="lightkurve.lightcurve.LightCurve.fold"><code class="xref py py-obj docutils literal"><span class="pre">fold</span></code></a>(period[,&nbsp;phase])</td>
@@ -246,19 +246,22 @@
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.plot" title="lightkurve.lightcurve.LightCurve.plot"><code class="xref py py-obj docutils literal"><span class="pre">plot</span></code></a>([ax,&nbsp;normalize,&nbsp;xlabel,&nbsp;ylabel,&nbsp;title,&nbsp;…])</td>
 <td>Plots the light curve.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.remove_nans" title="lightkurve.lightcurve.LightCurve.remove_nans"><code class="xref py py-obj docutils literal"><span class="pre">remove_nans</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.properties" title="lightkurve.lightcurve.LightCurve.properties"><code class="xref py py-obj docutils literal"><span class="pre">properties</span></code></a>()</td>
+<td>Print out a description of each of the non-callable attributes of a LightCurve object.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.remove_nans" title="lightkurve.lightcurve.LightCurve.remove_nans"><code class="xref py py-obj docutils literal"><span class="pre">remove_nans</span></code></a>()</td>
 <td>Removes cadences where the flux is NaN.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.remove_outliers" title="lightkurve.lightcurve.LightCurve.remove_outliers"><code class="xref py py-obj docutils literal"><span class="pre">remove_outliers</span></code></a>([sigma,&nbsp;return_mask])</td>
+<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.remove_outliers" title="lightkurve.lightcurve.LightCurve.remove_outliers"><code class="xref py py-obj docutils literal"><span class="pre">remove_outliers</span></code></a>([sigma,&nbsp;return_mask])</td>
 <td>Removes outlier flux values using sigma-clipping.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.to_csv" title="lightkurve.lightcurve.LightCurve.to_csv"><code class="xref py py-obj docutils literal"><span class="pre">to_csv</span></code></a>([path_or_buf])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.to_csv" title="lightkurve.lightcurve.LightCurve.to_csv"><code class="xref py py-obj docutils literal"><span class="pre">to_csv</span></code></a>([path_or_buf])</td>
 <td>Writes the LightCurve to a csv file.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.to_pandas" title="lightkurve.lightcurve.LightCurve.to_pandas"><code class="xref py py-obj docutils literal"><span class="pre">to_pandas</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.to_pandas" title="lightkurve.lightcurve.LightCurve.to_pandas"><code class="xref py py-obj docutils literal"><span class="pre">to_pandas</span></code></a>()</td>
 <td>Export the LightCurve as a Pandas DataFrame.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.to_table" title="lightkurve.lightcurve.LightCurve.to_table"><code class="xref py py-obj docutils literal"><span class="pre">to_table</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.to_table" title="lightkurve.lightcurve.LightCurve.to_table"><code class="xref py py-obj docutils literal"><span class="pre">to_table</span></code></a>()</td>
 <td>Export the LightCurve as an AstroPy Table.</td>
 </tr>
 </tbody>
@@ -398,8 +401,9 @@ svn+ssh://murzim/repo/so/trunk/Develop/jvc/common/compute_SG_noise.m</p>
 
 <dl class="method">
 <dt id="lightkurve.lightcurve.LightCurve.flatten">
-<code class="descname">flatten</code><span class="sig-paren">(</span><em>window_length=101</em>, <em>polyorder=3</em>, <em>return_trend=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve.flatten"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.flatten" title="Permalink to this definition">¶</a></dt>
+<code class="descname">flatten</code><span class="sig-paren">(</span><em>window_length=101</em>, <em>polyorder=2</em>, <em>return_trend=False</em>, <em>break_tolerance=5</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve.flatten"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.flatten" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes low frequency trend using scipy’s Savitzky-Golay filter.</p>
+<p>This method wraps <cite>scipy.signal.savgol_filter</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -418,6 +422,14 @@ must be less than window_length.</p>
 <blockquote>
 <div><p>If <cite>True</cite>, the method will return a tuple of two elements
 (flattened_lc, trend_lc) where trend_lc is the removed trend.</p>
+</div></blockquote>
+<p><strong>break_tolerance</strong> : int</p>
+<blockquote>
+<div><p>If there are large gaps in time, flatten will split the flux into
+several sub-lightcurves and apply <cite>savgol_filter</cite> to each
+individually. A gap is defined as a period in time larger than
+<cite>break_tolerance</cite> times the median gap.  To disable this feature,
+set <cite>break_tolerance</cite> to None.</p>
 </div></blockquote>
 <p><strong>**kwargs</strong> : dict</p>
 <blockquote>
@@ -496,7 +508,7 @@ by the median.</p>
 
 <dl class="method">
 <dt id="lightkurve.lightcurve.LightCurve.plot">
-<code class="descname">plot</code><span class="sig-paren">(</span><em>ax=None</em>, <em>normalize=True</em>, <em>xlabel='Time - 2454833 (days)'</em>, <em>ylabel='Normalized Flux'</em>, <em>title=None</em>, <em>color='#363636'</em>, <em>linestyle=''</em>, <em>fill=False</em>, <em>grid=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.plot" title="Permalink to this definition">¶</a></dt>
+<code class="descname">plot</code><span class="sig-paren">(</span><em>ax=None</em>, <em>normalize=True</em>, <em>xlabel='Time - 2454833 (days)'</em>, <em>ylabel='Normalized Flux'</em>, <em>title=None</em>, <em>fill=False</em>, <em>grid=True</em>, <em>style='fast'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots the light curve.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -523,17 +535,21 @@ a new one will be generated.</p>
 <blockquote>
 <div><p>Plot set_title</p>
 </div></blockquote>
-<p><strong>color: str</strong></p>
+<p><strong>color</strong> : str</p>
 <blockquote>
-<div><p>Color to plot flux points</p>
+<div><p>Color to plot line in</p>
 </div></blockquote>
-<p><strong>fill: bool</strong></p>
+<p><strong>fill</strong> : bool</p>
 <blockquote>
 <div><p>Shade the region between 0 and flux</p>
 </div></blockquote>
-<p><strong>grid: bool</strong></p>
+<p><strong>grid</strong> : bool</p>
 <blockquote>
-<div><p>Add a grid to the plot</p>
+<div><p>Plot with a grid</p>
+</div></blockquote>
+<p><strong>style</strong> : str</p>
+<blockquote>
+<div><p>matplotlib.pyplot.style.context, default is ‘fast’</p>
 </div></blockquote>
 <p><strong>kwargs</strong> : dict</p>
 <blockquote>
@@ -549,6 +565,15 @@ a new one will be generated.</p>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="method">
+<dt id="lightkurve.lightcurve.LightCurve.properties">
+<code class="descname">properties</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve.properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.properties" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print out a description of each of the non-callable attributes of a
+LightCurve object.</p>
+<p>Prints in order of type (ints, strings, lists, arrays and others)
+Prints in alphabetical order.</p>
 </dd></dl>
 
 <dl class="method">
@@ -743,7 +768,7 @@ and <cite>flux_err</cite>.</p>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.correct" title="lightkurve.lightcurve.KeplerLightCurve.correct"><code class="xref py py-obj docutils literal"><span class="pre">correct</span></code></a>([method])</td>
 <td>Corrects a lightcurve for motion-dependent systematic errors.</td>
 </tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">flatten</span></code>([window_length,&nbsp;polyorder,&nbsp;return_trend])</td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">flatten</span></code>([window_length,&nbsp;polyorder,&nbsp;…])</td>
 <td>Removes low frequency trend using scipy’s Savitzky-Golay filter.</td>
 </tr>
 <tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">fold</span></code>(period[,&nbsp;phase])</td>
@@ -755,22 +780,25 @@ and <cite>flux_err</cite>.</p>
 <tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">plot</span></code>([ax,&nbsp;normalize,&nbsp;xlabel,&nbsp;ylabel,&nbsp;title,&nbsp;…])</td>
 <td>Plots the light curve.</td>
 </tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">remove_nans</span></code>()</td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">properties</span></code>()</td>
+<td>Print out a description of each of the non-callable attributes of a LightCurve object.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">remove_nans</span></code>()</td>
 <td>Removes cadences where the flux is NaN.</td>
 </tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">remove_outliers</span></code>([sigma,&nbsp;return_mask])</td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">remove_outliers</span></code>([sigma,&nbsp;return_mask])</td>
 <td>Removes outlier flux values using sigma-clipping.</td>
 </tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">to_csv</span></code>([path_or_buf])</td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">to_csv</span></code>([path_or_buf])</td>
 <td>Writes the LightCurve to a csv file.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.to_fits" title="lightkurve.lightcurve.KeplerLightCurve.to_fits"><code class="xref py py-obj docutils literal"><span class="pre">to_fits</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.to_fits" title="lightkurve.lightcurve.KeplerLightCurve.to_fits"><code class="xref py py-obj docutils literal"><span class="pre">to_fits</span></code></a>()</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">to_pandas</span></code>()</td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">to_pandas</span></code>()</td>
 <td>Export the LightCurve as a Pandas DataFrame.</td>
 </tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">to_table</span></code>()</td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">to_table</span></code>()</td>
 <td>Export the LightCurve as an AstroPy Table.</td>
 </tr>
 </tbody>
@@ -865,7 +893,7 @@ defined by <cite>method</cite>.</p>
 <tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">cdpp</span></code>([transit_duration,&nbsp;savgol_window,&nbsp;…])</td>
 <td>Estimate the CDPP noise metric using the Savitzky-Golay (SG) method.</td>
 </tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">flatten</span></code>([window_length,&nbsp;polyorder,&nbsp;return_trend])</td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">flatten</span></code>([window_length,&nbsp;polyorder,&nbsp;…])</td>
 <td>Removes low frequency trend using scipy’s Savitzky-Golay filter.</td>
 </tr>
 <tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">fold</span></code>(period[,&nbsp;phase])</td>
@@ -877,22 +905,25 @@ defined by <cite>method</cite>.</p>
 <tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">plot</span></code>([ax,&nbsp;normalize,&nbsp;xlabel,&nbsp;ylabel,&nbsp;title,&nbsp;…])</td>
 <td>Plots the light curve.</td>
 </tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">remove_nans</span></code>()</td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">properties</span></code>()</td>
+<td>Print out a description of each of the non-callable attributes of a LightCurve object.</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">remove_nans</span></code>()</td>
 <td>Removes cadences where the flux is NaN.</td>
 </tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">remove_outliers</span></code>([sigma,&nbsp;return_mask])</td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">remove_outliers</span></code>([sigma,&nbsp;return_mask])</td>
 <td>Removes outlier flux values using sigma-clipping.</td>
 </tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">to_csv</span></code>([path_or_buf])</td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">to_csv</span></code>([path_or_buf])</td>
 <td>Writes the LightCurve to a csv file.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.TessLightCurve.to_fits" title="lightkurve.lightcurve.TessLightCurve.to_fits"><code class="xref py py-obj docutils literal"><span class="pre">to_fits</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.TessLightCurve.to_fits" title="lightkurve.lightcurve.TessLightCurve.to_fits"><code class="xref py py-obj docutils literal"><span class="pre">to_fits</span></code></a>()</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">to_pandas</span></code>()</td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">to_pandas</span></code>()</td>
 <td>Export the LightCurve as a Pandas DataFrame.</td>
 </tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">to_table</span></code>()</td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">to_table</span></code>()</td>
 <td>Export the LightCurve as an AstroPy Table.</td>
 </tr>
 </tbody>

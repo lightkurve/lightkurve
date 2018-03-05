@@ -96,6 +96,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials/section1.html">Introduction to lightkurve</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials/section2.html">Science with lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/section3.html">Advanced topics</a></li>
 </ul>
 <p class="caption"><span class="caption-text">About lightkurve</span></p>
 <ul>
@@ -159,6 +160,8 @@
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="k">import</span> <span class="n">signal</span>
 <span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="k">import</span> <span class="n">minimize</span>
 <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="k">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span> <span class="nn">cycler</span> <span class="k">import</span> <span class="n">cycler</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
 
 <span class="kn">from</span> <span class="nn">astropy.stats</span> <span class="k">import</span> <span class="n">sigma_clip</span>
 <span class="kn">from</span> <span class="nn">astropy.table</span> <span class="k">import</span> <span class="n">Table</span>
@@ -251,6 +254,59 @@
     <span class="k">def</span> <span class="nf">__rdiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__rtruediv__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
 
+<div class="viewcode-block" id="LightCurve.properties"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.LightCurve.properties">[docs]</a>    <span class="k">def</span> <span class="nf">properties</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Print out a description of each of the non-callable attributes of a</span>
+<span class="sd">        LightCurve object.</span>
+
+<span class="sd">        Prints in order of type (ints, strings, lists, arrays and others)</span>
+<span class="sd">        Prints in alphabetical order.&#39;&#39;&#39;</span>
+        <span class="n">attrs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">attr</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">):</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">attr</span> <span class="o">==</span> <span class="s1">&#39;hdu&#39;</span><span class="p">:</span>
+                    <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;res&#39;</span><span class="p">:</span><span class="n">res</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span><span class="s1">&#39;list&#39;</span><span class="p">}</span>
+                    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">idx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s1">&#39;print&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;EXTNAME&#39;</span><span class="p">])</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s1">&#39;print&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s1">&#39;print&#39;</span><span class="p">],</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;EXTNAME&#39;</span><span class="p">]))</span>
+                    <span class="k">continue</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;res&#39;</span><span class="p">:</span><span class="n">res</span><span class="p">}</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                    <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s1">&#39;print&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+                    <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;int&#39;</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+                    <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s1">&#39;print&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;array </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+                    <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;array&#39;</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s1">&#39;print&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;list length </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="p">))</span>
+                    <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;list&#39;</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">res</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                        <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s1">&#39;print&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;None&#39;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s1">&#39;print&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+                    <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;str&#39;</span>
+                <span class="k">elif</span> <span class="n">attr</span> <span class="o">==</span> <span class="s1">&#39;wcs&#39;</span><span class="p">:</span>
+                    <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s1">&#39;print&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;astropy.wcs.wcs.WCS&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span>
+                    <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;other&#39;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s1">&#39;print&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">res</span><span class="p">))</span>
+                    <span class="n">attrs</span><span class="p">[</span><span class="n">attr</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;other&#39;</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span><span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Attribute&#39;</span><span class="p">,</span> <span class="s1">&#39;Description&#39;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="p">[</span><span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">])</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">types</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;int&#39;</span><span class="p">,</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span> <span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;other&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">typ</span> <span class="ow">in</span> <span class="n">types</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">attr</span><span class="p">,</span> <span class="n">dic</span> <span class="ow">in</span> <span class="n">attrs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">dic</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">typ</span><span class="p">:</span>
+                    <span class="n">output</span><span class="o">.</span><span class="n">add_row</span><span class="p">([</span><span class="n">attr</span><span class="p">,</span> <span class="n">dic</span><span class="p">[</span><span class="s1">&#39;print&#39;</span><span class="p">]])</span>
+                    <span class="n">idx</span><span class="o">+=</span><span class="mi">1</span>
+        <span class="n">output</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">max_lines</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_width</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="LightCurve.append"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.LightCurve.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">others</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Append LightCurve objects.</span>
@@ -280,9 +336,12 @@
                 <span class="n">new_lc</span><span class="o">.</span><span class="n">centroid_row</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_lc</span><span class="o">.</span><span class="n">centroid_row</span><span class="p">,</span> <span class="n">others</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">centroid_row</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">new_lc</span></div>
 
-<div class="viewcode-block" id="LightCurve.flatten"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.LightCurve.flatten">[docs]</a>    <span class="k">def</span> <span class="nf">flatten</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">window_length</span><span class="o">=</span><span class="mi">101</span><span class="p">,</span> <span class="n">polyorder</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">return_trend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="LightCurve.flatten"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.LightCurve.flatten">[docs]</a>    <span class="k">def</span> <span class="nf">flatten</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">window_length</span><span class="o">=</span><span class="mi">101</span><span class="p">,</span> <span class="n">polyorder</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">return_trend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">break_tolerance</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Removes low frequency trend using scipy&#39;s Savitzky-Golay filter.</span>
+
+<span class="sd">        This method wraps `scipy.signal.savgol_filter`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -295,6 +354,12 @@
 <span class="sd">        return_trend : bool</span>
 <span class="sd">            If `True`, the method will return a tuple of two elements</span>
 <span class="sd">            (flattened_lc, trend_lc) where trend_lc is the removed trend.</span>
+<span class="sd">        break_tolerance : int</span>
+<span class="sd">            If there are large gaps in time, flatten will split the flux into</span>
+<span class="sd">            several sub-lightcurves and apply `savgol_filter` to each</span>
+<span class="sd">            individually. A gap is defined as a period in time larger than</span>
+<span class="sd">            `break_tolerance` times the median gap.  To disable this feature,</span>
+<span class="sd">            set `break_tolerance` to None.</span>
 <span class="sd">        **kwargs : dict</span>
 <span class="sd">            Dictionary of arguments to be passed to `scipy.signal.savgol_filter`.</span>
 
@@ -306,16 +371,26 @@
 <span class="sd">        trend_lc : LightCurve object</span>
 <span class="sd">            Trend in the lightcurve data</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">lc_clean</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_nans</span><span class="p">()</span>  <span class="c1"># The SG filter does not allow NaNs</span>
-        <span class="n">trend_signal</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">savgol_filter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">lc_clean</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span>
-                                            <span class="n">window_length</span><span class="o">=</span><span class="n">window_length</span><span class="p">,</span>
-                                            <span class="n">polyorder</span><span class="o">=</span><span class="n">polyorder</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">flatten_lc</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">lc_clean</span><span class="p">)</span>
-        <span class="n">flatten_lc</span><span class="o">.</span><span class="n">flux</span> <span class="o">=</span> <span class="n">lc_clean</span><span class="o">.</span><span class="n">flux</span> <span class="o">/</span> <span class="n">trend_signal</span>
-        <span class="n">flatten_lc</span><span class="o">.</span><span class="n">flux_err</span> <span class="o">=</span> <span class="n">lc_clean</span><span class="o">.</span><span class="n">flux_err</span> <span class="o">/</span> <span class="n">trend_signal</span>
-
+        <span class="k">if</span> <span class="n">break_tolerance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">break_tolerance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="n">lc_clean</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_nans</span><span class="p">()</span>
+        <span class="c1"># Split the lightcurve into segments by finding large gaps in time</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="n">lc_clean</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="n">lc_clean</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">cut</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">dt</span> <span class="o">&gt;</span> <span class="n">break_tolerance</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">dt</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">low</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">],</span> <span class="n">cut</span><span class="p">)</span>
+        <span class="n">high</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cut</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">lc_clean</span><span class="o">.</span><span class="n">time</span><span class="p">))</span>
+        <span class="c1"># Then, apply the savgol_filter to each segment separately</span>
+        <span class="n">trend_signal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lc_clean</span><span class="o">.</span><span class="n">time</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">l</span><span class="p">,</span> <span class="n">h</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">):</span>
+            <span class="n">trend_signal</span><span class="p">[</span><span class="n">l</span><span class="p">:</span><span class="n">h</span><span class="p">]</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">savgol_filter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">lc_clean</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="n">l</span><span class="p">:</span><span class="n">h</span><span class="p">],</span>
+                                                     <span class="n">window_length</span><span class="o">=</span><span class="n">window_length</span><span class="p">,</span>
+                                                     <span class="n">polyorder</span><span class="o">=</span><span class="n">polyorder</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">trend_signal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">lc_clean</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">trend_signal</span><span class="p">)</span>
+        <span class="n">flatten_lc</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">flatten_lc</span><span class="o">.</span><span class="n">flux</span> <span class="o">/=</span> <span class="n">trend_signal</span>
+        <span class="n">flatten_lc</span><span class="o">.</span><span class="n">flux_err</span> <span class="o">/=</span> <span class="n">trend_signal</span>
         <span class="k">if</span> <span class="n">return_trend</span><span class="p">:</span>
-            <span class="n">trend_lc</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">lc_clean</span><span class="p">)</span>
+            <span class="n">trend_lc</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
             <span class="n">trend_lc</span><span class="o">.</span><span class="n">flux</span> <span class="o">=</span> <span class="n">trend_signal</span>
             <span class="k">return</span> <span class="n">flatten_lc</span><span class="p">,</span> <span class="n">trend_lc</span>
         <span class="k">return</span> <span class="n">flatten_lc</span></div>
@@ -345,9 +420,9 @@
         <span class="c1"># fold time domain from -.5 to .5</span>
         <span class="n">fold_time</span><span class="p">[</span><span class="n">fold_time</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
         <span class="n">sorted_args</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">fold_time</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">LightCurve</span><span class="p">(</span><span class="n">fold_time</span><span class="p">[</span><span class="n">sorted_args</span><span class="p">],</span>
-                          <span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="n">sorted_args</span><span class="p">],</span>
-                          <span class="n">flux_err</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">flux_err</span><span class="p">[</span><span class="n">sorted_args</span><span class="p">])</span></div>
+        <span class="k">return</span> <span class="n">FoldedLightCurve</span><span class="p">(</span><span class="n">fold_time</span><span class="p">[</span><span class="n">sorted_args</span><span class="p">],</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="n">sorted_args</span><span class="p">],</span>
+                                <span class="n">flux_err</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">flux_err</span><span class="p">[</span><span class="n">sorted_args</span><span class="p">])</span></div>
 
 <div class="viewcode-block" id="LightCurve.normalize"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.LightCurve.normalize">[docs]</a>    <span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns a normalized version of the lightcurve.</span>
@@ -519,8 +594,8 @@
         <span class="k">return</span> <span class="n">cdpp_ppm</span></div>
 
 <div class="viewcode-block" id="LightCurve.plot"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.LightCurve.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Time - 2454833 (days)&#39;</span><span class="p">,</span>
-             <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;Normalized Flux&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#363636&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
-             <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+             <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;Normalized Flux&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+             <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s1">&#39;fast&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Plots the light curve.</span>
 
 <span class="sd">        Parameters</span>
@@ -536,12 +611,14 @@
 <span class="sd">            Plot y axis label</span>
 <span class="sd">        title : str</span>
 <span class="sd">            Plot set_title</span>
-<span class="sd">        color: str</span>
-<span class="sd">            Color to plot flux points</span>
-<span class="sd">        fill: bool</span>
+<span class="sd">        color : str</span>
+<span class="sd">            Color to plot line in</span>
+<span class="sd">        fill : bool</span>
 <span class="sd">            Shade the region between 0 and flux</span>
-<span class="sd">        grid: bool</span>
-<span class="sd">            Add a grid to the plot</span>
+<span class="sd">        grid : bool</span>
+<span class="sd">            Plot with a grid</span>
+<span class="sd">        style : str</span>
+<span class="sd">            matplotlib.pyplot.style.context, default is &#39;fast&#39;</span>
 <span class="sd">        kwargs : dict</span>
 <span class="sd">            Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.</span>
 
@@ -550,29 +627,34 @@
 <span class="sd">        ax : matplotlib.axes._subplots.AxesSubplot</span>
 <span class="sd">            The matplotlib axes object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># The &quot;fast&quot; style has only been in matplotlib since v2.1.</span>
+        <span class="c1"># Let&#39;s make it optional until &gt;v2.1 is mainstream and can</span>
+        <span class="c1"># be made the minimum requirement.</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;fast&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">&quot;fast&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mpl</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">available</span><span class="p">):</span>
+            <span class="n">style</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span>
         <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
             <span class="n">normalized_lc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
             <span class="n">flux</span><span class="p">,</span> <span class="n">flux_err</span> <span class="o">=</span> <span class="n">normalized_lc</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="n">normalized_lc</span><span class="o">.</span><span class="n">flux_err</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">flux</span><span class="p">,</span> <span class="n">flux_err</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux_err</span>
-        <span class="k">if</span> <span class="n">flux_err</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
-                    <span class="n">linestyle</span><span class="o">=</span><span class="n">linestyle</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">ax</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">flux_err</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
-                        <span class="n">linestyle</span><span class="o">=</span><span class="n">linestyle</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">fill</span><span class="p">:</span>
-            <span class="n">ax</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">fc</span><span class="o">=</span><span class="s1">&#39;#a8a7a7&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">grid</span><span class="p">:</span>
-            <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
-        <span class="k">if</span> <span class="s1">&#39;label&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-            <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">xlabel</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="s1">&#39;k&#39;</span><span class="p">})</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">ylabel</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="s1">&#39;k&#39;</span><span class="p">})</span>
+        <span class="k">with</span> <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">context</span><span class="p">(</span><span class="n">style</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;color&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">lines</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;color&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;black&#39;</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">flux_err</span><span class="p">)):</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">flux_err</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">fill</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;label&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">xlabel</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">ylabel</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ax</span></div>
 
 <div class="viewcode-block" id="LightCurve.to_table"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.LightCurve.to_table">[docs]</a>    <span class="k">def</span> <span class="nf">to_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -627,6 +709,22 @@
 <span class="sd">            returns None otherwise.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">path_or_buf</span><span class="o">=</span><span class="n">path_or_buf</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+
+
+<span class="k">class</span> <span class="nc">FoldedLightCurve</span><span class="p">(</span><span class="n">LightCurve</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Defines a folded lightcurve with different plotting defaults.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">FoldedLightCurve</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">phase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span>
+
+    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">FoldedLightCurve</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;xlabel&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Phase&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="s1">&#39;k&#39;</span><span class="p">})</span>
+        <span class="k">return</span> <span class="n">ax</span>
 
 
 <div class="viewcode-block" id="KeplerLightCurve"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.KeplerLightCurve">[docs]</a><span class="k">class</span> <span class="nc">KeplerLightCurve</span><span class="p">(</span><span class="n">LightCurve</span><span class="p">):</span>
