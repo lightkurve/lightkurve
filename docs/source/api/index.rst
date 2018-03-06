@@ -7,5 +7,7 @@ API documentation
 
     targetpixelfile
     lightcurve
+    lightcurvefile
+    correctors
     prf
     utils
