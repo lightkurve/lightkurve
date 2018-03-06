@@ -257,6 +257,8 @@ class KeplerLightCurveFile(LightCurveFile):
             Dictionary of keyword arguments to be passed to
             `KeplerLightCurve.plot()`.
         """
+        if (style == "fast") and ("fast" not in mpl.style.available):
+            style = "default"
         with plt.style.context(style):
             if not ('ax' in kwargs):
                 fig, ax = plt.subplots(1)
