@@ -93,6 +93,8 @@
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">API documentation</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="targetpixelfile.html">TargetPixelFile classes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="lightcurve.html">LightCurve classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lightcurvefile.html">LightCurveFile classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="correctors.html">Systematics correction classes</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">PSF photometry classes</a><ul class="simple">
 </ul>
 </li>
@@ -104,6 +106,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/section1.html">Introduction to lightkurve</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/section2.html">Science with lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section3.html">Advanced topics</a></li>
 </ul>
 <p class="caption"><span class="caption-text">About lightkurve</span></p>
 <ul>
@@ -195,15 +198,15 @@
 <dl class="class">
 <dt id="lightkurve.prf.KeplerPRF">
 <em class="property">class </em><code class="descclassname">lightkurve.prf.</code><code class="descname">KeplerPRF</code><span class="sig-paren">(</span><em>channel</em>, <em>shape</em>, <em>column</em>, <em>row</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/prf.html#KeplerPRF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.prf.KeplerPRF" title="Permalink to this definition">¶</a></dt>
-<dd><p>Kepler’s Pixel Response Function as designed by <a class="reference internal" href="#r1" id="id1">[R1]</a>.</p>
+<dd><p>Kepler’s Pixel Response Function as designed by <a class="reference internal" href="#r3" id="id1">[R3]</a>.</p>
 <p>This class provides the necessary interface to load Kepler PRF
 calibration files and to create a model that can be fit as a function
 of flux, center positions, width, and rotation angle.</p>
 <p class="rubric">References</p>
-<table class="docutils citation" frame="void" id="r1" rules="none">
+<table class="docutils citation" frame="void" id="r3" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label">[R1]</td><td><em>(<a class="fn-backref" href="#id1">1</a>, <a class="fn-backref" href="#id2">2</a>)</em> S. T. Bryson. The Kepler Pixel Response Function, 2010.
+<tr><td class="label">[R3]</td><td><em>(<a class="fn-backref" href="#id1">1</a>, <a class="fn-backref" href="#id2">2</a>)</em> S. T. Bryson. The Kepler Pixel Response Function, 2010.
 &lt;<a class="reference external" href="https://arxiv.org/abs/1001.0331">https://arxiv.org/abs/1001.0331</a>&gt;.</td></tr>
 </tbody>
 </table>

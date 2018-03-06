@@ -632,6 +632,9 @@
         <span class="c1"># be made the minimum requirement.</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;fast&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">&quot;fast&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mpl</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">available</span><span class="p">):</span>
             <span class="n">style</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">normalize</span> <span class="ow">and</span> <span class="n">ylabel</span> <span class="o">==</span> <span class="s1">&#39;Normalized Flux&#39;</span><span class="p">:</span>
+            <span class="n">ylabel</span> <span class="o">==</span> <span class="s1">&#39;Flux&#39;</span>
+        <span class="c1"># Normalize the lightcurve if requested</span>
         <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
             <span class="n">normalized_lc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
             <span class="n">flux</span><span class="p">,</span> <span class="n">flux_err</span> <span class="o">=</span> <span class="n">normalized_lc</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="n">normalized_lc</span><span class="o">.</span><span class="n">flux_err</span>
