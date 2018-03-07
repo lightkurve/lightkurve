@@ -618,7 +618,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         self.hdu.writeto(output_fn, overwrite=overwrite, checksum=True)
 
     @staticmethod
-    def from_fits_images(images, position, size=(10, 10), extension=None,
+    def from_fits_images(images, position=None, size=(10, 10), extension=None,
                          target_id="unnamed-target", **kwargs):
         """Creates a new Target Pixel File from a set of images.
 
@@ -666,8 +666,11 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 hdu = fits.open(img)[extension]
             if idx == 0:  # Get default keyword values from the first image
                 factory.keywords = hdu.header
-            cutout = Cutout2D(hdu.data, position, wcs=WCS(hdu.header),
-                              size=size, mode='partial')
+            if position is None:
+                cutout = hdu
+            else:
+                cutout = Cutout2D(hdu.data, position, wcs=WCS(hdu.header),
+                                  size=size, mode='partial')
             factory.add_cadence(frameno=idx, flux=cutout.data, header=hdu.header)
         return factory.get_tpf(**kwargs)
 
