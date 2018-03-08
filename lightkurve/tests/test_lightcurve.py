@@ -165,7 +165,8 @@ def test_cdpp_tabby():
 
 
 def test_bin():
-    lc = LightCurve(time=np.arange(10), flux=2*np.ones(10),
+    lc = LightCurve(time=np.arange(10),
+                    flux=2*np.ones(10),
                     flux_err=2**.5*np.ones(10))
     binned_lc = lc.bin(binsize=2)
     assert_allclose(binned_lc.flux, 2*np.ones(5))
@@ -173,6 +174,19 @@ def test_bin():
     assert len(binned_lc.time) == 5
     with pytest.raises(ValueError):
         lc.bin(method='doesnotexist')
+
+
+def test_bin_quality():
+    """Binning must also revise the quality and centroid columns."""
+    lc = KeplerLightCurve(time=[1, 2, 3, 4],
+                          flux=[1, 1, 1, 1],
+                          quality=[0, 1, 2, 3],
+                          centroid_col=[0, 1, 0, 1],
+                          centroid_row=[0, 2, 0, 2])
+    binned_lc = lc.bin(binsize=2)
+    assert_allclose(binned_lc.quality, [1, 3])  # Expect bitwise or
+    assert_allclose(binned_lc.centroid_col, [0.5, 0.5])  # Expect mean
+    assert_allclose(binned_lc.centroid_row, [1, 1])  # Expect mean
 
 
 def test_normalize():

@@ -354,6 +354,8 @@ class LightCurve(object):
           the binned lightcurve will report the root-mean-square error.
           If no uncertainties are included, the binned curve will return the
           standard deviation of the data.
+        - If the original lightcurve contains a quality attribute, then the
+          bitwise OR of the quality flags will be returned per bin.
         """
         available_methods = ['mean', 'median']
         if method not in available_methods:
@@ -375,6 +377,16 @@ class LightCurve(object):
             # compute the standard deviation from the data
             binned_lc.flux_err = np.array([np.nanstd(a)
                                            for a in np.array_split(self.flux, n_bins)])
+
+        if hasattr(binned_lc, 'quality'):
+            binned_lc.quality = np.array(
+                [np.bitwise_or.reduce(a) for a in np.array_split(self.quality, n_bins)])
+        if hasattr(binned_lc, 'centroid_col'):
+            binned_lc.centroid_col = np.array(
+                [methodf(a) for a in np.array_split(self.centroid_col, n_bins)])
+        if hasattr(binned_lc, 'centroid_row'):
+            binned_lc.centroid_row = np.array(
+                [methodf(a) for a in np.array_split(self.centroid_row, n_bins)])
 
         return binned_lc
 
@@ -445,7 +457,7 @@ class LightCurve(object):
 
     def plot(self, ax=None, normalize=True, xlabel='Time - 2454833 (days)',
              ylabel='Normalized Flux', title=None,
-             fill=False, grid=True, style='fast', **kwargs):
+             fill=False, grid=True, style='fast', time=None, **kwargs):
         """Plots the light curve.
 
         Parameters
@@ -482,6 +494,11 @@ class LightCurve(object):
         # be made the minimum requirement.
         if (style == "fast") and ("fast" not in mpl.style.available):
             style = "default"
+        if not normalize and ylabel == 'Normalized Flux':
+            ylabel == 'Flux'
+        if time is None:
+            time = self.time
+        # Normalize the lightcurve if requested
         if normalize:
             normalized_lc = self.normalize()
             flux, flux_err = normalized_lc.flux, normalized_lc.flux_err
