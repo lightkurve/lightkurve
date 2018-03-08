@@ -457,7 +457,7 @@ class LightCurve(object):
 
     def plot(self, ax=None, normalize=True, xlabel='Time - 2454833 (days)',
              ylabel='Normalized Flux', title=None,
-             fill=False, grid=True, style='fast', time=None, **kwargs):
+             fill=False, grid=True, style='fast', **kwargs):
         """Plots the light curve.
 
         Parameters
@@ -494,11 +494,6 @@ class LightCurve(object):
         # be made the minimum requirement.
         if (style == "fast") and ("fast" not in mpl.style.available):
             style = "default"
-        if not normalize and ylabel == 'Normalized Flux':
-            ylabel == 'Flux'
-        if time is None:
-            time = self.time
-        # Normalize the lightcurve if requested
         if normalize:
             normalized_lc = self.normalize()
             flux, flux_err = normalized_lc.flux, normalized_lc.flux_err
