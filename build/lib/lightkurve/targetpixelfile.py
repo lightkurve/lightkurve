@@ -606,19 +606,19 @@ class KeplerTargetPixelFile(TargetPixelFile):
         nanmask = np.isfinite(ts['corr_flux'])
 
         ### to do! Implement light curve POS_CORR1, POS_CORR2 attributes.
+        lc = KeplerLightCurve(flux=ts['corr_flux'],
+                time=ts['time'],
+                flux_err=np.nan*ts['corr_flux'],
+                centroid_col=ts['x'],
+                centroid_row=ts['y'],
+                quality=ts['quality'],
+                channel=self.channel,
+                campaign=self.campaign,
+                quarter=self.quarter,
+                mission=self.mission,
+                cadenceno=ts['cadence'])
 
-
-        return weightmap, KeplerLightCurve(flux=ts['corr_flux'],
-                                time=ts['time'],
-                                flux_err=np.nan*ts['corr_flux'],
-                                centroid_col=ts['x'],
-                                centroid_row=ts['y'],
-                                quality=ts['quality'],
-                                channel=self.channel,
-                                campaign=self.campaign,
-                                quarter=self.quarter,
-                                mission=self.mission,
-                                cadenceno=ts['cadence'])
+        return lc, weightmap
 
 
 
