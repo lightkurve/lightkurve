@@ -223,6 +223,19 @@ def test_to_pandas():
         pass
 
 
+def test_to_pandas_kepler():
+    """When to_pandas() is executed on a KeplerLightCurve, it should include
+    extra columns such as `quality`."""
+    time, flux, quality = range(3), np.ones(3), np.zeros(3)
+    lc = KeplerLightCurve(time, flux, quality=quality)
+    try:
+        df = lc.to_pandas()
+        assert_allclose(df.quality, quality)
+    except ImportError:
+        # pandas is an optional dependency
+        pass
+
+
 def test_to_table():
     """Test the `LightCurve.to_table()` method."""
     time, flux, flux_err = range(3), np.ones(3), np.zeros(3)
@@ -238,7 +251,7 @@ def test_to_csv():
     time, flux, flux_err = range(3), np.ones(3), np.zeros(3)
     try:
         lc = LightCurve(time, flux, flux_err)
-        assert(lc.to_csv() == 'time,flux,flux_err\n0,1.0,0.0\n1,1.0,0.0\n2,1.0,0.0\n')
+        assert(lc.to_csv(index=False) == 'time,flux,flux_err\n0,1.0,0.0\n1,1.0,0.0\n2,1.0,0.0\n')
     except ImportError:
         # pandas is an optional dependency
         pass
