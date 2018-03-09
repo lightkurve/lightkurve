@@ -698,6 +698,12 @@ class KeplerLightCurve(LightCurve):
                                  'centroid_col', 'centroid_row']):
         """Export the LightCurve as a Pandas DataFrame.
 
+        Parameters
+        ----------
+        columns : list of str
+            List of columns to include in the DataFrame.  The names must match
+            attributes of the `LightCurve` object (e.g. `time`, `flux`).
+
         Returns
         -------
         dataframe : `pandas.DataFrame` object
