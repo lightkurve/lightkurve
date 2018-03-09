@@ -91,7 +91,6 @@ class TargetPixelFile(object):
         output.pprint(max_lines=-1, max_width=-1)
 
 
-
 class TessTargetPixelFile(TargetPixelFile):
     """
     Defines a TargetPixelFile class for the TESS Mission.
@@ -114,6 +113,7 @@ class TessTargetPixelFile(TargetPixelFile):
     .. [1] Kepler: A Search for Terrestrial Planets. Kepler Archive Manual.
         http://archive.stsci.edu/kepler/manuals/archive_manual.pdf
     """
+    pass
 
 
 class KeplerTargetPixelFile(TargetPixelFile):
@@ -369,6 +369,18 @@ class KeplerTargetPixelFile(TargetPixelFile):
         except:
             out = 0
         return out
+
+    @property
+    def pos_corr1(self):
+        """Returns the column position correction
+        """
+        return self.hdu[1].data['POS_CORR1'][self.quality_mask]
+
+    @property
+    def pos_corr2(self):
+        """Returns the row position correction
+        """
+        return self.hdu[1].data['POS_CORR2'][self.quality_mask]
 
     @property
     def pipeline_mask(self):
