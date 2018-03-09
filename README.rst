@@ -62,6 +62,6 @@ Please read the citation instructions at `http://lightkurve.keplerscience.org/ci
 
 Contact
 -------
-Lightkurve is an open source community project owned by the authors and supported by
+Lightkurve is an open source community project owned by `the authors <AUTHORS.rst>`_ and supported by
 `NASA's Kepler/K2 Guest Observer Office <https://keplerscience.arc.nasa.gov>`_.
 You can contact us via keplergo@mail.arc.nasa.gov.
