@@ -2,6 +2,7 @@ from __future__ import division, print_function
 import datetime
 import os
 import warnings
+import logging
 
 from astropy.io import fits
 from astropy.nddata import Cutout2D
@@ -498,6 +499,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
             cadence.
         """
         aperture_mask = self._parse_aperture_mask(aperture_mask)
+        if aperture_mask.sum() == 0:
+            logging.warning('Warning: aperture mask contains zero pixels.')
         centroid_col, centroid_row = self.centroids(aperture_mask)
 
         return KeplerLightCurve(flux=np.nansum(self.flux[:, aperture_mask], axis=1),
