@@ -7,6 +7,7 @@ Direct contributions to the code base:
 - `Thomas Barclay <https://github.com/mrtommyb>`_
 
 Comments, corrections & suggestions:
+
 - `Ann Marie Cody <https://github.com/amcody>`_
 - `Jessie Dotson <https://github.com/jessie-dotson>`_
 - `Clare Brasseur <https://github.com/ceb8>`_
