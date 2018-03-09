@@ -504,6 +504,8 @@
 <span class="sd">          the binned lightcurve will report the root-mean-square error.</span>
 <span class="sd">          If no uncertainties are included, the binned curve will return the</span>
 <span class="sd">          standard deviation of the data.</span>
+<span class="sd">        - If the original lightcurve contains a quality attribute, then the</span>
+<span class="sd">          bitwise OR of the quality flags will be returned per bin.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">available_methods</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="s1">&#39;median&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">available_methods</span><span class="p">:</span>
@@ -525,6 +527,16 @@
             <span class="c1"># compute the standard deviation from the data</span>
             <span class="n">binned_lc</span><span class="o">.</span><span class="n">flux_err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">nanstd</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
                                            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="n">n_bins</span><span class="p">)])</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">binned_lc</span><span class="p">,</span> <span class="s1">&#39;quality&#39;</span><span class="p">):</span>
+            <span class="n">binned_lc</span><span class="o">.</span><span class="n">quality</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">bitwise_or</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">quality</span><span class="p">,</span> <span class="n">n_bins</span><span class="p">)])</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">binned_lc</span><span class="p">,</span> <span class="s1">&#39;centroid_col&#39;</span><span class="p">):</span>
+            <span class="n">binned_lc</span><span class="o">.</span><span class="n">centroid_col</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">methodf</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">centroid_col</span><span class="p">,</span> <span class="n">n_bins</span><span class="p">)])</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">binned_lc</span><span class="p">,</span> <span class="s1">&#39;centroid_row&#39;</span><span class="p">):</span>
+            <span class="n">binned_lc</span><span class="o">.</span><span class="n">centroid_row</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">methodf</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">centroid_row</span><span class="p">,</span> <span class="n">n_bins</span><span class="p">)])</span>
 
         <span class="k">return</span> <span class="n">binned_lc</span></div>
 
@@ -632,9 +644,6 @@
         <span class="c1"># be made the minimum requirement.</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;fast&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">&quot;fast&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mpl</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">available</span><span class="p">):</span>
             <span class="n">style</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">normalize</span> <span class="ow">and</span> <span class="n">ylabel</span> <span class="o">==</span> <span class="s1">&#39;Normalized Flux&#39;</span><span class="p">:</span>
-            <span class="n">ylabel</span> <span class="o">==</span> <span class="s1">&#39;Flux&#39;</span>
-        <span class="c1"># Normalize the lightcurve if requested</span>
         <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
             <span class="n">normalized_lc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
             <span class="n">flux</span><span class="p">,</span> <span class="n">flux_err</span> <span class="o">=</span> <span class="n">normalized_lc</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="n">normalized_lc</span><span class="o">.</span><span class="n">flux_err</span>
@@ -672,8 +681,14 @@
                      <span class="n">names</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="s1">&#39;flux&#39;</span><span class="p">,</span> <span class="s1">&#39;flux_err&#39;</span><span class="p">),</span>
                      <span class="n">meta</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="LightCurve.to_pandas"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.LightCurve.to_pandas">[docs]</a>    <span class="k">def</span> <span class="nf">to_pandas</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="LightCurve.to_pandas"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.LightCurve.to_pandas">[docs]</a>    <span class="k">def</span> <span class="nf">to_pandas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="s1">&#39;flux&#39;</span><span class="p">,</span> <span class="s1">&#39;flux_err&#39;</span><span class="p">]):</span>
         <span class="sd">&quot;&quot;&quot;Export the LightCurve as a Pandas DataFrame.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        columns : list of str</span>
+<span class="sd">            List of columns to include in the DataFrame.  The names must match</span>
+<span class="sd">            attributes of the `LightCurve` object (e.g. `time`, `flux`).</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -687,9 +702,11 @@
         <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;You need to install pandas to use the &quot;</span>
                               <span class="s2">&quot;LightCurve.to_pandas() method.&quot;</span><span class="p">)</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;flux&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="s1">&#39;flux_err&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux_err</span><span class="p">},</span>
-                          <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
-                          <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;flux&#39;</span><span class="p">,</span> <span class="s1">&#39;flux_err&#39;</span><span class="p">])</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col</span><span class="p">):</span>
+                <span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">)[</span><span class="n">col</span><span class="p">]</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">)</span>
         <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;time&#39;</span>
         <span class="n">df</span><span class="o">.</span><span class="n">meta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span>
         <span class="k">return</span> <span class="n">df</span></div>
@@ -826,6 +843,24 @@
         <span class="n">new_lc</span><span class="o">.</span><span class="n">flux</span> <span class="o">=</span> <span class="n">corrected_lc</span><span class="o">.</span><span class="n">flux</span>
         <span class="n">new_lc</span><span class="o">.</span><span class="n">flux_err</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span><span class="o">.</span><span class="n">flux_err</span><span class="p">[</span><span class="n">not_nan</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">new_lc</span></div>
+
+<div class="viewcode-block" id="KeplerLightCurve.to_pandas"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.KeplerLightCurve.to_pandas">[docs]</a>    <span class="k">def</span> <span class="nf">to_pandas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="s1">&#39;flux&#39;</span><span class="p">,</span> <span class="s1">&#39;flux_err&#39;</span><span class="p">,</span> <span class="s1">&#39;quality&#39;</span><span class="p">,</span>
+                                 <span class="s1">&#39;centroid_col&#39;</span><span class="p">,</span> <span class="s1">&#39;centroid_row&#39;</span><span class="p">]):</span>
+        <span class="sd">&quot;&quot;&quot;Export the LightCurve as a Pandas DataFrame.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        columns : list of str</span>
+<span class="sd">            List of columns to include in the DataFrame.  The names must match</span>
+<span class="sd">            attributes of the `LightCurve` object (e.g. `time`, `flux`).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dataframe : `pandas.DataFrame` object</span>
+<span class="sd">            A dataframe indexed by `time` and containing the columns `flux`</span>
+<span class="sd">            and `flux_err`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">KeplerLightCurve</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="KeplerLightCurve.to_fits"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.KeplerLightCurve.to_fits">[docs]</a>    <span class="k">def</span> <span class="nf">to_fits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div></div>

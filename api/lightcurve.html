@@ -261,7 +261,7 @@
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.to_csv" title="lightkurve.lightcurve.LightCurve.to_csv"><code class="xref py py-obj docutils literal"><span class="pre">to_csv</span></code></a>([path_or_buf])</td>
 <td>Writes the LightCurve to a csv file.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.to_pandas" title="lightkurve.lightcurve.LightCurve.to_pandas"><code class="xref py py-obj docutils literal"><span class="pre">to_pandas</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.to_pandas" title="lightkurve.lightcurve.LightCurve.to_pandas"><code class="xref py py-obj docutils literal"><span class="pre">to_pandas</span></code></a>([columns])</td>
 <td>Export the LightCurve as a Pandas DataFrame.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.to_table" title="lightkurve.lightcurve.LightCurve.to_table"><code class="xref py py-obj docutils literal"><span class="pre">to_table</span></code></a>()</td>
@@ -329,6 +329,8 @@ ignored.</li>
 the binned lightcurve will report the root-mean-square error.
 If no uncertainties are included, the binned curve will return the
 standard deviation of the data.</li>
+<li>If the original lightcurve contains a quality attribute, then the
+bitwise OR of the quality flags will be returned per bin.</li>
 </ul>
 </dd></dl>
 
@@ -666,13 +668,20 @@ returns None otherwise.</p>
 
 <dl class="method">
 <dt id="lightkurve.lightcurve.LightCurve.to_pandas">
-<code class="descname">to_pandas</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve.to_pandas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.to_pandas" title="Permalink to this definition">¶</a></dt>
+<code class="descname">to_pandas</code><span class="sig-paren">(</span><em>columns=['time', 'flux', 'flux_err']</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve.to_pandas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.to_pandas" title="Permalink to this definition">¶</a></dt>
 <dd><p>Export the LightCurve as a Pandas DataFrame.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>dataframe</strong> : <cite>pandas.DataFrame</cite> object</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>columns</strong> : list of str</p>
+<blockquote>
+<div><p>List of columns to include in the DataFrame.  The names must match
+attributes of the <cite>LightCurve</cite> object (e.g. <cite>time</cite>, <cite>flux</cite>).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>dataframe</strong> : <cite>pandas.DataFrame</cite> object</p>
 <blockquote class="last">
 <div><p>A dataframe indexed by <cite>time</cite> and containing the columns <cite>flux</cite>
 and <cite>flux_err</cite>.</p>
@@ -798,7 +807,7 @@ and <cite>flux_err</cite>.</p>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.to_fits" title="lightkurve.lightcurve.KeplerLightCurve.to_fits"><code class="xref py py-obj docutils literal"><span class="pre">to_fits</span></code></a>()</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">to_pandas</span></code>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.to_pandas" title="lightkurve.lightcurve.KeplerLightCurve.to_pandas"><code class="xref py py-obj docutils literal"><span class="pre">to_pandas</span></code></a>([columns])</td>
 <td>Export the LightCurve as a Pandas DataFrame.</td>
 </tr>
 <tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">to_table</span></code>()</td>
@@ -840,6 +849,32 @@ defined by <cite>method</cite>.</p>
 <dt id="lightkurve.lightcurve.KeplerLightCurve.to_fits">
 <code class="descname">to_fits</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#KeplerLightCurve.to_fits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurve.to_fits" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="method">
+<dt id="lightkurve.lightcurve.KeplerLightCurve.to_pandas">
+<code class="descname">to_pandas</code><span class="sig-paren">(</span><em>columns=['time', 'flux', 'flux_err', 'quality', 'centroid_col', 'centroid_row']</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#KeplerLightCurve.to_pandas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurve.to_pandas" title="Permalink to this definition">¶</a></dt>
+<dd><p>Export the LightCurve as a Pandas DataFrame.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>columns</strong> : list of str</p>
+<blockquote>
+<div><p>List of columns to include in the DataFrame.  The names must match
+attributes of the <cite>LightCurve</cite> object (e.g. <cite>time</cite>, <cite>flux</cite>).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>dataframe</strong> : <cite>pandas.DataFrame</cite> object</p>
+<blockquote class="last">
+<div><p>A dataframe indexed by <cite>time</cite> and containing the columns <cite>flux</cite>
+and <cite>flux_err</cite>.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </dd></dl>
 
@@ -923,7 +958,7 @@ defined by <cite>method</cite>.</p>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.TessLightCurve.to_fits" title="lightkurve.lightcurve.TessLightCurve.to_fits"><code class="xref py py-obj docutils literal"><span class="pre">to_fits</span></code></a>()</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">to_pandas</span></code>()</td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">to_pandas</span></code>([columns])</td>
 <td>Export the LightCurve as a Pandas DataFrame.</td>
 </tr>
 <tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">to_table</span></code>()</td>

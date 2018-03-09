@@ -237,7 +237,7 @@ Enables extraction of raw lightcurves and centroid positions.</p>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.from_archive" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.from_archive"><code class="xref py py-obj docutils literal"><span class="pre">from_archive</span></code></a>(target[,&nbsp;cadence,&nbsp;quarter,&nbsp;…])</td>
 <td>Fetch a Target Pixel File from the Kepler/K2 data archive at MAST.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.from_fits_images" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.from_fits_images"><code class="xref py py-obj docutils literal"><span class="pre">from_fits_images</span></code></a>(images,&nbsp;position[,&nbsp;size,&nbsp;…])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.from_fits_images" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.from_fits_images"><code class="xref py py-obj docutils literal"><span class="pre">from_fits_images</span></code></a>(images[,&nbsp;position,&nbsp;size,&nbsp;…])</td>
 <td>Creates a new Target Pixel File from a set of images.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_bkg_lightcurve" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.get_bkg_lightcurve"><code class="xref py py-obj docutils literal"><span class="pre">get_bkg_lightcurve</span></code></a>([aperture_mask])</td>
@@ -387,7 +387,7 @@ Hence, if cadence=’short’ you need to specify month=1, 2, or 3.</p>
 
 <dl class="staticmethod">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.from_fits_images">
-<em class="property">static </em><code class="descname">from_fits_images</code><span class="sig-paren">(</span><em>images</em>, <em>position</em>, <em>size=(10</em>, <em>10)</em>, <em>extension=None</em>, <em>target_id='unnamed-target'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/targetpixelfile.html#KeplerTargetPixelFile.from_fits_images"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.from_fits_images" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">from_fits_images</code><span class="sig-paren">(</span><em>images</em>, <em>position=None</em>, <em>size=(10</em>, <em>10)</em>, <em>extension=None</em>, <em>target_id='unnamed-target'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/targetpixelfile.html#KeplerTargetPixelFile.from_fits_images"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.from_fits_images" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a new Target Pixel File from a set of images.</p>
 <p>This method is intended to make it easy to cut out targets from
 Kepler/K2 “superstamp” regions or TESS FFI images.</p>
@@ -583,6 +583,18 @@ This argument has priority over frame number.</p>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.pos_corr1">
+<code class="descname">pos_corr1</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.pos_corr1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the column position correction.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.pos_corr2">
+<code class="descname">pos_corr2</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.pos_corr2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the row position correction.</p>
 </dd></dl>
 
 <dl class="attribute">

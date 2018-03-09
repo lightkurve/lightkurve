@@ -189,13 +189,13 @@
 
     <span class="c1"># Which is the recommended QUALITY mask to identify bad data?</span>
     <span class="n">DEFAULT_BITMASK</span> <span class="o">=</span> <span class="p">(</span><span class="n">AttitudeTweak</span> <span class="o">|</span> <span class="n">SafeMode</span> <span class="o">|</span> <span class="n">CoarsePoint</span> <span class="o">|</span> <span class="n">EarthPoint</span> <span class="o">|</span>
-                       <span class="n">Desat</span> <span class="o">|</span> <span class="n">ManualExclude</span> <span class="o">|</span>
-                       <span class="n">DetectorAnomaly</span> <span class="o">|</span> <span class="n">NoData</span> <span class="o">|</span> <span class="n">ThrusterFiring</span><span class="p">)</span>
+                       <span class="n">Desat</span> <span class="o">|</span> <span class="n">ManualExclude</span> <span class="o">|</span> <span class="n">DetectorAnomaly</span> <span class="o">|</span>
+                       <span class="n">NoData</span> <span class="o">|</span> <span class="n">PossibleThrusterFiring</span> <span class="o">|</span> <span class="n">ThrusterFiring</span><span class="p">)</span>
 
     <span class="c1"># This bitmask includes flags that are known to identify both good and bad cadences.</span>
     <span class="c1"># Use it wisely.</span>
     <span class="n">HARD_BITMASK</span> <span class="o">=</span> <span class="p">(</span><span class="n">DEFAULT_BITMASK</span> <span class="o">|</span> <span class="n">SensitivityDropout</span> <span class="o">|</span> <span class="n">ApertureCosmic</span> <span class="o">|</span>
-                    <span class="n">CollateralCosmic</span> <span class="o">|</span> <span class="n">PossibleThrusterFiring</span><span class="p">)</span>
+                    <span class="n">CollateralCosmic</span><span class="p">)</span>
 
     <span class="c1"># Using this bitmask only QUALITY == 0 cadences will remain</span>
     <span class="n">HARDEST_BITMASK</span> <span class="o">=</span> <span class="mi">2096639</span>
