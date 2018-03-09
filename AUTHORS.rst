@@ -13,4 +13,7 @@ Comments, corrections & suggestions:
 - `Clare Brasseur <https://github.com/ceb8>`_
 - `Elisa Quintana <https://github.com/elisaquintana>`_
 - `Doug Caldwell <https://github.com/dacmess>`_
+- `Daniel Foreman-Mackey <https://github.com/dfm>`_
 - Jeff Van Cleve
+- Ashley Villar
+- TJ Jaffe
