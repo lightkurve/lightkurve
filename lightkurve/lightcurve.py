@@ -531,8 +531,14 @@ class LightCurve(object):
                      names=('time', 'flux', 'flux_err'),
                      meta=self.meta)
 
-    def to_pandas(self):
+    def to_pandas(self, columns=['time', 'flux', 'flux_err']):
         """Export the LightCurve as a Pandas DataFrame.
+
+        Parameters
+        ----------
+        columns : list of str
+            List of columns to include in the DataFrame.  The names must match
+            attributes of the `LightCurve` object (e.g. `time`, `flux`).
 
         Returns
         -------
@@ -546,9 +552,11 @@ class LightCurve(object):
         except ImportError:
             raise ImportError("You need to install pandas to use the "
                               "LightCurve.to_pandas() method.")
-        df = pd.DataFrame(data={'flux': self.flux, 'flux_err': self.flux_err},
-                          index=self.time,
-                          columns=['flux', 'flux_err'])
+        data = {}
+        for col in columns:
+            if hasattr(self, col):
+                data[col] = vars(self)[col]
+        df = pd.DataFrame(data=data, index=self.time, columns=columns)
         df.index.name = 'time'
         df.meta = self.meta
         return df
@@ -685,6 +693,24 @@ class KeplerLightCurve(LightCurve):
         new_lc.flux = corrected_lc.flux
         new_lc.flux_err = self.normalize().flux_err[not_nan]
         return new_lc
+
+    def to_pandas(self, columns=['time', 'flux', 'flux_err', 'quality',
+                                 'centroid_col', 'centroid_row']):
+        """Export the LightCurve as a Pandas DataFrame.
+
+        Parameters
+        ----------
+        columns : list of str
+            List of columns to include in the DataFrame.  The names must match
+            attributes of the `LightCurve` object (e.g. `time`, `flux`).
+
+        Returns
+        -------
+        dataframe : `pandas.DataFrame` object
+            A dataframe indexed by `time` and containing the columns `flux`
+            and `flux_err`.
+        """
+        return super(KeplerLightCurve, self).to_pandas(columns=columns)
 
     def to_fits(self):
         raise NotImplementedError()
