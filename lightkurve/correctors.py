@@ -361,9 +361,9 @@ class SFFCorrector(object):
                 corrected_flux = self.normflux / self.interp(self.s)
                 flux[i] = corrected_flux
 
-            flux_hat = np.append(flux_hat, flux[i])
             if restore_trend:
-                flux_hat *= self.trend
+                flux[i] *= self.trend
+            flux_hat = np.append(flux_hat, flux[i])
 
         return LightCurve(time=timecopy, flux=flux_hat)
 
