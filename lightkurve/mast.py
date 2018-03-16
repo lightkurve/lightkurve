@@ -103,8 +103,8 @@ def search_kepler_tpf_products(target, cadence='long', quarter=None,
     # Identify the campaign or quarter by the description.
     quarter_or_campaign = campaign if campaign is not None else quarter
     if quarter_or_campaign is not None:
-        mask &= np.array([desc.endswith('Q{}'.format(quarter_or_campaign)) or
-                          desc.endswith('C{:02d}'.format(quarter_or_campaign))
+        mask &= np.array([desc.lower().endswith('q{}'.format(quarter_or_campaign)) or
+                          desc.lower().endswith('c{:02d}'.format(quarter_or_campaign))
                           for desc in products['description']])
     return products[mask]
 
@@ -140,7 +140,7 @@ def search_kepler_lightcurve_products(target, cadence='long', quarter=None,
     # Identify the campaign or quarter by the description.
     quarter_or_campaign = campaign if campaign is not None else quarter
     if quarter_or_campaign is not None:
-        mask &= np.array([desc.endswith('Q{}'.format(quarter_or_campaign)) or
-                          desc.endswith('C{:02d}'.format(quarter_or_campaign))
+        mask &= np.array([desc.lower().endswith('q{}'.format(quarter_or_campaign)) or
+                          desc.lower().endswith('c{:02d}'.format(quarter_or_campaign))
                           for desc in products['description']])
     return products[mask]
