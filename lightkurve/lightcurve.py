@@ -232,13 +232,23 @@ class LightCurve(object):
         # Then, apply the savgol_filter to each segment separately
         trend_signal = np.zeros(len(lc_clean.time))
         for l, h in zip(low, high):
+            segment_window_length, segment_polyorder = window_length, polyorder
+            # Reduce window_length if necessary to avoid error
+            if segment_window_length > (h - l):
+                segment_window_length = h - l
+                # window_length must be odd
+                if (segment_window_length % 2) == 0:
+                    segment_window_length -= 1
+            # Reduce polyorder if necessary to avoid error
+            if segment_polyorder >= segment_window_length:
+                segment_polyorder = segment_window_length - 1
             trend_signal[l:h] = signal.savgol_filter(x=lc_clean.flux[l:h],
-                                                     window_length=window_length,
-                                                     polyorder=polyorder, **kwargs)
+                                                     window_length=segment_window_length,
+                                                     polyorder=segment_polyorder, **kwargs)
         trend_signal = np.interp(self.time, lc_clean.time, trend_signal)
         flatten_lc = copy.deepcopy(self)
-        flatten_lc.flux /= trend_signal
-        flatten_lc.flux_err /= trend_signal
+        flatten_lc.flux = flatten_lc.flux / trend_signal
+        flatten_lc.flux_err = flatten_lc.flux_err / trend_signal
         if return_trend:
             trend_lc = copy.deepcopy(self)
             trend_lc.flux = trend_signal

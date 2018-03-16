@@ -360,3 +360,17 @@ def test_flatten():
     assert(len(flat_lc.time) == 5)
     assert(np.isfinite(flat_lc.flux).sum() == 3)
     assert(np.isfinite(flat_lc.flux_err).sum() == 3)
+
+
+def test_flatten_robustness():
+    """Flatten should work with integer fluxes."""
+    lc = LightCurve([1, 2, 3, 4, 5, 6], [10, 20, 30, 40, 50, 60])
+    # flatten() should be robust even if the fluxes are integers
+    flat_lc = lc.flatten(window_length=3, polyorder=1)
+    assert_allclose(flat_lc.flux, np.array([ 1.,  1.,  1.,  1.,  1., 1.]))
+    # flatten() should be robust even if `window_length > len(flux)`
+    flat_lc = lc.flatten(window_length=7, polyorder=1)
+    assert_allclose(flat_lc.flux, np.array([ 1.,  1.,  1.,  1.,  1., 1.]))
+    # flatten() should be robust even if `polyorder >= window_length`
+    flat_lc = lc.flatten(window_length=3, polyorder=3)
+    assert_allclose(flat_lc.flux, np.array([ 1.,  1.,  1.,  1.,  1., 1.]))
