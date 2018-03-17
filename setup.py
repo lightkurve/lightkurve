@@ -16,8 +16,8 @@ exec(open('lightkurve/version.py').read())
 
 setup(name='lightkurve',
       version=__version__,
-      description="A beautiful package for astronomical flux time series"
-                  "analysis in Python.",
+      description="A simple and beautiful package for astronomical "
+                  "flux time series analysis in Python.",
       long_description=open('README.rst').read(),
       author='KeplerGO',
       author_email='keplergo@mail.arc.nasa.gov',
