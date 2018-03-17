@@ -232,14 +232,13 @@ class LightCurve(object):
         # Then, apply the savgol_filter to each segment separately
         trend_signal = np.zeros(len(lc_clean.time))
         for l, h in zip(low, high):
+            # Reduce `window_length` and `polyorder` for short segments;
+            # this prevents `savgol_filter` from raising an exception
             segment_window_length, segment_polyorder = window_length, polyorder
-            # Reduce window_length if necessary to avoid error
             if segment_window_length > (h - l):
                 segment_window_length = h - l
-                # window_length must be odd
                 if (segment_window_length % 2) == 0:
-                    segment_window_length -= 1
-            # Reduce polyorder if necessary to avoid error
+                    segment_window_length -= 1  # window_length must be odd
             if segment_polyorder >= segment_window_length:
                 segment_polyorder = segment_window_length - 1
             trend_signal[l:h] = signal.savgol_filter(x=lc_clean.flux[l:h],
