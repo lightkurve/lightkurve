@@ -351,7 +351,7 @@ def test_properties(capfd):
     assert len(out) > 500
 
 
-def test_flatten():
+def test_flatten_with_nans():
     """Flatten should not remove NaNs."""
     lc = LightCurve(time=[1, 2, 3, 4, 5],
                     flux=[np.nan, 1.1, 1.2, np.nan, 1.4],
@@ -363,14 +363,16 @@ def test_flatten():
 
 
 def test_flatten_robustness():
-    """Flatten should work with integer fluxes."""
+    """Test various special cases for flatten()."""
+    # flatten should work with integer fluxes
     lc = LightCurve([1, 2, 3, 4, 5, 6], [10, 20, 30, 40, 50, 60])
-    # flatten() should be robust even if the fluxes are integers
     flat_lc = lc.flatten(window_length=3, polyorder=1)
     assert_allclose(flat_lc.flux, np.array([ 1.,  1.,  1.,  1.,  1., 1.]))
-    # flatten() should be robust even if `window_length > len(flux)`
+    # flatten should work even if `window_length > len(flux)`
     flat_lc = lc.flatten(window_length=7, polyorder=1)
     assert_allclose(flat_lc.flux, np.array([ 1.,  1.,  1.,  1.,  1., 1.]))
-    # flatten() should be robust even if `polyorder >= window_length`
+    # flatten should work even if `polyorder >= window_length`
     flat_lc = lc.flatten(window_length=3, polyorder=3)
+    assert_allclose(flat_lc.flux, np.array([ 1.,  1.,  1.,  1.,  1., 1.]))
+    flat_lc = lc.flatten(window_length=3, polyorder=5)
     assert_allclose(flat_lc.flux, np.array([ 1.,  1.,  1.,  1.,  1., 1.]))
