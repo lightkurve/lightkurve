@@ -25,19 +25,8 @@ __all__ = ['KeplerTargetPixelFile']
 
 class TargetPixelFile(object):
     """
-    TargetPixelFile class
+    Generic TargetPixelFile class
     """
-    def to_lightcurve(self):
-        """Returns a raw light curve of the TPF.
-
-        Returns
-        -------
-        lc : LightCurve object
-            Array containing the summed or detrended flux within the aperture
-            for each cadence.
-        """
-        pass
-
     def properties(self):
         '''Print out a description of each of the non-callable attributes of a
         TargetPixelFile object.

@@ -260,7 +260,7 @@ class KeplerLightCurveFile(LightCurveFile):
         ----------
         flux_types : str or list of str
             List of flux types to plot. Default is to plot all available.
-            (For Kepler the default fluxes are 'SAP_FLUX' and 'PDCSAP-FLUX'.
+            (For Kepler the default fluxes are 'SAP_FLUX' and 'PDCSAP_FLUX'.
         style : str
             matplotlib.pyplot.style.context, default is 'fast'
         kwargs : dict

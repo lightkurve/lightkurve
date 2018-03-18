@@ -376,7 +376,7 @@ class LightCurve(object):
         binned_lc.time = np.array([methodf(a) for a in np.array_split(self.time, n_bins)])
         binned_lc.flux = np.array([methodf(a) for a in np.array_split(self.flux, n_bins)])
 
-        if self.flux_err is not None:
+        if np.any(np.isfinite(self.flux_err)):
             # root-mean-square error
             binned_lc.flux_err = np.array(
                                     [np.sqrt(np.nansum(a**2))
@@ -721,9 +721,6 @@ class KeplerLightCurve(LightCurve):
         """
         return super(KeplerLightCurve, self).to_pandas(columns=columns)
 
-    def to_fits(self):
-        raise NotImplementedError()
-
 
 class TessLightCurve(LightCurve):
     """Defines a light curve class for NASA's TESS mission.
@@ -769,9 +766,6 @@ class TessLightCurve(LightCurve):
 
     def __repr__(self):
         return('TessLightCurve(TICID: {})'.format(self.ticid))
-
-    def to_fits(self):
-        raise NotImplementedError()
 
 
 def iterative_box_period_search(lc, niters=2, min_period=0.5, max_period=30,
