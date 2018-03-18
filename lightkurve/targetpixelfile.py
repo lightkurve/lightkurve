@@ -586,7 +586,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                  "must be in the range {}-{}.".format(
                                     cadenceno, self.cadenceno[0], self.cadenceno[-1]))
         try:
-            if bkg:
+            if bkg and np.any(np.isfinite(self.flux_bkg[frame])):
                 pflux = self.flux[frame] + self.flux_bkg[frame]
             else:
                 pflux = self.flux[frame]
