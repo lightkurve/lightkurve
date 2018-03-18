@@ -76,6 +76,9 @@ def test_KeplerLightCurveFile(path, mission):
     assert_array_equal(kplc.time, hdu[1].data['TIME'])
     assert_array_equal(kplc.flux, hdu[1].data['SAP_FLUX'])
 
+    with pytest.raises(KeyError):
+        lcf.get_lightcurve('BLABLA')
+
 
 @pytest.mark.remote_data
 @pytest.mark.parametrize("quality_bitmask",
@@ -113,6 +116,7 @@ def test_lightcurve_fold():
     assert_almost_equal(fold.time[0], -0.5, 2)
     assert_almost_equal(np.min(fold.phase), -0.5, 2)
     assert_almost_equal(np.max(fold.phase), 0.5, 2)
+    fold.plot()
 
 
 def test_lightcurve_append():
@@ -140,7 +144,9 @@ def test_lightcurve_plot():
     """Sanity check to verify that lightcurve plotting works"""
     lcf = KeplerLightCurveFile(TABBY_Q8)
     lcf.plot()
+    lcf.plot(flux_types=['SAP_FLUX', 'PDCSAP_FLUX'])
     lcf.SAP_FLUX.plot()
+    lcf.SAP_FLUX.plot(normalize=False, fill=False, title="Not the default")
 
 
 def test_cdpp():
@@ -165,6 +171,7 @@ def test_cdpp_tabby():
 
 
 def test_bin():
+    """Does binning work?"""
     lc = LightCurve(time=np.arange(10),
                     flux=2*np.ones(10),
                     flux_err=2**.5*np.ones(10))
@@ -174,6 +181,11 @@ def test_bin():
     assert len(binned_lc.time) == 5
     with pytest.raises(ValueError):
         lc.bin(method='doesnotexist')
+    # If `flux_err` is missing, the errors on the bins should be the stddev
+    lc = LightCurve(time=np.arange(10),
+                    flux=2*np.ones(10))
+    binned_lc = lc.bin(binsize=2)
+    assert_allclose(binned_lc.flux_err, np.zeros(5))
 
 
 def test_bin_quality():
@@ -334,10 +346,15 @@ def test_remove_nans():
 
 
 def test_remove_outliers():
-    time, flux = [1, 2, 3, 4], [1, 1, 1000, 1]
-    lc_clean = LightCurve(time, flux).remove_outliers(sigma=1)
+    # Does `remove_outliers()` remove outliers?
+    lc = LightCurve([1, 2, 3, 4], [1, 1, 1000, 1])
+    lc_clean = lc.remove_outliers(sigma=1)
     assert_array_equal(lc_clean.time, [1, 2, 4])
     assert_array_equal(lc_clean.flux, [1, 1, 1])
+    # It should also be possible to return the outlier mask
+    lc_clean, outlier_mask = lc.remove_outliers(sigma=1, return_mask=True)
+    assert(len(outlier_mask) == len(lc.flux))
+    assert(outlier_mask.sum() == 1)
 
 
 @pytest.mark.remote_data
@@ -366,13 +383,17 @@ def test_flatten_robustness():
     """Test various special cases for flatten()."""
     # flatten should work with integer fluxes
     lc = LightCurve([1, 2, 3, 4, 5, 6], [10, 20, 30, 40, 50, 60])
+    expected_result = np.array([ 1.,  1.,  1.,  1.,  1., 1.])
     flat_lc = lc.flatten(window_length=3, polyorder=1)
-    assert_allclose(flat_lc.flux, np.array([ 1.,  1.,  1.,  1.,  1., 1.]))
+    assert_allclose(flat_lc.flux, expected_result)
     # flatten should work even if `window_length > len(flux)`
     flat_lc = lc.flatten(window_length=7, polyorder=1)
-    assert_allclose(flat_lc.flux, np.array([ 1.,  1.,  1.,  1.,  1., 1.]))
+    assert_allclose(flat_lc.flux, expected_result)
     # flatten should work even if `polyorder >= window_length`
     flat_lc = lc.flatten(window_length=3, polyorder=3)
-    assert_allclose(flat_lc.flux, np.array([ 1.,  1.,  1.,  1.,  1., 1.]))
+    assert_allclose(flat_lc.flux, expected_result)
     flat_lc = lc.flatten(window_length=3, polyorder=5)
-    assert_allclose(flat_lc.flux, np.array([ 1.,  1.,  1.,  1.,  1., 1.]))
+    assert_allclose(flat_lc.flux, expected_result)
+    # flatten should work even if `break_tolerance = None`
+    flat_lc = lc.flatten(break_tolerance=None)
+    assert_allclose(flat_lc.flux, expected_result)

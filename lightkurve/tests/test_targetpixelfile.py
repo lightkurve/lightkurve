@@ -41,9 +41,16 @@ def test_tpf_plot():
     tpf.plot(aperture_mask=tpf.pipeline_mask)
     tpf.plot(aperture_mask='all')
     tpf.plot(frame=5)
+    with pytest.raises(ValueError):
+        tpf.plot(frame=999999)
     tpf.plot(cadenceno=125250)
     with pytest.raises(ValueError):
         tpf.plot(cadenceno=999)
+    tpf.plot(bkg=True)
+    tpf.plot(scale="sqrt")
+    tpf.plot(scale="log")
+    with pytest.raises(ValueError):
+        tpf.plot(scale="blabla")
 
 
 def test_tpf_zeros():
