@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Replicate Vanderburg &amp; Johnson 2014 K2SFF Method &mdash; lightkurve 1.0.a1 documentation</title>
+  <title>How does the SFF method work? &mdash; lightkurve 1.0.a1 documentation</title>
   
 
   
@@ -95,7 +95,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../section1.html">Introduction to lightkurve</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../section2.html">Science with lightkurve</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../section3.html">Advanced topics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../section3.html">Systematics correction using lightkurve</a></li>
 </ul>
 <p class="caption"><span class="caption-text">About lightkurve</span></p>
 <ul>
@@ -132,7 +132,7 @@
   <ul class="wy-breadcrumbs">
     <li><a href="../../../index.html">Docs</a> &raquo;</li>
       
-    <li>Replicate Vanderburg &amp; Johnson 2014 K2SFF Method</li>
+    <li>How does the SFF method work?</li>
       <li class="wy-breadcrumbs-aside">
         
           
@@ -344,55 +344,158 @@ div.nboutput div.output_area.stderr {
     margin-right: 4px;  /* make room for the exclamation icon */
 }
 </style>
-<div class="section" id="Replicate-Vanderburg-&amp;-Johnson-2014-K2SFF-Method">
-<h1>Replicate Vanderburg &amp; Johnson 2014 K2SFF Method<a class="headerlink" href="#Replicate-Vanderburg-&-Johnson-2014-K2SFF-Method" title="Permalink to this headline">¶</a></h1>
-<p>In this notebook we will replicate the K2SFF method from <a class="reference external" href="http://adsabs.harvard.edu/abs/2014PASP..126..948V">Vanderburg and
-Johnson 2014</a>
-(hereafter referred to as VJ). The paper introduces a method for “Self
-Flat Fielding”, by tracking how the lightcurve changes with motion of
-the spacecraft.</p>
+<div class="section" id="How-does-the-SFF-method-work?">
+<h1>How does the SFF method work?<a class="headerlink" href="#How-does-the-SFF-method-work?" title="Permalink to this headline">¶</a></h1>
+<p>Vanderburg and Johnson (2014) introduced a method for “Self Flat
+Fielding” by tracking how the lightcurve changes with motion of the
+spacecraft:</p>
+<p><a class="reference external" href="http://adsabs.harvard.edu/abs/2014PASP..126..948V">A Technique for Extracting Highly Precise Photometry for the
+Two-Wheeled Kepler
+Mission</a></p>
+<p>In this notebook we replicate the K2SFF method following the same
+example source, #60021426, as that in the publication. We aim to
+demystify the technique, which is extremely popular within the K2
+community. We have focused on reproducibility, so that we achieve the
+same result at the publication.</p>
+<p>The Vanderburg &amp; Johnson 2014 paper uses data from the Kepler two-wheel
+“Concept Engineering Test”, predating campaign 0, and sometimes called
+campaign <em>“eng”</em> or abbreviated CET. This vestigal “campaign” lacks some
+of the standardization of later K2 campaigns— it was much shorter,
+only about 9 days long, it lacks some of the standard quality flags,
+targets have non-traditional EPIC IDs, and other quirks.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>%matplotlib inline
+import numpy as np
+import matplotlib.pyplot as plt
+from astropy.io import fits
+import pandas as pd
+</pre></div>
+</div>
+</div>
+<div class="section" id="Retrieve-the-K2SFF-data-for-ENG-test-source-60021426">
+<h2>Retrieve the K2SFF data for ENG test source <code class="docutils literal"><span class="pre">60021426</span></code><a class="headerlink" href="#Retrieve-the-K2SFF-data-for-ENG-test-source-60021426" title="Permalink to this headline">¶</a></h2>
+<p>First we will retrieve data and inspect the mask used in the paper.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none"><div class="highlight"><pre>
 <span></span>In [2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span>from pyke import KeplerTargetPixelFile
-%matplotlib inline
-%config InlineBackend.figure_format = &#39;retina&#39;
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
+<span></span>#! wget -q http://archive.stsci.edu/hlsps/k2sff/cet/060000000/21426/hlsp_k2sff_k2_lightcurve_060021426-cet_kepler_v1_llc.fits
 </pre></div>
 </div>
 </div>
-<div class="section" id="Get-data">
-<h2>Get data<a class="headerlink" href="#Get-data" title="Permalink to this headline">¶</a></h2>
-<p>The example lightcurve used in the VJ paper can be downloaded from
-Andrew Vanderburg’s website:</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none"><div class="highlight"><pre>
 <span></span>In [3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span>df = pd.read_csv(&#39;https://www.cfa.harvard.edu/~avanderb/k2/ep60021426alldiagnostics.csv&#39;,index_col=False)
+<span></span>vdb_fits = fits.open(&#39;hlsp_k2sff_k2_lightcurve_060021426-cet_kepler_v1_llc.fits&#39;)
 </pre></div>
 </div>
 </div>
+<p>The <code class="docutils literal"><span class="pre">BESTAPER</span></code> keyword explains which aperture was chosen as the
+“best” by Vanderburg &amp; Johnson 2014. The FITS header for that slice
+contains the metadata needed to reproduce the mask.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none"><div class="highlight"><pre>
 <span></span>In [4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span>df.head()
+<span></span>keys = [&#39;MASKTYPE&#39;, &#39;MASKINDE&#39;, &#39;NPIXSAP&#39;]
+_ = [print(key, &#39; : &#39;, vdb_fits[&#39;BESTAPER&#39;].header[key]) for key in keys]
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+MASKTYPE  :  PRF FIT
+MASKINDE  :  4
+NPIXSAP  :  29.0
+</pre></div></div>
+</div>
+<p>We want the <em>exact same</em> mask as Vanderburg &amp; Johnson 2014, but the
+publication version and MAST version differ!</p>
+<p>Publication version: <img alt="img" src="https://www.cfa.harvard.edu/~avanderb/k2/ep60021426image.png" /></p>
+<p>MAST Version: <img alt="MAST Version" src="http://archive.stsci.edu/hlsps/k2sff/cet/060000000/21426/hlsp_k2sff_k2_lightcurve_060021426-cet_kepler_v1_image.png" /></p>
+<p>Aperture 7 should yield a bigger mask, more similar to what was used in
+the paper.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>VDB_J_mask = vdb_fits[&#39;PRF_APER_TBL&#39;].data[7,:, :] == True
+VDB_J_mask.sum()
 </pre></div>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>Out[4]:
+<span></span>Out[5]:
+</pre></div>
+</div>
+<div class="output_area highlight-none"><div class="highlight"><pre>
+<span></span>53
+</pre></div>
+</div>
+</div>
+<p>Save the mask for easy use in our next notebook.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>np.save(&#39;VDB_J_2014_mask.npy&#39;, VDB_J_mask)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Manually-reproduce-with-the-Vanderburg-provided-diagnostic-data">
+<h2>Manually reproduce with the Vanderburg-provided diagnostic data<a class="headerlink" href="#Manually-reproduce-with-the-Vanderburg-provided-diagnostic-data" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line">Retrieve the Vanderburg-provided diagnostic data for the Kepler ENG
+testing.</div>
+<div class="line">Uncomment the line below to retrieve the data programmatically, or
+manually get the linked file in a browser and save it to this
+directory.</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>#! wget https://www.cfa.harvard.edu/~avanderb/k2/ep60021426alldiagnostics.csv
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>df = pd.read_csv(&#39;ep60021426alldiagnostics.csv&#39;,index_col=False)
+df.head()
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>Out[7]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -484,16 +587,12 @@ Andrew Vanderburg’s website:</p>
 </table>
 </div></div>
 </div>
-<p>The data file provides us with several measurements for the star. In
-this notebook, we will use the time (“BJD - 2454833”), the flux (“Raw
-Flux”), and the position measurements (“X-centroid” and “Y-centroid”).</p>
-<p>Let’s use the provided <span class="math">\(x-y\)</span> centroids, but we could compute these
-on our own too.</p>
-<p>We subtract the mean from the centroids to enable the axes of our
-figures to match those in the VJ paper:</p>
+<p>We can mean-subtract the provided <span class="math">\(x-y\)</span> centroids, assigning them
+column and row identifiers, then rotate the coordinates into their major
+and minor axes.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [6]:
+<span></span>In [8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3"><div class="highlight"><pre>
@@ -504,40 +603,17 @@ row = row - np.mean(row)
 </pre></div>
 </div>
 </div>
-<p>Next, we define and execute two key functions which the SFF algorithm
-needs, one to compute the eigen vectors, and another one to rotate them:</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [7]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span>def _get_eigen_vectors(centroid_col, centroid_row):
-    centroids = np.array([centroid_col, centroid_row])
-    eig_val, eig_vec = np.linalg.eigh(np.cov(centroids))
-    return eig_val, eig_vec
-</pre></div>
-</div>
-</div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [8]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span>def _rotate(eig_vec, centroid_col, centroid_row):
-    centroids = np.array([centroid_col, centroid_row])
-    return np.dot(eig_vec, centroids)
-</pre></div>
-</div>
-</div>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none"><div class="highlight"><pre>
 <span></span>In [9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span>eig_val, eig_vec = _get_eigen_vectors(col, row)
+<span></span>def _get_eigen_vectors(centroid_col, centroid_row):
+    &#39;&#39;&#39;get the eigenvalues and eigenvectors given centroid x, y positions&#39;&#39;&#39;
+    centroids = np.array([centroid_col, centroid_row])
+    eig_val, eig_vec = np.linalg.eigh(np.cov(centroids))
+    return eig_val, eig_vec
 </pre></div>
 </div>
 </div>
@@ -547,23 +623,44 @@ needs, one to compute the eigen vectors, and another one to rotate them:</p>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span>v1, v2 = eig_vec
+<span></span>def _rotate(eig_vec, centroid_col, centroid_row):
+    &#39;&#39;&#39;rotate the centroids into their predominant linear axis&#39;&#39;&#39;
+    centroids = np.array([centroid_col, centroid_row])
+    return np.dot(eig_vec, centroids)
 </pre></div>
 </div>
 </div>
-<p>The major axis (i.e. the eigen vector with the most variance) is <code class="docutils literal"><span class="pre">v2</span></code>
-because numpy returns eigen vectors this way.</p>
-<p>Next, let’s plot the motion of the target (red circles) along with the
-eigen vectors we found (blue lines):</p>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none"><div class="highlight"><pre>
 <span></span>In [11]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>eig_val, eig_vec = _get_eigen_vectors(col, row)
+v1, v2 = eig_vec
+</pre></div>
+</div>
+</div>
+<p>The major axis is the latter.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
+<span></span>platescale = 4.0 # The Kepler plate scale; has units of arcseconds / pixel
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none"><div class="highlight"><pre>
+<span></span>In [13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3"><div class="highlight"><pre>
 <span></span>plt.figure(figsize=(5, 6))
-plt.plot(col*4.0, row*4.0, &#39;ko&#39;, ms=4)
-plt.plot(col*4.0, row*4.0, &#39;ro&#39;, ms=1)
+plt.plot(col * platescale, row * platescale, &#39;ko&#39;, ms=4)
+plt.plot(col * platescale, row * platescale, &#39;ro&#39;, ms=1)
 plt.xticks([-2, -1,0, 1, 2])
 plt.yticks([-2, -1,0, 1, 2])
 plt.xlabel(&#39;X position [arcseconds]&#39;)
@@ -579,30 +676,30 @@ plt.plot([0, v2[0]], [0, v2[1]], color=&#39;blue&#39;, lw=3);
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../../_images/tutorials_motion-correction_.ipynb_checkpoints_replicate-vanderburg-2014-k2sff-checkpoint_17_0.png" src="../../../_images/tutorials_motion-correction_.ipynb_checkpoints_replicate-vanderburg-2014-k2sff-checkpoint_17_0.png" />
+<img alt="../../../_images/tutorials_motion-correction_.ipynb_checkpoints_replicate-vanderburg-2014-k2sff-checkpoint_25_0.png" src="../../../_images/tutorials_motion-correction_.ipynb_checkpoints_replicate-vanderburg-2014-k2sff-checkpoint_25_0.png" />
 </div>
 </div>
-<p>Following the form of Figure 2 of Vanderburg &amp; Johsnon 2014.</p>
+<p>Following the form of <strong>Figure 2</strong> of Vanderburg &amp; Johsnon 2014.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [12]:
+<span></span>In [14]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span>rot_colp, rot_rowp = _rotate(eig_vec, col, row)
+<span></span>rot_colp, rot_rowp = _rotate(eig_vec, col, row) #units in pixels
 </pre></div>
 </div>
 </div>
 <p>You can rotate into the new reference frame.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [13]:
+<span></span>In [15]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3"><div class="highlight"><pre>
 <span></span>plt.figure(figsize=(5, 6))
-plt.plot(rot_rowp*4.0, rot_colp*4.0, &#39;ko&#39;, ms=4)
-plt.plot(rot_rowp*4.0, rot_colp*4.0, &#39;ro&#39;, ms=1)
+plt.plot(rot_rowp * platescale, rot_colp * platescale, &#39;ko&#39;, ms=4)
+plt.plot(rot_rowp * platescale, rot_colp * platescale, &#39;ro&#39;, ms=1)
 plt.xticks([-2, -1,0, 1, 2])
 plt.yticks([-2, -1,0, 1, 2])
 plt.xlabel(&quot;X&#39; position [arcseconds]&quot;)
@@ -618,7 +715,7 @@ plt.plot([0, 0], [0, 1], color=&#39;blue&#39;);
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../../_images/tutorials_motion-correction_.ipynb_checkpoints_replicate-vanderburg-2014-k2sff-checkpoint_21_0.png" src="../../../_images/tutorials_motion-correction_.ipynb_checkpoints_replicate-vanderburg-2014-k2sff-checkpoint_21_0.png" />
+<img alt="../../../_images/tutorials_motion-correction_.ipynb_checkpoints_replicate-vanderburg-2014-k2sff-checkpoint_29_0.png" src="../../../_images/tutorials_motion-correction_.ipynb_checkpoints_replicate-vanderburg-2014-k2sff-checkpoint_29_0.png" />
 </div>
 </div>
 <p>We need to calculate the arclength using:</p>
@@ -626,9 +723,10 @@ plt.plot([0, 0], [0, 1], color=&#39;blue&#39;);
 \[ \begin{align}\begin{aligned}s= \int_{x'_0}^{x'_1}\sqrt{1+\left( \frac{dy'_p}{dx'}\right)^2} dx'\\where :math:`x^\prime_0` is the transformed :math:`x` coordinate of
 the point with the smallest :math:`x^\prime` position, and
 :math:`y^\prime_p` is the best--fit polynomial function.\end{aligned}\end{align} \]</div>
+<p>Fit a <span class="math">\(5^{th}\)</span> order polynomial to the rotated coordinates.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [14]:
+<span></span>In [16]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3"><div class="highlight"><pre>
@@ -640,33 +738,28 @@ p5_deriv = p5.deriv()
 </div>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [15]:
+<span></span>In [17]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3"><div class="highlight"><pre>
 <span></span>x0_prime = np.min(rot_rowp)
 xmax_prime = np.max(rot_rowp)
-</pre></div>
-</div>
-</div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [16]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span>x_dense = np.linspace(x0_prime, xmax_prime, 2000)
+x_dense = np.linspace(x0_prime, xmax_prime, 2000)
 </pre></div>
 </div>
 </div>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [17]:
+<span></span>In [18]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3"><div class="highlight"><pre>
 <span></span>plt.plot(rot_rowp, rot_colp, &#39;.&#39;)
-plt.plot(x_dense, p5(x_dense));
+plt.plot(x_dense, p5(x_dense))
+plt.ylabel(&#39;Position along minor axis (pixels)&#39;)
+plt.xlabel(&#39;Position along major axis (pixels)&#39;)
+plt.title(&#39;Performance of polynomial regression&#39;)
+plt.ylim(-0.1, 0.1);
 </pre></div>
 </div>
 </div>
@@ -674,12 +767,15 @@ plt.plot(x_dense, p5(x_dense));
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../../_images/tutorials_motion-correction_.ipynb_checkpoints_replicate-vanderburg-2014-k2sff-checkpoint_26_0.png" src="../../../_images/tutorials_motion-correction_.ipynb_checkpoints_replicate-vanderburg-2014-k2sff-checkpoint_26_0.png" />
+<img alt="../../../_images/tutorials_motion-correction_.ipynb_checkpoints_replicate-vanderburg-2014-k2sff-checkpoint_34_0.png" src="../../../_images/tutorials_motion-correction_.ipynb_checkpoints_replicate-vanderburg-2014-k2sff-checkpoint_34_0.png" />
 </div>
 </div>
+<p>We see evidence for a <a class="reference external" href="https://en.wikipedia.org/wiki/Bias%E2%80%93variance_tradeoff">bias-variance
+tradeoff</a>,
+suggesting some modest opportunity for improvement.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [18]:
+<span></span>In [19]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3"><div class="highlight"><pre>
@@ -693,13 +789,19 @@ def arclength(x):
 </pre></div>
 </div>
 </div>
+<p>Let’s double check that we compute the same arclength as the published
+paper.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [19]:
+<span></span>In [20]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span>plt.plot(df[&#39; arclength&#39;], arclength(rot_rowp)*4.0, &#39;.&#39;)
+<span></span>aspect_ratio = plt.figaspect(1)
+plt.figure(figsize=aspect_ratio)
+plt.plot(df[&#39; arclength&#39;], arclength(rot_rowp)*4.0, &#39;.&#39;)
+plt.xlabel(&#39;$s$  (Vanderburg &amp; Johnson 2014)&#39;)
+plt.ylabel(&#39;$s$  (This work)&#39;)
 plt.plot([0, 4], [0, 4], &#39;k--&#39;);
 </pre></div>
 </div>
@@ -708,15 +810,16 @@ plt.plot([0, 4], [0, 4], &#39;k--&#39;);
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../../_images/tutorials_motion-correction_.ipynb_checkpoints_replicate-vanderburg-2014-k2sff-checkpoint_28_0.png" src="../../../_images/tutorials_motion-correction_.ipynb_checkpoints_replicate-vanderburg-2014-k2sff-checkpoint_28_0.png" />
+<img alt="../../../_images/tutorials_motion-correction_.ipynb_checkpoints_replicate-vanderburg-2014-k2sff-checkpoint_38_0.png" src="../../../_images/tutorials_motion-correction_.ipynb_checkpoints_replicate-vanderburg-2014-k2sff-checkpoint_38_0.png" />
 </div>
 </div>
-<p>It works!</p>
-<p>Now we apply a high-pass filter. We follow the original paper by using
-BSplines with 1.5 day breakpoints.</p>
+<p>Yes, we compute arclength correctly.</p>
+<p>Now we apply a <strong>high-pass filter</strong> to the raw lightcurve data. We
+follow the original paper by using <em>BSplines</em> with 1.5 day breakpoints.
+You can also apply data exclusion at this stage.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [20]:
+<span></span>In [21]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3"><div class="highlight"><pre>
@@ -727,32 +830,26 @@ from scipy import interpolate
 </div>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [21]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span>tt, ff = df[&#39;BJD - 2454833&#39;].values, df[&#39; Raw Flux&#39;].values
-tt = tt - tt[0]
-</pre></div>
-</div>
-</div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
 <span></span>In [22]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span>knots = np.arange(0, tt[-1], 1.5)
+<span></span>times, raw_fluxes = df[&#39;BJD - 2454833&#39;].values, df[&#39; Raw Flux&#39;].values
 </pre></div>
 </div>
 </div>
+<p>We find the weighted least square spline for a given set of knots,
+<span class="math">\(t\)</span>. We supply interior knots as knots on the ends are added
+automatically, as stated in the <code class="docutils literal"><span class="pre">interpolate.splrep()</span></code> docstring.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none"><div class="highlight"><pre>
 <span></span>In [23]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span>t,c,k = interpolate.splrep(tt, ff, s=0, task=-1, t=knots[1:])
+<span></span>interior_knots = np.arange(times[0]+1.5, times[0]+6, 1.5)
+t,c,k = interpolate.splrep(times, raw_fluxes, s=0, task=-1, t=interior_knots)
+bspl = BSpline(t,c,k)
 </pre></div>
 </div>
 </div>
@@ -762,20 +859,10 @@ tt = tt - tt[0]
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span>bspl = BSpline(t,c,k)
-
-plt.plot(tt, ff, &#39;.&#39;)
-plt.plot(tt, bspl(tt))
-</pre></div>
-</div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>Out[24]:
-</pre></div>
-</div>
-<div class="output_area highlight-none"><div class="highlight"><pre>
-<span></span>[&lt;matplotlib.lines.Line2D at 0x107a3b588&gt;]
+<span></span>plt.plot(times, raw_fluxes, &#39;.&#39;)
+plt.plot(times, bspl(times))
+plt.xlabel(&#39;$t$ (days)&#39;)
+plt.ylabel(&#39;Raw Flux&#39;);
 </pre></div>
 </div>
 </div>
@@ -783,11 +870,12 @@ plt.plot(tt, bspl(tt))
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../../_images/tutorials_motion-correction_.ipynb_checkpoints_replicate-vanderburg-2014-k2sff-checkpoint_35_1.png" src="../../../_images/tutorials_motion-correction_.ipynb_checkpoints_replicate-vanderburg-2014-k2sff-checkpoint_35_1.png" />
+<img alt="../../../_images/tutorials_motion-correction_.ipynb_checkpoints_replicate-vanderburg-2014-k2sff-checkpoint_45_0.png" src="../../../_images/tutorials_motion-correction_.ipynb_checkpoints_replicate-vanderburg-2014-k2sff-checkpoint_45_0.png" />
 </div>
 </div>
 <div class="line-block">
-<div class="line">Spline fit looks good, so normalize the flux by the long-term trend.</div>
+<div class="line">The Spline fit looks good, so we can normalize the flux by the
+long-term trend.</div>
 <div class="line">Plot the normalized flux versus arclength to see the
 position-dependent flux.</div>
 </div>
@@ -797,7 +885,7 @@ position-dependent flux.</div>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span>norm_ff = ff/bspl(tt)
+<span></span>fluxes = raw_fluxes/bspl(times)
 </pre></div>
 </div>
 </div>
@@ -810,7 +898,8 @@ position-dependent flux.</div>
 <div class="input_area highlight-ipython3"><div class="highlight"><pre>
 <span></span>bi = df[&#39; Thrusters On&#39;].values == 1.0
 gi = df[&#39; Thrusters On&#39;].values == 0.0
-al, gff = arclength(rot_rowp[gi])*4.0, norm_ff[gi]
+clean_fluxes = fluxes[gi]
+al = arclength(rot_rowp[gi]) * platescale
 </pre></div>
 </div>
 </div>
@@ -824,8 +913,8 @@ al, gff = arclength(rot_rowp[gi])*4.0, norm_ff[gi]
 </pre></div>
 </div>
 </div>
-<p>We will follow the paper by interpolating 15 bins of means. This is a
-piecewise linear fit.</p>
+<p>We will follow the paper by interpolating <strong>flux versus arclength
+position</strong> in 15 bins of means, which is a <em>piecewise linear fit</em>.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none"><div class="highlight"><pre>
 <span></span>In [28]:
@@ -844,9 +933,9 @@ piecewise linear fit.</p>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span>bin_means = np.array([gff[sorted_inds][0]]+
-                     [np.mean(splt) for splt in np.array_split(gff[sorted_inds], 15)]+
-                     [gff[sorted_inds][-1]])
+<span></span>bin_means = np.array([clean_fluxes[sorted_inds][0]]+
+                     [np.mean(splt) for splt in np.array_split(clean_fluxes[sorted_inds], 15)]+
+                     [clean_fluxes[sorted_inds][-1]])
 </pre></div>
 </div>
 </div>
@@ -856,7 +945,7 @@ piecewise linear fit.</p>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span>zz = np.polyfit(al, gff,6)
+<span></span>zz = np.polyfit(al, clean_fluxes,6)
 sff = np.poly1d(zz)
 al_dense = np.linspace(0, 4, 1000)
 interp_func = interpolate.interp1d(knots, bin_means)
@@ -870,18 +959,17 @@ interp_func = interpolate.interp1d(knots, bin_means)
 </div>
 <div class="input_area highlight-ipython3"><div class="highlight"><pre>
 <span></span>plt.figure(figsize=(5, 6))
-plt.plot(arclength(rot_rowp)*4.0, norm_ff, &#39;ko&#39;, ms=4)
-plt.plot(arclength(rot_rowp)*4.0, norm_ff, &#39;o&#39;, color=&#39;#3498db&#39;, ms=3)
-plt.plot(arclength(rot_rowp[bi])*4.0, norm_ff[bi], &#39;o&#39;, color=&#39;r&#39;, ms=3)
-#plt.plot(al_dense, sff(al_dense), &#39;-&#39;, color=&#39;#e67e22&#39;)
-#plt.plot(knots, bin_means, &#39;-&#39;, color=&#39;#e67e22&#39;)
+plt.plot(arclength(rot_rowp)*4.0, fluxes, &#39;ko&#39;, ms=4)
+plt.plot(arclength(rot_rowp)*4.0, fluxes, &#39;o&#39;, color=&#39;#3498db&#39;, ms=3)
+plt.plot(arclength(rot_rowp[bi])*4.0, fluxes[bi], &#39;o&#39;, color=&#39;r&#39;, ms=3)
 plt.plot(np.sort(al), interp_func(np.sort(al)), &#39;-&#39;, color=&#39;#e67e22&#39;)
 
-#plt.xticks([0, 1,2, 3, 4])
+plt.xticks([0, 1,2, 3, 4])
+plt.minorticks_on()
 plt.xlabel(&#39;Arclength [arcseconds]&#39;)
 plt.ylabel(&#39;Relative Brightness&#39;)
 plt.title(&#39;EPIC 60021426, Kp =10.3&#39;)
-#plt.xlim(0,4)
+plt.xlim(0,4)
 plt.ylim(0.997, 1.002);
 </pre></div>
 </div>
@@ -890,10 +978,10 @@ plt.ylim(0.997, 1.002);
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../../_images/tutorials_motion-correction_.ipynb_checkpoints_replicate-vanderburg-2014-k2sff-checkpoint_45_0.png" src="../../../_images/tutorials_motion-correction_.ipynb_checkpoints_replicate-vanderburg-2014-k2sff-checkpoint_45_0.png" />
+<img alt="../../../_images/tutorials_motion-correction_.ipynb_checkpoints_replicate-vanderburg-2014-k2sff-checkpoint_55_0.png" src="../../../_images/tutorials_motion-correction_.ipynb_checkpoints_replicate-vanderburg-2014-k2sff-checkpoint_55_0.png" />
 </div>
 </div>
-<p>Following Figure 4 of Vanderburg &amp; Johnson 2014.</p>
+<p>Following <strong>Figure 4</strong> of Vanderburg &amp; Johnson 2014.</p>
 <p>Apply the Self Flat Field (SFF) correction:</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none"><div class="highlight"><pre>
@@ -901,7 +989,7 @@ plt.ylim(0.997, 1.002);
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span>corr_flux = gff / interp_func(al)
+<span></span>corr_fluxes = clean_fluxes / interp_func(al)
 </pre></div>
 </div>
 </div>
@@ -917,9 +1005,8 @@ dy = 0.004
 plt.plot(df[&#39;BJD - 2454833&#39;], df[&#39; Raw Flux&#39;]+dy, &#39;ko&#39;, ms=4)
 plt.plot(df[&#39;BJD - 2454833&#39;], df[&#39; Raw Flux&#39;]+dy, &#39;o&#39;, color=&#39;#3498db&#39;, ms=3)
 plt.plot(df[&#39;BJD - 2454833&#39;][bi], df[&#39; Raw Flux&#39;][bi]+dy, &#39;o&#39;, color=&#39;r&#39;, ms=3)
-plt.plot(df[&#39;BJD - 2454833&#39;][gi], corr_flux*bspl(tt[gi]), &#39;o&#39;, color=&#39;k&#39;, ms = 4)
-plt.plot(df[&#39;BJD - 2454833&#39;][gi], corr_flux*bspl(tt[gi]), &#39;o&#39;, color=&#39;#e67e22&#39;, ms = 3)
-#plt.plot(df[&#39;BJD - 2454833&#39;][gi], df[&#39; Corrected Flux&#39;][gi], &#39;o&#39;, color=&#39;#00ff00&#39;, ms = 4)
+plt.plot(df[&#39;BJD - 2454833&#39;][gi], corr_fluxes*bspl(times[gi]), &#39;o&#39;, color=&#39;k&#39;, ms = 4)
+plt.plot(df[&#39;BJD - 2454833&#39;][gi], corr_fluxes*bspl(times[gi]), &#39;o&#39;, color=&#39;#e67e22&#39;, ms = 3)
 
 plt.xlabel(&#39;BJD - 2454833&#39;)
 plt.ylabel(&#39;Relative Brightness&#39;)
@@ -933,188 +1020,11 @@ plt.ylim(0.994, 1.008);
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../../_images/tutorials_motion-correction_.ipynb_checkpoints_replicate-vanderburg-2014-k2sff-checkpoint_49_0.png" src="../../../_images/tutorials_motion-correction_.ipynb_checkpoints_replicate-vanderburg-2014-k2sff-checkpoint_49_0.png" />
+<img alt="../../../_images/tutorials_motion-correction_.ipynb_checkpoints_replicate-vanderburg-2014-k2sff-checkpoint_59_0.png" src="../../../_images/tutorials_motion-correction_.ipynb_checkpoints_replicate-vanderburg-2014-k2sff-checkpoint_59_0.png" />
 </div>
 </div>
-<p>Following Figure 5 of Vanderburg &amp; Johnson 2015.</p>
-<p>Let’s compute the CDPP:</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [34]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span>from pyke import LightCurve
-</pre></div>
-</div>
-</div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [35]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span>#lc = LightCurve(time=df[&#39;BJD - 2454833&#39;][gi], flux=corr_flux*bspl(tt[gi]))
-lc = LightCurve(time=df[&#39;BJD - 2454833&#39;][gi], flux=df[&#39; Corrected Flux&#39;][gi])
-</pre></div>
-</div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [36]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span>lc.cdpp(savgol_window=201)
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>Out[36]:
-</pre></div>
-</div>
-<div class="output_area highlight-none"><div class="highlight"><pre>
-<span></span>27.766078493609353
-</pre></div>
-</div>
-</div>
-<p>The end.</p>
-<p>Using lightkurve:</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [37]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span>from lightkurve.lightcurve import SFFCorrector
-</pre></div>
-</div>
-</div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [38]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span>sff = SFFCorrector()
-</pre></div>
-</div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [39]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span>lc_corrected = sff.correct(df[&#39;BJD - 2454833&#39;][gi].values,
-                           df[&#39; Raw Flux&#39;][gi].values,
-                           col[gi], row[gi], niters=1, windows=1, polyorder=5)
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="stderr output_area docutils container">
-<div class="highlight"><pre>
-100%|██████████| 1/1 [00:00&lt;00:00,  9.84it/s]
-</pre></div></div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [40]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span>plt.figure(figsize=(10,6))
-
-dy = 0.004
-plt.plot(df[&#39;BJD - 2454833&#39;], df[&#39; Raw Flux&#39;]+dy, &#39;ko&#39;, ms=4)
-plt.plot(df[&#39;BJD - 2454833&#39;], df[&#39; Raw Flux&#39;]+dy, &#39;o&#39;, color=&#39;#3498db&#39;, ms=3)
-plt.plot(df[&#39;BJD - 2454833&#39;][bi], df[&#39; Raw Flux&#39;][bi]+dy, &#39;o&#39;, color=&#39;r&#39;, ms=3)
-plt.plot(df[&#39;BJD - 2454833&#39;][gi], lc_corrected.flux*bspl(tt[gi]), &#39;o&#39;, color=&#39;k&#39;, ms = 4)
-plt.plot(df[&#39;BJD - 2454833&#39;][gi], lc_corrected.flux*bspl(tt[gi]), &#39;o&#39;, color=&#39;pink&#39;, ms = 3)
-
-plt.xlabel(&#39;BJD - 2454833&#39;)
-plt.ylabel(&#39;Relative Brightness&#39;)
-
-plt.xlim(1862, 1870)
-plt.ylim(0.994, 1.008);
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../../_images/tutorials_motion-correction_.ipynb_checkpoints_replicate-vanderburg-2014-k2sff-checkpoint_60_0.png" src="../../../_images/tutorials_motion-correction_.ipynb_checkpoints_replicate-vanderburg-2014-k2sff-checkpoint_60_0.png" />
-</div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [41]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span>sff._plot_normflux_arclength()
-</pre></div>
-</div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>Out[41]:
-</pre></div>
-</div>
-<div class="output_area highlight-none"><div class="highlight"><pre>
-<span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x1c1d4c5128&gt;
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../../_images/tutorials_motion-correction_.ipynb_checkpoints_replicate-vanderburg-2014-k2sff-checkpoint_61_1.png" src="../../../_images/tutorials_motion-correction_.ipynb_checkpoints_replicate-vanderburg-2014-k2sff-checkpoint_61_1.png" />
-</div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [42]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span>sff._plot_rotated_centroids()
-</pre></div>
-</div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>Out[42]:
-</pre></div>
-</div>
-<div class="output_area highlight-none"><div class="highlight"><pre>
-<span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x1c1d474f60&gt;
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../../_images/tutorials_motion-correction_.ipynb_checkpoints_replicate-vanderburg-2014-k2sff-checkpoint_62_1.png" src="../../../_images/tutorials_motion-correction_.ipynb_checkpoints_replicate-vanderburg-2014-k2sff-checkpoint_62_1.png" />
-</div>
-</div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [ ]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span>
-</pre></div>
-</div>
-</div>
+<p>Following <strong>Figure 5</strong> of Vanderburg &amp; Johnson 2015.</p>
+<p><em>The end.</em></p>
 </div>
 </div>
 

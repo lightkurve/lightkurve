@@ -96,7 +96,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials/section1.html">Introduction to lightkurve</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials/section2.html">Science with lightkurve</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../tutorials/section3.html">Advanced topics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/section3.html">Systematics correction using lightkurve</a></li>
 </ul>
 <p class="caption"><span class="caption-text">About lightkurve</span></p>
 <ul>
@@ -382,13 +382,22 @@
         <span class="c1"># Then, apply the savgol_filter to each segment separately</span>
         <span class="n">trend_signal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lc_clean</span><span class="o">.</span><span class="n">time</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">l</span><span class="p">,</span> <span class="n">h</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">):</span>
+            <span class="c1"># Reduce `window_length` and `polyorder` for short segments;</span>
+            <span class="c1"># this prevents `savgol_filter` from raising an exception</span>
+            <span class="n">segment_window_length</span><span class="p">,</span> <span class="n">segment_polyorder</span> <span class="o">=</span> <span class="n">window_length</span><span class="p">,</span> <span class="n">polyorder</span>
+            <span class="k">if</span> <span class="n">segment_window_length</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">h</span> <span class="o">-</span> <span class="n">l</span><span class="p">):</span>
+                <span class="n">segment_window_length</span> <span class="o">=</span> <span class="n">h</span> <span class="o">-</span> <span class="n">l</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">segment_window_length</span> <span class="o">%</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">segment_window_length</span> <span class="o">-=</span> <span class="mi">1</span>  <span class="c1"># window_length must be odd</span>
+            <span class="k">if</span> <span class="n">segment_polyorder</span> <span class="o">&gt;=</span> <span class="n">segment_window_length</span><span class="p">:</span>
+                <span class="n">segment_polyorder</span> <span class="o">=</span> <span class="n">segment_window_length</span> <span class="o">-</span> <span class="mi">1</span>
             <span class="n">trend_signal</span><span class="p">[</span><span class="n">l</span><span class="p">:</span><span class="n">h</span><span class="p">]</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">savgol_filter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">lc_clean</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="n">l</span><span class="p">:</span><span class="n">h</span><span class="p">],</span>
-                                                     <span class="n">window_length</span><span class="o">=</span><span class="n">window_length</span><span class="p">,</span>
-                                                     <span class="n">polyorder</span><span class="o">=</span><span class="n">polyorder</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                                                     <span class="n">window_length</span><span class="o">=</span><span class="n">segment_window_length</span><span class="p">,</span>
+                                                     <span class="n">polyorder</span><span class="o">=</span><span class="n">segment_polyorder</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">trend_signal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">lc_clean</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">trend_signal</span><span class="p">)</span>
         <span class="n">flatten_lc</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="n">flatten_lc</span><span class="o">.</span><span class="n">flux</span> <span class="o">/=</span> <span class="n">trend_signal</span>
-        <span class="n">flatten_lc</span><span class="o">.</span><span class="n">flux_err</span> <span class="o">/=</span> <span class="n">trend_signal</span>
+        <span class="n">flatten_lc</span><span class="o">.</span><span class="n">flux</span> <span class="o">=</span> <span class="n">flatten_lc</span><span class="o">.</span><span class="n">flux</span> <span class="o">/</span> <span class="n">trend_signal</span>
+        <span class="n">flatten_lc</span><span class="o">.</span><span class="n">flux_err</span> <span class="o">=</span> <span class="n">flatten_lc</span><span class="o">.</span><span class="n">flux_err</span> <span class="o">/</span> <span class="n">trend_signal</span>
         <span class="k">if</span> <span class="n">return_trend</span><span class="p">:</span>
             <span class="n">trend_lc</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
             <span class="n">trend_lc</span><span class="o">.</span><span class="n">flux</span> <span class="o">=</span> <span class="n">trend_signal</span>
@@ -517,7 +526,7 @@
         <span class="n">binned_lc</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">methodf</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">n_bins</span><span class="p">)])</span>
         <span class="n">binned_lc</span><span class="o">.</span><span class="n">flux</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">methodf</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="n">n_bins</span><span class="p">)])</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux_err</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux_err</span><span class="p">)):</span>
             <span class="c1"># root-mean-square error</span>
             <span class="n">binned_lc</span><span class="o">.</span><span class="n">flux_err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
                                     <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">a</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
@@ -860,10 +869,7 @@
 <span class="sd">            A dataframe indexed by `time` and containing the columns `flux`</span>
 <span class="sd">            and `flux_err`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">KeplerLightCurve</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="KeplerLightCurve.to_fits"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.KeplerLightCurve.to_fits">[docs]</a>    <span class="k">def</span> <span class="nf">to_fits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div></div>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">KeplerLightCurve</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="TessLightCurve"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.TessLightCurve">[docs]</a><span class="k">class</span> <span class="nc">TessLightCurve</span><span class="p">(</span><span class="n">LightCurve</span><span class="p">):</span>
@@ -909,10 +915,7 @@
         <span class="k">return</span> <span class="n">lc</span>
 
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span><span class="p">(</span><span class="s1">&#39;TessLightCurve(TICID: </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ticid</span><span class="p">))</span>
-
-<div class="viewcode-block" id="TessLightCurve.to_fits"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.TessLightCurve.to_fits">[docs]</a>    <span class="k">def</span> <span class="nf">to_fits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div></div>
+        <span class="k">return</span><span class="p">(</span><span class="s1">&#39;TessLightCurve(TICID: </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ticid</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="iterative_box_period_search"><a class="viewcode-back" href="../../api/lightcurve.html#lightkurve.lightcurve.iterative_box_period_search">[docs]</a><span class="k">def</span> <span class="nf">iterative_box_period_search</span><span class="p">(</span><span class="n">lc</span><span class="p">,</span> <span class="n">niters</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">min_period</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">max_period</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
