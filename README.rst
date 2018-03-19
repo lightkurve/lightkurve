@@ -1,7 +1,7 @@
 lightkurve
 ==========
 
-**A simple and beautiful package for astronomical flux time series analysis in Python.**
+**A beautiful package for astronomical flux time series analysis in Python.**
 
 |pypi-badge| |ci-badge| |appveyor-badge| |cov-badge| |doi-badge|
 
