@@ -4,9 +4,11 @@
 Other software
 ==============
 
-**lightkurve** provides general purpose tools for interacting with astronomical lightcurve data.
+Lightkurve provides general purpose tools for interacting with astronomical lightcurve data.
 Many other tools have been developed to solve related scientific and data analysis problems.
-On this page we list the community-produced tools that may complement **lightkurve**.
+On this page we list community-produced software that may complement lightkurve.
+
+If your software is not listed, please `open a Pull Request <https://github.com/KeplerGO/lightkurve/blob/master/docs/source/other_software.rst>`_ to add it!
 
 
 Detrending & Analysis
@@ -107,3 +109,4 @@ Other
 - `radvel <http://github.com/California-Planet-Search/radvel>`_ : General Toolkit for Modeling Radial Velocity Data
 - `koi3278 <http://github.com/ethankruse/koi3278>`_ : Analysis files for the KOI-3278 system
 - `trappist1 <http://github.com/rodluger/trappist1>`_ : TRAPPIST-1 photometry with K2
+- `PyORBIT <https://github.com/LucaMalavolta/PyORBIT>`_: Simultaneously characterize the orbits of exoplanets and the noise induced by stellar activity.
