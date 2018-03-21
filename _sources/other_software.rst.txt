@@ -4,11 +4,11 @@
 Other software
 ==============
 
-**lightkurve** provides general purpose tools for interacting with astronomical lightcurve data.
+Lightkurve provides general purpose tools for interacting with astronomical lightcurve data.
 Many other tools have been developed to solve related scientific and data analysis problems.
-On this page we list community-produced software that may complement **lightkurve**.
+On this page we list community-produced software that may complement lightkurve.
 
-If your software is not listed, please `open a Pull Request <https://github.com/KeplerGO/lightkurve/blob/master/docs/source/other_software.rst>` to add it!
+If your software is not listed, please `open a Pull Request <https://github.com/KeplerGO/lightkurve/blob/master/docs/source/other_software.rst>`_ to add it!
 
 
 Detrending & Analysis
