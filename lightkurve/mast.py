@@ -221,7 +221,7 @@ def get_kepler_products(target, filetype='Target Pixel', cadence='long',
     products['qoc'] = qoc
      #Add the dates of each short cadence observation to the product table.
     dates = np.asarray([p.split('/')[-1].split('-')[1].split('_')[0]
-                         for p in products['dataURI']], dtype=int)
+                         for p in products['dataURI']], dtype=float)
     products['dates'] = dates
     #Limit to the correct number of hits based on ID. If there are multiple versions
     #of the same ID, this shouldn't count towards the limit.
