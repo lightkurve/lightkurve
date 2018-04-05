@@ -141,7 +141,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         self.quality_bitmask = quality_bitmask
         self.quality_mask = self._quality_mask(quality_bitmask)
 
-
+    @staticmethod
     def from_archive(target, cadence='long', quarter=None, month=None,
                      campaign=None, radius=1., limit=1, verbose=True, **kwargs):
         """Fetch a Target Pixel File from the Kepler/K2 data archive at MAST.
