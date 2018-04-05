@@ -1,12 +1,14 @@
 """Functions which wrap `astroquery.mast` to obtain Kepler/K2 data from MAST."""
 
 from __future__ import division, print_function
+import os, sys
 import logging
 import numpy as np
 from astroquery.mast import Observations
 from astroquery.exceptions import ResolverError
 from astropy.coordinates import SkyCoord
 from astropy import log as astropylog
+
 
 class ArchiveError(Exception):
     """Raised if there is a problem accessing data."""
@@ -280,7 +282,14 @@ def get_kepler_products(target, filetype='Target Pixel', cadence='long',
     #Otherwise download all the files
     if verbose:
         print('Found {} File(s)'.format(np.shape(products)[0]))
+
+    if not verbose:
+        old_stdout = sys.stdout
+        sys.stdout = open(os.devnull, "w")
     path = download_products(products)
+    if not verbose:
+        sys.stdout.close()
+        sys.stdout = old_stdout
     #Make sure we always put the verbosity back...
     if not verbose:
         astropylog.setLevel('INFO')
