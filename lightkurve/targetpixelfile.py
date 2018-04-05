@@ -608,6 +608,82 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                                        alpha=.6))
         return ax
 
+    def quick_look(self, lc=None):
+        """
+        Interact with a linked target pixel file and lightcurve
+
+        Parameters
+        ----------
+        lc : an optional user-supplied pre-processed lightcurve for this target
+
+        Returns
+        -------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            The matplotlib axes object.
+        """
+        try:
+            from ipywidgets import interact
+            import ipywidgets as widgets
+            from bokeh.io import push_notebook, show, output_notebook
+            from bokeh.plotting import figure
+            from bokeh.models import Span
+            from bokeh.layouts import row
+            output_notebook()
+        except ImportError:
+            raise ImportError('The quicklook tool requires Bokeh and ipywidgets.  See the Installation Guide.')
+            return
+
+        if lc is None:
+            lc = self.to_lightcurve()
+
+        title = "Quicklook lightcurve for {} target {}".format(self.mission, self.keplerid)
+        p = figure(title=title, plot_height=300, plot_width=600)
+        p.yaxis.axis_label = 'Normalized Flux'
+        p.xaxis.axis_label = 'Time - 2454833 (days)'
+
+        r = p.step(lc.time, lc.flux, color="#2222aa", line_width=3, )
+        #r2 = p.line([lc.time[800], lc.time[800] ],[80, 115], color="#aa2222", line_width=3)
+        vert = Span(location=800, dimension='height', line_color='firebrick', line_width=4)
+        p.add_layout(vert)
+
+        s2 = figure(plot_width=300, plot_height=300, title='Target Pixel File')
+        s2.yaxis.axis_label = 'Pixel Row Number'
+        s2.xaxis.axis_label = 'Pixel Column Number'
+
+        s2_dat = s2.image([self.flux[0,:,:]], x=self.column, y=self.row,
+                          dw=self.shape[2], dh=self.shape[1], dilate=True)#, palette="Spectral11")
+
+
+
+        def update(f):
+            vert.update(location=self.time[f])
+            s2_dat.data_source.data['image'] = [self.flux[f,:,:]]
+            push_notebook()
+
+        show(row(p, s2), notebook_handle=True)
+        n_cad, nx, ny = self.flux.shape
+        #interact(update, f=(0, n_cad-1,1))
+
+
+        play = widgets.Play(
+            interval=10,
+            value=9,
+            min=0,
+            max=n_cad-1,
+            step=1,
+            description="Press play",
+            disabled=False)
+
+        f_slider = widgets.IntSlider(min=0,max=n_cad-1,step=1,value=5,
+                                     layout=widgets.Layout(width='80%', height='80px'))
+        widgets.jslink((play, 'value'), (f_slider, 'value'))
+        ui = widgets.HBox([play, f_slider])
+
+        out = widgets.interactive_output(update, {'f': f_slider})
+
+        display(ui, out)
+
+
     def get_bkg_lightcurve(self, aperture_mask=None):
         aperture_mask = self._parse_aperture_mask(aperture_mask)
         return LightCurve(flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
