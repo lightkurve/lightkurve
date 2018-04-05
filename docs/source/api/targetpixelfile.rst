@@ -1,5 +1,5 @@
 TargetPixelFile classes
-=================
+=======================
 
 .. automodule:: lightkurve.targetpixelfile
     :members:

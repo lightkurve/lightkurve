@@ -1,5 +1,5 @@
 LightCurveFile classes
-==========
+======================
 
 .. automodule:: lightkurve.lightcurvefile
     :members:
