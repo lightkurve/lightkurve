@@ -507,8 +507,8 @@ class LightCurve(object):
             normalized_lc = self.normalize()
             flux, flux_err = normalized_lc.flux, normalized_lc.flux_err
         else:
-            if ylabel=='Normalized Flux':
-                ylabel='Flux'
+            if ylabel == 'Normalized Flux':
+                ylabel = 'Flux'
             flux, flux_err = self.flux, self.flux_err
         with plt.style.context(style):
             if ax is None:
