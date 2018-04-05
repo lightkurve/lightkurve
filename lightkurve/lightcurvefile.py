@@ -10,7 +10,7 @@ from astropy.io import fits as pyfits
 from astropy.table import Table
 
 from .utils import (bkjd_to_time, KeplerQualityFlags, TessQualityFlags)
-from .mast import search_kepler_lightcurve_products, download_products, ArchiveError
+from .mast import get_kepler_products
 
 
 __all__ = ['KeplerLightCurveFile', 'TessLightCurveFile']
@@ -95,12 +95,12 @@ class KeplerLightCurveFile(LightCurveFile):
         self.quality_bitmask = quality_bitmask
         self.quality_mask = self._quality_mask(quality_bitmask)
 
-    @staticmethod
-    def from_archive(target, cadence='long', quarter=None, month=None,
-                     campaign=None, **kwargs):
-        """Fetch a Light Curve File from the Kepler/K2 data archive at MAST.
 
-        Raises an `ArchiveError` if a unique file cannot be found.  For example,
+    def from_archive(target, cadence='long', quarter=None, month=None,
+                     campaign=None, radius=1., limit=1, verbose=True, **kwargs):
+        """Fetch a Lightcurve File from the Kepler/K2 data archive at MAST.
+
+        Raises an `ArchiveError` if a unique LCF cannot be found.  For example,
         this is the case if a target was observed in multiple Quarters and the
         quarter parameter is unspecified.
 
@@ -110,37 +110,31 @@ class KeplerLightCurveFile(LightCurveFile):
             KIC/EPIC ID or object name.
         cadence : str
             'long' or 'short'.
-        quarter, campaign : int
+        quarter, campaign : int, list or 'all'
             Kepler Quarter or K2 Campaign number.
-        month : 1, 2, or 3
+        month : 1, 2, 3, list or 'all'
             For Kepler's prime mission, there are three short-cadence
-            lightcurve files for each quarter, each covering one month.
+            Target Pixel Files for each quarter, each covering one month.
             Hence, if cadence='short' you need to specify month=1, 2, or 3.
+        radius : float
+            Search radius in arcseconds. Default is 1 arcsecond.
+        limit : None or int
+            Limit the number of returned target pixel files. If none, no limit
+            is set
         kwargs : dict
-            Keywords arguments passed to `KeplerLightCurveFile`.
+            Keywords arguments passed to `KeplerTargetPixelFile`.
 
         Returns
         -------
-        tpf : KeplerLightCurveFile object.
+        lcf : KeplerLightCurveFile object or list of KeplerLightCurveFile objects
         """
-        products = search_kepler_lightcurve_products(target=target, cadence=cadence,
-                                                     quarter=quarter, campaign=campaign)
-        if cadence == 'short' and len(products) > 1:
-            if month is None:
-                raise ArchiveError("Found {} different lightcurve files "
-                                   "for target {} in Quarter {}."
-                                   "Please specify the month (1, 2, or 3)."
-                                   "".format(len(products), target, quarter))
-            products = Table(products[month+1])
-        elif len(products) > 1:
-            raise ArchiveError("Found {} different lightcurve files "
-                               "for target {}. Please specify quarter/month "
-                               "or campaign number."
-                               "".format(len(products), target))
-        elif len(products) < 1:
-            raise ArchiveError("No lightcurve file found for {} at MAST.".format(target))
-        path = download_products(products)[0]
-        return KeplerLightCurveFile(path, **kwargs)
+
+        path = get_kepler_products(target=target, filetype='Lightcurve', cadence=cadence,
+                                   quarter=quarter, campaign=campaign, month=month, verbose=verbose,
+                                   radius=radius, limit=limit)
+        if len(path) == 1:
+            return KeplerLightCurveFile(path[0], **kwargs)
+        return [KeplerLightCurveFile(p, **kwargs) for p in path]
 
     def __repr__(self):
         if self.mission is None:
@@ -200,6 +194,10 @@ class KeplerLightCurveFile(LightCurveFile):
     @property
     def keplerid(self):
         return self.header(ext=0)['KEPLERID']
+
+    @property
+    def cadence(self):
+        return self.header()['OBSMODE']
 
     @property
     def pos_corr1(self):

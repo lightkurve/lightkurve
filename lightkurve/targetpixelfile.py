@@ -17,7 +17,7 @@ from . import PACKAGEDIR
 from .lightcurve import KeplerLightCurve, LightCurve
 from .prf import SimpleKeplerPRF
 from .utils import KeplerQualityFlags, plot_image, bkjd_to_time
-from .mast import search_kepler_tpf_products, download_products, ArchiveError
+from .mast import get_kepler_products
 
 
 __all__ = ['KeplerTargetPixelFile']
@@ -141,9 +141,9 @@ class KeplerTargetPixelFile(TargetPixelFile):
         self.quality_bitmask = quality_bitmask
         self.quality_mask = self._quality_mask(quality_bitmask)
 
-    @staticmethod
+
     def from_archive(target, cadence='long', quarter=None, month=None,
-                     campaign=None, **kwargs):
+                     campaign=None, radius=1., limit=1, verbose=True, **kwargs):
         """Fetch a Target Pixel File from the Kepler/K2 data archive at MAST.
 
         Raises an `ArchiveError` if a unique TPF cannot be found.  For example,
@@ -156,12 +156,17 @@ class KeplerTargetPixelFile(TargetPixelFile):
             KIC/EPIC ID or object name.
         cadence : str
             'long' or 'short'.
-        quarter, campaign : int
+        quarter, campaign : int, list or 'all'
             Kepler Quarter or K2 Campaign number.
-        month : 1, 2, or 3
+        month : 1, 2, 3, list or 'all'
             For Kepler's prime mission, there are three short-cadence
             Target Pixel Files for each quarter, each covering one month.
             Hence, if cadence='short' you need to specify month=1, 2, or 3.
+        radius : float
+            Search radius in arcseconds. Default is 1 arcsecond.
+        limit : None or int
+            Limit the number of returned target pixel files. If none, no limit
+            is set
         kwargs : dict
             Keywords arguments passed to `KeplerTargetPixelFile`.
 
@@ -169,24 +174,12 @@ class KeplerTargetPixelFile(TargetPixelFile):
         -------
         tpf : KeplerTargetPixelFile object.
         """
-        products = search_kepler_tpf_products(target=target, cadence=cadence,
-                                              quarter=quarter, campaign=campaign)
-        if cadence == 'short' and len(products) > 1:
-            if month is None:
-                raise ArchiveError("Found {} different Target Pixel Files "
-                                   "for target {} in Quarter {}."
-                                   "Please specify the month (1, 2, or 3)."
-                                   "".format(len(products), target, quarter))
-            products = Table(products[month+1])
-        elif len(products) > 1:
-            raise ArchiveError("Found {} different Target Pixel Files "
-                               "for target {}. Please specify quarter/month "
-                               "or campaign number."
-                               "".format(len(products), target))
-        elif len(products) < 1:
-            raise ArchiveError("No Target Pixel File found for {} at MAST.".format(target))
-        path = download_products(products)[0]
-        return KeplerTargetPixelFile(path, **kwargs)
+        path = get_kepler_products(target=target, filetype='Target Pixel', cadence=cadence,
+                                   quarter=quarter, campaign=campaign, month=month, verbose=verbose,
+                                   radius=radius, limit=limit)
+        if len(path) == 1:
+            return KeplerTargetPixelFile(path[0], **kwargs)
+        return [KeplerTargetPixelFile(p, **kwargs) for p in path]
 
     def __repr__(self):
         return('KeplerTargetPixelFile Object (ID: {})'.format(self.keplerid))
@@ -317,6 +310,10 @@ class KeplerTargetPixelFile(TargetPixelFile):
     @property
     def keplerid(self):
         return self.header()['KEPLERID']
+
+    @property
+    def cadence(self):
+        return self.header()['OBSMODE']
 
     @property
     def module(self):
