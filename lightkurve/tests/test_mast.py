@@ -74,7 +74,7 @@ def test_kepler_tpf_from_archive():
     assert(isinstance(tpfs[0], KeplerTargetPixelFile))
     assert(tpfs[0].quarter == 1)
     #If we ask for a nearby target, it should only give back one extra with the same quarter.
-    tpfs = KeplerTargetPixelFile.from_archive(5728079, cadence='long', radius=60, quarter=1, limit=2)
+    tpfs = KeplerTargetPixelFile.from_archive(5728079, cadence='long', radius=60, quarter=1, targetlimit=2)
     assert(isinstance(tpfs, list))
     assert(isinstance(tpfs[0], KeplerTargetPixelFile))
     assert(tpfs[0].quarter == tpfs[1].quarter)
@@ -110,11 +110,12 @@ def test_kepler_lightcurve_from_archive():
     assert(isinstance(lcfs[0], KeplerLightCurveFile))
     assert(lcfs[0].quarter == 1)
     #If we ask for a nearby target, it should only give back one extra with the same quarter.
-    lcfs = KeplerLightCurveFile.from_archive(5728079, cadence='long', radius=60, quarter=1, limit=2)
+    lcfs = KeplerLightCurveFile.from_archive(5728079, cadence='long', radius=60, quarter=1, targetlimit=2)
     assert(isinstance(lcfs, list))
     assert(isinstance(lcfs[0], KeplerLightCurveFile))
     assert(lcfs[0].quarter == lcfs[1].quarter)
     assert(lcfs[0].keplerid != lcfs[1].keplerid)
+
 
 def test_verbosity(capfd):
     tpf = KeplerTargetPixelFile.from_archive(5728079, quarter=1, verbose=False)

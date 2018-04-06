@@ -143,7 +143,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
     @staticmethod
     def from_archive(target, cadence='long', quarter=None, month=None,
-                     campaign=None, radius=1., limit=1, verbose=True, **kwargs):
+                     campaign=None, radius=1., targetlimit=1, verbose=True, **kwargs):
         """Fetch a Target Pixel File from the Kepler/K2 data archive at MAST.
 
         Raises an `ArchiveError` if a unique TPF cannot be found.  For example,
@@ -164,7 +164,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
             Hence, if cadence='short' you need to specify month=1, 2, or 3.
         radius : float
             Search radius in arcseconds. Default is 1 arcsecond.
-        limit : None or int
+        targetlimit : None or int
             Limit the number of returned target pixel files. If none, no limit
             is set
         kwargs : dict
@@ -176,7 +176,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         """
         path = get_kepler_products(target=target, filetype='Target Pixel', cadence=cadence,
                                    quarter=quarter, campaign=campaign, month=month, verbose=verbose,
-                                   radius=radius, limit=limit)
+                                   radius=radius, targetlimit=targetlimit)
         if len(path) == 1:
             return KeplerTargetPixelFile(path[0], **kwargs)
         return [KeplerTargetPixelFile(p, **kwargs) for p in path]

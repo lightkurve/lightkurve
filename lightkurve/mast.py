@@ -4,11 +4,14 @@ from __future__ import division, print_function
 import os, sys
 import logging
 import numpy as np
+import pandas as pd
+
 from astroquery.mast import Observations
 from astroquery.exceptions import ResolverError
 from astropy.coordinates import SkyCoord
 from astropy import log as astropylog
 
+from . import PACKAGEDIR
 
 class ArchiveError(Exception):
     """Raised if there is a problem accessing data."""
@@ -91,6 +94,7 @@ def search_products(target, radius=1):
     l = [np.where(t['parent_obsid'] == o)[0]  for o in obsids]
     l = [item for sublist in l for item in sublist]
     t = t[l]
+
     return t
 
 
@@ -149,13 +153,26 @@ def search_kepler_products(target, filetype='Target Pixel', cadence='long', quar
                           desc.lower().endswith('fits.gz')
                           for desc in products['dataURI']])
         mask &= np.array([suffix in desc for desc in products['description']])
-        return products[mask]
-    else:
-        return products
+        products = products[mask]
+
+    #Add the quarter or campaign numbers
+    qoc = np.asarray([p.split(' - ')[-1][1:]
+                      for p in products['description']], dtype=int)
+    products['qoc'] = qoc
+     #Add the dates of each short cadence observation to the product table.
+    dates = [p.split('/')[-1].split('-')[1].split('_')[0]
+             for p in products['dataURI']]
+    for idx, d in enumerate(dates):
+        try:
+            dates[idx] = float(d)
+        except:
+            dates[idx] = 0
+    products['dates'] = np.asarray(dates)
+    return products
 
 def get_kepler_products(target, filetype='Target Pixel', cadence='long',
                         quarter=None, month=None, campaign=None, radius=1.,
-                        limit=1, verbose=True, **kwargs):
+                        targetlimit=1, verbose=True, **kwargs):
     """Fetch files from from the Kepler/K2 data archive at MAST.
 
     Raises an `ArchiveError` if a unique TPF cannot be found.  For example,
@@ -179,7 +196,7 @@ def get_kepler_products(target, filetype='Target Pixel', cadence='long',
         Hence, if cadence='short' you need to specify month=1, 2, or 3.
     radius : float
         Search radius in arcseconds. Default is 1 arcsecond.
-    limit : None or int
+    targetlimit : None or int
         Limit the number of returned target pixel files. If none, no limit
         is set
     kwargs : dict
@@ -211,30 +228,24 @@ def get_kepler_products(target, filetype='Target Pixel', cadence='long',
 
     #Grab the products
     products = search_kepler_products(target=target, filetype=filetype, cadence=cadence,
-                                          quarter=quarter, campaign=campaign,
-                                          radius=radius)
+                                      quarter=quarter, campaign=campaign,
+                                      radius=radius)
     if len(products) < 1:
         raise ArchiveError("No {} File found for {} at MAST.".format(filetype, target))
-    #Add the quarter or campaign numbers
-    qoc = np.asarray([p.split(' - ')[-1][1:]
-                      for p in products['description']], dtype=int)
-    products['qoc'] = qoc
-     #Add the dates of each short cadence observation to the product table.
-    dates = np.asarray([p.split('/')[-1].split('-')[1].split('_')[0]
-                         for p in products['dataURI']], dtype=float)
-    products['dates'] = dates
+
+
     #Limit to the correct number of hits based on ID. If there are multiple versions
     #of the same ID, this shouldn't count towards the limit.
-    if limit is not None:
+    if targetlimit is not None:
         ids = np.asarray([p.split('/')[-1].split('-')[0].split('_')[0][4:]
                           for p in products['dataURI']], dtype=int)
-        if len(np.unique(ids)) < limit:
+        if len(np.unique(ids)) < targetlimit:
             logging.warning('Target return limit set to {} '
                             'but only {} unique targets found. '
                             'Trying increasing search radius. '
                             '(radius currently set to {} arcseconds)'
-                            ''.format(limit, len(np.unique(ids)), radius))
-        okids = ids[np.sort(np.unique(ids, return_index=True)[1])[0:limit]]
+                            ''.format(targetlimit, len(np.unique(ids)), radius))
+        okids = ids[np.sort(np.unique(ids, return_index=True)[1])[0:targetlimit]]
         mask = np.zeros(len(ids), dtype=bool)
         idsort = np.zeros(len(ids))
         for idx, o in enumerate(okids):
@@ -248,7 +259,7 @@ def get_kepler_products(target, filetype='Target Pixel', cadence='long',
     #where there is short cadence data...
     scmask = np.asarray(['Short' in d for d in products['description']]) &\
              np.asarray(['kplr' in d for d in products['dataURI']])
-    if np.any(scmask) and len(products) > 1:
+    if np.any(scmask):
         #Error check the user if there's multiple months and they didn't ask
         #for a specific one
         if month is None:
@@ -256,21 +267,25 @@ def get_kepler_products(target, filetype='Target Pixel', cadence='long',
                                "for target {} in Quarter {}. "
                                "Please specify the month (1, 2, or 3)."
                                "".format(len(products), target, quarter))
+        #Get the short cadence date lookup table.
+        table = pd.read_csv(os.path.join(PACKAGEDIR, "data",
+                            "short_cadence_month_lookup.csv"))
         #Grab the dates of each of the short cadence files and make sure they
         #all use the correct month
         finalmask = np.ones(len(products), dtype=bool)
         for c in np.unique(products[scmask]['qoc']):
             ok = (products['qoc'] == c) & (scmask)
-            udates = np.sort(np.unique(products['dates'][ok]))
             mask = np.zeros(np.shape(products[ok])[0], dtype=bool)
             for m in month:
-                if m - 1 >= len(udates):
-                    break
-                mask |= products['dates'][ok] == udates[m - 1]
+                udate = (table.loc[np.where((table.Month == m) & (table.Quarter == c))[0][0], 'Date'])
+                mask |= np.asarray(products['dates'][ok]) == udate
             finalmask[ok] = mask
         products = products[finalmask]
         #Sort by id, then date and quarter
         products.sort(['ids', 'dates', 'qoc'])
+        if len(products) < 1:
+            raise ArchiveError("No {} File found for {} "
+                               "at month {} at MAST.".format(filetype, target, month))
 
     #If there is no specified quarter but there are many campaigns/quarters
     #returned, throw an error to the user
@@ -279,10 +294,10 @@ def get_kepler_products(target, filetype='Target Pixel', cadence='long',
                            "for target {}. Please specify quarter/month "
                            "or campaign number."
                            "".format(len(products), target))
+
     #Otherwise download all the files
     if verbose:
         print('Found {} File(s)'.format(np.shape(products)[0]))
-
     if not verbose:
         old_stdout = sys.stdout
         sys.stdout = open(os.devnull, "w")
