@@ -4,12 +4,12 @@ from __future__ import division, print_function
 import os, sys
 import logging
 import numpy as np
-import pandas as pd
 
 from astroquery.mast import Observations
 from astroquery.exceptions import ResolverError
 from astropy.coordinates import SkyCoord
 from astropy import log as astropylog
+from astropy.io import ascii
 
 from . import PACKAGEDIR
 
@@ -268,8 +268,7 @@ def get_kepler_products(target, filetype='Target Pixel', cadence='long',
                                "Please specify the month (1, 2, or 3)."
                                "".format(len(products), target, quarter))
         #Get the short cadence date lookup table.
-        table = pd.read_csv(os.path.join(PACKAGEDIR, "data",
-                            "short_cadence_month_lookup.csv"))
+        table = ascii.read('/Users/ch/K2/repos/lightkurve/lightkurve/data/short_cadence_month_lookup.csv')
         #Grab the dates of each of the short cadence files and make sure they
         #all use the correct month
         finalmask = np.ones(len(products), dtype=bool)
@@ -277,7 +276,7 @@ def get_kepler_products(target, filetype='Target Pixel', cadence='long',
             ok = (products['qoc'] == c) & (scmask)
             mask = np.zeros(np.shape(products[ok])[0], dtype=bool)
             for m in month:
-                udate = (table.loc[np.where((table.Month == m) & (table.Quarter == c))[0][0], 'Date'])
+                udate = (table['Date'][np.where((table['Month'] == m) & (table['Quarter'] == c))[0][0]])
                 mask |= np.asarray(products['dates'][ok]) == udate
             finalmask[ok] = mask
         products = products[finalmask]
