@@ -98,11 +98,17 @@ class KeplerLightCurveFile(LightCurveFile):
     @staticmethod
     def from_archive(target, cadence='long', quarter=None, month=None,
                      campaign=None, radius=1., targetlimit=1, verbose=True, **kwargs):
-        """Fetch a Lightcurve File from the Kepler/K2 data archive at MAST.
+        """Fetch *one or more* Lightcurve File(s) from the Kepler/K2 data archive at MAST.
 
         Raises an `ArchiveError` if a unique LCF cannot be found.  For example,
         this is the case if a target was observed in multiple Quarters and the
         quarter parameter is unspecified.
+
+        If targetlimit is set to more than one (or None) then will return a list
+        of KeplerLightCurveFiles. Will only return hits within the specified radius.
+
+        If campaign, quarter or month is given a list, will return a list of
+        KeplerLightCurveFiles of all matches.
 
         Parameters
         ----------
@@ -122,7 +128,7 @@ class KeplerLightCurveFile(LightCurveFile):
             Limit the number of returned target pixel files. If none, no limit
             is set
         kwargs : dict
-            Keywords arguments passed to `KeplerTargetPixelFile`.
+            Keywords arguments passed to `KeplerLightCurveFile`.
 
         Returns
         -------
@@ -196,7 +202,7 @@ class KeplerLightCurveFile(LightCurveFile):
         return self.header(ext=0)['KEPLERID']
 
     @property
-    def cadence(self):
+    def obsmode(self):
         return self.header()['OBSMODE']
 
     @property

@@ -72,7 +72,7 @@ def search_products(target, radius=1):
         obs = Observations.query_criteria(objectname=target_name,
                                           radius='{} arcsec'.format(radius),
                                           project=["Kepler", "K2"])
-        #Remove KeplerFFI data set.
+        # Remove KeplerFFI data set.
         obs = obs[(obs['obs_collection']=='Kepler') | (obs['obs_collection']=='K2')]
         obs.sort('distance')
     except ValueError:
@@ -88,14 +88,13 @@ def search_products(target, radius=1):
         except ResolverError as exc:
             raise ArchiveError(exc)
 
-    #Make sure the final table is in DISTANCE order.
+    # Make sure the final table is in DISTANCE order.
     obsids = np.asarray(obs['obsid'])
-    t = (Observations.get_product_list(obs))
-    l = [np.where(t['parent_obsid'] == o)[0]  for o in obsids]
-    l = [item for sublist in l for item in sublist]
-    t = t[l]
-
-    return t
+    products = Observations.get_product_list(obs)
+    order = [np.where(products['parent_obsid'] == o)[0]  for o in obsids]
+    order = [item for sublist in order for item in sublist]
+    products = products[order]
+    return products
 
 
 def search_kepler_products(target, filetype='Target Pixel', cadence='long', quarter=None,
@@ -123,7 +122,7 @@ def search_kepler_products(target, filetype='Target Pixel', cadence='long', quar
     if filetype not in ['Target Pixel', 'Lightcurve']:
         logging.exception("Choose a filetype of 'Target Pixel' or 'Lightcurve'")
 
-    #Value for the quarter or campaign
+    # Value for the quarter or campaign
     qoc = campaign if campaign is not None else quarter
 
     if not hasattr(qoc, '__iter__'):
@@ -155,11 +154,11 @@ def search_kepler_products(target, filetype='Target Pixel', cadence='long', quar
         mask &= np.array([suffix in desc for desc in products['description']])
         products = products[mask]
 
-    #Add the quarter or campaign numbers
+    # Add the quarter or campaign numbers
     qoc = np.asarray([p.split(' - ')[-1][1:]
                       for p in products['description']], dtype=int)
     products['qoc'] = qoc
-     #Add the dates of each short cadence observation to the product table.
+     # Add the dates of each short cadence observation to the product table.
     dates = [p.split('/')[-1].split('-')[1].split('_')[0]
              for p in products['dataURI']]
     for idx, d in enumerate(dates):
@@ -173,7 +172,9 @@ def search_kepler_products(target, filetype='Target Pixel', cadence='long', quar
 def get_kepler_products(target, filetype='Target Pixel', cadence='long',
                         quarter=None, month=None, campaign=None, radius=1.,
                         targetlimit=1, verbose=True, **kwargs):
-    """Fetch files from from the Kepler/K2 data archive at MAST.
+    """Download and cache files from from the Kepler/K2 data archive at MAST.
+
+    Returns path to the cached files.
 
     Raises an `ArchiveError` if a unique TPF cannot be found.  For example,
     this is the case if a target was observed in multiple Quarters and the
@@ -188,9 +189,9 @@ def get_kepler_products(target, filetype='Target Pixel', cadence='long',
         Whether to return TPFs of LCs
     cadence : str
         'long' or 'short'.
-    quarter, campaign : int, list or 'all'
+    quarter, campaign : int, list of int or 'all'
         Kepler Quarter or K2 Campaign number.
-    month : 1, 2, 3, list or 'all'
+    month : 1, 2, 3, list of int or 'all'
         For Kepler's prime mission, there are three short-cadence
         Target Pixel Files for each quarter, each covering one month.
         Hence, if cadence='short' you need to specify month=1, 2, or 3.
@@ -216,11 +217,11 @@ def get_kepler_products(target, filetype='Target Pixel', cadence='long',
         month = np.arange(3) + 1
 
     #anys and all should be a list of numbers
-    if month in ['all','any']:
+    if month in ['all', 'any']:
         month = np.arange(3) + 1
     if campaign in ['all','any']:
         campaign = np.arange(0, 22)
-    if quarter in ['all','any']:
+    if quarter in ['all', 'any']:
         quarter = np.arange(0, 18)
     if month is not None:
         if not hasattr(month,'__iter__'):
@@ -268,7 +269,7 @@ def get_kepler_products(target, filetype='Target Pixel', cadence='long',
                                "Please specify the month (1, 2, or 3)."
                                "".format(len(products), target, quarter))
         #Get the short cadence date lookup table.
-        table = ascii.read('/Users/ch/K2/repos/lightkurve/lightkurve/data/short_cadence_month_lookup.csv')
+        table = ascii.read(os.path.join(PACKAGEDIR, 'data', 'short_cadence_month_lookup.csv'))
         #Grab the dates of each of the short cadence files and make sure they
         #all use the correct month
         finalmask = np.ones(len(products), dtype=bool)
@@ -276,7 +277,7 @@ def get_kepler_products(target, filetype='Target Pixel', cadence='long',
             ok = (products['qoc'] == c) & (scmask)
             mask = np.zeros(np.shape(products[ok])[0], dtype=bool)
             for m in month:
-                udate = (table['Date'][np.where((table['Month'] == m) & (table['Quarter'] == c))[0][0]])
+                udate = (table['StartTime'][np.where((table['Month'] == m) & (table['Quarter'] == c))[0][0]])
                 mask |= np.asarray(products['dates'][ok]) == udate
             finalmask[ok] = mask
         products = products[finalmask]
@@ -307,4 +308,4 @@ def get_kepler_products(target, filetype='Target Pixel', cadence='long',
     #Make sure we always put the verbosity back...
     if not verbose:
         astropylog.setLevel('INFO')
-    return np.asarray(path)
+    return list(path)

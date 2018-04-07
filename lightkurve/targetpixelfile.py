@@ -312,7 +312,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         return self.header()['KEPLERID']
 
     @property
-    def cadence(self):
+    def obsmode(self):
         return self.header()['OBSMODE']
 
     @property
