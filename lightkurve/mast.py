@@ -216,7 +216,7 @@ def get_kepler_products(target, filetype='Target Pixel', cadence='long',
     if (cadence in ['any', 'both']) & (month is None):
         month = np.arange(3) + 1
 
-    #anys and all should be a list of numbers
+    # anys and all should be a list of numbers
     if month in ['all', 'any']:
         month = np.arange(3) + 1
     if campaign in ['all','any']:
@@ -227,7 +227,7 @@ def get_kepler_products(target, filetype='Target Pixel', cadence='long',
         if not hasattr(month,'__iter__'):
             month = [month]
 
-    #Grab the products
+    # Grab the products
     products = search_kepler_products(target=target, filetype=filetype, cadence=cadence,
                                       quarter=quarter, campaign=campaign,
                                       radius=radius)
@@ -235,8 +235,8 @@ def get_kepler_products(target, filetype='Target Pixel', cadence='long',
         raise ArchiveError("No {} File found for {} at MAST.".format(filetype, target))
 
 
-    #Limit to the correct number of hits based on ID. If there are multiple versions
-    #of the same ID, this shouldn't count towards the limit.
+    # Limit to the correct number of hits based on ID. If there are multiple versions
+    # of the same ID, this shouldn't count towards the limit.
     if targetlimit is not None:
         ids = np.asarray([p.split('/')[-1].split('-')[0].split('_')[0][4:]
                           for p in products['dataURI']], dtype=int)
@@ -256,22 +256,22 @@ def get_kepler_products(target, filetype='Target Pixel', cadence='long',
         products['ids'] = idsort
         products = products[mask]
 
-    #For Kepler short cadence data there are additional rules, so find anywhere
-    #where there is short cadence data...
+    # For Kepler short cadence data there are additional rules, so find anywhere
+    # where there is short cadence data...
     scmask = np.asarray(['Short' in d for d in products['description']]) &\
              np.asarray(['kplr' in d for d in products['dataURI']])
     if np.any(scmask):
-        #Error check the user if there's multiple months and they didn't ask
-        #for a specific one
+        # Error check the user if there's multiple months and they didn't ask
+        # for a specific one
         if month is None:
             raise ArchiveError("Found {} different Target Pixel Files "
                                "for target {} in Quarter {}. "
                                "Please specify the month (1, 2, or 3)."
                                "".format(len(products), target, quarter))
-        #Get the short cadence date lookup table.
+        # Get the short cadence date lookup table.
         table = ascii.read(os.path.join(PACKAGEDIR, 'data', 'short_cadence_month_lookup.csv'))
-        #Grab the dates of each of the short cadence files and make sure they
-        #all use the correct month
+        # Grab the dates of each of the short cadence files and make sure they
+        # all use the correct month
         finalmask = np.ones(len(products), dtype=bool)
         for c in np.unique(products[scmask]['qoc']):
             ok = (products['qoc'] == c) & (scmask)
@@ -281,21 +281,21 @@ def get_kepler_products(target, filetype='Target Pixel', cadence='long',
                 mask |= np.asarray(products['dates'][ok]) == udate
             finalmask[ok] = mask
         products = products[finalmask]
-        #Sort by id, then date and quarter
+        # Sort by id, then date and quarter
         products.sort(['ids', 'dates', 'qoc'])
         if len(products) < 1:
             raise ArchiveError("No {} File found for {} "
                                "at month {} at MAST.".format(filetype, target, month))
 
-    #If there is no specified quarter but there are many campaigns/quarters
-    #returned, throw an error to the user
+    # If there is no specified quarter but there are many campaigns/quarters
+    # returned, throw an error to the user
     if (len(np.unique(products['qoc'])) > 1) & (campaign is None) & (quarter is None):
         raise ArchiveError("Found {} different Target Pixel Files "
                            "for target {}. Please specify quarter/month "
                            "or campaign number."
                            "".format(len(products), target))
 
-    #Otherwise download all the files
+    # Otherwise download all the files
     if verbose:
         print('Found {} File(s)'.format(np.shape(products)[0]))
     if not verbose:
