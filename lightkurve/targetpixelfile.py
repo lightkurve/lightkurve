@@ -608,7 +608,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                                        alpha=.6))
         return ax
 
-    def quick_look(self, lc=None):
+    def interact(self, lc=None):
         """
         Interact with a linked target pixel file and lightcurve
 
@@ -631,7 +631,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
             output_notebook()
         except ImportError:
             raise ImportError('The quicklook tool requires Bokeh and ipywidgets.  See the Installation Guide.')
-            return
 
         if lc is None:
             lc = self.to_lightcurve()
@@ -640,20 +639,14 @@ class KeplerTargetPixelFile(TargetPixelFile):
         p = figure(title=title, plot_height=300, plot_width=600)
         p.yaxis.axis_label = 'Normalized Flux'
         p.xaxis.axis_label = 'Time - 2454833 (days)'
-
         r = p.step(lc.time, lc.flux, color="#2222aa", line_width=3, )
-        #r2 = p.line([lc.time[800], lc.time[800] ],[80, 115], color="#aa2222", line_width=3)
         vert = Span(location=800, dimension='height', line_color='firebrick', line_width=4)
         p.add_layout(vert)
-
         s2 = figure(plot_width=300, plot_height=300, title='Target Pixel File')
         s2.yaxis.axis_label = 'Pixel Row Number'
         s2.xaxis.axis_label = 'Pixel Column Number'
-
         s2_dat = s2.image([self.flux[0,:,:]], x=self.column, y=self.row,
-                          dw=self.shape[2], dh=self.shape[1], dilate=True)#, palette="Spectral11")
-
-
+                          dw=self.shape[2], dh=self.shape[1], dilate=True)
 
         def update(f):
             vert.update(location=self.time[f])
@@ -662,8 +655,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
         show(row(p, s2), notebook_handle=True)
         n_cad, nx, ny = self.flux.shape
-        #interact(update, f=(0, n_cad-1,1))
-
 
         play = widgets.Play(
             interval=10,
@@ -678,11 +669,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                      layout=widgets.Layout(width='80%', height='80px'))
         widgets.jslink((play, 'value'), (f_slider, 'value'))
         ui = widgets.HBox([play, f_slider])
-
         out = widgets.interactive_output(update, {'f': f_slider})
-
         display(ui, out)
-
 
     def get_bkg_lightcurve(self, aperture_mask=None):
         aperture_mask = self._parse_aperture_mask(aperture_mask)
