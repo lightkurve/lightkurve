@@ -627,6 +627,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
             from bokeh.io import push_notebook, show, output_notebook
             from bokeh.plotting import figure
             from bokeh.models import Span
+            from bokeh.models import LogColorMapper
             from bokeh.layouts import row
             output_notebook()
         except ImportError:
@@ -645,12 +646,20 @@ class KeplerTargetPixelFile(TargetPixelFile):
         s2 = figure(plot_width=300, plot_height=300, title='Target Pixel File')
         s2.yaxis.axis_label = 'Pixel Row Number'
         s2.xaxis.axis_label = 'Pixel Column Number'
-        s2_dat = s2.image([self.flux[0,:,:]], x=self.column, y=self.row,
-                          dw=self.shape[2], dh=self.shape[1], dilate=True)
 
-        def update(f):
+        pedestal = self.flux.min()
+        vlo, lo, med, hi, vhi = np.fix(np.percentile(self.flux-pedestal, [0.2, 1, 50, 95, 99.8]))
+        color_mapper = LogColorMapper(palette="Viridis256", low=lo, high=hi)
+
+        s2_dat = s2.image([pedestal+self.flux[0,:,:]], x=self.column, y=self.row,
+                          dw=self.shape[2], dh=self.shape[1], dilate=True,
+                          color_mapper=color_mapper)
+
+        def update(f, v):
             vert.update(location=self.time[f])
             s2_dat.data_source.data['image'] = [self.flux[f,:,:]]
+            s2_dat.glyph.color_mapper.high = v[1]
+            s2_dat.glyph.color_mapper.low = v[0]
             push_notebook()
 
         show(row(p, s2), notebook_handle=True)
@@ -666,10 +675,21 @@ class KeplerTargetPixelFile(TargetPixelFile):
             disabled=False)
 
         f_slider = widgets.IntSlider(min=0,max=n_cad-1,step=1,value=5,
-                                     layout=widgets.Layout(width='80%', height='80px'))
+                                     layout=widgets.Layout(width='40%', height='20px'))
+
+        vstep = np.round((hi-lo)/300.0, 1)
+
+        v_slider = widgets.FloatRangeSlider(value=[lo, hi],
+                                            min=0,
+                                            max=hi,
+                                            step=vstep,
+                                            description='v:',
+                                            continuous_update=False,
+                                            layout=widgets.Layout(width='30%', height='20px'))
+
         widgets.jslink((play, 'value'), (f_slider, 'value'))
-        ui = widgets.HBox([play, f_slider])
-        out = widgets.interactive_output(update, {'f': f_slider})
+        ui = widgets.HBox([play, f_slider, v_slider])
+        out = widgets.interactive_output(update, {'f': f_slider, 'v':v_slider})
         display(ui, out)
 
     def get_bkg_lightcurve(self, aperture_mask=None):
