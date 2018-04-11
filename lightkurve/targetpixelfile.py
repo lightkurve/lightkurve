@@ -625,10 +625,11 @@ class KeplerTargetPixelFile(TargetPixelFile):
             from ipywidgets import interact
             import ipywidgets as widgets
             from bokeh.io import push_notebook, show, output_notebook
-            from bokeh.plotting import figure
+            from bokeh.plotting import figure, ColumnDataSource
             from bokeh.models import Span
             from bokeh.models import LogColorMapper
             from bokeh.layouts import row
+            from bokeh.models.tools import HoverTool
             output_notebook()
         except ImportError:
             raise ImportError('The quicklook tool requires Bokeh and ipywidgets.  See the Installation Guide.')
@@ -636,12 +637,31 @@ class KeplerTargetPixelFile(TargetPixelFile):
         if lc is None:
             lc = self.to_lightcurve()
 
+        source = ColumnDataSource(data=dict(
+            time=lc.time, flux=lc.flux,
+            cadence=lc.cadenceno,
+            quality=lc.quality))
+
         title = "Quicklook lightcurve for {} target {}".format(self.mission, self.keplerid)
-        p = figure(title=title, plot_height=300, plot_width=600)
+        p = figure(title=title, plot_height=300, plot_width=600, tools="tap,pan,wheel_zoom,box_zoom,reset")
         p.yaxis.axis_label = 'Normalized Flux'
         p.xaxis.axis_label = 'Time - 2454833 (days)'
-        r = p.step(lc.time, lc.flux, color="#2222aa", line_width=3, )
-        vert = Span(location=800, dimension='height', line_color='firebrick', line_width=4)
+        p.step('time', 'flux', line_width=1, color='gray', source=source, nonselection_line_color='gray')
+
+        r = p.circle('time', 'flux', source=source, fill_alpha=0.3, size=8,line_color=None,
+                     selection_color="firebrick", nonselection_fill_alpha=0.0,
+                     nonselection_fill_color="grey",nonselection_line_color=None,
+                     nonselection_line_alpha=0.0, fill_color=None,
+                     hover_fill_color="firebrick",hover_alpha=0.9,hover_line_color="white")
+
+        p.add_tools(HoverTool(tooltips=[("index", "$index"),
+                                        ("cadence", "@cadence"),
+                                        ("time", "@time{0,0.000}"),
+                                        ("flux", "@flux"),
+                                        ("quality", "@quality")],
+                              renderers=[r], mode='mouse', point_policy="snap_to_data"))
+
+        vert = Span(location=800, dimension='height', line_color='firebrick', line_width=4, line_alpha=0.5)
         p.add_layout(vert)
         s2 = figure(plot_width=300, plot_height=300, title='Target Pixel File')
         s2.yaxis.axis_label = 'Pixel Row Number'
