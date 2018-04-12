@@ -101,7 +101,6 @@ def search_kepler_tpf_products(target, cadence='long', quarter=None,
         suffix = "lpd-targ"
     mask = np.array([suffix in fn for fn in products['productFilename']])
     # Identify the campaign or quarter by the description.
-    print(products['description'])
     quarter_or_campaign = campaign if campaign is not None else quarter
     if quarter_or_campaign is not None:
         mask &= np.array([desc.lower().endswith('q{}'.format(quarter_or_campaign)) or
