@@ -142,6 +142,7 @@ def search_kepler_lightcurve_products(target, cadence='long', quarter=None,
     quarter_or_campaign = campaign if campaign is not None else quarter
     if quarter_or_campaign is not None:
         mask &= np.array([desc.lower().endswith('q{}'.format(quarter_or_campaign)) or
-                          desc.lower().endswith('c{:02d}'.format(quarter_or_campaign))
+                          desc.lower().endswith('c{:02d}'.format(quarter_or_campaign)) or
+                          desc.replace('-','').lower().endswith('c{:03d}'.format(quarter_or_campaign))
                           for desc in products['description']])
     return products[mask]
