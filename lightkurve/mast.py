@@ -103,8 +103,9 @@ def search_kepler_tpf_products(target, cadence='long', quarter=None,
     # Identify the campaign or quarter by the description.
     quarter_or_campaign = campaign if campaign is not None else quarter
     if quarter_or_campaign is not None:
-        mask &= np.array([desc.lower().endswith('q{}'.format(quarter_or_campaign)) or
-                          desc.lower().endswith('c{:02d}'.format(quarter_or_campaign))
+        mask &= np.array([desc.replace('-','').lower().endswith('q{}'.format(quarter_or_campaign)) or
+                          desc.replace('-','').lower().endswith('c{:02d}'.format(quarter_or_campaign)) or
+                          desc.replace('-','').lower().endswith('c{:03d}'.format(quarter_or_campaign))
                           for desc in products['description']])
     return products[mask]
 
