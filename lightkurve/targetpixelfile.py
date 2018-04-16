@@ -686,12 +686,14 @@ class KeplerTargetPixelFile(TargetPixelFile):
             description="Press play", disabled=False)
 
         ff_slider = widgets.IntSlider(min=0,max=n_cad-1,step=1,value=5,
-                                     layout=widgets.Layout(width='40%', height='20px'))
+                                      description='Index',
+                                      layout=widgets.Layout(width='40%', height='20px'))
 
         vstep = np.round((hi-lo)/300.0, 1) #assumes counts >> 1.0!
 
         vv_slider = widgets.FloatRangeSlider(value=[lo, hi], min=0, max=vhi,
-                                            step=vstep, description='Screen Stretch:',
+                                            step=vstep, description='Screen Stretch',
+                                            style={'description_width': 'initial'},
                                             continuous_update=False,
                                             layout=widgets.Layout(width='30%', height='20px'))
 
