@@ -659,6 +659,7 @@ class KeplerLightCurve(LightCurve):
         lc = super(KeplerLightCurve, self).__getitem__(key)
         # Compared to `LightCurve`, we need to slice a few additional arrays:
         lc.quality = self.quality[key]
+        lc.cadenceno = self.cadenceno[key]
         lc.centroid_col = self.centroid_col[key]
         lc.centroid_row = self.centroid_row[key]
         return lc
