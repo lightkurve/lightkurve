@@ -616,23 +616,18 @@ class KeplerTargetPixelFile(TargetPixelFile):
         ----------
         lc : an optional user-supplied pre-processed lightcurve for this target
 
-        Returns
-        -------
-        ax : matplotlib.axes._subplots.AxesSubplot
-            The matplotlib axes object.
         """
         try:
             from ipywidgets import interact
             import ipywidgets as widgets
             from bokeh.io import push_notebook, show, output_notebook
             from bokeh.plotting import figure, ColumnDataSource
-            from bokeh.models import Span
-            from bokeh.models import LogColorMapper
+            from bokeh.models import Span, Range1d, LinearAxis, LogColorMapper
             from bokeh.layouts import row
             from bokeh.models.tools import HoverTool
             output_notebook()
         except ImportError:
-            raise ImportError('The quicklook tool requires Bokeh and ipywidgets.  See the Installation Guide.')
+            raise ImportError('The quicklook tool requires Bokeh and ipywidgets.  See the .interact() tutorial')
 
         if lc is None:
             lc = self.to_lightcurve()
@@ -643,73 +638,66 @@ class KeplerTargetPixelFile(TargetPixelFile):
             quality=lc.quality))
 
         title = "Quicklook lightcurve for {} target {}".format(self.mission, self.keplerid)
-        p = figure(title=title, plot_height=300, plot_width=600, tools="tap,pan,wheel_zoom,box_zoom,reset")
-        p.yaxis.axis_label = 'Normalized Flux'
-        p.xaxis.axis_label = 'Time - 2454833 (days)'
-        p.step('time', 'flux', line_width=1, color='gray', source=source, nonselection_line_color='gray')
+        p1 = figure(title=title, plot_height=300, plot_width=600,
+                   tools="tap,pan,wheel_zoom,box_zoom,reset")
+        p1.yaxis.axis_label = 'Relative Flux'
+        p1.xaxis.axis_label = 'Time - 2454833 (days)'
+        p1.step('time', 'flux', line_width=1, color='gray', source=source,
+                nonselection_line_color='gray', mode="center")
 
-        r = p.circle('time', 'flux', source=source, fill_alpha=0.3, size=8,line_color=None,
+        r = p1.circle('time', 'flux', source=source, fill_alpha=0.3, size=8,line_color=None,
                      selection_color="firebrick", nonselection_fill_alpha=0.0,
-                     nonselection_fill_color="grey",nonselection_line_color=None,
-                     nonselection_line_alpha=0.0, fill_color=None,
+                     nonselection_line_color=None,nonselection_line_alpha=0.0, fill_color=None,
                      hover_fill_color="firebrick",hover_alpha=0.9,hover_line_color="white")
 
-        p.add_tools(HoverTool(tooltips=[("index", "$index"),
+        p1.add_tools(HoverTool(tooltips=[("index", "$index"),
                                         ("cadence", "@cadence"),
                                         ("time", "@time{0,0.000}"),
                                         ("flux", "@flux"),
                                         ("quality", "@quality")],
                               renderers=[r], mode='mouse', point_policy="snap_to_data"))
 
-        vert = Span(location=800, dimension='height', line_color='firebrick', line_width=4, line_alpha=0.5)
-        p.add_layout(vert)
+        vert = Span(location=0, dimension='height', line_color='firebrick', line_width=4, line_alpha=0.5)
+        p1.add_layout(vert)
         s2 = figure(plot_width=300, plot_height=300, title='Target Pixel File')
         s2.yaxis.axis_label = 'Pixel Row Number'
         s2.xaxis.axis_label = 'Pixel Column Number'
 
-        pedestal = self.flux.min()
-        vlo, lo, med, hi, vhi = np.fix(np.percentile(self.flux-pedestal, [0.2, 1, 50, 95, 99.8]))
+        pedestal = np.nanmin(self.flux)
+        vlo, lo, med, hi, vhi = np.fix(np.nanpercentile(self.flux-pedestal, [0.2, 1, 50, 95, 99.8]))
         color_mapper = LogColorMapper(palette="Viridis256", low=lo, high=hi)
 
-        s2_dat = s2.image([pedestal+self.flux[0,:,:]], x=self.column, y=self.row,
+        s2_dat = s2.image([self.flux[0,:,:]-pedestal], x=self.column, y=self.row,
                           dw=self.shape[2], dh=self.shape[1], dilate=True,
                           color_mapper=color_mapper)
 
-        def update(f, v):
-            vert.update(location=self.time[f])
-            s2_dat.data_source.data['image'] = [self.flux[f,:,:]]
-            s2_dat.glyph.color_mapper.high = v[1]
-            s2_dat.glyph.color_mapper.low = v[0]
+        def update(ff, vv):
+            '''Function that connects to the interact widget slider values'''
+            vert.update(location=self.time[ff])
+            s2_dat.data_source.data['image'] = [self.flux[ff,:,:]-pedestal]
+            s2_dat.glyph.color_mapper.high = vv[1]
+            s2_dat.glyph.color_mapper.low = vv[0]
             push_notebook()
 
-        show(row(p, s2), notebook_handle=True)
+        show(row(p1, s2), notebook_handle=True)
         n_cad, nx, ny = self.flux.shape
 
-        play = widgets.Play(
-            interval=10,
-            value=9,
-            min=0,
-            max=n_cad-1,
-            step=1,
-            description="Press play",
-            disabled=False)
+        play = widgets.Play(interval=10, value=0, min=0, max=n_cad-1, step=1,
+            description="Press play", disabled=False)
 
-        f_slider = widgets.IntSlider(min=0,max=n_cad-1,step=1,value=5,
+        ff_slider = widgets.IntSlider(min=0,max=n_cad-1,step=1,value=5,
                                      layout=widgets.Layout(width='40%', height='20px'))
 
-        vstep = np.round((hi-lo)/300.0, 1)
+        vstep = np.round((hi-lo)/300.0, 1) #assumes counts >> 1.0!
 
-        v_slider = widgets.FloatRangeSlider(value=[lo, hi],
-                                            min=0,
-                                            max=hi,
-                                            step=vstep,
-                                            description='v:',
+        vv_slider = widgets.FloatRangeSlider(value=[lo, hi], min=0, max=vhi,
+                                            step=vstep, description='Screen Stretch:',
                                             continuous_update=False,
                                             layout=widgets.Layout(width='30%', height='20px'))
 
-        widgets.jslink((play, 'value'), (f_slider, 'value'))
-        ui = widgets.HBox([play, f_slider, v_slider])
-        out = widgets.interactive_output(update, {'f': f_slider, 'v':v_slider})
+        widgets.jslink((play, 'value'), (ff_slider, 'value'))
+        ui = widgets.HBox([play, ff_slider, vv_slider])
+        out = widgets.interactive_output(update, {'ff': ff_slider, 'vv':vv_slider})
         display(ui, out)
 
     def get_bkg_lightcurve(self, aperture_mask=None):
