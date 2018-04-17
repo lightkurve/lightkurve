@@ -317,6 +317,7 @@ def test_slicing():
     lc = KeplerLightCurve(time, flux, flux_err,
                           centroid_col=centroid_col,
                           centroid_row=centroid_row,
+                          cadenceno=cadenceno,
                           quality=quality)
     assert_array_equal(lc[::3].centroid_col, centroid_col[::3])
     assert_array_equal(lc[4:].centroid_row, centroid_row[4:])
