@@ -313,6 +313,7 @@ def test_slicing():
     centroid_col = np.linspace(40, 50, 10)
     centroid_row = np.linspace(50, 60, 10)
     quality = np.linspace(70, 80, 10)
+    cadenceno = np.linspace(90, 100, 10)
     lc = KeplerLightCurve(time, flux, flux_err,
                           centroid_col=centroid_col,
                           centroid_row=centroid_row,
@@ -320,6 +321,8 @@ def test_slicing():
     assert_array_equal(lc[::3].centroid_col, centroid_col[::3])
     assert_array_equal(lc[4:].centroid_row, centroid_row[4:])
     assert_array_equal(lc[10:2].quality, quality[10:2])
+    mask = cadenceno < 95 #check for boolean mask support
+    assert_array_equal(lc[mask].cadenceno, cadenceno[mask])
 
     # The same is true for TessLightCurve
     lc = TessLightCurve(time, flux, flux_err,
