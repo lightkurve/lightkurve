@@ -8,6 +8,7 @@ import numpy as np
 import scipy
 import tqdm
 from oktopus.posterior import PoissonPosterior
+import copy
 
 from .utils import channel_to_module_output, plot_image
 
@@ -245,11 +246,23 @@ class PRFPhotometry(object):
         self.loss_value = np.array([])
         self.uncertainties = np.array([])
 
-    def shift_prior_with_pos_corr(self, tpf, cadence)
+    def shift_prior_with_pos_corr(self, tpf, t):
         '''Shifts the prior windows to accomodate spacecraft motion
             Experimental! See discussion on Issue #95 on GitHub.
         '''
-        return self.prior
+
+        ##TODO: implement this line:
+        #if type(self.prior) == oktopus.prior.UniformPrior:
+        #    pass
+
+        # For now: assumes uniform prior only!!!
+        out_prior = copy.deepcopy(self.prior)
+        out_prior.lb[1] += tpf.pos_corr1[t]
+        out_prior.lb[2] += tpf.pos_corr2[t]
+        out_prior.ub[1] += tpf.pos_corr1[t]
+        out_prior.ub[2] += tpf.pos_corr2[t]
+
+        return out_prior
 
 
     def fit(self, tpf, x0=None, cadences='all', method='powell',
@@ -292,7 +305,7 @@ class PRFPhotometry(object):
             cadences = range(tpf.flux.shape[0])
 
         for t in tqdm.tqdm(cadences):
-            #prior_at_t = self.shift_prior_with_pos_corr(t, tpf, self.prior)
+            prior_at_t = self.shift_prior_with_pos_corr(tpf, t)
             loss = self.loss_function(tpf.flux[t], self.scene_model,
                                       prior=prior_at_t, **self.loss_kwargs)
             result = loss.fit(x0=x0, method='powell', **kwargs)
