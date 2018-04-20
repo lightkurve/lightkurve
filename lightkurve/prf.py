@@ -245,7 +245,14 @@ class PRFPhotometry(object):
         self.loss_value = np.array([])
         self.uncertainties = np.array([])
 
-    def fit(self, tpf_flux, x0=None, cadences='all', method='powell',
+    def shift_prior_with_pos_corr(self, tpf, cadence)
+        '''Shifts the prior windows to accomodate spacecraft motion
+            Experimental! See discussion on Issue #95 on GitHub.
+        '''
+        return self.prior
+
+
+    def fit(self, tpf, x0=None, cadences='all', method='powell',
             **kwargs):
         """
         Fits the scene model to the given data in ``tpf_flux``.
@@ -282,19 +289,20 @@ class PRFPhotometry(object):
             x0 = self.prior.mean
 
         if cadences == 'all':
-            cadences = range(tpf_flux.shape[0])
+            cadences = range(tpf.flux.shape[0])
 
         for t in tqdm.tqdm(cadences):
-            loss = self.loss_function(tpf_flux[t], self.scene_model,
-                                      prior=self.prior, **self.loss_kwargs)
+            #prior_at_t = self.shift_prior_with_pos_corr(t, tpf, self.prior)
+            loss = self.loss_function(tpf.flux[t], self.scene_model,
+                                      prior=prior_at_t, **self.loss_kwargs)
             result = loss.fit(x0=x0, method='powell', **kwargs)
             opt_params = result.x
-            residuals = tpf_flux[t] - self.scene_model(*opt_params)
+            residuals = tpf.flux[t] - self.scene_model(*opt_params)
             self.loss_value = np.append(self.loss_value, result.fun)
             self.opt_params = np.append(self.opt_params, opt_params)
             self.residuals = np.append(self.residuals, residuals)
-        self.opt_params = self.opt_params.reshape((tpf_flux.shape[0], len(x0)))
-        self.residuals = self.residuals.reshape(tpf_flux.shape)
+        self.opt_params = self.opt_params.reshape((tpf.flux.shape[0], len(x0)))
+        self.residuals = self.residuals.reshape(tpf.flux.shape)
 
         return self.opt_params
 
