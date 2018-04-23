@@ -629,8 +629,10 @@ class KeplerTargetPixelFile(TargetPixelFile):
         except ImportError:
             raise ImportError('The quicklook tool requires Bokeh and ipywidgets.  See the .interact() tutorial')
 
+        ytitle = 'Flux'
         if lc is None:
             lc = self.to_lightcurve()
+            ytitle = 'Flux (e/s)'
 
         source = ColumnDataSource(data=dict(
             time=lc.time, flux=lc.flux,
@@ -640,7 +642,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         title = "Quicklook lightcurve for {} target {}".format(self.mission, self.keplerid)
         p1 = figure(title=title, plot_height=300, plot_width=600,
                    tools="tap,pan,wheel_zoom,box_zoom,reset")
-        p1.yaxis.axis_label = 'Relative Flux'
+        p1.yaxis.axis_label = ytitle
         p1.xaxis.axis_label = 'Time - 2454833 (days)'
         p1.step('time', 'flux', line_width=1, color='gray', source=source,
                 nonselection_line_color='gray', mode="center")
@@ -671,18 +673,25 @@ class KeplerTargetPixelFile(TargetPixelFile):
                           dw=self.shape[2], dh=self.shape[1], dilate=True,
                           color_mapper=color_mapper)
 
+        n_cad, nx, ny = self.flux.shape
+        min_cadence = np.min(self.cadenceno)
+        max_cadence = np.max(self.cadenceno)
+        cadence_lookup = {self.cadenceno[j]:j for j in range(n_cad)}
+
         def update(ff, vv):
             '''Function that connects to the interact widget slider values'''
-            vert.update(location=self.time[ff])
-            s2_dat.data_source.data['image'] = [self.flux[ff,:,:]-pedestal]
+            cadence_mask = self.cadenceno == ff
+            index_val = np.where(self.cadenceno == ff)[0][0]
+            vert.update(location=self.time[index_val])
+            s2_dat.data_source.data['image'] = [self.flux[index_val,:,:]-pedestal]
             s2_dat.glyph.color_mapper.high = vv[1]
             s2_dat.glyph.color_mapper.low = vv[0]
             push_notebook()
 
         show(row(p1, s2), notebook_handle=True)
-        n_cad, nx, ny = self.flux.shape
 
-        play = widgets.Play(interval=10, value=0, min=0, max=n_cad-1, step=1,
+
+        play = widgets.Play(interval=10, value=min_cadence, min=min_cadence, max=max_cadence, step=1,
             description="Press play", disabled=False)
 
         ff_slider = widgets.IntSlider(min=0,max=n_cad-1,step=1,value=5,
