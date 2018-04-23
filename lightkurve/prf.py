@@ -12,6 +12,11 @@ import copy
 
 from .utils import channel_to_module_output, plot_image
 
+from astropy.wcs.utils import skycoord_to_pixel
+from astropy.coordinates import SkyCoord
+from astropy.wcs import WCS
+from oktopus import GaussianPrior, UniformPrior
+
 # This is a workaround to get the number of arguments of
 # a given function.
 # In Python 2, this works by using getargspec.
@@ -31,6 +36,32 @@ else:
     from inspect import signature
     def _get_number_of_arguments(func):
         return len(signature(func).parameters)
+
+
+def ra_dec_to_prior(tpf, ra, dec, flux, width, bg, bg_width=500, prior_type=None):
+    '''Returns an oktopus prior object given input RA, DEC, etc
+
+        Note: Assumes input RA, DEC is in ICRS degrees
+    '''
+    skyposition = SkyCoord(ra, dec, unit=('deg','deg'), frame='icrs')
+    wcs = tpf.wcs
+    prior_x, prior_y = skycoord_to_pixel(skyposition, wcs=wcs)
+    prior_x += tpf.column
+    prior_y += tpf.row
+    width_in_pix = width / (tpf.wcs.wcs.cdelt[1]*3600.0)
+    if (prior_type == None) | (prior_type == 'uniform') | (prior_type == 'Uniform'):
+        flux_lower = np.sqrt(flux)
+        flux_upper = 2.0*flux
+        bg_lower = bg-bg_width
+        bg_upper = bg+bg_width
+        prior_out = UniformPrior(lb=[flux_lower, prior_x-width_in_pix,
+                                     prior_y-width_in_pix, bg_lower],
+                                 ub=[flux_upper, prior_x+width_in_pix,
+                                     prior_y+width_in_pix, bg_upper])
+    if (prior_type == 'gaussian') | (prior_type == 'Gaussian'):
+        prior_out = GaussianPrior([flux, prior_x, prior_y, bg], [np.sqrt(flux), width, width,bg_width])
+    return prior_out
+
 
 
 __all__ = ['KeplerPRF', 'PRFPhotometry', 'SceneModel', 'SimpleKeplerPRF',
@@ -200,6 +231,8 @@ class KeplerPRF(object):
                    extent=(self.column, self.column + self.shape[1],
                            self.row, self.row + self.shape[0]), **kwargs)
 
+
+
 class PRFPhotometry(object):
     """
     This class performs PRF Photometry on TPF-like files.
@@ -245,6 +278,7 @@ class PRFPhotometry(object):
         self.residuals = np.array([])
         self.loss_value = np.array([])
         self.uncertainties = np.array([])
+
 
     def shift_prior_with_pos_corr(self, tpf, t):
         '''Shifts the prior windows to accomodate spacecraft motion
@@ -484,4 +518,3 @@ def get_initial_guesses(data, ref_col, ref_row):
     sigma0 = math.sqrt((sigma_x**2 + sigma_y**2)/2.0)
 
     return flux0, col0, row0, sigma0
-
