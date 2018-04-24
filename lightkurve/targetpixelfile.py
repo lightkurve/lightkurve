@@ -635,6 +635,9 @@ class KeplerTargetPixelFile(TargetPixelFile):
             ytitle = 'Flux (e/s)'
 
         # Map cadence to index or nearest index for gapped cadences.
+        lc_cad_matches = np.isin(self.cadenceno, lc.cadenceno)
+        if lc_cad_matches.sum() != len(lc.cadenceno):
+            raise IndexError("lightcurve cadences must be an equal set or subset of TPF cadences")
         n_cad, nx, ny = self.flux.shape
         min_cadence = np.min(self.cadenceno)
         max_cadence = np.max(self.cadenceno)
@@ -645,6 +648,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
             cadence_lookup[cad] = np.argmin(np.abs(self.cadenceno - cad))
 
         tpf_indices = np.array([cadence_lookup[cadno] for cadno in lc.cadenceno])
+
 
         qual_strings = []
         for flag in lc.quality:
@@ -699,12 +703,18 @@ class KeplerTargetPixelFile(TargetPixelFile):
         s2.yaxis.axis_label = 'Pixel Row Number'
         s2.xaxis.axis_label = 'Pixel Column Number'
 
-        pedestal = np.nanmin(self.flux)
-        vlo, lo, med, hi, vhi = np.fix(np.nanpercentile(self.flux-pedestal, [0.2, 1, 50, 95, 99.8]))
+        pedestal = np.nanmin(self.flux[lc_cad_matches, :, :])
+        stretch_dims = np.prod(self.flux[lc_cad_matches, :, :].shape)
+        screen_stretch = self.flux[lc_cad_matches, :, :].reshape(stretch_dims)-pedestal
+        screen_stretch = screen_stretch[(screen_stretch>0.0) &
+                                        (screen_stretch==screen_stretch)]
+        vlo = np.partition(screen_stretch, 1)[1] #takes the 2nd smallest nonzero!
+        vhi = np.max(screen_stretch)
+        lo, med, hi= np.nanpercentile(screen_stretch, [1, 50, 95])
         color_mapper = LogColorMapper(palette="Viridis256", low=lo, high=hi)
 
         s2_dat = s2.image([self.flux[0,:,:]-pedestal], x=self.column, y=self.row,
-                          dw=self.shape[2], dh=self.shape[1], dilate=True,
+                          dw=self.shape[2], dh=self.shape[1], dilate=False,
                           color_mapper=color_mapper)
 
 
@@ -713,8 +723,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
             index_val = cadence_lookup[ff]
             vert.update(location=self.time[index_val])
             s2_dat.data_source.data['image'] = [self.flux[index_val,:,:]-pedestal]
-            s2_dat.glyph.color_mapper.high = vv[1]
-            s2_dat.glyph.color_mapper.low = vv[0]
+            s2_dat.glyph.color_mapper.high = 10**vv[1]
+            s2_dat.glyph.color_mapper.low = 10**vv[0]
             push_notebook()
 
         show(row(p1, s2), notebook_handle=True)
@@ -727,10 +737,10 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                       description='Cadence',
                                       layout=widgets.Layout(width='40%', height='20px'))
 
-        vstep = np.round((hi-lo)/300.0, 1) #assumes counts >> 1.0!
+        vstep = (np.log10(vhi)-np.log10(vlo))/300.0 #assumes counts >> 1.0!
 
-        vv_slider = widgets.FloatRangeSlider(value=[lo, hi], min=0, max=vhi,
-                                            step=vstep, description='Screen Stretch',
+        vv_slider = widgets.FloatRangeSlider(value=[np.log10(lo), np.log10(hi)], min=np.log10(vlo),
+                                            max=np.log10(vhi),step=vstep, description='Pixel Stretch (log)',
                                             style={'description_width': 'initial'},
                                             continuous_update=False,
                                             layout=widgets.Layout(width='30%', height='20px'))
