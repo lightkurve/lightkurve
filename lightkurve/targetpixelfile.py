@@ -634,14 +634,45 @@ class KeplerTargetPixelFile(TargetPixelFile):
             lc = self.to_lightcurve()
             ytitle = 'Flux (e/s)'
 
+        # Map cadence to index or nearest index for gapped cadences.
+        n_cad, nx, ny = self.flux.shape
+        min_cadence = np.min(self.cadenceno)
+        max_cadence = np.max(self.cadenceno)
+        cadence_lookup = {self.cadenceno[j]:j for j in range(n_cad)}
+        cadence_full_range = np.arange(min_cadence,max_cadence,1, dtype=np.int)
+        missing_cadences = list(set(cadence_full_range)-set(self.cadenceno))
+        for cad in missing_cadences:
+            cadence_lookup[cad] = np.argmin(np.abs(self.cadenceno - cad))
+
+        tpf_indices = np.array([cadence_lookup[cadno] for cadno in lc.cadenceno])
+
+        qual_strings = []
+        for flag in lc.quality:
+            flag_str_list = KeplerQualityFlags.decode(flag)
+            if len(flag_str_list) == 0:
+                qual_strings.append(' ')
+            if len(flag_str_list) == 1:
+                qual_strings.append(flag_str_list[0])
+            if len(flag_str_list) > 1:
+                qual_strings.append("; ".join(flag_str_list))
+
         source = ColumnDataSource(data=dict(
             time=lc.time, flux=lc.flux,
             cadence=lc.cadenceno,
-            quality=lc.quality))
+            quality_code=lc.quality,
+            quality=np.array(qual_strings),
+            tpf_index=tpf_indices))
 
-        title = "Quicklook lightcurve for {} target {}".format(self.mission, self.keplerid)
+        if self.mission == 'K2':
+            title = ("Lightcurve for K2 Campaign {} "
+                "target {} on mod.out {}.{} (ch. {})").format(self.campaign,
+                self.keplerid, self.module, self.output, self.channel)
+        if self.mission == 'Kepler':
+            title = ("Quicklook lightcurve for Kepler quarter {} "
+                "target {} on mod.out {}.{} (ch. {})").format(self.quarter,
+                self.keplerid, self.module, self.output, self.channel)
         p1 = figure(title=title, plot_height=300, plot_width=600,
-                   tools="tap,pan,wheel_zoom,box_zoom,reset")
+                   tools="pan,wheel_zoom,box_zoom,reset")
         p1.yaxis.axis_label = ytitle
         p1.xaxis.axis_label = 'Time - 2454833 (days)'
         p1.step('time', 'flux', line_width=1, color='gray', source=source,
@@ -652,11 +683,14 @@ class KeplerTargetPixelFile(TargetPixelFile):
                      nonselection_line_color=None,nonselection_line_alpha=0.0, fill_color=None,
                      hover_fill_color="firebrick",hover_alpha=0.9,hover_line_color="white")
 
-        p1.add_tools(HoverTool(tooltips=[("index", "$index"),
-                                        ("cadence", "@cadence"),
-                                        ("time", "@time{0,0.000}"),
-                                        ("flux", "@flux"),
-                                        ("quality", "@quality")],
+        #
+        p1.add_tools(HoverTool(tooltips=[("Lightcurve Index", "$index"),
+                                        ("TPF Index", "@tpf_index"),
+                                        ("Cadence", "@cadence"),
+                                        ("Time", "@time{0,0.000}"),
+                                        ("Flux", "@flux"),
+                                        ("Quality Code", "@quality_code"),
+                                        ("Quality Flag", "@quality")],
                               renderers=[r], mode='mouse', point_policy="snap_to_data"))
 
         vert = Span(location=0, dimension='height', line_color='firebrick', line_width=4, line_alpha=0.5)
@@ -673,15 +707,10 @@ class KeplerTargetPixelFile(TargetPixelFile):
                           dw=self.shape[2], dh=self.shape[1], dilate=True,
                           color_mapper=color_mapper)
 
-        n_cad, nx, ny = self.flux.shape
-        min_cadence = np.min(self.cadenceno)
-        max_cadence = np.max(self.cadenceno)
-        cadence_lookup = {self.cadenceno[j]:j for j in range(n_cad)}
 
         def update(ff, vv):
             '''Function that connects to the interact widget slider values'''
-            cadence_mask = self.cadenceno == ff
-            index_val = np.where(self.cadenceno == ff)[0][0]
+            index_val = cadence_lookup[ff]
             vert.update(location=self.time[index_val])
             s2_dat.data_source.data['image'] = [self.flux[index_val,:,:]-pedestal]
             s2_dat.glyph.color_mapper.high = vv[1]
@@ -694,8 +723,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
         play = widgets.Play(interval=10, value=min_cadence, min=min_cadence, max=max_cadence, step=1,
             description="Press play", disabled=False)
 
-        ff_slider = widgets.IntSlider(min=0,max=n_cad-1,step=1,value=5,
-                                      description='Index',
+        ff_slider = widgets.IntSlider(min=min_cadence,max=max_cadence,step=1,value=min_cadence,
+                                      description='Cadence',
                                       layout=widgets.Layout(width='40%', height='20px'))
 
         vstep = np.round((hi-lo)/300.0, 1) #assumes counts >> 1.0!
