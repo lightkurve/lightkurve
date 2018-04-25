@@ -647,12 +647,12 @@ class KeplerLightCurve(LightCurve):
         self.centroid_col = self._validate_array(centroid_col, name='centroid_col')
         self.centroid_row = self._validate_array(centroid_row, name='centroid_row')
         self.quality = self._validate_array(quality, name='quality')
+        self.cadenceno = self._validate_array(cadenceno, name='cadenceno')
         self.quality_bitmask = quality_bitmask
         self.channel = channel
         self.campaign = campaign
         self.quarter = quarter
         self.mission = mission
-        self.cadenceno = cadenceno
         self.keplerid = keplerid
 
     def __getitem__(self, key):
@@ -754,9 +754,9 @@ class TessLightCurve(LightCurve):
         self.centroid_col = self._validate_array(centroid_col, name='centroid_col')
         self.centroid_row = self._validate_array(centroid_row, name='centroid_row')
         self.quality = self._validate_array(quality, name='quality')
+        self.cadenceno = self._validate_array(cadenceno)
         self.quality_bitmask = quality_bitmask
         self.mission = "TESS"
-        self.cadenceno = cadenceno
         self.ticid = ticid
 
     def __getitem__(self, key):
