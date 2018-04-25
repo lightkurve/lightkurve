@@ -625,6 +625,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
             from bokeh.models import Span, Range1d, LinearAxis, LogColorMapper
             from bokeh.layouts import row
             from bokeh.models.tools import HoverTool
+            from IPython.display import display
             output_notebook()
         except ImportError:
             raise ImportError('The quicklook tool requires Bokeh and ipywidgets.  See the .interact() tutorial')
@@ -635,7 +636,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
             ytitle = 'Flux (e/s)'
 
         # Map cadence to index or nearest index for gapped cadences.
-        lc_cad_matches = np.isin(self.cadenceno, lc.cadenceno)
+        lc_cad_matches = np.in1d(self.cadenceno, lc.cadenceno)
         if lc_cad_matches.sum() != len(lc.cadenceno):
             raise IndexError("lightcurve cadences must be an equal set or subset of TPF cadences")
         n_cad, nx, ny = self.flux.shape

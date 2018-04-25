@@ -203,3 +203,10 @@ def test_properties(capfd):
     tpf.properties()
     out, err = capfd.readouterr()
     assert len(out) > 1000
+
+def test_interact():
+    """Test the Jupyter notebook interact() widget."""
+    tpf = KeplerTargetPixelFile(filename_tpf_one_center)
+    tpf.interact()
+    tpf = KeplerTargetPixelFile(filename_tpf_all_zeros)
+    tpf.interact()
