@@ -38,7 +38,7 @@ else:
         return len(signature(func).parameters)
 
 
-def ra_dec_to_prior(tpf, ra, dec, flux, width, bg, bg_width=500, prior_type=None):
+def ra_dec_to_uniformprior(tpf, ra, dec, width, flux):
     '''Returns an oktopus prior object given input RA, DEC, etc
 
         Note: Assumes input RA, DEC is in ICRS degrees
@@ -49,19 +49,53 @@ def ra_dec_to_prior(tpf, ra, dec, flux, width, bg, bg_width=500, prior_type=None
     prior_x += tpf.column
     prior_y += tpf.row
     width_in_pix = width / (tpf.wcs.wcs.cdelt[1]*3600.0)
-    if (prior_type == None) | (prior_type == 'uniform') | (prior_type == 'Uniform'):
-        flux_lower = np.sqrt(flux)
-        flux_upper = 2.0*flux
-        bg_lower = bg-bg_width
-        bg_upper = bg+bg_width
-        prior_out = UniformPrior(lb=[flux_lower, prior_x-width_in_pix,
-                                     prior_y-width_in_pix, bg_lower],
-                                 ub=[flux_upper, prior_x+width_in_pix,
-                                     prior_y+width_in_pix, bg_upper])
-    if (prior_type == 'gaussian') | (prior_type == 'Gaussian'):
-        prior_out = GaussianPrior([flux, prior_x, prior_y, bg], [np.sqrt(flux), width, width,bg_width])
-    return prior_out
+    flux_lower = np.sqrt(flux)
+    flux_upper = 2.0*flux
 
+    prior_out_lower = [flux_lower, prior_x-width_in_pix, prior_y-width_in_pix]
+    prior_out_upper = [flux_upper, prior_x+width_in_pix, prior_y+width_in_pix]
+
+    return prior_out_lower,prior_out_upper
+
+def ra_dec_to_gaussprior(tpf, ra, dec, width, flux, prior_type=None):
+    skyposition = SkyCoord(ra, dec, unit=('deg','deg'), frame='icrs')
+    wcs = tpf.wcs
+    prior_x, prior_y = skycoord_to_pixel(skyposition, wcs=wcs)
+    prior_x += tpf.column
+    prior_y += tpf.row
+    width_in_pix = width / (tpf.wcs.wcs.cdelt[1]*3600.0)
+
+    prior_out_mean = [flux, prior_x, prior_y]
+    prior_out_sigma = [np.sqrt(flux), width_in_pix]
+
+    return prior_out_mean,prior_out_sigma
+
+
+def stars_to_prior(starlist, bg, bg_width=500, prior_type=None):
+    if (prior_type == None) | (prior_type == 'uniform') | (prior_type == 'Uniform'):
+      lower = []
+      upper = []
+      for star in starlist:    
+        lower = np.append(lower,star[0])
+        upper = np.append(upper,star[1])
+
+      print(lower)
+      lower = np.append(lower,bg-bg_width)
+      upper = np.append(upper,bg+bg_width) 
+      prior_out = UniformPrior(lb=lower,ub=upper)
+
+    if (prior_type == 'gaussian') | (prior_type == 'Gaussian'):
+      lower = []
+      upper = []
+      for star in starlist:
+        lower = np.append(lower,star[0])
+        upper = np.append(upper,star[1])
+
+      lower = np.append(lower,bg-bg_width)
+      upper = np.append(upper,bg+bg_width)
+      prior_out = GaussianPrior(lb=lower,ub=upper)
+
+    return prior_out
 
 
 __all__ = ['KeplerPRF', 'PRFPhotometry', 'SceneModel', 'SimpleKeplerPRF',
@@ -291,10 +325,10 @@ class PRFPhotometry(object):
 
         # For now: assumes uniform prior only!!!
         out_prior = copy.deepcopy(self.prior)
-        out_prior.lb[1] += tpf.pos_corr1[t]
-        out_prior.lb[2] += tpf.pos_corr2[t]
-        out_prior.ub[1] += tpf.pos_corr1[t]
-        out_prior.ub[2] += tpf.pos_corr2[t]
+        out_prior.lb[1::3] += tpf.pos_corr1[t]
+        out_prior.lb[2::3] += tpf.pos_corr2[t]
+        out_prior.ub[1::3] += tpf.pos_corr1[t]
+        out_prior.ub[2::3] += tpf.pos_corr2[t]
 
         return out_prior
 
