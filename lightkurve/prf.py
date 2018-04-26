@@ -57,7 +57,7 @@ def ra_dec_to_uniformprior(tpf, ra, dec, width, flux):
 
     return prior_out_lower,prior_out_upper
 
-def ra_dec_to_gaussprior(tpf, ra, dec, width, flux, prior_type=None):
+def ra_dec_to_gaussprior(tpf, ra, dec, width, flux):
     skyposition = SkyCoord(ra, dec, unit=('deg','deg'), frame='icrs')
     wcs = tpf.wcs
     prior_x, prior_y = skycoord_to_pixel(skyposition, wcs=wcs)
