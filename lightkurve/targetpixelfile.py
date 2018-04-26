@@ -669,17 +669,15 @@ class KeplerTargetPixelFile(TargetPixelFile):
             tpf_index=tpf_indices))
 
         if self.mission == 'K2':
-            title = ("Lightcurve for K2 Campaign {} "
-                "target {} on mod.out {}.{} (ch. {})").format(self.campaign,
-                self.keplerid, self.module, self.output, self.channel)
-        if self.mission == 'Kepler':
-            title = ("Quicklook lightcurve for Kepler quarter {} "
-                "target {} on mod.out {}.{} (ch. {})").format(self.quarter,
-                self.keplerid, self.module, self.output, self.channel)
+            title = "Quicklook lightcurve for EPIC {} (K2 Campaign {})".format(
+                        self.keplerid, self.campaign)
+        elif self.mission == 'Kepler':
+            title = "Quicklook lightcurve for KIC {} (Kepler Quarter {})".format(
+                        self.keplerid, self.quarter)
         p1 = figure(title=title, plot_height=300, plot_width=600,
                    tools="pan,wheel_zoom,box_zoom,reset")
         p1.yaxis.axis_label = ytitle
-        p1.xaxis.axis_label = 'Time - 2454833 (days)'
+        p1.xaxis.axis_label = 'Time - 2454833 days [BKJD]'
         p1.step('time', 'flux', line_width=1, color='gray', source=source,
                 nonselection_line_color='gray', mode="center")
 
@@ -700,7 +698,9 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
         vert = Span(location=0, dimension='height', line_color='firebrick', line_width=4, line_alpha=0.5)
         p1.add_layout(vert)
-        s2 = figure(plot_width=300, plot_height=300, title='Target Pixel File')
+        s2 = figure(plot_width=300, plot_height=300,
+                    title='Pixel data (CCD {}.{})'.format(
+                                self.module, self.output))
         s2.yaxis.axis_label = 'Pixel Row Number'
         s2.xaxis.axis_label = 'Pixel Column Number'
 
