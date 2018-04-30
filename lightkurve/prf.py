@@ -39,7 +39,7 @@ else:
 
 
 def ra_dec_to_uniformprior(tpf, ra, dec, width, flux):
-    '''Returns an oktopus prior object given input RA, DEC, etc
+    '''Returns a tupe of partial prior objects given input RA, DEC, etc
 
         Note: Assumes input RA, DEC is in ICRS degrees
     '''
@@ -72,21 +72,20 @@ def ra_dec_to_gaussprior(tpf, ra, dec, width, flux):
 
 
 def stars_to_prior(starlist, bg, bg_width=500, prior_type=None):
+    '''Takes in a list of tuples of prior limits and yields a combined prior '''
+
+    lower = []
+    upper = []
     if (prior_type == None) | (prior_type == 'uniform') | (prior_type == 'Uniform'):
-      lower = []
-      upper = []
-      for star in starlist:    
+      for star in starlist:
         lower = np.append(lower,star[0])
         upper = np.append(upper,star[1])
 
-      print(lower)
       lower = np.append(lower,bg-bg_width)
-      upper = np.append(upper,bg+bg_width) 
+      upper = np.append(upper,bg+bg_width)
       prior_out = UniformPrior(lb=lower,ub=upper)
 
     if (prior_type == 'gaussian') | (prior_type == 'Gaussian'):
-      lower = []
-      upper = []
       for star in starlist:
         lower = np.append(lower,star[0])
         upper = np.append(upper,star[1])
