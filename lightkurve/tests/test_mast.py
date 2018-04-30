@@ -24,8 +24,12 @@ def test_search_kepler_tpf_products():
     # KIC 11904151 (Kepler-10) was observed in LC in 15 Quarters
     assert(len(search_kepler_products(11904151)) == 15)
     # ...including quarter 11 but not 12:
-    assert(len(search_kepler_products(11904151, quarter=11)) == 1)
-    assert(len(search_kepler_products(11904151, quarter=12)) == 0)
+    assert(len(search_kepler_tpf_products(11904151, quarter=11)) == 1)
+    assert(len(search_kepler_tpf_products(11904151, quarter=12)) == 0)
+    # should work for 91/92
+    assert(len(search_kepler_tpf_products(200068780, quarter=91)) == 1)
+    assert(len(search_kepler_tpf_products(200068780, quarter=92)) == 1)
+    assert(len(search_kepler_tpf_products(200071712, quarter=102)) == 1)
     # We should also be able to resolve it by its name instead of KIC ID
     assert(len(search_kepler_products('Kepler-10')) == 15)
     # An invalid KIC/EPIC ID should be dealt with gracefully
@@ -42,8 +46,8 @@ def test_search_kepler_tpf_products():
 @pytest.mark.remote_data
 def test_search_kepler_lightcurve_products():
     """Tests `lightkurve.mast.search_kepler_lightcurve_products`."""
-    assert(len(search_kepler_products('Kepler-10', filetype='Lightcurve')) == 15)
-
+    assert(len(search_kepler_lightcurve_products('Kepler-10')) == 15)
+    assert(len(search_kepler_lightcurve_products(200071712, quarter=102)) == 1)
 
 @pytest.mark.remote_data
 @pytest.mark.filterwarnings('ignore:Query returned no results')
