@@ -370,7 +370,7 @@ class PRFPhotometry(object):
             x0 = self.prior.mean
 
         if cadences == 'all':
-            cadences = range(tpf.flux.shape[0])
+            cadences = range(len(tpf.flux))
 
         for t in tqdm.tqdm(cadences):
             prior_at_t = self.shift_prior_with_pos_corr(tpf, t)
@@ -382,8 +382,8 @@ class PRFPhotometry(object):
             self.loss_value = np.append(self.loss_value, result.fun)
             self.opt_params = np.append(self.opt_params, opt_params)
             self.residuals = np.append(self.residuals, residuals)
-        self.opt_params = self.opt_params.reshape((tpf.flux.shape[0], len(x0)))
-        self.residuals = self.residuals.reshape(tpf.flux.shape)
+        self.opt_params = self.opt_params.reshape((len(cadences), len(x0)))
+        self.residuals = self.residuals.reshape(len(cadences),tpf.flux.shape[1],tpf.flux.shape[2])
 
         return self.opt_params
 
