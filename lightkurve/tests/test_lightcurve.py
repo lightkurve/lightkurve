@@ -76,6 +76,9 @@ def test_KeplerLightCurveFile(path, mission):
     assert_array_equal(kplc.time, hdu[1].data['TIME'])
     assert_array_equal(kplc.flux, hdu[1].data['SAP_FLUX'])
 
+    with pytest.raises(KeyError):
+        lcf.get_lightcurve('BLABLA')
+
 
 @pytest.mark.remote_data
 @pytest.mark.parametrize("quality_bitmask",
@@ -113,6 +116,7 @@ def test_lightcurve_fold():
     assert_almost_equal(fold.time[0], -0.5, 2)
     assert_almost_equal(np.min(fold.phase), -0.5, 2)
     assert_almost_equal(np.max(fold.phase), 0.5, 2)
+    fold.plot()
 
 
 def test_lightcurve_append():
@@ -140,7 +144,9 @@ def test_lightcurve_plot():
     """Sanity check to verify that lightcurve plotting works"""
     lcf = KeplerLightCurveFile(TABBY_Q8)
     lcf.plot()
+    lcf.plot(flux_types=['SAP_FLUX', 'PDCSAP_FLUX'])
     lcf.SAP_FLUX.plot()
+    lcf.SAP_FLUX.plot(normalize=False, fill=False, title="Not the default")
 
 
 def test_cdpp():
@@ -165,7 +171,9 @@ def test_cdpp_tabby():
 
 
 def test_bin():
-    lc = LightCurve(time=np.arange(10), flux=2*np.ones(10),
+    """Does binning work?"""
+    lc = LightCurve(time=np.arange(10),
+                    flux=2*np.ones(10),
                     flux_err=2**.5*np.ones(10))
     binned_lc = lc.bin(binsize=2)
     assert_allclose(binned_lc.flux, 2*np.ones(5))
@@ -173,6 +181,24 @@ def test_bin():
     assert len(binned_lc.time) == 5
     with pytest.raises(ValueError):
         lc.bin(method='doesnotexist')
+    # If `flux_err` is missing, the errors on the bins should be the stddev
+    lc = LightCurve(time=np.arange(10),
+                    flux=2*np.ones(10))
+    binned_lc = lc.bin(binsize=2)
+    assert_allclose(binned_lc.flux_err, np.zeros(5))
+
+
+def test_bin_quality():
+    """Binning must also revise the quality and centroid columns."""
+    lc = KeplerLightCurve(time=[1, 2, 3, 4],
+                          flux=[1, 1, 1, 1],
+                          quality=[0, 1, 2, 3],
+                          centroid_col=[0, 1, 0, 1],
+                          centroid_row=[0, 2, 0, 2])
+    binned_lc = lc.bin(binsize=2)
+    assert_allclose(binned_lc.quality, [1, 3])  # Expect bitwise or
+    assert_allclose(binned_lc.centroid_col, [0.5, 0.5])  # Expect mean
+    assert_allclose(binned_lc.centroid_row, [1, 1])  # Expect mean
 
 
 def test_normalize():
@@ -209,6 +235,19 @@ def test_to_pandas():
         pass
 
 
+def test_to_pandas_kepler():
+    """When to_pandas() is executed on a KeplerLightCurve, it should include
+    extra columns such as `quality`."""
+    time, flux, quality = range(3), np.ones(3), np.zeros(3)
+    lc = KeplerLightCurve(time, flux, quality=quality)
+    try:
+        df = lc.to_pandas()
+        assert_allclose(df.quality, quality)
+    except ImportError:
+        # pandas is an optional dependency
+        pass
+
+
 def test_to_table():
     """Test the `LightCurve.to_table()` method."""
     time, flux, flux_err = range(3), np.ones(3), np.zeros(3)
@@ -224,7 +263,7 @@ def test_to_csv():
     time, flux, flux_err = range(3), np.ones(3), np.zeros(3)
     try:
         lc = LightCurve(time, flux, flux_err)
-        assert(lc.to_csv() == 'time,flux,flux_err\n0,1.0,0.0\n1,1.0,0.0\n2,1.0,0.0\n')
+        assert(lc.to_csv(index=False) == 'time,flux,flux_err\n0,1.0,0.0\n1,1.0,0.0\n2,1.0,0.0\n')
     except ImportError:
         # pandas is an optional dependency
         pass
@@ -307,10 +346,15 @@ def test_remove_nans():
 
 
 def test_remove_outliers():
-    time, flux = [1, 2, 3, 4], [1, 1, 1000, 1]
-    lc_clean = LightCurve(time, flux).remove_outliers(sigma=1)
+    # Does `remove_outliers()` remove outliers?
+    lc = LightCurve([1, 2, 3, 4], [1, 1, 1000, 1])
+    lc_clean = lc.remove_outliers(sigma=1)
     assert_array_equal(lc_clean.time, [1, 2, 4])
     assert_array_equal(lc_clean.flux, [1, 1, 1])
+    # It should also be possible to return the outlier mask
+    lc_clean, outlier_mask = lc.remove_outliers(sigma=1, return_mask=True)
+    assert(len(outlier_mask) == len(lc.flux))
+    assert(outlier_mask.sum() == 1)
 
 
 @pytest.mark.remote_data
@@ -324,7 +368,7 @@ def test_properties(capfd):
     assert len(out) > 500
 
 
-def test_flatten():
+def test_flatten_with_nans():
     """Flatten should not remove NaNs."""
     lc = LightCurve(time=[1, 2, 3, 4, 5],
                     flux=[np.nan, 1.1, 1.2, np.nan, 1.4],
@@ -333,3 +377,23 @@ def test_flatten():
     assert(len(flat_lc.time) == 5)
     assert(np.isfinite(flat_lc.flux).sum() == 3)
     assert(np.isfinite(flat_lc.flux_err).sum() == 3)
+
+
+def test_flatten_robustness():
+    """Test various special cases for flatten()."""
+    # flatten should work with integer fluxes
+    lc = LightCurve([1, 2, 3, 4, 5, 6], [10, 20, 30, 40, 50, 60])
+    expected_result = np.array([ 1.,  1.,  1.,  1.,  1., 1.])
+    flat_lc = lc.flatten(window_length=3, polyorder=1)
+    assert_allclose(flat_lc.flux, expected_result)
+    # flatten should work even if `window_length > len(flux)`
+    flat_lc = lc.flatten(window_length=7, polyorder=1)
+    assert_allclose(flat_lc.flux, expected_result)
+    # flatten should work even if `polyorder >= window_length`
+    flat_lc = lc.flatten(window_length=3, polyorder=3)
+    assert_allclose(flat_lc.flux, expected_result)
+    flat_lc = lc.flatten(window_length=3, polyorder=5)
+    assert_allclose(flat_lc.flux, expected_result)
+    # flatten should work even if `break_tolerance = None`
+    flat_lc = lc.flatten(break_tolerance=None)
+    assert_allclose(flat_lc.flux, expected_result)

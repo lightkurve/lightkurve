@@ -1,5 +1,5 @@
 Utility functions
-=========
+=================
 
 .. automodule:: lightkurve.utils
     :members:

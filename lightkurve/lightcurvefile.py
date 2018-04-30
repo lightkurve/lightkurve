@@ -202,6 +202,16 @@ class KeplerLightCurveFile(LightCurveFile):
         return self.header(ext=0)['KEPLERID']
 
     @property
+    def pos_corr1(self):
+        """Returns the column position correction."""
+        return self.hdu[1].data['POS_CORR1'][self.quality_mask]
+
+    @property
+    def poss_corr2(self):
+        """Returns the row position correction."""
+        return self.hdu[1].data['POS_CORR2'][self.quality_mask]
+
+    @property
     def quarter(self):
         """Quarter number"""
         try:
@@ -243,15 +253,23 @@ class KeplerLightCurveFile(LightCurveFile):
         from .correctors import KeplerCBVCorrector
         return KeplerCBVCorrector(self).correct(cbvs=cbvs, **kwargs)
 
-    def plot(self, flux_types=None, context='fast', **kwargs):
-        """Plot all the flux types in a light curve.
+    def plot(self, flux_types=None, style='fast', **kwargs):
+        """Plot all the light curves contained in this light curve file.
 
         Parameters
         ----------
         flux_types : str or list of str
-            List of FLUX types to plot. Default is to plot all available.
+            List of flux types to plot. Default is to plot all available.
+            (For Kepler the default fluxes are 'SAP_FLUX' and 'PDCSAP_FLUX'.
+        style : str
+            matplotlib.pyplot.style.context, default is 'fast'
+        kwargs : dict
+            Dictionary of keyword arguments to be passed to
+            `KeplerLightCurve.plot()`.
         """
-        with plt.style.context(context):
+        if (style == "fast") and ("fast" not in mpl.style.available):
+            style = "default"
+        with plt.style.context(style):
             if not ('ax' in kwargs):
                 fig, ax = plt.subplots(1)
                 kwargs['ax'] = ax

@@ -232,13 +232,22 @@ class LightCurve(object):
         # Then, apply the savgol_filter to each segment separately
         trend_signal = np.zeros(len(lc_clean.time))
         for l, h in zip(low, high):
+            # Reduce `window_length` and `polyorder` for short segments;
+            # this prevents `savgol_filter` from raising an exception
+            segment_window_length, segment_polyorder = window_length, polyorder
+            if segment_window_length > (h - l):
+                segment_window_length = h - l
+                if (segment_window_length % 2) == 0:
+                    segment_window_length -= 1  # window_length must be odd
+            if segment_polyorder >= segment_window_length:
+                segment_polyorder = segment_window_length - 1
             trend_signal[l:h] = signal.savgol_filter(x=lc_clean.flux[l:h],
-                                                     window_length=window_length,
-                                                     polyorder=polyorder, **kwargs)
+                                                     window_length=segment_window_length,
+                                                     polyorder=segment_polyorder, **kwargs)
         trend_signal = np.interp(self.time, lc_clean.time, trend_signal)
         flatten_lc = copy.deepcopy(self)
-        flatten_lc.flux /= trend_signal
-        flatten_lc.flux_err /= trend_signal
+        flatten_lc.flux = flatten_lc.flux / trend_signal
+        flatten_lc.flux_err = flatten_lc.flux_err / trend_signal
         if return_trend:
             trend_lc = copy.deepcopy(self)
             trend_lc.flux = trend_signal
@@ -354,6 +363,8 @@ class LightCurve(object):
           the binned lightcurve will report the root-mean-square error.
           If no uncertainties are included, the binned curve will return the
           standard deviation of the data.
+        - If the original lightcurve contains a quality attribute, then the
+          bitwise OR of the quality flags will be returned per bin.
         """
         available_methods = ['mean', 'median']
         if method not in available_methods:
@@ -365,7 +376,7 @@ class LightCurve(object):
         binned_lc.time = np.array([methodf(a) for a in np.array_split(self.time, n_bins)])
         binned_lc.flux = np.array([methodf(a) for a in np.array_split(self.flux, n_bins)])
 
-        if self.flux_err is not None:
+        if np.any(np.isfinite(self.flux_err)):
             # root-mean-square error
             binned_lc.flux_err = np.array(
                                     [np.sqrt(np.nansum(a**2))
@@ -375,6 +386,16 @@ class LightCurve(object):
             # compute the standard deviation from the data
             binned_lc.flux_err = np.array([np.nanstd(a)
                                            for a in np.array_split(self.flux, n_bins)])
+
+        if hasattr(binned_lc, 'quality'):
+            binned_lc.quality = np.array(
+                [np.bitwise_or.reduce(a) for a in np.array_split(self.quality, n_bins)])
+        if hasattr(binned_lc, 'centroid_col'):
+            binned_lc.centroid_col = np.array(
+                [methodf(a) for a in np.array_split(self.centroid_col, n_bins)])
+        if hasattr(binned_lc, 'centroid_row'):
+            binned_lc.centroid_row = np.array(
+                [methodf(a) for a in np.array_split(self.centroid_row, n_bins)])
 
         return binned_lc
 
@@ -445,7 +466,7 @@ class LightCurve(object):
 
     def plot(self, ax=None, normalize=True, xlabel='Time - 2454833 (days)',
              ylabel='Normalized Flux', title=None,
-             fill=False, grid=True, context='fast', **kwargs):
+             fill=False, grid=True, style='fast', **kwargs):
         """Plots the light curve.
 
         Parameters
@@ -467,7 +488,7 @@ class LightCurve(object):
             Shade the region between 0 and flux
         grid : bool
             Plot with a grid
-        context : str
+        style : str
             matplotlib.pyplot.style.context, default is 'fast'
         kwargs : dict
             Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
@@ -477,16 +498,23 @@ class LightCurve(object):
         ax : matplotlib.axes._subplots.AxesSubplot
             The matplotlib axes object.
         """
+        # The "fast" style has only been in matplotlib since v2.1.
+        # Let's make it optional until >v2.1 is mainstream and can
+        # be made the minimum requirement.
+        if (style == "fast") and ("fast" not in mpl.style.available):
+            style = "default"
         if normalize:
             normalized_lc = self.normalize()
             flux, flux_err = normalized_lc.flux, normalized_lc.flux_err
         else:
+            if ylabel == 'Normalized Flux':
+                ylabel = 'Flux'
             flux, flux_err = self.flux, self.flux_err
-        with plt.style.context(context):
+        with plt.style.context(style):
             if ax is None:
                 fig, ax = plt.subplots(1)
-            if ('color' not in kwargs) and (len(ax.lines)==0):
-                kwargs['color']='black'
+            if ('color' not in kwargs) and (len(ax.lines) == 0):
+                kwargs['color'] = 'black'
             if np.any(~np.isfinite(flux_err)):
                 ax.plot(self.time, flux, **kwargs)
             else:
@@ -514,8 +542,14 @@ class LightCurve(object):
                      names=('time', 'flux', 'flux_err'),
                      meta=self.meta)
 
-    def to_pandas(self):
+    def to_pandas(self, columns=['time', 'flux', 'flux_err']):
         """Export the LightCurve as a Pandas DataFrame.
+
+        Parameters
+        ----------
+        columns : list of str
+            List of columns to include in the DataFrame.  The names must match
+            attributes of the `LightCurve` object (e.g. `time`, `flux`).
 
         Returns
         -------
@@ -529,9 +563,11 @@ class LightCurve(object):
         except ImportError:
             raise ImportError("You need to install pandas to use the "
                               "LightCurve.to_pandas() method.")
-        df = pd.DataFrame(data={'flux': self.flux, 'flux_err': self.flux_err},
-                          index=self.time,
-                          columns=['flux', 'flux_err'])
+        data = {}
+        for col in columns:
+            if hasattr(self, col):
+                data[col] = vars(self)[col]
+        df = pd.DataFrame(data=data, index=self.time, columns=columns)
         df.index.name = 'time'
         df.meta = self.meta
         return df
@@ -669,8 +705,23 @@ class KeplerLightCurve(LightCurve):
         new_lc.flux_err = self.normalize().flux_err[not_nan]
         return new_lc
 
-    def to_fits(self):
-        raise NotImplementedError()
+    def to_pandas(self, columns=['time', 'flux', 'flux_err', 'quality',
+                                 'centroid_col', 'centroid_row']):
+        """Export the LightCurve as a Pandas DataFrame.
+
+        Parameters
+        ----------
+        columns : list of str
+            List of columns to include in the DataFrame.  The names must match
+            attributes of the `LightCurve` object (e.g. `time`, `flux`).
+
+        Returns
+        -------
+        dataframe : `pandas.DataFrame` object
+            A dataframe indexed by `time` and containing the columns `flux`
+            and `flux_err`.
+        """
+        return super(KeplerLightCurve, self).to_pandas(columns=columns)
 
 
 class TessLightCurve(LightCurve):
@@ -717,9 +768,6 @@ class TessLightCurve(LightCurve):
 
     def __repr__(self):
         return('TessLightCurve(TICID: {})'.format(self.ticid))
-
-    def to_fits(self):
-        raise NotImplementedError()
 
 
 def iterative_box_period_search(lc, niters=2, min_period=0.5, max_period=30,

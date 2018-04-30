@@ -85,7 +85,7 @@ class KeplerPRF(object):
         self.shape = shape
         self.column = column
         self.row = row
-        self.col_coord, self.row_coord, self.interpolate = self._prepare_prf()
+        self.col_coord, self.row_coord, self.interpolate, self.supersampled_prf = self._prepare_prf()
 
     def __call__(self, flux, center_col, center_row, scale_col, scale_row,
                  rotation_angle):
@@ -171,16 +171,15 @@ class KeplerPRF(object):
         # interpolate the calibrated PRF shape to the target position
         rowdim, coldim = self.shape[0], self.shape[1]
         prf = np.zeros(np.shape(prfn[0]), dtype='float32')
-        prf_weight = np.zeros(n_hdu, dtype='float32')
         ref_column = self.column + .5 * coldim
         ref_row = self.row + .5 * rowdim
 
         for i in range(n_hdu):
-            prf_weight[i] = math.sqrt((ref_column - crval1p[i]) ** 2
-                                     + (ref_row - crval2p[i]) ** 2)
-            if prf_weight[i] < min_prf_weight:
-                prf_weight[i] = min_prf_weight
-            prf += prfn[i] / prf_weight[i]
+            prf_weight = math.sqrt((ref_column - crval1p[i]) ** 2
+                                   + (ref_row - crval2p[i]) ** 2)
+            if prf_weight < min_prf_weight:
+                prf_weight = min_prf_weight
+            prf += prfn[i] / prf_weight
 
         prf /= (np.nansum(prf) * cdelt1p[0] * cdelt2p[0])
 
@@ -192,7 +191,7 @@ class KeplerPRF(object):
         # x-axis correspond to the column-axis
         interpolate = scipy.interpolate.RectBivariateSpline(PRFrow, PRFcol, prf)
 
-        return col_coord, row_coord, interpolate
+        return col_coord, row_coord, interpolate, prf
 
     def plot(self, *params, **kwargs):
         pflux = self.evaluate(*params)

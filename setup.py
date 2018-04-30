@@ -16,14 +16,14 @@ exec(open('lightkurve/version.py').read())
 
 setup(name='lightkurve',
       version=__version__,
-      description="A beautiful package for astronomical flux time series"
-                  "analysis in Python.",
+      description="A simple and beautiful package for astronomical "
+                  "flux time series analysis in Python.",
       long_description=open('README.rst').read(),
       author='KeplerGO',
       author_email='keplergo@mail.arc.nasa.gov',
       license='MIT',
       packages=['lightkurve'],
-      install_requires=['numpy>=1.11', 'astropy>=1.3', 'scipy>=0.17.0',
+      install_requires=['numpy>=1.11', 'astropy>=1.3', 'scipy>=0.19.0',
                         'matplotlib>=1.5.3', 'tqdm', 'oktopus', 'bs4',
                         'requests', 'astroquery>=0.3.7'],
       setup_requires=['pytest-runner'],

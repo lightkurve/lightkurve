@@ -2,6 +2,7 @@ from __future__ import division, print_function
 import datetime
 import os
 import warnings
+import logging
 
 from astropy.io import fits
 from astropy.nddata import Cutout2D
@@ -24,19 +25,8 @@ __all__ = ['KeplerTargetPixelFile']
 
 class TargetPixelFile(object):
     """
-    TargetPixelFile class
+    Generic TargetPixelFile class
     """
-    def to_lightcurve(self):
-        """Returns a raw light curve of the TPF.
-
-        Returns
-        -------
-        lc : LightCurve object
-            Array containing the summed or detrended flux within the aperture
-            for each cadence.
-        """
-        pass
-
     def properties(self):
         '''Print out a description of each of the non-callable attributes of a
         TargetPixelFile object.
@@ -91,7 +81,6 @@ class TargetPixelFile(object):
         output.pprint(max_lines=-1, max_width=-1)
 
 
-
 class TessTargetPixelFile(TargetPixelFile):
     """
     Defines a TargetPixelFile class for the TESS Mission.
@@ -114,6 +103,7 @@ class TessTargetPixelFile(TargetPixelFile):
     .. [1] Kepler: A Search for Terrestrial Planets. Kepler Archive Manual.
         http://archive.stsci.edu/kepler/manuals/archive_manual.pdf
     """
+    pass
 
 
 class KeplerTargetPixelFile(TargetPixelFile):
@@ -371,6 +361,16 @@ class KeplerTargetPixelFile(TargetPixelFile):
         return out
 
     @property
+    def pos_corr1(self):
+        """Returns the column position correction."""
+        return self.hdu[1].data['POS_CORR1'][self.quality_mask]
+
+    @property
+    def pos_corr2(self):
+        """Returns the row position correction."""
+        return self.hdu[1].data['POS_CORR2'][self.quality_mask]
+
+    @property
     def pipeline_mask(self):
         """Returns the aperture mask used by the Kepler pipeline"""
         return self.hdu[-1].data > 2
@@ -498,6 +498,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
             cadence.
         """
         aperture_mask = self._parse_aperture_mask(aperture_mask)
+        if aperture_mask.sum() == 0:
+            logging.warning('Warning: aperture mask contains zero pixels.')
         centroid_col, centroid_row = self.centroids(aperture_mask)
 
         return KeplerLightCurve(flux=np.nansum(self.flux[:, aperture_mask], axis=1),
@@ -542,7 +544,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         return col_centr, row_centr
 
     def plot(self, ax=None, frame=0, cadenceno=None, bkg=False, aperture_mask=None,
-             show_colorbar=True, mask_color='pink', context='fast', **kwargs):
+             show_colorbar=True, mask_color='pink', style='fast', **kwargs):
         """
         Plot a target pixel file at a given frame (index) or cadence number.
 
@@ -564,8 +566,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
             Whether or not to show the colorbar
         mask_color : str
             Color to show the aperture mask
-        context : str
-            matplotlib.pyplot.style.context, default is ggplot
+        style : str
+            matplotlib.pyplot.style.context, default is 'fast'
         kwargs : dict
             Keywords arguments passed to `lightkurve.utils.plot_image`.
 
@@ -574,6 +576,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
         ax : matplotlib.axes._subplots.AxesSubplot
             The matplotlib axes object.
         """
+        if (style == "fast") and ("fast" not in plt.style.available):
+            style = "default"
         if cadenceno is not None:
             try:
                 frame = np.argwhere(cadenceno == self.cadenceno)[0][0]
@@ -582,14 +586,14 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                  "must be in the range {}-{}.".format(
                                     cadenceno, self.cadenceno[0], self.cadenceno[-1]))
         try:
-            if bkg:
+            if bkg and np.any(np.isfinite(self.flux_bkg[frame])):
                 pflux = self.flux[frame] + self.flux_bkg[frame]
             else:
                 pflux = self.flux[frame]
         except IndexError:
             raise ValueError("frame {} is out of bounds, must be in the range "
                              "0-{}.".format(frame, self.shape[0]))
-        with plt.style.context(context):
+        with plt.style.context(style):
             ax = plot_image(pflux, ax=ax, title='Kepler ID: {}'.format(self.keplerid),
                     extent=(self.column, self.column + self.shape[2], self.row,
                     self.row + self.shape[1]), show_colorbar=show_colorbar, **kwargs)
@@ -618,8 +622,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
             self.hdu.writeto(output_fn, overwrite=overwrite, checksum=True)
 
     @staticmethod
-    def from_fits_images(images, position, size=(10, 10), extension=None,
-                         target_id="unnamed-target", hdu0_keywords={}, **kwargs):
+    def from_fits_images(images, position=None, size=(10, 10), extension=None,
+                         target_id="unnamed-target", **kwargs):
         """Creates a new Target Pixel File from a set of images.
 
         This method is intended to make it easy to cut out targets from
@@ -680,8 +684,11 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
             if idx == 0:  # Get default keyword values from the first image
                 factory.keywords = hdu.header
-            cutout = Cutout2D(hdu.data, position, wcs=WCS(hdu.header),
-                              size=size, mode='partial')
+            if position is None:
+                cutout = hdu
+            else:
+                cutout = Cutout2D(hdu.data, position, wcs=WCS(hdu.header),
+                                  size=size, mode='partial')
             factory.add_cadence(frameno=idx, flux=cutout.data, header=hdu.header)
 
             allkeys = hdu0_keywords.copy()
