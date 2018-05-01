@@ -13,6 +13,7 @@ from ..mast import (search_kepler_products, ArchiveError)
 from .. import KeplerTargetPixelFile, KeplerLightCurveFile
 from astropy.coordinates import SkyCoord
 import astropy.units as u
+import numpy as np
 
 
 @pytest.mark.remote_data
@@ -27,26 +28,32 @@ def test_search_kepler_tpf_products():
     # ...including quarter 11 but not 12:
     assert(len(search_kepler_products(11904151, quarter=11)) == 1)
     assert(len(search_kepler_products(11904151, quarter=12)) == 0)
-    # should work for 91/92
-    c91 = search_kepler_products(200068780, quarter=91)
-    c92 = search_kepler_products(200068780, quarter=92)
-    assert(len(c91) == 1)
-    assert(len(c91) == len(c92))
-    assert(~np.any(c91['description'] == c92['description']))
-    assert(~np.any(c91['dataURI'] == c92['dataURI']))
-    c91 = search_kepler_products(200068780, quarter=91, targetlimit=3)
-    assert(len(c91) == 3)
-    c9 = search_kepler_products(200068780, quarter=9, targetlimit=3)
-    assert(len(c9) == 6)
+    # should work for all split campaigns
+    campaigns = [[91, 92, 9], [101, 102, 10], [111, 112, 11]]
+    ids = [200068780, 200071712, 202975993]
+    for c, idx in zip(campaigns, ids):
+        ca = search_kepler_products(idx, quarter=c[0])
+        cb = search_kepler_products(idx, quarter=c[1])
+        assert(len(ca) == 1)
+        assert(len(ca) == len(cb))
+        assert(~np.any(ca['description'] == cb['description']))
+        assert(~np.any(ca['dataURI'] == cb['dataURI']))
+        ca = search_kepler_products(idx, quarter=c[0], targetlimit=3, radius=400)
+        assert(len(ca) == 3)
+        # If you specify the whole campaign, both split parts must be returned.
+        cc = search_kepler_products(idx, quarter=c[2], targetlimit=3, radius=400)
+        assert(len(cc) == 6)
     # We should also be able to resolve it by its name instead of KIC ID
     assert(len(search_kepler_products('Kepler-10')) == 15)
     # An invalid KIC/EPIC ID should be dealt with gracefully
     with pytest.raises(ArchiveError) as exc:
         search_kepler_products(-999)
     assert('Could not resolve' in str(exc))
-    # If we ask for all cadence types, there should be four Kepler files given background
+    # If we ask for all cadence types, there should be four Kepler files given
     assert(len(search_kepler_products(4914423, quarter=6, cadence='any')) == 4)
+    # Should be able to resolve an ra/dec
     assert(len(search_kepler_products('297.5835, 40.98339', quarter=6) == 1))
+    # Should be able to resolve a SkyCoord
     c = SkyCoord('297.5835 40.98339', unit=(u.deg, u.deg))
     assert(len(search_kepler_products(c, quarter=6) == 1))
 
@@ -54,8 +61,8 @@ def test_search_kepler_tpf_products():
 @pytest.mark.remote_data
 def test_search_kepler_lightcurve_products():
     """Tests `lightkurve.mast.search_kepler_lightcurve_products`."""
-    assert(len(search_kepler_lightcurve_products('Kepler-10')) == 15)
-    assert(len(search_kepler_lightcurve_products(200071712, quarter=102)) == 1)
+    assert(len(search_kepler_products('Kepler-10', filetype='Lightcurve')) == 15)
+    assert(len(search_kepler_products(200071712, quarter=102, filetype='Lightcurve')) == 1)
 
 
 @pytest.mark.remote_data
