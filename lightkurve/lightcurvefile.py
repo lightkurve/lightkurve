@@ -120,7 +120,7 @@ class KeplerLightCurveFile(LightCurveFile):
             Kepler Quarter or K2 Campaign number.
         month : 1, 2, 3, list or 'all'
             For Kepler's prime mission, there are three short-cadence
-            Target Pixel Files for each quarter, each covering one month.
+            Lightcurve Files for each quarter, each covering one month.
             Hence, if cadence='short' you need to specify month=1, 2, or 3.
         radius : float
             Search radius in arcseconds. Default is 1 arcsecond.
