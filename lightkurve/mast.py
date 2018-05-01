@@ -71,6 +71,8 @@ def search_products(target, radius=1):
             target_name = 'kplr{:09d}'.format(target)
         elif (target > 200000000) and (target < 300000000):
             target_name = 'ktwo{:09d}'.format(target)
+        else:
+            target_name = target
     except:
         # If `target` is not a number, or not in range, try to continue.
         target_name = target
@@ -119,7 +121,7 @@ def search_kepler_products(target, filetype='Target Pixel', cadence='long', quar
         Table detailing the available Target Pixel File products.
     """
     if filetype not in ['Target Pixel', 'Lightcurve']:
-        logging.exception("Choose a filetype of 'Target Pixel' or 'Lightcurve'")
+        raise ValueError("Choose a filetype of 'Target Pixel' or 'Lightcurve'")
 
     # Value for the quarter or campaign
     qoc = campaign if campaign is not None else quarter
