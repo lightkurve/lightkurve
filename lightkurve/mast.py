@@ -57,8 +57,10 @@ def search_products(target, radius=1):
     products : astropy.Table
         Table detailing the available data products.
     """
+    # If passed a SkyCoord, convert it to an RA and Dec
     if isinstance(target, SkyCoord):
         target = '{}, {}'.format(target.ra.deg, target.dec.deg)
+
     try:
         # If `target` looks like a KIC or EPIC ID, we will pass the exact
         # `target_name` under which MAST will know the object.
@@ -67,28 +69,23 @@ def search_products(target, radius=1):
             target_name = 'kplr{:09d}'.format(target)
         elif (target > 200000000) and (target < 300000000):
             target_name = 'ktwo{:09d}'.format(target)
-        else:
-            raise ValueError("Not in the Kepler KIC or EPIC ID range")
+    except:
+        # If `target` is not a number, or not in range, try to continue.
+        target_name = target
+
+    # Attempt to query the target name
+    try:
         obs = Observations.query_criteria(objectname=target_name,
                                           radius='{} arcsec'.format(radius),
                                           project=["Kepler", "K2"])
-        # Remove KeplerFFI data set.
-        obs = obs[(obs['obs_collection']=='Kepler') | (obs['obs_collection']=='K2')]
-        obs.sort('distance')
-    except ValueError:
-        # If `target` did not look like a KIC or EPIC ID, then we let MAST
-        # resolve the target name to a sky position.
-        try:
-            obs = Observations.query_criteria(objectname=target,
-                                              radius='{} arcsec'.format(radius),
-                                              project=["Kepler", "K2"])
-            #Remove KeplerFFI data set.
-            obs = obs[(obs['obs_collection']=='Kepler') | (obs['obs_collection']=='K2')]
-            obs.sort('distance')
-        except ResolverError as exc:
-            raise ArchiveError(exc)
+    except ResolverError as exc:
+        raise ArchiveError(exc)
 
-    # Make sure the final table is in DISTANCE order.
+    # Remove KeplerFFI data set.
+    obs = obs[(obs['obs_collection']=='Kepler') | (obs['obs_collection']=='K2')]
+    obs.sort('distance')
+
+    # Make sure the final table is in same DISTANCE order as above.
     obsids = np.asarray(obs['obsid'])
     products = Observations.get_product_list(obs)
     order = [np.where(products['parent_obsid'] == o)[0]  for o in obsids]
@@ -98,7 +95,7 @@ def search_products(target, radius=1):
 
 
 def search_kepler_products(target, filetype='Target Pixel', cadence='long', quarter=None,
-                               campaign=None, radius=1):
+                               campaign=None, radius=1, targetlimit=1):
     """Returns a table of Kepler or K2 Target Pixel Files or Lightcurve Files
      for a given target.
 
@@ -125,8 +122,9 @@ def search_kepler_products(target, filetype='Target Pixel', cadence='long', quar
     # Value for the quarter or campaign
     qoc = campaign if campaign is not None else quarter
 
-    if not hasattr(qoc, '__iter__'):
-        qoc = [qoc]
+    # Ensure quarter or campaign is iterable.
+    if (campaign is not None) | (quarter is not None):
+        qoc = np.atleast_1d(np.asarray(qoc, dtype=int))
 
     products = search_products(target, radius)
     # Because MAST doesn't let us query based on Kepler-specific meta data
@@ -137,28 +135,35 @@ def search_kepler_products(target, filetype='Target Pixel', cadence='long', quar
         suffix = "{}".format(filetype)
     else:
         suffix = "{} Long".format(filetype)
-    if len(products) > 0:
-        # Identify the campaign or quarter by the description.
-        if qoc[0] is not None:
-            mask = np.zeros(np.shape(products)[0], dtype=bool)
-            for q in qoc:
-                if q is not None:
-                    mask |= np.array([desc.lower().endswith('q{}'.format(q)) or
-                                      desc.lower().endswith('c{:02d}'.format(q))
-                                      for desc in products['description']])
-        else:
-            mask = np.ones(np.shape(products)[0], dtype=bool)
-        mask &= np.array([desc.lower().endswith('fits') or
-                          desc.lower().endswith('fits.gz')
-                          for desc in products['dataURI']])
-        mask &= np.array([suffix in desc for desc in products['description']])
-        products = products[mask]
+
+    #If there is nothing in the table, quit now.
+    if len(products) == 0:
+        return products
+
+    # Identify the campaign or quarter by the description.
+    if qoc is not None:
+        mask = np.zeros(np.shape(products)[0], dtype=bool)
+        for q in qoc:
+            mask |= np.array([desc.lower().replace('-','').endswith('q{}'.format(q)) or
+                              'c{:02d}'.format(q) in desc.lower().replace('-','') or
+                              'c{:03d}'.format(q) in desc.lower().replace('-','')
+                              for desc in products['description']])
+    else:
+        mask = np.ones(np.shape(products)[0], dtype=bool)
+    # Allow only the correct fits or fits.gz type
+    mask &= np.array([desc.lower().endswith('fits') or
+                      desc.lower().endswith('fits.gz')
+                      for desc in products['dataURI']])
+    # Allow only the correct cadence type
+    mask &= np.array([suffix in desc for desc in products['description']])
+    products = products[mask]
 
     # Add the quarter or campaign numbers
-    qoc = np.asarray([p.split(' - ')[-1][1:]
-                      for p in products['description']], dtype=int)
+    qoc = np.asarray([p.split(' - ')[-1][1:].replace('-','')
+                        for p in products['description']], dtype=int)
     products['qoc'] = qoc
-     # Add the dates of each short cadence observation to the product table.
+    # Add the dates of each short cadence observation to the product table.
+    # Note this will not produce a date for ktwo observations, but will not break.
     dates = [p.split('/')[-1].split('-')[1].split('_')[0]
              for p in products['dataURI']]
     for idx, d in enumerate(dates):
@@ -167,6 +172,31 @@ def search_kepler_products(target, filetype='Target Pixel', cadence='long', quar
         except:
             dates[idx] = 0
     products['dates'] = np.asarray(dates)
+
+    # Limit to the correct number of hits based on ID. If there are multiple versions
+    # of the same ID, this shouldn't count towards the limit.
+    if targetlimit is not None:
+        ids = np.asarray([p.split('/')[-1].split('-')[0].split('_')[0][4:]
+                          for p in products['dataURI']], dtype=int)
+        if len(np.unique(ids)) < targetlimit:
+            logging.warning('Target return limit set to {} '
+                            'but only {} unique targets found. '
+                            'Try increasing the search radius. '
+                            '(Radius currently set to {} arcseconds)'
+                            ''.format(targetlimit, len(np.unique(ids)), radius))
+        okids = ids[np.sort(np.unique(ids, return_index=True)[1])[0:targetlimit]]
+        mask = np.zeros(len(ids), dtype=bool)
+
+        # Mask data.
+        # Make sure they still appear in the same order.
+        order = np.zeros(len(ids))
+        for idx, okid in enumerate(okids):
+            pos = ids == okid
+            order[pos] = int(idx)
+            mask |= pos
+        products['order'] = order
+        products = products[mask]
+
     return products
 
 def get_kepler_products(target, filetype='Target Pixel', cadence='long',
@@ -230,31 +260,9 @@ def get_kepler_products(target, filetype='Target Pixel', cadence='long',
     # Grab the products
     products = search_kepler_products(target=target, filetype=filetype, cadence=cadence,
                                       quarter=quarter, campaign=campaign,
-                                      radius=radius)
-    if len(products) < 1:
+                                      radius=radius, targetlimit=targetlimit)
+    if len(products) == 0:
         raise ArchiveError("No {} File found for {} at MAST.".format(filetype, target))
-
-
-    # Limit to the correct number of hits based on ID. If there are multiple versions
-    # of the same ID, this shouldn't count towards the limit.
-    if targetlimit is not None:
-        ids = np.asarray([p.split('/')[-1].split('-')[0].split('_')[0][4:]
-                          for p in products['dataURI']], dtype=int)
-        if len(np.unique(ids)) < targetlimit:
-            logging.warning('Target return limit set to {} '
-                            'but only {} unique targets found. '
-                            'Trying increasing search radius. '
-                            '(radius currently set to {} arcseconds)'
-                            ''.format(targetlimit, len(np.unique(ids)), radius))
-        okids = ids[np.sort(np.unique(ids, return_index=True)[1])[0:targetlimit]]
-        mask = np.zeros(len(ids), dtype=bool)
-        idsort = np.zeros(len(ids))
-        for idx, o in enumerate(okids):
-            p = ids == o
-            idsort[p] = int(idx)
-            mask |= p
-        products['ids'] = idsort
-        products = products[mask]
 
     # For Kepler short cadence data there are additional rules, so find anywhere
     # where there is short cadence data...
@@ -270,8 +278,8 @@ def get_kepler_products(target, filetype='Target Pixel', cadence='long',
                                "".format(len(products), target, quarter))
         # Get the short cadence date lookup table.
         table = ascii.read(os.path.join(PACKAGEDIR, 'data', 'short_cadence_month_lookup.csv'))
-        # Grab the dates of each of the short cadence files and make sure they
-        # all use the correct month
+        # Grab the dates of each of the short cadence files. Make sure every entry
+        # has the correct month
         finalmask = np.ones(len(products), dtype=bool)
         for c in np.unique(products[scmask]['qoc']):
             ok = (products['qoc'] == c) & (scmask)
@@ -282,13 +290,13 @@ def get_kepler_products(target, filetype='Target Pixel', cadence='long',
             finalmask[ok] = mask
         products = products[finalmask]
         # Sort by id, then date and quarter
-        products.sort(['ids', 'dates', 'qoc'])
+        products.sort(['order', 'dates', 'qoc'])
         if len(products) < 1:
             raise ArchiveError("No {} File found for {} "
                                "at month {} at MAST.".format(filetype, target, month))
 
     # If there is no specified quarter but there are many campaigns/quarters
-    # returned, throw an error to the user
+    # returned, warn the user with an error
     if (len(np.unique(products['qoc'])) > 1) & (campaign is None) & (quarter is None):
         raise ArchiveError("Found {} different Target Pixel Files "
                            "for target {}. Please specify quarter/month "

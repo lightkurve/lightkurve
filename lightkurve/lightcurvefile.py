@@ -116,7 +116,7 @@ class KeplerLightCurveFile(LightCurveFile):
             KIC/EPIC ID or object name.
         cadence : str
             'long' or 'short'.
-        quarter, campaign : int, list or 'all'
+        quarter, campaign : int, list of ints or 'all'
             Kepler Quarter or K2 Campaign number.
         month : 1, 2, 3, list or 'all'
             For Kepler's prime mission, there are three short-cadence

@@ -24,12 +24,19 @@ def test_search_kepler_tpf_products():
     # KIC 11904151 (Kepler-10) was observed in LC in 15 Quarters
     assert(len(search_kepler_products(11904151)) == 15)
     # ...including quarter 11 but not 12:
-    assert(len(search_kepler_tpf_products(11904151, quarter=11)) == 1)
-    assert(len(search_kepler_tpf_products(11904151, quarter=12)) == 0)
+    assert(len(search_kepler_products(11904151, quarter=11)) == 1)
+    assert(len(search_kepler_products(11904151, quarter=12)) == 0)
     # should work for 91/92
-    assert(len(search_kepler_tpf_products(200068780, quarter=91)) == 1)
-    assert(len(search_kepler_tpf_products(200068780, quarter=92)) == 1)
-    assert(len(search_kepler_tpf_products(200071712, quarter=102)) == 1)
+    c91 = search_kepler_products(200068780, quarter=91)
+    c92 = search_kepler_products(200068780, quarter=92)
+    assert(len(c91) == 1)
+    assert(len(c91) == len(c92))
+    assert(~np.any(c91['description'] == c92['description']))
+    assert(~np.any(c91['dataURI'] == c92['dataURI']))
+    c91 = search_kepler_products(200068780, quarter=91, targetlimit=3)
+    assert(len(c91) == 3)
+    c9 = search_kepler_products(200068780, quarter=9, targetlimit=3)
+    assert(len(c9) == 6)
     # We should also be able to resolve it by its name instead of KIC ID
     assert(len(search_kepler_products('Kepler-10')) == 15)
     # An invalid KIC/EPIC ID should be dealt with gracefully
