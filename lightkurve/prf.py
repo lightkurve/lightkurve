@@ -365,9 +365,6 @@ class PRFPhotometry(object):
         self.loss_value = np.array([])
         self.uncertainties = np.array([])
 
-        if x0 is None:
-            x0 = self.prior.mean
-
         if cadences == 'all':
             cadences = range(len(tpf.flux))
 
@@ -375,13 +372,18 @@ class PRFPhotometry(object):
             prior_at_t = self.shift_prior_with_pos_corr(tpf, t)
             loss = self.loss_function(tpf.flux[t], self.scene_model,
                                       prior=prior_at_t, **self.loss_kwargs)
-            result = loss.fit(x0=x0, method='powell', **kwargs)
+            if x0 is None:
+             xguess = prior_at_t.mean
+            else:
+             xguess = x0
+
+            result = loss.fit(x0=xguess, method='powell', **kwargs)
             opt_params = result.x
             residuals = tpf.flux[t] - self.scene_model(*opt_params)
             self.loss_value = np.append(self.loss_value, result.fun)
             self.opt_params = np.append(self.opt_params, opt_params)
             self.residuals = np.append(self.residuals, residuals)
-        self.opt_params = self.opt_params.reshape((len(cadences), len(x0)))
+        self.opt_params = self.opt_params.reshape((len(cadences), len(xguess)))
         self.residuals = self.residuals.reshape(len(cadences),tpf.flux.shape[1],tpf.flux.shape[2])
 
         return self.opt_params
