@@ -614,7 +614,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
         Parameters
         ----------
-        lc : an optional user-supplied pre-processed lightcurve for this target
+        lc : an optional user-supplied pre-processed lightcurve object for this target
 
         """
         try:
@@ -636,21 +636,17 @@ class KeplerTargetPixelFile(TargetPixelFile):
             ytitle = 'Flux (e/s)'
 
         # Map cadence to index or nearest index for gapped cadences.
-        lc_cad_matches = np.in1d(self.cadenceno, lc.cadenceno)
-        if lc_cad_matches.sum() != len(lc.cadenceno):
-            raise IndexError("lightcurve cadences must be an equal set or subset of TPF cadences")
+        n_lc_cad = len(lc.cadenceno)
         n_cad, nx, ny = self.flux.shape
-        min_cadence = np.min(self.cadenceno)
-        max_cadence = np.max(self.cadenceno)
-        cadence_lookup = {self.cadenceno[j]:j for j in range(n_cad)}
+        lc_cad_matches = np.in1d(self.cadenceno, lc.cadenceno)
+        assert lc_cad_matches.sum() == n_lc_cad, "Input cadences must be a subset of TPF"
+        min_cadence, max_cadence = np.min(self.cadenceno), np.max(self.cadenceno)
+        cadence_lookup = {cad:j for j, cad in enumerate(self.cadenceno)}
         cadence_full_range = np.arange(min_cadence,max_cadence,1, dtype=np.int)
         missing_cadences = list(set(cadence_full_range)-set(self.cadenceno))
-        for cad in missing_cadences:
-            cadence_lookup[cad] = np.argmin(np.abs(self.cadenceno - cad))
-
         tpf_indices = np.array([cadence_lookup[cadno] for cadno in lc.cadenceno])
 
-
+        # Convert binary quality numbers into human readable strings
         qual_strings = []
         for flag in lc.quality:
             flag_str_list = KeplerQualityFlags.decode(flag)
@@ -661,8 +657,16 @@ class KeplerTargetPixelFile(TargetPixelFile):
             if len(flag_str_list) > 1:
                 qual_strings.append("; ".join(flag_str_list))
 
+        # Convert time into human readable strings, breaks with NaN time
+        # See https://github.com/KeplerGO/lightkurve/issues/116
+        if (self.time == self.time).all():
+            human_time = self.timeobj.isot[lc_cad_matches]
+        else:
+            human_time = [' ']*n_lc_cad
+
         source = ColumnDataSource(data=dict(
-            time=lc.time, time_iso=lc.time,
+            time=lc.time,
+            time_iso=human_time,
             flux=lc.flux,
             cadence=lc.cadenceno,
             quality_code=lc.quality,
@@ -691,7 +695,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
         p1.add_tools(HoverTool(tooltips=[("Lightcurve Index", "$index"),
                                         ("TPF Index", "@tpf_index"),
                                         ("Cadence", "@cadence"),
-                                        ("Time", "@time{0,0.000}"),
+                                        ("Time ", "@time{0,0.000}"),
+                                        ("Time (iso)", "@time_iso"),
                                         ("Flux", "@flux"),
                                         ("Quality Code", "@quality_code"),
                                         ("Quality Flag", "@quality")],
@@ -720,14 +725,21 @@ class KeplerTargetPixelFile(TargetPixelFile):
                           dw=self.shape[2], dh=self.shape[1], dilate=False,
                           color_mapper=color_mapper)
 
-
         def update(ff, vv):
             '''Function that connects to the interact widget slider values'''
-            index_val = cadence_lookup[ff]
-            vert.update(location=self.time[index_val])
-            s2_dat.data_source.data['image'] = [self.flux[index_val,:,:]-pedestal]
             s2_dat.glyph.color_mapper.high = 10**vv[1]
             s2_dat.glyph.color_mapper.low = 10**vv[0]
+            if ff not in missing_cadences:
+                index_val = cadence_lookup[ff]
+                vert.update(line_alpha=0.5)
+                if self.time[index_val] == self.time[index_val]:
+                    vert.update(location=self.time[index_val])
+                else:
+                    vert.update(line_alpha=0.0)
+                s2_dat.data_source.data['image'] = [self.flux[index_val,:,:]-pedestal]
+            else:
+                vert.update(line_alpha=0)
+                s2_dat.data_source.data['image'] = [self.flux[0,:,:]*np.NaN]
             push_notebook()
 
         show(row(p1, s2), notebook_handle=True)
@@ -735,6 +747,9 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
         play = widgets.Play(interval=10, value=min_cadence, min=min_cadence, max=max_cadence, step=1,
             description="Press play", disabled=False)
+        play.show_repeat = False
+        play._repeat = False
+
 
         ff_slider = widgets.IntSlider(min=min_cadence,max=max_cadence,step=1,value=min_cadence,
                                       description='Cadence',
