@@ -7,10 +7,14 @@ import warnings
 
 from bs4 import BeautifulSoup
 from tqdm import tqdm
+from copy import deepcopy
+
+from astropy.convolution import convolve, Box1DKernel
 
 import oktopus
 import numpy as np
 from scipy import linalg, interpolate
+from scipy.optimize import minimize
 from matplotlib import pyplot as plt
 
 from astropy.io import fits as pyfits
@@ -20,8 +24,154 @@ from .utils import channel_to_module_output
 from .lightcurve import LightCurve
 from .lightcurvefile import KeplerLightCurveFile
 
+import celerite
 
 __all__ = ['KeplerCBVCorrector', 'SFFCorrector']
+
+
+class GPCorrector(object):
+    r'''Remove long term trends by fitting a Gaussian Process using celerite
+
+    Attributes
+    ----------
+    lc : LightCurve object
+        A light curve of the target
+    mask : boolean mask with the same length as lc.flux (optional)
+        Mask to avoid fitting to signals where time scales should be preserved.
+        e.g. if the light curve has transits, it is strongly recommended to mask
+        these out.
+        Points where mask is False will be removed from the fit.
+    '''
+
+    def __init__(self, lc, mask=None):
+        if np.any([np.isnan(lc.flux), np.isnan(lc.time), np.isnan(lc.flux_err)]):
+            raise ValueError('Light curve contains NaN values.')
+        if np.nansum(lc.normalize().flux - lc.flux) != 0:
+            raise ValueError('Flux is unnormalized.')
+        self.lc = lc
+        self.break_tolerance = 10
+        if mask is None:
+            self.mask = np.ones(len(lc.flux), dtype=bool)
+        else:
+            self.mask = mask
+        self.dt = self.lc.time[1:] - self.lc.time[0:-1]
+        self.dt_min = np.nanmin(self.dt)
+
+        self.breaks = self.find_breaks()
+
+    def find_breaks(self):
+        '''Find breaks in data collection that are more than the break_tolerance.
+        '''
+        breaks = np.where(self.dt > self.break_tolerance * np.nanmin(self.dt))[0] + 1
+        breaks = np.append([0], breaks)
+        breaks = np.append(breaks, len(self.lc.time))
+        return breaks
+
+    def initialize(self, timescale=None):
+        '''Returns a corrected lightcurve which is a copy of lc.
+
+        Note: Name is currently to replicate other correctors.
+        '''
+        if timescale is not None:
+            bounds = [(-15, 15), (np.log(6 * timescale), 15)]
+            log_rho = np.log(6*timescale)
+        else:
+            bounds = [(-15, 15), (-15, 15)]
+            log_rho = -np.log(0.26)
+        log_sigma = np.log(np.nanstd(self.lc[self.mask].flux))
+
+        jittersigma = np.log(np.nanmedian(self.lc.flux_err))
+        kernel = celerite.terms.Matern32Term(log_sigma=log_sigma,
+                                             log_rho=log_rho, bounds=bounds)
+        kernel += celerite.terms.JitterTerm(log_sigma=jittersigma)
+        gp = celerite.GP(kernel, mean=1, fit_mean=True)
+        self.initial_params = gp.get_parameter_dict()
+        gp.compute(self.lc[self.mask].time - self.lc.time[0], self.lc[self.mask].flux_err)
+
+        def neg_log_like(params, y, gp):
+            gp.set_parameter_vector(params)
+            return -gp.log_likelihood(y)
+
+        initial_params = gp.get_parameter_vector()
+        bounds = gp.get_parameter_bounds()
+
+        soln = minimize(neg_log_like, initial_params,
+                        method="L-BFGS-B", bounds=bounds, args=(self.lc[self.mask].flux, gp))
+        gp.set_parameter_vector(soln.x)
+        self.best_fit_params = gp.get_parameter_dict()
+        self.gp = gp
+
+    def check(self, ax=None, max_points=None):
+        '''Plots a segment of the data to check that the GP is reasonable.
+        '''
+        if max_points is None:
+            max_points = self.breaks[1]
+        if ax is None:
+            _, ax = plt.subplots()
+        self.lc[self.mask][0:max_points].plot(ax=ax, color='black')
+        x = self.lc[self.mask][0:max_points].time - self.lc.time[0]
+        pred_mean, pred_var = self.gp.predict(self.lc[self.mask].flux, x, return_var=True)
+        pred_mean = pred_mean
+        pred_std = np.sqrt(pred_var)
+        ax.plot(x + self.lc.time[0], pred_mean, color='C1', zorder=10)
+        ax.fill_between(x + self.lc.time[0], pred_mean + pred_std, pred_mean -
+                        pred_std, color='C1', alpha=0.3, edgecolor="none")
+        return
+
+    def correct(self, timescale=0.25, iters=2, sigma=3, return_trend=False):
+        '''Returns a lightcurve corrected by a GP.
+
+        Runs the GP for times, split into different chunks based on gaps in
+        data collection.
+
+        Attributes
+        ----------
+        timescale : float (default 0.25 days)
+            The time scale at which the user wishes to preserve signals.
+        iters : int
+            Number of times to iterate the correction. Each iteration successively
+            masks out data that is poorly fit by the GP.
+        return_trend : bool (default False)
+            If True, returns a LightCurve object with the correction. If False,
+            applies the correction to a copy of the original lc.s
+        '''
+        boxwidth = (int(timescale//self.dt_min))
+        for iter in range(iters):
+            self.initialize(timescale=timescale)
+            flat = LightCurve(time=self.lc.time, flux=self.lc.flux*0, flux_err=self.lc.flux_err*0)
+            for idx in tqdm(range(len(self.breaks)-1), desc='Iteration {} ({}% Masked)'.format(iter + 1, int(100.*np.nansum(~self.mask)/len(self.mask)))):
+                l = self.lc[self.breaks[idx]:self.breaks[idx+1]]
+                x = l.time - self.lc.time[0]
+                pred_mean, pred_var = self.gp.predict(self.lc[self.mask].flux, x, return_var=True)
+                pred_mean = pred_mean + self.gp.get_parameter_dict()['mean:value'] - 1
+                pred_std = np.sqrt(pred_var)
+
+                flat.flux[self.breaks[idx]:self.breaks[idx+1]] = pred_mean - 1
+
+                flat.flux_err[self.breaks[idx]:self.breaks[idx+1]] = pred_std
+
+            # fig, ax = plt.subplots()
+            # ax.errorbar(self.lc[self.mask].time, self.lc[self.mask].flux - flat[self.mask].flux,
+            #            ((self.lc[self.mask].flux_err**2 + (flat[self.mask].flux_err)**2)**0.5), zorder=-1, ls='', alpha=0.2)
+
+            # plt.plot(self.lc[self.mask].time, 1+sigma*(self.lc[self.mask].flux_err **
+        #                                               2 + (flat[self.mask].flux_err)**2)**0.5, zorder=2)
+        #    plt.plot(self.lc[self.mask].time, 1-sigma*(self.lc[self.mask].flux_err **
+        #                                               2 + (flat[self.mask].flux_err)**2)**0.5, zorder=2)
+
+            corr = np.abs(self.lc.flux - flat.flux)
+            mask = np.abs(corr - np.nanmedian(corr)) < sigma *\
+                ((self.lc.flux_err**2 + (flat.flux_err)**2)**0.5)
+            mask = (convolve(mask, Box1DKernel(boxwidth)) == 1)
+            self.mask &= mask
+        flat.flux -= np.nanmedian(flat.flux)
+        corrected_lc = deepcopy(self.lc)
+        corrected_lc.flux -= flat.flux
+        corrected_lc.flux_err = (self.lc.flux_err**2 + (flat.flux_err)**2)**0.5
+        if return_trend:
+            flat.flux += 1
+            return corrected_lc, flat
+        return corrected_lc
 
 
 class KeplerCBVCorrector(object):
@@ -106,7 +256,8 @@ class KeplerCBVCorrector(object):
         module, output = channel_to_module_output(self.lc_file.channel)
         cbv_file = pyfits.open(self.get_cbv_url())
         cbv_data = cbv_file['MODOUT_{0}_{1}'.format(module, output)].data
-        time = cbv_file['MODOUT_{0}_{1}'.format(module, output)].data['TIME_MJD'][self.lc_file.quality_mask]
+        time = cbv_file['MODOUT_{0}_{1}'.format(
+            module, output)].data['TIME_MJD'][self.lc_file.quality_mask]
         cbv_array = []
         for i in cbvs:
             cbv_array.append(cbv_data.field('VECTOR_{}'.format(i))[self.lc_file.quality_mask])
@@ -168,7 +319,7 @@ class KeplerCBVCorrector(object):
         """
 
         self.bayes_factor, cost = [], []  # bayes_factor here is actually the
-                                          # negative log of the bayes factor
+        # negative log of the bayes factor
         self.correct(cbvs=[1], options={'xtol': 1e-6, 'ftol': 1e-6, 'maxfev': 2000})
         cost.append(self.opt_result.fun)
         for n in tqdm(range(2, self._ncbvs+1)):
@@ -240,9 +391,11 @@ class KeplerCBVCorrector(object):
         ax.set_xlabel('Time (MJD)')
         module, output = channel_to_module_output(self.lc_file.channel)
         if self.lc_file.mission == 'Kepler':
-            ax.set_title('Kepler CBVs (Module : {}, Output : {}, Quarter : {})'.format(module, output, self.lc_file.quarter))
+            ax.set_title('Kepler CBVs (Module : {}, Output : {}, Quarter : {})'.format(
+                module, output, self.lc_file.quarter))
         elif self.lc_file.mission == 'K2':
-            ax.set_title('K2 CBVs (Module : {}, Output : {}, Campaign : {})'.format(module, output, self.lc_file.campaign))
+            ax.set_title('K2 CBVs (Module : {}, Output : {}, Campaign : {})'.format(
+                module, output, self.lc_file.campaign))
         ax.grid(':', alpha=0.3)
         ax.legend()
         return ax

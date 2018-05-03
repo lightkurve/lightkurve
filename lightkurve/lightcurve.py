@@ -117,15 +117,16 @@ class LightCurve(object):
                 if callable(res):
                     continue
                 if attr == 'hdu':
-                    attrs[attr] = {'res':res, 'type':'list'}
+                    attrs[attr] = {'res': res, 'type': 'list'}
                     for idx, r in enumerate(res):
                         if idx == 0:
                             attrs[attr]['print'] = '{}'.format(r.header['EXTNAME'])
                         else:
-                            attrs[attr]['print'] = '{}, {}'.format(attrs[attr]['print'], '{}'.format(r.header['EXTNAME']))
+                            attrs[attr]['print'] = '{}, {}'.format(
+                                attrs[attr]['print'], '{}'.format(r.header['EXTNAME']))
                     continue
                 else:
-                    attrs[attr] = {'res':res}
+                    attrs[attr] = {'res': res}
                 if isinstance(res, int):
                     attrs[attr]['print'] = '{}'.format(res)
                     attrs[attr]['type'] = 'int'
@@ -154,7 +155,7 @@ class LightCurve(object):
             for attr, dic in attrs.items():
                 if dic['type'] == typ:
                     output.add_row([attr, dic['print']])
-                    idx+=1
+                    idx += 1
         output.pprint(max_lines=-1, max_width=-1)
 
     def append(self, others):
@@ -203,9 +204,9 @@ class LightCurve(object):
             must be less than window_length.
         return_trend : bool
             If `True`, the method will return a tuple of two elements
-            (flattened_lc, trend_lc) where trend_lc is the removed trend.
+            (remove_smooth_lc, trend_lc) where trend_lc is the removed trend.
         break_tolerance : int
-            If there are large gaps in time, flatten will split the flux into
+            If there are large gaps in time, remove_smooth will split the flux into
             several sub-lightcurves and apply `savgol_filter` to each
             individually. A gap is defined as a period in time larger than
             `break_tolerance` times the median gap.  To disable this feature,
@@ -215,7 +216,7 @@ class LightCurve(object):
 
         Returns
         -------
-        flatten_lc : LightCurve object
+        remove_smooth_lc : LightCurve object
             Flattened lightcurve.
         If `return_trend` is `True`, the method will also return:
         trend_lc : LightCurve object
@@ -379,9 +380,9 @@ class LightCurve(object):
         if np.any(np.isfinite(self.flux_err)):
             # root-mean-square error
             binned_lc.flux_err = np.array(
-                                    [np.sqrt(np.nansum(a**2))
-                                     for a in np.array_split(self.flux_err, n_bins)]
-                                 ) / binsize
+                [np.sqrt(np.nansum(a**2))
+                 for a in np.array_split(self.flux_err, n_bins)]
+            ) / binsize
         else:
             # compute the standard deviation from the data
             binned_lc.flux_err = np.array([np.nanstd(a)
@@ -594,6 +595,7 @@ class LightCurve(object):
 
 class FoldedLightCurve(LightCurve):
     """Defines a folded lightcurve with different plotting defaults."""
+
     def __init__(self, *args, **kwargs):
         super(FoldedLightCurve, self).__init__(*args, **kwargs)
 
@@ -690,13 +692,13 @@ class KeplerLightCurve(LightCurve):
         """
         not_nan = np.isfinite(self.flux)
         if method == 'sff':
-                from .correctors import SFFCorrector
-                self.corrector = SFFCorrector()
-                corrected_lc = self.corrector.correct(time=self.time[not_nan],
-                                                      flux=self.flux[not_nan],
-                                                      centroid_col=self.centroid_col[not_nan],
-                                                      centroid_row=self.centroid_row[not_nan],
-                                                      **kwargs)
+            from .correctors import SFFCorrector
+            self.corrector = SFFCorrector()
+            corrected_lc = self.corrector.correct(time=self.time[not_nan],
+                                                  flux=self.flux[not_nan],
+                                                  centroid_col=self.centroid_col[not_nan],
+                                                  centroid_row=self.centroid_row[not_nan],
+                                                  **kwargs)
         else:
             raise ValueError("method {} is not available.".format(method))
         new_lc = copy.copy(self)
@@ -746,6 +748,7 @@ class TessLightCurve(LightCurve):
     ticid : int
         Tess Input Catalog ID number
     """
+
     def __init__(self, time, flux, flux_err=None, centroid_col=None,
                  centroid_row=None, quality=None, quality_bitmask=None,
                  cadenceno=None, ticid=None):
