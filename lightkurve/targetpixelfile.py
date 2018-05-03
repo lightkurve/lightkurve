@@ -662,7 +662,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 qual_strings.append("; ".join(flag_str_list))
 
         source = ColumnDataSource(data=dict(
-            time=lc.time, flux=lc.flux,
+            time=lc.time, time_iso=lc.time,
+            flux=lc.flux,
             cadence=lc.cadenceno,
             quality_code=lc.quality,
             quality=np.array(qual_strings),
@@ -675,7 +676,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
             title = "Quicklook lightcurve for KIC {} (Kepler Quarter {})".format(
                         self.keplerid, self.quarter)
         p1 = figure(title=title, plot_height=300, plot_width=600,
-                   tools="pan,wheel_zoom,box_zoom,reset")
+                   tools="pan,wheel_zoom,box_zoom,save,reset")
         p1.yaxis.axis_label = ytitle
         p1.xaxis.axis_label = 'Time - 2454833 days [BKJD]'
         p1.step('time', 'flux', line_width=1, color='gray', source=source,
@@ -699,6 +700,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         vert = Span(location=0, dimension='height', line_color='firebrick', line_width=4, line_alpha=0.5)
         p1.add_layout(vert)
         s2 = figure(plot_width=300, plot_height=300,
+                    tools="pan,wheel_zoom,box_zoom,save,reset",
                     title='Pixel data (CCD {}.{})'.format(
                                 self.module, self.output))
         s2.yaxis.axis_label = 'Pixel Row Number'
@@ -707,8 +709,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
         pedestal = np.nanmin(self.flux[lc_cad_matches, :, :])
         stretch_dims = np.prod(self.flux[lc_cad_matches, :, :].shape)
         screen_stretch = self.flux[lc_cad_matches, :, :].reshape(stretch_dims)-pedestal
-        screen_stretch = screen_stretch[(screen_stretch>0.0) &
-                                        (screen_stretch==screen_stretch)]
+        screen_stretch = screen_stretch[screen_stretch==screen_stretch]
+        screen_stretch = screen_stretch[screen_stretch > 0.0]
         vlo = np.partition(screen_stretch, 1)[1] #takes the 2nd smallest nonzero!
         vhi = np.max(screen_stretch)
         lo, med, hi= np.nanpercentile(screen_stretch, [1, 50, 95])
