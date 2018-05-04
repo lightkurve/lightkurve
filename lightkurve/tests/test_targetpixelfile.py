@@ -208,5 +208,3 @@ def test_interact():
     """Test the Jupyter notebook interact() widget."""
     tpf = KeplerTargetPixelFile(filename_tpf_one_center)
     tpf.interact()
-    tpf = KeplerTargetPixelFile(filename_tpf_all_zeros)
-    tpf.interact()
