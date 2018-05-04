@@ -647,7 +647,9 @@ class KeplerTargetPixelFile(TargetPixelFile):
         n_lc_cad = len(lc.cadenceno)
         n_cad, nx, ny = self.flux.shape
         lc_cad_matches = np.in1d(self.cadenceno, lc.cadenceno)
-        assert lc_cad_matches.sum() == n_lc_cad, "Input cadences must be a subset of TPF"
+        if lc_cad_matches.sum() != n_lc_cad:
+            raise ValueError("The lightcurve provided has cadences that are not "
+                             "present in the Target Pixel File.")
         min_cadence, max_cadence = np.min(self.cadenceno), np.max(self.cadenceno)
         cadence_lookup = {cad: j for j, cad in enumerate(self.cadenceno)}
         cadence_full_range = np.arange(min_cadence, max_cadence, 1, dtype=np.int)
