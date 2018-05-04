@@ -616,7 +616,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         unless the user supplies a custom `LightCurve` object.
 
         Note: at this time, this feature only works inside an active Jupyter
-        Notebook, and tends to be too slow when more than ~10,000 cadences
+        Notebook, and tends to be too slow when more than ~30,000 cadences
         are contained in the TPF (e.g. short cadence data).
 
         Parameters
@@ -643,6 +643,11 @@ class KeplerTargetPixelFile(TargetPixelFile):
             lc = self.to_lightcurve()
             ytitle = 'Flux (e/s)'
 
+        # Bokeh cannot handle many data points
+        ## https://github.com/bokeh/bokeh/issues/7490
+        if len(lc.cadenceno) > 30000:
+            raise RuntimeError('Interact cannot display more than 20000 cadences.')
+
         # Map cadence to index for quick array slicing.
         n_lc_cad = len(lc.cadenceno)
         n_cad, nx, ny = self.flux.shape
@@ -654,7 +659,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
         cadence_lookup = {cad: j for j, cad in enumerate(self.cadenceno)}
         cadence_full_range = np.arange(min_cadence, max_cadence, 1, dtype=np.int)
         missing_cadences = list(set(cadence_full_range)-set(self.cadenceno))
-        tpf_indices = np.array([cadence_lookup[cadno] for cadno in lc.cadenceno])
 
         # Convert binary quality numbers into human readable strings
         qual_strings = []
@@ -681,8 +685,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                   flux=lc.flux,
                                   cadence=lc.cadenceno,
                                   quality_code=lc.quality,
-                                  quality=np.array(qual_strings),
-                                  tpf_index=tpf_indices))
+                                  quality=np.array(qual_strings)))
 
         # Provide extra metadata in the title
         if self.mission == 'K2':
@@ -707,11 +710,9 @@ class KeplerTargetPixelFile(TargetPixelFile):
                         hover_fill_color="firebrick", hover_alpha=0.9,
                         hover_line_color="white")
 
-        fig1.add_tools(HoverTool(tooltips=[("Lightcurve Index", "$index"),
-                                           ("TPF Index", "@tpf_index"),
-                                           ("Cadence", "@cadence"),
-                                           ("Time ", "@time{0,0.000}"),
-                                           ("Time (iso)", "@time_iso"),
+        fig1.add_tools(HoverTool(tooltips=[("Cadence", "@cadence"),
+                                           ("Time (BKJD)", "@time{0,0.000}"),
+                                           ("Time (ISO)", "@time_iso"),
                                            ("Flux", "@flux"),
                                            ("Quality Code", "@quality_code"),
                                            ("Quality Flag", "@quality")],
