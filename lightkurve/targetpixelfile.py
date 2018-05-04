@@ -609,15 +609,20 @@ class KeplerTargetPixelFile(TargetPixelFile):
         return ax
 
     def interact(self, lc=None):
-        """
-        Interact with a linked target pixel file and lightcurve
-        Still in development
-        See https://github.com/KeplerGO/lightkurve/pull/100
+        """Display an interactive IPython Notebook widget to inspect the data.
+
+        The widget will show both the lightcurve and pixel data.  By default,
+        the lightcurve shown is obtained by calling the `to_lightcurve()` method,
+        unless the user supplies a custom `LightCurve` object.
+
+        Note: at this time, this feature only works inside an active Jupyter
+        Notebook, and tends to be too slow when more than ~10,000 cadences
+        are contained in the TPF (e.g. short cadence data).
 
         Parameters
         ----------
-        lc : an optional user-supplied pre-processed lightcurve object for this target
-
+        lc : LightCurve object
+            An optional pre-processed lightcurve object to show.
         """
         try:
             from ipywidgets import interact
@@ -630,7 +635,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
             from IPython.display import display
             output_notebook()
         except ImportError:
-            raise ImportError('The quicklook tool requires Bokeh and ipywidgets.  See the .interact() tutorial')
+            raise ImportError('The quicklook tool requires Bokeh and ipywidgets. '
+                              'See the .interact() tutorial')
 
         ytitle = 'Flux'
         if lc is None:
@@ -643,15 +649,15 @@ class KeplerTargetPixelFile(TargetPixelFile):
         lc_cad_matches = np.in1d(self.cadenceno, lc.cadenceno)
         assert lc_cad_matches.sum() == n_lc_cad, "Input cadences must be a subset of TPF"
         min_cadence, max_cadence = np.min(self.cadenceno), np.max(self.cadenceno)
-        cadence_lookup = {cad:j for j, cad in enumerate(self.cadenceno)}
-        cadence_full_range = np.arange(min_cadence,max_cadence,1, dtype=np.int)
+        cadence_lookup = {cad: j for j, cad in enumerate(self.cadenceno)}
+        cadence_full_range = np.arange(min_cadence, max_cadence, 1, dtype=np.int)
         missing_cadences = list(set(cadence_full_range)-set(self.cadenceno))
         tpf_indices = np.array([cadence_lookup[cadno] for cadno in lc.cadenceno])
 
         # Convert binary quality numbers into human readable strings
         qual_strings = []
-        for flag in lc.quality:
-            flag_str_list = KeplerQualityFlags.decode(flag)
+        for bitmask in lc.quality:
+            flag_str_list = KeplerQualityFlags.decode(bitmask)
             if len(flag_str_list) == 0:
                 qual_strings.append(' ')
             if len(flag_str_list) == 1:
@@ -664,17 +670,17 @@ class KeplerTargetPixelFile(TargetPixelFile):
         if (self.time == self.time).all():
             human_time = self.timeobj.isot[lc_cad_matches]
         else:
-            human_time = [' ']*n_lc_cad
+            human_time = [' '] * n_lc_cad
 
         # Each data source will later become a hover-over tooltip
         source = ColumnDataSource(data=dict(
-            time=lc.time,
-            time_iso=human_time,
-            flux=lc.flux,
-            cadence=lc.cadenceno,
-            quality_code=lc.quality,
-            quality=np.array(qual_strings),
-            tpf_index=tpf_indices))
+                                  time=lc.time,
+                                  time_iso=human_time,
+                                  flux=lc.flux,
+                                  cadence=lc.cadenceno,
+                                  quality_code=lc.quality,
+                                  quality=np.array(qual_strings),
+                                  tpf_index=tpf_indices))
 
         # Provide extra metadata in the title
         if self.mission == 'K2':
@@ -684,61 +690,66 @@ class KeplerTargetPixelFile(TargetPixelFile):
             title = "Quicklook lightcurve for KIC {} (Kepler Quarter {})".format(
                         self.keplerid, self.quarter)
 
-        # Figure 1 shows the lightcurve with, steps, tooltips, and vertical line
+        # Figure 1 shows the lightcurve with steps, tooltips, and vertical line
         fig1 = figure(title=title, plot_height=300, plot_width=600,
-                   tools="pan,wheel_zoom,box_zoom,save,reset")
+                      tools="pan,wheel_zoom,box_zoom,save,reset")
         fig1.yaxis.axis_label = ytitle
         fig1.xaxis.axis_label = 'Time - 2454833 days [BKJD]'
         fig1.step('time', 'flux', line_width=1, color='gray', source=source,
-                nonselection_line_color='gray', mode="center")
+                  nonselection_line_color='gray', mode="center")
 
-        r = fig1.circle('time', 'flux', source=source, fill_alpha=0.3, size=8,line_color=None,
-                     selection_color="firebrick", nonselection_fill_alpha=0.0,
-                     nonselection_line_color=None,nonselection_line_alpha=0.0, fill_color=None,
-                     hover_fill_color="firebrick",hover_alpha=0.9,hover_line_color="white")
+        r = fig1.circle('time', 'flux', source=source, fill_alpha=0.3, size=8,
+                        line_color=None, selection_color="firebrick",
+                        nonselection_fill_alpha=0.0, nonselection_line_color=None,
+                        nonselection_line_alpha=0.0, fill_color=None,
+                        hover_fill_color="firebrick", hover_alpha=0.9,
+                        hover_line_color="white")
 
         fig1.add_tools(HoverTool(tooltips=[("Lightcurve Index", "$index"),
-                                        ("TPF Index", "@tpf_index"),
-                                        ("Cadence", "@cadence"),
-                                        ("Time ", "@time{0,0.000}"),
-                                        ("Time (iso)", "@time_iso"),
-                                        ("Flux", "@flux"),
-                                        ("Quality Code", "@quality_code"),
-                                        ("Quality Flag", "@quality")],
-                              renderers=[r], mode='mouse', point_policy="snap_to_data"))
-
-        vert = Span(location=0, dimension='height', line_color='firebrick', line_width=4, line_alpha=0.5)
+                                           ("TPF Index", "@tpf_index"),
+                                           ("Cadence", "@cadence"),
+                                           ("Time ", "@time{0,0.000}"),
+                                           ("Time (iso)", "@time_iso"),
+                                           ("Flux", "@flux"),
+                                           ("Quality Code", "@quality_code"),
+                                           ("Quality Flag", "@quality")],
+                                 renderers=[r],
+                                 mode='mouse',
+                                 point_policy="snap_to_data"))
+        # Vertical line to indicate the cadence shown in Fig 2
+        vert = Span(location=0, dimension='height', line_color='firebrick',
+                    line_width=4, line_alpha=0.5)
         fig1.add_layout(vert)
 
         # Figure 2 shows the Target Pixel File stamp with log screen stretch
         fig2 = figure(plot_width=300, plot_height=300,
-                    tools="pan,wheel_zoom,box_zoom,save,reset",
-                    title='Pixel data (CCD {}.{})'.format(
+                      tools="pan,wheel_zoom,box_zoom,save,reset",
+                      title='Pixel data (CCD {}.{})'.format(
                                 self.module, self.output))
         fig2.yaxis.axis_label = 'Pixel Row Number'
         fig2.xaxis.axis_label = 'Pixel Column Number'
 
         pedestal = np.nanmin(self.flux[lc_cad_matches, :, :])
         stretch_dims = np.prod(self.flux[lc_cad_matches, :, :].shape)
-        screen_stretch = self.flux[lc_cad_matches, :, :].reshape(stretch_dims)-pedestal
-        screen_stretch = screen_stretch[screen_stretch==screen_stretch]
+        screen_stretch = self.flux[lc_cad_matches, :, :].reshape(stretch_dims) - pedestal
+        screen_stretch = screen_stretch[np.isfinite(screen_stretch)]  # ignore NaNs
         screen_stretch = screen_stretch[screen_stretch > 0.0]
-        vlo = np.partition(screen_stretch, 1)[1] #takes the 2nd smallest nonzero!
+        vlo = np.min(screen_stretch)
         vhi = np.max(screen_stretch)
-        vstep = (np.log10(vhi)-np.log10(vlo))/300.0 #assumes counts >> 1.0!
-        lo, med, hi= np.nanpercentile(screen_stretch, [1, 50, 95])
+        vstep = (np.log10(vhi) - np.log10(vlo)) / 300.0  # assumes counts >> 1.0!
+        lo, med, hi = np.nanpercentile(screen_stretch, [1, 50, 95])
         color_mapper = LogColorMapper(palette="Viridis256", low=lo, high=hi)
 
-        fig2_dat = fig2.image([self.flux[0,:,:]-pedestal], x=self.column, y=self.row,
-                          dw=self.shape[2], dh=self.shape[1], dilate=False,
-                          color_mapper=color_mapper)
+        fig2_dat = fig2.image([self.flux[0, :, :] - pedestal], x=self.column,
+                              y=self.row, dw=self.shape[2], dh=self.shape[1],
+                              dilate=False, color_mapper=color_mapper)
 
         # The figures appear before the interactive widget sliders
         show(row(fig1, fig2), notebook_handle=True)
 
         # The widget sliders call the update function each time
         def update(cadence, log_stretch):
-            '''Function that connects to the interact widget slider values'''
+            """Function that connects to the interact widget slider values"""
             fig2_dat.glyph.color_mapper.high = 10**log_stretch[1]
             fig2_dat.glyph.color_mapper.low = 10**log_stretch[0]
             if cadence not in missing_cadences:
@@ -748,30 +759,35 @@ class KeplerTargetPixelFile(TargetPixelFile):
                     vert.update(location=self.time[index_val])
                 else:
                     vert.update(line_alpha=0.0)
-                fig2_dat.data_source.data['image'] = [self.flux[index_val,:,:]-pedestal]
+                fig2_dat.data_source.data['image'] = [self.flux[index_val, :, :]
+                                                      - pedestal]
             else:
                 vert.update(line_alpha=0)
-                fig2_dat.data_source.data['image'] = [self.flux[0,:,:]*np.NaN]
+                fig2_dat.data_source.data['image'] = [self.flux[0, :, :] * np.NaN]
             push_notebook()
 
-        # The interactivite part
+        # Define the widgets that enable the interactivity
         play = widgets.Play(interval=10, value=min_cadence, min=min_cadence,
-                        max=max_cadence, step=1, description="Press play", disabled=False)
+                            max=max_cadence, step=1, description="Press play",
+                            disabled=False)
         play.show_repeat, play._repeat = False, False
-
-        cadence_slider = widgets.IntSlider(min=min_cadence,max=max_cadence,step=1,
-                                      value=min_cadence,description='Cadence',
-                                      layout=widgets.Layout(width='40%', height='20px'))
-
-        screen_slider = widgets.FloatRangeSlider(value=[np.log10(lo), np.log10(hi)], min=np.log10(vlo),
-                                            max=np.log10(vhi),step=vstep, description='Pixel Stretch (log)',
-                                            style={'description_width': 'initial'},
-                                            continuous_update=False,
-                                            layout=widgets.Layout(width='30%', height='20px'))
-
+        cadence_slider = widgets.IntSlider(
+                            min=min_cadence, max=max_cadence,
+                            step=1, value=min_cadence, description='Cadence',
+                            layout=widgets.Layout(width='40%', height='20px'))
+        screen_slider = widgets.FloatRangeSlider(
+                            value=[np.log10(lo), np.log10(hi)],
+                            min=np.log10(vlo),
+                            max=np.log10(vhi),
+                            step=vstep,
+                            description='Pixel Stretch (log)',
+                            style={'description_width': 'initial'},
+                            continuous_update=False,
+                            layout=widgets.Layout(width='30%', height='20px'))
         widgets.jslink((play, 'value'), (cadence_slider, 'value'))
         ui = widgets.HBox([play, cadence_slider, screen_slider])
-        out = widgets.interactive_output(update, {'cadence': cadence_slider, 'log_stretch':screen_slider})
+        out = widgets.interactive_output(update, {'cadence': cadence_slider,
+                                                  'log_stretch': screen_slider})
         display(ui, out)
 
     def get_bkg_lightcurve(self, aperture_mask=None):
