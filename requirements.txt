@@ -7,3 +7,4 @@ oktopus
 bs4
 requests
 tqdm
+celerite

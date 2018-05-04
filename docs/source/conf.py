@@ -33,16 +33,16 @@ import sphinx_rtd_theme
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = ['sphinx.ext.autosummary',
-    'sphinx.ext.autodoc',
-    'sphinx.ext.doctest',
-    'sphinx.ext.intersphinx',
-    'sphinx.ext.todo',
-    'sphinx.ext.coverage',
-    'sphinx.ext.githubpages',
-    'sphinx.ext.mathjax',
-    'sphinx.ext.viewcode',
-    'numpydoc',
-    'nbsphinx']
+              'sphinx.ext.autodoc',
+              'sphinx.ext.doctest',
+              'sphinx.ext.intersphinx',
+              'sphinx.ext.todo',
+              'sphinx.ext.coverage',
+              'sphinx.ext.githubpages',
+              'sphinx.ext.mathjax',
+              'sphinx.ext.viewcode',
+              'numpydoc',
+              'nbsphinx']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -173,7 +173,8 @@ texinfo_documents = [
 intersphinx_mapping = {'python': ('https://docs.python.org/', None),
                        'numpy': ('http://docs.scipy.org/doc/numpy/', None),
                        'scipy': ('http://docs.scipy.org/doc/scipy/reference', None),
-                       'oktopus': ('http://keplergo.github.io/oktopus')}
+                       'oktopus': ('http://keplergo.github.io/oktopus'),
+                       'celerite': ('http://celerite.readthedocs.io/en/stable/')}
 
 
 sys.path += ['exts']
