@@ -29,8 +29,16 @@ import celerite
 __all__ = ['KeplerCBVCorrector', 'SFFCorrector']
 
 
+class MaskError(Exception):
+    """Raised if there is a problem masking the data."""
+    pass
+
+
 class GPCorrector(object):
     r'''Remove long term trends by fitting a Gaussian Process using celerite
+
+    Uses `celerite` and a Matern 3/2 Kernel and a Jitter term to model the
+    long term noise.
 
     Attributes
     ----------
@@ -42,6 +50,14 @@ class GPCorrector(object):
         these out.
         Points where mask is False will be removed from the fit.
     '''
+
+    def find_breaks(self):
+        '''Find breaks in data collection that are more than the break_tolerance.
+        '''
+        breaks = np.where(self.dt > self.break_tolerance * np.nanmin(self.dt))[0] + 1
+        breaks = np.append([0], breaks)
+        breaks = np.append(breaks, len(self.lc.time))
+        return breaks
 
     def __init__(self, lc, mask=None):
         if np.any([np.isnan(lc.flux), np.isnan(lc.time), np.isnan(lc.flux_err)]):
@@ -56,30 +72,25 @@ class GPCorrector(object):
             self.mask = mask
         self.dt = self.lc.time[1:] - self.lc.time[0:-1]
         self.dt_min = np.nanmin(self.dt)
-
         self.breaks = self.find_breaks()
-
-    def find_breaks(self):
-        '''Find breaks in data collection that are more than the break_tolerance.
-        '''
-        breaks = np.where(self.dt > self.break_tolerance * np.nanmin(self.dt))[0] + 1
-        breaks = np.append([0], breaks)
-        breaks = np.append(breaks, len(self.lc.time))
-        return breaks
 
     def initialize(self, timescale=None):
         '''Returns a corrected lightcurve which is a copy of lc.
 
-        Note: Name is currently to replicate other correctors.
+        Parameters
+        ----------
+        timescale : float or None
+            If not None, sets the lower bound for optimization of the GP. Will
+            not fit trends on timescales near to or shorter than this timescale.
         '''
+        # Set up the kernels and bounds for celerite
         if timescale is not None:
-            bounds = [(-15, 15), (np.log(6 * timescale), 15)]
-            log_rho = np.log(6*timescale)
+            bounds = [(-15, 15), (np.log(5 * timescale), 15)]
+            log_rho = np.log(5 * timescale)
         else:
             bounds = [(-15, 15), (-15, 15)]
             log_rho = -np.log(0.26)
         log_sigma = np.log(np.nanstd(self.lc[self.mask].flux))
-
         jittersigma = np.log(np.nanmedian(self.lc.flux_err))
         kernel = celerite.terms.Matern32Term(log_sigma=log_sigma,
                                              log_rho=log_rho, bounds=bounds)
@@ -88,35 +99,19 @@ class GPCorrector(object):
         self.initial_params = gp.get_parameter_dict()
         gp.compute(self.lc[self.mask].time - self.lc.time[0], self.lc[self.mask].flux_err)
 
+        # Define a log liklihood to minimize
         def neg_log_like(params, y, gp):
             gp.set_parameter_vector(params)
             return -gp.log_likelihood(y)
 
+        # Optimize the GP with scipy.minimize
         initial_params = gp.get_parameter_vector()
         bounds = gp.get_parameter_bounds()
-
         soln = minimize(neg_log_like, initial_params,
                         method="L-BFGS-B", bounds=bounds, args=(self.lc[self.mask].flux, gp))
         gp.set_parameter_vector(soln.x)
         self.best_fit_params = gp.get_parameter_dict()
         self.gp = gp
-
-    def check(self, ax=None, max_points=None):
-        '''Plots a segment of the data to check that the GP is reasonable.
-        '''
-        if max_points is None:
-            max_points = self.breaks[1]
-        if ax is None:
-            _, ax = plt.subplots()
-        self.lc[self.mask][0:max_points].plot(ax=ax, color='black')
-        x = self.lc[self.mask][0:max_points].time - self.lc.time[0]
-        pred_mean, pred_var = self.gp.predict(self.lc[self.mask].flux, x, return_var=True)
-        pred_mean = pred_mean
-        pred_std = np.sqrt(pred_var)
-        ax.plot(x + self.lc.time[0], pred_mean, color='C1', zorder=10)
-        ax.fill_between(x + self.lc.time[0], pred_mean + pred_std, pred_mean -
-                        pred_std, color='C1', alpha=0.3, edgecolor="none")
-        return
 
     def correct(self, timescale=0.25, iters=2, sigma=3, return_trend=False):
         '''Returns a lightcurve corrected by a GP.
@@ -124,7 +119,7 @@ class GPCorrector(object):
         Runs the GP for times, split into different chunks based on gaps in
         data collection.
 
-        Attributes
+        Parameters
         ----------
         timescale : float (default 0.25 days)
             The time scale at which the user wishes to preserve signals.
@@ -134,36 +129,50 @@ class GPCorrector(object):
         return_trend : bool (default False)
             If True, returns a LightCurve object with the correction. If False,
             applies the correction to a copy of the original lc.s
+
+        Returns
+        -------
+        corrected_lc : lightkurve.LightCurve object
+            The corrected light curve with propagated errors
+        flat : lightkurve.LightCurve object (optional)
+            If return_trend is True, will also return the best fit trend.
         '''
+        # We need to know how many points the `time_scale` corresponds to.
         boxwidth = (int(timescale//self.dt_min))
+        if boxwidth < 1:
+            raise MaskError('timescale is too short ({})'.format(timescale))
+        mask = np.ones(len(self.lc.flux), dtype=bool)
+        # Iteratively sigma clip the data
         for iter in range(iters):
+            # In the next run, include this new mask.
+            self.mask &= mask
+            if 100.*np.nansum(~self.mask)/len(self.mask) > 80:
+                raise MaskError('Too large of a fraction of data is masked ({}%).'
+                                'Consider running fewer iterations, with a larger '
+                                'sigma tolerance or a shorter timescale.'
+                                ''.format(int(100.*np.nansum(~self.mask)/len(self.mask))))
+            # Start the GP, find the maximum liklihood solution
             self.initialize(timescale=timescale)
             flat = LightCurve(time=self.lc.time, flux=self.lc.flux*0, flux_err=self.lc.flux_err*0)
+            # Run over each 'portion' of the data, defined where breaks are greater
+            # than break_tolerance
             for idx in tqdm(range(len(self.breaks)-1), desc='Iteration {} ({}% Masked)'.format(iter + 1, int(100.*np.nansum(~self.mask)/len(self.mask)))):
                 l = self.lc[self.breaks[idx]:self.breaks[idx+1]]
                 x = l.time - self.lc.time[0]
+                # Calculate the best fit mean and errors
                 pred_mean, pred_var = self.gp.predict(self.lc[self.mask].flux, x, return_var=True)
                 pred_mean = pred_mean + self.gp.get_parameter_dict()['mean:value'] - 1
                 pred_std = np.sqrt(pred_var)
-
                 flat.flux[self.breaks[idx]:self.breaks[idx+1]] = pred_mean - 1
-
                 flat.flux_err[self.breaks[idx]:self.breaks[idx+1]] = pred_std
 
-            # fig, ax = plt.subplots()
-            # ax.errorbar(self.lc[self.mask].time, self.lc[self.mask].flux - flat[self.mask].flux,
-            #            ((self.lc[self.mask].flux_err**2 + (flat[self.mask].flux_err)**2)**0.5), zorder=-1, ls='', alpha=0.2)
-
-            # plt.plot(self.lc[self.mask].time, 1+sigma*(self.lc[self.mask].flux_err **
-        #                                               2 + (flat[self.mask].flux_err)**2)**0.5, zorder=2)
-        #    plt.plot(self.lc[self.mask].time, 1-sigma*(self.lc[self.mask].flux_err **
-        #                                               2 + (flat[self.mask].flux_err)**2)**0.5, zorder=2)
-
+            # Mask out any data that is different from the model by `sigma`
             corr = np.abs(self.lc.flux - flat.flux)
-            mask = np.abs(corr - np.nanmedian(corr)) < sigma *\
-                ((self.lc.flux_err**2 + (flat.flux_err)**2)**0.5)
+            corr -= np.nanmedian(corr)
+            mask = corr < sigma * ((self.lc.flux_err**2 + (flat.flux_err)**2)**0.5)
             mask = (convolve(mask, Box1DKernel(boxwidth)) == 1)
-            self.mask &= mask
+
+        # Return the best fit trend.
         flat.flux -= np.nanmedian(flat.flux)
         corrected_lc = deepcopy(self.lc)
         corrected_lc.flux -= flat.flux
