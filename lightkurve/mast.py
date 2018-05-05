@@ -88,11 +88,8 @@ def _query_kepler_products(target, radius=1):
     except ResolverError as exc:
         raise ArchiveError(exc)
 
-    # Remove KeplerFFI data set.
-    #obs = obs[(obs['obs_collection'] == 'Kepler') | (obs['obs_collection'] == 'K2')]
+    # Make sure the final table is in DISTANCE order
     obs.sort('distance')
-
-    # Make sure the final table is in same DISTANCE order as above.
     obsids = np.asarray(obs['obsid'])
     products = Observations.get_product_list(obs)
     order = [np.where(products['parent_obsid'] == o)[0] for o in obsids]
