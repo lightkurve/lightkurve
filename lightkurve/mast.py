@@ -43,8 +43,10 @@ def download_products(products):
     return dl['Local Path']
 
 
-def search_products(target, radius=1):
-    """Returns a table of Kepler/K2 pipeline products for a given target.
+def _query_kepler_products(target, radius=1):
+    """Helper function for `search_kepler_products`.
+
+    Returns a table of Kepler/K2 pipeline products for a given target.
 
     Raises an ArchiveError if no products are found.
 
@@ -52,7 +54,7 @@ def search_products(target, radius=1):
     ----------
     target : str or int
         If the value is an integer in a specific range, we'll assume it is
-        a KIC or EPIC ID.
+        a KIC or EPIC ID.  Otherwise we will pass it to MAST as an objectname.
 
     Returns
     -------
@@ -65,28 +67,29 @@ def search_products(target, radius=1):
 
     try:
         # If `target` looks like a KIC or EPIC ID, we will pass the exact
-        # `target_name` under which MAST will know the object.
+        # `objectname` under which MAST will know the object.
         target = int(target)
         if (target > 0) and (target < 200000000):
-            target_name = 'kplr{:09d}'.format(target)
+            objectname = 'KIC {:09d}'.format(target)
         elif (target > 200000000) and (target < 300000000):
-            target_name = 'ktwo{:09d}'.format(target)
+            objectname = 'EPIC {:09d}'.format(target)
         else:
-            target_name = target
+            objectname = target
     except:
         # If `target` is not a number, or not in range, try to continue.
-        target_name = target
+        objectname = target
 
     # Attempt to query the target name
     try:
-        obs = Observations.query_criteria(objectname=target_name,
+        obs = Observations.query_criteria(objectname=objectname,
                                           radius='{} arcsec'.format(radius),
-                                          project=["Kepler", "K2"])
+                                          project=["Kepler", "K2"],
+                                          obs_collection=["Kepler", "K2"])
     except ResolverError as exc:
         raise ArchiveError(exc)
 
     # Remove KeplerFFI data set.
-    obs = obs[(obs['obs_collection'] == 'Kepler') | (obs['obs_collection'] == 'K2')]
+    #obs = obs[(obs['obs_collection'] == 'Kepler') | (obs['obs_collection'] == 'K2')]
     obs.sort('distance')
 
     # Make sure the final table is in same DISTANCE order as above.
@@ -105,15 +108,19 @@ def search_kepler_products(target, filetype='Target Pixel', cadence='long', quar
 
     Parameters
     ----------
-    cadence: 'short' or 'long'
-        Specify short (1-min) or long (30-min) cadence data.
     filetype : 'Target Pixel' or 'Lightcurve'
         Whether to return TPFs of LCs
+    cadence: 'short' or 'long'
+        Specify short (1-min) or long (30-min) cadence data.
     quarter, campaign : int
         Specify the Kepler Quarter or K2 Campaign Number.
         If None, then return the products for all Quarters/Campaigns.
     radius : float
         Search radius in arcseconds
+    targetlimit : None or int
+        If multiple targets are present within `radius`, limit the number
+        of returned TargetPixelFile objects to `targetlimit`.
+        If `None`, no limit is applied.
 
     Returns
     -------
@@ -130,7 +137,7 @@ def search_kepler_products(target, filetype='Target Pixel', cadence='long', quar
     if (campaign is not None) | (quarter is not None):
         qoc = np.atleast_1d(np.asarray(qoc, dtype=int))
 
-    products = search_products(target, radius)
+    products = _query_kepler_products(target, radius)
     # Because MAST doesn't let us query based on Kepler-specific meta data
     # fields, we need to identify short/long-cadence TPFs by their filename.
     if cadence in ['short', 'sc']:
@@ -204,12 +211,12 @@ def search_kepler_products(target, filetype='Target Pixel', cadence='long', quar
     return products
 
 
-def get_kepler_products(target, filetype='Target Pixel', cadence='long',
-                        quarter=None, month=None, campaign=None, radius=1.,
-                        targetlimit=1, verbose=True, **kwargs):
+def download_kepler_products(target, filetype='Target Pixel', cadence='long',
+                             quarter=None, month=None, campaign=None, radius=1.,
+                             targetlimit=1, verbose=True, **kwargs):
     """Download and cache files from from the Kepler/K2 data archive at MAST.
 
-    Returns path to the cached files.
+    Returns paths to the cached files.
 
     Raises an `ArchiveError` if a unique TPF cannot be found.  For example,
     this is the case if a target was observed in multiple Quarters and the

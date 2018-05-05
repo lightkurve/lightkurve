@@ -17,7 +17,7 @@ from . import PACKAGEDIR
 from .lightcurve import KeplerLightCurve, LightCurve
 from .prf import SimpleKeplerPRF
 from .utils import KeplerQualityFlags, plot_image, bkjd_to_time
-from .mast import get_kepler_products
+from .mast import download_kepler_products
 
 
 __all__ = ['KeplerTargetPixelFile']
@@ -156,7 +156,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
             KIC/EPIC ID or object name.
         cadence : str
             'long' or 'short'.
-        quarter, campaign : int, list or 'all'
+        quarter, campaign : int, list of ints, or 'all'
             Kepler Quarter or K2 Campaign number.
         month : 1, 2, 3, list or 'all'
             For Kepler's prime mission, there are three short-cadence
@@ -165,8 +165,9 @@ class KeplerTargetPixelFile(TargetPixelFile):
         radius : float
             Search radius in arcseconds. Default is 1 arcsecond.
         targetlimit : None or int
-            Limit the number of returned target pixel files. If none, no limit
-            is set
+            If multiple targets are present within `radius`, limit the number
+            of returned TargetPixelFile objects to `targetlimit`.
+            If `None`, no limit is applied.
         kwargs : dict
             Keywords arguments passed to `KeplerTargetPixelFile`.
 
@@ -174,9 +175,10 @@ class KeplerTargetPixelFile(TargetPixelFile):
         -------
         tpf : KeplerTargetPixelFile object.
         """
-        path = get_kepler_products(target=target, filetype='Target Pixel', cadence=cadence,
-                                   quarter=quarter, campaign=campaign, month=month, verbose=verbose,
-                                   radius=radius, targetlimit=targetlimit)
+        path = download_kepler_products(
+                    target=target, filetype='Target Pixel', cadence=cadence,
+                    quarter=quarter, campaign=campaign, month=month, verbose=verbose,
+                    radius=radius, targetlimit=targetlimit)
         if len(path) == 1:
             return KeplerTargetPixelFile(path[0], **kwargs)
         return [KeplerTargetPixelFile(p, **kwargs) for p in path]

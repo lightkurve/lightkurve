@@ -10,7 +10,7 @@ from astropy.io import fits as pyfits
 from astropy.table import Table
 
 from .utils import (bkjd_to_time, KeplerQualityFlags, TessQualityFlags)
-from .mast import get_kepler_products
+from .mast import download_kepler_products
 
 
 __all__ = ['KeplerLightCurveFile', 'TessLightCurveFile']
@@ -99,17 +99,18 @@ class KeplerLightCurveFile(LightCurveFile):
     @staticmethod
     def from_archive(target, cadence='long', quarter=None, month=None,
                      campaign=None, radius=1., targetlimit=1, verbose=True, **kwargs):
-        """Fetch *one or more* Lightcurve File(s) from the Kepler/K2 data archive at MAST.
+        """Fetches a LightCurveFile (or list thereof) from the data archive at MAST.
 
-        Raises an `ArchiveError` if a unique LCF cannot be found.  For example,
-        this is the case if a target was observed in multiple Quarters and the
-        quarter parameter is unspecified.
+        If a target was observed across multiple quarters or campaigns, a
+        list of `LightCurveFile` objects will only be returned if the string
+        'all' is passed to `quarter` or `campaign`.  Alternatively, a list of
+        numbers can be pased to these arguments.
 
-        If targetlimit is set to more than one (or None) then will return a list
-        of KeplerLightCurveFiles. Will only return hits within the specified radius.
+        An `ArchiveError` will be raised if no (unique) LightCurveFile
+        can be found.
 
-        If campaign, quarter or month is given a list, will return a list of
-        KeplerLightCurveFiles of all matches.
+        If `targetlimit` is set to more than one (or None) then will return a list
+        of `KeplerLightCurveFile`. Will only return hits within the specified radius.
 
         Parameters
         ----------
@@ -117,17 +118,18 @@ class KeplerLightCurveFile(LightCurveFile):
             KIC/EPIC ID or object name.
         cadence : str
             'long' or 'short'.
-        quarter, campaign : int, list of ints or 'all'
+        quarter, campaign : int, list of ints, or 'all'
             Kepler Quarter or K2 Campaign number.
-        month : 1, 2, 3, list or 'all'
+        month : 1, 2, 3, list of int, or 'all'
             For Kepler's prime mission, there are three short-cadence
-            Lightcurve Files for each quarter, each covering one month.
+            LightCurveFile objects for each quarter, each covering one month.
             Hence, if cadence='short' you need to specify month=1, 2, or 3.
         radius : float
             Search radius in arcseconds. Default is 1 arcsecond.
         targetlimit : None or int
-            Limit the number of returned target pixel files. If none, no limit
-            is set
+            If multiple targets are present within `radius`, limit the number
+            of returned LightCurveFile objects to `targetlimit`.
+            If `None`, no limit is applied.
         kwargs : dict
             Keywords arguments passed to `KeplerLightCurveFile`.
 
@@ -135,10 +137,10 @@ class KeplerLightCurveFile(LightCurveFile):
         -------
         lcf : KeplerLightCurveFile object or list of KeplerLightCurveFile objects
         """
-
-        path = get_kepler_products(target=target, filetype='Lightcurve', cadence=cadence,
-                                   quarter=quarter, campaign=campaign, month=month, verbose=verbose,
-                                   radius=radius, targetlimit=targetlimit)
+        path = download_kepler_products(
+                    target=target, filetype='Lightcurve', cadence=cadence,
+                    quarter=quarter, campaign=campaign, month=month, verbose=verbose,
+                    radius=radius, targetlimit=targetlimit)
         if len(path) == 1:
             return KeplerLightCurveFile(path[0], **kwargs)
         return [KeplerLightCurveFile(p, **kwargs) for p in path]
