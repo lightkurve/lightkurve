@@ -27,6 +27,7 @@ class TargetPixelFile(object):
     """
     Generic TargetPixelFile class
     """
+
     def properties(self):
         '''Print out a description of each of the non-callable attributes of a
         TargetPixelFile object.
@@ -40,15 +41,16 @@ class TargetPixelFile(object):
                 if callable(res):
                     continue
                 if attr == 'hdu':
-                    attrs[attr] = {'res':res, 'type':'list'}
+                    attrs[attr] = {'res': res, 'type': 'list'}
                     for idx, r in enumerate(res):
                         if idx == 0:
                             attrs[attr]['print'] = '{}'.format(r.header['EXTNAME'])
                         else:
-                            attrs[attr]['print'] = '{}, {}'.format(attrs[attr]['print'], '{}'.format(r.header['EXTNAME']))
+                            attrs[attr]['print'] = '{}, {}'.format(
+                                attrs[attr]['print'], '{}'.format(r.header['EXTNAME']))
                     continue
                 else:
-                    attrs[attr] = {'res':res}
+                    attrs[attr] = {'res': res}
                 if isinstance(res, int):
                     attrs[attr]['print'] = '{}'.format(res)
                     attrs[attr]['type'] = 'int'
@@ -77,7 +79,7 @@ class TargetPixelFile(object):
             for attr, dic in attrs.items():
                 if dic['type'] == typ:
                     output.add_row([attr, dic['print']])
-                    idx+=1
+                    idx += 1
         output.pprint(max_lines=-1, max_width=-1)
 
 
@@ -176,9 +178,9 @@ class KeplerTargetPixelFile(TargetPixelFile):
         tpf : KeplerTargetPixelFile object.
         """
         path = download_kepler_products(
-                    target=target, filetype='Target Pixel', cadence=cadence,
-                    quarter=quarter, campaign=campaign, month=month, verbose=verbose,
-                    radius=radius, targetlimit=targetlimit)
+            target=target, filetype='Target Pixel', cadence=cadence,
+            quarter=quarter, campaign=campaign, month=month, verbose=verbose,
+            radius=radius, targetlimit=targetlimit)
         if len(path) == 1:
             return KeplerTargetPixelFile(path[0], **kwargs)
         return [KeplerTargetPixelFile(p, **kwargs) for p in path]
@@ -196,9 +198,9 @@ class KeplerTargetPixelFile(TargetPixelFile):
         '''
         for key in keys:
             if ~(np.any([value[1].header[ttype] == key
-                for ttype in value[1].header['TTYPE*']])):
+                         for ttype in value[1].header['TTYPE*']])):
                 raise ValueError("File {} does not have a {} column, "
-                         "is this a target pixel file?".format(self.path, key))
+                                 "is this a target pixel file?".format(self.path, key))
         else:
             self._hdu = value
 
@@ -242,7 +244,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         w : astropy.wcs.WCS object
             WCS solution
         """
-        #Use WCS keywords of the 5th column (FLUX)
+        # Use WCS keywords of the 5th column (FLUX)
         wcs_keywords = {'1CTYP5': 'CTYPE1',
                         '2CTYP5': 'CTYPE2',
                         '1CRPX5': 'CRPIX1',
@@ -583,7 +585,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
             except IndexError:
                 raise ValueError("cadenceno {} is out of bounds, "
                                  "must be in the range {}-{}.".format(
-                                    cadenceno, self.cadenceno[0], self.cadenceno[-1]))
+                                     cadenceno, self.cadenceno[0], self.cadenceno[-1]))
         try:
             if bkg and np.any(np.isfinite(self.flux_bkg[frame])):
                 pflux = self.flux[frame] + self.flux_bkg[frame]
@@ -594,8 +596,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
                              "0-{}.".format(frame, self.shape[0]))
         with plt.style.context(style):
             ax = plot_image(pflux, ax=ax, title='Kepler ID: {}'.format(self.keplerid),
-                    extent=(self.column, self.column + self.shape[2], self.row,
-                    self.row + self.shape[1]), show_colorbar=show_colorbar, **kwargs)
+                            extent=(self.column, self.column + self.shape[2], self.row,
+                                    self.row + self.shape[1]), show_colorbar=show_colorbar, **kwargs)
             ax.grid(False)
         if aperture_mask is not None:
             aperture_mask = self._parse_aperture_mask(aperture_mask)
@@ -643,7 +645,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
             ytitle = 'Flux (e/s)'
 
         # Bokeh cannot handle many data points
-        ## https://github.com/bokeh/bokeh/issues/7490
+        # https://github.com/bokeh/bokeh/issues/7490
         if len(lc.cadenceno) > 30000:
             raise RuntimeError('Interact cannot display more than 20000 cadences.')
 
@@ -689,10 +691,10 @@ class KeplerTargetPixelFile(TargetPixelFile):
         # Provide extra metadata in the title
         if self.mission == 'K2':
             title = "Quicklook lightcurve for EPIC {} (K2 Campaign {})".format(
-                        self.keplerid, self.campaign)
+                self.keplerid, self.campaign)
         elif self.mission == 'Kepler':
             title = "Quicklook lightcurve for KIC {} (Kepler Quarter {})".format(
-                        self.keplerid, self.quarter)
+                self.keplerid, self.quarter)
 
         # Figure 1 shows the lightcurve with steps, tooltips, and vertical line
         fig1 = figure(title=title, plot_height=300, plot_width=600,
@@ -727,7 +729,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         fig2 = figure(plot_width=300, plot_height=300,
                       tools="pan,wheel_zoom,box_zoom,save,reset",
                       title='Pixel data (CCD {}.{})'.format(
-                                self.module, self.output))
+                          self.module, self.output))
         fig2.yaxis.axis_label = 'Pixel Row Number'
         fig2.xaxis.axis_label = 'Pixel Column Number'
 
@@ -774,18 +776,18 @@ class KeplerTargetPixelFile(TargetPixelFile):
                             disabled=False)
         play.show_repeat, play._repeat = False, False
         cadence_slider = widgets.IntSlider(
-                            min=min_cadence, max=max_cadence,
-                            step=1, value=min_cadence, description='Cadence',
-                            layout=widgets.Layout(width='40%', height='20px'))
+            min=min_cadence, max=max_cadence,
+            step=1, value=min_cadence, description='Cadence',
+            layout=widgets.Layout(width='40%', height='20px'))
         screen_slider = widgets.FloatRangeSlider(
-                            value=[np.log10(lo), np.log10(hi)],
-                            min=np.log10(vlo),
-                            max=np.log10(vhi),
-                            step=vstep,
-                            description='Pixel Stretch (log)',
-                            style={'description_width': 'initial'},
-                            continuous_update=False,
-                            layout=widgets.Layout(width='30%', height='20px'))
+            value=[np.log10(lo), np.log10(hi)],
+            min=np.log10(vlo),
+            max=np.log10(vhi),
+            step=vstep,
+            description='Pixel Stretch (log)',
+            style={'description_width': 'initial'},
+            continuous_update=False,
+            layout=widgets.Layout(width='30%', height='20px'))
         widgets.jslink((play, 'value'), (cadence_slider, 'value'))
         ui = widgets.HBox([play, cadence_slider, screen_slider])
         out = widgets.interactive_output(update, {'cadence': cadence_slider,
