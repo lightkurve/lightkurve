@@ -313,13 +313,16 @@ def test_slicing():
     centroid_col = np.linspace(40, 50, 10)
     centroid_row = np.linspace(50, 60, 10)
     quality = np.linspace(70, 80, 10)
+    cadenceno = np.linspace(90, 100, 10)
     lc = KeplerLightCurve(time, flux, flux_err,
                           centroid_col=centroid_col,
                           centroid_row=centroid_row,
+                          cadenceno=cadenceno,
                           quality=quality)
     assert_array_equal(lc[::3].centroid_col, centroid_col[::3])
     assert_array_equal(lc[4:].centroid_row, centroid_row[4:])
     assert_array_equal(lc[10:2].quality, quality[10:2])
+    assert_array_equal(lc[3:6].cadenceno, cadenceno[3:6])
 
     # The same is true for TessLightCurve
     lc = TessLightCurve(time, flux, flux_err,
@@ -332,9 +335,11 @@ def test_slicing():
 
 
 def test_boolean_masking():
-    lc = KeplerLightCurve(time=[1, 2, 3], flux=[1, 1, 10], quality=[0, 0, 200])
+    lc = KeplerLightCurve(time=[1, 2, 3], flux=[1, 1, 10],
+                          quality=[0, 0, 200], cadenceno=[5, 6, 7])
     assert_array_equal(lc[lc.flux < 5].time, [1, 2])
     assert_array_equal(lc[lc.flux < 5].quality, [0, 0])
+    assert_array_equal(lc[lc.flux < 5].cadenceno, [5, 6])
 
 
 def test_remove_nans():
