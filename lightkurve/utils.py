@@ -7,8 +7,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-__all__ = ['KeplerQualityFlags', 'TessQualityFlags', 'channel_to_module_output',
-           'module_output_to_channel', 'running_mean']
+__all__ = ['KeplerQualityFlags', 'TessQualityFlags', 'bkjd_to_time',
+           'channel_to_module_output', 'module_output_to_channel',
+           'running_mean']
 
 
 class KeplerQualityFlags(object):

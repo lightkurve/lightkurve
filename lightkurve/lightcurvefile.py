@@ -10,7 +10,7 @@ from astropy.io import fits as pyfits
 from astropy.table import Table
 
 from .utils import (bkjd_to_time, KeplerQualityFlags, TessQualityFlags)
-from .mast import search_kepler_lightcurve_products, download_products, ArchiveError
+from .mast import download_kepler_products
 
 
 __all__ = ['KeplerLightCurveFile', 'TessLightCurveFile']
@@ -26,6 +26,7 @@ class LightCurveFile(object):
     kwargs : dict
         Keyword arguments to be passed to astropy.io.fits.open.
     """
+
     def __init__(self, path, **kwargs):
         self.path = path
         self.hdu = pyfits.open(self.path, **kwargs)
@@ -97,12 +98,19 @@ class KeplerLightCurveFile(LightCurveFile):
 
     @staticmethod
     def from_archive(target, cadence='long', quarter=None, month=None,
-                     campaign=None, **kwargs):
-        """Fetch a Light Curve File from the Kepler/K2 data archive at MAST.
+                     campaign=None, radius=1., targetlimit=1, verbose=True, **kwargs):
+        """Fetches a LightCurveFile (or list thereof) from the data archive at MAST.
 
-        Raises an `ArchiveError` if a unique file cannot be found.  For example,
-        this is the case if a target was observed in multiple Quarters and the
-        quarter parameter is unspecified.
+        If a target was observed across multiple quarters or campaigns, a
+        list of `LightCurveFile` objects will only be returned if the string
+        'all' is passed to `quarter` or `campaign`.  Alternatively, a list of
+        numbers can be pased to these arguments.
+
+        An `ArchiveError` will be raised if no (unique) LightCurveFile
+        can be found.
+
+        If `targetlimit` is set to more than one (or None) then will return a list
+        of `KeplerLightCurveFile`. Will only return hits within the specified radius.
 
         Parameters
         ----------
@@ -110,37 +118,32 @@ class KeplerLightCurveFile(LightCurveFile):
             KIC/EPIC ID or object name.
         cadence : str
             'long' or 'short'.
-        quarter, campaign : int
+        quarter, campaign : int, list of ints, or 'all'
             Kepler Quarter or K2 Campaign number.
-        month : 1, 2, or 3
+        month : 1, 2, 3, list of int, or 'all'
             For Kepler's prime mission, there are three short-cadence
-            lightcurve files for each quarter, each covering one month.
+            LightCurveFile objects for each quarter, each covering one month.
             Hence, if cadence='short' you need to specify month=1, 2, or 3.
+        radius : float
+            Search radius in arcseconds. Default is 1 arcsecond.
+        targetlimit : None or int
+            If multiple targets are present within `radius`, limit the number
+            of returned LightCurveFile objects to `targetlimit`.
+            If `None`, no limit is applied.
         kwargs : dict
             Keywords arguments passed to `KeplerLightCurveFile`.
 
         Returns
         -------
-        tpf : KeplerLightCurveFile object.
+        lcf : KeplerLightCurveFile object or list of KeplerLightCurveFile objects
         """
-        products = search_kepler_lightcurve_products(target=target, cadence=cadence,
-                                                     quarter=quarter, campaign=campaign)
-        if cadence == 'short' and len(products) > 1:
-            if month is None:
-                raise ArchiveError("Found {} different lightcurve files "
-                                   "for target {} in Quarter {}."
-                                   "Please specify the month (1, 2, or 3)."
-                                   "".format(len(products), target, quarter))
-            products = Table(products[month+1])
-        elif len(products) > 1:
-            raise ArchiveError("Found {} different lightcurve files "
-                               "for target {}. Please specify quarter/month "
-                               "or campaign number."
-                               "".format(len(products), target))
-        elif len(products) < 1:
-            raise ArchiveError("No lightcurve file found for {} at MAST.".format(target))
-        path = download_products(products)[0]
-        return KeplerLightCurveFile(path, **kwargs)
+        path = download_kepler_products(
+                    target=target, filetype='Lightcurve', cadence=cadence,
+                    quarter=quarter, campaign=campaign, month=month, verbose=verbose,
+                    radius=radius, targetlimit=targetlimit)
+        if len(path) == 1:
+            return KeplerLightCurveFile(path[0], **kwargs)
+        return [KeplerLightCurveFile(p, **kwargs) for p in path]
 
     def __repr__(self):
         if self.mission is None:
@@ -175,19 +178,19 @@ class KeplerLightCurveFile(LightCurveFile):
             # We did not import lightcurve at the top to prevent circular imports
             from .lightcurve import KeplerLightCurve
             return KeplerLightCurve(
-                        self.hdu[1].data['TIME'][self.quality_mask],
-                        self.hdu[1].data[flux_type][self.quality_mask],
-                        flux_err=self.hdu[1].data[flux_type + "_ERR"][self.quality_mask],
-                        centroid_col=self.hdu[1].data[centroid_type + "1"][self.quality_mask],
-                        centroid_row=self.hdu[1].data[centroid_type + "2"][self.quality_mask],
-                        quality=self.hdu[1].data['SAP_QUALITY'][self.quality_mask],
-                        quality_bitmask=self.quality_bitmask,
-                        channel=self.channel,
-                        campaign=self.campaign,
-                        quarter=self.quarter,
-                        mission=self.mission,
-                        cadenceno=self.cadenceno,
-                        keplerid=self.keplerid)
+                self.hdu[1].data['TIME'][self.quality_mask],
+                self.hdu[1].data[flux_type][self.quality_mask],
+                flux_err=self.hdu[1].data[flux_type + "_ERR"][self.quality_mask],
+                centroid_col=self.hdu[1].data[centroid_type + "1"][self.quality_mask],
+                centroid_row=self.hdu[1].data[centroid_type + "2"][self.quality_mask],
+                quality=self.hdu[1].data['SAP_QUALITY'][self.quality_mask],
+                quality_bitmask=self.quality_bitmask,
+                channel=self.channel,
+                campaign=self.campaign,
+                quarter=self.quarter,
+                mission=self.mission,
+                cadenceno=self.cadenceno,
+                keplerid=self.keplerid)
         else:
             raise KeyError("{} is not a valid flux type. Available types are: {}".
                            format(flux_type, self._flux_types))
@@ -200,6 +203,10 @@ class KeplerLightCurveFile(LightCurveFile):
     @property
     def keplerid(self):
         return self.header(ext=0)['KEPLERID']
+
+    @property
+    def obsmode(self):
+        return self.header()['OBSMODE']
 
     @property
     def pos_corr1(self):
@@ -341,12 +348,12 @@ class TessLightCurveFile(LightCurveFile):
             # We did not import lightcurve at the top to prevent circular imports
             from .lightcurve import TessLightCurve
             return TessLightCurve(
-                        self.hdu[1].data['TIME'][self.quality_mask],
-                        self.hdu[1].data[flux_type][self.quality_mask],
-                        flux_err=self.hdu[1].data[flux_type + "_ERR"][self.quality_mask],
-                        centroid_col=self.hdu[1].data[centroid_type + "1"][self.quality_mask],
-                        centroid_row=self.hdu[1].data[centroid_type + "2"][self.quality_mask],
-                        quality=self.hdu[1].data['QUALITY'][self.quality_mask],
-                        quality_bitmask=self.quality_bitmask,
-                        cadenceno=self.cadenceno,
-                        ticid=self.ticid)
+                self.hdu[1].data['TIME'][self.quality_mask],
+                self.hdu[1].data[flux_type][self.quality_mask],
+                flux_err=self.hdu[1].data[flux_type + "_ERR"][self.quality_mask],
+                centroid_col=self.hdu[1].data[centroid_type + "1"][self.quality_mask],
+                centroid_row=self.hdu[1].data[centroid_type + "2"][self.quality_mask],
+                quality=self.hdu[1].data['QUALITY'][self.quality_mask],
+                quality_bitmask=self.quality_bitmask,
+                cadenceno=self.cadenceno,
+                ticid=self.ticid)
