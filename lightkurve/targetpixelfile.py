@@ -892,6 +892,10 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                 flux_err=flux_err,
                                 **keys)
 
+    def show_gaia():
+        '''show the gaia data '''
+        pass
+
     def get_bkg_lightcurve(self, aperture_mask=None):
         aperture_mask = self._parse_aperture_mask(aperture_mask)
         # Ignore warnings related to zero or negative errors
