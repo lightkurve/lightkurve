@@ -194,9 +194,9 @@
     margin-right: 4px;  /* make room for the exclamation icon */
 }
 </style>
-<div class="section" id="targetpixelfile-classes">
-<h1>TargetPixelFile classes<a class="headerlink" href="#targetpixelfile-classes" title="Permalink to this headline">¶</a></h1>
-<span class="target" id="module-lightkurve.targetpixelfile"></span><dl class="class">
+<div class="section" id="module-lightkurve.targetpixelfile">
+<span id="targetpixelfile-classes"></span><h1>TargetPixelFile classes<a class="headerlink" href="#module-lightkurve.targetpixelfile" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile">
 <em class="property">class </em><code class="descclassname">lightkurve.targetpixelfile.</code><code class="descname">KeplerTargetPixelFile</code><span class="sig-paren">(</span><em>path</em>, <em>quality_bitmask='default'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/targetpixelfile.html#KeplerTargetPixelFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines a TargetPixelFile class for the Kepler/K2 Mission.
@@ -252,16 +252,19 @@ Enables extraction of raw lightcurves and centroid positions.</p>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.header" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.header"><code class="xref py py-obj docutils literal"><span class="pre">header</span></code></a>([ext])</td>
 <td>Returns the header for a given extension.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.plot" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.plot"><code class="xref py py-obj docutils literal"><span class="pre">plot</span></code></a>([ax,&nbsp;frame,&nbsp;cadenceno,&nbsp;bkg,&nbsp;…])</td>
+<tr class="row-even"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.interact" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.interact"><code class="xref py py-obj docutils literal"><span class="pre">interact</span></code></a>([lc])</td>
+<td>Display an interactive IPython Notebook widget to inspect the data.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.plot" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.plot"><code class="xref py py-obj docutils literal"><span class="pre">plot</span></code></a>([ax,&nbsp;frame,&nbsp;cadenceno,&nbsp;bkg,&nbsp;…])</td>
 <td>Plot a target pixel file at a given frame (index) or cadence number.</td>
 </tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">properties</span></code>()</td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">properties</span></code>()</td>
 <td>Print out a description of each of the non-callable attributes of a TargetPixelFile object.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.to_fits" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.to_fits"><code class="xref py py-obj docutils literal"><span class="pre">to_fits</span></code></a>([output_fn,&nbsp;overwrite])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.to_fits" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.to_fits"><code class="xref py py-obj docutils literal"><span class="pre">to_fits</span></code></a>([output_fn,&nbsp;overwrite])</td>
 <td>Writes the TPF to a FITS file on disk.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.to_lightcurve" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.to_lightcurve"><code class="xref py py-obj docutils literal"><span class="pre">to_lightcurve</span></code></a>([aperture_mask])</td>
+<tr class="row-even"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.to_lightcurve" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.to_lightcurve"><code class="xref py py-obj docutils literal"><span class="pre">to_lightcurve</span></code></a>([aperture_mask])</td>
 <td>Performs aperture photometry.</td>
 </tr>
 </tbody>
@@ -345,7 +348,7 @@ The default behaviour is to use the Kepler pipeline mask.</p>
 
 <dl class="staticmethod">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.from_archive">
-<em class="property">static </em><code class="descname">from_archive</code><span class="sig-paren">(</span><em>target</em>, <em>cadence='long'</em>, <em>quarter=None</em>, <em>month=None</em>, <em>campaign=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/targetpixelfile.html#KeplerTargetPixelFile.from_archive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.from_archive" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">from_archive</code><span class="sig-paren">(</span><em>target</em>, <em>cadence='long'</em>, <em>quarter=None</em>, <em>month=None</em>, <em>campaign=None</em>, <em>radius=1.0</em>, <em>targetlimit=1</em>, <em>verbose=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/targetpixelfile.html#KeplerTargetPixelFile.from_archive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.from_archive" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetch a Target Pixel File from the Kepler/K2 data archive at MAST.</p>
 <p>Raises an <cite>ArchiveError</cite> if a unique TPF cannot be found.  For example,
 this is the case if a target was observed in multiple Quarters and the
@@ -362,15 +365,25 @@ quarter parameter is unspecified.</p>
 <blockquote>
 <div><p>‘long’ or ‘short’.</p>
 </div></blockquote>
-<p><strong>quarter, campaign</strong> : int</p>
+<p><strong>quarter, campaign</strong> : int, list of ints, or ‘all’</p>
 <blockquote>
 <div><p>Kepler Quarter or K2 Campaign number.</p>
 </div></blockquote>
-<p><strong>month</strong> : 1, 2, or 3</p>
+<p><strong>month</strong> : 1, 2, 3, list or ‘all’</p>
 <blockquote>
 <div><p>For Kepler’s prime mission, there are three short-cadence
 Target Pixel Files for each quarter, each covering one month.
 Hence, if cadence=’short’ you need to specify month=1, 2, or 3.</p>
+</div></blockquote>
+<p><strong>radius</strong> : float</p>
+<blockquote>
+<div><p>Search radius in arcseconds. Default is 1 arcsecond.</p>
+</div></blockquote>
+<p><strong>targetlimit</strong> : None or int</p>
+<blockquote>
+<div><p>If multiple targets are present within <cite>radius</cite>, limit the number
+of returned TargetPixelFile objects to <cite>targetlimit</cite>.
+If <cite>None</cite>, no limit is applied.</p>
 </div></blockquote>
 <p><strong>kwargs</strong> : dict</p>
 <blockquote>
@@ -494,6 +507,30 @@ necessary metadata in the tpf object.</p>
 <dd><p>Returns the header for a given extension.</p>
 </dd></dl>
 
+<dl class="method">
+<dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.interact">
+<code class="descname">interact</code><span class="sig-paren">(</span><em>lc=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/targetpixelfile.html#KeplerTargetPixelFile.interact"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.interact" title="Permalink to this definition">¶</a></dt>
+<dd><p>Display an interactive IPython Notebook widget to inspect the data.</p>
+<p>The widget will show both the lightcurve and pixel data.  By default,
+the lightcurve shown is obtained by calling the <cite>to_lightcurve()</cite> method,
+unless the user supplies a custom <cite>LightCurve</cite> object.</p>
+<p>Note: at this time, this feature only works inside an active Jupyter
+Notebook, and tends to be too slow when more than ~30,000 cadences
+are contained in the TPF (e.g. short cadence data).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>lc</strong> : LightCurve object</p>
+<blockquote class="last">
+<div><p>An optional pre-processed lightcurve object to show.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.keplerid">
 <code class="descname">keplerid</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.keplerid" title="Permalink to this definition">¶</a></dt>
@@ -515,6 +552,11 @@ necessary metadata in the tpf object.</p>
 <code class="descname">nan_time_mask</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.nan_time_mask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a boolean mask flagging cadences whose time is <cite>nan</cite>.</p>
 </dd></dl>
+
+<dl class="attribute">
+<dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.obsmode">
+<code class="descname">obsmode</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.obsmode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.output">

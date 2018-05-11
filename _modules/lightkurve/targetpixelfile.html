@@ -167,7 +167,7 @@
 <span class="kn">from</span> <span class="nn">.lightcurve</span> <span class="k">import</span> <span class="n">KeplerLightCurve</span><span class="p">,</span> <span class="n">LightCurve</span>
 <span class="kn">from</span> <span class="nn">.prf</span> <span class="k">import</span> <span class="n">SimpleKeplerPRF</span>
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="k">import</span> <span class="n">KeplerQualityFlags</span><span class="p">,</span> <span class="n">plot_image</span><span class="p">,</span> <span class="n">bkjd_to_time</span>
-<span class="kn">from</span> <span class="nn">.mast</span> <span class="k">import</span> <span class="n">search_kepler_tpf_products</span><span class="p">,</span> <span class="n">download_products</span><span class="p">,</span> <span class="n">ArchiveError</span>
+<span class="kn">from</span> <span class="nn">.mast</span> <span class="k">import</span> <span class="n">download_kepler_products</span>
 
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;KeplerTargetPixelFile&#39;</span><span class="p">]</span>
@@ -293,7 +293,7 @@
 
 <div class="viewcode-block" id="KeplerTargetPixelFile.from_archive"><a class="viewcode-back" href="../../api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.from_archive">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">from_archive</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s1">&#39;long&#39;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                     <span class="n">campaign</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                     <span class="n">campaign</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">targetlimit</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Fetch a Target Pixel File from the Kepler/K2 data archive at MAST.</span>
 
 <span class="sd">        Raises an `ArchiveError` if a unique TPF cannot be found.  For example,</span>
@@ -306,12 +306,18 @@
 <span class="sd">            KIC/EPIC ID or object name.</span>
 <span class="sd">        cadence : str</span>
 <span class="sd">            &#39;long&#39; or &#39;short&#39;.</span>
-<span class="sd">        quarter, campaign : int</span>
+<span class="sd">        quarter, campaign : int, list of ints, or &#39;all&#39;</span>
 <span class="sd">            Kepler Quarter or K2 Campaign number.</span>
-<span class="sd">        month : 1, 2, or 3</span>
+<span class="sd">        month : 1, 2, 3, list or &#39;all&#39;</span>
 <span class="sd">            For Kepler&#39;s prime mission, there are three short-cadence</span>
 <span class="sd">            Target Pixel Files for each quarter, each covering one month.</span>
 <span class="sd">            Hence, if cadence=&#39;short&#39; you need to specify month=1, 2, or 3.</span>
+<span class="sd">        radius : float</span>
+<span class="sd">            Search radius in arcseconds. Default is 1 arcsecond.</span>
+<span class="sd">        targetlimit : None or int</span>
+<span class="sd">            If multiple targets are present within `radius`, limit the number</span>
+<span class="sd">            of returned TargetPixelFile objects to `targetlimit`.</span>
+<span class="sd">            If `None`, no limit is applied.</span>
 <span class="sd">        kwargs : dict</span>
 <span class="sd">            Keywords arguments passed to `KeplerTargetPixelFile`.</span>
 
@@ -319,24 +325,13 @@
 <span class="sd">        -------</span>
 <span class="sd">        tpf : KeplerTargetPixelFile object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">products</span> <span class="o">=</span> <span class="n">search_kepler_tpf_products</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="n">cadence</span><span class="p">,</span>
-                                              <span class="n">quarter</span><span class="o">=</span><span class="n">quarter</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="n">campaign</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">cadence</span> <span class="o">==</span> <span class="s1">&#39;short&#39;</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">products</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">month</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">ArchiveError</span><span class="p">(</span><span class="s2">&quot;Found </span><span class="si">{}</span><span class="s2"> different Target Pixel Files &quot;</span>
-                                   <span class="s2">&quot;for target </span><span class="si">{}</span><span class="s2"> in Quarter </span><span class="si">{}</span><span class="s2">.&quot;</span>
-                                   <span class="s2">&quot;Please specify the month (1, 2, or 3).&quot;</span>
-                                   <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">products</span><span class="p">),</span> <span class="n">target</span><span class="p">,</span> <span class="n">quarter</span><span class="p">))</span>
-            <span class="n">products</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span><span class="n">products</span><span class="p">[</span><span class="n">month</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
-        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">products</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ArchiveError</span><span class="p">(</span><span class="s2">&quot;Found </span><span class="si">{}</span><span class="s2"> different Target Pixel Files &quot;</span>
-                               <span class="s2">&quot;for target </span><span class="si">{}</span><span class="s2">. Please specify quarter/month &quot;</span>
-                               <span class="s2">&quot;or campaign number.&quot;</span>
-                               <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">products</span><span class="p">),</span> <span class="n">target</span><span class="p">))</span>
-        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">products</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ArchiveError</span><span class="p">(</span><span class="s2">&quot;No Target Pixel File found for </span><span class="si">{}</span><span class="s2"> at MAST.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
-        <span class="n">path</span> <span class="o">=</span> <span class="n">download_products</span><span class="p">(</span><span class="n">products</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">KeplerTargetPixelFile</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">download_kepler_products</span><span class="p">(</span>
+                    <span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">,</span> <span class="n">filetype</span><span class="o">=</span><span class="s1">&#39;Target Pixel&#39;</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="n">cadence</span><span class="p">,</span>
+                    <span class="n">quarter</span><span class="o">=</span><span class="n">quarter</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="n">campaign</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="n">month</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+                    <span class="n">radius</span><span class="o">=</span><span class="n">radius</span><span class="p">,</span> <span class="n">targetlimit</span><span class="o">=</span><span class="n">targetlimit</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">KeplerTargetPixelFile</span><span class="p">(</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">KeplerTargetPixelFile</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">path</span><span class="p">]</span></div>
 
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span><span class="p">(</span><span class="s1">&#39;KeplerTargetPixelFile Object (ID: </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keplerid</span><span class="p">))</span>
@@ -467,6 +462,10 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">keplerid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">()[</span><span class="s1">&#39;KEPLERID&#39;</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">obsmode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">()[</span><span class="s1">&#39;OBSMODE&#39;</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">module</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -757,6 +756,191 @@
                                                        <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">mask_color</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                                                        <span class="n">alpha</span><span class="o">=.</span><span class="mi">6</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">ax</span></div>
+
+<div class="viewcode-block" id="KeplerTargetPixelFile.interact"><a class="viewcode-back" href="../../api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.interact">[docs]</a>    <span class="k">def</span> <span class="nf">interact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lc</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Display an interactive IPython Notebook widget to inspect the data.</span>
+
+<span class="sd">        The widget will show both the lightcurve and pixel data.  By default,</span>
+<span class="sd">        the lightcurve shown is obtained by calling the `to_lightcurve()` method,</span>
+<span class="sd">        unless the user supplies a custom `LightCurve` object.</span>
+
+<span class="sd">        Note: at this time, this feature only works inside an active Jupyter</span>
+<span class="sd">        Notebook, and tends to be too slow when more than ~30,000 cadences</span>
+<span class="sd">        are contained in the TPF (e.g. short cadence data).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        lc : LightCurve object</span>
+<span class="sd">            An optional pre-processed lightcurve object to show.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="k">import</span> <span class="n">interact</span>
+            <span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
+            <span class="kn">from</span> <span class="nn">bokeh.io</span> <span class="k">import</span> <span class="n">push_notebook</span><span class="p">,</span> <span class="n">show</span><span class="p">,</span> <span class="n">output_notebook</span>
+            <span class="kn">from</span> <span class="nn">bokeh.plotting</span> <span class="k">import</span> <span class="n">figure</span><span class="p">,</span> <span class="n">ColumnDataSource</span>
+            <span class="kn">from</span> <span class="nn">bokeh.models</span> <span class="k">import</span> <span class="n">Span</span><span class="p">,</span> <span class="n">Range1d</span><span class="p">,</span> <span class="n">LinearAxis</span><span class="p">,</span> <span class="n">LogColorMapper</span>
+            <span class="kn">from</span> <span class="nn">bokeh.layouts</span> <span class="k">import</span> <span class="n">row</span>
+            <span class="kn">from</span> <span class="nn">bokeh.models.tools</span> <span class="k">import</span> <span class="n">HoverTool</span>
+            <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="k">import</span> <span class="n">display</span>
+            <span class="n">output_notebook</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s1">&#39;The quicklook tool requires Bokeh and ipywidgets. &#39;</span>
+                              <span class="s1">&#39;See the .interact() tutorial&#39;</span><span class="p">)</span>
+
+        <span class="n">ytitle</span> <span class="o">=</span> <span class="s1">&#39;Flux&#39;</span>
+        <span class="k">if</span> <span class="n">lc</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">()</span>
+            <span class="n">ytitle</span> <span class="o">=</span> <span class="s1">&#39;Flux (e/s)&#39;</span>
+
+        <span class="c1"># Bokeh cannot handle many data points</span>
+        <span class="c1">## https://github.com/bokeh/bokeh/issues/7490</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">cadenceno</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">30000</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Interact cannot display more than 20000 cadences.&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Map cadence to index for quick array slicing.</span>
+        <span class="n">n_lc_cad</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">cadenceno</span><span class="p">)</span>
+        <span class="n">n_cad</span><span class="p">,</span> <span class="n">nx</span><span class="p">,</span> <span class="n">ny</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">lc_cad_matches</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">in1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cadenceno</span><span class="p">,</span> <span class="n">lc</span><span class="o">.</span><span class="n">cadenceno</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">lc_cad_matches</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">!=</span> <span class="n">n_lc_cad</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The lightcurve provided has cadences that are not &quot;</span>
+                             <span class="s2">&quot;present in the Target Pixel File.&quot;</span><span class="p">)</span>
+        <span class="n">min_cadence</span><span class="p">,</span> <span class="n">max_cadence</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cadenceno</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cadenceno</span><span class="p">)</span>
+        <span class="n">cadence_lookup</span> <span class="o">=</span> <span class="p">{</span><span class="n">cad</span><span class="p">:</span> <span class="n">j</span> <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">cad</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cadenceno</span><span class="p">)}</span>
+        <span class="n">cadence_full_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">min_cadence</span><span class="p">,</span> <span class="n">max_cadence</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+        <span class="n">missing_cadences</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">cadence_full_range</span><span class="p">)</span><span class="o">-</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cadenceno</span><span class="p">))</span>
+
+        <span class="c1"># Convert binary quality numbers into human readable strings</span>
+        <span class="n">qual_strings</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">bitmask</span> <span class="ow">in</span> <span class="n">lc</span><span class="o">.</span><span class="n">quality</span><span class="p">:</span>
+            <span class="n">flag_str_list</span> <span class="o">=</span> <span class="n">KeplerQualityFlags</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">bitmask</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">flag_str_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">qual_strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">flag_str_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">qual_strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">flag_str_list</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">flag_str_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">qual_strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">flag_str_list</span><span class="p">))</span>
+
+        <span class="c1"># Convert time into human readable strings, breaks with NaN time</span>
+        <span class="c1"># See https://github.com/KeplerGO/lightkurve/issues/116</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="n">human_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeobj</span><span class="o">.</span><span class="n">isot</span><span class="p">[</span><span class="n">lc_cad_matches</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">human_time</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39; &#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_lc_cad</span>
+
+        <span class="c1"># Each data source will later become a hover-over tooltip</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">ColumnDataSource</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+                                  <span class="n">time</span><span class="o">=</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+                                  <span class="n">time_iso</span><span class="o">=</span><span class="n">human_time</span><span class="p">,</span>
+                                  <span class="n">flux</span><span class="o">=</span><span class="n">lc</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span>
+                                  <span class="n">cadence</span><span class="o">=</span><span class="n">lc</span><span class="o">.</span><span class="n">cadenceno</span><span class="p">,</span>
+                                  <span class="n">quality_code</span><span class="o">=</span><span class="n">lc</span><span class="o">.</span><span class="n">quality</span><span class="p">,</span>
+                                  <span class="n">quality</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">qual_strings</span><span class="p">)))</span>
+
+        <span class="c1"># Provide extra metadata in the title</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mission</span> <span class="o">==</span> <span class="s1">&#39;K2&#39;</span><span class="p">:</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Quicklook lightcurve for EPIC </span><span class="si">{}</span><span class="s2"> (K2 Campaign </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">keplerid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">campaign</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mission</span> <span class="o">==</span> <span class="s1">&#39;Kepler&#39;</span><span class="p">:</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Quicklook lightcurve for KIC </span><span class="si">{}</span><span class="s2"> (Kepler Quarter </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">keplerid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">quarter</span><span class="p">)</span>
+
+        <span class="c1"># Figure 1 shows the lightcurve with steps, tooltips, and vertical line</span>
+        <span class="n">fig1</span> <span class="o">=</span> <span class="n">figure</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">plot_height</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">plot_width</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span>
+                      <span class="n">tools</span><span class="o">=</span><span class="s2">&quot;pan,wheel_zoom,box_zoom,save,reset&quot;</span><span class="p">)</span>
+        <span class="n">fig1</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="n">ytitle</span>
+        <span class="n">fig1</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="s1">&#39;Time - 2454833 days [BKJD]&#39;</span>
+        <span class="n">fig1</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="s1">&#39;flux&#39;</span><span class="p">,</span> <span class="n">line_width</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span>
+                  <span class="n">nonselection_line_color</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">)</span>
+
+        <span class="n">r</span> <span class="o">=</span> <span class="n">fig1</span><span class="o">.</span><span class="n">circle</span><span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="s1">&#39;flux&#39;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">fill_alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+                        <span class="n">line_color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">selection_color</span><span class="o">=</span><span class="s2">&quot;firebrick&quot;</span><span class="p">,</span>
+                        <span class="n">nonselection_fill_alpha</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">nonselection_line_color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">nonselection_line_alpha</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">fill_color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">hover_fill_color</span><span class="o">=</span><span class="s2">&quot;firebrick&quot;</span><span class="p">,</span> <span class="n">hover_alpha</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+                        <span class="n">hover_line_color</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">)</span>
+
+        <span class="n">fig1</span><span class="o">.</span><span class="n">add_tools</span><span class="p">(</span><span class="n">HoverTool</span><span class="p">(</span><span class="n">tooltips</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;Cadence&quot;</span><span class="p">,</span> <span class="s2">&quot;@cadence&quot;</span><span class="p">),</span>
+                                           <span class="p">(</span><span class="s2">&quot;Time (BKJD)&quot;</span><span class="p">,</span> <span class="s2">&quot;@time{0,0.000}&quot;</span><span class="p">),</span>
+                                           <span class="p">(</span><span class="s2">&quot;Time (ISO)&quot;</span><span class="p">,</span> <span class="s2">&quot;@time_iso&quot;</span><span class="p">),</span>
+                                           <span class="p">(</span><span class="s2">&quot;Flux&quot;</span><span class="p">,</span> <span class="s2">&quot;@flux&quot;</span><span class="p">),</span>
+                                           <span class="p">(</span><span class="s2">&quot;Quality Code&quot;</span><span class="p">,</span> <span class="s2">&quot;@quality_code&quot;</span><span class="p">),</span>
+                                           <span class="p">(</span><span class="s2">&quot;Quality Flag&quot;</span><span class="p">,</span> <span class="s2">&quot;@quality&quot;</span><span class="p">)],</span>
+                                 <span class="n">renderers</span><span class="o">=</span><span class="p">[</span><span class="n">r</span><span class="p">],</span>
+                                 <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;mouse&#39;</span><span class="p">,</span>
+                                 <span class="n">point_policy</span><span class="o">=</span><span class="s2">&quot;snap_to_data&quot;</span><span class="p">))</span>
+        <span class="c1"># Vertical line to indicate the cadence shown in Fig 2</span>
+        <span class="n">vert</span> <span class="o">=</span> <span class="n">Span</span><span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">dimension</span><span class="o">=</span><span class="s1">&#39;height&#39;</span><span class="p">,</span> <span class="n">line_color</span><span class="o">=</span><span class="s1">&#39;firebrick&#39;</span><span class="p">,</span>
+                    <span class="n">line_width</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">line_alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+        <span class="n">fig1</span><span class="o">.</span><span class="n">add_layout</span><span class="p">(</span><span class="n">vert</span><span class="p">)</span>
+
+        <span class="c1"># Figure 2 shows the Target Pixel File stamp with log screen stretch</span>
+        <span class="n">fig2</span> <span class="o">=</span> <span class="n">figure</span><span class="p">(</span><span class="n">plot_width</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">plot_height</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+                      <span class="n">tools</span><span class="o">=</span><span class="s2">&quot;pan,wheel_zoom,box_zoom,save,reset&quot;</span><span class="p">,</span>
+                      <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Pixel data (CCD </span><span class="si">{}</span><span class="s1">.</span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">))</span>
+        <span class="n">fig2</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="s1">&#39;Pixel Row Number&#39;</span>
+        <span class="n">fig2</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">axis_label</span> <span class="o">=</span> <span class="s1">&#39;Pixel Column Number&#39;</span>
+
+        <span class="n">pedestal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="n">lc_cad_matches</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:])</span>
+        <span class="n">stretch_dims</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="n">lc_cad_matches</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">screen_stretch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="n">lc_cad_matches</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">stretch_dims</span><span class="p">)</span> <span class="o">-</span> <span class="n">pedestal</span>
+        <span class="n">screen_stretch</span> <span class="o">=</span> <span class="n">screen_stretch</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">screen_stretch</span><span class="p">)]</span>  <span class="c1"># ignore NaNs</span>
+        <span class="n">screen_stretch</span> <span class="o">=</span> <span class="n">screen_stretch</span><span class="p">[</span><span class="n">screen_stretch</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">]</span>
+        <span class="n">vlo</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">screen_stretch</span><span class="p">)</span>
+        <span class="n">vhi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">screen_stretch</span><span class="p">)</span>
+        <span class="n">vstep</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">vhi</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">vlo</span><span class="p">))</span> <span class="o">/</span> <span class="mf">300.0</span>  <span class="c1"># assumes counts &gt;&gt; 1.0!</span>
+        <span class="n">lo</span><span class="p">,</span> <span class="n">med</span><span class="p">,</span> <span class="n">hi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanpercentile</span><span class="p">(</span><span class="n">screen_stretch</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">95</span><span class="p">])</span>
+        <span class="n">color_mapper</span> <span class="o">=</span> <span class="n">LogColorMapper</span><span class="p">(</span><span class="n">palette</span><span class="o">=</span><span class="s2">&quot;Viridis256&quot;</span><span class="p">,</span> <span class="n">low</span><span class="o">=</span><span class="n">lo</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="n">hi</span><span class="p">)</span>
+
+        <span class="n">fig2_dat</span> <span class="o">=</span> <span class="n">fig2</span><span class="o">.</span><span class="n">image</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">pedestal</span><span class="p">],</span> <span class="n">x</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">column</span><span class="p">,</span>
+                              <span class="n">y</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">row</span><span class="p">,</span> <span class="n">dw</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">dh</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                              <span class="n">dilate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">color_mapper</span><span class="o">=</span><span class="n">color_mapper</span><span class="p">)</span>
+
+        <span class="c1"># The figures appear before the interactive widget sliders</span>
+        <span class="n">show</span><span class="p">(</span><span class="n">row</span><span class="p">(</span><span class="n">fig1</span><span class="p">,</span> <span class="n">fig2</span><span class="p">),</span> <span class="n">notebook_handle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># The widget sliders call the update function each time</span>
+        <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="n">cadence</span><span class="p">,</span> <span class="n">log_stretch</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;Function that connects to the interact widget slider values&quot;&quot;&quot;</span>
+            <span class="n">fig2_dat</span><span class="o">.</span><span class="n">glyph</span><span class="o">.</span><span class="n">color_mapper</span><span class="o">.</span><span class="n">high</span> <span class="o">=</span> <span class="mi">10</span><span class="o">**</span><span class="n">log_stretch</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">fig2_dat</span><span class="o">.</span><span class="n">glyph</span><span class="o">.</span><span class="n">color_mapper</span><span class="o">.</span><span class="n">low</span> <span class="o">=</span> <span class="mi">10</span><span class="o">**</span><span class="n">log_stretch</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">cadence</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">missing_cadences</span><span class="p">:</span>
+                <span class="n">index_val</span> <span class="o">=</span> <span class="n">cadence_lookup</span><span class="p">[</span><span class="n">cadence</span><span class="p">]</span>
+                <span class="n">vert</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">line_alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="n">index_val</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="n">index_val</span><span class="p">]:</span>
+                    <span class="n">vert</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="n">index_val</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">vert</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">line_alpha</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+                <span class="n">fig2_dat</span><span class="o">.</span><span class="n">data_source</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;image&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="n">index_val</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+                                                      <span class="o">-</span> <span class="n">pedestal</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">vert</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">line_alpha</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">fig2_dat</span><span class="o">.</span><span class="n">data_source</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;image&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">NaN</span><span class="p">]</span>
+            <span class="n">push_notebook</span><span class="p">()</span>
+
+        <span class="c1"># Define the widgets that enable the interactivity</span>
+        <span class="n">play</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Play</span><span class="p">(</span><span class="n">interval</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">min_cadence</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="n">min_cadence</span><span class="p">,</span>
+                            <span class="nb">max</span><span class="o">=</span><span class="n">max_cadence</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Press play&quot;</span><span class="p">,</span>
+                            <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">play</span><span class="o">.</span><span class="n">show_repeat</span><span class="p">,</span> <span class="n">play</span><span class="o">.</span><span class="n">_repeat</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span>
+        <span class="n">cadence_slider</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">IntSlider</span><span class="p">(</span>
+                            <span class="nb">min</span><span class="o">=</span><span class="n">min_cadence</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="n">max_cadence</span><span class="p">,</span>
+                            <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">min_cadence</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Cadence&#39;</span><span class="p">,</span>
+                            <span class="n">layout</span><span class="o">=</span><span class="n">widgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s1">&#39;40%&#39;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s1">&#39;20px&#39;</span><span class="p">))</span>
+        <span class="n">screen_slider</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">FloatRangeSlider</span><span class="p">(</span>
+                            <span class="n">value</span><span class="o">=</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">lo</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">hi</span><span class="p">)],</span>
+                            <span class="nb">min</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">vlo</span><span class="p">),</span>
+                            <span class="nb">max</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">vhi</span><span class="p">),</span>
+                            <span class="n">step</span><span class="o">=</span><span class="n">vstep</span><span class="p">,</span>
+                            <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Pixel Stretch (log)&#39;</span><span class="p">,</span>
+                            <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;description_width&#39;</span><span class="p">:</span> <span class="s1">&#39;initial&#39;</span><span class="p">},</span>
+                            <span class="n">continuous_update</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                            <span class="n">layout</span><span class="o">=</span><span class="n">widgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s1">&#39;30%&#39;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s1">&#39;20px&#39;</span><span class="p">))</span>
+        <span class="n">widgets</span><span class="o">.</span><span class="n">jslink</span><span class="p">((</span><span class="n">play</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">),</span> <span class="p">(</span><span class="n">cadence_slider</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">))</span>
+        <span class="n">ui</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">HBox</span><span class="p">([</span><span class="n">play</span><span class="p">,</span> <span class="n">cadence_slider</span><span class="p">,</span> <span class="n">screen_slider</span><span class="p">])</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">interactive_output</span><span class="p">(</span><span class="n">update</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;cadence&#39;</span><span class="p">:</span> <span class="n">cadence_slider</span><span class="p">,</span>
+                                                  <span class="s1">&#39;log_stretch&#39;</span><span class="p">:</span> <span class="n">screen_slider</span><span class="p">})</span>
+        <span class="n">display</span><span class="p">(</span><span class="n">ui</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="KeplerTargetPixelFile.get_bkg_lightcurve"><a class="viewcode-back" href="../../api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_bkg_lightcurve">[docs]</a>    <span class="k">def</span> <span class="nf">get_bkg_lightcurve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">aperture_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_aperture_mask</span><span class="p">(</span><span class="n">aperture_mask</span><span class="p">)</span>

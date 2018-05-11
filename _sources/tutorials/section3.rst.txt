@@ -1,5 +1,5 @@
 Systematics correction using lightkurve
-======================================
+=======================================
 
 .. toctree::
     :maxdepth: 1

@@ -193,9 +193,9 @@
     margin-right: 4px;  /* make room for the exclamation icon */
 }
 </style>
-<div class="section" id="utility-functions">
-<h1>Utility functions<a class="headerlink" href="#utility-functions" title="Permalink to this headline">¶</a></h1>
-<span class="target" id="module-lightkurve.utils"></span><dl class="class">
+<div class="section" id="module-lightkurve.utils">
+<span id="utility-functions"></span><h1>Utility functions<a class="headerlink" href="#module-lightkurve.utils" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
 <dt id="lightkurve.utils.KeplerQualityFlags">
 <em class="property">class </em><code class="descclassname">lightkurve.utils.</code><code class="descname">KeplerQualityFlags</code><a class="reference internal" href="../_modules/lightkurve/utils.html#KeplerQualityFlags"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class encodes the meaning of the various Kepler QUALITY bitmask flags,
@@ -379,6 +379,45 @@ quality flags raised.  Returns an empty list if no flags raised.</p>
 <tbody valign="top">
 <tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">decode</span></code>(quality)</td>
 <td>Converts a Kepler QUALITY value into a list of human-readable strings.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="lightkurve.utils.bkjd_to_time">
+<code class="descclassname">lightkurve.utils.</code><code class="descname">bkjd_to_time</code><span class="sig-paren">(</span><em>bkjd</em>, <em>timecorr</em>, <em>timslice</em>, <em>bjdref=2454833.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/utils.html#bkjd_to_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.utils.bkjd_to_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts Barycentric Kepler Julian Day (BKJD) to an astropy.time.Time object.</p>
+<p>Kepler Barycentric Julian Day is a Julian day minus 2454833.0 (UTC=January
+1, 2009 12:00:00) and corrected to be the arrival times at the barycenter
+of the Solar System. See Section 2.3.2 in the Kepler Archive Manual.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>bkjd</strong> : array of floats</p>
+<blockquote>
+<div><p>Barycentric Kepler Julian Day</p>
+</div></blockquote>
+<p><strong>timecorr</strong> : array of floats</p>
+<blockquote>
+<div><p>Kepler barycentric correction</p>
+</div></blockquote>
+<p><strong>timslice</strong> : array of floats</p>
+<blockquote>
+<div><p>Kepler time-slice correction</p>
+</div></blockquote>
+<p><strong>bjdref</strong> : float</p>
+<blockquote>
+<div><p>BJD reference date, for Kepler this is 2454833</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>time</strong> : astropy.time.Time object</p>
+<blockquote class="last">
+<div><p>Resulting time object</p>
+</div></blockquote>
+</td>
 </tr>
 </tbody>
 </table>

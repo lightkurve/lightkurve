@@ -160,7 +160,7 @@
 <span class="kn">from</span> <span class="nn">astropy.table</span> <span class="k">import</span> <span class="n">Table</span>
 
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="k">import</span> <span class="p">(</span><span class="n">bkjd_to_time</span><span class="p">,</span> <span class="n">KeplerQualityFlags</span><span class="p">,</span> <span class="n">TessQualityFlags</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">.mast</span> <span class="k">import</span> <span class="n">search_kepler_lightcurve_products</span><span class="p">,</span> <span class="n">download_products</span><span class="p">,</span> <span class="n">ArchiveError</span>
+<span class="kn">from</span> <span class="nn">.mast</span> <span class="k">import</span> <span class="n">download_kepler_products</span>
 
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;KeplerLightCurveFile&#39;</span><span class="p">,</span> <span class="s1">&#39;TessLightCurveFile&#39;</span><span class="p">]</span>
@@ -176,6 +176,7 @@
 <span class="sd">    kwargs : dict</span>
 <span class="sd">        Keyword arguments to be passed to astropy.io.fits.open.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span> <span class="o">=</span> <span class="n">pyfits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -247,12 +248,19 @@
 
 <div class="viewcode-block" id="KeplerLightCurveFile.from_archive"><a class="viewcode-back" href="../../api/lightcurvefile.html#lightkurve.lightcurvefile.KeplerLightCurveFile.from_archive">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">from_archive</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s1">&#39;long&#39;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                     <span class="n">campaign</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Fetch a Light Curve File from the Kepler/K2 data archive at MAST.</span>
+                     <span class="n">campaign</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">targetlimit</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fetches a LightCurveFile (or list thereof) from the data archive at MAST.</span>
 
-<span class="sd">        Raises an `ArchiveError` if a unique file cannot be found.  For example,</span>
-<span class="sd">        this is the case if a target was observed in multiple Quarters and the</span>
-<span class="sd">        quarter parameter is unspecified.</span>
+<span class="sd">        If a target was observed across multiple quarters or campaigns, a</span>
+<span class="sd">        list of `LightCurveFile` objects will only be returned if the string</span>
+<span class="sd">        &#39;all&#39; is passed to `quarter` or `campaign`.  Alternatively, a list of</span>
+<span class="sd">        numbers can be pased to these arguments.</span>
+
+<span class="sd">        An `ArchiveError` will be raised if no (unique) LightCurveFile</span>
+<span class="sd">        can be found.</span>
+
+<span class="sd">        If `targetlimit` is set to more than one (or None) then will return a list</span>
+<span class="sd">        of `KeplerLightCurveFile`. Will only return hits within the specified radius.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -260,37 +268,32 @@
 <span class="sd">            KIC/EPIC ID or object name.</span>
 <span class="sd">        cadence : str</span>
 <span class="sd">            &#39;long&#39; or &#39;short&#39;.</span>
-<span class="sd">        quarter, campaign : int</span>
+<span class="sd">        quarter, campaign : int, list of ints, or &#39;all&#39;</span>
 <span class="sd">            Kepler Quarter or K2 Campaign number.</span>
-<span class="sd">        month : 1, 2, or 3</span>
+<span class="sd">        month : 1, 2, 3, list of int, or &#39;all&#39;</span>
 <span class="sd">            For Kepler&#39;s prime mission, there are three short-cadence</span>
-<span class="sd">            lightcurve files for each quarter, each covering one month.</span>
+<span class="sd">            LightCurveFile objects for each quarter, each covering one month.</span>
 <span class="sd">            Hence, if cadence=&#39;short&#39; you need to specify month=1, 2, or 3.</span>
+<span class="sd">        radius : float</span>
+<span class="sd">            Search radius in arcseconds. Default is 1 arcsecond.</span>
+<span class="sd">        targetlimit : None or int</span>
+<span class="sd">            If multiple targets are present within `radius`, limit the number</span>
+<span class="sd">            of returned LightCurveFile objects to `targetlimit`.</span>
+<span class="sd">            If `None`, no limit is applied.</span>
 <span class="sd">        kwargs : dict</span>
 <span class="sd">            Keywords arguments passed to `KeplerLightCurveFile`.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        tpf : KeplerLightCurveFile object.</span>
+<span class="sd">        lcf : KeplerLightCurveFile object or list of KeplerLightCurveFile objects</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">products</span> <span class="o">=</span> <span class="n">search_kepler_lightcurve_products</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="n">cadence</span><span class="p">,</span>
-                                                     <span class="n">quarter</span><span class="o">=</span><span class="n">quarter</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="n">campaign</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">cadence</span> <span class="o">==</span> <span class="s1">&#39;short&#39;</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">products</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">month</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">ArchiveError</span><span class="p">(</span><span class="s2">&quot;Found </span><span class="si">{}</span><span class="s2"> different lightcurve files &quot;</span>
-                                   <span class="s2">&quot;for target </span><span class="si">{}</span><span class="s2"> in Quarter </span><span class="si">{}</span><span class="s2">.&quot;</span>
-                                   <span class="s2">&quot;Please specify the month (1, 2, or 3).&quot;</span>
-                                   <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">products</span><span class="p">),</span> <span class="n">target</span><span class="p">,</span> <span class="n">quarter</span><span class="p">))</span>
-            <span class="n">products</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span><span class="n">products</span><span class="p">[</span><span class="n">month</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
-        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">products</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ArchiveError</span><span class="p">(</span><span class="s2">&quot;Found </span><span class="si">{}</span><span class="s2"> different lightcurve files &quot;</span>
-                               <span class="s2">&quot;for target </span><span class="si">{}</span><span class="s2">. Please specify quarter/month &quot;</span>
-                               <span class="s2">&quot;or campaign number.&quot;</span>
-                               <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">products</span><span class="p">),</span> <span class="n">target</span><span class="p">))</span>
-        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">products</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ArchiveError</span><span class="p">(</span><span class="s2">&quot;No lightcurve file found for </span><span class="si">{}</span><span class="s2"> at MAST.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
-        <span class="n">path</span> <span class="o">=</span> <span class="n">download_products</span><span class="p">(</span><span class="n">products</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">KeplerLightCurveFile</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">download_kepler_products</span><span class="p">(</span>
+                    <span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">,</span> <span class="n">filetype</span><span class="o">=</span><span class="s1">&#39;Lightcurve&#39;</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="n">cadence</span><span class="p">,</span>
+                    <span class="n">quarter</span><span class="o">=</span><span class="n">quarter</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="n">campaign</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="n">month</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+                    <span class="n">radius</span><span class="o">=</span><span class="n">radius</span><span class="p">,</span> <span class="n">targetlimit</span><span class="o">=</span><span class="n">targetlimit</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">KeplerLightCurveFile</span><span class="p">(</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">KeplerLightCurveFile</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">path</span><span class="p">]</span></div>
 
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mission</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -325,19 +328,19 @@
             <span class="c1"># We did not import lightcurve at the top to prevent circular imports</span>
             <span class="kn">from</span> <span class="nn">.lightcurve</span> <span class="k">import</span> <span class="n">KeplerLightCurve</span>
             <span class="k">return</span> <span class="n">KeplerLightCurve</span><span class="p">(</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;TIME&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">],</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">flux_type</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">],</span>
-                        <span class="n">flux_err</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">flux_type</span> <span class="o">+</span> <span class="s2">&quot;_ERR&quot;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">],</span>
-                        <span class="n">centroid_col</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">centroid_type</span> <span class="o">+</span> <span class="s2">&quot;1&quot;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">],</span>
-                        <span class="n">centroid_row</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">centroid_type</span> <span class="o">+</span> <span class="s2">&quot;2&quot;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">],</span>
-                        <span class="n">quality</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;SAP_QUALITY&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">],</span>
-                        <span class="n">quality_bitmask</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_bitmask</span><span class="p">,</span>
-                        <span class="n">channel</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">,</span>
-                        <span class="n">campaign</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">campaign</span><span class="p">,</span>
-                        <span class="n">quarter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quarter</span><span class="p">,</span>
-                        <span class="n">mission</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mission</span><span class="p">,</span>
-                        <span class="n">cadenceno</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cadenceno</span><span class="p">,</span>
-                        <span class="n">keplerid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">keplerid</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;TIME&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">flux_type</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">],</span>
+                <span class="n">flux_err</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">flux_type</span> <span class="o">+</span> <span class="s2">&quot;_ERR&quot;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">],</span>
+                <span class="n">centroid_col</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">centroid_type</span> <span class="o">+</span> <span class="s2">&quot;1&quot;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">],</span>
+                <span class="n">centroid_row</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">centroid_type</span> <span class="o">+</span> <span class="s2">&quot;2&quot;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">],</span>
+                <span class="n">quality</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;SAP_QUALITY&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">],</span>
+                <span class="n">quality_bitmask</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_bitmask</span><span class="p">,</span>
+                <span class="n">channel</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">,</span>
+                <span class="n">campaign</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">campaign</span><span class="p">,</span>
+                <span class="n">quarter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quarter</span><span class="p">,</span>
+                <span class="n">mission</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mission</span><span class="p">,</span>
+                <span class="n">cadenceno</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cadenceno</span><span class="p">,</span>
+                <span class="n">keplerid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">keplerid</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> is not a valid flux type. Available types are: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span>
                            <span class="nb">format</span><span class="p">(</span><span class="n">flux_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flux_types</span><span class="p">))</span></div>
@@ -350,6 +353,10 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">keplerid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="n">ext</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="s1">&#39;KEPLERID&#39;</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">obsmode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">()[</span><span class="s1">&#39;OBSMODE&#39;</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">pos_corr1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -491,15 +498,15 @@
             <span class="c1"># We did not import lightcurve at the top to prevent circular imports</span>
             <span class="kn">from</span> <span class="nn">.lightcurve</span> <span class="k">import</span> <span class="n">TessLightCurve</span>
             <span class="k">return</span> <span class="n">TessLightCurve</span><span class="p">(</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;TIME&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">],</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">flux_type</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">],</span>
-                        <span class="n">flux_err</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">flux_type</span> <span class="o">+</span> <span class="s2">&quot;_ERR&quot;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">],</span>
-                        <span class="n">centroid_col</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">centroid_type</span> <span class="o">+</span> <span class="s2">&quot;1&quot;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">],</span>
-                        <span class="n">centroid_row</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">centroid_type</span> <span class="o">+</span> <span class="s2">&quot;2&quot;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">],</span>
-                        <span class="n">quality</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;QUALITY&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">],</span>
-                        <span class="n">quality_bitmask</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_bitmask</span><span class="p">,</span>
-                        <span class="n">cadenceno</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cadenceno</span><span class="p">,</span>
-                        <span class="n">ticid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ticid</span><span class="p">)</span></div></div>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;TIME&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">flux_type</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">],</span>
+                <span class="n">flux_err</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">flux_type</span> <span class="o">+</span> <span class="s2">&quot;_ERR&quot;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">],</span>
+                <span class="n">centroid_col</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">centroid_type</span> <span class="o">+</span> <span class="s2">&quot;1&quot;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">],</span>
+                <span class="n">centroid_row</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">centroid_type</span> <span class="o">+</span> <span class="s2">&quot;2&quot;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">],</span>
+                <span class="n">quality</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;QUALITY&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">],</span>
+                <span class="n">quality_bitmask</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_bitmask</span><span class="p">,</span>
+                <span class="n">cadenceno</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cadenceno</span><span class="p">,</span>
+                <span class="n">ticid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ticid</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

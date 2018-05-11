@@ -193,9 +193,9 @@
     margin-right: 4px;  /* make room for the exclamation icon */
 }
 </style>
-<div class="section" id="lightcurvefile-classes">
-<h1>LightCurveFile classes<a class="headerlink" href="#lightcurvefile-classes" title="Permalink to this headline">¶</a></h1>
-<span class="target" id="module-lightkurve.lightcurvefile"></span><p>Defines LightCurveFile classes, i.e. files that contain LightCurves.</p>
+<div class="section" id="module-lightkurve.lightcurvefile">
+<span id="lightcurvefile-classes"></span><h1>LightCurveFile classes<a class="headerlink" href="#module-lightkurve.lightcurvefile" title="Permalink to this headline">¶</a></h1>
+<p>Defines LightCurveFile classes, i.e. files that contain LightCurves.</p>
 <dl class="class">
 <dt id="lightkurve.lightcurvefile.KeplerLightCurveFile">
 <em class="property">class </em><code class="descclassname">lightkurve.lightcurvefile.</code><code class="descname">KeplerLightCurveFile</code><span class="sig-paren">(</span><em>path</em>, <em>quality_bitmask='default'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurvefile.html#KeplerLightCurveFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile" title="Permalink to this definition">¶</a></dt>
@@ -230,7 +230,7 @@ K2 missions.</p>
 <td>Returns a LightCurve object after cotrending the SAP_FLUX against the cotrending basis vectors.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.from_archive" title="lightkurve.lightcurvefile.KeplerLightCurveFile.from_archive"><code class="xref py py-obj docutils literal"><span class="pre">from_archive</span></code></a>(target[,&nbsp;cadence,&nbsp;quarter,&nbsp;…])</td>
-<td>Fetch a Light Curve File from the Kepler/K2 data archive at MAST.</td>
+<td>Fetches a LightCurveFile (or list thereof) from the data archive at MAST.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.get_lightcurve" title="lightkurve.lightcurvefile.KeplerLightCurveFile.get_lightcurve"><code class="xref py py-obj docutils literal"><span class="pre">get_lightcurve</span></code></a>(flux_type[,&nbsp;centroid_type])</td>
 <td></td>
@@ -288,11 +288,16 @@ KeplerCBVCorrector.correct.</p>
 
 <dl class="staticmethod">
 <dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.from_archive">
-<em class="property">static </em><code class="descname">from_archive</code><span class="sig-paren">(</span><em>target</em>, <em>cadence='long'</em>, <em>quarter=None</em>, <em>month=None</em>, <em>campaign=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurvefile.html#KeplerLightCurveFile.from_archive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.from_archive" title="Permalink to this definition">¶</a></dt>
-<dd><p>Fetch a Light Curve File from the Kepler/K2 data archive at MAST.</p>
-<p>Raises an <cite>ArchiveError</cite> if a unique file cannot be found.  For example,
-this is the case if a target was observed in multiple Quarters and the
-quarter parameter is unspecified.</p>
+<em class="property">static </em><code class="descname">from_archive</code><span class="sig-paren">(</span><em>target</em>, <em>cadence='long'</em>, <em>quarter=None</em>, <em>month=None</em>, <em>campaign=None</em>, <em>radius=1.0</em>, <em>targetlimit=1</em>, <em>verbose=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurvefile.html#KeplerLightCurveFile.from_archive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.from_archive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetches a LightCurveFile (or list thereof) from the data archive at MAST.</p>
+<p>If a target was observed across multiple quarters or campaigns, a
+list of <cite>LightCurveFile</cite> objects will only be returned if the string
+‘all’ is passed to <cite>quarter</cite> or <cite>campaign</cite>.  Alternatively, a list of
+numbers can be pased to these arguments.</p>
+<p>An <cite>ArchiveError</cite> will be raised if no (unique) LightCurveFile
+can be found.</p>
+<p>If <cite>targetlimit</cite> is set to more than one (or None) then will return a list
+of <cite>KeplerLightCurveFile</cite>. Will only return hits within the specified radius.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -305,15 +310,25 @@ quarter parameter is unspecified.</p>
 <blockquote>
 <div><p>‘long’ or ‘short’.</p>
 </div></blockquote>
-<p><strong>quarter, campaign</strong> : int</p>
+<p><strong>quarter, campaign</strong> : int, list of ints, or ‘all’</p>
 <blockquote>
 <div><p>Kepler Quarter or K2 Campaign number.</p>
 </div></blockquote>
-<p><strong>month</strong> : 1, 2, or 3</p>
+<p><strong>month</strong> : 1, 2, 3, list of int, or ‘all’</p>
 <blockquote>
 <div><p>For Kepler’s prime mission, there are three short-cadence
-lightcurve files for each quarter, each covering one month.
+LightCurveFile objects for each quarter, each covering one month.
 Hence, if cadence=’short’ you need to specify month=1, 2, or 3.</p>
+</div></blockquote>
+<p><strong>radius</strong> : float</p>
+<blockquote>
+<div><p>Search radius in arcseconds. Default is 1 arcsecond.</p>
+</div></blockquote>
+<p><strong>targetlimit</strong> : None or int</p>
+<blockquote>
+<div><p>If multiple targets are present within <cite>radius</cite>, limit the number
+of returned LightCurveFile objects to <cite>targetlimit</cite>.
+If <cite>None</cite>, no limit is applied.</p>
 </div></blockquote>
 <p><strong>kwargs</strong> : dict</p>
 <blockquote>
@@ -321,7 +336,7 @@ Hence, if cadence=’short’ you need to specify month=1, 2, or 3.</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>tpf</strong> : KeplerLightCurveFile object.</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>lcf</strong> : KeplerLightCurveFile object or list of KeplerLightCurveFile objects</p>
 </td>
 </tr>
 </tbody>
@@ -343,6 +358,11 @@ Hence, if cadence=’short’ you need to specify month=1, 2, or 3.</p>
 <code class="descname">mission</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.mission" title="Permalink to this definition">¶</a></dt>
 <dd><p>Mission name</p>
 </dd></dl>
+
+<dl class="attribute">
+<dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.obsmode">
+<code class="descname">obsmode</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.obsmode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.plot">

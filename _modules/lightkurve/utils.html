@@ -157,8 +157,9 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;KeplerQualityFlags&#39;</span><span class="p">,</span> <span class="s1">&#39;TessQualityFlags&#39;</span><span class="p">,</span> <span class="s1">&#39;channel_to_module_output&#39;</span><span class="p">,</span>
-           <span class="s1">&#39;module_output_to_channel&#39;</span><span class="p">,</span> <span class="s1">&#39;running_mean&#39;</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;KeplerQualityFlags&#39;</span><span class="p">,</span> <span class="s1">&#39;TessQualityFlags&#39;</span><span class="p">,</span> <span class="s1">&#39;bkjd_to_time&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;channel_to_module_output&#39;</span><span class="p">,</span> <span class="s1">&#39;module_output_to_channel&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;running_mean&#39;</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="KeplerQualityFlags"><a class="viewcode-back" href="../../api/utils.html#lightkurve.utils.KeplerQualityFlags">[docs]</a><span class="k">class</span> <span class="nc">KeplerQualityFlags</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -350,7 +351,7 @@
     <span class="k">return</span> <span class="p">(</span><span class="n">cumsum</span><span class="p">[</span><span class="n">window_size</span><span class="p">:]</span> <span class="o">-</span> <span class="n">cumsum</span><span class="p">[:</span><span class="o">-</span><span class="n">window_size</span><span class="p">])</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">window_size</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">bkjd_to_time</span><span class="p">(</span><span class="n">bkjd</span><span class="p">,</span> <span class="n">timecorr</span><span class="p">,</span> <span class="n">timslice</span><span class="p">,</span> <span class="n">bjdref</span><span class="o">=</span><span class="mf">2454833.</span><span class="p">):</span>
+<div class="viewcode-block" id="bkjd_to_time"><a class="viewcode-back" href="../../api/utils.html#lightkurve.utils.bkjd_to_time">[docs]</a><span class="k">def</span> <span class="nf">bkjd_to_time</span><span class="p">(</span><span class="n">bkjd</span><span class="p">,</span> <span class="n">timecorr</span><span class="p">,</span> <span class="n">timslice</span><span class="p">,</span> <span class="n">bjdref</span><span class="o">=</span><span class="mf">2454833.</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Converts Barycentric Kepler Julian Day (BKJD) to an astropy.time.Time object.</span>
 
 <span class="sd">    Kepler Barycentric Julian Day is a Julian day minus 2454833.0 (UTC=January</span>
@@ -376,7 +377,7 @@
     <span class="n">bjd</span> <span class="o">=</span> <span class="n">bkjd</span> <span class="o">+</span> <span class="n">bjdref</span>
     <span class="n">jd</span> <span class="o">=</span> <span class="n">bjd</span> <span class="o">-</span> <span class="n">timecorr</span>
     <span class="n">jd</span> <span class="o">+=</span> <span class="p">(</span><span class="mf">0.25</span> <span class="o">+</span> <span class="mf">0.62</span> <span class="o">*</span> <span class="p">(</span><span class="mi">5</span> <span class="o">-</span> <span class="n">timslice</span><span class="p">))</span> <span class="o">/</span> <span class="mf">86400.</span>
-    <span class="k">return</span> <span class="n">Time</span><span class="p">(</span><span class="n">jd</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;jd&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Time</span><span class="p">(</span><span class="n">jd</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;jd&#39;</span><span class="p">)</span></div>
 
 
 <span class="k">def</span> <span class="nf">plot_image</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">,</span>

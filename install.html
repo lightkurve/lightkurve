@@ -195,16 +195,17 @@
 <span id="id1"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="requirements">
 <h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
-<p><strong>lightkurve</strong> has the following requirements, all of which tend to be available
-by default in a modern installation of Python:</p>
+<p><strong>lightkurve</strong> has the following requirements, all of which tend to be
+available by default in a modern installation of Python:</p>
 <ul class="simple">
 <li>Python: 2.7, 3.5, 3.6 or later.</li>
 <li>Astropy: 1.3 or later.</li>
-<li>Numpy: 1.11.3 or later.</li>
-<li>Scipy: 0.17 or later.</li>
+<li>Numpy: 1.11 or later.</li>
+<li>Scipy: 0.19 or later.</li>
 <li>Matplotlib: 1.5.3 or later.</li>
+<li>Astroquery 0.3.7 or later.</li>
 </ul>
-<p>We strongly recommend using the <a class="reference external" href="https://www.continuum.io/downloads">Anaconda Python</a>
+<p>We recommend using the <a class="reference external" href="https://www.continuum.io/downloads">Anaconda Python</a>
 distribution, which will install Python alongside its most common scientific
 packages, including all those listed above.</p>
 </div>
@@ -212,16 +213,15 @@ packages, including all those listed above.</p>
 <h2>Installing lightkurve<a class="headerlink" href="#installing-lightkurve" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="stable-version">
 <h3>Stable version<a class="headerlink" href="#stable-version" title="Permalink to this headline">¶</a></h3>
-<p>The easiest way to install or upgrade lightkurve is with <code class="docutils literal"><span class="pre">pip</span></code>, simply run the
-following command on a terminal window:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ pip install lightkurve --upgrade --no-deps
+<p>The easiest way to install or upgrade lightkurve is with <code class="docutils literal"><span class="pre">pip</span></code>,
+simply run the following command on a terminal window:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ pip install lightkurve --upgrade
 </pre></div>
 </div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">The <code class="docutils literal"><span class="pre">--no-deps</span></code> flag is optional, but highly recommended if you already
-have Numpy installed, since otherwise pip will sometimes try to upgrade
-your Numpy installation, which may not always be desired.</p>
+<p class="last">The <code class="docutils literal"><span class="pre">--upgrade</span></code> flag is optional, but recommended if you already
+have lightkurve installed and want to upgrade to the latest version.</p>
 </div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
@@ -249,8 +249,8 @@ $ pip install -e .
 <p class="first admonition-title">Note</p>
 <p class="last">In general, building the documentation is not necessary unless you are
 writing new documentation or do not have internet access, because the
-latest (and archive) versions of lightkurve’s documentation should be available
-at <a class="reference external" href="http://lightkurve.keplerscience.org/">lightkurve.keplerscience.org/</a> .</p>
+latest version of lightkurve’s documentation is available online at
+<a class="reference external" href="http://lightkurve.keplerscience.org/">lightkurve.keplerscience.org/</a> .</p>
 </div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
