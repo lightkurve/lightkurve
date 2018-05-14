@@ -59,22 +59,19 @@ class GPCorrector(object):
         breaks = np.append(breaks, len(self.lc.time))
         return breaks
 
-    def __init__(self, lc, mask=None):
+    def __init__(self, lc):
         if np.any([np.isnan(lc.flux), np.isnan(lc.time), np.isnan(lc.flux_err)]):
             raise ValueError('Light curve contains NaN values.')
         if np.nansum(lc.normalize().flux - lc.flux) != 0:
             raise ValueError('Flux is unnormalized.')
         self.lc = lc
         self.break_tolerance = 10
-        if mask is None:
-            self.mask = np.ones(len(lc.flux), dtype=bool)
-        else:
-            self.mask = mask
+        self.mask = np.ones(len(lc.flux), dtype=bool)
         self.dt = self.lc.time[1:] - self.lc.time[0:-1]
         self.dt_min = np.nanmin(self.dt)
         self.breaks = self.find_breaks()
 
-    def initialize(self, timescale=None):
+    def initialize(self, timescale=None, bounds=None, initial=None):
         '''Returns a corrected lightcurve which is a copy of lc.
 
         Parameters
@@ -84,17 +81,25 @@ class GPCorrector(object):
             not fit trends on timescales near to or shorter than this timescale.
         '''
         # Set up the kernels and bounds for celerite
+        sigma = self.lc[self.mask].flatten().flux.std()
+        jittersigma = self.lc[self.mask].flatten().flux.std()
         if timescale is not None:
-            bounds = [(-15, 15), (np.log(5 * timescale), 15)]
-            log_rho = np.log(5 * timescale)
+            if bounds is None:
+                bounds = [(np.log(0.1*sigma), np.log(10*sigma)),
+                          (np.log(timescale/2), np.log(timescale*10))]
+            log_rho = np.log(timescale)
         else:
-            bounds = [(-15, 15), (-15, 15)]
+            if bounds is None:
+                bounds = [(-15, 15), (-15, 15)]
             log_rho = -np.log(0.26)
-        log_sigma = np.log(np.nanstd(self.lc[self.mask].flux))
-        jittersigma = np.log(np.nanmedian(self.lc.flux_err))
-        kernel = celerite.terms.Matern32Term(log_sigma=log_sigma,
-                                             log_rho=log_rho, bounds=bounds)
-        kernel += celerite.terms.JitterTerm(log_sigma=jittersigma)
+        if initial is None:
+            kernel = celerite.terms.Matern32Term(log_sigma=np.log(sigma),
+                                                 log_rho=log_rho, bounds=bounds)
+        else:
+            kernel = celerite.terms.Matern32Term(log_sigma=initial[0],
+                                                 log_rho=initial[1], bounds=bounds)
+        kernel += celerite.terms.JitterTerm(log_sigma=np.log(jittersigma))
+
         gp = celerite.GP(kernel, mean=1, fit_mean=True)
         self.initial_params = gp.get_parameter_dict()
         gp.compute(self.lc[self.mask].time - self.lc.time[0], self.lc[self.mask].flux_err)
@@ -108,12 +113,14 @@ class GPCorrector(object):
         initial_params = gp.get_parameter_vector()
         bounds = gp.get_parameter_bounds()
         soln = minimize(neg_log_like, initial_params,
-                        method="L-BFGS-B", bounds=bounds, args=(self.lc[self.mask].flux, gp))
+                        method="TNC", bounds=bounds, args=(self.lc[self.mask].flux, gp))
+        self.soln = soln
         gp.set_parameter_vector(soln.x)
         self.best_fit_params = gp.get_parameter_dict()
         self.gp = gp
 
-    def correct(self, timescale=0.25, iters=2, sigma=3, return_trend=False):
+    def correct(self, timescale=2, iters=2, sigma=3, return_trend=False,
+                bounds=None, initial=None, mask=None, mask_burn=False):
         '''Returns a lightcurve corrected by a GP.
 
         Runs the GP for times, split into different chunks based on gaps in
@@ -138,10 +145,11 @@ class GPCorrector(object):
             If return_trend is True, will also return the best fit trend.
         '''
         # We need to know how many points the `time_scale` corresponds to.
-        boxwidth = (int(timescale//self.dt_min))
-        if boxwidth < 1:
-            raise MaskError('timescale is too short ({})'.format(timescale))
-        mask = np.ones(len(self.lc.flux), dtype=bool)
+        if mask is None:
+            mask = np.ones(len(self.lc.flux), dtype=bool)
+        if mask_burn is True:
+            mask &= ~np.in1d(np.arange(0, len(self.lc.time)), np.asarray(
+                [np.arange(b, b+20) for b in self.breaks]).ravel())
         # Iteratively sigma clip the data
         for iter in range(iters):
             # In the next run, include this new mask.
@@ -152,7 +160,7 @@ class GPCorrector(object):
                                 'sigma tolerance or a shorter timescale.'
                                 ''.format(int(100.*np.nansum(~self.mask)/len(self.mask))))
             # Start the GP, find the maximum liklihood solution
-            self.initialize(timescale=timescale)
+            self.initialize(timescale=timescale, bounds=bounds, initial=initial)
             flat = LightCurve(time=self.lc.time, flux=self.lc.flux*0, flux_err=self.lc.flux_err*0)
             # Run over each 'portion' of the data, defined where breaks are greater
             # than break_tolerance
@@ -170,7 +178,7 @@ class GPCorrector(object):
             corr = np.abs(self.lc.flux - flat.flux)
             corr -= np.nanmedian(corr)
             mask = corr < sigma * ((self.lc.flux_err**2 + (flat.flux_err)**2)**0.5)
-            mask = (convolve(mask, Box1DKernel(boxwidth)) == 1)
+#            mask = (convolve(mask, Box1DKernel(boxwidth)) == 1)
 
         # Return the best fit trend.
         flat.flux -= np.nanmedian(flat.flux)
