@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>What are Light Curve objects? &mdash; lightkurve 1.0.a1 documentation</title>
+  <title>Interactively inspecting Target Pixel Files and Lightcurves &mdash; lightkurve 1.0.a1 documentation</title>
   
 
   
@@ -35,8 +35,8 @@
         <link rel="search" title="Search" href="../search.html"/>
     <link rel="top" title="lightkurve 1.0.a1 documentation" href="../index.html"/>
         <link rel="up" title="Introduction to lightkurve" href="section1.html"/>
-        <link rel="next" title="What are Light Curve File objects?" href="1.04-lightcurve-files.html"/>
-        <link rel="prev" title="What are Target Pixel File objects?" href="1.02-target-pixel-files.html"/> 
+        <link rel="next" title="Science with lightkurve" href="section2.html"/>
+        <link rel="prev" title="What are Light Curve File objects?" href="1.04-lightcurve-files.html"/> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -98,9 +98,13 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="section1.html">Introduction to lightkurve</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="1.02-target-pixel-files.html">What are Target Pixel File objects?</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">What are Light Curve objects?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="1.03-what-are-lightcurves.html">What are Light Curve objects?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="1.04-lightcurve-files.html">What are Light Curve File objects?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="1.05-interact-with-lightcurves-and-tpf.html">Interactively inspecting Target Pixel Files and Lightcurves</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Interactively inspecting Target Pixel Files and Lightcurves</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Using-.interact()">Using <code class="docutils literal"><span class="pre">.interact()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Passing-in-a-preprocessed-lightcurve">Passing in a preprocessed lightcurve</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="section2.html">Science with lightkurve</a></li>
@@ -143,11 +147,11 @@
       
           <li><a href="section1.html">Introduction to lightkurve</a> &raquo;</li>
       
-    <li>What are Light Curve objects?</li>
+    <li>Interactively inspecting Target Pixel Files and Lightcurves</li>
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="../_sources/tutorials/1.03-what-are-lightcurves.ipynb.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/tutorials/1.05-interact-with-lightcurves-and-tpf.ipynb.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -355,39 +359,34 @@ div.nboutput div.output_area.stderr {
     margin-right: 4px;  /* make room for the exclamation icon */
 }
 </style>
-<div class="section" id="What-are-Light-Curve-objects?">
-<h1>What are Light Curve objects?<a class="headerlink" href="#What-are-Light-Curve-objects?" title="Permalink to this headline">¶</a></h1>
-<p><code class="docutils literal"><span class="pre">LightCurve</span></code> objects are data objects which encapsulate the brightness
-of a star over time. They provide a series of common operations, for
-example folding, binning, plotting, etc. There are a range of subclasses
-of <code class="docutils literal"><span class="pre">LightCurve</span></code> objects specific to telescopes, including
-<code class="docutils literal"><span class="pre">KeplerLightCurve</span></code> for Kepler and K2 data and <code class="docutils literal"><span class="pre">TessLightCurve</span></code> for
-TESS data.</p>
-<p>Although <code class="docutils literal"><span class="pre">lightkurve</span></code> was designed with Kepler, K2 and TESS in mind,
-these objects can be used for a range of astronomy data.</p>
-<p>You can create a <code class="docutils literal"><span class="pre">LightCurve</span></code> object from a <code class="docutils literal"><span class="pre">TargetPixelFile</span></code> object
-using Simple Aperture Photometry (see our tutorial for more information
-on Target Pixel Files
-<a class="reference external" href="http://lightkurve.keplerscience.org/tutorials/1.02-target-pixel-files.html">here</a>.
-Aperture Photometry is the simple act of summing up the values of all
-the pixels in a pre-defined aperture, as a function of time. By
-carefully choosing the shape of the aperture mask, you can avoid nearby
-contaminants or improve the strength of the specific signal you are
-trying to measure relative to the background.</p>
-<p>To demonstrate, lets create a <code class="docutils literal"><span class="pre">KeplerLightCurve</span></code> from a
-<code class="docutils literal"><span class="pre">KeplerTargetPixelFile</span></code>.</p>
+<div class="section" id="Interactively-inspecting-Target-Pixel-Files-and-Lightcurves">
+<h1>Interactively inspecting Target Pixel Files and Lightcurves<a class="headerlink" href="#Interactively-inspecting-Target-Pixel-Files-and-Lightcurves" title="Permalink to this headline">¶</a></h1>
+<p>One of the most common questions we get at the Kepler/K2 Guest Observer
+Office is “I see a noise blip in my K2 lightcurve. Is it real or
+instrumental?” Answering the question usually entails ticking through
+our (long, incomplete) mental list of conceivable, sometimes exotic
+instrumental artifacts. Space-craft induced periodic motion. Rolling
+band. Cosmic Rays. Collateral cosmic rays. Smear. Sudden pixel
+sensitivity dropouts. Fine-guidance-sensor cross talk. Regular cross
+talk. <a class="reference external" href="https://twitter.com/gully_/status/941707161058586624">Sweater
+fuzzy</a>.</p>
+<p>In this tutorial we introduce and explain the <code class="docutils literal"><span class="pre">tpf.interact()</span></code> tool
+that accomplishes the goal of interactively inspecting the TPFs and
+lightcurve simultaneously.</p>
+<div class="section" id="Using-.interact()">
+<h2>Using <code class="docutils literal"><span class="pre">.interact()</span></code><a class="headerlink" href="#Using-.interact()" title="Permalink to this headline">¶</a></h2>
+<p>Using interact should be as simple as downloading a Kepler Target Pixel
+File (TPF) and running the method <code class="docutils literal"><span class="pre">.interact()</span></code>. This method can only
+be run in a Jupyter Notebook at the moment, and is limited to
+lightcurves with fewer than 30000 cadences.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none"><div class="highlight"><pre>
 <span></span>In [1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span>from lightkurve import KeplerTargetPixelFile, KeplerLightCurve
-#First we open a Target Pixel File from MAST, this one is already cached from our previous tutorial!
-tpf = KeplerTargetPixelFile.from_archive(6922244, quarter=4)
-
-#Then we convert the target pixel file into a light curve using the pipeline-defined aperture mask.
-lc = tpf.to_lightcurve(aperture_mask=tpf.pipeline_mask)
+<span></span>from lightkurve import KeplerTargetPixelFile
+tpf = KeplerTargetPixelFile.from_archive(249928278, campaign=15) # WASP 104 for example
 </pre></div>
 </div>
 </div>
@@ -396,207 +395,99 @@ lc = tpf.to_lightcurve(aperture_mask=tpf.pipeline_mask)
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-INFO: Found cached file ./mastDownload/Kepler/kplr006922244_lc_Q111111111111111111/kplr006922244-2010078095331_lpd-targ.fits.gz with expected size 2009425. [astroquery.query]
+Found 1 File(s)
+INFO: Found cached file ./mastDownload/K2/ktwo249928278-c15_lc/ktwo249928278-c15_lpd-targ.fits.gz with expected size 6996829. [astroquery.query]
 </pre></div></div>
 </div>
-<p>We’ve built a new <code class="docutils literal"><span class="pre">KeplerLightCurve</span></code> object called <code class="docutils literal"><span class="pre">lc</span></code>. Note in
-this case we’ve passed an <strong>aperture_mask</strong> to the <code class="docutils literal"><span class="pre">to_lightcurve</span></code>
-method. The default is to use the <em>Kepler</em> pipeline aperture. (You can
-pass your own aperture, which is a boolean <code class="docutils literal"><span class="pre">numpy</span></code> array.) By summing
-all the pixels in the aperture we have created a Simple Aperture
-Photometry (SAP) lightcurve.</p>
-<p><code class="docutils literal"><span class="pre">KeplerLightCurve</span></code> has many useful functions that you can use. As with
-Target Pixel Files you can access the meta data very simply:</p>
-<div class="nbinput docutils container">
+<p>The default lightcurves comes from the default “pipeline” mask,
+typically only a few pixels centered on the target photocenter,
+depending on factors like the target brightness and its expected PSF
+size.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">tpf</span><span class="o">.</span><span class="n">interact</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="figure" id="id1">
+<img alt="TPF Interact demo" src="../_images/tpf_interact.gif" />
+<p class="caption"><span class="caption-text">TPF Interact demo</span></p>
+</div>
+<p>You can move the large bottom left slider to change the location of the
+verical red bar, which indicates which cadence is being shown in the TPF
+postage stamp image. You can also hit the play button to automatically
+play-though all the cadences. The left-and-right arrow keys on your
+keyboard will tick through the cadences one-by-one, if the widget slider
+is active (i.e. it’s the most recent thing you clicked on). The slider
+beneath the TPF postage stamp image controls the screen stretch, which
+defaults to logarithmic scaling initialized to 1% and 95% lower and
+upper limits respectively.</p>
+<p>You can move your cursor over individual data points to show hover-over
+tool-tips indicating additional information about that datum. Currently
+the tool tips list the cadence, time, flux, and quality flags. The tools
+on the right hand side of the plots enable zooming, panning, and
+toggling-off tool-tips.</p>
+</div>
+<div class="section" id="Passing-in-a-preprocessed-lightcurve">
+<h2>Passing in a preprocessed lightcurve<a class="headerlink" href="#Passing-in-a-preprocessed-lightcurve" title="Permalink to this headline">¶</a></h2>
+<p>You may wish to visualize a custom-processed lightcurve adjacent to its
+TPF postage stamp representation. You can pass-in a lightcurve as an
+optional keyword argument like so:</p>
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none"><div class="highlight"><pre>
 <span></span>In [2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span>lc.mission
+<span></span>import numpy as np
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>Out[2]:
-</pre></div>
-</div>
-<div class="output_area highlight-none"><div class="highlight"><pre>
-<span></span>&#39;Kepler&#39;
-</pre></div>
-</div>
-</div>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none"><div class="highlight"><pre>
 <span></span>In [3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span>lc.quarter
+<span></span>def my_custom_lc_cleaner(tpf):
+    &#39;&#39;&#39;Returns a custom lightcurve that uses local background subtraction&#39;&#39;&#39;
+
+    # Define the background as the outermost ring of non-NaN pixels
+    aper_mask = tpf.pipeline_mask * False
+    aper_mask[1:-1, 1:-1] = True
+    back_mask = ~aper_mask &amp; ~np.all(np.isnan(tpf.flux), axis=0)
+
+    # Estimate the background level by the outer ring of pixels
+    lc_aper = tpf.to_lightcurve(aperture_mask=aper_mask) / aper_mask.sum()
+    lc_back = tpf.to_lightcurve(aperture_mask=back_mask) / back_mask.sum()
+
+    lc_bg_sub = lc_aper - lc_back.flux
+
+    # Remove outliers
+    lc_cln= lc_bg_sub.remove_outliers()
+
+    return lc_cln
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>Out[3]:
-</pre></div>
-</div>
-<div class="output_area highlight-none"><div class="highlight"><pre>
-<span></span>4
-</pre></div>
-</div>
-</div>
-<p>And you still have access to time and flux attributes. In a light curve,
-there is only one flux point for every time stamp:</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [4]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span>lc.time, lc.flux
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>Out[4]:
-</pre></div>
-</div>
-<div class="output_area highlight-none"><div class="highlight"><pre>
-<span></span>(array([352.37632485, 352.39675805, 352.43762445, ..., 442.16263546,
-        442.18306983, 442.2035041 ]),
- array([43689.15 , 43698.08 , 43694.105, ..., 43155.8  , 43148.465,
-        43151.562], dtype=float32))
-</pre></div>
-</div>
-</div>
-<p>You can also check the “CDPP” noise metric of the lightcurve using the
-built in method:</p>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none"><div class="highlight"><pre>
 <span></span>In [4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span>lc.cdpp()
+<span></span>lc_cln = my_custom_lc_cleaner(tpf)
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>Out[4]:
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">tpf</span><span class="o">.</span><span class="n">interact</span><span class="p">(</span><span class="n">lc</span><span class="o">=</span><span class="n">lc_cln</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="output_area highlight-none"><div class="highlight"><pre>
-<span></span>407.35519723966718
-</pre></div>
+<div class="figure" id="id2">
+<img alt="preprocessed lightcurve interaction" src="../_images/tpf_interact_preprocessed_lc.gif" />
+<p class="caption"><span class="caption-text">preprocessed lightcurve interaction</span></p>
 </div>
-</div>
-<p>Now we can use the built in <code class="docutils literal"><span class="pre">plot</span></code> function on the
-<code class="docutils literal"><span class="pre">KeplerLightCurve</span></code> object to plot the time series. You can pass
-<code class="docutils literal"><span class="pre">plot</span></code> any keywords you would normally pass to
-<code class="docutils literal"><span class="pre">matplotlib.pyplot.plot</span></code>.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [6]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span>%matplotlib inline
-lc.plot();
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../_images/tutorials_1.03-what-are-lightcurves_11_0.png" src="../_images/tutorials_1.03-what-are-lightcurves_11_0.png" />
-</div>
-</div>
-<p>There are a set of useful functions in <code class="docutils literal"><span class="pre">LightCurve</span></code> objects which you
-can use to work with the data. These include: * <code class="docutils literal"><span class="pre">flatten()</span></code>: Remove
-long term trends using a <a class="reference external" href="https://en.wikipedia.org/wiki/Savitzky%E2%80%93Golay_filter">Savitzky–Golay
-filter</a>
-* <code class="docutils literal"><span class="pre">remove_outliers()</span></code>: Remove outliers using simple sigma clipping *
-<code class="docutils literal"><span class="pre">remove_nans()</span></code>: Remove infinite or NaN values (these can occur during
-thruster firings) * <code class="docutils literal"><span class="pre">fold()</span></code>: Fold the data at a particular period *
-<code class="docutils literal"><span class="pre">bin()</span></code>: Reduce the time resolution of the array, taking the average
-value in each bin.</p>
-<p>We can use these simply on a light curve object</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [7]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span>flat_lc = lc.flatten(window_length=401)
-flat_lc.plot();
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../_images/tutorials_1.03-what-are-lightcurves_13_0.png" src="../_images/tutorials_1.03-what-are-lightcurves_13_0.png" />
-</div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [8]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span>folded_lc = flat_lc.fold(period=3.5225)
-folded_lc.plot();
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../_images/tutorials_1.03-what-are-lightcurves_14_0.png" src="../_images/tutorials_1.03-what-are-lightcurves_14_0.png" />
-</div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [9]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span>binned_lc = folded_lc.bin(binsize=10)
-binned_lc.plot();
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../_images/tutorials_1.03-what-are-lightcurves_15_0.png" src="../_images/tutorials_1.03-what-are-lightcurves_15_0.png" />
-</div>
-</div>
-<p>Or we can do these all in a single (long) line!</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none"><div class="highlight"><pre>
-<span></span>In [11]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3"><div class="highlight"><pre>
-<span></span>lc.remove_nans().flatten(window_length=401).fold(period=3.5225).bin(binsize=10).plot();
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../_images/tutorials_1.03-what-are-lightcurves_17_0.png" src="../_images/tutorials_1.03-what-are-lightcurves_17_0.png" />
-</div>
+<p>Your clean lightcurve may have a different number of cadences than your
+target pixel file, for example if you dropped outliers. The TPF will
+show all of the available cadences by default, with missing spaces in
+the lightcurve.</p>
 </div>
 </div>
 
@@ -607,10 +498,10 @@ binned_lc.plot();
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="1.04-lightcurve-files.html" class="btn btn-neutral float-right" title="What are Light Curve File objects?" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="section2.html" class="btn btn-neutral float-right" title="Science with lightkurve" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="1.02-target-pixel-files.html" class="btn btn-neutral" title="What are Target Pixel File objects?" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="1.04-lightcurve-files.html" class="btn btn-neutral" title="What are Light Curve File objects?" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
