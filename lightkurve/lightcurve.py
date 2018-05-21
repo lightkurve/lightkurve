@@ -691,13 +691,13 @@ class KeplerLightCurve(LightCurve):
         """
         not_nan = np.isfinite(self.flux)
         if method == 'sff':
-                from .correctors import SFFCorrector
-                self.corrector = SFFCorrector()
-                corrected_lc = self.corrector.correct(time=self.time[not_nan],
-                                                      flux=self.flux[not_nan],
-                                                      centroid_col=self.centroid_col[not_nan],
-                                                      centroid_row=self.centroid_row[not_nan],
-                                                      **kwargs)
+            from .correctors import SFFCorrector
+            self.corrector = SFFCorrector()
+            corrected_lc = self.corrector.correct(time=self.time[not_nan],
+                                                  flux=self.flux[not_nan],
+                                                  centroid_col=self.centroid_col[not_nan],
+                                                  centroid_row=self.centroid_row[not_nan],
+                                                  **kwargs)
         else:
             raise ValueError("method {} is not available.".format(method))
         new_lc = copy.copy(self)
