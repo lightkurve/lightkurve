@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Installation &mdash; lightkurve 1.0.0dev documentation</title>
+  <title>Installation &mdash; lightkurve 1.0.a1 documentation</title>
   
 
   
@@ -29,7 +29,8 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Contributing" href="contributing.html" /> 
+    <link rel="next" title="API documentation" href="api/index.html" />
+    <link rel="prev" title="Quickstart" href="tutorials/quickstart.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -53,7 +54,7 @@
 
           
             
-            <img src="_static/lightkurve.svg" class="logo" alt="Logo"/>
+            <img src="_static/lightkurve.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -61,7 +62,7 @@
             
             
               <div class="version">
-                1.0.0dev
+                1.0
               </div>
             
           
@@ -85,22 +86,9 @@
               
             
             
-              <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="api/index.html">API documentation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="api/targetpixelfile.html">Target Pixel File</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="api/lightcurve.html">Lightcurve</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="api/prf.html">Point Spread Function Photometry</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="api/utils.html">Utilities</a><ul class="simple">
-</ul>
-</li>
-</ul>
-</li>
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="tutorials/quickstart.html">Quickstart</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#installing-lightkurve">Installing lightkurve</a><ul>
@@ -111,32 +99,81 @@
 <li class="toctree-l2"><a class="reference internal" href="#building-documentation">Building documentation</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="api/index.html">API documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/targetpixelfile.html">TargetPixelFile classes</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/lightcurve.html">LightCurve classes</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/lightcurvefile.html">LightCurveFile classes</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/correctors.html">Systematics correction classes</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/prf.html">PSF photometry classes</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/utils.html">Utility functions</a><ul class="simple">
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/section1.html">Introduction to lightkurve</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/1.02-target-pixel-files.html">What are Target Pixel File objects?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/1.03-what-are-lightcurves.html">What are Light Curve objects?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/1.04-lightcurve-files.html">What are Light Curve File objects?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/1.05-interact-with-lightcurves-and-tpf.html">Interactively inspecting Target Pixel Files and Lightcurves</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/1.05-interact-with-lightcurves-and-tpf.html#Using-.interact()">Using <code class="docutils literal notranslate"><span class="pre">.interact()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/1.05-interact-with-lightcurves-and-tpf.html#Passing-in-a-preprocessed-lightcurve">Passing in a preprocessed lightcurve</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/section2.html">Science with lightkurve</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/2.02-recover-a-planet.html">How to recover a known planet in Kepler data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/2.03-appending-lightcurves.html">How to combine lightcurves from different Kepler quarters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/2.05-making-custom-apertures.html">How to perform aperture photometry with custom apertures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/cutting-out-tpfs-from-tess-ffis.html">How to cut out Target Pixel Files from Kepler Super Stamps or TESS FFIs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/section3.html">Systematics correction using lightkurve</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/2.04-removing-cbvs.html">How to remove common systematics using basis vectors (CBVs)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/2.01-how-to-detrend.html">How to remove K2 motion systematics with SFF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html">How does the SFF method work?</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html#Retrieve-the-K2SFF-data-for-ENG-test-source-60021426">Retrieve the K2SFF data for ENG test source <code class="docutils literal notranslate"><span class="pre">60021426</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html#Manually-reproduce-with-the-Vanderburg-provided-diagnostic-data">Manually reproduce with the Vanderburg-provided diagnostic data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/motion-correction/replicate-vanderburg-2014-lightkurve.html">Replicating Vanderburg &amp; Johnson 2014 using lightkurve</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/motion-correction/replicate-vanderburg-2014-lightkurve.html#Data-Exclusion">Data Exclusion</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">About lightkurve</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing and reporting issues</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="contributing.html#proposing-changes-to-lightkurve-using-github-pull-requests">Proposing changes to lightkurve using GitHub pull requests</a></li>
 <li class="toctree-l2"><a class="reference internal" href="contributing.html#coding-and-documentation-guidelines">Coding and documentation guidelines</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="community_software.html">Community Software</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="community_software.html#detrending-analysis">Detrending &amp; Analysis</a></li>
-<li class="toctree-l2"><a class="reference internal" href="community_software.html#full-frame-images">Full Frame Images</a></li>
-<li class="toctree-l2"><a class="reference internal" href="community_software.html#data-access">Data access</a></li>
-<li class="toctree-l2"><a class="reference internal" href="community_software.html#metadata">Metadata</a></li>
-<li class="toctree-l2"><a class="reference internal" href="community_software.html#planet-search">Planet Search</a></li>
-<li class="toctree-l2"><a class="reference internal" href="community_software.html#population-statistics">Population Statistics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="community_software.html#positional">Positional</a></li>
-<li class="toctree-l2"><a class="reference internal" href="community_software.html#science-astrophysics">Science / Astrophysics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="community_software.html#other">Other</a></li>
-</ul>
-</li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/index.html">lightkurve tutorials</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/target-pixel-files.html">What are Target Pixel Files?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/lightcurve-files.html">What are Light Curve Files?</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="tutorials/lightcurve-files.html#Lightcurves-from-Target-Pixel-Files">Lightcurves from Target Pixel Files</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tutorials/lightcurve-files.html#PDCSAP-from-lightcurves-from-MAST">PDCSAP from lightcurves from MAST</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="citing.html">Citing and acknowledging lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="other_software.html">Other software</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="other_software.html#detrending-analysis">Detrending &amp; Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="other_software.html#full-frame-images">Full Frame Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="other_software.html#data-access">Data access</a></li>
+<li class="toctree-l2"><a class="reference internal" href="other_software.html#metadata">Metadata</a></li>
+<li class="toctree-l2"><a class="reference internal" href="other_software.html#planet-search">Planet Search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="other_software.html#population-statistics">Population Statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="other_software.html#positional">Positional</a></li>
+<li class="toctree-l2"><a class="reference internal" href="other_software.html#science-astrophysics">Science / Astrophysics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="other_software.html#other">Other</a></li>
 </ul>
 </li>
 </ul>
@@ -242,16 +279,17 @@
 <span id="id1"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="requirements">
 <h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
-<p><strong>lightkurve</strong> has the following requirements, all of which tend to be available
-by default in a modern installation of Python:</p>
+<p><strong>lightkurve</strong> has the following requirements, all of which tend to be
+available by default in a modern installation of Python:</p>
 <ul class="simple">
 <li>Python: 2.7, 3.5, 3.6 or later.</li>
 <li>Astropy: 1.3 or later.</li>
-<li>Numpy: 1.11.3 or later.</li>
-<li>Scipy: 0.17 or later.</li>
+<li>Numpy: 1.11 or later.</li>
+<li>Scipy: 0.19 or later.</li>
 <li>Matplotlib: 1.5.3 or later.</li>
+<li>Astroquery 0.3.7 or later.</li>
 </ul>
-<p>We strongly recommend using the <a class="reference external" href="https://www.continuum.io/downloads">Anaconda Python</a>
+<p>We recommend using the <a class="reference external" href="https://www.continuum.io/downloads">Anaconda Python</a>
 distribution, which will install Python alongside its most common scientific
 packages, including all those listed above.</p>
 </div>
@@ -259,22 +297,21 @@ packages, including all those listed above.</p>
 <h2>Installing lightkurve<a class="headerlink" href="#installing-lightkurve" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="stable-version">
 <h3>Stable version<a class="headerlink" href="#stable-version" title="Permalink to this headline">¶</a></h3>
-<p>The easiest way to install or upgrade lightkurve is with <code class="docutils literal"><span class="pre">pip</span></code>, simply run the
-following command on a terminal window:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ pip install lightkurve --upgrade --no-deps
+<p>The easiest way to install or upgrade lightkurve is with <code class="docutils literal notranslate"><span class="pre">pip</span></code>,
+simply run the following command on a terminal window:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install lightkurve --upgrade
 </pre></div>
 </div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">The <code class="docutils literal"><span class="pre">--no-deps</span></code> flag is optional, but highly recommended if you already
-have Numpy installed, since otherwise pip will sometimes try to upgrade
-your Numpy installation, which may not always be desired.</p>
+<p class="last">The <code class="docutils literal notranslate"><span class="pre">--upgrade</span></code> flag is optional, but recommended if you already
+have lightkurve installed and want to upgrade to the latest version.</p>
 </div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">If you get a <code class="docutils literal"><span class="pre">PermissionError</span></code> this means that you do not have the
+<p class="last">If you get a <code class="docutils literal notranslate"><span class="pre">PermissionError</span></code> this means that you do not have the
 required administrative access to install new packages to your Python
-installation.  In this case you may consider using the <code class="docutils literal"><span class="pre">--user</span></code> option
+installation.  In this case you may consider using the <code class="docutils literal notranslate"><span class="pre">--user</span></code> option
 to install the package into your home directory.  You can read more
 about how to do this in the <a class="reference external" href="http://www.pip-installer.org/en/1.2.1/other-tools.html#using-pip-with-the-user-scheme">pip documentation</a>.</p>
 </div>
@@ -283,7 +320,7 @@ about how to do this in the <a class="reference external" href="http://www.pip-i
 <h3>Development version<a class="headerlink" href="#development-version" title="Permalink to this headline">¶</a></h3>
 <p>Alternatively, if you want to experiment with the latest development version of
 lightkurve, you can install it straight from GitHub:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ git clone https://github.com/KeplerGO/lightkurve.git
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/KeplerGO/lightkurve.git
 $ cd lightkurve
 $ pip install -e .
 </pre></div>
@@ -296,16 +333,16 @@ $ pip install -e .
 <p class="first admonition-title">Note</p>
 <p class="last">In general, building the documentation is not necessary unless you are
 writing new documentation or do not have internet access, because the
-latest (and archive) versions of lightkurve’s documentation should be available
-at <a class="reference external" href="http://lightkurve.keplerscience.org/">lightkurve.keplerscience.org/</a> .</p>
+latest version of lightkurve’s documentation is available online at
+<a class="reference external" href="http://lightkurve.keplerscience.org/">lightkurve.keplerscience.org/</a> .</p>
 </div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last"><strong>lightkurve</strong> documentation requires the <a class="reference external" href="https://github.com/numpy/numpydoc">numpydoc sphinx extension</a>
-which can be installed with <code class="docutils literal"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">numpydoc</span></code>.</p>
+which can be installed with <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">numpydoc</span></code>.</p>
 </div>
 <p>To build the documentation to HTML format, you can do:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">docs</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">docs</span>
 <span class="n">make</span> <span class="n">html</span>
 </pre></div>
 </div>
@@ -320,8 +357,10 @@ which can be installed with <code class="docutils literal"><span class="pre">pip
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="contributing.html" class="btn btn-neutral float-right" title="Contributing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="api/index.html" class="btn btn-neutral float-right" title="API documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
+      
+        <a href="tutorials/quickstart.html" class="btn btn-neutral" title="Quickstart" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -330,7 +369,7 @@ which can be installed with <code class="docutils literal"><span class="pre">pip
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright lightkurve Developers and Contributors.
+        &copy; Copyright lightkurve developers and contributors.
 
     </p>
   </div>
@@ -352,7 +391,7 @@ which can be installed with <code class="docutils literal"><span class="pre">pip
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'1.0.0dev',
+            VERSION:'1.0.a1',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Utilities &mdash; lightkurve 1.0.0dev documentation</title>
+  <title>Utility functions &mdash; lightkurve 1.0.a1 documentation</title>
   
 
   
@@ -52,7 +52,7 @@
 
           
             
-            <img src="../_static/lightkurve.svg" class="logo" alt="Logo"/>
+            <img src="../_static/lightkurve.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                1.0.0dev
+                1.0
               </div>
             
           
@@ -84,22 +84,9 @@
               
             
             
-              <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">API documentation</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="targetpixelfile.html">Target Pixel File</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="lightcurve.html">Lightcurve</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="prf.html">Point Spread Function Photometry</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Utilities</a><ul class="simple">
-</ul>
-</li>
-</ul>
-</li>
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/quickstart.html">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../install.html#requirements">Requirements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../install.html#installing-lightkurve">Installing lightkurve</a><ul>
@@ -110,32 +97,81 @@
 <li class="toctree-l2"><a class="reference internal" href="../install.html#building-documentation">Building documentation</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a><ul>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="targetpixelfile.html">TargetPixelFile classes</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lightcurve.html">LightCurve classes</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lightcurvefile.html">LightCurveFile classes</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="correctors.html">Systematics correction classes</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="prf.html">PSF photometry classes</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Utility functions</a><ul class="simple">
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section1.html">Introduction to lightkurve</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/1.02-target-pixel-files.html">What are Target Pixel File objects?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/1.03-what-are-lightcurves.html">What are Light Curve objects?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/1.04-lightcurve-files.html">What are Light Curve File objects?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/1.05-interact-with-lightcurves-and-tpf.html">Interactively inspecting Target Pixel Files and Lightcurves</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/1.05-interact-with-lightcurves-and-tpf.html#Using-.interact()">Using <code class="docutils literal notranslate"><span class="pre">.interact()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/1.05-interact-with-lightcurves-and-tpf.html#Passing-in-a-preprocessed-lightcurve">Passing in a preprocessed lightcurve</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section2.html">Science with lightkurve</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.02-recover-a-planet.html">How to recover a known planet in Kepler data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.03-appending-lightcurves.html">How to combine lightcurves from different Kepler quarters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.05-making-custom-apertures.html">How to perform aperture photometry with custom apertures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/cutting-out-tpfs-from-tess-ffis.html">How to cut out Target Pixel Files from Kepler Super Stamps or TESS FFIs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section3.html">Systematics correction using lightkurve</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.04-removing-cbvs.html">How to remove common systematics using basis vectors (CBVs)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.01-how-to-detrend.html">How to remove K2 motion systematics with SFF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html">How does the SFF method work?</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html#Retrieve-the-K2SFF-data-for-ENG-test-source-60021426">Retrieve the K2SFF data for ENG test source <code class="docutils literal notranslate"><span class="pre">60021426</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html#Manually-reproduce-with-the-Vanderburg-provided-diagnostic-data">Manually reproduce with the Vanderburg-provided diagnostic data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/motion-correction/replicate-vanderburg-2014-lightkurve.html">Replicating Vanderburg &amp; Johnson 2014 using lightkurve</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/motion-correction/replicate-vanderburg-2014-lightkurve.html#Data-Exclusion">Data Exclusion</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">About lightkurve</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing and reporting issues</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../contributing.html#proposing-changes-to-lightkurve-using-github-pull-requests">Proposing changes to lightkurve using GitHub pull requests</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../contributing.html#coding-and-documentation-guidelines">Coding and documentation guidelines</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../community_software.html">Community Software</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../community_software.html#detrending-analysis">Detrending &amp; Analysis</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../community_software.html#full-frame-images">Full Frame Images</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../community_software.html#data-access">Data access</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../community_software.html#metadata">Metadata</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../community_software.html#planet-search">Planet Search</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../community_software.html#population-statistics">Population Statistics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../community_software.html#positional">Positional</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../community_software.html#science-astrophysics">Science / Astrophysics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../community_software.html#other">Other</a></li>
-</ul>
-</li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">lightkurve tutorials</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/target-pixel-files.html">What are Target Pixel Files?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/lightcurve-files.html">What are Light Curve Files?</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/lightcurve-files.html#Lightcurves-from-Target-Pixel-Files">Lightcurves from Target Pixel Files</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/lightcurve-files.html#PDCSAP-from-lightcurves-from-MAST">PDCSAP from lightcurves from MAST</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../citing.html">Citing and acknowledging lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../other_software.html">Other software</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../other_software.html#detrending-analysis">Detrending &amp; Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../other_software.html#full-frame-images">Full Frame Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../other_software.html#data-access">Data access</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../other_software.html#metadata">Metadata</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../other_software.html#planet-search">Planet Search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../other_software.html#population-statistics">Population Statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../other_software.html#positional">Positional</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../other_software.html#science-astrophysics">Science / Astrophysics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../other_software.html#other">Other</a></li>
 </ul>
 </li>
 </ul>
@@ -186,7 +222,7 @@
         
           <li><a href="index.html">API documentation</a> &raquo;</li>
         
-      <li>Utilities</li>
+      <li>Utility functions</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -240,7 +276,7 @@
 }
 </style>
 <div class="section" id="module-lightkurve.utils">
-<span id="utilities"></span><h1>Utilities<a class="headerlink" href="#module-lightkurve.utils" title="Permalink to this headline">¶</a></h1>
+<span id="utility-functions"></span><h1>Utility functions<a class="headerlink" href="#module-lightkurve.utils" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="lightkurve.utils.KeplerQualityFlags">
 <em class="property">class </em><code class="descclassname">lightkurve.utils.</code><code class="descname">KeplerQualityFlags</code><a class="reference internal" href="../_modules/lightkurve/utils.html#KeplerQualityFlags"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags" title="Permalink to this definition">¶</a></dt>
@@ -253,7 +289,7 @@ as documented in the Kepler Archive Manual (Table 2.3).</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.utils.KeplerQualityFlags.decode" title="lightkurve.utils.KeplerQualityFlags.decode"><code class="xref py py-obj docutils literal"><span class="pre">decode</span></code></a>(quality)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.utils.KeplerQualityFlags.decode" title="lightkurve.utils.KeplerQualityFlags.decode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decode</span></code></a>(quality)</td>
 <td>Converts a Kepler QUALITY value into a list of human-readable strings.</td>
 </tr>
 </tbody>
@@ -290,7 +326,7 @@ as documented in the Kepler Archive Manual (Table 2.3).</p>
 
 <dl class="attribute">
 <dt id="lightkurve.utils.KeplerQualityFlags.DEFAULT_BITMASK">
-<code class="descname">DEFAULT_BITMASK</code><em class="property"> = 1130927</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.DEFAULT_BITMASK" title="Permalink to this definition">¶</a></dt>
+<code class="descname">DEFAULT_BITMASK</code><em class="property"> = 1130799</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.DEFAULT_BITMASK" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -340,7 +376,7 @@ as documented in the Kepler Archive Manual (Table 2.3).</p>
 
 <dl class="attribute">
 <dt id="lightkurve.utils.KeplerQualityFlags.OPTIONS">
-<code class="descname">OPTIONS</code><em class="property"> = {'default': 1130927, 'hard': 1664431, 'hardest': 2096639}</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.OPTIONS" title="Permalink to this definition">¶</a></dt>
+<code class="descname">OPTIONS</code><em class="property"> = {'default': 1130799, 'hard': 1664431, 'hardest': 2096639}</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.OPTIONS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -413,27 +449,55 @@ quality flags raised.  Returns an empty list if no flags raised.</p>
 
 </dd></dl>
 
+<dl class="class">
+<dt id="lightkurve.utils.TessQualityFlags">
+<em class="property">class </em><code class="descclassname">lightkurve.utils.</code><code class="descname">TessQualityFlags</code><a class="reference internal" href="../_modules/lightkurve/utils.html#TessQualityFlags"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.utils.TessQualityFlags" title="Permalink to this definition">¶</a></dt>
+<dd><p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">decode</span></code>(quality)</td>
+<td>Converts a Kepler QUALITY value into a list of human-readable strings.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="function">
-<dt id="lightkurve.utils.module_output_to_channel">
-<code class="descclassname">lightkurve.utils.</code><code class="descname">module_output_to_channel</code><span class="sig-paren">(</span><em>module</em>, <em>output</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/utils.html#module_output_to_channel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.utils.module_output_to_channel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the CCD channel number for a given module and output pair.</p>
+<dt id="lightkurve.utils.bkjd_to_time">
+<code class="descclassname">lightkurve.utils.</code><code class="descname">bkjd_to_time</code><span class="sig-paren">(</span><em>bkjd</em>, <em>timecorr</em>, <em>timslice</em>, <em>bjdref=2454833.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/utils.html#bkjd_to_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.utils.bkjd_to_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts Barycentric Kepler Julian Day (BKJD) to an astropy.time.Time object.</p>
+<p>Kepler Barycentric Julian Day is a Julian day minus 2454833.0 (UTC=January
+1, 2009 12:00:00) and corrected to be the arrival times at the barycenter
+of the Solar System. See Section 2.3.2 in the Kepler Archive Manual.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>module</strong> : int</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>bkjd</strong> : array of floats</p>
 <blockquote>
-<div><p>Module number</p>
+<div><p>Barycentric Kepler Julian Day</p>
 </div></blockquote>
-<p><strong>output</strong> : int</p>
+<p><strong>timecorr</strong> : array of floats</p>
 <blockquote>
-<div><p>Output number</p>
+<div><p>Kepler barycentric correction</p>
+</div></blockquote>
+<p><strong>timslice</strong> : array of floats</p>
+<blockquote>
+<div><p>Kepler time-slice correction</p>
+</div></blockquote>
+<p><strong>bjdref</strong> : float</p>
+<blockquote>
+<div><p>BJD reference date, for Kepler this is 2454833</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>channel</strong> : int</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>time</strong> : astropy.time.Time object</p>
 <blockquote class="last">
-<div><p>Channel number</p>
+<div><p>Resulting time object</p>
 </div></blockquote>
 </td>
 </tr>
@@ -458,6 +522,34 @@ quality flags raised.  Returns an empty list if no flags raised.</p>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>module, output</strong> : tuple of ints</p>
 <blockquote class="last">
 <div><p>Module and Output number</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="lightkurve.utils.module_output_to_channel">
+<code class="descclassname">lightkurve.utils.</code><code class="descname">module_output_to_channel</code><span class="sig-paren">(</span><em>module</em>, <em>output</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/utils.html#module_output_to_channel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.utils.module_output_to_channel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the CCD channel number for a given module and output pair.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>module</strong> : int</p>
+<blockquote>
+<div><p>Module number</p>
+</div></blockquote>
+<p><strong>output</strong> : int</p>
+<blockquote>
+<div><p>Output number</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>channel</strong> : int</p>
+<blockquote class="last">
+<div><p>Channel number</p>
 </div></blockquote>
 </td>
 </tr>
@@ -500,7 +592,7 @@ quality flags raised.  Returns an empty list if no flags raised.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright lightkurve Developers and Contributors.
+        &copy; Copyright lightkurve developers and contributors.
 
     </p>
   </div>
@@ -522,7 +614,7 @@ quality flags raised.  Returns an empty list if no flags raised.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'1.0.0dev',
+            VERSION:'1.0.a1',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

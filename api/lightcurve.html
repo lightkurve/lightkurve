@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Lightcurve &mdash; lightkurve 1.0.0dev documentation</title>
+  <title>LightCurve classes &mdash; lightkurve 1.0.a1 documentation</title>
   
 
   
@@ -52,7 +52,7 @@
 
           
             
-            <img src="../_static/lightkurve.svg" class="logo" alt="Logo"/>
+            <img src="../_static/lightkurve.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                1.0.0dev
+                1.0
               </div>
             
           
@@ -84,22 +84,9 @@
               
             
             
-              <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">API documentation</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="targetpixelfile.html">Target Pixel File</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Lightcurve</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="prf.html">Point Spread Function Photometry</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html">Utilities</a><ul class="simple">
-</ul>
-</li>
-</ul>
-</li>
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/quickstart.html">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../install.html#requirements">Requirements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../install.html#installing-lightkurve">Installing lightkurve</a><ul>
@@ -110,32 +97,81 @@
 <li class="toctree-l2"><a class="reference internal" href="../install.html#building-documentation">Building documentation</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a><ul>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="targetpixelfile.html">TargetPixelFile classes</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">LightCurve classes</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lightcurvefile.html">LightCurveFile classes</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="correctors.html">Systematics correction classes</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="prf.html">PSF photometry classes</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">Utility functions</a><ul class="simple">
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section1.html">Introduction to lightkurve</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/1.02-target-pixel-files.html">What are Target Pixel File objects?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/1.03-what-are-lightcurves.html">What are Light Curve objects?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/1.04-lightcurve-files.html">What are Light Curve File objects?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/1.05-interact-with-lightcurves-and-tpf.html">Interactively inspecting Target Pixel Files and Lightcurves</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/1.05-interact-with-lightcurves-and-tpf.html#Using-.interact()">Using <code class="docutils literal notranslate"><span class="pre">.interact()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/1.05-interact-with-lightcurves-and-tpf.html#Passing-in-a-preprocessed-lightcurve">Passing in a preprocessed lightcurve</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section2.html">Science with lightkurve</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.02-recover-a-planet.html">How to recover a known planet in Kepler data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.03-appending-lightcurves.html">How to combine lightcurves from different Kepler quarters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.05-making-custom-apertures.html">How to perform aperture photometry with custom apertures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/cutting-out-tpfs-from-tess-ffis.html">How to cut out Target Pixel Files from Kepler Super Stamps or TESS FFIs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section3.html">Systematics correction using lightkurve</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.04-removing-cbvs.html">How to remove common systematics using basis vectors (CBVs)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.01-how-to-detrend.html">How to remove K2 motion systematics with SFF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html">How does the SFF method work?</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html#Retrieve-the-K2SFF-data-for-ENG-test-source-60021426">Retrieve the K2SFF data for ENG test source <code class="docutils literal notranslate"><span class="pre">60021426</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html#Manually-reproduce-with-the-Vanderburg-provided-diagnostic-data">Manually reproduce with the Vanderburg-provided diagnostic data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/motion-correction/replicate-vanderburg-2014-lightkurve.html">Replicating Vanderburg &amp; Johnson 2014 using lightkurve</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/motion-correction/replicate-vanderburg-2014-lightkurve.html#Data-Exclusion">Data Exclusion</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">About lightkurve</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing and reporting issues</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../contributing.html#proposing-changes-to-lightkurve-using-github-pull-requests">Proposing changes to lightkurve using GitHub pull requests</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../contributing.html#coding-and-documentation-guidelines">Coding and documentation guidelines</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../community_software.html">Community Software</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../community_software.html#detrending-analysis">Detrending &amp; Analysis</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../community_software.html#full-frame-images">Full Frame Images</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../community_software.html#data-access">Data access</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../community_software.html#metadata">Metadata</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../community_software.html#planet-search">Planet Search</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../community_software.html#population-statistics">Population Statistics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../community_software.html#positional">Positional</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../community_software.html#science-astrophysics">Science / Astrophysics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../community_software.html#other">Other</a></li>
-</ul>
-</li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">lightkurve tutorials</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/target-pixel-files.html">What are Target Pixel Files?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/lightcurve-files.html">What are Light Curve Files?</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/lightcurve-files.html#Lightcurves-from-Target-Pixel-Files">Lightcurves from Target Pixel Files</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/lightcurve-files.html#PDCSAP-from-lightcurves-from-MAST">PDCSAP from lightcurves from MAST</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../citing.html">Citing and acknowledging lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../other_software.html">Other software</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../other_software.html#detrending-analysis">Detrending &amp; Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../other_software.html#full-frame-images">Full Frame Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../other_software.html#data-access">Data access</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../other_software.html#metadata">Metadata</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../other_software.html#planet-search">Planet Search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../other_software.html#population-statistics">Population Statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../other_software.html#positional">Positional</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../other_software.html#science-astrophysics">Science / Astrophysics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../other_software.html#other">Other</a></li>
 </ul>
 </li>
 </ul>
@@ -186,7 +222,7 @@
         
           <li><a href="index.html">API documentation</a> &raquo;</li>
         
-      <li>Lightcurve</li>
+      <li>LightCurve classes</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -240,7 +276,8 @@
 }
 </style>
 <div class="section" id="module-lightkurve.lightcurve">
-<span id="lightcurve"></span><h1>Lightcurve<a class="headerlink" href="#module-lightkurve.lightcurve" title="Permalink to this headline">¶</a></h1>
+<span id="lightcurve-classes"></span><h1>LightCurve classes<a class="headerlink" href="#module-lightkurve.lightcurve" title="Permalink to this headline">¶</a></h1>
+<p>Defines LightCurve, KeplerLightCurve, TessLightCurve, etc.</p>
 <dl class="class">
 <dt id="lightkurve.lightcurve.LightCurve">
 <em class="property">class </em><code class="descclassname">lightkurve.lightcurve.</code><code class="descname">LightCurve</code><span class="sig-paren">(</span><em>time</em>, <em>flux</em>, <em>flux_err=None</em>, <em>meta={}</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve" title="Permalink to this definition">¶</a></dt>
@@ -273,44 +310,71 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.bin" title="lightkurve.lightcurve.LightCurve.bin"><code class="xref py py-obj docutils literal"><span class="pre">bin</span></code></a>([binsize,&nbsp;method])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.append" title="lightkurve.lightcurve.LightCurve.append"><code class="xref py py-obj docutils literal notranslate"><span class="pre">append</span></code></a>(others)</td>
+<td>Append LightCurve objects.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.bin" title="lightkurve.lightcurve.LightCurve.bin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bin</span></code></a>([binsize,&nbsp;method])</td>
 <td>Bins a lightcurve using a function defined by <cite>method</cite> on blocks of samples of size <cite>binsize</cite>.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.cdpp" title="lightkurve.lightcurve.LightCurve.cdpp"><code class="xref py py-obj docutils literal"><span class="pre">cdpp</span></code></a>([transit_duration,&nbsp;savgol_window,&nbsp;…])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.cdpp" title="lightkurve.lightcurve.LightCurve.cdpp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cdpp</span></code></a>([transit_duration,&nbsp;savgol_window,&nbsp;…])</td>
 <td>Estimate the CDPP noise metric using the Savitzky-Golay (SG) method.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.flatten" title="lightkurve.lightcurve.LightCurve.flatten"><code class="xref py py-obj docutils literal"><span class="pre">flatten</span></code></a>([window_length,&nbsp;polyorder,&nbsp;return_trend])</td>
+<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.flatten" title="lightkurve.lightcurve.LightCurve.flatten"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flatten</span></code></a>([window_length,&nbsp;polyorder,&nbsp;…])</td>
 <td>Removes low frequency trend using scipy’s Savitzky-Golay filter.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.fold" title="lightkurve.lightcurve.LightCurve.fold"><code class="xref py py-obj docutils literal"><span class="pre">fold</span></code></a>(period[,&nbsp;phase])</td>
-<td>Folds the lightcurve at a specified <code class="docutils literal"><span class="pre">period</span></code> and <code class="docutils literal"><span class="pre">phase</span></code>.</td>
+<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.fold" title="lightkurve.lightcurve.LightCurve.fold"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fold</span></code></a>(period[,&nbsp;phase])</td>
+<td>Folds the lightcurve at a specified <code class="docutils literal notranslate"><span class="pre">period</span></code> and <code class="docutils literal notranslate"><span class="pre">phase</span></code>.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.normalize" title="lightkurve.lightcurve.LightCurve.normalize"><code class="xref py py-obj docutils literal"><span class="pre">normalize</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.normalize" title="lightkurve.lightcurve.LightCurve.normalize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">normalize</span></code></a>()</td>
 <td>Returns a normalized version of the lightcurve.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.plot" title="lightkurve.lightcurve.LightCurve.plot"><code class="xref py py-obj docutils literal"><span class="pre">plot</span></code></a>([ax,&nbsp;normalize,&nbsp;xlabel,&nbsp;ylabel,&nbsp;title,&nbsp;…])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.plot" title="lightkurve.lightcurve.LightCurve.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>([ax,&nbsp;normalize,&nbsp;xlabel,&nbsp;ylabel,&nbsp;title,&nbsp;…])</td>
 <td>Plots the light curve.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.remove_nans" title="lightkurve.lightcurve.LightCurve.remove_nans"><code class="xref py py-obj docutils literal"><span class="pre">remove_nans</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.properties" title="lightkurve.lightcurve.LightCurve.properties"><code class="xref py py-obj docutils literal notranslate"><span class="pre">properties</span></code></a>()</td>
+<td>Print out a description of each of the non-callable attributes of a LightCurve object.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.remove_nans" title="lightkurve.lightcurve.LightCurve.remove_nans"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_nans</span></code></a>()</td>
 <td>Removes cadences where the flux is NaN.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.remove_outliers" title="lightkurve.lightcurve.LightCurve.remove_outliers"><code class="xref py py-obj docutils literal"><span class="pre">remove_outliers</span></code></a>([sigma,&nbsp;return_mask])</td>
+<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.remove_outliers" title="lightkurve.lightcurve.LightCurve.remove_outliers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_outliers</span></code></a>([sigma,&nbsp;return_mask])</td>
 <td>Removes outlier flux values using sigma-clipping.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.stitch" title="lightkurve.lightcurve.LightCurve.stitch"><code class="xref py py-obj docutils literal"><span class="pre">stitch</span></code></a>(*others)</td>
-<td>Stitches LightCurve objects.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.to_csv" title="lightkurve.lightcurve.LightCurve.to_csv"><code class="xref py py-obj docutils literal"><span class="pre">to_csv</span></code></a>([path_or_buf])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.to_csv" title="lightkurve.lightcurve.LightCurve.to_csv"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_csv</span></code></a>([path_or_buf])</td>
 <td>Writes the LightCurve to a csv file.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.to_pandas" title="lightkurve.lightcurve.LightCurve.to_pandas"><code class="xref py py-obj docutils literal"><span class="pre">to_pandas</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.to_pandas" title="lightkurve.lightcurve.LightCurve.to_pandas"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_pandas</span></code></a>([columns])</td>
 <td>Export the LightCurve as a Pandas DataFrame.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.to_table" title="lightkurve.lightcurve.LightCurve.to_table"><code class="xref py py-obj docutils literal"><span class="pre">to_table</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.LightCurve.to_table" title="lightkurve.lightcurve.LightCurve.to_table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_table</span></code></a>()</td>
 <td>Export the LightCurve as an AstroPy Table.</td>
 </tr>
 </tbody>
 </table>
+<dl class="method">
+<dt id="lightkurve.lightcurve.LightCurve.append">
+<code class="descname">append</code><span class="sig-paren">(</span><em>others</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.append" title="Permalink to this definition">¶</a></dt>
+<dd><p>Append LightCurve objects.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>others</strong> : LightCurve object or list of LightCurve objects</p>
+<blockquote>
+<div><p>Light curves to be appended to the current one.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>new_lc</strong> : LightCurve object</p>
+<blockquote class="last">
+<div><p>Concatenated light curve.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="method">
 <dt id="lightkurve.lightcurve.LightCurve.bin">
 <code class="descname">bin</code><span class="sig-paren">(</span><em>binsize=13</em>, <em>method='mean'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve.bin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.bin" title="Permalink to this definition">¶</a></dt>
@@ -347,6 +411,8 @@ ignored.</li>
 the binned lightcurve will report the root-mean-square error.
 If no uncertainties are included, the binned curve will return the
 standard deviation of the data.</li>
+<li>If the original lightcurve contains a quality attribute, then the
+bitwise OR of the quality flags will be returned per bin.</li>
 </ul>
 </dd></dl>
 
@@ -384,9 +450,10 @@ limit to 1/transit_duration.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>transit_duration</strong> : int, optional</p>
 <blockquote>
-<div><p>The transit duration in cadences. This is the length of the window
-used to compute the running mean. The default is 13, which
-corresponds to a 6.5 hour transit in data sampled at 30-min cadence.</p>
+<div><p>The transit duration in units of number of cadences. This is the
+length of the window used to compute the running mean. The default
+is 13, which corresponds to a 6.5 hour transit in data sampled at
+30-min cadence.</p>
 </div></blockquote>
 <p><strong>savgol_window</strong> : int, optional</p>
 <blockquote>
@@ -421,8 +488,9 @@ svn+ssh://murzim/repo/so/trunk/Develop/jvc/common/compute_SG_noise.m</p>
 
 <dl class="method">
 <dt id="lightkurve.lightcurve.LightCurve.flatten">
-<code class="descname">flatten</code><span class="sig-paren">(</span><em>window_length=101</em>, <em>polyorder=3</em>, <em>return_trend=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve.flatten"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.flatten" title="Permalink to this definition">¶</a></dt>
+<code class="descname">flatten</code><span class="sig-paren">(</span><em>window_length=101</em>, <em>polyorder=2</em>, <em>return_trend=False</em>, <em>break_tolerance=5</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve.flatten"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.flatten" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes low frequency trend using scipy’s Savitzky-Golay filter.</p>
+<p>This method wraps <cite>scipy.signal.savgol_filter</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -430,17 +498,25 @@ svn+ssh://murzim/repo/so/trunk/Develop/jvc/common/compute_SG_noise.m</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>window_length</strong> : int</p>
 <blockquote>
 <div><p>The length of the filter window (i.e. the number of coefficients).
-<code class="docutils literal"><span class="pre">window_length</span></code> must be a positive odd integer.</p>
+<code class="docutils literal notranslate"><span class="pre">window_length</span></code> must be a positive odd integer.</p>
 </div></blockquote>
 <p><strong>polyorder</strong> : int</p>
 <blockquote>
-<div><p>The order of the polynomial used to fit the samples. <code class="docutils literal"><span class="pre">polyorder</span></code>
+<div><p>The order of the polynomial used to fit the samples. <code class="docutils literal notranslate"><span class="pre">polyorder</span></code>
 must be less than window_length.</p>
 </div></blockquote>
 <p><strong>return_trend</strong> : bool</p>
 <blockquote>
 <div><p>If <cite>True</cite>, the method will return a tuple of two elements
 (flattened_lc, trend_lc) where trend_lc is the removed trend.</p>
+</div></blockquote>
+<p><strong>break_tolerance</strong> : int</p>
+<blockquote>
+<div><p>If there are large gaps in time, flatten will split the flux into
+several sub-lightcurves and apply <cite>savgol_filter</cite> to each
+individually. A gap is defined as a period in time larger than
+<cite>break_tolerance</cite> times the median gap.  To disable this feature,
+set <cite>break_tolerance</cite> to None.</p>
 </div></blockquote>
 <p><strong>**kwargs</strong> : dict</p>
 <blockquote>
@@ -466,10 +542,10 @@ must be less than window_length.</p>
 <dl class="method">
 <dt id="lightkurve.lightcurve.LightCurve.fold">
 <code class="descname">fold</code><span class="sig-paren">(</span><em>period</em>, <em>phase=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve.fold"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.fold" title="Permalink to this definition">¶</a></dt>
-<dd><p>Folds the lightcurve at a specified <code class="docutils literal"><span class="pre">period</span></code> and <code class="docutils literal"><span class="pre">phase</span></code>.</p>
-<p>This method returns a new <code class="docutils literal"><span class="pre">LightCurve</span></code> object in which the time
+<dd><p>Folds the lightcurve at a specified <code class="docutils literal notranslate"><span class="pre">period</span></code> and <code class="docutils literal notranslate"><span class="pre">phase</span></code>.</p>
+<p>This method returns a new <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> object in which the time
 values range between -0.5 to +0.5.  Data points which occur exactly
-at <code class="docutils literal"><span class="pre">phase</span></code> or an integer multiple of <cite>phase + n*period</cite> have time
+at <code class="docutils literal notranslate"><span class="pre">phase</span></code> or an integer multiple of <cite>phase + n*period</cite> have time
 value 0.0.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -487,7 +563,7 @@ value 0.0.</p>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>folded_lightcurve</strong> : LightCurve object</p>
 <blockquote class="last">
-<div><p>A new <code class="docutils literal"><span class="pre">LightCurve</span></code> in which the data are folded and sorted by
+<div><p>A new <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> in which the data are folded and sorted by
 phase.</p>
 </div></blockquote>
 </td>
@@ -508,7 +584,7 @@ by the median flux.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>normalized_lightcurve</strong> : LightCurve object</p>
 <blockquote class="last">
-<div><p>A new <code class="docutils literal"><span class="pre">LightCurve</span></code> in which <cite>flux</cite> and <cite>flux_err</cite> are divided
+<div><p>A new <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> in which <cite>flux</cite> and <cite>flux_err</cite> are divided
 by the median.</p>
 </div></blockquote>
 </td>
@@ -519,7 +595,7 @@ by the median.</p>
 
 <dl class="method">
 <dt id="lightkurve.lightcurve.LightCurve.plot">
-<code class="descname">plot</code><span class="sig-paren">(</span><em>ax=None</em>, <em>normalize=True</em>, <em>xlabel='Time - 2454833 (days)'</em>, <em>ylabel='Normalized Flux'</em>, <em>title=None</em>, <em>color='#363636'</em>, <em>linestyle=''</em>, <em>fill=False</em>, <em>grid=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.plot" title="Permalink to this definition">¶</a></dt>
+<code class="descname">plot</code><span class="sig-paren">(</span><em>ax=None</em>, <em>normalize=True</em>, <em>xlabel='Time - 2454833 (days)'</em>, <em>ylabel='Normalized Flux'</em>, <em>title=None</em>, <em>fill=False</em>, <em>grid=True</em>, <em>style='fast'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots the light curve.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -546,17 +622,21 @@ a new one will be generated.</p>
 <blockquote>
 <div><p>Plot set_title</p>
 </div></blockquote>
-<p><strong>color: str</strong></p>
+<p><strong>color</strong> : str</p>
 <blockquote>
-<div><p>Color to plot flux points</p>
+<div><p>Color to plot line in</p>
 </div></blockquote>
-<p><strong>fill: bool</strong></p>
+<p><strong>fill</strong> : bool</p>
 <blockquote>
 <div><p>Shade the region between 0 and flux</p>
 </div></blockquote>
-<p><strong>grid: bool</strong></p>
+<p><strong>grid</strong> : bool</p>
 <blockquote>
-<div><p>Add a grid to the plot</p>
+<div><p>Plot with a grid</p>
+</div></blockquote>
+<p><strong>style</strong> : str</p>
+<blockquote>
+<div><p>matplotlib.pyplot.style.context, default is ‘fast’</p>
 </div></blockquote>
 <p><strong>kwargs</strong> : dict</p>
 <blockquote>
@@ -575,6 +655,15 @@ a new one will be generated.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="lightkurve.lightcurve.LightCurve.properties">
+<code class="descname">properties</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve.properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.properties" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print out a description of each of the non-callable attributes of a
+LightCurve object.</p>
+<p>Prints in order of type (ints, strings, lists, arrays and others)
+Prints in alphabetical order.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="lightkurve.lightcurve.LightCurve.remove_nans">
 <code class="descname">remove_nans</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve.remove_nans"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.remove_nans" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes cadences where the flux is NaN.</p>
@@ -584,7 +673,7 @@ a new one will be generated.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>clean_lightcurve</strong> : LightCurve object</p>
 <blockquote class="last">
-<div><p>A new <code class="docutils literal"><span class="pre">LightCurve</span></code> from which NaNs fluxes have been removed.</p>
+<div><p>A new <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> from which NaNs fluxes have been removed.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -621,31 +710,7 @@ were removed. Entries marked as <cite>True</cite> are considered outliers.</p>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>clean_lightcurve</strong> : LightCurve object</p>
 <blockquote class="last">
-<div><p>A new <code class="docutils literal"><span class="pre">LightCurve</span></code> in which outliers have been removed.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="lightkurve.lightcurve.LightCurve.stitch">
-<code class="descname">stitch</code><span class="sig-paren">(</span><em>*others</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve.stitch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.stitch" title="Permalink to this definition">¶</a></dt>
-<dd><p>Stitches LightCurve objects.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>*others</strong> : LightCurve objects</p>
-<blockquote>
-<div><p>Light curves to be stitched.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>stitched_lc</strong> : LightCurve object</p>
-<blockquote class="last">
-<div><p>Stitched light curve.</p>
+<div><p>A new <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> in which outliers have been removed.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -685,13 +750,20 @@ returns None otherwise.</p>
 
 <dl class="method">
 <dt id="lightkurve.lightcurve.LightCurve.to_pandas">
-<code class="descname">to_pandas</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve.to_pandas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.to_pandas" title="Permalink to this definition">¶</a></dt>
+<code class="descname">to_pandas</code><span class="sig-paren">(</span><em>columns=['time', 'flux', 'flux_err']</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve.to_pandas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.to_pandas" title="Permalink to this definition">¶</a></dt>
 <dd><p>Export the LightCurve as a Pandas DataFrame.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>dataframe</strong> : <cite>pandas.DataFrame</cite> object</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>columns</strong> : list of str</p>
+<blockquote>
+<div><p>List of columns to include in the DataFrame.  The names must match
+attributes of the <cite>LightCurve</cite> object (e.g. <cite>time</cite>, <cite>flux</cite>).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>dataframe</strong> : <cite>pandas.DataFrame</cite> object</p>
 <blockquote class="last">
 <div><p>A dataframe indexed by <cite>time</cite> and containing the columns <cite>flux</cite>
 and <cite>flux_err</cite>.</p>
@@ -778,46 +850,46 @@ and <cite>flux_err</cite>.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">bin</span></code>([binsize,&nbsp;method])</td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">append</span></code>(others)</td>
+<td>Append LightCurve objects.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">bin</span></code>([binsize,&nbsp;method])</td>
 <td>Bins a lightcurve using a function defined by <cite>method</cite> on blocks of samples of size <cite>binsize</cite>.</td>
 </tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">cdpp</span></code>([transit_duration,&nbsp;savgol_window,&nbsp;…])</td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">cdpp</span></code>([transit_duration,&nbsp;savgol_window,&nbsp;…])</td>
 <td>Estimate the CDPP noise metric using the Savitzky-Golay (SG) method.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.correct" title="lightkurve.lightcurve.KeplerLightCurve.correct"><code class="xref py py-obj docutils literal"><span class="pre">correct</span></code></a>([method])</td>
+<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.correct" title="lightkurve.lightcurve.KeplerLightCurve.correct"><code class="xref py py-obj docutils literal notranslate"><span class="pre">correct</span></code></a>([method])</td>
 <td>Corrects a lightcurve for motion-dependent systematic errors.</td>
 </tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">flatten</span></code>([window_length,&nbsp;polyorder,&nbsp;return_trend])</td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">flatten</span></code>([window_length,&nbsp;polyorder,&nbsp;…])</td>
 <td>Removes low frequency trend using scipy’s Savitzky-Golay filter.</td>
 </tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">fold</span></code>(period[,&nbsp;phase])</td>
-<td>Folds the lightcurve at a specified <code class="docutils literal"><span class="pre">period</span></code> and <code class="docutils literal"><span class="pre">phase</span></code>.</td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">fold</span></code>(period[,&nbsp;phase])</td>
+<td>Folds the lightcurve at a specified <code class="docutils literal notranslate"><span class="pre">period</span></code> and <code class="docutils literal notranslate"><span class="pre">phase</span></code>.</td>
 </tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">normalize</span></code>()</td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">normalize</span></code>()</td>
 <td>Returns a normalized version of the lightcurve.</td>
 </tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">plot</span></code>([ax,&nbsp;normalize,&nbsp;xlabel,&nbsp;ylabel,&nbsp;title,&nbsp;…])</td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code>([ax,&nbsp;normalize,&nbsp;xlabel,&nbsp;ylabel,&nbsp;title,&nbsp;…])</td>
 <td>Plots the light curve.</td>
 </tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">remove_nans</span></code>()</td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">properties</span></code>()</td>
+<td>Print out a description of each of the non-callable attributes of a LightCurve object.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_nans</span></code>()</td>
 <td>Removes cadences where the flux is NaN.</td>
 </tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">remove_outliers</span></code>([sigma,&nbsp;return_mask])</td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_outliers</span></code>([sigma,&nbsp;return_mask])</td>
 <td>Removes outlier flux values using sigma-clipping.</td>
 </tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">stitch</span></code>(*others)</td>
-<td>Stitches LightCurve objects.</td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">to_csv</span></code>([path_or_buf])</td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_csv</span></code>([path_or_buf])</td>
 <td>Writes the LightCurve to a csv file.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.to_fits" title="lightkurve.lightcurve.KeplerLightCurve.to_fits"><code class="xref py py-obj docutils literal"><span class="pre">to_fits</span></code></a>()</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">to_pandas</span></code>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.to_pandas" title="lightkurve.lightcurve.KeplerLightCurve.to_pandas"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_pandas</span></code></a>([columns])</td>
 <td>Export the LightCurve as a Pandas DataFrame.</td>
 </tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">to_table</span></code>()</td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_table</span></code>()</td>
 <td>Export the LightCurve as an AstroPy Table.</td>
 </tr>
 </tbody>
@@ -853,210 +925,67 @@ defined by <cite>method</cite>.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="lightkurve.lightcurve.KeplerLightCurve.to_fits">
-<code class="descname">to_fits</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#KeplerLightCurve.to_fits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurve.to_fits" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="lightkurve.lightcurve.KeplerLightCurve.to_pandas">
+<code class="descname">to_pandas</code><span class="sig-paren">(</span><em>columns=['time', 'flux', 'flux_err', 'quality', 'centroid_col', 'centroid_row']</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#KeplerLightCurve.to_pandas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurve.to_pandas" title="Permalink to this definition">¶</a></dt>
+<dd><p>Export the LightCurve as a Pandas DataFrame.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>columns</strong> : list of str</p>
+<blockquote>
+<div><p>List of columns to include in the DataFrame.  The names must match
+attributes of the <cite>LightCurve</cite> object (e.g. <cite>time</cite>, <cite>flux</cite>).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>dataframe</strong> : <cite>pandas.DataFrame</cite> object</p>
+<blockquote class="last">
+<div><p>A dataframe indexed by <cite>time</cite> and containing the columns <cite>flux</cite>
+and <cite>flux_err</cite>.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="lightkurve.lightcurve.KeplerLightCurveFile">
-<em class="property">class </em><code class="descclassname">lightkurve.lightcurve.</code><code class="descname">KeplerLightCurveFile</code><span class="sig-paren">(</span><em>path</em>, <em>quality_bitmask=1130927</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#KeplerLightCurveFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurveFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Defines a class for a given light curve FITS file from NASA’s Kepler and
-K2 missions.</p>
+<dt id="lightkurve.lightcurve.TessLightCurve">
+<em class="property">class </em><code class="descclassname">lightkurve.lightcurve.</code><code class="descname">TessLightCurve</code><span class="sig-paren">(</span><em>time</em>, <em>flux</em>, <em>flux_err=None</em>, <em>centroid_col=None</em>, <em>centroid_row=None</em>, <em>quality=None</em>, <em>quality_bitmask=None</em>, <em>cadenceno=None</em>, <em>ticid=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#TessLightCurve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines a light curve class for NASA’s TESS mission.</p>
 <p class="rubric">Attributes</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="6%" />
-<col width="94%" />
+<col width="27%" />
+<col width="73%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><strong>path</strong></td>
-<td>(str) Directory path or url to a lightcurve FITS file.</td>
+<tr class="row-odd"><td><strong>time</strong></td>
+<td>(array-like) Time measurements</td>
+</tr>
+<tr class="row-even"><td><strong>flux</strong></td>
+<td>(array-like) Data flux for every time point</td>
+</tr>
+<tr class="row-odd"><td><strong>flux_err</strong></td>
+<td>(array-like) Uncertainty on each flux data point</td>
+</tr>
+<tr class="row-even"><td><strong>centroid_col, centroid_row</strong></td>
+<td>(array-like, array-like) Centroid column and row coordinates as a function of time</td>
+</tr>
+<tr class="row-odd"><td><strong>quality</strong></td>
+<td>(array-like) Array indicating the quality of each data point</td>
 </tr>
 <tr class="row-even"><td><strong>quality_bitmask</strong></td>
-<td>(str or int) Bitmask specifying quality flags of cadences that should be ignored. If a string is passed, it has the following meaning:  * default: recommended quality mask * hard: removes more flags, known to remove good data * hardest: removes all data that has been flagged</td>
+<td>(int) Bitmask specifying quality flags of cadences that should be ignored</td>
 </tr>
-<tr class="row-odd"><td><strong>kwargs</strong></td>
-<td>(dict) Keyword arguments to be passed to astropy.io.fits.open.</td>
+<tr class="row-odd"><td><strong>cadenceno</strong></td>
+<td>(array-like) Cadence numbers corresponding to every time measurement</td>
 </tr>
-</tbody>
-</table>
-<p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurveFile.compute_cotrended_lightcurve" title="lightkurve.lightcurve.KeplerLightCurveFile.compute_cotrended_lightcurve"><code class="xref py py-obj docutils literal"><span class="pre">compute_cotrended_lightcurve</span></code></a>([cbvs])</td>
-<td>Returns a LightCurve object after cotrending the SAP_FLUX against the cotrending basis vectors.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurveFile.get_lightcurve" title="lightkurve.lightcurve.KeplerLightCurveFile.get_lightcurve"><code class="xref py py-obj docutils literal"><span class="pre">get_lightcurve</span></code></a>(flux_type[,&nbsp;centroid_type])</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurveFile.header" title="lightkurve.lightcurve.KeplerLightCurveFile.header"><code class="xref py py-obj docutils literal"><span class="pre">header</span></code></a>([ext])</td>
-<td>Header of the object at extension <cite>ext</cite></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurveFile.plot" title="lightkurve.lightcurve.KeplerLightCurveFile.plot"><code class="xref py py-obj docutils literal"><span class="pre">plot</span></code></a>([plottype])</td>
-<td>Plot all the flux types in a light curve.</td>
-</tr>
-</tbody>
-</table>
-<dl class="attribute">
-<dt id="lightkurve.lightcurve.KeplerLightCurveFile.PDCSAP_FLUX">
-<code class="descname">PDCSAP_FLUX</code><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurveFile.PDCSAP_FLUX" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a KeplerLightCurve object for PDCSAP_FLUX</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="lightkurve.lightcurve.KeplerLightCurveFile.SAP_FLUX">
-<code class="descname">SAP_FLUX</code><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurveFile.SAP_FLUX" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a KeplerLightCurve object for SAP_FLUX</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="lightkurve.lightcurve.KeplerLightCurveFile.cadenceno">
-<code class="descname">cadenceno</code><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurveFile.cadenceno" title="Permalink to this definition">¶</a></dt>
-<dd><p>Cadence number</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="lightkurve.lightcurve.KeplerLightCurveFile.campaign">
-<code class="descname">campaign</code><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurveFile.campaign" title="Permalink to this definition">¶</a></dt>
-<dd><p>Campaign number</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="lightkurve.lightcurve.KeplerLightCurveFile.channel">
-<code class="descname">channel</code><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurveFile.channel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Channel number</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="lightkurve.lightcurve.KeplerLightCurveFile.compute_cotrended_lightcurve">
-<code class="descname">compute_cotrended_lightcurve</code><span class="sig-paren">(</span><em>cbvs=[1, 2], **kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#KeplerLightCurveFile.compute_cotrended_lightcurve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurveFile.compute_cotrended_lightcurve" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a LightCurve object after cotrending the SAP_FLUX
-against the cotrending basis vectors.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>cbvs</strong> : list of ints</p>
-<blockquote>
-<div><p>The list of cotrending basis vectors to fit to the data. For example,
-[1, 2] will fit the first two basis vectors.</p>
-</div></blockquote>
-<p><strong>kwargs</strong> : dict</p>
-<blockquote>
-<div><p>Dictionary of keyword arguments to be passed to
-KeplerCBVCorrector.correct.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>lc</strong> : LightCurve object</p>
-<blockquote class="last">
-<div><p>CBV flux-corrected lightcurve.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="lightkurve.lightcurve.KeplerLightCurveFile.get_lightcurve">
-<code class="descname">get_lightcurve</code><span class="sig-paren">(</span><em>flux_type</em>, <em>centroid_type='MOM_CENTR'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#KeplerLightCurveFile.get_lightcurve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurveFile.get_lightcurve" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="lightkurve.lightcurve.KeplerLightCurveFile.hdu">
-<code class="descname">hdu</code><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurveFile.hdu" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="lightkurve.lightcurve.KeplerLightCurveFile.header">
-<code class="descname">header</code><span class="sig-paren">(</span><em>ext=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#KeplerLightCurveFile.header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurveFile.header" title="Permalink to this definition">¶</a></dt>
-<dd><p>Header of the object at extension <cite>ext</cite></p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="lightkurve.lightcurve.KeplerLightCurveFile.keplerid">
-<code class="descname">keplerid</code><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurveFile.keplerid" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="lightkurve.lightcurve.KeplerLightCurveFile.mission">
-<code class="descname">mission</code><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurveFile.mission" title="Permalink to this definition">¶</a></dt>
-<dd><p>Mission name</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="lightkurve.lightcurve.KeplerLightCurveFile.plot">
-<code class="descname">plot</code><span class="sig-paren">(</span><em>plottype=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#KeplerLightCurveFile.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurveFile.plot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot all the flux types in a light curve.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>plottype</strong> : str or list of str</p>
-<blockquote class="last">
-<div><p>List of FLUX types to plot. Default is to plot all available.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="lightkurve.lightcurve.KeplerLightCurveFile.quarter">
-<code class="descname">quarter</code><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurveFile.quarter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Quarter number</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="lightkurve.lightcurve.KeplerLightCurveFile.time">
-<code class="descname">time</code><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurveFile.time" title="Permalink to this definition">¶</a></dt>
-<dd><p>Time measurements</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="lightkurve.lightcurve.KeplerCBVCorrector">
-<em class="property">class </em><code class="descclassname">lightkurve.lightcurve.</code><code class="descname">KeplerCBVCorrector</code><span class="sig-paren">(</span><em>lc_file</em>, <em>likelihood=&lt;class 'oktopus.likelihood.LaplacianLikelihood'&gt;</em>, <em>prior=&lt;class 'oktopus.prior.LaplacianPrior'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#KeplerCBVCorrector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.KeplerCBVCorrector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Remove systematic trends from Kepler light curves by fitting
-cotrending basis vectors.</p>
-<div class="math">
-\[\arg \min_{\bm{\theta} \in \Theta} \sum_{t}|f_{SAP}(t) - \sum_{j=1}^{n}\theta_j v_{j}(t)|^p, p&gt;0, p \in \mathbb{R}\]</div>
-<p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">lightkurve</span> <span class="k">import</span> <span class="n">KeplerCBVCorrector</span><span class="p">,</span> <span class="n">KeplerLightCurveFile</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fn</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;https://archive.stsci.edu/missions/kepler/lightcurves/&quot;</span>
-<span class="gp">... </span>      <span class="s2">&quot;0084/008462852/kplr008462852-2011073133259_llc.fits&quot;</span><span class="p">)</span> 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cbv</span> <span class="o">=</span> <span class="n">KeplerCBVCorrector</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span> 
-<span class="go">Downloading https://archive.stsci.edu/missions/kepler/lightcurves/0084/008462852/kplr008462852-2011073133259_llc.fits [Done]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cbv_lc</span> <span class="o">=</span> <span class="n">cbv</span><span class="o">.</span><span class="n">correct</span><span class="p">()</span> 
-<span class="go">Downloading http://archive.stsci.edu/missions/kepler/cbv/kplr2011073133259-q08-d25_lcbv.fits [Done]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sap_lc</span> <span class="o">=</span> <span class="n">KeplerLightCurveFile</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="n">SAP_FLUX</span> 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">sap_lc</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">sap_lc</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;SAP_FLUX&#39;</span><span class="p">)</span> 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cbv_lc</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">cbv_lc</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;CBV_FLUX&#39;</span><span class="p">)</span> 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span> 
-</pre></div>
-</div>
-<p class="rubric">Attributes</p>
-<table border="1" class="docutils">
-<colgroup>
-<col width="8%" />
-<col width="92%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><strong>lc_file</strong></td>
-<td>(KeplerLightCurveFile object or str) An instance from KeplerLightCurveFile or a path for the .fits file of a NASA’s Kepler/K2 light curve.</td>
-</tr>
-<tr class="row-even"><td><strong>likelihood</strong></td>
-<td>(oktopus.Likelihood subclass) A class that describes a cost function. The default is <code class="xref py py-class docutils literal"><span class="pre">oktopus.LaplacianLikelihood</span></code>, which is tantamount to the L1 norm.</td>
+<tr class="row-even"><td><strong>ticid</strong></td>
+<td>(int) Tess Input Catalog ID number</td>
 </tr>
 </tbody>
 </table>
@@ -1067,417 +996,64 @@ cotrending basis vectors.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.KeplerCBVCorrector.correct" title="lightkurve.lightcurve.KeplerCBVCorrector.correct"><code class="xref py py-obj docutils literal"><span class="pre">correct</span></code></a>([cbvs,&nbsp;method,&nbsp;options])</td>
-<td>Correct the SAP_FLUX by fitting a number of cotrending basis vectors <cite>cbvs</cite>.</td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">append</span></code>(others)</td>
+<td>Append LightCurve objects.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.KeplerCBVCorrector.get_cbv_url" title="lightkurve.lightcurve.KeplerCBVCorrector.get_cbv_url"><code class="xref py py-obj docutils literal"><span class="pre">get_cbv_url</span></code></a>()</td>
-<td></td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">bin</span></code>([binsize,&nbsp;method])</td>
+<td>Bins a lightcurve using a function defined by <cite>method</cite> on blocks of samples of size <cite>binsize</cite>.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.KeplerCBVCorrector.get_cbvs_list" title="lightkurve.lightcurve.KeplerCBVCorrector.get_cbvs_list"><code class="xref py py-obj docutils literal"><span class="pre">get_cbvs_list</span></code></a>([method])</td>
-<td>Returns the subsequence of subsequent CBVs that maximizes Bayes’ factor [R66].</td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">cdpp</span></code>([transit_duration,&nbsp;savgol_window,&nbsp;…])</td>
+<td>Estimate the CDPP noise metric using the Savitzky-Golay (SG) method.</td>
 </tr>
-</tbody>
-</table>
-<dl class="attribute">
-<dt id="lightkurve.lightcurve.KeplerCBVCorrector.coeffs">
-<code class="descname">coeffs</code><a class="headerlink" href="#lightkurve.lightcurve.KeplerCBVCorrector.coeffs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the fitted coefficients.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="lightkurve.lightcurve.KeplerCBVCorrector.correct">
-<code class="descname">correct</code><span class="sig-paren">(</span><em>cbvs=[1, 2], method='powell', options={}</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#KeplerCBVCorrector.correct"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.KeplerCBVCorrector.correct" title="Permalink to this definition">¶</a></dt>
-<dd><p>Correct the SAP_FLUX by fitting a number of cotrending basis vectors
-<cite>cbvs</cite>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>cbvs</strong> : list of ints</p>
-<blockquote>
-<div><p>The list of cotrending basis vectors to fit to the data. For example,
-[1, 2] will fit the first two basis vectors.</p>
-</div></blockquote>
-<p><strong>method</strong> : str</p>
-<blockquote>
-<div><p>Numerical optimization method. See scipy.optimize.minimize for the
-full list of methods.</p>
-</div></blockquote>
-<p><strong>options</strong> : dict</p>
-<blockquote class="last">
-<div><p>Dictionary of options to be passed to scipy.optimize.minimize.</p>
-</div></blockquote>
-</td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">flatten</span></code>([window_length,&nbsp;polyorder,&nbsp;…])</td>
+<td>Removes low frequency trend using scipy’s Savitzky-Golay filter.</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">fold</span></code>(period[,&nbsp;phase])</td>
+<td>Folds the lightcurve at a specified <code class="docutils literal notranslate"><span class="pre">period</span></code> and <code class="docutils literal notranslate"><span class="pre">phase</span></code>.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">normalize</span></code>()</td>
+<td>Returns a normalized version of the lightcurve.</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code>([ax,&nbsp;normalize,&nbsp;xlabel,&nbsp;ylabel,&nbsp;title,&nbsp;…])</td>
+<td>Plots the light curve.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">properties</span></code>()</td>
+<td>Print out a description of each of the non-callable attributes of a LightCurve object.</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_nans</span></code>()</td>
+<td>Removes cadences where the flux is NaN.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_outliers</span></code>([sigma,&nbsp;return_mask])</td>
+<td>Removes outlier flux values using sigma-clipping.</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_csv</span></code>([path_or_buf])</td>
+<td>Writes the LightCurve to a csv file.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_pandas</span></code>([columns])</td>
+<td>Export the LightCurve as a Pandas DataFrame.</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_table</span></code>()</td>
+<td>Export the LightCurve as an AstroPy Table.</td>
 </tr>
 </tbody>
 </table>
-</dd></dl>
-
-<dl class="method">
-<dt id="lightkurve.lightcurve.KeplerCBVCorrector.get_cbv_url">
-<code class="descname">get_cbv_url</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#KeplerCBVCorrector.get_cbv_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.KeplerCBVCorrector.get_cbv_url" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="lightkurve.lightcurve.KeplerCBVCorrector.get_cbvs_list">
-<code class="descname">get_cbvs_list</code><span class="sig-paren">(</span><em>method='bayes-factor'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#KeplerCBVCorrector.get_cbvs_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.KeplerCBVCorrector.get_cbvs_list" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the subsequence of subsequent CBVs that maximizes
-Bayes’ factor <a class="reference internal" href="#r147" id="id2">[R147]</a>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>cbv_list</strong> : list</p>
-<blockquote class="last">
-<div><p>Subsequence of subsequent CBVs that maximizes the Bayes’ factor.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">References</p>
-<table class="docutils citation" frame="void" id="r147" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label">[R147]</td><td><em>(<a class="fn-backref" href="#id2">1</a>, <a class="fn-backref" href="#id3">2</a>)</em> <a class="reference external" href="https://en.wikipedia.org/wiki/Bayes_factor">https://en.wikipedia.org/wiki/Bayes_factor</a></td></tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="lightkurve.lightcurve.KeplerCBVCorrector.lc_file">
-<code class="descname">lc_file</code><a class="headerlink" href="#lightkurve.lightcurve.KeplerCBVCorrector.lc_file" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="lightkurve.lightcurve.KeplerCBVCorrector.opt_result">
-<code class="descname">opt_result</code><a class="headerlink" href="#lightkurve.lightcurve.KeplerCBVCorrector.opt_result" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the result of the optimization process.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="lightkurve.lightcurve.SPLDCorrector">
-<em class="property">class </em><code class="descclassname">lightkurve.lightcurve.</code><code class="descname">SPLDCorrector</code><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#SPLDCorrector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.SPLDCorrector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Implements the simple first order Pixel Level Decorrelation (PLD) proposed by
-Deming et. al. <a class="reference internal" href="#r28" id="id4">[R28]</a> and Luger et. al. <a class="reference internal" href="#r38" id="id5">[R38]</a>, <a class="reference internal" href="#r48" id="id6">[R48]</a>.</p>
-<p class="rubric">Notes</p>
-<p>This code serves only as a quick look into the PLD technique.
-Users are encouraged to check out the GitHub repos
-<a class="reference external" href="http://www.github.com/rodluger/everest">everest</a>
-and <a class="reference external" href="http://www.github.com/rodluger/everest3">everest3</a>.</p>
-<p class="rubric">References</p>
-<table class="docutils citation" frame="void" id="r28" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label">[R28]</td><td><em>(<a class="fn-backref" href="#id4">1</a>, <a class="fn-backref" href="#id7">2</a>)</em> Deming et. al. Spitzer Secondary Eclipses of the Dense, Modestly-irradiated, Giant Exoplanet HAT-P-20b using Pixel-Level Decorrelation.</td></tr>
-</tbody>
-</table>
-<table class="docutils citation" frame="void" id="r38" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label">[R38]</td><td><em>(<a class="fn-backref" href="#id5">1</a>, <a class="fn-backref" href="#id8">2</a>)</em> Luger et. al. EVEREST: Pixel Level Decorrelation of K2 Light Curves.</td></tr>
-</tbody>
-</table>
-<table class="docutils citation" frame="void" id="r48" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label">[R48]</td><td><em>(<a class="fn-backref" href="#id6">1</a>, <a class="fn-backref" href="#id9">2</a>)</em> Luger et. al. An Update to the EVEREST K2 Pipeline: short cadence, saturated stars, and Kepler-like photometry down to K_p = 15.</td></tr>
-</tbody>
-</table>
-<p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.SPLDCorrector.correct" title="lightkurve.lightcurve.SPLDCorrector.correct"><code class="xref py py-obj docutils literal"><span class="pre">correct</span></code></a>(time,&nbsp;tpf_flux[,&nbsp;window_length,&nbsp;…])</td>
-<td><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"></td>
-</tr>
-</tbody>
-</table>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt id="lightkurve.lightcurve.SPLDCorrector.correct">
-<code class="descname">correct</code><span class="sig-paren">(</span><em>time</em>, <em>tpf_flux</em>, <em>window_length=None</em>, <em>polyorder=2</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#SPLDCorrector.correct"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.SPLDCorrector.correct" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>time</strong> : array-like</p>
-<blockquote>
-<div><p>Time array</p>
-</div></blockquote>
-<p><strong>tpf_flux</strong> : array-like</p>
-<blockquote>
-<div><p>Pixel values series</p>
-</div></blockquote>
-<p><strong>window_length</strong> : int</p>
-<p class="last"><strong>polyorder</strong> : int</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="lightkurve.lightcurve.SFFCorrector">
-<em class="property">class </em><code class="descclassname">lightkurve.lightcurve.</code><code class="descname">SFFCorrector</code><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#SFFCorrector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.SFFCorrector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Implements the Self-Flat-Fielding (SFF) systematics removal method.</p>
-<p>This method is described in detail by Vanderburg and Johnson (2014).
-Briefly, the algorithm implemented in this class can be described
-as follows</p>
-<blockquote>
-<div><ol class="arabic simple">
-<li>Rotate the centroid measurements onto the subspace spanned by the
-eigenvectors of the centroid covariance matrix</li>
-<li>Fit a polynomial to the rotated centroids</li>
-<li>Compute the arclength of such polynomial</li>
-<li>Fit a BSpline of the raw flux as a function of time</li>
-<li>Normalize the raw flux by the fitted BSpline computed in step (4)</li>
-<li>Bin and interpolate the normalized flux as function of the arclength</li>
-<li>Divide the raw flux by the piecewise linear interpolation done in step [(6)</li>
-<li>Set raw flux as the flux computed in step (7) and repeat</li>
-</ol>
-</div></blockquote>
-<p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.SFFCorrector.arclength" title="lightkurve.lightcurve.SFFCorrector.arclength"><code class="xref py py-obj docutils literal"><span class="pre">arclength</span></code></a>(x1,&nbsp;x)</td>
-<td>Compute the arclength of the polynomial used to fit the centroid measurements.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.SFFCorrector.bin_and_interpolate" title="lightkurve.lightcurve.SFFCorrector.bin_and_interpolate"><code class="xref py py-obj docutils literal"><span class="pre">bin_and_interpolate</span></code></a>(s,&nbsp;normflux,&nbsp;bins,&nbsp;sigma)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.SFFCorrector.breakpoints" title="lightkurve.lightcurve.SFFCorrector.breakpoints"><code class="xref py py-obj docutils literal"><span class="pre">breakpoints</span></code></a>(campaign)</td>
-<td>Return a break point as a function of the campaign number.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.SFFCorrector.correct" title="lightkurve.lightcurve.SFFCorrector.correct"><code class="xref py py-obj docutils literal"><span class="pre">correct</span></code></a>(time,&nbsp;flux,&nbsp;centroid_col,&nbsp;centroid_row)</td>
-<td>Returns a systematics-corrected LightCurve.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.SFFCorrector.fit_bspline" title="lightkurve.lightcurve.SFFCorrector.fit_bspline"><code class="xref py py-obj docutils literal"><span class="pre">fit_bspline</span></code></a>(time,&nbsp;flux[,&nbsp;s])</td>
-<td>s describes the “smoothness” of the spline</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.SFFCorrector.rotate_centroids" title="lightkurve.lightcurve.SFFCorrector.rotate_centroids"><code class="xref py py-obj docutils literal"><span class="pre">rotate_centroids</span></code></a>(centroid_col,&nbsp;centroid_row)</td>
-<td>Rotate the coordinate frame of the (col, row) centroids to a new (x,y) frame in which the dominant motion of the spacecraft is aligned with the x axis.</td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt id="lightkurve.lightcurve.SFFCorrector.arclength">
-<code class="descname">arclength</code><span class="sig-paren">(</span><em>x1</em>, <em>x</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#SFFCorrector.arclength"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.SFFCorrector.arclength" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute the arclength of the polynomial used to fit the centroid
-measurements.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>x1</strong> : float</p>
-<blockquote>
-<div><p>Upper limit of the integration domain.</p>
-</div></blockquote>
-<p><strong>x</strong> : ndarray</p>
-<blockquote>
-<div><p>Domain at which the arclength integrand is defined.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>arclength</strong> : float</p>
-<blockquote class="last">
-<div><p>Result of the arclength integral from x[0] to x1.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="lightkurve.lightcurve.SFFCorrector.bin_and_interpolate">
-<code class="descname">bin_and_interpolate</code><span class="sig-paren">(</span><em>s</em>, <em>normflux</em>, <em>bins</em>, <em>sigma</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#SFFCorrector.bin_and_interpolate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.SFFCorrector.bin_and_interpolate" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="lightkurve.lightcurve.SFFCorrector.breakpoints">
-<code class="descname">breakpoints</code><span class="sig-paren">(</span><em>campaign</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#SFFCorrector.breakpoints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.SFFCorrector.breakpoints" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a break point as a function of the campaign number.</p>
-<p>The intention of this function is to implement a smart way to determine
-the boundaries of the windows on which the SFF algorithm is applied
-independently. However, this is not implemented yet in this version.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="lightkurve.lightcurve.SFFCorrector.correct">
-<code class="descname">correct</code><span class="sig-paren">(</span><em>time</em>, <em>flux</em>, <em>centroid_col</em>, <em>centroid_row</em>, <em>polyorder=5</em>, <em>niters=3</em>, <em>bins=15</em>, <em>windows=1</em>, <em>sigma_1=3.0</em>, <em>sigma_2=5.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#SFFCorrector.correct"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.SFFCorrector.correct" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a systematics-corrected LightCurve.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>time</strong> : array-like</p>
-<blockquote>
-<div><p>Time measurements</p>
-</div></blockquote>
-<p><strong>flux</strong> : array-like</p>
-<blockquote>
-<div><p>Data flux for every time point</p>
-</div></blockquote>
-<p><strong>centroid_col, centroid_row</strong> : array-like, array-like</p>
-<blockquote>
-<div><p>Centroid column and row coordinates as a function of time</p>
-</div></blockquote>
-<p><strong>polyorder</strong> : int</p>
-<blockquote>
-<div><p>Degree of the polynomial which will be used to fit one
-centroid as a function of the other.</p>
-</div></blockquote>
-<p><strong>niters</strong> : int</p>
-<blockquote>
-<div><p>Number of iterations of the aforementioned algorithm.</p>
-</div></blockquote>
-<p><strong>bins</strong> : int</p>
-<blockquote>
-<div><p>Number of bins to be used in step (6) to create the
-piece-wise interpolation of arclength vs flux correction.</p>
-</div></blockquote>
-<p><strong>windows</strong> : int</p>
-<blockquote>
-<div><p>Number of windows to subdivide the data.  The SFF algorithm
-is ran independently in each window.</p>
-</div></blockquote>
-<p><strong>sigma_1, sigma_2</strong> : float, float</p>
-<blockquote>
-<div><p>Sigma values which will be used to reject outliers
-in steps (6) and (2), respectivelly.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>corrected_lightcurve</strong> : LightCurve object</p>
-<blockquote class="last">
-<div><p>Returns a corrected lightcurve object.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="lightkurve.lightcurve.SFFCorrector.fit_bspline">
-<code class="descname">fit_bspline</code><span class="sig-paren">(</span><em>time</em>, <em>flux</em>, <em>s=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#SFFCorrector.fit_bspline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.SFFCorrector.fit_bspline" title="Permalink to this definition">¶</a></dt>
-<dd><p>s describes the “smoothness” of the spline</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="lightkurve.lightcurve.SFFCorrector.rotate_centroids">
-<code class="descname">rotate_centroids</code><span class="sig-paren">(</span><em>centroid_col</em>, <em>centroid_row</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#SFFCorrector.rotate_centroids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.SFFCorrector.rotate_centroids" title="Permalink to this definition">¶</a></dt>
-<dd><p>Rotate the coordinate frame of the (col, row) centroids to a new (x,y)
-frame in which the dominant motion of the spacecraft is aligned with
-the x axis.  This makes it easier to fit a characteristic polynomial
-that describes the motion.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="function">
-<dt id="lightkurve.lightcurve.box_period_search">
-<code class="descclassname">lightkurve.lightcurve.</code><code class="descname">box_period_search</code><span class="sig-paren">(</span><em>lc</em>, <em>min_period=0.5</em>, <em>max_period=30</em>, <em>nperiods=2000</em>, <em>prior=None</em>, <em>period_scale='log'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#box_period_search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.box_period_search" title="Permalink to this definition">¶</a></dt>
-<dd><p>Implements a brute force search to find transit-like periodic events.
-This function fits a “box” model defined as:</p>
-<div class="math">
-\[\Pi (t) = h - d\cdot \mathbb{I}(t_0 \leq t_i \leq t_0 + w)\]</div>
-<p>to a list of <cite>nperiods</cite> periods between <cite>min_period</cite> and <cite>max_period</cite>.
-It’s assumed that the best period is the one that maximizes the posterior
-probability of the fit.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>lc</strong> : LightCurve object</p>
-<blockquote>
-<div><p>An object from KeplerLightCurve or LightCurve.
-Note that flattening the lightcurve beforehand does aid the quest
-for the transit period.</p>
-</div></blockquote>
-<p><strong>min_period</strong> : float</p>
-<blockquote>
-<div><p>Minimum period to search for. Units must be the same as <cite>lc.time</cite>.</p>
-</div></blockquote>
-<p><strong>max_period</strong> : float</p>
-<blockquote>
-<div><p>Maximum period to search for. Units must be the same as <cite>lc.time</cite>.</p>
-</div></blockquote>
-<p><strong>nperiods</strong> : int</p>
-<blockquote>
-<div><p>Number of periods to search between <cite>min_period</cite> and <cite>max_period</cite>.</p>
-</div></blockquote>
-<p><strong>prior</strong> : oktopus.Prior object</p>
-<blockquote>
-<div><p>Prior probability on the parameters of the box function,
-namely, <cite>amplitude</cite>, <cite>depth</cite>, <cite>to</cite> (time of the first discontinuity),
-and <cite>width</cite>.</p>
-</div></blockquote>
-<p><strong>period_scale</strong> : str</p>
-<blockquote>
-<div><p>Type of the scale used to create the grid of periods between <cite>min_period</cite>
-and <cite>max_period</cite> used to search for the best period.
-Options are ‘linear’ or ‘log’.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>log_posterior</strong> : list</p>
-<blockquote>
-<div><p>Log posterior (up to an additive constant) of the fit. The “best”
-period is therefore the one that maximizes the log posterior
-probability.</p>
-</div></blockquote>
-<p><strong>trial_periods</strong> : numpy array</p>
-<blockquote>
-<div><p>List of trial periods.</p>
-</div></blockquote>
-<p><strong>best_period</strong> : float</p>
-<blockquote class="last">
-<div><p>Best period.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Notes</p>
-<p>This function is experimental. Changes may be made in both its signature
-and implementation.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="lightkurve.lightcurve.iterative_box_period_search">
-<code class="descclassname">lightkurve.lightcurve.</code><code class="descname">iterative_box_period_search</code><span class="sig-paren">(</span><em>lc</em>, <em>niters=2</em>, <em>min_period=0.5</em>, <em>max_period=30</em>, <em>nperiods=2000</em>, <em>period_scale='log'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#iterative_box_period_search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.iterative_box_period_search" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">lightkurve.lightcurve.</code><code class="descname">iterative_box_period_search</code><span class="sig-paren">(</span><em>lc</em>, <em>niters=2</em>, <em>min_period=0.5</em>, <em>max_period=30</em>, <em>nperiods=501</em>, <em>period_scale='log'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#iterative_box_period_search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.iterative_box_period_search" title="Permalink to this definition">¶</a></dt>
 <dd><p>Implements a routine to find box-like transit events.
 This function fits a “box” model defined as:</p>
-<div class="math">
+<div class="math notranslate nohighlight">
 \[\Pi (t) = h - d\cdot \mathbb{I}(t_0 \leq t_i \leq t_0 + w)\]</div>
-<p>in which <span class="math">\(\mathbb{I}\)</span> is the indicator function.</p>
+<p>in which <span class="math notranslate nohighlight">\(\mathbb{I}\)</span> is the indicator function.</p>
 <p>It turns out that, in a iid Gaussian noise setting, the parameters
-<span class="math">\(h\)</span> and <span class="math">\(d\)</span>, respectively, the amplitude and the depth
+<span class="math notranslate nohighlight">\(h\)</span> and <span class="math notranslate nohighlight">\(d\)</span>, respectively, the amplitude and the depth
 of the box, can be solved analytically.</p>
 <p>Hence, this function iterates between two procedures:
-(i) compute <span class="math">\(h\)</span> and <span class="math">\(d\)</span> for given <span class="math">\(t_0\)</span> and <span class="math">\(w\)</span>
-(ii) numerically optimize for <span class="math">\(t_0\)</span> and <span class="math">\(w\)</span> given <span class="math">\(h\)</span>
-and <span class="math">\(d\)</span>.</p>
+(i) compute <span class="math notranslate nohighlight">\(h\)</span> and <span class="math notranslate nohighlight">\(d\)</span> for given <span class="math notranslate nohighlight">\(t_0\)</span> and <span class="math notranslate nohighlight">\(w\)</span>
+(ii) numerically optimize for <span class="math notranslate nohighlight">\(t_0\)</span> and <span class="math notranslate nohighlight">\(w\)</span> given <span class="math notranslate nohighlight">\(h\)</span>
+and <span class="math notranslate nohighlight">\(d\)</span>.</p>
 <p>This procedure is done to a list of <cite>nperiods</cite> periods between <cite>min_period</cite>
 and <cite>max_period</cite>. It’s assumed that the best period is the one that
 maximizes the posterior probability of the fit.</p>
@@ -1547,7 +1123,7 @@ and implementation.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright lightkurve Developers and Contributors.
+        &copy; Copyright lightkurve developers and contributors.
 
     </p>
   </div>
@@ -1569,7 +1145,7 @@ and implementation.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'1.0.0dev',
+            VERSION:'1.0.a1',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

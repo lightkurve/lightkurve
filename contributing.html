@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Contributing &mdash; lightkurve 1.0.0dev documentation</title>
+  <title>Contributing and reporting issues &mdash; lightkurve 1.0.a1 documentation</title>
   
 
   
@@ -29,8 +29,8 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Community Software" href="community_software.html" />
-    <link rel="prev" title="Installation" href="install.html" /> 
+    <link rel="next" title="Citing and acknowledging lightkurve" href="citing.html" />
+    <link rel="prev" title="Replicating Vanderburg &amp; Johnson 2014 using lightkurve" href="tutorials/motion-correction/replicate-vanderburg-2014-lightkurve.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -54,7 +54,7 @@
 
           
             
-            <img src="_static/lightkurve.svg" class="logo" alt="Logo"/>
+            <img src="_static/lightkurve.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                1.0.0dev
+                1.0
               </div>
             
           
@@ -86,22 +86,9 @@
               
             
             
-              <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="api/index.html">API documentation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="api/targetpixelfile.html">Target Pixel File</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="api/lightcurve.html">Lightcurve</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="api/prf.html">Point Spread Function Photometry</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="api/utils.html">Utilities</a><ul class="simple">
-</ul>
-</li>
-</ul>
-</li>
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/quickstart.html">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="install.html#requirements">Requirements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="install.html#installing-lightkurve">Installing lightkurve</a><ul>
@@ -112,32 +99,81 @@
 <li class="toctree-l2"><a class="reference internal" href="install.html#building-documentation">Building documentation</a></li>
 </ul>
 </li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Contributing</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="api/index.html">API documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/targetpixelfile.html">TargetPixelFile classes</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/lightcurve.html">LightCurve classes</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/lightcurvefile.html">LightCurveFile classes</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/correctors.html">Systematics correction classes</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/prf.html">PSF photometry classes</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/utils.html">Utility functions</a><ul class="simple">
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/section1.html">Introduction to lightkurve</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/1.02-target-pixel-files.html">What are Target Pixel File objects?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/1.03-what-are-lightcurves.html">What are Light Curve objects?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/1.04-lightcurve-files.html">What are Light Curve File objects?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/1.05-interact-with-lightcurves-and-tpf.html">Interactively inspecting Target Pixel Files and Lightcurves</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/1.05-interact-with-lightcurves-and-tpf.html#Using-.interact()">Using <code class="docutils literal notranslate"><span class="pre">.interact()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/1.05-interact-with-lightcurves-and-tpf.html#Passing-in-a-preprocessed-lightcurve">Passing in a preprocessed lightcurve</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/section2.html">Science with lightkurve</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/2.02-recover-a-planet.html">How to recover a known planet in Kepler data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/2.03-appending-lightcurves.html">How to combine lightcurves from different Kepler quarters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/2.05-making-custom-apertures.html">How to perform aperture photometry with custom apertures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/cutting-out-tpfs-from-tess-ffis.html">How to cut out Target Pixel Files from Kepler Super Stamps or TESS FFIs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/section3.html">Systematics correction using lightkurve</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/2.04-removing-cbvs.html">How to remove common systematics using basis vectors (CBVs)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/2.01-how-to-detrend.html">How to remove K2 motion systematics with SFF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html">How does the SFF method work?</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html#Retrieve-the-K2SFF-data-for-ENG-test-source-60021426">Retrieve the K2SFF data for ENG test source <code class="docutils literal notranslate"><span class="pre">60021426</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html#Manually-reproduce-with-the-Vanderburg-provided-diagnostic-data">Manually reproduce with the Vanderburg-provided diagnostic data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/motion-correction/replicate-vanderburg-2014-lightkurve.html">Replicating Vanderburg &amp; Johnson 2014 using lightkurve</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/motion-correction/replicate-vanderburg-2014-lightkurve.html#Data-Exclusion">Data Exclusion</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">About lightkurve</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Contributing and reporting issues</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#proposing-changes-to-lightkurve-using-github-pull-requests">Proposing changes to lightkurve using GitHub pull requests</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#coding-and-documentation-guidelines">Coding and documentation guidelines</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="community_software.html">Community Software</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="community_software.html#detrending-analysis">Detrending &amp; Analysis</a></li>
-<li class="toctree-l2"><a class="reference internal" href="community_software.html#full-frame-images">Full Frame Images</a></li>
-<li class="toctree-l2"><a class="reference internal" href="community_software.html#data-access">Data access</a></li>
-<li class="toctree-l2"><a class="reference internal" href="community_software.html#metadata">Metadata</a></li>
-<li class="toctree-l2"><a class="reference internal" href="community_software.html#planet-search">Planet Search</a></li>
-<li class="toctree-l2"><a class="reference internal" href="community_software.html#population-statistics">Population Statistics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="community_software.html#positional">Positional</a></li>
-<li class="toctree-l2"><a class="reference internal" href="community_software.html#science-astrophysics">Science / Astrophysics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="community_software.html#other">Other</a></li>
-</ul>
-</li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/index.html">lightkurve tutorials</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/target-pixel-files.html">What are Target Pixel Files?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/lightcurve-files.html">What are Light Curve Files?</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="tutorials/lightcurve-files.html#Lightcurves-from-Target-Pixel-Files">Lightcurves from Target Pixel Files</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tutorials/lightcurve-files.html#PDCSAP-from-lightcurves-from-MAST">PDCSAP from lightcurves from MAST</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="citing.html">Citing and acknowledging lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="other_software.html">Other software</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="other_software.html#detrending-analysis">Detrending &amp; Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="other_software.html#full-frame-images">Full Frame Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="other_software.html#data-access">Data access</a></li>
+<li class="toctree-l2"><a class="reference internal" href="other_software.html#metadata">Metadata</a></li>
+<li class="toctree-l2"><a class="reference internal" href="other_software.html#planet-search">Planet Search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="other_software.html#population-statistics">Population Statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="other_software.html#positional">Positional</a></li>
+<li class="toctree-l2"><a class="reference internal" href="other_software.html#science-astrophysics">Science / Astrophysics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="other_software.html#other">Other</a></li>
 </ul>
 </li>
 </ul>
@@ -186,7 +222,7 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Contributing</li>
+      <li>Contributing and reporting issues</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -239,8 +275,8 @@
     margin-right: 4px;  /* make room for the exclamation icon */
 }
 </style>
-<div class="section" id="contributing">
-<span id="id1"></span><h1>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="contributing-and-reporting-issues">
+<span id="contributing"></span><h1>Contributing and reporting issues<a class="headerlink" href="#contributing-and-reporting-issues" title="Permalink to this headline">¶</a></h1>
 <p><strong>lightkurve</strong> is actively developed on its <a class="reference external" href="https://github.com/KeplerGO/lightkurve">GitHub repository</a>.</p>
 <p>If you encounter a problem with <strong>lightkurve</strong>, we encourage you to
 <a class="reference external" href="https://github.com/KeplerGO/lightkurve/issues">open an issue on the GitHub repository</a>
@@ -256,33 +292,33 @@ Once you are ready to propose the changes, please go ahead and open a pull reque
 In brief, the steps are as follows:</p>
 <ol class="arabic simple">
 <li>Fork the main <strong>lightkurve</strong> repository by logging into GitHub, browsing to
-<code class="docutils literal"><span class="pre">https://github.com/KeplerGO/lightkurve</span></code> and clicking on <code class="docutils literal"><span class="pre">Fork</span></code> in the top right corner.</li>
+<code class="docutils literal notranslate"><span class="pre">https://github.com/KeplerGO/lightkurve</span></code> and clicking on <code class="docutils literal notranslate"><span class="pre">Fork</span></code> in the top right corner.</li>
 <li>Clone your fork to your computer:</li>
 </ol>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ git clone https://github.com/YOUR-GITHUB-USERNAME/lightkurve.git
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/YOUR-GITHUB-USERNAME/lightkurve.git
 </pre></div>
 </div>
 <ol class="arabic simple" start="3">
 <li>Install the development version of lightkurve:</li>
 </ol>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> lightkurve
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> lightkurve
 $ pip install -e .
 </pre></div>
 </div>
 <ol class="arabic simple" start="4">
 <li>Add the KeplerGO remote to your GitHub enviroment:</li>
 </ol>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ git remote add upstream https://github.com/KeplerGO/lightkurve.git
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git remote add upstream https://github.com/KeplerGO/lightkurve.git
 </pre></div>
 </div>
 <ol class="arabic simple" start="5">
 <li>Let’s make sure everything is setup correctly. Execute:</li>
 </ol>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ git remote -v
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git remote -v
 </pre></div>
 </div>
 <p>You should see something like this:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>origin      https://github.com/YOUR-GITHUB-USERNAME/lightkurve.git <span class="o">(</span>fetch<span class="o">)</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>origin      https://github.com/YOUR-GITHUB-USERNAME/lightkurve.git <span class="o">(</span>fetch<span class="o">)</span>
 origin      https://github.com/YOUR-GITHUB-USERNAME/lightkurve.git <span class="o">(</span>push<span class="o">)</span>
 upstream    https://github.com/KeplerGO/lightkurve.git <span class="o">(</span>fetch<span class="o">)</span>
 upstream    https://github.com/KeplerGO/lightkurve.git <span class="o">(</span>push<span class="o">)</span>
@@ -291,20 +327,20 @@ upstream    https://github.com/KeplerGO/lightkurve.git <span class="o">(</span>p
 <ol class="arabic simple" start="6">
 <li>Now you are ready to start contributing; make a new branch with a name of your choice and checkout:</li>
 </ol>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ git branch name-of-your-branch
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git branch name-of-your-branch
 $ git checkout name-of-your-branch
 </pre></div>
 </div>
 <ol class="arabic simple" start="7">
 <li>Do the changes you want and add them:</li>
 </ol>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ git add FILE-YOU-ADDED-OR-MODIFIED
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git add FILE-YOU-ADDED-OR-MODIFIED
 </pre></div>
 </div>
 <ol class="arabic simple" start="8">
 <li>Commit and push your changes:</li>
 </ol>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ git commit -m <span class="s2">&quot;description of changes&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git commit -m <span class="s2">&quot;description of changes&quot;</span>
 $ git push origin name-of-my-branch
 </pre></div>
 </div>
@@ -329,10 +365,10 @@ as documented in <a class="reference external" href="http://docs.astropy.org/en/
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="community_software.html" class="btn btn-neutral float-right" title="Community Software" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="citing.html" class="btn btn-neutral float-right" title="Citing and acknowledging lightkurve" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="install.html" class="btn btn-neutral" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="tutorials/motion-correction/replicate-vanderburg-2014-lightkurve.html" class="btn btn-neutral" title="Replicating Vanderburg &amp; Johnson 2014 using lightkurve" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -341,7 +377,7 @@ as documented in <a class="reference external" href="http://docs.astropy.org/en/
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright lightkurve Developers and Contributors.
+        &copy; Copyright lightkurve developers and contributors.
 
     </p>
   </div>
@@ -363,7 +399,7 @@ as documented in <a class="reference external" href="http://docs.astropy.org/en/
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'1.0.0dev',
+            VERSION:'1.0.a1',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

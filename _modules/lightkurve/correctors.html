@@ -1,0 +1,771 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>lightkurve.correctors &mdash; lightkurve 1.0.a1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> lightkurve
+          
+
+          
+            
+            <img src="../../_static/lightkurve.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../install.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../install.html#installing-lightkurve">Installing lightkurve</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../install.html#stable-version">Stable version</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../install.html#development-version">Development version</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../install.html#building-documentation">Building documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/index.html">API documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/targetpixelfile.html">TargetPixelFile classes</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/lightcurve.html">LightCurve classes</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/lightcurvefile.html">LightCurveFile classes</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/correctors.html">Systematics correction classes</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/prf.html">PSF photometry classes</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/utils.html">Utility functions</a><ul class="simple">
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/section1.html">Introduction to lightkurve</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/1.02-target-pixel-files.html">What are Target Pixel File objects?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/1.03-what-are-lightcurves.html">What are Light Curve objects?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/1.04-lightcurve-files.html">What are Light Curve File objects?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/1.05-interact-with-lightcurves-and-tpf.html">Interactively inspecting Target Pixel Files and Lightcurves</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/1.05-interact-with-lightcurves-and-tpf.html#Using-.interact()">Using <code class="docutils literal notranslate"><span class="pre">.interact()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/1.05-interact-with-lightcurves-and-tpf.html#Passing-in-a-preprocessed-lightcurve">Passing in a preprocessed lightcurve</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/section2.html">Science with lightkurve</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/2.02-recover-a-planet.html">How to recover a known planet in Kepler data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/2.03-appending-lightcurves.html">How to combine lightcurves from different Kepler quarters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/2.05-making-custom-apertures.html">How to perform aperture photometry with custom apertures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/cutting-out-tpfs-from-tess-ffis.html">How to cut out Target Pixel Files from Kepler Super Stamps or TESS FFIs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/section3.html">Systematics correction using lightkurve</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/2.04-removing-cbvs.html">How to remove common systematics using basis vectors (CBVs)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/2.01-how-to-detrend.html">How to remove K2 motion systematics with SFF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html">How does the SFF method work?</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html#Retrieve-the-K2SFF-data-for-ENG-test-source-60021426">Retrieve the K2SFF data for ENG test source <code class="docutils literal notranslate"><span class="pre">60021426</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html#Manually-reproduce-with-the-Vanderburg-provided-diagnostic-data">Manually reproduce with the Vanderburg-provided diagnostic data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/motion-correction/replicate-vanderburg-2014-lightkurve.html">Replicating Vanderburg &amp; Johnson 2014 using lightkurve</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/motion-correction/replicate-vanderburg-2014-lightkurve.html#Data-Exclusion">Data Exclusion</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">About lightkurve</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing and reporting issues</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#proposing-changes-to-lightkurve-using-github-pull-requests">Proposing changes to lightkurve using GitHub pull requests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#coding-and-documentation-guidelines">Coding and documentation guidelines</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../citing.html">Citing and acknowledging lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../other_software.html">Other software</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../other_software.html#detrending-analysis">Detrending &amp; Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../other_software.html#full-frame-images">Full Frame Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../other_software.html#data-access">Data access</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../other_software.html#metadata">Metadata</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../other_software.html#planet-search">Planet Search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../other_software.html#population-statistics">Population Statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../other_software.html#positional">Positional</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../other_software.html#science-astrophysics">Science / Astrophysics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../other_software.html#other">Other</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">lightkurve</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>lightkurve.correctors</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for lightkurve.correctors</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Defines KeplerCBVCorrector and SFFCorrector.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">from</span> <span class="nn">bs4</span> <span class="k">import</span> <span class="n">BeautifulSoup</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="k">import</span> <span class="n">tqdm</span>
+
+<span class="kn">import</span> <span class="nn">oktopus</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="k">import</span> <span class="n">linalg</span><span class="p">,</span> <span class="n">interpolate</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="k">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="kn">from</span> <span class="nn">astropy.io</span> <span class="k">import</span> <span class="n">fits</span> <span class="k">as</span> <span class="n">pyfits</span>
+<span class="kn">from</span> <span class="nn">astropy.stats</span> <span class="k">import</span> <span class="n">sigma_clip</span>
+
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="k">import</span> <span class="n">channel_to_module_output</span>
+<span class="kn">from</span> <span class="nn">.lightcurve</span> <span class="k">import</span> <span class="n">LightCurve</span>
+<span class="kn">from</span> <span class="nn">.lightcurvefile</span> <span class="k">import</span> <span class="n">KeplerLightCurveFile</span>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;KeplerCBVCorrector&#39;</span><span class="p">,</span> <span class="s1">&#39;SFFCorrector&#39;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="KeplerCBVCorrector"><a class="viewcode-back" href="../../api/correctors.html#lightkurve.correctors.KeplerCBVCorrector">[docs]</a><span class="k">class</span> <span class="nc">KeplerCBVCorrector</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove systematic trends from Kepler light curves by fitting</span>
+<span class="sd">    cotrending basis vectors.</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \arg \min_{\bm{\theta} \in \Theta} \sum_{t}|f_{SAP}(t) - \sum_{j=1}^{n}\theta_j v_{j}(t)|^p, p&gt;0, p \in \mathbb{R}</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lc_file : KeplerLightCurveFile object or str</span>
+<span class="sd">        An instance from KeplerLightCurveFile or a path for the .fits</span>
+<span class="sd">        file of a NASA&#39;s Kepler/K2 light curve.</span>
+<span class="sd">    likelihood : oktopus.Likelihood subclass</span>
+<span class="sd">        A class that describes a cost function.</span>
+<span class="sd">        The default is :class:`oktopus.LaplacianLikelihood`, which is tantamount</span>
+<span class="sd">        to the L1 norm.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import matplotlib.pyplot as plt</span>
+<span class="sd">    &gt;&gt;&gt; from lightkurve import KeplerCBVCorrector, KeplerLightCurveFile</span>
+<span class="sd">    &gt;&gt;&gt; fn = (&quot;https://archive.stsci.edu/missions/kepler/lightcurves/&quot;</span>
+<span class="sd">    ...       &quot;0084/008462852/kplr008462852-2011073133259_llc.fits&quot;) # doctest: +SKIP</span>
+<span class="sd">    &gt;&gt;&gt; cbv = KeplerCBVCorrector(fn) # doctest: +SKIP</span>
+<span class="sd">    Downloading https://archive.stsci.edu/missions/kepler/lightcurves/0084/008462852/kplr008462852-2011073133259_llc.fits [Done]</span>
+<span class="sd">    &gt;&gt;&gt; cbv_lc = cbv.correct() # doctest: +SKIP</span>
+<span class="sd">    Downloading http://archive.stsci.edu/missions/kepler/cbv/kplr2011073133259-q08-d25_lcbv.fits [Done]</span>
+<span class="sd">    &gt;&gt;&gt; sap_lc = KeplerLightCurveFile(fn).SAP_FLUX # doctest: +SKIP</span>
+<span class="sd">    &gt;&gt;&gt; plt.plot(sap_lc.time, sap_lc.flux, &#39;x&#39;, markersize=1, label=&#39;SAP_FLUX&#39;) # doctest: +SKIP</span>
+<span class="sd">    &gt;&gt;&gt; plt.plot(cbv_lc.time, cbv_lc.flux, &#39;o&#39;, markersize=1, label=&#39;CBV_FLUX&#39;) # doctest: +SKIP</span>
+<span class="sd">    &gt;&gt;&gt; plt.legend() # doctest: +SKIP</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lc_file</span><span class="p">,</span> <span class="n">likelihood</span><span class="o">=</span><span class="n">oktopus</span><span class="o">.</span><span class="n">LaplacianLikelihood</span><span class="p">,</span>
+                 <span class="n">prior</span><span class="o">=</span><span class="n">oktopus</span><span class="o">.</span><span class="n">LaplacianPrior</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lc_file</span> <span class="o">=</span> <span class="n">lc_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">likelihood</span> <span class="o">=</span> <span class="n">likelihood</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prior</span> <span class="o">=</span> <span class="n">prior</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ncbvs</span> <span class="o">=</span> <span class="mi">16</span>  <span class="c1"># number of cbvs for Kepler/K2</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lc_file</span><span class="o">.</span><span class="n">mission</span> <span class="o">==</span> <span class="s1">&#39;Kepler&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cbv_base_url</span> <span class="o">=</span> <span class="s2">&quot;http://archive.stsci.edu/missions/kepler/cbv/&quot;</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">lc_file</span><span class="o">.</span><span class="n">mission</span> <span class="o">==</span> <span class="s1">&#39;K2&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cbv_base_url</span> <span class="o">=</span> <span class="s2">&quot;http://archive.stsci.edu/missions/k2/cbv/&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">lc_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lc_file</span>
+
+    <span class="nd">@lc_file</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">lc_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="c1"># this enables `lc_file` to be either a string</span>
+        <span class="c1"># or an object from KeplerLightCurveFile</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_lc_file</span> <span class="o">=</span> <span class="n">KeplerLightCurveFile</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">KeplerLightCurveFile</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_lc_file</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;lc_file must be either a string or a&quot;</span>
+                             <span class="s2">&quot; KeplerLightCurveFile instance, got </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">coeffs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the fitted coefficients.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coeffs</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">opt_result</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the result of the optimization process.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_opt_result</span>
+
+    <span class="k">def</span> <span class="nf">_get_cbv_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cbvs</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]):</span>
+        <span class="sd">&#39;&#39;&#39;Gets the CBV data for a channel and module</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">module</span><span class="p">,</span> <span class="n">output</span> <span class="o">=</span> <span class="n">channel_to_module_output</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lc_file</span><span class="o">.</span><span class="n">channel</span><span class="p">)</span>
+        <span class="n">cbv_file</span> <span class="o">=</span> <span class="n">pyfits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_cbv_url</span><span class="p">())</span>
+        <span class="n">cbv_data</span> <span class="o">=</span> <span class="n">cbv_file</span><span class="p">[</span><span class="s1">&#39;MODOUT_</span><span class="si">{0}</span><span class="s1">_</span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">output</span><span class="p">)]</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">time</span> <span class="o">=</span> <span class="n">cbv_file</span><span class="p">[</span><span class="s1">&#39;MODOUT_</span><span class="si">{0}</span><span class="s1">_</span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">output</span><span class="p">)]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;TIME_MJD&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">lc_file</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">]</span>
+        <span class="n">cbv_array</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">cbvs</span><span class="p">:</span>
+            <span class="n">cbv_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cbv_data</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="s1">&#39;VECTOR_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">))[</span><span class="bp">self</span><span class="o">.</span><span class="n">lc_file</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">])</span>
+        <span class="n">cbv_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">cbv_array</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cbv_array</span><span class="p">,</span> <span class="n">time</span>
+
+<div class="viewcode-block" id="KeplerCBVCorrector.correct"><a class="viewcode-back" href="../../api/correctors.html#lightkurve.correctors.KeplerCBVCorrector.correct">[docs]</a>    <span class="k">def</span> <span class="nf">correct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cbvs</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;powell&#39;</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">{}):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Correct the SAP_FLUX by fitting a number of cotrending basis vectors</span>
+<span class="sd">        `cbvs`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        cbvs : list of ints</span>
+<span class="sd">            The list of cotrending basis vectors to fit to the data. For example,</span>
+<span class="sd">            [1, 2] will fit the first two basis vectors.</span>
+<span class="sd">        method : str</span>
+<span class="sd">            Numerical optimization method. See scipy.optimize.minimize for the</span>
+<span class="sd">            full list of methods.</span>
+<span class="sd">        options : dict</span>
+<span class="sd">            Dictionary of options to be passed to scipy.optimize.minimize.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cbv_array</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_cbv_data</span><span class="p">(</span><span class="n">cbvs</span><span class="p">)</span>
+
+        <span class="n">sap_lc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lc_file</span><span class="o">.</span><span class="n">SAP_FLUX</span>
+        <span class="n">median_sap_flux</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">sap_lc</span><span class="o">.</span><span class="n">flux</span><span class="p">)</span>
+        <span class="n">norm_sap_flux</span> <span class="o">=</span> <span class="n">sap_lc</span><span class="o">.</span><span class="n">flux</span> <span class="o">/</span> <span class="n">median_sap_flux</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">norm_err_sap_flux</span> <span class="o">=</span> <span class="n">sap_lc</span><span class="o">.</span><span class="n">flux_err</span> <span class="o">/</span> <span class="n">median_sap_flux</span>
+
+        <span class="k">def</span> <span class="nf">mean_model</span><span class="p">(</span><span class="o">*</span><span class="n">theta</span><span class="p">):</span>
+            <span class="n">coeffs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">coeffs</span><span class="p">,</span> <span class="n">cbv_array</span><span class="p">)</span>
+
+        <span class="n">prior</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prior</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cbvs</span><span class="p">)),</span> <span class="n">var</span><span class="o">=</span><span class="mf">16.</span><span class="p">)</span>
+        <span class="n">likelihood</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">likelihood</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">norm_sap_flux</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="n">mean_model</span><span class="p">,</span>
+                                     <span class="n">var</span><span class="o">=</span><span class="n">norm_err_sap_flux</span><span class="p">)</span>
+        <span class="n">x0</span> <span class="o">=</span> <span class="n">likelihood</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x0</span><span class="o">=</span><span class="n">prior</span><span class="o">.</span><span class="n">mean</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">)</span><span class="o">.</span><span class="n">x</span>
+        <span class="n">posterior</span> <span class="o">=</span> <span class="n">oktopus</span><span class="o">.</span><span class="n">Posterior</span><span class="p">(</span><span class="n">likelihood</span><span class="o">=</span><span class="n">likelihood</span><span class="p">,</span> <span class="n">prior</span><span class="o">=</span><span class="n">prior</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_opt_result</span> <span class="o">=</span> <span class="n">posterior</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x0</span><span class="o">=</span><span class="n">x0</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span>
+                                         <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_coeffs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_opt_result</span><span class="o">.</span><span class="n">x</span>
+        <span class="n">flux_hat</span> <span class="o">=</span> <span class="n">sap_lc</span><span class="o">.</span><span class="n">flux</span> <span class="o">-</span> <span class="n">median_sap_flux</span> <span class="o">*</span> <span class="n">mean_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_coeffs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">LightCurve</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">sap_lc</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">flux</span><span class="o">=</span><span class="n">flux_hat</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span>
+                          <span class="n">flux_err</span><span class="o">=</span><span class="n">sap_lc</span><span class="o">.</span><span class="n">flux_err</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="KeplerCBVCorrector.get_cbvs_list"><a class="viewcode-back" href="../../api/correctors.html#lightkurve.correctors.KeplerCBVCorrector.get_cbvs_list">[docs]</a>    <span class="k">def</span> <span class="nf">get_cbvs_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the subsequence of subsequent CBVs that maximizes</span>
+<span class="sd">        Bayes&#39; factor [1]_.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        cbv_list : list</span>
+<span class="sd">            Subsequence of subsequent CBVs that maximizes the Bayes&#39; factor.</span>
+
+<span class="sd">        References</span>
+<span class="sd">        ----------</span>
+<span class="sd">        .. [1] https://en.wikipedia.org/wiki/Bayes_factor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">bayes_factor</span><span class="p">,</span> <span class="n">cost</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>  <span class="c1"># bayes_factor here is actually the</span>
+                                          <span class="c1"># negative log of the bayes factor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">correct</span><span class="p">(</span><span class="n">cbvs</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;xtol&#39;</span><span class="p">:</span> <span class="mf">1e-6</span><span class="p">,</span> <span class="s1">&#39;ftol&#39;</span><span class="p">:</span> <span class="mf">1e-6</span><span class="p">,</span> <span class="s1">&#39;maxfev&#39;</span><span class="p">:</span> <span class="mi">2000</span><span class="p">})</span>
+        <span class="n">cost</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">opt_result</span><span class="o">.</span><span class="n">fun</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ncbvs</span><span class="o">+</span><span class="mi">1</span><span class="p">)):</span>
+            <span class="n">cbv_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">correct</span><span class="p">(</span><span class="n">cbv_list</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;xtol&#39;</span><span class="p">:</span> <span class="mf">1e-6</span><span class="p">,</span> <span class="s1">&#39;ftol&#39;</span><span class="p">:</span> <span class="mf">1e-6</span><span class="p">,</span> <span class="s1">&#39;maxfev&#39;</span><span class="p">:</span> <span class="mi">2000</span><span class="p">})</span>
+            <span class="n">cost</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">opt_result</span><span class="o">.</span><span class="n">fun</span><span class="p">)</span>
+            <span class="c1"># cost is the negative log of the posterior evaluated at the</span>
+            <span class="c1"># Maximum A Posterior Probability (MAP) estimator</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bayes_factor</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">cost</span><span class="p">[</span><span class="n">n</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">cost</span><span class="p">[</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="c1"># so cost[n-2] - cost[n-1] = -log(p1) + log(p2) = log(p2/p1)</span>
+            <span class="c1"># where p1 is the posterior probability (evaluated at the MAP)</span>
+            <span class="c1"># for the model with n-2 cbvs and p2 is the posterior probability</span>
+            <span class="c1"># also evaluated at the MAP for the model with n-1 cbvs</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bayes_factor</span><span class="p">)</span>
+        <span class="c1"># transform to get the actual Bayes factor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bayes_factor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bayes_factor</span><span class="p">))</span>
+        <span class="c1"># the k+2 here comes from the fact that Python indexes begin</span>
+        <span class="c1"># from 0 and we count CBVs starting from 1 and also</span>
+        <span class="c1"># note that range(1, k) equals the interval [1, k), which excludes k.</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="o">+</span><span class="mi">2</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="KeplerCBVCorrector.get_cbv_url"><a class="viewcode-back" href="../../api/correctors.html#lightkurve.correctors.KeplerCBVCorrector.get_cbv_url">[docs]</a>    <span class="k">def</span> <span class="nf">get_cbv_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># gets the html page and finds all references to &#39;a&#39; tag</span>
+        <span class="c1"># keeps the ones for which &#39;href&#39; ends with &#39;fits&#39;</span>
+        <span class="c1"># this might slow things down in case the user wants to fit 1e3 stars</span>
+        <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cbv_base_url</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="s1">&#39;html.parser&#39;</span><span class="p">)</span>
+        <span class="n">cbv_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">fn</span><span class="p">[</span><span class="s1">&#39;href&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">soup</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">fn</span><span class="p">[</span><span class="s1">&#39;href&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;fits&#39;</span><span class="p">)]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lc_file</span><span class="o">.</span><span class="n">mission</span> <span class="o">==</span> <span class="s1">&#39;Kepler&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lc_file</span><span class="o">.</span><span class="n">quarter</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+                <span class="n">quarter</span> <span class="o">=</span> <span class="s1">&#39;q0&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lc_file</span><span class="o">.</span><span class="n">quarter</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">quarter</span> <span class="o">=</span> <span class="s1">&#39;q&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lc_file</span><span class="o">.</span><span class="n">quarter</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">cbv_file</span> <span class="ow">in</span> <span class="n">cbv_files</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">quarter</span> <span class="o">+</span> <span class="s1">&#39;-d25&#39;</span> <span class="ow">in</span> <span class="n">cbv_file</span><span class="p">:</span>
+                    <span class="k">break</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">lc_file</span><span class="o">.</span><span class="n">mission</span> <span class="o">==</span> <span class="s1">&#39;K2&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lc_file</span><span class="o">.</span><span class="n">campaign</span> <span class="o">&lt;=</span> <span class="mi">8</span><span class="p">:</span>
+                <span class="n">campaign</span> <span class="o">=</span> <span class="s1">&#39;c0&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lc_file</span><span class="o">.</span><span class="n">campaign</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">campaign</span> <span class="o">=</span> <span class="s1">&#39;c&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lc_file</span><span class="o">.</span><span class="n">campaign</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">cbv_file</span> <span class="ow">in</span> <span class="n">cbv_files</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">campaign</span> <span class="ow">in</span> <span class="n">cbv_file</span><span class="p">:</span>
+                    <span class="k">break</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cbv_base_url</span> <span class="o">+</span> <span class="n">cbv_file</span>
+</div>
+<div class="viewcode-block" id="KeplerCBVCorrector.plot_cbvs"><a class="viewcode-back" href="../../api/correctors.html#lightkurve.correctors.KeplerCBVCorrector.plot_cbvs">[docs]</a>    <span class="k">def</span> <span class="nf">plot_cbvs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cbvs</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Plot the CBVs for a given list of CBVs</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        cbvs : list of ints</span>
+<span class="sd">            The list of cotrending basis vectors to fit to the data. For example,</span>
+<span class="sd">            [1, 2] will fit the first two basis vectors.</span>
+<span class="sd">        ax : matplotlib.pyplot.Axes.AxesSubplot</span>
+<span class="sd">            Matplotlib axis object. If none, one will be generated.</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ax : matplotlib.pyplot.Axes.AxesSubplot</span>
+<span class="sd">            Matplotlib axis object</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">cbv_array</span><span class="p">,</span> <span class="n">time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_cbv_data</span><span class="p">(</span><span class="n">cbvs</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">cbv</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cbv_array</span><span class="p">):</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">cbv</span><span class="o">+</span><span class="n">idx</span><span class="o">/</span><span class="mf">10.</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time (MJD)&#39;</span><span class="p">)</span>
+        <span class="n">module</span><span class="p">,</span> <span class="n">output</span> <span class="o">=</span> <span class="n">channel_to_module_output</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lc_file</span><span class="o">.</span><span class="n">channel</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lc_file</span><span class="o">.</span><span class="n">mission</span> <span class="o">==</span> <span class="s1">&#39;Kepler&#39;</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Kepler CBVs (Module : </span><span class="si">{}</span><span class="s1">, Output : </span><span class="si">{}</span><span class="s1">, Quarter : </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lc_file</span><span class="o">.</span><span class="n">quarter</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">lc_file</span><span class="o">.</span><span class="n">mission</span> <span class="o">==</span> <span class="s1">&#39;K2&#39;</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;K2 CBVs (Module : </span><span class="si">{}</span><span class="s1">, Output : </span><span class="si">{}</span><span class="s1">, Campaign : </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lc_file</span><span class="o">.</span><span class="n">campaign</span><span class="p">))</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">ax</span>
+</div></div>
+
+<div class="viewcode-block" id="SFFCorrector"><a class="viewcode-back" href="../../api/correctors.html#lightkurve.correctors.SFFCorrector">[docs]</a><span class="k">class</span> <span class="nc">SFFCorrector</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Implements the Self-Flat-Fielding (SFF) systematics removal method.</span>
+
+<span class="sd">    This method is described in detail by Vanderburg and Johnson (2014).</span>
+<span class="sd">    Briefly, the algorithm implemented in this class can be described</span>
+<span class="sd">    as follows</span>
+
+<span class="sd">       (1) Rotate the centroid measurements onto the subspace spanned by the</span>
+<span class="sd">           eigenvectors of the centroid covariance matrix</span>
+<span class="sd">       (2) Fit a polynomial to the rotated centroids</span>
+<span class="sd">       (3) Compute the arclength of such polynomial</span>
+<span class="sd">       (4) Fit a BSpline of the raw flux as a function of time</span>
+<span class="sd">       (5) Normalize the raw flux by the fitted BSpline computed in step (4)</span>
+<span class="sd">       (6) Bin and interpolate the normalized flux as a function of the arclength</span>
+<span class="sd">       (7) Divide the raw flux by the piecewise linear interpolation done in step (6)</span>
+<span class="sd">       (8) Set raw flux as the flux computed in step (7) and repeat</span>
+<span class="sd">       (9) Multiply back the fitted BSpline</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="SFFCorrector.correct"><a class="viewcode-back" href="../../api/correctors.html#lightkurve.correctors.SFFCorrector.correct">[docs]</a>    <span class="k">def</span> <span class="nf">correct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">centroid_col</span><span class="p">,</span> <span class="n">centroid_row</span><span class="p">,</span>
+                <span class="n">polyorder</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">niters</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">windows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">sigma_1</span><span class="o">=</span><span class="mf">3.</span><span class="p">,</span>
+                <span class="n">sigma_2</span><span class="o">=</span><span class="mf">5.</span><span class="p">,</span> <span class="n">restore_trend</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a systematics-corrected LightCurve.</span>
+
+<span class="sd">        Note that it is assumed that time and flux do not contain NaNs.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        time : array-like</span>
+<span class="sd">            Time measurements</span>
+<span class="sd">        flux : array-like</span>
+<span class="sd">            Data flux for every time point</span>
+<span class="sd">        centroid_col, centroid_row : array-like, array-like</span>
+<span class="sd">            Centroid column and row coordinates as a function of time</span>
+<span class="sd">        polyorder : int</span>
+<span class="sd">            Degree of the polynomial which will be used to fit one</span>
+<span class="sd">            centroid as a function of the other.</span>
+<span class="sd">        niters : int</span>
+<span class="sd">            Number of iterations of the aforementioned algorithm.</span>
+<span class="sd">        bins : int</span>
+<span class="sd">            Number of bins to be used in step (6) to create the</span>
+<span class="sd">            piece-wise interpolation of arclength vs flux correction.</span>
+<span class="sd">        windows : int</span>
+<span class="sd">            Number of windows to subdivide the data.  The SFF algorithm</span>
+<span class="sd">            is ran independently in each window.</span>
+<span class="sd">        sigma_1, sigma_2 : float, float</span>
+<span class="sd">            Sigma values which will be used to reject outliers</span>
+<span class="sd">            in steps (6) and (2), respectivelly.</span>
+<span class="sd">        restore_trend : bool</span>
+<span class="sd">            If `True`, the long-term trend will be added back into the</span>
+<span class="sd">            lightcurve.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        corrected_lightcurve : LightCurve object</span>
+<span class="sd">            Returns a corrected lightcurve object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">timecopy</span> <span class="o">=</span> <span class="n">time</span>
+        <span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">windows</span><span class="p">)</span>
+        <span class="n">flux</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="n">flux</span><span class="p">,</span> <span class="n">windows</span><span class="p">)</span>
+        <span class="n">centroid_col</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="n">centroid_col</span><span class="p">,</span> <span class="n">windows</span><span class="p">)</span>
+        <span class="n">centroid_row</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="n">centroid_row</span><span class="p">,</span> <span class="n">windows</span><span class="p">)</span>
+
+        <span class="n">flux_hat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+        <span class="c1"># The SFF algorithm is going to be run on each window independently</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">windows</span><span class="p">)):</span>
+            <span class="c1"># To make it easier (and more numerically stable) to fit a</span>
+            <span class="c1"># characteristic polynomial that describes the spacecraft motion,</span>
+            <span class="c1"># we rotate the centroids to a new coordinate frame in which</span>
+            <span class="c1"># the dominant direction of motion is aligned with the x-axis.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rot_col</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rot_row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotate_centroids</span><span class="p">(</span><span class="n">centroid_col</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                                                               <span class="n">centroid_row</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="c1"># Next, we fit the motion polynomial after removing outliers</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outlier_cent</span> <span class="o">=</span> <span class="n">sigma_clip</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rot_col</span><span class="p">,</span>
+                                           <span class="n">sigma</span><span class="o">=</span><span class="n">sigma_2</span><span class="p">)</span><span class="o">.</span><span class="n">mask</span>
+            <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+                <span class="c1"># ignore warning messages related to polyfit being poorly conditioned</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">RankWarning</span><span class="p">)</span>
+                <span class="n">coeffs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rot_row</span><span class="p">[</span><span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">outlier_cent</span><span class="p">],</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">rot_col</span><span class="p">[</span><span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">outlier_cent</span><span class="p">],</span> <span class="n">polyorder</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">poly</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">(</span><span class="n">coeffs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">polyprime</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">(</span><span class="n">coeffs</span><span class="p">)</span><span class="o">.</span><span class="n">deriv</span><span class="p">()</span>
+
+            <span class="c1"># Compute the arclength s.  It is the length of the polynomial</span>
+            <span class="c1"># (fitted above) that describes the typical motion.</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rot_row</span><span class="p">[</span><span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">outlier_cent</span><span class="p">]),</span>
+                            <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rot_row</span><span class="p">[</span><span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">outlier_cent</span><span class="p">]),</span> <span class="mi">10000</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">arclength</span><span class="p">(</span><span class="n">x1</span><span class="o">=</span><span class="n">xp</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">xp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rot_row</span><span class="p">])</span>
+
+            <span class="c1"># Next, we find and apply the correction iteratively</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trend</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">time</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">niters</span><span class="p">):</span>
+                <span class="c1"># First, fit a spline to capture the long-term varation</span>
+                <span class="c1"># We don&#39;t want to fit the long-term trend because we know</span>
+                <span class="c1"># that the K2 motion noise is a high-frequency effect.</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bspline</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fit_bspline</span><span class="p">(</span><span class="n">time</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">flux</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="c1"># Remove the long-term variation by dividing the flux by the spline</span>
+                <span class="n">iter_trend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bspline</span><span class="p">(</span><span class="n">time</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">time</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">normflux</span> <span class="o">=</span> <span class="n">flux</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="n">iter_trend</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">trend</span> <span class="o">*=</span> <span class="n">iter_trend</span>
+                <span class="c1"># Bin and interpolate normalized flux to capture the dependency</span>
+                <span class="c1"># of the flux as a function of arclength</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">interp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bin_and_interpolate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">normflux</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span>
+                                                       <span class="n">sigma</span><span class="o">=</span><span class="n">sigma_1</span><span class="p">)</span>
+                <span class="c1"># Correct the raw flux</span>
+                <span class="n">corrected_flux</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">normflux</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">)</span>
+                <span class="n">flux</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">corrected_flux</span>
+
+            <span class="k">if</span> <span class="n">restore_trend</span><span class="p">:</span>
+                <span class="n">flux</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trend</span>
+            <span class="n">flux_hat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">flux_hat</span><span class="p">,</span> <span class="n">flux</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">LightCurve</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">timecopy</span><span class="p">,</span> <span class="n">flux</span><span class="o">=</span><span class="n">flux_hat</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="SFFCorrector.rotate_centroids"><a class="viewcode-back" href="../../api/correctors.html#lightkurve.correctors.SFFCorrector.rotate_centroids">[docs]</a>    <span class="k">def</span> <span class="nf">rotate_centroids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">centroid_col</span><span class="p">,</span> <span class="n">centroid_row</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Rotate the coordinate frame of the (col, row) centroids to a new (x,y)</span>
+<span class="sd">        frame in which the dominant motion of the spacecraft is aligned with</span>
+<span class="sd">        the x axis.  This makes it easier to fit a characteristic polynomial</span>
+<span class="sd">        that describes the motion.&quot;&quot;&quot;</span>
+        <span class="n">centroids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">centroid_col</span><span class="p">,</span> <span class="n">centroid_row</span><span class="p">])</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">eig_vecs</span> <span class="o">=</span> <span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">centroids</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">eig_vecs</span><span class="p">,</span> <span class="n">centroids</span><span class="p">)</span>
+</div>
+    <span class="k">def</span> <span class="nf">_plot_rotated_centroids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rot_row</span><span class="p">[</span><span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">outlier_cent</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">rot_col</span><span class="p">[</span><span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">outlier_cent</span><span class="p">],</span>
+                <span class="s1">&#39;ko&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rot_row</span><span class="p">[</span><span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">outlier_cent</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">rot_col</span><span class="p">[</span><span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">outlier_cent</span><span class="p">],</span>
+                <span class="s1">&#39;bo&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rot_row</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">outlier_cent</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">rot_col</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">outlier_cent</span><span class="p">],</span>
+                <span class="s1">&#39;ko&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rot_row</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">outlier_cent</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">rot_col</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">outlier_cent</span><span class="p">],</span>
+                <span class="s1">&#39;ro&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rot_row</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rot_row</span><span class="p">),</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">poly</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="s1">&#39;--&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Rotated row centroid&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Rotated column centroid&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ax</span>
+
+    <span class="k">def</span> <span class="nf">_plot_normflux_arclength</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">s_srtd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="n">normflux_srtd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">normflux</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">s_srtd</span><span class="p">[</span><span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">outlier_mask</span><span class="p">],</span> <span class="n">normflux_srtd</span><span class="p">[</span><span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">outlier_mask</span><span class="p">],</span>
+                <span class="s1">&#39;ko&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">s_srtd</span><span class="p">[</span><span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">outlier_mask</span><span class="p">],</span> <span class="n">normflux_srtd</span><span class="p">[</span><span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">outlier_mask</span><span class="p">],</span>
+                <span class="s1">&#39;bo&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">s_srtd</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">outlier_mask</span><span class="p">],</span> <span class="n">normflux_srtd</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">outlier_mask</span><span class="p">],</span>
+                <span class="s1">&#39;ko&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">s_srtd</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">outlier_mask</span><span class="p">],</span> <span class="n">normflux_srtd</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">outlier_mask</span><span class="p">],</span>
+                <span class="s1">&#39;ro&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">s_srtd</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">s_srtd</span><span class="p">),</span> <span class="s1">&#39;--&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Arclength $(s)$&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;Flux $(e^{-}s^{-1})$&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ax</span>
+
+<div class="viewcode-block" id="SFFCorrector.arclength"><a class="viewcode-back" href="../../api/correctors.html#lightkurve.correctors.SFFCorrector.arclength">[docs]</a>    <span class="k">def</span> <span class="nf">arclength</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compute the arclength of the polynomial used to fit the centroid</span>
+<span class="sd">        measurements.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x1 : float</span>
+<span class="sd">            Upper limit of the integration domain.</span>
+<span class="sd">        x : ndarray</span>
+<span class="sd">            Domain at which the arclength integrand is defined.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        arclength : float</span>
+<span class="sd">            Result of the arclength integral from x[0] to x1.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">x1</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">trapz</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">polyprime</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">mask</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">),</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">[</span><span class="n">mask</span><span class="p">])</span>
+</div>
+<div class="viewcode-block" id="SFFCorrector.fit_bspline"><a class="viewcode-back" href="../../api/correctors.html#lightkurve.correctors.SFFCorrector.fit_bspline">[docs]</a>    <span class="k">def</span> <span class="nf">fit_bspline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;s describes the &quot;smoothness&quot; of the spline&quot;&quot;&quot;</span>
+        <span class="n">time</span> <span class="o">=</span> <span class="n">time</span> <span class="o">-</span> <span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">knots</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">time</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mf">1.5</span><span class="p">)</span>
+        <span class="n">t</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">splrep</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="n">knots</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">s</span><span class="o">=</span><span class="n">s</span><span class="p">,</span> <span class="n">task</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">BSpline</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="SFFCorrector.bin_and_interpolate"><a class="viewcode-back" href="../../api/correctors.html#lightkurve.correctors.SFFCorrector.bin_and_interpolate">[docs]</a>    <span class="k">def</span> <span class="nf">bin_and_interpolate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">normflux</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">sigma</span><span class="p">):</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">s_srtd</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="n">normflux_srtd</span> <span class="o">=</span> <span class="n">normflux</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">outlier_mask</span> <span class="o">=</span> <span class="n">sigma_clip</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">normflux_srtd</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">)</span><span class="o">.</span><span class="n">mask</span>
+        <span class="n">normflux_srtd</span> <span class="o">=</span> <span class="n">normflux_srtd</span><span class="p">[</span><span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">outlier_mask</span><span class="p">]</span>
+        <span class="n">s_srtd</span> <span class="o">=</span> <span class="n">s_srtd</span><span class="p">[</span><span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">outlier_mask</span><span class="p">]</span>
+
+        <span class="n">knots</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">s_srtd</span><span class="p">)]</span>
+                         <span class="o">+</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">split</span><span class="p">)</span> <span class="k">for</span> <span class="n">split</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="n">s_srtd</span><span class="p">,</span> <span class="n">bins</span><span class="p">)]</span>
+                         <span class="o">+</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">s_srtd</span><span class="p">)])</span>
+        <span class="n">bin_means</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">normflux_srtd</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+                             <span class="o">+</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">split</span><span class="p">)</span> <span class="k">for</span> <span class="n">split</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="n">normflux_srtd</span><span class="p">,</span> <span class="n">bins</span><span class="p">)]</span>
+                             <span class="o">+</span> <span class="p">[</span><span class="n">normflux_srtd</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+        <span class="k">return</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="n">knots</span><span class="p">,</span> <span class="n">bin_means</span><span class="p">,</span> <span class="n">bounds_error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                    <span class="n">fill_value</span><span class="o">=</span><span class="s1">&#39;extrapolate&#39;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="SFFCorrector.breakpoints"><a class="viewcode-back" href="../../api/correctors.html#lightkurve.correctors.SFFCorrector.breakpoints">[docs]</a>    <span class="k">def</span> <span class="nf">breakpoints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">campaign</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a break point as a function of the campaign number.</span>
+
+<span class="sd">        The intention of this function is to implement a smart way to determine</span>
+<span class="sd">        the boundaries of the windows on which the SFF algorithm is applied</span>
+<span class="sd">        independently. However, this is not implemented yet in this version.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+</pre></div></div></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright lightkurve developers and contributors.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'1.0.a1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

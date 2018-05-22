@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>lightkurve.utils &mdash; lightkurve 1.0.0dev documentation</title>
+  <title>lightkurve.utils &mdash; lightkurve 1.0.a1 documentation</title>
   
 
   
@@ -52,7 +52,7 @@
 
           
             
-            <img src="../../_static/lightkurve.svg" class="logo" alt="Logo"/>
+            <img src="../../_static/lightkurve.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                1.0.0dev
+                1.0
               </div>
             
           
@@ -84,22 +84,9 @@
               
             
             
-              <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../api/index.html">API documentation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../api/targetpixelfile.html">Target Pixel File</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../../api/lightcurve.html">Lightcurve</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../../api/prf.html">Point Spread Function Photometry</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../../api/utils.html">Utilities</a><ul class="simple">
-</ul>
-</li>
-</ul>
-</li>
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/quickstart.html">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../install.html#requirements">Requirements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../install.html#installing-lightkurve">Installing lightkurve</a><ul>
@@ -110,32 +97,81 @@
 <li class="toctree-l2"><a class="reference internal" href="../../install.html#building-documentation">Building documentation</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api/index.html">API documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/targetpixelfile.html">TargetPixelFile classes</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/lightcurve.html">LightCurve classes</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/lightcurvefile.html">LightCurveFile classes</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/correctors.html">Systematics correction classes</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/prf.html">PSF photometry classes</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/utils.html">Utility functions</a><ul class="simple">
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/section1.html">Introduction to lightkurve</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/1.02-target-pixel-files.html">What are Target Pixel File objects?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/1.03-what-are-lightcurves.html">What are Light Curve objects?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/1.04-lightcurve-files.html">What are Light Curve File objects?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/1.05-interact-with-lightcurves-and-tpf.html">Interactively inspecting Target Pixel Files and Lightcurves</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/1.05-interact-with-lightcurves-and-tpf.html#Using-.interact()">Using <code class="docutils literal notranslate"><span class="pre">.interact()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/1.05-interact-with-lightcurves-and-tpf.html#Passing-in-a-preprocessed-lightcurve">Passing in a preprocessed lightcurve</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/section2.html">Science with lightkurve</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/2.02-recover-a-planet.html">How to recover a known planet in Kepler data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/2.03-appending-lightcurves.html">How to combine lightcurves from different Kepler quarters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/2.05-making-custom-apertures.html">How to perform aperture photometry with custom apertures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/cutting-out-tpfs-from-tess-ffis.html">How to cut out Target Pixel Files from Kepler Super Stamps or TESS FFIs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/section3.html">Systematics correction using lightkurve</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/2.04-removing-cbvs.html">How to remove common systematics using basis vectors (CBVs)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/2.01-how-to-detrend.html">How to remove K2 motion systematics with SFF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html">How does the SFF method work?</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html#Retrieve-the-K2SFF-data-for-ENG-test-source-60021426">Retrieve the K2SFF data for ENG test source <code class="docutils literal notranslate"><span class="pre">60021426</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html#Manually-reproduce-with-the-Vanderburg-provided-diagnostic-data">Manually reproduce with the Vanderburg-provided diagnostic data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/motion-correction/replicate-vanderburg-2014-lightkurve.html">Replicating Vanderburg &amp; Johnson 2014 using lightkurve</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/motion-correction/replicate-vanderburg-2014-lightkurve.html#Data-Exclusion">Data Exclusion</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">About lightkurve</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing and reporting issues</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../contributing.html#proposing-changes-to-lightkurve-using-github-pull-requests">Proposing changes to lightkurve using GitHub pull requests</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../contributing.html#coding-and-documentation-guidelines">Coding and documentation guidelines</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../community_software.html">Community Software</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../community_software.html#detrending-analysis">Detrending &amp; Analysis</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../community_software.html#full-frame-images">Full Frame Images</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../community_software.html#data-access">Data access</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../community_software.html#metadata">Metadata</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../community_software.html#planet-search">Planet Search</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../community_software.html#population-statistics">Population Statistics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../community_software.html#positional">Positional</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../community_software.html#science-astrophysics">Science / Astrophysics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../community_software.html#other">Other</a></li>
-</ul>
-</li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">lightkurve tutorials</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../tutorials/target-pixel-files.html">What are Target Pixel Files?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../tutorials/lightcurve-files.html">What are Light Curve Files?</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../tutorials/lightcurve-files.html#Lightcurves-from-Target-Pixel-Files">Lightcurves from Target Pixel Files</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../tutorials/lightcurve-files.html#PDCSAP-from-lightcurves-from-MAST">PDCSAP from lightcurves from MAST</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../citing.html">Citing and acknowledging lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../other_software.html">Other software</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../other_software.html#detrending-analysis">Detrending &amp; Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../other_software.html#full-frame-images">Full Frame Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../other_software.html#data-access">Data access</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../other_software.html#metadata">Metadata</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../other_software.html#planet-search">Planet Search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../other_software.html#population-statistics">Population Statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../other_software.html#positional">Positional</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../other_software.html#science-astrophysics">Science / Astrophysics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../other_software.html#other">Other</a></li>
 </ul>
 </li>
 </ul>
@@ -202,91 +238,18 @@
            <div itemprop="articleBody">
             
   <h1>Source code for lightkurve.utils</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+
 <span class="kn">from</span> <span class="nn">astropy.visualization</span> <span class="k">import</span> <span class="p">(</span><span class="n">PercentileInterval</span><span class="p">,</span> <span class="n">ImageNormalize</span><span class="p">,</span>
                                    <span class="n">SqrtStretch</span><span class="p">,</span> <span class="n">LogStretch</span><span class="p">,</span> <span class="n">LinearStretch</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">astropy.time</span> <span class="k">import</span> <span class="n">Time</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;KeplerQualityFlags&#39;</span><span class="p">,</span> <span class="s1">&#39;module_output_to_channel&#39;</span><span class="p">,</span>
-           <span class="s1">&#39;channel_to_module_output&#39;</span><span class="p">,</span> <span class="s1">&#39;running_mean&#39;</span><span class="p">]</span>
-
-
-<div class="viewcode-block" id="module_output_to_channel"><a class="viewcode-back" href="../../api/utils.html#lightkurve.utils.module_output_to_channel">[docs]</a><span class="k">def</span> <span class="nf">module_output_to_channel</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">output</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Returns the CCD channel number for a given module and output pair.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    module : int</span>
-<span class="sd">        Module number</span>
-<span class="sd">    output : int</span>
-<span class="sd">        Output number</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    channel : int</span>
-<span class="sd">        Channel number</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">module</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">module</span> <span class="o">&gt;</span> <span class="mi">26</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Module number must be in range 1-26.&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">output</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">output</span> <span class="o">&gt;</span> <span class="mi">4</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Output number must be 1, 2, 3, or 4.&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">_get_channel_lookup_array</span><span class="p">()[</span><span class="n">module</span><span class="p">,</span> <span class="n">output</span><span class="p">]</span></div>
-
-
-<div class="viewcode-block" id="channel_to_module_output"><a class="viewcode-back" href="../../api/utils.html#lightkurve.utils.channel_to_module_output">[docs]</a><span class="k">def</span> <span class="nf">channel_to_module_output</span><span class="p">(</span><span class="n">channel</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Returns a (module, output) pair given a CCD channel number.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    channel : int</span>
-<span class="sd">        Channel number</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    module, output : tuple of ints</span>
-<span class="sd">        Module and Output number</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">channel</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">channel</span> <span class="o">&gt;</span> <span class="mi">88</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Channel number must be in the range 1-88.&quot;</span><span class="p">)</span>
-    <span class="n">lookup</span> <span class="o">=</span> <span class="n">_get_channel_lookup_array</span><span class="p">()</span>
-    <span class="n">lookup</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">modout</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">lookup</span> <span class="o">==</span> <span class="n">channel</span><span class="p">)</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">modout</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">modout</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span></div>
-
-
-<span class="k">def</span> <span class="nf">_get_channel_lookup_array</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;Returns a lookup table which maps (module, output) onto channel.&quot;&quot;&quot;</span>
-    <span class="c1"># In the array below, channel == array[module][output]</span>
-    <span class="c1"># Note: modules 1, 5, 21, 25 are the FGS guide star CCDs.</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
-       <span class="p">[</span><span class="mi">0</span><span class="p">,</span>     <span class="mi">0</span><span class="p">,</span>    <span class="mi">0</span><span class="p">,</span>    <span class="mi">0</span><span class="p">,</span>    <span class="mi">0</span><span class="p">],</span>
-       <span class="p">[</span><span class="mi">1</span><span class="p">,</span>    <span class="mi">85</span><span class="p">,</span>    <span class="mi">0</span><span class="p">,</span>    <span class="mi">0</span><span class="p">,</span>    <span class="mi">0</span><span class="p">],</span>
-       <span class="p">[</span><span class="mi">2</span><span class="p">,</span>     <span class="mi">1</span><span class="p">,</span>    <span class="mi">2</span><span class="p">,</span>    <span class="mi">3</span><span class="p">,</span>    <span class="mi">4</span><span class="p">],</span>
-       <span class="p">[</span><span class="mi">3</span><span class="p">,</span>     <span class="mi">5</span><span class="p">,</span>    <span class="mi">6</span><span class="p">,</span>    <span class="mi">7</span><span class="p">,</span>    <span class="mi">8</span><span class="p">],</span>
-       <span class="p">[</span><span class="mi">4</span><span class="p">,</span>     <span class="mi">9</span><span class="p">,</span>   <span class="mi">10</span><span class="p">,</span>   <span class="mi">11</span><span class="p">,</span>   <span class="mi">12</span><span class="p">],</span>
-       <span class="p">[</span><span class="mi">5</span><span class="p">,</span>    <span class="mi">86</span><span class="p">,</span>    <span class="mi">0</span><span class="p">,</span>    <span class="mi">0</span><span class="p">,</span>    <span class="mi">0</span><span class="p">],</span>
-       <span class="p">[</span><span class="mi">6</span><span class="p">,</span>    <span class="mi">13</span><span class="p">,</span>   <span class="mi">14</span><span class="p">,</span>   <span class="mi">15</span><span class="p">,</span>   <span class="mi">16</span><span class="p">],</span>
-       <span class="p">[</span><span class="mi">7</span><span class="p">,</span>    <span class="mi">17</span><span class="p">,</span>   <span class="mi">18</span><span class="p">,</span>   <span class="mi">19</span><span class="p">,</span>   <span class="mi">20</span><span class="p">],</span>
-       <span class="p">[</span><span class="mi">8</span><span class="p">,</span>    <span class="mi">21</span><span class="p">,</span>   <span class="mi">22</span><span class="p">,</span>   <span class="mi">23</span><span class="p">,</span>   <span class="mi">24</span><span class="p">],</span>
-       <span class="p">[</span><span class="mi">9</span><span class="p">,</span>    <span class="mi">25</span><span class="p">,</span>   <span class="mi">26</span><span class="p">,</span>   <span class="mi">27</span><span class="p">,</span>   <span class="mi">28</span><span class="p">],</span>
-       <span class="p">[</span><span class="mi">10</span><span class="p">,</span>   <span class="mi">29</span><span class="p">,</span>   <span class="mi">30</span><span class="p">,</span>   <span class="mi">31</span><span class="p">,</span>   <span class="mi">32</span><span class="p">],</span>
-       <span class="p">[</span><span class="mi">11</span><span class="p">,</span>   <span class="mi">33</span><span class="p">,</span>   <span class="mi">34</span><span class="p">,</span>   <span class="mi">35</span><span class="p">,</span>   <span class="mi">36</span><span class="p">],</span>
-       <span class="p">[</span><span class="mi">12</span><span class="p">,</span>   <span class="mi">37</span><span class="p">,</span>   <span class="mi">38</span><span class="p">,</span>   <span class="mi">39</span><span class="p">,</span>   <span class="mi">40</span><span class="p">],</span>
-       <span class="p">[</span><span class="mi">13</span><span class="p">,</span>   <span class="mi">41</span><span class="p">,</span>   <span class="mi">42</span><span class="p">,</span>   <span class="mi">43</span><span class="p">,</span>   <span class="mi">44</span><span class="p">],</span>
-       <span class="p">[</span><span class="mi">14</span><span class="p">,</span>   <span class="mi">45</span><span class="p">,</span>   <span class="mi">46</span><span class="p">,</span>   <span class="mi">47</span><span class="p">,</span>   <span class="mi">48</span><span class="p">],</span>
-       <span class="p">[</span><span class="mi">15</span><span class="p">,</span>   <span class="mi">49</span><span class="p">,</span>   <span class="mi">50</span><span class="p">,</span>   <span class="mi">51</span><span class="p">,</span>   <span class="mi">52</span><span class="p">],</span>
-       <span class="p">[</span><span class="mi">16</span><span class="p">,</span>   <span class="mi">53</span><span class="p">,</span>   <span class="mi">54</span><span class="p">,</span>   <span class="mi">55</span><span class="p">,</span>   <span class="mi">56</span><span class="p">],</span>
-       <span class="p">[</span><span class="mi">17</span><span class="p">,</span>   <span class="mi">57</span><span class="p">,</span>   <span class="mi">58</span><span class="p">,</span>   <span class="mi">59</span><span class="p">,</span>   <span class="mi">60</span><span class="p">],</span>
-       <span class="p">[</span><span class="mi">18</span><span class="p">,</span>   <span class="mi">61</span><span class="p">,</span>   <span class="mi">62</span><span class="p">,</span>   <span class="mi">63</span><span class="p">,</span>   <span class="mi">64</span><span class="p">],</span>
-       <span class="p">[</span><span class="mi">19</span><span class="p">,</span>   <span class="mi">65</span><span class="p">,</span>   <span class="mi">66</span><span class="p">,</span>   <span class="mi">67</span><span class="p">,</span>   <span class="mi">68</span><span class="p">],</span>
-       <span class="p">[</span><span class="mi">20</span><span class="p">,</span>   <span class="mi">69</span><span class="p">,</span>   <span class="mi">70</span><span class="p">,</span>   <span class="mi">71</span><span class="p">,</span>   <span class="mi">72</span><span class="p">],</span>
-       <span class="p">[</span><span class="mi">21</span><span class="p">,</span>   <span class="mi">87</span><span class="p">,</span>    <span class="mi">0</span><span class="p">,</span>    <span class="mi">0</span><span class="p">,</span>    <span class="mi">0</span><span class="p">],</span>
-       <span class="p">[</span><span class="mi">22</span><span class="p">,</span>   <span class="mi">73</span><span class="p">,</span>   <span class="mi">74</span><span class="p">,</span>   <span class="mi">75</span><span class="p">,</span>   <span class="mi">76</span><span class="p">],</span>
-       <span class="p">[</span><span class="mi">23</span><span class="p">,</span>   <span class="mi">77</span><span class="p">,</span>   <span class="mi">78</span><span class="p">,</span>   <span class="mi">79</span><span class="p">,</span>   <span class="mi">80</span><span class="p">],</span>
-       <span class="p">[</span><span class="mi">24</span><span class="p">,</span>   <span class="mi">81</span><span class="p">,</span>   <span class="mi">82</span><span class="p">,</span>   <span class="mi">83</span><span class="p">,</span>   <span class="mi">84</span><span class="p">],</span>
-       <span class="p">[</span><span class="mi">25</span><span class="p">,</span>   <span class="mi">88</span><span class="p">,</span>    <span class="mi">0</span><span class="p">,</span>    <span class="mi">0</span><span class="p">,</span>    <span class="mi">0</span><span class="p">],</span>
-       <span class="p">])</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;KeplerQualityFlags&#39;</span><span class="p">,</span> <span class="s1">&#39;TessQualityFlags&#39;</span><span class="p">,</span> <span class="s1">&#39;bkjd_to_time&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;channel_to_module_output&#39;</span><span class="p">,</span> <span class="s1">&#39;module_output_to_channel&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;running_mean&#39;</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="KeplerQualityFlags"><a class="viewcode-back" href="../../api/utils.html#lightkurve.utils.KeplerQualityFlags">[docs]</a><span class="k">class</span> <span class="nc">KeplerQualityFlags</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -317,13 +280,13 @@
 
     <span class="c1"># Which is the recommended QUALITY mask to identify bad data?</span>
     <span class="n">DEFAULT_BITMASK</span> <span class="o">=</span> <span class="p">(</span><span class="n">AttitudeTweak</span> <span class="o">|</span> <span class="n">SafeMode</span> <span class="o">|</span> <span class="n">CoarsePoint</span> <span class="o">|</span> <span class="n">EarthPoint</span> <span class="o">|</span>
-                       <span class="n">Desat</span> <span class="o">|</span> <span class="n">ApertureCosmic</span> <span class="o">|</span> <span class="n">ManualExclude</span> <span class="o">|</span>
+                       <span class="n">Desat</span> <span class="o">|</span> <span class="n">ManualExclude</span> <span class="o">|</span>
                        <span class="n">DetectorAnomaly</span> <span class="o">|</span> <span class="n">NoData</span> <span class="o">|</span> <span class="n">ThrusterFiring</span><span class="p">)</span>
 
     <span class="c1"># This bitmask includes flags that are known to identify both good and bad cadences.</span>
     <span class="c1"># Use it wisely.</span>
-    <span class="n">HARD_BITMASK</span> <span class="o">=</span> <span class="p">(</span><span class="n">DEFAULT_BITMASK</span> <span class="o">|</span> <span class="n">SensitivityDropout</span> <span class="o">|</span> <span class="n">CollateralCosmic</span> <span class="o">|</span>
-                    <span class="n">PossibleThrusterFiring</span><span class="p">)</span>
+    <span class="n">HARD_BITMASK</span> <span class="o">=</span> <span class="p">(</span><span class="n">DEFAULT_BITMASK</span> <span class="o">|</span> <span class="n">SensitivityDropout</span> <span class="o">|</span> <span class="n">ApertureCosmic</span> <span class="o">|</span>
+                    <span class="n">CollateralCosmic</span> <span class="o">|</span> <span class="n">PossibleThrusterFiring</span><span class="p">)</span>
 
     <span class="c1"># Using this bitmask only QUALITY == 0 cadences will remain</span>
     <span class="n">HARDEST_BITMASK</span> <span class="o">=</span> <span class="mi">2096639</span>
@@ -380,64 +343,89 @@
         <span class="k">for</span> <span class="n">flag</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">STRINGS</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">quality</span> <span class="o">&amp;</span> <span class="n">flag</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">STRINGS</span><span class="p">[</span><span class="n">flag</span><span class="p">])</span>
-        <span class="k">return</span> <span class="n">result</span></div></div>
+        <span class="k">return</span> <span class="n">result</span>
+</div></div>
 
+<div class="viewcode-block" id="TessQualityFlags"><a class="viewcode-back" href="../../api/utils.html#lightkurve.utils.TessQualityFlags">[docs]</a><span class="k">class</span> <span class="nc">TessQualityFlags</span><span class="p">(</span><span class="n">KeplerQualityFlags</span><span class="p">):</span>
+    <span class="k">pass</span>
+</div>
 
-<span class="k">def</span> <span class="nf">plot_image</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">,</span>
-               <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Pixel Column Number&#39;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;Pixel Row Number&#39;</span><span class="p">,</span>
-               <span class="n">clabel</span><span class="o">=</span><span class="s1">&#39;Flux ($e^{-}s^{-1}$)&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show_colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-               <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Utility function to plot a 2D image</span>
+<div class="viewcode-block" id="channel_to_module_output"><a class="viewcode-back" href="../../api/utils.html#lightkurve.utils.channel_to_module_output">[docs]</a><span class="k">def</span> <span class="nf">channel_to_module_output</span><span class="p">(</span><span class="n">channel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a (module, output) pair given a CCD channel number.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        image : 2d array</span>
-<span class="sd">            Image data.</span>
-<span class="sd">        ax : matplotlib.axes._subplots.AxesSubplot</span>
-<span class="sd">            A matplotlib axes object to plot into. If no axes is provided,</span>
-<span class="sd">            a new one will be generated.</span>
-<span class="sd">        scale : str</span>
-<span class="sd">            Scale used to stretch the colormap.</span>
-<span class="sd">            Options: &#39;linear&#39;, &#39;sqrt&#39;, or &#39;log&#39;.</span>
-<span class="sd">        origin : str</span>
-<span class="sd">            The origin of the coordinate system.</span>
-<span class="sd">        xlabel : str</span>
-<span class="sd">            Label for the x-axis.</span>
-<span class="sd">        ylabel : str</span>
-<span class="sd">            Label for the y-axis.</span>
-<span class="sd">        clabel : str</span>
-<span class="sd">            Label for the color bar.</span>
-<span class="sd">        title : str or None</span>
-<span class="sd">            Title for the plot.</span>
-<span class="sd">        show_colorbar : bool</span>
-<span class="sd">            Whether or not to show the colorbar</span>
-<span class="sd">        kwargs : dict</span>
-<span class="sd">            Keyword arguments to be passed to `matplotlib.pyplot.imshow`.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    channel : int</span>
+<span class="sd">        Channel number</span>
 
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        ax : matplotlib.axes._subplots.AxesSubplot</span>
-<span class="sd">            The matplotlib axes object.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-        <span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span> <span class="o">=</span> <span class="n">PercentileInterval</span><span class="p">(</span><span class="mf">95.</span><span class="p">)</span><span class="o">.</span><span class="n">get_limits</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">scale</span> <span class="o">==</span> <span class="s1">&#39;linear&#39;</span><span class="p">:</span>
-            <span class="n">norm</span> <span class="o">=</span> <span class="n">ImageNormalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">,</span> <span class="n">stretch</span><span class="o">=</span><span class="n">LinearStretch</span><span class="p">())</span>
-        <span class="k">elif</span> <span class="n">scale</span> <span class="o">==</span> <span class="s1">&#39;sqrt&#39;</span><span class="p">:</span>
-            <span class="n">norm</span> <span class="o">=</span> <span class="n">ImageNormalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">,</span> <span class="n">stretch</span><span class="o">=</span><span class="n">SqrtStretch</span><span class="p">())</span>
-        <span class="k">elif</span> <span class="n">scale</span> <span class="o">==</span> <span class="s1">&#39;log&#39;</span><span class="p">:</span>
-            <span class="n">norm</span> <span class="o">=</span> <span class="n">ImageNormalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">,</span> <span class="n">stretch</span><span class="o">=</span><span class="n">LogStretch</span><span class="p">())</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;scale </span><span class="si">{}</span><span class="s2"> is not available.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">scale</span><span class="p">))</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    module, output : tuple of ints</span>
+<span class="sd">        Module and Output number</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">channel</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">channel</span> <span class="o">&gt;</span> <span class="mi">88</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Channel number must be in the range 1-88.&quot;</span><span class="p">)</span>
+    <span class="n">lookup</span> <span class="o">=</span> <span class="n">_get_channel_lookup_array</span><span class="p">()</span>
+    <span class="n">lookup</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">modout</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">lookup</span> <span class="o">==</span> <span class="n">channel</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">modout</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">modout</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+</div>
 
-        <span class="n">cax</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="n">origin</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">xlabel</span><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">ylabel</span><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">show_colorbar</span><span class="p">:</span>
-            <span class="n">cbar</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">cax</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">clabel</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">ax</span>
+<div class="viewcode-block" id="module_output_to_channel"><a class="viewcode-back" href="../../api/utils.html#lightkurve.utils.module_output_to_channel">[docs]</a><span class="k">def</span> <span class="nf">module_output_to_channel</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">output</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the CCD channel number for a given module and output pair.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    module : int</span>
+<span class="sd">        Module number</span>
+<span class="sd">    output : int</span>
+<span class="sd">        Output number</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    channel : int</span>
+<span class="sd">        Channel number</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">module</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">module</span> <span class="o">&gt;</span> <span class="mi">26</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Module number must be in range 1-26.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">output</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">output</span> <span class="o">&gt;</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Output number must be 1, 2, 3, or 4.&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_get_channel_lookup_array</span><span class="p">()[</span><span class="n">module</span><span class="p">,</span> <span class="n">output</span><span class="p">]</span>
+</div>
+
+<span class="k">def</span> <span class="nf">_get_channel_lookup_array</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Returns a lookup table which maps (module, output) onto channel.&quot;&quot;&quot;</span>
+    <span class="c1"># In the array below, channel == array[module][output]</span>
+    <span class="c1"># Note: modules 1, 5, 21, 25 are the FGS guide star CCDs.</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+       <span class="p">[</span><span class="mi">0</span><span class="p">,</span>     <span class="mi">0</span><span class="p">,</span>    <span class="mi">0</span><span class="p">,</span>    <span class="mi">0</span><span class="p">,</span>    <span class="mi">0</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">1</span><span class="p">,</span>    <span class="mi">85</span><span class="p">,</span>    <span class="mi">0</span><span class="p">,</span>    <span class="mi">0</span><span class="p">,</span>    <span class="mi">0</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">2</span><span class="p">,</span>     <span class="mi">1</span><span class="p">,</span>    <span class="mi">2</span><span class="p">,</span>    <span class="mi">3</span><span class="p">,</span>    <span class="mi">4</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">3</span><span class="p">,</span>     <span class="mi">5</span><span class="p">,</span>    <span class="mi">6</span><span class="p">,</span>    <span class="mi">7</span><span class="p">,</span>    <span class="mi">8</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">4</span><span class="p">,</span>     <span class="mi">9</span><span class="p">,</span>   <span class="mi">10</span><span class="p">,</span>   <span class="mi">11</span><span class="p">,</span>   <span class="mi">12</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">5</span><span class="p">,</span>    <span class="mi">86</span><span class="p">,</span>    <span class="mi">0</span><span class="p">,</span>    <span class="mi">0</span><span class="p">,</span>    <span class="mi">0</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">6</span><span class="p">,</span>    <span class="mi">13</span><span class="p">,</span>   <span class="mi">14</span><span class="p">,</span>   <span class="mi">15</span><span class="p">,</span>   <span class="mi">16</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">7</span><span class="p">,</span>    <span class="mi">17</span><span class="p">,</span>   <span class="mi">18</span><span class="p">,</span>   <span class="mi">19</span><span class="p">,</span>   <span class="mi">20</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">8</span><span class="p">,</span>    <span class="mi">21</span><span class="p">,</span>   <span class="mi">22</span><span class="p">,</span>   <span class="mi">23</span><span class="p">,</span>   <span class="mi">24</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">9</span><span class="p">,</span>    <span class="mi">25</span><span class="p">,</span>   <span class="mi">26</span><span class="p">,</span>   <span class="mi">27</span><span class="p">,</span>   <span class="mi">28</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">10</span><span class="p">,</span>   <span class="mi">29</span><span class="p">,</span>   <span class="mi">30</span><span class="p">,</span>   <span class="mi">31</span><span class="p">,</span>   <span class="mi">32</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">11</span><span class="p">,</span>   <span class="mi">33</span><span class="p">,</span>   <span class="mi">34</span><span class="p">,</span>   <span class="mi">35</span><span class="p">,</span>   <span class="mi">36</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">12</span><span class="p">,</span>   <span class="mi">37</span><span class="p">,</span>   <span class="mi">38</span><span class="p">,</span>   <span class="mi">39</span><span class="p">,</span>   <span class="mi">40</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">13</span><span class="p">,</span>   <span class="mi">41</span><span class="p">,</span>   <span class="mi">42</span><span class="p">,</span>   <span class="mi">43</span><span class="p">,</span>   <span class="mi">44</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">14</span><span class="p">,</span>   <span class="mi">45</span><span class="p">,</span>   <span class="mi">46</span><span class="p">,</span>   <span class="mi">47</span><span class="p">,</span>   <span class="mi">48</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">15</span><span class="p">,</span>   <span class="mi">49</span><span class="p">,</span>   <span class="mi">50</span><span class="p">,</span>   <span class="mi">51</span><span class="p">,</span>   <span class="mi">52</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">16</span><span class="p">,</span>   <span class="mi">53</span><span class="p">,</span>   <span class="mi">54</span><span class="p">,</span>   <span class="mi">55</span><span class="p">,</span>   <span class="mi">56</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">17</span><span class="p">,</span>   <span class="mi">57</span><span class="p">,</span>   <span class="mi">58</span><span class="p">,</span>   <span class="mi">59</span><span class="p">,</span>   <span class="mi">60</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">18</span><span class="p">,</span>   <span class="mi">61</span><span class="p">,</span>   <span class="mi">62</span><span class="p">,</span>   <span class="mi">63</span><span class="p">,</span>   <span class="mi">64</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">19</span><span class="p">,</span>   <span class="mi">65</span><span class="p">,</span>   <span class="mi">66</span><span class="p">,</span>   <span class="mi">67</span><span class="p">,</span>   <span class="mi">68</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">20</span><span class="p">,</span>   <span class="mi">69</span><span class="p">,</span>   <span class="mi">70</span><span class="p">,</span>   <span class="mi">71</span><span class="p">,</span>   <span class="mi">72</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">21</span><span class="p">,</span>   <span class="mi">87</span><span class="p">,</span>    <span class="mi">0</span><span class="p">,</span>    <span class="mi">0</span><span class="p">,</span>    <span class="mi">0</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">22</span><span class="p">,</span>   <span class="mi">73</span><span class="p">,</span>   <span class="mi">74</span><span class="p">,</span>   <span class="mi">75</span><span class="p">,</span>   <span class="mi">76</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">23</span><span class="p">,</span>   <span class="mi">77</span><span class="p">,</span>   <span class="mi">78</span><span class="p">,</span>   <span class="mi">79</span><span class="p">,</span>   <span class="mi">80</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">24</span><span class="p">,</span>   <span class="mi">81</span><span class="p">,</span>   <span class="mi">82</span><span class="p">,</span>   <span class="mi">83</span><span class="p">,</span>   <span class="mi">84</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">25</span><span class="p">,</span>   <span class="mi">88</span><span class="p">,</span>    <span class="mi">0</span><span class="p">,</span>    <span class="mi">0</span><span class="p">,</span>    <span class="mi">0</span><span class="p">],</span>
+       <span class="p">])</span>
+
 
 <div class="viewcode-block" id="running_mean"><a class="viewcode-back" href="../../api/utils.html#lightkurve.utils.running_mean">[docs]</a><span class="k">def</span> <span class="nf">running_mean</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">window_size</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Returns the moving average of an array `data`.</span>
@@ -450,7 +438,96 @@
 <span class="sd">        Window length used to compute the running mean.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">cumsum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">cumsum</span><span class="p">[</span><span class="n">window_size</span><span class="p">:]</span> <span class="o">-</span> <span class="n">cumsum</span><span class="p">[:</span><span class="o">-</span><span class="n">window_size</span><span class="p">])</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">window_size</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="p">(</span><span class="n">cumsum</span><span class="p">[</span><span class="n">window_size</span><span class="p">:]</span> <span class="o">-</span> <span class="n">cumsum</span><span class="p">[:</span><span class="o">-</span><span class="n">window_size</span><span class="p">])</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">window_size</span><span class="p">)</span>
+</div>
+
+<div class="viewcode-block" id="bkjd_to_time"><a class="viewcode-back" href="../../api/utils.html#lightkurve.utils.bkjd_to_time">[docs]</a><span class="k">def</span> <span class="nf">bkjd_to_time</span><span class="p">(</span><span class="n">bkjd</span><span class="p">,</span> <span class="n">timecorr</span><span class="p">,</span> <span class="n">timslice</span><span class="p">,</span> <span class="n">bjdref</span><span class="o">=</span><span class="mf">2454833.</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Converts Barycentric Kepler Julian Day (BKJD) to an astropy.time.Time object.</span>
+
+<span class="sd">    Kepler Barycentric Julian Day is a Julian day minus 2454833.0 (UTC=January</span>
+<span class="sd">    1, 2009 12:00:00) and corrected to be the arrival times at the barycenter</span>
+<span class="sd">    of the Solar System. See Section 2.3.2 in the Kepler Archive Manual.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    bkjd : array of floats</span>
+<span class="sd">        Barycentric Kepler Julian Day</span>
+<span class="sd">    timecorr : array of floats</span>
+<span class="sd">        Kepler barycentric correction</span>
+<span class="sd">    timslice : array of floats</span>
+<span class="sd">        Kepler time-slice correction</span>
+<span class="sd">    bjdref : float</span>
+<span class="sd">        BJD reference date, for Kepler this is 2454833</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    time : astropy.time.Time object</span>
+<span class="sd">        Resulting time object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">bjd</span> <span class="o">=</span> <span class="n">bkjd</span> <span class="o">+</span> <span class="n">bjdref</span>
+    <span class="n">jd</span> <span class="o">=</span> <span class="n">bjd</span> <span class="o">-</span> <span class="n">timecorr</span>
+    <span class="n">jd</span> <span class="o">+=</span> <span class="p">(</span><span class="mf">0.25</span> <span class="o">+</span> <span class="mf">0.62</span> <span class="o">*</span> <span class="p">(</span><span class="mi">5</span> <span class="o">-</span> <span class="n">timslice</span><span class="p">))</span> <span class="o">/</span> <span class="mf">86400.</span>
+    <span class="k">return</span> <span class="n">Time</span><span class="p">(</span><span class="n">jd</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;jd&#39;</span><span class="p">)</span>
+</div>
+
+<span class="k">def</span> <span class="nf">plot_image</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">,</span>
+               <span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;Pixel Column Number&#39;</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;Pixel Row Number&#39;</span><span class="p">,</span>
+               <span class="n">clabel</span><span class="o">=</span><span class="s1">&#39;Flux ($e^{-}s^{-1}$)&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show_colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+               <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Utility function to plot a 2D image</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    image : 2d array</span>
+<span class="sd">        Image data.</span>
+<span class="sd">    ax : matplotlib.axes._subplots.AxesSubplot</span>
+<span class="sd">        A matplotlib axes object to plot into. If no axes is provided,</span>
+<span class="sd">        a new one will be generated.</span>
+<span class="sd">    scale : str</span>
+<span class="sd">        Scale used to stretch the colormap.</span>
+<span class="sd">        Options: &#39;linear&#39;, &#39;sqrt&#39;, or &#39;log&#39;.</span>
+<span class="sd">    origin : str</span>
+<span class="sd">        The origin of the coordinate system.</span>
+<span class="sd">    xlabel : str</span>
+<span class="sd">        Label for the x-axis.</span>
+<span class="sd">    ylabel : str</span>
+<span class="sd">        Label for the y-axis.</span>
+<span class="sd">    clabel : str</span>
+<span class="sd">        Label for the color bar.</span>
+<span class="sd">    title : str or None</span>
+<span class="sd">        Title for the plot.</span>
+<span class="sd">    show_colorbar : bool</span>
+<span class="sd">        Whether or not to show the colorbar</span>
+<span class="sd">    kwargs : dict</span>
+<span class="sd">        Keyword arguments to be passed to `matplotlib.pyplot.imshow`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ax : matplotlib.axes._subplots.AxesSubplot</span>
+<span class="sd">        The matplotlib axes object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+    <span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span> <span class="o">=</span> <span class="n">PercentileInterval</span><span class="p">(</span><span class="mf">95.</span><span class="p">)</span><span class="o">.</span><span class="n">get_limits</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+
+    <span class="n">norm</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">scale</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">scale</span> <span class="o">==</span> <span class="s1">&#39;linear&#39;</span><span class="p">:</span>
+            <span class="n">norm</span> <span class="o">=</span> <span class="n">ImageNormalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">,</span> <span class="n">stretch</span><span class="o">=</span><span class="n">LinearStretch</span><span class="p">())</span>
+        <span class="k">elif</span> <span class="n">scale</span> <span class="o">==</span> <span class="s1">&#39;sqrt&#39;</span><span class="p">:</span>
+            <span class="n">norm</span> <span class="o">=</span> <span class="n">ImageNormalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">,</span> <span class="n">stretch</span><span class="o">=</span><span class="n">SqrtStretch</span><span class="p">())</span>
+        <span class="k">elif</span> <span class="n">scale</span> <span class="o">==</span> <span class="s1">&#39;log&#39;</span><span class="p">:</span>
+            <span class="n">norm</span> <span class="o">=</span> <span class="n">ImageNormalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">,</span> <span class="n">stretch</span><span class="o">=</span><span class="n">LogStretch</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;scale </span><span class="si">{}</span><span class="s2"> is not available.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">scale</span><span class="p">))</span>
+
+    <span class="n">cax</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="n">origin</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">xlabel</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">ylabel</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">show_colorbar</span><span class="p">:</span>
+        <span class="n">cbar</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">cax</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">clabel</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ax</span>
 </pre></div>
 
            </div>
@@ -463,7 +540,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright lightkurve Developers and Contributors.
+        &copy; Copyright lightkurve developers and contributors.
 
     </p>
   </div>
@@ -485,7 +562,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'1.0.0dev',
+            VERSION:'1.0.a1',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

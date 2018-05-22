@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Index &mdash; lightkurve 1.0.0dev documentation</title>
+  <title>Index &mdash; lightkurve 1.0.a1 documentation</title>
   
 
   
@@ -53,7 +53,7 @@
 
           
             
-            <img src="_static/lightkurve.svg" class="logo" alt="Logo"/>
+            <img src="_static/lightkurve.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                1.0.0dev
+                1.0
               </div>
             
           
@@ -85,22 +85,9 @@
               
             
             
-              <ul>
-<li class="toctree-l1"><a class="reference internal" href="api/index.html">API documentation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="api/targetpixelfile.html">Target Pixel File</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="api/lightcurve.html">Lightcurve</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="api/prf.html">Point Spread Function Photometry</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="api/utils.html">Utilities</a><ul class="simple">
-</ul>
-</li>
-</ul>
-</li>
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/quickstart.html">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="install.html#requirements">Requirements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="install.html#installing-lightkurve">Installing lightkurve</a><ul>
@@ -111,32 +98,81 @@
 <li class="toctree-l2"><a class="reference internal" href="install.html#building-documentation">Building documentation</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="api/index.html">API documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/targetpixelfile.html">TargetPixelFile classes</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/lightcurve.html">LightCurve classes</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/lightcurvefile.html">LightCurveFile classes</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/correctors.html">Systematics correction classes</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/prf.html">PSF photometry classes</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/utils.html">Utility functions</a><ul class="simple">
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/section1.html">Introduction to lightkurve</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/1.02-target-pixel-files.html">What are Target Pixel File objects?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/1.03-what-are-lightcurves.html">What are Light Curve objects?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/1.04-lightcurve-files.html">What are Light Curve File objects?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/1.05-interact-with-lightcurves-and-tpf.html">Interactively inspecting Target Pixel Files and Lightcurves</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/1.05-interact-with-lightcurves-and-tpf.html#Using-.interact()">Using <code class="docutils literal notranslate"><span class="pre">.interact()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/1.05-interact-with-lightcurves-and-tpf.html#Passing-in-a-preprocessed-lightcurve">Passing in a preprocessed lightcurve</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/section2.html">Science with lightkurve</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/2.02-recover-a-planet.html">How to recover a known planet in Kepler data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/2.03-appending-lightcurves.html">How to combine lightcurves from different Kepler quarters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/2.05-making-custom-apertures.html">How to perform aperture photometry with custom apertures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/cutting-out-tpfs-from-tess-ffis.html">How to cut out Target Pixel Files from Kepler Super Stamps or TESS FFIs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/section3.html">Systematics correction using lightkurve</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/2.04-removing-cbvs.html">How to remove common systematics using basis vectors (CBVs)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/2.01-how-to-detrend.html">How to remove K2 motion systematics with SFF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html">How does the SFF method work?</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html#Retrieve-the-K2SFF-data-for-ENG-test-source-60021426">Retrieve the K2SFF data for ENG test source <code class="docutils literal notranslate"><span class="pre">60021426</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html#Manually-reproduce-with-the-Vanderburg-provided-diagnostic-data">Manually reproduce with the Vanderburg-provided diagnostic data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/motion-correction/replicate-vanderburg-2014-lightkurve.html">Replicating Vanderburg &amp; Johnson 2014 using lightkurve</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/motion-correction/replicate-vanderburg-2014-lightkurve.html#Data-Exclusion">Data Exclusion</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">About lightkurve</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing and reporting issues</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="contributing.html#proposing-changes-to-lightkurve-using-github-pull-requests">Proposing changes to lightkurve using GitHub pull requests</a></li>
 <li class="toctree-l2"><a class="reference internal" href="contributing.html#coding-and-documentation-guidelines">Coding and documentation guidelines</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="community_software.html">Community Software</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="community_software.html#detrending-analysis">Detrending &amp; Analysis</a></li>
-<li class="toctree-l2"><a class="reference internal" href="community_software.html#full-frame-images">Full Frame Images</a></li>
-<li class="toctree-l2"><a class="reference internal" href="community_software.html#data-access">Data access</a></li>
-<li class="toctree-l2"><a class="reference internal" href="community_software.html#metadata">Metadata</a></li>
-<li class="toctree-l2"><a class="reference internal" href="community_software.html#planet-search">Planet Search</a></li>
-<li class="toctree-l2"><a class="reference internal" href="community_software.html#population-statistics">Population Statistics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="community_software.html#positional">Positional</a></li>
-<li class="toctree-l2"><a class="reference internal" href="community_software.html#science-astrophysics">Science / Astrophysics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="community_software.html#other">Other</a></li>
-</ul>
-</li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/index.html">lightkurve tutorials</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/target-pixel-files.html">What are Target Pixel Files?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorials/lightcurve-files.html">What are Light Curve Files?</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="tutorials/lightcurve-files.html#Lightcurves-from-Target-Pixel-Files">Lightcurves from Target Pixel Files</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tutorials/lightcurve-files.html#PDCSAP-from-lightcurves-from-MAST">PDCSAP from lightcurves from MAST</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="citing.html">Citing and acknowledging lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="other_software.html">Other software</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="other_software.html#detrending-analysis">Detrending &amp; Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="other_software.html#full-frame-images">Full Frame Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="other_software.html#data-access">Data access</a></li>
+<li class="toctree-l2"><a class="reference internal" href="other_software.html#metadata">Metadata</a></li>
+<li class="toctree-l2"><a class="reference internal" href="other_software.html#planet-search">Planet Search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="other_software.html#population-statistics">Population Statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="other_software.html#positional">Positional</a></li>
+<li class="toctree-l2"><a class="reference internal" href="other_software.html#science-astrophysics">Science / Astrophysics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="other_software.html#other">Other</a></li>
 </ul>
 </li>
 </ul>
@@ -225,6 +261,7 @@
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
+ | <a href="#W"><strong>W</strong></a>
  | <a href="#Z"><strong>Z</strong></a>
  
 </div>
@@ -233,7 +270,9 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/utils.html#lightkurve.utils.KeplerQualityFlags.ApertureCosmic">ApertureCosmic (lightkurve.utils.KeplerQualityFlags attribute)</a>
 </li>
-      <li><a href="api/lightcurve.html#lightkurve.lightcurve.SFFCorrector.arclength">arclength() (lightkurve.lightcurve.SFFCorrector method)</a>
+      <li><a href="api/lightcurve.html#lightkurve.lightcurve.LightCurve.append">append() (lightkurve.lightcurve.LightCurve method)</a>
+</li>
+      <li><a href="api/correctors.html#lightkurve.correctors.SFFCorrector.arclength">arclength() (lightkurve.correctors.SFFCorrector method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -251,13 +290,13 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/lightcurve.html#lightkurve.lightcurve.LightCurve.bin">bin() (lightkurve.lightcurve.LightCurve method)</a>
 </li>
-      <li><a href="api/lightcurve.html#lightkurve.lightcurve.SFFCorrector.bin_and_interpolate">bin_and_interpolate() (lightkurve.lightcurve.SFFCorrector method)</a>
+      <li><a href="api/correctors.html#lightkurve.correctors.SFFCorrector.bin_and_interpolate">bin_and_interpolate() (lightkurve.correctors.SFFCorrector method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/lightcurve.html#lightkurve.lightcurve.box_period_search">box_period_search() (in module lightkurve.lightcurve)</a>
+      <li><a href="api/utils.html#lightkurve.utils.bkjd_to_time">bkjd_to_time() (in module lightkurve.utils)</a>
 </li>
-      <li><a href="api/lightcurve.html#lightkurve.lightcurve.SFFCorrector.breakpoints">breakpoints() (lightkurve.lightcurve.SFFCorrector method)</a>
+      <li><a href="api/correctors.html#lightkurve.correctors.SFFCorrector.breakpoints">breakpoints() (lightkurve.correctors.SFFCorrector method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -265,13 +304,9 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/lightcurve.html#lightkurve.lightcurve.KeplerLightCurveFile.cadenceno">cadenceno (lightkurve.lightcurve.KeplerLightCurveFile attribute)</a>
-
-      <ul>
-        <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.cadenceno">(lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
+      <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.cadenceno">cadenceno (lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
 </li>
-      </ul></li>
-      <li><a href="api/lightcurve.html#lightkurve.lightcurve.KeplerLightCurveFile.campaign">campaign (lightkurve.lightcurve.KeplerLightCurveFile attribute)</a>
+      <li><a href="api/lightcurvefile.html#lightkurve.lightcurvefile.KeplerLightCurveFile.campaign">campaign (lightkurve.lightcurvefile.KeplerLightCurveFile attribute)</a>
 
       <ul>
         <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.campaign">(lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
@@ -281,7 +316,7 @@
 </li>
       <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.centroids">centroids() (lightkurve.targetpixelfile.KeplerTargetPixelFile method)</a>
 </li>
-      <li><a href="api/lightcurve.html#lightkurve.lightcurve.KeplerLightCurveFile.channel">channel (lightkurve.lightcurve.KeplerLightCurveFile attribute)</a>
+      <li><a href="api/lightcurvefile.html#lightkurve.lightcurvefile.KeplerLightCurveFile.channel">channel (lightkurve.lightcurvefile.KeplerLightCurveFile attribute)</a>
 
       <ul>
         <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.channel">(lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
@@ -293,22 +328,20 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/utils.html#lightkurve.utils.KeplerQualityFlags.CoarsePoint">CoarsePoint (lightkurve.utils.KeplerQualityFlags attribute)</a>
 </li>
-      <li><a href="api/lightcurve.html#lightkurve.lightcurve.KeplerCBVCorrector.coeffs">coeffs (lightkurve.lightcurve.KeplerCBVCorrector attribute)</a>
+      <li><a href="api/correctors.html#lightkurve.correctors.KeplerCBVCorrector.coeffs">coeffs (lightkurve.correctors.KeplerCBVCorrector attribute)</a>
 </li>
       <li><a href="api/utils.html#lightkurve.utils.KeplerQualityFlags.CollateralCosmic">CollateralCosmic (lightkurve.utils.KeplerQualityFlags attribute)</a>
 </li>
       <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.column">column (lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
 </li>
-      <li><a href="api/lightcurve.html#lightkurve.lightcurve.KeplerLightCurveFile.compute_cotrended_lightcurve">compute_cotrended_lightcurve() (lightkurve.lightcurve.KeplerLightCurveFile method)</a>
+      <li><a href="api/lightcurvefile.html#lightkurve.lightcurvefile.KeplerLightCurveFile.compute_cotrended_lightcurve">compute_cotrended_lightcurve() (lightkurve.lightcurvefile.KeplerLightCurveFile method)</a>
 </li>
-      <li><a href="api/lightcurve.html#lightkurve.lightcurve.KeplerCBVCorrector.correct">correct() (lightkurve.lightcurve.KeplerCBVCorrector method)</a>
+      <li><a href="api/correctors.html#lightkurve.correctors.KeplerCBVCorrector.correct">correct() (lightkurve.correctors.KeplerCBVCorrector method)</a>
 
       <ul>
+        <li><a href="api/correctors.html#lightkurve.correctors.SFFCorrector.correct">(lightkurve.correctors.SFFCorrector method)</a>
+</li>
         <li><a href="api/lightcurve.html#lightkurve.lightcurve.KeplerLightCurve.correct">(lightkurve.lightcurve.KeplerLightCurve method)</a>
-</li>
-        <li><a href="api/lightcurve.html#lightkurve.lightcurve.SFFCorrector.correct">(lightkurve.lightcurve.SFFCorrector method)</a>
-</li>
-        <li><a href="api/lightcurve.html#lightkurve.lightcurve.SPLDCorrector.correct">(lightkurve.lightcurve.SPLDCorrector method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -353,21 +386,29 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/prf.html#lightkurve.prf.PRFPhotometry.fit">fit() (lightkurve.prf.PRFPhotometry method)</a>
 </li>
-      <li><a href="api/lightcurve.html#lightkurve.lightcurve.SFFCorrector.fit_bspline">fit_bspline() (lightkurve.lightcurve.SFFCorrector method)</a>
+      <li><a href="api/correctors.html#lightkurve.correctors.SFFCorrector.fit_bspline">fit_bspline() (lightkurve.correctors.SFFCorrector method)</a>
 </li>
       <li><a href="api/lightcurve.html#lightkurve.lightcurve.LightCurve.flatten">flatten() (lightkurve.lightcurve.LightCurve method)</a>
 </li>
       <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.flux">flux (lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.flux_bkg">flux_bkg (lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.flux_bkg_err">flux_bkg_err (lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
 </li>
       <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.flux_err">flux_err (lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
 </li>
       <li><a href="api/lightcurve.html#lightkurve.lightcurve.LightCurve.fold">fold() (lightkurve.lightcurve.LightCurve method)</a>
+</li>
+      <li><a href="api/lightcurvefile.html#lightkurve.lightcurvefile.KeplerLightCurveFile.from_archive">from_archive() (lightkurve.lightcurvefile.KeplerLightCurveFile static method)</a>
+
+      <ul>
+        <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.from_archive">(lightkurve.targetpixelfile.KeplerTargetPixelFile static method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.from_fits_images">from_fits_images() (lightkurve.targetpixelfile.KeplerTargetPixelFile static method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -377,16 +418,22 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_bkg_lightcurve">get_bkg_lightcurve() (lightkurve.targetpixelfile.KeplerTargetPixelFile method)</a>
 </li>
-      <li><a href="api/lightcurve.html#lightkurve.lightcurve.KeplerCBVCorrector.get_cbv_url">get_cbv_url() (lightkurve.lightcurve.KeplerCBVCorrector method)</a>
+      <li><a href="api/correctors.html#lightkurve.correctors.KeplerCBVCorrector.get_cbv_url">get_cbv_url() (lightkurve.correctors.KeplerCBVCorrector method)</a>
 </li>
-      <li><a href="api/lightcurve.html#lightkurve.lightcurve.KeplerCBVCorrector.get_cbvs_list">get_cbvs_list() (lightkurve.lightcurve.KeplerCBVCorrector method)</a>
+      <li><a href="api/correctors.html#lightkurve.correctors.KeplerCBVCorrector.get_cbvs_list">get_cbvs_list() (lightkurve.correctors.KeplerCBVCorrector method)</a>
+</li>
+      <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_coordinates">get_coordinates() (lightkurve.targetpixelfile.KeplerTargetPixelFile method)</a>
 </li>
       <li><a href="api/prf.html#lightkurve.prf.get_initial_guesses">get_initial_guesses() (in module lightkurve.prf)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/lightcurve.html#lightkurve.lightcurve.KeplerLightCurveFile.get_lightcurve">get_lightcurve() (lightkurve.lightcurve.KeplerLightCurveFile method)</a>
+      <li><a href="api/lightcurvefile.html#lightkurve.lightcurvefile.KeplerLightCurveFile.get_lightcurve">get_lightcurve() (lightkurve.lightcurvefile.KeplerLightCurveFile method)</a>
+
+      <ul>
+        <li><a href="api/lightcurvefile.html#lightkurve.lightcurvefile.TessLightCurveFile.get_lightcurve">(lightkurve.lightcurvefile.TessLightCurveFile method)</a>
 </li>
+      </ul></li>
       <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_prf_model">get_prf_model() (lightkurve.targetpixelfile.KeplerTargetPixelFile method)</a>
 </li>
       <li><a href="api/prf.html#lightkurve.prf.PRFPhotometry.get_residuals">get_residuals() (lightkurve.prf.PRFPhotometry method)</a>
@@ -407,20 +454,12 @@
 </li>
       <li><a href="api/utils.html#lightkurve.utils.KeplerQualityFlags.HARDEST_BITMASK">HARDEST_BITMASK (lightkurve.utils.KeplerQualityFlags attribute)</a>
 </li>
-      <li><a href="api/lightcurve.html#lightkurve.lightcurve.KeplerLightCurveFile.hdu">hdu (lightkurve.lightcurve.KeplerLightCurveFile attribute)</a>
-
-      <ul>
-        <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.hdu">(lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
-</li>
-      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/lightcurve.html#lightkurve.lightcurve.KeplerLightCurveFile.header">header() (lightkurve.lightcurve.KeplerLightCurveFile method)</a>
-
-      <ul>
-        <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.header">(lightkurve.targetpixelfile.KeplerTargetPixelFile method)</a>
+      <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.hdu">hdu (lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
 </li>
-      </ul></li>
+      <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.header">header() (lightkurve.targetpixelfile.KeplerTargetPixelFile method)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -431,6 +470,8 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.interact">interact() (lightkurve.targetpixelfile.KeplerTargetPixelFile method)</a>
+</li>
       <li><a href="api/lightcurve.html#lightkurve.lightcurve.iterative_box_period_search">iterative_box_period_search() (in module lightkurve.lightcurve)</a>
 </li>
   </ul></td>
@@ -439,9 +480,9 @@
 <h2 id="K">K</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/lightcurve.html#lightkurve.lightcurve.KeplerCBVCorrector">KeplerCBVCorrector (class in lightkurve.lightcurve)</a>
+      <li><a href="api/correctors.html#lightkurve.correctors.KeplerCBVCorrector">KeplerCBVCorrector (class in lightkurve.correctors)</a>
 </li>
-      <li><a href="api/lightcurve.html#lightkurve.lightcurve.KeplerLightCurveFile.keplerid">keplerid (lightkurve.lightcurve.KeplerLightCurveFile attribute)</a>
+      <li><a href="api/lightcurvefile.html#lightkurve.lightcurvefile.KeplerLightCurveFile.keplerid">keplerid (lightkurve.lightcurvefile.KeplerLightCurveFile attribute)</a>
 
       <ul>
         <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.keplerid">(lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
@@ -451,7 +492,7 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/lightcurve.html#lightkurve.lightcurve.KeplerLightCurveFile">KeplerLightCurveFile (class in lightkurve.lightcurve)</a>
+      <li><a href="api/lightcurvefile.html#lightkurve.lightcurvefile.KeplerLightCurveFile">KeplerLightCurveFile (class in lightkurve.lightcurvefile)</a>
 </li>
       <li><a href="api/prf.html#lightkurve.prf.KeplerPRF">KeplerPRF (class in lightkurve.prf)</a>
 </li>
@@ -465,14 +506,18 @@
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/lightcurve.html#lightkurve.lightcurve.KeplerCBVCorrector.lc_file">lc_file (lightkurve.lightcurve.KeplerCBVCorrector attribute)</a>
+      <li><a href="api/correctors.html#lightkurve.correctors.KeplerCBVCorrector.lc_file">lc_file (lightkurve.correctors.KeplerCBVCorrector attribute)</a>
 </li>
       <li><a href="api/lightcurve.html#lightkurve.lightcurve.LightCurve">LightCurve (class in lightkurve.lightcurve)</a>
+</li>
+      <li><a href="api/correctors.html#module-lightkurve.correctors">lightkurve.correctors (module)</a>
 </li>
       <li><a href="api/lightcurve.html#module-lightkurve.lightcurve">lightkurve.lightcurve (module)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/lightcurvefile.html#module-lightkurve.lightcurvefile">lightkurve.lightcurvefile (module)</a>
+</li>
       <li><a href="api/prf.html#module-lightkurve.prf">lightkurve.prf (module)</a>
 </li>
       <li><a href="api/targetpixelfile.html#module-lightkurve.targetpixelfile">lightkurve.targetpixelfile (module)</a>
@@ -487,7 +532,7 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/utils.html#lightkurve.utils.KeplerQualityFlags.ManualExclude">ManualExclude (lightkurve.utils.KeplerQualityFlags attribute)</a>
 </li>
-      <li><a href="api/lightcurve.html#lightkurve.lightcurve.KeplerLightCurveFile.mission">mission (lightkurve.lightcurve.KeplerLightCurveFile attribute)</a>
+      <li><a href="api/lightcurvefile.html#lightkurve.lightcurvefile.KeplerLightCurveFile.mission">mission (lightkurve.lightcurvefile.KeplerLightCurveFile attribute)</a>
 
       <ul>
         <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.mission">(lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
@@ -505,14 +550,12 @@
 <h2 id="N">N</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.n_good_cadences">n_good_cadences (lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
-</li>
       <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.nan_time_mask">nan_time_mask (lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
+</li>
+      <li><a href="api/utils.html#lightkurve.utils.KeplerQualityFlags.NoData">NoData (lightkurve.utils.KeplerQualityFlags attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/utils.html#lightkurve.utils.KeplerQualityFlags.NoData">NoData (lightkurve.utils.KeplerQualityFlags attribute)</a>
-</li>
       <li><a href="api/utils.html#lightkurve.utils.KeplerQualityFlags.NoFinePoint">NoFinePoint (lightkurve.utils.KeplerQualityFlags attribute)</a>
 </li>
       <li><a href="api/lightcurve.html#lightkurve.lightcurve.LightCurve.normalize">normalize() (lightkurve.lightcurve.LightCurve method)</a>
@@ -523,10 +566,16 @@
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/lightcurve.html#lightkurve.lightcurve.KeplerCBVCorrector.opt_result">opt_result (lightkurve.lightcurve.KeplerCBVCorrector attribute)</a>
+      <li><a href="api/lightcurvefile.html#lightkurve.lightcurvefile.KeplerLightCurveFile.obsmode">obsmode (lightkurve.lightcurvefile.KeplerLightCurveFile attribute)</a>
+
+      <ul>
+        <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.obsmode">(lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
 </li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/correctors.html#lightkurve.correctors.KeplerCBVCorrector.opt_result">opt_result (lightkurve.correctors.KeplerCBVCorrector attribute)</a>
+</li>
       <li><a href="api/utils.html#lightkurve.utils.KeplerQualityFlags.OPTIONS">OPTIONS (lightkurve.utils.KeplerQualityFlags attribute)</a>
 </li>
       <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.output">output (lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
@@ -537,14 +586,12 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/lightcurve.html#lightkurve.lightcurve.KeplerLightCurveFile.PDCSAP_FLUX">PDCSAP_FLUX (lightkurve.lightcurve.KeplerLightCurveFile attribute)</a>
-</li>
       <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.pipeline_mask">pipeline_mask (lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
 </li>
-      <li><a href="api/lightcurve.html#lightkurve.lightcurve.KeplerLightCurveFile.plot">plot() (lightkurve.lightcurve.KeplerLightCurveFile method)</a>
+      <li><a href="api/lightcurve.html#lightkurve.lightcurve.LightCurve.plot">plot() (lightkurve.lightcurve.LightCurve method)</a>
 
       <ul>
-        <li><a href="api/lightcurve.html#lightkurve.lightcurve.LightCurve.plot">(lightkurve.lightcurve.LightCurve method)</a>
+        <li><a href="api/lightcurvefile.html#lightkurve.lightcurvefile.KeplerLightCurveFile.plot">(lightkurve.lightcurvefile.KeplerLightCurveFile method)</a>
 </li>
         <li><a href="api/prf.html#lightkurve.prf.KeplerPRF.plot">(lightkurve.prf.KeplerPRF method)</a>
 </li>
@@ -553,11 +600,25 @@
         <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.plot">(lightkurve.targetpixelfile.KeplerTargetPixelFile method)</a>
 </li>
       </ul></li>
+      <li><a href="api/correctors.html#lightkurve.correctors.KeplerCBVCorrector.plot_cbvs">plot_cbvs() (lightkurve.correctors.KeplerCBVCorrector method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/lightcurvefile.html#lightkurve.lightcurvefile.KeplerLightCurveFile.pos_corr1">pos_corr1 (lightkurve.lightcurvefile.KeplerLightCurveFile attribute)</a>
+
+      <ul>
+        <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.pos_corr1">(lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.pos_corr2">pos_corr2 (lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
+</li>
+      <li><a href="api/lightcurvefile.html#lightkurve.lightcurvefile.KeplerLightCurveFile.poss_corr2">poss_corr2 (lightkurve.lightcurvefile.KeplerLightCurveFile attribute)</a>
+</li>
       <li><a href="api/utils.html#lightkurve.utils.KeplerQualityFlags.PossibleThrusterFiring">PossibleThrusterFiring (lightkurve.utils.KeplerQualityFlags attribute)</a>
 </li>
       <li><a href="api/prf.html#lightkurve.prf.PRFPhotometry">PRFPhotometry (class in lightkurve.prf)</a>
+</li>
+      <li><a href="api/lightcurve.html#lightkurve.lightcurve.LightCurve.properties">properties() (lightkurve.lightcurve.LightCurve method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -569,7 +630,7 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/lightcurve.html#lightkurve.lightcurve.KeplerLightCurveFile.quarter">quarter (lightkurve.lightcurve.KeplerLightCurveFile attribute)</a>
+      <li><a href="api/lightcurvefile.html#lightkurve.lightcurvefile.KeplerLightCurveFile.quarter">quarter (lightkurve.lightcurvefile.KeplerLightCurveFile attribute)</a>
 
       <ul>
         <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.quarter">(lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
@@ -593,7 +654,7 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/utils.html#lightkurve.utils.KeplerQualityFlags.RollingBandInMask">RollingBandInMask (lightkurve.utils.KeplerQualityFlags attribute)</a>
 </li>
-      <li><a href="api/lightcurve.html#lightkurve.lightcurve.SFFCorrector.rotate_centroids">rotate_centroids() (lightkurve.lightcurve.SFFCorrector method)</a>
+      <li><a href="api/correctors.html#lightkurve.correctors.SFFCorrector.rotate_centroids">rotate_centroids() (lightkurve.correctors.SFFCorrector method)</a>
 </li>
       <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.row">row (lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
 </li>
@@ -607,23 +668,17 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/utils.html#lightkurve.utils.KeplerQualityFlags.SafeMode">SafeMode (lightkurve.utils.KeplerQualityFlags attribute)</a>
 </li>
-      <li><a href="api/lightcurve.html#lightkurve.lightcurve.KeplerLightCurveFile.SAP_FLUX">SAP_FLUX (lightkurve.lightcurve.KeplerLightCurveFile attribute)</a>
-</li>
       <li><a href="api/prf.html#lightkurve.prf.SceneModel">SceneModel (class in lightkurve.prf)</a>
 </li>
       <li><a href="api/utils.html#lightkurve.utils.KeplerQualityFlags.SensitivityDropout">SensitivityDropout (lightkurve.utils.KeplerQualityFlags attribute)</a>
 </li>
-      <li><a href="api/lightcurve.html#lightkurve.lightcurve.SFFCorrector">SFFCorrector (class in lightkurve.lightcurve)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/correctors.html#lightkurve.correctors.SFFCorrector">SFFCorrector (class in lightkurve.correctors)</a>
+</li>
       <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.shape">shape (lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
 </li>
       <li><a href="api/prf.html#lightkurve.prf.SimpleKeplerPRF">SimpleKeplerPRF (class in lightkurve.prf)</a>
-</li>
-      <li><a href="api/lightcurve.html#lightkurve.lightcurve.SPLDCorrector">SPLDCorrector (class in lightkurve.lightcurve)</a>
-</li>
-      <li><a href="api/lightcurve.html#lightkurve.lightcurve.LightCurve.stitch">stitch() (lightkurve.lightcurve.LightCurve method)</a>
 </li>
       <li><a href="api/utils.html#lightkurve.utils.KeplerQualityFlags.STRINGS">STRINGS (lightkurve.utils.KeplerQualityFlags attribute)</a>
 </li>
@@ -633,29 +688,43 @@
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/lightcurve.html#lightkurve.lightcurve.TessLightCurve">TessLightCurve (class in lightkurve.lightcurve)</a>
+</li>
+      <li><a href="api/lightcurvefile.html#lightkurve.lightcurvefile.TessLightCurveFile">TessLightCurveFile (class in lightkurve.lightcurvefile)</a>
+</li>
+      <li><a href="api/utils.html#lightkurve.utils.TessQualityFlags">TessQualityFlags (class in lightkurve.utils)</a>
+</li>
       <li><a href="api/utils.html#lightkurve.utils.KeplerQualityFlags.ThrusterFiring">ThrusterFiring (lightkurve.utils.KeplerQualityFlags attribute)</a>
 </li>
-      <li><a href="api/lightcurve.html#lightkurve.lightcurve.KeplerLightCurveFile.time">time (lightkurve.lightcurve.KeplerLightCurveFile attribute)</a>
-
-      <ul>
-        <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.time">(lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
+      <li><a href="api/lightcurvefile.html#lightkurve.lightcurvefile.TessLightCurveFile.ticid">ticid (lightkurve.lightcurvefile.TessLightCurveFile attribute)</a>
 </li>
-      </ul></li>
-      <li><a href="api/lightcurve.html#lightkurve.lightcurve.LightCurve.to_csv">to_csv() (lightkurve.lightcurve.LightCurve method)</a>
+      <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.time">time (lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/lightcurve.html#lightkurve.lightcurve.KeplerLightCurve.to_fits">to_fits() (lightkurve.lightcurve.KeplerLightCurve method)</a>
-
-      <ul>
-        <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.to_fits">(lightkurve.targetpixelfile.KeplerTargetPixelFile method)</a>
+      <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.timeobj">timeobj (lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
 </li>
-      </ul></li>
+      <li><a href="api/lightcurve.html#lightkurve.lightcurve.LightCurve.to_csv">to_csv() (lightkurve.lightcurve.LightCurve method)</a>
+</li>
+      <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.to_fits">to_fits() (lightkurve.targetpixelfile.KeplerTargetPixelFile method)</a>
+</li>
       <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.to_lightcurve">to_lightcurve() (lightkurve.targetpixelfile.KeplerTargetPixelFile method)</a>
 </li>
-      <li><a href="api/lightcurve.html#lightkurve.lightcurve.LightCurve.to_pandas">to_pandas() (lightkurve.lightcurve.LightCurve method)</a>
+      <li><a href="api/lightcurve.html#lightkurve.lightcurve.KeplerLightCurve.to_pandas">to_pandas() (lightkurve.lightcurve.KeplerLightCurve method)</a>
+
+      <ul>
+        <li><a href="api/lightcurve.html#lightkurve.lightcurve.LightCurve.to_pandas">(lightkurve.lightcurve.LightCurve method)</a>
 </li>
+      </ul></li>
       <li><a href="api/lightcurve.html#lightkurve.lightcurve.LightCurve.to_table">to_table() (lightkurve.lightcurve.LightCurve method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="W">W</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/targetpixelfile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.wcs">wcs (lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -680,7 +749,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright lightkurve Developers and Contributors.
+        &copy; Copyright lightkurve developers and contributors.
 
     </p>
   </div>
@@ -702,7 +771,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'1.0.0dev',
+            VERSION:'1.0.a1',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
