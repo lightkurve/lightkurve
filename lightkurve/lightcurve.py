@@ -178,7 +178,8 @@ class LightCurve(object):
             new_lc.time = np.append(new_lc.time, others[i].time)
             new_lc.flux = np.append(new_lc.flux, others[i].flux)
             new_lc.flux_err = np.append(new_lc.flux_err, others[i].flux_err)
-            new_lc.cadenceno = np.append(new_lc.cadenceno, others[i].cadenceno)
+            if hasattr(new_lc, 'cadenceno'):  # KJM
+                new_lc.cadenceno = np.append(new_lc.cadenceno, others[i].cadenceno)  # KJM
             if hasattr(new_lc, 'quality'):
                 new_lc.quality = np.append(new_lc.quality, others[i].quality)
             if hasattr(new_lc, 'centroid_col'):
