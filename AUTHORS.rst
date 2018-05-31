@@ -6,6 +6,7 @@ Direct contributions to the code base:
 - `Christina Hedges <https://github.com/christinahedges>`_
 - `Michael Gully-Santiago <https://github.com/gully>`_
 - `Thomas Barclay <https://github.com/mrtommyb>`_
+- `Ken Mighell <https://github.com/KenMighell>`_
 
 Comments, corrections & suggestions:
 
