@@ -121,13 +121,21 @@ def test_lightcurve_fold():
 
 def test_lightcurve_append():
     """Test ``LightCurve.append()``."""
-    lc = LightCurve(time=[1, 2, 3], flux=[1, .5, 1])
+    lc = LightCurve(time=[1, 2, 3], flux=[1, .5, 1], flux_err=[0.1, 0.2, 0.3])
     lc = lc.append(lc)
-    assert_array_equal(lc.flux, 2*[1, .5, 1])
     assert_array_equal(lc.time, 2*[1, 2, 3])
+    assert_array_equal(lc.flux, 2*[1, .5, 1])
+    assert_array_equal(lc.flux_err, 2*[0.1, 0.2, 0.3])
     # KeplerLightCurve has extra data
-    lc = KeplerLightCurve(time=[1, 2, 3], flux=[1, .5, 1], quality=[10, 20, 30])
+    lc = KeplerLightCurve(time=[1, 2, 3], flux=[1, .5, 1],
+                          centroid_col=[4, 5, 6], centroid_row=[7, 8, 9],
+                          cadenceno=[10, 11, 12], quality=[10, 20, 30])
     lc = lc.append(lc)
+    assert_array_equal(lc.time, 2*[1, 2, 3])
+    assert_array_equal(lc.flux, 2*[1, .5, 1])
+    assert_array_equal(lc.centroid_col, 2*[4, 5, 6])
+    assert_array_equal(lc.centroid_row, 2*[7, 8, 9])
+    assert_array_equal(lc.cadenceno, 2*[10, 11, 12])
     assert_array_equal(lc.quality, 2*[10, 20, 30])
 
 
