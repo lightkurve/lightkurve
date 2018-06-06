@@ -12,6 +12,8 @@ from matplotlib import patches
 import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
+import numpy as np
+
 
 from . import PACKAGEDIR
 from .lightcurve import KeplerLightCurve, LightCurve
@@ -140,10 +142,9 @@ class KeplerTargetPixelFile(TargetPixelFile):
             self.hdu = fits.open(self.path, **kwargs)
         self.quality_bitmask = quality_bitmask
         self.quality_mask = self._quality_mask(quality_bitmask)
-        # insert here
         time = self.hdu[1].data['TIME']
         time_mask = np.isnan(time)
-        self.quality_mask[time_mask] = False
+        self.quality_mask[time_mask] = False # removes nans 
 
     @staticmethod
     def from_archive(target, cadence='long', quarter=None, month=None,
@@ -392,7 +393,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
     @property
     def timeobj(self):
         """Returns the human-readable date for all good-quality cadences."""
-        return bkjd_to_time(self.time, self.hdu[1].data['TIMECORR'][self.quality_mask],self.hdu[1].header['TIMSLICE'])
+        return bkjd_to_time(self.time, self.hdu[1].data['TIMECORR'][self.quality_mask], self.hdu[1].header['TIMSLICE'])
 
     @property
     def cadenceno(self):
@@ -538,7 +539,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         yy, xx = np.indices(self.shape[1:]) + 0.5
         yy = self.row + yy
         xx = self.column + xx
-        total_flux = np.sum(self.flux[:, aperture_mask], axis=1)
+        total_flux = np.nansum(self.flux[:, aperture_mask], axis=1)
         with warnings.catch_warnings():
             # RuntimeWarnings may occur below if total_flux contains zeros
             warnings.simplefilter("ignore", RuntimeWarning)

@@ -11,6 +11,7 @@ from scipy.optimize import minimize
 from matplotlib import pyplot as plt
 from cycler import cycler
 import matplotlib as mpl
+import numpy as np
 
 from astropy.stats import sigma_clip
 from astropy.table import Table
