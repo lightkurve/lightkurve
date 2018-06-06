@@ -33,6 +33,12 @@ def test_tpf_shapes():
     assert tpf.quality_mask.shape == tpf.hdu[1].data['TIME'].shape
     assert tpf.flux.shape == tpf.flux_err.shape
 
+def test_time_nan():
+    """ Test if there are no nan values in time. """
+    tpf = KeplerTargetPixelFile(TABBY_TPF, quality_bitmask=None)
+    time = tpf.time
+    time_mask = ~np.isnan(tpf.time)
+    assert time_mask.all() == True
 
 def test_tpf_plot():
     """Sanity check to verify that tpf plotting works"""
