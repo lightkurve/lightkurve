@@ -12,7 +12,6 @@ from matplotlib import patches
 import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
-import numpy as np
 
 
 from . import PACKAGEDIR
@@ -144,7 +143,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         self.quality_mask = self._quality_mask(quality_bitmask)
         time = self.hdu[1].data['TIME']
         time_mask = np.isnan(time)
-        self.quality_mask[time_mask] = False # removes nans 
+        self.quality_mask[time_mask] = False # removes nans
 
     @staticmethod
     def from_archive(target, cadence='long', quarter=None, month=None,
@@ -543,8 +542,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
         with warnings.catch_warnings():
             # RuntimeWarnings may occur below if total_flux contains zeros
             warnings.simplefilter("ignore", RuntimeWarning)
-            col_centr = np.sum(xx * aperture_mask * self.flux, axis=(1, 2)) / total_flux
-            row_centr = np.sum(yy * aperture_mask * self.flux, axis=(1, 2)) / total_flux
+            col_centr = np.nansum(xx * aperture_mask * self.flux, axis=(1, 2)) / total_flux
+            row_centr = np.nansum(yy * aperture_mask * self.flux, axis=(1, 2)) / total_flux
 
         return col_centr, row_centr
 
