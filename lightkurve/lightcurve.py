@@ -6,12 +6,12 @@ import copy
 from tqdm import tqdm
 
 import oktopus
-import numpy as np
 from scipy import signal
 from scipy.optimize import minimize
 from matplotlib import pyplot as plt
 from cycler import cycler
 import matplotlib as mpl
+import numpy as np
 
 from astropy.stats import sigma_clip
 from astropy.table import Table
@@ -304,13 +304,13 @@ class LightCurve(object):
 
     def remove_nans(self):
         """Removes cadences where the flux is NaN.
-
         Returns
         -------
         clean_lightcurve : LightCurve object
             A new ``LightCurve`` from which NaNs fluxes have been removed.
         """
         return self[~np.isnan(self.flux)]  # This will return a sliced copy
+
 
     def remove_outliers(self, sigma=5., return_mask=False, **kwargs):
         """Removes outlier flux values using sigma-clipping.

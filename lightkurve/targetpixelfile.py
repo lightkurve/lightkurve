@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
 
+
 from . import PACKAGEDIR
 from .lightcurve import KeplerLightCurve, LightCurve
 from .prf import SimpleKeplerPRF
@@ -140,6 +141,9 @@ class KeplerTargetPixelFile(TargetPixelFile):
             self.hdu = fits.open(self.path, **kwargs)
         self.quality_bitmask = quality_bitmask
         self.quality_mask = self._quality_mask(quality_bitmask)
+        time = self.hdu[1].data['TIME']
+        time_mask = np.isnan(time)
+        self.quality_mask[time_mask] = False # removes nans
 
     @staticmethod
     def from_archive(target, cadence='long', quarter=None, month=None,
@@ -383,6 +387,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
     def time(self):
         """Returns the time for all good-quality cadences."""
         return self.hdu[1].data['TIME'][self.quality_mask]
+
 
     @property
     def timeobj(self):
