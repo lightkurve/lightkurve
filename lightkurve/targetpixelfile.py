@@ -513,7 +513,10 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                 campaign=self.campaign,
                                 quarter=self.quarter,
                                 mission=self.mission,
-                                cadenceno=self.cadenceno)
+                                cadenceno=self.cadenceno,
+                                timeobj=self.timeobj,
+                                ra=self.ra,
+                                dec=self.dec)
 
     def centroids(self, aperture_mask='pipeline'):
         """Returns centroids based on sample moments.

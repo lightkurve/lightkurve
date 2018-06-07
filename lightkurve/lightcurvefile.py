@@ -41,6 +41,16 @@ class LightCurveFile(object):
         return self.hdu[1].data['TIME'][self.quality_mask]
 
     @property
+    def ra(self):
+        """Time measurements"""
+        return self.hdu[0].header['RA_OBJ']
+
+    @property
+    def dec(self):
+        """Time measurements"""
+        return self.hdu[0].header['DEC_OBJ']
+
+    @property
     def timeobj(self):
         """Returns the human-readable date for all good-quality cadences."""
         return bkjd_to_time(bkjd=self.time,
@@ -138,9 +148,9 @@ class KeplerLightCurveFile(LightCurveFile):
         lcf : KeplerLightCurveFile object or list of KeplerLightCurveFile objects
         """
         path = download_kepler_products(
-                    target=target, filetype='Lightcurve', cadence=cadence,
-                    quarter=quarter, campaign=campaign, month=month, verbose=verbose,
-                    radius=radius, targetlimit=targetlimit)
+            target=target, filetype='Lightcurve', cadence=cadence,
+            quarter=quarter, campaign=campaign, month=month, verbose=verbose,
+            radius=radius, targetlimit=targetlimit)
         if len(path) == 1:
             return KeplerLightCurveFile(path[0], **kwargs)
         return [KeplerLightCurveFile(p, **kwargs) for p in path]
@@ -190,7 +200,10 @@ class KeplerLightCurveFile(LightCurveFile):
                 quarter=self.quarter,
                 mission=self.mission,
                 cadenceno=self.cadenceno,
-                keplerid=self.keplerid)
+                keplerid=self.keplerid,
+                timeobj=self.timeobj,
+                ra=self.ra,
+                dec=self.dec)
         else:
             raise KeyError("{} is not a valid flux type. Available types are: {}".
                            format(flux_type, self._flux_types))
