@@ -502,21 +502,24 @@ class KeplerTargetPixelFile(TargetPixelFile):
         if aperture_mask.sum() == 0:
             logging.warning('Warning: aperture mask contains zero pixels.')
         centroid_col, centroid_row = self.centroids(aperture_mask)
+        keys = {'centroid_col': centroid_col,
+                'centroid_row': centroid_row,
+                'quality': self.quality,
+                'channel': self.channel,
+                'campaign': self.campaign,
+                'quarter': self.quarter,
+                'mission': self.mission,
+                'cadenceno': self.cadenceno,
+                'ra': self.ra,
+                'dec': self.dec}
+
+        if 'timeobj' in self.__dir__():
+            keys['timeobj'] = self.timeobj
 
         return KeplerLightCurve(flux=np.nansum(self.flux[:, aperture_mask], axis=1),
                                 time=self.time,
                                 flux_err=np.nansum(self.flux_err[:, aperture_mask]**2, axis=1)**0.5,
-                                centroid_col=centroid_col,
-                                centroid_row=centroid_row,
-                                quality=self.quality,
-                                channel=self.channel,
-                                campaign=self.campaign,
-                                quarter=self.quarter,
-                                mission=self.mission,
-                                cadenceno=self.cadenceno,
-                                timeobj=self.timeobj,
-                                ra=self.ra,
-                                dec=self.dec)
+                                **keys)
 
     def centroids(self, aperture_mask='pipeline'):
         """Returns centroids based on sample moments.

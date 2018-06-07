@@ -6,6 +6,7 @@ import copy
 from tqdm import tqdm
 import os
 import datetime
+import warnings
 
 import oktopus
 import numpy as np
@@ -766,24 +767,36 @@ class KeplerLightCurve(LightCurve):
             for kw in tmpl:
                 hdu.header[kw] = (tmpl[kw], tmpl.comments[kw])
             # Override the defaults where necessary
-            hdu.header['ORIGIN'] = "Unofficial data product"
-            hdu.header['TELESCOP'] = "KEPLER"
-            hdu.header['INSTRUME'] = "Kepler Photometer"
-            hdu.header['DATE'] = datetime.datetime.now().strftime("%Y-%m-%d")
-            hdu.header['CREATOR'] = "lightkurve"
-            hdu.header['OBJECT'] = '{}'.format(self.keplerid)
-            hdu.header['KEPLERID'] = self.keplerid
-            hdu.header['CHANNEL'] = self.channel
-            hdu.header['MISSION'] = self.mission
-            hdu.header['RA_OBJ'] = self.ra
-            hdu.header['DEC_OBJ'] = self.dec
-            hdu.header['EQUINOX'] = 2000
+
+            default = default = {'ORIGIN': "Unofficial data product",
+                                 'TELESCOP': "KEPLER",
+                                 'INSTRUME': "Kepler Photometer",
+                                 'DATE': datetime.datetime.now().strftime("%Y-%m-%d"),
+                                 'CREATOR': "lightkurve",
+                                 'OBJECT': '{}'.format(self.keplerid),
+                                 'KEPLERID': self.keplerid,
+                                 'CHANNEL': self.channel,
+                                 'MISSION': self.mission,
+                                 'RA_OBJ': self.ra,
+                                 'DEC_OBJ': self.dec,
+                                 'EQUINOX': 2000}
+
+            for kw in default:
+                hdu.header['{}'.format(kw).upper()] = default[kw]
+                if default[kw] is None:
+                    warnings.warn('Value for {} is None'.format(kw))
             if 'timeobj' in self.__dir__():
-                hdu.header['DATE-OBJ'] = self.timeobj.isot[0]
+                hdu.header['DATE-OBS'] = self.timeobj.isot[0]
+            else:
+                warnings.warn('Cannot assign DATE_OBS is None')
+
             if self.quarter is not None:
                 hdu.header['QUARTER'] = self.quarter
-            else:
+            elif self.campaign is not None:
                 hdu.header['CAMPAIGN'] = self.campaign
+            else:
+                warnings.warn('Cannot find Campaign or Quarter number')
+
             for kw in keywords:
                 if isinstance(keywords[kw], (str, float, int, bool)):
                     hdu.header['{}'.format(kw).upper()] = keywords[kw]
