@@ -7,6 +7,7 @@ if no internet connection is available.
 """
 from __future__ import division, print_function
 
+import logging
 import pytest
 
 from ..mast import (search_kepler_products, ArchiveError)
@@ -144,9 +145,12 @@ def test_verbosity(capfd):
     log.setLevel('ERROR')
     tpf = KeplerTargetPixelFile.from_archive(5728079, quarter=1)
     out, err = capfd.readouterr()
+    assert log.isEnabledFor(logging.ERROR)
+    assert not log.isEnabledFor(logging.DEBUG)
     assert len(out) == 0
     # Verbose
     log.setLevel('DEBUG')
     tpf = KeplerTargetPixelFile.from_archive(5728079, quarter=1)
     out, err = capfd.readouterr()
+    assert log.isEnabledFor(logging.DEBUG)
     assert len(out) > 0
