@@ -2,7 +2,6 @@
 
 from __future__ import division, print_function
 import os
-import sys
 import logging
 import numpy as np
 
@@ -187,11 +186,11 @@ def search_kepler_products(target, filetype='Target Pixel', cadence='long', quar
         ids = np.asarray([p.split('/')[-1].split('-')[0].split('_')[0][4:]
                           for p in products['dataURI']], dtype=int)
         if len(np.unique(ids)) < targetlimit:
-            logging.warning('Target return limit set to {} '
-                            'but only {} unique targets found. '
-                            'Try increasing the search radius. '
-                            '(Radius currently set to {} arcseconds)'
-                            ''.format(targetlimit, len(np.unique(ids)), radius))
+            log.warning('Target return limit set to {} '
+                        'but only {} unique targets found. '
+                        'Try increasing the search radius. '
+                        '(Radius currently set to {} arcseconds)'
+                        ''.format(targetlimit, len(np.unique(ids)), radius))
         okids = ids[np.sort(np.unique(ids, return_index=True)[1])[0:targetlimit]]
         mask = np.zeros(len(ids), dtype=bool)
 

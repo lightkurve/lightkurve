@@ -1,4 +1,4 @@
-from __future__ import division, print_function
+from __future__ import division
 import datetime
 import os
 import warnings
@@ -21,6 +21,7 @@ from .mast import download_kepler_products
 
 
 __all__ = ['KeplerTargetPixelFile']
+log = logging.getLogger(__name__)
 
 
 class TargetPixelFile(object):
@@ -498,7 +499,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         """
         aperture_mask = self._parse_aperture_mask(aperture_mask)
         if aperture_mask.sum() == 0:
-            logging.warning('Warning: aperture mask contains zero pixels.')
+            log.warning('Warning: aperture mask contains zero pixels.')
         centroid_col, centroid_row = self.centroids(aperture_mask)
 
         return KeplerLightCurve(flux=np.nansum(self.flux[:, aperture_mask], axis=1),
