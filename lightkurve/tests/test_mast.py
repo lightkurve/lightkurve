@@ -143,3 +143,14 @@ def test_verbosity(capfd):
     tpf = KeplerTargetPixelFile.from_archive(5728079, quarter=1, verbose=False)
     out, err = capfd.readouterr()
     assert len(out) == 0
+
+
+@pytest.mark.remote_data
+def test_source_confusion():
+    # Regression test for issue #148.
+    # When obtaining the TPF for target 6507433, @benmontet noticed that
+    # a target 4 arcsec away was returned instead.
+    # See https://github.com/KeplerGO/lightkurve/issues/148
+    desired_target = 6507433
+    tpf = KeplerTargetPixelFile.from_archive(desired_target, quarter=8)
+    assert tpf.keplerid == desired_target
