@@ -128,7 +128,8 @@ class KeplerPRF(object):
         rot_col = delta_row * sina + delta_col * cosa
 
         self.prf_model = flux * self.interpolate(rot_row.flatten() * scale_row,
-                                                 rot_col.flatten() * scale_col, grid=False).reshape(self.shape)
+                                                 rot_col.flatten() * scale_col,
+                                                 grid=False).reshape(self.shape)
         return self.prf_model
 
     def _read_prf_calibration_file(self, path, ext):
