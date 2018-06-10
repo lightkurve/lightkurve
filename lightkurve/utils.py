@@ -287,5 +287,5 @@ def plot_image(image, ax=None, scale='linear', origin='lower',
     ax.set_ylabel(ylabel)
     ax.set_title(title)
     if show_colorbar:
-        cbar = plt.colorbar(cax, ax=ax, norm=norm, label=clabel)
+        plt.colorbar(cax, ax=ax, norm=norm, label=clabel)
     return ax

@@ -7,7 +7,6 @@ import matplotlib as mpl
 from matplotlib import pyplot as plt
 
 from astropy.io import fits as pyfits
-from astropy.table import Table
 
 from .utils import (bkjd_to_time, KeplerQualityFlags, TessQualityFlags)
 from .mast import download_kepler_products

@@ -6,7 +6,6 @@ import numpy as np
 from numpy.testing import assert_array_equal
 import pytest
 import tempfile
-import sys
 from ..targetpixelfile import KeplerTargetPixelFile, KeplerTargetPixelFileFactory
 from ..utils import KeplerQualityFlags
 
