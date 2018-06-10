@@ -38,11 +38,9 @@ def test_search_kepler_tpf_products():
         assert(len(ca) == len(cb))
         assert(~np.any(ca['description'] == cb['description']))
         assert(~np.any(ca['dataURI'] == cb['dataURI']))
-        ca = search_kepler_products(idx, quarter=c[0], targetlimit=3, radius=400)
-        assert(len(ca) == 3)
         # If you specify the whole campaign, both split parts must be returned.
         cc = search_kepler_products(idx, quarter=c[2], targetlimit=3, radius=400)
-        assert(len(cc) == 6)
+        assert(len(cc) == 2)
     # We should also be able to resolve it by its name instead of KIC ID
     assert(len(search_kepler_products('Kepler-10')) == 15)
     # An invalid KIC/EPIC ID should be dealt with gracefully
@@ -93,12 +91,12 @@ def test_kepler_tpf_from_archive():
     assert(isinstance(tpfs, list))
     assert(isinstance(tpfs[0], KeplerTargetPixelFile))
     assert(tpfs[0].quarter == 1)
-    # If we ask for a nearby target, it should only give back one extra with the same quarter.
+    # Ask for one extra nearby target
     tpfs = KeplerTargetPixelFile.from_archive(
-        5728079, cadence='long', radius=60, quarter=1, targetlimit=2)
+        "GJ 9827", cadence='long', radius=60, campaign=12, targetlimit=2)
     assert(isinstance(tpfs, list))
     assert(isinstance(tpfs[0], KeplerTargetPixelFile))
-    assert(tpfs[0].quarter == tpfs[1].quarter)
+    assert(tpfs[0].campaign == tpfs[1].campaign)
     assert(tpfs[0].keplerid != tpfs[1].keplerid)
 
 
