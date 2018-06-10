@@ -1,21 +1,19 @@
-<!--
-Fill in the information below before opening an issue.
--->
+<!-- Fill in the information below before opening an issue. -->
 
-**Environment**
-- lightkurve version:
-- platform:
-- installation method (pip/conda/source/other?):
+#### Problem description
+<!-- Provide a clear and concise description of the issue. -->
 
-**Problem description**
-Provide a clear and concise description of what the bug is.
-
-*Minimal example:*
+#### Example
+<!-- Provide a link or minimal code snippet that demonstrates the issue. -->
 ```python
 import lightkurve
-# provide a minimal code snippet that demonstrates the issue
+# insert code here ...
 ```
 
-*Expected behavior:*
+#### Expected behavior
+<!-- Describe the behavior you expected and how it differs from the behavior observed in the example. -->
 
-*Actual behavior:*
+#### Environment:
+- platform (e.g. Linux, OSX, Windows):
+- lightkurve version (e.g. 1.0b6):
+- installation method (e.g. pip, conda, source):
