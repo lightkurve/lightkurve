@@ -17,8 +17,8 @@ and citizen scientists interested in analyzing Kepler and TESS space telescope d
 It does this by providing **high-quality building blocks and tutorials**
 which enable both hand-tailored data analyses and advanced automated pipelines.
 
-Lightkurve is an **open source community project**
-owned by `the authors <https://github.com/KeplerGO/lightkurve/AUTHORS.rst>`_
+Lightkurve is an **open source community project** owned by
+`the authors <https://github.com/KeplerGO/lightkurve/blob/master/AUTHORS.rst>`_
 and supported by
 `NASA's Kepler/K2 Guest Observer Office <https://keplerscience.arc.nasa.gov>`_.
 The development `takes place on GitHub <https://github.com/KeplerGO/lightkurve>`_
