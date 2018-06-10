@@ -130,7 +130,7 @@ def test_kepler_lightcurve_from_archive():
     assert(lcfs[0].quarter == 1)
     # If we ask for a nearby target, it should only give back one extra with the same quarter.
     lcfs = KeplerLightCurveFile.from_archive(
-        5728079, cadence='long', radius=60, quarter=1, targetlimit=2)
+        "GJ 9827", cadence='long', radius=60, campaign=12, targetlimit=2)
     assert(isinstance(lcfs, list))
     assert(isinstance(lcfs[0], KeplerLightCurveFile))
     assert(lcfs[0].quarter == lcfs[1].quarter)
