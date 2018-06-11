@@ -10,7 +10,6 @@ import numpy as np
 from scipy import signal
 from scipy.optimize import minimize
 from matplotlib import pyplot as plt
-from cycler import cycler
 import matplotlib as mpl
 
 from astropy.stats import sigma_clip
@@ -117,7 +116,7 @@ class LightCurve(object):
                 if callable(res):
                     continue
                 if attr == 'hdu':
-                    attrs[attr] = {'res':res, 'type':'list'}
+                    attrs[attr] = {'res': res, 'type': 'list'}
                     for idx, r in enumerate(res):
                         if idx == 0:
                             attrs[attr]['print'] = '{}'.format(r.header['EXTNAME'])
@@ -154,7 +153,7 @@ class LightCurve(object):
             for attr, dic in attrs.items():
                 if dic['type'] == typ:
                     output.add_row([attr, dic['print']])
-                    idx+=1
+                    idx += 1
         output.pprint(max_lines=-1, max_width=-1)
 
     def append(self, others):
@@ -640,7 +639,6 @@ class KeplerLightCurve(LightCurve):
     keplerid : int
         Kepler ID number
     """
-
     def __init__(self, time, flux, flux_err=None, centroid_col=None,
                  centroid_row=None, quality=None, quality_bitmask=None,
                  channel=None, campaign=None, quarter=None, mission=None,
