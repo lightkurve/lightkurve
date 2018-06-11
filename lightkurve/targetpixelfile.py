@@ -892,93 +892,115 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                 flux_err=flux_err,
                                 **keys)
 
-def show_gaia(self):
-    """Display an interactive Target Pixel File with positions of Gaia DR2 sources."""
+    def show_gaia(self):
+        """Display an interactive Target Pixel File with positions of Gaia DR2 sources."""
 
-    try:
-        from ipywidgets import interact
-        import ipywidgets as widgets
-        from bokeh.io import push_notebook, show, output_notebook
-        from bokeh.plotting import figure, ColumnDataSource
-        from bokeh.models import Span, Range1d, LinearAxis, LogColorMapper
-        from bokeh.layouts import row
-        from bokeh.models.tools import HoverTool
-        from IPython.display import display
-        output_notebook()
-    except ImportError:
-        raise ImportError('The sky_view tool requires Bokeh and ipywidgets. '
-                          'See the .interact() tutorial')
+        try:
+            from ipywidgets import interact
+            import ipywidgets as widgets
+            from bokeh.io import push_notebook, show, output_notebook
+            from bokeh.plotting import figure, ColumnDataSource
+            from bokeh.models import Span, Range1d, LinearAxis, LogColorMapper
+            from bokeh.layouts import row
+            from bokeh.models.tools import HoverTool
+            from IPython.display import display
+            from astropy.coordinates import SkyCoord, Angle
+            from astroquery.vizier import Vizier
+            output_notebook()
+        except ImportError:
+            raise ImportError('The sky_view tool requires Bokeh and ipywidgets. '
+                              'See the .interact() tutorial')
 
-    if self.mission == 'K2':
-        title = "Skyview for EPIC {}, K2 Campaign {}, CCD {}.{}".format(
-                            self.keplerid, self.campaign, self.module, self.output)
-    elif self.mission == 'Kepler':
-        title = "Skyview for KIC {}, Kepler Quarter {}, CCD {}.{}".format(
-                        self.keplerid, self.quarter, self.module, self.output)
-    fig2 = figure(plot_width=600, plot_height=600,
-                  tools="pan,wheel_zoom,box_zoom,save,reset",
-                  title=title)
-    fig2.yaxis.axis_label = 'Pixel Row Number'
-    fig2.xaxis.axis_label = 'Pixel Column Number'
+        if self.mission == 'K2':
+            title = "Skyview for EPIC {}, K2 Campaign {}, CCD {}.{}".format(
+                                self.keplerid, self.campaign, self.module, self.output)
+        elif self.mission == 'Kepler':
+            title = "Skyview for KIC {}, Kepler Quarter {}, CCD {}.{}".format(
+                            self.keplerid, self.quarter, self.module, self.output)
+        fig2 = figure(plot_width=600, plot_height=600,
+                      tools="pan,wheel_zoom,box_zoom,save,reset",
+                      title=title)
+        fig2.yaxis.axis_label = 'Pixel Row Number'
+        fig2.xaxis.axis_label = 'Pixel Column Number'
 
-    pedestal = np.nanmin(self.flux)
-    stretch_dims = np.prod(self.flux.shape)
-    screen_stretch = self.flux.reshape(stretch_dims) - pedestal
-    screen_stretch = screen_stretch[np.isfinite(screen_stretch)]  # ignore NaNs
-    screen_stretch = screen_stretch[screen_stretch > 0.0]
-    vlo = np.min(screen_stretch)
-    vhi = np.max(screen_stretch)
-    vstep = (np.log10(vhi) - np.log10(vlo)) / 300.0  # assumes counts >> 1.0!
-    lo, med, hi = np.nanpercentile(screen_stretch, [1, 50, 95])
-    color_mapper = LogColorMapper(palette="Viridis256", low=lo, high=hi)
+        pedestal = np.nanmin(self.flux)
+        stretch_dims = np.prod(self.flux.shape)
+        screen_stretch = self.flux.reshape(stretch_dims) - pedestal
+        screen_stretch = screen_stretch[np.isfinite(screen_stretch)]  # ignore NaNs
+        screen_stretch = screen_stretch[screen_stretch > 0.0]
+        vlo = np.min(screen_stretch)
+        vhi = np.max(screen_stretch)
+        vstep = (np.log10(vhi) - np.log10(vlo)) / 300.0  # assumes counts >> 1.0!
+        lo, med, hi = np.nanpercentile(screen_stretch, [1, 50, 95])
+        color_mapper = LogColorMapper(palette="Viridis256", low=lo, high=hi)
 
-    # Try to identify the "fiducial frame"
-    zp = (self.pos_corr1 == 0) & (self.pos_corr2 == 0)
-    zp_loc = np.where(zp)
+        # Try to identify the "fiducial frame"
+        zp = (self.pos_corr1 == 0) & (self.pos_corr2 == 0)
+        zp_loc, = np.where(zp)
 
-    if len(zp_loc) == 1:
-        fiducial_frame = zp_loc
-    else:
-        fiducial_frame = 0
+        if len(zp_loc) == 1:
+            fiducial_frame = zp_loc[0]
+        else:
+            fiducial_frame = 0
 
-    fig2_dat = fig2.image([self.flux[fiducial_frame, :, :] - pedestal], x=self.column,
-                          y=self.row, dw=self.shape[2], dh=self.shape[1],
-                          dilate=False, color_mapper=color_mapper)
+        fig2_dat = fig2.image([self.flux[0, :, :] - 0], x=self.column,
+                              y=self.row, dw=self.shape[2], dh=self.shape[1],
+                              dilate=False, color_mapper=color_mapper)
 
-    #Get the positions of the Gaia sources
-    ## TODO: turn this part into a method: `self.query_nearby_gaia()`
-    c1 = SkyCoord(self.ra, self.ra, frame='icrs', unit='deg')
-    Vizier.ROW_LIMIT = 500
-    result = Vizier.query_region(c1, catalog=["I/345/gaia2"], radius=Angle(60, "arcsec"))["I/345/gaia2"]
-    radecs = np.vstack([result['RA_ICRS'].data.data, result['DE_ICRS'].data.data]).T
+        #Get the positions of the Gaia sources
+        ## TODO: turn this part into a method: `self.query_nearby_gaia()`
+        c1 = SkyCoord(self.ra, self.dec, frame='icrs', unit='deg')
+        Vizier.ROW_LIMIT = 500
+        result = Vizier.query_region(c1, catalog=["I/345/gaia2"], radius=Angle(90, "arcsec"))["I/345/gaia2"]
+        radecs = np.vstack([result['RA_ICRS'].data.data, result['DE_ICRS'].data.data]).T
+        coords = self.wcs.all_world2pix(radecs, 0) ## TODO, is this supposed to be zero or one?????
 
-    coords = self.wcs.all_world2pix(radecs, 0) ## TODO, is this supposed to be zero or one?????
+        ## TODO: Gently size the points by their Gaia magnitude
+        source = ColumnDataSource(data=dict(ra=result['RA_ICRS'].data.data,
+                                            dec=result['DE_ICRS'].data.data,
+                                            source=result['Source'].data.data,
+                                            Gmag=result['Gmag'].data.data,
+                                            plx=result['Plx'].data.data,
+                                            x=coords[:, 0]+self.column,
+                                            y=coords[:, 1]+self.row))
 
-    ## TODO: Gently size the points by their Gaia magnitude
-    source = ColumnDataSource(data=dict(ra=result['RA_ICRS'].data.data,
-                                        dec=result['DE_ICRS'].data.data,
-                                        source=result['Source'].data.data,
-                                        Gmag=result['Gmag'].data.data,
-                                        plx=result['Plx'].data.data,
-                                        x=coords[:, 0]+self.column,
-                                        y=coords[:, 1]+self.row))
+        r = fig2.circle('x', 'y', source=source,fill_alpha=0.3, size=8, line_color=None,
+                        selection_color="firebrick",nonselection_fill_alpha=0.0, nonselection_line_color=None,
+                        nonselection_line_alpha=0.0, fill_color="firebrick",
+                        hover_fill_color="firebrick", hover_alpha=0.9, hover_line_color="white")
 
-    r = fig2.circle('x', 'y', source=source,fill_alpha=0.3, size=8, line_color=None,
-                    selection_color="firebrick",nonselection_fill_alpha=0.0, nonselection_line_color=None,
-                    nonselection_line_alpha=0.0, fill_color="firebrick",
-                    hover_fill_color="firebrick", hover_alpha=0.9, hover_line_color="white")
+        fig2.add_tools(HoverTool(tooltips=[("Source", "@source"),("G", "@Gmag"),("Parallax", "@plx"),
+                                        ("RA", "@ra{0,0.00000000}"),
+                                         ("DEC", "@dec{0,0.00000000}"),
+                                          ("x", "@x"),
+                                         ("y", "@y")],
+                                         renderers=[r],
+                                         mode='mouse',
+                                         point_policy="snap_to_data"))
 
-    fig2.add_tools(HoverTool(tooltips=[("Source", "@source"),("G", "@Gmag"),("Parallax", "@plx"),
-                                    ("RA", "@ra{0,0.00000000}"),
-                                     ("DEC", "@dec{0,0.00000000}"),
-                                      ("x", "@x"),
-                                     ("y", "@y")],
-                                     renderers=[r],
-                                     mode='mouse',
-                                     point_policy="snap_to_data"))
+        # The figures appear before the interactive widget sliders
+        show(fig2, notebook_handle=True)
 
-    # The figures appear before the interactive widget sliders
-    show(fig2, notebook_handle=True)
+        # The widget sliders call the update function each time
+        def update(log_stretch):
+            """Function that connects to the interact widget slider values"""
+            fig2_dat.glyph.color_mapper.high = 10**log_stretch[1]
+            fig2_dat.glyph.color_mapper.low = 10**log_stretch[0]
+            push_notebook()
+
+        # Define the widgets that enable the interactivity
+        screen_slider = widgets.FloatRangeSlider(
+                            value=[np.log10(lo), np.log10(hi)],
+                            min=np.log10(vlo),
+                            max=np.log10(vhi),
+                            step=vstep,
+                            description='Pixel Stretch (log)',
+                            style={'description_width': 'initial'},
+                            continuous_update=False,
+                            layout=widgets.Layout(width='30%', height='20px'))
+        ui = widgets.HBox([screen_slider])
+        out = widgets.interactive_output(update, {'log_stretch': screen_slider})
+        display(ui, out)
 
     def get_bkg_lightcurve(self, aperture_mask=None):
         aperture_mask = self._parse_aperture_mask(aperture_mask)
