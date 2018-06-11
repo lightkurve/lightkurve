@@ -1,8 +1,8 @@
 .. _citing:
 
-======
+===================================
 Citing and acknowledging lightkurve
-======
+===================================
 
 
 If you find this package useful in your research, please cite it using the DOI

@@ -17,3 +17,4 @@ import lightkurve
 - platform (e.g. Linux, OSX, Windows):
 - lightkurve version (e.g. 1.0b6):
 - installation method (e.g. pip, conda, source):
+

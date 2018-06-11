@@ -1,6 +1,8 @@
 Systematics correction classes
 ==============================
 
-.. automodule:: lightkurve.correctors
-    :members:
-    :undoc-members:
+.. module:: lightkurve.correctors
+
+.. automodapi:: lightkurve.correctors
+	:no-heading:
+	:inherited-members:

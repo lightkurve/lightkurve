@@ -9,10 +9,10 @@ import numpy as np
 from astroquery.mast import Observations
 from astroquery.exceptions import ResolverError
 from astropy.coordinates import SkyCoord
-from astropy import log as astropylog
 from astropy.io import ascii
 
 from . import PACKAGEDIR
+log = logging.getLogger(__name__)
 
 
 class ArchiveError(Exception):
@@ -210,7 +210,7 @@ def search_kepler_products(target, filetype='Target Pixel', cadence='long', quar
 
 def download_kepler_products(target, filetype='Target Pixel', cadence='long',
                              quarter=None, month=None, campaign=None, radius=1.,
-                             targetlimit=1, verbose=True, **kwargs):
+                             targetlimit=1, **kwargs):
     """Download and cache files from from the Kepler/K2 data archive at MAST.
 
     Returns paths to the cached files.
@@ -246,10 +246,8 @@ def download_kepler_products(target, filetype='Target Pixel', cadence='long',
     -------
     path : str or list of strs
     """
-    if verbose:
-        astropylog.setLevel('INFO')
-    else:
-        astropylog.setLevel('ERROR')
+    # Make sure astroquery uses the same level of verbosity
+    logging.getLogger('astropy').setLevel(log.getEffectiveLevel())
 
     # If we are asking for all cadences (long and short) and didn't specify a month, override it.
     if (cadence in ['any', 'both']) & (month is None):
@@ -314,16 +312,6 @@ def download_kepler_products(target, filetype='Target Pixel', cadence='long',
                            "".format(len(products), target))
 
     # Otherwise download all the files
-    if verbose:
-        print('Found {} File(s)'.format(np.shape(products)[0]))
-    if not verbose:
-        old_stdout = sys.stdout
-        sys.stdout = open(os.devnull, "w")
+    log.debug('Found {} File(s)'.format(np.shape(products)[0]))
     path = download_products(products)
-    if not verbose:
-        sys.stdout.close()
-        sys.stdout = old_stdout
-    # Make sure we always put the verbosity back...
-    if not verbose:
-        astropylog.setLevel('INFO')
     return list(path)

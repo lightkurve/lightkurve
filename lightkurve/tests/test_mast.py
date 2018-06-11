@@ -10,7 +10,7 @@ from __future__ import division, print_function
 import pytest
 
 from ..mast import (search_kepler_products, ArchiveError)
-from .. import KeplerTargetPixelFile, KeplerLightCurveFile
+from .. import KeplerTargetPixelFile, KeplerLightCurveFile, log
 from astropy.coordinates import SkyCoord
 import astropy.units as u
 import numpy as np
@@ -140,6 +140,13 @@ def test_kepler_lightcurve_from_archive():
 
 
 def test_verbosity(capfd):
-    tpf = KeplerTargetPixelFile.from_archive(5728079, quarter=1, verbose=False)
+    # Non-verbose
+    log.setLevel('ERROR')
+    tpf = KeplerTargetPixelFile.from_archive(5728079, quarter=1)
     out, err = capfd.readouterr()
     assert len(out) == 0
+    # Verbose
+    log.setLevel('DEBUG')
+    tpf = KeplerTargetPixelFile.from_archive(5728079, quarter=1)
+    out, err = capfd.readouterr()
+    assert len(out) > 0
