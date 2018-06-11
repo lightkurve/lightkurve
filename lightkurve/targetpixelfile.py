@@ -1,4 +1,4 @@
-from __future__ import division, print_function
+from __future__ import division
 import datetime
 import os
 import warnings
@@ -21,6 +21,7 @@ from .mast import download_kepler_products
 
 
 __all__ = ['KeplerTargetPixelFile']
+log = logging.getLogger(__name__)
 
 
 class TargetPixelFile(object):
@@ -144,7 +145,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
     @staticmethod
     def from_archive(target, cadence='long', quarter=None, month=None,
-                     campaign=None, radius=1., targetlimit=1, verbose=True, **kwargs):
+                     campaign=None, radius=1., targetlimit=1, **kwargs):
         """Fetch a Target Pixel File from the Kepler/K2 data archive at MAST.
 
         Raises an `ArchiveError` if a unique TPF cannot be found.  For example,
@@ -178,7 +179,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         """
         path = download_kepler_products(
                     target=target, filetype='Target Pixel', cadence=cadence,
-                    quarter=quarter, campaign=campaign, month=month, verbose=verbose,
+                    quarter=quarter, campaign=campaign, month=month,
                     radius=radius, targetlimit=targetlimit)
         if len(path) == 1:
             return KeplerTargetPixelFile(path[0], **kwargs)
@@ -501,7 +502,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         """
         aperture_mask = self._parse_aperture_mask(aperture_mask)
         if aperture_mask.sum() == 0:
-            logging.warning('Warning: aperture mask contains zero pixels.')
+            log.warning('Warning: aperture mask contains zero pixels.')
         centroid_col, centroid_row = self.centroids(aperture_mask)
 
         return KeplerLightCurve(flux=np.nansum(self.flux[:, aperture_mask], axis=1),

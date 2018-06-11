@@ -7,13 +7,16 @@ if no internet connection is available.
 """
 from __future__ import division, print_function
 
+import logging
+import numpy as np
 import pytest
 
-from ..mast import (search_kepler_products, ArchiveError)
-from .. import KeplerTargetPixelFile, KeplerLightCurveFile
 from astropy.coordinates import SkyCoord
 import astropy.units as u
-import numpy as np
+
+from ..mast import search_kepler_products, ArchiveError
+from .. import KeplerTargetPixelFile, KeplerLightCurveFile
+from .. import log
 
 
 @pytest.mark.remote_data
@@ -139,7 +142,18 @@ def test_kepler_lightcurve_from_archive():
     assert(lcfs[0].keplerid != lcfs[1].keplerid)
 
 
+@pytest.mark.remote_data
 def test_verbosity(capfd):
-    tpf = KeplerTargetPixelFile.from_archive(5728079, quarter=1, verbose=False)
+    # Non-verbose
+    log.setLevel('ERROR')
+    KeplerTargetPixelFile.from_archive(5728079, quarter=1)
     out, err = capfd.readouterr()
+    assert log.isEnabledFor(logging.ERROR)
+    assert not log.isEnabledFor(logging.DEBUG)
     assert len(out) == 0
+    # Verbose
+    log.setLevel('DEBUG')
+    KeplerTargetPixelFile.from_archive(5728079, quarter=1)
+    out, err = capfd.readouterr()
+    assert log.isEnabledFor(logging.DEBUG)
+    assert len(out) > 0
