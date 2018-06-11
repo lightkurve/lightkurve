@@ -225,7 +225,8 @@ class KeplerCBVCorrector(object):
             The list of cotrending basis vectors to fit to the data. For example,
             [1, 2] will fit the first two basis vectors.
         ax : matplotlib.pyplot.Axes.AxesSubplot
-            Matplotlib axis object. If none, one will be generated.
+            Matplotlib axis object. If `None`, one will be generated.
+
         Returns
         -------
         ax : matplotlib.pyplot.Axes.AxesSubplot
