@@ -66,29 +66,30 @@ def _query_kepler_products(target, radius=1):
 
     try:
         # If `target` looks like a KIC or EPIC ID, we will pass the exact
-        # `objectname` under which MAST will know the object.
+        # `target_name` under which MAST will know the object.
         target = int(target)
         if (target > 0) and (target < 200000000):
-            objectname = 'KIC {:09d}'.format(target)
+            target_name = 'kplr{:09d}'.format(target)
         elif (target > 200000000) and (target < 300000000):
-            objectname = 'EPIC {:09d}'.format(target)
+            target_name = 'ktwo{:09d}'.format(target)
         else:
-            objectname = target
-    except:
-        # If `target` is not a number, or not in range, try to continue.
-        objectname = target
-
-    # Attempt to query the target name
-    try:
-        obs = Observations.query_criteria(objectname=objectname,
-                                          radius='{} arcsec'.format(radius),
+            raise ValueError("{:09d}: not in the KIC or EPIC ID range".format(target))
+        obs = Observations.query_criteria(target_name=target_name,
                                           project=["Kepler", "K2"],
                                           obs_collection=["Kepler", "K2"])
-    except ResolverError as exc:
-        raise ArchiveError(exc)
+    except ValueError:
+        # If `target` did not look like a KIC or EPIC ID, then we let MAST
+        # resolve the target name to a sky position.
+        try:
+            obs = Observations.query_criteria(objectname=target,
+                                              radius='{} arcsec'.format(radius),
+                                              project=["Kepler", "K2"],
+                                              obs_collection=["Kepler", "K2"])
+            # Make sure the final table is in DISTANCE order
+            obs.sort('distance')
+        except ResolverError as exc:
+            raise ArchiveError(exc)
 
-    # Make sure the final table is in DISTANCE order
-    obs.sort('distance')
     obsids = np.asarray(obs['obsid'])
     products = Observations.get_product_list(obs)
     order = [np.where(products['parent_obsid'] == o)[0] for o in obsids]
@@ -269,6 +270,7 @@ def download_kepler_products(target, filetype='Target Pixel', cadence='long',
                                       radius=radius, targetlimit=targetlimit)
     if len(products) == 0:
         raise ArchiveError("No {} File found for {} at MAST.".format(filetype, target))
+    products.sort(['order', 'dates', 'qoc'])
 
     # For Kepler short cadence data there are additional rules, so find anywhere
     # where there is short cadence data...
