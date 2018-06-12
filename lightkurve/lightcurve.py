@@ -664,12 +664,8 @@ class LightCurve(object):
             # Turn the data arrays into fits columns and initialize the HDU
             cols = []
             if ~np.asarray(['TIME' in k.upper() for k in keywords.keys()]).any():
-                if 'timeobj' in dir(self):
-                    cols.append(fits.Column(name='TIME', format='D', unit='JD',
-                                            array=self.timeobj.jd))
-                else:
-                    cols.append(fits.Column(name='TIME', format='D', unit='BJD - 2454833',
-                                            array=self.time))
+                cols.append(fits.Column(name='TIME', format='D', unit='BJD - 2454833',
+                                        array=self.time))
             if ~np.asarray(['FLUX' in k.upper() for k in keywords.keys()]).any():
                 cols.append(fits.Column(name='FLUX', format='E',
                                         unit='counts', array=self.flux))
