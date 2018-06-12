@@ -629,6 +629,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         lc : LightCurve object
             An optional pre-processed lightcurve object to show.
         """
+        print('test123')
         try:
             from ipywidgets import interact
             import ipywidgets as widgets
@@ -642,6 +643,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         except ImportError:
             raise ImportError('The quicklook tool requires Bokeh and ipywidgets. '
                               'See the .interact() tutorial')
+        #to do: fix issue 154
 
         ytitle = 'Flux'
         if lc is None:
