@@ -28,6 +28,7 @@ class TargetPixelFile(object):
     """
     Generic TargetPixelFile class
     """
+
     def properties(self):
         '''Print out a description of each of the non-callable attributes of a
         TargetPixelFile object.
@@ -178,9 +179,9 @@ class KeplerTargetPixelFile(TargetPixelFile):
         tpf : KeplerTargetPixelFile object.
         """
         path = download_kepler_products(
-                    target=target, filetype='Target Pixel', cadence=cadence,
-                    quarter=quarter, campaign=campaign, month=month,
-                    radius=radius, targetlimit=targetlimit)
+            target=target, filetype='Target Pixel', cadence=cadence,
+            quarter=quarter, campaign=campaign, month=month,
+            radius=radius, targetlimit=targetlimit)
         if len(path) == 1:
             return KeplerTargetPixelFile(path[0], **kwargs)
         return [KeplerTargetPixelFile(p, **kwargs) for p in path]
@@ -198,7 +199,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         '''
         for key in keys:
             if ~(np.any([value[1].header[ttype] == key
-                        for ttype in value[1].header['TTYPE*']])):
+                         for ttype in value[1].header['TTYPE*']])):
                 raise ValueError("File {} does not have a {} column, "
                                  "is this a target pixel file?".format(self.path, key))
         else:
@@ -502,20 +503,23 @@ class KeplerTargetPixelFile(TargetPixelFile):
         if aperture_mask.sum() == 0:
             log.warning('Warning: aperture mask contains zero pixels.')
         centroid_col, centroid_row = self.centroids(aperture_mask)
+        keys = {'centroid_col': centroid_col,
+                'centroid_row': centroid_row,
+                'quality': self.quality,
+                'channel': self.channel,
+                'campaign': self.campaign,
+                'quarter': self.quarter,
+                'mission': self.mission,
+                'cadenceno': self.cadenceno,
+                'ra': self.ra,
+                'dec': self.dec}
 
         return KeplerLightCurve(time=self.time,
                                 time_format='bkjd',
                                 time_scale='tdb',
                                 flux=np.nansum(self.flux[:, aperture_mask], axis=1),
                                 flux_err=np.nansum(self.flux_err[:, aperture_mask]**2, axis=1)**0.5,
-                                centroid_col=centroid_col,
-                                centroid_row=centroid_row,
-                                quality=self.quality,
-                                channel=self.channel,
-                                campaign=self.campaign,
-                                quarter=self.quarter,
-                                mission=self.mission,
-                                cadenceno=self.cadenceno)
+                                **keys)
 
     def centroids(self, aperture_mask='pipeline'):
         """Returns centroids based on sample moments.
@@ -587,7 +591,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
             except IndexError:
                 raise ValueError("cadenceno {} is out of bounds, "
                                  "must be in the range {}-{}.".format(
-                                    cadenceno, self.cadenceno[0], self.cadenceno[-1]))
+                                     cadenceno, self.cadenceno[0], self.cadenceno[-1]))
         try:
             if bkg and np.any(np.isfinite(self.flux_bkg[frame])):
                 pflux = self.flux[frame] + self.flux_bkg[frame]
@@ -685,20 +689,20 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
         # Each data source will later become a hover-over tooltip
         source = ColumnDataSource(data=dict(
-                                  time=lc.time,
-                                  time_iso=human_time,
-                                  flux=lc.flux,
-                                  cadence=lc.cadenceno,
-                                  quality_code=lc.quality,
-                                  quality=np.array(qual_strings)))
+            time=lc.time,
+            time_iso=human_time,
+            flux=lc.flux,
+            cadence=lc.cadenceno,
+            quality_code=lc.quality,
+            quality=np.array(qual_strings)))
 
         # Provide extra metadata in the title
         if self.mission == 'K2':
             title = "Quicklook lightcurve for EPIC {} (K2 Campaign {})".format(
-                        self.keplerid, self.campaign)
+                self.keplerid, self.campaign)
         elif self.mission == 'Kepler':
             title = "Quicklook lightcurve for KIC {} (Kepler Quarter {})".format(
-                        self.keplerid, self.quarter)
+                self.keplerid, self.quarter)
 
         # Figure 1 shows the lightcurve with steps, tooltips, and vertical line
         fig1 = figure(title=title, plot_height=300, plot_width=600,
@@ -733,7 +737,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         fig2 = figure(plot_width=300, plot_height=300,
                       tools="pan,wheel_zoom,box_zoom,save,reset",
                       title='Pixel data (CCD {}.{})'.format(
-                                self.module, self.output))
+                          self.module, self.output))
         fig2.yaxis.axis_label = 'Pixel Row Number'
         fig2.xaxis.axis_label = 'Pixel Column Number'
 
@@ -780,18 +784,18 @@ class KeplerTargetPixelFile(TargetPixelFile):
                             disabled=False)
         play.show_repeat, play._repeat = False, False
         cadence_slider = widgets.IntSlider(
-                            min=min_cadence, max=max_cadence,
-                            step=1, value=min_cadence, description='Cadence',
-                            layout=widgets.Layout(width='40%', height='20px'))
+            min=min_cadence, max=max_cadence,
+            step=1, value=min_cadence, description='Cadence',
+            layout=widgets.Layout(width='40%', height='20px'))
         screen_slider = widgets.FloatRangeSlider(
-                            value=[np.log10(lo), np.log10(hi)],
-                            min=np.log10(vlo),
-                            max=np.log10(vhi),
-                            step=vstep,
-                            description='Pixel Stretch (log)',
-                            style={'description_width': 'initial'},
-                            continuous_update=False,
-                            layout=widgets.Layout(width='30%', height='20px'))
+            value=[np.log10(lo), np.log10(hi)],
+            min=np.log10(vlo),
+            max=np.log10(vhi),
+            step=vstep,
+            description='Pixel Stretch (log)',
+            style={'description_width': 'initial'},
+            continuous_update=False,
+            layout=widgets.Layout(width='30%', height='20px'))
         widgets.jslink((play, 'value'), (cadence_slider, 'value'))
         ui = widgets.HBox([play, cadence_slider, screen_slider])
         out = widgets.interactive_output(update, {'cadence': cadence_slider,

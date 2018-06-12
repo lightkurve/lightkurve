@@ -97,8 +97,8 @@ def test_TessLightCurveFile(quality_bitmask):
 
 @pytest.mark.remote_data
 @pytest.mark.parametrize("quality_bitmask, answer", [('hardest', 2661),
-    ('hard', 2706), ('default', 3113), (None, 3279),
-    (1, 3279), (100, 3252), (2096639, 2661)])
+                                                     ('hard', 2706), ('default', 3113), (None, 3279),
+                                                     (1, 3279), (100, 3252), (2096639, 2661)])
 def test_bitmasking(quality_bitmask, answer):
     """Test whether the bitmasking behaves like it should"""
     lcf = KeplerLightCurveFile(TABBY_Q8, quality_bitmask=quality_bitmask)
@@ -278,8 +278,27 @@ def test_to_csv():
         pass
 
 
+def test_to_fits():
+    """Test the KeplerLightCurve.to_fits() method"""
+    lcf = KeplerLightCurveFile(TABBY_Q8)
+    hdu = lcf.PDCSAP_FLUX.to_fits()
+    assert type(hdu).__name__ is 'HDUList'
+    assert len(hdu) == 2
+    assert hdu[0].header['EXTNAME'] == 'PRIMARY'
+    assert hdu[1].header['EXTNAME'] == 'LIGHTCURVE'
+    assert hdu[1].header['TTYPE1'] == 'TIME'
+    assert hdu[1].header['TTYPE2'] == 'FLUX'
+    assert hdu[1].header['TTYPE3'] == 'FLUX_ERR'
+    assert hdu[1].header['TTYPE4'] == 'CADENCENO'
+    hdu = LightCurve([0, 1, 2, 3, 4], [1, 1, 1, 1, 1]).to_fits()
+    assert hdu[0].header['EXTNAME'] == 'PRIMARY'
+    assert hdu[1].header['EXTNAME'] == 'LIGHTCURVE'
+    assert hdu[1].header['TTYPE1'] == 'TIME'
+    assert hdu[1].header['TTYPE2'] == 'FLUX'
+
+
 def test_astropy_time():
-    '''Test the `timeobj` property'''
+    '''Test the `astropy_time` property'''
     lcf = KeplerLightCurveFile(TABBY_Q8)
     astropy_time = lcf.astropy_time
     iso = astropy_time.iso
@@ -406,7 +425,7 @@ def test_flatten_robustness():
     """Test various special cases for flatten()."""
     # flatten should work with integer fluxes
     lc = LightCurve([1, 2, 3, 4, 5, 6], [10, 20, 30, 40, 50, 60])
-    expected_result = np.array([ 1.,  1.,  1.,  1.,  1., 1.])
+    expected_result = np.array([1.,  1.,  1.,  1.,  1., 1.])
     flat_lc = lc.flatten(window_length=3, polyorder=1)
     assert_allclose(flat_lc.flux, expected_result)
     # flatten should work even if `window_length > len(flux)`

@@ -40,6 +40,16 @@ class LightCurveFile(object):
         return self.hdu[1].data['TIME'][self.quality_mask]
 
     @property
+    def ra(self):
+        """Right Ascension of the target."""
+        return self.hdu[0].header['RA_OBJ']
+
+    @property
+    def dec(self):
+        """Declination of the target."""
+        return self.hdu[0].header['DEC_OBJ']
+
+    @property
     def SAP_FLUX(self):
         """Returns a LightCurve object for SAP_FLUX"""
         return self.get_lightcurve('SAP_FLUX')
@@ -130,9 +140,9 @@ class KeplerLightCurveFile(LightCurveFile):
         lcf : KeplerLightCurveFile object or list of KeplerLightCurveFile objects
         """
         path = download_kepler_products(
-                    target=target, filetype='Lightcurve', cadence=cadence,
-                    quarter=quarter, campaign=campaign, month=month,
-                    radius=radius, targetlimit=targetlimit)
+            target=target, filetype='Lightcurve', cadence=cadence,
+            quarter=quarter, campaign=campaign, month=month,
+            radius=radius, targetlimit=targetlimit)
         if len(path) == 1:
             return KeplerLightCurveFile(path[0], **kwargs)
         return [KeplerLightCurveFile(p, **kwargs) for p in path]
@@ -189,7 +199,9 @@ class KeplerLightCurveFile(LightCurveFile):
                 quarter=self.quarter,
                 mission=self.mission,
                 cadenceno=self.cadenceno,
-                keplerid=self.keplerid)
+                keplerid=self.keplerid,
+                ra=self.ra,
+                dec=self.dec)
         else:
             raise KeyError("{} is not a valid flux type. Available types are: {}".
                            format(flux_type, self._flux_types))
