@@ -130,6 +130,9 @@ class LightCurve(object):
             raise ValueError("To retrieve a `Time` object the `time_format` "
                              "attribute must be set on the LightCurve object, "
                              "e.g. `lightcurve.time_format = 'jd'`.")
+        # AstroPy does not support BKJD, so we call a function to convert to JD.
+        # In the future, we should think about making an AstroPy-compatible
+        # `TimeFormat` class for BKJD.
         if self.time_format == 'bkjd':
             return bkjd_to_astropy_time(self.time)
         return Time(self.time, format=self.time_format, scale=self.time_scale)
