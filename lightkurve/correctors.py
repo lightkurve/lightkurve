@@ -240,9 +240,11 @@ class KeplerCBVCorrector(object):
         ax.set_xlabel('Time (MJD)')
         module, output = channel_to_module_output(self.lc_file.channel)
         if self.lc_file.mission == 'Kepler':
-            ax.set_title('Kepler CBVs (Module : {}, Output : {}, Quarter : {})'.format(module, output, self.lc_file.quarter))
+            ax.set_title('Kepler CBVs (Module : {}, Output : {}, Quarter : {})'
+                         ''.format(module, output, self.lc_file.quarter))
         elif self.lc_file.mission == 'K2':
-            ax.set_title('K2 CBVs (Module : {}, Output : {}, Campaign : {})'.format(module, output, self.lc_file.campaign))
+            ax.set_title('K2 CBVs (Module : {}, Output : {}, Campaign : {})'
+                         ''.format(module, output, self.lc_file.campaign))
         ax.grid(':', alpha=0.3)
         ax.legend()
         return ax

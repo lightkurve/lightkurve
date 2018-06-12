@@ -1,4 +1,4 @@
-from __future__ import division, print_function
+from __future__ import division
 import datetime
 import os
 import warnings
@@ -21,6 +21,7 @@ from .mast import download_kepler_products
 
 
 __all__ = ['KeplerTargetPixelFile']
+log = logging.getLogger(__name__)
 
 
 class TargetPixelFile(object):
@@ -46,8 +47,8 @@ class TargetPixelFile(object):
                         if idx == 0:
                             attrs[attr]['print'] = '{}'.format(r.header['EXTNAME'])
                         else:
-                            attrs[attr]['print'] = '{}, {}'.format(
-                                attrs[attr]['print'], '{}'.format(r.header['EXTNAME']))
+                            attrs[attr]['print'] = '{}, {}'.format(attrs[attr]['print'],
+                                                                   '{}'.format(r.header['EXTNAME']))
                     continue
                 else:
                     attrs[attr] = {'res': res}
@@ -145,7 +146,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
     @staticmethod
     def from_archive(target, cadence='long', quarter=None, month=None,
-                     campaign=None, radius=1., targetlimit=1, verbose=True, **kwargs):
+                     campaign=None, radius=1., targetlimit=1, **kwargs):
         """Fetch a Target Pixel File from the Kepler/K2 data archive at MAST.
 
         Raises an `ArchiveError` if a unique TPF cannot be found.  For example,
@@ -179,7 +180,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         """
         path = download_kepler_products(
             target=target, filetype='Target Pixel', cadence=cadence,
-            quarter=quarter, campaign=campaign, month=month, verbose=verbose,
+            quarter=quarter, campaign=campaign, month=month,
             radius=radius, targetlimit=targetlimit)
         if len(path) == 1:
             return KeplerTargetPixelFile(path[0], **kwargs)
@@ -349,7 +350,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
     def column(self):
         try:
             out = self.hdu['TARGETTABLES'].header['1CRV5P']
-        except:
+        except KeyError:
             out = 0
         return out
 
@@ -357,7 +358,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
     def row(self):
         try:
             out = self.hdu['TARGETTABLES'].header['2CRV5P']
-        except:
+        except KeyError:
             out = 0
         return out
 
@@ -389,7 +390,9 @@ class KeplerTargetPixelFile(TargetPixelFile):
     @property
     def timeobj(self):
         """Returns the human-readable date for all good-quality cadences."""
-        return bkjd_to_time(self.time, self.hdu[1].data['TIMECORR'][self.quality_mask], self.hdu[1].header['TIMSLICE'])
+        return bkjd_to_time(bkjd=self.time,
+                            timecorr=self.hdu[1].data['TIMECORR'][self.quality_mask],
+                            timslice=self.hdu[1].header['TIMSLICE'])
 
     @property
     def cadenceno(self):
@@ -446,7 +449,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         """Mission name, defaults to None if Not available"""
         try:
             return self.header(ext=0)['MISSION']
-        except:
+        except KeyError:
             return None
 
     def _parse_aperture_mask(self, aperture_mask):
@@ -500,7 +503,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         """
         aperture_mask = self._parse_aperture_mask(aperture_mask)
         if aperture_mask.sum() == 0:
-            logging.warning('Warning: aperture mask contains zero pixels.')
+            log.warning('Warning: aperture mask contains zero pixels.')
         centroid_col, centroid_row = self.centroids(aperture_mask)
         keys = {'centroid_col': centroid_col,
                 'centroid_row': centroid_row,
@@ -598,9 +601,11 @@ class KeplerTargetPixelFile(TargetPixelFile):
             raise ValueError("frame {} is out of bounds, must be in the range "
                              "0-{}.".format(frame, self.shape[0]))
         with plt.style.context(style):
-            ax = plot_image(pflux, ax=ax, title='Kepler ID: {}'.format(self.keplerid),
-                            extent=(self.column, self.column + self.shape[2], self.row,
-                                    self.row + self.shape[1]), show_colorbar=show_colorbar, **kwargs)
+            img_title = 'Kepler ID: {}'.format(self.keplerid)
+            img_extent = (self.column, self.column + self.shape[2],
+                          self.row, self.row + self.shape[1])
+            ax = plot_image(pflux, ax=ax, title=img_title, extent=img_extent,
+                            show_colorbar=show_colorbar, **kwargs)
             ax.grid(False)
         if aperture_mask is not None:
             aperture_mask = self._parse_aperture_mask(aperture_mask)
@@ -633,7 +638,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
             import ipywidgets as widgets
             from bokeh.io import push_notebook, show, output_notebook
             from bokeh.plotting import figure, ColumnDataSource
-            from bokeh.models import Span, Range1d, LinearAxis, LogColorMapper
+            from bokeh.models import Span, LogColorMapper
             from bokeh.layouts import row
             from bokeh.models.tools import HoverTool
             from IPython.display import display
@@ -684,12 +689,12 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
         # Each data source will later become a hover-over tooltip
         source = ColumnDataSource(data=dict(
-                                  time=lc.time,
-                                  time_iso=human_time,
-                                  flux=lc.flux,
-                                  cadence=lc.cadenceno,
-                                  quality_code=lc.quality,
-                                  quality=np.array(qual_strings)))
+            time=lc.time,
+            time_iso=human_time,
+            flux=lc.flux,
+            cadence=lc.cadenceno,
+            quality_code=lc.quality,
+            quality=np.array(qual_strings)))
 
         # Provide extra metadata in the title
         if self.mission == 'K2':

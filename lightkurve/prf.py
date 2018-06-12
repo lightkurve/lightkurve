@@ -20,6 +20,7 @@ from .utils import channel_to_module_output, plot_image
 # signature function.
 if sys.version_info[0] == 2:
     from inspect import getargspec
+
     def _get_number_of_arguments(func):
         list_of_args = getargspec(func).args
         if 'self' in list_of_args:
@@ -28,12 +29,14 @@ if sys.version_info[0] == 2:
             return len(list_of_args)
 else:
     from inspect import signature
+
     def _get_number_of_arguments(func):
         return len(signature(func).parameters)
 
 
 __all__ = ['KeplerPRF', 'PRFPhotometry', 'SceneModel', 'SimpleKeplerPRF',
            'get_initial_guesses']
+
 
 class KeplerPRF(object):
     """
@@ -125,7 +128,8 @@ class KeplerPRF(object):
         rot_col = delta_row * sina + delta_col * cosa
 
         self.prf_model = flux * self.interpolate(rot_row.flatten() * scale_row,
-                                                 rot_col.flatten() * scale_col, grid=False).reshape(self.shape)
+                                                 rot_col.flatten() * scale_col,
+                                                 grid=False).reshape(self.shape)
         return self.prf_model
 
     def _read_prf_calibration_file(self, path, ext):
@@ -160,7 +164,8 @@ class KeplerPRF(object):
         cdelt2p = np.zeros(n_hdu, dtype='float32')
 
         for i in range(n_hdu):
-            prfn[i], crval1p[i], crval2p[i], cdelt1p[i], cdelt2p[i] = self._read_prf_calibration_file(prffile, i+1)
+            prfn[i], crval1p[i], crval2p[i], cdelt1p[i], cdelt2p[i] = self._read_prf_calibration_file(
+                prffile, i+1)
 
         prfn = np.array(prfn)
         PRFcol = np.arange(0.5, np.shape(prfn[0])[1] + 0.5)
@@ -198,6 +203,7 @@ class KeplerPRF(object):
         plot_image(pflux, title='Kepler PRF Model, Channel: {}'.format(self.channel),
                    extent=(self.column, self.column + self.shape[1],
                            self.row, self.row + self.shape[0]), **kwargs)
+
 
 class PRFPhotometry(object):
     """
@@ -458,9 +464,10 @@ def get_initial_guesses(data, ref_col, ref_row):
     row0 = np.nansum(yy * data) / flux0
     marg_col = data[:, int(np.round(col0 - ref_col))]
     marg_row = data[int(np.round(row0 - ref_row)), :]
-    sigma_y = math.sqrt(np.abs((np.arange(marg_row.size) - row0) ** 2 * marg_row).sum() / marg_row.sum())
-    sigma_x = math.sqrt(np.abs((np.arange(marg_col.size) - col0) ** 2 * marg_col).sum() / marg_col.sum())
+    sigma_y = math.sqrt(np.abs((np.arange(marg_row.size) - row0)
+                               ** 2 * marg_row).sum() / marg_row.sum())
+    sigma_x = math.sqrt(np.abs((np.arange(marg_col.size) - col0)
+                               ** 2 * marg_col).sum() / marg_col.sum())
     sigma0 = math.sqrt((sigma_x**2 + sigma_y**2)/2.0)
 
     return flux0, col0, row0, sigma0
-

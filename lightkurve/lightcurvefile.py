@@ -7,7 +7,6 @@ import matplotlib as mpl
 from matplotlib import pyplot as plt
 
 from astropy.io import fits as pyfits
-from astropy.table import Table
 
 from .utils import (bkjd_to_time, KeplerQualityFlags, TessQualityFlags)
 from .mast import download_kepler_products
@@ -108,7 +107,7 @@ class KeplerLightCurveFile(LightCurveFile):
 
     @staticmethod
     def from_archive(target, cadence='long', quarter=None, month=None,
-                     campaign=None, radius=1., targetlimit=1, verbose=True, **kwargs):
+                     campaign=None, radius=1., targetlimit=1, **kwargs):
         """Fetches a LightCurveFile (or list thereof) from the data archive at MAST.
 
         If a target was observed across multiple quarters or campaigns, a
@@ -149,7 +148,7 @@ class KeplerLightCurveFile(LightCurveFile):
         """
         path = download_kepler_products(
             target=target, filetype='Lightcurve', cadence=cadence,
-            quarter=quarter, campaign=campaign, month=month, verbose=verbose,
+            quarter=quarter, campaign=campaign, month=month,
             radius=radius, targetlimit=targetlimit)
         if len(path) == 1:
             return KeplerLightCurveFile(path[0], **kwargs)

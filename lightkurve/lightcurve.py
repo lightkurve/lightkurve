@@ -6,13 +6,13 @@ import copy
 from tqdm import tqdm
 import os
 import datetime
+import logging
 
 import oktopus
 import numpy as np
 from scipy import signal
 from scipy.optimize import minimize
 from matplotlib import pyplot as plt
-from cycler import cycler
 import matplotlib as mpl
 
 from astropy.stats import sigma_clip
@@ -25,6 +25,8 @@ from . import PACKAGEDIR
 
 __all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve',
            'iterative_box_period_search']
+
+log = logging.getLogger(__name__)
 
 
 class LightCurve(object):
