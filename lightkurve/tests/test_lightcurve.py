@@ -277,13 +277,15 @@ def test_to_csv():
         pass
 
 
-def test_date():
-    '''Test the lc.date() function'''
+def test_timeobj():
+    '''Test the `timeobj` property'''
     lcf = KeplerLightCurveFile(TABBY_Q8)
-    date = lcf.timeobj.iso
-    assert len(date) == len(lcf.time)
-    assert date[0] == '2011-01-06 20:45:08.811'
-    assert date[-1] == '2011-03-14 20:18:16.734'
+    timeobj = lcf.timeobj
+    iso = timeobj.iso
+    assert timeobj.scale == 'tdb'
+    assert len(iso) == len(lcf.time)
+    assert iso[0] == '2011-01-06 20:45:08.811'
+    assert iso[-1] == '2011-03-14 20:18:16.734'
 
 
 def test_lightcurve_repr():
