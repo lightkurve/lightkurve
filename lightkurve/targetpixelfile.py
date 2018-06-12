@@ -16,7 +16,7 @@ from tqdm import tqdm
 from . import PACKAGEDIR
 from .lightcurve import KeplerLightCurve, LightCurve
 from .prf import SimpleKeplerPRF
-from .utils import KeplerQualityFlags, plot_image, bkjd_to_time
+from .utils import KeplerQualityFlags, plot_image, bkjd_to_astropy_time
 from .mast import download_kepler_products
 
 
@@ -387,11 +387,9 @@ class KeplerTargetPixelFile(TargetPixelFile):
         return self.hdu[1].data['TIME'][self.quality_mask]
 
     @property
-    def timeobj(self):
-        """Returns the human-readable date for all good-quality cadences."""
-        return bkjd_to_time(bkjd=self.time,
-                            timecorr=self.hdu[1].data['TIMECORR'][self.quality_mask],
-                            timslice=self.hdu[1].header['TIMSLICE'])
+    def astropy_time(self):
+        """Returns an AstroPy Time object for all good-quality cadences."""
+        return bkjd_to_astropy_time(bkjd=self.time)
 
     @property
     def cadenceno(self):
@@ -505,8 +503,10 @@ class KeplerTargetPixelFile(TargetPixelFile):
             log.warning('Warning: aperture mask contains zero pixels.')
         centroid_col, centroid_row = self.centroids(aperture_mask)
 
-        return KeplerLightCurve(flux=np.nansum(self.flux[:, aperture_mask], axis=1),
-                                time=self.time,
+        return KeplerLightCurve(time=self.time,
+                                time_format='bkjd',
+                                time_scale='tdb',
+                                flux=np.nansum(self.flux[:, aperture_mask], axis=1),
                                 flux_err=np.nansum(self.flux_err[:, aperture_mask]**2, axis=1)**0.5,
                                 centroid_col=centroid_col,
                                 centroid_row=centroid_row,
@@ -679,7 +679,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         # Convert time into human readable strings, breaks with NaN time
         # See https://github.com/KeplerGO/lightkurve/issues/116
         if (self.time == self.time).all():
-            human_time = self.timeobj.isot[lc_cad_matches]
+            human_time = self.astropy_time.isot[lc_cad_matches]
         else:
             human_time = [' '] * n_lc_cad
 
@@ -800,8 +800,11 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
     def get_bkg_lightcurve(self, aperture_mask=None):
         aperture_mask = self._parse_aperture_mask(aperture_mask)
-        return LightCurve(flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
-                          time=self.time, flux_err=self.flux_bkg_err)
+        return LightCurve(time=self.time,
+                          time_format='bkjd',
+                          time_scale='tdb',
+                          flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
+                          flux_err=self.flux_bkg_err)
 
     def to_fits(self, output_fn=None, overwrite=False):
         """Writes the TPF to a FITS file on disk."""
