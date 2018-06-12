@@ -645,9 +645,9 @@ class LightCurve(object):
                 hdu.header['{}'.format(kw).upper()] = default[kw]
                 if default[kw] is None:
                     log.warn('Value for {} is None'.format(kw))
-            if ('quarter' in self.__dir__()) and (self.quarter is not None):
+            if ('quarter' in dir(self)) and (self.quarter is not None):
                 hdu.header['QUARTER'] = self.quarter
-            elif ('campaign' in self.__dir__()) and self.campaign is not None:
+            elif ('campaign' in dir(self)) and self.campaign is not None:
                 hdu.header['CAMPAIGN'] = self.campaign
             else:
                 log.warn('Cannot find Campaign or Quarter number')
@@ -664,7 +664,7 @@ class LightCurve(object):
             # Turn the data arrays into fits columns and initialize the HDU
             cols = []
             if ~np.asarray(['TIME' in k.upper() for k in keywords.keys()]).any():
-                if 'timeobj' in self.__dir__():
+                if 'timeobj' in dir(self):
                     cols.append(fits.Column(name='TIME', format='D', unit='JD',
                                             array=self.timeobj.jd))
                 else:
@@ -673,12 +673,12 @@ class LightCurve(object):
             if ~np.asarray(['FLUX' in k.upper() for k in keywords.keys()]).any():
                 cols.append(fits.Column(name='FLUX', format='E',
                                         unit='counts', array=self.flux))
-            if 'flux_err' in self.__dir__():
+            if 'flux_err' in dir(self):
                 if ~np.asarray(['FLUX_ERR' in k.upper() for k in keywords.keys()]).any():
                     cols.append(fits.Column(name='FLUX_ERR', format='E',
                                             unit='counts', array=self.flux_err))
 
-            if 'cadenceno' in self.__dir__():
+            if 'cadenceno' in dir(self):
                 if ~np.asarray(['CADENCENO' in k.upper() for k in keywords.keys()]).any():
                     cols.append(fits.Column(name='CADENCENO', format='J',
                                             array=self.cadenceno))
