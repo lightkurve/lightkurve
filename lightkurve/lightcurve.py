@@ -15,7 +15,7 @@ import matplotlib as mpl
 from astropy.stats import sigma_clip
 from astropy.table import Table
 
-from .utils import running_mean
+from .utils import running_mean, bkjd_to_astropy_time
 
 
 __all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve',
@@ -112,11 +112,12 @@ class LightCurve(object):
         return self.__rtruediv__(other)
 
     @property
-    def timeobj(self):
+    def astropy_time(self):
         """Returns an `astropy.time.Time` object.
 
         The Time object will be created using the values in `self.time`
         and the `self.time_format` and `self.time_scale` attributes.
+        For Kepler data products, the times are Barycentric.
 
         Raises
         ------
@@ -129,6 +130,8 @@ class LightCurve(object):
             raise ValueError("To retrieve a `Time` object the `time_format` "
                              "attribute must be set on the LightCurve object, "
                              "e.g. `lightcurve.time_format = 'jd'`.")
+        if self.time_format == 'bkjd':
+            return bkjd_to_astropy_time(self.time)
         return Time(self.time, format=self.time_format, scale=self.time_scale)
 
     def properties(self):

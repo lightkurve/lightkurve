@@ -8,7 +8,7 @@ from matplotlib import pyplot as plt
 
 from astropy.io import fits as pyfits
 
-from .utils import (bkjd_to_time, KeplerQualityFlags, TessQualityFlags)
+from .utils import (bkjd_to_astropy_time, KeplerQualityFlags, TessQualityFlags)
 from .mast import download_kepler_products
 
 
@@ -40,11 +40,9 @@ class LightCurveFile(object):
         return self.hdu[1].data['TIME'][self.quality_mask]
 
     @property
-    def timeobj(self):
-        """Returns the human-readable date for all good-quality cadences."""
-        return bkjd_to_time(bkjd=self.time,
-                            timecorr=self.hdu[1].data['TIMECORR'][self.quality_mask],
-                            timslice=self.hdu[1].header['TIMSLICE'])
+    def astropy_time(self):
+        """Returns an AstroPy Time object for all good-quality cadences."""
+        return bkjd_to_astropy_time(bkjd=self.time)
 
     @property
     def SAP_FLUX(self):
@@ -177,9 +175,11 @@ class KeplerLightCurveFile(LightCurveFile):
             # We did not import lightcurve at the top to prevent circular imports
             from .lightcurve import KeplerLightCurve
             return KeplerLightCurve(
-                self.hdu[1].data['TIME'][self.quality_mask],
-                self.hdu[1].data[flux_type][self.quality_mask],
+                time=self.hdu[1].data['TIME'][self.quality_mask],
+                flux=self.hdu[1].data[flux_type][self.quality_mask],
                 flux_err=self.hdu[1].data[flux_type + "_ERR"][self.quality_mask],
+                time_format='bkjd',
+                time_scale='tdb',
                 centroid_col=self.hdu[1].data[centroid_type + "1"][self.quality_mask],
                 centroid_row=self.hdu[1].data[centroid_type + "2"][self.quality_mask],
                 quality=self.hdu[1].data['SAP_QUALITY'][self.quality_mask],
