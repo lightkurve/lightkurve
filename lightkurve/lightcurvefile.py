@@ -201,7 +201,6 @@ class KeplerLightCurveFile(LightCurveFile):
                 mission=self.mission,
                 cadenceno=self.cadenceno,
                 keplerid=self.keplerid,
-                timeobj=self.timeobj,
                 ra=self.ra,
                 dec=self.dec)
         else:

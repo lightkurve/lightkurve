@@ -19,6 +19,7 @@ import matplotlib as mpl
 from astropy.stats import sigma_clip
 from astropy.table import Table
 from astropy.io import fits
+from astropy.time import Time
 
 from .utils import running_mean
 from . import PACKAGEDIR
@@ -643,11 +644,6 @@ class LightCurve(object):
                 hdu.header['{}'.format(kw).upper()] = default[kw]
                 if default[kw] is None:
                     warnings.warn('Value for {} is None'.format(kw))
-            if 'timeobj' in self.__dir__():
-                hdu.header['DATE-OBS'] = self.timeobj.isot[0]
-            else:
-                warnings.warn('Cannot assign DATE_OBS is None')
-
             if ('quarter' in self.__dir__()) and (self.quarter is not None):
                 hdu.header['QUARTER'] = self.quarter
             elif ('campaign' in self.__dir__()) and self.campaign is not None:
@@ -766,7 +762,7 @@ class KeplerLightCurve(LightCurve):
     def __init__(self, time, flux, flux_err=None, centroid_col=None,
                  centroid_row=None, quality=None, quality_bitmask=None,
                  channel=None, campaign=None, quarter=None, mission=None,
-                 cadenceno=None, keplerid=None, timeobj=None, ra=None, dec=None):
+                 cadenceno=None, keplerid=None, ra=None, dec=None):
         super(KeplerLightCurve, self).__init__(time, flux, flux_err)
         self.centroid_col = self._validate_array(centroid_col, name='centroid_col')
         self.centroid_row = self._validate_array(centroid_row, name='centroid_row')
@@ -778,7 +774,6 @@ class KeplerLightCurve(LightCurve):
         self.quarter = quarter
         self.mission = mission
         self.keplerid = keplerid
-        self.timeobj = timeobj
         self.ra = ra
         self.dec = dec
 
@@ -880,7 +875,8 @@ class KeplerLightCurve(LightCurve):
             'MISSION': self.mission,
             'RA_OBJ': self.ra,
             'DEC_OBJ': self.dec,
-            'EQUINOX': 2000}
+            'EQUINOX': 2000,
+            'DATE-OBS': Time(self.time[0]+2454833., format=('jd')).isot}
 
         for kw in keplerkwargs:
             if ~np.asarray([kw.lower == k.lower() for k in kwargs]).any():

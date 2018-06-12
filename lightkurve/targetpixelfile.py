@@ -513,9 +513,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 'ra': self.ra,
                 'dec': self.dec}
 
-        if 'timeobj' in self.__dir__():
-            keys['timeobj'] = self.timeobj
-
         return KeplerLightCurve(flux=np.nansum(self.flux[:, aperture_mask], axis=1),
                                 time=self.time,
                                 flux_err=np.nansum(self.flux_err[:, aperture_mask]**2, axis=1)**0.5,
