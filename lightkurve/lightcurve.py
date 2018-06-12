@@ -43,7 +43,7 @@ class LightCurve(object):
     meta : dict
         Free-form metadata associated with the LightCurve.
     """
-    def __init__(self, time, flux, flux_err=None, time_format=None,
+    def __init__(self, time, flux=None, flux_err=None, time_format=None,
                  time_scale=None, meta={}):
         self.time = np.asarray(time)
         self.flux = self._validate_array(flux, name='flux')
@@ -670,7 +670,7 @@ class KeplerLightCurve(LightCurve):
     keplerid : int
         Kepler ID number
     """
-    def __init__(self, time, flux, flux_err=None, time_format=None, time_scale=None,
+    def __init__(self, time, flux=None, flux_err=None, time_format=None, time_scale=None,
                  centroid_col=None, centroid_row=None, quality=None, quality_bitmask=None,
                  channel=None, campaign=None, quarter=None, mission=None,
                  cadenceno=None, keplerid=None):
@@ -778,7 +778,7 @@ class TessLightCurve(LightCurve):
     ticid : int
         Tess Input Catalog ID number
     """
-    def __init__(self, time, flux, flux_err=None, centroid_col=None,
+    def __init__(self, time, flux=None, flux_err=None, centroid_col=None,
                  centroid_row=None, quality=None, quality_bitmask=None,
                  cadenceno=None, ticid=None):
         super(TessLightCurve, self).__init__(time, flux, flux_err)

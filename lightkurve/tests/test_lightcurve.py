@@ -288,6 +288,13 @@ def test_astropy_time():
     #assert iso[-1] == '2011-03-14 20:18:16.734'
 
 
+def test_astropy_time_bkjd():
+    """Does `LightCurve.astropy_time` support bkjd?"""
+    bkjd = np.array([100, 200])
+    lc = LightCurve(time=[100, 200], time_format='bkjd')
+    assert_allclose(lc.astropy_time.jd, bkjd + 2454833.)
+
+
 def test_lightcurve_repr():
     """Do __str__ and __repr__ work?"""
     time, flux = range(3), np.ones(3)
