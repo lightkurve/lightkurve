@@ -20,7 +20,7 @@ from astropy.table import Table
 from astropy.io import fits
 from astropy.time import Time
 
-from .utils import running_mean
+from .utils import running_mean, bkjd_to_astropy_time
 from . import PACKAGEDIR
 
 __all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve',
@@ -41,14 +41,22 @@ class LightCurve(object):
         Data flux for every time point
     flux_err : array-like
         Uncertainty on each flux data point
+    time_format : str
+        String specifying how an instant of time is represented,
+        e.g. 'bkjd' or 'jd'.
+    time_scale : str
+        String which specifies how the time is measured,
+        e.g. tdb', 'tt', 'ut1', or 'utc'.
     meta : dict
         Free-form metadata associated with the LightCurve.
     """
-
-    def __init__(self, time, flux, flux_err=None, meta={}):
+    def __init__(self, time, flux=None, flux_err=None, time_format=None,
+                 time_scale=None, meta={}):
         self.time = np.asarray(time)
         self.flux = self._validate_array(flux, name='flux')
         self.flux_err = self._validate_array(flux_err, name='flux_err')
+        self.time_format = time_format
+        self.time_scale = time_scale
         self.meta = meta
 
     def _validate_array(self, arr, name='array'):
@@ -109,6 +117,32 @@ class LightCurve(object):
 
     def __rdiv__(self, other):
         return self.__rtruediv__(other)
+
+    @property
+    def astropy_time(self):
+        """Returns an `astropy.time.Time` object.
+
+        The Time object will be created using the values in `self.time`
+        and the `self.time_format` and `self.time_scale` attributes.
+        For Kepler data products, the times are Barycentric.
+
+        Raises
+        ------
+        ValueError
+            If `self.time_format` is not set or not one of the formats
+            allowed by AstroPy.
+        """
+        from astropy.time import Time
+        if self.time_format is None:
+            raise ValueError("To retrieve a `Time` object the `time_format` "
+                             "attribute must be set on the LightCurve object, "
+                             "e.g. `lightcurve.time_format = 'jd'`.")
+        # AstroPy does not support BKJD, so we call a function to convert to JD.
+        # In the future, we should think about making an AstroPy-compatible
+        # `TimeFormat` class for BKJD.
+        if self.time_format == 'bkjd':
+            return bkjd_to_astropy_time(self.time)
+        return Time(self.time, format=self.time_format, scale=self.time_scale)
 
     def properties(self):
         '''Print out a description of each of the non-callable attributes of a
@@ -756,12 +790,11 @@ class KeplerLightCurve(LightCurve):
     keplerid : int
         Kepler ID number
     """
-
-    def __init__(self, time, flux, flux_err=None, centroid_col=None,
-                 centroid_row=None, quality=None, quality_bitmask=None,
+    def __init__(self, time, flux=None, flux_err=None, time_format=None, time_scale=None,
+                 centroid_col=None, centroid_row=None, quality=None, quality_bitmask=None,
                  channel=None, campaign=None, quarter=None, mission=None,
                  cadenceno=None, keplerid=None, ra=None, dec=None):
-        super(KeplerLightCurve, self).__init__(time, flux, flux_err)
+        super(KeplerLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err, time_format=time_format, time_scale=time_scale)
         self.centroid_col = self._validate_array(centroid_col, name='centroid_col')
         self.centroid_row = self._validate_array(centroid_row, name='centroid_row')
         self.quality = self._validate_array(quality, name='quality')
@@ -906,8 +939,7 @@ class TessLightCurve(LightCurve):
     ticid : int
         Tess Input Catalog ID number
     """
-
-    def __init__(self, time, flux, flux_err=None, centroid_col=None,
+    def __init__(self, time, flux=None, flux_err=None, centroid_col=None,
                  centroid_row=None, quality=None, quality_bitmask=None,
                  cadenceno=None, ticid=None):
         super(TessLightCurve, self).__init__(time, flux, flux_err)

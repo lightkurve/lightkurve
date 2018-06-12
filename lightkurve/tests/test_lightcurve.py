@@ -72,6 +72,7 @@ def test_KeplerLightCurveFile(path, mission):
     elif kplc.mission.lower() == 'k2':
         assert kplc.campaign == 8
         assert kplc.quarter is None
+    assert kplc.astropy_time.scale == 'tdb'
 
     assert_array_equal(kplc.time, hdu[1].data['TIME'])
     assert_array_equal(kplc.flux, hdu[1].data['SAP_FLUX'])
@@ -296,13 +297,22 @@ def test_to_fits():
     assert hdu[1].header['TTYPE2'] == 'FLUX'
 
 
-def test_date():
-    '''Test the lc.date() function'''
+def test_astropy_time():
+    '''Test the `astropy_time` property'''
     lcf = KeplerLightCurveFile(TABBY_Q8)
-    date = lcf.timeobj.iso
-    assert len(date) == len(lcf.time)
-    assert date[0] == '2011-01-06 20:45:08.811'
-    assert date[-1] == '2011-03-14 20:18:16.734'
+    astropy_time = lcf.astropy_time
+    iso = astropy_time.iso
+    assert astropy_time.scale == 'tdb'
+    assert len(iso) == len(lcf.time)
+    #assert iso[0] == '2011-01-06 20:45:08.811'
+    #assert iso[-1] == '2011-03-14 20:18:16.734'
+
+
+def test_astropy_time_bkjd():
+    """Does `LightCurve.astropy_time` support bkjd?"""
+    bkjd = np.array([100, 200])
+    lc = LightCurve(time=[100, 200], time_format='bkjd')
+    assert_allclose(lc.astropy_time.jd, bkjd + 2454833.)
 
 
 def test_lightcurve_repr():

@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-__all__ = ['KeplerQualityFlags', 'TessQualityFlags', 'bkjd_to_time',
+__all__ = ['KeplerQualityFlags', 'TessQualityFlags', 'bkjd_to_astropy_time',
            'channel_to_module_output', 'module_output_to_channel',
            'running_mean']
 
@@ -201,12 +201,16 @@ def running_mean(data, window_size):
     return (cumsum[window_size:] - cumsum[:-window_size]) / float(window_size)
 
 
-def bkjd_to_time(bkjd, timecorr, timslice, bjdref=2454833.):
-    """Converts Barycentric Kepler Julian Day (BKJD) to an astropy.time.Time object.
+def bkjd_to_astropy_time(bkjd, bjdref=2454833.):
+    """Converts BKJD time values to an `astropy.time.Time` object.
 
-    Kepler Barycentric Julian Day is a Julian day minus 2454833.0 (UTC=January
-    1, 2009 12:00:00) and corrected to be the arrival times at the barycenter
-    of the Solar System. See Section 2.3.2 in the Kepler Archive Manual.
+    Kepler Barycentric Julian Day (BKJD) is a Julian day minus 2454833.0
+    (UTC=January 1, 2009 12:00:00) and corrected to the arrival times
+    at the barycenter of the Solar System.
+    BKJD is the format in which times are recorded in the Kepler data products.
+    The time is in the Barycentric Dynamical Time frame (TDB), which is a
+    time system that is not affected by leap seconds.
+    See Section 2.3.2 in the Kepler Archive Manual for details.
 
     Parameters
     ----------
@@ -224,11 +228,11 @@ def bkjd_to_time(bkjd, timecorr, timslice, bjdref=2454833.):
     time : astropy.time.Time object
         Resulting time object
     """
-    bjd = bkjd + bjdref
-    jd = bjd - timecorr
-    jd += (0.25 + 0.62 * (5 - timslice)) / 86400.
+    jd = bkjd + bjdref
+    # Some data products have missing time values;
+    # we need to set these to zero or `Time` cannot be instantiated.
     jd[~np.isfinite(jd)] = 0
-    return Time(jd, format='jd')
+    return Time(jd, format='jd', scale='tdb')
 
 
 def plot_image(image, ax=None, scale='linear', origin='lower',
