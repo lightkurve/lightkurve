@@ -41,12 +41,12 @@ class LightCurveFile(object):
 
     @property
     def ra(self):
-        """Time measurements"""
+        """Right Ascension of the target."""
         return self.hdu[0].header['RA_OBJ']
 
     @property
     def dec(self):
-        """Time measurements"""
+        """Declination of the target."""
         return self.hdu[0].header['DEC_OBJ']
 
     @property

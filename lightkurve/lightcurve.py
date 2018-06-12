@@ -600,7 +600,7 @@ class LightCurve(object):
         """
         return self.to_pandas().to_csv(path_or_buf=path_or_buf, **kwargs)
 
-    def to_fits(self, path=None, overwrite=False, **kwargs):
+    def to_fits(self, path=None, overwrite=False, **extra_data):
         """Writes the KeplerLightCurve to a fits file.
 
         Parameters
@@ -609,10 +609,12 @@ class LightCurve(object):
             File path, if None returns an astropy.io.fits object.
         overwrite : bool
             Whether or not to overwrite the file
-        **kwargs : dict
-            Keywords to pass to to_fits. Keywords that are str, int, float or bool
-            are converted to headers. Keywords that are np.arrays or lists are
-            converted to columns.
+        extra_data : dict
+            Extra keywords or columns to include in the FITS file.
+            Arguments of type str, int, float, or bool will be stored as
+            keywords in the primary header.
+            Arguments of type np.array or list will be stored as columns
+            in the first extension.
 
         Returns
         -------
@@ -628,71 +630,72 @@ class LightCurve(object):
                                        "lc-ext{}-header.txt".format(extension))
             return fits.Header.fromtextfile(template_fn)
 
-        def _make_primary_hdu(keywords={}):
+        def _make_primary_hdu(extra_data={}):
             """Returns the primary extension (#0)."""
             hdu = fits.PrimaryHDU()
             # Copy the default keywords from a template file from the MAST archive
             tmpl = _header_template(0)
             for kw in tmpl:
                 hdu.header[kw] = (tmpl[kw], tmpl.comments[kw])
-            # Override the defaults where necessary
 
+            # Override the defaults where necessary
+            from . import __version__
             default = default = {'ORIGIN': "Unofficial data product",
                                  'DATE': datetime.datetime.now().strftime("%Y-%m-%d"),
-                                 'CREATOR': "lightkurve"}
+                                 'CREATOR': "lightkurve",
+                                 'PROCVER': str(__version__)}
 
             for kw in default:
                 hdu.header['{}'.format(kw).upper()] = default[kw]
                 if default[kw] is None:
-                    log.warn('Value for {} is None'.format(kw))
+                    log.warning('Value for {} is None.'.format(kw))
             if ('quarter' in dir(self)) and (self.quarter is not None):
                 hdu.header['QUARTER'] = self.quarter
             elif ('campaign' in dir(self)) and self.campaign is not None:
                 hdu.header['CAMPAIGN'] = self.campaign
             else:
-                log.warn('Cannot find Campaign or Quarter number')
+                log.warning('Cannot find Campaign or Quarter number.')
 
-            for kw in keywords:
-                if isinstance(keywords[kw], (str, float, int, bool, type(None))):
-                    hdu.header['{}'.format(kw).upper()] = keywords[kw]
-                    if keywords[kw] is None:
-                        log.warn('Value for {} is None'.format(kw))
+            for kw in extra_data:
+                if isinstance(extra_data[kw], (str, float, int, bool, type(None))):
+                    hdu.header['{}'.format(kw).upper()] = extra_data[kw]
+                    if extra_data[kw] is None:
+                        log.warning('Value for {} is None.'.format(kw))
             return hdu
 
-        def _make_lightcurve_extension(keywords={}):
+        def _make_lightcurve_extension(extra_data={}):
             """Create the 'LIGHTCURVE' extension (i.e. extension #1)."""
             # Turn the data arrays into fits columns and initialize the HDU
             cols = []
-            if ~np.asarray(['TIME' in k.upper() for k in keywords.keys()]).any():
+            if ~np.asarray(['TIME' in k.upper() for k in extra_data.keys()]).any():
                 cols.append(fits.Column(name='TIME', format='D', unit='BJD - 2454833',
                                         array=self.time))
-            if ~np.asarray(['FLUX' in k.upper() for k in keywords.keys()]).any():
+            if ~np.asarray(['FLUX' in k.upper() for k in extra_data.keys()]).any():
                 cols.append(fits.Column(name='FLUX', format='E',
                                         unit='counts', array=self.flux))
             if 'flux_err' in dir(self):
-                if ~np.asarray(['FLUX_ERR' in k.upper() for k in keywords.keys()]).any():
+                if ~np.asarray(['FLUX_ERR' in k.upper() for k in extra_data.keys()]).any():
                     cols.append(fits.Column(name='FLUX_ERR', format='E',
                                             unit='counts', array=self.flux_err))
-
             if 'cadenceno' in dir(self):
-                if ~np.asarray(['CADENCENO' in k.upper() for k in keywords.keys()]).any():
+                if ~np.asarray(['CADENCENO' in k.upper() for k in extra_data.keys()]).any():
                     cols.append(fits.Column(name='CADENCENO', format='J',
                                             array=self.cadenceno))
-            for kw in keywords:
-                if isinstance(keywords[kw], (np.ndarray, list)):
-                    cols.append(fits.Column(name='{}'.format(kw).upper(), format=typedir[type(keywords[kw][0])],
-                                            array=keywords[kw]))
+            for kw in extra_data:
+                if isinstance(extra_data[kw], (np.ndarray, list)):
+                    cols.append(fits.Column(name='{}'.format(kw).upper(),
+                                            format=typedir[type(extra_data[kw][0])],
+                                            array=extra_data[kw]))
 
             coldefs = fits.ColDefs(cols)
             hdu = fits.BinTableHDU.from_columns(coldefs)
-
             hdu.header['EXTNAME'] = 'LIGHTCURVE'
             return hdu
 
         def _hdulist(**kwargs):
             """Returns an astropy.io.fits.HDUList object."""
-            return fits.HDUList([_make_primary_hdu(keywords=kwargs),
-                                 _make_lightcurve_extension(keywords=kwargs)])
+            return fits.HDUList([_make_primary_hdu(extra_data=extra_data),
+                                 _make_lightcurve_extension(extra_data=extra_data)])
 
         def _header_template(extension):
             """Returns a template `fits.Header` object for a given extension."""
@@ -700,12 +703,10 @@ class LightCurve(object):
                                        "lc-ext{}-header.txt".format(extension))
             return fits.Header.fromtextfile(template_fn)
 
-        hdu = _hdulist(**kwargs)
-        if path is None:
-            return hdu
-        else:
+        hdu = _hdulist(**extra_data)
+        if path is not None:
             hdu.writeto(path, overwrite=overwrite, checksum=True)
-            return hdu
+        return hdu
 
 
 class FoldedLightCurve(LightCurve):
