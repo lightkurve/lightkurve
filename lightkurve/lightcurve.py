@@ -6,7 +6,6 @@ import copy
 from tqdm import tqdm
 import os
 import datetime
-import warnings
 
 import oktopus
 import numpy as np
@@ -600,7 +599,7 @@ class LightCurve(object):
         return self.to_pandas().to_csv(path_or_buf=path_or_buf, **kwargs)
 
     def to_fits(self, path=None, overwrite=False, **kwargs):
-        """Writes the KeplerLightCurve to a fits fileself.
+        """Writes the KeplerLightCurve to a fits file.
 
         Parameters
         ----------
@@ -643,19 +642,19 @@ class LightCurve(object):
             for kw in default:
                 hdu.header['{}'.format(kw).upper()] = default[kw]
                 if default[kw] is None:
-                    warnings.warn('Value for {} is None'.format(kw))
+                    log.warn('Value for {} is None'.format(kw))
             if ('quarter' in self.__dir__()) and (self.quarter is not None):
                 hdu.header['QUARTER'] = self.quarter
             elif ('campaign' in self.__dir__()) and self.campaign is not None:
                 hdu.header['CAMPAIGN'] = self.campaign
             else:
-                warnings.warn('Cannot find Campaign or Quarter number')
+                log.warn('Cannot find Campaign or Quarter number')
 
             for kw in keywords:
                 if isinstance(keywords[kw], (str, float, int, bool, type(None))):
                     hdu.header['{}'.format(kw).upper()] = keywords[kw]
                     if keywords[kw] is None:
-                        warnings.warn('Value for {} is None'.format(kw))
+                        log.warn('Value for {} is None'.format(kw))
             return hdu
 
         def _make_lightcurve_extension(keywords={}):
