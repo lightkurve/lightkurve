@@ -162,9 +162,11 @@ def test_repr():
 
 def test_to_lightcurve():
     tpf = KeplerTargetPixelFile(filename_tpf_all_zeros)
-    tpf.to_lightcurve()
+    lc = tpf.to_lightcurve()
+    assert lc.astropy_time.scale == 'tdb'
     tpf.to_lightcurve(aperture_mask='all')
-    tpf.get_bkg_lightcurve()
+    bglc = tpf.get_bkg_lightcurve()
+    assert bglc.astropy_time.scale == 'tdb'
     tpf.get_bkg_lightcurve(aperture_mask='all')
 
 

@@ -503,8 +503,10 @@ class KeplerTargetPixelFile(TargetPixelFile):
             log.warning('Warning: aperture mask contains zero pixels.')
         centroid_col, centroid_row = self.centroids(aperture_mask)
 
-        return KeplerLightCurve(flux=np.nansum(self.flux[:, aperture_mask], axis=1),
-                                time=self.time,
+        return KeplerLightCurve(time=self.time,
+                                time_format='bkjd',
+                                time_scale='tdb',
+                                flux=np.nansum(self.flux[:, aperture_mask], axis=1),
                                 flux_err=np.nansum(self.flux_err[:, aperture_mask]**2, axis=1)**0.5,
                                 centroid_col=centroid_col,
                                 centroid_row=centroid_row,
@@ -798,8 +800,11 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
     def get_bkg_lightcurve(self, aperture_mask=None):
         aperture_mask = self._parse_aperture_mask(aperture_mask)
-        return LightCurve(flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
-                          time=self.time, flux_err=self.flux_bkg_err)
+        return LightCurve(time=self.time,
+                          time_format='bkjd',
+                          time_scale='tdb',
+                          flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
+                          flux_err=self.flux_bkg_err)
 
     def to_fits(self, output_fn=None, overwrite=False):
         """Writes the TPF to a FITS file on disk."""

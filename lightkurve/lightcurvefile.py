@@ -40,11 +40,6 @@ class LightCurveFile(object):
         return self.hdu[1].data['TIME'][self.quality_mask]
 
     @property
-    def astropy_time(self):
-        """Returns an AstroPy Time object for all good-quality cadences."""
-        return bkjd_to_astropy_time(bkjd=self.time)
-
-    @property
     def SAP_FLUX(self):
         """Returns a LightCurve object for SAP_FLUX"""
         return self.get_lightcurve('SAP_FLUX')
@@ -169,6 +164,11 @@ class KeplerLightCurveFile(LightCurveFile):
         if isinstance(bitmask, str):
             bitmask = KeplerQualityFlags.OPTIONS[bitmask]
         return (self.hdu[1].data['SAP_QUALITY'] & bitmask) == 0
+
+    @property
+    def astropy_time(self):
+        """Returns an AstroPy Time object for all good-quality cadences."""
+        return bkjd_to_astropy_time(bkjd=self.time)
 
     def get_lightcurve(self, flux_type, centroid_type='MOM_CENTR'):
         if flux_type in self._flux_types():

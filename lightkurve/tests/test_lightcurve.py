@@ -72,6 +72,7 @@ def test_KeplerLightCurveFile(path, mission):
     elif kplc.mission.lower() == 'k2':
         assert kplc.campaign == 8
         assert kplc.quarter is None
+    assert kplc.astropy_time.scale == 'tdb'
 
     assert_array_equal(kplc.time, hdu[1].data['TIME'])
     assert_array_equal(kplc.flux, hdu[1].data['SAP_FLUX'])
