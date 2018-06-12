@@ -692,7 +692,7 @@ class LightCurve(object):
             hdu.header['EXTNAME'] = 'LIGHTCURVE'
             return hdu
 
-        def _hdulist(**kwargs):
+        def _hdulist(**extra_data):
             """Returns an astropy.io.fits.HDUList object."""
             return fits.HDUList([_make_primary_hdu(extra_data=extra_data),
                                  _make_lightcurve_extension(extra_data=extra_data)])
@@ -844,7 +844,7 @@ class KeplerLightCurve(LightCurve):
         """
         return super(KeplerLightCurve, self).to_pandas(columns=columns)
 
-    def to_fits(self, path=None, overwrite=False, **kwargs):
+    def to_fits(self, path=None, overwrite=False, **extra_data):
         """Export the KeplerLightCurve as an astropy.io.fits object.
 
         Parameters
@@ -853,18 +853,19 @@ class KeplerLightCurve(LightCurve):
             File path, if None returns an astropy.io.fits object.
         overwrite : bool
             Whether or not to overwrite the file
-        **kwargs : dict
-            Keywords to pass to to_fits. Keywords that are str, int, float or bool
-            are converted to headers. Keywords that are np.arrays or lists are
-            converted to columns.
+        extra_data : dict
+            Extra keywords or columns to include in the FITS file.
+            Arguments of type str, int, float, or bool will be stored as
+            keywords in the primary header.
+            Arguments of type np.array or list will be stored as columns
+            in the first extension.
 
         Returns
         -------
         hdu : astropy.io.fits
             Returns an astropy.io.fits object if path is None
         """
-
-        keplerkwargs = {
+        kepler_specific_data = {
             'TELESCOP': "KEPLER",
             'INSTRUME': "Kepler Photometer",
             'OBJECT': '{}'.format(self.keplerid),
@@ -875,11 +876,12 @@ class KeplerLightCurve(LightCurve):
             'DEC_OBJ': self.dec,
             'EQUINOX': 2000,
             'DATE-OBS': Time(self.time[0]+2454833., format=('jd')).isot}
-
-        for kw in keplerkwargs:
-            if ~np.asarray([kw.lower == k.lower() for k in kwargs]).any():
-                kwargs[kw] = keplerkwargs[kw]
-        return super(KeplerLightCurve, self).to_fits(path=path, overwrite=overwrite, **kwargs)
+        for kw in kepler_specific_data:
+            if ~np.asarray([kw.lower == k.lower() for k in extra_data]).any():
+                extra_data[kw] = kepler_specific_data[kw]
+        return super(KeplerLightCurve, self).to_fits(path=path,
+                                                     overwrite=overwrite,
+                                                     **extra_data)
 
 
 class TessLightCurve(LightCurve):
