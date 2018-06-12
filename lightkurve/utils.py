@@ -206,7 +206,9 @@ def bkjd_to_time(bkjd, timecorr, timslice, bjdref=2454833.):
 
     Kepler Barycentric Julian Day is a Julian day minus 2454833.0 (UTC=January
     1, 2009 12:00:00) and corrected to be the arrival times at the barycenter
-    of the Solar System. See Section 2.3.2 in the Kepler Archive Manual.
+    of the Solar System. The time is in the Barycentric Dynamical Time frame
+    (TDB), which is a time system that is not affected by leap seconds.
+    See Section 2.3.2 in the Kepler Archive Manual for details.
 
     Parameters
     ----------
@@ -228,7 +230,7 @@ def bkjd_to_time(bkjd, timecorr, timslice, bjdref=2454833.):
     jd = bjd - timecorr
     jd += (0.25 + 0.62 * (5 - timslice)) / 86400.
     jd[~np.isfinite(jd)] = 0
-    return Time(jd, format='jd')
+    return Time(jd, format='jd', scale='tdb')
 
 
 def plot_image(image, ax=None, scale='linear', origin='lower',
