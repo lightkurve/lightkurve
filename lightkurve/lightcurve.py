@@ -702,7 +702,7 @@ class LightCurve(object):
             # Turn the data arrays into fits columns and initialize the HDU
             cols = []
             if ~np.asarray(['TIME' in k.upper() for k in extra_data.keys()]).any():
-                cols.append(fits.Column(name='TIME', format='D', unit='BJD - 2454833',
+                cols.append(fits.Column(name='TIME', format='D', unit=self.time_format,
                                         array=self.time))
             if ~np.asarray(['FLUX' in k.upper() for k in extra_data.keys()]).any():
                 cols.append(fits.Column(name='FLUX', format='E',
