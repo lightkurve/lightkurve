@@ -742,6 +742,18 @@ class LightCurve(object):
             hdu.writeto(path, overwrite=overwrite, checksum=True)
         return hdu
 
+    def inject(self):
+        """Injects a supernova into the lightcurve flux
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+        lc : LightCurve class
+            Returns a lightcurve possessing a synthetic supernova signal.
+        """
+        raise NotImplementedError
 
 class FoldedLightCurve(LightCurve):
     """Defines a folded lightcurve with different plotting defaults."""
@@ -760,7 +772,6 @@ class FoldedLightCurve(LightCurve):
         return ax
 
 
-    #to do: create injection class
 
 
 class KeplerLightCurve(LightCurve):
