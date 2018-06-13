@@ -760,6 +760,9 @@ class FoldedLightCurve(LightCurve):
         return ax
 
 
+    #to do: create injection class
+
+
 class KeplerLightCurve(LightCurve):
     """Defines a light curve class for NASA's Kepler and K2 missions.
 
