@@ -1,21 +1,26 @@
-from oktopus import GaussianPrior
+import numpy as np
+
+from oktopus import UniformPrior, GaussianPrior
+
+from .utils import plot_image
+from .prf import SimpleKeplerPRF
 
 
 class Star(object):
     """Holds the information on a star being fitted during PSF photometry."""
-    def __init__(self, targetid, col, err_col, row, err_row, flux, err_flux):
-        self.targetid = targetid
-        self.col = col
-        self.err_col = err_col
-        self.row = self.row
-        self.err_row = self.err_row
+    def __init__(self, flux, col, row, err_col=None, err_row=None, err_flux=None, targetid=None):
         self.flux = flux
+        self.col = col
+        self.row = row
+        self.targetid = targetid
+        self.err_col = err_col
+        self.err_row = err_row
         self.err_flux = err_flux
         self.col_prior = GaussianPrior(mean=self.col, var=self.err_col**2)
         self.row_prior = GaussianPrior(mean=self.row, var=self.err_row**2)
-        self.flux_prior = GaussianPrior(mean=self.flux, var=self.err_flux**2)
+        self.flux_prior = UniformPrior(lb=self.flux - self.err_flux[0], ub=self.flux + err_flux[1])
 
-    def evaluate(self, col, row, flux):
+    def evaluate(self, flux, col, row):
         """Evaluate the prior probability of a star of a given flux being at
         a given row and col."""
         logp = (self.col_prior.evaluate(col) +
@@ -28,20 +33,19 @@ class Star(object):
 
 
 class Background():
-    """
+    """Background level in a single cadence.
+
+    Attributes
+    ----------
     mean : 2D image or float
     """
-    def __init__(self, mean, sigma):
-        pass
+    def __init__(self, bgflux, sigma_bgflux):
+        self.bgflux = bgflux
+        self.sigma_bgflux = sigma_bgflux
+        self.prior = GaussianPrior(mean=self.bgflux, var=self.sigma_bgflux**2)
 
-
-class Focus():
-    pass
-
-
-class Motion():
-    pass
-    # delta_col, delta_row = UniformPDF(), UniformPDF()
+    def evaluate(self, bgflux):
+        return self.prior.evaluate(bgflux)
 
 
 class SceneModelParameters():
@@ -52,33 +56,50 @@ class SceneModelParameters():
     stars : list of `Star` objects
         Stars in the scene.
     """
-    def __init__(self, stars, background=None, focus=None, motion=None, meta=None):
+    def __init__(self, stars, background=None, meta=None):
         self.stars = stars
+        self.background = background
         self.meta = meta  # intended to hold scipy fitting diagnostics (aka garbage)
 
 
-class SceneModel():
+class SimpleSceneModel():
     """A model which describes a single Kepler image.
 
     Attributes
     ----------
     stars : list of `Star` objects
     """
-    def __init__(self, stars, background=None, focus=None, motion=None):
-        self.params = SceneModelParameters(stars, background, focus, motion)
+    def __init__(self, stars, prfmodel, background):
+        self.initial_params = SceneModelParameters(stars, background)
+        self.prfmodel = prfmodel
 
-    def predict(self, params):
+    def plot(self, params=None):
+        if params is None:
+            params = self.initial_params
+        img = self.predict(params)
+        plot_image(img)
+
+    def predict(self, params=None):
         """Produces a synthetic Kepler 2D image given a set of scene parameters."""
         # put a star at position col + delta_col
+        if params is None:
+            params = self.initial_params
+        star_images = []
+        for star in params.stars:
+            star_images.append(self.prfmodel(star.flux, star.col, star.row))
+        synthetic_image = np.sum(star_images, axis=0) + params.background.bgflux
         return synthetic_image
 
     def fit(self, observed_data):
+        """
         self.fitted_params = self.params
         score = self.predict(self.fitted_params) - observed_data
         whatevz = optimize(score)
         self.fitted_params.meta['scipy'] = whatevz
         return self.fitted_params
+        """
 
+"""
 
 class KeplerTargetPixelFile():
 
@@ -101,8 +122,19 @@ class KeplerTargetPixelFile():
         for idx in range(len(r.stars)):
             LightCurve(flux=[r.stars[0].flux for r in results])
         return LightCurveCollection([lc1, lc2, lc3])
+"""
+
+
+def do():
+    stars = [Star(flux=100, col=10, row=20, err_flux=0.1, err_col=1, err_row=1, targetid="christina")]
+    prfmodel = SimpleKeplerPRF(channel=44, shape=(10, 10), column=10, row=20)
+    background = Background(bgflux=10, sigma_bgflux=1.0)
+    scenemodel = SimpleSceneModel(stars=stars, prfmodel=prfmodel, background=background)
+    img = scenemodel.predict()
+    return img
 
 
 if __name__ == '__main__':
-    tpf = KeplerTargetPixelFile()
-    tpf.psf_photometry(sourcelist='kic')
+    #tpf = KeplerTargetPixelFile()
+    #tpf.psf_photometry(sourcelist='kic')
+    pass
