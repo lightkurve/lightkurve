@@ -1,6 +1,6 @@
 import numpy as np
 
-from oktopus import UniformPrior, GaussianPrior
+from oktopus import UniformPrior, GaussianPrior, PoissonPosterior
 
 from .utils import plot_image
 from .prf import SimpleKeplerPRF
@@ -18,7 +18,7 @@ class Star(object):
         self.err_flux = err_flux
         self.col_prior = GaussianPrior(mean=self.col, var=self.err_col**2)
         self.row_prior = GaussianPrior(mean=self.row, var=self.err_row**2)
-        self.flux_prior = UniformPrior(lb=self.flux - self.err_flux[0], ub=self.flux + err_flux[1])
+        self.flux_prior = GaussianPrior(mean=self.flux, var=self.err_flux**2)
 
     def evaluate(self, flux, col, row):
         """Evaluate the prior probability of a star of a given flux being at
@@ -32,9 +32,8 @@ class Star(object):
         raise NotImplementedError('Geert was lazy.')
 
 
-class Background():
-    """Background level in a single cadence.
-
+class Background(object):
+    """
     Attributes
     ----------
     mean : 2D image or float
@@ -60,6 +59,14 @@ class SceneModelParameters():
         self.stars = stars
         self.background = background
         self.meta = meta  # intended to hold scipy fitting diagnostics (aka garbage)
+
+    def evaluate(self, params):
+        """Returns probability of a new set of params given the current priors."""
+        logp = 0
+        for old_star, new_star in zip(self.stars, params.stars):
+            logp += old_star.evaluate(new_star.flux, new_star.col, new_star.row)
+        logp += self.background.evaluate(params.background.bgflux)
+        return logp
 
 
 class SimpleSceneModel():
@@ -90,7 +97,10 @@ class SimpleSceneModel():
         synthetic_image = np.sum(star_images, axis=0) + params.background.bgflux
         return synthetic_image
 
-    def fit(self, observed_data):
+    def fit(self, observed_data, loss_function=PoissonPosterior):
+        loss_function
+        loss = self.loss_function(tpf_flux[t], self.predict,
+                                      prior=self.prior)
         """
         self.fitted_params = self.params
         score = self.predict(self.fitted_params) - observed_data
