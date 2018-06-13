@@ -1,3 +1,4 @@
+"""Draft implementation of a dream Kepler PSF photometry API."""
 import numpy as np
 
 from oktopus import UniformPrior, GaussianPrior, PoissonPosterior
@@ -6,19 +7,29 @@ from .utils import plot_image
 from .prf import SimpleKeplerPRF
 
 
-class Star(object):
-    """Holds the information on a star being fitted during PSF photometry."""
-    def __init__(self, flux, col, row, err_col=None, err_row=None, err_flux=None, targetid=None):
+class StarParameters(object):
+    """Captures the parameters of a star in a model.
+    """
+    def __init__(self, flux, col, row, err_flux=None, err_col=None, err_row=None):
         self.flux = flux
         self.col = col
         self.row = row
-        self.targetid = targetid
+        self.err_flux = err_flux
         self.err_col = err_col
         self.err_row = err_row
-        self.err_flux = err_flux
-        self.col_prior = GaussianPrior(mean=self.col, var=self.err_col**2)
-        self.row_prior = GaussianPrior(mean=self.row, var=self.err_row**2)
-        self.flux_prior = GaussianPrior(mean=self.flux, var=self.err_flux**2)
+
+    def __repr__(self):
+        print('Gorgeous repr.')
+
+
+class StarPrior(object):
+    """Captures user's beliefs about a star's position and flux.
+    """
+    def __init__(self, flux, col, row, err_col=None, err_row=None, err_flux=None, targetid=None):
+        self.targetid = targetid
+        self.col_prior = GaussianPrior(mean=col, var=err_col**2)
+        self.row_prior = GaussianPrior(mean=row, var=err_row**2)
+        self.flux_prior = GaussianPrior(mean=flux, var=err_flux**2)
 
     def evaluate(self, flux, col, row):
         """Evaluate the prior probability of a star of a given flux being at
@@ -32,19 +43,32 @@ class Star(object):
         raise NotImplementedError('Geert was lazy.')
 
 
-class Background(object):
+class BackgroundParameters(object):
+    """Captures the parameters of the background in a model.
     """
+    def __init__(self, flux, err_flux=None):
+        self.flux = flux
+        self.err_flux = err_flux
+
+    def __repr__(self):
+        print('Gorgeous repr.')
+
+
+class BackgroundPrior(object):
+    """Captures user's beliefs about the background level.
+
     Attributes
     ----------
     mean : 2D image or float
     """
-    def __init__(self, bgflux, sigma_bgflux):
-        self.bgflux = bgflux
-        self.sigma_bgflux = sigma_bgflux
-        self.prior = GaussianPrior(mean=self.bgflux, var=self.sigma_bgflux**2)
+    def __init__(self, flux, err_flux):
+        self.flux_prior = GaussianPrior(mean=flux, var=err_flux**2)
 
-    def evaluate(self, bgflux):
-        return self.prior.evaluate(bgflux)
+    def evaluate(self, flux):
+        return self.flux_prior.evaluate(flux)
+
+    def mean(self):
+        return BackgroundParameters(flux=self.flux_prior.mean)
 
 
 class SceneModelParameters():
@@ -52,21 +76,22 @@ class SceneModelParameters():
 
     Attributes
     ----------
-    stars : list of `Star` objects
+    stars : list of `StarParameter` objects
         Stars in the scene.
     """
-    def __init__(self, stars, background=None, meta=None):
+    def __init__(self, stars, background):
         self.stars = stars
         self.background = background
-        self.meta = meta  # intended to hold scipy fitting diagnostics (aka garbage)
 
-    def evaluate(self, params):
-        """Returns probability of a new set of params given the current priors."""
-        logp = 0
-        for old_star, new_star in zip(self.stars, params.stars):
-            logp += old_star.evaluate(new_star.flux, new_star.col, new_star.row)
-        logp += self.background.evaluate(params.background.bgflux)
-        return logp
+    def to_tuple(self):
+        """Convert to a tuple of numbers, which is what oktopus needs."""
+        result = []
+        for star in self.stars:
+            result.append(star.flux)
+            result.append(star.col)
+            result.append(star.row)
+        result.append(background.flux)
+        return tuple(result)
 
 
 class SimpleSceneModel():
@@ -74,15 +99,27 @@ class SimpleSceneModel():
 
     Attributes
     ----------
-    stars : list of `Star` objects
+    star_priors : list of `StarPrior` objects
     """
-    def __init__(self, stars, prfmodel, background):
-        self.initial_params = SceneModelParameters(stars, background)
+    def __init__(self, star_priors, background_prior, prfmodel):
+        self.star_priors = star_priors
+        self.background_prior = background_prior
         self.prfmodel = prfmodel
+
+    def initial_guesses(self):
+        # Infer initial parameter guesses from the prior means
+        initial_star_guesses = []
+        for star in self.star_priors:
+            initial_star_guesses.append(StarParameters(flux=star.flux_prior.mean,
+                                                       col=star.col_prior.mean,
+                                                       row=star.row_prior.mean))
+        initial_params = SceneModelParameters(stars=initial_star_guesses,
+                                              background=BackgroundParameters(flux=self.background_prior.flux_prior.mean))
+        return initial_params
 
     def plot(self, params=None):
         if params is None:
-            params = self.initial_params
+            params = self.initial_guesses()
         img = self.predict(params)
         plot_image(img)
 
@@ -90,14 +127,32 @@ class SimpleSceneModel():
         """Produces a synthetic Kepler 2D image given a set of scene parameters."""
         # put a star at position col + delta_col
         if params is None:
-            params = self.initial_params
+            params = self.initial_guesses()
         star_images = []
         for star in params.stars:
             star_images.append(self.prfmodel(star.flux, star.col, star.row))
-        synthetic_image = np.sum(star_images, axis=0) + params.background.bgflux
+        synthetic_image = np.sum(star_images, axis=0) + params.background.flux
         return synthetic_image
 
+    def evaluate_prior(self, params):
+        logp = 0
+        for star, star_prior in zip(params.stars, self.star_priors):
+            logp += star_prior.evaluate(flux=star.flux, col=star.col, row=star.row)
+        logp += self.background_prior.evaluate(flux=params.background.flux)
+        return logp
+
+    def evaluate_likelihood(self, params, data):
+        # Poisson likelihood
+        return np.nansum(self.predict(params) - data * np.log(self.predict(params)))
+
+    def evaluate_posterior(self, params, data):
+        return self.evaluate_likelihood(params, data) + self.evaluate_prior(params)
+
     def fit(self, observed_data, loss_function=PoissonPosterior):
+        from scipy.optimize import minimize
+        self.opt_result = minimize(self.evaluate_posterior, x0=self.initial_guesses().to_tuple())
+
+        pass
         loss_function
         loss = self.loss_function(tpf_flux[t], self.predict,
                                       prior=self.prior)
@@ -108,6 +163,8 @@ class SimpleSceneModel():
         self.fitted_params.meta['scipy'] = whatevz
         return self.fitted_params
         """
+
+def scenemodelparameters_to_listofparameters()
 
 """
 
