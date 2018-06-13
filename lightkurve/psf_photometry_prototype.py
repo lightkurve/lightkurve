@@ -1,23 +1,30 @@
-class PDF():
-    """Generic distribution class"""
-    def __init__():
-
-    def mean():
-
-    def std():
-
-    def plot():
+from oktopus import GaussianPrior
 
 
-class Star():
-    id
-    col = DeltaPDF()
-    row = DeltaPDF()
-    flux = SampledPDF()
-    
-    def evaluate(ra, dec, flux=None):
-        """Evaluate the prior prob."""
-        return prob
+class Star(object):
+    """Holds the information on a star being fitted during PSF photometry."""
+    def __init__(self, targetid, col, err_col, row, err_row, flux, err_flux):
+        self.targetid = targetid
+        self.col = col
+        self.err_col = err_col
+        self.row = self.row
+        self.err_row = self.err_row
+        self.flux = flux
+        self.err_flux = err_flux
+        self.col_prior = GaussianPrior(mean=self.col, var=self.err_col**2)
+        self.row_prior = GaussianPrior(mean=self.row, var=self.err_row**2)
+        self.flux_prior = GaussianPrior(mean=self.flux, var=self.err_flux**2)
+
+    def evaluate(self, col, row, flux):
+        """Evaluate the prior probability of a star of a given flux being at
+        a given row and col."""
+        logp = (self.col_prior.evaluate(col) +
+                self.row_prior.evaluate(row) +
+                self.flux_prior.evaluate(flux))
+        return logp
+
+    def plot(self):
+        raise NotImplementedError('Geert was lazy.')
 
 
 class Background():
@@ -29,43 +36,48 @@ class Background():
 
 
 class Focus():
-    sigma
+    pass
 
 
 class Motion():
-    delta_col, delta_row = UniformPDF(), UniformPDF()
+    pass
+    # delta_col, delta_row = UniformPDF(), UniformPDF()
 
 
 class SceneModelParameters():
-    stars = list of Stars  # mean and sigma of star properties
-    background  # Background object
-    diagnostics = list of scipyjunkobjects
+    """Parameters that define a single cadence of a TPF image.
+
+    Attributes
+    ----------
+    stars : list of `Star` objects
+        Stars in the scene.
+    """
+    def __init__(self, stars, background=None, focus=None, motion=None, meta=None):
+        self.stars = stars
+        self.meta = meta  # intended to hold scipy fitting diagnostics (aka garbage)
 
 
 class SceneModel():
     """A model which describes a single Kepler image.
 
-    stars : list of Star objects
+    Attributes
+    ----------
+    stars : list of `Star` objects
     """
-    def __init__(self, stars=[], background_prior=None, focus_prior=None):
-        self.star_priors = star_priors
-        self.background_prior = background_prior
+    def __init__(self, stars, background=None, focus=None, motion=None):
+        self.params = SceneModelParameters(stars, background, focus, motion)
 
-    def get_prior_means(self):
-        """Returns the mean priors guess based on priors."""
-        # Call the mean functions of all the Prior objects
-        return ...
-
-    def predict(self, params=self.get_initial_guesses()):
+    def predict(self, params):
         """Produces a synthetic Kepler 2D image given a set of scene parameters."""
-        put a star at position col + delta_col
+        # put a star at position col + delta_col
         return synthetic_image
 
     def fit(self, observed_data):
-        param = self.get_initial_guesses()
-        score = self.predict(param) - observed_data
+        self.fitted_params = self.params
+        score = self.predict(self.fitted_params) - observed_data
         whatevz = optimize(score)
-        return SceneModelParameters(whatevz, garbage)
+        self.fitted_params.meta['scipy'] = whatevz
+        return self.fitted_params
 
 
 class KeplerTargetPixelFile():
