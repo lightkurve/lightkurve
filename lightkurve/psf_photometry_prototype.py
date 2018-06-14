@@ -51,23 +51,6 @@ class BackgroundParameters(object):
         self.err_flux = err_flux
 
 
-class BackgroundPrior(object):
-    """Captures the user's beliefs about the background flux.
-
-    Attributes
-    ----------
-    mean : 2D image or float
-        Mean expected background level.
-    err_flux : sigma
-        Standard deviation around the mean expected background level.
-    """
-    def __init__(self, flux=UniformPrior(lb=0, ub=1e4)):
-        self.flux = flux
-
-    def evaluate(self, flux):
-        return self.flux.evaluate(flux)
-
-
 class SimpleSceneModelParameters():
     """Parameters that define a single cadence of a TPF image.
 
@@ -89,9 +72,9 @@ class SimpleSceneModelParameters():
         """
         array = []
         for star in self.stars:
-            array.append(star.flux)
             array.append(star.col)
             array.append(star.row)
+            array.append(star.flux)
         array.append(self.background.flux)
         return np.array(array)
 
@@ -103,9 +86,9 @@ class SimpleSceneModelParameters():
         stars = []
         n_stars = int((len(array) - 1) / 3)
         for staridx in range(n_stars):
-            star = StarParameters(flux=array[staridx * 3],
-                                  col=array[staridx * 3 + 1],
-                                  row=array[staridx * 3 + 2])
+            star = StarParameters(col=array[staridx * 3],
+                                  row=array[staridx * 3 + 1],
+                                  flux=array[staridx * 3 + 2])
             stars.append(star)
         background = BackgroundParameters(flux=array[-1])
         return SimpleSceneModelParameters(stars=stars, background=background)
@@ -131,13 +114,12 @@ class SimpleSceneModel():
         """Returns the prior means."""
         initial_star_guesses = []
         for star in self.star_priors:
-            initial_star_guesses.append(StarParameters(flux=star.flux.mean,
-                                                       col=star.col.mean,
-                                                       row=star.row.mean))
-        background = BackgroundParameters(flux=self.background_prior.flux.mean)
+            initial_star_guesses.append(StarParameters(col=star.col.mean,
+                                                       row=star.row.mean,
+                                                       flux=star.flux.mean))
+        background = BackgroundParameters(flux=self.background_prior.mean)
         initial_params = SimpleSceneModelParameters(stars=initial_star_guesses,
                                                     background=background)
-        assert self.logp_prior(initial_params) == 0
         return initial_params
 
     def plot(self, *params, **kwargs):
@@ -199,8 +181,8 @@ class SimpleSceneModel():
         """
         logp = 0
         for star, star_prior in zip(params.stars, self.star_priors):
-            logp += star_prior.evaluate(flux=star.flux, col=star.col, row=star.row)
-        logp += self.background_prior.evaluate(flux=params.background.flux)
+            logp += star_prior.evaluate(col=star.col, row=star.row, flux=star.flux)
+        logp += self.background_prior.evaluate(params.background.flux)
         return logp
 
     def _logp_prior(self, params_array):
@@ -225,16 +207,16 @@ def psf_photometry_demo():
 
     # We will attempt to make a lightcurve for Tabby's star
     tpf = KeplerTargetPixelFile.from_archive(8462852, quarter=16, quality_bitmask='hardest')
+    bgflux = np.nanpercentile(tpf.flux[0], 10)
+    maxflux = np.nansum(tpf.flux, axis=(1, 2)).max()
 
     # First, set up a simple scene model with one star and no motion or focus changes
     star_prior = StarPrior(col=GaussianPrior(mean=tpf.column, var=2**2),
                            row=GaussianPrior(mean=tpf.row, var=2**2),
-                           flux=GaussianPrior(mean=np.nansum(tpf.flux[0]), var=1e5**2),
+                           flux=UniformPrior(lb=0, ub=maxflux),
                            targetid=tpf.keplerid)
-    background_prior = BackgroundPrior(flux=GaussianPrior(mean=np.nanpercentile(tpf.flux[0], 10),
-                                                          var=10**2))
     model = SimpleSceneModel(star_priors=[star_prior],
-                             background_prior=background_prior,
+                             background_prior=GaussianPrior(mean=bgflux, var=bgflux),
                              prfmodel=tpf.get_prf_model())
 
     # Now make the lightcurve by fitting each cadence
