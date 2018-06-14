@@ -744,6 +744,7 @@ class LightCurve(object):
 
     def inject(self):
         """Injects a supernova into the lightcurve flux
+        Assumes the supernova peak is in the middle of the light curve
 
         Parameters
         ----------
@@ -753,7 +754,16 @@ class LightCurve(object):
         lc : LightCurve class
             Returns a lightcurve possessing a synthetic supernova signal.
         """
-        raise NotImplementedError
+        import sncosmo
+
+        tpeak = np.nanmedian(self.time)
+
+        model = sncosmo.Model(source='hsiao')
+        model.set(z=0.5, t0=tpeak, amplitude=6.e-5)
+        bandflux = model.bandflux('kepler', self.time)
+        mergedflux = self.flux + bandflux
+
+        return LightCurve(self.time, flux=mergedflux, flux_err=self.flux_err)
 
 class FoldedLightCurve(LightCurve):
     """Defines a folded lightcurve with different plotting defaults."""
