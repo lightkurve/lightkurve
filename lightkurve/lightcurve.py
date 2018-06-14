@@ -747,10 +747,6 @@ class LightCurve(object):
         """Injects a supernova into the lightcurve flux
         Assumes the supernova peak is in the middle of the light curve
 
-        # NOTE: Right now this method only works with sources which take
-                3 parameters: z, t0, and amplitude. Consult http://sncosmo.readthedocs.io/en/v1.6.x/
-                for more information.
-
         Parameters
         ----------
         t0 : float
