@@ -210,8 +210,11 @@ class SimpleSceneModel():
 
 
 def psf_photometry_demo():
-    # Set up a simple scene model with one star and no motion or focus changes
+
+    # We will attempt to make a lightcurve for Tabby's star
     tpf = KeplerTargetPixelFile.from_archive(8462852, quarter=16, quality_bitmask='hardest')
+
+    # First, set up a simple scene model with one star and no motion or focus changes
     star_prior = StarPrior(flux=np.nansum(tpf.flux[0]), col=tpf.column, row=tpf.row,
                            err_flux=1e5, err_col=2, err_row=2,
                            targetid=tpf.keplerid)
@@ -219,14 +222,14 @@ def psf_photometry_demo():
     scenemodel = SimpleSceneModel(star_priors=[star_prior],
                                   background_prior=background_prior,
                                   prfmodel=tpf.get_prf_model())
-    # Now make the lightcurve
+
+    # Now make the lightcurve by fitting each cadence
     time = tpf.time[1400:1700]
     flux = []
     for idx in tqdm(range(len(time))):
         result = scenemodel.fit(tpf.flux[idx])
         flux.append(result.stars[0].flux)
     return LightCurve(time, flux)
-
 
 """
 # Possibe changes to TPF planned:
