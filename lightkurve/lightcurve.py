@@ -771,8 +771,10 @@ class KeplerLightCurve(LightCurve):
         Data flux for every time point
     flux_err : array-like
         Uncertainty on each flux data point
-    centroid_col, centroid_row : array-like, array-like
-        Centroid column and row coordinates as a function of time
+    centroid_col : array-like
+        Centroid column coordinates as a function of time
+    centroid_row : array-like
+        Centroid row coordinates as a function of time
     quality : array-like
         Array indicating the quality of each data point
     quality_bitmask : int

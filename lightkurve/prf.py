@@ -450,8 +450,8 @@ def get_initial_guesses(data, ref_col, ref_row):
     ref_col, ref_row : scalars
         Reference column and row (coordinates of the bottom left corner)
 
-    Return
-    ------
+    Returns
+    -------
     flux0, col0, row0, sigma0: floats
         Inital guesses for flux, center position, and width
     """
