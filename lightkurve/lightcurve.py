@@ -742,7 +742,7 @@ class LightCurve(object):
             hdu.writeto(path, overwrite=overwrite, checksum=True)
         return hdu
 
-    def inject(self, t0, source, bandpass='kepler', **kwargs):
+    def inject_sn(self, t0, source, bandpass='kepler', **kwargs):
         """Injects a supernova into the lightcurve flux
 
         Parameters
@@ -771,6 +771,34 @@ class LightCurve(object):
         model.set(t0=t0, **kwargs)
         bandflux = model.bandflux(bandpass, self.time)
         mergedflux = self.flux + bandflux
+
+        return LightCurve(self.time, flux=mergedflux, flux_err=self.flux_err)
+
+    def inject_transit(self, t0, period, rprs, rho=1.5, ld=[0.2, 0.4, 0.0, 0.0], dil=0.0, zpt=0.0,
+                        impact=0.0, ecosw=0.0, esinw=0.0, occ=0.0):
+        """Injects a supernova into the lightcurve flux
+
+        Parameters
+        ----------
+        t0 : float
+            time of supernova's peak brightness
+        rho : float
+
+        Returns
+        -------
+        lc : LightCurve class
+            Returns a lightcurve possessing a synthetic supernova signal.
+        """
+
+        import ktransit
+
+        model = ktransit.LCModel()
+        model.add_star(rho=1.5, ld1=0.2, ld2=0.4, ld3=0, ld4=0, dil=dil, zpt=zpt)
+        model.add_planet(T0=t0, period=period, impact=impact, rprs=rprs, ecosw=ecosw, esinw=esinw, occ=occ)
+        model.add_data(time=self.time)
+
+        transit_flux = model.transitmodel
+        mergedflux = self.flux * transit_flux
 
         return LightCurve(self.time, flux=mergedflux, flux_err=self.flux_err)
 
