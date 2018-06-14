@@ -2,7 +2,7 @@
 import numpy as np
 from tqdm import tqdm
 
-from oktopus import GaussianPrior, PoissonPosterior
+from oktopus import GaussianPrior, UniformPrior, PoissonPosterior
 
 from .utils import plot_image
 from . import LightCurve
@@ -12,38 +12,35 @@ from . import KeplerTargetPixelFile
 class StarParameters(object):
     """Captures the parameters of a star in a scene model.
     """
-    def __init__(self, flux, col, row, err_flux=None, err_col=None, err_row=None):
-        self.flux = flux
+    def __init__(self, col, row, flux, err_col=None, err_row=None, err_flux=None):
         self.col = col
         self.row = row
-        self.err_flux = err_flux
-        self.err_col = err_col
-        self.err_row = err_row
-
-    def __repr__(self):
-        print('Gorgeous repr.')
+        self.flux = flux
 
 
 class StarPrior(object):
     """Captures the user's beliefs about a single star's position and flux.
-    """
-    def __init__(self, flux, col, row, err_col=None, err_row=None, err_flux=None, targetid=None):
-        self.targetid = targetid
-        self.col_prior = GaussianPrior(mean=col, var=err_col**2)
-        self.row_prior = GaussianPrior(mean=row, var=err_row**2)
-        self.flux_prior = GaussianPrior(mean=flux, var=err_flux**2)
 
-    def evaluate(self, flux, col, row):
+    Example use
+    -----------
+    StarPrior(col=GaussianPrior(mean=col, var=err_col**2),
+              row=GaussianPrior(mean=row, var=err_row**2),
+              flux=GaussianPrior(mean=flux, var=err_flux**2))
+    """
+    def __init__(self, col, row, flux=UniformPrior(lb=0, ub=1e10), targetid=None):
+        self.col = col
+        self.row = row
+        self.flux = flux
+        self.targetid = targetid
+
+    def evaluate(self, col, row, flux):
         """Evaluate the prior probability of a star of a given flux being at
         a given row and col.
         """
-        logp = (self.col_prior.evaluate(col) +
-                self.row_prior.evaluate(row) +
-                self.flux_prior.evaluate(flux))
+        logp = (self.col.evaluate(col) +
+                self.row.evaluate(row) +
+                self.flux.evaluate(flux))
         return logp
-
-    def plot(self):
-        raise NotImplementedError('Geert was lazy.')
 
 
 class BackgroundParameters(object):
@@ -52,9 +49,6 @@ class BackgroundParameters(object):
     def __init__(self, flux, err_flux=None):
         self.flux = flux
         self.err_flux = err_flux
-
-    def __repr__(self):
-        print('Gorgeous repr.')
 
 
 class BackgroundPrior(object):
@@ -67,14 +61,11 @@ class BackgroundPrior(object):
     err_flux : sigma
         Standard deviation around the mean expected background level.
     """
-    def __init__(self, flux, err_flux):
-        self.flux_prior = GaussianPrior(mean=flux, var=err_flux**2)
+    def __init__(self, flux=UniformPrior(lb=0, ub=1e4)):
+        self.flux = flux
 
     def evaluate(self, flux):
-        return self.flux_prior.evaluate(flux)
-
-    def mean(self):
-        return BackgroundParameters(flux=self.flux_prior.mean)
+        return self.flux.evaluate(flux)
 
 
 class SimpleSceneModelParameters():
@@ -140,10 +131,10 @@ class SimpleSceneModel():
         """Returns the prior means."""
         initial_star_guesses = []
         for star in self.star_priors:
-            initial_star_guesses.append(StarParameters(flux=star.flux_prior.mean,
-                                                       col=star.col_prior.mean,
-                                                       row=star.row_prior.mean))
-        background = BackgroundParameters(flux=self.background_prior.flux_prior.mean)
+            initial_star_guesses.append(StarParameters(flux=star.flux.mean,
+                                                       col=star.col.mean,
+                                                       row=star.row.mean))
+        background = BackgroundParameters(flux=self.background_prior.flux.mean)
         initial_params = SimpleSceneModelParameters(stars=initial_star_guesses,
                                                     background=background)
         assert self.logp_prior(initial_params) == 0
@@ -230,49 +221,26 @@ class SimpleSceneModel():
 
 
 def psf_photometry_demo():
+    """Prototype implementation of `KeplerTargetPixelFile.psf_photometry()`"""
 
     # We will attempt to make a lightcurve for Tabby's star
     tpf = KeplerTargetPixelFile.from_archive(8462852, quarter=16, quality_bitmask='hardest')
 
     # First, set up a simple scene model with one star and no motion or focus changes
-    star_prior = StarPrior(flux=np.nansum(tpf.flux[0]), col=tpf.column, row=tpf.row,
-                           err_flux=1e5, err_col=2, err_row=2,
+    star_prior = StarPrior(col=GaussianPrior(mean=tpf.column, var=2**2),
+                           row=GaussianPrior(mean=tpf.row, var=2**2),
+                           flux=GaussianPrior(mean=np.nansum(tpf.flux[0]), var=1e5**2),
                            targetid=tpf.keplerid)
-    background_prior = BackgroundPrior(flux=np.nanpercentile(tpf.flux[0], 10), err_flux=100.0)
-    scenemodel = SimpleSceneModel(star_priors=[star_prior],
-                                  background_prior=background_prior,
-                                  prfmodel=tpf.get_prf_model())
+    background_prior = BackgroundPrior(flux=GaussianPrior(mean=np.nanpercentile(tpf.flux[0], 10),
+                                                          var=10**2))
+    model = SimpleSceneModel(star_priors=[star_prior],
+                             background_prior=background_prior,
+                             prfmodel=tpf.get_prf_model())
 
     # Now make the lightcurve by fitting each cadence
-    time = tpf.time[1400:1700]
+    time = tpf.time[1400:1700]  # this cadence range include the deepest dip
     flux = []
     for idx in tqdm(range(len(time))):
-        result = scenemodel.fit(tpf.flux[idx])
+        result = model.fit(tpf.flux[idx])
         flux.append(result.stars[0].flux)
     return LightCurve(time, flux)
-
-"""
-# Possibe changes to TPF planned:
-
-class KeplerTargetPixelFile():
-
-    def to_lightcurve(method='aperture'):
-        ...
-
-    def aperture_photometry(self):
-        ...
-
-    def get_scenemodel(self):
-        return ...
-
-    def psf_photometry(self, sourcelist, return_diagnostics=False):
-        star_priors = tpf.get_starpriors(sourcelist)
-        BackgroudPrior(self.data.median(), self.data.std())
-        scenemodel = self.get_scenemodel(star_priors)
-        for cadence in tpf.data:
-            result = scenemodel.fit(tpf.data)
-            results.append(result)
-        for idx in range(len(r.stars)):
-            LightCurve(flux=[r.stars[0].flux for r in results])
-        return LightCurveCollection([lc1, lc2, lc3])
-"""
