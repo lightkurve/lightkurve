@@ -52,6 +52,21 @@ def test_tpf_plot():
     with pytest.raises(ValueError):
         tpf.plot(scale="blabla")
 
+def test_find():
+    "Minimum sanity chech of the table it returns contains the coordinates of the tpf"
+    tpf = KeplerTargetPixelFile(TABBY_TPF)
+    if tpf.mission == 'Kepler':
+        catalog = 'KIC'
+    elif tpf.mission == 'K2':
+        catalog = 'EPIC'
+    print ('passes here')
+    dat = KeplerTargetPixelFile.find_stars(tpf, catalog)
+    ra, dec = dat['RAJ2000'], dat['DEJ2000']
+    finder = np.where(ra==tpf.ra)
+
+    assert(len(finder[0])==1)
+
+
 
 def test_tpf_zeros():
     """Does the LightCurve of a zero-flux TPF make sense?"""
