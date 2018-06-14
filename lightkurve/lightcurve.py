@@ -742,28 +742,44 @@ class LightCurve(object):
             hdu.writeto(path, overwrite=overwrite, checksum=True)
         return hdu
 
-    def inject(self):
+    def inject(self, t0, source, bandpass='kepler', **kwargs):
+    #inject(self, t0, source='hsiao', z=0.5, amplitude=6.e-5, bandflux='kepler'):
         """Injects a supernova into the lightcurve flux
         Assumes the supernova peak is in the middle of the light curve
 
+        # NOTE: Right now this method only works with sources which take
+                3 parameters: z, t0, and amplitude. Consult http://sncosmo.readthedocs.io/en/v1.6.x/
+                for more information.
+
         Parameters
         ----------
+        t0 : float
+            time of supernova's peak brightness
+        source : string, default 'hsiao'
+            Source of supernova model. Default is the hsiao model:
+            http://adsabs.harvard.edu/abs/2007ApJ...663.1187H
+        bandpass : string, default 'kepler'
+            Bandpass defined by sncosmo. Built-in bandpasses here:
+            https://sncosmo.readthedocs.io/en/v1.6.x/bandpass-list.html
+        kwargs : dict
+            Dictionary of keyword arguments to be passed to model.set that
+            specify the supernova based on the chosen model.
 
         Returns
         -------
         lc : LightCurve class
             Returns a lightcurve possessing a synthetic supernova signal.
         """
+
         import sncosmo
 
-        tpeak = np.nanmedian(self.time)
-
-        model = sncosmo.Model(source='hsiao')
-        model.set(z=0.5, t0=tpeak, amplitude=6.e-5)
-        bandflux = model.bandflux('kepler', self.time)
+        model = sncosmo.Model(source=source)
+        model.set(t0=t0, **kwargs)
+        bandflux = model.bandflux(bandpass, self.time)
         mergedflux = self.flux + bandflux
 
         return LightCurve(self.time, flux=mergedflux, flux_err=self.flux_err)
+
 
 class FoldedLightCurve(LightCurve):
     """Defines a folded lightcurve with different plotting defaults."""
