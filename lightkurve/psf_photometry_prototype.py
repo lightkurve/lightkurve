@@ -71,7 +71,7 @@ class BackgroundPrior(object):
         return BackgroundParameters(flux=self.flux_prior.mean)
 
 
-class SceneModelParameters():
+class SimpleSceneModelParameters():
     """Parameters that define a single cadence of a TPF image.
 
     Attributes
@@ -84,7 +84,7 @@ class SceneModelParameters():
         self.background = background
 
     def to_tuple(self):
-        """Convert to a tuple of numbers, which is what oktopus needs."""
+        """Convert to a tuple of numbers, which is what oktopus and scipy.optimize needs."""
         result = []
         for star in self.stars:
             result.append(star.flux)
@@ -92,6 +92,18 @@ class SceneModelParameters():
             result.append(star.row)
         result.append(background.flux)
         return tuple(result)
+
+    @staticmethod
+    def from_tuple(tpl):
+        stars = []
+        n_stars = (len(tpl) - 1) / 3
+        for staridx in range(n_stars):
+            star = StarParameters(flux=tpl[staridx * 3],
+                                  col=tpl[staridx * 3 + 1],
+                                  row=tpl[staridx * 3 + 2])
+            stars.append(star)
+        background = BackgroundParameters(flux=tpl[-1])
+        return SimpleSceneModelParameters(stars=stars, background=background)
 
 
 class SimpleSceneModel():
@@ -113,8 +125,9 @@ class SimpleSceneModel():
             initial_star_guesses.append(StarParameters(flux=star.flux_prior.mean,
                                                        col=star.col_prior.mean,
                                                        row=star.row_prior.mean))
-        initial_params = SceneModelParameters(stars=initial_star_guesses,
-                                              background=BackgroundParameters(flux=self.background_prior.flux_prior.mean))
+        background = BackgroundParameters(flux=self.background_prior.flux_prior.mean)
+        initial_params = SimpleSceneModelParameters(stars=initial_star_guesses,
+                                                    background=background)
         return initial_params
 
     def plot(self, params=None):
