@@ -149,12 +149,33 @@ class SimpleSceneModel():
         assert self.logp_prior(initial_params) == 0
         return initial_params
 
-    def plot(self, params=None):
+    def plot(self, *params, **kwargs):
         """Plots an image of the model for a given point in the parameter space."""
-        if params is None:
-            params = self.initial_guesses()
-        img = self.predict(params)
-        plot_image(img)
+        img = self.predict(*params)
+        plot_image(img,
+                   title='Scene Model, Channel: {}'.format(self.prfmodel.channel),
+                   extent=(self.prfmodel.column, self.prfmodel.column + self.prfmodel.shape[1],
+                           self.prfmodel.row, self.prfmodel.row + self.prfmodel.shape[0]),
+                   **kwargs)
+
+    def diagnostics(self, observed_data, *params, **kwargs):
+        """Plots an image of the model for a given point in the parameter space."""
+        fit = self.fit(observed_data)
+        plot_image(observed_data,
+                   title='Observed Data, Channel: {}'.format(self.prfmodel.channel),
+                   extent=(self.prfmodel.column, self.prfmodel.column + self.prfmodel.shape[1],
+                           self.prfmodel.row, self.prfmodel.row + self.prfmodel.shape[0]),
+                   **kwargs)
+        plot_image(fit.predicted_image,
+                   title='Predicted Image, Channel: {}'.format(self.prfmodel.channel),
+                   extent=(self.prfmodel.column, self.prfmodel.column + self.prfmodel.shape[1],
+                           self.prfmodel.row, self.prfmodel.row + self.prfmodel.shape[0]),
+                   **kwargs)
+        plot_image(fit.residual_image,
+                   title='Residual Image, Channel: {}'.format(self.prfmodel.channel),
+                   extent=(self.prfmodel.column, self.prfmodel.column + self.prfmodel.shape[1],
+                           self.prfmodel.row, self.prfmodel.row + self.prfmodel.shape[0]),
+                   **kwargs)
 
     def predict(self, params=None):
         """Produces a synthetic Kepler 2D image given a set of scene parameters.
@@ -200,13 +221,12 @@ class SimpleSceneModel():
 
     def fit(self, observed_data, loss_function=PoissonPosterior):
         loss = loss_function(observed_data, self._predict, prior=self._logp_prior)
-        result = loss.fit(x0=self.initial_guesses().to_array(), method='powell')
-        opt_params = result.x
-        residuals = observed_data - self._predict(*opt_params)
-        self.loss_value = result.fun
-        self.opt_params = opt_params
-        self.residuals = residuals
-        return SimpleSceneModelParameters.from_array(opt_params)
+        fit = loss.fit(x0=self.initial_guesses().to_array(), method='powell')
+        result = SimpleSceneModelParameters.from_array(fit.x)
+        result.predicted_image = self._predict(*fit.x)
+        result.residual_image = observed_data - result.predicted_image
+        result.loss_value = fit.fun
+        return result
 
 
 def psf_photometry_demo():
