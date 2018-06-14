@@ -745,7 +745,6 @@ class LightCurve(object):
     def inject(self, t0, source, bandpass='kepler', **kwargs):
     #inject(self, t0, source='hsiao', z=0.5, amplitude=6.e-5, bandflux='kepler'):
         """Injects a supernova into the lightcurve flux
-        Assumes the supernova peak is in the middle of the light curve
 
         Parameters
         ----------
