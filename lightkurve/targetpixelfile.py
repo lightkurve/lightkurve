@@ -12,6 +12,10 @@ from matplotlib import patches
 import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
+from astroquery.vizier import Vizier
+from astropy import units as u
+from astropy.coordinates import SkyCoord
+
 
 from . import PACKAGEDIR
 from .lightcurve import KeplerLightCurve, LightCurve
@@ -308,6 +312,88 @@ class KeplerTargetPixelFile(TargetPixelFile):
         if cadence is not 'all':
             return ra[cadence], dec[cadence]
         return ra, dec
+
+
+        def find_stars(tpf, catalog=None):
+            """
+            Load tpf file to find field stars within the tpf.
+
+            Returns a crossmatched table of stars that are within the tpf file
+              given a tpf mission (either KIC or EPIC).
+
+            Parameters
+            -----------
+            catalog: string
+                Indicate catalog assigned for mission. If Kepler, catalog will be KIC
+                if K2 catalog is EPIC.
+
+            Returns
+            -------
+            ID : astropy.table.column (EPIC)
+                Catalog ID from EPIC
+            KIC: astropy.table.column (KIC)
+                Catalog ID from KIC
+            RAJ200: astropy.table.column (KIC & EPIC)
+                Right ascension [degrees]
+            DEJ2000: astropy.table.column (KIC & EPIC)
+                Declination [deg]
+            pmRA: astropy.table.column (KIC & EPIC)
+                Proper motion for right ascension [mas/year]
+            e_pmRA: astropy.table.column (KJIC & EPIC)
+                Error proper motion for Right ascension [mas/year]
+            pmDEC: astropy.table.column (EPIC)
+                Proper motion for declination [mas/year]
+            pmDE: astropy.table.column (KIC)
+                    Proper motion for declination [mas/year]
+            e_pmDEC: astropy.table.column (EPIC)
+                Error proper motion for declination [mas/year]
+            Kpmag: astropy.table.column (KIC & EPIC)
+                Magnitude in Kepler band [mag]
+            """
+
+            # List of parameters we want from each catalog
+            Pars_KIC = ["KIC", "RAJ2000", "DEJ2000", "pmRA", "pmDE", "kepmag"]
+
+            Pars_EPIC = ["ID", "RAJ2000", "DEJ2000", "pmRA", "pmDEC",
+            "e_pmRA", "e_pmDEC", "Kpmag"]
+
+            # Vizier id's
+            ID = { "KIC":["V/133/kic", Pars_KIC],
+            "EPIC":["IV/34/epic", Pars_EPIC] }
+
+            # identifies for catalog
+            viz_id = (ID[catalog])[0]
+            pars = (ID[catalog])[1]
+
+            # ra,dec of each pixel in the tpf
+            cc = tpf.get_coordinates(cadence='all')
+            ra, dec = cc[0], cc[1]
+
+            c = SkyCoord(ra=ra, dec=dec, frame='icrs', unit=(u.deg, u.deg))
+
+            # Define min,max of ra,dec
+            min_ra, min_dec = np.min(c.ra), np.min(c.dec)
+            max_ra, max_dec = np.max(c.ra), np.max(c.dec)
+
+            # Dimensions of box
+            height_box = (max_dec - min_dec)
+            width_box = (max_ra - min_ra)
+
+            # Centre of box
+            x_c = (min_ra + max_ra)/2
+            y_c = (min_dec + max_dec)/2
+
+            #Skycoord the centre of box
+            cent = SkyCoord(ra=x_c, dec=y_c, frame='icrs', unit=(u.deg, u.deg))
+
+            # Choose columns from Vizier
+            v = Vizier(catalog=[viz_id], columns=pars)
+            # query around cent. with height and width
+            result = v.query_region(cent, height=height_box , width=width_box,
+             catalog=[catalog])
+
+            return result[viz_id]
+
 
     @property
     def keplerid(self):
