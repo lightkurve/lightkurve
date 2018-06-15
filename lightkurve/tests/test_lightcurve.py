@@ -440,9 +440,11 @@ def test_flatten_robustness():
     flat_lc = lc.flatten(break_tolerance=None)
     assert_allclose(flat_lc.flux, expected_result)
 
-def test_sn_injection():
-    """Test supernova injection tool"""
-    #this just checks that anything is being injected into the light curve
+def test_injection():
+    """Test injection tools"""
+    #this just checks that something is being injected into the light curve
     lc = LightCurve(time=range(10), flux=np.zeros(10))
-    lcinj = lc.inject_sn(t0=np.nanmedian(lc.time), source='hsiao', z=0.5, amplitude=2.e-4)
-    assert(lc != lcinj)
+    lc_sn_inj = lc.inject_sn(t0=np.nanmedian(lc.time), source='hsiao', z=0.5, amplitude=2.e-4)
+    lc_tr_inj = lc_transit = lc.inject_transit(t0=np.nanmedian(lc.time), period=5, rprs=0.1)
+    assert(lc != lc_sn_inj)
+    assert(lc != lc_tr_inj)

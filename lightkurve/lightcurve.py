@@ -774,15 +774,32 @@ class LightCurve(object):
 
         return LightCurve(self.time, flux=mergedflux, flux_err=self.flux_err)
 
-    def inject_transit(self, t0, period, rprs, rho=1.5, ld=[0.2, 0.4, 0.0, 0.0], dil=0.0, zpt=0.0,
+    def inject_transit(self, t0, period, rprs, rho=1.5, ld1=0.2, ld2=0.4, ld3=0, ld4=0, dil=0.0, zpt=1.0,
                         impact=0.0, ecosw=0.0, esinw=0.0, occ=0.0):
         """Injects a supernova into the lightcurve flux
 
         Parameters
         ----------
         t0 : float
-            time of supernova's peak brightness
-        rho : float
+            a transit mid-time
+        period : float
+            an orbital period in days
+        rprs : float
+            ratio of planet radius to star radius
+        rho : float, default 1.5
+            mean stellar density (in cgs units)
+        ld1, ld2, ld3, ld4 : floats, default ld1 = 0.2, ld2 = 0.4, ld3 = 0.0, ld4 = 0.0 (quadratic limb darkening)
+            limb darkening coefficients
+        dil : float, default 0.0
+            transit dilution factor
+        zpt : float, default 1.0
+            a photometric zeropoint
+        impact : float, default 0.0
+            an impact parameter
+        ecosw, esinw : floats, default ecosw = 0.0, esinw = 0.0
+            an eccentricity vector
+        occ : float, default 0.0
+            a secondary eclipse depth (in ppm)
 
         Returns
         -------
@@ -793,7 +810,7 @@ class LightCurve(object):
         import ktransit
 
         model = ktransit.LCModel()
-        model.add_star(rho=1.5, ld1=0.2, ld2=0.4, ld3=0, ld4=0, dil=dil, zpt=zpt)
+        model.add_star(rho=1.5, ld1=ld1, ld2=ld2, ld3=ld3, ld4=ld4, dil=dil, zpt=zpt)
         model.add_planet(T0=t0, period=period, impact=impact, rprs=rprs, ecosw=ecosw, esinw=esinw, occ=occ)
         model.add_data(time=self.time)
 
