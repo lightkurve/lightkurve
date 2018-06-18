@@ -54,7 +54,7 @@ def test_tpf_plot():
 def test_find():
     "Minimum sanity chech of the table it returns contains the coordinates of the tpf"
     tpf = KeplerTargetPixelFile(TABBY_TPF)
-    dat = tpf.find_stars(catalog='KIC', radius=1)
+    dat = tpf.find_stars(catalog='KIC')
     assert len(dat) != 0
     ra, dec = dat['RA'], dat['Dec']
     finder = np.where(ra==tpf.ra)
