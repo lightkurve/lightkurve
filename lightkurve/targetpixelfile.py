@@ -195,7 +195,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         return('KeplerTargetPixelFile Object (ID: {})'.format(self.keplerid))
 
 
-    def find_stars(self, catalog=None, radius=0.04):
+    def find_stars(self, catalog=None, radius=None):
         """
         Load tpf file to find field stars within the tpf.
 
@@ -208,7 +208,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
             Indicate catalog assigned for mission. If Kepler, catalog will be KIC
             if K2 catalog is EPIC.
         radius: float
-            Radius of cone search centered on the target in arcminutes. Default 0.04
+            Radius of cone search centered on the target in arcminutes.
+            Default is TPF size.
 
         Returns
         -------
@@ -240,6 +241,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
             else:
                 log.error('Please provide a catalog.')
 
+        if radius is None:
+            radius = (4 * (2*np.max(self.shape[1:])**2)**0.5)/60
 
         if catalog is "Gaia":
             log.warn('Gaia RAs and Decs are at EPOC 2015.5. These RA/Decs have not been corrected.')
@@ -268,7 +271,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         output_columns=['ID','RA', 'Dec', 'pmRA', 'pmDE', 'e_pmRA','e_pmDEC', 'mag']
         # Rename the columns to something reasonable and standard between catalogs
         [result.rename_column(p, o) for p, o in zip(ID[catalog]['parameters'], output_columns)]
-        
+
         return result
 
 
