@@ -192,7 +192,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         return('KeplerTargetPixelFile Object (ID: {})'.format(self.keplerid))
 
 
-    def find_stars(self, catalog=None, radius=None):
+    def find_stars(self, catalog=None, radius=0.04):
         """
         Load tpf file to find field stars within the tpf.
 
@@ -204,15 +204,13 @@ class KeplerTargetPixelFile(TargetPixelFile):
         catalog: string
             Indicate catalog assigned for mission. If Kepler, catalog will be KIC
             if K2 catalog is EPIC.
-        radius: int
-            Radius of cone search centered on the target in arcminutes.
+        radius: float
+            Radius of cone search centered on the target in arcminutes. Default 0.04
 
         Returns
         -------
         ID : astropy.table.column (EPIC)
-            Catalog ID from EPIC
-        KIC: astropy.table.column (KIC)
-            Catalog ID from KIC
+            Catalog ID from catalog
         RAJ200: astropy.table.column (KIC & EPIC)
             Right ascension [degrees]
         DEJ2000: astropy.table.column (KIC & EPIC)
@@ -231,26 +229,32 @@ class KeplerTargetPixelFile(TargetPixelFile):
             Magnitude in Kepler band [mag]
         """
 
-        # List of parameters we want from each catalog
-        Pars_KIC = ["KIC", "RAJ2000", "DEJ2000", "pmRA", "pmDE", "kepmag"]
-
-        Pars_EPIC = ["ID", "RAJ2000", "DEJ2000", "pmRA", "pmDEC",
-        "e_pmRA", "e_pmDEC", "Kpmag"]
+        if catalog is None:
+            if tpf.mission == 'Kepler':
+                catalog = 'KIC'
+            elif tpf.mission == 'K2':
+                catalog = 'EPIC'
+            else:
+                log.error('Please provide a catalog.')
 
         # Vizier id's
-        ID = { "KIC":["V/133/kic", Pars_KIC],
-        "EPIC":["IV/34/epic", Pars_EPIC] }
+        ID = {"KIC":
+                    {'vizier':"V/133/kic",
+                     'parameters':["KIC", "RAJ2000", "DEJ2000", "pmRA", "pmDE", "kepmag"]},
+               "EPIC":
+               {'vizier':"IV/34/epic",
+                'parameters':["ID", "RAJ2000", "DEJ2000", "pmRA", "pmDEC", "e_pmRA", "e_pmDEC", "Kpmag"]} }
 
         # identifies catalog
-        viz_id = (ID[catalog])[0]
-        pars = (ID[catalog])[1]
+        viz_id = (ID[catalog])['vizier']
+        pars = (ID[catalog])['parameters']
 
         #Skycoord the centre of target
         cent = SkyCoord(ra=self.ra, dec=self.dec, frame='icrs', unit=(u.deg, u.deg))
 
         # Choose columns from Vizier
         v = Vizier(catalog=[viz_id], columns=pars)
-        # query around cent. with height and width
+        # query around cent. with radius
         result = v.query_region(cent, radius=radius*u.arcmin, catalog=[catalog])
 
         return result[viz_id]
