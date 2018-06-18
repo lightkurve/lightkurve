@@ -191,7 +191,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
     def __repr__(self):
         return('KeplerTargetPixelFile Object (ID: {})'.format(self.keplerid))
 
-    def find_stars(self, catalog=None):
+
+    def find_stars(self, catalog=None, radius=None):
         """
         Load tpf file to find field stars within the tpf.
 
@@ -203,6 +204,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
         catalog: string
             Indicate catalog assigned for mission. If Kepler, catalog will be KIC
             if K2 catalog is EPIC.
+        radius: int
+            Radius of cone search centered on the target in arcminutes.
 
         Returns
         -------
@@ -238,38 +241,20 @@ class KeplerTargetPixelFile(TargetPixelFile):
         ID = { "KIC":["V/133/kic", Pars_KIC],
         "EPIC":["IV/34/epic", Pars_EPIC] }
 
-        # identifies for catalog
+        # identifies catalog
         viz_id = (ID[catalog])[0]
         pars = (ID[catalog])[1]
 
-        # ra,dec of each pixel in the tpf
-        cc = self.get_coordinates(cadence='all')
-        ra, dec = cc[0], cc[1]
-
-        c = SkyCoord(ra=ra, dec=dec, frame='icrs', unit=(u.deg, u.deg))
-
-        # Define min,max of ra,dec
-        min_ra, min_dec = np.min(c.ra), np.min(c.dec)
-        max_ra, max_dec = np.max(c.ra), np.max(c.dec)
-
-        # Dimensions of box
-        height_box = (max_dec - min_dec)
-        width_box = (max_ra - min_ra)
-
-        # Centre of box
-        x_c = (min_ra + max_ra)/2
-        y_c = (min_dec + max_dec)/2
-
-        #Skycoord the centre of box
-        cent = SkyCoord(ra=x_c, dec=y_c, frame='icrs', unit=(u.deg, u.deg))
+        #Skycoord the centre of target
+        cent = SkyCoord(ra=self.ra, dec=self.dec, frame='icrs', unit=(u.deg, u.deg))
 
         # Choose columns from Vizier
         v = Vizier(catalog=[viz_id], columns=pars)
         # query around cent. with height and width
-        result = v.query_region(cent, height=height_box , width=width_box,
-         catalog=[catalog])
+        result = v.query_region(cent, radius=radius*u.arcmin, catalog=[catalog])
 
         return result[viz_id]
+
 
     @property
     def hdu(self):
