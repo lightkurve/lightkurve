@@ -233,20 +233,26 @@ class KeplerTargetPixelFile(TargetPixelFile):
         """
 
         if catalog is None:
-            if tpf.mission == 'Kepler':
+            if self.mission == 'Kepler':
                 catalog = 'KIC'
-            elif tpf.mission == 'K2':
+            elif self.mission == 'K2':
                 catalog = 'EPIC'
             else:
                 log.error('Please provide a catalog.')
 
+
+        if catalog is "Gaia":
+            log.warn('Gaia RAs and Decs are at EPOC 2015.5. These RA/Decs have not been corrected.')
         # Vizier id's
         ID = {"KIC":
                     {'vizier':"V/133/kic",
                      'parameters':["KIC", "RAJ2000", "DEJ2000", "pmRA", "pmDE", "kepmag"]},
                "EPIC":
                {'vizier':"IV/34/epic",
-                'parameters':["ID", "RAJ2000", "DEJ2000", "pmRA", "pmDEC", "e_pmRA", "e_pmDEC", "Kpmag"]} }
+                'parameters':["ID", "RAJ2000", "DEJ2000", "pmRA", "pmDEC", "e_pmRA", "e_pmDEC", "Kpmag"]},
+               "Gaia":
+               {'vizier':"I/345/gaia2",
+               'parameters':["DR2Name", "RA_ICRS", "DE_ICRS", "pmRA", "pmDE", "e_pmRA", "e_pmDE", "Gmag"]}}
 
         # identifies catalog
         viz_id = (ID[catalog])['vizier']
@@ -258,9 +264,12 @@ class KeplerTargetPixelFile(TargetPixelFile):
         # Choose columns from Vizier
         v = Vizier(catalog=[viz_id], columns=pars)
         # query around cent. with radius
-        result = v.query_region(cent, radius=radius*u.arcmin, catalog=[catalog])
-
-        return result[viz_id]
+        result = v.query_region(cent, radius=radius*u.arcmin, catalog=viz_id)[viz_id]
+        output_columns=['ID','RA', 'Dec', 'pmRA', 'pmDE', 'e_pmRA','e_pmDEC', 'mag']
+        # Rename the columns to something reasonable and standard between catalogs
+        [result.rename_column(p, o) for p, o in zip(ID[catalog]['parameters'], output_columns)]
+        
+        return result
 
 
     @property

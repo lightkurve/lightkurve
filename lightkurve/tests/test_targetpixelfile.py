@@ -54,15 +54,13 @@ def test_tpf_plot():
 def test_find():
     "Minimum sanity chech of the table it returns contains the coordinates of the tpf"
     tpf = KeplerTargetPixelFile(TABBY_TPF)
-    if tpf.mission == 'Kepler':
-        catalog = 'KIC'
-    elif tpf.mission == 'K2':
-        catalog = 'EPIC'
-    dat = KeplerTargetPixelFile.find_stars(tpf, catalog, 1)
-    ra, dec = dat['RAJ2000'], dat['DEJ2000']
+    dat = tpf.find_stars(catalog='KIC', radius=1)
+    assert len(dat) != 0
+    ra, dec = dat['RA'], dat['Dec']
     finder = np.where(ra==tpf.ra)
     # Crossmatched table must contain the tpf.target
     assert(len(finder[0])==1)
+    # Should have a unit test based on IDs, but there is an astroquery bug.
 
 
 
