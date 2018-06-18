@@ -59,11 +59,10 @@ def test_find():
         catalog = 'KIC'
     elif tpf.mission == 'K2':
         catalog = 'EPIC'
-    print ('passes here')
-    dat = KeplerTargetPixelFile.find_stars(tpf, catalog)
+    dat = KeplerTargetPixelFile.find_stars(tpf, catalog, 1)
     ra, dec = dat['RAJ2000'], dat['DEJ2000']
     finder = np.where(ra==tpf.ra)
-
+    # Crossmatched table must contain the tpf.target
     assert(len(finder[0])==1)
 
 
