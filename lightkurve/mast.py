@@ -2,17 +2,16 @@
 
 from __future__ import division, print_function
 import os
-import sys
 import logging
 import numpy as np
 
 from astroquery.mast import Observations
 from astroquery.exceptions import ResolverError
 from astropy.coordinates import SkyCoord
-from astropy import log as astropylog
 from astropy.io import ascii
 
 from . import PACKAGEDIR
+log = logging.getLogger(__name__)
 
 
 class ArchiveError(Exception):
@@ -67,29 +66,30 @@ def _query_kepler_products(target, radius=1):
 
     try:
         # If `target` looks like a KIC or EPIC ID, we will pass the exact
-        # `objectname` under which MAST will know the object.
+        # `target_name` under which MAST will know the object.
         target = int(target)
         if (target > 0) and (target < 200000000):
-            objectname = 'KIC {:09d}'.format(target)
+            target_name = 'kplr{:09d}'.format(target)
         elif (target > 200000000) and (target < 300000000):
-            objectname = 'EPIC {:09d}'.format(target)
+            target_name = 'ktwo{:09d}'.format(target)
         else:
-            objectname = target
-    except:
-        # If `target` is not a number, or not in range, try to continue.
-        objectname = target
-
-    # Attempt to query the target name
-    try:
-        obs = Observations.query_criteria(objectname=objectname,
-                                          radius='{} arcsec'.format(radius),
+            raise ValueError("{:09d}: not in the KIC or EPIC ID range".format(target))
+        obs = Observations.query_criteria(target_name=target_name,
                                           project=["Kepler", "K2"],
                                           obs_collection=["Kepler", "K2"])
-    except ResolverError as exc:
-        raise ArchiveError(exc)
+    except ValueError:
+        # If `target` did not look like a KIC or EPIC ID, then we let MAST
+        # resolve the target name to a sky position.
+        try:
+            obs = Observations.query_criteria(objectname=target,
+                                              radius='{} arcsec'.format(radius),
+                                              project=["Kepler", "K2"],
+                                              obs_collection=["Kepler", "K2"])
+            # Make sure the final table is in DISTANCE order
+            obs.sort('distance')
+        except ResolverError as exc:
+            raise ArchiveError(exc)
 
-    # Make sure the final table is in DISTANCE order
-    obs.sort('distance')
     obsids = np.asarray(obs['obsid'])
     products = Observations.get_product_list(obs)
     order = [np.where(products['parent_obsid'] == o)[0] for o in obsids]
@@ -187,11 +187,11 @@ def search_kepler_products(target, filetype='Target Pixel', cadence='long', quar
         ids = np.asarray([p.split('/')[-1].split('-')[0].split('_')[0][4:]
                           for p in products['dataURI']], dtype=int)
         if len(np.unique(ids)) < targetlimit:
-            logging.warning('Target return limit set to {} '
-                            'but only {} unique targets found. '
-                            'Try increasing the search radius. '
-                            '(Radius currently set to {} arcseconds)'
-                            ''.format(targetlimit, len(np.unique(ids)), radius))
+            log.warning('Target return limit set to {} '
+                        'but only {} unique targets found. '
+                        'Try increasing the search radius. '
+                        '(Radius currently set to {} arcseconds)'
+                        ''.format(targetlimit, len(np.unique(ids)), radius))
         okids = ids[np.sort(np.unique(ids, return_index=True)[1])[0:targetlimit]]
         mask = np.zeros(len(ids), dtype=bool)
 
@@ -210,7 +210,7 @@ def search_kepler_products(target, filetype='Target Pixel', cadence='long', quar
 
 def download_kepler_products(target, filetype='Target Pixel', cadence='long',
                              quarter=None, month=None, campaign=None, radius=1.,
-                             targetlimit=1, verbose=True, **kwargs):
+                             targetlimit=1, **kwargs):
     """Download and cache files from from the Kepler/K2 data archive at MAST.
 
     Returns paths to the cached files.
@@ -246,10 +246,8 @@ def download_kepler_products(target, filetype='Target Pixel', cadence='long',
     -------
     path : str or list of strs
     """
-    if verbose:
-        astropylog.setLevel('INFO')
-    else:
-        astropylog.setLevel('ERROR')
+    # Make sure astroquery uses the same level of verbosity
+    logging.getLogger('astropy').setLevel(log.getEffectiveLevel())
 
     # If we are asking for all cadences (long and short) and didn't specify a month, override it.
     if (cadence in ['any', 'both']) & (month is None):
@@ -272,6 +270,7 @@ def download_kepler_products(target, filetype='Target Pixel', cadence='long',
                                       radius=radius, targetlimit=targetlimit)
     if len(products) == 0:
         raise ArchiveError("No {} File found for {} at MAST.".format(filetype, target))
+    products.sort(['order', 'dates', 'qoc'])
 
     # For Kepler short cadence data there are additional rules, so find anywhere
     # where there is short cadence data...
@@ -314,16 +313,6 @@ def download_kepler_products(target, filetype='Target Pixel', cadence='long',
                            "".format(len(products), target))
 
     # Otherwise download all the files
-    if verbose:
-        print('Found {} File(s)'.format(np.shape(products)[0]))
-    if not verbose:
-        old_stdout = sys.stdout
-        sys.stdout = open(os.devnull, "w")
+    log.debug('Found {} File(s)'.format(np.shape(products)[0]))
     path = download_products(products)
-    if not verbose:
-        sys.stdout.close()
-        sys.stdout = old_stdout
-    # Make sure we always put the verbosity back...
-    if not verbose:
-        astropylog.setLevel('INFO')
     return list(path)
