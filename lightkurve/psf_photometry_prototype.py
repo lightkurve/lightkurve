@@ -17,6 +17,10 @@ class StarParameters(object):
         self.row = row
         self.flux = flux
 
+    def __repr__(self):
+        return ('StarParameters : col:{}, row:{}, flux:{}'
+                ''.format(self.col, self.row, self.flux))
+
 
 class StarPrior(object):
     """Captures the user's beliefs about a single star's position and flux.
@@ -32,6 +36,10 @@ class StarPrior(object):
         self.row = row
         self.flux = flux
         self.targetid = targetid
+
+    def __repr__(self):
+        return ('StarPrior ({}): col:{}, row:{}, flux:{}'
+                ''.format(self.targetid, self.col, self.row, self.flux))
 
     def evaluate(self, col, row, flux):
         """Evaluate the prior probability of a star of a given flux being at
@@ -50,6 +58,10 @@ class BackgroundParameters(object):
         self.flux = flux
         self.err_flux = err_flux
 
+    def __repr__(self):
+        return ('BackgroundParameters : flux:{}, err_flux:{}'
+                ''.format(self.flux, self.err_flux))
+
 
 class SimpleSceneModelParameters():
     """Parameters that define a single cadence of a TPF image.
@@ -63,6 +75,11 @@ class SimpleSceneModelParameters():
         self.stars = stars
         self.background = background
 
+    def __repr__(self):
+        s = '\t Stars:\n'+''.join(['\t\t{}\n'.format(star) for star in self.stars])
+        b = '\t Background:\n\t\t{}\n'.format(self.background)
+        return 'SimpleSceneModelParameters\n'+s+b
+
     def to_array(self):
         """Converts the parameters to an array of real elements of size (n,),
         where n is the number of parameters.
@@ -72,9 +89,9 @@ class SimpleSceneModelParameters():
         """
         array = []
         for star in self.stars:
+            array.append(star.flux)
             array.append(star.col)
             array.append(star.row)
-            array.append(star.flux)
         array.append(self.background.flux)
         return np.array(array)
 
@@ -84,11 +101,13 @@ class SimpleSceneModelParameters():
         `SceneModelParameters class`.
         """
         stars = []
+        if isinstance(array, tuple):
+            array = np.asarray(array).ravel()
         n_stars = int((len(array) - 1) / 3)
         for staridx in range(n_stars):
-            star = StarParameters(col=array[staridx * 3],
-                                  row=array[staridx * 3 + 1],
-                                  flux=array[staridx * 3 + 2])
+            star = StarParameters(flux=array[staridx * 3],
+                                  col=array[staridx * 3 + 1],
+                                  row=array[staridx * 3 + 2])
             stars.append(star)
         background = BackgroundParameters(flux=array[-1])
         return SimpleSceneModelParameters(stars=stars, background=background)
@@ -211,18 +230,22 @@ def psf_photometry_demo():
     maxflux = np.nansum(tpf.flux, axis=(1, 2)).max()
 
     # First, set up a simple scene model with one star and no motion or focus changes
-    star_prior = StarPrior(col=GaussianPrior(mean=tpf.column, var=2**2),
-                           row=GaussianPrior(mean=tpf.row, var=2**2),
+    col, row = np.nanmedian(tpf.centroids(), axis=1)
+    star_prior = StarPrior(col=UniformPrior(lb=col-4, ub=col+4),
+                           row=UniformPrior(lb=row-4, ub=row+4),
                            flux=UniformPrior(lb=0, ub=maxflux),
                            targetid=tpf.keplerid)
     model = SimpleSceneModel(star_priors=[star_prior],
-                             background_prior=GaussianPrior(mean=bgflux, var=bgflux),
+                             background_prior=UniformPrior(lb=0, ub=10),
                              prfmodel=tpf.get_prf_model())
 
     # Now make the lightcurve by fitting each cadence
     time = tpf.time[1400:1700]  # this cadence range include the deepest dip
-    flux = []
-    for idx in tqdm(range(len(time))):
+    flux, cols, rows, bkgs = [], [], [], []
+    for idx in tqdm(np.arange(1400, 1700)):
         result = model.fit(tpf.flux[idx])
         flux.append(result.stars[0].flux)
+        cols.append(result.stars[0].col)
+        rows.append(result.stars[0].row)
+        bkgs.append(result.background.flux)
     return LightCurve(time, flux)
