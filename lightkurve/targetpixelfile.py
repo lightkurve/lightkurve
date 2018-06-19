@@ -213,8 +213,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
         Returns
         -------
-        ID : astropy.table.column (EPIC)
-            Catalog ID from catalog
+        ID : astropy.table.column (KIC & EPIC)
+            Catalog ID from catalog.
         RAJ200: astropy.table.column (KIC & EPIC)
             Right ascension [degrees]
         DEJ2000: astropy.table.column (KIC & EPIC)
@@ -244,6 +244,13 @@ class KeplerTargetPixelFile(TargetPixelFile):
         if radius is None:
             radius = (4 * (2*np.max(self.shape[1:])**2)**0.5)/60
 
+        X_drif = max(self.pos_corr1) - min(self.pos_corr1)
+        Y_drif = max(self.pos_corr2) - min(self.pos_corr2)
+
+        # Expand radius of cone if drift is greater than 1 pixel
+        if (X_drif or Y_dirf) >= 1 :
+            radius = 0.247 + (4 * (2*np.max(self.shape[1:])**2)**0.5)/60.0
+
         if catalog is "Gaia":
             log.warn('Gaia RAs and Decs are at EPOC 2015.5. These RA/Decs have not been corrected.')
         # Vizier id's
@@ -267,12 +274,11 @@ class KeplerTargetPixelFile(TargetPixelFile):
         # Choose columns from Vizier
         v = Vizier(catalog=[viz_id], columns=pars)
         # query around cent. with radius
-        result = v.query_region(cent, radius=radius*u.arcmin, catalog=viz_id)[viz_id]
-        output_columns=['ID','RA', 'Dec', 'pmRA', 'pmDE', 'e_pmRA','e_pmDEC', 'mag']
-        # Rename the columns to something reasonable and standard between catalogs
-        [result.rename_column(p, o) for p, o in zip(ID[catalog]['parameters'], output_columns)]
+        result = v.query_region_async(cent, radius=radius*u.arcmin, catalog=viz_id)
 
-        return result
+        with open('my_votable.xml', 'w') as fh:
+            fh.write(result.text.replace('short', 'long'))
+        return Table.read('my_votable.xml')
 
 
     @property
