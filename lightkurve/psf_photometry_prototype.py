@@ -16,9 +16,24 @@ class StarParameters(object):
         self.col = col
         self.row = row
         self.flux = flux
+        self.dict = {0:self.flux, 1:self.col, 2:self.row}
+        self.label_dict = {0:'flux', 1:'col', 2:'row'}
+
+    def __iter__(self):
+        self.n = 0
+        return self
+
+    def __next__(self):
+        if self.n < 3:
+            self.n += 1
+            return (self.label_dict[self.n-1], self.dict[self.n-1])
+        else:
+            raise StopIteration
+
+    next = __next__
 
     def __repr__(self):
-        return ('StarParameters : col:{}, row:{}, flux:{}'
+        return ('StarParameters: col: {}, row: {}, flux: {}'
                 ''.format(self.col, self.row, self.flux))
 
 
@@ -36,10 +51,25 @@ class StarPrior(object):
         self.row = row
         self.flux = flux
         self.targetid = targetid
+        self.dict = {0:self.flux, 1:self.col, 2:self.row}
+        self.label_dict = {0:'flux', 1:'col', 2:'row'}
 
     def __repr__(self):
-        return ('StarPrior ({}): col:{}, row:{}, flux:{}'
+        return ('StarPrior (ID: {}):\n \tcol: {}\n \trow: {}\n \tflux: {}\n'
                 ''.format(self.targetid, self.col, self.row, self.flux))
+
+    def __iter__(self):
+        self.n = 0
+        return self
+
+    def __next__(self):
+        if self.n < 3:
+            self.n += 1
+            return (self.label_dict[self.n-1], self.dict[self.n-1])
+        else:
+            raise StopIteration
+
+    next = __next__
 
     def evaluate(self, col, row, flux):
         """Evaluate the prior probability of a star of a given flux being at
@@ -59,7 +89,7 @@ class BackgroundParameters(object):
         self.err_flux = err_flux
 
     def __repr__(self):
-        return ('BackgroundParameters : flux:{}, err_flux:{}'
+        return ('BackgroundParameters: flux: {}, err_flux: {}'
                 ''.format(self.flux, self.err_flux))
 
 
@@ -76,9 +106,17 @@ class SimpleSceneModelParameters():
         self.background = background
 
     def __repr__(self):
-        s = '\t Stars:\n'+''.join(['\t\t{}\n'.format(star) for star in self.stars])
-        b = '\t Background:\n\t\t{}\n'.format(self.background)
-        return 'SimpleSceneModelParameters\n'+s+b
+        output = 'SimpleSceneModelParameters\n'
+        output += '\t Stars:\n'+''.join(['\t\t{}\n'.format(star) for star in self.stars])
+        output += '\t Background:\n\t\t{}\n'.format(self.background)
+        if 'residual_image' in vars(self):
+            output += '\t Residual Image: \n\t\t {}'.format(self.residual_image[0][0:4])[:-1]
+            output +='...\n\t\t\t...\n'
+        if 'predicted_image' in vars(self):
+            output += '\t Predicted Image: \n\t\t {}'.format(self.predicted_image[0][0:4])[:-1]
+            output +='...\n\t\t\t...\n'
+
+        return output
 
     def to_array(self):
         """Converts the parameters to an array of real elements of size (n,),
@@ -128,6 +166,12 @@ class SimpleSceneModel():
         self.star_priors = star_priors
         self.background_prior = background_prior
         self.prfmodel = prfmodel
+
+    def __repr__(self):
+        s = '\t Stars Priors:\n'+''.join(['\t\t{}\n'.format(star) for star in self.star_priors])
+        b = '\t Background Prior:\n\t\t{}\n'.format(self.background_prior)
+        return 'SimpleSceneModel\n'+s+b
+
 
     def initial_guesses(self):
         """Returns the prior means."""
