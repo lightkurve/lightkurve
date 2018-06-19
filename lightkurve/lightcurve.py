@@ -811,13 +811,23 @@ class LightCurve(object):
 
         model = ktransit.LCModel()
         model.add_star(rho=1.5, ld1=ld1, ld2=ld2, ld3=ld3, ld4=ld4, dil=dil, zpt=zpt)
-        model.add_planet(T0=t0, period=period, impact=impact, rprs=rprs, ecosw=ecosw, esinw=esinw, occ=occ)
+        model.add_planet(T0=t0, period=period, impact=impact, rprs=rprs,
+                         ecosw=ecosw, esinw=esinw, occ=occ)
         model.add_data(time=self.time)
 
         transit_flux = model.transitmodel
         mergedflux = self.flux * transit_flux
+        #if zpt is 0.0, will this work?
 
         return LightCurve(self.time, flux=mergedflux, flux_err=self.flux_err)
+
+    def recover_sn(self, model='hsiao', **kwargs):
+        """docstring"""
+        import sncosmo
+
+        result, fitted_model = sncosmo.fit_lc(data, model, **kwargs)
+
+
 
 
 class FoldedLightCurve(LightCurve):
