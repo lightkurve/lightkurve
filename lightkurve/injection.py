@@ -2,6 +2,8 @@
 
 import numpy as np
 from lightkurve import LightCurve
+import matplotlib.pyplot as plt
+from scipy.stats import norm
 
 class UniformDistribution(object):
     """
@@ -18,8 +20,9 @@ class UniformDistribution(object):
         self.lb = lb
         self.ub = ub
 
-    #def __repr__():
-        #pass
+    def __repr__(self):
+        return 'UniformDistribution(lb={},ub={})'.format(self.lb,
+                                         self.ub)
 
     def sample(self, size=1):
         """Chooses values from uniform distribution.
@@ -36,8 +39,11 @@ class UniformDistribution(object):
         """
         return np.random.uniform(self.lb, self.ub, size)
 
-    def plot():
-        pass
+    def plot(self):
+        t = np.arange(self.lb, self.ub, 0.01)
+        vals = [1]*len(t)
+        plt.plot(t, vals)
+        plt.ylim(0, 2)
 
 class GaussianDistribution(object):
     """
@@ -54,8 +60,9 @@ class GaussianDistribution(object):
         self.mean = mean
         self.var = var
 
-    def __repr__():
-        pass
+    def __repr__(self):
+        return 'GaussianDistribution(mean={},var={})'.format(self.mean,
+                                         self.var)
 
     def sample(self, size=1):
         """Chooses values from Gaussian distribution.
@@ -72,8 +79,11 @@ class GaussianDistribution(object):
         """
         return np.random.normal(self.mean, self.var, size)
 
-    def plot():
-        pass
+    def plot(self):
+        t = np.linspace(self.mean - 3*self.var, self.mean + 3*self.var, 100)
+        vals = norm.pdf(t, self.mean, self.var)
+        plt.plot(t, vals)
+        plt.ylim(0, np.max(vals))
 
 
 class TransitModel(object):
