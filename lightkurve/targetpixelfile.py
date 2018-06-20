@@ -278,8 +278,9 @@ class KeplerTargetPixelFile(TargetPixelFile):
         # query around cent. with radius
         result = v.query_region(cent, radius=radius*u.arcmin, catalog=viz_id)
 
-        # Rename KIC id to ID
+        # Rename names in KIC for consistency with EPIC
         result[viz_id]['KIC'].name = 'ID'
+        result[viz_id]['pmDE'].name = 'e_pmDEC'
 
         return (result[viz_id])
 
