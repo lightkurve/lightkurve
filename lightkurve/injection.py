@@ -119,26 +119,39 @@ class TransitModel(object):
 
     """
 
-    def __init__(self, period=UniformDistribution(0,20).sample(),
-                    rprs=UniformDistribution(0,0.4).sample(),
-                    impact=UniformDistribution(0,1).sample(),
-                    ld1=UniformDistribution(0,1).sample(), ld2=UniformDistribution(0,1).sample(),
-                    ld3=0.0, ld4=0.0, dil=0.0, rho=1.5, zpt=1.0,
-                    ecosw=0.0, esinw=0.0, occ=0.0):
+    def __init__(self, period, rprs, zpt, **kwargs):
 
-        self.period = period
-        self.rprs = rprs
-        self.rho = rho
-        self.ld1, self.ld2, self.ld3, self.ld4 = ld1, ld2, ld3, ld4
-        self.dil = dil
+        if isinstance(period, (GaussianDistribution, UniformDistribution)):
+            self.period = period.sample()
+        else:
+            self.period = period
+
+        if isinstance(rprs, (GaussianDistribution, UniformDistribution)):
+            self.rprs = rprs.sample()
+        else:
+            self.rprs = rprs
+
+        self.star_params = {}
+        self.planet_params = {}
+        for key, value in kwargs.items():
+            if key in ('rho', 'ld1', 'ld2', 'ld3', 'ld4', 'dil', 'zpt'):
+                if isinstance(value, (GaussianDistribution, UniformDistribution)):
+                    self.star_params[key] = value.sample()
+                else:
+                    self.star_params[key] = value
+            else:
+                if isinstance(value, (GaussianDistribution, UniformDistribution)):
+                    self.planet_params[key] = value.sample()
+                else:
+                    self.planet_params[key] = value
+
         self.zpt = zpt
-        self.impact = impact
-        self.ecosw = ecosw
-        self.esinw = esinw
-        self.occ = occ
         self.multiplicative = True
 
-    def evaluate(self, time, t0=None):
+    def __repr__(self):
+        return 'TransitModel(' + str(self.__dict__) + ')'
+
+    def evaluate(self, time):
         """Evaluates synthetic transiting planet light curve from model.
            Currently, we can only create one planet at a time.
 
@@ -156,15 +169,9 @@ class TransitModel(object):
         """
         import ktransit
 
-        if t0==None:
-            t0=UniformDistribution(time[0],time[-1]).sample()
-        else:
-            t0=t0
-
         model = ktransit.LCModel()
-        model.add_star(rho=self.rho, ld1=self.ld1, ld2=self.ld2, ld3=self.ld3, ld4=self.ld4, dil=self.dil, zpt=self.zpt)
-        model.add_planet(T0=t0, period=self.period, impact=self.impact, rprs=self.rprs,
-                         ecosw=self.ecosw, esinw=self.esinw, occ=self.occ)
+        model.add_star(zpt=self.zpt, **self.star_params)
+        model.add_planet(period=self.period, rprs=self.rprs, **self.planet_params)
         model.add_data(time=time)
 
         transit_flux = model.transitmodel
@@ -172,6 +179,9 @@ class TransitModel(object):
         return transit_flux
 
 class SupernovaModel(object):
+
+    from lightkurve.injection import GaussianDistribution
+    from lightkurve.injection import UniformDistribution
     """
     Implements a class for creating a supernova model using sncosmo.
 
@@ -185,14 +195,28 @@ class SupernovaModel(object):
     z : float
         Redshift of supernova
     """
-    def __init__(self, source='hsiao', bandpass='kepler', z=0.5):
+    def __init__(self, t0, source='hsiao', bandpass='kepler', z=0.5, **kwargs):
 
         self.source = source
+        self.t0 = t0
         self.bandpass = bandpass
-        self.z = z
+        if isinstance(z, (GaussianDistribution, UniformDistribution)):
+            self.z = z.sample()
+        else:
+            self.z = z
         self.multiplicative = False
 
-    def evaluate(self, time, t0=None, size=1, **params):
+        self.params = {}
+        for key, value in kwargs.items():
+            if isinstance(value, (GaussianDistribution, UniformDistribution)):
+                self.params[key] = value.sample()
+            else:
+                self.params[key] = value
+
+    def __repr__(self):
+        return 'SupernovaModel(' + str(self.__dict__) + ')'
+
+    def evaluate(self, time, size=1):
         """Evaluates synthetic supernova light curve from model.
            Currently, we can only create one supernova at a time.
 
@@ -214,18 +238,13 @@ class SupernovaModel(object):
 
         import sncosmo
 
-        if t0==None:
-            t0=UniformDistribution(time[0],time[-1]).sample()
-        else:
-            t0=t0
-
         model = sncosmo.Model(source=self.source)
-        model.set(t0=t0, z=self.z, **params)
+        model.set(t0=self.t0, z=self.z, **self.params)
         bandflux = model.bandflux(self.bandpass, time)
 
         return bandflux
 
-def inject(lc, model, **params):
+def inject(lc, model):
     """Injects synthetic model into a light curve.
 
     Parameters
@@ -247,7 +266,7 @@ def inject(lc, model, **params):
     """
 
     if model.multiplicative is True:
-        mergedflux = lc.flux * model.evaluate(lc.time, **params)
+        mergedflux = lc.flux * model.evaluate(lc.time)
     else:
-        mergedflux = lc.flux + model.evaluate(lc.time, **params)
+        mergedflux = lc.flux + model.evaluate(lc.time)
     return LightCurve(lc.time, flux=mergedflux, flux_err=lc.flux_err)
