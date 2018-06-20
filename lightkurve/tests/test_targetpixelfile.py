@@ -54,15 +54,12 @@ def test_tpf_plot():
 def test_find():
     "Minimum sanity chech of the table it returns contains the coordinates of the tpf"
     tpf = KeplerTargetPixelFile(TABBY_TPF)
-    dat = tpf.find_stars(catalog='KIC')
-    assert len(dat) != 0
-    ra, dec = dat['RA'], dat['Dec']
-    finder = np.where(ra==tpf.ra)
-    # Crossmatched table must contain the tpf.target
-    assert(len(finder[0])==1)
-    # Should have a unit test based on IDs, but there is an astroquery bug.
-
-
+    dat = tpf.find_stars()
+    # Smallest number the query should find is at least 1
+    assert (len(dat['RAJ2000'])>=1)
+    # KIC & EPIC ID's have 7 digits
+    for i in range (0, len(dat['ID'])):
+        assert (len(str(dat['ID'][i]))==7)
 
 def test_tpf_zeros():
     """Does the LightCurve of a zero-flux TPF make sense?"""
