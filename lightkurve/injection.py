@@ -24,22 +24,22 @@ class UniformDistribution(object):
         return 'UniformDistribution(lb={},ub={})'.format(self.lb,
                                          self.ub)
 
-    def sample(self, size=1):
+    def sample(self):
         """Chooses values from uniform distribution.
 
         Parameters
         ----------
-        size : int
-            Number of values to return.
+        None
 
         Returns
         -------
         values : array-like
             Returns array of randomly chosen values.
         """
-        return np.random.uniform(self.lb, self.ub, size)
+        return np.random.uniform(self.lb, self.ub)
 
     def plot(self):
+        """Plots specified distribution."""
         t = np.arange(self.lb, self.ub, 0.01)
         vals = [1]*len(t)
         plt.plot(t, vals)
@@ -64,22 +64,22 @@ class GaussianDistribution(object):
         return 'GaussianDistribution(mean={},var={})'.format(self.mean,
                                          self.var)
 
-    def sample(self, size=1):
+    def sample(self):
         """Chooses values from Gaussian distribution.
 
         Parameters
         ----------
-        size : int
-            Number of values to return.
+        None
 
         Returns
         -------
         values : array-like
             Returns array of randomly chosen values.
         """
-        return np.random.normal(self.mean, self.var, size)
+        return np.random.normal(self.mean, self.var)
 
     def plot(self):
+        """Plots specified distribution."""
         t = np.linspace(self.mean - 3*self.var, self.mean + 3*self.var, 100)
         vals = norm.pdf(t, self.mean, self.var)
         plt.plot(t, vals)
@@ -96,26 +96,31 @@ class TransitModel(object):
         Orbital period in days
     rprs : float, default chosen from a uniform dist. of 0-0.4
         Planet radius / star radius
-    impact : float, default chosen from a uniform dist. of 0-1
-        Impact parameter
-    ld1 : float, default chosen from a uniform dist. of 0-1
-        Limb darkening coefficient 1
-    ld2 : float, default chosen from a uniform dist. of 0-1
-        Limb darkening coefficient 2
-    ld3 : float, default 0.0
-        Limb darkening coefficient 3
-    ld4 : float, default 0.0
-        Limb darkening coefficient 4
-    dil : float, default 0.0
-        Transit dilution fraction
-    rho : float, default 1.5
-        Mean stellar density in cgs units
     zpt : float, default 1.0
         A photometric zeropoint
-    ecosw, esinw : floats, default 0.0
-        An eccentricity vector
-    occ : float, default 0.0
-        a secondary eclipse depth in ppm
+    **kwargs : dict
+        Keyword arguments to be passed to model.add_star and
+        model.add_planet that specify the transits. Options are:
+            T0 : float
+                a transit mid-time (note that the T is uppercase)
+            impact : float, default chosen from a uniform dist. of 0-1
+                Impact parameter
+            ld1 : float, default chosen from a uniform dist. of 0-1
+                Limb darkening coefficient 1
+            ld2 : float, default chosen from a uniform dist. of 0-1
+                Limb darkening coefficient 2
+            ld3 : float, default 0.0
+                Limb darkening coefficient 3
+            ld4 : float, default 0.0
+                Limb darkening coefficient 4
+            dil : float, default 0.0
+                Transit dilution fraction
+            rho : float, default 1.5
+                Mean stellar density in cgs units
+            ecosw, esinw : floats, default 0.0
+                An eccentricity vector
+            occ : float, default 0.0
+                a secondary eclipse depth in ppm
 
     """
 
@@ -159,8 +164,6 @@ class TransitModel(object):
         ----------
         time : array-like
             Time array of transit light curve
-        t0 : float, default chosen from a uniform distribution of all time values
-            Transit mid-time
 
         Returns
         -------
@@ -194,11 +197,13 @@ class SupernovaModel(object):
         https://sncosmo.readthedocs.io/en/v1.6.x/bandpass-list.html
     z : float
         Redshift of supernova
+    T0 : float, default chosen from a uniform distribution of all time values
+        Time of supernova's beginning or peak brightness, depending on source chosen
     """
-    def __init__(self, t0, source='hsiao', bandpass='kepler', z=0.5, **kwargs):
+    def __init__(self, T0, source='hsiao', bandpass='kepler', z=0.5, **kwargs):
 
         self.source = source
-        self.t0 = t0
+        self.T0 = T0
         self.bandpass = bandpass
         if isinstance(z, (GaussianDistribution, UniformDistribution)):
             self.z = z.sample()
@@ -223,9 +228,7 @@ class SupernovaModel(object):
         Parameters
         ----------
         time : array-like
-            Time array of supernova light curve
-        t0 : float, default chosen from a uniform distribution of all time values
-            Time of supernova's beginning or peak brightness, depending on source chosen.
+            Time array of supernova light curve.
         params : dict
             Dictionary of keyword arguments to be passed to model.set that
             specify the supernova based on the chosen model.
@@ -239,7 +242,7 @@ class SupernovaModel(object):
         import sncosmo
 
         model = sncosmo.Model(source=self.source)
-        model.set(t0=self.t0, z=self.z, **self.params)
+        model.set(t0=self.T0, z=self.z, **self.params)
         bandflux = model.bandflux(self.bandpass, time)
 
         return bandflux
@@ -253,11 +256,6 @@ def inject(lc, model):
         Lightcurve to be injected into
     model : SupernovaModel or TransitModel object
          Model lightcurve to be injected
-    size : int
-        Number of t0 values to be randomly chosen (must always be 1 - change this)
-    params : dict
-        Dictionary of keyword arguments to be passed to model.evaluate that
-        specify the model.
 
     Returns
     -------
