@@ -113,8 +113,8 @@ def test_get_model_prf():
     tpf_fn = get_pkg_data_filename("data/test-tpf-star.fits")
     tpf = KeplerTargetPixelFile(tpf_fn)
 
-    prf = SimpleKeplerPRF(channel=tpf.channel, shape=tpf.shape[1:],
-                          column=tpf.column, row=tpf.row)
+    prf = KeplerPRF(channel=tpf.channel, shape=tpf.shape[1:],
+                    column=tpf.column, row=tpf.row)
     prf_from_tpf = tpf.get_prf_model()
 
     assert type(prf) == type(prf_from_tpf)

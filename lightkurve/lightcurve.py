@@ -47,16 +47,24 @@ class LightCurve(object):
     time_scale : str
         String which specifies how the time is measured,
         e.g. tdb', 'tt', 'ut1', or 'utc'.
+    targetid : str
+        Identifier of the target.
     meta : dict
         Free-form metadata associated with the LightCurve.
     """
-    def __init__(self, time, flux=None, flux_err=None, time_format=None,
-                 time_scale=None, meta={}):
-        self.time = np.asarray(time)
+    def __init__(self, time=None, flux=None, flux_err=None, time_format=None,
+                 time_scale=None, targetid=None, meta={}):
+        if time is None and flux is None:
+            raise ValueError('either time or flux must be given')
+        if time is None:
+            self.time = np.arange(len(flux))
+        else:
+            self.time = np.asarray(time)
         self.flux = self._validate_array(flux, name='flux')
         self.flux_err = self._validate_array(flux_err, name='flux_err')
         self.time_format = time_format
         self.time_scale = time_scale
+        self.targetid = targetid
         self.meta = meta
 
     def _validate_array(self, arr, name='array'):

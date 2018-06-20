@@ -95,8 +95,8 @@ class KeplerPRF(object):
         return self.evaluate(flux, center_col, center_row,
                              scale_col, scale_row, rotation_angle)
 
-    def evaluate(self, flux, center_col, center_row, scale_col, scale_row,
-                 rotation_angle):
+    def evaluate(self, flux, center_col, center_row, scale_col=1., scale_row=1.,
+                 rotation_angle=0.):
         """
         Interpolates the PRF model onto detector coordinates.
 

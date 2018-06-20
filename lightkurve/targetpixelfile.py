@@ -15,7 +15,7 @@ from tqdm import tqdm
 
 from . import PACKAGEDIR
 from .lightcurve import KeplerLightCurve, LightCurve
-from .prf import SimpleKeplerPRF
+from .prf import KeplerPRF
 from .utils import KeplerQualityFlags, plot_image, bkjd_to_astropy_time
 from .mast import download_kepler_products
 
@@ -232,8 +232,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
         prf : instance of SimpleKeplerPRF
         """
 
-        return SimpleKeplerPRF(channel=self.channel, shape=self.shape[1:],
-                               column=self.column, row=self.row)
+        return KeplerPRF(channel=self.channel, shape=self.shape[1:],
+                         column=self.column, row=self.row)
 
     @property
     def wcs(self):
