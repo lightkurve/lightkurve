@@ -1,18 +1,24 @@
-"""Draft implementation of a dream Kepler PSF photometry API."""
+from __future__ import division, print_function
+
+from matplotlib import pyplot as plt
 import numpy as np
 from tqdm import tqdm
-from matplotlib import pyplot as plt
 
 from oktopus import GaussianPrior, UniformPrior, PoissonPosterior
+from oktopus.posterior import PoissonPosterior
 
-from .utils import plot_image
 from .prf import KeplerPRF
-from . import LightCurve
-from . import KeplerTargetPixelFile
+from .utils import plot_image
+
+
+__all__ = ['StarPrior', 'FocusPrior', 'MotionPrior',
+           'StarParameters', 'BackgroundParameters', 'FocusParameters',
+           'MotionParameters', 'SceneModelParameters',
+           'SceneModel', 'PRFPhotometry']
 
 
 class StarPrior(object):
-    """Captures the user's beliefs about a single star's position and flux.
+    """Container class to capture a user's beliefs about a star's position and flux.
 
     Example use
     -----------
@@ -36,8 +42,18 @@ class StarPrior(object):
         return logp
 
 
-class FocusPrior(object):
-    def __init__(self, scale_col=GaussianPrior(mean=1, var=0.0001),
+class FocusPrior():
+    """Container class to capture a user's beliefs about the telescope focus.
+
+    Parameters
+    ----------
+    scale_col, scale_row : oktopus ``Prior`` object
+        Pixel scale in the column and row directions. Typically close to one.
+    rotation_angle : oktopus ``Prior`` object
+        Rotation angle in radians. Typically zero.
+    """
+    def __init__(self,
+                 scale_col=GaussianPrior(mean=1, var=0.0001),
                  scale_row=GaussianPrior(mean=1, var=0.0001),
                  rotation_angle=UniformPrior(lb=-3.1415, ub=3.1415)):
         self.scale_col = scale_col
@@ -45,8 +61,7 @@ class FocusPrior(object):
         self.rotation_angle = rotation_angle
 
     def evaluate(self, scale_col, scale_row, rotation_angle):
-        """Evaluate the prior probability.
-        """
+        """Returns the prior probability for a gien set of focus parameters."""
         logp = (self.scale_col.evaluate(scale_col) +
                 self.scale_row.evaluate(scale_row) +
                 self.rotation_angle.evaluate(rotation_angle))
@@ -54,20 +69,22 @@ class FocusPrior(object):
 
 
 class MotionPrior(object):
+    """Container class to capture a user's beliefs about the telescope motion.
+    """
     def __init__(self, shift_col=UniformPrior(lb=-0.1, ub=0.1),
                  shift_row=UniformPrior(lb=-0.1, ub=0.1)):
         self.shift_col = shift_col
         self.shift_row = shift_row
 
     def evaluate(self, shift_col, shift_row):
-        """Evaluate the prior probability."""
+        """Returns the prior probability for a gien set of motion parameters."""
         logp = (self.shift_col.evaluate(shift_col) +
                 self.shift_row.evaluate(shift_row))
         return logp
 
 
 class StarParameters(object):
-    """Captures the parameters of a star in a scene model.
+    """Container class to hold the parameters of a star in a ``SceneModel``.
     """
     def __init__(self, col, row, flux, err_col=None, err_row=None, err_flux=None):
         self.col = col
@@ -79,8 +96,9 @@ class StarParameters(object):
                     self.col, self.row, self.flux)
         return r
 
+
 class BackgroundParameters(object):
-    """Captures the parameters of the background in a Kepler scene model.
+    """Container class to hold the parameters of the background in a ``SceneModel``.
     """
     def __init__(self, flux=0., err_flux=None, fixed=False):
         self.flux = flux
@@ -94,7 +112,8 @@ class BackgroundParameters(object):
 
 
 class FocusParameters(object):
-    """Captures the parameters of the telescope focus."""
+    """Container class to hold the parameters of the telescope focus in a ``SceneModel``.
+    """
     def __init__(self, scale_col=1., scale_row=1., rotation_angle=0., fixed=False):
         self.scale_col = scale_col
         self.scale_row = scale_row
@@ -107,7 +126,8 @@ class FocusParameters(object):
 
 
 class MotionParameters(object):
-    """Captures the parameters of the telescope motion."""
+    """Container class to hold the parameters of the telescope motion in a ``SceneModel``.
+    """
     def __init__(self, shift_col=0., shift_row=0., fixed=False):
         self.shift_col = shift_col
         self.shift_row = shift_row
@@ -119,12 +139,18 @@ class MotionParameters(object):
 
 
 class SceneModelParameters():
-    """Parameters that define a single cadence of a TPF image.
+    """Container class to combine all parameters that parameterize a ``SceneModel``.
 
     Attributes
     ----------
-    stars : list of `StarParameter` objects
-        Stars in the scene.
+    stars : list of ``StarParameters`` objects
+        Parameters related to the stars in the scene.
+    background : ``BackgroundParameters`` object
+        Parameters related to the background flux.
+    focus : ``FocusParameters`` object
+        Parameters related to the telescope focus.
+    motion : ``MotionParameters`` object
+        Parameters related to the telescope motion.
     """
     def __init__(self, stars=[], background=BackgroundParameters(),
                  focus=FocusParameters(), motion=MotionParameters()):
@@ -143,11 +169,18 @@ class SceneModelParameters():
 
 
     def to_array(self):
-        """Converts the parameters to an array of real elements of size (n,),
-        where n is the number of parameters.
+        """Converts the free parameters held by this class to an array of size (n,),
+        where n is the number of free parameters.
 
-        We do this because scipy.optimize can only optimize arrays of real
-        numbers.
+        This method exists because `scipy.optimize` can only optimize arrays of
+        real numbers, yet we like to store in the parameters in human-friendly
+        container classes to make the fitted parameters accessible without
+        confusion.
+
+        Returns
+        -------
+        array : array-like
+            Array containing all the free parameters.
         """
         array = []
         for star in self.stars:
@@ -166,9 +199,7 @@ class SceneModelParameters():
         return np.array(array)
 
     def from_array(self, array):
-        """Converts an array of parameters to a more human-friendly
-        `SceneModelParameters class`.
-        """
+        """Inverse of ``to_array()``."""
         next_idx = 0
         stars = []
         for staridx in range(len(self.stars)):
@@ -207,11 +238,22 @@ class SceneModel():
 
     Attributes
     ----------
-    star_priors : list of `StarPrior` objects.
+    star_priors : list of ``StarPrior`` objects.
         List of stars believed to be in the image.
-    background_prior : BackgroundPrior object.
-        Beliefs about the per-pixel background flux.
-    prfmodel : KeplerPRF object.
+    background_prior : ``BackgroundPrior`` object.
+        Beliefs about the background flux.
+    prfmodel : ``KeplerPRF`` object.
+        The callable Pixel Reponse Function (PRF) model to use.
+    focus_prior : ``FocusPrior`` object.
+        Beliefs about the telescope focus.
+    motion_prior : ``MotionPrior`` object.
+        Beliefs about the telescope motion.
+    fix_background : bool
+        If True, the background parameters will be kept fixed.
+    fix_focus : bool
+        If True, the telescope focus parameters will be kept fixed.
+    fix_motion : bool
+        If True, the telescope motion parameters will be kept fixed.
     """
     def __init__(self, star_priors=[],
                  background_prior=GaussianPrior(mean=0, var=100),
@@ -230,7 +272,10 @@ class SceneModel():
         self.params = self.initial_guesses()
 
     def initial_guesses(self):
-        """Returns the prior means which can be used to initialize the model."""
+        """Returns the prior means which can be used to initialize the model.
+
+        The guesses are obtained by taking the means of the priors.
+        """
         initial_star_guesses = []
         for star in self.star_priors:
             initial_star_guesses.append(StarParameters(col=star.col.mean,
@@ -256,11 +301,13 @@ class SceneModel():
 
         Attributes
         ----------
-        params : SceneModelParameters object
+        params : ```SceneModelParameters``` object
+            Parameters which define the scene.
 
         Returns
         -------
         synthetic_image : 2D ndarray
+            Predicted image given the parameters.
         """
         if params is None:
             params = self.initial_guesses()
@@ -276,8 +323,10 @@ class SceneModel():
         return synthetic_image
 
     def _predict(self, *params_array):
-        """Version of `predict()` that takes an array instead of a
-        SceneModelParameters object.
+        """Wrapper around ``predict()`` which takes an array of shape (n,)
+        where n is the number of free parameters.
+
+        Unlike ``predict()`, this function can be called by scipy.optimize.
         """
         params = self.params.from_array(params_array)
         return self.predict(params)
@@ -304,18 +353,38 @@ class SceneModel():
         return logp
 
     def _logp_prior(self, params_array):
-        """Version of `logp_prior()` that takes an array instead of a
-        SceneModelParameters object.
+        """Wrapper around ``logp_prior()`` which takes an array of shape (n,)
+        where n is the number of free parameters.
+
+        Unlike ``predict()`, this function can be called by scipy.optimize.
         """
         params = self.params.from_array(params_array)
         return self.logp_prior(params)
 
-    def fit(self, observed_data, loss_function=PoissonPosterior):
-        loss = loss_function(observed_data, self._predict, prior=self._logp_prior)
-        fit = loss.fit(x0=self.initial_guesses().to_array(), method='powell')
+    def fit(self, data, loss_function=PoissonPosterior, method='powell', **kwargs):
+        """Fits the scene model to the data.
+
+        Parameters
+        ----------
+        data : array-like
+            The pixel data for a single cadence, i.e. the data obtained using
+            ``KeplerTargetPixelFile.flux[cadenceno]``.
+        loss_function : subclass of oktopus.LossFunction
+            Noise distribution associated with each random measurement
+        kwargs : dict
+            Dictionary of additional parameters to be passed to
+            `scipy.optimize.minimize`.
+
+        Returns
+        -------
+        result : ``SceneParameters`` object
+            Fitted parameters plus fitting diagnostics.
+        """
+        loss = loss_function(data, self._predict, prior=self._logp_prior)
+        fit = loss.fit(x0=self.initial_guesses().to_array(), method=method, **kwargs)
         result = self.params.from_array(fit.x)
         result.predicted_image = self._predict(*fit.x)
-        result.residual_image = observed_data - result.predicted_image
+        result.residual_image = data - result.predicted_image
         result.loss_value = fit.fun
         return result
 
@@ -328,10 +397,10 @@ class SceneModel():
                            self.prfmodel.row, self.prfmodel.row + self.prfmodel.shape[0]),
                    **kwargs)
 
-    def diagnostics(self, observed_data, *params, **kwargs):
+    def diagnostics(self, data, *params, **kwargs):
         """Plots an image of the model for a given point in the parameter space."""
-        fit = self.fit(observed_data)
-        plot_image(observed_data,
+        fit = self.fit(data)
+        plot_image(data,
                    title='Observed Data, Channel: {}'.format(self.prfmodel.channel),
                    extent=(self.prfmodel.column, self.prfmodel.column + self.prfmodel.shape[1],
                            self.prfmodel.row, self.prfmodel.row + self.prfmodel.shape[0]),
@@ -349,20 +418,41 @@ class SceneModel():
 
 
 class PRFPhotometry():
+    """This class performs PRF Photometry on TPF-like data given a ``SceneModel``.
+
+    This class exists because a ``SceneModel`` object is designed to fit only
+    one cadence at a time.  This class makes it easy to fit a large number
+    of cadences and obtain the resulting LightCurve.
+
+    Attributes
+    ----------
+    model : instance of SceneModel
+        Model which will be fit to the data
+    """
     def __init__(self, model):
         self.model = model
         self.results = []
     
-    def fit(self, data):
+    def run(self, tpf_flux):
+        """Fits the scene model to the flux data.
+
+        Parameters
+        ----------
+        tpf_flux : array-like
+            A pixel flux time-series, i.e., the pixel data, e.g,
+            KeplerTargetPixelFile.flux, such that (time, row, column) represents
+            the shape of ``tpf_flux``.
+        """
         self.results = []
-        for cadence in tqdm((range(len(data)))):
-            self.results.append(self.model.fit(data[cadence]))
+        for cadence in tqdm((range(len(tpf_flux)))):
+            self.results.append(self.model.fit(tpf_flux[cadence]))
         # Parse results
         self.lightcurves = [self._parse_lightcurve(star_idx)
                             for star_idx in range(len(self.model.star_priors))]
             
     def _parse_lightcurve(self, star_idx):
         # Create a lightcurve
+        from . import LightCurve
         flux = []
         for cadence in range(len(self.results)):
             flux.append(self.results[cadence].stars[star_idx].flux)
@@ -370,6 +460,7 @@ class PRFPhotometry():
 
     def _parse_background(self):
         # Create a lightcurve
+        from . import LightCurve
         bgflux = []
         for cadence in range(len(self.results)):
             bgflux.append(self.results[cadence].background.flux)
@@ -402,10 +493,7 @@ class PRFPhotometry():
         return fig
 
 
-def psf_photometry_demo():
-    """Prototype implementation of `KeplerTargetPixelFile.psf_photometry()`"""
-
-    # We will attempt to make a lightcurve for Tabby's star
+def _example():
     tpf = KeplerTargetPixelFile.from_archive(8462852, quarter=16, quality_bitmask='hardest')
     bgflux = np.nanpercentile(tpf.flux[0], 10)
     maxflux = np.nansum(tpf.flux, axis=(1, 2)).max()
@@ -416,13 +504,17 @@ def psf_photometry_demo():
                            flux=UniformPrior(lb=0, ub=maxflux),
                            targetid=tpf.keplerid)
     model = SceneModel(star_priors=[star_prior],
-                            background_prior=GaussianPrior(mean=bgflux, var=bgflux),
-                            prfmodel=tpf.get_prf_model())
+                       background_prior=GaussianPrior(mean=bgflux, var=bgflux),
+                       prfmodel=tpf.get_prf_model(),
+                       focus_prior=FocusPrior(scale_col=GaussianPrior(mean=1, var=0.0001),
+                                              scale_row=GaussianPrior(mean=1, var=0.0001),
+                                              rotation_angle=UniformPrior(lb=-3.1415, ub=3.1415)),
+                       motion_prior=MotionPrior(shift_col=UniformPrior(lb=-0.1, ub=0.1),
+                                                shift_row=UniformPrior(lb=-0.1, ub=0.1)),
+                       fix_background=False,
+                       fix_focus=False,
+                       fix_motion=False)
 
-    # Now make the lightcurve by fitting each cadence
-    time = tpf.time[1400:1700]  # this cadence range include the deepest dip
-    flux = []
-    for idx in tqdm(np.arange(1400, 1700)):
-        result = model.fit(tpf.flux[idx])
-        flux.append(result.stars[0].flux)
-    return LightCurve(time, flux)
+    pp = PRFPhotometry(model)
+    pp.run(tpf.flux[1650:1850])
+    pp.plot_results()

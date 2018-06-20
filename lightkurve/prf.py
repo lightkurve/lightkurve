@@ -1,41 +1,17 @@
+"""Provides callable models of the Kepler Pixel Response Function (PRF)."""
 from __future__ import division, print_function
 
 import math
-import sys
 
 from astropy.io import fits as pyfits
 import numpy as np
 import scipy
-import tqdm
-from oktopus.posterior import PoissonPosterior
+import scipy.interpolate
 
 from .utils import channel_to_module_output, plot_image
 
-# This is a workaround to get the number of arguments of
-# a given function.
-# In Python 2, this works by using getargspec.
-# Note that `self` is accounted as an argument,
-# which is unwanted, hence the subtraction by 1.
-# On the other hand, Python 3 handles that trivially with the
-# signature function.
-if sys.version_info[0] == 2:
-    from inspect import getargspec
 
-    def _get_number_of_arguments(func):
-        list_of_args = getargspec(func).args
-        if 'self' in list_of_args:
-            return len(list_of_args) - 1
-        else:
-            return len(list_of_args)
-else:
-    from inspect import signature
-
-    def _get_number_of_arguments(func):
-        return len(signature(func).parameters)
-
-
-__all__ = ['KeplerPRF', 'PRFPhotometry', 'SceneModel', 'SimpleKeplerPRF',
-           'get_initial_guesses']
+__all__ = ['KeplerPRF', 'SimpleKeplerPRF']
 
 
 class KeplerPRF(object):
@@ -205,175 +181,6 @@ class KeplerPRF(object):
                            self.row, self.row + self.shape[0]), **kwargs)
 
 
-class PRFPhotometry(object):
-    """
-    This class performs PRF Photometry on TPF-like files.
-
-    Attributes
-    ----------
-    scene_model : instance of SceneModel
-        Model which will be fit to the data
-    priors : instance of oktopus.JointPrior
-        Priors on the parameters that will be estimated
-    loss_function : subclass of oktopus.LossFunction
-        Noise distribution associated with each random measurement
-
-    Examples
-    --------
-    >>> from lightkurve import KeplerTargetPixelFile, SimpleKeplerPRF, SceneModel, PRFPhotometry
-    >>> from oktopus import UniformPrior
-    >>> tpf = KeplerTargetPixelFile("https://archive.stsci.edu/missions/kepler/"
-    ...                             "target_pixel_files/0084/008462852/"
-    ...                             "kplr008462852-2013098041711_lpd-targ.fits.gz") # doctest: +SKIP
-    Downloading https://archive.stsci.edu/missions/kepler/target_pixel_files
-    /0084/008462852/kplr008462852-2013098041711_lpd-targ.fits.gz [Done]
-    >>> prf = tpf.get_prf_model() # doctest: +SKIP
-    Downloading http://archive.stsci.edu/missions/kepler/fpc/prf
-    /extracted/kplr16.4_2011265_prf.fits [Done]
-    >>> scene = SceneModel(prfs=prf) # doctest: +SKIP
-    >>> prior = UniformPrior(lb=[1.2e5, 230., 128.,1e2], ub=[3.4e5, 235., 133., 1e3]) # doctest: +SKIP
-    >>> phot = PRFPhotometry(scene, prior) # doctest: +SKIP
-    >>> results = phot.fit(tpf.flux) # doctest: +SKIP
-    >>> flux_fit = results[:, 0] # doctest: +SKIP
-    >>> x_fit = results[:, 1] # doctest: +SKIP
-    >>> y_fit = results[:, 2] # doctest: +SKIP
-    >>> bkg_fit = results[:, 3] # doctest: +SKIP
-    """
-
-    def __init__(self, scene_model, prior, loss_function=PoissonPosterior,
-                 **kwargs):
-        self.scene_model = scene_model
-        self.prior = prior
-        self.loss_function = loss_function
-        self.loss_kwargs = kwargs
-        self.opt_params = np.array([])
-        self.residuals = np.array([])
-        self.loss_value = np.array([])
-        self.uncertainties = np.array([])
-
-    def fit(self, tpf_flux, x0=None, cadences='all', method='powell',
-            **kwargs):
-        """
-        Fits the scene model to the given data in ``tpf_flux``.
-
-        Parameters
-        ----------
-        tpf_flux : array-like
-            A pixel flux time-series, i.e., the pixel data, e.g,
-            KeplerTargetPixelFile.flux, such that (time, row, column) represents
-            the shape of ``tpf_flux``.
-        x0 : array-like or None
-            Initial guesses on the parameters. The default is to use the mean
-            of the prior distribution.
-        cadences : array-like of ints or str
-            A list or array that contains the cadences which will be fitted.
-            Default is to fit all cadences.
-        kwargs : dict
-            Dictionary of additional parameters to be passed to
-            `scipy.optimize.minimize`.
-
-        Returns
-        -------
-        opt_params : array-like
-            Matrix with the optimized parameter values. The i-th line contain
-            the best parameter values at the i-th cadence. The order of the parameters
-            in every line follows the order of the ``scene_model``.
-        """
-        self.opt_params = np.array([])
-        self.residuals = np.array([])
-        self.loss_value = np.array([])
-        self.uncertainties = np.array([])
-
-        if x0 is None:
-            x0 = self.prior.mean
-
-        if cadences == 'all':
-            cadences = range(tpf_flux.shape[0])
-
-        for t in tqdm.tqdm(cadences):
-            loss = self.loss_function(tpf_flux[t], self.scene_model,
-                                      prior=self.prior, **self.loss_kwargs)
-            result = loss.fit(x0=x0, method='powell', **kwargs)
-            opt_params = result.x
-            residuals = tpf_flux[t] - self.scene_model(*opt_params)
-            self.loss_value = np.append(self.loss_value, result.fun)
-            self.opt_params = np.append(self.opt_params, opt_params)
-            self.residuals = np.append(self.residuals, residuals)
-        self.opt_params = self.opt_params.reshape((tpf_flux.shape[0], len(x0)))
-        self.residuals = self.residuals.reshape(tpf_flux.shape)
-
-        return self.opt_params
-
-    def get_residuals(self):
-        return self.residuals
-
-
-class SceneModel(object):
-    """
-    This class builds a generic model for a scene.
-
-    Attributes
-    ----------
-    prfs : list of callables
-        A list of prfs
-    bkg_model : callable
-        A function that models the background variation.
-        Default is a constant background
-    """
-
-    def __init__(self, prfs, bkg_model=lambda bkg: np.array([bkg])):
-        self.prfs = np.asarray([prfs]).reshape(-1)
-        self.bkg_model = bkg_model
-        self._prepare_scene_model()
-
-    def __call__(self, *params):
-        return self.evaluate(*params)
-
-    def _prepare_scene_model(self):
-        self.n_models = len(self.prfs)
-        self.bkg_order = _get_number_of_arguments(self.bkg_model)
-
-        model_orders = [0]
-        for i in range(self.n_models):
-            model_orders.append(_get_number_of_arguments(self.prfs[i].evaluate))
-        self.n_params = np.cumsum(model_orders)
-
-    def evaluate(self, *params):
-        """
-        Parameters
-        ----------
-        flux : scalar or array-like
-            Total integrated flux of the PRF model
-        center_col, center_row : scalar or array-like
-            Column and row coordinates of the center
-        scale_col, scale_row : scalar or array-like
-            Pixel scale in the column and row directions
-        rotation_angle : float
-            Rotation angle in radians
-        bkg_params : scalar or array-like
-            Parameters for the background model
-        """
-        self.mm = []
-        for i in range(self.n_models):
-            self.mm.append(self.prfs[i](*params[self.n_params[i]:self.n_params[i+1]]))
-        self.scene_model = np.sum(self.mm, axis=0) + self.bkg_model(*params[-self.bkg_order:])
-        return self.scene_model
-
-    def gradient(self, *params):
-        grad = []
-        for i in range(self.n_models):
-            grad.append(self.prfs[i].gradient(*params[self.n_params[i]:self.n_params[i+1]]))
-        grad.append(self.bkg_model.gradient(*params[-self.bkg_order:]))
-        grad = sum(grad, [])
-        return grad
-
-    def plot(self, *params, **kwargs):
-        pflux = self.evaluate(*params)
-        plot_image(pflux, title='Scene Model, Channel: {}'.format(self.prfs[0].channel),
-                   extent=(self.prfs[0].column, self.prfs[0].column + self.prfs[0].shape[1],
-                           self.prfs[0].row, self.prfs[0].row + self.prfs[0].shape[0]), **kwargs)
-
-
 class SimpleKeplerPRF(KeplerPRF):
     """
     Simple model of KeplerPRF.
@@ -436,38 +243,3 @@ class SimpleKeplerPRF(KeplerPRF):
         deriv_center_row = - flux * self.interpolate(delta_row, delta_col, dx=1)
 
         return [deriv_flux, deriv_center_col, deriv_center_row]
-
-
-def get_initial_guesses(data, ref_col, ref_row):
-    """
-    Compute the initial guesses for total flux, centers position, and PSF
-    width using the sample moments of the data.
-
-    Parameters
-    ----------
-    data : 2D array-like
-        Image data
-    ref_col, ref_row : scalars
-        Reference column and row (coordinates of the bottom left corner)
-
-    Returns
-    -------
-    flux0, col0, row0, sigma0: floats
-        Inital guesses for flux, center position, and width
-    """
-
-    flux0 = np.nansum(data)
-    yy, xx = np.indices(data.shape) + 0.5
-    yy = ref_row + yy
-    xx = ref_col + xx
-    col0 = np.nansum(xx * data) / flux0
-    row0 = np.nansum(yy * data) / flux0
-    marg_col = data[:, int(np.round(col0 - ref_col))]
-    marg_row = data[int(np.round(row0 - ref_row)), :]
-    sigma_y = math.sqrt(np.abs((np.arange(marg_row.size) - row0)
-                               ** 2 * marg_row).sum() / marg_row.sum())
-    sigma_x = math.sqrt(np.abs((np.arange(marg_col.size) - col0)
-                               ** 2 * marg_col).sum() / marg_col.sum())
-    sigma0 = math.sqrt((sigma_x**2 + sigma_y**2)/2.0)
-
-    return flux0, col0, row0, sigma0
