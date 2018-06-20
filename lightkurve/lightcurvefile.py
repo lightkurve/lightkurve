@@ -7,9 +7,8 @@ import matplotlib as mpl
 from matplotlib import pyplot as plt
 
 from astropy.io import fits as pyfits
-from astropy.table import Table
 
-from .utils import (bkjd_to_time, KeplerQualityFlags, TessQualityFlags)
+from .utils import (bkjd_to_astropy_time, KeplerQualityFlags, TessQualityFlags)
 from .mast import download_kepler_products
 
 
@@ -41,11 +40,14 @@ class LightCurveFile(object):
         return self.hdu[1].data['TIME'][self.quality_mask]
 
     @property
-    def timeobj(self):
-        """Returns the human-readable date for all good-quality cadences."""
-        return bkjd_to_time(bkjd=self.time,
-                            timecorr=self.hdu[1].data['TIMECORR'][self.quality_mask],
-                            timslice=self.hdu[1].header['TIMSLICE'])
+    def ra(self):
+        """Right Ascension of the target."""
+        return self.hdu[0].header['RA_OBJ']
+
+    @property
+    def dec(self):
+        """Declination of the target."""
+        return self.hdu[0].header['DEC_OBJ']
 
     @property
     def SAP_FLUX(self):
@@ -98,7 +100,7 @@ class KeplerLightCurveFile(LightCurveFile):
 
     @staticmethod
     def from_archive(target, cadence='long', quarter=None, month=None,
-                     campaign=None, radius=1., targetlimit=1, verbose=True, **kwargs):
+                     campaign=None, radius=1., targetlimit=1, **kwargs):
         """Fetches a LightCurveFile (or list thereof) from the data archive at MAST.
 
         If a target was observed across multiple quarters or campaigns, a
@@ -138,9 +140,9 @@ class KeplerLightCurveFile(LightCurveFile):
         lcf : KeplerLightCurveFile object or list of KeplerLightCurveFile objects
         """
         path = download_kepler_products(
-                    target=target, filetype='Lightcurve', cadence=cadence,
-                    quarter=quarter, campaign=campaign, month=month, verbose=verbose,
-                    radius=radius, targetlimit=targetlimit)
+            target=target, filetype='Lightcurve', cadence=cadence,
+            quarter=quarter, campaign=campaign, month=month,
+            radius=radius, targetlimit=targetlimit)
         if len(path) == 1:
             return KeplerLightCurveFile(path[0], **kwargs)
         return [KeplerLightCurveFile(p, **kwargs) for p in path]
@@ -173,13 +175,20 @@ class KeplerLightCurveFile(LightCurveFile):
             bitmask = KeplerQualityFlags.OPTIONS[bitmask]
         return (self.hdu[1].data['SAP_QUALITY'] & bitmask) == 0
 
+    @property
+    def astropy_time(self):
+        """Returns an AstroPy Time object for all good-quality cadences."""
+        return bkjd_to_astropy_time(bkjd=self.time)
+
     def get_lightcurve(self, flux_type, centroid_type='MOM_CENTR'):
         if flux_type in self._flux_types():
             # We did not import lightcurve at the top to prevent circular imports
             from .lightcurve import KeplerLightCurve
             return KeplerLightCurve(
-                self.hdu[1].data['TIME'][self.quality_mask],
-                self.hdu[1].data[flux_type][self.quality_mask],
+                time=self.hdu[1].data['TIME'][self.quality_mask],
+                time_format='bkjd',
+                time_scale='tdb',
+                flux=self.hdu[1].data[flux_type][self.quality_mask],
                 flux_err=self.hdu[1].data[flux_type + "_ERR"][self.quality_mask],
                 centroid_col=self.hdu[1].data[centroid_type + "1"][self.quality_mask],
                 centroid_row=self.hdu[1].data[centroid_type + "2"][self.quality_mask],
@@ -190,7 +199,9 @@ class KeplerLightCurveFile(LightCurveFile):
                 quarter=self.quarter,
                 mission=self.mission,
                 cadenceno=self.cadenceno,
-                keplerid=self.keplerid)
+                keplerid=self.keplerid,
+                ra=self.ra,
+                dec=self.dec)
         else:
             raise KeyError("{} is not a valid flux type. Available types are: {}".
                            format(flux_type, self._flux_types))

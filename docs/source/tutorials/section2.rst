@@ -11,3 +11,4 @@ In this section we will look at some common data analysis tasks, and show how th
     2.03-appending-lightcurves.ipynb
     2.05-making-custom-apertures.ipynb
     cutting-out-tpfs-from-tess-ffis.ipynb
+    2.08-making-fits-files.ipynb
