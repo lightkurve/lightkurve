@@ -197,7 +197,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         return('KeplerTargetPixelFile Object (ID: {})'.format(self.keplerid))
 
 
-    def find_stars(self, catalog=None, radius=None):
+    def find_stars(self, catalog=None, radius=0.5):
         """
         Load tpf file to find field stars within the tpf.
 
@@ -211,7 +211,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
             if K2 catalog is EPIC.
         radius: float
             Radius of cone search centered on the target in arcminutes.
-            Default is TPF size.
+            Default radius is 0.5 arcmin.
 
         Returns
         -------
@@ -241,28 +241,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
             else:
                 log.error('Please provide a catalog.')
 
-        # Make search radius the size of the tpf
-        mc, mr  = (self.column + (self.shape[2]/2)), (self.row + (self.shape[1]/2))
-        c1, r1 = self.wcs.wcs_pix2world([self.column], [self.row], 0)
-        c2, r2 = self.wcs.wcs_pix2world([mc], [mr], 0)
-        horizontal_rad = ((abs(c2-c1)) * 60)
-
-        # Determine centorid drift
-        cent_c, cent_r = self.centroids(aperture_mask='pipeline')
-        cd_1, rd_1 = self.wcs.wcs_pix2world([min(cent_c)], [min(cent_r)], 0)
-        cd_2, rd_2 = self.wcs.wcs_pix2world([max(cent_c)], [max(cent_r)], 0)
-        horizontal_drift = abs(cd_2 - cd_1) * 60
-        vertical_drift = abs(rd_2 - rd_1) * 60
-
-        if radius is None:
-            log.warning('Automatic radius search has been set.')
-            # Select the highest drift value from either direction
-            if horizontal_drift >= vertical_drift:
-                radius = horizontal_rad + horizontal_drift
-            elif vertical_drift >= horizontal_drift:
-                radius = horizontal_rad + vertical_drift
-
-
         if catalog is "Gaia":
             log.warn('Gaia RAs and Decs are at EPOC 2015.5. These RA/Decs have not been corrected.')
 
@@ -291,9 +269,48 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
         # Rename names in KIC for consistency with EPIC
         result[viz_id]['KIC'].name = 'ID'
-        result[viz_id]['pmDE'].name = 'e_pmDEC'
+        result[viz_id]['pmDE'].name = 'pmDEC'
+        result[viz_id]['kepmag'].name = 'Kpmag'
 
-        return (result[viz_id])
+        # Queried stats
+        data = result[viz_id]
+
+        # Load ra & dec of all tpf pixels
+        gc_ra, gc_dec = self.get_coordinates(cadence='all')
+
+        # Reduce calculation for astroy seperation
+        c1 = np.asarray([gc_ra.ravel(), gc_dec.ravel()])
+        co = np.round(c1, decimals=5)
+
+        # Return unique pairs
+        pairs_gc = (np.unique(co, axis=1))
+
+        # Make pairs_gc into SkyCoord
+        sky_pairs_gc = SkyCoord(ra=pairs_gc[0]*u.deg, dec=pairs_gc[1]*u.deg, frame='icrs', unit=(u.deg, u.deg))
+        # Make pairs in sky_data
+        sky_data = SkyCoord(ra=data['RAJ2000'], dec=data['DEJ2000'], frame='icrs', unit=(u.deg, u.deg))
+
+        new_ra, new_dec = [], []
+        new_id = []
+        new_pmra, new_pmdec, new_e_pmra, new_e_pmdec = [], [], [], []
+        new_kpmag = []
+        for i in range (0, len(data)):
+            # seperation between tpf pixels and queried stats
+            s = sky_pairs_gc.separation(sky_data[i])
+            store = np.any(s.arcsec<=11)
+            if store==True:
+                new_ra.append(data['RAJ2000'][i])
+                new_dec.append(data['DEJ2000'][i])
+                new_id.append(data['ID'][i])
+                new_pmra.append(data['pmRA'][i])
+                new_pmdec.append(data['pmDEC'][i])
+                new_kpmag.append(data['Kpmag'][i])
+
+        # Dictionary of parameters of queried statrs
+        new_table = {'ID':new_id, 'RAJ2000':new_ra, 'DEJ2000':new_dec,
+        'pmRA':new_pmra, 'pmDEC':new_pmdec, 'Kpmag':new_kpmag}
+
+        return new_table
 
     @property
     def hdu(self):
@@ -402,7 +419,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
                           np.abs(pos_corr1_pix - np.nanmedian(pos_corr1_pix)) > 50,
                           np.abs(pos_corr2_pix - np.nanmedian(pos_corr2_pix)) > 50], axis=0)
         pos_corr1_pix[bad], pos_corr2_pix[bad] = 0, 0
-
         # Add in POSCORRs
         X = (np.atleast_3d(X).transpose([2, 0, 1]) +
              np.atleast_3d(pos_corr1_pix).transpose([1, 2, 0]))
