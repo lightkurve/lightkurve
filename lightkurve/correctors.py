@@ -339,7 +339,7 @@ class KeplerCBVCorrector(object):
         # negative log of the bayes factor
         self.correct(cbvs=[1], options={'xtol': 1e-6, 'ftol': 1e-6, 'maxfev': 2000})
         cost.append(self.opt_result.fun)
-        for n in tqdm(range(2, self._ncbvs+1)):
+        for n in range(2, self._ncbvs+1):
             cbv_list = list(range(1, n+1))
             self.correct(cbv_list, options={'xtol': 1e-6, 'ftol': 1e-6, 'maxfev': 2000})
             cost.append(self.opt_result.fun)
@@ -488,7 +488,7 @@ class SFFCorrector(object):
         flux_hat = np.array([])
         # The SFF algorithm is going to be run on each window independently
 
-        for i in tqdm(range(windows)):
+        for i in range(windows):
             # To make it easier (and more numerically stable) to fit a
             # characteristic polynomial that describes the spacecraft motion,
             # we rotate the centroids to a new coordinate frame in which
