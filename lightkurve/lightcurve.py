@@ -791,6 +791,10 @@ class SyntheticLightCurve(LightCurve):
         for key, value in kwargs.items():
             setattr(self, key, value)
 
+    def __getitem__(self, key):
+        lc = super(SyntheticLightCurve, self).__getitem__(key)
+        return lc
+
     def __repr__(self):
         if self.signaltype is None:
             return('No signal injected')
