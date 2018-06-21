@@ -25,6 +25,7 @@ from .utils import KeplerQualityFlags, plot_image, bkjd_to_astropy_time
 from .mast import download_kepler_products
 
 
+
 __all__ = ['KeplerTargetPixelFile']
 log = logging.getLogger(__name__)
 
@@ -391,15 +392,15 @@ class KeplerTargetPixelFile(TargetPixelFile):
         """
         w = self.wcs
         X, Y = np.meshgrid(np.arange(self.shape[2]), np.arange(self.shape[1]))
-        pos_corr1_pix, pos_corr2_pix = self.hdu[1].data['POS_CORR1'], self.hdu[1].data['POS_CORR2']
+        pos_corr1_pix, pos_corr2_pix = np.copy(self.hdu[1].data['POS_CORR1']), np.copy(self.hdu[1].data['POS_CORR2'])
 
         # We zero POS_CORR* when the values are NaN or make no sense (>50px)
         with warnings.catch_warnings():  # Comparing NaNs to numbers is OK here
             warnings.simplefilter("ignore", RuntimeWarning)
             bad = np.any([~np.isfinite(pos_corr1_pix),
                           ~np.isfinite(pos_corr2_pix),
-                          np.abs(pos_corr1_pix) < 50,
-                          np.abs(pos_corr2_pix) < 50], axis=0)
+                          np.abs(pos_corr1_pix - np.nanmedian(pos_corr1_pix)) > 50,
+                          np.abs(pos_corr2_pix - np.nanmedian(pos_corr2_pix)) > 50], axis=0)
         pos_corr1_pix[bad], pos_corr2_pix[bad] = 0, 0
 
         # Add in POSCORRs
