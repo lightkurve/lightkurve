@@ -290,27 +290,10 @@ class KeplerTargetPixelFile(TargetPixelFile):
         # Make pairs in sky_data
         sky_data = SkyCoord(ra=data['RAJ2000'], dec=data['DEJ2000'], frame='icrs', unit=(u.deg, u.deg))
 
-        new_ra, new_dec = [], []
-        new_id = []
-        new_pmra, new_pmdec, new_e_pmra, new_e_pmdec = [], [], [], []
-        new_kpmag = []
         for i in range (0, len(data)):
             # seperation between tpf pixels and queried stats
             s = sky_pairs_gc.separation(sky_data[i])
             store = np.any(s.arcsec<=11)
-            if store==True:
-                new_ra.append(data['RAJ2000'][i])
-                new_dec.append(data['DEJ2000'][i])
-                new_id.append(data['ID'][i])
-                new_pmra.append(data['pmRA'][i])
-                new_pmdec.append(data['pmDEC'][i])
-                new_kpmag.append(data['Kpmag'][i])
-
-        # Dictionary of parameters of queried statrs
-        new_table = {'ID':new_id, 'RAJ2000':new_ra, 'DEJ2000':new_dec,
-        'pmRA':new_pmra, 'pmDEC':new_pmdec, 'Kpmag':new_kpmag}
-
-        return new_table
 
     @property
     def hdu(self):
