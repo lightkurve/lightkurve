@@ -3,7 +3,6 @@ import datetime
 import os
 import warnings
 import logging
-from copy import deepcopy
 
 from astropy.io import fits
 from astropy.nddata import Cutout2D
@@ -288,7 +287,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         """
         w = self.wcs
         X, Y = np.meshgrid(np.arange(self.shape[2]), np.arange(self.shape[1]))
-        pos_corr1_pix, pos_corr2_pix = deepcopy(self.hdu[1].data['POS_CORR1']), deepcopy(self.hdu[1].data['POS_CORR2'])
+        pos_corr1_pix, pos_corr2_pix = np.copy(self.hdu[1].data['POS_CORR1']), np.copy(self.hdu[1].data['POS_CORR2'])
 
         # We zero POS_CORR* when the values are NaN or make no sense (>50px)
         with warnings.catch_warnings():  # Comparing NaNs to numbers is OK here
