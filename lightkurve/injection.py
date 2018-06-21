@@ -97,7 +97,7 @@ class TransitModel(object):
     rprs : float, default chosen from a uniform dist. of 0-0.4
         Planet radius / star radius
     zpt : float, default 1.0
-        A photometric zeropoint
+        A photometric zeropointf
     **kwargs : dict
         Keyword arguments to be passed to model.add_star and
         model.add_planet that specify the transits. Options are:
@@ -127,34 +127,66 @@ class TransitModel(object):
     def __init__(self, period, rprs, zpt, **kwargs):
 
         if isinstance(period, (GaussianDistribution, UniformDistribution)):
-            self.period = period.sample()
+            self.period = [period.sample()]
         else:
-            self.period = period
+            self.period = [period]
 
         if isinstance(rprs, (GaussianDistribution, UniformDistribution)):
-            self.rprs = rprs.sample()
+            self.rprs = [rprs.sample()]
         else:
-            self.rprs = rprs
+            self.rprs = [rprs]
 
         self.star_params = {}
         self.planet_params = {}
         for key, value in kwargs.items():
             if key in ('rho', 'ld1', 'ld2', 'ld3', 'ld4', 'dil', 'zpt'):
                 if isinstance(value, (GaussianDistribution, UniformDistribution)):
-                    self.star_params[key] = value.sample()
+                    self.star_params[key] = [value.sample()]
                 else:
-                    self.star_params[key] = value
+                    self.star_params[key] = [value]
             else:
                 if isinstance(value, (GaussianDistribution, UniformDistribution)):
-                    self.planet_params[key] = value.sample()
+                    self.planet_params[key] = [value.sample()]
                 else:
-                    self.planet_params[key] = value
+                    self.planet_params[key] = [value]
 
         self.zpt = zpt
+        self.planet_num = 1
         self.multiplicative = True
 
     def __repr__(self):
         return 'TransitModel(' + str(self.__dict__) + ')'
+
+    def add_planet(self, period, rprs, **added_planet_params):
+        """Modifies existing TransitModel object by adding another planet.
+
+        Parameters
+        ----------
+        Default values are those initialized in TransitModel.
+        A parameter must be defined in the initialization of
+        TransitModel if it is to be changed in add_planet.
+
+        period : float
+            Orbital period of new planet
+        rprs : float
+            Planet radius/star radius of new planet
+        **added_planet_params : dict
+            Dictonary of planet parameters (options the same as in TransitModel)
+        """
+
+        self.planet_num += 1
+        self.add_planet_attributes(**added_planet_params)
+        self.period[self.planet_num-1] = period
+        self.rprs[self.planet_num-1] = rprs
+        for key, value in added_planet_params.items():
+            self.planet_params[key][self.planet_num-1] = value
+
+    def add_planet_attributes(self, **added_planet_params):
+        """Helper class for add_planet."""
+        self.period = np.r_[self.period, 0.0]
+        self.rprs = np.r_[self.rprs, 0.0]
+        for key in added_planet_params.items():
+            self.planet_params[key[0]] = np.r_[self.planet_params[key[0]], 0.0]
 
     def evaluate(self, time):
         """Evaluates synthetic transiting planet light curve from model.
@@ -174,7 +206,14 @@ class TransitModel(object):
 
         model = ktransit.LCModel()
         model.add_star(zpt=self.zpt, **self.star_params)
-        model.add_planet(period=self.period, rprs=self.rprs, **self.planet_params)
+        params_to_add = {}
+        for i in range(len(self.period)):
+            for key, value in self.planet_params.items():
+                if len(value) > 1:
+                    params_to_add[key] = value[i]
+                else:
+                    params_to_add[key] = value[0]
+            model.add_planet(period=self.period[i], rprs=self.rprs[i], **params_to_add)
         model.add_data(time=time)
 
         transit_flux = model.transitmodel
