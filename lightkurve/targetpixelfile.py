@@ -295,8 +295,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
             warnings.simplefilter("ignore", RuntimeWarning)
             bad = np.any([~np.isfinite(pos_corr1_pix),
                           ~np.isfinite(pos_corr2_pix),
-                          np.abs(pos_corr1_pix - np.nanmedian(pos_corr1_pix)) < 50,
-                          np.abs(pos_corr2_pix - np.nanmedian(pos_corr2_pix)) < 50], axis=0)
+                          np.abs(pos_corr1_pix - np.nanmedian(pos_corr1_pix)) > 50,
+                          np.abs(pos_corr2_pix - np.nanmedian(pos_corr2_pix)) > 50], axis=0)
         pos_corr1_pix[bad], pos_corr2_pix[bad] = 0, 0
 
         # Add in POSCORRs
