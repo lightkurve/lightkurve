@@ -89,62 +89,32 @@ class GaussianDistribution(object):
 class TransitModel(object):
     """
     Implements a class for creating a transiting model using ktransit.
+    When you initialize the model, you must set parameters for the star.
 
     Attributes
     ----------
-    period : float, default chosen from a uniform dist. of 0-20
-        Orbital period in days
-    rprs : float, default chosen from a uniform dist. of 0-0.4
-        Planet radius / star radius
-    zpt : float, default 1.0
-        A photometric zeropointf
-    **kwargs : dict
-        Keyword arguments to be passed to model.add_star and
-        model.add_planet that specify the transits. Options are:
-            T0 : float
-                a transit mid-time (note that the T is uppercase)
-            impact : float, default chosen from a uniform dist. of 0-1
-                Impact parameter
-            ld1 : float, default chosen from a uniform dist. of 0-1
-                Limb darkening coefficient 1
-            ld2 : float, default chosen from a uniform dist. of 0-1
-                Limb darkening coefficient 2
-            ld3 : float, default 0.0
-                Limb darkening coefficient 3
-            ld4 : float, default 0.0
-                Limb darkening coefficient 4
-            dil : float, default 0.0
-                Transit dilution fraction
-            rho : float, default 1.5
-                Mean stellar density in cgs units
-            ecosw, esinw : floats, default 0.0
-                An eccentricity vector
-            occ : float, default 0.0
-                a secondary eclipse depth in ppm
+    zpt : float
+        A photometric zeropoint
+    rho : float
+        Mean stellar density in cgs units
+    ld1, ld2, ld3, ld4 : floats
+        Limb darkening coefficients
+    dil : float
+        Fraction of transit diluted
 
     """
 
-    def __init__(self, zpt = 1.0, rho=1.5, ld1 = 0.2, ld2=0.4, ld3=0.0, ld4=0.0, dil=0.0):
+    def __init__(self, zpt=1.0, rho=1.5, ld1=0.2, ld2=0.4, ld3=0.0, ld4=0.0, dil=0.0):
         """Initialize the star."""
+        import ktransit
 
-        """
-        self.planet_num = 0
-        self.T0 = []
-        self.period = []
-        self.impact = []
-        self.rprs = []
-        self.ecosw = []
-        self.esinw = []
-        self.occ = []
-        self.ell = []
-        self.alb = []
-        """
-
-        self.rho = rho
         self.ld1 = ld1
         self.ld2 = ld2
         self.ld3 = ld3
         self.ld4 = ld4
+
+        self.rho = rho
+
         self.dil = dil
         self.zpt = zpt
 
@@ -158,7 +128,7 @@ class TransitModel(object):
         return 'TransitModel(' + str(self.__dict__) + ')'
 
     def add_planet(self, period, rprs, T0, impact=0.0, ecosw=0.0, esinw=0.0,
-                    rvamp = 0.0, occ=0.0, alb=0.0):
+                    occ=0.0, alb=0.0):
         """Modifies existing TransitModel object by adding another planet.
 
         Parameters
@@ -175,71 +145,13 @@ class TransitModel(object):
             Dictonary of planet parameters (options the same as in TransitModel)
         """
 
-
-
-        """
-        self.T0 = T0
-        self.period = period
-        self.impact = impact
-        self.rprs = rprs
-        self.ecosw = ecosw
-        self.esinw = esinw
-        self.occ = occ
-        self.alb = alb
-        self.planet_num += 1
-        self.add_planet_attributes(self.period, self.rprs, self.T0, self.impact,
-                                        self.ecosw, self.esinw,
-                                        self.occ, self.alb)
-        self.period[self.planet_num-1] = period
-        self.impact[self.planet_num-1] = impact
-        self.rprs[self.planet_num-1] = rprs
-        self.ecosw[self.planet_num-1] = ecosw
-        self.esinw[self.planet_num-1] = esinw
-        self.occ[self.planet_num-1] = occ
-        self.alb[self.planet_num-1] = alb
-        """
-
-    def add_planet_attributes(self, period, rprs, T0, impact=0.0, ecosw=0.0,
-                                esinw=0.0, occ=0.0, alb=0.0):
-        """Helper class for add_planet."""
-        self.period = np.r_[self.period, 0.0]
-        self.rprs = np.r_[self.rprs, 0.0]
-        self.T0 = np.r_[self.T0, 0.0]
-        self.impact = np.r_[self.impact, 0.0]
-        self.ecosw = np.r_[self.ecosw, 0.0]
-        self.esinw = np.r_[self.esinw, 0.0]
-        self.occ = np.r_[self.occ, 0.0]
-        self.alb = np.r_[self.alb, 0.0]
+        self.model.add_planet(period=period, rprs=rprs, T0=T0, impact=impact, ecosw=ecosw,
+                        esinw=esinw, occ=occ, alb=alb)
 
     def evaluate(self, time):
-        """Evaluates synthetic transiting planet light curve from model.
-           Currently, we can only create one planet at a time.
 
-        Parameters
-        ----------
-        time : array-like
-            Time array of transit light curve
-
-        Returns
-        -------
-        transit_flux : array-like
-            Returns the flux of the model lightcurve.
-        """
-        import ktransit
-
-        model = ktransit.LCModel()
-        model.add_star(zpt=self.zpt, **self.star_params)
-        params_to_add = {}
-        for i in range(len(self.period)):
-            for key, value in self.planet_params.items():
-                if len(value) > 1:
-                    params_to_add[key] = value[i]
-                else:
-                    params_to_add[key] = value[0]
-            model.add_planet(period=self.period[i], rprs=self.rprs[i], **params_to_add)
-        model.add_data(time=time)
-
-        transit_flux = model.transitmodel
+        self.model.add_data(time=time)
+        transit_flux = self.model.transitmodel
 
         return transit_flux
 
