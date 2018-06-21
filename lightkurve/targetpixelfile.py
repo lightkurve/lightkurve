@@ -222,12 +222,10 @@ class KeplerTargetPixelFile(TargetPixelFile):
             Declination [deg]
         pmRA: astropy.table.column (KIC & EPIC)
             Proper motion for right ascension [mas/year]
-        e_pmRA: astropy.table.column (KJIC & EPIC)
+        e_pmRA: astropy.table.column (KIC & EPIC)
             Error proper motion for Right ascension [mas/year]
-        pmDEC: astropy.table.column (EPIC)
+        pmDEC: astropy.table.column (KIC & EPIC)
             Proper motion for declination [mas/year]
-        pmDE: astropy.table.column (KIC)
-                Proper motion for declination [mas/year]
         e_pmDEC: astropy.table.column (EPIC)
             Error proper motion for declination [mas/year]
         Kpmag: astropy.table.column (KIC & EPIC)
@@ -242,15 +240,27 @@ class KeplerTargetPixelFile(TargetPixelFile):
             else:
                 log.error('Please provide a catalog.')
 
-        if radius is None:
-            radius = (4 * (2*np.max(self.shape[1:])**2)**0.5)/60
+        # Make search radius the size of the tpf
+        mc, mr  = (self.column + (self.shape[2]/2)), (self.row + (self.shape[1]/2))
+        c1, r1 = self.wcs.wcs_pix2world([self.column], [self.row], 0)
+        c2, r2 = self.wcs.wcs_pix2world([mc], [mr], 0)
+        horizontal_rad = ((abs(c2-c1)) * 60)
 
-        X_drif = max(self.pos_corr1) - min(self.pos_corr1)
-        Y_drif = max(self.pos_corr2) - min(self.pos_corr2)
-        # Expand radius of cone if drift is greater than 1 pixel
-        if (X_drif or Y_dirf) >= 1 :
-            log.warn('High pixel drift -- will expand radius!')
-            radius = 0.247 + (4 * (2*np.max(self.shape[1:])**2)**0.5)/60.0
+        # Determine centorid drift
+        cent_c, cent_r = self.centroids(aperture_mask='pipeline')
+        cd_1, rd_1 = self.wcs.wcs_pix2world([min(cent_c)], [min(cent_r)], 0)
+        cd_2, rd_2 = self.wcs.wcs_pix2world([max(cent_c)], [max(cent_r)], 0)
+        horizontal_drift = abs(cd_2 - cd_1) * 60
+        vertical_drift = abs(rd_2 - rd_1) * 60
+
+        if radius is None:
+            log.warning('Automatic radius search has been set.')
+            # Select the highest drift value from either direction
+            if horizontal_drift >= vertical_drift:
+                radius = horizontal_rad + horizontal_drift
+            elif vertical_drift >= horizontal_drift:
+                radius = horizontal_rad + vertical_drift
+
 
         if catalog is "Gaia":
             log.warn('Gaia RAs and Decs are at EPOC 2015.5. These RA/Decs have not been corrected.')
@@ -283,7 +293,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
         result[viz_id]['pmDE'].name = 'e_pmDEC'
 
         return (result[viz_id])
-
 
     @property
     def hdu(self):
