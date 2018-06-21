@@ -32,6 +32,10 @@ class StarPrior(object):
         self.flux = flux
         self.targetid = targetid
 
+    def __repr__(self):
+        return ('<StarPrior (ID: {}): col={}, row={}, flux={}>'
+                ''.format(self.targetid, self.col, self.row, self.flux))
+
     def evaluate(self, col, row, flux):
         """Evaluate the prior probability of a star of a given flux being at
         a given row and col.
@@ -60,6 +64,10 @@ class FocusPrior():
         self.scale_row = scale_row
         self.rotation_angle = rotation_angle
 
+    def __repr__(self):
+        return ('<StarPrior: scale_col={}, scale_row={}, rotation_angle={}>'
+                ''.format(self.scale_col, self.scale_row, self.rotation_angle))
+
     def evaluate(self, scale_col, scale_row, rotation_angle):
         """Returns the prior probability for a gien set of focus parameters."""
         logp = (self.scale_col.evaluate(scale_col) +
@@ -75,6 +83,10 @@ class MotionPrior(object):
                  shift_row=UniformPrior(lb=-0.1, ub=0.1)):
         self.shift_col = shift_col
         self.shift_row = shift_row
+
+    def __repr__(self):
+        return ('<MotionPrior: shift_col={}, shift_row={}>'
+                ''.format(self.shift_col, self.shift_row))
 
     def evaluate(self, shift_col, shift_row):
         """Returns the prior probability for a gien set of motion parameters."""
@@ -92,7 +104,7 @@ class StarParameters(object):
         self.flux = flux
 
     def __repr__(self):
-        r = "<StarParameters: col={}, row={}, flux={}>".format(
+        r = "<StarParameters: col={:.3f}, row={:.3f}, flux={:.3e}>".format(
                     self.col, self.row, self.flux)
         return r
 
@@ -106,7 +118,7 @@ class BackgroundParameters(object):
         self.fixed = fixed
 
     def __repr__(self):
-        r = "<BackgroundParameters: flux={}, fixed={}>".format(
+        r = "<BackgroundParameters: flux={:.3e}, fixed={}>".format(
                     self.flux, self.fixed)
         return r
 
@@ -121,7 +133,7 @@ class FocusParameters(object):
         self.fixed = fixed
 
     def __repr__(self):
-        return "<FocusParameters: scale_col={}, scale_row={}, rotation_angle={}, fixed={}>".format(
+        return "<FocusParameters: scale_col={:.3f}, scale_row={:.3f}, rotation_angle={:.3f}, fixed={}>".format(
                     self.scale_col, self.scale_row, self.rotation_angle, self.fixed)
 
 
@@ -134,7 +146,7 @@ class MotionParameters(object):
         self.fixed = fixed
 
     def __repr__(self):
-        return "<MotionParameters: shift_col={}, shift_row={}, fixed={}>".format(
+        return "<MotionParameters: shift_col={:.3f}, shift_row={:.3f}, fixed={}>".format(
                     self.shift_col, self.shift_row, self.fixed)
 
 
@@ -160,12 +172,18 @@ class SceneModelParameters():
         self.motion = motion
 
     def __repr__(self):
-        return "{}\n{}\n{}\n{}\n{}".format(
-            super(SceneModelParameters, self).__repr__(),
-            self.stars.__repr__(),
-            self.background.__repr__(),
-            self.focus.__repr__(),
-            self.motion.__repr__())
+        out = super(SceneModelParameters, self).__repr__() + '\n'
+        out += '  Stars:\n'+''.join(['    {}\n'.format(star) for star in self.stars])
+        out += '  Background:\n    {}\n'.format(self.background)
+        out += '  Focus:\n    {}\n'.format(self.focus)
+        out += '  Motion:\n    {}\n'.format(self.motion)
+        if 'residual_image' in vars(self):
+            out += '  Residual image:\n    {}'.format(self.residual_image[0][0:4])[:-1]
+            out +='...\n'
+        if 'predicted_image' in vars(self):
+            out += '  Predicted image:\n    {}'.format(self.predicted_image[0][0:4])[:-1]
+            out +='...\n'
+        return out
 
 
     def to_array(self):
@@ -270,6 +288,17 @@ class SceneModel():
         self.fix_focus = fix_focus
         self.fix_motion = fix_motion
         self.params = self.initial_guesses()
+
+    def __repr__(self):
+        out = super(SceneModel, self).__repr__() + '\n'
+        out += '  Star priors:\n'+''.join(['    {}\n'.format(star) for star in self.star_priors])
+        out += '  Background prior:\n    {}\n'.format(self.background_prior)
+        out += '  Focus prior:\n    {}\n'.format(self.focus_prior)
+        out += '  Motion prior:\n    {}\n'.format(self.motion_prior)
+        out += '  PRF model:\n    {}\n'.format(self.prfmodel)
+        out += '  Fixed parameters:\n    fix_background={}, fix_focus={}, fix_motion={}\n'.format(
+                        self.fix_background, self.fix_focus, self.fix_motion)
+        return out
 
     def initial_guesses(self):
         """Returns the prior means which can be used to initialize the model.
@@ -499,12 +528,13 @@ def _example():
     maxflux = np.nansum(tpf.flux, axis=(1, 2)).max()
 
     # First, set up a simple scene model with one star and no motion or focus changes
-    star_prior = StarPrior(col=GaussianPrior(mean=tpf.column, var=2**2),
-                           row=GaussianPrior(mean=tpf.row, var=2**2),
+    col, row = np.nanmedian(tpf.centroids(), axis=1)
+    star_prior = StarPrior(col=GaussianPrior(mean=col, var=2**2),
+                           row=GaussianPrior(mean=row, var=2**2),
                            flux=UniformPrior(lb=0, ub=maxflux),
                            targetid=tpf.keplerid)
     model = SceneModel(star_priors=[star_prior],
-                       background_prior=GaussianPrior(mean=bgflux, var=bgflux),
+                       background_prior=UniformPrior(lb=0, ub=10),
                        prfmodel=tpf.get_prf_model(),
                        focus_prior=FocusPrior(scale_col=GaussianPrior(mean=1, var=0.0001),
                                               scale_row=GaussianPrior(mean=1, var=0.0001),
