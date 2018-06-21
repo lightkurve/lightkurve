@@ -12,6 +12,7 @@ from matplotlib import patches
 import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
+from K2fov import fields
 
 from . import PACKAGEDIR
 from .lightcurve import KeplerLightCurve, TessLightCurve, LightCurve
@@ -977,10 +978,12 @@ class KeplerTargetPixelFileFactory(object):
         hdu.header['CREATOR'] = "lightkurve"
         hdu.header['OBJECT'] = self.target_id
         hdu.header['KEPLERID'] = self.target_id
+        hdu.header['RA_OBJ'] = self.keywords['RA_OBJ']
+        hdu.header['DEC_OBJ'] = self.keywords['DEC_OBJ']
+
         # Empty a bunch of keywords rather than having incorrect info
         for kw in ["PROCVER", "FILEVER", "CHANNEL", "MODULE", "OUTPUT",
-                   "TIMVERSN", "CAMPAIGN", "DATA_REL", "TTABLEID",
-                   "RA_OBJ", "DEC_OBJ"]:
+                   "TIMVERSN", "CAMPAIGN", "DATA_REL", "TTABLEID"]:
             hdu.header[kw] = ""
         return hdu
 
@@ -1023,7 +1026,7 @@ class KeplerTargetPixelFileFactory(object):
                                 array=self.pos_corr2))
         coldefs = fits.ColDefs(cols)
         hdu = fits.BinTableHDU.from_columns(coldefs)
-        #WCS needs to be added here 
+
         # Set the header with defaults
         template = self._header_template(1)
         for kw in template:
@@ -1036,7 +1039,6 @@ class KeplerTargetPixelFileFactory(object):
                                       template.comments[kw])
 
         # Override the defaults where necessary
-        hdu.header['EXTNAME'] = 'TARGETTABLES' ##this is already in the default file?
         hdu.header['OBJECT'] = self.target_id
         hdu.header['KEPLERID'] = self.target_id
         for n in [5, 6, 7, 8, 9]:
@@ -1044,6 +1046,70 @@ class KeplerTargetPixelFileFactory(object):
             hdu.header["TDIM{}".format(n)] = coldim
         hdu.header['TFORM4'] = jformat
         hdu.header['TDIM4'] = coldim
+
+        # Overriding the defaults with data from the original .fits file
+        ra = self.keywords["RA_OBJ"]
+        dec = self.keywords["DEC_OBJ"]
+
+        # Find the detector's coords to cut around
+        campaign = self.keywords["CAMPAIGN"]
+        fov_obj = fields.getKeplerfov(campaign)
+        ch, detcol, detrow = fov_obj.getChannelColRow(ra,dec)
+        detcol, detrow = np.round(col), np.round(row)
+        tpfsize = self.n_cols #Unsure about this - a. does it need to be odd, and b. can I just pick columns?
+
+        # Find the ra and dec of the center of the middle image
+        skyposition = SkyCoord(ra, dec, unit=('deg','deg'), frame='icrs')
+        wcs = WCS(files[int((self.n_cadences/2))-1])
+        pixelpos = skycoord_to_pixel(skyposition, wcs=wcs)
+        column = int(np.round(pixelpos[0]))
+        row = int(np.round(pixelpos[1]))
+        skyposctr = pixel_to_skycoord(column,row,wcs=wcs)
+        ractr = skyposctr.ra.deg
+        decctr = skyposctr.dec.deg
+
+        cd11 = self.keywords['CD1_1']
+        cd12 = self.keywords['CD1_2']
+        cd21 = self.keywords['CD2_1']
+        cd22 = self.keywords['CD2_2']
+
+        hdu.header['1CRV4P'] = detcol - (tpfsize-1)/2
+        hdu.header['2CRV4P'] = detrow - (tpfsize-1)/2
+        hdu.header['1CRPX4'] = (tpfsize + 1)/2
+        hdu.header['2CRPX4'] = (tpfsize + 1)/2
+
+        hdu.header['1CRV5P'] = detcol - (tpfsize-1)/2
+        hdu.header['2CRV5P'] = detrow - (tpfsize-1)/2
+        hdu.header['2CRPX5'] = (tpfsize + 1)/2
+        hdu.header['1CRPX5'] = (tpfsize + 1)/2
+
+        hdu.header['1CRVL5'] = ractr
+        hdu.header['2CRVL5'] = decctr
+        cdelt = hdu.header['2CDLT5']
+        hdu.header['11PC5'] = -1.0*cd11/cdelt
+        hdu.header['12PC5'] = -1.0*cd12/cdelt
+        hdu.header['21PC5'] = cd21/cdelt
+        hdu.header['22PC5'] = cd22/cdelt
+
+        hdu.header['1CRV6P'] = detcol - (tpfsize-1)/2
+        hdu.header['2CRV6P'] = detrow - (tpfsize-1)/2
+        hdu.header['1CRPX6'] = (tpfsize + 1)/2
+        hdu.header['2CRPX6'] = (tpfsize + 1)/2
+
+        hdu.header['1CRV7P'] = detcol - (tpfsize-1)/2
+        hdu.header['2CRV7P'] = detrow - (tpfsize-1)/2
+        hdu.header['1CRPX7'] = (tpfsize + 1)/2
+        hdu.header['2CRPX7'] = (tpfsize + 1)/2
+
+        hdu.header['1CRV8P'] = detcol - (tpfsize-1)/2
+        hdu.header['2CRP8P'] = detrow - (tpfsize-1)/2
+        hdu.header['1CRPX8'] = (tpfsize + 1)/2
+        hdu.header['2CRPX8'] = (tpfsize + 1)/2
+
+        hdu.header['1CRV9P'] = detcol - (tpfsize-1)/2
+        hdu.header['2CRV9P'] = detrow - (tpfsize-1)/2
+        hdu.header['1CRPX9'] = (tpfsize + 1)/2
+        hdu.header['2CRPX9'] = (tpfsize + 1)/2
 
         return hdu
 
@@ -1062,6 +1128,11 @@ class KeplerTargetPixelFileFactory(object):
                 except KeyError:
                     hdu.header[kw] = (template[kw],
                                       template.comments[kw])
+
+        # Override the defaults where necessary
+        for keyword in ['CTYPE1','CTYPE2','CRPIX1','CRPIX2', 'CRVAL1','CRVAL2', 'CUNIT1',
+                        'CUNIT2', 'CDELT1', 'CDELT2','PC1_1','PC1_2','PC2_1','PC2_2']:
+                hdu.header[keyword] = "" #override wcs keywords
         hdu.header['EXTNAME'] = 'APERTURE'
         return hdu
 
