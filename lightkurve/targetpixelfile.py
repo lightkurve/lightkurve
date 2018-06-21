@@ -1023,7 +1023,7 @@ class KeplerTargetPixelFileFactory(object):
                                 array=self.pos_corr2))
         coldefs = fits.ColDefs(cols)
         hdu = fits.BinTableHDU.from_columns(coldefs)
-
+        #WCS needs to be added here 
         # Set the header with defaults
         template = self._header_template(1)
         for kw in template:
@@ -1036,7 +1036,7 @@ class KeplerTargetPixelFileFactory(object):
                                       template.comments[kw])
 
         # Override the defaults where necessary
-        hdu.header['EXTNAME'] = 'TARGETTABLES'
+        hdu.header['EXTNAME'] = 'TARGETTABLES' ##this is already in the default file?
         hdu.header['OBJECT'] = self.target_id
         hdu.header['KEPLERID'] = self.target_id
         for n in [5, 6, 7, 8, 9]:
