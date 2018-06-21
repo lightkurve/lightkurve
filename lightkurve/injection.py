@@ -124,40 +124,41 @@ class TransitModel(object):
 
     """
 
-    def __init__(self, period, rprs, zpt, **kwargs):
+    def __init__(self, zpt = 1.0, rho=1.5, ld1 = 0.2, ld2=0.4, ld3=0.0, ld4=0.0, dil=0.0):
+        """Initialize the star."""
 
-        if isinstance(period, (GaussianDistribution, UniformDistribution)):
-            self.period = [period.sample()]
-        else:
-            self.period = [period]
+        """
+        self.planet_num = 0
+        self.T0 = []
+        self.period = []
+        self.impact = []
+        self.rprs = []
+        self.ecosw = []
+        self.esinw = []
+        self.occ = []
+        self.ell = []
+        self.alb = []
+        """
 
-        if isinstance(rprs, (GaussianDistribution, UniformDistribution)):
-            self.rprs = [rprs.sample()]
-        else:
-            self.rprs = [rprs]
-
-        self.star_params = {}
-        self.planet_params = {}
-        for key, value in kwargs.items():
-            if key in ('rho', 'ld1', 'ld2', 'ld3', 'ld4', 'dil', 'zpt'):
-                if isinstance(value, (GaussianDistribution, UniformDistribution)):
-                    self.star_params[key] = [value.sample()]
-                else:
-                    self.star_params[key] = [value]
-            else:
-                if isinstance(value, (GaussianDistribution, UniformDistribution)):
-                    self.planet_params[key] = [value.sample()]
-                else:
-                    self.planet_params[key] = [value]
-
+        self.rho = rho
+        self.ld1 = ld1
+        self.ld2 = ld2
+        self.ld3 = ld3
+        self.ld4 = ld4
+        self.dil = dil
         self.zpt = zpt
-        self.planet_num = 1
+
+        self.model = ktransit.LCModel()
+        self.model.add_star(zpt=self.zpt, rho=self.rho, ld1=self.ld1, ld2=self.ld2, ld3=self.ld3,
+                            ld4=self.ld4, dil=self.dil)
+
         self.multiplicative = True
 
     def __repr__(self):
         return 'TransitModel(' + str(self.__dict__) + ')'
 
-    def add_planet(self, period, rprs, **added_planet_params):
+    def add_planet(self, period, rprs, T0, impact=0.0, ecosw=0.0, esinw=0.0,
+                    rvamp = 0.0, occ=0.0, alb=0.0):
         """Modifies existing TransitModel object by adding another planet.
 
         Parameters
@@ -174,19 +175,41 @@ class TransitModel(object):
             Dictonary of planet parameters (options the same as in TransitModel)
         """
 
-        self.planet_num += 1
-        self.add_planet_attributes(**added_planet_params)
-        self.period[self.planet_num-1] = period
-        self.rprs[self.planet_num-1] = rprs
-        for key, value in added_planet_params.items():
-            self.planet_params[key][self.planet_num-1] = value
 
-    def add_planet_attributes(self, **added_planet_params):
+
+        """
+        self.T0 = T0
+        self.period = period
+        self.impact = impact
+        self.rprs = rprs
+        self.ecosw = ecosw
+        self.esinw = esinw
+        self.occ = occ
+        self.alb = alb
+        self.planet_num += 1
+        self.add_planet_attributes(self.period, self.rprs, self.T0, self.impact,
+                                        self.ecosw, self.esinw,
+                                        self.occ, self.alb)
+        self.period[self.planet_num-1] = period
+        self.impact[self.planet_num-1] = impact
+        self.rprs[self.planet_num-1] = rprs
+        self.ecosw[self.planet_num-1] = ecosw
+        self.esinw[self.planet_num-1] = esinw
+        self.occ[self.planet_num-1] = occ
+        self.alb[self.planet_num-1] = alb
+        """
+
+    def add_planet_attributes(self, period, rprs, T0, impact=0.0, ecosw=0.0,
+                                esinw=0.0, occ=0.0, alb=0.0):
         """Helper class for add_planet."""
         self.period = np.r_[self.period, 0.0]
         self.rprs = np.r_[self.rprs, 0.0]
-        for key in added_planet_params.items():
-            self.planet_params[key[0]] = np.r_[self.planet_params[key[0]], 0.0]
+        self.T0 = np.r_[self.T0, 0.0]
+        self.impact = np.r_[self.impact, 0.0]
+        self.ecosw = np.r_[self.ecosw, 0.0]
+        self.esinw = np.r_[self.esinw, 0.0]
+        self.occ = np.r_[self.occ, 0.0]
+        self.alb = np.r_[self.alb, 0.0]
 
     def evaluate(self, time):
         """Evaluates synthetic transiting planet light curve from model.
