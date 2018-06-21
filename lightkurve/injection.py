@@ -95,40 +95,34 @@ class TransitModel(object):
     ----------
     zpt : float
         A photometric zeropoint
-    rho : float
-        Mean stellar density in cgs units
-    ld1, ld2, ld3, ld4 : floats
-        Limb darkening coefficients
-    dil : float
-        Fraction of transit diluted
+    **kwargs : dict
+        Star parameters
 
     """
 
-    def __init__(self, zpt=1.0, rho=1.5, ld1=0.2, ld2=0.4, ld3=0.0, ld4=0.0, dil=0.0):
-        """Initialize the star."""
+    def __init__(self):
         import ktransit
-
-        self.ld1 = ld1
-        self.ld2 = ld2
-        self.ld3 = ld3
-        self.ld4 = ld4
-
-        self.rho = rho
-
-        self.dil = dil
-        self.zpt = zpt
-
-        self.model = ktransit.LCModel()
-        self.model.add_star(zpt=self.zpt, rho=self.rho, ld1=self.ld1, ld2=self.ld2, ld3=self.ld3,
-                            ld4=self.ld4, dil=self.dil)
-
         self.multiplicative = True
+        self.model = ktransit.LCModel()
 
     def __repr__(self):
         return 'TransitModel(' + str(self.__dict__) + ')'
 
-    def add_planet(self, period, rprs, T0, impact=0.0, ecosw=0.0, esinw=0.0,
-                    occ=0.0, alb=0.0):
+    def add_star(self, zpt=1.0, **kwargs):
+        """Initialize the star."""
+
+        self.zpt = zpt
+
+        self.star_params = {}
+        for key, value in kwargs.items():
+            if isinstance(value, (GaussianDistribution, UniformDistribution)):
+                self.star_params[key] = value.sample()
+            else:
+                self.star_params[key] = value
+
+        self.model.add_star(zpt=self.zpt, **self.star_params)
+
+    def add_planet(self, period, rprs, T0, **kwargs):
         """Modifies existing TransitModel object by adding another planet.
 
         Parameters
@@ -141,18 +135,35 @@ class TransitModel(object):
             Orbital period of new planet
         rprs : float
             Planet radius/star radius of new planet
-        **added_planet_params : dict
-            Dictonary of planet parameters (options the same as in TransitModel)
+        **kwargs : dict
+            Dictonary of planet parameters
         """
 
-        self.model.add_planet(period=period, rprs=rprs, T0=T0, impact=impact, ecosw=ecosw,
-                        esinw=esinw, occ=occ, alb=alb)
+        if isinstance(period, (GaussianDistribution, UniformDistribution)):
+            self.period = period.sample()
+        else:
+            self.period = period
+        if isinstance(rprs, (GaussianDistribution, UniformDistribution)):
+            self.rprs = rprs.sample()
+        else:
+            self.rprs = rprs
+        if isinstance(T0, (GaussianDistribution, UniformDistribution)):
+            self.T0 = T0.sample()
+        else:
+            self.T0 = T0
+
+        self.planet_params = {}
+        for key, value in kwargs.items():
+            if isinstance(value, (GaussianDistribution, UniformDistribution)):
+                self.planet_params[key] = value.sample()
+            else:
+                self.planet_params[key] = value
+
+        self.model.add_planet(period=self.period, rprs=self.rprs, T0=self.T0, **self.planet_params)
 
     def evaluate(self, time):
-
         self.model.add_data(time=time)
         transit_flux = self.model.transitmodel
-
         return transit_flux
 
 class SupernovaModel(object):
