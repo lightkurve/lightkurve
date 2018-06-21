@@ -109,7 +109,23 @@ class TransitModel(object):
         return 'TransitModel(' + str(self.__dict__) + ')'
 
     def add_star(self, zpt=1.0, **kwargs):
-        """Initialize the star."""
+        """Initializes the star.
+
+        Parameters
+        ----------
+        Default values are those initialized in TransitModel.
+        A parameter must be defined in the initialization of
+        TransitModel if it is to be changed in add_planet.
+
+        zpt : float
+            A photometric zeropoint
+        **kwargs : dict
+            Dictonary of planet parameters. Options are:
+                rho : stellar density
+                ld1, ld2, ld3, ld3 : limb darkening coefficients
+                dil : transit dilution fraction
+                veloffset : (not sure what this is)
+        """
 
         self.zpt = zpt
 
@@ -123,20 +139,24 @@ class TransitModel(object):
         self.model.add_star(zpt=self.zpt, **self.star_params)
 
     def add_planet(self, period, rprs, T0, **kwargs):
-        """Modifies existing TransitModel object by adding another planet.
+        """Adds a planet to TransitModel object.
 
         Parameters
         ----------
-        Default values are those initialized in TransitModel.
-        A parameter must be defined in the initialization of
-        TransitModel if it is to be changed in add_planet.
-
         period : float
             Orbital period of new planet
         rprs : float
             Planet radius/star radius of new planet
+        T0 : float
+            A transit mid-time
         **kwargs : dict
-            Dictonary of planet parameters
+            Dictonary of planet parameters. Options are:
+                impact: an impact parameter
+                ecosw, esinw : an eccentricity vector
+                occ : a secondary eclipse depth
+                rvamp : (not sure)
+                ell : (not sure)
+                alb : (not sure)
         """
 
         if isinstance(period, (GaussianDistribution, UniformDistribution)):
@@ -162,6 +182,19 @@ class TransitModel(object):
         self.model.add_planet(period=self.period, rprs=self.rprs, T0=self.T0, **self.planet_params)
 
     def evaluate(self, time):
+        """Creates lightcurve from model.
+
+        Parameters
+        ----------
+        time : array-like
+            Time array over which to create lightcurve
+            
+        Returns
+        _______
+        transit_flux : array-like
+            Flux array of lightcurve
+
+        """
         self.model.add_data(time=time)
         transit_flux = self.model.transitmodel
         return transit_flux
