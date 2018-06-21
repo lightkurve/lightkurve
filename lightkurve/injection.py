@@ -1,7 +1,7 @@
 """Defines UniformDistribution, GaussianDistribution, TransitModel, and SupernovaModel"""
 
 import numpy as np
-from lightkurve import LightCurve
+import lightkurve
 import matplotlib.pyplot as plt
 from scipy.stats import norm
 
@@ -102,6 +102,7 @@ class TransitModel(object):
 
     def __init__(self):
         import ktransit
+        self.signaltype = 'Planet'
         self.multiplicative = True
         self.model = ktransit.LCModel()
 
@@ -179,6 +180,11 @@ class TransitModel(object):
             else:
                 self.planet_params[key] = value
 
+        self.params = self.star_params.copy()
+        self.params.update(self.planet_params)
+        default_params = {'period':self.period, 'rprs':self.rprs, 'T0':self.T0}
+        self.params.update(default_params)
+
         self.model.add_planet(period=self.period, rprs=self.rprs, T0=self.T0, **self.planet_params)
 
     def evaluate(self, time):
@@ -188,7 +194,7 @@ class TransitModel(object):
         ----------
         time : array-like
             Time array over which to create lightcurve
-            
+
         Returns
         _______
         transit_flux : array-like
@@ -220,6 +226,7 @@ class SupernovaModel(object):
     """
     def __init__(self, T0, source='hsiao', bandpass='kepler', z=0.5, **kwargs):
 
+        self.signaltype = 'Supernova'
         self.source = source
         self.T0 = T0
         self.bandpass = bandpass
@@ -285,4 +292,5 @@ def inject(lc, model):
         mergedflux = lc.flux * model.evaluate(lc.time)
     else:
         mergedflux = lc.flux + model.evaluate(lc.time)
-    return LightCurve(lc.time, flux=mergedflux, flux_err=lc.flux_err)
+    return lightkurve.lightcurve.SyntheticLightCurve(lc.time, flux=mergedflux, flux_err=lc.flux_err,
+                               signaltype=model.signaltype, **model.params)

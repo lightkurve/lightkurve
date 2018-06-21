@@ -742,85 +742,6 @@ class LightCurve(object):
             hdu.writeto(path, overwrite=overwrite, checksum=True)
         return hdu
 
-    def inject_sn(self, t0, source, bandpass='kepler', **kwargs):
-        """Injects a supernova into the lightcurve flux
-
-        Parameters
-        ----------
-        t0 : float
-            time of supernova's peak brightness
-        source : string, default 'hsiao'
-            Source of supernova model. Default is the hsiao model:
-            http://adsabs.harvard.edu/abs/2007ApJ...663.1187H
-        bandpass : string, default 'kepler'
-            Bandpass defined by sncosmo. Built-in bandpasses here:
-            https://sncosmo.readthedocs.io/en/v1.6.x/bandpass-list.html
-        kwargs : dict
-            Dictionary of keyword arguments to be passed to model.set that
-            specify the supernova based on the chosen model.
-
-        Returns
-        -------
-        lc : LightCurve class
-            Returns a lightcurve possessing a synthetic supernova signal.
-        """
-
-        import sncosmo
-
-        model = sncosmo.Model(source=source)
-        model.set(t0=t0, **kwargs)
-        bandflux = model.bandflux(bandpass, self.time)
-        mergedflux = self.flux + bandflux
-
-        return LightCurve(self.time, flux=mergedflux, flux_err=self.flux_err)
-
-    def inject_transit(self, t0, period, rprs, rho=1.5, ld1=0.2, ld2=0.4, ld3=0, ld4=0, dil=0.0, zpt=1.0,
-                        impact=0.0, ecosw=0.0, esinw=0.0, occ=0.0):
-        """Injects a supernova into the lightcurve flux
-
-        Parameters
-        ----------
-        t0 : float
-            a transit mid-time
-        period : float
-            an orbital period in days
-        rprs : float
-            ratio of planet radius to star radius
-        rho : float, default 1.5
-            mean stellar density (in cgs units)
-        ld1, ld2, ld3, ld4 : floats, default ld1 = 0.2, ld2 = 0.4, ld3 = 0.0, ld4 = 0.0 (quadratic limb darkening)
-            limb darkening coefficients
-        dil : float, default 0.0
-            transit dilution factor
-        zpt : float, default 1.0
-            a photometric zeropoint
-        impact : float, default 0.0
-            an impact parameter
-        ecosw, esinw : floats, default ecosw = 0.0, esinw = 0.0
-            an eccentricity vector
-        occ : float, default 0.0
-            a secondary eclipse depth (in ppm)
-
-        Returns
-        -------
-        lc : LightCurve class
-            Returns a lightcurve possessing a synthetic supernova signal.
-        """
-
-        import ktransit
-
-        model = ktransit.LCModel()
-        model.add_star(rho=1.5, ld1=ld1, ld2=ld2, ld3=ld3, ld4=ld4, dil=dil, zpt=zpt)
-        model.add_planet(T0=t0, period=period, impact=impact, rprs=rprs,
-                         ecosw=ecosw, esinw=esinw, occ=occ)
-        model.add_data(time=self.time)
-
-        transit_flux = model.transitmodel
-        mergedflux = self.flux * transit_flux
-        #if zpt is 0.0, will this work?
-
-        return LightCurve(self.time, flux=mergedflux, flux_err=self.flux_err)
-
     def recover_sn(self, model='hsiao', **kwargs):
         """docstring"""
         import sncosmo
@@ -847,6 +768,40 @@ class FoldedLightCurve(LightCurve):
         return ax
 
 
+class SyntheticLightCurve(LightCurve):
+    """Defines a light curve class for synthetic lightcurves.
+
+    Attributes
+    ----------
+    time : array-like
+        Time measurements
+    flux : array-like
+        Data flux for every time point
+    flux_err : array-like
+        Uncertainty on each flux data point
+    **kwargs : dict
+        Parameters of injected light curve. Options given in
+        injection.py.
+    """
+
+    def __init__(self, time, flux=None, flux_err=None, time_format=None, time_scale=None, signaltype=None, **kwargs):
+        super(SyntheticLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err, time_format=time_format, time_scale=time_scale)
+
+        self.signaltype = signaltype
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+    def __repr__(self):
+        if self.signaltype is None:
+            return('No signal injected')
+        elif self.signaltype is 'Supernova':
+            return('Supernova Source: {})'.format(self.source))
+        elif self.signaltype is 'Planet':
+            return('Planet period: {} '.format(self.period)
+                    + 'Planet Rp/Rs: {}'.format(self.rprs))
+
+    def chisq(self):
+        pass
 
 
 class KeplerLightCurve(LightCurve):
