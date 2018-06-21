@@ -1,5 +1,6 @@
 from __future__ import division, print_function
 
+import logging
 from matplotlib import pyplot as plt
 import numpy as np
 from tqdm import tqdm
@@ -15,6 +16,9 @@ __all__ = ['StarPrior', 'FocusPrior', 'MotionPrior',
            'StarParameters', 'BackgroundParameters', 'FocusParameters',
            'MotionParameters', 'SceneModelParameters',
            'SceneModel', 'PRFPhotometry']
+
+
+log = logging.getLogger(__name__)
 
 
 class StarPrior(object):
@@ -462,7 +466,7 @@ class PRFPhotometry():
         self.model = model
         self.results = []
     
-    def run(self, tpf_flux):
+    def run(self, tpf_flux, pos_corr1=None, pos_corr2=None):
         """Fits the scene model to the flux data.
 
         Parameters
@@ -473,7 +477,11 @@ class PRFPhotometry():
             the shape of ``tpf_flux``.
         """
         self.results = []
-        for cadence in tqdm((range(len(tpf_flux)))):
+        for cadence in tqdm(range(len(tpf_flux))):
+            if pos_corr1 is not None and np.abs(pos_corr1[cadence]) < 50:
+                self.model.motion_prior.shift_col.mean = pos_corr1[cadence]
+            if pos_corr2 is not None and np.abs(pos_corr2[cadence]) < 50:
+                self.model.motion_prior.shift_row.mean = pos_corr2[cadence]
             self.results.append(self.model.fit(tpf_flux[cadence]))
         # Parse results
         self.lightcurves = [self._parse_lightcurve(star_idx)
@@ -529,8 +537,8 @@ def _example():
 
     # First, set up a simple scene model with one star and no motion or focus changes
     col, row = np.nanmedian(tpf.centroids(), axis=1)
-    star_prior = StarPrior(col=GaussianPrior(mean=col, var=2**2),
-                           row=GaussianPrior(mean=row, var=2**2),
+    star_prior = StarPrior(col=GaussianPrior(mean=col[0], var=2**2),
+                           row=GaussianPrior(mean=row[0], var=2**2),
                            flux=UniformPrior(lb=0, ub=maxflux),
                            targetid=tpf.keplerid)
     model = SceneModel(star_priors=[star_prior],
@@ -539,12 +547,12 @@ def _example():
                        focus_prior=FocusPrior(scale_col=GaussianPrior(mean=1, var=0.0001),
                                               scale_row=GaussianPrior(mean=1, var=0.0001),
                                               rotation_angle=UniformPrior(lb=-3.1415, ub=3.1415)),
-                       motion_prior=MotionPrior(shift_col=UniformPrior(lb=-0.1, ub=0.1),
-                                                shift_row=UniformPrior(lb=-0.1, ub=0.1)),
+                       motion_prior=MotionPrior(shift_col=GaussianPrior(mean=0., var=0.01),
+                                                shift_row=GaussianPrior(mean=0., var=0.01)),
                        fix_background=False,
                        fix_focus=False,
                        fix_motion=False)
 
     pp = PRFPhotometry(model)
-    pp.run(tpf.flux[1650:1850])
+    pp.run(tpf.flux[1650:1850], pos_corr1=tpf.pos_corr1[1650:1850], pos_corr2=tpf.pos_corr2[1650:1850])
     pp.plot_results()
