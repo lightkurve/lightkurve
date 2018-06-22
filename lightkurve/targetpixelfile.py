@@ -197,7 +197,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         return('KeplerTargetPixelFile Object (ID: {})'.format(self.keplerid))
 
 
-    def find_stars(self, catalog=None, radius=0.5):
+    def query_catalog(self, catalog=None, radius=0.5):
         """
         Load tpf file to find field stars within the tpf.
 
@@ -243,6 +243,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
         if catalog is "Gaia":
             log.warn('Gaia RAs and Decs are at EPOC 2015.5. These RA/Decs have not been corrected.')
+            log.warn('Gaia magnitude is in Gaia Gmag')
 
         # Vizier id's
         ID = {"KIC":
@@ -250,50 +251,37 @@ class KeplerTargetPixelFile(TargetPixelFile):
                      'parameters':["KIC", "RAJ2000", "DEJ2000", "pmRA", "pmDE", "kepmag"]},
                "EPIC":
                {'vizier':"IV/34/epic",
-                'parameters':["ID", "RAJ2000", "DEJ2000", "pmRA", "pmDEC", "e_pmRA", "e_pmDEC", "Kpmag"]},
+                'parameters':["ID", "RAJ2000", "DEJ2000", "pmRA", "pmDEC", "Kpmag","e_pmRA", "e_pmDEC"]},
                "Gaia":
                {'vizier':"I/345/gaia2",
                'parameters':["DR2Name", "RA_ICRS", "DE_ICRS", "pmRA", "pmDE", "e_pmRA", "e_pmDE", "Gmag"]}}
 
         # identifies catalog
-        viz_id = (ID[catalog])['vizier']
-        pars = (ID[catalog])['parameters']
+        viz_id = ID[catalog]['vizier']
 
         #Skycoord the centre of target
         cent = SkyCoord(ra=self.ra, dec=self.dec, frame='icrs', unit=(u.deg, u.deg))
 
         # Choose columns from Vizier
-        v = Vizier(catalog=[viz_id], columns=pars)
+        v = Vizier(catalog=[viz_id], columns=ID[catalog]['parameters'])
         # query around cent. with radius
         result = v.query_region(cent, radius=radius*u.arcmin, catalog=viz_id)
 
-        # Rename names in KIC for consistency with EPIC
-        result[viz_id]['KIC'].name = 'ID'
-        result[viz_id]['pmDE'].name = 'pmDEC'
-        result[viz_id]['kepmag'].name = 'Kpmag'
+        new_pars_kepler = ['ID', 'RAJ200', 'DEC', 'pmRA', 'pmDEC', 'kpmag']
+        new_pars_gaia = ['ID', 'RAJ2015', 'DEJ2015', 'pmRA', 'pmDEC', 'e_pmRA', 'e_pmDEC', 'Gmag' ]
+        if catalog == 'KIC':
+            for i in range(len(new_pars_kepler)):
+                result[viz_id].rename_column(result[viz_id].colnames[i], new_pars_kepler[i])
+        elif catalog == 'Gaia':
+            for i in range(len(new_pars_gaia)):
+                result[viz_id].rename_column(result[viz_id].colnames[i], new_pars_gaia[i])
+
 
         # Queried stats
         data = result[viz_id]
 
-        # Load ra & dec of all tpf pixels
-        gc_ra, gc_dec = self.get_coordinates(cadence='all')
+        return (data)
 
-        # Reduce calculation for astroy seperation
-        c1 = np.asarray([gc_ra.ravel(), gc_dec.ravel()])
-        co = np.round(c1, decimals=5)
-
-        # Return unique pairs
-        pairs_gc = (np.unique(co, axis=1))
-
-        # Make pairs_gc into SkyCoord
-        sky_pairs_gc = SkyCoord(ra=pairs_gc[0]*u.deg, dec=pairs_gc[1]*u.deg, frame='icrs', unit=(u.deg, u.deg))
-        # Make pairs in sky_data
-        sky_data = SkyCoord(ra=data['RAJ2000'], dec=data['DEJ2000'], frame='icrs', unit=(u.deg, u.deg))
-
-        for i in range (0, len(data)):
-            # seperation between tpf pixels and queried stats
-            s = sky_pairs_gc.separation(sky_data[i])
-            store = np.any(s.arcsec<=11)
 
     @property
     def hdu(self):
