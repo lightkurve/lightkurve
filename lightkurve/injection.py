@@ -51,8 +51,7 @@ class GaussianDistribution(object):
         self.var = var
 
     def __repr__(self):
-        return 'GaussianDistribution(mean={}, var={})'.format(self.mean,
-                                         self.var)
+        return 'GaussianDistribution(mean={}, var={})'.format(self.mean, self.var)
 
     def sample(self):
         """Returns a value from a Gaussian distribution."""
