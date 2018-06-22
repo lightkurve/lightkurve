@@ -25,23 +25,13 @@ class UniformDistribution(object):
                                          self.ub)
 
     def sample(self):
-        """Chooses values from uniform distribution.
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        values : array-like
-            Returns array of randomly chosen values.
-        """
+        """Returns a value from a uniform distribution."""
         return np.random.uniform(self.lb, self.ub)
 
     def plot(self):
         """Plots specified distribution."""
-        t = np.arange(self.lb, self.ub, 0.01)
-        vals = [1]*len(t)
+        t = np.linspace(self.lb*0.9, self.ub*1.1, 1000)
+        vals = [1] * len(t)
         plt.plot(t, vals)
         plt.ylim(0, 2)
 
@@ -61,21 +51,11 @@ class GaussianDistribution(object):
         self.var = var
 
     def __repr__(self):
-        return 'GaussianDistribution(mean={},var={})'.format(self.mean,
+        return 'GaussianDistribution(mean={}, var={})'.format(self.mean,
                                          self.var)
 
     def sample(self):
-        """Chooses values from Gaussian distribution.
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        values : array-like
-            Returns array of randomly chosen values.
-        """
+        """Returns a value from a Gaussian distribution."""
         return np.random.normal(self.mean, self.var)
 
     def plot(self):
@@ -89,7 +69,6 @@ class GaussianDistribution(object):
 class TransitModel(object):
     """
     Implements a class for creating a transiting model using ktransit.
-    When you initialize the model, you must set parameters for the star.
 
     Attributes
     ----------
@@ -160,18 +139,12 @@ class TransitModel(object):
                 alb : (not sure)
         """
 
-        if isinstance(period, (GaussianDistribution, UniformDistribution)):
-            self.period = period.sample()
-        else:
-            self.period = period
-        if isinstance(rprs, (GaussianDistribution, UniformDistribution)):
-            self.rprs = rprs.sample()
-        else:
-            self.rprs = rprs
-        if isinstance(T0, (GaussianDistribution, UniformDistribution)):
-            self.T0 = T0.sample()
-        else:
-            self.T0 = T0
+        params = {'period':period, 'rprs':rprs, 'T0':T0}
+        for key, val in params.items():
+            if isinstance(val, (GaussianDistribution, UniformDistribution)):
+                setattr(self, key, val.sample())
+            else:
+                setattr(self, key, val)
 
         self.planet_params = {}
         for key, value in kwargs.items():
@@ -182,8 +155,8 @@ class TransitModel(object):
 
         self.params = self.star_params.copy()
         self.params.update(self.planet_params)
-        default_params = {'period':self.period, 'rprs':self.rprs, 'T0':self.T0}
-        self.params.update(default_params)
+        required_params = {'period':self.period, 'rprs':self.rprs, 'T0':self.T0}
+        self.params.update(required_params)
 
         self.model.add_planet(period=self.period, rprs=self.rprs, T0=self.T0, **self.planet_params)
 
@@ -203,12 +176,11 @@ class TransitModel(object):
         """
         self.model.add_data(time=time)
         transit_flux = self.model.transitmodel
+        transit_flux_dict = {'signal':transit_flux}
+        self.params.update(transit_flux_dict)
         return transit_flux
 
 class SupernovaModel(object):
-
-    from lightkurve.injection import GaussianDistribution
-    from lightkurve.injection import UniformDistribution
     """
     Implements a class for creating a supernova model using sncosmo.
 
@@ -236,12 +208,12 @@ class SupernovaModel(object):
             self.z = z
         self.multiplicative = False
 
-        self.params = {}
+        self.sn_params = {}
         for key, value in kwargs.items():
             if isinstance(value, (GaussianDistribution, UniformDistribution)):
-                self.params[key] = value.sample()
+                self.sn_params[key] = value.sample()
             else:
-                self.params[key] = value
+                self.sn_params[key] = value
 
     def __repr__(self):
         return 'SupernovaModel(' + str(self.__dict__) + ')'
@@ -267,8 +239,12 @@ class SupernovaModel(object):
         import sncosmo
 
         model = sncosmo.Model(source=self.source)
-        model.set(t0=self.T0, z=self.z, **self.params)
+        model.set(t0=self.T0, z=self.z, **self.sn_params)
         bandflux = model.bandflux(self.bandpass, time)
+
+        self.params = self.sn_params.copy()
+        signal_dict = {'signal':bandflux}
+        self.params.update(signal_dict)
 
         return bandflux
 
