@@ -50,6 +50,25 @@ class StarPrior(object):
         return logp
 
 
+class BackgroundPrior():
+    """Container class to capture a user's beliefs about the background flux.
+
+    Parameters
+    ----------
+    flux : oktopus ``Prior`` object
+        Prior on the background flux in electrons/second per pixel.
+    """
+    def __init__(self, flux=UniformPrior(lb=-20, ub=20)):
+        self.flux = flux
+
+    def __repr__(self):
+        return ('<BackgroundPrior: flux={}>'.format(self.flux))
+
+    def evaluate(self, flux):
+        """Returns the prior probability for a given background flux value."""
+        return self.flux.evaluate(flux)
+
+
 class FocusPrior():
     """Container class to capture a user's beliefs about the telescope focus.
 
@@ -77,7 +96,7 @@ class FocusPrior():
         logp = (self.scale_col.evaluate(scale_col) +
                 self.scale_row.evaluate(scale_row) +
                 self.rotation_angle.evaluate(rotation_angle))
-        return logp  
+        return logp
 
 
 class MotionPrior(object):
@@ -183,12 +202,11 @@ class SceneModelParameters():
         out += '  Motion:\n    {}\n'.format(self.motion)
         if 'residual_image' in vars(self):
             out += '  Residual image:\n    {}'.format(self.residual_image[0][0:4])[:-1]
-            out +='...\n'
+            out += '...\n'
         if 'predicted_image' in vars(self):
             out += '  Predicted image:\n    {}'.format(self.predicted_image[0][0:4])[:-1]
-            out +='...\n'
+            out += '...\n'
         return out
-
 
     def to_array(self):
         """Converts the free parameters held by this class to an array of size (n,),
@@ -235,7 +253,7 @@ class SceneModelParameters():
             background = self.background
         else:
             background = BackgroundParameters(flux=array[next_idx])
-            next_idx += 1          
+            next_idx += 1
 
         if self.focus.fixed:
             focus = self.focus
@@ -250,7 +268,7 @@ class SceneModelParameters():
         else:
             motion = MotionParameters(shift_col=array[next_idx],
                                       shift_row=array[next_idx + 1])
-            
+
         return SceneModelParameters(stars=stars, background=background,
                                     focus=focus, motion=motion)
 
@@ -278,16 +296,16 @@ class SceneModel():
         If True, the telescope motion parameters will be kept fixed.
     """
     def __init__(self, star_priors=[],
-                 background_prior=GaussianPrior(mean=0, var=100),
-                 prfmodel=KeplerPRF(1, shape=(10,10), column=0, row=0),
+                 background_prior=BackgroundPrior(),
                  focus_prior=FocusPrior(),
                  motion_prior=MotionPrior(),
+                 prfmodel=KeplerPRF(1, shape=(10, 10), column=0, row=0),
                  fix_background=False, fix_focus=True, fix_motion=True):
         self.star_priors = star_priors
         self.background_prior = background_prior
-        self.prfmodel = prfmodel
         self.focus_prior = focus_prior
         self.motion_prior = motion_prior
+        self.prfmodel = prfmodel
         self.fix_background = fix_background
         self.fix_focus = fix_focus
         self.fix_motion = fix_motion
@@ -314,7 +332,7 @@ class SceneModel():
             initial_star_guesses.append(StarParameters(col=star.col.mean,
                                                        row=star.row.mean,
                                                        flux=star.flux.mean))
-        background = BackgroundParameters(flux=self.background_prior.mean,
+        background = BackgroundParameters(flux=self.background_prior.flux.mean,
                                           fixed=self.fix_background)
         focus = FocusParameters(scale_col=self.focus_prior.scale_col.mean,
                                 scale_row=self.focus_prior.scale_row.mean,
@@ -465,7 +483,7 @@ class PRFPhotometry():
     def __init__(self, model):
         self.model = model
         self.results = []
-    
+
     def run(self, tpf_flux, pos_corr1=None, pos_corr2=None):
         """Fits the scene model to the flux data.
 
@@ -486,7 +504,7 @@ class PRFPhotometry():
         # Parse results
         self.lightcurves = [self._parse_lightcurve(star_idx)
                             for star_idx in range(len(self.model.star_priors))]
-            
+
     def _parse_lightcurve(self, star_idx):
         # Create a lightcurve
         from . import LightCurve
@@ -502,7 +520,7 @@ class PRFPhotometry():
         for cadence in range(len(self.results)):
             bgflux.append(self.results[cadence].background.flux)
         return LightCurve(flux=bgflux)
-    
+
     def plot_results(self, star_idx=0):
         """Plot all the scene model parameters over time."""
         fig, ax = plt.subplots(10, sharex=True, figsize=(6, 10))
@@ -542,13 +560,13 @@ def _example():
                            flux=UniformPrior(lb=0, ub=maxflux),
                            targetid=tpf.keplerid)
     model = SceneModel(star_priors=[star_prior],
-                       background_prior=UniformPrior(lb=0, ub=10),
-                       prfmodel=tpf.get_prf_model(),
+                       background_prior=BackgroundPrior(),
                        focus_prior=FocusPrior(scale_col=GaussianPrior(mean=1, var=0.0001),
                                               scale_row=GaussianPrior(mean=1, var=0.0001),
                                               rotation_angle=UniformPrior(lb=-3.1415, ub=3.1415)),
                        motion_prior=MotionPrior(shift_col=GaussianPrior(mean=0., var=0.01),
                                                 shift_row=GaussianPrior(mean=0., var=0.01)),
+                       prfmodel=tpf.get_prf_model(),
                        fix_background=False,
                        fix_focus=False,
                        fix_motion=False)
