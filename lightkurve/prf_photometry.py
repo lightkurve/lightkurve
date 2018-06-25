@@ -135,42 +135,42 @@ class StarParameters(object):
 class BackgroundParameters(object):
     """Container class to hold the parameters of the background in a ``SceneModel``.
     """
-    def __init__(self, flux=0., err_flux=None, fixed=False):
+    def __init__(self, flux=0., err_flux=None, fitted=True):
         self.flux = flux
         self.err_flux = err_flux
-        self.fixed = fixed
+        self.fitted = fitted
 
     def __repr__(self):
-        r = "<BackgroundParameters: flux={:.3e}, fixed={}>".format(
-                    self.flux, self.fixed)
+        r = "<BackgroundParameters: flux={:.3e}, fitted={}>".format(
+                    self.flux, self.fitted)
         return r
 
 
 class FocusParameters(object):
     """Container class to hold the parameters of the telescope focus in a ``SceneModel``.
     """
-    def __init__(self, scale_col=1., scale_row=1., rotation_angle=0., fixed=False):
+    def __init__(self, scale_col=1., scale_row=1., rotation_angle=0., fitted=False):
         self.scale_col = scale_col
         self.scale_row = scale_row
         self.rotation_angle = rotation_angle
-        self.fixed = fixed
+        self.fitted = fitted
 
     def __repr__(self):
-        return "<FocusParameters: scale_col={:.3f}, scale_row={:.3f}, rotation_angle={:.3f}, fixed={}>".format(
-                    self.scale_col, self.scale_row, self.rotation_angle, self.fixed)
+        return "<FocusParameters: scale_col={:.3f}, scale_row={:.3f}, rotation_angle={:.3f}, fitted={}>".format(
+                    self.scale_col, self.scale_row, self.rotation_angle, self.fitted)
 
 
 class MotionParameters(object):
     """Container class to hold the parameters of the telescope motion in a ``SceneModel``.
     """
-    def __init__(self, shift_col=0., shift_row=0., fixed=False):
+    def __init__(self, shift_col=0., shift_row=0., fitted=False):
         self.shift_col = shift_col
         self.shift_row = shift_row
-        self.fixed = fixed
+        self.fitted = fitted
 
     def __repr__(self):
-        return "<MotionParameters: shift_col={:.3f}, shift_row={:.3f}, fixed={}>".format(
-                    self.shift_col, self.shift_row, self.fixed)
+        return "<MotionParameters: shift_col={:.3f}, shift_row={:.3f}, fitted={}>".format(
+                    self.shift_col, self.shift_row, self.fitted)
 
 
 class SceneModelParameters():
@@ -227,13 +227,13 @@ class SceneModelParameters():
             array.append(star.col)
             array.append(star.row)
             array.append(star.flux)
-        if not self.background.fixed:
+        if self.background.fitted:
             array.append(self.background.flux)
-        if not self.focus.fixed:
+        if self.focus.fitted:
             array.append(self.focus.scale_col)
             array.append(self.focus.scale_row)
             array.append(self.focus.rotation_angle)
-        if not self.motion.fixed:
+        if self.motion.fitted:
             array.append(self.motion.shift_col)
             array.append(self.motion.shift_row)
         return np.array(array)
@@ -249,13 +249,13 @@ class SceneModelParameters():
             stars.append(star)
             next_idx += 3
 
-        if self.background.fixed:
+        if not self.background.fitted:
             background = self.background
         else:
             background = BackgroundParameters(flux=array[next_idx])
             next_idx += 1
 
-        if self.focus.fixed:
+        if not self.focus.fitted:
             focus = self.focus
         else:
             focus = FocusParameters(scale_col=array[next_idx],
@@ -263,7 +263,7 @@ class SceneModelParameters():
                                     rotation_angle=array[next_idx + 2])
             next_idx += 3
 
-        if self.motion.fixed:
+        if not self.motion.fitted:
             motion = self.motion
         else:
             motion = MotionParameters(shift_col=array[next_idx],
@@ -288,27 +288,27 @@ class SceneModel():
         Beliefs about the telescope focus.
     motion_prior : ``MotionPrior`` object.
         Beliefs about the telescope motion.
-    fix_background : bool
-        If True, the background parameters will be kept fixed.
-    fix_focus : bool
-        If True, the telescope focus parameters will be kept fixed.
-    fix_motion : bool
-        If True, the telescope motion parameters will be kept fixed.
+    fit_background : bool
+        If False, the background parameters will be kept fixed.
+    fit_focus : bool
+        If False, the telescope focus parameters will be kept fixed.
+    fit_motion : bool
+        If False, the telescope motion parameters will be kept fixed.
     """
     def __init__(self, star_priors=[],
                  background_prior=BackgroundPrior(),
                  focus_prior=FocusPrior(),
                  motion_prior=MotionPrior(),
                  prfmodel=KeplerPRF(1, shape=(10, 10), column=0, row=0),
-                 fix_background=False, fix_focus=True, fix_motion=True):
+                 fit_background=True, fit_focus=False, fit_motion=False):
         self.star_priors = star_priors
         self.background_prior = background_prior
         self.focus_prior = focus_prior
         self.motion_prior = motion_prior
         self.prfmodel = prfmodel
-        self.fix_background = fix_background
-        self.fix_focus = fix_focus
-        self.fix_motion = fix_motion
+        self.fit_background = fit_background
+        self.fit_focus = fit_focus
+        self.fit_motion = fit_motion
         self.params = self.initial_guesses()
 
     def __repr__(self):
@@ -318,8 +318,8 @@ class SceneModel():
         out += '  Focus prior:\n    {}\n'.format(self.focus_prior)
         out += '  Motion prior:\n    {}\n'.format(self.motion_prior)
         out += '  PRF model:\n    {}\n'.format(self.prfmodel)
-        out += '  Fixed parameters:\n    fix_background={}, fix_focus={}, fix_motion={}\n'.format(
-                        self.fix_background, self.fix_focus, self.fix_motion)
+        out += '  Options:\n    fit_background={}, fit_focus={}, fit_motion={}\n'.format(
+                        self.fit_background, self.fit_focus, self.fit_motion)
         return out
 
     def initial_guesses(self):
@@ -333,14 +333,14 @@ class SceneModel():
                                                        row=star.row.mean,
                                                        flux=star.flux.mean))
         background = BackgroundParameters(flux=self.background_prior.flux.mean,
-                                          fixed=self.fix_background)
+                                          fitted=self.fit_background)
         focus = FocusParameters(scale_col=self.focus_prior.scale_col.mean,
                                 scale_row=self.focus_prior.scale_row.mean,
                                 rotation_angle=self.focus_prior.rotation_angle.mean,
-                                fixed=self.fix_focus)
+                                fitted=self.fit_focus)
         motion = MotionParameters(shift_col=self.motion_prior.shift_col.mean,
                                   shift_row=self.motion_prior.shift_row.mean,
-                                  fixed=self.fix_motion)
+                                  fitted=self.fit_motion)
         initial_params = SceneModelParameters(stars=initial_star_guesses,
                                               background=background,
                                               focus=focus,
@@ -392,13 +392,13 @@ class SceneModel():
         logp = 0
         for star, star_prior in zip(params.stars, self.star_priors):
             logp += star_prior.evaluate(col=star.col, row=star.row, flux=star.flux)
-        if not self.fix_background:
+        if self.fit_background:
             logp += self.background_prior.evaluate(params.background.flux)
-        if not self.fix_focus:
+        if self.fit_focus:
             logp += self.focus_prior.evaluate(params.focus.scale_col,
                                               params.focus.scale_row,
                                               params.focus.rotation_angle)
-        if not self.fix_motion:
+        if self.fit_motion:
             logp += self.motion_prior.evaluate(params.motion.shift_col,
                                                params.motion.shift_row)
         return logp
@@ -567,9 +567,9 @@ def _example():
                        motion_prior=MotionPrior(shift_col=GaussianPrior(mean=0., var=0.01),
                                                 shift_row=GaussianPrior(mean=0., var=0.01)),
                        prfmodel=tpf.get_prf_model(),
-                       fix_background=False,
-                       fix_focus=False,
-                       fix_motion=False)
+                       fit_background=True,
+                       fit_focus=True,
+                       fit_motion=True)
 
     pp = PRFPhotometry(model)
     pp.run(tpf.flux[1650:1850], pos_corr1=tpf.pos_corr1[1650:1850], pos_corr2=tpf.pos_corr2[1650:1850])
