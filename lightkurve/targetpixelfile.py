@@ -16,6 +16,7 @@ from astroquery.vizier import Vizier
 from astropy import units as u
 from astropy.coordinates import SkyCoord
 from astropy.table import Table
+import numpy.ma as ma
 
 
 from . import PACKAGEDIR
@@ -197,12 +198,10 @@ class KeplerTargetPixelFile(TargetPixelFile):
         return('KeplerTargetPixelFile Object (ID: {})'.format(self.keplerid))
 
 
-    def query_catalog(self, catalog=None, radius=0.5):
+    def query_catalog(self, catalog=None, radius=0.5, seperation_factor=12):
         """
-        Load tpf file to find field stars within the tpf.
-
-        Returns a crossmatched table of stars that are within the tpf file
-          given a tpf mission (either KIC or EPIC).
+        Returns a crossmatched table of stars that are centered on the target
+        of the tpf file. Current tables supported are KIC, EPIC and Gaia DR2.
 
         Parameters
         -----------
@@ -212,6 +211,11 @@ class KeplerTargetPixelFile(TargetPixelFile):
         radius: float
             Radius of cone search centered on the target in arcminutes.
             Default radius is 0.5 arcmin.
+        seperation_factor: float
+            Distance tolerance from the tpf pixel poistions. Will introduce
+            sources that fall outside the the tpf frame but account for the motions
+            of the source alongside with closeby targetsself.
+            Default value is 12 arcsec.
 
         Returns
         -------
@@ -243,7 +247,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
         if catalog is "Gaia":
             log.warn('Gaia RAs and Decs are at EPOC 2015.5. These RA/Decs have not been corrected.')
-            log.warn('Gaia magnitude is in Gaia Gmag')
 
         # Vizier id's
         ID = {"KIC":
@@ -264,24 +267,53 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
         # Choose columns from Vizier
         v = Vizier(catalog=[viz_id], columns=ID[catalog]['parameters'])
-        # query around cent. with radius
+        # query around centre with radius
         result = v.query_region(cent, radius=radius*u.arcmin, catalog=viz_id)
 
-        new_pars_kepler = ['ID', 'RAJ200', 'DEC', 'pmRA', 'pmDEC', 'kpmag']
-        new_pars_gaia = ['ID', 'RAJ2015', 'DEJ2015', 'pmRA', 'pmDEC', 'e_pmRA', 'e_pmDEC', 'Gmag' ]
-        if catalog == 'KIC':
-            for i in range(len(new_pars_kepler)):
-                result[viz_id].rename_column(result[viz_id].colnames[i], new_pars_kepler[i])
-        elif catalog == 'Gaia':
-            for i in range(len(new_pars_gaia)):
-                result[viz_id].rename_column(result[viz_id].colnames[i], new_pars_gaia[i])
-
+        # Rename column names
+        new_pars = ['ID', 'RA', 'DEC', 'pmRA', 'pmDEC']
+        for i in range(len(new_pars)):
+            result[viz_id].rename_column(result[viz_id].colnames[i], new_pars[i])
 
         # Queried stats
         data = result[viz_id]
 
-        return (data)
+        # Load ra & dec of all tpf pixels
+        pixels_ra, pixels_dec = self.get_coordinates(cadence='all')
 
+        # Reduce calculation for astroy seperation
+        c1 = np.asarray([pixels_ra.ravel(), pixels_dec.ravel()])
+        co = np.round(c1, decimals=5)
+
+        # Return unique pairs
+        pixel_pairs = (np.unique(co, axis=1))
+
+        # Make pixel pairs into SkyCoord
+        sky_pixel_pairs = SkyCoord(ra=pixel_pairs[0]*u.deg, dec=pixel_pairs[1]*u.deg, frame='icrs', unit=(u.deg, u.deg))
+        # Make pairs in sky_data
+        sky_data = SkyCoord(ra=data['RA'], dec=data['DEC'], frame='icrs', unit=(u.deg, u.deg))
+
+        seperation_mask = []
+        for i in range (len(data)):
+            s = sky_pixel_pairs.separation(sky_data[i]) # Estimate seperation
+            seperation = ~np.any(s.arcsec<=seperation_factor)
+            seperation_mask.append(seperation)
+
+        sep_mask = np.array(seperation_mask, dtype=bool)
+        # Append masked list to data table
+        for i in range (len(data.colnames)):
+            data[data.colnames[i]].mask = sep_mask
+
+        # Scan and remove masked values
+        masked_indicies = []
+        for i in range (0, len(data)):
+            find_masked = (data['ID'][i] is ma.masked)
+            # Find where masked values are true
+            if find_masked == True:
+                masked_indicies.append(i)
+        data.remove_rows(masked_indicies)
+
+        return (data)
 
     @property
     def hdu(self):
