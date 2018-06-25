@@ -54,11 +54,10 @@ def test_tpf_plot():
 def test_find():
     "Minimum sanity chech of the table it returns contains the coordinates of the tpf"
     tpf = KeplerTargetPixelFile(TABBY_TPF)
-    dat = tpf.find_stars()
+    dat = tpf.query_catalog()
     # Smallest number the query should find is at least 1
-    assert (len(dat['RAJ2000'])>=1)
-    assert (len(dat['ID'])) >= 1 
-
+    assert (len(dat['RA'])>=1)
+    assert (len(dat['ID'])) >= 1
 
 def test_tpf_zeros():
     """Does the LightCurve of a zero-flux TPF make sense?"""
