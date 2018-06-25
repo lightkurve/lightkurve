@@ -16,7 +16,7 @@ from astroquery.vizier import Vizier
 from astropy import units as u
 from astropy.coordinates import SkyCoord
 from astropy.table import Table
-import numpy.ma as ma
+import np.ma as ma
 
 from . import PACKAGEDIR
 from .lightcurve import KeplerLightCurve, LightCurve
@@ -276,46 +276,42 @@ class KeplerTargetPixelFile(TargetPixelFile):
         # Queried stats
         data = result[viz_id]
 
-        if nearby_sources == True:
+        # Load ra & dec of all tpf pixels
+        pixels_ra, pixels_dec = self.get_coordinates(cadence='all')
 
-            # Load ra & dec of all tpf pixels
-            pixels_ra, pixels_dec = self.get_coordinates(cadence='all')
+        # Reduce calculation for astroy seperation
+        c1 = np.asarray([pixels_ra.ravel(), pixels_dec.ravel()])
+        co = np.round(c1, decimals=5)
 
-            # Reduce calculation for astroy seperation
-            c1 = np.asarray([pixels_ra.ravel(), pixels_dec.ravel()])
-            co = np.round(c1, decimals=5)
+        # Return unique pairs
+        pixel_pairs = (np.unique(co, axis=1))
 
-            # Return unique pairs
-            pixel_pairs = (np.unique(co, axis=1))
+        # Make pixel pairs into SkyCoord
+        sky_pixel_pairs = SkyCoord(ra=pixel_pairs[0]*u.deg, dec=pixel_pairs[1]*u.deg, frame='icrs', unit=(u.deg, u.deg))
+        # Make pairs in sky_sources
+        sky_sources = SkyCoord(ra=data['RA'], dec=data['DEC'], frame='icrs', unit=(u.deg, u.deg))
 
-            # Make pixel pairs into SkyCoord
-            sky_pixel_pairs = SkyCoord(ra=pixel_pairs[0]*u.deg, dec=pixel_pairs[1]*u.deg, frame='icrs', unit=(u.deg, u.deg))
-            # Make pairs in sky_sources
-            sky_sources = SkyCoord(ra=data['RA'], dec=data['DEC'], frame='icrs', unit=(u.deg, u.deg))
+        seperation_mask = []
+        for i in range (len(data)):
+            s = sky_pixel_pairs.separation(sky_sources[i]) # Estimate seperation
+            seperation = ~np.any(s.arcsec<=seperation_factor)
+            seperation_mask.append(seperation)
 
-            seperation_mask = []
-            for i in range (len(data)):
-                s = sky_pixel_pairs.separation(sky_sources[i]) # Estimate seperation
-                seperation = ~np.any(s.arcsec<=dist_tolerance)
-                seperation_mask.append(seperation)
+        sep_mask = np.array(seperation_mask, dtype=bool)
+        # Append masked list to data table
+        for i in range (len(data.colnames)):
+            data[data.colnames[i]].mask = sep_mask
 
-            sep_mask = np.array(seperation_mask, dtype=bool)
-            # Append masked list to data table
-            for i in range (len(data.colnames)):
-                data[data.colnames[i]].mask = sep_mask
+        # Scan and remove masked values
+        masked_indicies = []
+        for i in range (0, len(data)):
+            find_masked = (data['ID'][i] is ma.masked)
+            # Find where masked values are true
+            if find_masked == True:
+                masked_indicies.append(i)
+        data.remove_rows(masked_indicies)
 
-            # Scan and remove masked values
-            masked_indicies = []
-            for i in range (0, len(data)):
-                find_masked = (data['ID'][i] is ma.masked)
-                # Find where masked values are true
-                if find_masked == True:
-                    masked_indicies.append(i)
-
-            data.remove_rows(masked_indicies)
-            return (data)
-        else:
-            return (data)
+        return (data)
 
     @property
     def hdu(self):
