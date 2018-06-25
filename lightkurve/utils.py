@@ -3,8 +3,15 @@ from __future__ import division, print_function
 from astropy.visualization import (PercentileInterval, ImageNormalize,
                                    SqrtStretch, LogStretch, LinearStretch)
 from astropy.time import Time
+from astroquery.vizier import Vizier
+from astropy.table import Table
+import astropy.units as u
+
 import matplotlib.pyplot as plt
 import numpy as np
+import logging
+
+log = logging.getLogger(__name__)
 
 
 __all__ = ['KeplerQualityFlags', 'TessQualityFlags', 'bkjd_to_astropy_time',
@@ -293,3 +300,72 @@ def plot_image(image, ax=None, scale='linear', origin='lower',
     if show_colorbar:
         plt.colorbar(cax, ax=ax, norm=norm, label=clabel)
     return ax
+
+
+
+def query_catalog(coordinate, catalog="KIC", radius=0.5):
+        """
+        Returns an astropy table of the sources inside a radius query.
+        Current catalogs supported are KIC, EPIC and Gaia DR2.
+
+        Parameters
+        -----------
+        coordinate : astropy.coordinates.SkyCoord
+            Coordinate to query around.
+        catalog: string
+            Indicate catalog assigned for mission. If Kepler, catalog will be KIC
+            if K2 catalog is EPIC.
+        radius: float
+            Radius of cone search centered on the target in arcminutes.
+            Default radius is 0.5 arcmin.
+
+        Returns
+        -------
+        result : astropy.table
+            Astropy table with the following columns
+        ID : astropy.table.column (KIC & EPIC)
+            Catalog ID from catalog.
+        RAJ200: astropy.table.column (KIC & EPIC)
+            Right ascension [degrees]
+        DEJ2000: astropy.table.column (KIC & EPIC)
+            Declination [deg]
+        pmRA: astropy.table.column (KIC & EPIC)
+            Proper motion for right ascension [mas/year]
+        pmDEC: astropy.table.column (KIC & EPIC)
+        Kpmag: astropy.table.column (KIC & EPIC)
+            Magnitude in Kepler band [mag]
+        """
+
+        if catalog is "Gaia":
+            log.warn('Gaia RAs and Decs are at EPOC 2015.5. These RA/Decs have not been corrected.')
+            log.warn('Gaia magnitudes are in Gaia Gmag not KepMag')
+
+        # Vizier id's
+        ID = {"KIC":
+                    {'vizier':"V/133/kic",
+                     'parameters': ["KIC", "RAJ2000", "DEJ2000", "pmRA", "pmDE", "kepmag"]},
+             "EPIC":
+                    {'vizier': "IV/34/epic",
+                     'parameters': ["ID", "RAJ2000", "DEJ2000", "pmRA", "pmDEC", "Kpmag"]},
+             "Gaia":
+                    {'vizier': "I/345/gaia2",
+                     'parameters': ["DR2Name", "RA_ICRS", "DE_ICRS", "pmRA", "pmDE", "Gmag"]}}
+
+        # identifies catalog
+        viz_id = ID[catalog]['vizier']
+
+        # Choose columns from Vizier
+        v = Vizier(catalog=[viz_id], columns=ID[catalog]['parameters'])
+        # query around centre with radius
+        result = v.query_region(coordinate, radius=radius, catalog=viz_id)
+        if len(result) == 0:
+            log.error('No sources found in queried region. Try another catalog.')
+
+        # Rename column names
+        new_pars = ['ID', 'RA', 'Dec', 'pmRA', 'pmDec', "mag"]
+        for i in range(len(new_pars)):
+            result[viz_id].rename_column(result[viz_id].colnames[i], new_pars[i])
+
+        # Queried stats
+        data = result[viz_id]
+        return data

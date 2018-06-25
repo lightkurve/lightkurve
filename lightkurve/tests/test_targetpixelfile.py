@@ -2,12 +2,16 @@ from __future__ import division, print_function
 
 import os
 from astropy.utils.data import get_pkg_data_filename
+from astropy.coordinates import SkyCoord
+import astropy.units as u
+
 import numpy as np
 from numpy.testing import assert_array_equal
 import pytest
 import tempfile
 from ..targetpixelfile import KeplerTargetPixelFile, KeplerTargetPixelFileFactory
-from ..utils import KeplerQualityFlags
+from ..utils import KeplerQualityFlags, query_catalog
+
 
 
 filename_tpf_all_zeros = get_pkg_data_filename("data/test-tpf-all-zeros.fits")
@@ -54,10 +58,17 @@ def test_tpf_plot():
 def test_find():
     "Minimum sanity chech of the table it returns contains the coordinates of the tpf"
     tpf = KeplerTargetPixelFile(TABBY_TPF)
-    dat = tpf.query_catalog()
+    dat = tpf.get_sources()
     # Smallest number the query should find is at least 1
-    assert (len(dat['RA'])>=1)
+    assert (len(dat['RA']) >= 1)
     assert (len(dat['ID'])) >= 1
+    assert np.any([d == tpf.keplerid for d in dat['ID']])
+    c = SkyCoord(60, 10, unit=(u.deg, u.deg))
+    result = query_catalog(c, 'Gaia', radius=1*u.arcmin)
+    assert len(result) == 3
+
+
+
 
 def test_tpf_zeros():
     """Does the LightCurve of a zero-flux TPF make sense?"""
