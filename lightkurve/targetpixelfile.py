@@ -251,13 +251,13 @@ class KeplerTargetPixelFile(TargetPixelFile):
         # Vizier id's
         ID = {"KIC":
                     {'vizier':"V/133/kic",
-                     'parameters':["KIC", "RAJ2000", "DEJ2000", "pmRA", "pmDE", "kepmag"]},
-               "EPIC":
-               {'vizier':"IV/34/epic",
-                'parameters':["ID", "RAJ2000", "DEJ2000", "pmRA", "pmDEC", "Kpmag","e_pmRA", "e_pmDEC"]},
-               "Gaia":
-               {'vizier':"I/345/gaia2",
-               'parameters':["DR2Name", "RA_ICRS", "DE_ICRS", "pmRA", "pmDE", "e_pmRA", "e_pmDE", "Gmag"]}}
+                     'parameters': ["KIC", "RAJ2000", "DEJ2000", "pmRA", "pmDE", "kepmag"]},
+             "EPIC":
+                    {'vizier': "IV/34/epic",
+                     'parameters': ["ID", "RAJ2000", "DEJ2000", "pmRA", "pmDEC", "Kpmag","e_pmRA", "e_pmDEC"]},
+             "Gaia":
+                    {'vizier': "I/345/gaia2",
+                     'parameters': ["DR2Name", "RA_ICRS", "DE_ICRS", "pmRA", "pmDE", "e_pmRA", "e_pmDE", "Gmag"]}}
 
         # identifies catalog
         viz_id = ID[catalog]['vizier']
@@ -282,38 +282,25 @@ class KeplerTargetPixelFile(TargetPixelFile):
         pixels_ra, pixels_dec = self.get_coordinates(cadence='all')
 
         # Reduce calculation for astroy seperation
-        c1 = np.asarray([pixels_ra.ravel(), pixels_dec.ravel()])
-        co = np.round(c1, decimals=5)
+        pixel_radec = np.asarray([pixels_ra.ravel(), pixels_dec.ravel()])
+        pixel_radec = np.round(pixel_radec, decimals=5)
 
         # Return unique pairs
-        pixel_pairs = (np.unique(co, axis=1))
+        pixel_pairs = (np.unique(pixel_radec, axis=1))
 
         # Make pixel pairs into SkyCoord
         sky_pixel_pairs = SkyCoord(ra=pixel_pairs[0]*u.deg, dec=pixel_pairs[1]*u.deg, frame='icrs', unit=(u.deg, u.deg))
         # Make pairs in sky_data
-        sky_data = SkyCoord(ra=data['RA'], dec=data['DEC'], frame='icrs', unit=(u.deg, u.deg))
+        sky_sources = SkyCoord(ra=data['RA'], dec=data['DEC'], frame='icrs', unit=(u.deg, u.deg))
 
         seperation_mask = []
         for i in range (len(data)):
-            s = sky_pixel_pairs.separation(sky_data[i]) # Estimate seperation
-            seperation = ~np.any(s.arcsec<=seperation_factor)
+            s = sky_pixel_pairs.separation(sky_sources[i])  # Estimate seperation
+            seperation = np.any(s.arcsec <= seperation_factor)
             seperation_mask.append(seperation)
 
         sep_mask = np.array(seperation_mask, dtype=bool)
-        # Append masked list to data table
-        for i in range (len(data.colnames)):
-            data[data.colnames[i]].mask = sep_mask
-
-        # Scan and remove masked values
-        masked_indicies = []
-        for i in range (0, len(data)):
-            find_masked = (data['ID'][i] is ma.masked)
-            # Find where masked values are true
-            if find_masked == True:
-                masked_indicies.append(i)
-        data.remove_rows(masked_indicies)
-
-        return (data)
+        return data[sep_mask]
 
     @property
     def hdu(self):
