@@ -12,7 +12,8 @@ from matplotlib import patches
 import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
-from K2fov import fields
+from astropy.coordinates import SkyCoord
+from astropy.wcs.utils import skycoord_to_pixel, pixel_to_skycoord
 
 from . import PACKAGEDIR
 from .lightcurve import KeplerLightCurve, TessLightCurve, LightCurve
@@ -872,6 +873,24 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                                n_rows=size[0],
                                                n_cols=size[1],
                                                target_id=target_id)
+
+        #Calculate reference WCS coords from the middle image to use later to do pos_corr calcs
+        mid_img = images[int(len(images)/2)-1]
+        if isinstance(mid_img, fits.ImageHDU):
+            hdu = mid_img
+        elif isinstance(mid_img, fits.HDUList):
+            hdu = mid_img[extension]
+        else:
+            hdu = fits.open(mid_img)[extension]
+
+        wcs = WCS(mid_img)
+        pixelpos = skycoord_to_pixel(position, wcs=wcs) #am I using the right position object here? Is the position passed in the position of the star?
+        column = int(np.round(pixelpos[0]))
+        row = int(np.round(pixelpos[1]))
+        skyposctr = pixel_to_skycoord(column,row,wcs=wcs) #do I need to convert back, or can i just do position.ra.deg?
+        ractr = skyposctr.ra.deg
+        decctr = skyposctr.dec.deg
+
         for idx, img in tqdm(enumerate(images), total=len(images)):
             if isinstance(img, fits.ImageHDU):
                 hdu = img
@@ -886,6 +905,23 @@ class KeplerTargetPixelFile(TargetPixelFile):
             else:
                 cutout = Cutout2D(hdu.data, position, wcs=WCS(hdu.header),
                                   size=size, mode='partial')
+            #Get positional shift of each image from WCS of reference file
+            wcs1 = WCS(images[idx])
+            pixelpos1 = skycoord_to_pixel(position, wcs=wcs1)
+            column1 = int(np.round(pixelpos1[0]))
+            row1 = int(np.round(pixelpos1[1]))
+            poscorr1 = pixelpos1[0] - pixelpos[0]
+            poscorr2 = pixelpos1[1] - pixelpos[1]
+            #Add calculated pos corr shifts to the keywords dictionary
+            hdu.header['POSCORR1'] = poscorr1
+            hdu.header['POSCORR2'] = poscorr2
+            #Information on the center of the TPF file to be created
+            factory.keywords['MID_COL'] = column
+            factory.keywords['MID_ROW'] = row
+            factory.keywords['RA_CTR'] = ractr
+            factory.keywords['DEC_CTR'] = decctr
+            print (column,row,poscorr1,poscorr2)
+
             factory.add_cadence(frameno=idx, flux=cutout.data, header=hdu.header)
         return factory.get_tpf(**kwargs)
 
@@ -1046,68 +1082,53 @@ class KeplerTargetPixelFileFactory(object):
             hdu.header["TDIM{}".format(n)] = coldim
         hdu.header['TFORM4'] = jformat
         hdu.header['TDIM4'] = coldim
+        ra = hdu.header['RA_OBJ'] = self.keywords["RA_OBJ"]
+        dec = hdu.header['DEC_OBJ'] = self.keywords["DEC_OBJ"]
 
-        # Overriding the defaults with data from the original .fits file
-        ra = self.keywords["RA_OBJ"]
-        dec = self.keywords["DEC_OBJ"]
-
-        # Find the detector's coords to cut around
-        campaign = self.keywords["CAMPAIGN"]
-        fov_obj = fields.getKeplerfov(campaign)
-        ch, detcol, detrow = fov_obj.getChannelColRow(ra,dec)
-        detcol, detrow = np.round(col), np.round(row)
-        tpfsize = self.n_cols #Unsure about this - a. does it need to be odd, and b. can I just pick columns?
-
-        # Find the ra and dec of the center of the middle image
-        skyposition = SkyCoord(ra, dec, unit=('deg','deg'), frame='icrs')
-        wcs = WCS(files[int((self.n_cadences/2))-1])
-        pixelpos = skycoord_to_pixel(skyposition, wcs=wcs)
-        column = int(np.round(pixelpos[0]))
-        row = int(np.round(pixelpos[1]))
-        skyposctr = pixel_to_skycoord(column,row,wcs=wcs)
-        ractr = skyposctr.ra.deg
-        decctr = skyposctr.dec.deg
+        tpfsize = self.n_cols #Pick col value assuming a square TPF
+        if (tpfsize % 2 == 0): #Make sure tpfsize is odd to center the star
+             tpfsize += 1
 
         cd11 = self.keywords['CD1_1']
         cd12 = self.keywords['CD1_2']
         cd21 = self.keywords['CD2_1']
         cd22 = self.keywords['CD2_2']
 
-        hdu.header['1CRV4P'] = detcol - (tpfsize-1)/2
-        hdu.header['2CRV4P'] = detrow - (tpfsize-1)/2
+        hdu.header['1CRV4P'] = self.keywords['MID_COL'] - int((self.n_cols-1)/2) - 12
+        hdu.header['2CRV4P'] = self.keywords['MID_ROW'] - int((self.n_rows-1)/2) - 20
         hdu.header['1CRPX4'] = (tpfsize + 1)/2
         hdu.header['2CRPX4'] = (tpfsize + 1)/2
 
-        hdu.header['1CRV5P'] = detcol - (tpfsize-1)/2
-        hdu.header['2CRV5P'] = detrow - (tpfsize-1)/2
+        hdu.header['1CRV5P'] = self.keywords['MID_COL'] - int((self.n_cols-1)/2) - 12
+        hdu.header['2CRV5P'] = self.keywords['MID_ROW'] - int((self.n_rows-1)/2) - 20
         hdu.header['2CRPX5'] = (tpfsize + 1)/2
         hdu.header['1CRPX5'] = (tpfsize + 1)/2
 
-        hdu.header['1CRVL5'] = ractr
-        hdu.header['2CRVL5'] = decctr
+        hdu.header['1CRVL5'] = self.keywords['RA_CTR']
+        hdu.header['2CRVL5'] = self.keywords['DEC_CTR']
         cdelt = hdu.header['2CDLT5']
         hdu.header['11PC5'] = -1.0*cd11/cdelt
         hdu.header['12PC5'] = -1.0*cd12/cdelt
         hdu.header['21PC5'] = cd21/cdelt
         hdu.header['22PC5'] = cd22/cdelt
 
-        hdu.header['1CRV6P'] = detcol - (tpfsize-1)/2
-        hdu.header['2CRV6P'] = detrow - (tpfsize-1)/2
+        hdu.header['1CRV6P'] = self.keywords['MID_COL'] - int((self.n_cols-1)/2) - 12
+        hdu.header['2CRV6P'] = self.keywords['MID_ROW'] - int((self.n_rows-1)/2) - 20
         hdu.header['1CRPX6'] = (tpfsize + 1)/2
         hdu.header['2CRPX6'] = (tpfsize + 1)/2
 
-        hdu.header['1CRV7P'] = detcol - (tpfsize-1)/2
-        hdu.header['2CRV7P'] = detrow - (tpfsize-1)/2
+        hdu.header['1CRV7P'] = self.keywords['MID_COL'] - int((self.n_cols-1)/2) - 12
+        hdu.header['2CRV7P'] = self.keywords['MID_ROW'] - int((self.n_rows-1)/2) - 20
         hdu.header['1CRPX7'] = (tpfsize + 1)/2
         hdu.header['2CRPX7'] = (tpfsize + 1)/2
 
-        hdu.header['1CRV8P'] = detcol - (tpfsize-1)/2
-        hdu.header['2CRP8P'] = detrow - (tpfsize-1)/2
+        hdu.header['1CRV8P'] = self.keywords['MID_COL'] - int((self.n_cols-1)/2) - 12
+        hdu.header['2CRP8P'] = self.keywords['MID_ROW'] - int((self.n_rows-1)/2) - 20
         hdu.header['1CRPX8'] = (tpfsize + 1)/2
         hdu.header['2CRPX8'] = (tpfsize + 1)/2
 
-        hdu.header['1CRV9P'] = detcol - (tpfsize-1)/2
-        hdu.header['2CRV9P'] = detrow - (tpfsize-1)/2
+        hdu.header['1CRV9P'] = self.keywords['MID_COL'] - int((self.n_cols-1)/2) - 12
+        hdu.header['2CRV9P'] = self.keywords['MID_ROW'] - int((self.n_rows-1)/2) - 20
         hdu.header['1CRPX9'] = (tpfsize + 1)/2
         hdu.header['2CRPX9'] = (tpfsize + 1)/2
 
