@@ -811,7 +811,10 @@ class LightCurveCollection(Sequence):
     def plot(self):
         '''Plot a collection of LightCurves
         '''
-        raise NotImplementedError()
+     
+        axis = self.lcs[0].plot(color=np.random.rand(3,1), label='0', linestyle='-')
+        for i in len(self.lcs):
+            self.lcs[i].plot(ax=axis, color=np.random.rand(3,1), label=str(i), linestyle='-')
 
     def pca(self):
         '''Creates the Principle Components of a collection of LightCurves
