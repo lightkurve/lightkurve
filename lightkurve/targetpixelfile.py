@@ -16,8 +16,7 @@ from astroquery.vizier import Vizier
 from astropy import units as u
 from astropy.coordinates import SkyCoord
 from astropy.table import Table
-import numpy.ma as ma
-
+import np.ma as ma
 
 from . import PACKAGEDIR
 from .lightcurve import KeplerLightCurve, LightCurve
@@ -198,7 +197,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         return('KeplerTargetPixelFile Object (ID: {})'.format(self.keplerid))
 
 
-    def query_catalog(self, catalog=None, radius=0.5, seperation_factor=12):
+    def query_catalog(self, catalog=None, radius=0.5, dist_tolerance=12):
         """
         Returns a crossmatched table of stars that are centered on the target
         of the tpf file. Current tables supported are KIC, EPIC and Gaia DR2.
@@ -211,11 +210,10 @@ class KeplerTargetPixelFile(TargetPixelFile):
         radius: float
             Radius of cone search centered on the target in arcminutes.
             Default radius is 0.5 arcmin.
-        seperation_factor: float
-            Distance tolerance from the tpf pixel poistions. Will introduce
-            sources that fall outside the the tpf frame but account for the motions
-            of the source alongside with closeby targetsself.
-            Default value is 12 arcsec.
+        dist_tolerance: float
+            Tolerance for source matching. Sources that fall within this Tolerance
+            of pixels in the KeplerTargetPixelFile will be returned in the result.
+            Default is 3 pixels (12 arcsec).
 
         Returns
         -------
@@ -290,12 +288,12 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
         # Make pixel pairs into SkyCoord
         sky_pixel_pairs = SkyCoord(ra=pixel_pairs[0]*u.deg, dec=pixel_pairs[1]*u.deg, frame='icrs', unit=(u.deg, u.deg))
-        # Make pairs in sky_data
-        sky_data = SkyCoord(ra=data['RA'], dec=data['DEC'], frame='icrs', unit=(u.deg, u.deg))
+        # Make pairs in sky_sources
+        sky_sources = SkyCoord(ra=data['RA'], dec=data['DEC'], frame='icrs', unit=(u.deg, u.deg))
 
         seperation_mask = []
         for i in range (len(data)):
-            s = sky_pixel_pairs.separation(sky_data[i]) # Estimate seperation
+            s = sky_pixel_pairs.separation(sky_sources[i]) # Estimate seperation
             seperation = ~np.any(s.arcsec<=seperation_factor)
             seperation_mask.append(seperation)
 
