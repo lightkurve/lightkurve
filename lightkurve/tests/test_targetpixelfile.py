@@ -61,11 +61,11 @@ def test_get_sources():
     tpf = KeplerTargetPixelFile(TABBY_TPF)
     dat = tpf.get_sources()
     # Smallest number the query should find is at least 1
-    assert (len(dat['RA']) >= 1)
-    assert (len(dat['ID'])) >= 1
-    assert np.any([d == tpf.keplerid for d in dat['ID']])
+    assert (len(dat['ra']) >= 1)
+    assert (len(dat['id'])) >= 1
+    assert np.any([d == tpf.keplerid for d in dat['id']])
     c = SkyCoord(60, 10, unit=(u.deg, u.deg))
-    result = query_catalog(c, 'Gaia', radius=1*u.arcmin)
+    result = query_catalog(c, 'Gaia', radius=1)
     assert len(result) == 3
 
 def test_tpf_zeros():
