@@ -263,7 +263,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
         separation_mask = []
         for i in range (len(data)):
             s = sky_pixel_pairs.separation(sky_sources[i])  # Estimate separation
-            print (s.arcsec)
             separation = np.any(s.arcmin <= dist_tolerance)
             separation_mask.append(separation)
 
