@@ -840,11 +840,7 @@ class SyntheticLightCurve(LightCurve):
         min_lst = chisqarr[np.argmin(chisqarr[:,nparams])]
         """
 
-
-
-        params =
-
-        return chisqarr[np.argmin(chisqarr[:,nparams])]
+        #return chisqarr[np.argmin(chisqarr[:,nparams])]
 
 class KeplerLightCurve(LightCurve):
     """Defines a light curve class for NASA's Kepler and K2 missions.
