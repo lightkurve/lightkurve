@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 from tqdm import tqdm
 
-from oktopus import GaussianPrior, UniformPrior, PoissonPosterior
+from oktopus import Prior, GaussianPrior, UniformPrior, PoissonPosterior
 from oktopus.posterior import PoissonPosterior
 
 from .prf import KeplerPRF
@@ -21,7 +21,64 @@ __all__ = ['StarPrior', 'FocusPrior', 'MotionPrior',
 log = logging.getLogger(__name__)
 
 
-class StarPrior(object):
+class FixedValuePrior(Prior):
+    """An improper prior with a likelihood probability of 1 at a single fixed
+    value and -inf elsewhere. This is similar to a Dirac Delta function,
+    except this function does not peak at infinity so that it can be used
+    in numerical optimization functions.  It does not integrate to one as a
+    result and is therefore an "improper distribution".
+
+    Attributes
+    ----------
+    value : int or array-like of ints
+        The fixed value.
+
+    Examples
+    --------
+    >>> fp = FixedValuePrior(1)
+    >>> fp(1)
+    -0.0
+    >>> fp(0.5)
+    inf
+    """
+    def __init__(self, value, name=None):
+        self.value = np.asarray([value]).reshape(-1)
+        self.name = name
+
+    def __repr__(self):
+        return "<FixedValuePrior(value={})>".format(self.value)
+
+    @property
+    def mean(self):
+        """Returns the fixed value."""
+        return self.value
+
+    @property
+    def variance(self):
+        """Returns zero."""
+        return 0
+
+    def evaluate(self, params):
+        """Returns the negative log pdf."""
+        if self.value == params:
+            return -0.0
+        return np.inf
+
+    def gradient(self, params):
+        if self.value == params:
+            return 0.0
+        return np.inf
+
+
+class PriorContainer(object):
+    """Container object to hold parameter priors for PRF photometry."""
+    def _parse_prior(self, prior):
+        if isinstance(prior, Prior):
+            return prior
+        return FixedValuePrior(value=prior)
+
+
+class StarPrior(PriorContainer):
     """Container class to capture a user's beliefs about a star's position and flux.
 
     Example use
@@ -31,9 +88,9 @@ class StarPrior(object):
               flux=GaussianPrior(mean=flux, var=err_flux**2))
     """
     def __init__(self, col, row, flux=UniformPrior(lb=0, ub=1e10), targetid=None):
-        self.col = col
-        self.row = row
-        self.flux = flux
+        self.col = self._parse_prior(col)
+        self.row = self._parse_prior(row)
+        self.flux = self._parse_prior(flux)
         self.targetid = targetid
 
     def __repr__(self):
@@ -50,7 +107,7 @@ class StarPrior(object):
         return logp
 
 
-class BackgroundPrior():
+class BackgroundPrior(PriorContainer):
     """Container class to capture a user's beliefs about the background flux.
 
     Parameters
@@ -59,7 +116,7 @@ class BackgroundPrior():
         Prior on the background flux in electrons/second per pixel.
     """
     def __init__(self, flux=UniformPrior(lb=-20, ub=20)):
-        self.flux = flux
+        self.flux = self._parse_prior(flux)
 
     def __repr__(self):
         return ('<BackgroundPrior: flux={}>'.format(self.flux))
@@ -69,7 +126,7 @@ class BackgroundPrior():
         return self.flux.evaluate(flux)
 
 
-class FocusPrior():
+class FocusPrior(PriorContainer):
     """Container class to capture a user's beliefs about the telescope focus.
 
     Parameters
@@ -83,9 +140,9 @@ class FocusPrior():
                  scale_col=GaussianPrior(mean=1, var=0.0001),
                  scale_row=GaussianPrior(mean=1, var=0.0001),
                  rotation_angle=UniformPrior(lb=-3.1415, ub=3.1415)):
-        self.scale_col = scale_col
-        self.scale_row = scale_row
-        self.rotation_angle = rotation_angle
+        self.scale_col = self._parse_prior(scale_col)
+        self.scale_row = self._parse_prior(scale_row)
+        self.rotation_angle = self._parse_prior(rotation_angle)
 
     def __repr__(self):
         return ('<StarPrior: scale_col={}, scale_row={}, rotation_angle={}>'
@@ -99,13 +156,13 @@ class FocusPrior():
         return logp
 
 
-class MotionPrior(object):
+class MotionPrior(PriorContainer):
     """Container class to capture a user's beliefs about the telescope motion.
     """
     def __init__(self, shift_col=UniformPrior(lb=-0.1, ub=0.1),
                  shift_row=UniformPrior(lb=-0.1, ub=0.1)):
-        self.shift_col = shift_col
-        self.shift_row = shift_row
+        self.shift_col = self._parse_prior(shift_col)
+        self.shift_row = self._parse_prior(shift_row)
 
     def __repr__(self):
         return ('<MotionPrior: shift_col={}, shift_row={}>'
