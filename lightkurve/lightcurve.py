@@ -813,7 +813,7 @@ class LightCurveCollection(Sequence):
         '''
      
         axis = self.lcs[0].plot(color=np.random.rand(3,1), label='0', linestyle='-')
-        for i in len(self.lcs):
+        for i in range(1,len(self.lcs)):
             self.lcs[i].plot(ax=axis, color=np.random.rand(3,1), label=str(i), linestyle='-')
 
     def pca(self):
