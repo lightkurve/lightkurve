@@ -55,7 +55,8 @@ def test_tpf_plot():
     with pytest.raises(ValueError):
         tpf.plot(scale="blabla")
 
-def test_find():
+@pytest.mark.remote_data
+def test_get_sources():
     "Minimum sanity chech of the table it returns contains the coordinates of the tpf"
     tpf = KeplerTargetPixelFile(TABBY_TPF)
     dat = tpf.get_sources()
@@ -66,9 +67,6 @@ def test_find():
     c = SkyCoord(60, 10, unit=(u.deg, u.deg))
     result = query_catalog(c, 'Gaia', radius=1*u.arcmin)
     assert len(result) == 3
-
-
-
 
 def test_tpf_zeros():
     """Does the LightCurve of a zero-flux TPF make sense?"""

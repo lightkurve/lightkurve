@@ -4,7 +4,6 @@ from astropy.visualization import (PercentileInterval, ImageNormalize,
                                    SqrtStretch, LogStretch, LinearStretch)
 from astropy.time import Time
 from astroquery.vizier import Vizier
-from astropy.table import Table
 import astropy.units as u
 
 import matplotlib.pyplot as plt
@@ -312,9 +311,8 @@ def query_catalog(coordinate, catalog="KIC", radius=0.5):
         -----------
         coordinate : astropy.coordinates.SkyCoord
             Coordinate to query around.
-        catalog: string
-            Indicate catalog assigned for mission. If Kepler, catalog will be KIC
-            if K2 catalog is EPIC.
+        catalog: 'KIC', 'EPIC', or 'Gaia'
+            Indicate catalog assigned for mission.
         radius: float
             Radius of cone search centered on the target in arcminutes.
             Default radius is 0.5 arcmin.
@@ -335,6 +333,9 @@ def query_catalog(coordinate, catalog="KIC", radius=0.5):
         Kpmag: astropy.table.column (KIC & EPIC)
             Magnitude in Kepler band [mag]
         """
+        supported_catalogs = ['KIC', 'EPIC', 'Gaia']
+        if catalog not in supported_catalogs:
+            raise ValueError('catalog not one of {}'.format(supported_catalogs))
 
         if catalog is "Gaia":
             log.warn('Gaia RAs and Decs are at EPOC 2015.5. These RA/Decs have not been corrected.')
@@ -357,15 +358,13 @@ def query_catalog(coordinate, catalog="KIC", radius=0.5):
         # Choose columns from Vizier
         v = Vizier(catalog=[viz_id], columns=ID[catalog]['parameters'])
         # query around centre with radius
-        result = v.query_region(coordinate, radius=radius, catalog=viz_id)
+        result = v.query_region(coordinate, radius=radius*u.arcmin, catalog=viz_id)
         if len(result) == 0:
-            log.error('No sources found in queried region. Try another catalog.')
+            log.warning('No sources found in queried region. Try another catalog.')
 
         # Rename column names
-        new_pars = ['ID', 'RA', 'Dec', 'pmRA', 'pmDec', "mag"]
+        new_pars = ['id', 'ra', 'dec', 'pmra', 'pmdec', "mag"]
         for i in range(len(new_pars)):
             result[viz_id].rename_column(result[viz_id].colnames[i], new_pars[i])
 
-        # Queried stats
-        data = result[viz_id]
-        return data
+        return (result[viz_id])

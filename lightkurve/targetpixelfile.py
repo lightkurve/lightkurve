@@ -12,10 +12,8 @@ from matplotlib import patches
 import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
-from astroquery.vizier import Vizier
 from astropy import units as u
 from astropy.coordinates import SkyCoord
-from astropy.table import Table
 
 from . import PACKAGEDIR
 from .lightcurve import KeplerLightCurve, LightCurve
@@ -198,21 +196,20 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
     def get_sources(self, catalog=None, magnitude_limit=18, dist_tolerance=3):
         """
-        Returns a crossmatched table of stars that are centered on the target
+        Returns a table of stars that are centered on the target
         of the tpf file. Current catalog supported are KIC, EPIC and Gaia DR2.
 
         Parameters
         -----------
-        catalog: string
-            Indicate catalog assigned for mission. If Kepler, catalog will be KIC
-            if K2 catalog is EPIC.
+        catalog: 'KIC', 'EPIC' or 'Gaia'
+            Catalog to query. For Kepler target pixel files the default is 'KIC',
+            for K2 target pixel files the default is 'EPIC'.
         magnitude_limit : int or float
             Limit the returned magnitudes to only stars brighter than magnitude_limit.
-            Default 18.
+            Default 18 for both Kepmag and Gmag.
         dist_tolerance: float
-            Tolerance for source matching in pixels. Sources that fall within this
-            tolerance of pixels in the KeplerTargetPixelFile will be returned in the result.
-            Default is 3 pixels (12 arcsec).
+            Maximum distance (in arcseconds) a source may be seperated from the edge
+            of the target pixel file.
 
         Returns
         -------
@@ -237,13 +234,13 @@ class KeplerTargetPixelFile(TargetPixelFile):
             elif self.mission == 'K2':
                 catalog = 'EPIC'
             else:
-                log.error('Please provide a catalog.')
+                raise ValueError('Please provide a catalog.')
 
         #Skycoord the centre of target
         cent = SkyCoord(ra=self.ra, dec=self.dec, frame='icrs', unit=(u.deg, u.deg))
 
         #Find the size of the TPF
-        radius = np.max(self.flux.shape[1:]) * 4 * u.arcsecond
+        radius = (np.max(self.flux.shape[1:2]) * 4) / 60.0
 
         # query around centre with radius
         data = query_catalog(cent, radius=radius, catalog=catalog)
@@ -251,7 +248,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         # Load ra & dec of all tpf pixels
         pixels_ra, pixels_dec = self.get_coordinates(cadence='all')
 
-        # Reduce calculation for astroy seperation
+        # Reduce calculation for astroy separation
         pixel_radec = np.asarray([pixels_ra.ravel(), pixels_dec.ravel()])
         pixel_radec = np.round(pixel_radec, decimals=5)
 
@@ -261,16 +258,16 @@ class KeplerTargetPixelFile(TargetPixelFile):
         # Make pixel pairs into SkyCoord
         sky_pixel_pairs = SkyCoord(ra=pixel_pairs[0]*u.deg, dec=pixel_pairs[1]*u.deg, frame='icrs', unit=(u.deg, u.deg))
         # Make pairs in sky_sources
-        sky_sources = SkyCoord(ra=data['RA'], dec=data['Dec'], frame='icrs', unit=(u.deg, u.deg))
+        sky_sources = SkyCoord(ra=data['ra'], dec=data['dec'], frame='icrs', unit=(u.deg, u.deg))
 
-        seperation_mask = []
+        separation_mask = []
         for i in range (len(data)):
-            s = sky_pixel_pairs.separation(sky_sources[i])  # Estimate seperation
-            seperation = np.any(s.arcsec <= dist_tolerance)
-            seperation_mask.append(seperation)
+            s = sky_pixel_pairs.separation(sky_sources[i])  # Estimate separation
+            print (s.arcsec)
+            separation = np.any(s.arcmin <= dist_tolerance)
+            separation_mask.append(separation)
 
-
-        sep_mask = np.array(seperation_mask, dtype=bool)
+        sep_mask = np.array(separation_mask, dtype=bool)
 
         # Make sure it's bright enough
         sep_mask &= data['mag'] < magnitude_limit
