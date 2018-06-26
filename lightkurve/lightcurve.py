@@ -744,6 +744,7 @@ class LightCurve(object):
         return hdu
 
 
+
 class FoldedLightCurve(LightCurve):
     """Defines a folded lightcurve with different plotting defaults."""
 
