@@ -67,7 +67,7 @@ class GaussianDistribution(object):
 
 class TransitModel(object):
     """
-    Implements a class for creating a transiting model using ktransit.
+    Implements a class for creating a planetary transit model using ktransit.
 
     Attributes
     ----------
@@ -194,6 +194,8 @@ class SupernovaModel(object):
         Redshift of supernova
     T0 : float, default chosen from a uniform distribution of all time values
         Time of supernova's beginning or peak brightness, depending on source chosen
+    **kwargs : dict
+        List of parameters depending on chosen source.
     """
     def __init__(self, T0, source='hsiao', bandpass='kepler', z=0.5, **kwargs):
 
@@ -217,7 +219,7 @@ class SupernovaModel(object):
     def __repr__(self):
         return 'SupernovaModel(' + str(self.__dict__) + ')'
 
-    def evaluate(self, time, size=1):
+    def evaluate(self, time):
         """Evaluates synthetic supernova light curve from model.
            Currently, we can only create one supernova at a time.
 
@@ -226,8 +228,9 @@ class SupernovaModel(object):
         time : array-like
             Time array of supernova light curve.
         params : dict
-            Dictionary of keyword arguments to be passed to model.set that
-            specify the supernova based on the chosen model.
+            Dictionary of keyword arguments to be passed to sncosmo's
+            model.set (in this method) that specify the
+            supernova properties based on the chosen source.
 
         Returns
         -------
