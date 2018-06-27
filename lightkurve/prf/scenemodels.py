@@ -237,7 +237,7 @@ class MotionParameters(object):
                     self.shift_col, self.shift_row, self.fitted)
 
 
-class SceneModelParameters():
+class SceneModelParameters(object):
     """Container class to combine all parameters that parameterize a ``SceneModel``.
 
     Attributes
@@ -337,7 +337,7 @@ class SceneModelParameters():
                                     focus=focus, motion=motion)
 
 
-class SceneModel():
+class SceneModel(object):
     """A model which describes a single-cadence Kepler image.
 
     Attributes
@@ -532,7 +532,7 @@ class SceneModel():
                    **kwargs)
 
 
-class PRFPhotometry():
+class PRFPhotometry(object):
     """This class performs PRF Photometry on TPF-like data given a ``SceneModel``.
 
     This class exists because a ``SceneModel`` object is designed to fit only
