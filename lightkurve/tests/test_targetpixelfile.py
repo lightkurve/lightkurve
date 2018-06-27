@@ -6,7 +6,7 @@ import numpy as np
 from numpy.testing import assert_array_equal
 import pytest
 import tempfile
-from ..targetpixelfile import KeplerTargetPixelFile, KeplerTargetPixelFileFactory
+from ..targetpixelfile import KeplerTargetPixelFile, KeplerTargetPixelFileFactory, TargetPixelFileCollection
 from ..utils import KeplerQualityFlags
 
 
@@ -213,3 +213,29 @@ def test_interact():
     tpf = KeplerTargetPixelFile(filename_tpf_one_center)
     tpf.interact()
     tpf.interact(lc=tpf.to_lightcurve(aperture_mask='all'))
+
+
+@pytest.mark.remote_data
+def test_tpfcollection_create():
+    
+    tpf_1 = KeplerTargetPixelFile.from_archive('Kepler-8', quarter=4)
+    tpf_2 = KeplerTargetPixelFile.from_archive('Kepler-10', quarter=4)
+
+    tpf_collection = TargetPixelFileCollection((tpf_1, tpf_2))
+
+    assert(tpf_collection.data[tpf_1.keplerid] == tpf_1)
+    assert(tpf_collection.data[tpf_2.keplerid] == tpf_2)
+
+@pytest.mark.remote_data
+def test_lightcurvecollection_append():
+    
+    tpf_1 = KeplerTargetPixelFile.from_archive('Kepler-8', quarter=4)
+    tpf_2 = KeplerTargetPixelFile.from_archive('Kepler-10', quarter=4)
+    tpf_3 = KeplerTargetPixelFile.from_archive('Kepler-16', quarter=4)
+
+    tpf_collection = TargetPixelFileCollection((tpf_1, tpf_2))
+
+    tpf_collection.append(tpf_3)
+    assert(tpf_collection.data[tpf_3.keplerid] == tpf_3)
+
+

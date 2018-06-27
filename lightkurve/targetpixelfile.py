@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
 
+
 from . import PACKAGEDIR
 from .lightcurve import KeplerLightCurve, LightCurve
 from .prf import SimpleKeplerPRF
@@ -20,7 +21,9 @@ from .utils import KeplerQualityFlags, plot_image, bkjd_to_astropy_time
 from .mast import download_kepler_products
 
 
-__all__ = ['KeplerTargetPixelFile']
+__all__ = ['KeplerTargetPixelFile', 'TargetPixelFile',
+            'TessTargetPixelFile', 'KeplerTargetPixelFileFactory',
+            'TargetPixelFileCollection']
 log = logging.getLogger(__name__)
 
 
@@ -873,7 +876,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
             factory.add_cadence(frameno=idx, flux=cutout.data, header=hdu.header)
         return factory.get_tpf(**kwargs)
 
-
 class KeplerTargetPixelFileFactory(object):
     """Class to create a KeplerTargetPixelFile."""
 
@@ -1049,3 +1051,113 @@ class KeplerTargetPixelFileFactory(object):
                                       template.comments[kw])
         hdu.header['EXTNAME'] = 'APERTURE'
         return hdu
+
+class TargetPixelFileCollection(object):
+    """
+    Collects multiple TPF objects together with helpful functions.
+    """
+    def __init__(self, targetPixelFiles):
+        try:
+            tpfs = np.asarray(targetPixelFiles)
+        except:
+            raise TypeError("Unable to parse input")
+        self.data = {}
+        for TPF in tpfs:
+            try:
+                if TPF.keplerid:
+                    self.data[TPF.keplerid] = TPF
+            except:
+                raise TypeError("Object is not a TargetPixelFile instance")
+
+    def __len__(self):
+        return len(self.data)
+
+    def _ids(self):
+        """
+        Returns the kepler_ids of all the lightcurves as a dict_keys obj.
+        """
+        return self.data.keys()
+
+    def __getitem__(self, kep_id):
+        """
+        Returns the lightcurve associated with the kepler_id. 
+        """
+        try: 
+            return self.data[kep_id]
+        except:
+            raise ValueError('No TPF for ' + kep_id)
+
+    def append(self, tpf):
+        try:
+            self.data[tpf.keplerid] = tpf
+        except:
+            raise TypeError("Input is not a TPF")
+
+    def __repr__(self):
+        result = ""
+        for TPF in self.data.values():
+            result += TPF.__repr__() + "\n"
+        return result
+
+
+
+    def plot(self):
+        """
+        Plot a collection of TPF. Random colors are assigned to each plot.
+        """
+        from astropy.visualization import (ImageNormalize, LinearStretch, LogStretch)
+        row_min = 10000
+        row_max = 0
+        num_samples = 0
+        flux_min = 10000
+        flux_max = 0
+        col_min = 10000
+        col_max = 0
+        for i, tpf in enumerate(self.data.values()):
+            if tpf.row < row_min:
+                row_min = tpf.row
+            if tpf.row + tpf.shape[1] > row_max:
+                row_max = tpf.row + tpf.shape[1]
+            if tpf.column < col_min:
+                col_min = tpf.column
+            if tpf.column + tpf.shape[2] > col_max:
+                col_max = tpf.column + tpf.shape[2]
+
+            small = np.nanmin(tpf.flux[0])
+            if small < flux_min:
+                flux_min = small
+            large = np.nanmax(tpf.flux[0])
+            if large > flux_max:
+                flux_max = large
+        
+        _, axis = plt.subplots()
+        axis.set_xlim(col_min,col_max)
+        axis.set_ylim(row_min,row_max)
+        #axis.set_aspect('equal','box')
+        
+        norm = ImageNormalize(vmin=flux_min, vmax=flux_max, stretch = LinearStretch())
+        
+        #cax = axis.imshow(,origin='lower',norm=norm)
+        #plt.colorbar(cax, ax=axis,norm=norm)
+        #plt.axes().set_aspect('equal', 'datalim')
+        for i, k_id in enumerate(self.data):
+            if i == 0:
+                #axis = self.data[k_id].collections_plot(flux_min, flux_max, label=k_id)
+                cax = axis.imshow(self.data[k_id].flux[0], norm=norm)
+                plt.colorbar(cax, ax=axis, norm=norm)
+                
+                self.data[k_id].plot(ax=axis, show_colorbar=False)
+
+            #    axis = self.data[k_id].plot()
+            else:
+                self.data[k_id].plot(ax=axis, show_colorbar=False)
+
+        plt.axis('equal')
+        
+        return axis
+
+    def pca(self):
+        '''Creates the Principle Components of a collection of LightCurves
+        '''
+        raise NotImplementedError('Should be able to run a PCA on a collection.')
+

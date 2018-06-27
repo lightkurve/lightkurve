@@ -6,7 +6,7 @@ from numpy.testing import (assert_almost_equal, assert_array_equal,
                            assert_allclose)
 from astropy.io import fits as pyfits
 from ..lightcurve import (LightCurve, KeplerLightCurve, TessLightCurve,
-                          iterative_box_period_search)
+                          iterative_box_period_search, LightCurveCollection)
 from ..lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
 
 # 8th Quarter of Tabby's star
@@ -439,3 +439,37 @@ def test_flatten_robustness():
     # flatten should work even if `break_tolerance = None`
     flat_lc = lc.flatten(break_tolerance=None)
     assert_allclose(flat_lc.flux, expected_result)
+
+
+@pytest.mark.remote_data
+def test_lightcurvecollection_create():
+    
+    lcf_1 = KeplerLightCurveFile(TABBY_Q8)
+    lcf_2 = KeplerLightCurveFile(KEPLER10)
+
+    lcc = LightCurveCollection((lcf_1, lcf_2))
+
+    assert(lcc.data[lcf_1.keplerid] == lcf_1)
+    assert(lcc.data[lcf_2.keplerid] == lcf_2)
+
+@pytest.mark.remote_data
+def test_lightcurvecollection_append():
+    
+    lcf_1 = KeplerLightCurveFile(TABBY_Q8)
+    lcf_2 = KeplerLightCurveFile(KEPLER10)
+    lcf_3 = KeplerLightCurveFile(K2_C08)
+
+    lcc = LightCurveCollection((lcf_1, lcf_2))
+    lcc.append(lcf_3)
+    assert(lcc.data[lcf_3.keplerid] == lcf_3)
+
+@pytest.mark.remote_data
+def test_lightcurvecollection_plot():
+    
+    lcf_1 = KeplerLightCurveFile(TABBY_Q8)
+    lcf_2 = KeplerLightCurveFile(KEPLER10)
+
+    lcc = LightCurveCollection((lcf_1, lcf_2))
+
+    lcc.plot()
+

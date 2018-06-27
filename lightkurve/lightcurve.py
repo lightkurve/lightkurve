@@ -20,11 +20,12 @@ from astropy.table import Table
 from astropy.io import fits
 from astropy.time import Time
 
+
 from .utils import running_mean, bkjd_to_astropy_time
 from . import PACKAGEDIR
 
 __all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve',
-           'iterative_box_period_search', 'LightCurveCollection', 'TargetPixelFileCollection']
+           'iterative_box_period_search', 'LightCurveCollection']
 
 log = logging.getLogger(__name__)
 
@@ -1135,104 +1136,22 @@ class LightCurveCollection(object):
             result += lightcurve.__repr__() + "\n"
         return result
 
-    def plot(self):
+    def plot(self, ax=None, **kwargs):
         """
         Plot a collection of LightCurves. Random colors are assigned to each plot.
         """
         for i, k_id in enumerate(self.data):
-            rand_color = np.random.rand(3)
+            
             if i == 0:
                 #TODO: what if longest axis is not the first item?
-                axis = self.data[k_id].plot(color=rand_color, linestyle='-',label=k_id)
+                axis = self.data[k_id].plot(linestyle='-',label=k_id)
             else:
-                self.data[k_id].plot(ax=axis, color=rand_color, linestyle='-', label=k_id)
-
-
-    def pca(self):
-        '''Creates the Principle Components of a collection of LightCurves
-        '''
-        raise NotImplementedError('Should be able to run a PCA on a collection.')
-
-class TargetPixelFileCollection(object):
-    """
-    Collects multiple TPF objects together with helpful functions.
-    """
-    def __init__(self, targetPixelFiles):
-        try:
-            tpfs = np.asarray(targetPixelFiles)
-        except:
-            raise TypeError("Unable to parse input")
-        self.data = {}
-        for TPF in tpfs:
-            try:
-                if TPF.keplerid:
-                    self.data[TPF.keplerid] = TPF
-            except:
-                raise TypeError("Object is not a TargetPixelFile instance")
-
-    def __len__(self):
-        return len(self.data)
-
-    def _ids(self):
-        """
-        Returns the kepler_ids of all the lightcurves as a dict_keys obj.
-        """
-        return self.data.keys()
-
-    def __getitem__(self, kep_id):
-        """
-        Returns the lightcurve associated with the kepler_id. 
-        """
-        try: 
-            return self.data[kep_id]
-        except:
-            raise ValueError('No TPF for ' + kep_id)
-
-    def append(self, tpf):
-        try:
-            self.data[tpf.keplerid] = tpf
-        except:
-            log.warning("Input is not a TPF")
-
-    def __repr__(self):
-        result = ""
-        for TPF in self.data.values():
-            result += TPF.__repr__() + "\n"
-        return result
-
-    def plot(self):
-        """
-        Plot a collection of LightCurves. Random colors are assigned to each plot.
-        """
-        axis_min = 10000
-        axis_max = 0
-        num_samples = 0
-        flux_min = 10000
-        flux_max = 0
-        for i, tpf in enumerate(self.data.values()):
-            if tpf.time[0] < axis_min:
-                axis_min = tpf.time[0]
-            if tpf.time[-1] > axis_max:
-                axis_max = tpf.time[-1]
-            if len(tpf.time) > num_samples:
-                num_samples = len(tpf.time)
-            small = np.nanmin(tpf.flux)
-            if small < flux_min:
-                flux_min = small
-            large = np.nanmax(tpf.flux)
-            if large > flux_max:
-                flux_max = large
-        x = np.linspace(axis_min, axis_max, num = num_samples)
-        y = np.linspace(flux_min, flux_max, num = num_samples)
-        _, axis = plt.subplots()
-        axis.plot(x, y)
-
-        for i, k_id in enumerate(self.data):
-            self.data[k_id].plot(ax=axis, label=k_id)
-
+                self.data[k_id].plot(ax=axis, linestyle='-', label=k_id)
+        return axis
 
     def pca(self):
         '''Creates the Principle Components of a collection of LightCurves
         '''
         raise NotImplementedError('Should be able to run a PCA on a collection.')
+
 
