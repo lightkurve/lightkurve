@@ -2,8 +2,7 @@ import pytest
 import numpy as np
 
 from ..lightcurve import (LightCurve, KeplerLightCurve, TessLightCurve,
-                          iterative_box_period_search, LightCurveCollection)
-from ..lightcurvecollection import LightCurveCollection
+                          iterative_box_period_search, LightCurveCollection, TargetPixelFileCollection)
 from ..lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
 import sys
 sys.path.append("..") 
@@ -26,4 +25,3 @@ def test_collections_plot():
 	lc_2 = lightcurve.LightCurve(time=np.arange(1, 5), flux=np.arange(6, 10), flux_err=np.arange(1, 5))
 	collection = LightCurveCollection((lc_1,lc_2))
 	collection.plot()
-

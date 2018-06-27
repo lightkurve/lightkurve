@@ -7,6 +7,7 @@ from tqdm import tqdm
 import os
 import datetime
 import logging
+from collections import Sequence
 
 import oktopus
 import numpy as np
@@ -1087,7 +1088,7 @@ def iterative_box_period_search(lc, niters=2, min_period=0.5, max_period=30,
 
     return log_posterior, trial_periods, trial_periods[np.argmax(log_posterior)]
 
-class LightCurveCollection(object):
+class LightCurveCollection(Sequence):
     """
     Collects multiple LightCurve objects together with helpful functions.
     """
@@ -1153,7 +1154,7 @@ class LightCurveCollection(object):
         '''
         raise NotImplementedError('Should be able to run a PCA on a collection.')
 
-class TargetPixelFileCollection(object):
+class TargetPixelFileCollection(Sequence):
     """
     Collects multiple TPF objects together with helpful functions.
     """
