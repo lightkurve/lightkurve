@@ -833,7 +833,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
                           flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
                           flux_err=self.flux_bkg_err)
 
-    def get_hdu(image):
+
+    def get_hdu(image, extension):
         """Checks if an image is a FITS single image, or a FITS file,
         and returns the appropriate PrimaryHDU.
 
@@ -841,6 +842,9 @@ class KeplerTargetPixelFile(TargetPixelFile):
         ----------
         image : fits.ImageHDU or fits.HDUList object
             FITS filename path or ImageHDU object to get the data from.
+        extension: integer 0, or 1
+            Determines which file extension the data is in, depending on the file
+            type and source
         Returns
         -------
         hdu : astropy.PrimaryHDU
@@ -854,15 +858,17 @@ class KeplerTargetPixelFile(TargetPixelFile):
             hdu = fits.open(image)[extension]
         return hdu
 
-    def get_WCS(hdu): #name of this?? add doc string
-        """Calculates the position correction values (both in row and column) and WCS for an image relative
-        to the reference image, defined as the middle cadence of the FITS file.
+    def get_WCS(mid_img,hdu,position,extension): #name of this?? add doc string
+        """Calculates the position correction values (both in row and column) and
+        WCS for an image relative to the reference image, defined as the middle
+        cadence of the FITS file.
 
         Attributes
         ----------
         hdu : astropy.PrimaryHDU
             PrimaryHDU of the image being looked at
-
+        mid_img : fits.ImageHDU
+            middle layer of the FITS file used as a reference image
         Returns
         -------
         poscorr1 :  float32
@@ -872,23 +878,25 @@ class KeplerTargetPixelFile(TargetPixelFile):
         wcs1 :  astropy.wcs.WCS
             WCS object for this specific hdu
         """
-        #Calculate reference WCS coords from the middle image to use later to do pos_corr calcs
-        mid_img = images[int(len(images)/2)-1]
-        mid_hdu = self.get_hdu(mid_img)
+        # Calculate reference WCS coords from the middle image to use later to
+        # do pos_corr calcs. Get the middle pixel column and row.
+        mid_hdu = KeplerTargetPixelFile.get_hdu(mid_img, extension)
         wcs = WCS(mid_hdu)
-        pixelpos = skycoord_to_pixel(position, wcs=wcs) #am I using the right position object here? Is the position passed in the position of the star?
+        pixelpos = skycoord_to_pixel(position, wcs=wcs)
         column = int(np.round(pixelpos[0]))
         row = int(np.round(pixelpos[1]))
 
-        #Get positional shift of the image compared to the reference file
+        # Calculate the ra and dec of the center pixel of the middle image
+        skyposctr = pixel_to_skycoord(column,row,wcs=wcs)
+        ractr = skyposctr.ra.deg
+        decctr = skyposctr.dec.deg
+
+        # Get positional shift of the image compared to the reference file
         wcs1 = WCS(hdu)
         pixelpos1 = skycoord_to_pixel(position, wcs=wcs1)
-        #column1 = int(np.round(pixelpos1[0]))
-        #row1 = int(np.round(pixelpos1[1]))
         poscorr1 = pixelpos1[0] - pixelpos[0]
         poscorr2 = pixelpos1[1] - pixelpos[1]
-        return [wcs1, poscorr1, poscorr2]
-
+        return [wcs1, poscorr1, poscorr2, column, row, ractr, decctr]
 
     @staticmethod
     def from_fits_images(images, position=None, size=(10, 10), extension=None,
@@ -930,13 +938,11 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                                n_rows=size[0],
                                                n_cols=size[1],
                                                target_id=target_id)
-
-        skyposctr = pixel_to_skycoord(column,row,wcs=wcs) #do I need to convert back, or can i just do position.ra.deg?
-        ractr = skyposctr.ra.deg
-        decctr = skyposctr.dec.deg
+        # Find middle image to use as a reference
+        mid_img = images[int(len(images)/2)-1]
 
         for idx, img in tqdm(enumerate(images), total=len(images)):
-            hdu = self.get_hdu(image)
+            hdu = KeplerTargetPixelFile.get_hdu(img, extension)
             if idx == 0:  # Get default keyword values from the first image
                 factory.keywords = hdu.header
             if position is None:
@@ -945,17 +951,20 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 cutout = Cutout2D(hdu.data, position, wcs=WCS(hdu.header),
                                   size=size, mode='partial')
 
-            [img_wcs, poscorr1,poscorr2] = get_WCS(hdu)
-            #Add calculated pos corr shifts to the keywords dictionary
-            hdu.header['POSCORR1'] = poscorr1
-            hdu.header['POSCORR2'] = poscorr2
-            # Information on the center of the TPF file to be created
-            # factory.keywords['MID_COL'] = column
-            # factory.keywords['MID_ROW'] = row
-            # factory.keywords['RA_CTR'] = ractr
-            # factory.keywords['DEC_CTR'] = decctr
+            img_data = KeplerTargetPixelFile.get_WCS(mid_img,hdu,position,extension)
+            # Add calculated pos corr shifts to the keywords dictionary
+            hdu.header['POSCORR1'] = img_data[1]
+            hdu.header['POSCORR2'] = img_data[2]
+            #print (img_data[1])
+            #print (hdu.header)
+            # Information on the center of the TPF file to be created, used to create the second header extension
+            factory.keywords['MID_COL'] = img_data[3]
+            factory.keywords['MID_ROW'] = img_data[4]
+            factory.keywords['RA_CTR'] = img_data[5]
+            factory.keywords['DEC_CTR'] = img_data[6]
 
-            factory.add_cadence(frameno=idx, flux=cutout.data, header=hdu.header, wcs=img_wcs)
+            factory.add_cadence(frameno=idx, wcs=img_data[0], flux=cutout.data, header=hdu.header)
+        #print (factory.get_tpf().pos_corr1)
         return factory.get_tpf(**kwargs)
 
 
@@ -995,7 +1004,7 @@ class KeplerTargetPixelFileFactory(object):
         self.pos_corr1 = np.zeros(n_cadences, dtype='float32')
         self.pos_corr2 = np.zeros(n_cadences, dtype='float32')
 
-    def add_cadence(self, frameno, raw_cnts=None, flux=None, flux_err=None,
+    def add_cadence(self, frameno, wcs, raw_cnts=None, flux=None, flux_err=None,
                     flux_bkg=None, flux_bkg_err=None, cosmic_rays=None,
                     header={}):
         """Populate the data for a single cadence."""
@@ -1015,11 +1024,13 @@ class KeplerTargetPixelFileFactory(object):
             self.quality[frameno] = header['QUALITY']
         if 'POSCORR1' in header:
             self.pos_corr1[frameno] = header['POSCORR1']
+            #print (self.pos_corr1[frameno])
         if 'POSCORR2' in header:
             self.pos_corr2[frameno] = header['POSCORR2']
 
     def get_tpf(self, **kwargs):
         """Returns a KeplerTargetPixelFile object."""
+        #print (self._hdulist()[1].data['POS_CORR1'])
         return KeplerTargetPixelFile(self._hdulist(), **kwargs)
 
     def _hdulist(self):
@@ -1089,6 +1100,7 @@ class KeplerTargetPixelFileFactory(object):
                                 array=self.cosmic_rays))
         cols.append(fits.Column(name='QUALITY', format='J',
                                 array=self.quality))
+        #print (self.pos_corr1, self.pos_corr2)
         cols.append(fits.Column(name='POS_CORR1', format='E', unit='pixels',
                                 array=self.pos_corr1))
         cols.append(fits.Column(name='POS_CORR2', format='E', unit='pixels',
@@ -1140,7 +1152,7 @@ class KeplerTargetPixelFileFactory(object):
         hdu.header['12PC5'] = -1.0*cd12/cdelt
         hdu.header['21PC5'] = cd21/cdelt
         hdu.header['22PC5'] = cd22/cdelt
-
+        #print (hdu.data['POS_CORR1'])
         return hdu
 
     def _make_aperture_extension(self):
