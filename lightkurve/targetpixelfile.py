@@ -955,8 +955,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
             # Add calculated pos corr shifts to the keywords dictionary
             hdu.header['POSCORR1'] = img_data[1]
             hdu.header['POSCORR2'] = img_data[2]
-            #print (img_data[1])
-            #print (hdu.header)
             # Information on the center of the TPF file to be created, used to create the second header extension
             factory.keywords['MID_COL'] = img_data[3]
             factory.keywords['MID_ROW'] = img_data[4]
@@ -964,7 +962,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
             factory.keywords['DEC_CTR'] = img_data[6]
 
             factory.add_cadence(frameno=idx, wcs=img_data[0], flux=cutout.data, header=hdu.header)
-        #print (factory.get_tpf().pos_corr1)
         return factory.get_tpf(**kwargs)
 
 
@@ -1024,13 +1021,11 @@ class KeplerTargetPixelFileFactory(object):
             self.quality[frameno] = header['QUALITY']
         if 'POSCORR1' in header:
             self.pos_corr1[frameno] = header['POSCORR1']
-            #print (self.pos_corr1[frameno])
         if 'POSCORR2' in header:
             self.pos_corr2[frameno] = header['POSCORR2']
 
     def get_tpf(self, **kwargs):
         """Returns a KeplerTargetPixelFile object."""
-        #print (self._hdulist()[1].data['POS_CORR1'])
         return KeplerTargetPixelFile(self._hdulist(), **kwargs)
 
     def _hdulist(self):
@@ -1100,7 +1095,6 @@ class KeplerTargetPixelFileFactory(object):
                                 array=self.cosmic_rays))
         cols.append(fits.Column(name='QUALITY', format='J',
                                 array=self.quality))
-        #print (self.pos_corr1, self.pos_corr2)
         cols.append(fits.Column(name='POS_CORR1', format='E', unit='pixels',
                                 array=self.pos_corr1))
         cols.append(fits.Column(name='POS_CORR2', format='E', unit='pixels',
@@ -1135,8 +1129,8 @@ class KeplerTargetPixelFileFactory(object):
              tpfsize += 1
 
         for m in [4, 5, 6, 7, 8, 9]:
-            hdu.header['1CRV{}P'.format(m)] = self.keywords['MID_COL'] - int((self.n_cols-1)/2) - self.keywords['CRVAL1P']
-            hdu.header['2CRV{}P'.format(m)] = self.keywords['MID_ROW'] - int((self.n_rows-1)/2) - self.keywords['CRVAL2P']
+            hdu.header['1CRV{}P'.format(m)] = self.keywords['MID_COL'] - int((self.n_cols-1)/2) + self.keywords['CRVAL1P']
+            hdu.header['2CRV{}P'.format(m)] = self.keywords['MID_ROW'] - int((self.n_rows-1)/2) + self.keywords['CRVAL2P']
             hdu.header['1CRPX{}'.format(m)] = (tpfsize + 1)/2
             hdu.header['2CRPX{}'.format(m)] = (tpfsize + 1)/2
 
@@ -1152,7 +1146,6 @@ class KeplerTargetPixelFileFactory(object):
         hdu.header['12PC5'] = -1.0*cd12/cdelt
         hdu.header['21PC5'] = cd21/cdelt
         hdu.header['22PC5'] = cd22/cdelt
-        #print (hdu.data['POS_CORR1'])
         return hdu
 
     def _make_aperture_extension(self):
