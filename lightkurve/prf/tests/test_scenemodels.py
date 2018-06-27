@@ -88,7 +88,7 @@ def test_scene_model():
     assert 'TESTSTAR' in str(model)
 
 
-def test_prf_vs_aperture_photometry():
+def test_scene_model_fitting():
     # Is the PRF photometry result consistent with simple aperture photometry?
     tpf_fn = os.path.join(PACKAGEDIR, "tests", "data", "ktwo201907706-c01-first-cadence.fits.gz")
     tpf = fits.open(tpf_fn)
@@ -105,40 +105,19 @@ def test_prf_vs_aperture_photometry():
     scene = SceneModel(star_priors=star_priors,
                        background_prior=background_prior,
                        prfmodel=prfmodel)
-    #fluxo, colo, rowo, _ = scene.get_initial_guesses()
-    #data=tpf[1].data, ref_col=prf.col_coord[0], ref_row=prf.row_coord[0])
-    #prior = JointPrior(UniformPrior(lb=0.1*fluxo, ub=fluxo),
-    #                   UniformPrior(lb=prf.col_coord[0], ub=prf.col_coord[-1]),
-    #                   UniformPrior(lb=prf.row_coord[0], ub=prf.row_coord[-1]),
-    #                   GaussianPrior(mean=1, var=1e-2),
-    #                   GaussianPrior(mean=1, var=1e-2),
-    #                   GaussianPrior(mean=0, var=1e-2),
-    #                   UniformPrior(lb=bkg - .5*bkg, ub=bkg + .5*bkg))
-    #logL = PoissonPosterior(tpf[1].data, mean=scene, prior=prior)
-    #result = logL.fit(x0=prior.mean, method='powell')
-    #prf_flux, prf_col, prf_row, prf_scale_col, prf_scale_row, prf_rotation, prf_bkg = logL.opt_result.x
-    #assert result.success is True
-    #assert np.isclose(prf_col, colo, rtol=1e-1)
-    #assert np.isclose(prf_row, rowo, rtol=1e-1)
-    #assert np.isclose(prf_bkg, np.percentile(tpf[1].data, 10), rtol=0.1)
+    # Does fitting run without errors?
+    scene.fit(tpf[1].data)
+    # Does fitting via the PRFPhotometry class run without errors?
+    phot = PRFPhotometry(scene)
+    phot.run([tpf[1].data])
 
-    #phot = PRFPhotometry(scene)
-    #phot.run(tpf[1].data)
 
-    result = scene.fit(tpf[1].data)
-    #assert np.isclose(result.stars[0].flux, fluxsum, rtol=0.1)
-    #assert np.isclose(opt_params[1], prf_col, rtol=1e-1)
-    #assert np.isclose(opt_params[2], prf_row, rtol=1e-1)
-    #assert np.isclose(opt_params[-1], prf_bkg, rtol=0.1)
-
-    """
-    # Test KeplerPRFPhotometry class
-    kepler_phot = PRFPhotometry(scene_model=scene, prior=prior)
-    tpf_flux = tpf[1].data.reshape((1, tpf[1].data.shape[0], tpf[1].data.shape[1]))
-    kepler_phot.fit(tpf_flux=tpf_flux)
-    opt_params = kepler_phot.opt_params.reshape(-1)
-    assert np.isclose(opt_params[0], prf_flux, rtol=0.1)
-    assert np.isclose(opt_params[1], prf_col, rtol=1e-1)
-    assert np.isclose(opt_params[2], prf_row, rtol=1e-1)
-    assert np.isclose(opt_params[-1], prf_bkg, rtol=0.1)
-    """
+def test_empty_scene():
+    """Can we fit the background flux in an empty scene?"""
+    shape = (4, 3)
+    bgflux = 1.23
+    background_prior = BackgroundPrior(flux=UniformPrior(lb=0, ub=10))
+    scene = SceneModel(background_prior=background_prior)
+    background = bgflux * np.ones(shape=shape)
+    results = scene.fit(background)
+    assert np.isclose(results.background.flux, bgflux, rtol=1e-2)
