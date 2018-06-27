@@ -2,6 +2,7 @@
 
 from __future__ import division, print_function
 
+import os
 import numpy as np
 import matplotlib as mpl
 from matplotlib import pyplot as plt
@@ -139,10 +140,13 @@ class KeplerLightCurveFile(LightCurveFile):
         -------
         lcf : KeplerLightCurveFile object or list of KeplerLightCurveFile objects
         """
-        path = download_kepler_products(
-            target=target, filetype='Lightcurve', cadence=cadence,
-            quarter=quarter, campaign=campaign, month=month,
-            radius=radius, targetlimit=targetlimit)
+        if os.path.exists(target) or str(target).startswith('http'):
+            path = [target]
+        else:
+            path = download_kepler_products(
+                target=target, filetype='Lightcurve', cadence=cadence,
+                quarter=quarter, campaign=campaign, month=month,
+                radius=radius, targetlimit=targetlimit)
         if len(path) == 1:
             return KeplerLightCurveFile(path[0], **kwargs)
         return [KeplerLightCurveFile(p, **kwargs) for p in path]
