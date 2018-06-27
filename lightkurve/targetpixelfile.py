@@ -775,9 +775,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
             try:
                 push_notebook()
             except AttributeError:
-                print('Interact tool must be run in a Jupyter Notebook.')
-                print('\n')
-                print('\n')
+                log.error('Interact tool must be run in a Jupyter Notebook.\n')
                 return None
 
 
