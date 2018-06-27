@@ -441,6 +441,7 @@ def test_flatten_robustness():
     assert_allclose(flat_lc.flux, expected_result)
 
 
+@pytest.mark.remote_data
 def test_from_archive_should_accept_path():
     """If a url is passed to `from_archive` it should still just work."""
     KeplerLightCurveFile.from_archive(TABBY_Q8)

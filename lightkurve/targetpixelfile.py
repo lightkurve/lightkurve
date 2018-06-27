@@ -179,7 +179,9 @@ class KeplerTargetPixelFile(TargetPixelFile):
         -------
         tpf : KeplerTargetPixelFile object.
         """
-        if os.path.exists(target) or str(target).startswith('http'):
+        if os.path.exists(str(target)) or str(target).startswith('http'):
+            log.warning('Warning: from_archive() is not intended to accept a '
+                        'direct path, use KeplerTargetPixelFile(path) instead.')
             path = [target]
         else:
             path = download_kepler_products(
