@@ -10,9 +10,9 @@ from oktopus import GaussianPrior, JointPrior, PoissonPosterior, UniformPrior
 import pytest
 from scipy.stats import mode
 
-from ..prf import KeplerPRF, SimpleKeplerPRF
-from ..prf_photometry import PRFPhotometry, SceneModel
-from ..targetpixelfile import KeplerTargetPixelFile
+from ...prf import KeplerPRF, SimpleKeplerPRF
+from ...prf import PRFPhotometry, SceneModel
+from ...targetpixelfile import KeplerTargetPixelFile
 
 
 def test_prf_normalization():
@@ -110,7 +110,7 @@ def test_scene_model():
 
 
 def test_get_model_prf():
-    tpf_fn = get_pkg_data_filename("data/test-tpf-star.fits")
+    tpf_fn = get_pkg_data_filename("../../tests/data/test-tpf-star.fits")
     tpf = KeplerTargetPixelFile(tpf_fn)
 
     prf = KeplerPRF(channel=tpf.channel, shape=tpf.shape[1:],

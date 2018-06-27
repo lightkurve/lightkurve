@@ -1,3 +1,4 @@
+"""Provides tools to model a Kepler image."""
 from __future__ import division, print_function
 
 import logging
@@ -6,13 +7,13 @@ import numpy as np
 from tqdm import tqdm
 
 from oktopus import Prior, GaussianPrior, UniformPrior, PoissonPosterior
-from oktopus.posterior import PoissonPosterior
 
-from .prf import KeplerPRF
-from .utils import plot_image
+from .prfmodels import KeplerPRF
+from ..utils import plot_image
 
 
-__all__ = ['StarPrior', 'FocusPrior', 'MotionPrior',
+__all__ = ['GaussianPrior', 'UniformPrior', 'FixedValuePrior',
+           'StarPrior', 'BackgroundPrior', 'FocusPrior', 'MotionPrior',
            'StarParameters', 'BackgroundParameters', 'FocusParameters',
            'MotionParameters', 'SceneModelParameters',
            'SceneModel', 'PRFPhotometry']
@@ -76,6 +77,10 @@ class PriorContainer(object):
         if isinstance(prior, Prior):
             return prior
         return FixedValuePrior(value=prior)
+
+    def __call__(self, *params):
+        """Calls :func:`evaluate`"""
+        return self.evaluate(*params)
 
 
 class StarPrior(PriorContainer):
@@ -213,8 +218,10 @@ class FocusParameters(object):
         self.fitted = fitted
 
     def __repr__(self):
-        return "<FocusParameters: scale_col={:.3f}, scale_row={:.3f}, rotation_angle={:.3f}, fitted={}>".format(
-                    self.scale_col, self.scale_row, self.rotation_angle, self.fitted)
+        return ("<FocusParameters: scale_col={:.3f}, scale_row={:.3f}, "
+                "rotation_angle={:.3f}, fitted={}>"
+                "".format(self.scale_col, self.scale_row,
+                          self.rotation_angle, self.fitted))
 
 
 class MotionParameters(object):

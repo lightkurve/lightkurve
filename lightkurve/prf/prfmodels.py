@@ -8,7 +8,7 @@ import numpy as np
 import scipy
 import scipy.interpolate
 
-from .utils import channel_to_module_output, plot_image
+from ..utils import channel_to_module_output, plot_image
 
 
 __all__ = ['KeplerPRF', 'SimpleKeplerPRF']
