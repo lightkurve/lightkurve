@@ -213,3 +213,8 @@ def test_interact():
     tpf = KeplerTargetPixelFile(filename_tpf_one_center)
     tpf.interact()
     tpf.interact(lc=tpf.to_lightcurve(aperture_mask='all'))
+
+
+def test_from_archive_should_accept_path():
+    """If a path is accidentally passed to `from_archive` it should still just work."""
+    KeplerTargetPixelFile.from_archive(filename_tpf_all_zeros)
