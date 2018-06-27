@@ -1,6 +1,8 @@
 PSF photometry classes
 ======================
 
-.. automodule:: lightkurve.prf
-    :members:
-    :undoc-members:
+.. module:: lightkurve.prf
+
+.. automodapi:: lightkurve.prf
+	:no-heading:
+	:inherited-members:

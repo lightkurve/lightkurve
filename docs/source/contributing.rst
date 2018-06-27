@@ -1,8 +1,8 @@
 .. _contributing:
 
-============
+=================================
 Contributing and reporting issues
-============
+=================================
 
 **lightkurve** is actively developed on its `GitHub repository <https://github.com/KeplerGO/lightkurve>`_.
 
