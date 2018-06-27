@@ -804,13 +804,17 @@ class SyntheticLightCurve(LightCurve):
             return('Planet period: {} '.format(self.period)
                     + 'Planet Rp/Rs: {}'.format(self.rprs))
 
-    def chisq(self, model, nparams, **kwargs):
+    def recover():
+        '''TBD'''
+        return True
+
+    def compute_chisq(self, model, nparams, **kwargs):
         """sample across surface and pick the one where chisq is lowest
         right now we have to choose the same lb and ub for every param
         """
         from scipy.optimize import brute
 
-        """
+
         model_flux = model.evaluate(self.time)
         model_flux = model_flux / np.nanmedian(model_flux)
         lc_normalized = self.normalize()
@@ -838,7 +842,7 @@ class SyntheticLightCurve(LightCurve):
 
 
         min_lst = chisqarr[np.argmin(chisqarr[:,nparams])]
-        """
+
 
         #return chisqarr[np.argmin(chisqarr[:,nparams])]
 

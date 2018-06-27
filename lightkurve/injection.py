@@ -272,3 +272,41 @@ def inject(lc, model):
         mergedflux = lc.flux + model.evaluate(lc.time)
     return lightkurve.lightcurve.SyntheticLightCurve(lc.time, flux=mergedflux, flux_err=lc.flux_err,
                                signaltype=model.signaltype, **model.params)
+
+
+def recover_hsiao(lc, T0=x, z=x, ...): #, T0, z=0.5, amplitude=1.e-4):
+    """Recover injected signals from a lightcurve
+    Parameters
+    ----------
+
+    Returns
+    -------
+    lc : LightCurve class
+        Returns a lightcurve possessing a synthetic signal.
+
+    """
+    def get_initial_guess():
+        # estimate T0 based on ...
+        #...
+        returns (T0, z, ...)
+
+    # Estimate an initial guess
+    initial_guesses = get_initial_guess()
+    initial_model = SupernovaModel(initial_guesses)
+
+    def calculate_galaxy_background(supernova_flux):
+
+
+
+    def neg_log_like(theta):
+        supernova_flux = model.evaluate(lc.time)
+        net_model_flux = supernova_flux + galaxy_background
+        residual = lc.flux - net_model_flux
+        return 0.5 * np.sum((residual / lc.flux_err)**2)
+
+    results = minimize(neg_log_like())
+
+
+
+
+    return 1
