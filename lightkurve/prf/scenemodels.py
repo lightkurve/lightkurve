@@ -300,7 +300,7 @@ class SceneModelParameters(object):
         if self.motion.fitted:
             array.append(self.motion.shift_col)
             array.append(self.motion.shift_row)
-        return np.array(array)
+        return np.array(array).ravel()
 
     def from_array(self, array):
         """Inverse of ``to_array()``."""
@@ -373,7 +373,7 @@ class SceneModel(object):
         self.fit_background = fit_background
         self.fit_focus = fit_focus
         self.fit_motion = fit_motion
-        self.params = self.initial_guesses()
+        self.params = self.get_initial_guesses()
 
     def __repr__(self):
         out = super(SceneModel, self).__repr__() + '\n'
@@ -386,7 +386,7 @@ class SceneModel(object):
                         self.fit_background, self.fit_focus, self.fit_motion)
         return out
 
-    def initial_guesses(self):
+    def get_initial_guesses(self):
         """Returns the prior means which can be used to initialize the model.
 
         The guesses are obtained by taking the means of the priors.
@@ -425,7 +425,7 @@ class SceneModel(object):
             Predicted image given the parameters.
         """
         if params is None:
-            params = self.initial_guesses()
+            params = self.get_initial_guesses()
         star_images = []
         for star in params.stars:
             star_images.append(self.prfmodel(flux=star.flux,
@@ -496,7 +496,7 @@ class SceneModel(object):
             Fitted parameters plus fitting diagnostics.
         """
         loss = loss_function(data, self._predict, prior=self._logp_prior)
-        fit = loss.fit(x0=self.initial_guesses().to_array(), method=method, **kwargs)
+        fit = loss.fit(x0=self.get_initial_guesses().to_array(), method=method, **kwargs)
         result = self.params.from_array(fit.x)
         result.predicted_image = self._predict(*fit.x)
         result.residual_image = data - result.predicted_image
@@ -571,7 +571,7 @@ class PRFPhotometry(object):
 
     def _parse_lightcurve(self, star_idx):
         # Create a lightcurve
-        from . import LightCurve
+        from .. import LightCurve
         flux = []
         for cadence in range(len(self.results)):
             flux.append(self.results[cadence].stars[star_idx].flux)
@@ -579,7 +579,7 @@ class PRFPhotometry(object):
 
     def _parse_background(self):
         # Create a lightcurve
-        from . import LightCurve
+        from .. import LightCurve
         bgflux = []
         for cadence in range(len(self.results)):
             bgflux.append(self.results[cadence].background.flux)
