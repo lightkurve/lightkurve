@@ -274,10 +274,11 @@ def inject(lc, model):
                                signaltype=model.signaltype, **model.params)
 
 
-def recover_hsiao(lc, T0=x, z=x, ...): #, T0, z=0.5, amplitude=1.e-4):
+def recover_hsiao(lc): #, T0, z=0.5, amplitude=1.e-4):
     """Recover injected signals from a lightcurve
     Parameters
     ----------
+    lc : SyntheticLightCurve object
 
     Returns
     -------
@@ -285,28 +286,29 @@ def recover_hsiao(lc, T0=x, z=x, ...): #, T0, z=0.5, amplitude=1.e-4):
         Returns a lightcurve possessing a synthetic signal.
 
     """
+    from scipy.optimize import minimize
+
     def get_initial_guess():
-        # estimate T0 based on ...
-        #...
-        returns (T0, z, ...)
-
-    # Estimate an initial guess
-    initial_guesses = get_initial_guess()
-    initial_model = SupernovaModel(initial_guesses)
-
-    def calculate_galaxy_background(supernova_flux):
-
+        T0 = 2600
+        z = 0.5
+        amplitude = 3.e-4
+        background_flux = np.percentile(lc.flux, 3)
+        params = T0, z, amplitude, background_flux
+        return params
 
 
     def neg_log_like(theta):
-        supernova_flux = model.evaluate(lc.time)
-        net_model_flux = supernova_flux + galaxy_background
+        lc.remove_nans()
+        T0, z, amplitude, background_flux = theta
+        supernova_model = SupernovaModel(T0, z=0.5, amplitude=amplitude)
+        supernova_flux = supernova_model.evaluate(lc.time)
+        net_model_flux = supernova_flux + background_flux
         residual = lc.flux - net_model_flux
         return 0.5 * np.sum((residual / lc.flux_err)**2)
 
-    results = minimize(neg_log_like())
+    #return neg_log_like([7, 3, 4, 5])
+    bnds = ((min(lc.time), max(lc.time)), (None, None), (None, None), (None, None))
 
+    results = minimize(neg_log_like, get_initial_guess(), method='SLSQP', bounds=bnds)
 
-
-
-    return 1
+    return results.x
