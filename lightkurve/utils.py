@@ -321,17 +321,12 @@ def query_catalog(coordinate, catalog="KIC", radius=0.5):
         -------
         result : astropy.table
             Astropy table with the following columns
-        ID : astropy.table.column (KIC & EPIC)
-            Catalog ID from catalog.
-        RAJ200: astropy.table.column (KIC & EPIC)
-            Right ascension [degrees]
-        DEJ2000: astropy.table.column (KIC & EPIC)
-            Declination [deg]
-        pmRA: astropy.table.column (KIC & EPIC)
-            Proper motion for right ascension [mas/year]
-        pmDEC: astropy.table.column (KIC & EPIC)
-        Kpmag: astropy.table.column (KIC & EPIC)
-            Magnitude in Kepler band [mag]
+            ID : Catalog ID from catalog.
+            RAJ200: Right ascension [degrees]
+            DEJ2000: Declination [degrees]
+            pmRA: Proper motion for right ascension [mas/year]
+            pmDEC: Proper motion for declination [mas/year]
+            Kpmag: Magnitude in Kepler band [mag]
         """
         supported_catalogs = ['KIC', 'EPIC', 'Gaia']
         if catalog not in supported_catalogs:

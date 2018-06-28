@@ -215,17 +215,13 @@ class KeplerTargetPixelFile(TargetPixelFile):
         -------
         result : astropy.table
             Astropy table with the following columns
-        ID : astropy.table.column (KIC & EPIC)
-            Catalog ID from catalog.
-        RAJ200: astropy.table.column (KIC & EPIC)
-            Right ascension [degrees]
-        DEJ2000: astropy.table.column (KIC & EPIC)
-            Declination [deg]
-        pmRA: astropy.table.column (KIC & EPIC)
-            Proper motion for right ascension [mas/year]
-        pmDEC: astropy.table.column (KIC & EPIC)
-        Kpmag: astropy.table.column (KIC & EPIC)
-            Magnitude in Kepler band [mag]
+            ID : Catalog ID from catalog.
+            RAJ200: Right ascension [degrees]
+            DEJ2000: Declination [degrees]
+            pmRA: Proper motion for right ascension [mas/year]
+            pmDEC: Proper motion for declination [mas/year]
+            Kpmag: Magnitude in Kepler band [mag]
+
         """
 
         if catalog is None:
@@ -245,8 +241,11 @@ class KeplerTargetPixelFile(TargetPixelFile):
         # query around centre with radius
         data = query_catalog(cent, radius=radius, catalog=catalog)
 
+        # Find where nans are in cadence
+        find_nans = ~np.isnan(self.flux[4])
         # Load ra & dec of all tpf pixels
-        pixels_ra, pixels_dec = self.get_coordinates(cadence='all')
+        pixels_ra, pixels_dec = self.get_coordinates(cadence=5)
+        pixels_ra, pixels_dec = pixels_ra[find_nans], pixels_dec[find_nans]
 
         # Reduce calculation for astroy separation
         pixel_radec = np.asarray([pixels_ra.ravel(), pixels_dec.ravel()])
