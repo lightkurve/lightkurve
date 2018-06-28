@@ -93,8 +93,6 @@ class TransitModel(object):
         Parameters
         ----------
         Default values are those initialized in TransitModel.
-        A parameter must be defined in the initialization of
-        TransitModel if it is to be changed in add_planet.
 
         zpt : float
             A photometric zeropoint
@@ -274,8 +272,9 @@ def inject(lc, model):
                                signaltype=model.signaltype, **model.params)
 
 
-def recover_hsiao(lc): #, T0, z=0.5, amplitude=1.e-4):
+def recover(lc, signal_type, **kwargs):
     """Recover injected signals from a lightcurve
+    kwargs will be initial guesses
     Parameters
     ----------
     lc : SyntheticLightCurve object
@@ -287,27 +286,50 @@ def recover_hsiao(lc): #, T0, z=0.5, amplitude=1.e-4):
 
     """
     from scipy.optimize import minimize
+    bnds = ()
 
     def get_initial_guess():
-        T0 = 2600
-        z = 0.5
-        amplitude = 3.e-4
-        background_flux = np.percentile(lc.flux, 3)
-        params = T0, z, amplitude, background_flux
-        return params
-
+        if signal_type == 'Supernova':
+            T0 = 2600
+            z = 0.5
+            amplitude = 3.e-4
+            background_flux = np.percentile(lc.flux, 3)
+            params = T0, z, amplitude, background_flux
+            return params
+        elif signal_type == 'Planet':
+            T0 = min(lc.time) + 2
+            period = 5
+            rprs = 0.1
+            impact = 0.0
+            params = T0, period, rprs, impact
+            return params
+        else:
+            print('Signal type not supported.')
+            return
+            #raise error or something instead of printing
 
     def neg_log_like(theta):
         lc.remove_nans()
-        T0, z, amplitude, background_flux = theta
-        supernova_model = SupernovaModel(T0, z=0.5, amplitude=amplitude)
-        supernova_flux = supernova_model.evaluate(lc.time)
-        net_model_flux = supernova_flux + background_flux
+        if signal_type == 'Supernova':
+            T0, z, amplitude, background_flux = theta
+            supernova_model = SupernovaModel(T0, z=0.5, amplitude=amplitude)
+            supernova_flux = supernova_model.evaluate(lc.time)
+            net_model_flux = supernova_flux + background_flux
+
+        elif signal_type == 'Planet':
+            T0, period, rprs, impact = theta
+            transit_model = TransitModel()
+            transit_model.add_star(zpt=1.0)
+            transit_model.add_planet(period, rprs, T0, impact=impact)
+            net_model_flux = transit_model.evaluate(lc.time)
+
         residual = lc.flux - net_model_flux
         return 0.5 * np.sum((residual / lc.flux_err)**2)
 
-    #return neg_log_like([7, 3, 4, 5])
-    bnds = ((min(lc.time), max(lc.time)), (None, None), (None, None), (None, None))
+    if signal_type == 'Supernova':
+        bnds = ((min(lc.time), max(lc.time)), (None, None), (None, None), (None, None))
+    elif signal_type == 'Planet':
+        bnds = ((min(lc.time), min(lc.time)+5), (0, 10), (0, 1), (0, 1))
 
     results = minimize(neg_log_like, get_initial_guess(), method='SLSQP', bounds=bnds)
 
