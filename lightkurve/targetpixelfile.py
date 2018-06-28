@@ -834,21 +834,22 @@ class KeplerTargetPixelFile(TargetPixelFile):
                           flux_err=self.flux_bkg_err)
 
 
-    def get_hdu(image, extension):
-        """Checks if an image is a FITS single image, or a FITS file,
+    def _get_hdu(image, extension):
+        """Checks if an image is a single FITS image, or a FITS file,
         and returns the appropriate PrimaryHDU.
 
         Attributes
         ----------
         image : fits.ImageHDU or fits.HDUList object
             FITS filename path or ImageHDU object to get the data from.
-        extension: integer 0, or 1
-            Determines which file extension the data is in, depending on the file
-            type and source
+        extension: integer
+            Number of the file extension containing data, depends on the file
+            type and source.
+
         Returns
         -------
         hdu : astropy.PrimaryHDU
-            PrimaryHDU of the image inputted
+            PrimaryHDU of the image inputted.
         """
         if isinstance(image, fits.ImageHDU):
             hdu = image
@@ -858,7 +859,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
             hdu = fits.open(image)[extension]
         return hdu
 
-    def get_WCS(mid_img,hdu,position,extension): #name of this?? add doc string
+    def _get_pos_corrs(mid_img, hdu, position, extension):
         """Calculates the position correction values (both in row and column) and
         WCS for an image relative to the reference image, defined as the middle
         cadence of the FITS file.
@@ -866,28 +867,41 @@ class KeplerTargetPixelFile(TargetPixelFile):
         Attributes
         ----------
         hdu : astropy.PrimaryHDU
-            PrimaryHDU of the image being looked at
+            PrimaryHDU of the image being looked at.
         mid_img : fits.ImageHDU
-            middle layer of the FITS file used as a reference image
+            Reference image from the FITS file.
+        position : astropy.SkyCoord
+            Position around which to cut out pixels.
+        extension : integer
+            Number of the file extension containing data, depends on the file
+            type and source.
+
         Returns
         -------
         poscorr1 :  float32
-            Position correction in the vertical direction (column)
+            Position correction in the vertical direction (column).
         poscorr2 :  float32
-            Position correction in the horizontal direction (row)
+            Position correction in the horizontal direction (row).
         wcs1 :  astropy.wcs.WCS
-            WCS object for this specific hdu
+            WCS object for this hdu.
+        column : integer
+            Column number of the center pixel.
+        row : integer
+            Row number of the center pixel.
+        ractr :
+            Right ascension of the center of the center pixel.
+        decctr:
+            Declination of the center of the center pixel.
         """
         # Calculate reference WCS coords from the middle image to use later to
         # do pos_corr calcs. Get the middle pixel column and row.
-        mid_hdu = KeplerTargetPixelFile.get_hdu(mid_img, extension)
+        mid_hdu = KeplerTargetPixelFile._get_hdu(mid_img, extension)
         wcs = WCS(mid_hdu)
         pixelpos = skycoord_to_pixel(position, wcs=wcs)
-        column = int(np.round(pixelpos[0]))
-        row = int(np.round(pixelpos[1]))
+        column, row = int(np.round(pixelpos[0])), int(np.round(pixelpos[1]))
 
         # Calculate the ra and dec of the center pixel of the middle image
-        skyposctr = pixel_to_skycoord(column,row,wcs=wcs)
+        skyposctr = pixel_to_skycoord(column, row, wcs=wcs)
         ractr = skyposctr.ra.deg
         decctr = skyposctr.dec.deg
 
@@ -896,6 +910,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         pixelpos1 = skycoord_to_pixel(position, wcs=wcs1)
         poscorr1 = pixelpos1[0] - pixelpos[0]
         poscorr2 = pixelpos1[1] - pixelpos[1]
+
         return [wcs1, poscorr1, poscorr2, column, row, ractr, decctr]
 
     @staticmethod
@@ -942,7 +957,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         mid_img = images[int(len(images)/2)-1]
 
         for idx, img in tqdm(enumerate(images), total=len(images)):
-            hdu = KeplerTargetPixelFile.get_hdu(img, extension)
+            hdu = KeplerTargetPixelFile._get_hdu(img, extension)
             if idx == 0:  # Get default keyword values from the first image
                 factory.keywords = hdu.header
             if position is None:
@@ -951,19 +966,49 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 cutout = Cutout2D(hdu.data, position, wcs=WCS(hdu.header),
                                   size=size, mode='partial')
 
-            img_data = KeplerTargetPixelFile.get_WCS(mid_img,hdu,position,extension)
+            wcs, pos_corr1, pos_corr2, col, row, ractr, decctr = \
+                KeplerTargetPixelFile._get_pos_corrs(mid_img, hdu, position, extension)
             # Add calculated pos corr shifts to the keywords dictionary
-            hdu.header['POSCORR1'] = img_data[1]
-            hdu.header['POSCORR2'] = img_data[2]
-            # Information on the center of the TPF file to be created, used to create the second header extension
-            factory.keywords['MID_COL'] = img_data[3]
-            factory.keywords['MID_ROW'] = img_data[4]
-            factory.keywords['RA_CTR'] = img_data[5]
-            factory.keywords['DEC_CTR'] = img_data[6]
+            hdu.header['POSCORR1'] = pos_corr1
+            hdu.header['POSCORR2'] = pos_corr2
 
-            factory.add_cadence(frameno=idx, wcs=img_data[0], flux=cutout.data, header=hdu.header)
+            factory.add_cadence(frameno=idx, wcs=wcs, flux=cutout.data, header=hdu.header)
+
+        tpfsize = size[0] # Use column value assuming a square TPF
+        if (tpfsize % 2 == 0): # Make sure tpfsize is odd to center the star
+             tpfsize += 1
+
+        # Override the defaults where necessary, and pass into the header generating functions
+        header_info = {}
+        header_info['OBJECT'] = factory.target_id
+        header_info['KEPLERID'] = factory.target_id
+        header_info['RA_OBJ'] = factory.keywords["RA_OBJ"]
+        header_info['DEC_OBJ'] = factory.keywords["DEC_OBJ"]
+
+        ext1_info = {}
+        ext1_info['TFORM4'] = '{}J'.format(size[0]*size[1])
+        ext1_info['TDIM4'] = '({},{})'.format(size[0],size[1])
+
+        cd11 = factory.keywords['CD1_1']
+        cd12 = factory.keywords['CD1_2']
+        cd21 = factory.keywords['CD2_1']
+        cd22 = factory.keywords['CD2_2']
+        ext1_info['11PC5'] = -1.0*cd11/0.001102672560321 # hard coded from the template file
+        ext1_info['12PC5'] = -1.0*cd12/0.001102672560321
+        ext1_info['21PC5'] = cd21/0.001102672560321
+        ext1_info['22PC5'] = cd22/0.001102672560321
+
+        for m in [4, 5, 6, 7, 8, 9]:
+            if m > 4:
+                header_info["TFORM{}".format(m)] = '{}E'.format(size[0]*size[1])
+            ext1_info['TDIM{}'.format(m)] = '({},{})'.format(size[0],size[1])
+            ext1_info['1CRV{}P'.format(m)] = col - int((tpfsize-1)/2) + factory.keywords['CRVAL1P']
+            ext1_info['2CRV{}P'.format(m)] = row - int((tpfsize-1)/2) + factory.keywords['CRVAL2P']
+            ext1_info['1CRPX{}'.format(m)] = (tpfsize + 1)/2
+            ext1_info['2CRPX{}'.format(m)] = (tpfsize + 1)/2
+
+        kwargs = {"header_info": header_info, "ext1_info": ext1_info}
         return factory.get_tpf(**kwargs)
-
 
 class KeplerTargetPixelFileFactory(object):
     """Class to create a KeplerTargetPixelFile."""
@@ -1026,12 +1071,12 @@ class KeplerTargetPixelFileFactory(object):
 
     def get_tpf(self, **kwargs):
         """Returns a KeplerTargetPixelFile object."""
-        return KeplerTargetPixelFile(self._hdulist(), **kwargs)
+        return KeplerTargetPixelFile(self._hdulist(**kwargs), **kwargs)
 
-    def _hdulist(self):
+    def _hdulist(self, **kwargs):
         """Returns an astropy.io.fits.HDUList object."""
-        return fits.HDUList([self._make_primary_hdu(),
-                             self._make_target_extension(),
+        return fits.HDUList([self._make_primary_hdu(**kwargs.get('header_info')),
+                             self._make_target_extension(**kwargs.get('ext1_info')),
                              self._make_aperture_extension()])
 
     def _header_template(self, extension):
@@ -1040,7 +1085,7 @@ class KeplerTargetPixelFileFactory(object):
                                    "tpf-ext{}-header.txt".format(extension))
         return fits.Header.fromtextfile(template_fn)
 
-    def _make_primary_hdu(self, keywords={}):
+    def _make_primary_hdu(self, keywords={}, **kwargs):
         """Returns the primary extension (#0)."""
         hdu = fits.PrimaryHDU()
         # Copy the default keywords from a template file from the MAST archive
@@ -1056,13 +1101,17 @@ class KeplerTargetPixelFileFactory(object):
         hdu.header['RA_OBJ'] = self.keywords['RA_OBJ']
         hdu.header['DEC_OBJ'] = self.keywords['DEC_OBJ']
 
+        # Override defaults using data calculated in from_fits_images
+        for kw in kwargs.keys():
+            hdu.header[kw] = kwargs[kw]
         # Empty a bunch of keywords rather than having incorrect info
         for kw in ["PROCVER", "FILEVER", "CHANNEL", "MODULE", "OUTPUT",
                    "TIMVERSN", "CAMPAIGN", "DATA_REL", "TTABLEID"]:
             hdu.header[kw] = ""
+
         return hdu
 
-    def _make_target_extension(self):
+    def _make_target_extension(self, **kwargs):
         """Create the 'TARGETTABLES' extension (i.e. extension #1)."""
         # Turn the data arrays into fits columns and initialize the HDU
         coldim = '({},{})'.format(self.n_cols, self.n_rows)
@@ -1112,40 +1161,10 @@ class KeplerTargetPixelFileFactory(object):
                 except KeyError:
                     hdu.header[kw] = (template[kw],
                                       template.comments[kw])
+        # Override defaults using data calculated in from_fits_images
+        for kw in kwargs.keys():
+            hdu.header[kw] = kwargs[kw]
 
-        # Override the defaults where necessary
-        hdu.header['OBJECT'] = self.target_id
-        hdu.header['KEPLERID'] = self.target_id
-        for n in [5, 6, 7, 8, 9]:
-            hdu.header["TFORM{}".format(n)] = eformat
-            hdu.header["TDIM{}".format(n)] = coldim
-        hdu.header['TFORM4'] = jformat
-        hdu.header['TDIM4'] = coldim
-        ra = hdu.header['RA_OBJ'] = self.keywords["RA_OBJ"]
-        dec = hdu.header['DEC_OBJ'] = self.keywords["DEC_OBJ"]
-
-        tpfsize = self.n_cols # Pick col value assuming a square TPF
-        if (tpfsize % 2 == 0): # Make sure tpfsize is odd to center the star
-             tpfsize += 1
-
-        for m in [4, 5, 6, 7, 8, 9]:
-            hdu.header['1CRV{}P'.format(m)] = self.keywords['MID_COL'] - int((self.n_cols-1)/2) + self.keywords['CRVAL1P']
-            hdu.header['2CRV{}P'.format(m)] = self.keywords['MID_ROW'] - int((self.n_rows-1)/2) + self.keywords['CRVAL2P']
-            hdu.header['1CRPX{}'.format(m)] = (tpfsize + 1)/2
-            hdu.header['2CRPX{}'.format(m)] = (tpfsize + 1)/2
-
-        cd11 = self.keywords['CD1_1']
-        cd12 = self.keywords['CD1_2']
-        cd21 = self.keywords['CD2_1']
-        cd22 = self.keywords['CD2_2']
-
-        hdu.header['1CRVL5'] = self.keywords['RA_CTR']
-        hdu.header['2CRVL5'] = self.keywords['DEC_CTR']
-        cdelt = hdu.header['2CDLT5']
-        hdu.header['11PC5'] = -1.0*cd11/cdelt
-        hdu.header['12PC5'] = -1.0*cd12/cdelt
-        hdu.header['21PC5'] = cd21/cdelt
-        hdu.header['22PC5'] = cd22/cdelt
         return hdu
 
     def _make_aperture_extension(self):
