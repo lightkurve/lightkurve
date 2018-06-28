@@ -394,17 +394,17 @@ class SceneModel(object):
         """
         initial_star_guesses = []
         for star in self.star_priors:
-            initial_star_guesses.append(StarParameters(col=star.col.mean,
-                                                       row=star.row.mean,
-                                                       flux=star.flux.mean))
-        background = BackgroundParameters(flux=self.background_prior.flux.mean,
+            initial_star_guesses.append(StarParameters(col=star.col.mean[0],
+                                                       row=star.row.mean[0],
+                                                       flux=star.flux.mean[0]))
+        background = BackgroundParameters(flux=self.background_prior.flux.mean[0],
                                           fitted=self.fit_background)
-        focus = FocusParameters(scale_col=self.focus_prior.scale_col.mean,
-                                scale_row=self.focus_prior.scale_row.mean,
-                                rotation_angle=self.focus_prior.rotation_angle.mean,
+        focus = FocusParameters(scale_col=self.focus_prior.scale_col.mean[0],
+                                scale_row=self.focus_prior.scale_row.mean[0],
+                                rotation_angle=self.focus_prior.rotation_angle.mean[0],
                                 fitted=self.fit_focus)
-        motion = MotionParameters(shift_col=self.motion_prior.shift_col.mean,
-                                  shift_row=self.motion_prior.shift_row.mean,
+        motion = MotionParameters(shift_col=self.motion_prior.shift_col.mean[0],
+                                  shift_row=self.motion_prior.shift_row.mean[0],
                                   fitted=self.fit_motion)
         initial_params = SceneModelParameters(stars=initial_star_guesses,
                                               background=background,
@@ -502,6 +502,7 @@ class SceneModel(object):
         result.predicted_image = self._predict(fit.x)
         result.residual_image = data - result.predicted_image
         result.loss_value = fit.fun
+        result.opt_result = fit
         return result
 
     def plot(self, *params, **kwargs):

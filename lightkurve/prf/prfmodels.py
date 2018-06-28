@@ -190,10 +190,10 @@ class SimpleKeplerPRF(KeplerPRF):
     and angle are fixed to 1.0 and 0, respectivelly.
     """
 
-    def __call__(self, flux, center_col, center_row):
+    def __call__(self, flux, center_col, center_row, **kwargs):
         return self.evaluate(flux, center_col, center_row)
 
-    def evaluate(self, flux, center_col, center_row):
+    def evaluate(self, flux, center_col, center_row, **kwargs):
         """
         Interpolates the PRF model onto detector coordinates.
 

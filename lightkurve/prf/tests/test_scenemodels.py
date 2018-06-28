@@ -121,3 +121,39 @@ def test_empty_scene():
     background = bgflux * np.ones(shape=shape)
     results = scene.fit(background)
     assert np.isclose(results.background.flux, bgflux, rtol=1e-2)
+
+
+def test_scene_with_one_star():
+    """Can we fit the background flux in an empty scene?"""
+    channel = 42
+    shape = (10, 12)
+    starflux, col, row = 1000., 60., 70.
+    bgflux = 10.
+    scale_col, scale_row, rotation_angle = 1.2, 1.3, 0.2
+    prf = KeplerPRF(channel=channel, shape=shape, column=col, row=row)
+    star_prior = StarPrior(col=GaussianPrior(col + 6, 0.01),
+                           row=GaussianPrior(row + 6, 0.01),
+                           flux=UniformPrior(lb=0.5*starflux, ub=1.5*starflux))
+    background_prior = BackgroundPrior(flux=UniformPrior(lb=0, ub=100))
+    focus_prior = FocusPrior(scale_col=UniformPrior(lb=0.5, ub=1.5),
+                             scale_row=UniformPrior(lb=0.5, ub=1.5),
+                             rotation_angle=UniformPrior(lb=0., ub=0.5))
+    scene = SceneModel(star_priors=[star_prior],
+                       background_prior=background_prior,
+                       focus_prior=focus_prior,
+                       prfmodel=prf,
+                       fit_background=True,
+                       fit_focus=True)
+    # Generate and fit fake data
+    fake_data = bgflux + prf(starflux, col + 6, row + 6,
+                             scale_col=scale_col, scale_row=scale_row,
+                             rotation_angle=rotation_angle)
+    results = scene.fit(fake_data, tol=1e-12, options={'maxiter': 100})
+    # Do the results match the input?
+    assert np.isclose(results.stars[0].col, col + 6)
+    assert np.isclose(results.stars[0].row, row + 6)
+    assert np.isclose(results.stars[0].flux, starflux)
+    assert np.isclose(results.background.flux, bgflux)
+    assert np.isclose(results.focus.scale_col, scale_col)
+    assert np.isclose(results.focus.scale_row, scale_row)
+    assert np.isclose(results.focus.rotation_angle, rotation_angle)
