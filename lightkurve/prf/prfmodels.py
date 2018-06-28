@@ -180,6 +180,34 @@ class KeplerPRF(object):
                    extent=(self.column, self.column + self.shape[1],
                            self.row, self.row + self.shape[0]), **kwargs)
 
+    def gradient(self, flux, center_col, center_row):
+        """
+        This function returns the gradient of the SimpleKeplerPRF model with
+        respect to flux, center_col, and center_row.
+
+        Parameters
+        ----------
+        flux : float
+            Total integrated flux of the PRF
+        center_col, center_row : float
+            Column and row coordinates of the center
+
+        Returns
+        -------
+        grad_prf : list
+            Returns a list of arrays where the elements are the derivative
+            of the KeplerPRF model with respect to flux, center_col, and
+            center_row, respectively.
+        """
+        delta_col = self.col_coord - center_col
+        delta_row = self.row_coord - center_row
+
+        deriv_flux = self.interpolate(delta_row, delta_col)
+        deriv_center_col = - flux * self.interpolate(delta_row, delta_col, dy=1)
+        deriv_center_row = - flux * self.interpolate(delta_row, delta_col, dx=1)
+
+        return [deriv_flux, deriv_center_col, deriv_center_row]
+
 
 class SimpleKeplerPRF(KeplerPRF):
     """
@@ -215,31 +243,3 @@ class SimpleKeplerPRF(KeplerPRF):
         self.prf_model = flux * self.interpolate(delta_row, delta_col)
 
         return self.prf_model
-
-    def gradient(self, flux, center_col, center_row):
-        """
-        This function returns the gradient of the SimpleKeplerPRF model with
-        respect to flux, center_col, and center_row.
-
-        Parameters
-        ----------
-        flux : float
-            Total integrated flux of the PRF
-        center_col, center_row : float
-            Column and row coordinates of the center
-
-        Returns
-        -------
-        grad_prf : list
-            Returns a list of arrays where the elements are the derivative
-            of the KeplerPRF model with respect to flux, center_col, and
-            center_row, respectively.
-        """
-        delta_col = self.col_coord - center_col
-        delta_row = self.row_coord - center_row
-
-        deriv_flux = self.interpolate(delta_row, delta_col)
-        deriv_center_col = - flux * self.interpolate(delta_row, delta_col, dy=1)
-        deriv_center_row = - flux * self.interpolate(delta_row, delta_col, dx=1)
-
-        return [deriv_flux, deriv_center_col, deriv_center_row]

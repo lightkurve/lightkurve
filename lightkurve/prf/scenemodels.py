@@ -183,10 +183,11 @@ class MotionPrior(PriorContainer):
 class StarParameters(object):
     """Container class to hold the parameters of a star in a ``SceneModel``.
     """
-    def __init__(self, col, row, flux, err_col=None, err_row=None, err_flux=None):
+    def __init__(self, col, row, flux, err_col=None, err_row=None, err_flux=None, fitted=True):
         self.col = col
         self.row = row
         self.flux = flux
+        self.fitted = fitted
 
     def __repr__(self):
         r = "<StarParameters: col={:.3f}, row={:.3f}, flux={:.3e}>".format(
@@ -310,14 +311,15 @@ class SceneModelParameters(object):
         for staridx in range(len(self.stars)):
             star = StarParameters(col=array[next_idx],
                                   row=array[next_idx + 1],
-                                  flux=array[next_idx + 2])
+                                  flux=array[next_idx + 2],
+                                  fitted=True)
             stars.append(star)
             next_idx += 3
 
         if not self.background.fitted:
             background = self.background
         else:
-            background = BackgroundParameters(flux=array[next_idx])
+            background = BackgroundParameters(flux=array[next_idx], fitted=True)
             next_idx += 1
 
         if not self.focus.fitted:
@@ -325,14 +327,16 @@ class SceneModelParameters(object):
         else:
             focus = FocusParameters(scale_col=array[next_idx],
                                     scale_row=array[next_idx + 1],
-                                    rotation_angle=array[next_idx + 2])
+                                    rotation_angle=array[next_idx + 2],
+                                    fitted=True)
             next_idx += 3
 
         if not self.motion.fitted:
             motion = self.motion
         else:
             motion = MotionParameters(shift_col=array[next_idx],
-                                      shift_row=array[next_idx + 1])
+                                      shift_row=array[next_idx + 1],
+                                      fitted=True)
 
         return SceneModelParameters(stars=stars, background=background,
                                     focus=focus, motion=motion)
@@ -447,6 +451,29 @@ class SceneModel(object):
         params = self.params.from_array(params_array)
         return self.predict(params)
 
+    def __call__(self, *params_array):
+        return self._predict(*params_array)
+
+    def gradient(self, *params_array):
+        """UNFINISHED WORK!
+        Ze: how to implement this gradient??
+        """
+        params = self.params.from_array(params_array)
+        grad = []
+        for star in params.stars:
+            # Caution: prfmodel takes (flux, col, row) in a different order
+            # than scene model, this has yet to be streamlined
+            grad.append(self.prfmodel.gradient(flux=star.flux,
+                                               center_col=star.col,
+                                               center_row=star.row))
+        # We assume the background gradient is proportional to one
+        grad.append([np.ones(self.prfmodel.shape)])
+        # We assume the gradient of other parameters is zero
+        for i in range(len([*params_array]) - 3 * len(params.stars) - 1):
+            grad.append([np.zeros(self.prfmodel.shape)])
+        grad = sum(grad, [])
+        return grad
+
     def logp_prior(self, params):
         """Evaluates the prior at a point in the parameter space.
 
@@ -496,8 +523,9 @@ class SceneModel(object):
         result : ``SceneParameters`` object
             Fitted parameters plus fitting diagnostics.
         """
-        loss = loss_function(data, self._predict, prior=self._logp_prior)
+        loss = loss_function(data, self, prior=self._logp_prior)
         fit = loss.fit(x0=self.get_initial_guesses().to_array(), method=method, **kwargs)
+        uncertainties = loss.loglikelihood.uncertainties(fit.x)
         result = self.params.from_array(fit.x)
         result.predicted_image = self._predict(fit.x)
         result.residual_image = data - result.predicted_image
