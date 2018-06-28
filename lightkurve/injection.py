@@ -297,7 +297,7 @@ def recover(lc, signal_type, **kwargs):
             params = T0, z, amplitude, background_flux
             return params
         elif signal_type == 'Planet':
-            T0 = min(lc.time) + 2
+            T0 = min(lc.time) + 4
             period = 5
             rprs = 0.1
             impact = 0.0
