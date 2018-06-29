@@ -7,6 +7,7 @@ from tqdm import tqdm
 import os
 import datetime
 import logging
+from collections import Sequence
 
 import oktopus
 import numpy as np
@@ -741,6 +742,81 @@ class LightCurve(object):
         if path is not None:
             hdu.writeto(path, overwrite=overwrite, checksum=True)
         return hdu
+
+
+class CollectionError(Exception):
+    """Raised if there is a problem with a LightCurveCollection."""
+    pass
+
+class LightCurveCollection(Sequence):
+    """
+    Collects multiple LightCurve objects together with helpful functions.
+    """
+
+    def __init__(self, lcs):
+        self.lcs = np.asarray(lcs)
+
+    def __len__(self):
+        return len(self.lcs)
+
+    def _ids(self):
+        '''Finds the KeplerIDs of lightcurves in the collection.
+
+        If there are undefined IDs, or no IDs exist, returns None.
+        '''
+        if 'keplerid' in vars(self.lcs[0]):
+            ids = np.asarray([lc.keplerid for lc in self.lcs])
+            if np.asarray(ids == None).any():
+                log.warn('LightCurves in LightCurve collection have keplerids with None values.')
+                return None
+            if len(np.unique(ids)) != len(ids):
+                log.warn('LightCurves in LightCurve collection do not all have unique keplerids.')
+                return None
+            else:
+                return ids
+        else:
+            return None
+
+    def __getitem__(self, index):
+        '''Indexes the collection. If a string is passed, will attempt to index by the ID that
+        has the same string.
+        '''
+        if isinstance(index, int):
+            return self.lcs[index]
+        elif isinstance(index, str):
+            ids = self._ids()
+            if ids is None:
+                raise CollectionError('Cannot index a LightCurveCollection with {}.'.format(index))
+            loc = np.where(ids == index)[0]
+            if len(loc) == 0:
+                raise CollectionError('No LightCurve named {} in the collection.'.format(index))
+            return self.lcs[loc[0]]
+        else:
+            raise CollectionError('Cannot index a LightCurveCollection with {}.'.format(index))
+
+
+    def append(self, lc):
+        # This error check doesn't work.
+        if not isinstance(lc, LightCurve):
+            log.warning("You can only collect LightCurves")
+        self.lcs = np.append(self.lcs,lc)
+
+    def __repr__(self):
+        str = ''
+        for lc in self.lcs[:-1]:
+            str += '{}, '.format(lc.__repr__())
+        str += '{}.'.format(self.lcs[-1].__repr__())
+        return str
+
+    def plot(self):
+        '''Plot a collection of LightCurves
+        '''
+        raise NotImplementedError()
+
+    def pca(self):
+        '''Creates the Principle Components of a collection of LightCurves
+        '''
+        raise NotImplementedError('Should be able to run a PCA on a collection.')
 
 
 class FoldedLightCurve(LightCurve):
