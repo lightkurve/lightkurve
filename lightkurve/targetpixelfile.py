@@ -1007,8 +1007,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
             ext1_info['1CRPX{}'.format(m)] = (tpfsize + 1)/2
             ext1_info['2CRPX{}'.format(m)] = (tpfsize + 1)/2
 
-        kwargs = {"header_info": header_info, "ext1_info": ext1_info}
-        return factory.get_tpf(**kwargs)
+        ext_info = {"header_info": header_info, "ext1_info": ext1_info}
+        return factory.get_tpf(ext_info)
 
 class KeplerTargetPixelFileFactory(object):
     """Class to create a KeplerTargetPixelFile."""
@@ -1069,14 +1069,14 @@ class KeplerTargetPixelFileFactory(object):
         if 'POSCORR2' in header:
             self.pos_corr2[frameno] = header['POSCORR2']
 
-    def get_tpf(self, **kwargs):
+    def get_tpf(self, ext_info={}):
         """Returns a KeplerTargetPixelFile object."""
-        return KeplerTargetPixelFile(self._hdulist(**kwargs), **kwargs)
+        return KeplerTargetPixelFile(self._hdulist(ext_info), **kwargs)
 
-    def _hdulist(self, **kwargs):
+    def _hdulist(self, ext_info={}):
         """Returns an astropy.io.fits.HDUList object."""
-        return fits.HDUList([self._make_primary_hdu(**kwargs.get('header_info')),
-                             self._make_target_extension(**kwargs.get('ext1_info')),
+        return fits.HDUList([self._make_primary_hdu(ext_info.get('header_info')),
+                             self._make_target_extension(ext_info.get('ext1_info')),
                              self._make_aperture_extension()])
 
     def _header_template(self, extension):
@@ -1085,7 +1085,7 @@ class KeplerTargetPixelFileFactory(object):
                                    "tpf-ext{}-header.txt".format(extension))
         return fits.Header.fromtextfile(template_fn)
 
-    def _make_primary_hdu(self, keywords={}, **kwargs):
+    def _make_primary_hdu(self, keywords={}, header):
         """Returns the primary extension (#0)."""
         hdu = fits.PrimaryHDU()
         # Copy the default keywords from a template file from the MAST archive
@@ -1102,8 +1102,8 @@ class KeplerTargetPixelFileFactory(object):
         hdu.header['DEC_OBJ'] = self.keywords['DEC_OBJ']
 
         # Override defaults using data calculated in from_fits_images
-        for kw in kwargs.keys():
-            hdu.header[kw] = kwargs[kw]
+        for kw in header_info.keys():
+            hdu.header[kw] = header_info[kw]
         # Empty a bunch of keywords rather than having incorrect info
         for kw in ["PROCVER", "FILEVER", "CHANNEL", "MODULE", "OUTPUT",
                    "TIMVERSN", "CAMPAIGN", "DATA_REL", "TTABLEID"]:
@@ -1111,7 +1111,7 @@ class KeplerTargetPixelFileFactory(object):
 
         return hdu
 
-    def _make_target_extension(self, **kwargs):
+    def _make_target_extension(self, ext1_info):
         """Create the 'TARGETTABLES' extension (i.e. extension #1)."""
         # Turn the data arrays into fits columns and initialize the HDU
         coldim = '({},{})'.format(self.n_cols, self.n_rows)
@@ -1162,8 +1162,8 @@ class KeplerTargetPixelFileFactory(object):
                     hdu.header[kw] = (template[kw],
                                       template.comments[kw])
         # Override defaults using data calculated in from_fits_images
-        for kw in kwargs.keys():
-            hdu.header[kw] = kwargs[kw]
+        for kw in ext1_info.keys():
+            hdu.header[kw] = ext1_info[kw]
 
         return hdu
 
