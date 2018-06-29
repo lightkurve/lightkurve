@@ -795,14 +795,17 @@ class SyntheticLightCurve(LightCurve):
         lc = super(SyntheticLightCurve, self).__getitem__(key)
         return lc
 
+    #TO DO: fix repr
     def __repr__(self):
         if self.signaltype is None:
             return('No signal injected')
         elif self.signaltype is 'Supernova':
-            return('Supernova Source: {})'.format(self.source))
+            pass
+            #return('Supernova Source: {})'.format(self.source))
         elif self.signaltype is 'Planet':
-            return('Planet period: {} '.format(self.period)
-                    + 'Planet Rp/Rs: {}'.format(self.rprs))
+            pass
+            #return('Planet period: {} '.format(self.period)
+            #        + 'Planet Rp/Rs: {}'.format(self.rprs))
 
     def recover():
         '''TBD'''
