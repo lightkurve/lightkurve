@@ -290,9 +290,9 @@ def recover(lc, signal_type, **kwargs):
 
     def get_initial_guess():
         if signal_type == 'Supernova':
-            T0 = 2600
-            z = 0.5
-            amplitude = 3.e-4
+            T0 = 2605
+            z = 0.1
+            amplitude = 3.3e-4
             background_flux = np.percentile(lc.flux, 3)
             params = T0, z, amplitude, background_flux
             return params
@@ -309,10 +309,9 @@ def recover(lc, signal_type, **kwargs):
             #raise error or something instead of printing
 
     def neg_log_like(theta):
-        lc.remove_nans()
         if signal_type == 'Supernova':
             T0, z, amplitude, background_flux = theta
-            supernova_model = SupernovaModel(T0, z=0.5, amplitude=amplitude)
+            supernova_model = SupernovaModel(T0, z=z, amplitude=amplitude)
             supernova_flux = supernova_model.evaluate(lc.time)
             net_model_flux = supernova_flux + background_flux
 
@@ -327,10 +326,12 @@ def recover(lc, signal_type, **kwargs):
         return 0.5 * np.sum((residual / lc.flux_err)**2)
 
     if signal_type == 'Supernova':
-        bnds = ((min(lc.time), max(lc.time)), (None, None), (None, None), (None, None))
+        bnds = ((min(lc.time), max(lc.time)), (0, 0.55), (None, None), (None, None))
     elif signal_type == 'Planet':
         bnds = ((min(lc.time), min(lc.time)+5), (0, 10), (0, 1), (0, 1))
 
     results = minimize(neg_log_like, get_initial_guess(), method='SLSQP', bounds=bnds)
 
-    return results.x
+    #return neg_log_like(theta)
+
+    return results
