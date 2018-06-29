@@ -525,8 +525,8 @@ class SceneModel(object):
         """
         loss = loss_function(data, self, prior=self._logp_prior)
         fit = loss.fit(x0=self.get_initial_guesses().to_array(), method=method, **kwargs)
-        uncertainties = loss.loglikelihood.uncertainties(fit.x)
         result = self.params.from_array(fit.x)
+        result.uncertainties = loss.loglikelihood.uncertainties(fit.x)
         result.predicted_image = self._predict(fit.x)
         result.residual_image = data - result.predicted_image
         result.loss_value = fit.fun
