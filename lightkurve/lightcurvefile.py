@@ -2,6 +2,8 @@
 
 from __future__ import division, print_function
 
+import os
+import logging
 import numpy as np
 import matplotlib as mpl
 from matplotlib import pyplot as plt
@@ -13,6 +15,8 @@ from .mast import download_kepler_products
 
 
 __all__ = ['KeplerLightCurveFile', 'TessLightCurveFile']
+
+log = logging.getLogger(__name__)
 
 
 class LightCurveFile(object):
@@ -139,10 +143,16 @@ class KeplerLightCurveFile(LightCurveFile):
         -------
         lcf : KeplerLightCurveFile object or list of KeplerLightCurveFile objects
         """
-        path = download_kepler_products(
-            target=target, filetype='Lightcurve', cadence=cadence,
-            quarter=quarter, campaign=campaign, month=month,
-            radius=radius, targetlimit=targetlimit)
+        # Be tolerant if a direct path or url is passed to this function by accident
+        if os.path.exists(str(target)) or str(target).startswith('http'):
+            log.warning('Warning: from_archive() is not intended to accept a '
+                        'direct path, use KeplerLightCurveFile(path) instead.')
+            path = [target]
+        else:
+            path = download_kepler_products(
+                target=target, filetype='Lightcurve', cadence=cadence,
+                quarter=quarter, campaign=campaign, month=month,
+                radius=radius, targetlimit=targetlimit)
         if len(path) == 1:
             return KeplerLightCurveFile(path[0], **kwargs)
         return [KeplerLightCurveFile(p, **kwargs) for p in path]

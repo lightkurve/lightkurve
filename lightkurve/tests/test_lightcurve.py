@@ -483,3 +483,8 @@ def test_lightcurvecollection_plot():
     lcc = LightCurveCollection((lcf_1, lcf_2, lcf_3))
 
     lcc.plot()
+
+def test_from_archive_should_accept_path():
+    """If a url is passed to `from_archive` it should still just work."""
+    KeplerLightCurveFile.from_archive(TABBY_Q8)
+

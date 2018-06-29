@@ -181,10 +181,15 @@ class KeplerTargetPixelFile(TargetPixelFile):
         -------
         tpf : KeplerTargetPixelFile object.
         """
-        path = download_kepler_products(
-            target=target, filetype='Target Pixel', cadence=cadence,
-            quarter=quarter, campaign=campaign, month=month,
-            radius=radius, targetlimit=targetlimit)
+        if os.path.exists(str(target)) or str(target).startswith('http'):
+            log.warning('Warning: from_archive() is not intended to accept a '
+                        'direct path, use KeplerTargetPixelFile(path) instead.')
+            path = [target]
+        else:
+            path = download_kepler_products(
+                target=target, filetype='Target Pixel', cadence=cadence,
+                quarter=quarter, campaign=campaign, month=month,
+                radius=radius, targetlimit=targetlimit)
         if len(path) == 1:
             return KeplerTargetPixelFile(path[0], **kwargs)
         return [KeplerTargetPixelFile(p, **kwargs) for p in path]
