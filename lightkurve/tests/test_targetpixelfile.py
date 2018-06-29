@@ -6,6 +6,7 @@ import numpy as np
 from numpy.testing import assert_array_equal
 import pytest
 import tempfile
+from astropy.wcs import WCS
 from ..targetpixelfile import KeplerTargetPixelFile, KeplerTargetPixelFileFactory
 from ..targetpixelfile import TessTargetPixelFile
 from ..utils import KeplerQualityFlags
@@ -19,7 +20,6 @@ TABBY_TPF = ("https://archive.stsci.edu/missions/kepler/target_pixel_files"
              "/0084/008462852/kplr008462852-2011073133259_lpd-targ.fits.gz")
 TESS_SIM = ("https://archive.stsci.edu/missions/tess/ete-6/tid/00/000"
             "/004/176/tess2019128220341-0000000417699452-0016-s_tp.fits")
-
 
 @pytest.mark.remote_data
 def test_load_bad_file():
@@ -198,11 +198,12 @@ def test_tpf_to_fits():
 def test_tpf_factory():
     """Can we create TPFs using KeplerTargetPixelFileFactory?"""
     factory = KeplerTargetPixelFileFactory(n_cadences=10, n_rows=6, n_cols=8)
+    wcs = WCS(filename_tpf_one_center)
     flux_0 = np.ones((6, 8))
-    factory.add_cadence(frameno=0, flux=flux_0,
+    factory.add_cadence(frameno=0, wcs=wcs, flux=flux_0,
                         header={'TSTART': 0, 'TSTOP': 10})
     flux_9 = 3 * np.ones((6, 8))
-    factory.add_cadence(frameno=9, flux=flux_9,
+    factory.add_cadence(frameno=9, wcs=wcs, flux=flux_9,
                         header={'TSTART': 90, 'TSTOP': 100})
     tpf = factory.get_tpf()
     assert_array_equal(tpf.flux[0], flux_0)
