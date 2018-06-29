@@ -240,8 +240,14 @@ class SupernovaModel(object):
 
         model = sncosmo.Model(source=self.source)
         model.set(t0=self.T0, z=self.z, **self.sn_params)
-        bandflux = model.bandflux(self.bandpass, time)
-
+        band_intensity = model.bandflux(self.bandpass, time)  #Units: e/s/cm^2
+        if self.bandpass == 'kepler':
+            # Spectral response already includes QE: units are e- not photons.
+            # see Kepler Instrument Handbook
+            A_eff_cm2 = 5480.0 # Units cm^2
+            bandflux = band_intensity * A_eff_cm2  #e/s
+        else:
+            bandflux = band_intensity # Units: photons/s/cm^2
         self.params = self.sn_params.copy()
         signal_dict = {'signal':bandflux}
         self.params.update(signal_dict)
