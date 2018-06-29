@@ -198,12 +198,11 @@ def test_tpf_to_fits():
 def test_tpf_factory():
     """Can we create TPFs using KeplerTargetPixelFileFactory?"""
     factory = KeplerTargetPixelFileFactory(n_cadences=10, n_rows=6, n_cols=8)
-    wcs = WCS(filename_tpf_one_center)
     flux_0 = np.ones((6, 8))
-    factory.add_cadence(frameno=0, wcs=wcs, flux=flux_0,
+    factory.add_cadence(frameno=0, flux=flux_0,
                         header={'TSTART': 0, 'TSTOP': 10})
     flux_9 = 3 * np.ones((6, 8))
-    factory.add_cadence(frameno=9, wcs=wcs, flux=flux_9,
+    factory.add_cadence(frameno=9, flux=flux_9,
                         header={'TSTART': 90, 'TSTOP': 100})
     tpf = factory.get_tpf()
     assert_array_equal(tpf.flux[0], flux_0)
