@@ -1072,6 +1072,7 @@ class TargetPixelFileCollection(object):
             else:
                 raise TypeError("Object is not a TargetPixelFile instance")
         self.data[None] = []
+
     def __len__(self):
         length = 0
         for tpf_array in self.data.values():
@@ -1110,8 +1111,6 @@ class TargetPixelFileCollection(object):
                 result += TPF.__repr__() + " "
             result += "\n"
         return result
-
-
 
     def plot(self, ax=None, **kwargs):
         """Plots a collection of TPF frames.
@@ -1180,4 +1179,3 @@ class TargetPixelFileCollection(object):
         '''Creates the Principle Components of a collection of LightCurves
         '''
         raise NotImplementedError('Should be able to run a PCA on a collection.')
-

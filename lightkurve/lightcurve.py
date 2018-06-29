@@ -1094,7 +1094,6 @@ class LightCurveCollection(object):
     """
     Collects multiple LightCurve objects together with helpful functions.
     """
-
     def __init__(self, lcs):
         try:
             lightcurves = np.asarray(lcs)
