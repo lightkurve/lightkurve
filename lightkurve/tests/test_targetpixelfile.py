@@ -215,6 +215,7 @@ def test_interact():
     tpf.interact(lc=tpf.to_lightcurve(aperture_mask='all'))
 
 
+
 @pytest.mark.remote_data
 def test_tpfcollection_create():
     
@@ -248,3 +249,8 @@ def test_tpfcollection_plot():
     tpf_collection = TargetPixelFileCollection((tpf_1, tpf_2, tpf_3))
 
     tpf_collection.plot()
+
+def test_from_archive_should_accept_path():
+    """If a path is accidentally passed to `from_archive` it should still just work."""
+    KeplerTargetPixelFile.from_archive(filename_tpf_all_zeros)
+
