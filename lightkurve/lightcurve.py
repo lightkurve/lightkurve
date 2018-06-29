@@ -1171,12 +1171,7 @@ class LightCurveCollection(object):
             The matplotlib axes object.
         """
         if ax is None:
-            try:
-                lc = next(iter(self.data.values()))[0]
-                ax = lc.plot(label=lc.keplerid)
-            except:
-                raise KeyError("LightCurveCollection is empty")
-
+            _, ax = plt.subplots()
         for lc_array in self.data.values():
             for lightcurve in lc_array:
                 lightcurve.plot(ax=ax, label=lightcurve.keplerid)
