@@ -1,4 +1,4 @@
-"""Defines UniformDistribution, GaussianDistribution, TransitModel, and SupernovaModel"""
+f"""Defines UniformDistribution, GaussianDistribution, TransitModel, and SupernovaModel"""
 
 import numpy as np
 import lightkurve
@@ -10,7 +10,7 @@ class UniformDistribution(object):
     Implements a class for choosing a value from a uniform distribution.
 
     Attributes
-    ----------
+    ----------s
     lb : float
         Lower bound of distribution
     ub : float
@@ -192,7 +192,7 @@ class SupernovaModel(object):
         Redshift of supernova
     T0 : float, default chosen from a uniform distribution of all time values
         Time of supernova's beginning or peak brightness, depending on source chosen
-    **kwargs : dict
+    **kwargs : dicts
         List of parameters depending on chosen source.
     """
     def __init__(self, T0, source='hsiao', bandpass='kepler', z=0.5, **kwargs):
@@ -322,15 +322,20 @@ def recover(lc, signal_type, **kwargs):
             transit_model.add_planet(period, rprs, T0, impact=impact)
             net_model_flux = transit_model.evaluate(lc.time)
 
-        residual = lc.flux - net_model_flux
-        return 0.5 * np.sum((residual / lc.flux_err)**2)
+        residual = abs(lc.flux - net_model_flux)
+        print(residual)
+        limit = 1e-6
+        chisq_val = 0.5 * np.sum((residual / lc.flux_err)**2)
+        if chisq_val < 1.e-6:
+            chisq_val = 1.e99
+        return chisq_val
 
     if signal_type == 'Supernova':
         bnds = ((min(lc.time), max(lc.time)), (0, 0.55), (None, None), (None, None))
     elif signal_type == 'Planet':
         bnds = ((min(lc.time), min(lc.time)+5), (0, 10), (0, 1), (0, 1))
 
-    results = minimize(neg_log_like, get_initial_guess(), method='SLSQP', bounds=bnds)
+    results = minimize(neg_log_like, get_initial_guess(), method='BFGS', bounds=bnds)
 
     #return neg_log_like(theta)
 
