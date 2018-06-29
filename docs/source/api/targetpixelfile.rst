@@ -1,6 +1,8 @@
 TargetPixelFile classes
 =======================
 
-.. automodule:: lightkurve.targetpixelfile
-    :members:
-    :undoc-members:
+.. module:: lightkurve.targetpixelfile
+
+.. automodapi:: lightkurve.targetpixelfile
+	:no-heading:
+	:inherited-members:

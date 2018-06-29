@@ -1,6 +1,8 @@
 Utility functions
 =================
 
-.. automodule:: lightkurve.utils
-    :members:
-    :undoc-members:
+.. module:: lightkurve.utils
+
+.. automodapi:: lightkurve.utils
+	:no-heading:
+	:inherited-members:
