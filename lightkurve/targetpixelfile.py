@@ -1063,14 +1063,21 @@ class TargetPixelFileCollection(object):
             raise TypeError("Unable to parse input")
         self.data = {}
         for TPF in tpfs:
-            try:
+            if isinstance(TPF, TargetPixelFile) or isinstance(TPF,KeplerTargetPixelFile):
                 if TPF.keplerid:
-                    self.data[TPF.keplerid] = TPF
-            except:
+                    if TPF.keplerid in self.data:
+                        self.data[TPF.keplerid].append(TPF)
+                    else:
+                        self.data[TPF.keplerid] = [TPF]
+            else:
                 raise TypeError("Object is not a TargetPixelFile instance")
-
+        self.data[None] = []
     def __len__(self):
-        return len(self.data)
+        length = 0
+        for tpf_array in self.data.values():
+            for tpf in tpf_array:
+                length += 1
+        return length
 
     def _ids(self):
         """
@@ -1089,21 +1096,39 @@ class TargetPixelFileCollection(object):
 
     def append(self, tpf):
         try:
-            self.data[tpf.keplerid] = tpf
+            if tpf.keplerid in self.data:
+                self.data[tpf.keplerid].append(tpf)
+            else:
+                self.data[tpf.keplerid] = [tpf]
         except:
             raise TypeError("Input is not a TPF")
 
     def __repr__(self):
         result = ""
-        for TPF in self.data.values():
-            result += TPF.__repr__() + "\n"
+        for TPF_array in self.data.values():
+            for TPF in TPF_array:
+                result += TPF.__repr__() + " "
+            result += "\n"
         return result
 
 
 
-    def plot(self):
-        """
-        Plot a collection of TPF. Random colors are assigned to each plot.
+    def plot(self, ax=None, **kwargs):
+        """Plots a collection of TPF frames.
+
+        Parameters
+        ----------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            A matplotlib axes object to plot into. If no axes is provided,
+            a new one will be generated.
+        
+        kwargs : dict
+            Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
+
+        Returns
+        -------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            The matplotlib axes object.
         """
         from astropy.visualization import (ImageNormalize, LinearStretch, LogStretch)
         row_min = 10000
@@ -1113,48 +1138,43 @@ class TargetPixelFileCollection(object):
         flux_max = 0
         col_min = 10000
         col_max = 0
-        for i, tpf in enumerate(self.data.values()):
-            if tpf.row < row_min:
-                row_min = tpf.row
-            if tpf.row + tpf.shape[1] > row_max:
-                row_max = tpf.row + tpf.shape[1]
-            if tpf.column < col_min:
-                col_min = tpf.column
-            if tpf.column + tpf.shape[2] > col_max:
-                col_max = tpf.column + tpf.shape[2]
 
-            small = np.nanmin(tpf.flux[0])
-            if small < flux_min:
-                flux_min = small
-            large = np.nanmax(tpf.flux[0])
-            if large > flux_max:
-                flux_max = large
+        for tpf_array in self.data.values():
+            for tpf in tpf_array:
+                if tpf.row < row_min:
+                    row_min = tpf.row
+                if tpf.row + tpf.shape[1] > row_max:
+                    row_max = tpf.row + tpf.shape[1]
+                if tpf.column < col_min:
+                    col_min = tpf.column
+                if tpf.column + tpf.shape[2] > col_max:
+                    col_max = tpf.column + tpf.shape[2]
+
+                small = np.nanmin(tpf.flux[0])
+                if small < flux_min:
+                    flux_min = small
+                large = np.nanmax(tpf.flux[0])
+                if large > flux_max:
+                    flux_max = large
         
-        _, axis = plt.subplots()
-        axis.set_xlim(col_min,col_max)
-        axis.set_ylim(row_min,row_max)
-        #axis.set_aspect('equal','box')
+        if ax is None:
+            _, ax = plt.subplots()
+
+        ax.set_xlim(col_min, col_max)
+        ax.set_ylim(row_min, row_max)
         
         norm = ImageNormalize(vmin=flux_min, vmax=flux_max, stretch = LinearStretch())
-        
-        #cax = axis.imshow(,origin='lower',norm=norm)
-        #plt.colorbar(cax, ax=axis,norm=norm)
-        #plt.axes().set_aspect('equal', 'datalim')
-        for i, k_id in enumerate(self.data):
-            if i == 0:
-                #axis = self.data[k_id].collections_plot(flux_min, flux_max, label=k_id)
-                cax = axis.imshow(self.data[k_id].flux[0], norm=norm)
-                plt.colorbar(cax, ax=axis, norm=norm)
-                
-                self.data[k_id].plot(ax=axis, show_colorbar=False)
+        tpf = next(iter(self.data.values()))[0]
+        cax = ax.imshow(tpf.flux[0], norm=norm)
+        plt.colorbar(cax, ax=ax, norm=norm)
 
-            #    axis = self.data[k_id].plot()
-            else:
-                self.data[k_id].plot(ax=axis, show_colorbar=False)
+        for tpf_array in self.data.values():
+            for tpf in tpf_array:
+                tpf.plot(ax=ax, show_colorbar=False)
 
         plt.axis('equal')
         
-        return axis
+        return ax
 
     def pca(self):
         '''Creates the Principle Components of a collection of LightCurves

@@ -1099,15 +1099,26 @@ class LightCurveCollection(object):
         except:
             raise TypeError("Unable to parse input")
         self.data = {}
+        
         for lc in lightcurves:
-            try:
+            if isinstance(lc, KeplerLightCurve) or isinstance(lc,LightCurve):
                 if lc.keplerid:
-                    self.data[lc.keplerid] = lc
-            except:
+                    if lc.keplerid in self.data:
+                        self.data[lc.keplerid].append(lc)
+                    else:
+                        self.data[lc.keplerid] = [lc]
+                else: #no keplerID
+                    self.data[None].append(lc)
+            else:
                 raise TypeError("Object is not a LightCurve instance")
+        self.data[None] = []
 
     def __len__(self):
-        return len(self.data)
+        length = 0
+        for lc_array in self.data.values():
+            for lc in lc_array:
+                length += 1
+        return length
 
     def _ids(self):
         """
@@ -1126,32 +1137,52 @@ class LightCurveCollection(object):
 
     def append(self, lc):
         try:
-            self.data[lc.keplerid] = lc
+            if lc.keplerid in self.data:
+                self.data[lc.keplerid].append(lc)
+            else:
+                self.data[lc.keplerid] = [lc]
         except:
             raise TypeError("Input is not a lightcurve")
 
     def __repr__(self):
         result = ""
-        for lightcurve in self.data.values():
-            result += lightcurve.__repr__() + "\n"
+        for lightcurve_array in self.data.values():
+            for lightcurve in lightcurve_array:
+                result += lightcurve.__repr__() + " "
+            result += "\n"
         return result
 
     def plot(self, ax=None, **kwargs):
+        """Plots a collection of light curve.
+
+        Parameters
+        ----------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            A matplotlib axes object to plot into. If no axes is provided,
+            a new one will be generated.
+        
+        kwargs : dict
+            Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
+
+        Returns
+        -------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            The matplotlib axes object.
         """
-        Plot a collection of LightCurves. Random colors are assigned to each plot.
-        """
-        for i, k_id in enumerate(self.data):
-            
-            if i == 0:
-                #TODO: what if longest axis is not the first item?
-                axis = self.data[k_id].plot(linestyle='-',label=k_id)
-            else:
-                self.data[k_id].plot(ax=axis, linestyle='-', label=k_id)
-        return axis
+        if ax is None:
+            try:
+                lc = next(iter(self.data.values()))[0]
+                ax = lc.plot(label=lc.keplerid)
+            except:
+                raise KeyError("LightCurveCollection is empty")
+
+        for lc_array in self.data.values():
+            for lightcurve in lc_array:
+                lightcurve.plot(ax=ax, label=lightcurve.keplerid)
+
+        return ax
 
     def pca(self):
         '''Creates the Principle Components of a collection of LightCurves
         '''
         raise NotImplementedError('Should be able to run a PCA on a collection.')
-
-
