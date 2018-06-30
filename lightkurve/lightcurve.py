@@ -596,8 +596,10 @@ class LightCurve(object):
 
     def createPowerFrequencyPlot(self, ax=None, **kwargs):
         from astropy.stats import LombScargle
-        m = 1
-        t = np.array([self.time[m]])
+        m = (self.quality == 0)
+        m &= np.isfinite(self.time)
+        m &= np.isfinite(self.flux)
+        t = self.time[m]
         y = 1e6 * (self.flux[m] - 1.0)
         
         uHz_conv = 1e-6 * 24 * 60 * 60
@@ -610,7 +612,7 @@ class LightCurve(object):
 
         plt.semilogy(frequency_uHz, power, "k")
         plt.ylim(1e-2, 1e1)
-        plt.xlim(frequency_uHz[0], frequency_uHz[1])
+        plt.xlim(frequency_uHz[0], frequency_uHz[-1])
         plt.xlabel("frequency [$\mu$Hz]")
         plt.ylabel("power [ppm$^2$/$\mu$Hz")
 
