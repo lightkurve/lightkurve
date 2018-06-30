@@ -1136,9 +1136,12 @@ class LightCurveCollection(object):
         except:
             raise ValueError('No LightCurve for ' + kep_id)
 
-    def append(self, lc):
+    def append(self, lc, **kwargs):
         try:
             if lc.keplerid in self.data:
+                if 'stitch' in kwargs:
+                    self.data[lc.keplerid][0].append(lc)
+                    return   
                 self.data[lc.keplerid].append(lc)
             else:
                 self.data[lc.keplerid] = [lc]
