@@ -501,6 +501,9 @@ class LightCurve(object):
         # The "fast" style has only been in matplotlib since v2.1.
         # Let's make it optional until >v2.1 is mainstream and can
         # be made the minimum requirement.
+        if 'seismology' in kwargs:
+            return self.createPowerFrequencyPlot(ax=ax, **kwargs)
+
         if (style == "fast") and ("fast" not in mpl.style.available):
             style = "default"
         if normalize:
@@ -590,6 +593,26 @@ class LightCurve(object):
             returns None otherwise.
         """
         return self.to_pandas().to_csv(path_or_buf=path_or_buf, **kwargs)
+
+    def createPowerFrequencyPlot(self, ax=None, **kwargs):
+        from astropy.stats import LombScargle
+        m = 1
+        t = np.array([self.time[m]])
+        y = 1e6 * (self.flux[m] - 1.0)
+        
+        uHz_conv = 1e-6 * 24 * 60 * 60
+        frequency_uHz = np.linspace(1, 300, 100000)
+        frequency = frequency_uHz * uHz_conv
+
+        model = LombScargle(t, y)
+        power = model.power(frequency, method="fast", normalization="psd")
+        power *= uHz_conv / len(t)
+
+        plt.semilogy(frequency_uHz, power, "k")
+        plt.ylim(1e-2, 1e1)
+        plt.xlim(frequency_uHz[0], frequency_uHz[1])
+        plt.xlabel("frequency [$\mu$Hz]")
+        plt.ylabel("power [ppm$^2$/$\mu$Hz")
 
 
 class FoldedLightCurve(LightCurve):
