@@ -148,6 +148,13 @@ def test_lightcurve_plot():
     lcf.SAP_FLUX.plot()
     lcf.SAP_FLUX.plot(normalize=False, fill=False, title="Not the default")
 
+@pytest.mark.remote_data
+def test_lightcurve_seismology_plot():
+    """Sanity check to verify that lightcurve plotting works"""
+    lcf = KeplerLightCurveFile(TABBY_Q8)
+    lcf.plot(seismology=True)
+    lcf.plot(seismology=True, normalize_seismology=True)
+    
 
 def test_cdpp():
     """Test the basics of the CDPP noise metric."""

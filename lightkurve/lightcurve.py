@@ -610,12 +610,56 @@ class LightCurve(object):
         power = model.power(frequency, method="fast", normalization="psd")
         power *= uHz_conv / len(t)
 
-        plt.semilogy(frequency_uHz, power, "k")
-        plt.ylim(1e-2, 1e1)
-        plt.xlim(frequency_uHz[0], frequency_uHz[-1])
-        plt.xlabel("frequency [$\mu$Hz]")
-        plt.ylabel("power [ppm$^2$/$\mu$Hz")
+        if ax is None:
+            _, ax = plt.subplots(1)
+        ax.semilogy(frequency_uHz, power, "k")
+        ax.set_ylim(1e-2, 1e1)
+        ax.set_xlim(frequency_uHz[0], frequency_uHz[-1])
+        ax.set_xlabel("frequency [$\mu$Hz]")
+        ax.set_ylabel("power [ppm$^2$/$\mu$Hz")
 
+        if 'normalize_seismology' in kwargs:
+            ax = self.normalizePowerFrequencyPlot(frequency_uHz, power, ax, **kwargs)
+
+        return ax
+
+    def normalizePowerFrequencyPlot(self, frequency_uHz, power, ax, **kwargs):
+        from scipy.ndimage.filters import gaussian_filter
+        bkg = self.estimate_background(frequency_uHz, power)
+        df = frequency_uHz[1] - frequency_uHz[0]
+        normalized_power = power / bkg
+        smoothed_ps = gaussian_filter(normalized_power, 10 / df)
+        peak_freqs = frequency_uHz[self.find_peaks(smoothed_ps)]
+        nu_max = peak_freqs[peak_freqs > 5][0]
+
+        factor = np.max(normalized_power) / np.max(smoothed_ps)
+        ax.semilogy(frequency_uHz, normalized_power, "k")
+        ax.plot(frequency_uHz, smoothed_ps, label="smoothed", color="C1")
+        ax.axvline(nu_max, label="$\\nu_\mathrm{{max}} = {0:.2f}\,\mu\mathrm{{Hz}}$".format(nu_max))
+        ax.set_ylim(1e-1, 3e2)
+        ax.set_xlim(frequency_uHz[0], frequency_uHz[-1])
+        ax.legend()
+        ax.set_xlabel("frequency [$\mu$Hz]")
+        ax.set_ylabel("normalized power")
+
+        return ax
+
+    def estimate_background(self, x, y, log_width=.01):
+        count = np.zeros(len(x), dtype=int)
+        bkg = np.zeros_like(x)
+        x0 = np.log10(x[0])
+        while x0 < np.log10(x[-1]):
+            m = np.abs(np.log10(x) - x0) < log_width
+            bkg[m] += np.median(y[m])
+            count[m] += 1
+            x0 += 0.5 * log_width
+        return bkg / count
+
+    def find_peaks(self, z):
+        peak_inds = (z[1:-1] > z[:-2]) * (z[1:-1] > z[2:])
+        peak_inds = np.arange(1, len(z)-1)[peak_inds]
+        peak_inds = peak_inds[np.argsort(z[peak_inds])][::-1]
+        return peak_inds
 
 class FoldedLightCurve(LightCurve):
     """Defines a folded lightcurve with different plotting defaults."""
