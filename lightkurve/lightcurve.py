@@ -595,6 +595,7 @@ class LightCurve(object):
         return self.to_pandas().to_csv(path_or_buf=path_or_buf, **kwargs)
 
     def createPowerFrequencyPlot(self, ax=None, **kwargs):
+        from astropy import units
         from astropy.stats import LombScargle
         m = (self.quality == 0)
         m &= np.isfinite(self.time)
@@ -604,6 +605,7 @@ class LightCurve(object):
         
         uHz_conv = 1e-6 * 24 * 60 * 60
         frequency_uHz = np.linspace(1, 300, 100000)
+        #frequency = frequency_uHz * units.Hz * units.micron
         frequency = frequency_uHz * uHz_conv
 
         model = LombScargle(t, y)
@@ -613,7 +615,7 @@ class LightCurve(object):
         if ax is None:
             _, ax = plt.subplots(1)
         ax.semilogy(frequency_uHz, power, "k")
-        ax.set_ylim(1e-2, 1e1)
+        #ax.set_ylim(1e-2, 1e1)
         ax.set_xlim(frequency_uHz[0], frequency_uHz[-1])
         ax.set_xlabel("frequency [$\mu$Hz]")
         ax.set_ylabel("power [ppm$^2$/$\mu$Hz")
