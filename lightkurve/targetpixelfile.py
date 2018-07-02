@@ -242,20 +242,17 @@ class KeplerTargetPixelFile(TargetPixelFile):
         data = query_catalog(cent, radius=radius, catalog=catalog)
 
         # Find where nans are in cadence
-        find_nans = ~np.isnan(self.flux[4])
+        find_nans = np.isfinite(self.flux)
+        sum_nans = np.sum(find_nans, axis=0)
+
         # Load ra & dec of all tpf pixels
-        pixels_ra, pixels_dec = self.get_coordinates(cadence=5)
-        pixels_ra, pixels_dec = pixels_ra[find_nans], pixels_dec[find_nans]
+        pixels_ra, pixels_dec = self.get_coordinates(cadence=int(len(self.flux)/2.0))
 
-        # Reduce calculation for astroy separation
-        pixel_radec = np.asarray([pixels_ra.ravel(), pixels_dec.ravel()])
-        pixel_radec = np.round(pixel_radec, decimals=5)
-
-        # Return unique pairs
-        pixel_pairs = (np.unique(pixel_radec, axis=1))
+        # Load pixel ra, dec with no nans
+        pixel_radec = np.asarray([pixels_ra[sum_nans != 0].ravel(), pixels_dec[sum_nans != 0].ravel()])
 
         # Make pixel pairs into SkyCoord
-        sky_pixel_pairs = SkyCoord(ra=pixel_pairs[0]*u.deg, dec=pixel_pairs[1]*u.deg, frame='icrs', unit=(u.deg, u.deg))
+        sky_pixel_pairs = SkyCoord(ra=pixel_radec[0]*u.deg, dec=pixel_radec[1]*u.deg, frame='icrs', unit=(u.deg, u.deg))
         # Make pairs in sky_sources
         sky_sources = SkyCoord(ra=data['ra'], dec=data['dec'], frame='icrs', unit=(u.deg, u.deg))
 
