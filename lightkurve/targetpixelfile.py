@@ -232,6 +232,9 @@ class KeplerTargetPixelFile(TargetPixelFile):
             else:
                 raise ValueError('Please provide a catalog.')
 
+        if dist_tolerance < 3:
+            log.warning('Distance tolerance is too low')
+
         #Skycoord the centre of target
         cent = SkyCoord(ra=self.ra, dec=self.dec, frame='icrs', unit=(u.deg, u.deg))
 
@@ -246,10 +249,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         sum_nans = np.sum(find_nans, axis=0)
 
         # Load ra & dec of all tpf pixels
-        ## (optional) TODO: try to find a cadences with poscorr = (0,0)
-        ##                  If not, then fall back to the middle cadence.
-        ##                  to ensure cadence exists, use tpf.cadenceno
-        pixels_ra, pixels_dec = self.get_coordinates(cadence=int(len(self.flux)/2.0))
+        pixels_ra, pixels_dec = self.get_coordinates(cadence=int(len(self.cadenceno)/2))
 
         # Load pixel ra, dec with no nans
         pixel_radec = np.asarray([pixels_ra[sum_nans != 0].ravel(), pixels_dec[sum_nans != 0].ravel()])
@@ -262,7 +262,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         separation_mask = []
         for i in range (len(data)):
             s = sky_pixel_pairs.separation(sky_sources[i])  # Estimate separation
-            separation = np.any(s.arcsec <= dist_tolerance )
+            separation = np.any(s.arcsec <= dist_tolerance)
             separation_mask.append(separation)
 
         sep_mask = np.array(separation_mask, dtype=bool)
