@@ -322,15 +322,14 @@ def query_catalog(coordinate, catalog="KIC", radius=0.5):
         result : astropy.table
             Astropy table with the following columns
             ID : Catalog ID from catalog.
-            RAJ200: Right ascension [degrees]
-            DEJ2000: Declination [degrees]
+            RAJ200: Right ascension [degrees] (KIC & EPIC)
+            DEJ2000: Declination [degrees]    (KIC & EPIC)
+            RAJ2015.5: Right ascension [degrees] (Gaia)
+            DEJ2015.5: Declination [degrees]     (Gaia)
             pmRA: Proper motion for right ascension [mas/year]
             pmDEC: Proper motion for declination [mas/year]
             Kpmag: Magnitude in Kepler band [mag]
         """
-        supported_catalogs = ['KIC', 'EPIC', 'Gaia']
-        if catalog not in supported_catalogs:
-            raise ValueError('catalog not one of {}'.format(supported_catalogs))
 
         if catalog is "Gaia":
             log.warn('Gaia RAs and Decs are at EPOC 2015.5. These RA/Decs have not been corrected.')
@@ -346,6 +345,9 @@ def query_catalog(coordinate, catalog="KIC", radius=0.5):
              "Gaia":
                     {'vizier': "I/345/gaia2",
                      'parameters': ["DR2Name", "RA_ICRS", "DE_ICRS", "pmRA", "pmDE", "Gmag"]}}
+
+        if catalog not in ID.keys():
+            raise ValueError('catalog not one of {}'.format([key for key in ID.keys()]))
 
         # identifies catalog
         viz_id = ID[catalog]['vizier']
