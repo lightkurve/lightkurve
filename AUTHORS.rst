@@ -2,18 +2,21 @@ Direct contributions to the code base:
 
 - `José Vinícius de Miranda Cardoso <https://github.com/mirca>`_
 - `Geert Barentsen <https://github.com/barentsen>`_
+- `Ann Marie Cody <https://github.com/amcody>`_
 - `Christina Hedges <https://github.com/christinahedges>`_
 - `Michael Gully-Santiago <https://github.com/gully>`_
 - `Thomas Barclay <https://github.com/mrtommyb>`_
+- `Ken Mighell <https://github.com/KenMighell>`_
 
 Comments, corrections & suggestions:
 
-- `Ann Marie Cody <https://github.com/amcody>`_
-- `Jessie Dotson <https://github.com/jessie-dotson>`_
 - `Clare Brasseur <https://github.com/ceb8>`_
-- `Elisa Quintana <https://github.com/elisaquintana>`_
 - `Doug Caldwell <https://github.com/dacmess>`_
+- `Jessie Dotson <https://github.com/jessie-dotson>`_
+- `Scott Fleming <https://github.com/scfleming>`_
 - `Daniel Foreman-Mackey <https://github.com/dfm>`_
+- TJ Jaffe
+- `Susan Mullally <https://github.com/mustaric>`_
+- `Elisa Quintana <https://github.com/elisaquintana>`_
 - Jeff Van Cleve
 - Ashley Villar
-- TJ Jaffe

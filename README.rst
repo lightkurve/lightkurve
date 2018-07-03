@@ -49,7 +49,7 @@ Once installed, visit our quickstart guide at `http://lightkurve.keplerscience.o
 Contributing
 ------------
 
-We welcome community contributions from everyone!  
+We welcome community contributions from everyone!
 Please read the contribution guidelines at `http://lightkurve.keplerscience.org/contributing.html <http://lightkurve.keplerscience.org/contributing.html>`_.
 
 
