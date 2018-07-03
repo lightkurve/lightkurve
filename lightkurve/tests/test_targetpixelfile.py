@@ -6,7 +6,6 @@ import numpy as np
 from numpy.testing import assert_array_equal
 import pytest
 import tempfile
-import sys
 from ..targetpixelfile import KeplerTargetPixelFile, KeplerTargetPixelFileFactory
 from ..utils import KeplerQualityFlags
 
@@ -60,6 +59,7 @@ def test_tpf_zeros():
     # If you don't mask out bad data, time contains NaNs
     assert np.any(lc.time != tpf.time)  # Using the property that NaN does not equal NaN
     # When you do mask out bad data everything should work.
+    assert (tpf.astropy_time.jd == 0).any()
     tpf = KeplerTargetPixelFile(filename_tpf_all_zeros, quality_bitmask='hard')
     lc = tpf.to_lightcurve()
     assert len(lc.time) == len(lc.flux)
@@ -91,9 +91,9 @@ def test_quality_flag_decoding():
         == [flags[3][1], flags[4][1], flags[5][1]]
 
 
-@pytest.mark.parametrize("quality_bitmask,answer",[('hardest', 1101),
-    ('hard', 1101), ('default', 1233), (None, 1290),
-    (1, 1290), (100, 1278), (2096639, 1101)])
+@pytest.mark.parametrize("quality_bitmask,answer", [('hardest', 1101),
+                                                    ('hard', 1101), ('default', 1233), (None, 1290),
+                                                    (1, 1290), (100, 1278), (2096639, 1101)])
 def test_bitmasking(quality_bitmask, answer):
     '''Test whether the bitmasking behaves like it should'''
     tpf = KeplerTargetPixelFile(filename_tpf_one_center, quality_bitmask=quality_bitmask)
@@ -121,19 +121,19 @@ def test_wcs_tabby():
     col -= tpf.column
     row -= tpf.row
     y, x = int(np.round(col[0])), int(np.round(row[1]))
-    #Compare with RA and Dec from Simbad
+    # Compare with RA and Dec from Simbad
     assert np.isclose(ra[x, y], 301.5643971, 1e-4)
     assert np.isclose(dec[x, y], 44.4568869, 1e-4)
 
 
-def test_date():
+def test_astropy_time():
     '''Test the lc.date() function'''
     tpf = KeplerTargetPixelFile(filename_tpf_all_zeros)
-    date = tpf.timeobj.iso
-    assert len(date) == len(tpf.time)
-    print(date)
-    assert date[0] == '2016-04-22 14:19:41.510'
-    assert date[-1] == '2016-05-18 22:27:43.895'
+    astropy_time = tpf.astropy_time
+    assert astropy_time.scale == 'tdb'
+    assert len(astropy_time.iso) == len(tpf.time)
+    #assert date[0] == '2016-04-22 14:19:41.510'
+    #assert date[-1] == '2016-05-18 22:27:43.895'
 
 
 def test_properties():
@@ -162,9 +162,11 @@ def test_repr():
 
 def test_to_lightcurve():
     tpf = KeplerTargetPixelFile(filename_tpf_all_zeros)
-    tpf.to_lightcurve()
+    lc = tpf.to_lightcurve()
+    assert lc.astropy_time.scale == 'tdb'
     tpf.to_lightcurve(aperture_mask='all')
-    tpf.get_bkg_lightcurve()
+    bglc = tpf.get_bkg_lightcurve()
+    assert bglc.astropy_time.scale == 'tdb'
     tpf.get_bkg_lightcurve(aperture_mask='all')
 
 
@@ -196,6 +198,7 @@ def test_tpf_factory():
     assert(tpf.time[0] == 5)
     assert(tpf.time[9] == 95)
 
+
 def test_properties(capfd):
     '''Test if the describe function produces an output.
     The output is 1870 characters at the moment, but we might add more properties.'''
@@ -203,3 +206,15 @@ def test_properties(capfd):
     tpf.properties()
     out, err = capfd.readouterr()
     assert len(out) > 1000
+
+
+def test_interact():
+    """Test the Jupyter notebook interact() widget."""
+    tpf = KeplerTargetPixelFile(filename_tpf_one_center)
+    tpf.interact()
+    tpf.interact(lc=tpf.to_lightcurve(aperture_mask='all'))
+
+
+def test_from_archive_should_accept_path():
+    """If a path is accidentally passed to `from_archive` it should still just work."""
+    KeplerTargetPixelFile.from_archive(filename_tpf_all_zeros)
