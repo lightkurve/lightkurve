@@ -1,6 +1,8 @@
 LightCurveFile classes
 ======================
 
-.. automodule:: lightkurve.lightcurvefile
-    :members:
-    :undoc-members:
+.. module:: lightkurve.lightcurvefile
+
+.. automodapi:: lightkurve.lightcurvefile
+	:no-heading:
+	:inherited-members:
