@@ -279,75 +279,8 @@ def inject(lc, model):
 
 
 def recover(lc, signal_type, **kwargs):
-    """Recover injected signals from a lightcurve
-    kwargs will be initial guesses
-    Parameters
-    ----------
-    lc : SyntheticLightCurve object
-
-    Returns
-    -------
-    lc : LightCurve class
-        Returns a lightcurve possessing a synthetic signal.
-
-    """
-    from scipy.optimize import minimize
-    bnds = ()
-
-    def get_initial_guess():
-        if signal_type == 'Supernova':
-            T0 = 2610
-            z = 0.1
-            amplitude = 3.3e-4
-            background_flux = np.percentile(lc.flux, 3)
-            params = T0, z, amplitude, background_flux
-            return params
-        elif signal_type == 'Planet':
-            T0 = min(lc.time) + 4
-            period = 5
-            rprs = 0.1
-            impact = 0.0
-            params = T0, period, rprs, impact
-            return params
-        else:
-            print('Signal type not supported.')
-            return
-            #raise error or something instead of printing
 
     def neg_log_like(theta):
-        if signal_type == 'Supernova':
-            T0, z, amplitude, background_flux = theta
-            if z < 0 or z > 3:
-                return 1.e99
-            supernova_model = SupernovaModel(T0, z=z, amplitude=amplitude)
-            supernova_flux = supernova_model.evaluate(lc.time)
-            net_model_flux = supernova_flux + background_flux
+        pass
 
-        elif signal_type == 'Planet':
-            T0, period, rprs, impact = theta
-            transit_model = TransitModel()
-            transit_model.add_star(zpt=1.0)
-            transit_model.add_planet(period, rprs, T0, impact=impact)
-            net_model_flux = transit_model.evaluate(lc.time)
-
-        residual = lc.flux - net_model_flux
-        negloglike = 0.5 * np.sum((residual / lc.flux_err)**2)
-        temp = np.sum(residual / lc.flux_err)**2
-        limit = 1e-6
-        if temp < limit:
-            negloglike = np.sum(np.minimum(0.0, temp-limit)) / limit
-            temp = np.maximum(temp, limit)
-            print(negloglike)
-        return negloglike
-
-
-    if signal_type == 'Supernova':
-        bnds = ((None, None), (-10, 10), (None, None), (None, None))
-    elif signal_type == 'Planet':
-        bnds = ((min(lc.time), min(lc.time)), (0, 10), (0, 1), (0, 1))
-
-    results = minimize(neg_log_like, get_initial_guess(), method='Nelder-Mead')
-
-    #return neg_log_like(theta)
-    print(results)
-    return results.x
+    return
