@@ -6,7 +6,7 @@ from numpy.testing import (assert_almost_equal, assert_array_equal,
                            assert_allclose)
 from astropy.io import fits as pyfits
 from ..lightcurve import (LightCurve, KeplerLightCurve, TessLightCurve,
-                          iterative_box_period_search)
+                          iterative_box_period_search, LightCurveCollection)
 from ..lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
 
 # 8th Quarter of Tabby's star
@@ -449,6 +449,49 @@ def test_flatten_robustness():
 
 
 @pytest.mark.remote_data
+def test_lightcurvecollection_create():
+    
+    lcf_1 = KeplerLightCurveFile.from_archive('Kepler-10b', quarter=1).PDCSAP_FLUX
+    lcf_2 = KeplerLightCurveFile.from_archive('Kepler-8b', quarter=3).PDCSAP_FLUX
+    lcf_3 = KeplerLightCurveFile.from_archive('Kepler-16b', quarter=7).PDCSAP_FLUX
+
+    lcc = LightCurveCollection((lcf_1, lcf_2))
+
+    assert(lcc.data[lcf_1.keplerid][0] == lcf_1)
+    assert(lcc.data[lcf_2.keplerid][0] == lcf_2)
+
+@pytest.mark.remote_data
+def test_lightcurvecollection_append():
+    
+    lcf_1 = KeplerLightCurveFile.from_archive('Kepler-10b', quarter=1).PDCSAP_FLUX
+    lcf_2 = KeplerLightCurveFile.from_archive('Kepler-8b', quarter=3).PDCSAP_FLUX
+    lcf_3 = KeplerLightCurveFile.from_archive('Kepler-16b', quarter=7).PDCSAP_FLUX
+
+    lcc = LightCurveCollection((lcf_1, lcf_2))
+    lcc.append(lcf_3)
+    assert(lcc.data[lcf_3.keplerid][0] == lcf_3)
+
+@pytest.mark.remote_data
+def test_lightcurvecollection_length():
+    lcf_1 = KeplerLightCurveFile.from_archive('Kepler-10b', quarter=1).PDCSAP_FLUX
+    lcf_2 = KeplerLightCurveFile.from_archive('Kepler-8b', quarter=3).PDCSAP_FLUX
+    lcf_3 = KeplerLightCurveFile.from_archive('Kepler-16b', quarter=7).PDCSAP_FLUX
+
+    lcc = LightCurveCollection((lcf_1, lcf_2, lcf_3))
+    assert(lcc.__len__() == 3)
+
+@pytest.mark.remote_data
+def test_lightcurvecollection_plot():
+    
+    lcf_1 = KeplerLightCurveFile.from_archive('Kepler-10b', quarter=1).PDCSAP_FLUX
+    lcf_2 = KeplerLightCurveFile.from_archive('Kepler-8b', quarter=3).PDCSAP_FLUX
+    lcf_3 = KeplerLightCurveFile.from_archive('Kepler-16b', quarter=7).PDCSAP_FLUX
+
+    lcc = LightCurveCollection((lcf_1, lcf_2, lcf_3))
+
+    lcc.plot()
+
 def test_from_archive_should_accept_path():
     """If a url is passed to `from_archive` it should still just work."""
     KeplerLightCurveFile.from_archive(TABBY_Q8)
+
