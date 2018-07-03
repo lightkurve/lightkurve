@@ -544,6 +544,9 @@ class LightCurve(object):
         # The "fast" style has only been in matplotlib since v2.1.
         # Let's make it optional until >v2.1 is mainstream and can
         # be made the minimum requirement.
+        if 'seismology' in kwargs:
+            return self.createPowerFrequencyPlot(ax=ax, **kwargs)
+
         if (style == "fast") and ("fast" not in mpl.style.available):
             style = "default"
         if normalize:
@@ -633,6 +636,76 @@ class LightCurve(object):
             returns None otherwise.
         """
         return self.to_pandas().to_csv(path_or_buf=path_or_buf, **kwargs)
+
+
+    def createPowerFrequencyPlot(self, ax=None, **kwargs):
+        from astropy import units
+        from astropy.stats import LombScargle
+        m = (self.quality == 0)
+        m &= np.isfinite(self.time)
+        m &= np.isfinite(self.flux)
+        t = self.time[m]
+        y = 1e6 * (self.flux[m] - 1.0)
+        
+        uHz_conv = 1e-6 * 24 * 60 * 60
+        frequency_uHz = np.linspace(1, 300, 100000)
+        #frequency = frequency_uHz * units.Hz * units.micron
+        frequency = frequency_uHz * uHz_conv
+
+        model = LombScargle(t, y)
+        power = model.power(frequency, method="fast", normalization="psd")
+        power *= uHz_conv / len(t)
+
+        if ax is None:
+            _, ax = plt.subplots(1)
+        ax.semilogy(frequency_uHz, power, "k")
+        #ax.set_ylim(1e-2, 1e1)
+        ax.set_xlim(frequency_uHz[0], frequency_uHz[-1])
+        ax.set_xlabel("frequency [$\mu$Hz]")
+        ax.set_ylabel("power [ppm$^2$/$\mu$Hz")
+
+        if 'normalize_seismology' in kwargs:
+            ax = self.normalizePowerFrequencyPlot(frequency_uHz, power, ax, **kwargs)
+
+        return ax
+
+    def normalizePowerFrequencyPlot(self, frequency_uHz, power, ax, **kwargs):
+        from scipy.ndimage.filters import gaussian_filter
+        bkg = self.estimate_background(frequency_uHz, power)
+        df = frequency_uHz[1] - frequency_uHz[0]
+        normalized_power = power / bkg
+        smoothed_ps = gaussian_filter(normalized_power, 10 / df)
+        peak_freqs = frequency_uHz[self.find_peaks(smoothed_ps)]
+        nu_max = peak_freqs[peak_freqs > 5][0]
+
+        factor = np.max(normalized_power) / np.max(smoothed_ps)
+        ax.semilogy(frequency_uHz, normalized_power, "k")
+        ax.plot(frequency_uHz, smoothed_ps, label="smoothed", color="C1")
+        ax.axvline(nu_max, label="$\\nu_\mathrm{{max}} = {0:.2f}\,\mu\mathrm{{Hz}}$".format(nu_max))
+        ax.set_ylim(1e-1, 3e2)
+        ax.set_xlim(frequency_uHz[0], frequency_uHz[-1])
+        ax.legend()
+        ax.set_xlabel("frequency [$\mu$Hz]")
+        ax.set_ylabel("normalized power")
+
+        return ax
+
+    def estimate_background(self, x, y, log_width=.01):
+        count = np.zeros(len(x), dtype=int)
+        bkg = np.zeros_like(x)
+        x0 = np.log10(x[0])
+        while x0 < np.log10(x[-1]):
+            m = np.abs(np.log10(x) - x0) < log_width
+            bkg[m] += np.median(y[m])
+            count[m] += 1
+            x0 += 0.5 * log_width
+        return bkg / count
+
+    def find_peaks(self, z):
+        peak_inds = (z[1:-1] > z[:-2]) * (z[1:-1] > z[2:])
+        peak_inds = np.arange(1, len(z)-1)[peak_inds]
+        peak_inds = peak_inds[np.argsort(z[peak_inds])][::-1]
+        return peak_inds
 
     def to_fits(self, path=None, overwrite=False, **extra_data):
         """Writes the KeplerLightCurve to a fits file.
