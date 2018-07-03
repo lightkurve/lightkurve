@@ -1221,14 +1221,18 @@ class LightCurveCollection(object):
         except:
             raise TypeError("Input is not a lightcurve")
 
-    def stitch(self):
-        pass
+    def stitch(self, normalize=False):
+        
+        new_lc = LightCurve(time=[])
+
         #TODO: Implement this
-        #for lc_array in self.data.values():
-        #    for lc in lc_array:
-        #        self.data[lc.keplerid][0].append(lc)
+        for lc_array in self.data.values():
+            for lc in lc_array:
+                if normalize:
+                    lc = lc.normalize()
+                new_lc.append(lc)
 
-
+        return new_lc
 
     def __repr__(self):
         result = ""

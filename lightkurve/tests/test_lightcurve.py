@@ -495,3 +495,14 @@ def test_from_archive_should_accept_path():
     """If a url is passed to `from_archive` it should still just work."""
     KeplerLightCurveFile.from_archive(TABBY_Q8)
 
+@pytest.mark.remote_data
+def test_lightcurvecollection_stitch():
+    
+    lcf_1 = KeplerLightCurveFile.from_archive('Kepler-10b', quarter=1).PDCSAP_FLUX
+    lcf_2 = KeplerLightCurveFile.from_archive('Kepler-8b', quarter=3).PDCSAP_FLUX
+    lcf_3 = KeplerLightCurveFile.from_archive('Kepler-16b', quarter=7).PDCSAP_FLUX
+
+    lcc = LightCurveCollection((lcf_1, lcf_2, lcf_3))
+
+    lc = lcc.stitch(normalize=True)
+    lc_non_normalized = lcc.stitch()
