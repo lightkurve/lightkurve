@@ -1068,7 +1068,7 @@ class TargetPixelFileCollection(object):
             raise TypeError("Unable to parse input")
         self.data = {}
         for TPF in tpfs:
-            if isinstance(TPF, TargetPixelFile) or isinstance(TPF,KeplerTargetPixelFile):
+            if isinstance(TPF, TargetPixelFile) or isinstance(TPF, KeplerTargetPixelFile):
                 if TPF.keplerid:
                     if TPF.keplerid in self.data:
                         self.data[TPF.keplerid].append(TPF)
@@ -1179,8 +1179,3 @@ class TargetPixelFileCollection(object):
         plt.axis('equal')
         
         return ax
-
-    def pca(self):
-        '''Creates the Principle Components of a collection of LightCurves
-        '''
-        raise NotImplementedError('Should be able to run a PCA on a collection.')
