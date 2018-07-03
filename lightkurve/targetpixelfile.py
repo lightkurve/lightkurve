@@ -208,7 +208,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
             Limit the returned magnitudes to only stars brighter than magnitude_limit.
             Default 18 for both Kepmag and Gmag.
         dist_tolerance: float
-            Maximum distance (in arcseconds) a source may be seperated from the edge
+            Maximum distance (in arcseconds) a source may be separated from the edge
             of the target pixel file.
 
         Returns
@@ -236,7 +236,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         cent = SkyCoord(ra=self.ra, dec=self.dec, frame='icrs', unit=(u.deg, u.deg))
 
         #Find the size of the TPF
-        radius = (np.max(self.flux.shape[1:2]) * 4) / 60.0
+        radius = ( (np.max(self.flux.shape[1:2]) * 4) + dist_tolerance)/ 60.0
 
         # query around centre with radius
         data = query_catalog(cent, radius=radius, catalog=catalog)
@@ -246,20 +246,23 @@ class KeplerTargetPixelFile(TargetPixelFile):
         sum_nans = np.sum(find_nans, axis=0)
 
         # Load ra & dec of all tpf pixels
+        ## (optional) TODO: try to find a cadences with poscorr = (0,0)
+        ##                  If not, then fall back to the middle cadence.
+        ##                  to ensure cadence exists, use tpf.cadenceno
         pixels_ra, pixels_dec = self.get_coordinates(cadence=int(len(self.flux)/2.0))
 
         # Load pixel ra, dec with no nans
         pixel_radec = np.asarray([pixels_ra[sum_nans != 0].ravel(), pixels_dec[sum_nans != 0].ravel()])
 
         # Make pixel pairs into SkyCoord
-        sky_pixel_pairs = SkyCoord(ra=pixel_radec[0]*u.deg, dec=pixel_radec[1]*u.deg, frame='icrs', unit=(u.deg, u.deg))
+        sky_pixel_pairs = SkyCoord(ra=pixel_radec[0], dec=pixel_radec[1], frame='icrs', unit=(u.deg, u.deg))
         # Make pairs in sky_sources
         sky_sources = SkyCoord(ra=data['ra'], dec=data['dec'], frame='icrs', unit=(u.deg, u.deg))
 
         separation_mask = []
         for i in range (len(data)):
             s = sky_pixel_pairs.separation(sky_sources[i])  # Estimate separation
-            separation = np.any(s.arcmin <= dist_tolerance)
+            separation = np.any(s.arcsec <= dist_tolerance )
             separation_mask.append(separation)
 
         sep_mask = np.array(separation_mask, dtype=bool)
