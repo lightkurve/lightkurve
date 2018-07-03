@@ -1155,6 +1155,8 @@ class LightCurveCollection(object):
                 if normalize:
                     lc = lc.normalize()
                 new_lc.append(lc)
+                if new_lc.keplerid != lc.keplerid:
+                    log.warning(‘CAUTION: Stitching light curves with multiple IDs’)
         return new_lc
 
     def __repr__(self):
