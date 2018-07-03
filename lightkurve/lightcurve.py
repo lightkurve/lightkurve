@@ -1138,10 +1138,7 @@ class LightCurveCollection(object):
 
     def append(self, lc, **kwargs):
         try:
-            if lc.keplerid in self.data:
-                if 'stitch' in kwargs:
-                    self.data[lc.keplerid][0].append(lc)
-                    return   
+            if lc.keplerid in self.data: 
                 self.data[lc.keplerid].append(lc)
             else:
                 self.data[lc.keplerid] = [lc]
@@ -1149,14 +1146,14 @@ class LightCurveCollection(object):
             raise TypeError("Input is not a lightcurve")
 
     def stitch(self, normalize=False):
-        new_lc = LightCurve(time=[])
+        new_lc = LightCurve(time=[],flux=[])
         for lc_array in self.data.values():
             for lc in lc_array:
                 if normalize:
                     lc = lc.normalize()
                 new_lc.append(lc)
                 if new_lc.keplerid != lc.keplerid:
-                    log.warning(‘CAUTION: Stitching light curves with multiple IDs’)
+                    log.warning("CAUTION: Stitching light curves with multiple IDs")
         return new_lc
 
     def __repr__(self):
@@ -1188,7 +1185,7 @@ class LightCurveCollection(object):
             _, ax = plt.subplots()
         for lc_array in self.data.values():
             for lightcurve in lc_array:
-                lightcurve.plot(ax=ax, label=lightcurve.keplerid)
+                lightcurve.plot(ax=ax,label=lightcurve.keplerid)
 
         return ax
 
