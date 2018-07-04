@@ -258,7 +258,10 @@ class KeplerLightCurveFile(LightCurveFile):
     @property
     def mission(self):
         """Mission name"""
-        return self.header(ext=0)['MISSION']
+        try:
+            return self.header(ext=0)['MISSION']
+        except KeyError:
+            return None
 
     def compute_cotrended_lightcurve(self, cbvs=[1, 2], **kwargs):
         """Returns a LightCurve object after cotrending the SAP_FLUX
