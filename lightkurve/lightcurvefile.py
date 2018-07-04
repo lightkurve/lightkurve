@@ -258,7 +258,7 @@ class KeplerLightCurveFile(LightCurveFile):
     @property
     def mission(self):
         """Mission name"""
-	try:
+        try:
             return self.header(ext=0)['MISSION']
         except KeyError:
             return None
