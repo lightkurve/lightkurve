@@ -7,6 +7,7 @@ Direct contributions to the code base:
 - `Michael Gully-Santiago <https://github.com/gully>`_
 - `Thomas Barclay <https://github.com/mrtommyb>`_
 - `Ken Mighell <https://github.com/KenMighell>`_
+- `Keaton Bell <https://github.com/keatonb>`_
 
 Comments, corrections & suggestions:
 
