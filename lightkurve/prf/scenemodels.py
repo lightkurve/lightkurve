@@ -23,8 +23,8 @@ log = logging.getLogger(__name__)
 
 
 class FixedValuePrior(Prior):
-    """An improper prior with a likelihood probability of 1 at a single fixed
-    value and -inf elsewhere. This is similar to a Dirac Delta function,
+    """An improper prior with a negative log probability of 0 at a single fixed
+    value and inf elsewhere. This is similar to a Dirac Delta function,
     except this function does not peak at infinity so that it can be used
     in numerical optimization functions.  It does not integrate to one as a
     result and is therefore an "improper distribution".
