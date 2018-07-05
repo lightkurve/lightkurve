@@ -795,6 +795,11 @@ class KeplerTargetPixelFile(TargetPixelFile):
         if aperture_mask.sum() == 0:
             log.warning('Warning: aperture mask contains zero pixels.')
         centroid_col, centroid_row = self.centroids(aperture_mask)
+        # Ignore warnings related to zero or negative errors
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RuntimeWarning)
+            flux_err = np.nansum(self.flux_err[:, aperture_mask]**2, axis=1)**0.5
+
         keys = {'centroid_col': centroid_col,
                 'centroid_row': centroid_row,
                 'quality': self.quality,
@@ -804,13 +809,13 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 'mission': self.mission,
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
-                'dec': self.dec}
-
+                'dec': self.dec,
+                'keplerid': self.keplerid}
         return KeplerLightCurve(time=self.time,
                                 time_format='bkjd',
                                 time_scale='tdb',
                                 flux=np.nansum(self.flux[:, aperture_mask], axis=1),
-                                flux_err=np.nansum(self.flux_err[:, aperture_mask]**2, axis=1)**0.5,
+                                flux_err=flux_err,
                                 **keys)
 
     def get_bkg_lightcurve(self, aperture_mask=None):
@@ -1135,6 +1140,10 @@ class TessTargetPixelFile(TargetPixelFile):
         if aperture_mask.sum() == 0:
             log.warning('Warning: aperture mask contains zero pixels.')
         centroid_col, centroid_row = self.centroids(aperture_mask)
+        # Ignore warnings related to zero or negative errors
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RuntimeWarning)
+            flux_err = np.nansum(self.flux_err[:, aperture_mask]**2, axis=1)**0.5
 
         keys = {'centroid_col': centroid_col,
                 'centroid_row': centroid_row,
@@ -1144,12 +1153,13 @@ class TessTargetPixelFile(TargetPixelFile):
                 'ccd': self.ccd,
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
-                'dec': self.dec}
+                'dec': self.dec,
+                'ticid': self.ticid}
         return TessLightCurve(time=self.time,
                               time_format='btjd',
                               time_scale='tdb',
                               flux=np.nansum(self.flux[:, aperture_mask], axis=1),
-                              flux_err=np.nansum(self.flux_err[:, aperture_mask]**2, axis=1)**0.5,
+                              flux_err=flux_err,
                               **keys)
 
     def get_bkg_lightcurve(self, aperture_mask=None):
