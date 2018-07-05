@@ -74,6 +74,35 @@ class LightCurveFile(object):
         types = [n for n in types if not ('ERR' in n)]
         return types
 
+    def plot(self, flux_types=None, style='fast', **kwargs):
+        """Plot all the light curves contained in this light curve file.
+
+        Parameters
+        ----------
+        flux_types : str or list of str
+            List of flux types to plot. Default is to plot all available.
+            (For Kepler the default fluxes are 'SAP_FLUX' and 'PDCSAP_FLUX'.
+        style : str
+            matplotlib.pyplot.style.context, default is 'fast'
+        kwargs : dict
+            Dictionary of keyword arguments to be passed to
+            `KeplerLightCurve.plot()`.
+        """
+        if (style == "fast") and ("fast" not in mpl.style.available):
+            style = "default"
+        with plt.style.context(style):
+            if not ('ax' in kwargs):
+                fig, ax = plt.subplots(1)
+                kwargs['ax'] = ax
+            if flux_types is None:
+                flux_types = self._flux_types()
+            if isinstance(flux_types, str):
+                flux_types = [flux_types]
+            for idx, ft in enumerate(flux_types):
+                lc = self.get_lightcurve(ft)
+                kwargs['color'] = np.asarray(mpl.rcParams['axes.prop_cycle'])[idx]['color']
+                lc.plot(label=ft, **kwargs)
+
 
 class KeplerLightCurveFile(LightCurveFile):
     """Defines a class for a given light curve FITS file from NASA's Kepler and
@@ -283,35 +312,6 @@ class KeplerLightCurveFile(LightCurveFile):
         """
         from .correctors import KeplerCBVCorrector
         return KeplerCBVCorrector(self).correct(cbvs=cbvs, **kwargs)
-
-    def plot(self, flux_types=None, style='fast', **kwargs):
-        """Plot all the light curves contained in this light curve file.
-
-        Parameters
-        ----------
-        flux_types : str or list of str
-            List of flux types to plot. Default is to plot all available.
-            (For Kepler the default fluxes are 'SAP_FLUX' and 'PDCSAP_FLUX'.
-        style : str
-            matplotlib.pyplot.style.context, default is 'fast'
-        kwargs : dict
-            Dictionary of keyword arguments to be passed to
-            `KeplerLightCurve.plot()`.
-        """
-        if (style == "fast") and ("fast" not in mpl.style.available):
-            style = "default"
-        with plt.style.context(style):
-            if not ('ax' in kwargs):
-                fig, ax = plt.subplots(1)
-                kwargs['ax'] = ax
-            if flux_types is None:
-                flux_types = self._flux_types()
-            if isinstance(flux_types, str):
-                flux_types = [flux_types]
-            for idx, ft in enumerate(flux_types):
-                lc = self.get_lightcurve(ft)
-                kwargs['color'] = np.asarray(mpl.rcParams['axes.prop_cycle'])[idx]['color']
-                lc.plot(label=ft, **kwargs)
 
 
 class TessLightCurveFile(LightCurveFile):
