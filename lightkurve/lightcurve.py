@@ -20,11 +20,12 @@ from astropy.table import Table
 from astropy.io import fits
 from astropy.time import Time
 
+
 from .utils import running_mean, bkjd_to_astropy_time, btjd_to_astropy_time
 from . import PACKAGEDIR
 
 __all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve',
-           'iterative_box_period_search']
+           'iterative_box_period_search', 'LightCurveCollection']
 
 log = logging.getLogger(__name__)
 
@@ -745,6 +746,7 @@ class LightCurve(object):
         return hdu
 
 
+
 class FoldedLightCurve(LightCurve):
     """Defines a folded lightcurve with different plotting defaults."""
 
@@ -1110,3 +1112,107 @@ def iterative_box_period_search(lc, niters=2, min_period=0.5, max_period=30,
         snr_d.append(depth_star * np.sqrt(width_star))
 
     return log_posterior, trial_periods, trial_periods[np.argmax(log_posterior)]
+
+class LightCurveCollection(object):
+    """
+    Collects multiple LightCurve objects together with helpful functions.
+    """
+    def __init__(self, lcs):
+        try:
+            lightcurves = np.asarray(lcs)
+        except:
+            raise TypeError("Unable to parse input")
+        self.data = {}
+        
+        for lc in lightcurves:
+            if isinstance(lc, KeplerLightCurve) or isinstance(lc,LightCurve):
+                if lc.keplerid:
+                    if lc.keplerid in self.data:
+                        self.data[lc.keplerid].append(lc)
+                    else:
+                        self.data[lc.keplerid] = [lc]
+                else: #no keplerID
+                    self.data[None].append(lc)
+            else:
+                raise TypeError("Object is not a LightCurve instance")
+        self.data[None] = []
+
+    def __len__(self):
+        length = 0
+        for lc_array in self.data.values():
+            for lc in lc_array:
+                length += 1
+        return length
+
+    def _ids(self):
+        """
+        Returns the kepler_ids of all the lightcurves as a dict_keys obj.
+        """
+        return self.data.keys()
+
+    def __getitem__(self, kep_id):
+        """
+        Returns the lightcurve associated with the kepler_id. 
+        """
+        try: 
+            return self.data[kep_id]
+        except:
+            raise ValueError('No LightCurve for ' + kep_id)
+
+    def append(self, lc, **kwargs):
+        try:
+            if lc.keplerid in self.data: 
+                self.data[lc.keplerid].append(lc)
+            else:
+                self.data[lc.keplerid] = [lc]
+        except:
+            raise TypeError("Input is not a lightcurve")
+
+    def stitch(self, normalize=False):
+        new_lc = LightCurve(time=[],flux=[])
+        for lc_array in self.data.values():
+            for lc in lc_array:
+                if normalize:
+                    lc = lc.normalize()
+                new_lc.append(lc)
+                if new_lc.keplerid != lc.keplerid:
+                    log.warning("CAUTION: Stitching light curves with multiple IDs")
+        return new_lc
+
+    def __repr__(self):
+        result = ""
+        for lightcurve_array in self.data.values():
+            for lightcurve in lightcurve_array:
+                result += lightcurve.__repr__() + " "
+            result += "\n"
+        return result
+
+    def plot(self, ax=None, **kwargs):
+        """Plots a collection of light curve.
+
+        Parameters
+        ----------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            A matplotlib axes object to plot into. If no axes is provided,
+            a new one will be generated.
+        
+        kwargs : dict
+            Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
+
+        Returns
+        -------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            The matplotlib axes object.
+        """
+        if ax is None:
+            _, ax = plt.subplots()
+        for lc_array in self.data.values():
+            for lightcurve in lc_array:
+                lightcurve.plot(ax=ax,label=lightcurve.keplerid)
+
+        return ax
+
+    def pca(self):
+        '''Creates the Principle Components of a collection of LightCurves
+        '''
+        raise NotImplementedError('Should be able to run a PCA on a collection.')
