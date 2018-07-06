@@ -655,7 +655,7 @@ class LightCurve(object):
         return nlc
 
 
-    def Periodogram(self, frequency=None):
+    def periodogram(self, frequency=None):
         from astropy.stats import LombScargle
         from astropy import units as u
         from lightkurve.periodogram import Periodogram

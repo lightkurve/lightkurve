@@ -17,4 +17,6 @@ def test_lightcurve_seismology_plot():
     """Sanity check to verify that periodogram plotting works"""
     lcf = KeplerLightCurveFile(TABBY_Q8).PDCSAP_FLUX.normalize()
     pf = Periodogram.from_lightcurve(lcf)
-    pf.plot_frequency()
+    pf.plot()
+
+    lcf.Periodogram().plot()
