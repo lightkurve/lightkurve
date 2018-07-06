@@ -2,6 +2,8 @@
 
 from __future__ import division, print_function
 
+import os
+import logging
 import numpy as np
 import matplotlib as mpl
 from matplotlib import pyplot as plt
@@ -13,6 +15,8 @@ from .mast import download_kepler_products
 
 
 __all__ = ['KeplerLightCurveFile', 'TessLightCurveFile']
+
+log = logging.getLogger(__name__)
 
 
 class LightCurveFile(object):
@@ -69,6 +73,35 @@ class LightCurveFile(object):
         types = [n for n in self.hdu[1].data.columns.names if 'FLUX' in n]
         types = [n for n in types if not ('ERR' in n)]
         return types
+
+    def plot(self, flux_types=None, style='fast', **kwargs):
+        """Plot all the light curves contained in this light curve file.
+
+        Parameters
+        ----------
+        flux_types : str or list of str
+            List of flux types to plot. Default is to plot all available.
+            (For Kepler the default fluxes are 'SAP_FLUX' and 'PDCSAP_FLUX'.
+        style : str
+            matplotlib.pyplot.style.context, default is 'fast'
+        kwargs : dict
+            Dictionary of keyword arguments to be passed to
+            `KeplerLightCurve.plot()`.
+        """
+        if (style == "fast") and ("fast" not in mpl.style.available):
+            style = "default"
+        with plt.style.context(style):
+            if not ('ax' in kwargs):
+                fig, ax = plt.subplots(1)
+                kwargs['ax'] = ax
+            if flux_types is None:
+                flux_types = self._flux_types()
+            if isinstance(flux_types, str):
+                flux_types = [flux_types]
+            for idx, ft in enumerate(flux_types):
+                lc = self.get_lightcurve(ft)
+                kwargs['color'] = np.asarray(mpl.rcParams['axes.prop_cycle'])[idx]['color']
+                lc.plot(label=ft, **kwargs)
 
 
 class KeplerLightCurveFile(LightCurveFile):
@@ -139,10 +172,16 @@ class KeplerLightCurveFile(LightCurveFile):
         -------
         lcf : KeplerLightCurveFile object or list of KeplerLightCurveFile objects
         """
-        path = download_kepler_products(
-            target=target, filetype='Lightcurve', cadence=cadence,
-            quarter=quarter, campaign=campaign, month=month,
-            radius=radius, targetlimit=targetlimit)
+        # Be tolerant if a direct path or url is passed to this function by accident
+        if os.path.exists(str(target)) or str(target).startswith('http'):
+            log.warning('Warning: from_archive() is not intended to accept a '
+                        'direct path, use KeplerLightCurveFile(path) instead.')
+            path = [target]
+        else:
+            path = download_kepler_products(
+                target=target, filetype='Lightcurve', cadence=cadence,
+                quarter=quarter, campaign=campaign, month=month,
+                radius=radius, targetlimit=targetlimit)
         if len(path) == 1:
             return KeplerLightCurveFile(path[0], **kwargs)
         return [KeplerLightCurveFile(p, **kwargs) for p in path]
@@ -248,7 +287,10 @@ class KeplerLightCurveFile(LightCurveFile):
     @property
     def mission(self):
         """Mission name"""
-        return self.header(ext=0)['MISSION']
+        try:
+            return self.header(ext=0)['MISSION']
+        except KeyError:
+            return None
 
     def compute_cotrended_lightcurve(self, cbvs=[1, 2], **kwargs):
         """Returns a LightCurve object after cotrending the SAP_FLUX
@@ -270,35 +312,6 @@ class KeplerLightCurveFile(LightCurveFile):
         """
         from .correctors import KeplerCBVCorrector
         return KeplerCBVCorrector(self).correct(cbvs=cbvs, **kwargs)
-
-    def plot(self, flux_types=None, style='fast', **kwargs):
-        """Plot all the light curves contained in this light curve file.
-
-        Parameters
-        ----------
-        flux_types : str or list of str
-            List of flux types to plot. Default is to plot all available.
-            (For Kepler the default fluxes are 'SAP_FLUX' and 'PDCSAP_FLUX'.
-        style : str
-            matplotlib.pyplot.style.context, default is 'fast'
-        kwargs : dict
-            Dictionary of keyword arguments to be passed to
-            `KeplerLightCurve.plot()`.
-        """
-        if (style == "fast") and ("fast" not in mpl.style.available):
-            style = "default"
-        with plt.style.context(style):
-            if not ('ax' in kwargs):
-                fig, ax = plt.subplots(1)
-                kwargs['ax'] = ax
-            if flux_types is None:
-                flux_types = self._flux_types()
-            if isinstance(flux_types, str):
-                flux_types = [flux_types]
-            for idx, ft in enumerate(flux_types):
-                lc = self.get_lightcurve(ft)
-                kwargs['color'] = np.asarray(mpl.rcParams['axes.prop_cycle'])[idx]['color']
-                lc.plot(label=ft, **kwargs)
 
 
 class TessLightCurveFile(LightCurveFile):

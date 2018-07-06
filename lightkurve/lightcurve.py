@@ -7,6 +7,7 @@ from tqdm import tqdm
 import os
 import datetime
 import logging
+import pandas as pd
 
 import oktopus
 import numpy as np
@@ -20,7 +21,7 @@ from astropy.table import Table
 from astropy.io import fits
 from astropy.time import Time
 
-from .utils import running_mean, bkjd_to_astropy_time
+from .utils import running_mean, bkjd_to_astropy_time, btjd_to_astropy_time
 from . import PACKAGEDIR
 
 __all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve',
@@ -150,6 +151,8 @@ class LightCurve(object):
         # `TimeFormat` class for BKJD.
         if self.time_format == 'bkjd':
             return bkjd_to_astropy_time(self.time)
+        elif self.time_format == 'btjd':  # TESS
+            return btjd_to_astropy_time(self.time)
         return Time(self.time, format=self.time_format, scale=self.time_scale)
 
     def properties(self):
@@ -360,6 +363,49 @@ class LightCurve(object):
             A new ``LightCurve`` from which NaNs fluxes have been removed.
         """
         return self[~np.isnan(self.flux)]  # This will return a sliced copy
+
+    def fill_gaps(lc, method='nearest'):
+        """Fill in gaps in time with linear interpolation.
+
+        Parameters
+        ----------
+        method : string {None, 'backfill'/'bfill', 'pad'/'ffill', 'nearest'}
+            Method to use for gap filling. 'nearest' by default.
+
+        Returns
+        -------
+        nlc : LightCurve object
+            A new ``LightCurve`` in which NaNs values and gaps in time have been
+            filled.
+        """
+        clc = copy.deepcopy(lc.remove_nans())
+        nlc = copy.deepcopy(lc)
+
+        # Average gap between cadences
+        dt = np.nanmedian(clc.time[1::] - clc.time[:-1:])
+
+        # Iterate over flux and flux_err
+        for idx, y in enumerate([clc.flux, clc.flux_err]):
+            # We need to ensure pandas gets the correct byteorder
+            # Background info: https://github.com/astropy/astropy/issues/1156
+            if y.dtype.byteorder == '>':
+                y = y.byteswap().newbyteorder()
+            ts = pd.Series(y, index=clc.time)
+            newindex = [clc.time[0]]
+            for t in clc.time[1::]:
+                prevtime = newindex[-1]
+                while (t - prevtime) > 1.2*dt:
+                    newindex.append(prevtime + dt)
+                    prevtime = newindex[-1]
+                newindex.append(t)
+            ts = ts.reindex(newindex, method=method)
+            if idx == 0:
+                nlc.flux = np.asarray(ts)
+            elif idx == 1:
+                nlc.flux_err = np.asarray(ts)
+
+        nlc.time = np.asarray(ts.index)
+        return nlc
 
     def remove_outliers(self, sigma=5., return_mask=False, **kwargs):
         """Removes outlier flux values using sigma-clipping.
@@ -779,6 +825,12 @@ class KeplerLightCurve(LightCurve):
         Data flux for every time point
     flux_err : array-like
         Uncertainty on each flux data point
+    time_format : str
+        String specifying how an instant of time is represented,
+        e.g. 'bkjd' or 'jd'.
+    time_scale : str
+        String which specifies how the time is measured,
+        e.g. tdb', 'tt', 'ut1', or 'utc'.
     centroid_col : array-like
         Centroid column coordinates as a function of time
     centroid_row : array-like
@@ -804,7 +856,8 @@ class KeplerLightCurve(LightCurve):
                  centroid_col=None, centroid_row=None, quality=None, quality_bitmask=None,
                  channel=None, campaign=None, quarter=None, mission=None,
                  cadenceno=None, keplerid=None, ra=None, dec=None):
-        super(KeplerLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err, time_format=time_format, time_scale=time_scale)
+        super(KeplerLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err,
+                                               time_format=time_format, time_scale=time_scale)
         self.centroid_col = self._validate_array(centroid_col, name='centroid_col')
         self.centroid_row = self._validate_array(centroid_row, name='centroid_row')
         self.quality = self._validate_array(quality, name='quality')
@@ -938,6 +991,12 @@ class TessLightCurve(LightCurve):
         Data flux for every time point
     flux_err : array-like
         Uncertainty on each flux data point
+    time_format : str
+        String specifying how an instant of time is represented,
+        e.g. 'bkjd' or 'jd'.
+    time_scale : str
+        String which specifies how the time is measured,
+        e.g. tdb', 'tt', 'ut1', or 'utc'.
     centroid_col, centroid_row : array-like, array-like
         Centroid column and row coordinates as a function of time
     quality : array-like
@@ -949,22 +1008,30 @@ class TessLightCurve(LightCurve):
     ticid : int
         Tess Input Catalog ID number
     """
-    def __init__(self, time, flux=None, flux_err=None, centroid_col=None,
-                 centroid_row=None, quality=None, quality_bitmask=None,
-                 cadenceno=None, ticid=None):
-        super(TessLightCurve, self).__init__(time, flux, flux_err)
+    def __init__(self, time, flux=None, flux_err=None, time_format=None, time_scale=None,
+                 centroid_col=None, centroid_row=None, quality=None, quality_bitmask=None,
+                 cadenceno=None, sector=None, camera=None, ccd=None,
+                 ticid=None, ra=None, dec=None):
+        super(TessLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err,
+                                             time_format=time_format, time_scale=time_scale)
         self.centroid_col = self._validate_array(centroid_col, name='centroid_col')
         self.centroid_row = self._validate_array(centroid_row, name='centroid_row')
         self.quality = self._validate_array(quality, name='quality')
         self.cadenceno = self._validate_array(cadenceno)
         self.quality_bitmask = quality_bitmask
         self.mission = "TESS"
+        self.sector = sector
+        self.camera = camera
+        self.ccd = ccd
         self.ticid = ticid
+        self.ra = ra
+        self.dec = dec
 
     def __getitem__(self, key):
         lc = super(TessLightCurve, self).__getitem__(key)
         # Compared to `LightCurve`, we need to slice a few additional arrays:
         lc.quality = self.quality[key]
+        lc.cadenceno = self.cadenceno[key]
         lc.centroid_col = self.centroid_col[key]
         lc.centroid_row = self.centroid_row[key]
         return lc

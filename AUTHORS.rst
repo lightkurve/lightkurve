@@ -7,6 +7,11 @@ Direct contributions to the code base:
 - `Michael Gully-Santiago <https://github.com/gully>`_
 - `Thomas Barclay <https://github.com/mrtommyb>`_
 - `Ken Mighell <https://github.com/KenMighell>`_
+- `Keaton Bell <https://github.com/keatonb>`_
+- `Johnny Zhang <https://github.com/johnnyzhang295>`_
+- `Andy Tzanidakis <https://github.com/AndyTza>`_
+- `Sheila Sagear <https://github.com/ssagear>`_
+- `Emma Turtelboom <https://github.com/Emmavt>`_
 
 Comments, corrections & suggestions:
 
