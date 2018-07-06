@@ -151,11 +151,11 @@ def test_lightcurve_append_multiple():
 @pytest.mark.remote_data
 def test_lightcurve_plot():
     """Sanity check to verify that lightcurve plotting works"""
-    lcf = KeplerLightCurveFile(TABBY_Q8)
-    lcf.plot()
-    lcf.plot(flux_types=['SAP_FLUX', 'PDCSAP_FLUX'])
-    lcf.SAP_FLUX.plot()
-    lcf.SAP_FLUX.plot(normalize=False, fill=False, title="Not the default")
+    for lcf in [KeplerLightCurveFile(TABBY_Q8), TessLightCurveFile(TESS_SIM)]:
+        lcf.plot()
+        lcf.plot(flux_types=['SAP_FLUX', 'PDCSAP_FLUX'])
+        lcf.SAP_FLUX.plot()
+        lcf.SAP_FLUX.plot(normalize=False, fill=False, title="Not the default")
 
 @pytest.mark.remote_data
 def test_lightcurve_seismology_plot():
@@ -372,16 +372,19 @@ def test_slicing():
     lc = TessLightCurve(time, flux, flux_err,
                         centroid_col=centroid_col,
                         centroid_row=centroid_row,
+                        cadenceno=cadenceno,
                         quality=quality)
     assert_array_equal(lc[::4].centroid_col, centroid_col[::4])
     assert_array_equal(lc[5:].centroid_row, centroid_row[5:])
     assert_array_equal(lc[10:3].quality, quality[10:3])
+    assert_array_equal(lc[4:6].cadenceno, cadenceno[4:6])
 
 
 def test_boolean_masking():
     lc = KeplerLightCurve(time=[1, 2, 3], flux=[1, 1, 10],
                           quality=[0, 0, 200], cadenceno=[5, 6, 7])
     assert_array_equal(lc[lc.flux < 5].time, [1, 2])
+    assert_array_equal(lc[lc.flux < 5].flux, [1, 1])
     assert_array_equal(lc[lc.flux < 5].quality, [0, 0])
     assert_array_equal(lc[lc.flux < 5].cadenceno, [5, 6])
 
@@ -495,6 +498,7 @@ def test_from_archive_should_accept_path():
     """If a url is passed to `from_archive` it should still just work."""
     KeplerLightCurveFile.from_archive(TABBY_Q8)
 
+
 @pytest.mark.remote_data
 def test_lightcurvecollection_stitch():
     
@@ -506,3 +510,17 @@ def test_lightcurvecollection_stitch():
 
     lc = lcc.stitch(normalize=True)
     lc_non_normalized = lcc.stitch()
+
+def test_fill_gaps():
+    lc = LightCurve([1,2,3,4,6,7,8], [1,1,1,1,1,1,1])
+    nlc = lc.fill_gaps()
+    assert(len(lc.time) < len(nlc.time))
+    assert(np.any(nlc.time == 5))
+    assert(np.all(nlc.flux == 1))
+
+    lc = LightCurve([1,2,3,4,6,7,8], [1,1,np.nan,1,1,1,1])
+    nlc = lc.fill_gaps()
+    assert(len(lc.time) < len(nlc.time))
+    assert(np.any(nlc.time == 5))
+    assert(np.all(nlc.flux == 1))
+    assert(np.all(np.isfinite(nlc.flux)))

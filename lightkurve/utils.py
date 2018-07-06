@@ -7,7 +7,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-__all__ = ['KeplerQualityFlags', 'TessQualityFlags', 'bkjd_to_astropy_time',
+__all__ = ['KeplerQualityFlags', 'TessQualityFlags',
+           'bkjd_to_astropy_time', 'btjd_to_astropy_time',
            'channel_to_module_output', 'module_output_to_channel',
            'running_mean']
 
@@ -215,13 +216,9 @@ def bkjd_to_astropy_time(bkjd, bjdref=2454833.):
     Parameters
     ----------
     bkjd : array of floats
-        Barycentric Kepler Julian Day
-    timecorr : array of floats
-        Kepler barycentric correction
-    timslice : array of floats
-        Kepler time-slice correction
+        Barycentric Kepler Julian Day.
     bjdref : float
-        BJD reference date, for Kepler this is 2454833
+        BJD reference date, for Kepler this is 2454833.
 
     Returns
     -------
@@ -231,6 +228,32 @@ def bkjd_to_astropy_time(bkjd, bjdref=2454833.):
     jd = bkjd + bjdref
     # Some data products have missing time values;
     # we need to set these to zero or `Time` cannot be instantiated.
+    jd[~np.isfinite(jd)] = 0
+    return Time(jd, format='jd', scale='tdb')
+
+
+def btjd_to_astropy_time(btjd, bjdref=2457000.):
+    """Converts BTJD time values to an `astropy.time.Time` object.
+
+    TESS Barycentric Julian Day (BTJD) is a Julian day minus 2457000.0
+    and corrected to the arrival times at the barycenter of the Solar System.
+    BTJD is the format in which times are recorded in the TESS data products.
+    The time is in the Barycentric Dynamical Time frame (TDB), which is a
+    time system that is not affected by leap seconds.
+
+    Parameters
+    ----------
+    btjd : array of floats
+        Barycentric Kepler Julian Day
+    bjdref : float
+        BJD reference date.
+
+    Returns
+    -------
+    time : astropy.time.Time object
+        Resulting time object
+    """
+    jd = btjd + bjdref
     jd[~np.isfinite(jd)] = 0
     return Time(jd, format='jd', scale='tdb')
 
