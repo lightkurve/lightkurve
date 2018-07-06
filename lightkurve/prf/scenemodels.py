@@ -66,9 +66,7 @@ class FixedValuePrior(Prior):
         return np.inf
 
     def gradient(self, params):
-        if self.value == params:
-            return 0.0
-        return np.inf
+        raise NotImplementedError()
 
 
 class PriorContainer(object):
@@ -398,17 +396,17 @@ class SceneModel(object):
         """
         initial_star_guesses = []
         for star in self.star_priors:
-            initial_star_guesses.append(StarParameters(col=star.col.mean[0],
-                                                       row=star.row.mean[0],
-                                                       flux=star.flux.mean[0]))
-        background = BackgroundParameters(flux=self.background_prior.flux.mean[0],
+            initial_star_guesses.append(StarParameters(col=star.col.mean,
+                                                       row=star.row.mean,
+                                                       flux=star.flux.mean))
+        background = BackgroundParameters(flux=self.background_prior.flux.mean,
                                           fitted=self.fit_background)
-        focus = FocusParameters(scale_col=self.focus_prior.scale_col.mean[0],
-                                scale_row=self.focus_prior.scale_row.mean[0],
-                                rotation_angle=self.focus_prior.rotation_angle.mean[0],
+        focus = FocusParameters(scale_col=self.focus_prior.scale_col.mean,
+                                scale_row=self.focus_prior.scale_row.mean,
+                                rotation_angle=self.focus_prior.rotation_angle.mean,
                                 fitted=self.fit_focus)
-        motion = MotionParameters(shift_col=self.motion_prior.shift_col.mean[0],
-                                  shift_row=self.motion_prior.shift_row.mean[0],
+        motion = MotionParameters(shift_col=self.motion_prior.shift_col.mean,
+                                  shift_row=self.motion_prior.shift_row.mean,
                                   fitted=self.fit_motion)
         initial_params = SceneModelParameters(stars=initial_star_guesses,
                                               background=background,
@@ -455,9 +453,7 @@ class SceneModel(object):
         return self._predict(*params_array)
 
     def gradient(self, *params_array):
-        """UNFINISHED WORK!
-        Ze: how to implement this gradient??
-        """
+        """UNFINISHED WORK!"""
         params = self.params.from_array(params_array)
         grad = []
         for star in params.stars:
@@ -468,9 +464,9 @@ class SceneModel(object):
                                                center_row=star.row))
         # We assume the background gradient is proportional to one
         grad.append([np.ones(self.prfmodel.shape)])
-        # We assume the gradient of other parameters is zero
+        # We assume the gradient of other parameters is one
         for i in range(len([*params_array]) - 3 * len(params.stars) - 1):
-            grad.append([np.zeros(self.prfmodel.shape)])
+            grad.append([np.ones(self.prfmodel.shape)])
         grad = sum(grad, [])
         return grad
 
@@ -526,7 +522,7 @@ class SceneModel(object):
         loss = loss_function(data, self, prior=self._logp_prior)
         fit = loss.fit(x0=self.get_initial_guesses().to_array(), method=method, **kwargs)
         result = self.params.from_array(fit.x)
-        result.uncertainties = loss.loglikelihood.uncertainties(fit.x)
+        #result.uncertainties = loss.loglikelihood.uncertainties(fit.x)
         result.predicted_image = self._predict(fit.x)
         result.residual_image = data - result.predicted_image
         result.loss_value = fit.fun
@@ -578,7 +574,7 @@ class PRFPhotometry(object):
         self.model = model
         self.results = []
 
-    def run(self, tpf_flux, pos_corr1=None, pos_corr2=None):
+    def run(self, tpf_flux, pos_corr1=None, pos_corr2=None, cadences=None):
         """Fits the scene model to the flux data.
 
         Parameters
@@ -587,9 +583,17 @@ class PRFPhotometry(object):
             A pixel flux time-series, i.e., the pixel data, e.g,
             KeplerTargetPixelFile.flux, such that (time, row, column) represents
             the shape of ``tpf_flux``.
+        pos_corr1, pos_corr2 : array-like, array-like
+            If set, use these values to update the prior means for
+            `model.motion_prior.shift_col` and `model.motion_prior.shift_row`
+            for each cadence.
+        cadences : array-like
+            Cadences to fit.  If `None` then fit all.
         """
         self.results = []
-        for cadence in tqdm(range(len(tpf_flux))):
+        if cadences is None:
+            cadences = range(len(tpf_flux))
+        for cadence in tqdm(cadences):
             if pos_corr1 is not None and np.abs(pos_corr1[cadence]) < 50:
                 self.model.motion_prior.shift_col.mean = pos_corr1[cadence]
             if pos_corr2 is not None and np.abs(pos_corr2[cadence]) < 50:
