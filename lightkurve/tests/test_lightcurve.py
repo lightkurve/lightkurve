@@ -448,3 +448,17 @@ def test_flatten_robustness():
 def test_from_archive_should_accept_path():
     """If a url is passed to `from_archive` it should still just work."""
     KeplerLightCurveFile.from_archive(TABBY_Q8)
+
+def test_fill_gaps():
+    lc = LightCurve([1,2,3,4,6,7,8], [1,1,1,1,1,1,1])
+    nlc = lc.fill_gaps()
+    assert(len(lc.time) < len(nlc.time))
+    assert(np.any(nlc.time == 5))
+    assert(np.all(nlc.flux == 1))
+
+    lc = LightCurve([1,2,3,4,6,7,8], [1,1,np.nan,1,1,1,1])
+    nlc = lc.fill_gaps()
+    assert(len(lc.time) < len(nlc.time))
+    assert(np.any(nlc.time == 5))
+    assert(np.all(nlc.flux == 1))
+    assert(np.all(np.isfinite(nlc.flux)))
