@@ -145,7 +145,7 @@ def test_scene_with_one_star():
                        fit_background=True,
                        fit_focus=True)
     # Generate and fit fake data
-    fake_data = bgflux + prf(starflux, col + 6, row + 6,
+    fake_data = bgflux + prf(col + 6, row + 6, starflux,
                              scale_col=scale_col, scale_row=scale_row,
                              rotation_angle=rotation_angle)
     results = scene.fit(fake_data, tol=1e-12, options={'maxiter': 100})

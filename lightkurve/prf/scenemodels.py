@@ -431,9 +431,9 @@ class SceneModel(object):
             params = self.get_initial_guesses()
         star_images = []
         for star in params.stars:
-            star_images.append(self.prfmodel(flux=star.flux,
-                                             center_col=star.col + params.motion.shift_col,
+            star_images.append(self.prfmodel(center_col=star.col + params.motion.shift_col,
                                              center_row=star.row + params.motion.shift_row,
+                                             flux=star.flux,
                                              scale_col=params.focus.scale_col,
                                              scale_row=params.focus.scale_row,
                                              rotation_angle=params.focus.rotation_angle))
