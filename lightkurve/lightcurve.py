@@ -26,7 +26,7 @@ from .utils import running_mean, bkjd_to_astropy_time, btjd_to_astropy_time
 from . import PACKAGEDIR
 
 __all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve',
-           'iterative_box_period_search', 'LightCurveCollection']
+           'iterative_box_period_search']
 
 log = logging.getLogger(__name__)
 
@@ -705,78 +705,8 @@ class LightCurve(object):
 
         if frequency is None:
             log.warning("No frequency is given, one will be generated")
-        model = LombScargle((self.time*u.day).to(u.second), self.flux*1e6)
-        return Periodogram(model=model, lc=self, frequency=frequency)
-
-    def createPowerFrequencyPlot(self, ax=None, **kwargs):
-        from astropy import units
-        from astropy.stats import LombScargle
-        m = (self.quality == 0)
-        m &= np.isfinite(self.time)
-        m &= np.isfinite(self.flux)
-        t = self.time[m]
-        y = 1e6 * (self.flux[m] - 1.0)
-        
-        uHz_conv = 1e-6 * 24 * 60 * 60
-        frequency_uHz = np.linspace(1, 300, 100000)
-        #frequency = frequency_uHz * units.Hz * units.micron
-        frequency = frequency_uHz * uHz_conv
-
-        model = LombScargle(t, y)
-        power = model.power(frequency, method="fast", normalization="psd")
-        power *= uHz_conv / len(t)
-        print("frequency is ...", frequency)
-        print("power is ...", power)
-        if ax is None:
-            _, ax = plt.subplots(1)
-        ax.semilogy(frequency_uHz, power, "k")
-        #ax.set_ylim(1e-2, 1e1)
-        ax.set_xlim(frequency_uHz[0], frequency_uHz[-1])
-        ax.set_xlabel("frequency [$\mu$Hz]")
-        ax.set_ylabel("power [ppm$^2$/$\mu$Hz")
-
-        if 'normalize_seismology' in kwargs:
-            ax = self.normalizePowerFrequencyPlot(frequency_uHz, power, ax, **kwargs)
-
-        return ax
-
-    def normalizePowerFrequencyPlot(self, frequency_uHz, power, ax, **kwargs):
-        from scipy.ndimage.filters import gaussian_filter
-        bkg = self.estimate_background(frequency_uHz, power)
-        df = frequency_uHz[1] - frequency_uHz[0]
-        normalized_power = power / bkg
-        smoothed_ps = gaussian_filter(normalized_power, 10 / df)
-        peak_freqs = frequency_uHz[self.find_peaks(smoothed_ps)]
-        nu_max = peak_freqs[peak_freqs > 5][0]
-
-        factor = np.max(normalized_power) / np.max(smoothed_ps)
-        ax.semilogy(frequency_uHz, normalized_power, "k")
-        ax.plot(frequency_uHz, smoothed_ps, label="smoothed", color="C1")
-        ax.axvline(nu_max, label="$\\nu_\mathrm{{max}} = {0:.2f}\,\mu\mathrm{{Hz}}$".format(nu_max))
-        ax.set_ylim(1e-1, 3e2)
-        ax.set_xlim(frequency_uHz[0], frequency_uHz[-1])
-        ax.legend()
-        ax.set_xlabel("frequency [$\mu$Hz]")
-        ax.set_ylabel("normalized power")
-
-        return ax
-
-    def estimate_background(self, x, y, log_width=.01):
-        count = np.zeros(len(x), dtype=int)
-        bkg = np.zeros_like(x)
-        x0 = np.log10(x[0])
-        while x0 < np.log10(x[-1]):
-            m = np.abs(np.log10(x) - x0) < log_width
-            bkg[m] += np.median(y[m])
-            count[m] += 1
-            x0 += 0.5 * log_width
-        return bkg / count
-
-    def find_peaks(self, z):
-        peak_inds = (z[1:-1] > z[:-2]) * (z[1:-1] > z[2:])
-        peak_inds = np.arange(1, len(z)-1)[peak_inds]
-        peak_inds = peak_inds[np.argsort(z[peak_inds])][::-1]
-        return peak_inds
+        #model = LombScargle((self.time*u.day).to(u.second), self.flux*1e6)
+        return Periodogram(lc=self, frequency=frequency)
 
     def to_fits(self, path=None, overwrite=False, **extra_data):
         """Writes the KeplerLightCurve to a fits file.
@@ -1253,112 +1183,3 @@ def iterative_box_period_search(lc, niters=2, min_period=0.5, max_period=30,
         snr_d.append(depth_star * np.sqrt(width_star))
 
     return log_posterior, trial_periods, trial_periods[np.argmax(log_posterior)]
-
-class LightCurveCollection(object):
-    """
-    Collects multiple LightCurve objects together with helpful functions.
-    """
-    def __init__(self, lcs):
-        try:
-            lightcurves = np.asarray(lcs)
-        except:
-            raise TypeError("Unable to parse input")
-        self.data = {}
-        
-        for lc in lightcurves:
-            if isinstance(lc, KeplerLightCurve) or isinstance(lc,LightCurve):
-                if lc.keplerid:
-                    if lc.keplerid in self.data:
-                        self.data[lc.keplerid].append(lc)
-                    else:
-                        self.data[lc.keplerid] = [lc]
-                else: #no keplerID
-                    self.data[None].append(lc)
-            else:
-                raise TypeError("Object is not a LightCurve instance")
-        self.data[None] = []
-
-    def __len__(self):
-        length = 0
-        for lc_array in self.data.values():
-            for lc in lc_array:
-                length += 1
-        return length
-
-    def _ids(self):
-        """
-        Returns the kepler_ids of all the lightcurves as a dict_keys obj.
-        """
-        return self.data.keys()
-
-    def __getitem__(self, kep_id):
-        """
-        Returns the lightcurve associated with the kepler_id. 
-        """
-        try: 
-            return self.data[kep_id]
-        except:
-            raise ValueError('No LightCurve for ' + kep_id)
-
-    def append(self, lc, **kwargs):
-        try:
-            if lc.keplerid in self.data:
-                if 'stitch' in kwargs:
-                    self.data[lc.keplerid][0].append(lc)
-                    return   
-                self.data[lc.keplerid].append(lc)
-            else:
-                self.data[lc.keplerid] = [lc]
-        except:
-            raise TypeError("Input is not a lightcurve")
-
-    def stitch(self, normalize=False):
-        
-        new_lc = LightCurve(time=[])
-
-        #TODO: Implement this
-        for lc_array in self.data.values():
-            for lc in lc_array:
-                if normalize:
-                    lc = lc.normalize()
-                new_lc.append(lc)
-
-        return new_lc
-
-    def __repr__(self):
-        result = ""
-        for lightcurve_array in self.data.values():
-            for lightcurve in lightcurve_array:
-                result += lightcurve.__repr__() + " "
-            result += "\n"
-        return result
-
-    def plot(self, ax=None, **kwargs):
-        """Plots a collection of light curve.
-
-        Parameters
-        ----------
-        ax : matplotlib.axes._subplots.AxesSubplot
-            A matplotlib axes object to plot into. If no axes is provided,
-            a new one will be generated.
-        
-        kwargs : dict
-            Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
-
-        Returns
-        -------
-        ax : matplotlib.axes._subplots.AxesSubplot
-            The matplotlib axes object.
-        """
-        if ax is None:
-            _, ax = plt.subplots()
-        for lc_array in self.data.values():
-            for lightcurve in lc_array:
-                lightcurve.plot(ax=ax, label=lightcurve.keplerid)
-
-        return ax
-
-    def pca(self):
-        '''Creates the Principle Components of a collection of LightCurves
-        '''
-        raise NotImplementedError('Should be able to run a PCA on a collection.')

@@ -21,8 +21,7 @@ from .utils import KeplerQualityFlags, plot_image, bkjd_to_astropy_time, btjd_to
 from .mast import download_kepler_products
 
 __all__ = ['KeplerTargetPixelFile', 'TargetPixelFile',
-            'TessTargetPixelFile', 'KeplerTargetPixelFileFactory',
-            'TargetPixelFileCollection']
+            'TessTargetPixelFile', 'KeplerTargetPixelFileFactory']
 
 log = logging.getLogger(__name__)
 
@@ -1062,136 +1061,6 @@ class KeplerTargetPixelFileFactory(object):
         hdu.header['EXTNAME'] = 'APERTURE'
         return hdu
 
-<<<<<<< HEAD
-class TargetPixelFileCollection(object):
-    """
-    Collects multiple TPF objects together with helpful functions.
-    """
-    def __init__(self, targetPixelFiles):
-        try:
-            tpfs = np.asarray(targetPixelFiles)
-        except:
-            raise TypeError("Unable to parse input")
-        self.data = {}
-        for TPF in tpfs:
-            if isinstance(TPF, TargetPixelFile) or isinstance(TPF,KeplerTargetPixelFile):
-                if TPF.keplerid:
-                    if TPF.keplerid in self.data:
-                        self.data[TPF.keplerid].append(TPF)
-                    else:
-                        self.data[TPF.keplerid] = [TPF]
-            else:
-                raise TypeError("Object is not a TargetPixelFile instance")
-        self.data[None] = []
-
-    def __len__(self):
-        length = 0
-        for tpf_array in self.data.values():
-            for tpf in tpf_array:
-                length += 1
-        return length
-
-    def _ids(self):
-        """
-        Returns the kepler_ids of all the lightcurves as a dict_keys obj.
-        """
-        return self.data.keys()
-
-    def __getitem__(self, kep_id):
-        """
-        Returns the lightcurve associated with the kepler_id. 
-        """
-        try: 
-            return self.data[kep_id]
-        except:
-            raise ValueError('No TPF for ' + kep_id)
-
-    def append(self, tpf):
-        try:
-            if tpf.keplerid in self.data:
-                self.data[tpf.keplerid].append(tpf)
-            else:
-                self.data[tpf.keplerid] = [tpf]
-        except:
-            raise TypeError("Input is not a TPF")
-
-    def __repr__(self):
-        result = ""
-        for TPF_array in self.data.values():
-            for TPF in TPF_array:
-                result += TPF.__repr__() + " "
-            result += "\n"
-        return result
-
-    def plot(self, ax=None, **kwargs):
-        """Plots a collection of TPF frames.
-
-        Parameters
-        ----------
-        ax : matplotlib.axes._subplots.AxesSubplot
-            A matplotlib axes object to plot into. If no axes is provided,
-            a new one will be generated.
-        
-        kwargs : dict
-            Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
-
-        Returns
-        -------
-        ax : matplotlib.axes._subplots.AxesSubplot
-            The matplotlib axes object.
-        """
-        from astropy.visualization import (ImageNormalize, LinearStretch, LogStretch)
-        row_min = 10000
-        row_max = 0
-        num_samples = 0
-        flux_min = 10000
-        flux_max = 0
-        col_min = 10000
-        col_max = 0
-
-        for tpf_array in self.data.values():
-            for tpf in tpf_array:
-                if tpf.row < row_min:
-                    row_min = tpf.row
-                if tpf.row + tpf.shape[1] > row_max:
-                    row_max = tpf.row + tpf.shape[1]
-                if tpf.column < col_min:
-                    col_min = tpf.column
-                if tpf.column + tpf.shape[2] > col_max:
-                    col_max = tpf.column + tpf.shape[2]
-
-                small = np.nanmin(tpf.flux[0])
-                if small < flux_min:
-                    flux_min = small
-                large = np.nanmax(tpf.flux[0])
-                if large > flux_max:
-                    flux_max = large
-        
-        if ax is None:
-            _, ax = plt.subplots()
-
-        ax.set_xlim(col_min, col_max)
-        ax.set_ylim(row_min, row_max)
-        
-        norm = ImageNormalize(vmin=flux_min, vmax=flux_max, stretch = LinearStretch())
-        tpf = next(iter(self.data.values()))[0]
-        cax = ax.imshow(tpf.flux[0], norm=norm)
-        plt.colorbar(cax, ax=ax, norm=norm)
-
-        for tpf_array in self.data.values():
-            for tpf in tpf_array:
-                tpf.plot(ax=ax, show_colorbar=False)
-
-        plt.axis('equal')
-        
-        return ax
-
-    def pca(self):
-        '''Creates the Principle Components of a collection of LightCurves
-        '''
-        raise NotImplementedError('Should be able to run a PCA on a collection.')
-=======
-
 class TessTargetPixelFile(TargetPixelFile):
     """
     Defines a TargetPixelFile class for the TESS Mission.
@@ -1300,4 +1169,4 @@ class TessTargetPixelFile(TargetPixelFile):
                           time_scale='tdb',
                           flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
                           flux_err=self.flux_bkg_err)
->>>>>>> upstream/master
+

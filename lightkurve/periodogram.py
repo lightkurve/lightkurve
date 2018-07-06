@@ -14,13 +14,21 @@ class Periodogram(object):
 				power=None, lc=None):
 
 		self.lightcurve = lc
+
+		nyquist_frequency = 0.5 * (1./((np.median(self.lightcurve.time[1:] - self.lightcurve.time[0:-1])*u.day).to(u.second))).to(u.microhertz).value
+		frequency = np.linspace(1, nyquist_frequency, len(self.lightcurve.time)//2) * u.microhertz
 		self.frequency = frequency
-		self.model = model
+
+		try:
+			self.model = model((self.lightcurve.time*u.day).to(u.second), self.lightcurve.flux*1e6)
+		except:
+			raise AttributeError("No Ligtcurve given")
+
 		self.power = power
 
-	def from_lightcurve(lc, model=LombScargle, normalization="psd"):
-		model = model((lc.time*u.day).to(u.second), lc.flux*1e6)
-		return Periodogram(model=model, lc=lc)
+	def from_lightcurve(lc):
+		#model = model((lc.time*u.day).to(u.second), lc.flux*1e6)
+		return Periodogram(lc=lc)
 
 	def get_period(self):
 		#TODO: implement me
@@ -28,34 +36,32 @@ class Periodogram(object):
 
 	def generate_power(self, frequency):
 		uHz_conv = 1./(((1./u.day).to(u.microhertz)))
+		self.power = self.model.power(frequency, method="fast", normalization="psd")
+		self.power *= uHz_conv / len(self.lightcurve.time)  # Convert to ppm^2/uHz
 
-		if frequency is not None:
-			self.frequency = np.asarray(frequency) #Load as a numpy array
+	def generate_freq(self, frequency):
+		if frequency is None:
+			nyquist_frequency = 0.5 * (1./((np.median(self.lightcurve.time[1:] - self.lightcurve.time[0:-1])*u.day).to(u.second))).to(u.microhertz).value
+			frequency = np.linspace(1, nyquist_frequency, len(self.lightcurve.time)//2) * u.microhertz
+		else:
+			frequency = np.asarray(frequency) #Load as a numpy array
 			if type(frequency) != u.quantity.Quantity: #Has no astropy units
-				self.frequency = frequency * u.microhertz
+				frequency = frequency * u.microhertz
 			else:
-				if frequency.unit == "uHz": #frequency was provided in microhertz, no conversion
-					self.frequency = frequency
-				else:
-					#frequency *= 1./(((1./u.day).to(u.microhertz))) #try to convert from DAYS to MICROHERTZ
+				if frequency.unit != "uHz": #try to convert from DAYS to MICROHERTZ
 					frequency *= 1./u.day
 					frequency *= 1./uHz_conv
-					self.frequency = frequency
 
-		if self.frequency is None: #we need to create frequency for them based off lightcurve
-			nyquist_frequency = 0.5 * (1./((np.median(self.lightcurve.time[1:] - self.lightcurve.time[0:-1])*u.day).to(u.second))).to(u.microhertz).value
-			self.frequency = np.linspace(1, nyquist_frequency, len(self.lightcurve.time)//2) * u.microhertz
-
-		self.power = self.model.power(self.frequency, method="fast", normalization="psd")
-		self.power *= uHz_conv / len(self.lightcurve.time)  # Convert to ppm^2/uHz
+		return frequency
 
 	def plot(self, frequency=None, scale="linear", ax=None, numax=None, **kwargs):
 		if ax is None:
 			fig, ax = plt.subplots()
 
+		frequency = self.generate_freq(frequency)
 		self.generate_power(frequency)
 
-		ax.plot(self.frequency, self.power, **kwargs)
+		ax.plot(frequency, self.power, **kwargs)
 		ax.set_xlabel("frequency [$\mu$Hz]")
 		ax.set_ylabel("power [ppm$^2$/$\mu$Hz]");
 		try:
@@ -69,25 +75,6 @@ class Periodogram(object):
 		if scale == "log":
 			ax.set_yscale('log')
 			ax.set_xscale('log')
-
-		return ax
-
-	def normalized_plot(self, ax=None, **kwargs):
-		if ax is None:
-			_, ax = plt.subplots(1)
-		bkg, df, norm_power = self._normalize_power()
-		smoothed_ps = self.smooth_ps(norm_power, df)
-
-		ax.semilogy(self.frequency.value, norm_power, "k")
-		ax.plot(self.frequency.value, smoothed_ps, label="smoothed", color="C1")
-		ax.set_xlim(self.frequency[0].value, self.frequency[-1].value)
-		
-		#TODO: Create some 'reasonable' ylim for axis
-		#ax.set_ylim(1e-1, 3e2)
-
-		ax.legend()
-		ax.set_xlabel("frequency [$\mu$Hz]")
-		ax.set_ylabel("normalized power")
 
 		return ax
 
