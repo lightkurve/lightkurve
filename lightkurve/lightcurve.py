@@ -7,6 +7,7 @@ from tqdm import tqdm
 import os
 import datetime
 import logging
+import pandas as pd
 
 import oktopus
 import numpy as np
@@ -354,6 +355,44 @@ class LightCurve(object):
             A new ``LightCurve`` from which NaNs fluxes have been removed.
         """
         return self[~np.isnan(self.flux)]  # This will return a sliced copy
+
+    def fill_gaps(lc, method='nearest'):
+        """Fill in gaps in time with linear interpolation.
+
+        Parameters
+        ----------
+        method : string {None, ‘backfill’/’bfill’, ‘pad’/’ffill’, ‘nearest’}
+            Method to use for gap filling. 'nearest' by default.
+
+        Returns
+        -------
+        nlc : LightCurve object
+            A new ``LightCurve`` in which NaNs values and gaps in time have been
+            filled.
+        """
+        nlc = copy.deepcopy(lc)
+
+        # Average gap between cadences
+        dt = np.nanmedian(lc.time[1::] - lc.time[:-1:])
+
+        # Iterate over flux and flux_err
+        for idx, y in enumerate([lc.flux, lc.flux_err]):
+            ts = pd.Series(y, index=lc.time)
+            newindex = [lc.time[0]]
+            for t in lc.time[1::]:
+                prevtime = newindex[-1]
+                while (t - prevtime) > 1.2*dt:
+                    newindex.append(prevtime + dt)
+                    prevtime = newindex[-1]
+                newindex.append(t)
+            ts = ts.reindex(newindex, method=method)
+            if idx == 0:
+                nlc.flux = np.asarray(ts)
+            elif idx == 1:
+                nlc.flux_err = np.asarray(ts)
+
+        nlc.time = np.asarray(ts.index)
+        return nlc
 
     def remove_outliers(self, sigma=5., return_mask=False, **kwargs):
         """Removes outlier flux values using sigma-clipping.
