@@ -373,7 +373,6 @@ class LightCurve(object):
         clc = copy.deepcopy(lc.remove_nans())
         nlc = copy.deepcopy(lc)
 
-
         # Average gap between cadences
         dt = np.nanmedian(clc.time[1::] - clc.time[:-1:])
 
