@@ -370,16 +370,18 @@ class LightCurve(object):
             A new ``LightCurve`` in which NaNs values and gaps in time have been
             filled.
         """
+        clc = copy.deepcopy(lc.remove_nans())
         nlc = copy.deepcopy(lc)
 
+
         # Average gap between cadences
-        dt = np.nanmedian(lc.time[1::] - lc.time[:-1:])
+        dt = np.nanmedian(clc.time[1::] - clc.time[:-1:])
 
         # Iterate over flux and flux_err
-        for idx, y in enumerate([lc.flux, lc.flux_err]):
-            ts = pd.Series(y, index=lc.time)
-            newindex = [lc.time[0]]
-            for t in lc.time[1::]:
+        for idx, y in enumerate([clc.flux, clc.flux_err]):
+            ts = pd.Series(y, index=clc.time)
+            newindex = [clc.time[0]]
+            for t in clc.time[1::]:
                 prevtime = newindex[-1]
                 while (t - prevtime) > 1.2*dt:
                     newindex.append(prevtime + dt)
