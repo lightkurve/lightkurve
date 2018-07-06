@@ -587,9 +587,6 @@ class LightCurve(object):
         # The "fast" style has only been in matplotlib since v2.1.
         # Let's make it optional until >v2.1 is mainstream and can
         # be made the minimum requirement.
-        if 'seismology' in kwargs:
-            return self.createPowerFrequencyPlot(ax=ax, **kwargs)
-
         if (style == "fast") and ("fast" not in mpl.style.available):
             style = "default"
         if normalize:
