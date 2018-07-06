@@ -654,6 +654,17 @@ class LightCurve(object):
         nlc = LightCurve(ts.index, np.asarray(ts))
         return nlc
 
+
+    def Periodogram(self, frequency=None):
+        from astropy.stats import LombScargle
+        from astropy import units as u
+        from lightkurve.periodogram import Periodogram
+
+        if frequency is None:
+            log.warning("No frequency is given, one will be generated")
+        model = LombScargle((self.time*u.day).to(u.second), self.flux*1e6)
+        return Periodogram(model=model, lc=self, frequency=frequency)
+
     def createPowerFrequencyPlot(self, ax=None, **kwargs):
         from astropy import units
         from astropy.stats import LombScargle

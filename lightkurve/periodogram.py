@@ -30,7 +30,7 @@ class Periodogram(object):
 		#TODO: implement me
 		pass
 
-	def plot_frequency(self, frequency=None, scale="linear", ax=None, numax=None, **kwargs):
+	def plot(self, frequency=None, scale="linear", ax=None, numax=None, **kwargs):
 		if ax is None:
 			fig, ax = plt.subplots()
 
@@ -48,7 +48,8 @@ class Periodogram(object):
 					frequency *= 1./u.day
 					frequency *= 1./uHz_conv
 					self.frequency = frequency
-		else: #we need to create frequency for them based off lightcurve
+
+		if self.frequency is None: #we need to create frequency for them based off lightcurve
 			nyquist_frequency = 0.5 * (1./((np.median(self.lightcurve.time[1:] - self.lightcurve.time[0:-1])*u.day).to(u.second))).to(u.microhertz).value
 			self.frequency = np.linspace(1, nyquist_frequency, len(self.lightcurve.time)//2) * u.microhertz
 
