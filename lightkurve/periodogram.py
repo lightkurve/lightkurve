@@ -34,19 +34,25 @@ class Periodogram(object):
 		if ax is None:
 			fig, ax = plt.subplots()
 
-		if frequency:
+		uHz_conv = 1./(((1./u.day).to(u.microhertz)))
+
+		if frequency is not None:
 			self.frequency = np.asarray(frequency) #Load as a numpy array
 			if type(frequency) != u.quantity.Quantity: #Has no astropy units
 				self.frequency = frequency * u.microhertz
 			else:
-				frequency *= 1./(((1./u.day).to(u.microhertz)))
-				self.frequency = frequency
-
+				if frequency.unit == "uHz": #frequency was provided in microhertz, no conversion
+					self.frequency = frequency
+				else:
+					#frequency *= 1./(((1./u.day).to(u.microhertz))) #try to convert from DAYS to MICROHERTZ
+					frequency *= 1./u.day
+					frequency *= 1./uHz_conv
+					self.frequency = frequency
 		else: #we need to create frequency for them based off lightcurve
 			nyquist_frequency = 0.5 * (1./((np.median(self.lightcurve.time[1:] - self.lightcurve.time[0:-1])*u.day).to(u.second))).to(u.microhertz).value
 			self.frequency = np.linspace(1, nyquist_frequency, len(self.lightcurve.time)//2) * u.microhertz
 
-		uHz_conv = 1./(((1./u.day).to(u.microhertz)))
+		
 		self.power = self.model.power(self.frequency, method="fast", normalization="psd")
 		self.power *= uHz_conv / len(self.lightcurve.time)  # Convert to ppm^2/uHz
 
