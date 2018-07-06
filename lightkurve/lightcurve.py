@@ -677,30 +677,21 @@ class LightCurve(object):
         """
         return self.to_pandas().to_csv(path_or_buf=path_or_buf, **kwargs)
 
-    def fill_nans(self):
-        import pandas as pd
-        dt = np.nanmedian(self.time[1::] - self.time[:-1:])
-        fixedtime = np.arange(self.time[0], self.time[-1]+dt, dt)
-        ts = pd.Series(self.flux, index=self.time)
-        #ts['real'] = True
-        newindex = [self.time[0]]
-        for t in self.time[1::]:
-            prevtime = newindex[-1]
-            while (t - prevtime) > 1.2*dt:
-                newindex.append(prevtime + dt)
-                prevtime = newindex[-1]
-            newindex.append(t)
-        ts = ts.reindex(newindex, method='nearest')
-        nlc = LightCurve(ts.index, np.asarray(ts))
-        return nlc
-
-
     def periodogram(self, frequency=None):
         """
         This method will create a Periodogram object from a given lightcurve and frequency.
+
+        Parameters
+        ----------
+        frequency : array like
+            Frequency in microhertz over the range you want to assess
+
+        Returns
+        -------
+        Periodogram: Periodogram object
+            Returns a Periodogram object extracted from the lightkurve
+
         """
-        from astropy.stats import LombScargle
-        from astropy import units as u
         from lightkurve.periodogram import Periodogram
 
         if frequency is None:
