@@ -637,6 +637,22 @@ class LightCurve(object):
         """
         return self.to_pandas().to_csv(path_or_buf=path_or_buf, **kwargs)
 
+    def fill_nans(self):
+        import pandas as pd
+        dt = np.nanmedian(self.time[1::] - self.time[:-1:])
+        fixedtime = np.arange(self.time[0], self.time[-1]+dt, dt)
+        ts = pd.Series(self.flux, index=self.time)
+        #ts['real'] = True
+        newindex = [self.time[0]]
+        for t in self.time[1::]:
+            prevtime = newindex[-1]
+            while (t - prevtime) > 1.2*dt:
+                newindex.append(prevtime + dt)
+                prevtime = newindex[-1]
+            newindex.append(t)
+        ts = ts.reindex(newindex, method='nearest')
+        nlc = LightCurve(ts.index, np.asarray(ts))
+        return nlc
 
     def createPowerFrequencyPlot(self, ax=None, **kwargs):
         from astropy import units
@@ -655,7 +671,8 @@ class LightCurve(object):
         model = LombScargle(t, y)
         power = model.power(frequency, method="fast", normalization="psd")
         power *= uHz_conv / len(t)
-
+        print("frequency is ...", frequency)
+        print("power is ...", power)
         if ax is None:
             _, ax = plt.subplots(1)
         ax.semilogy(frequency_uHz, power, "k")

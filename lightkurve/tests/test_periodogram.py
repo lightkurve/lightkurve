@@ -19,3 +19,12 @@ def test_lightcurve_seismology_plot():
     pf = Periodogram.from_lightcurve(lcf)
     pf.get_power()
     pf.plot()
+
+@pytest.mark.remote_data
+def test_lightcurve_seismology_normalize_functions():
+    """Sanity check to verify that periodogram plotting works"""
+    lcf = KeplerLightCurveFile(TABBY_Q8).PDCSAP_FLUX.normalize()
+    pf = Periodogram.from_lightcurve(lcf)
+    pf.get_power()
+    pf.normalized_plot()
+    pf.normalize_power()
