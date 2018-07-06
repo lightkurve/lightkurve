@@ -699,13 +699,15 @@ class LightCurve(object):
 
 
     def periodogram(self, frequency=None):
+        """
+        This method will create a Periodogram object from a given lightcurve and frequency.
+        """
         from astropy.stats import LombScargle
         from astropy import units as u
         from lightkurve.periodogram import Periodogram
 
         if frequency is None:
             log.warning("No frequency is given, one will be generated")
-        #model = LombScargle((self.time*u.day).to(u.second), self.flux*1e6)
         return Periodogram(lc=self, frequency=frequency)
 
     def to_fits(self, path=None, overwrite=False, **extra_data):
