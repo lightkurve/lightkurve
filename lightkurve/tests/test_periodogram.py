@@ -16,6 +16,7 @@ TABBY_Q8 = ("https://archive.stsci.edu/missions/kepler/lightcurves"
 def test_lightcurve_seismology_plot():
     """Sanity check to verify that periodogram plotting works"""
     lcf = KeplerLightCurveFile(TABBY_Q8).PDCSAP_FLUX.normalize()
+    pf = Periodogram()
     pf = Periodogram.from_lightcurve(lcf)
     pf.plot()
 

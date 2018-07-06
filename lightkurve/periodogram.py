@@ -10,17 +10,13 @@ class Periodogram(object):
 	"""
 	Implements a simple class for a generic periodogram
 	"""
-	def __init__(self, delta_nu=None, nu_max=None, period=None,
-				frequency=None, model=LombScargle, power=None, 
-				lc=None):
-		self.delta_nu = delta_nu
-		self.nu_max = nu_max
-		self.period = period
+	def __init__(self, frequency=None, model=LombScargle, 
+				power=None, lc=None):
+
 		self.lightcurve = lc
 		self.frequency = frequency
 		self.model = model
 		self.power = power
-		
 
 	def from_lightcurve(lc, model=LombScargle, normalization="psd"):
 		model = model((lc.time*u.day).to(u.second), lc.flux*1e6)
@@ -30,10 +26,7 @@ class Periodogram(object):
 		#TODO: implement me
 		pass
 
-	def plot(self, frequency=None, scale="linear", ax=None, numax=None, **kwargs):
-		if ax is None:
-			fig, ax = plt.subplots()
-
+	def generate_power(self, frequency):
 		uHz_conv = 1./(((1./u.day).to(u.microhertz)))
 
 		if frequency is not None:
@@ -53,9 +46,14 @@ class Periodogram(object):
 			nyquist_frequency = 0.5 * (1./((np.median(self.lightcurve.time[1:] - self.lightcurve.time[0:-1])*u.day).to(u.second))).to(u.microhertz).value
 			self.frequency = np.linspace(1, nyquist_frequency, len(self.lightcurve.time)//2) * u.microhertz
 
-		
 		self.power = self.model.power(self.frequency, method="fast", normalization="psd")
 		self.power *= uHz_conv / len(self.lightcurve.time)  # Convert to ppm^2/uHz
+
+	def plot(self, frequency=None, scale="linear", ax=None, numax=None, **kwargs):
+		if ax is None:
+			fig, ax = plt.subplots()
+
+		self.generate_power(frequency)
 
 		ax.plot(self.frequency, self.power, **kwargs)
 		ax.set_xlabel("frequency [$\mu$Hz]")
@@ -77,7 +75,7 @@ class Periodogram(object):
 	def normalized_plot(self, ax=None, **kwargs):
 		if ax is None:
 			_, ax = plt.subplots(1)
-		bkg, df, norm_power = self.normalize_power()
+		bkg, df, norm_power = self._normalize_power()
 		smoothed_ps = self.smooth_ps(norm_power, df)
 
 		ax.semilogy(self.frequency.value, norm_power, "k")
@@ -85,7 +83,7 @@ class Periodogram(object):
 		ax.set_xlim(self.frequency[0].value, self.frequency[-1].value)
 		
 		#TODO: Create some 'reasonable' ylim for axis
-		ax.set_ylim(1e-1, 3e2)
+		#ax.set_ylim(1e-1, 3e2)
 
 		ax.legend()
 		ax.set_xlabel("frequency [$\mu$Hz]")
@@ -93,17 +91,17 @@ class Periodogram(object):
 
 		return ax
 
-	def normalize_power(self):
-		bkg = self.estimate_background(self.frequency.value, self.power)
+	def _normalize_power(self):
+		bkg = self.estimate_background(self.frequency.value, self.power.value)
 		df = self.frequency[1].value - self.frequency[0].value
-		normalized_power = self.power / bkg
-		return bkg, df, normalized_power
+		norm_p = self.power.value / bkg
+		return bkg, df, norm_p
 
 	def smooth_ps(self, normalized_power, df, filter=gaussian_filter):
 		return filter(normalized_power, 10 / df)
 
 	def find_nu_max(self):
-		_, df, normalized_power = self.normalize_power()
+		_, df, normalized_power = self._normalize_power()
 		smoothed_power_spectrum = self.smooth_ps(normalized_power, df)
 		peak_frequencies = self.frequency[self.find_peaks(smoothed_power_spectrum)].value
 		self.nu_max = peak_frequencies[peak_frequencies > 5][0]
