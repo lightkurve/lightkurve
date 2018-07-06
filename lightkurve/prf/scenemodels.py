@@ -1,4 +1,43 @@
-"""Provides tools to model a Kepler image."""
+"""Provides tools to model a Kepler image for PRF photometry fitting.
+
+Example use
+-----------
+%matplotlib inline
+import numpy as np
+from lightkurve import KeplerTargetPixelFile, LightCurve
+from lightkurve.prf import StarPrior, BackgroundPrior, FocusPrior, MotionPrior, SceneModel, PRFPhotometry
+from oktopus import GaussianPrior, UniformPrior
+
+tpf = KeplerTargetPixelFile("https://archive.stsci.edu/missions/kepler/target_pixel_files/0084/008462852/"
+                            "kplr008462852-2013098041711_lpd-targ.fits.gz", quality_mask='hardest')
+
+# First, compute a few values from our TPF which will inform the priors
+bgflux = np.nanpercentile(tpf.flux[0], 10)
+maxflux = np.nansum(tpf.flux, axis=(1, 2)).max()
+col, row = np.nanmedian(tpf.centroids(), axis=1)
+
+# Set up the model
+model = SceneModel(star_priors=[StarPrior(col=GaussianPrior(mean=col, var=2**2),
+                                          row=GaussianPrior(mean=row, var=2**2),
+                                          flux=UniformPrior(lb=0, ub=maxflux),
+                                          targetid=tpf.keplerid)],
+                   background_prior=BackgroundPrior(flux=GaussianPrior(mean=bgflux, var=bgflux)),
+                   focus_prior=FocusPrior(scale_col=GaussianPrior(mean=1, var=0.0001),
+                                          scale_row=GaussianPrior(mean=1, var=0.0001),
+                                          rotation_angle=UniformPrior(lb=-3.1415, ub=3.1415)),
+                   motion_prior=MotionPrior(shift_col=GaussianPrior(mean=0., var=0.01),
+                                            shift_row=GaussianPrior(mean=0., var=0.01)),
+                   prfmodel=tpf.get_prf_model(),
+                   fit_background=True,
+                   fit_focus=False,
+                   fit_motion=False)
+
+pp = PRFPhotometry(model)
+pp.run(tpf.flux, pos_corr1=tpf.pos_corr1, pos_corr2=tpf.pos_corr2, cadences=range(1650, 1850))
+pp.plot_results()
+
+
+"""
 from __future__ import division, print_function
 
 import logging
@@ -522,6 +561,7 @@ class SceneModel(object):
         loss = loss_function(data, self, prior=self._logp_prior)
         fit = loss.fit(x0=self.get_initial_guesses().to_array(), method=method, **kwargs)
         result = self.params.from_array(fit.x)
+        #uncertainties are broken for now because `self.gradient` is unfinished
         #result.uncertainties = loss.loglikelihood.uncertainties(fit.x)
         result.predicted_image = self._predict(fit.x)
         result.residual_image = data - result.predicted_image
@@ -644,31 +684,3 @@ class PRFPhotometry(object):
         ax[9].plot(x, [r.loss_value for r in self.results])
         ax[9].set_ylabel('Loss')
         return fig
-
-
-def _example():
-    tpf = KeplerTargetPixelFile.from_archive(8462852, quarter=16, quality_bitmask='hardest')
-    bgflux = np.nanpercentile(tpf.flux[0], 10)
-    maxflux = np.nansum(tpf.flux, axis=(1, 2)).max()
-
-    # First, set up a simple scene model with one star and no motion or focus changes
-    col, row = np.nanmedian(tpf.centroids(), axis=1)
-    star_prior = StarPrior(col=GaussianPrior(mean=col[0], var=2**2),
-                           row=GaussianPrior(mean=row[0], var=2**2),
-                           flux=UniformPrior(lb=0, ub=maxflux),
-                           targetid=tpf.keplerid)
-    model = SceneModel(star_priors=[star_prior],
-                       background_prior=BackgroundPrior(),
-                       focus_prior=FocusPrior(scale_col=GaussianPrior(mean=1, var=0.0001),
-                                              scale_row=GaussianPrior(mean=1, var=0.0001),
-                                              rotation_angle=UniformPrior(lb=-3.1415, ub=3.1415)),
-                       motion_prior=MotionPrior(shift_col=GaussianPrior(mean=0., var=0.01),
-                                                shift_row=GaussianPrior(mean=0., var=0.01)),
-                       prfmodel=tpf.get_prf_model(),
-                       fit_background=True,
-                       fit_focus=True,
-                       fit_motion=True)
-
-    pp = PRFPhotometry(model)
-    pp.run(tpf.flux[1650:1850], pos_corr1=tpf.pos_corr1[1650:1850], pos_corr2=tpf.pos_corr2[1650:1850])
-    pp.plot_results()
