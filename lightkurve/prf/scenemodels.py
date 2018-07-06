@@ -35,8 +35,7 @@ model = SceneModel(star_priors=[StarPrior(col=GaussianPrior(mean=col, var=2**2),
 pp = PRFPhotometry(model)
 pp.run(tpf.flux, pos_corr1=tpf.pos_corr1, pos_corr2=tpf.pos_corr2, cadences=range(1650, 1850))
 pp.plot_results()
-
-
+print('The star flux in the first cadence is {}'.format(pp.results[0].stars[0].flux))
 """
 from __future__ import division, print_function
 
