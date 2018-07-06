@@ -361,7 +361,7 @@ class LightCurve(object):
 
         Parameters
         ----------
-        method : string {None, ‘backfill’/’bfill’, ‘pad’/’ffill’, ‘nearest’}
+        method : string {None, 'backfill'/'bfill', 'pad'/'ffill', 'nearest'}
             Method to use for gap filling. 'nearest' by default.
 
         Returns
