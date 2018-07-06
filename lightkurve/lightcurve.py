@@ -378,6 +378,10 @@ class LightCurve(object):
 
         # Iterate over flux and flux_err
         for idx, y in enumerate([clc.flux, clc.flux_err]):
+            # We need to ensure pandas gets the correct byteorder
+            # Background info: https://github.com/astropy/astropy/issues/1156
+            if y.dtype.byteorder == '>':
+                y = y.byteswap().newbyteorder()
             ts = pd.Series(y, index=clc.time)
             newindex = [clc.time[0]]
             for t in clc.time[1::]:
