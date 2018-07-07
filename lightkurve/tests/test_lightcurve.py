@@ -157,6 +157,7 @@ def test_lightcurve_plot():
         lcf.SAP_FLUX.plot()
         lcf.SAP_FLUX.plot(normalize=False, fill=False, title="Not the default")
 
+
 def test_cdpp():
     """Test the basics of the CDPP noise metric."""
     # A flat lightcurve should have a CDPP close to zero
@@ -441,6 +442,12 @@ def test_flatten_robustness():
     # flatten should work even if `break_tolerance = None`
     flat_lc = lc.flatten(break_tolerance=None)
     assert_allclose(flat_lc.flux, expected_result)
+
+
+@pytest.mark.remote_data
+def test_from_archive_should_accept_path():
+    """If a url is passed to `from_archive` it should still just work."""
+    KeplerLightCurveFile.from_archive(TABBY_Q8)
 
 def test_fill_gaps():
     lc = LightCurve([1,2,3,4,6,7,8], [1,1,1,1,1,1,1])

@@ -20,8 +20,7 @@ from .prf import SimpleKeplerPRF
 from .utils import KeplerQualityFlags, plot_image, bkjd_to_astropy_time, btjd_to_astropy_time
 from .mast import download_kepler_products
 
-__all__ = ['KeplerTargetPixelFile', 'TargetPixelFile',
-            'TessTargetPixelFile', 'KeplerTargetPixelFileFactory']
+__all__ = ['KeplerTargetPixelFile', 'TessTargetPixelFile']
 
 log = logging.getLogger(__name__)
 

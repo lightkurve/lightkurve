@@ -6,11 +6,8 @@ import numpy as np
 from numpy.testing import assert_array_equal
 import pytest
 import tempfile
-
 from ..targetpixelfile import KeplerTargetPixelFile, KeplerTargetPixelFileFactory
-
 from ..targetpixelfile import TessTargetPixelFile
-
 from ..utils import KeplerQualityFlags
 
 
@@ -230,7 +227,7 @@ def test_interact():
         tpf.interact()
         tpf.interact(lc=tpf.to_lightcurve(aperture_mask='all'))
 
+
 def test_from_archive_should_accept_path():
     """If a path is accidentally passed to `from_archive` it should still just work."""
     KeplerTargetPixelFile.from_archive(filename_tpf_all_zeros)
-

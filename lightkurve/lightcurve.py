@@ -677,26 +677,21 @@ class LightCurve(object):
         """
         return self.to_pandas().to_csv(path_or_buf=path_or_buf, **kwargs)
 
-    def periodogram(self, frequency=None):
-        """
-        This method will create a Periodogram object from a given lightcurve and frequency.
+    def periodogram(self, frequencies=None):
+        """Returns a `Periodogram`.
 
         Parameters
         ----------
-        frequency : array like
-            Frequency in microhertz over the range you want to assess
+        frequencies : array-like
+            Frequencies in microhertz. (Optional.)
 
         Returns
         -------
-        Periodogram: Periodogram object
-            Returns a Periodogram object extracted from the lightkurve
-
+        Periodogram : `Periodogram` object
+            Returns a Periodogram object extracted from the lightcurve.
         """
-        from lightkurve.periodogram import Periodogram
-
-        if frequency is None:
-            log.warning("No frequency is given, one will be generated")
-        return Periodogram(lc=self, frequency=frequency)
+        from . import Periodogram
+        return Periodogram.from_lightcurve(lc=self)
 
     def to_fits(self, path=None, overwrite=False, **extra_data):
         """Writes the KeplerLightCurve to a fits file.
