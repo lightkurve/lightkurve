@@ -21,8 +21,9 @@ from astropy.table import Table
 from astropy.io import fits
 from astropy.time import Time
 
-from .utils import running_mean, bkjd_to_astropy_time, btjd_to_astropy_time
 from . import PACKAGEDIR
+from .utils import running_mean, bkjd_to_astropy_time, btjd_to_astropy_time
+
 
 __all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve',
            'iterative_box_period_search']
@@ -679,6 +680,22 @@ class LightCurve(object):
             returns None otherwise.
         """
         return self.to_pandas().to_csv(path_or_buf=path_or_buf, **kwargs)
+
+    def periodogram(self, frequencies=None):
+        """Returns a `Periodogram`.
+
+        Parameters
+        ----------
+        frequencies : array-like
+            Frequencies in microhertz. (Optional.)
+
+        Returns
+        -------
+        Periodogram : `Periodogram` object
+            Returns a Periodogram object extracted from the lightcurve.
+        """
+        from . import Periodogram
+        return Periodogram.from_lightcurve(lc=self)
 
     def to_fits(self, path=None, overwrite=False, **extra_data):
         """Writes the KeplerLightCurve to a fits file.
