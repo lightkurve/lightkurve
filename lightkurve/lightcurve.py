@@ -21,9 +21,9 @@ from astropy.table import Table
 from astropy.io import fits
 from astropy.time import Time
 
+from . import PACKAGEDIR
 from .utils import running_mean, bkjd_to_astropy_time, btjd_to_astropy_time
 
-from . import PACKAGEDIR
 
 __all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve',
            'iterative_box_period_search']
@@ -800,7 +800,6 @@ class LightCurve(object):
         if path is not None:
             hdu.writeto(path, overwrite=overwrite, checksum=True)
         return hdu
-
 
 
 class FoldedLightCurve(LightCurve):

@@ -13,15 +13,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
 
-
 from . import PACKAGEDIR
 from .lightcurve import KeplerLightCurve, TessLightCurve, LightCurve
 from .prf import SimpleKeplerPRF
 from .utils import KeplerQualityFlags, plot_image, bkjd_to_astropy_time, btjd_to_astropy_time
 from .mast import download_kepler_products
 
-__all__ = ['KeplerTargetPixelFile', 'TessTargetPixelFile']
 
+__all__ = ['KeplerTargetPixelFile', 'TessTargetPixelFile']
 log = logging.getLogger(__name__)
 
 
@@ -884,6 +883,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
             factory.add_cadence(frameno=idx, flux=cutout.data, header=hdu.header)
         return factory.get_tpf(**kwargs)
 
+
 class KeplerTargetPixelFileFactory(object):
     """Class to create a KeplerTargetPixelFile."""
 
@@ -1060,6 +1060,7 @@ class KeplerTargetPixelFileFactory(object):
         hdu.header['EXTNAME'] = 'APERTURE'
         return hdu
 
+
 class TessTargetPixelFile(TargetPixelFile):
     """
     Defines a TargetPixelFile class for the TESS Mission.
@@ -1168,4 +1169,3 @@ class TessTargetPixelFile(TargetPixelFile):
                           time_scale='tdb',
                           flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
                           flux_err=self.flux_bkg_err)
-
