@@ -1,0 +1,23 @@
+SceneModel
+==========
+
+.. currentmodule:: lightkurve.prf
+
+.. autoclass:: SceneModel
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~SceneModel.__call__
+      ~SceneModel.evaluate
+      ~SceneModel.gradient
+      ~SceneModel.plot
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: __call__
+   .. automethod:: evaluate
+   .. automethod:: gradient
+   .. automethod:: plot

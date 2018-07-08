@@ -1,0 +1,19 @@
+PRFPhotometry
+=============
+
+.. currentmodule:: lightkurve.prf
+
+.. autoclass:: PRFPhotometry
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~PRFPhotometry.fit
+      ~PRFPhotometry.get_residuals
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: fit
+   .. automethod:: get_residuals

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>LightCurveFile classes &mdash; lightkurve 1.0.a1 documentation</title>
+  <title>LightCurveFile classes &mdash; lightkurve 1.0b9 documentation</title>
   
 
   
@@ -28,7 +28,9 @@
     <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="KeplerLightCurveFile" href="lightkurve.lightcurvefile.KeplerLightCurveFile.html" />
+    <link rel="prev" title="TessLightCurve" href="lightkurve.lightcurve.TessLightCurve.html" /> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -60,7 +62,7 @@
             
             
               <div class="version">
-                1.0
+                1.0b9
               </div>
             
           
@@ -98,22 +100,77 @@
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">API documentation</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="targetpixelfile.html">TargetPixelFile classes</a><ul class="simple">
+<li class="toctree-l2"><a class="reference internal" href="targetpixelfile.html">TargetPixelFile classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="targetpixelfile.html#classes">Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.targetpixelfile.KeplerTargetPixelFile.html">KeplerTargetPixelFile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.targetpixelfile.TessTargetPixelFile.html">TessTargetPixelFile</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="lightcurve.html">LightCurve classes</a><ul class="simple">
+<li class="toctree-l3"><a class="reference internal" href="targetpixelfile.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
 </ul>
 </li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">LightCurveFile classes</a><ul class="simple">
+<li class="toctree-l2"><a class="reference internal" href="lightcurve.html">LightCurve classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lightcurve.html#functions">Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurve.iterative_box_period_search.html">iterative_box_period_search</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="correctors.html">Systematics correction classes</a><ul class="simple">
+<li class="toctree-l3"><a class="reference internal" href="lightcurve.html#classes">Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurve.LightCurve.html">LightCurve</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurve.KeplerLightCurve.html">KeplerLightCurve</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurve.TessLightCurve.html">TessLightCurve</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="prf.html">PSF photometry classes</a><ul class="simple">
+<li class="toctree-l3"><a class="reference internal" href="lightcurve.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html">Utility functions</a><ul class="simple">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">LightCurveFile classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#classes">Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurvefile.KeplerLightCurveFile.html">KeplerLightCurveFile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurvefile.TessLightCurveFile.html">TessLightCurveFile</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#class-inheritance-diagram">Class Inheritance Diagram</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="correctors.html">Systematics correction classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="correctors.html#classes">Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.correctors.KeplerCBVCorrector.html">KeplerCBVCorrector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.correctors.SFFCorrector.html">SFFCorrector</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="correctors.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="prf.html">PSF photometry classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="prf.html#functions">Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.get_initial_guesses.html">get_initial_guesses</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="prf.html#classes">Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.KeplerPRF.html">KeplerPRF</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.PRFPhotometry.html">PRFPhotometry</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.SceneModel.html">SceneModel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.SimpleKeplerPRF.html">SimpleKeplerPRF</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="prf.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">Utility functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#functions">Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.utils.bkjd_to_astropy_time.html">bkjd_to_astropy_time</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.utils.btjd_to_astropy_time.html">btjd_to_astropy_time</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.utils.channel_to_module_output.html">channel_to_module_output</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.utils.module_output_to_channel.html">module_output_to_channel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.utils.running_mean.html">running_mean</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#classes">Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.utils.KeplerQualityFlags.html">KeplerQualityFlags</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.utils.TessQualityFlags.html">TessQualityFlags</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
 </ul>
 </li>
 </ul>
@@ -137,6 +194,11 @@
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/2.03-appending-lightcurves.html">How to combine lightcurves from different Kepler quarters</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/2.05-making-custom-apertures.html">How to perform aperture photometry with custom apertures</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/cutting-out-tpfs-from-tess-ffis.html">How to cut out Target Pixel Files from Kepler Super Stamps or TESS FFIs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.08-making-fits-files.html">How to store a light curve in FITS format?</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/2.08-making-fits-files.html#Example:-editing-and-writing-a-lightcurve">Example: editing and writing a lightcurve</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.09-how-to-use-lightkurve-for-asteroseismology.html">How to use lightkurve for asteroseismology</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/section3.html">Systematics correction using lightkurve</a><ul>
@@ -151,6 +213,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/motion-correction/replicate-vanderburg-2014-lightkurve.html#Data-Exclusion">Data Exclusion</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.06-identify-rolling-band.html">How to identify time-variable background noise (“rolling bands”)?</a></li>
 </ul>
 </li>
 </ul>
@@ -277,273 +340,31 @@
 </style>
 <div class="section" id="module-lightkurve.lightcurvefile">
 <span id="lightcurvefile-classes"></span><h1>LightCurveFile classes<a class="headerlink" href="#module-lightkurve.lightcurvefile" title="Permalink to this headline">¶</a></h1>
-<p>Defines LightCurveFile classes, i.e. files that contain LightCurves.</p>
-<dl class="class">
-<dt id="lightkurve.lightcurvefile.KeplerLightCurveFile">
-<em class="property">class </em><code class="descclassname">lightkurve.lightcurvefile.</code><code class="descname">KeplerLightCurveFile</code><span class="sig-paren">(</span><em>path</em>, <em>quality_bitmask='default'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurvefile.html#KeplerLightCurveFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Defines a class for a given light curve FITS file from NASA’s Kepler and
-K2 missions.</p>
-<p class="rubric">Attributes</p>
-<table border="1" class="docutils">
-<colgroup>
-<col width="5%" />
-<col width="95%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><strong>path</strong></td>
-<td>(str) Directory path or url to a lightcurve FITS file.</td>
-</tr>
-<tr class="row-even"><td><strong>quality_bitmask</strong></td>
-<td>(str or int) Bitmask specifying quality flags of cadences that should be ignored. If <cite>None</cite> is passed, then no cadences are ignored. If a string is passed, it has the following meaning:  * default: recommended quality mask * hard: removes more flags, known to remove good data * hardest: removes all data that has been flagged  See the <cite>KeplerQualityFlags</cite> class for details on the bitmasks.</td>
-</tr>
-<tr class="row-odd"><td><strong>kwargs</strong></td>
-<td>(dict) Keyword arguments to be passed to astropy.io.fits.open.</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Methods</p>
+<span class="target" id="module-lightkurve.lightcurvefile"></span><p>Defines LightCurveFile classes, i.e. files that contain LightCurves.</p>
+<div class="section" id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="longtable docutils">
 <colgroup>
 <col width="10%" />
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.compute_cotrended_lightcurve" title="lightkurve.lightcurvefile.KeplerLightCurveFile.compute_cotrended_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_cotrended_lightcurve</span></code></a>([cbvs])</td>
-<td>Returns a LightCurve object after cotrending the SAP_FLUX against the cotrending basis vectors.</td>
+<tr class="row-odd"><td><a class="reference internal" href="lightkurve.lightcurvefile.KeplerLightCurveFile.html#lightkurve.lightcurvefile.KeplerLightCurveFile" title="lightkurve.lightcurvefile.KeplerLightCurveFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerLightCurveFile</span></code></a>(path[,&nbsp;quality_bitmask])</td>
+<td>Defines a class for a given light curve FITS file from NASA’s Kepler and K2 missions.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.from_archive" title="lightkurve.lightcurvefile.KeplerLightCurveFile.from_archive"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_archive</span></code></a>(target[,&nbsp;cadence,&nbsp;quarter,&nbsp;…])</td>
-<td>Fetches a LightCurveFile (or list thereof) from the data archive at MAST.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.get_lightcurve" title="lightkurve.lightcurvefile.KeplerLightCurveFile.get_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_lightcurve</span></code></a>(flux_type[,&nbsp;centroid_type])</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">header</span></code>([ext])</td>
-<td>Header of the object at extension <cite>ext</cite></td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.plot" title="lightkurve.lightcurvefile.KeplerLightCurveFile.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>([flux_types,&nbsp;style])</td>
-<td>Plot all the light curves contained in this light curve file.</td>
+<tr class="row-even"><td><a class="reference internal" href="lightkurve.lightcurvefile.TessLightCurveFile.html#lightkurve.lightcurvefile.TessLightCurveFile" title="lightkurve.lightcurvefile.TessLightCurveFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TessLightCurveFile</span></code></a>(path[,&nbsp;quality_bitmask])</td>
+<td>Defines a class for a given light curve FITS file from NASA’s TESS mission.</td>
 </tr>
 </tbody>
 </table>
-<dl class="attribute">
-<dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.campaign">
-<code class="descname">campaign</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.campaign" title="Permalink to this definition">¶</a></dt>
-<dd><p>Campaign number</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.channel">
-<code class="descname">channel</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.channel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Channel number</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.compute_cotrended_lightcurve">
-<code class="descname">compute_cotrended_lightcurve</code><span class="sig-paren">(</span><em>cbvs=[1, 2], **kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurvefile.html#KeplerLightCurveFile.compute_cotrended_lightcurve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.compute_cotrended_lightcurve" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a LightCurve object after cotrending the SAP_FLUX
-against the cotrending basis vectors.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>cbvs</strong> : list of ints</p>
-<blockquote>
-<div><p>The list of cotrending basis vectors to fit to the data. For example,
-[1, 2] will fit the first two basis vectors.</p>
-</div></blockquote>
-<p><strong>kwargs</strong> : dict</p>
-<blockquote>
-<div><p>Dictionary of keyword arguments to be passed to
-KeplerCBVCorrector.correct.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>lc</strong> : LightCurve object</p>
-<blockquote class="last">
-<div><p>CBV flux-corrected lightcurve.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="staticmethod">
-<dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.from_archive">
-<em class="property">static </em><code class="descname">from_archive</code><span class="sig-paren">(</span><em>target</em>, <em>cadence='long'</em>, <em>quarter=None</em>, <em>month=None</em>, <em>campaign=None</em>, <em>radius=1.0</em>, <em>targetlimit=1</em>, <em>verbose=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurvefile.html#KeplerLightCurveFile.from_archive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.from_archive" title="Permalink to this definition">¶</a></dt>
-<dd><p>Fetches a LightCurveFile (or list thereof) from the data archive at MAST.</p>
-<p>If a target was observed across multiple quarters or campaigns, a
-list of <cite>LightCurveFile</cite> objects will only be returned if the string
-‘all’ is passed to <cite>quarter</cite> or <cite>campaign</cite>.  Alternatively, a list of
-numbers can be pased to these arguments.</p>
-<p>An <cite>ArchiveError</cite> will be raised if no (unique) LightCurveFile
-can be found.</p>
-<p>If <cite>targetlimit</cite> is set to more than one (or None) then will return a list
-of <cite>KeplerLightCurveFile</cite>. Will only return hits within the specified radius.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>target</strong> : str or int</p>
-<blockquote>
-<div><p>KIC/EPIC ID or object name.</p>
-</div></blockquote>
-<p><strong>cadence</strong> : str</p>
-<blockquote>
-<div><p>‘long’ or ‘short’.</p>
-</div></blockquote>
-<p><strong>quarter, campaign</strong> : int, list of ints, or ‘all’</p>
-<blockquote>
-<div><p>Kepler Quarter or K2 Campaign number.</p>
-</div></blockquote>
-<p><strong>month</strong> : 1, 2, 3, list of int, or ‘all’</p>
-<blockquote>
-<div><p>For Kepler’s prime mission, there are three short-cadence
-LightCurveFile objects for each quarter, each covering one month.
-Hence, if cadence=’short’ you need to specify month=1, 2, or 3.</p>
-</div></blockquote>
-<p><strong>radius</strong> : float</p>
-<blockquote>
-<div><p>Search radius in arcseconds. Default is 1 arcsecond.</p>
-</div></blockquote>
-<p><strong>targetlimit</strong> : None or int</p>
-<blockquote>
-<div><p>If multiple targets are present within <cite>radius</cite>, limit the number
-of returned LightCurveFile objects to <cite>targetlimit</cite>.
-If <cite>None</cite>, no limit is applied.</p>
-</div></blockquote>
-<p><strong>kwargs</strong> : dict</p>
-<blockquote>
-<div><p>Keywords arguments passed to <cite>KeplerLightCurveFile</cite>.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>lcf</strong> : KeplerLightCurveFile object or list of KeplerLightCurveFile objects</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.get_lightcurve">
-<code class="descname">get_lightcurve</code><span class="sig-paren">(</span><em>flux_type</em>, <em>centroid_type='MOM_CENTR'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurvefile.html#KeplerLightCurveFile.get_lightcurve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.get_lightcurve" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.keplerid">
-<code class="descname">keplerid</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.keplerid" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.mission">
-<code class="descname">mission</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.mission" title="Permalink to this definition">¶</a></dt>
-<dd><p>Mission name</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.obsmode">
-<code class="descname">obsmode</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.obsmode" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.plot">
-<code class="descname">plot</code><span class="sig-paren">(</span><em>flux_types=None</em>, <em>style='fast'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurvefile.html#KeplerLightCurveFile.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.plot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot all the light curves contained in this light curve file.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>flux_types</strong> : str or list of str</p>
-<blockquote>
-<div><p>List of flux types to plot. Default is to plot all available.
-(For Kepler the default fluxes are ‘SAP_FLUX’ and ‘PDCSAP_FLUX’.</p>
-</div></blockquote>
-<p><strong>style</strong> : str</p>
-<blockquote>
-<div><p>matplotlib.pyplot.style.context, default is ‘fast’</p>
-</div></blockquote>
-<p><strong>kwargs</strong> : dict</p>
-<blockquote class="last">
-<div><p>Dictionary of keyword arguments to be passed to
-<cite>KeplerLightCurve.plot()</cite>.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.pos_corr1">
-<code class="descname">pos_corr1</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.pos_corr1" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the column position correction.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.poss_corr2">
-<code class="descname">poss_corr2</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.poss_corr2" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the row position correction.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.quarter">
-<code class="descname">quarter</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.quarter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Quarter number</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="lightkurve.lightcurvefile.TessLightCurveFile">
-<em class="property">class </em><code class="descclassname">lightkurve.lightcurvefile.</code><code class="descname">TessLightCurveFile</code><span class="sig-paren">(</span><em>path</em>, <em>quality_bitmask='default'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurvefile.html#TessLightCurveFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurvefile.TessLightCurveFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Defines a class for a given light curve FITS file from NASA’s TESS
-mission.</p>
-<p class="rubric">Attributes</p>
-<table border="1" class="docutils">
-<colgroup>
-<col width="5%" />
-<col width="95%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><strong>path</strong></td>
-<td>(str) Directory path or url to a lightcurve FITS file.</td>
-</tr>
-<tr class="row-even"><td><strong>quality_bitmask</strong></td>
-<td>(str or int) Bitmask specifying quality flags of cadences that should be ignored. If a string is passed, it has the following meaning:  * default: recommended quality mask * hard: removes more flags, known to remove good data * hardest: removes all data that has been flagged  See the <cite>TessQualityFlags</cite> class for details on the bitmasks.</td>
-</tr>
-<tr class="row-odd"><td><strong>kwargs</strong></td>
-<td>(dict) Keyword arguments to be passed to astropy.io.fits.open.</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurvefile.TessLightCurveFile.get_lightcurve" title="lightkurve.lightcurvefile.TessLightCurveFile.get_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_lightcurve</span></code></a>(flux_type[,&nbsp;centroid_type])</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">header</span></code>([ext])</td>
-<td>Header of the object at extension <cite>ext</cite></td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt id="lightkurve.lightcurvefile.TessLightCurveFile.get_lightcurve">
-<code class="descname">get_lightcurve</code><span class="sig-paren">(</span><em>flux_type</em>, <em>centroid_type='MOM_CENTR'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurvefile.html#TessLightCurveFile.get_lightcurve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurvefile.TessLightCurveFile.get_lightcurve" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="lightkurve.lightcurvefile.TessLightCurveFile.ticid">
-<code class="descname">ticid</code><a class="headerlink" href="#lightkurve.lightcurvefile.TessLightCurveFile.ticid" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+</div>
+<div class="section" id="class-inheritance-diagram">
+<h2>Class Inheritance Diagram<a class="headerlink" href="#class-inheritance-diagram" title="Permalink to this headline">¶</a></h2>
+<img src="../_images/inheritance-62768afd3acfa1265b3632b487d7689ea78f8d70.png" alt="Inheritance diagram of lightkurve.lightcurvefile.KeplerLightCurveFile, lightkurve.lightcurvefile.TessLightCurveFile" usemap="#inheritance8eaf80ad13" class="inheritance"/>
+<map id="inheritance8eaf80ad13" name="inheritance8eaf80ad13">
+<area shape="rect" id="node1" href="lightkurve.lightcurvefile.KeplerLightCurveFile.html#lightkurve.lightcurvefile.KeplerLightCurveFile" target="_top" title="Defines a class for a given light curve FITS file from NASA&#39;s Kepler and" alt="" coords="161,5,306,29"/>
+<area shape="rect" id="node3" href="lightkurve.lightcurvefile.TessLightCurveFile.html#lightkurve.lightcurvefile.TessLightCurveFile" target="_top" title="Defines a class for a given light curve FITS file from NASA&#39;s TESS" alt="" coords="166,53,301,77"/>
+</map></div>
 </div>
 
 
@@ -551,6 +372,15 @@ mission.</p>
            
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="lightkurve.lightcurvefile.KeplerLightCurveFile.html" class="btn btn-neutral float-right" title="KeplerLightCurveFile" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="lightkurve.lightcurve.TessLightCurve.html" class="btn btn-neutral" title="TessLightCurve" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>
@@ -579,7 +409,7 @@ mission.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'1.0.a1',
+            VERSION:'1.0b9',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

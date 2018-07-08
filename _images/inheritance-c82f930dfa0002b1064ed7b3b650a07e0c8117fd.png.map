@@ -1,0 +1,6 @@
+<map id="inheritance35d8fed1f5" name="inheritance35d8fed1f5">
+<area shape="rect" id="node1" href="lightkurve.prf.KeplerPRF.html#lightkurve.prf.KeplerPRF" target="_top" title="Kepler&#39;s Pixel Response Function as designed by [1]_." alt="" coords="20,101,107,125"/>
+<area shape="rect" id="node4" href="lightkurve.prf.SimpleKeplerPRF.html#lightkurve.prf.SimpleKeplerPRF" target="_top" title="Simple model of KeplerPRF." alt="" coords="170,101,297,125"/>
+<area shape="rect" id="node2" href="lightkurve.prf.PRFPhotometry.html#lightkurve.prf.PRFPhotometry" target="_top" title="This class performs PRF Photometry on TPF&#45;like files." alt="" coords="5,53,122,77"/>
+<area shape="rect" id="node3" href="lightkurve.prf.SceneModel.html#lightkurve.prf.SceneModel" target="_top" title="This class builds a generic model for a scene." alt="" coords="16,5,111,29"/>
+</map>

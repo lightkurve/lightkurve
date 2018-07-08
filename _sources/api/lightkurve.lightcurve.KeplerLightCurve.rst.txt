@@ -1,0 +1,43 @@
+KeplerLightCurve
+================
+
+.. currentmodule:: lightkurve.lightcurve
+
+.. autoclass:: KeplerLightCurve
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~KeplerLightCurve.append
+      ~KeplerLightCurve.bin
+      ~KeplerLightCurve.cdpp
+      ~KeplerLightCurve.correct
+      ~KeplerLightCurve.flatten
+      ~KeplerLightCurve.fold
+      ~KeplerLightCurve.normalize
+      ~KeplerLightCurve.plot
+      ~KeplerLightCurve.properties
+      ~KeplerLightCurve.remove_nans
+      ~KeplerLightCurve.remove_outliers
+      ~KeplerLightCurve.to_csv
+      ~KeplerLightCurve.to_pandas
+      ~KeplerLightCurve.to_table
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: append
+   .. automethod:: bin
+   .. automethod:: cdpp
+   .. automethod:: correct
+   .. automethod:: flatten
+   .. automethod:: fold
+   .. automethod:: normalize
+   .. automethod:: plot
+   .. automethod:: properties
+   .. automethod:: remove_nans
+   .. automethod:: remove_outliers
+   .. automethod:: to_csv
+   .. automethod:: to_pandas
+   .. automethod:: to_table

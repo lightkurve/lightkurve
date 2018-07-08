@@ -1,0 +1,75 @@
+KeplerQualityFlags
+==================
+
+.. currentmodule:: lightkurve.utils
+
+.. autoclass:: KeplerQualityFlags
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~KeplerQualityFlags.ApertureCosmic
+      ~KeplerQualityFlags.Argabrightening
+      ~KeplerQualityFlags.ArgabrighteningOnCCD
+      ~KeplerQualityFlags.AttitudeTweak
+      ~KeplerQualityFlags.CoarsePoint
+      ~KeplerQualityFlags.CollateralCosmic
+      ~KeplerQualityFlags.DEFAULT_BITMASK
+      ~KeplerQualityFlags.Desat
+      ~KeplerQualityFlags.DetectorAnomaly
+      ~KeplerQualityFlags.EarthPoint
+      ~KeplerQualityFlags.HARDEST_BITMASK
+      ~KeplerQualityFlags.HARD_BITMASK
+      ~KeplerQualityFlags.ImpulsiveOutlier
+      ~KeplerQualityFlags.ManualExclude
+      ~KeplerQualityFlags.NoData
+      ~KeplerQualityFlags.NoFinePoint
+      ~KeplerQualityFlags.OPTIONS
+      ~KeplerQualityFlags.PossibleThrusterFiring
+      ~KeplerQualityFlags.RollingBandInAperture
+      ~KeplerQualityFlags.RollingBandInMask
+      ~KeplerQualityFlags.STRINGS
+      ~KeplerQualityFlags.SafeMode
+      ~KeplerQualityFlags.SensitivityDropout
+      ~KeplerQualityFlags.ThrusterFiring
+      ~KeplerQualityFlags.ZeroCrossing
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~KeplerQualityFlags.decode
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: ApertureCosmic
+   .. autoattribute:: Argabrightening
+   .. autoattribute:: ArgabrighteningOnCCD
+   .. autoattribute:: AttitudeTweak
+   .. autoattribute:: CoarsePoint
+   .. autoattribute:: CollateralCosmic
+   .. autoattribute:: DEFAULT_BITMASK
+   .. autoattribute:: Desat
+   .. autoattribute:: DetectorAnomaly
+   .. autoattribute:: EarthPoint
+   .. autoattribute:: HARDEST_BITMASK
+   .. autoattribute:: HARD_BITMASK
+   .. autoattribute:: ImpulsiveOutlier
+   .. autoattribute:: ManualExclude
+   .. autoattribute:: NoData
+   .. autoattribute:: NoFinePoint
+   .. autoattribute:: OPTIONS
+   .. autoattribute:: PossibleThrusterFiring
+   .. autoattribute:: RollingBandInAperture
+   .. autoattribute:: RollingBandInMask
+   .. autoattribute:: STRINGS
+   .. autoattribute:: SafeMode
+   .. autoattribute:: SensitivityDropout
+   .. autoattribute:: ThrusterFiring
+   .. autoattribute:: ZeroCrossing
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: decode

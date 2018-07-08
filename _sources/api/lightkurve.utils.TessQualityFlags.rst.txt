@@ -1,0 +1,75 @@
+TessQualityFlags
+================
+
+.. currentmodule:: lightkurve.utils
+
+.. autoclass:: TessQualityFlags
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~TessQualityFlags.ApertureCosmic
+      ~TessQualityFlags.Argabrightening
+      ~TessQualityFlags.ArgabrighteningOnCCD
+      ~TessQualityFlags.AttitudeTweak
+      ~TessQualityFlags.CoarsePoint
+      ~TessQualityFlags.CollateralCosmic
+      ~TessQualityFlags.DEFAULT_BITMASK
+      ~TessQualityFlags.Desat
+      ~TessQualityFlags.DetectorAnomaly
+      ~TessQualityFlags.EarthPoint
+      ~TessQualityFlags.HARDEST_BITMASK
+      ~TessQualityFlags.HARD_BITMASK
+      ~TessQualityFlags.ImpulsiveOutlier
+      ~TessQualityFlags.ManualExclude
+      ~TessQualityFlags.NoData
+      ~TessQualityFlags.NoFinePoint
+      ~TessQualityFlags.OPTIONS
+      ~TessQualityFlags.PossibleThrusterFiring
+      ~TessQualityFlags.RollingBandInAperture
+      ~TessQualityFlags.RollingBandInMask
+      ~TessQualityFlags.STRINGS
+      ~TessQualityFlags.SafeMode
+      ~TessQualityFlags.SensitivityDropout
+      ~TessQualityFlags.ThrusterFiring
+      ~TessQualityFlags.ZeroCrossing
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~TessQualityFlags.decode
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: ApertureCosmic
+   .. autoattribute:: Argabrightening
+   .. autoattribute:: ArgabrighteningOnCCD
+   .. autoattribute:: AttitudeTweak
+   .. autoattribute:: CoarsePoint
+   .. autoattribute:: CollateralCosmic
+   .. autoattribute:: DEFAULT_BITMASK
+   .. autoattribute:: Desat
+   .. autoattribute:: DetectorAnomaly
+   .. autoattribute:: EarthPoint
+   .. autoattribute:: HARDEST_BITMASK
+   .. autoattribute:: HARD_BITMASK
+   .. autoattribute:: ImpulsiveOutlier
+   .. autoattribute:: ManualExclude
+   .. autoattribute:: NoData
+   .. autoattribute:: NoFinePoint
+   .. autoattribute:: OPTIONS
+   .. autoattribute:: PossibleThrusterFiring
+   .. autoattribute:: RollingBandInAperture
+   .. autoattribute:: RollingBandInMask
+   .. autoattribute:: STRINGS
+   .. autoattribute:: SafeMode
+   .. autoattribute:: SensitivityDropout
+   .. autoattribute:: ThrusterFiring
+   .. autoattribute:: ZeroCrossing
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: decode

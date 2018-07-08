@@ -1,0 +1,5 @@
+<map id="inheritance8eaf80ad13" name="inheritance8eaf80ad13">
+<area shape="rect" id="node1" href="lightkurve.lightcurvefile.KeplerLightCurveFile.html#lightkurve.lightcurvefile.KeplerLightCurveFile" target="_top" title="Defines a class for a given light curve FITS file from NASA&#39;s Kepler and" alt="" coords="161,5,306,29"/>
+<area shape="rect" id="node2" title="Defines a generic class to handle light curve files." alt="" coords="5,29,113,53"/>
+<area shape="rect" id="node3" href="lightkurve.lightcurvefile.TessLightCurveFile.html#lightkurve.lightcurvefile.TessLightCurveFile" target="_top" title="Defines a class for a given light curve FITS file from NASA&#39;s TESS" alt="" coords="166,53,301,77"/>
+</map>

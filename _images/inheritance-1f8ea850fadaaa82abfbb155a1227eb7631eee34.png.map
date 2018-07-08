@@ -1,0 +1,4 @@
+<map id="inheritancea288947b7e" name="inheritancea288947b7e">
+<area shape="rect" id="node1" href="lightkurve.correctors.KeplerCBVCorrector.html#lightkurve.correctors.KeplerCBVCorrector" target="_top" title="Remove systematic trends from Kepler light curves by fitting" alt="" coords="5,53,148,77"/>
+<area shape="rect" id="node2" href="lightkurve.correctors.SFFCorrector.html#lightkurve.correctors.SFFCorrector" target="_top" title="Implements the Self&#45;Flat&#45;Fielding (SFF) systematics removal method." alt="" coords="26,5,128,29"/>
+</map>

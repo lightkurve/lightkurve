@@ -1,0 +1,89 @@
+TessTargetPixelFile
+===================
+
+.. currentmodule:: lightkurve.targetpixelfile
+
+.. autoclass:: TessTargetPixelFile
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~TessTargetPixelFile.astropy_time
+      ~TessTargetPixelFile.cadenceno
+      ~TessTargetPixelFile.camera
+      ~TessTargetPixelFile.ccd
+      ~TessTargetPixelFile.column
+      ~TessTargetPixelFile.dec
+      ~TessTargetPixelFile.flux
+      ~TessTargetPixelFile.flux_bkg
+      ~TessTargetPixelFile.flux_bkg_err
+      ~TessTargetPixelFile.flux_err
+      ~TessTargetPixelFile.hdu
+      ~TessTargetPixelFile.mission
+      ~TessTargetPixelFile.nan_time_mask
+      ~TessTargetPixelFile.pipeline_mask
+      ~TessTargetPixelFile.pos_corr1
+      ~TessTargetPixelFile.pos_corr2
+      ~TessTargetPixelFile.quality
+      ~TessTargetPixelFile.ra
+      ~TessTargetPixelFile.row
+      ~TessTargetPixelFile.sector
+      ~TessTargetPixelFile.shape
+      ~TessTargetPixelFile.ticid
+      ~TessTargetPixelFile.time
+      ~TessTargetPixelFile.wcs
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~TessTargetPixelFile.centroids
+      ~TessTargetPixelFile.get_bkg_lightcurve
+      ~TessTargetPixelFile.get_coordinates
+      ~TessTargetPixelFile.header
+      ~TessTargetPixelFile.interact
+      ~TessTargetPixelFile.plot
+      ~TessTargetPixelFile.properties
+      ~TessTargetPixelFile.to_fits
+      ~TessTargetPixelFile.to_lightcurve
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: astropy_time
+   .. autoattribute:: cadenceno
+   .. autoattribute:: camera
+   .. autoattribute:: ccd
+   .. autoattribute:: column
+   .. autoattribute:: dec
+   .. autoattribute:: flux
+   .. autoattribute:: flux_bkg
+   .. autoattribute:: flux_bkg_err
+   .. autoattribute:: flux_err
+   .. autoattribute:: hdu
+   .. autoattribute:: mission
+   .. autoattribute:: nan_time_mask
+   .. autoattribute:: pipeline_mask
+   .. autoattribute:: pos_corr1
+   .. autoattribute:: pos_corr2
+   .. autoattribute:: quality
+   .. autoattribute:: ra
+   .. autoattribute:: row
+   .. autoattribute:: sector
+   .. autoattribute:: shape
+   .. autoattribute:: ticid
+   .. autoattribute:: time
+   .. autoattribute:: wcs
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: centroids
+   .. automethod:: get_bkg_lightcurve
+   .. automethod:: get_coordinates
+   .. automethod:: header
+   .. automethod:: interact
+   .. automethod:: plot
+   .. automethod:: properties
+   .. automethod:: to_fits
+   .. automethod:: to_lightcurve

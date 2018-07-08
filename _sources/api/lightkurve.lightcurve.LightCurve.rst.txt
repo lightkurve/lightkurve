@@ -1,0 +1,41 @@
+LightCurve
+==========
+
+.. currentmodule:: lightkurve.lightcurve
+
+.. autoclass:: LightCurve
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~LightCurve.append
+      ~LightCurve.bin
+      ~LightCurve.cdpp
+      ~LightCurve.flatten
+      ~LightCurve.fold
+      ~LightCurve.normalize
+      ~LightCurve.plot
+      ~LightCurve.properties
+      ~LightCurve.remove_nans
+      ~LightCurve.remove_outliers
+      ~LightCurve.to_csv
+      ~LightCurve.to_pandas
+      ~LightCurve.to_table
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: append
+   .. automethod:: bin
+   .. automethod:: cdpp
+   .. automethod:: flatten
+   .. automethod:: fold
+   .. automethod:: normalize
+   .. automethod:: plot
+   .. automethod:: properties
+   .. automethod:: remove_nans
+   .. automethod:: remove_outliers
+   .. automethod:: to_csv
+   .. automethod:: to_pandas
+   .. automethod:: to_table

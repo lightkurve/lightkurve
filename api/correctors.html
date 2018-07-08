@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Systematics correction classes &mdash; lightkurve 1.0.a1 documentation</title>
+  <title>Systematics correction classes &mdash; lightkurve 1.0b9 documentation</title>
   
 
   
@@ -28,7 +28,9 @@
     <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="KeplerCBVCorrector" href="lightkurve.correctors.KeplerCBVCorrector.html" />
+    <link rel="prev" title="TessLightCurveFile" href="lightkurve.lightcurvefile.TessLightCurveFile.html" /> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -60,7 +62,7 @@
             
             
               <div class="version">
-                1.0
+                1.0b9
               </div>
             
           
@@ -98,22 +100,77 @@
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">API documentation</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="targetpixelfile.html">TargetPixelFile classes</a><ul class="simple">
+<li class="toctree-l2"><a class="reference internal" href="targetpixelfile.html">TargetPixelFile classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="targetpixelfile.html#classes">Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.targetpixelfile.KeplerTargetPixelFile.html">KeplerTargetPixelFile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.targetpixelfile.TessTargetPixelFile.html">TessTargetPixelFile</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="lightcurve.html">LightCurve classes</a><ul class="simple">
+<li class="toctree-l3"><a class="reference internal" href="targetpixelfile.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="lightcurvefile.html">LightCurveFile classes</a><ul class="simple">
+<li class="toctree-l2"><a class="reference internal" href="lightcurve.html">LightCurve classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lightcurve.html#functions">Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurve.iterative_box_period_search.html">iterative_box_period_search</a></li>
 </ul>
 </li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Systematics correction classes</a><ul class="simple">
+<li class="toctree-l3"><a class="reference internal" href="lightcurve.html#classes">Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurve.LightCurve.html">LightCurve</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurve.KeplerLightCurve.html">KeplerLightCurve</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurve.TessLightCurve.html">TessLightCurve</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="prf.html">PSF photometry classes</a><ul class="simple">
+<li class="toctree-l3"><a class="reference internal" href="lightcurve.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html">Utility functions</a><ul class="simple">
+<li class="toctree-l2"><a class="reference internal" href="lightcurvefile.html">LightCurveFile classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lightcurvefile.html#classes">Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurvefile.KeplerLightCurveFile.html">KeplerLightCurveFile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurvefile.TessLightCurveFile.html">TessLightCurveFile</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="lightcurvefile.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Systematics correction classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#classes">Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.correctors.KeplerCBVCorrector.html">KeplerCBVCorrector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.correctors.SFFCorrector.html">SFFCorrector</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#class-inheritance-diagram">Class Inheritance Diagram</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="prf.html">PSF photometry classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="prf.html#functions">Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.get_initial_guesses.html">get_initial_guesses</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="prf.html#classes">Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.KeplerPRF.html">KeplerPRF</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.PRFPhotometry.html">PRFPhotometry</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.SceneModel.html">SceneModel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.SimpleKeplerPRF.html">SimpleKeplerPRF</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="prf.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">Utility functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#functions">Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.utils.bkjd_to_astropy_time.html">bkjd_to_astropy_time</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.utils.btjd_to_astropy_time.html">btjd_to_astropy_time</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.utils.channel_to_module_output.html">channel_to_module_output</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.utils.module_output_to_channel.html">module_output_to_channel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.utils.running_mean.html">running_mean</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#classes">Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.utils.KeplerQualityFlags.html">KeplerQualityFlags</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.utils.TessQualityFlags.html">TessQualityFlags</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
 </ul>
 </li>
 </ul>
@@ -137,6 +194,11 @@
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/2.03-appending-lightcurves.html">How to combine lightcurves from different Kepler quarters</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/2.05-making-custom-apertures.html">How to perform aperture photometry with custom apertures</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/cutting-out-tpfs-from-tess-ffis.html">How to cut out Target Pixel Files from Kepler Super Stamps or TESS FFIs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.08-making-fits-files.html">How to store a light curve in FITS format?</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/2.08-making-fits-files.html#Example:-editing-and-writing-a-lightcurve">Example: editing and writing a lightcurve</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.09-how-to-use-lightkurve-for-asteroseismology.html">How to use lightkurve for asteroseismology</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/section3.html">Systematics correction using lightkurve</a><ul>
@@ -151,6 +213,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/motion-correction/replicate-vanderburg-2014-lightkurve.html#Data-Exclusion">Data Exclusion</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.06-identify-rolling-band.html">How to identify time-variable background noise (“rolling bands”)?</a></li>
 </ul>
 </li>
 </ul>
@@ -277,343 +340,31 @@
 </style>
 <div class="section" id="module-lightkurve.correctors">
 <span id="systematics-correction-classes"></span><h1>Systematics correction classes<a class="headerlink" href="#module-lightkurve.correctors" title="Permalink to this headline">¶</a></h1>
-<p>Defines KeplerCBVCorrector and SFFCorrector.</p>
-<dl class="class">
-<dt id="lightkurve.correctors.KeplerCBVCorrector">
-<em class="property">class </em><code class="descclassname">lightkurve.correctors.</code><code class="descname">KeplerCBVCorrector</code><span class="sig-paren">(</span><em>lc_file</em>, <em>likelihood=&lt;class 'oktopus.likelihood.LaplacianLikelihood'&gt;</em>, <em>prior=&lt;class 'oktopus.prior.LaplacianPrior'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/correctors.html#KeplerCBVCorrector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Remove systematic trends from Kepler light curves by fitting
-cotrending basis vectors.</p>
-<div class="math notranslate nohighlight">
-\[\arg \min_{\bm{\theta} \in \Theta} \sum_{t}|f_{SAP}(t) - \sum_{j=1}^{n}\theta_j v_{j}(t)|^p, p&gt;0, p \in \mathbb{R}\]</div>
-<p class="rubric">Examples</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">lightkurve</span> <span class="k">import</span> <span class="n">KeplerCBVCorrector</span><span class="p">,</span> <span class="n">KeplerLightCurveFile</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fn</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;https://archive.stsci.edu/missions/kepler/lightcurves/&quot;</span>
-<span class="gp">... </span>      <span class="s2">&quot;0084/008462852/kplr008462852-2011073133259_llc.fits&quot;</span><span class="p">)</span> 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cbv</span> <span class="o">=</span> <span class="n">KeplerCBVCorrector</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span> 
-<span class="go">Downloading https://archive.stsci.edu/missions/kepler/lightcurves/0084/008462852/kplr008462852-2011073133259_llc.fits [Done]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cbv_lc</span> <span class="o">=</span> <span class="n">cbv</span><span class="o">.</span><span class="n">correct</span><span class="p">()</span> 
-<span class="go">Downloading http://archive.stsci.edu/missions/kepler/cbv/kplr2011073133259-q08-d25_lcbv.fits [Done]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sap_lc</span> <span class="o">=</span> <span class="n">KeplerLightCurveFile</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="n">SAP_FLUX</span> 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">sap_lc</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">sap_lc</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;SAP_FLUX&#39;</span><span class="p">)</span> 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cbv_lc</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">cbv_lc</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;CBV_FLUX&#39;</span><span class="p">)</span> 
-<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span> 
-</pre></div>
+<span class="target" id="module-lightkurve.correctors"></span><p>Defines KeplerCBVCorrector and SFFCorrector.</p>
+<div class="section" id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="lightkurve.correctors.KeplerCBVCorrector.html#lightkurve.correctors.KeplerCBVCorrector" title="lightkurve.correctors.KeplerCBVCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerCBVCorrector</span></code></a>(lc_file[,&nbsp;likelihood,&nbsp;prior])</td>
+<td>Remove systematic trends from Kepler light curves by fitting cotrending basis vectors.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="lightkurve.correctors.SFFCorrector.html#lightkurve.correctors.SFFCorrector" title="lightkurve.correctors.SFFCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SFFCorrector</span></code></a>()</td>
+<td>Implements the Self-Flat-Fielding (SFF) systematics removal method.</td>
+</tr>
+</tbody>
+</table>
 </div>
-<p class="rubric">Attributes</p>
-<table border="1" class="docutils">
-<colgroup>
-<col width="8%" />
-<col width="92%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><strong>lc_file</strong></td>
-<td>(KeplerLightCurveFile object or str) An instance from KeplerLightCurveFile or a path for the .fits file of a NASA’s Kepler/K2 light curve.</td>
-</tr>
-<tr class="row-even"><td><strong>likelihood</strong></td>
-<td>(oktopus.Likelihood subclass) A class that describes a cost function. The default is <code class="xref py py-class docutils literal notranslate"><span class="pre">oktopus.LaplacianLikelihood</span></code>, which is tantamount to the L1 norm.</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.correctors.KeplerCBVCorrector.correct" title="lightkurve.correctors.KeplerCBVCorrector.correct"><code class="xref py py-obj docutils literal notranslate"><span class="pre">correct</span></code></a>([cbvs,&nbsp;method,&nbsp;options])</td>
-<td>Correct the SAP_FLUX by fitting a number of cotrending basis vectors <cite>cbvs</cite>.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.correctors.KeplerCBVCorrector.get_cbv_url" title="lightkurve.correctors.KeplerCBVCorrector.get_cbv_url"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_cbv_url</span></code></a>()</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.correctors.KeplerCBVCorrector.get_cbvs_list" title="lightkurve.correctors.KeplerCBVCorrector.get_cbvs_list"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_cbvs_list</span></code></a>()</td>
-<td>Returns the subsequence of subsequent CBVs that maximizes Bayes’ factor [R33].</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.correctors.KeplerCBVCorrector.plot_cbvs" title="lightkurve.correctors.KeplerCBVCorrector.plot_cbvs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_cbvs</span></code></a>([cbvs,&nbsp;ax])</td>
-<td>Plot the CBVs for a given list of CBVs</td>
-</tr>
-</tbody>
-</table>
-<dl class="attribute">
-<dt id="lightkurve.correctors.KeplerCBVCorrector.coeffs">
-<code class="descname">coeffs</code><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector.coeffs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the fitted coefficients.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="lightkurve.correctors.KeplerCBVCorrector.correct">
-<code class="descname">correct</code><span class="sig-paren">(</span><em>cbvs=[1, 2], method='powell', options={}</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/correctors.html#KeplerCBVCorrector.correct"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector.correct" title="Permalink to this definition">¶</a></dt>
-<dd><p>Correct the SAP_FLUX by fitting a number of cotrending basis vectors
-<cite>cbvs</cite>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>cbvs</strong> : list of ints</p>
-<blockquote>
-<div><p>The list of cotrending basis vectors to fit to the data. For example,
-[1, 2] will fit the first two basis vectors.</p>
-</div></blockquote>
-<p><strong>method</strong> : str</p>
-<blockquote>
-<div><p>Numerical optimization method. See scipy.optimize.minimize for the
-full list of methods.</p>
-</div></blockquote>
-<p><strong>options</strong> : dict</p>
-<blockquote class="last">
-<div><p>Dictionary of options to be passed to scipy.optimize.minimize.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="lightkurve.correctors.KeplerCBVCorrector.get_cbv_url">
-<code class="descname">get_cbv_url</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/correctors.html#KeplerCBVCorrector.get_cbv_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector.get_cbv_url" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="lightkurve.correctors.KeplerCBVCorrector.get_cbvs_list">
-<code class="descname">get_cbvs_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/correctors.html#KeplerCBVCorrector.get_cbvs_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector.get_cbvs_list" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the subsequence of subsequent CBVs that maximizes
-Bayes’ factor <a class="reference internal" href="#r114" id="id2">[R114]</a>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>cbv_list</strong> : list</p>
-<blockquote class="last">
-<div><p>Subsequence of subsequent CBVs that maximizes the Bayes’ factor.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">References</p>
-<table class="docutils citation" frame="void" id="r114" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label">[R114]</td><td><em>(<a class="fn-backref" href="#id2">1</a>, <a class="fn-backref" href="#id3">2</a>)</em> <a class="reference external" href="https://en.wikipedia.org/wiki/Bayes_factor">https://en.wikipedia.org/wiki/Bayes_factor</a></td></tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="lightkurve.correctors.KeplerCBVCorrector.lc_file">
-<code class="descname">lc_file</code><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector.lc_file" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="lightkurve.correctors.KeplerCBVCorrector.opt_result">
-<code class="descname">opt_result</code><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector.opt_result" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the result of the optimization process.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="lightkurve.correctors.KeplerCBVCorrector.plot_cbvs">
-<code class="descname">plot_cbvs</code><span class="sig-paren">(</span><em>cbvs=[1, 2], ax=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/correctors.html#KeplerCBVCorrector.plot_cbvs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector.plot_cbvs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot the CBVs for a given list of CBVs</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>cbvs</strong> : list of ints</p>
-<blockquote>
-<div><p>The list of cotrending basis vectors to fit to the data. For example,
-[1, 2] will fit the first two basis vectors.</p>
-</div></blockquote>
-<p><strong>ax</strong> : matplotlib.pyplot.Axes.AxesSubplot</p>
-<blockquote>
-<div><p>Matplotlib axis object. If none, one will be generated.</p>
-</div></blockquote>
-<p><strong>Returns</strong></p>
-<p><strong>——-</strong></p>
-<p><strong>ax</strong> : matplotlib.pyplot.Axes.AxesSubplot</p>
-<blockquote class="last">
-<div><p>Matplotlib axis object</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="lightkurve.correctors.SFFCorrector">
-<em class="property">class </em><code class="descclassname">lightkurve.correctors.</code><code class="descname">SFFCorrector</code><a class="reference internal" href="../_modules/lightkurve/correctors.html#SFFCorrector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.correctors.SFFCorrector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Implements the Self-Flat-Fielding (SFF) systematics removal method.</p>
-<p>This method is described in detail by Vanderburg and Johnson (2014).
-Briefly, the algorithm implemented in this class can be described
-as follows</p>
-<blockquote>
-<div><ol class="arabic simple">
-<li>Rotate the centroid measurements onto the subspace spanned by the
-eigenvectors of the centroid covariance matrix</li>
-<li>Fit a polynomial to the rotated centroids</li>
-<li>Compute the arclength of such polynomial</li>
-<li>Fit a BSpline of the raw flux as a function of time</li>
-<li>Normalize the raw flux by the fitted BSpline computed in step (4)</li>
-<li>Bin and interpolate the normalized flux as a function of the arclength</li>
-<li>Divide the raw flux by the piecewise linear interpolation done in step (6)</li>
-<li>Set raw flux as the flux computed in step (7) and repeat</li>
-<li>Multiply back the fitted BSpline</li>
-</ol>
-</div></blockquote>
-<p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.correctors.SFFCorrector.arclength" title="lightkurve.correctors.SFFCorrector.arclength"><code class="xref py py-obj docutils literal notranslate"><span class="pre">arclength</span></code></a>(x1,&nbsp;x)</td>
-<td>Compute the arclength of the polynomial used to fit the centroid measurements.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.correctors.SFFCorrector.bin_and_interpolate" title="lightkurve.correctors.SFFCorrector.bin_and_interpolate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bin_and_interpolate</span></code></a>(s,&nbsp;normflux,&nbsp;bins,&nbsp;sigma)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.correctors.SFFCorrector.breakpoints" title="lightkurve.correctors.SFFCorrector.breakpoints"><code class="xref py py-obj docutils literal notranslate"><span class="pre">breakpoints</span></code></a>(campaign)</td>
-<td>Return a break point as a function of the campaign number.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.correctors.SFFCorrector.correct" title="lightkurve.correctors.SFFCorrector.correct"><code class="xref py py-obj docutils literal notranslate"><span class="pre">correct</span></code></a>(time,&nbsp;flux,&nbsp;centroid_col,&nbsp;centroid_row)</td>
-<td>Returns a systematics-corrected LightCurve.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.correctors.SFFCorrector.fit_bspline" title="lightkurve.correctors.SFFCorrector.fit_bspline"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit_bspline</span></code></a>(time,&nbsp;flux[,&nbsp;s])</td>
-<td>s describes the “smoothness” of the spline</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.correctors.SFFCorrector.rotate_centroids" title="lightkurve.correctors.SFFCorrector.rotate_centroids"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rotate_centroids</span></code></a>(centroid_col,&nbsp;centroid_row)</td>
-<td>Rotate the coordinate frame of the (col, row) centroids to a new (x,y) frame in which the dominant motion of the spacecraft is aligned with the x axis.</td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt id="lightkurve.correctors.SFFCorrector.arclength">
-<code class="descname">arclength</code><span class="sig-paren">(</span><em>x1</em>, <em>x</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/correctors.html#SFFCorrector.arclength"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.arclength" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute the arclength of the polynomial used to fit the centroid
-measurements.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>x1</strong> : float</p>
-<blockquote>
-<div><p>Upper limit of the integration domain.</p>
-</div></blockquote>
-<p><strong>x</strong> : ndarray</p>
-<blockquote>
-<div><p>Domain at which the arclength integrand is defined.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>arclength</strong> : float</p>
-<blockquote class="last">
-<div><p>Result of the arclength integral from x[0] to x1.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="lightkurve.correctors.SFFCorrector.bin_and_interpolate">
-<code class="descname">bin_and_interpolate</code><span class="sig-paren">(</span><em>s</em>, <em>normflux</em>, <em>bins</em>, <em>sigma</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/correctors.html#SFFCorrector.bin_and_interpolate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.bin_and_interpolate" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="lightkurve.correctors.SFFCorrector.breakpoints">
-<code class="descname">breakpoints</code><span class="sig-paren">(</span><em>campaign</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/correctors.html#SFFCorrector.breakpoints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.breakpoints" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a break point as a function of the campaign number.</p>
-<p>The intention of this function is to implement a smart way to determine
-the boundaries of the windows on which the SFF algorithm is applied
-independently. However, this is not implemented yet in this version.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="lightkurve.correctors.SFFCorrector.correct">
-<code class="descname">correct</code><span class="sig-paren">(</span><em>time</em>, <em>flux</em>, <em>centroid_col</em>, <em>centroid_row</em>, <em>polyorder=5</em>, <em>niters=3</em>, <em>bins=15</em>, <em>windows=1</em>, <em>sigma_1=3.0</em>, <em>sigma_2=5.0</em>, <em>restore_trend=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/correctors.html#SFFCorrector.correct"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.correct" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a systematics-corrected LightCurve.</p>
-<p>Note that it is assumed that time and flux do not contain NaNs.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>time</strong> : array-like</p>
-<blockquote>
-<div><p>Time measurements</p>
-</div></blockquote>
-<p><strong>flux</strong> : array-like</p>
-<blockquote>
-<div><p>Data flux for every time point</p>
-</div></blockquote>
-<p><strong>centroid_col, centroid_row</strong> : array-like, array-like</p>
-<blockquote>
-<div><p>Centroid column and row coordinates as a function of time</p>
-</div></blockquote>
-<p><strong>polyorder</strong> : int</p>
-<blockquote>
-<div><p>Degree of the polynomial which will be used to fit one
-centroid as a function of the other.</p>
-</div></blockquote>
-<p><strong>niters</strong> : int</p>
-<blockquote>
-<div><p>Number of iterations of the aforementioned algorithm.</p>
-</div></blockquote>
-<p><strong>bins</strong> : int</p>
-<blockquote>
-<div><p>Number of bins to be used in step (6) to create the
-piece-wise interpolation of arclength vs flux correction.</p>
-</div></blockquote>
-<p><strong>windows</strong> : int</p>
-<blockquote>
-<div><p>Number of windows to subdivide the data.  The SFF algorithm
-is ran independently in each window.</p>
-</div></blockquote>
-<p><strong>sigma_1, sigma_2</strong> : float, float</p>
-<blockquote>
-<div><p>Sigma values which will be used to reject outliers
-in steps (6) and (2), respectivelly.</p>
-</div></blockquote>
-<p><strong>restore_trend</strong> : bool</p>
-<blockquote>
-<div><p>If <cite>True</cite>, the long-term trend will be added back into the
-lightcurve.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>corrected_lightcurve</strong> : LightCurve object</p>
-<blockquote class="last">
-<div><p>Returns a corrected lightcurve object.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="lightkurve.correctors.SFFCorrector.fit_bspline">
-<code class="descname">fit_bspline</code><span class="sig-paren">(</span><em>time</em>, <em>flux</em>, <em>s=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/correctors.html#SFFCorrector.fit_bspline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.fit_bspline" title="Permalink to this definition">¶</a></dt>
-<dd><p>s describes the “smoothness” of the spline</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="lightkurve.correctors.SFFCorrector.rotate_centroids">
-<code class="descname">rotate_centroids</code><span class="sig-paren">(</span><em>centroid_col</em>, <em>centroid_row</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/correctors.html#SFFCorrector.rotate_centroids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.rotate_centroids" title="Permalink to this definition">¶</a></dt>
-<dd><p>Rotate the coordinate frame of the (col, row) centroids to a new (x,y)
-frame in which the dominant motion of the spacecraft is aligned with
-the x axis.  This makes it easier to fit a characteristic polynomial
-that describes the motion.</p>
-</dd></dl>
-
-</dd></dl>
-
+<div class="section" id="class-inheritance-diagram">
+<h2>Class Inheritance Diagram<a class="headerlink" href="#class-inheritance-diagram" title="Permalink to this headline">¶</a></h2>
+<img src="../_images/inheritance-1f8ea850fadaaa82abfbb155a1227eb7631eee34.png" alt="Inheritance diagram of lightkurve.correctors.KeplerCBVCorrector, lightkurve.correctors.SFFCorrector" usemap="#inheritancea288947b7e" class="inheritance"/>
+<map id="inheritancea288947b7e" name="inheritancea288947b7e">
+<area shape="rect" id="node1" href="lightkurve.correctors.KeplerCBVCorrector.html#lightkurve.correctors.KeplerCBVCorrector" target="_top" title="Remove systematic trends from Kepler light curves by fitting" alt="" coords="5,53,148,77"/>
+<area shape="rect" id="node2" href="lightkurve.correctors.SFFCorrector.html#lightkurve.correctors.SFFCorrector" target="_top" title="Implements the Self&#45;Flat&#45;Fielding (SFF) systematics removal method." alt="" coords="26,5,128,29"/>
+</map></div>
 </div>
 
 
@@ -621,6 +372,15 @@ that describes the motion.</p>
            
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="lightkurve.correctors.KeplerCBVCorrector.html" class="btn btn-neutral float-right" title="KeplerCBVCorrector" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="lightkurve.lightcurvefile.TessLightCurveFile.html" class="btn btn-neutral" title="TessLightCurveFile" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>
@@ -649,7 +409,7 @@ that describes the motion.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'1.0.a1',
+            VERSION:'1.0b9',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

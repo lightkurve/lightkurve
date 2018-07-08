@@ -1,0 +1,41 @@
+TessLightCurve
+==============
+
+.. currentmodule:: lightkurve.lightcurve
+
+.. autoclass:: TessLightCurve
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~TessLightCurve.append
+      ~TessLightCurve.bin
+      ~TessLightCurve.cdpp
+      ~TessLightCurve.flatten
+      ~TessLightCurve.fold
+      ~TessLightCurve.normalize
+      ~TessLightCurve.plot
+      ~TessLightCurve.properties
+      ~TessLightCurve.remove_nans
+      ~TessLightCurve.remove_outliers
+      ~TessLightCurve.to_csv
+      ~TessLightCurve.to_pandas
+      ~TessLightCurve.to_table
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: append
+   .. automethod:: bin
+   .. automethod:: cdpp
+   .. automethod:: flatten
+   .. automethod:: fold
+   .. automethod:: normalize
+   .. automethod:: plot
+   .. automethod:: properties
+   .. automethod:: remove_nans
+   .. automethod:: remove_outliers
+   .. automethod:: to_csv
+   .. automethod:: to_pandas
+   .. automethod:: to_table

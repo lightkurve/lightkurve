@@ -1,0 +1,39 @@
+TessLightCurveFile
+==================
+
+.. currentmodule:: lightkurve.lightcurvefile
+
+.. autoclass:: TessLightCurveFile
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~TessLightCurveFile.PDCSAP_FLUX
+      ~TessLightCurveFile.SAP_FLUX
+      ~TessLightCurveFile.cadenceno
+      ~TessLightCurveFile.ticid
+      ~TessLightCurveFile.time
+      ~TessLightCurveFile.timeobj
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~TessLightCurveFile.get_lightcurve
+      ~TessLightCurveFile.header
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: PDCSAP_FLUX
+   .. autoattribute:: SAP_FLUX
+   .. autoattribute:: cadenceno
+   .. autoattribute:: ticid
+   .. autoattribute:: time
+   .. autoattribute:: timeobj
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: get_lightcurve
+   .. automethod:: header

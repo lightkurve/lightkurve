@@ -1,0 +1,101 @@
+KeplerTargetPixelFile
+=====================
+
+.. currentmodule:: lightkurve.targetpixelfile
+
+.. autoclass:: KeplerTargetPixelFile
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~KeplerTargetPixelFile.cadenceno
+      ~KeplerTargetPixelFile.campaign
+      ~KeplerTargetPixelFile.channel
+      ~KeplerTargetPixelFile.column
+      ~KeplerTargetPixelFile.dec
+      ~KeplerTargetPixelFile.flux
+      ~KeplerTargetPixelFile.flux_bkg
+      ~KeplerTargetPixelFile.flux_bkg_err
+      ~KeplerTargetPixelFile.flux_err
+      ~KeplerTargetPixelFile.hdu
+      ~KeplerTargetPixelFile.keplerid
+      ~KeplerTargetPixelFile.mission
+      ~KeplerTargetPixelFile.module
+      ~KeplerTargetPixelFile.nan_time_mask
+      ~KeplerTargetPixelFile.obsmode
+      ~KeplerTargetPixelFile.output
+      ~KeplerTargetPixelFile.pipeline_mask
+      ~KeplerTargetPixelFile.pos_corr1
+      ~KeplerTargetPixelFile.pos_corr2
+      ~KeplerTargetPixelFile.quality
+      ~KeplerTargetPixelFile.quarter
+      ~KeplerTargetPixelFile.ra
+      ~KeplerTargetPixelFile.row
+      ~KeplerTargetPixelFile.shape
+      ~KeplerTargetPixelFile.time
+      ~KeplerTargetPixelFile.timeobj
+      ~KeplerTargetPixelFile.wcs
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~KeplerTargetPixelFile.centroids
+      ~KeplerTargetPixelFile.from_archive
+      ~KeplerTargetPixelFile.from_fits_images
+      ~KeplerTargetPixelFile.get_bkg_lightcurve
+      ~KeplerTargetPixelFile.get_coordinates
+      ~KeplerTargetPixelFile.get_prf_model
+      ~KeplerTargetPixelFile.header
+      ~KeplerTargetPixelFile.interact
+      ~KeplerTargetPixelFile.plot
+      ~KeplerTargetPixelFile.properties
+      ~KeplerTargetPixelFile.to_fits
+      ~KeplerTargetPixelFile.to_lightcurve
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: cadenceno
+   .. autoattribute:: campaign
+   .. autoattribute:: channel
+   .. autoattribute:: column
+   .. autoattribute:: dec
+   .. autoattribute:: flux
+   .. autoattribute:: flux_bkg
+   .. autoattribute:: flux_bkg_err
+   .. autoattribute:: flux_err
+   .. autoattribute:: hdu
+   .. autoattribute:: keplerid
+   .. autoattribute:: mission
+   .. autoattribute:: module
+   .. autoattribute:: nan_time_mask
+   .. autoattribute:: obsmode
+   .. autoattribute:: output
+   .. autoattribute:: pipeline_mask
+   .. autoattribute:: pos_corr1
+   .. autoattribute:: pos_corr2
+   .. autoattribute:: quality
+   .. autoattribute:: quarter
+   .. autoattribute:: ra
+   .. autoattribute:: row
+   .. autoattribute:: shape
+   .. autoattribute:: time
+   .. autoattribute:: timeobj
+   .. autoattribute:: wcs
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: centroids
+   .. automethod:: from_archive
+   .. automethod:: from_fits_images
+   .. automethod:: get_bkg_lightcurve
+   .. automethod:: get_coordinates
+   .. automethod:: get_prf_model
+   .. automethod:: header
+   .. automethod:: interact
+   .. automethod:: plot
+   .. automethod:: properties
+   .. automethod:: to_fits
+   .. automethod:: to_lightcurve
