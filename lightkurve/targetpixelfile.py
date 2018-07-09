@@ -1204,5 +1204,5 @@ class TargetPixelFileCollection(Collection):
         -------
         ax : matplotlib.axes._subplots.AxesSubplot
         """
-        raise NotImplementedError('Should be able to run a PCA on a collection.')
+        raise NotImplementedError('Plotting TPFs has not been implemented')
     
