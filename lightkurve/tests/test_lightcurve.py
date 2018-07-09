@@ -6,7 +6,7 @@ from numpy.testing import (assert_almost_equal, assert_array_equal,
                            assert_allclose)
 from astropy.io import fits as pyfits
 from ..lightcurve import (LightCurve, KeplerLightCurve, TessLightCurve,
-                          iterative_box_period_search)
+                          iterative_box_period_search, LightCurveCollection)
 from ..lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
 
 # 8th Quarter of Tabby's star
@@ -462,3 +462,24 @@ def test_fill_gaps():
     assert(np.any(nlc.time == 5))
     assert(np.all(nlc.flux == 1))
     assert(np.all(np.isfinite(nlc.flux)))
+
+@pytest.mark.remote_data
+def test_lc_collection():
+    lc = LightCurve(time=np.arange(1, 5), flux=np.arange(1, 5), flux_err=np.arange(1, 5))
+    
+    lcf = KeplerLightCurveFile(TABBY_Q8)
+    lcc = LightCurveCollection([lcf])
+    
+    assert(len(lcc) == 1)
+    assert(lcc[0] == lcf)
+    assert(type(lcc[lcf.keplerid]) == type(lcf))
+
+    lcc.append(lc)
+
+    assert(len(lcc) == 2)
+    assert(lcc[1] == lc)
+
+    lcc.plot()
+
+    for lc in lcc:
+        print(lc)
