@@ -24,7 +24,7 @@ from astropy.time import Time
 
 from . import PACKAGEDIR
 from .utils import running_mean, bkjd_to_astropy_time, btjd_to_astropy_time
-
+from .lightcurvefile import KeplerLightCurveFile
 
 __all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve',
            'iterative_box_period_search', 'LightCurveCollection']
@@ -1181,78 +1181,39 @@ class LightCurveCollection(object):
     """
     Collects multiple LightCurve objects together with helpful functions.
     """
-    def __init__(self, lcs):
-        try:
-            lightcurves = np.asarray(lcs)
-        except:
-            raise TypeError("Unable to parse input")
-        self.data = {}
-        
-        for lc in lightcurves:
-            if isinstance(lc, KeplerLightCurve) or isinstance(lc,LightCurve):
-                if lc.keplerid:
-                    if lc.keplerid in self.data:
-                        self.data[lc.keplerid].append(lc)
-                    else:
-                        self.data[lc.keplerid] = [lc]
-                else: #no keplerID
-                    self.data[None].append(lc)
-            else:
-                raise TypeError("Object is not a LightCurve instance")
-        self.data[None] = []
+    def __init__(self, lightcurves):
+        self.data = lightcurves
+        self.k_id = self.assign_hash_values()
+
+    def assign_hash_values(self):
+        result = {}
+        for idx,lc in enumerate(self.data):
+            try:
+                result[lc.keplerid] = idx
+            except AttributeError:
+                print("Object "+ str(idx) + " has no keplerid")
+        return result
 
     def __len__(self):
-        length = 0
-        for lc_array in self.data.values():
-            for lc in lc_array:
-                length += 1
-        return length
+        return len(self.data)
 
-    def _ids(self):
-        """
-        Returns the kepler_ids of all the lightcurves as a dict_keys obj.
-        """
-        return self.data.keys()
-
-    def __getitem__(self, kep_id):
-        """
-        Returns the lightcurve associated with the kepler_id. 
-        """
+    def __getitem__(self, index):
         try: 
-            return self.data[kep_id]
-        except:
-            raise ValueError('No LightCurve for ' + kep_id)
-
-    def append(self, lc, **kwargs):
-        try:
-            if lc.keplerid in self.data:
-                if 'stitch' in kwargs:
-                    self.data[lc.keplerid][0].append(lc)
-                    return   
-                self.data[lc.keplerid].append(lc)
+            if index > len(self.data):
+                return self.data[self.k_id[index]]
             else:
-                self.data[lc.keplerid] = [lc]
-        except:
-            raise TypeError("Input is not a lightcurve")
+                return self.data[index]
+        except KeyError:
+            print("Object has no keplerid")
 
-    def stitch(self, normalize=False):
-        
-        new_lc = LightCurve(time=[])
-
-        #TODO: Implement this
-        for lc_array in self.data.values():
-            for lc in lc_array:
-                if normalize:
-                    lc = lc.normalize()
-                new_lc.append(lc)
-
-        return new_lc
+    def append(self, lc):
+        self.data.append(lc)
+        self.assign_hash_values()
 
     def __repr__(self):
         result = ""
-        for lightcurve_array in self.data.values():
-            for lightcurve in lightcurve_array:
-                result += lightcurve.__repr__() + " "
+        for lc in self.data:
+            results += lc.__repr__() + " "
             result += "\n"
         return result
 
@@ -1275,10 +1236,8 @@ class LightCurveCollection(object):
         """
         if ax is None:
             _, ax = plt.subplots()
-        for lc_array in self.data.values():
-            for lightcurve in lc_array:
-                lightcurve.plot(ax=ax, label=lightcurve.keplerid)
-
+        for lightcurve in self.data:
+           lightcurve.plot(ax=ax)
         return ax
 
     def pca(self):
