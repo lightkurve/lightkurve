@@ -6,7 +6,7 @@ from numpy.testing import (assert_almost_equal, assert_array_equal,
                            assert_allclose)
 from astropy.io import fits as pyfits
 from ..lightcurve import (LightCurve, KeplerLightCurve, TessLightCurve,
-                          iterative_box_period_search)
+                          iterative_box_period_search, LightCurveCollection)
 from ..lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
 
 # 8th Quarter of Tabby's star
@@ -156,7 +156,6 @@ def test_lightcurve_plot():
         lcf.plot(flux_types=['SAP_FLUX', 'PDCSAP_FLUX'])
         lcf.SAP_FLUX.plot()
         lcf.SAP_FLUX.plot(normalize=False, fill=False, title="Not the default")
-
 
 def test_cdpp():
     """Test the basics of the CDPP noise metric."""
@@ -443,11 +442,10 @@ def test_flatten_robustness():
     flat_lc = lc.flatten(break_tolerance=None)
     assert_allclose(flat_lc.flux, expected_result)
 
-
-@pytest.mark.remote_data
 def test_from_archive_should_accept_path():
     """If a url is passed to `from_archive` it should still just work."""
     KeplerLightCurveFile.from_archive(TABBY_Q8)
+
 
 def test_fill_gaps():
     lc = LightCurve([1,2,3,4,6,7,8], [1,1,1,1,1,1,1])
@@ -462,3 +460,25 @@ def test_fill_gaps():
     assert(np.any(nlc.time == 5))
     assert(np.all(nlc.flux == 1))
     assert(np.all(np.isfinite(nlc.flux)))
+
+@pytest.mark.remote_data
+def test_lc_collection():
+    lc = LightCurve(time=np.arange(1, 5), flux=np.arange(1, 5), flux_err=np.arange(1, 5))
+    
+    lcf = KeplerLightCurveFile(TABBY_Q8)
+    lcc = LightCurveCollection([lcf])
+    
+    assert(len(lcc) == 1)
+    assert(lcc[0] == lcf)
+    assert(type(lcc[lcf.keplerid]) == type(lcf))
+
+    lcc.append(lc)
+
+    assert(len(lcc) == 2)
+    assert(lcc[1] == lc)
+
+    lcc.plot()
+
+    for lc in lcc:
+        print(lc)
+

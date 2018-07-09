@@ -13,14 +13,20 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
 
+
 from . import PACKAGEDIR
 from .lightcurve import KeplerLightCurve, TessLightCurve, LightCurve
 from .prf import SimpleKeplerPRF
 from .utils import KeplerQualityFlags, plot_image, bkjd_to_astropy_time, btjd_to_astropy_time
 from .mast import download_kepler_products
+from .collection import Collection
 
+__all__ = ['KeplerTargetPixelFile', 'TargetPixelFile',
+            'TessTargetPixelFile', 'KeplerTargetPixelFileFactory',
+            'TargetPixelFileCollection']
 
 __all__ = ['KeplerTargetPixelFile', 'TessTargetPixelFile']
+
 log = logging.getLogger(__name__)
 
 
@@ -888,7 +894,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
             factory.add_cadence(frameno=idx, flux=cutout.data, header=hdu.header)
         return factory.get_tpf(**kwargs)
 
-
 class KeplerTargetPixelFileFactory(object):
     """Class to create a KeplerTargetPixelFile."""
 
@@ -1064,8 +1069,7 @@ class KeplerTargetPixelFileFactory(object):
                                       template.comments[kw])
         hdu.header['EXTNAME'] = 'APERTURE'
         return hdu
-
-
+      
 class TessTargetPixelFile(TargetPixelFile):
     """
     Defines a TargetPixelFile class for the TESS Mission.
@@ -1174,3 +1178,35 @@ class TessTargetPixelFile(TargetPixelFile):
                           time_scale='tdb',
                           flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
                           flux_err=self.flux_bkg_err)
+
+class TargetPixelFileCollection(Collection):
+    """Represents a set of Target Pixel Files
+
+    Attributes
+    ----------
+    data: array
+        List of TPF objects.
+    k_id: dictionary
+        Mapping keplerid to index in self.data
+    """
+    def __init__(self, tpfs):
+        super().__init__(tpfs)
+
+    def plot(self, ax=None, **kwargs):
+        """Plots a collection of TPF objects in space.
+
+        Parameters
+        ----------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            A matplotlib axes object to plot into. If no axes is provided,
+            a new one will be generated.
+        
+        kwargs : dict
+            Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
+
+        Returns
+        -------
+        ax : matplotlib.axes._subplots.AxesSubplot
+        """
+        raise NotImplementedError('Should be able to run a PCA on a collection.')
+    

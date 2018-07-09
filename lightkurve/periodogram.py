@@ -1,6 +1,7 @@
 import numpy as np
 from astropy import units as u
 from astropy.stats import LombScargle
+
 from matplotlib import pyplot as plt
 
 __all__ = ['Periodogram']
