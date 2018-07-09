@@ -7,6 +7,7 @@ from tqdm import tqdm
 import os
 import datetime
 import logging
+import pandas as pd
 
 import oktopus
 import numpy as np
@@ -21,8 +22,9 @@ from astropy.io import fits
 from astropy.time import Time
 
 
-from .utils import running_mean, bkjd_to_astropy_time
 from . import PACKAGEDIR
+from .utils import running_mean, bkjd_to_astropy_time, btjd_to_astropy_time
+
 
 __all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve',
            'iterative_box_period_search', 'LightCurveCollection']
@@ -143,6 +145,8 @@ class LightCurve(object):
         # `TimeFormat` class for BKJD.
         if self.time_format == 'bkjd':
             return bkjd_to_astropy_time(self.time)
+        elif self.time_format == 'btjd':  # TESS
+            return btjd_to_astropy_time(self.time)
         return Time(self.time, format=self.time_format, scale=self.time_scale)
 
     def properties(self):
@@ -353,6 +357,49 @@ class LightCurve(object):
             A new ``LightCurve`` from which NaNs fluxes have been removed.
         """
         return self[~np.isnan(self.flux)]  # This will return a sliced copy
+
+    def fill_gaps(lc, method='nearest'):
+        """Fill in gaps in time with linear interpolation.
+
+        Parameters
+        ----------
+        method : string {None, 'backfill'/'bfill', 'pad'/'ffill', 'nearest'}
+            Method to use for gap filling. 'nearest' by default.
+
+        Returns
+        -------
+        nlc : LightCurve object
+            A new ``LightCurve`` in which NaNs values and gaps in time have been
+            filled.
+        """
+        clc = copy.deepcopy(lc.remove_nans())
+        nlc = copy.deepcopy(lc)
+
+        # Average gap between cadences
+        dt = np.nanmedian(clc.time[1::] - clc.time[:-1:])
+
+        # Iterate over flux and flux_err
+        for idx, y in enumerate([clc.flux, clc.flux_err]):
+            # We need to ensure pandas gets the correct byteorder
+            # Background info: https://github.com/astropy/astropy/issues/1156
+            if y.dtype.byteorder == '>':
+                y = y.byteswap().newbyteorder()
+            ts = pd.Series(y, index=clc.time)
+            newindex = [clc.time[0]]
+            for t in clc.time[1::]:
+                prevtime = newindex[-1]
+                while (t - prevtime) > 1.2*dt:
+                    newindex.append(prevtime + dt)
+                    prevtime = newindex[-1]
+                newindex.append(t)
+            ts = ts.reindex(newindex, method=method)
+            if idx == 0:
+                nlc.flux = np.asarray(ts)
+            elif idx == 1:
+                nlc.flux_err = np.asarray(ts)
+
+        nlc.time = np.asarray(ts.index)
+        return nlc
 
     def remove_outliers(self, sigma=5., return_mask=False, **kwargs):
         """Removes outlier flux values using sigma-clipping.
@@ -639,75 +686,21 @@ class LightCurve(object):
         return self.to_pandas().to_csv(path_or_buf=path_or_buf, **kwargs)
 
 
-    def createPowerFrequencyPlot(self, ax=None, **kwargs):
-        from astropy import units
-        from astropy.stats import LombScargle
-        m = (self.quality == 0)
-        m &= np.isfinite(self.time)
-        m &= np.isfinite(self.flux)
-        t = self.time[m]
-        y = 1e6 * (self.flux[m] - 1.0)
-        
-        uHz_conv = 1e-6 * 24 * 60 * 60
-        frequency_uHz = np.linspace(1, 300, 100000)
-        #frequency = frequency_uHz * units.Hz * units.micron
-        frequency = frequency_uHz * uHz_conv
+    def periodogram(self, frequencies=None):
+        """Returns a `Periodogram`.
 
-        model = LombScargle(t, y)
-        power = model.power(frequency, method="fast", normalization="psd")
-        power *= uHz_conv / len(t)
+        Parameters
+        ----------
+        frequencies : array-like
+            Frequencies in microhertz. (Optional.)
 
-        if ax is None:
-            _, ax = plt.subplots(1)
-        ax.semilogy(frequency_uHz, power, "k")
-        #ax.set_ylim(1e-2, 1e1)
-        ax.set_xlim(frequency_uHz[0], frequency_uHz[-1])
-        ax.set_xlabel("frequency [$\mu$Hz]")
-        ax.set_ylabel("power [ppm$^2$/$\mu$Hz")
-
-        if 'normalize_seismology' in kwargs:
-            ax = self.normalizePowerFrequencyPlot(frequency_uHz, power, ax, **kwargs)
-
-        return ax
-
-    def normalizePowerFrequencyPlot(self, frequency_uHz, power, ax, **kwargs):
-        from scipy.ndimage.filters import gaussian_filter
-        bkg = self.estimate_background(frequency_uHz, power)
-        df = frequency_uHz[1] - frequency_uHz[0]
-        normalized_power = power / bkg
-        smoothed_ps = gaussian_filter(normalized_power, 10 / df)
-        peak_freqs = frequency_uHz[self.find_peaks(smoothed_ps)]
-        nu_max = peak_freqs[peak_freqs > 5][0]
-
-        factor = np.max(normalized_power) / np.max(smoothed_ps)
-        ax.semilogy(frequency_uHz, normalized_power, "k")
-        ax.plot(frequency_uHz, smoothed_ps, label="smoothed", color="C1")
-        ax.axvline(nu_max, label="$\\nu_\mathrm{{max}} = {0:.2f}\,\mu\mathrm{{Hz}}$".format(nu_max))
-        ax.set_ylim(1e-1, 3e2)
-        ax.set_xlim(frequency_uHz[0], frequency_uHz[-1])
-        ax.legend()
-        ax.set_xlabel("frequency [$\mu$Hz]")
-        ax.set_ylabel("normalized power")
-
-        return ax
-
-    def estimate_background(self, x, y, log_width=.01):
-        count = np.zeros(len(x), dtype=int)
-        bkg = np.zeros_like(x)
-        x0 = np.log10(x[0])
-        while x0 < np.log10(x[-1]):
-            m = np.abs(np.log10(x) - x0) < log_width
-            bkg[m] += np.median(y[m])
-            count[m] += 1
-            x0 += 0.5 * log_width
-        return bkg / count
-
-    def find_peaks(self, z):
-        peak_inds = (z[1:-1] > z[:-2]) * (z[1:-1] > z[2:])
-        peak_inds = np.arange(1, len(z)-1)[peak_inds]
-        peak_inds = peak_inds[np.argsort(z[peak_inds])][::-1]
-        return peak_inds
-
+        Returns
+        -------
+        Periodogram : `Periodogram` object
+            Returns a Periodogram object extracted from the lightcurve.
+        """
+        from . import Periodogram
+        return Periodogram.from_lightcurve(lc=self)
     def to_fits(self, path=None, overwrite=False, **extra_data):
         """Writes the KeplerLightCurve to a fits file.
 
@@ -846,6 +839,12 @@ class KeplerLightCurve(LightCurve):
         Data flux for every time point
     flux_err : array-like
         Uncertainty on each flux data point
+    time_format : str
+        String specifying how an instant of time is represented,
+        e.g. 'bkjd' or 'jd'.
+    time_scale : str
+        String which specifies how the time is measured,
+        e.g. tdb', 'tt', 'ut1', or 'utc'.
     centroid_col : array-like
         Centroid column coordinates as a function of time
     centroid_row : array-like
@@ -871,7 +870,8 @@ class KeplerLightCurve(LightCurve):
                  centroid_col=None, centroid_row=None, quality=None, quality_bitmask=None,
                  channel=None, campaign=None, quarter=None, mission=None,
                  cadenceno=None, keplerid=None, ra=None, dec=None):
-        super(KeplerLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err, time_format=time_format, time_scale=time_scale)
+        super(KeplerLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err,
+                                               time_format=time_format, time_scale=time_scale)
         self.centroid_col = self._validate_array(centroid_col, name='centroid_col')
         self.centroid_row = self._validate_array(centroid_row, name='centroid_row')
         self.quality = self._validate_array(quality, name='quality')
@@ -1005,6 +1005,12 @@ class TessLightCurve(LightCurve):
         Data flux for every time point
     flux_err : array-like
         Uncertainty on each flux data point
+    time_format : str
+        String specifying how an instant of time is represented,
+        e.g. 'bkjd' or 'jd'.
+    time_scale : str
+        String which specifies how the time is measured,
+        e.g. tdb', 'tt', 'ut1', or 'utc'.
     centroid_col, centroid_row : array-like, array-like
         Centroid column and row coordinates as a function of time
     quality : array-like
@@ -1016,22 +1022,30 @@ class TessLightCurve(LightCurve):
     ticid : int
         Tess Input Catalog ID number
     """
-    def __init__(self, time, flux=None, flux_err=None, centroid_col=None,
-                 centroid_row=None, quality=None, quality_bitmask=None,
-                 cadenceno=None, ticid=None):
-        super(TessLightCurve, self).__init__(time, flux, flux_err)
+    def __init__(self, time, flux=None, flux_err=None, time_format=None, time_scale=None,
+                 centroid_col=None, centroid_row=None, quality=None, quality_bitmask=None,
+                 cadenceno=None, sector=None, camera=None, ccd=None,
+                 ticid=None, ra=None, dec=None):
+        super(TessLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err,
+                                             time_format=time_format, time_scale=time_scale)
         self.centroid_col = self._validate_array(centroid_col, name='centroid_col')
         self.centroid_row = self._validate_array(centroid_row, name='centroid_row')
         self.quality = self._validate_array(quality, name='quality')
         self.cadenceno = self._validate_array(cadenceno)
         self.quality_bitmask = quality_bitmask
         self.mission = "TESS"
+        self.sector = sector
+        self.camera = camera
+        self.ccd = ccd
         self.ticid = ticid
+        self.ra = ra
+        self.dec = dec
 
     def __getitem__(self, key):
         lc = super(TessLightCurve, self).__getitem__(key)
         # Compared to `LightCurve`, we need to slice a few additional arrays:
         lc.quality = self.quality[key]
+        lc.cadenceno = self.cadenceno[key]
         lc.centroid_col = self.centroid_col[key]
         lc.centroid_row = self.centroid_row[key]
         return lc

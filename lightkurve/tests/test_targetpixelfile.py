@@ -6,7 +6,9 @@ import numpy as np
 from numpy.testing import assert_array_equal
 import pytest
 import tempfile
-from ..targetpixelfile import KeplerTargetPixelFile, KeplerTargetPixelFileFactory, TargetPixelFileCollection
+from ..targetpixelfile import KeplerTargetPixelFile, KeplerTargetPixelFileFactory
+from ..targetpixelfile import TessTargetPixelFile
+
 from ..utils import KeplerQualityFlags
 
 
@@ -16,6 +18,8 @@ TABBY_Q8 = ("https://archive.stsci.edu/missions/kepler/lightcurves"
             "/0084/008462852/kplr008462852-2011073133259_llc.fits")
 TABBY_TPF = ("https://archive.stsci.edu/missions/kepler/target_pixel_files"
              "/0084/008462852/kplr008462852-2011073133259_lpd-targ.fits.gz")
+TESS_SIM = ("https://archive.stsci.edu/missions/tess/ete-6/tid/00/000"
+            "/004/176/tess2019128220341-0000000417699452-0016-s_tp.fits")
 
 
 @pytest.mark.remote_data
@@ -24,32 +28,37 @@ def test_load_bad_file():
     with pytest.raises(ValueError) as exc:
         tpf = KeplerTargetPixelFile(TABBY_Q8)
     assert('is this a target pixel file?' in exc.value.args[0])
+    with pytest.raises(ValueError) as exc:
+        tpf = TessTargetPixelFile(TABBY_Q8)
+    assert('is this a target pixel file?' in exc.value.args[0])
 
 
 def test_tpf_shapes():
     """Are the data array shapes of the TargetPixelFile object consistent?"""
-    tpf = KeplerTargetPixelFile(filename_tpf_all_zeros)
-    assert tpf.quality_mask.shape == tpf.hdu[1].data['TIME'].shape
-    assert tpf.flux.shape == tpf.flux_err.shape
+    for tpf in [KeplerTargetPixelFile(filename_tpf_all_zeros),
+                TessTargetPixelFile(filename_tpf_all_zeros)]:
+        assert tpf.quality_mask.shape == tpf.hdu[1].data['TIME'].shape
+        assert tpf.flux.shape == tpf.flux_err.shape
 
 
 def test_tpf_plot():
     """Sanity check to verify that tpf plotting works"""
-    tpf = KeplerTargetPixelFile(filename_tpf_one_center)
-    tpf.plot()
-    tpf.plot(aperture_mask=tpf.pipeline_mask)
-    tpf.plot(aperture_mask='all')
-    tpf.plot(frame=5)
-    with pytest.raises(ValueError):
-        tpf.plot(frame=999999)
-    tpf.plot(cadenceno=125250)
-    with pytest.raises(ValueError):
-        tpf.plot(cadenceno=999)
-    tpf.plot(bkg=True)
-    tpf.plot(scale="sqrt")
-    tpf.plot(scale="log")
-    with pytest.raises(ValueError):
-        tpf.plot(scale="blabla")
+    for tpf in [KeplerTargetPixelFile(filename_tpf_one_center),
+                TessTargetPixelFile(filename_tpf_one_center)]:
+        tpf.plot()
+        tpf.plot(aperture_mask=tpf.pipeline_mask)
+        tpf.plot(aperture_mask='all')
+        tpf.plot(frame=5)
+        with pytest.raises(ValueError):
+            tpf.plot(frame=999999)
+        tpf.plot(cadenceno=125250)
+        with pytest.raises(ValueError):
+            tpf.plot(cadenceno=999)
+        tpf.plot(bkg=True)
+        tpf.plot(scale="sqrt")
+        tpf.plot(scale="log")
+        with pytest.raises(ValueError):
+            tpf.plot(scale="blabla")
 
 
 def test_tpf_zeros():
@@ -71,13 +80,14 @@ def test_tpf_zeros():
 
 def test_tpf_ones():
     """Does the LightCurve of a one-flux TPF make sense?"""
-    tpf = KeplerTargetPixelFile(filename_tpf_one_center)
-    lc = tpf.to_lightcurve(aperture_mask='all')
-    assert np.all(lc.flux == 1)
-    assert np.all((lc.centroid_col < tpf.column+tpf.shape[1]).all()
-                  * (lc.centroid_col > tpf.column).all())
-    assert np.all((lc.centroid_row < tpf.row+tpf.shape[2]).all()
-                  * (lc.centroid_row > tpf.row).all())
+    for tpf in [KeplerTargetPixelFile(filename_tpf_one_center),
+                TessTargetPixelFile(filename_tpf_one_center)]:
+        lc = tpf.to_lightcurve(aperture_mask='all')
+        assert np.all(lc.flux == 1)
+        assert np.all((lc.centroid_col < tpf.column+tpf.shape[1]).all()
+                      * (lc.centroid_col > tpf.column).all())
+        assert np.all((lc.centroid_row < tpf.row+tpf.shape[2]).all()
+                      * (lc.centroid_row > tpf.row).all())
 
 
 def test_quality_flag_decoding():
@@ -103,13 +113,14 @@ def test_bitmasking(quality_bitmask, answer):
 
 
 def test_wcs():
-    '''Test the get_wcs function'''
-    tpf = KeplerTargetPixelFile(filename_tpf_one_center)
-    w = tpf.wcs
-    ra, dec = tpf.get_coordinates()
-    assert ra.shape == tpf.shape
-    assert dec.shape == tpf.shape
-    assert type(w).__name__ == 'WCS'
+    """Test the wcs property."""
+    for tpf in [KeplerTargetPixelFile(filename_tpf_one_center),
+                TessTargetPixelFile(filename_tpf_one_center)]:
+        w = tpf.wcs
+        ra, dec = tpf.get_coordinates()
+        assert ra.shape == tpf.shape
+        assert dec.shape == tpf.shape
+        assert type(w).__name__ == 'WCS'
 
 
 def test_wcs_tabby():
@@ -128,12 +139,11 @@ def test_wcs_tabby():
 
 def test_astropy_time():
     '''Test the lc.date() function'''
-    tpf = KeplerTargetPixelFile(filename_tpf_all_zeros)
-    astropy_time = tpf.astropy_time
-    assert astropy_time.scale == 'tdb'
-    assert len(astropy_time.iso) == len(tpf.time)
-    #assert date[0] == '2016-04-22 14:19:41.510'
-    #assert date[-1] == '2016-05-18 22:27:43.895'
+    for tpf in [KeplerTargetPixelFile(filename_tpf_all_zeros),
+                TessTargetPixelFile(filename_tpf_all_zeros)]:
+        astropy_time = tpf.astropy_time
+        assert astropy_time.scale == 'tdb'
+        assert len(astropy_time.iso) == len(tpf.time)
 
 
 def test_properties():
@@ -155,32 +165,35 @@ def test_properties():
 
 def test_repr():
     """Do __str__ and __repr__ work?"""
-    tpf = KeplerTargetPixelFile(filename_tpf_all_zeros)
-    str(tpf)
-    repr(tpf)
+    for tpf in [KeplerTargetPixelFile(filename_tpf_all_zeros),
+                TessTargetPixelFile(filename_tpf_all_zeros)]:
+        str(tpf)
+        repr(tpf)
 
 
 def test_to_lightcurve():
-    tpf = KeplerTargetPixelFile(filename_tpf_all_zeros)
-    lc = tpf.to_lightcurve()
-    assert lc.astropy_time.scale == 'tdb'
-    tpf.to_lightcurve(aperture_mask='all')
-    bglc = tpf.get_bkg_lightcurve()
-    assert bglc.astropy_time.scale == 'tdb'
-    tpf.get_bkg_lightcurve(aperture_mask='all')
+    for tpf in [KeplerTargetPixelFile(filename_tpf_all_zeros),
+                TessTargetPixelFile(filename_tpf_all_zeros)]:
+        lc = tpf.to_lightcurve()
+        assert lc.astropy_time.scale == 'tdb'
+        tpf.to_lightcurve(aperture_mask='all')
+        bglc = tpf.get_bkg_lightcurve()
+        assert bglc.astropy_time.scale == 'tdb'
+        tpf.get_bkg_lightcurve(aperture_mask='all')
 
 
 def test_tpf_to_fits():
     """Can we write a TPF back to a fits file?"""
-    tpf = KeplerTargetPixelFile(filename_tpf_all_zeros)
-    # `delete=False` is necessary to enable writing to the file on Windows
-    # but it means we have to clean up the tmp file ourselves
-    tmp = tempfile.NamedTemporaryFile(delete=False)
-    try:
-        tpf.to_fits(tmp.name)
-    finally:
-        tmp.close()
-        os.remove(tmp.name)
+    for tpf in [KeplerTargetPixelFile(filename_tpf_all_zeros),
+                TessTargetPixelFile(filename_tpf_all_zeros)]:
+        # `delete=False` is necessary to enable writing to the file on Windows
+        # but it means we have to clean up the tmp file ourselves
+        tmp = tempfile.NamedTemporaryFile(delete=False)
+        try:
+            tpf.to_fits(tmp.name)
+        finally:
+            tmp.close()
+            os.remove(tmp.name)
 
 
 def test_tpf_factory():
@@ -199,7 +212,7 @@ def test_tpf_factory():
     assert(tpf.time[9] == 95)
 
 
-def test_properties(capfd):
+def test_properties2(capfd):
     '''Test if the describe function produces an output.
     The output is 1870 characters at the moment, but we might add more properties.'''
     tpf = KeplerTargetPixelFile(filename_tpf_all_zeros)
@@ -210,9 +223,10 @@ def test_properties(capfd):
 
 def test_interact():
     """Test the Jupyter notebook interact() widget."""
-    tpf = KeplerTargetPixelFile(filename_tpf_one_center)
-    tpf.interact()
-    tpf.interact(lc=tpf.to_lightcurve(aperture_mask='all'))
+    for tpf in [KeplerTargetPixelFile(filename_tpf_one_center),
+                TessTargetPixelFile(filename_tpf_one_center)]:
+        tpf.interact()
+        tpf.interact(lc=tpf.to_lightcurve(aperture_mask='all'))
 
 
 

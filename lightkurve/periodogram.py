@@ -1,60 +1,78 @@
 import numpy as np
 from astropy import units as u
 from astropy.stats import LombScargle
-from scipy.ndimage.filters import gaussian_filter
+
 from matplotlib import pyplot as plt
 
 __all__ = ['Periodogram']
 
+
 class Periodogram(object):
-	"""
-	Implements a simple class for a generic periodogram
-	"""
-	def __init__(self, delta_nu=None, nu_max=None, period=None,
-				frequency=None, model=LombScargle, power=None, 
-				t=None):
-		self.delta_nu = delta_nu
-		self.nu_max = nu_max
-		self.period = period
-		self.t = t
-		self.frequency = frequency
-		self.model = model
-		self.power = power
+    """Represents a power spectrum.
 
-	def from_lightcurve(lc, model=LombScargle, normalization="psd"):
-		m = (lc.quality == 0)
-		m &= np.isfinite(lc.time)
-		m &= np.isfinite(lc.flux)
-		t = lc.time[m]
-		y = 1e6 * (lc.flux[m] - 1.0)
-		model = model(t, y)
+    Attributes
+    ----------
+    frequencies : array-like
+        List of frequencies.
+    powers : array-like
+        Power measurements.
+    """
+    def __init__(self, frequencies=None, powers=None):
+        self.frequencies = frequencies
+        self.powers = powers
 
-		return Periodogram(model=model, t=t)
-	
-	def get_power(self, frequency=None, normalization="psd", method="fast"):
-		uHz = u.Hz * 1e-6
-		if frequency is None:
-			#Create some 'reasonable' default for them.
-			self.frequency = np.linspace(1, 300, 100000) * uHz
-		else:
-			#TODO: check units for frequency
-			self.frequency = frequency
+    @staticmethod
+    def from_lightcurve(lc):
+        """Creates a Periodogram object from a LightCurve instance using
+        the Lomb-Scargle method.
 
-		self.power = self.model.power(self.frequency.value, method=method, normalization=normalization)
-		self.power *= (uHz / len(self.t)).value
+        Caution: for the time being, this method assumes that lc.time is
+        given in units of days.  In the future, we should use the lc.time_format
+        attribute to verify this.
+        """
+        nyquist_frequency = 0.5 * (1./((np.median(lc.time[1:] - lc.time[0:-1])*u.day).to(u.second))).to(u.microhertz).value
+        frequencies = np.linspace(1, nyquist_frequency, len(lc.time) // 2) * u.microhertz
+        lombscargle = LombScargle((lc.time * u.day).to(u.second), lc.flux * 1e6)
+        uHz_conv = 1./(((1./u.day).to(u.microhertz)))
+        powers = lombscargle.power(frequencies, method="fast", normalization="psd")
+        powers *= uHz_conv / len(lc.time)  # Convert to ppm^2/uHz
+        return Periodogram(frequencies=frequencies, powers=powers)
 
-	def get_period(self):
-		#TODO: implement me
-		pass
+    def plot(self, frequency=None, scale="linear", ax=None, numax=None, **kwargs):
+        """Plots the periodogram.
 
-	def plot(self, ax=None, **kwargs):
-		if ax is None:
-			_, ax = plt.subplots(1)
-		ax.semilogy(self.frequency.value, self.power, "k")
-		ax.set_xlim(self.frequency[0].value, self.frequency[-1].value)
-		ax.set_xlabel("frequency [$\mu$Hz]")
-		ax.set_ylabel("power [ppm$^2$/$\mu$Hz")
+        Parameters
+        ----------
+        frequency: array-like
+            Over what frequencies (in microhertz) will periodogram plot
+        scale: str
+            Set x,y axis to be "linear" or "log". Default is linear.
+        ax : matplotlib.axes._subplots.AxesSubplot
+            A matplotlib axes object to plot into. If no axes is provided,
+            a new one will be generated.
+        numax: bool
+            Plot the numax value as well?
+        kwargs : dict
+            Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
 
-		return ax
+        Returns
+        -------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            The matplotlib axes object.
 
-
+        """
+        if ax is None:
+            fig, ax = plt.subplots()
+        # Plot frequency and power
+        ax.plot(self.frequencies, self.powers, **kwargs)
+        ax.set_xlabel("Frequency [$\mu$Hz]")
+        ax.set_ylabel("Power [ppm$^2$/$\mu$Hz]")
+        if numax:
+            ax.fill_between([numax.value*0.8, numax.value*1.2],
+                            self.powers.value.min(),
+                            self.powers.value.max(),
+                            alpha=0.2, color='C3', zorder=10)
+        if scale == "log":
+            ax.set_yscale('log')
+            ax.set_xscale('log')
+        return ax
