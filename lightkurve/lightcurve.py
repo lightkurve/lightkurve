@@ -1178,14 +1178,34 @@ def iterative_box_period_search(lc, niters=2, min_period=0.5, max_period=30,
     return log_posterior, trial_periods, trial_periods[np.argmax(log_posterior)]
 
 class LightCurveCollection(object):
-    """
-    Collects multiple LightCurve objects together with helpful functions.
+    """Represents a set of LightCurves
+
+    Attributes
+    ----------
+    data: array
+        List of lightcurve objects.
+    k_id: dictionary
+        Mapping keplerid to index in self.data
     """
     def __init__(self, lightcurves):
         self.data = lightcurves
         self.k_id = self.assign_hash_values()
 
+    
     def assign_hash_values(self):
+        """
+        Assigns the keplerid to indexes in self.data
+        
+        Parameters:
+        -----------
+        None
+
+        Returns
+        -------
+        result: Dictionary
+            With keys of keplerid (int) and 
+            values of indexes (int) in the data array.
+        """
         result = {}
         for idx,lc in enumerate(self.data):
             try:
@@ -1198,6 +1218,18 @@ class LightCurveCollection(object):
         return len(self.data)
 
     def __getitem__(self, index):
+        """Called when indexing into LCC or such as when looping.
+
+        Parameters:
+        -----------
+        Index: int
+            This is either the index of the array or
+            the keplerid of the LC.
+
+        Returns:
+        --------
+        Lightcurve Object
+        """
         try: 
             if index > len(self.data):
                 return self.data[self.k_id[index]]
@@ -1207,10 +1239,32 @@ class LightCurveCollection(object):
             print("Object has no keplerid")
 
     def append(self, lc):
+        """Appends lightcurve object to LCC
+
+        Parameters:
+        -----------
+        lc: LightCurve object
+            Lightcurve target
+
+        Returns:
+        --------
+        None
+        """
         self.data.append(lc)
-        self.assign_hash_values()
+        try:
+            self.k_id[lc.keplerid] = len(self.data)-1
+        except AttributeError:
+            print("Object no keplerid")
 
     def __repr__(self):
+        """Used in printing
+        
+        Used to print out all the items in lcc
+        
+        Returns:
+        result: str
+            String containing the resulting lightcurves.
+        """
         result = ""
         for lc in self.data:
             results += lc.__repr__() + " "

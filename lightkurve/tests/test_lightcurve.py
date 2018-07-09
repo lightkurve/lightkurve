@@ -477,8 +477,8 @@ def test_lcc_init():
     assert(len(lcc) == 2)
     assert(lcc[1] == lc)
 
-
-
     lcc.plot()
 
-
+    for lc in lcc:
+        print(lc)
+        
