@@ -1096,10 +1096,12 @@ class KeplerTargetPixelFileFactory(object):
         except:
             hdu.header['RA_OBJ'] = 'nan'
             hdu.header['DEC_OBJ'] = 'nan'
+        hdu.header['CHANNEL'] = self.keywords['CHANNEL']
+        hdu.header['CAMPAIGN'] = self.keywords['CAMPAIGN']
 
         # Empty a bunch of keywords rather than having incorrect info
-        for kw in ["PROCVER", "FILEVER", "CHANNEL", "MODULE", "OUTPUT",
-                   "TIMVERSN", "CAMPAIGN", "DATA_REL", "TTABLEID"]:
+        for kw in ["PROCVER", "FILEVER", "MODULE", "OUTPUT",
+                   "TIMVERSN", "DATA_REL", "TTABLEID"]:
             hdu.header[kw] = ""
         return hdu
 
