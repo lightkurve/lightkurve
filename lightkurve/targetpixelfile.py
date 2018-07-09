@@ -1093,11 +1093,13 @@ class KeplerTargetPixelFileFactory(object):
         try:
             hdu.header['RA_OBJ'] = self.keywords['RA_OBJ']
             hdu.header['DEC_OBJ'] = self.keywords['DEC_OBJ']
+            hdu.header['CHANNEL'] = self.keywords['CHANNEL']
+            hdu.header['CAMPAIGN'] = self.keywords['CAMPAIGN']
         except:
             hdu.header['RA_OBJ'] = 'nan'
             hdu.header['DEC_OBJ'] = 'nan'
-        hdu.header['CHANNEL'] = self.keywords['CHANNEL']
-        hdu.header['CAMPAIGN'] = self.keywords['CAMPAIGN']
+            hdu.header['CHANNEL'] = 'nan'
+            hdu.header['CAMPAIGN'] = 'nan'
 
         # Empty a bunch of keywords rather than having incorrect info
         for kw in ["PROCVER", "FILEVER", "MODULE", "OUTPUT",
