@@ -462,7 +462,7 @@ def test_fill_gaps():
     assert(np.all(np.isfinite(nlc.flux)))
 
 @pytest.mark.remote_data
-def test_lcc_init():
+def test_lc_collection():
     lc = LightCurve(time=np.arange(1, 5), flux=np.arange(1, 5), flux_err=np.arange(1, 5))
     
     lcf = KeplerLightCurveFile(TABBY_Q8)
@@ -481,4 +481,4 @@ def test_lcc_init():
 
     for lc in lcc:
         print(lc)
-        
+

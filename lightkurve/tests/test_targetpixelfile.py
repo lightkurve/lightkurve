@@ -7,7 +7,7 @@ from numpy.testing import assert_array_equal
 import pytest
 import tempfile
 from ..targetpixelfile import KeplerTargetPixelFile, KeplerTargetPixelFileFactory
-from ..targetpixelfile import TessTargetPixelFile
+from ..targetpixelfile import TessTargetPixelFile, TargetPixelFileCollection
 
 from ..utils import KeplerQualityFlags
 
@@ -231,4 +231,24 @@ def test_interact():
 def test_from_archive_should_accept_path():
     """If a path is accidentally passed to `from_archive` it should still just work."""
     KeplerTargetPixelFile.from_archive(filename_tpf_all_zeros)
+
+@pytest.mark.remote_data
+def test_tpf_collection():
+    tpf1 = KeplerTargetPixelFile(filename_tpf_all_zeros)
+    tpf2 = KeplerTargetPixelFile(filename_tpf_one_center)
+
+    tpf_collection = TargetPixelFileCollection([tpf1])
+
+    assert(len(tpf_collection) == 1)
+    assert(tpf_collection[0] == tpf1)
+
+    tpf_collection.append(tpf2)
+
+    assert(len(tpf_collection) == 2)
+    assert(tpf_collection[1] == tpf2)
+
+    for tpf in tpf_collection:
+        print(tpf)
+
+
 
