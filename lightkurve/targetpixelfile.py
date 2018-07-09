@@ -1186,7 +1186,7 @@ class TargetPixelFileCollection(Collection):
         Mapping keplerid to index in self.data
     """
     def __init__(self, tpfs):
-        super().__init__(tpfs)
+        super(TargetPixelFileCollection, self).__init__(tpfs)
 
     def plot(self, ax=None, **kwargs):
         """Plots a collection of TPF objects in space.
@@ -1196,7 +1196,7 @@ class TargetPixelFileCollection(Collection):
         ax : matplotlib.axes._subplots.AxesSubplot
             A matplotlib axes object to plot into. If no axes is provided,
             a new one will be generated.
-        
+
         kwargs : dict
             Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
 
@@ -1205,4 +1205,3 @@ class TargetPixelFileCollection(Collection):
         ax : matplotlib.axes._subplots.AxesSubplot
         """
         raise NotImplementedError('Plotting TPFs has not been implemented')
-    

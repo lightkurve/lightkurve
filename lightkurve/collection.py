@@ -2,7 +2,7 @@ from abc import abstractmethod, ABCMeta
 
 __all__ = ['Collection']
 
-class Collection(metaclass=ABCMeta):
+class Collection:
     """Abstract Base Class for LightCurveCollections, TPFCollections
 
     Attributes
@@ -12,14 +12,15 @@ class Collection(metaclass=ABCMeta):
     k_id: dictionary
         Mapping keplerid to index in self.data
     """
+    __metaclass__ = ABCMeta #Needs to be set for Python 2.x to work properly
     def __init__(self, data):
         self.data = data
         self.k_id = self.assign_hash_values()
-    
+
     def assign_hash_values(self):
         """
         Assigns the keplerid to indexes in self.data
-        
+
         Parameters:
         -----------
         None
@@ -27,7 +28,7 @@ class Collection(metaclass=ABCMeta):
         Returns
         -------
         result: Dictionary
-            With keys of keplerid (int) and 
+            With keys of keplerid (int) and
             values of indexes (int) in the data array.
         """
         result = {}
@@ -54,7 +55,7 @@ class Collection(metaclass=ABCMeta):
         --------
         Lightcurve Object
         """
-        try: 
+        try:
             if index > len(self.data):
                 return self.data[self.k_id[index]]
             else:
@@ -82,9 +83,9 @@ class Collection(metaclass=ABCMeta):
 
     def __repr__(self):
         """Used in printing
-        
+
         Used to print out all the items in lcc
-        
+
         Returns:
         result: str
             String containing the resulting lightcurves.

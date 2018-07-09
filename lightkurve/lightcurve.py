@@ -1183,7 +1183,7 @@ class LightCurveCollection(Collection):
         Mapping keplerid to index in self.data
     """
     def __init__(self, lightcurves):
-        super().__init__(lightcurves)
+        super(LightCurveCollection, self).__init__(lightcurves)
 
     def plot(self, ax=None, **kwargs):
         """Plots a collection of light curve.
@@ -1193,7 +1193,7 @@ class LightCurveCollection(Collection):
         ax : matplotlib.axes._subplots.AxesSubplot
             A matplotlib axes object to plot into. If no axes is provided,
             a new one will be generated.
-        
+
         kwargs : dict
             Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
 
