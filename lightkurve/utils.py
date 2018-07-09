@@ -1,9 +1,11 @@
 from __future__ import division, print_function
+import sys
 
 from astropy.visualization import (PercentileInterval, ImageNormalize,
-                                   SqrtStretch, LogStretch, LinearStretch)
+                                   SqrtStretch, LinearStretch)
 from astropy.time import Time
 import matplotlib.pyplot as plt
+from matplotlib.colors import LogNorm
 import numpy as np
 
 
@@ -305,7 +307,10 @@ def plot_image(image, ax=None, scale='linear', origin='lower',
         elif scale == 'sqrt':
             norm = ImageNormalize(vmin=vmin, vmax=vmax, stretch=SqrtStretch())
         elif scale == 'log':
-            norm = ImageNormalize(vmin=vmin, vmax=vmax, stretch=LogStretch())
+            # To use log scale we need to guarantee that vmin > 0, so that
+            # we avoid division by zero and/or negative values.
+            norm = LogNorm(vmin=max(vmin, sys.float_info.epsilon), vmax=vmax,
+                           clip=True)
         else:
             raise ValueError("scale {} is not available.".format(scale))
 
