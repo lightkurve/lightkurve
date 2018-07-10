@@ -278,9 +278,45 @@ def inject(lc, model):
                                signaltype=model.signaltype, **model.params)
 
 
-def recover(lc, signal_type, **kwargs):
+def recover(lc, signal_type, x0, **kwargs):
+    import scipy.optimize as op
 
-    def neg_log_like(theta):
+    if signal_type == 'Supernova':
+
+        def ln_like(theta):
+            T0, z, amplitude, background = theta
+            if (z < 0) or (z > 1) or (T0 < np.min(lc.time)) or (T0 > np.max(lc.time)):
+                return -1.e99
+            model = SupernovaModel(T0, z=z, amplitude=amplitude, bandpass='kepler')
+            model = model.evaluate(lc.time) + background
+            inv_sigma2 = 1.0/(lc.flux_err**2)
+            chisq = (np.sum((lc.flux-model)**2*inv_sigma2))
+            lnlikelihood = -0.5*chisq
+            return lnlikelihood
+
+
+        def lnprior_optimization(theta):
+            T0, z, amplitude, background = theta
+            if (z < 0) or (z > 1):
+                return -1.e99
+            return 0.0
+
+
+        def neg_ln_posterior(theta):
+            log_posterior = lnprior_optimization(theta) + ln_like(theta)
+            return -1 * log_posterior
+
+
+        x0 = x0
+
+        result = op.minimize(neg_ln_posterior, x0)
+
+        return result
+
+
+
+    elif signal_type == 'Planet':
         pass
 
-    return
+    else:
+        pass
