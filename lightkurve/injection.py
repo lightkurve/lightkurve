@@ -311,12 +311,61 @@ def recover(lc, signal_type, x0, **kwargs):
 
         result = op.minimize(neg_ln_posterior, x0)
 
-        return result
+        return result.x
 
 
 
     elif signal_type == 'Planet':
-        pass
+
+        import batman
+
+        #First a BLS search:
+
+        from astropy.stats import BLS
+
+        model = BLS(lc.time, lc.flux, dy=0.01)
+        periodogram = model.autopower(0.2)
+        best_index = np.argmax(periodogram.power)
+        bls_period = periodogram.period[best_index]
+        depth = periodogram.depth[best_index]
+        bls_rprs = np.sqrt(depth)
+
+        bls_T0 = periodogram.transit_time[best_index]
+
+
+
+
+
+        def ln_like(theta):
+            period, rprs, T0 = theta
+
+            params = batman.TransitParams()       #object to store transit parameters
+            params.t0 = T0                        #time of inferior conjunction
+            params.per = period                   #orbital period
+            params.rp = rprs                      #planet radius (in units of stellar radii)
+            params.a = 15.                        #semi-major axis (in units of stellar radii)
+            params.inc = 90.                      #orbital inclination (in degrees)
+            params.ecc = 0.                       #eccentricity
+            params.w = 90.                        #longitude of periastron (in degrees)
+            params.limb_dark = "nonlinear"        #limb darkening model
+            params.u = [0.5, 0.1, 0.1, -0.1]      #limb darkening coefficients [u1, u2, u3, u4]
+
+            t = lc.time.astype(np.float)
+            m = batman.TransitModel(params, t, fac=1.0)
+            flux = m.light_curve(params)
+
+            inv_sigma2 = 1.0/(lc.flux_err**2)
+            chisq = (np.sum((lc.flux - flux)**2 * inv_sigma2))
+            lnlikelihood = -0.5*chisq
+
+            return lnlikelihood
+
+        def neg_ln_posterior(theta):
+            return -ln_like(theta)
+
+        result = op.minimize(neg_ln_posterior, [bls_period, bls_rprs, bls_T0])
+
+        return result.x
 
     else:
-        pass
+        print('You can only recover supernovae and transits right now')
