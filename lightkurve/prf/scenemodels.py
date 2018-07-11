@@ -503,7 +503,7 @@ class SceneModel(object):
         # We assume the background gradient is proportional to one
         grad.append([np.ones(self.prfmodel.shape)])
         # We assume the gradient of other parameters is one
-        for i in range(len([*params_array]) - 3 * len(params.stars) - 1):
+        for i in range(len([params_array]) - 3 * len(params.stars) - 1):
             grad.append([np.ones(self.prfmodel.shape)])
         grad = sum(grad, [])
         return grad
