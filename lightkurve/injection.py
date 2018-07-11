@@ -409,5 +409,54 @@ def recover(time, flux, flux_err, signal_type, source='hsiao', bandpass='kepler'
         return result.x
 
     else:
-        print('Signal Type not supported')
+        print('Signal Type not supported.')
         return
+
+
+
+#THIS IS A SKETCH. IT DOESN'T WORK YET
+"""
+def injrec_test(lc, signal_type, iters, **kwargs):
+    ""kwargs are distribution classes. for example. period=UniformDistribution(1, 9), rprs=GaussianDistribution(0.1, 0.05)
+    it will be different for supernovae.
+    ""
+
+    if signal_type == 'Supernova':
+        return 0
+
+    elif signal_type == 'Planet':
+        for i in iters:
+            lcinj = lc.inject
+            p, r, t = lcinj.recover
+            if p>0.3real and r>0.3real:
+                nrecovered += 1
+
+        return nrecovered
+
+
+    else:
+        print('Signal type not supported.')
+        return
+"""
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#hello

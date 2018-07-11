@@ -576,7 +576,7 @@ class LightCurve(object):
 
     def inject(self, model):
         from lightkurve import injection as inj
-        
+
         return inj.inject(self.time, self.flux, self.flux_err, model)
 
 
@@ -796,6 +796,7 @@ class SyntheticLightCurve(LightCurve):
 
     #TO DO: fix repr
     def __repr__(self):
+        pass
         if self.signaltype is None:
             return('No signal injected')
         elif self.signaltype is 'Supernova':
