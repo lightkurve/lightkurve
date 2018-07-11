@@ -573,6 +573,13 @@ class LightCurve(object):
             ax.set_ylabel(ylabel)
         return ax
 
+
+    def inject(self, model):
+        from lightkurve import injection as inj
+        
+        return inj.inject(self.time, self.flux, self.flux_err, model)
+
+
     def to_table(self):
         """Export the LightCurve as an AstroPy Table.
 
@@ -742,14 +749,6 @@ class LightCurve(object):
             hdu.writeto(path, overwrite=overwrite, checksum=True)
         return hdu
 
-    def recover_sn(self, model='hsiao', **kwargs):
-        """docstring"""
-        import sncosmo
-
-        result, fitted_model = sncosmo.fit_lc(data, model, **kwargs)
-
-
-
 
 class FoldedLightCurve(LightCurve):
     """Defines a folded lightcurve with different plotting defaults."""
@@ -807,47 +806,13 @@ class SyntheticLightCurve(LightCurve):
             #return('Planet period: {} '.format(self.period)
             #        + 'Planet Rp/Rs: {}'.format(self.rprs))
 
-    def recover():
+    def recover(self, signal_type, source='hsiao', bandpass='kepler', initial_guess=None):
         '''TBD'''
-        return True
-
-    def compute_chisq(self, model, nparams, **kwargs):
-        """sample across surface and pick the one where chisq is lowest
-        right now we have to choose the same lb and ub for every param
-        """
-        from scipy.optimize import brute
+        from lightkurve import injection as inj
+        return inj.recover(self.time, self.flux, self.flux_err, signal_type, source='hsiao', bandpass='kepler', initial_guess=None)
 
 
-        model_flux = model.evaluate(self.time)
-        model_flux = model_flux / np.nanmedian(model_flux)
-        lc_normalized = self.normalize()
 
-        chisqcalc = 0
-        params = dict()
-
-        for k, v in kwargs.items():
-            params[k] = v
-        print(params)
-
-        length = len(kwargs.items()[0][1])
-        chisqarr = np.zeros(shape=(length, nparams + 1))
-        print(chisqarr)
-
-        for i in range(nparams):
-            #chisqarr[0, i] = kwargs.items()[i][0]
-            chisqarr[:, i] = kwargs.items()[i][1]
-        print(chisqarr)
-
-        for x in range(length):
-            for i in range(len(model_flux)):
-                chisqcalc = ((lc_normalized.flux - model_flux)**2)/model_flux
-            chisqarr[:, nparams][x] = (np.median(chisqcalc))
-
-
-        min_lst = chisqarr[np.argmin(chisqarr[:,nparams])]
-
-
-        #return chisqarr[np.argmin(chisqarr[:,nparams])]
 
 class KeplerLightCurve(LightCurve):
     """Defines a light curve class for NASA's Kepler and K2 missions.

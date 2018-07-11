@@ -254,7 +254,7 @@ class SupernovaModel(object):
 
         return bandflux
 
-def inject(lc, model):
+def inject(time, flux, flux_err, model):
     """Injects synthetic model into a light curve.
 
     Parameters
@@ -271,33 +271,86 @@ def inject(lc, model):
     """
 
     if model.multiplicative is True:
-        mergedflux = lc.flux * model.evaluate(lc.time)
+        mergedflux = flux * model.evaluate(time)
     else:
-        mergedflux = lc.flux + model.evaluate(lc.time)
-    return lightkurve.lightcurve.SyntheticLightCurve(lc.time, flux=mergedflux, flux_err=lc.flux_err,
+        mergedflux = flux + model.evaluate(time)
+    return lightkurve.lightcurve.SyntheticLightCurve(time, flux=mergedflux, flux_err=flux_err,
                                signaltype=model.signaltype, **model.params)
 
 
-def recover(lc, signal_type, x0, **kwargs):
+def recover(time, flux, flux_err, signal_type, source='hsiao', bandpass='kepler', initial_guess=None):
+    """Recovers a signal from a lightcurve using optimization.  Coming soon: MCMC
+    Right now, we can only recover SALT1 and SALT2 supernovae, and any source that
+    takes only T0, z, and amplitude (which are most of them). I'm not sure if there are any
+    others but I'll have to check.
+
+    Parameters
+        ----------
+    time : array-like
+        Time array
+    flux : array-like
+        Flux array (with injected or real signal)
+    flux_err : array-like
+        Flux error array
+    signal_type : 'Supernova' or 'Planet'
+         Signal to recover
+    source : str (one of built in sources in sncosmo), default None
+        The source of the fitted supernova.
+    initial_guess : [T0, z, amplitude, background] or [T0, z, x0, x1, c], default None
+        Guess vector of parameters. Supernovae must take x0,
+        and Planets do not take x0.
+
+    Returns
+    -------
+    results.x : tuple
+        Fitted parameters.
+    """
+
     import scipy.optimize as op
+
+
+    def create_initial_guess():
+        if signal_type == "Supernova":
+            if source == 'SALT1' or source == 'SALT2':
+                return initial_guess
+            else:
+                if initial_guess is None:
+                    T0 = np.median(time)
+                    z = 0.5
+                    amplitude = 3.e-7
+                    background = np.percentile(flux, 3)
+                    return [T0, z, amplitude, background]
+                else:
+                    return initial_guess
 
     if signal_type == 'Supernova':
 
         def ln_like(theta):
-            T0, z, amplitude, background = theta
-            if (z < 0) or (z > 1) or (T0 < np.min(lc.time)) or (T0 > np.max(lc.time)):
-                return -1.e99
-            model = SupernovaModel(T0, z=z, amplitude=amplitude, bandpass='kepler')
-            model = model.evaluate(lc.time) + background
-            inv_sigma2 = 1.0/(lc.flux_err**2)
-            chisq = (np.sum((lc.flux-model)**2*inv_sigma2))
+            if source == 'SALT1' or source == 'SALT2':
+                T0, z, x0, x1, c, background = theta
+                #this makes no sense lol -- TODO: FIND OUT WHAT SALT1 AND SALT2 VALS VIOLATE THE BANDPASS
+                if (z < 0) or (z > 3) or (T0 < np.min(time)) or (T0 > np.max(time)) or (x0 < 0) or (x0 > 1) or (x1 < 0) or (x1 > 1) or (c < -0.5) or (c > 0.5):
+                    return -1.e99
+                model = SupernovaModel(T0, z=z, x0=x0, x1=x1, c=c, source=source, bandpass=bandpass)
+            else:
+                T0, z, amplitude, background = theta
+                if (z < 0) or (z > 3) or (T0 < np.min(time)) or (T0 > np.max(time)):
+                    return -1.e99
+                model = SupernovaModel(T0, z=z, amplitude=amplitude, source=source, bandpass=bandpass)
+
+            model = model.evaluate(time) + background
+            inv_sigma2 = 1.0/(flux_err**2)
+            chisq = (np.sum((flux-model)**2*inv_sigma2))
             lnlikelihood = -0.5*chisq
             return lnlikelihood
 
 
         def lnprior_optimization(theta):
-            T0, z, amplitude, background = theta
-            if (z < 0) or (z > 1):
+            if source == 'SALT1' or source == 'SALT2':
+                T0, z, x0, x1, c, background = theta
+            else:
+                T0, z, amplitude, background = theta
+            if (z < 0) or (z > 3):
                 return -1.e99
             return 0.0
 
@@ -306,13 +359,9 @@ def recover(lc, signal_type, x0, **kwargs):
             log_posterior = lnprior_optimization(theta) + ln_like(theta)
             return -1 * log_posterior
 
-
-        x0 = x0
-
-        result = op.minimize(neg_ln_posterior, x0)
+        result = op.minimize(neg_ln_posterior, x0=create_initial_guess())
 
         return result.x
-
 
 
     elif signal_type == 'Planet':
@@ -320,10 +369,9 @@ def recover(lc, signal_type, x0, **kwargs):
         import batman
 
         #First a BLS search:
-
         from astropy.stats import BLS
 
-        model = BLS(lc.time, lc.flux, dy=0.01)
+        model = BLS(time, flux, dy=0.01)
         periodogram = model.autopower(0.2)
         best_index = np.argmax(periodogram.power)
         bls_period = periodogram.period[best_index]
@@ -331,10 +379,6 @@ def recover(lc, signal_type, x0, **kwargs):
         bls_rprs = np.sqrt(depth)
 
         bls_T0 = periodogram.transit_time[best_index]
-
-
-
-
 
         def ln_like(theta):
             period, rprs, T0 = theta
@@ -350,22 +394,20 @@ def recover(lc, signal_type, x0, **kwargs):
             params.limb_dark = "nonlinear"        #limb darkening model
             params.u = [0.5, 0.1, 0.1, -0.1]      #limb darkening coefficients [u1, u2, u3, u4]
 
-            t = lc.time.astype(np.float)
+            t = time.astype(np.float)
             m = batman.TransitModel(params, t, fac=1.0)
-            flux = m.light_curve(params)
+            flux_model = m.light_curve(params)
 
-            inv_sigma2 = 1.0/(lc.flux_err**2)
-            chisq = (np.sum((lc.flux - flux)**2 * inv_sigma2))
+            inv_sigma2 = 1.0/(flux_err**2)
+            chisq = (np.sum((flux - flux_model)**2 * inv_sigma2))
             lnlikelihood = -0.5*chisq
 
-            return lnlikelihood
+            return -lnlikelihood
 
-        def neg_ln_posterior(theta):
-            return -ln_like(theta)
-
-        result = op.minimize(neg_ln_posterior, [bls_period, bls_rprs, bls_T0])
+        result = op.minimize(ln_like, [bls_period, bls_rprs, bls_T0])
 
         return result.x
 
     else:
-        print('You can only recover supernovae and transits right now')
+        print('Signal Type not supported')
+        return
