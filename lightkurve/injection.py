@@ -345,7 +345,6 @@ def recover(time, flux, flux_err, signal_type, source='hsiao', bandpass='kepler'
         bls_period = periodogram.period[best_index]
         depth = periodogram.depth[best_index]
         bls_rprs = np.sqrt(depth)
-        print(bls_rprs)
 
         bls_T0 = periodogram.transit_time[best_index]
 
@@ -381,32 +380,38 @@ def recover(time, flux, flux_err, signal_type, source='hsiao', bandpass='kepler'
         print('Signal Type not supported.')
         return
 
-
-
-#THIS IS A SKETCH. IT DOESN'T WORK YET
-"""
-def injrec_test(lc, signal_type, iters, **kwargs):
-    ""kwargs are distribution classes. for example. period=UniformDistribution(1, 9), rprs=GaussianDistribution(0.1, 0.05)
+def injrec_test(lc, signal_type, ntests, constr, period=None, rprs=None, T0=None):
+    """kwargs are distribution classes. for example. period=UniformDistribution(1, 9), rprs=GaussianDistribution(0.1, 0.05)
     it will be different for supernovae.
-    ""
+    """
+    import lightkurve.injection as inj
 
     if signal_type == 'Supernova':
         return 0
 
     elif signal_type == 'Planet':
-        for i in iters:
-            lcinj = lc.inject
-            p, r, t = lcinj.recover
-            if p>0.3real and r>0.3real:
-                nrecovered += 1
 
-        return nrecovered
+        nrecovered = 0
+
+        for i in range(ntests):
+            period_test = period.sample()
+            rprs_test = rprs.sample()
+            T0_test = T0.sample()
+            model = inj.TransitModel()
+            model.add_planet(period=period_test, rprs=rprs_test, T0=T0_test)
+            lcinj = lc.inject(model)
+            period_f, rprs_f, T0_f = lcinj.recover('Planet')
+            if abs(period_f-period_test) < constr*period_test and abs(rprs_f-rprs_test) < constr*rprs_test and abs(T0_f-T0_test) < constr*T0_test:
+                nrecovered += 1
+                print('Recovered: ' + str(period_test) + ' ' + str(rprs_test))
+
+        return nrecovered/ntests
 
 
     else:
         print('Signal type not supported.')
         return
-"""
+
 
 
 
