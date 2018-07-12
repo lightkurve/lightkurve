@@ -1205,7 +1205,7 @@ class LightCurveCollection(Collection):
         if ax is None:
             _, ax = plt.subplots()
         for lightcurve in self.data:
-           lightcurve.plot(ax=ax)
+           lightcurve.plot(ax=ax, label=lightcurve.keplerid)
         return ax
 
     def pca(self):
