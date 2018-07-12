@@ -10,7 +10,7 @@ class UniformDistribution(object):
     Implements a class for choosing a value from a uniform distribution.
 
     Attributes
-    ----------s
+    ----------
     lb : float
         Lower bound of distribution
     ub : float
@@ -79,43 +79,15 @@ class TransitModel(object):
     """
 
     def __init__(self):
-        import ktransit
+        import batman
         self.signaltype = 'Planet'
         self.multiplicative = True
-        self.model = ktransit.LCModel()
+        self.model = batman.TransitParams()
 
     def __repr__(self):
         return 'TransitModel(' + str(self.__dict__) + ')'
 
-    def add_star(self, zpt=1.0, **kwargs):
-        """Initializes the star.
-
-        Parameters
-        ----------
-        Default values are those initialized in TransitModel.
-
-        zpt : float
-            A photometric zeropoint
-        **kwargs : dict
-            Dictonary of planet parameters. Options are:
-                rho : stellar density
-                ld1, ld2, ld3, ld3 : limb darkening coefficients
-                dil : transit dilution fraction
-                veloffset : (not sure what this is)
-        """
-
-        self.zpt = zpt
-
-        self.star_params = {}
-        for key, value in kwargs.items():
-            if isinstance(value, (GaussianDistribution, UniformDistribution)):
-                self.star_params[key] = value.sample()
-            else:
-                self.star_params[key] = value
-
-        self.model.add_star(zpt=self.zpt, **self.star_params)
-
-    def add_planet(self, period, rprs, T0, **kwargs):
+    def add_planet(self, period, rprs, T0=5, a=15., inc=90., ecc=0., w=90., limb_dark='quadratic', u=[0.1, 0.3]):
         """Adds a planet to TransitModel object.
 
         Parameters
@@ -127,37 +99,33 @@ class TransitModel(object):
         T0 : float
             A transit mid-time
         **kwargs : dict
-            Dictonary of planet parameters. Options are:
-                impact: an impact parameter
-                ecosw, esinw : an eccentricity vector
-                occ : a secondary eclipse depth
-                rvamp : (not sure)
-                ell : (not sure)
-                alb : (not sure)
+            Dictonary of planet parameters. Requires:
+                period
+                rprs
+                a
+                inc
+                ec
         """
 
-        params = {'period':period, 'rprs':rprs, 'T0':T0}
+        params = {'period':period, 'rprs':rprs, 'T0':T0, 'a':a, 'inc':inc, 'ecc':ecc, 'w':w, 'limb_dark':limb_dark, 'u':u}
         for key, val in params.items():
             if isinstance(val, (GaussianDistribution, UniformDistribution)):
                 setattr(self, key, val.sample())
             else:
                 setattr(self, key, val)
 
-        self.planet_params = {}
-        for key, value in kwargs.items():
-            if isinstance(value, (GaussianDistribution, UniformDistribution)):
-                self.planet_params[key] = value.sample()
-            else:
-                self.planet_params[key] = value
-
-        self.params = self.star_params.copy()
-        self.params.update(self.planet_params)
-        required_params = {'period':self.period, 'rprs':self.rprs, 'T0':self.T0}
-        self.params.update(required_params)
-
-        self.model.add_planet(period=self.period, rprs=self.rprs, T0=self.T0, **self.planet_params)
+        self.model.t0 = self.T0                      #time of inferior conjunction
+        self.model.per = self.period
+        self.model.rp = self.rprs                    #planet radius (in units of stellar radii)
+        self.model.a = self.a                   #semi-major axis (in units of stellar radii)
+        self.model.inc = self.inc                     #orbital inclination (in degrees)
+        self.model.ecc = self.ecc                      #eccentricity
+        self.model.w = self.w                       #longitude of periastron (in degrees)
+        self.model.limb_dark = limb_dark        #limb darkening model
+        self.model.u = u      #limb darkening coefficients [u1, u2, u3, u4]
 
     def evaluate(self, time):
+        import batman
         """Creates lightcurve from model.
 
         Parameters
@@ -171,11 +139,11 @@ class TransitModel(object):
             Flux array of lightcurve
 
         """
-        self.model.add_data(time=time)
-        transit_flux = self.model.transitmodel
-        transit_flux_dict = {'signal':transit_flux}
-        self.params.update(transit_flux_dict)
-        return transit_flux
+
+        t = time.astype(np.float)  #times at which to calculate light curve
+        m_fit = batman.TransitModel(self.model, t, fac=1.0)    #initializes model
+        flux_fit = m_fit.light_curve(self.model)
+        return flux_fit
 
 class SupernovaModel(object):
     """
@@ -271,11 +239,11 @@ def inject(time, flux, flux_err, model):
     """
 
     if model.multiplicative is True:
-        mergedflux = flux * model.evaluate(time)
+        mergedflux = flux * model.evaluate(time.astype(np.float))
     else:
         mergedflux = flux + model.evaluate(time)
     return lightkurve.lightcurve.SyntheticLightCurve(time, flux=mergedflux, flux_err=flux_err,
-                               signaltype=model.signaltype, **model.params)
+                               signaltype=model.signaltype)#, **model.params)
 
 
 def recover(time, flux, flux_err, signal_type, source='hsiao', bandpass='kepler', initial_guess=None):
@@ -377,6 +345,7 @@ def recover(time, flux, flux_err, signal_type, source='hsiao', bandpass='kepler'
         bls_period = periodogram.period[best_index]
         depth = periodogram.depth[best_index]
         bls_rprs = np.sqrt(depth)
+        print(bls_rprs)
 
         bls_T0 = periodogram.transit_time[best_index]
 
