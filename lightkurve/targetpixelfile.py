@@ -287,6 +287,41 @@ class TargetPixelFile(object):
                     idx += 1
         output.pprint(max_lines=-1, max_width=-1)
 
+    def to_lightcurve(self, method='aperture', **kwargs):
+        """Performs photometry.
+
+        See the docstring of `aperture_photometry()` for valid
+        arguments if the method is 'aperture'.  Otherwise, see the docstring
+        of `prf_photometry()` for valid arguments if the method is 'prf'.
+
+        Parameters
+        ----------
+        method : 'aperture' or 'prf'.
+            Photometry method to use.
+        **kwargs : dict
+            Extra arguments to be passed to the `aperture_photometry` or the
+            `prf_photometry` method of this class.
+
+        Returns
+        -------
+        lc : LightCurve object
+            Object containing the resulting lightcurve.
+        """
+        if method == 'aperture':
+            return self.aperture_photometry(**kwargs)
+        elif method == 'prf':
+            return self.prf_photometry(**kwargs).lightcurves[0]
+        else:
+            raise ValueError("Photometry method must be 'aperture' or 'prf'.")
+
+    def aperture_photometry(self):
+        raise NotImplementedError("This is an abstract method that is "
+                                  "implemented in the subclasses.")
+
+    def prf_photometry(self):
+        raise NotImplementedError("This is an abstract method that is "
+                                  "implemented in the subclasses.")
+
     def _parse_aperture_mask(self, aperture_mask):
         """Parse the `aperture_mask` parameter as given by a user.
 
@@ -772,31 +807,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         try:
             return self.header(ext=0)['MISSION']
         except KeyError:
-            return None
-
-    def to_lightcurve(self, method='aperture', **kwargs):
-        """Performs aperture photometry.
-
-        Parameters
-        ----------
-        method : str
-            Either 'aperture' or 'prf'.
-        **kwargs : dict
-            Extra arguments to be passed to the `aperture_photometry` or the
-            `prf_photometry` method.
-
-        Returns
-        -------
-        lc : KeplerLightCurve object
-            Object containing the resulting lightcurve.
-        """
-        if method == 'aperture':
-            return self.aperture_photometry(**kwargs)
-        elif method == 'prf':
-            return self.prf_photometry(**kwargs).lightcurves[0]
-        else:
-            raise ValueError("Photometry method must be 'aperture' or 'prf'.")
-        
+            return None        
 
     def aperture_photometry(self, aperture_mask='pipeline'):
         """Returns a LightCurve obtained using aperture photometry.
@@ -1187,7 +1198,7 @@ class TessTargetPixelFile(TargetPixelFile):
         """Returns an AstroPy Time object for all good-quality cadences."""
         return btjd_to_astropy_time(btjd=self.time)
 
-    def to_lightcurve(self, aperture_mask='pipeline'):
+    def aperture_photometry(self, aperture_mask='pipeline'):
         """Performs aperture photometry.
 
         Parameters
