@@ -774,8 +774,32 @@ class KeplerTargetPixelFile(TargetPixelFile):
         except KeyError:
             return None
 
-    def to_lightcurve(self, aperture_mask='pipeline'):
+    def to_lightcurve(self, method='aperture', **kwargs):
         """Performs aperture photometry.
+
+        Parameters
+        ----------
+        method : str
+            Either 'aperture' or 'prf'.
+        **kwargs : dict
+            Extra arguments to be passed to the `aperture_photometry` or the
+            `prf_photometry` method.
+
+        Returns
+        -------
+        lc : KeplerLightCurve object
+            Object containing the resulting lightcurve.
+        """
+        if method == 'aperture':
+            return self.aperture_photometry(**kwargs)
+        elif method == 'prf':
+            return self.prf_photometry(**kwargs).lightcurves[0]
+        else:
+            raise ValueError("Photometry method must be 'aperture' or 'prf'.")
+        
+
+    def aperture_photometry(self, aperture_mask='pipeline'):
+        """Returns a LightCurve obtained using aperture photometry.
 
         Parameters
         ----------
@@ -826,8 +850,15 @@ class KeplerTargetPixelFile(TargetPixelFile):
                           flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
                           flux_err=self.flux_bkg_err)
 
-    def get_model(self, star_priors=None):
+    def get_model(self, star_priors=None, **kwargs):
         """Returns a `TargetPixelFileModel` object with appropriate defaults.
+
+        Parameters
+        ----------
+        star_priors : list of StarPrior objects
+            Stars to include in the model.
+        **kwargs : dict
+            Extra arguments to be passed to the `TPFModel` constructor.
 
         Returns
         -------
@@ -839,18 +870,27 @@ class KeplerTargetPixelFile(TargetPixelFile):
         # Set up the model
         if star_priors is None:
             centr_col, centr_row = self.centroids()
-            star_priors = [StarPrior(col=GaussianPrior(mean=np.nanmedian(centr_col), var=0),
-                                     row=GaussianPrior(mean=np.nanmedian(centr_row), var=0),
-                                     flux=UniformPrior(lb=np.nanmin(self.flux[0]),
+            star_priors = [StarPrior(col=GaussianPrior(mean=np.nanmedian(centr_col), var=0.1**2),
+                                     row=GaussianPrior(mean=np.nanmedian(centr_row), var=0.1**2),
+                                     flux=UniformPrior(lb=0.5*np.nanmax(self.flux[0]),
                                                        ub=2*np.nansum(self.flux[0]) + 1e-10),
                                      targetid=self.targetid)]
-        background_prior = BackgroundPrior(flux=GaussianPrior(mean=np.nanmean(self.flux_bkg),
-                                           var=np.nanstd(self.flux_bkg)**2))
+        background_prior = BackgroundPrior(flux=GaussianPrior(mean=0.,
+                                           var=(2 * np.nanstd(self.flux_bkg))**2))
         model = TPFModel(star_priors=star_priors,
                          background_prior=background_prior,
                          prfmodel=self.get_prf_model(),
-                         fit_background=True)
+                         fit_background=True,
+                         **kwargs)
         return model
+
+    def prf_photometry(self):
+        """Returns a LightCurve obtained using PRF-fitting photometry."""
+        from .prf import PRFPhotometry
+        model = self.get_model()
+        pp = PRFPhotometry(model)
+        pp.run(self.flux, pos_corr1=self.pos_corr1, pos_corr2=self.pos_corr2) #, cadences=range(0, 5))
+        return pp
 
     @staticmethod
     def from_fits_images(images, position=None, size=(10, 10), extension=None,

@@ -47,7 +47,7 @@ import warnings
 
 from oktopus import Prior, GaussianPrior, UniformPrior, PoissonPosterior
 
-from .prfmodels import KeplerPRF
+from .prfmodel import KeplerPRF
 from ..utils import plot_image
 
 
@@ -201,8 +201,8 @@ class FocusPrior(PriorContainer):
 class MotionPrior(PriorContainer):
     """Container class to capture a user's beliefs about the telescope motion.
     """
-    def __init__(self, shift_col=UniformPrior(lb=-0.1, ub=0.1),
-                 shift_row=UniformPrior(lb=-0.1, ub=0.1)):
+    def __init__(self, shift_col=GaussianPrior(mean=0, var=1.**2),
+                 shift_row=GaussianPrior(mean=0, var=1.**2)):
         self.shift_col = self._parse_prior(shift_col)
         self.shift_row = self._parse_prior(shift_row)
 
@@ -256,8 +256,8 @@ class FocusParameters(object):
         self.fitted = fitted
 
     def __repr__(self):
-        return ("<FocusParameters: scale_col={:.3f}, scale_row={:.3f}, "
-                "rotation_angle={:.3f}, fitted={}>"
+        return ("<FocusParameters: scale_col={}, scale_row={}, "
+                "rotation_angle={}, fitted={}>"
                 "".format(self.scale_col, self.scale_row,
                           self.rotation_angle, self.fitted))
 
@@ -271,7 +271,7 @@ class MotionParameters(object):
         self.fitted = fitted
 
     def __repr__(self):
-        return "<MotionParameters: shift_col={:.3f}, shift_row={:.3f}, fitted={}>".format(
+        return "<MotionParameters: shift_col={}, shift_row={}, fitted={}>".format(
                     self.shift_col, self.shift_row, self.fitted)
 
 
@@ -579,7 +579,7 @@ class TPFModel(object):
                            self.prfmodel.row, self.prfmodel.row + self.prfmodel.shape[0]),
                    **kwargs)
 
-    def diagnostics(self, data, *params, **kwargs):
+    def fit_diagnostics(self, data, *params, **kwargs):
         """Plots an image of the model for a given point in the parameter space."""
         fit = self.fit(data)
         plot_image(data,
@@ -597,6 +597,7 @@ class TPFModel(object):
                    extent=(self.prfmodel.column, self.prfmodel.column + self.prfmodel.shape[1],
                            self.prfmodel.row, self.prfmodel.row + self.prfmodel.shape[0]),
                    **kwargs)
+        return fit
 
 
 class PRFPhotometry(object):

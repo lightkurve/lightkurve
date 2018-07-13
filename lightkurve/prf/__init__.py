@@ -1,2 +1,2 @@
-from .prfmodels import *
-from .tpfmodels import *
+from .prfmodel import *
+from .tpfmodel import *
