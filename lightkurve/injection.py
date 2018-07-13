@@ -270,7 +270,7 @@ def recover(time, flux, flux_err, signal_type, source='hsiao', bandpass='kepler'
 
     Returns
     -------
-    results.x : tuple
+    result.x : tuple (?)
         Fitted parameters.
     """
 
@@ -351,20 +351,10 @@ def recover(time, flux, flux_err, signal_type, source='hsiao', bandpass='kepler'
         def ln_like(theta):
             period, rprs, T0 = theta
 
-            params = batman.TransitParams()       #object to store transit parameters
-            params.t0 = T0                        #time of inferior conjunction
-            params.per = period                   #orbital period
-            params.rp = rprs                      #planet radius (in units of stellar radii)
-            params.a = 15.                        #semi-major axis (in units of stellar radii)
-            params.inc = 90.                      #orbital inclination (in degrees)
-            params.ecc = 0.                       #eccentricity
-            params.w = 90.                        #longitude of periastron (in degrees)
-            params.limb_dark = "nonlinear"        #limb darkening model
-            params.u = [0.5, 0.1, 0.1, -0.1]      #limb darkening coefficients [u1, u2, u3, u4]
-
+            model = TransitModel()
+            model.add_planet(period=period, rprs=rprs, T0=T0)
             t = time.astype(np.float)
-            m = batman.TransitModel(params, t, fac=1.0)
-            flux_model = m.light_curve(params)
+            flux_model = model.evaluate(t)
 
             inv_sigma2 = 1.0/(flux_err**2)
             chisq = (np.sum((flux - flux_model)**2 * inv_sigma2))
