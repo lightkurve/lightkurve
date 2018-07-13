@@ -5,7 +5,7 @@ Example use
 %matplotlib inline
 import numpy as np
 from lightkurve import KeplerTargetPixelFile, LightCurve
-from lightkurve.prf import StarPrior, BackgroundPrior, FocusPrior, MotionPrior, SceneModel, PRFPhotometry
+from lightkurve.prf import StarPrior, BackgroundPrior, FocusPrior, MotionPrior, TPFModel, PRFPhotometry
 from oktopus import GaussianPrior, UniformPrior
 
 tpf = KeplerTargetPixelFile("https://archive.stsci.edu/missions/kepler/target_pixel_files/0084/008462852/"
@@ -17,20 +17,20 @@ maxflux = np.nansum(tpf.flux, axis=(1, 2)).max()
 col, row = np.nanmedian(tpf.centroids(), axis=1)
 
 # Set up the model
-model = SceneModel(star_priors=[StarPrior(col=GaussianPrior(mean=col, var=2**2),
-                                          row=GaussianPrior(mean=row, var=2**2),
-                                          flux=UniformPrior(lb=0, ub=maxflux),
-                                          targetid=tpf.keplerid)],
-                   background_prior=BackgroundPrior(flux=GaussianPrior(mean=bgflux, var=bgflux)),
-                   focus_prior=FocusPrior(scale_col=GaussianPrior(mean=1, var=0.0001),
-                                          scale_row=GaussianPrior(mean=1, var=0.0001),
-                                          rotation_angle=UniformPrior(lb=-3.1415, ub=3.1415)),
-                   motion_prior=MotionPrior(shift_col=GaussianPrior(mean=0., var=0.01),
-                                            shift_row=GaussianPrior(mean=0., var=0.01)),
-                   prfmodel=tpf.get_prf_model(),
-                   fit_background=True,
-                   fit_focus=False,
-                   fit_motion=False)
+model = TPFModel(star_priors=[StarPrior(col=GaussianPrior(mean=col, var=2**2),
+                                        row=GaussianPrior(mean=row, var=2**2),
+                                        flux=UniformPrior(lb=0, ub=maxflux),
+                                        targetid=tpf.keplerid)],
+                 background_prior=BackgroundPrior(flux=GaussianPrior(mean=bgflux, var=bgflux)),
+                 focus_prior=FocusPrior(scale_col=GaussianPrior(mean=1, var=0.0001),
+                                        scale_row=GaussianPrior(mean=1, var=0.0001),
+                                        rotation_angle=UniformPrior(lb=-3.1415, ub=3.1415)),
+                 motion_prior=MotionPrior(shift_col=GaussianPrior(mean=0., var=0.01),
+                                          shift_row=GaussianPrior(mean=0., var=0.01)),
+                 prfmodel=tpf.get_prf_model(),
+                 fit_background=True,
+                 fit_focus=False,
+                 fit_motion=False)
 
 pp = PRFPhotometry(model)
 pp.run(tpf.flux, pos_corr1=tpf.pos_corr1, pos_corr2=tpf.pos_corr2, cadences=range(1650, 1850))
@@ -54,8 +54,8 @@ from ..utils import plot_image
 __all__ = ['GaussianPrior', 'UniformPrior', 'FixedValuePrior',
            'StarPrior', 'BackgroundPrior', 'FocusPrior', 'MotionPrior',
            'StarParameters', 'BackgroundParameters', 'FocusParameters',
-           'MotionParameters', 'SceneModelParameters',
-           'SceneModel', 'PRFPhotometry']
+           'MotionParameters', 'TPFModelParameters',
+           'TPFModel', 'PRFPhotometry']
 
 
 log = logging.getLogger(__name__)
@@ -218,7 +218,7 @@ class MotionPrior(PriorContainer):
 
 
 class StarParameters(object):
-    """Container class to hold the parameters of a star in a ``SceneModel``.
+    """Container class to hold the parameters of a star in a ``TPFModel``.
     """
     def __init__(self, col, row, flux, err_col=None, err_row=None, err_flux=None, fitted=True):
         self.col = col
@@ -233,7 +233,7 @@ class StarParameters(object):
 
 
 class BackgroundParameters(object):
-    """Container class to hold the parameters of the background in a ``SceneModel``.
+    """Container class to hold the parameters of the background in a ``TPFModel``.
     """
     def __init__(self, flux=0., err_flux=None, fitted=True):
         self.flux = flux
@@ -247,7 +247,7 @@ class BackgroundParameters(object):
 
 
 class FocusParameters(object):
-    """Container class to hold the parameters of the telescope focus in a ``SceneModel``.
+    """Container class to hold the parameters of the telescope focus in a ``TPFModel``.
     """
     def __init__(self, scale_col=1., scale_row=1., rotation_angle=0., fitted=False):
         self.scale_col = scale_col
@@ -263,7 +263,7 @@ class FocusParameters(object):
 
 
 class MotionParameters(object):
-    """Container class to hold the parameters of the telescope motion in a ``SceneModel``.
+    """Container class to hold the parameters of the telescope motion in a ``TPFModel``.
     """
     def __init__(self, shift_col=0., shift_row=0., fitted=False):
         self.shift_col = shift_col
@@ -275,13 +275,13 @@ class MotionParameters(object):
                     self.shift_col, self.shift_row, self.fitted)
 
 
-class SceneModelParameters(object):
-    """Container class to combine all parameters that parameterize a ``SceneModel``.
+class TPFModelParameters(object):
+    """Container class to combine all parameters that parameterize a ``TPFModel``.
 
     Attributes
     ----------
     stars : list of ``StarParameters`` objects
-        Parameters related to the stars in the scene.
+        Parameters related to the stars in the model.
     background : ``BackgroundParameters`` object
         Parameters related to the background flux.
     focus : ``FocusParameters`` object
@@ -297,7 +297,7 @@ class SceneModelParameters(object):
         self.motion = motion
 
     def __repr__(self):
-        out = super(SceneModelParameters, self).__repr__() + '\n'
+        out = super(TPFModelParameters, self).__repr__() + '\n'
         out += '  Stars:\n'+''.join(['    {}\n'.format(star) for star in self.stars])
         out += '  Background:\n    {}\n'.format(self.background)
         out += '  Focus:\n    {}\n'.format(self.focus)
@@ -375,11 +375,11 @@ class SceneModelParameters(object):
                                       shift_row=array[next_idx + 1],
                                       fitted=True)
 
-        return SceneModelParameters(stars=stars, background=background,
+        return TPFModelParameters(stars=stars, background=background,
                                     focus=focus, motion=motion)
 
 
-class SceneModel(object):
+class TPFModel(object):
     """A model which describes a single-cadence Kepler image.
 
     Attributes
@@ -418,7 +418,7 @@ class SceneModel(object):
         self.params = self.get_initial_guesses()
 
     def __repr__(self):
-        out = super(SceneModel, self).__repr__() + '\n'
+        out = super(TPFModel, self).__repr__() + '\n'
         out += '  Star priors:\n'+''.join(['    {}\n'.format(star) for star in self.star_priors])
         out += '  Background prior:\n    {}\n'.format(self.background_prior)
         out += '  Focus prior:\n    {}\n'.format(self.focus_prior)
@@ -447,19 +447,19 @@ class SceneModel(object):
         motion = MotionParameters(shift_col=self.motion_prior.shift_col.mean,
                                   shift_row=self.motion_prior.shift_row.mean,
                                   fitted=self.fit_motion)
-        initial_params = SceneModelParameters(stars=initial_star_guesses,
+        initial_params = TPFModelParameters(stars=initial_star_guesses,
                                               background=background,
                                               focus=focus,
                                               motion=motion)
         return initial_params
 
     def predict(self, params=None):
-        """Returns a synthetic Kepler image given a set of scene parameters.
+        """Returns a synthetic Kepler image given a set of model parameters.
 
         Attributes
         ----------
-        params : ```SceneModelParameters``` object
-            Parameters which define the scene.
+        params : ```TPFModelParameters``` object
+            Parameters which define the model.
 
         Returns
         -------
@@ -496,11 +496,9 @@ class SceneModel(object):
         params = self.params.from_array(params_array)
         grad = []
         for star in params.stars:
-            # Caution: prfmodel takes (flux, col, row) in a different order
-            # than scene model, this has yet to be streamlined
-            grad.append(self.prfmodel.gradient(flux=star.flux,
-                                               center_col=star.col,
-                                               center_row=star.row))
+            grad.append(self.prfmodel.gradient(center_col=star.col,
+                                               center_row=star.row,
+                                               flux=star.flux))
         # We assume the background gradient is proportional to one
         grad.append([np.ones(self.prfmodel.shape)])
         # We assume the gradient of other parameters is one
@@ -514,7 +512,7 @@ class SceneModel(object):
 
         Attributes
         ----------
-        params : SceneModelParameters object
+        params : TPFModelParameters object
         """
         logp = 0
         for star, star_prior in zip(params.stars, self.star_priors):
@@ -540,7 +538,7 @@ class SceneModel(object):
         return self.logp_prior(params)
 
     def fit(self, data, loss_function=PoissonPosterior, method='powell', **kwargs):
-        """Fits the scene model to the data.
+        """Fits the model to the data.
 
         Parameters
         ----------
@@ -555,7 +553,7 @@ class SceneModel(object):
 
         Returns
         -------
-        result : ``SceneParameters`` object
+        result : ``TPFModelParameters`` object
             Fitted parameters plus fitting diagnostics.
         """
         loss = loss_function(data, self, prior=self._logp_prior)
@@ -576,7 +574,7 @@ class SceneModel(object):
         """Plots an image of the model for a given point in the parameter space."""
         img = self.predict(*params)
         plot_image(img,
-                   title='Scene Model, Channel: {}'.format(self.prfmodel.channel),
+                   title='TPF Model',
                    extent=(self.prfmodel.column, self.prfmodel.column + self.prfmodel.shape[1],
                            self.prfmodel.row, self.prfmodel.row + self.prfmodel.shape[0]),
                    **kwargs)
@@ -602,15 +600,15 @@ class SceneModel(object):
 
 
 class PRFPhotometry(object):
-    """This class performs PRF Photometry on TPF-like data given a ``SceneModel``.
+    """This class performs PRF Photometry on TPF-like data given a ``TPFModel``.
 
-    This class exists because a ``SceneModel`` object is designed to fit only
+    This class exists because a ``TPFModel`` object is designed to fit only
     one cadence at a time.  This class makes it easy to fit a large number
     of cadences and obtain the resulting LightCurve.
 
     Attributes
     ----------
-    model : instance of SceneModel
+    model : instance of TPFModel
         Model which will be fit to the data
     """
     def __init__(self, model):
@@ -618,7 +616,7 @@ class PRFPhotometry(object):
         self.results = []
 
     def run(self, tpf_flux, pos_corr1=None, pos_corr2=None, cadences=None):
-        """Fits the scene model to the flux data.
+        """Fits the model to the flux data.
 
         Parameters
         ----------
@@ -663,7 +661,7 @@ class PRFPhotometry(object):
         return LightCurve(flux=bgflux)
 
     def plot_results(self, star_idx=0):
-        """Plot all the scene model parameters over time."""
+        """Plot all the TPF model parameters over time."""
         fig, ax = plt.subplots(10, sharex=True, figsize=(6, 10))
         x = range(len(self.results))
         ax[0].plot(x, [r.stars[star_idx].flux for r in self.results])

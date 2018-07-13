@@ -826,15 +826,15 @@ class KeplerTargetPixelFile(TargetPixelFile):
                           flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
                           flux_err=self.flux_bkg_err)
 
-    def get_scene_model(self, star_priors=None):
-        """Returns a `SceneModel` object with appropriate defaults.
+    def get_model(self, star_priors=None):
+        """Returns a `TargetPixelFileModel` object with appropriate defaults.
 
         Returns
         -------
-        model : SceneModel object
+        model : TPFModel object
             Model with appropriate defaults for this Target Pixel File.
         """
-        from .prf import SceneModel, StarPrior, BackgroundPrior
+        from .prf import TPFModel, StarPrior, BackgroundPrior
         from .prf import GaussianPrior, UniformPrior
         # Set up the model
         if star_priors is None:
@@ -842,14 +842,14 @@ class KeplerTargetPixelFile(TargetPixelFile):
             star_priors = [StarPrior(col=GaussianPrior(mean=np.nanmedian(centr_col), var=0),
                                      row=GaussianPrior(mean=np.nanmedian(centr_row), var=0),
                                      flux=UniformPrior(lb=np.nanmin(self.flux[0]),
-                                                       ub=2*np.nansum(self.flux[0])),
+                                                       ub=2*np.nansum(self.flux[0]) + 1e-10),
                                      targetid=self.targetid)]
         background_prior = BackgroundPrior(flux=GaussianPrior(mean=np.nanmean(self.flux_bkg),
                                            var=np.nanstd(self.flux_bkg)**2))
-        model = SceneModel(star_priors=star_priors,
-                           background_prior=background_prior,
-                           prfmodel=self.get_prf_model(),
-                           fit_background=True)
+        model = TPFModel(star_priors=star_priors,
+                         background_prior=background_prior,
+                         prfmodel=self.get_prf_model(),
+                         fit_background=True)
         return model
 
     @staticmethod

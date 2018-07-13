@@ -1,4 +1,4 @@
-"""Test the features of the lightkurve.prf.scenemodels module."""
+"""Test the features of the lightkurve.prf.tpfmodels module."""
 from __future__ import division, print_function
 
 import os
@@ -11,7 +11,7 @@ from scipy.stats import mode
 from ... import PACKAGEDIR
 from ...prf import FixedValuePrior, GaussianPrior, UniformPrior
 from ...prf import StarPrior, BackgroundPrior, FocusPrior, MotionPrior
-from ...prf import SceneModel, PRFPhotometry
+from ...prf import TPFModel, PRFPhotometry
 from ...prf import SimpleKeplerPRF, KeplerPRF
 
 
@@ -48,29 +48,29 @@ def test_backgroundprior():
     assert not np.isfinite(bp(flux + 0.1))
 
 
-def test_scene_model_simple():
+def test_tpf_model_simple():
     prf = SimpleKeplerPRF(channel=16, shape=[10, 10], column=15, row=15)
-    scene = SceneModel(prfmodel=prf)
-    assert scene.prfmodel.channel == 16
+    model = TPFModel(prfmodel=prf)
+    assert model.prfmodel.channel == 16
 
 
-def test_scene_model():
+def test_tpf_model():
     col, row, flux, bgflux = 1, 2, 3, 4
     shape = (7, 8)
-    model = SceneModel(star_priors=[StarPrior(col=GaussianPrior(mean=col, var=2**2),
-                                              row=GaussianPrior(mean=row, var=2**2),
-                                              flux=UniformPrior(lb=flux - 0.5, ub=flux + 0.5),
-                                              targetid="TESTSTAR")],
-                       background_prior=BackgroundPrior(flux=GaussianPrior(mean=bgflux, var=bgflux)),
-                       focus_prior=FocusPrior(scale_col=GaussianPrior(mean=1, var=0.0001),
-                                              scale_row=GaussianPrior(mean=1, var=0.0001),
-                                              rotation_angle=UniformPrior(lb=-3.1415, ub=3.1415)),
-                       motion_prior=MotionPrior(shift_col=GaussianPrior(mean=0., var=0.01),
-                                                shift_row=GaussianPrior(mean=0., var=0.01)),
-                       prfmodel=KeplerPRF(channel=40, shape=shape, column=30, row=20),
-                       fit_background=True,
-                       fit_focus=False,
-                       fit_motion=False)
+    model = TPFModel(star_priors=[StarPrior(col=GaussianPrior(mean=col, var=2**2),
+                                            row=GaussianPrior(mean=row, var=2**2),
+                                            flux=UniformPrior(lb=flux - 0.5, ub=flux + 0.5),
+                                            targetid="TESTSTAR")],
+                     background_prior=BackgroundPrior(flux=GaussianPrior(mean=bgflux, var=bgflux)),
+                     focus_prior=FocusPrior(scale_col=GaussianPrior(mean=1, var=0.0001),
+                                            scale_row=GaussianPrior(mean=1, var=0.0001),
+                                            rotation_angle=UniformPrior(lb=-3.1415, ub=3.1415)),
+                     motion_prior=MotionPrior(shift_col=GaussianPrior(mean=0., var=0.01),
+                                              shift_row=GaussianPrior(mean=0., var=0.01)),
+                     prfmodel=KeplerPRF(channel=40, shape=shape, column=30, row=20),
+                     fit_background=True,
+                     fit_focus=False,
+                     fit_motion=False)
     # Sanity checks
     assert model.star_priors[0].col.mean == col
     assert model.star_priors[0].targetid == 'TESTSTAR'
@@ -88,7 +88,7 @@ def test_scene_model():
     assert 'TESTSTAR' in str(model)
 
 
-def test_scene_model_fitting():
+def test_tpf_model_fitting():
     # Is the PRF photometry result consistent with simple aperture photometry?
     tpf_fn = os.path.join(PACKAGEDIR, "tests", "data", "ktwo201907706-c01-first-cadence.fits.gz")
     tpf = fits.open(tpf_fn)
@@ -102,29 +102,29 @@ def test_scene_model_fitting():
                              row=UniformPrior(lb=prfmodel.row_coord[0], ub=prfmodel.row_coord[-1]),
                              flux=UniformPrior(lb=0.5*fluxsum, ub=1.5*fluxsum))]
     background_prior = BackgroundPrior(flux=UniformPrior(lb=.5*bkg, ub=1.5*bkg))
-    scene = SceneModel(star_priors=star_priors,
-                       background_prior=background_prior,
-                       prfmodel=prfmodel)
+    model = TPFModel(star_priors=star_priors,
+                     background_prior=background_prior,
+                     prfmodel=prfmodel)
     # Does fitting run without errors?
-    scene.fit(tpf[1].data)
+    model.fit(tpf[1].data)
     # Does fitting via the PRFPhotometry class run without errors?
-    phot = PRFPhotometry(scene)
+    phot = PRFPhotometry(model)
     phot.run([tpf[1].data])
 
 
-def test_empty_scene():
-    """Can we fit the background flux in an empty scene?"""
+def test_empty_model():
+    """Can we fit the background flux in a model without stars?"""
     shape = (4, 3)
     bgflux = 1.23
     background_prior = BackgroundPrior(flux=UniformPrior(lb=0, ub=10))
-    scene = SceneModel(background_prior=background_prior)
+    model = TPFModel(background_prior=background_prior)
     background = bgflux * np.ones(shape=shape)
-    results = scene.fit(background)
+    results = model.fit(background)
     assert np.isclose(results.background.flux, bgflux, rtol=1e-2)
 
 
-def test_scene_with_one_star():
-    """Can we fit the background flux in an empty scene?"""
+def test_model_with_one_star():
+    """Can we fit the background flux in a model with one star?"""
     channel = 42
     shape = (10, 12)
     starflux, col, row = 1000., 60., 70.
@@ -138,17 +138,17 @@ def test_scene_with_one_star():
     focus_prior = FocusPrior(scale_col=UniformPrior(lb=0.5, ub=1.5),
                              scale_row=UniformPrior(lb=0.5, ub=1.5),
                              rotation_angle=UniformPrior(lb=0., ub=0.5))
-    scene = SceneModel(star_priors=[star_prior],
-                       background_prior=background_prior,
-                       focus_prior=focus_prior,
-                       prfmodel=prf,
-                       fit_background=True,
-                       fit_focus=True)
+    model = TPFModel(star_priors=[star_prior],
+                     background_prior=background_prior,
+                     focus_prior=focus_prior,
+                     prfmodel=prf,
+                     fit_background=True,
+                     fit_focus=True)
     # Generate and fit fake data
     fake_data = bgflux + prf(col + 6, row + 6, starflux,
                              scale_col=scale_col, scale_row=scale_row,
                              rotation_angle=rotation_angle)
-    results = scene.fit(fake_data, tol=1e-12, options={'maxiter': 100})
+    results = model.fit(fake_data, tol=1e-12, options={'maxiter': 100})
     # Do the results match the input?
     assert np.isclose(results.stars[0].col, col + 6)
     assert np.isclose(results.stars[0].row, row + 6)
