@@ -43,6 +43,7 @@ import logging
 from matplotlib import pyplot as plt
 import numpy as np
 from tqdm import tqdm
+import warnings
 
 from oktopus import Prior, GaussianPrior, UniformPrior, PoissonPosterior
 
@@ -558,7 +559,10 @@ class SceneModel(object):
             Fitted parameters plus fitting diagnostics.
         """
         loss = loss_function(data, self, prior=self._logp_prior)
-        fit = loss.fit(x0=self.get_initial_guesses().to_array(), method=method, **kwargs)
+        with warnings.catch_warnings():
+            # Ignore RuntimeWarnings trigged by invalid values
+            warnings.simplefilter("ignore", RuntimeWarning)
+            fit = loss.fit(x0=self.get_initial_guesses().to_array(), method=method, **kwargs)
         result = self.params.from_array(fit.x)
         #uncertainties are broken for now because `self.gradient` is unfinished
         #result.uncertainties = loss.loglikelihood.uncertainties(fit.x)
