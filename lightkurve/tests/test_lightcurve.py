@@ -449,6 +449,7 @@ def test_from_archive_should_accept_path():
     """If a url is passed to `from_archive` it should still just work."""
     KeplerLightCurveFile.from_archive(TABBY_Q8)
 
+
 def test_fill_gaps():
     lc = LightCurve([1,2,3,4,6,7,8], [1,1,1,1,1,1,1])
     nlc = lc.fill_gaps()
@@ -462,3 +463,15 @@ def test_fill_gaps():
     assert(np.any(nlc.time == 5))
     assert(np.all(nlc.flux == 1))
     assert(np.all(np.isfinite(nlc.flux)))
+
+
+@pytest.mark.remote_data
+def test_from_fits():
+    """Does the lcf.from_fits() method work like the constructor?"""
+    lcf = KeplerLightCurveFile.from_fits(TABBY_Q8)
+    assert isinstance(lcf, KeplerLightCurveFile)
+    assert tpf.keplerid == KeplerLightCurveFile(TABBY_Q8).keplerid
+    # Execute the same test for TESS
+    tpf = TessLightCurveFile.from_fits(TESS_SIM)
+    assert isinstance(tpf, TessLightCurveFile)
+    assert tpf.ticid == TessLightCurveFile(TESS_SIM).ticid
