@@ -470,8 +470,8 @@ def test_from_fits():
     """Does the lcf.from_fits() method work like the constructor?"""
     lcf = KeplerLightCurveFile.from_fits(TABBY_Q8)
     assert isinstance(lcf, KeplerLightCurveFile)
-    assert tpf.keplerid == KeplerLightCurveFile(TABBY_Q8).keplerid
+    assert lcf.keplerid == KeplerLightCurveFile(TABBY_Q8).keplerid
     # Execute the same test for TESS
-    tpf = TessLightCurveFile.from_fits(TESS_SIM)
-    assert isinstance(tpf, TessLightCurveFile)
-    assert tpf.ticid == TessLightCurveFile(TESS_SIM).ticid
+    lcf = TessLightCurveFile.from_fits(TESS_SIM)
+    assert isinstance(lcf, TessLightCurveFile)
+    assert lcf.ticid == TessLightCurveFile(TESS_SIM).ticid
