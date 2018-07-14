@@ -66,16 +66,32 @@ Building documentation
 
 .. note::
 
-    In general, building the documentation is not necessary unless you are
+    Building the documentation is not necessary unless you are
     writing new documentation or do not have internet access, because the
     latest version of lightkurve's documentation is available online at
-    `lightkurve.keplerscience.org/ <http://lightkurve.keplerscience.org/>`_ .
+    `lightkurve.keplerscience.org <http://lightkurve.keplerscience.org/>`_ .
 
-.. note::
-    **lightkurve** documentation requires the `numpydoc sphinx extension <https://github.com/numpy/numpydoc>`_
-    which can be installed with ``pip install numpydoc``.
+Building the **lightkurve** documentation requires a few extra packages:
 
-To build the documentation to HTML format, you can do::
+- sphinx
+- sphinx-automodapi
+- nbsphinx
+- `numpydoc <https://github.com/numpy/numpydoc>`_
+
+These packages can be installed using `conda` or `pip`.
+
+To build the documentation in HTML format, you can do::
 
     cd docs
     make html
+
+This will save the documentation website in the `../../lightkurve-docs` directory
+on your system.  The notebook-based tutorials will not be recompiled by default
+because they take some time to build.  To recompile the notebooks, type::
+
+    make notebooks
+
+Finally, if you have write permission to lightkurve's GitHub repository,
+you can upload the documentation using::
+
+    make upload
