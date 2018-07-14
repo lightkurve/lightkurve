@@ -639,18 +639,19 @@ class PRFPhotometry(object):
         parallel : boolean
             If `True`, cadences will be fit in parallel using Python's `multiprocessing` module. 
         """
-        if cadences is None:
-            cadences = range(len(tpf_flux))
+        if cadences is None:  # By default, fit all cadences.
+            cadences = np.arange(len(tpf_flux))
         # Prepare an iterable of arguments, such that each item contains all information
-        # needed to fit a single cadence.  This will enable parallel processing below. 
+        # needed to fit a single cadence.  This will enable parallel processing below.
+        tpf_flux = np.asarray(tpf_flux)  # Ensure the flux data can be indexed
         if pos_corr1 is None or pos_corr2 is None:
+            args = zip([self.model]*len(cadences),
+                      tpf_flux[cadences])
+        else:
             args = zip([self.model]*len(cadences),
                       tpf_flux[cadences],
                        pos_corr1[cadences],
-                       pos_corr2[cadences])
-        else:
-            args = zip([self.model]*len(cadences),
-                      tpf_flux[cadences])
+                       pos_corr2[cadences])            
         # Set up a mapping function
         if parallel:
             import multiprocessing
