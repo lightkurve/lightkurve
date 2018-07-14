@@ -185,6 +185,28 @@ class TargetPixelFile(object):
             mywcs[newkey] = self.hdu[1].header[oldkey]
         return WCS(mywcs)
 
+    @classmethod
+    def from_fits(cls, path_or_url, **kwargs):
+        """Open a Target Pixel File using the path or url of a FITS file.
+
+        This is identical to opening a Target Pixel File via the constructor.
+        This method was added because many tutorials use the `from_archive`
+        method, therefore users may expect a `from_fits` equivalent.
+
+        Parameters
+        ----------
+        path_or_url : str
+            Path or URL of a FITS file.
+        **kwargs : dict
+            Keyword arguments that will be passed to the constructor.
+
+        Returns
+        -------
+        tpf : TargetPixelFile object
+            The loaded target pixel file.
+        """
+        return cls(path_or_url, **kwargs)
+
     def get_coordinates(self, cadence='all'):
         """Returns two 3D arrays of RA and Dec values in decimal degrees.
 

@@ -68,6 +68,28 @@ class LightCurveFile(object):
         """Cadence number"""
         return self.hdu[1].data['CADENCENO'][self.quality_mask]
 
+    @classmethod
+    def from_fits(cls, path_or_url, **kwargs):
+        """Open a Light Curve File using the path or url of a FITS file.
+
+        This is identical to opening a Light Curve File via the constructor.
+        This method was added because many tutorials use the `from_archive`
+        method, therefore users may expect a `from_fits` equivalent.
+
+        Parameters
+        ----------
+        path_or_url : str
+            Path or URL of a FITS file.
+        **kwargs : dict
+            Keyword arguments that will be passed to the constructor.
+
+        Returns
+        -------
+        tpf : LightCurveFile object
+            The loaded light curve file.
+        """
+        return cls(path_or_url, **kwargs)
+
     def _flux_types(self):
         """Returns a list of available flux types for this light curve file"""
         types = [n for n in self.hdu[1].data.columns.names if 'FLUX' in n]

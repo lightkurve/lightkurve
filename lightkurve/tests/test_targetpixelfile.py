@@ -231,3 +231,14 @@ def test_interact():
 def test_from_archive_should_accept_path():
     """If a path is accidentally passed to `from_archive` it should still just work."""
     KeplerTargetPixelFile.from_archive(filename_tpf_all_zeros)
+
+
+def test_from_fits():
+    """Does the tpf.from_fits() method work like the constructor?"""
+    tpf = KeplerTargetPixelFile.from_fits(filename_tpf_one_center)
+    assert isinstance(tpf, KeplerTargetPixelFile)
+    assert tpf.keplerid == KeplerTargetPixelFile(filename_tpf_one_center).keplerid
+    # Execute the same test for TESS
+    tpf = TessTargetPixelFile.from_fits(filename_tpf_one_center)
+    assert isinstance(tpf, TessTargetPixelFile)
+    assert tpf.ticid == TessTargetPixelFile(filename_tpf_one_center).ticid
