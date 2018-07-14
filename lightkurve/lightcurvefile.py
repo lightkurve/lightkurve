@@ -132,6 +132,28 @@ class KeplerLightCurveFile(LightCurveFile):
         self.quality_mask = self._quality_mask(quality_bitmask)
 
     @staticmethod
+    def from_fits(path_or_url, **kwargs):
+        """Open a Light Curve File using the path or url of a FITS file.
+
+        This is identical to opening a Light Curve File via the constructor.
+        This method was added because many tutorials use the `from_archive`
+        method, therefore users may expect a `from_fits` equivalent.
+
+        Parameters
+        ----------
+        path_or_url : str
+            Path or URL of a FITS file.
+        **kwargs : dict
+            Keyword arguments that will be passed to the constructor.
+
+        Returns
+        -------
+        tpf : KeplerLightCurveFile object
+            The loaded light curve file.
+        """
+        return KeplerLightCurveFile(path_or_url, **kwargs)
+
+    @staticmethod
     def from_archive(target, cadence='long', quarter=None, month=None,
                      campaign=None, radius=1., targetlimit=1, **kwargs):
         """Fetches a LightCurveFile (or list thereof) from the data archive at MAST.
@@ -339,6 +361,28 @@ class TessLightCurveFile(LightCurveFile):
         super(TessLightCurveFile, self).__init__(path, **kwargs)
         self.quality_bitmask = quality_bitmask
         self.quality_mask = self._quality_mask(quality_bitmask)
+
+    @staticmethod
+    def from_fits(path_or_url, **kwargs):
+        """Open a Light Curve File using the path or url of a FITS file.
+
+        This is identical to opening a Light Curve File via the constructor.
+        This method was added because many tutorials use the `from_archive`
+        method, therefore users may expect a `from_fits` equivalent.
+
+        Parameters
+        ----------
+        path_or_url : str
+            Path or URL of a FITS file.
+        **kwargs : dict
+            Keyword arguments that will be passed to the constructor.
+
+        Returns
+        -------
+        tpf : TessLightCurveFile object
+            The loaded light curve file.
+        """
+        return TessLightCurveFile(path_or_url, **kwargs)
 
     def __repr__(self):
         return('TessLightCurveFile(TICID: {})'.format(self.ticid))
