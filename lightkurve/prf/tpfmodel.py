@@ -621,7 +621,7 @@ class PRFPhotometry(object):
         self.model = model
         self.results = []
 
-    def run(self, tpf_flux, pos_corr1=None, pos_corr2=None, cadences=None, use_multiprocessing=False):
+    def run(self, tpf_flux, cadences=None, pos_corr1=None, pos_corr2=None, use_multiprocessing=True):
         """Fits the model to the flux data.
 
         Parameters
@@ -630,17 +630,19 @@ class PRFPhotometry(object):
             A pixel flux time-series, i.e., the pixel data, e.g,
             KeplerTargetPixelFile.flux, such that (time, row, column) represents
             the shape of ``tpf_flux``.
+        cadences : array-like
+            Cadences to fit.  If `None` then fit all.
         pos_corr1, pos_corr2 : array-like, array-like
             If set, use these values to update the prior means for
             `model.motion_prior.shift_col` and `model.motion_prior.shift_row`
             for each cadence.
-        cadences : array-like
-            Cadences to fit.  If `None` then fit all.
+        use_multiprocessing : boolean
+            If `True`, cadences will be fit in parallel using Python's `multiprocessing` module. 
         """
-        self.results = []
         if cadences is None:
             cadences = range(len(tpf_flux))
-        # Prepare arguments
+        # Prepare an iterable of arguments, such that each item contains all information
+        # needed to fit a single cadence.  This will enable parallel processing below. 
         if pos_corr1 is None or pos_corr2 is None:
             args = zip([self.model]*len(cadences),
                       tpf_flux[cadences],
@@ -649,17 +651,20 @@ class PRFPhotometry(object):
         else:
             args = zip([self.model]*len(cadences),
                       tpf_flux[cadences])
-        # Fit all cadences in parallel
+        # Set up a mapping function
         if use_multiprocessing:
             import multiprocessing
-            p = multiprocessing.Pool()
-            mymap = p.imap
+            pool = multiprocessing.Pool()
+            mymap = pool.imap
         else:
             import itertools
-            mymap = itertools.imap 
+            mymap = itertools.imap
+        # Now fit all cadences using the mapping function and the list of arguments
+        self.results = []
         for result in tqdm(mymap(fit_one_cadence, args), desc='Fitting cadences', total=len(cadences)):
             self.results.append(result)
-        p.close()
+        if use_multiprocessing:
+            pool.close()
         # Parse results
         self.lightcurves = [self._parse_lightcurve(star_idx)
                             for star_idx in range(len(self.model.star_priors))]

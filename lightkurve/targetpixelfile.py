@@ -913,11 +913,11 @@ class KeplerTargetPixelFile(TargetPixelFile):
             various diagnostics.
         """
         from .prf import PRFPhotometry
-        model = self.get_model(**kwargs)
-        pp = PRFPhotometry(model)
-        pp.run(self.flux, pos_corr1=self.pos_corr1, pos_corr2=self.pos_corr2,
-               cadences=cadences, use_multiprocessing=use_multiprocessing)
-        return pp
+        prfphot = PRFPhotometry(model=self.get_model(**kwargs))
+        prfphot.run(self.flux, cadences=cadences,
+                    pos_corr1=self.pos_corr1, pos_corr2=self.pos_corr2,
+                    use_multiprocessing=use_multiprocessing)
+        return prfphot
 
     @staticmethod
     def from_fits_images(images, position=None, size=(10, 10), extension=None,
