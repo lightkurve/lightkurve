@@ -185,6 +185,28 @@ class TargetPixelFile(object):
             mywcs[newkey] = self.hdu[1].header[oldkey]
         return WCS(mywcs)
 
+    @classmethod
+    def from_fits(cls, path_or_url, **kwargs):
+        """Open a Target Pixel File using the path or url of a FITS file.
+
+        This is identical to opening a Target Pixel File via the constructor.
+        This method was added because many tutorials use the `from_archive`
+        method, therefore users may expect a `from_fits` equivalent.
+
+        Parameters
+        ----------
+        path_or_url : str
+            Path or URL of a FITS file.
+        **kwargs : dict
+            Keyword arguments that will be passed to the constructor.
+
+        Returns
+        -------
+        tpf : TargetPixelFile object
+            The loaded target pixel file.
+        """
+        return cls(path_or_url, **kwargs)
+
     def get_coordinates(self, cadence='all'):
         """Returns two 3D arrays of RA and Dec values in decimal degrees.
 
@@ -655,28 +677,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
         self.targetid = self.header()['KEPLERID']
 
     @staticmethod
-    def from_fits(path_or_url, **kwargs):
-        """Open a Target Pixel File using the path or url of a FITS file.
-
-        This is identical to opening a Target Pixel File via the constructor.
-        This method was added because many tutorials use the `from_archive`
-        method, therefore users may expect a `from_fits` equivalent.
-
-        Parameters
-        ----------
-        path_or_url : str
-            Path or URL of a FITS file.
-        **kwargs : dict
-            Keyword arguments that will be passed to the constructor.
-
-        Returns
-        -------
-        tpf : KeplerTargetPixelFile object
-            The loaded target pixel file.
-        """
-        return KeplerTargetPixelFile(path_or_url, **kwargs)
-
-    @staticmethod
     def from_archive(target, cadence='long', quarter=None, month=None,
                      campaign=None, radius=1., targetlimit=1, **kwargs):
         """Fetch a Target Pixel File from the Kepler/K2 data archive at MAST.
@@ -1110,28 +1110,6 @@ class TessTargetPixelFile(TargetPixelFile):
             self.targetid = self.header()['TICID']
         except KeyError:
             self.targetid = None
-
-    @staticmethod
-    def from_fits(path_or_url, **kwargs):
-        """Open a Target Pixel File using the path or url of a FITS file.
-
-        This is identical to opening a Target Pixel File via the constructor.
-        This method was added because many tutorials use the `from_archive`
-        method, therefore users may expect a `from_fits` equivalent.
-
-        Parameters
-        ----------
-        path_or_url : str
-            Path or URL of a FITS file.
-        **kwargs : dict
-            Keyword arguments that will be passed to the constructor.
-
-        Returns
-        -------
-        tpf : TessTargetPixelFile object
-            The loaded target pixel file.
-        """
-        return TessTargetPixelFile(path_or_url, **kwargs)
 
     def __repr__(self):
         return('TessTargetPixelFile(TICID: {})'.format(self.ticid))
