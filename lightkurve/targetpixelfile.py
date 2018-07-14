@@ -895,16 +895,19 @@ class KeplerTargetPixelFile(TargetPixelFile):
                          **kwargs)
         return model
 
-    def prf_photometry(self, cadences=None, use_multiprocessing=True, **kwargs):
+    def prf_photometry(self, cadences=None, parallel=True, **kwargs):
         """Returns the results of PRF photometry applied to the pixel file.
 
         Parameters
         ----------
         cadences : list of int
-            Cadences to fit.  This can be useful while debugging a subset of
-            lightcurve cadences.
+            Cadences to fit.  If `None` (default) then all cadences will be fit.
+        parallel : bool
+            If `True`, fitting cadences will be distributed across multiple
+            cores using Python's `multiprocessing` module.
         **kwargs : dict
-            Keywords to be passed to `get_model`.
+            Keywords to be passed to `tpf.get_model()` to create the `TPFModel`
+            object that will be fit.
         
         Returns
         -------
@@ -914,9 +917,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
         """
         from .prf import PRFPhotometry
         prfphot = PRFPhotometry(model=self.get_model(**kwargs))
-        prfphot.run(self.flux, cadences=cadences,
-                    pos_corr1=self.pos_corr1, pos_corr2=self.pos_corr2,
-                    use_multiprocessing=use_multiprocessing)
+        prfphot.run(self.flux, cadences=cadences, parallel=parallel,
+                    pos_corr1=self.pos_corr1, pos_corr2=self.pos_corr2)
         return prfphot
 
     @staticmethod

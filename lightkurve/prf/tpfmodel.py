@@ -621,7 +621,7 @@ class PRFPhotometry(object):
         self.model = model
         self.results = []
 
-    def run(self, tpf_flux, cadences=None, pos_corr1=None, pos_corr2=None, use_multiprocessing=True):
+    def run(self, tpf_flux, cadences=None, pos_corr1=None, pos_corr2=None, parallel=True):
         """Fits the model to the flux data.
 
         Parameters
@@ -631,12 +631,12 @@ class PRFPhotometry(object):
             KeplerTargetPixelFile.flux, such that (time, row, column) represents
             the shape of ``tpf_flux``.
         cadences : array-like
-            Cadences to fit.  If `None` then fit all.
+            Cadences to fit.  If `None` (default) then all cadences will be fit.
         pos_corr1, pos_corr2 : array-like, array-like
             If set, use these values to update the prior means for
             `model.motion_prior.shift_col` and `model.motion_prior.shift_row`
             for each cadence.
-        use_multiprocessing : boolean
+        parallel : boolean
             If `True`, cadences will be fit in parallel using Python's `multiprocessing` module. 
         """
         if cadences is None:
@@ -652,7 +652,7 @@ class PRFPhotometry(object):
             args = zip([self.model]*len(cadences),
                       tpf_flux[cadences])
         # Set up a mapping function
-        if use_multiprocessing:
+        if parallel:
             import multiprocessing
             pool = multiprocessing.Pool()
             mymap = pool.imap
@@ -663,7 +663,7 @@ class PRFPhotometry(object):
         self.results = []
         for result in tqdm(mymap(fit_one_cadence, args), desc='Fitting cadences', total=len(cadences)):
             self.results.append(result)
-        if use_multiprocessing:
+        if parallel:
             pool.close()
         # Parse results
         self.lightcurves = [self._parse_lightcurve(star_idx)
@@ -712,7 +712,10 @@ class PRFPhotometry(object):
 
 
 def fit_one_cadence(arg):
-    """Helper function to enable parallelism."""
+    """Helper function to enable parallelism.
+
+    This function is used by PRFPhotometry.run().
+    """
     model = arg[0]
     data = arg[1]
     if len(arg) == 4:
