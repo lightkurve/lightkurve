@@ -537,7 +537,8 @@ class TPFModel(object):
         params = self.params.from_array(params_array)
         return self.logp_prior(params)
 
-    def fit(self, data, loss_function=PoissonPosterior, method='powell', **kwargs):
+    def fit(self, data, loss_function=PoissonPosterior, method='powell',
+            pos_corr1=None, pos_corr2=None, **kwargs):
         """Fits the model to the data.
 
         Parameters
@@ -557,6 +558,10 @@ class TPFModel(object):
             Fitted parameters plus fitting diagnostics.
         """
         loss = loss_function(data, self, prior=self._logp_prior)
+        if pos_corr1 is not None and np.abs(pos_corr1) < 50:
+            self.motion_prior.shift_col.mean = pos_corr1
+        if pos_corr2 is not None and np.abs(pos_corr2) < 50:
+            self.motion_prior.shift_row.mean = pos_corr2
         with warnings.catch_warnings():
             # Ignore RuntimeWarnings trigged by invalid values
             warnings.simplefilter("ignore", RuntimeWarning)
@@ -616,7 +621,7 @@ class PRFPhotometry(object):
         self.model = model
         self.results = []
 
-    def run(self, tpf_flux, pos_corr1=None, pos_corr2=None, cadences=None):
+    def run(self, tpf_flux, pos_corr1=None, pos_corr2=None, cadences=None, use_multiprocessing=False):
         """Fits the model to the flux data.
 
         Parameters
@@ -635,12 +640,26 @@ class PRFPhotometry(object):
         self.results = []
         if cadences is None:
             cadences = range(len(tpf_flux))
-        for cadence in tqdm(cadences):
-            if pos_corr1 is not None and np.abs(pos_corr1[cadence]) < 50:
-                self.model.motion_prior.shift_col.mean = pos_corr1[cadence]
-            if pos_corr2 is not None and np.abs(pos_corr2[cadence]) < 50:
-                self.model.motion_prior.shift_row.mean = pos_corr2[cadence]
-            self.results.append(self.model.fit(tpf_flux[cadence]))
+        # Prepare arguments
+        if pos_corr1 is None or pos_corr2 is None:
+            args = zip([self.model]*len(cadences),
+                      tpf_flux[cadences],
+                       pos_corr1[cadences],
+                       pos_corr2[cadences])
+        else:
+            args = zip([self.model]*len(cadences),
+                      tpf_flux[cadences])
+        # Fit all cadences in parallel
+        if use_multiprocessing:
+            import multiprocessing
+            p = multiprocessing.Pool()
+            mymap = p.imap
+        else:
+            import itertools
+            mymap = itertools.imap 
+        for result in tqdm(mymap(fit_one_cadence, args), desc='Fitting cadences', total=len(cadences)):
+            self.results.append(result)
+        p.close()
         # Parse results
         self.lightcurves = [self._parse_lightcurve(star_idx)
                             for star_idx in range(len(self.model.star_priors))]
@@ -663,7 +682,7 @@ class PRFPhotometry(object):
 
     def plot_results(self, star_idx=0):
         """Plot all the TPF model parameters over time."""
-        fig, ax = plt.subplots(10, sharex=True, figsize=(6, 10))
+        fig, ax = plt.subplots(10, sharex=True, figsize=(6, 12))
         x = range(len(self.results))
         ax[0].plot(x, [r.stars[star_idx].flux for r in self.results])
         ax[0].set_ylabel('Flux')
@@ -685,4 +704,14 @@ class PRFPhotometry(object):
         ax[8].set_ylabel('Focus angle')
         ax[9].plot(x, [r.loss_value for r in self.results])
         ax[9].set_ylabel('Loss')
-        return fig
+
+
+def fit_one_cadence(arg):
+    """Helper function to enable parallelism."""
+    model = arg[0]
+    data = arg[1]
+    if len(arg) == 4:
+        pos_corr1, pos_corr2 = arg[2], arg[3]
+    else:
+        pos_corr1, pos_corr2 = None, None
+    return model.fit(data, pos_corr1=pos_corr1, pos_corr2=pos_corr2)

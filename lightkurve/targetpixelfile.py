@@ -895,12 +895,28 @@ class KeplerTargetPixelFile(TargetPixelFile):
                          **kwargs)
         return model
 
-    def prf_photometry(self):
-        """Returns a LightCurve obtained using PRF-fitting photometry."""
+    def prf_photometry(self, cadences=None, use_multiprocessing=True, **kwargs):
+        """Returns the results of PRF photometry applied to the pixel file.
+
+        Parameters
+        ----------
+        cadences : list of int
+            Cadences to fit.  This can be useful while debugging a subset of
+            lightcurve cadences.
+        **kwargs : dict
+            Keywords to be passed to `get_model`.
+        
+        Returns
+        -------
+        results : PRFPhotometry object
+            Object that provides access to PRF-fitting photometry results and
+            various diagnostics.
+        """
         from .prf import PRFPhotometry
-        model = self.get_model()
+        model = self.get_model(**kwargs)
         pp = PRFPhotometry(model)
-        pp.run(self.flux, pos_corr1=self.pos_corr1, pos_corr2=self.pos_corr2) #, cadences=range(0, 5))
+        pp.run(self.flux, pos_corr1=self.pos_corr1, pos_corr2=self.pos_corr2,
+               cadences=cadences, use_multiprocessing=use_multiprocessing)
         return pp
 
     @staticmethod
