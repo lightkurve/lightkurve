@@ -106,7 +106,12 @@ def test_tpf_model_fitting():
                      background_prior=background_prior,
                      prfmodel=prfmodel)
     # Does fitting run without errors?
-    model.fit(tpf[1].data)
+    result = model.fit(tpf[1].data)
+    # Can we change model parameters?
+    assert result.motion.fitted == False
+    model.fit_motion = True
+    result = model.fit(tpf[1].data)
+    assert result.motion.fitted == True
     # Does fitting via the PRFPhotometry class run without errors?
     phot = PRFPhotometry(model)
     phot.run([tpf[1].data])

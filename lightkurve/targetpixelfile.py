@@ -907,12 +907,14 @@ class KeplerTargetPixelFile(TargetPixelFile):
             Model with appropriate defaults for this Target Pixel File.
         """
         from .prf import TPFModel, StarPrior, BackgroundPrior
-        from .prf import FixedValuePrior, UniformPrior, GaussianPrior
+        from .prf import UniformPrior, GaussianPrior
         # Set up the model
         if 'star_priors' not in kwargs:
             centr_col, centr_row = self.centroids()
-            star_priors = [StarPrior(col=FixedValuePrior(np.nanmedian(centr_col)),
-                                     row=FixedValuePrior(np.nanmedian(centr_row)),
+            star_priors = [StarPrior(col=GaussianPrior(mean=np.nanmedian(centr_col),
+                                                       var=np.nanstd(centr_col)**2),
+                                     row=GaussianPrior(mean=np.nanmedian(centr_row),
+                                                       var=np.nanstd(centr_row)**2),
                                      flux=UniformPrior(lb=0.5*np.nanmax(self.flux[0]),
                                                        ub=2*np.nansum(self.flux[0]) + 1e-10),
                                      targetid=self.targetid)]

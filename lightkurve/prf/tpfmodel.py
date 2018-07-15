@@ -376,7 +376,7 @@ class TPFModelParameters(object):
                                       fitted=True)
 
         return TPFModelParameters(stars=stars, background=background,
-                                    focus=focus, motion=motion)
+                                  focus=focus, motion=motion)
 
 
 class TPFModel(object):
@@ -415,7 +415,7 @@ class TPFModel(object):
         self.fit_background = fit_background
         self.fit_focus = fit_focus
         self.fit_motion = fit_motion
-        self.params = self.get_initial_guesses()
+        self._params = self.get_initial_guesses()
 
     def __repr__(self):
         out = super(TPFModel, self).__repr__() + '\n'
@@ -448,9 +448,9 @@ class TPFModel(object):
                                   shift_row=self.motion_prior.shift_row.mean,
                                   fitted=self.fit_motion)
         initial_params = TPFModelParameters(stars=initial_star_guesses,
-                                              background=background,
-                                              focus=focus,
-                                              motion=motion)
+                                            background=background,
+                                            focus=focus,
+                                            motion=motion)
         return initial_params
 
     def predict(self, params=None):
@@ -485,7 +485,7 @@ class TPFModel(object):
 
         Unlike ``predict()`, this function can be called by scipy.optimize.
         """
-        params = self.params.from_array(params_array)
+        params = self._params.from_array(params_array)
         return self.predict(params)
 
     def __call__(self, *params_array):
@@ -493,7 +493,7 @@ class TPFModel(object):
 
     def gradient(self, *params_array):
         """UNFINISHED WORK!"""
-        params = self.params.from_array(params_array)
+        params = self._params.from_array(params_array)
         grad = []
         for star in params.stars:
             grad.append(self.prfmodel.gradient(center_col=star.col,
@@ -534,7 +534,7 @@ class TPFModel(object):
 
         Unlike ``predict()`, this function can be called by scipy.optimize.
         """
-        params = self.params.from_array(params_array)
+        params = self._params.from_array(params_array)
         return self.logp_prior(params)
 
     def fit(self, data, loss_function=PoissonPosterior, method='powell',
@@ -557,18 +557,21 @@ class TPFModel(object):
         result : ``TPFModelParameters`` object
             Fitted parameters plus fitting diagnostics.
         """
-        loss = loss_function(data, self, prior=self._logp_prior)
         if pos_corr1 is not None and np.abs(pos_corr1) < 50:
             self.motion_prior.shift_col.mean = pos_corr1
         if pos_corr2 is not None and np.abs(pos_corr2) < 50:
             self.motion_prior.shift_row.mean = pos_corr2
+
+        self._params = self.get_initial_guesses()  # Update _params for model changes!
+        loss = loss_function(data, self, prior=self._logp_prior)
         with warnings.catch_warnings():
             # Ignore RuntimeWarnings trigged by invalid values
             warnings.simplefilter("ignore", RuntimeWarning)
             fit = loss.fit(x0=self.get_initial_guesses().to_array(), method=method, **kwargs)
-        result = self.params.from_array(fit.x)
-        #uncertainties are broken for now because `self.gradient` is unfinished
-        #result.uncertainties = loss.loglikelihood.uncertainties(fit.x)
+        result = self._params.from_array(fit.x)
+        # NOTE: uncertainties are not available for now because `self.gradient` is unfinished;
+        # hence, the line below is commented out for now:
+        # result.uncertainties = loss.loglikelihood.uncertainties(fit.x)
         result.predicted_image = self._predict(fit.x)
         result.residual_image = data - result.predicted_image
         result.loss_value = fit.fun
