@@ -449,6 +449,7 @@ def test_from_archive_should_accept_path():
     """If a url is passed to `from_archive` it should still just work."""
     KeplerLightCurveFile.from_archive(TABBY_Q8)
 
+
 def test_fill_gaps():
     lc = LightCurve([1,2,3,4,6,7,8], [1,1,1,1,1,1,1])
     nlc = lc.fill_gaps()
@@ -469,6 +470,7 @@ def test_lc_collection():
     
     lcf = KeplerLightCurveFile(TABBY_Q8)
     lcc = LightCurveCollection([lcf])
+    lcf2 = lcf
     
     assert(len(lcc) == 1)
     assert(lcc[0] == lcf)
@@ -483,3 +485,17 @@ def test_lc_collection():
 
     for lc in lcc:
         print(lc)
+
+    #What happens when I try to append the same obj twice?
+    lcc.append(lcf2)
+        
+@pytest.mark.remote_data
+def test_from_fits():
+    """Does the lcf.from_fits() method work like the constructor?"""
+    lcf = KeplerLightCurveFile.from_fits(TABBY_Q8)
+    assert isinstance(lcf, KeplerLightCurveFile)
+    assert lcf.keplerid == KeplerLightCurveFile(TABBY_Q8).keplerid
+    # Execute the same test for TESS
+    lcf = TessLightCurveFile.from_fits(TESS_SIM)
+    assert isinstance(lcf, TessLightCurveFile)
+    assert lcf.ticid == TessLightCurveFile(TESS_SIM).ticid
