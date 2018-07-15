@@ -12,6 +12,7 @@ Direct contributions to the code base:
 - `Andy Tzanidakis <https://github.com/AndyTza>`_
 - `Sheila Sagear <https://github.com/ssagear>`_
 - `Emma Turtelboom <https://github.com/Emmavt>`_
+- `Jeff Coughlin <https://github.com/JeffLCoughlin>`_
 
 Comments, corrections & suggestions:
 
@@ -25,3 +26,4 @@ Comments, corrections & suggestions:
 - `Elisa Quintana <https://github.com/elisaquintana>`_
 - Jeff Van Cleve
 - Ashley Villar
+- `Benjamin Pope <https://github.com/benjaminpope>`_

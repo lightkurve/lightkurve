@@ -9,3 +9,4 @@ requests
 tqdm
 bokeh>=0.12.15
 ipywidgets>=7.2.0
+pandas

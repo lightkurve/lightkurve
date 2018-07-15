@@ -185,6 +185,28 @@ class TargetPixelFile(object):
             mywcs[newkey] = self.hdu[1].header[oldkey]
         return WCS(mywcs)
 
+    @classmethod
+    def from_fits(cls, path_or_url, **kwargs):
+        """Open a Target Pixel File using the path or url of a FITS file.
+
+        This is identical to opening a Target Pixel File via the constructor.
+        This method was added because many tutorials use the `from_archive`
+        method, therefore users may expect a `from_fits` equivalent.
+
+        Parameters
+        ----------
+        path_or_url : str
+            Path or URL of a FITS file.
+        **kwargs : dict
+            Keyword arguments that will be passed to the constructor.
+
+        Returns
+        -------
+        tpf : TargetPixelFile object
+            The loaded target pixel file.
+        """
+        return cls(path_or_url, **kwargs)
+
     def get_coordinates(self, cadence='all'):
         """Returns two 3D arrays of RA and Dec values in decimal degrees.
 
@@ -492,8 +514,8 @@ class TargetPixelFile(object):
 
         # Bokeh cannot handle many data points
         # https://github.com/bokeh/bokeh/issues/7490
-        if len(lc.time) > 30000:
-            raise RuntimeError('Interact cannot display more than 20000 cadences.')
+        if len(lc.cadenceno) > 30000:
+            raise RuntimeError('Interact cannot display more than 30000 cadences.')
 
         # Map cadence to index for quick array slicing.
         n_lc_cad = len(lc.cadenceno)
@@ -624,7 +646,12 @@ class TargetPixelFile(object):
             else:
                 vert.update(line_alpha=0)
                 fig2_dat.data_source.data['image'] = [self.flux[0, :, :] * np.NaN]
-            push_notebook()
+            try:
+                push_notebook()
+            except AttributeError:
+                log.error('Interact tool must be run in a Jupyter Notebook.\n')
+                return None
+
 
         # Define the widgets that enable the interactivity
         play = widgets.Play(interval=10, value=min_cadence, min=min_cadence,
