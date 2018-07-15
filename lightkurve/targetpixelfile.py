@@ -893,34 +893,37 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
         The default model only includes one star and only allows its flux
         and position to change.  A different set of stars can be added using
-        the `star_priors` parameters.
+        the `star_priors` parameter.
 
         Parameters
         ----------
-        star_priors : list of StarPrior objects
-            Stars to include in the model.
         **kwargs : dict
-            Extra arguments to be passed to the `TPFModel` constructor.
+            Arguments to be passed to the `TPFModel` constructor, e.g.
+            `star_priors`.
 
         Returns
         -------
         model : TPFModel object
             Model with appropriate defaults for this Target Pixel File.
         """
-        from .prf import TPFModel, StarPrior
-        from .prf import FixedValuePrior, UniformPrior
+        from .prf import TPFModel, StarPrior, BackgroundPrior
+        from .prf import FixedValuePrior, UniformPrior, GaussianPrior
         # Set up the model
-        if star_priors is None:
+        if 'star_priors' not in kwargs:
             centr_col, centr_row = self.centroids()
             star_priors = [StarPrior(col=FixedValuePrior(np.nanmedian(centr_col)),
                                      row=FixedValuePrior(np.nanmedian(centr_row)),
                                      flux=UniformPrior(lb=0.5*np.nanmax(self.flux[0]),
                                                        ub=2*np.nansum(self.flux[0]) + 1e-10),
                                      targetid=self.targetid)]
-        model = TPFModel(star_priors=star_priors,
-                         prfmodel=self.get_prf_model(),
-                         **kwargs)
-        return model
+            kwargs['star_priors'] = star_priors
+        if 'prfmodel' not in kwargs:
+            kwargs['prfmodel'] = self.get_prf_model()
+        if 'background_prior' not in kwargs:
+            flux_prior = GaussianPrior(mean=np.nanmean(self.flux_bkg),
+                                       var=np.nanstd(self.flux_bkg)**2)
+            kwargs['background_prior'] = BackgroundPrior(flux=flux_prior)
+        return TPFModel(**kwargs)
 
     def prf_photometry(self, cadences=None, parallel=True, **kwargs):
         """Returns the results of PRF photometry applied to the pixel file.
@@ -943,8 +946,10 @@ class KeplerTargetPixelFile(TargetPixelFile):
             various diagnostics.
         """
         from .prf import PRFPhotometry
+        log.warning('Warning: PRF-fitting photometry is experimental '
+                    'in this version of lightkurve.')
         prfphot = PRFPhotometry(model=self.get_model(**kwargs))
-        prfphot.run(self.flux, cadences=cadences, parallel=parallel,
+        prfphot.run(self.flux + self.flux_bkg, cadences=cadences, parallel=parallel,
                     pos_corr1=self.pos_corr1, pos_corr2=self.pos_corr2)
         return prfphot
 
