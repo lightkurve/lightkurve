@@ -75,7 +75,6 @@ def test_tpf_zeros():
     assert np.all(lc.flux == 0)
     # The default QUALITY bitmask should have removed all NaNs in the TIME
     assert ~np.any(np.isnan(tpf.time))
-    tpf.get_model()
 
 
 def test_tpf_ones():
@@ -252,3 +251,10 @@ def test_from_fits():
     tpf = TessTargetPixelFile.from_fits(filename_tpf_one_center)
     assert isinstance(tpf, TessTargetPixelFile)
     assert tpf.ticid == TessTargetPixelFile(filename_tpf_one_center).ticid
+
+
+def test_get_models():
+    """Can we obtain PRF and TPF models?"""
+    tpf = KeplerTargetPixelFile(filename_tpf_all_zeros, quality_bitmask=None)
+    tpf.get_model()
+    tpf.get_prf_model()

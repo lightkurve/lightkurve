@@ -889,7 +889,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                           flux_err=self.flux_bkg_err)
 
     def get_model(self, star_priors=None, **kwargs):
-        """Returns a `TargetPixelFileModel` object with simple defaults.
+        """Returns a default `TPFModel` object for PRF fitting.
 
         The default model only includes one star and only allows its flux
         and position to change.  A different set of stars can be added using
@@ -936,8 +936,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
             If `True`, fitting cadences will be distributed across multiple
             cores using Python's `multiprocessing` module.
         **kwargs : dict
-            Keywords to be passed to `tpf.get_model()` to create the `TPFModel`
-            object that will be fit.
+            Keywords to be passed to `tpf.get_model()` to create the
+            `TPFModel` object that will be fit.
 
         Returns
         -------

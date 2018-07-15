@@ -187,7 +187,7 @@ class FocusPrior(PriorContainer):
         self.rotation_angle = self._parse_prior(rotation_angle)
 
     def __repr__(self):
-        return ('<StarPrior: scale_col={}, scale_row={}, rotation_angle={}>'
+        return ('<FocusPrior: scale_col={}, scale_row={}, rotation_angle={}>'
                 ''.format(self.scale_col, self.scale_row, self.rotation_angle))
 
     def evaluate(self, scale_col, scale_row, rotation_angle):
