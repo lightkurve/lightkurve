@@ -310,7 +310,7 @@ class TargetPixelFile(object):
         if method == 'aperture':
             return self.aperture_photometry(**kwargs)
         elif method == 'prf':
-            return self.prf_photometry(**kwargs).lightcurves[0]
+            return self.prf_lightcurve(**kwargs)
         else:
             raise ValueError("Photometry method must be 'aperture' or 'prf'.")
 
@@ -492,7 +492,7 @@ class TargetPixelFile(object):
 
         # Bokeh cannot handle many data points
         # https://github.com/bokeh/bokeh/issues/7490
-        if len(lc.cadenceno) > 30000:
+        if len(lc.time) > 30000:
             raise RuntimeError('Interact cannot display more than 20000 cadences.')
 
         # Map cadence to index for quick array slicing.
@@ -862,7 +862,11 @@ class KeplerTargetPixelFile(TargetPixelFile):
                           flux_err=self.flux_bkg_err)
 
     def get_model(self, star_priors=None, **kwargs):
-        """Returns a `TargetPixelFileModel` object with appropriate defaults.
+        """Returns a `TargetPixelFileModel` object with simple defaults.
+
+        The default model only includes one star and only allows its flux
+        and position to change.  A different set of stars can be added using
+        the `star_priors` parameters.
 
         Parameters
         ----------
@@ -876,22 +880,18 @@ class KeplerTargetPixelFile(TargetPixelFile):
         model : TPFModel object
             Model with appropriate defaults for this Target Pixel File.
         """
-        from .prf import TPFModel, StarPrior, BackgroundPrior
-        from .prf import GaussianPrior, UniformPrior
+        from .prf import TPFModel, StarPrior
+        from .prf import FixedValuePrior, UniformPrior
         # Set up the model
         if star_priors is None:
             centr_col, centr_row = self.centroids()
-            star_priors = [StarPrior(col=GaussianPrior(mean=np.nanmedian(centr_col), var=0.1**2),
-                                     row=GaussianPrior(mean=np.nanmedian(centr_row), var=0.1**2),
+            star_priors = [StarPrior(col=FixedValuePrior(np.nanmedian(centr_col)),
+                                     row=FixedValuePrior(np.nanmedian(centr_row)),
                                      flux=UniformPrior(lb=0.5*np.nanmax(self.flux[0]),
                                                        ub=2*np.nansum(self.flux[0]) + 1e-10),
                                      targetid=self.targetid)]
-        background_prior = BackgroundPrior(flux=GaussianPrior(mean=0.,
-                                           var=(2 * np.nanstd(self.flux_bkg))**2))
         model = TPFModel(star_priors=star_priors,
-                         background_prior=background_prior,
                          prfmodel=self.get_prf_model(),
-                         fit_background=True,
                          **kwargs)
         return model
 
@@ -908,7 +908,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         **kwargs : dict
             Keywords to be passed to `tpf.get_model()` to create the `TPFModel`
             object that will be fit.
-        
+
         Returns
         -------
         results : PRFPhotometry object
@@ -920,6 +920,23 @@ class KeplerTargetPixelFile(TargetPixelFile):
         prfphot.run(self.flux, cadences=cadences, parallel=parallel,
                     pos_corr1=self.pos_corr1, pos_corr2=self.pos_corr2)
         return prfphot
+
+    def prf_lightcurve(self, **kwargs):
+        lc = self.prf_photometry(**kwargs).lightcurves[0]
+        keys = {'quality': self.quality,
+                'channel': self.channel,
+                'campaign': self.campaign,
+                'quarter': self.quarter,
+                'mission': self.mission,
+                'cadenceno': self.cadenceno,
+                'ra': self.ra,
+                'dec': self.dec,
+                'keplerid': self.keplerid}
+        return KeplerLightCurve(time=self.time,
+                                flux=lc.flux,
+                                time_format='bkjd',
+                                time_scale='tdb',
+                                **keys)
 
     @staticmethod
     def from_fits_images(images, position=None, size=(10, 10), extension=None,

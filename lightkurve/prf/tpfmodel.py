@@ -157,7 +157,7 @@ class BackgroundPrior(PriorContainer):
     flux : oktopus ``Prior`` object
         Prior on the background flux in electrons/second per pixel.
     """
-    def __init__(self, flux=UniformPrior(lb=-20, ub=20)):
+    def __init__(self, flux=FixedValuePrior(value=0)):
         self.flux = self._parse_prior(flux)
 
     def __repr__(self):
@@ -227,7 +227,7 @@ class StarParameters(object):
         self.fitted = fitted
 
     def __repr__(self):
-        r = "<StarParameters: col={:.3f}, row={:.3f}, flux={:.3e}>".format(
+        r = "<StarParameters: col={}, row={}, flux={}>".format(
                     self.col, self.row, self.flux)
         return r
 
@@ -241,7 +241,7 @@ class BackgroundParameters(object):
         self.fitted = fitted
 
     def __repr__(self):
-        r = "<BackgroundParameters: flux={:.3e}, fitted={}>".format(
+        r = "<BackgroundParameters: flux={}, fitted={}>".format(
                     self.flux, self.fitted)
         return r
 
@@ -406,7 +406,7 @@ class TPFModel(object):
                  focus_prior=FocusPrior(),
                  motion_prior=MotionPrior(),
                  prfmodel=KeplerPRF(1, shape=(10, 10), column=0, row=0),
-                 fit_background=True, fit_focus=False, fit_motion=False):
+                 fit_background=False, fit_focus=False, fit_motion=False):
         self.star_priors = star_priors
         self.background_prior = background_prior
         self.focus_prior = focus_prior
@@ -584,20 +584,21 @@ class TPFModel(object):
                            self.prfmodel.row, self.prfmodel.row + self.prfmodel.shape[0]),
                    **kwargs)
 
-    def fit_diagnostics(self, data, *params, **kwargs):
+    def plot_diagnostics(self, data, *params, **kwargs):
         """Plots an image of the model for a given point in the parameter space."""
+        fig, ax = plt.subplots(nrows=1, ncols=3)
         fit = self.fit(data)
-        plot_image(data,
+        plot_image(data, ax=ax[0],
                    title='Observed Data, Channel: {}'.format(self.prfmodel.channel),
                    extent=(self.prfmodel.column, self.prfmodel.column + self.prfmodel.shape[1],
                            self.prfmodel.row, self.prfmodel.row + self.prfmodel.shape[0]),
                    **kwargs)
-        plot_image(fit.predicted_image,
+        plot_image(fit.predicted_image, ax=ax[1],
                    title='Predicted Image, Channel: {}'.format(self.prfmodel.channel),
                    extent=(self.prfmodel.column, self.prfmodel.column + self.prfmodel.shape[1],
                            self.prfmodel.row, self.prfmodel.row + self.prfmodel.shape[0]),
                    **kwargs)
-        plot_image(fit.residual_image,
+        plot_image(fit.residual_image, ax=ax[2],
                    title='Residual Image, Channel: {}'.format(self.prfmodel.channel),
                    extent=(self.prfmodel.column, self.prfmodel.column + self.prfmodel.shape[1],
                            self.prfmodel.row, self.prfmodel.row + self.prfmodel.shape[0]),

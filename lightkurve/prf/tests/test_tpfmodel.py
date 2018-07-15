@@ -117,7 +117,7 @@ def test_empty_model():
     shape = (4, 3)
     bgflux = 1.23
     background_prior = BackgroundPrior(flux=UniformPrior(lb=0, ub=10))
-    model = TPFModel(background_prior=background_prior)
+    model = TPFModel(background_prior=background_prior, fit_background=True)
     background = bgflux * np.ones(shape=shape)
     results = model.fit(background)
     assert np.isclose(results.background.flux, bgflux, rtol=1e-2)
