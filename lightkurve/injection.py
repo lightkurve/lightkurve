@@ -337,17 +337,35 @@ def recover(time, flux, flux_err, signal_type, source='hsiao', bandpass='kepler'
         import batman
 
         #First a BLS search:
-        from astropy.stats import BLS
+        import bls
 
-        model = BLS(time, flux, dy=0.01)
-        periodogram = model.autopower(0.2)
-        best_index = np.argmax(periodogram.power)
-        bls_period = periodogram.period[best_index]
-        depth = periodogram.depth[best_index]
+        u = [0.0]*len(time)
+        v = [0.0]*len(time)
+        u = np.array(u)
+        v = np.array(v)
+
+        nf = 1000.0
+        fmin = .035
+        df = 0.001
+        nbins = 500
+        qmi = 0.001
+        qma = 0.3
+
+        results = bls.eebls(time, flux, u, v, nf, fmin, df, nbins, qmi, qma)
+
+        bls_period = results[1]
+        depth = results[3]
         bls_rprs = np.sqrt(depth)
+        print(results[5])
+        print(results[6])
 
-        bls_T0 = periodogram.transit_time[best_index]
+        midtime = ((float(results[6])-float(results[5])) / 2) + results[5]
+        print(midtime)
 
+        bls_T0 =  (midtime / nbins) * bls_period
+        print(bls_T0)
+
+        #Then optimization fitting:
         def ln_like(theta):
             period, rprs, T0 = theta
 
@@ -370,14 +388,64 @@ def recover(time, flux, flux_err, signal_type, source='hsiao', bandpass='kepler'
         print('Signal Type not supported.')
         return
 
-def injrec_test(lc, signal_type, ntests, constr, period=None, rprs=None, T0=None):
-    """kwargs are distribution classes. for example. period=UniformDistribution(1, 9), rprs=GaussianDistribution(0.1, 0.05)
-    it will be different for supernovae.
+def injrec_test(lc, signal_type, ntests, constr, period=None, rprs=None, T0=None, z=None, amplitude=None):
+    """Runs an injection and recovery test for many models and one real lightcurve.
+    Right now we can only recover SN that take T0, z, and amplitude.
+
+    Parameters
+        ----------
+    lc : LightCurve class
+        Lightcurve object to inject models into.
+    signal_type : "Supernova" or "Planet"
+        Type of signal to be injected.
+    ntests : int
+        Number of injections to be performed.
+    constr : float
+        parameter constraint to determine a recovered signal (for example. 0.03
+        demands that all parameters must be within 3% of the injected value to be
+        considered recovered)
+    period : Distribution class
+        A GaussianDistribution or UniformDistribution object from which to draw
+        period values.
+    rprs : Distribution class
+        A GaussianDistribution or UniformDistribution object from which to draw
+        rprs values.
+    T0 : Distribution class
+        A GaussianDistribution or UniformDistribution object from which to draw
+        T0 values.
+    z : Distribution class
+        A GaussianDistribution or UniformDistribution object from which to draw
+        z values.
+    amplitude : Distribution class
+        A GaussianDistribution or UniformDistribution object from which to draw
+        amplitude values.
+
+    Returns
+    -------
+    fraction : float
+        Fraction of lightcurves recovered.
+
     """
     import lightkurve.injection as inj
 
     if signal_type == 'Supernova':
-        return 0
+        nrecovered = 0
+
+        for i in range(ntests):
+            T0_test = T0.sample()
+            z_test = z.sample()
+            amplitude_test = amplitude.sample()
+
+            model = inj.SupernovaModel(T0=T0_test, z=z_test, amplitude=amplitude_test, source='Hsiao', bandpass='Kepler')
+            lcinj = lc.inject(model)
+
+            T0_f, z_f, amplitude_f = lcinj.recover('Supernova')
+
+            if abs(T0_f-T0_test) < constr*T0_test and abs(z_f-z_test) < constr*z_test and abs(amplitude_f-amplitude_test) < constr*amplitude_test:
+                nrecovered += 1
+                print('Recovered: ' + str(T0_test) + ' ' + str(amplitude_test))
+
+        return (nrecovered / ntests)
 
     elif signal_type == 'Planet':
 
@@ -387,15 +455,18 @@ def injrec_test(lc, signal_type, ntests, constr, period=None, rprs=None, T0=None
             period_test = period.sample()
             rprs_test = rprs.sample()
             T0_test = T0.sample()
+
             model = inj.TransitModel()
             model.add_planet(period=period_test, rprs=rprs_test, T0=T0_test)
             lcinj = lc.inject(model)
+
             period_f, rprs_f, T0_f = lcinj.recover('Planet')
+
             if abs(period_f-period_test) < constr*period_test and abs(rprs_f-rprs_test) < constr*rprs_test and abs(T0_f-T0_test) < constr*T0_test:
                 nrecovered += 1
                 print('Recovered: ' + str(period_test) + ' ' + str(rprs_test))
 
-        return nrecovered/ntests
+        return (nrecovered / ntests)
 
 
     else:
