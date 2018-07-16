@@ -362,7 +362,7 @@ def recover(time, flux, flux_err, signal_type, source='hsiao', bandpass='kepler'
         midtime = ((float(results[6])-float(results[5])) / 2) + results[5]
         print(midtime)
 
-        bls_T0 =  (midtime / nbins) * bls_period
+        bls_T0 =  ((midtime / nbins) * bls_period) + min(time)
         print(bls_T0)
 
         #Then optimization fitting:
