@@ -173,13 +173,22 @@ def test_repr():
 def test_to_lightcurve():
     for tpf in [KeplerTargetPixelFile(filename_tpf_all_zeros),
                 TessTargetPixelFile(filename_tpf_all_zeros)]:
-        lc = tpf.to_lightcurve()
-        assert lc.astropy_time.scale == 'tdb'
+        tpf.to_lightcurve()
+        tpf.to_lightcurve(aperture_mask=None)
         tpf.to_lightcurve(aperture_mask='all')
+        lc = tpf.to_lightcurve(aperture_mask='pipeline')
+        assert lc.astropy_time.scale == 'tdb'
         bglc = tpf.get_bkg_lightcurve()
         assert bglc.astropy_time.scale == 'tdb'
         tpf.get_bkg_lightcurve(aperture_mask='all')
 
+def test_aperture_photometry():
+    for tpf in [KeplerTargetPixelFile(filename_tpf_all_zeros),
+                TessTargetPixelFile(filename_tpf_all_zeros)]:
+        tpf.aperture_photometry()
+        tpf.aperture_photometry(aperture_mask=None)
+        tpf.aperture_photometry(aperture_mask='all')
+        tpf.aperture_photometry(aperture_mask='pipeline')
 
 def test_tpf_to_fits():
     """Can we write a TPF back to a fits file?"""
@@ -242,3 +251,10 @@ def test_from_fits():
     tpf = TessTargetPixelFile.from_fits(filename_tpf_one_center)
     assert isinstance(tpf, TessTargetPixelFile)
     assert tpf.ticid == TessTargetPixelFile(filename_tpf_one_center).ticid
+
+
+def test_get_models():
+    """Can we obtain PRF and TPF models?"""
+    tpf = KeplerTargetPixelFile(filename_tpf_all_zeros, quality_bitmask=None)
+    tpf.get_model()
+    tpf.get_prf_model()
