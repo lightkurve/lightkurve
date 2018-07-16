@@ -13,3 +13,4 @@ In this section we will look at some common data analysis tasks, and show how th
     cutting-out-tpfs-from-tess-ffis.ipynb
     2.08-making-fits-files.ipynb
     2.09-how-to-use-lightkurve-for-asteroseismology.ipynb
+    2.10-how-to-make-a-supernova-lightcurve.ipynb
