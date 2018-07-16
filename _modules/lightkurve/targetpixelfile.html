@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>lightkurve.targetpixelfile &mdash; lightkurve 1.0b9 documentation</title>
+  <title>lightkurve.targetpixelfile &mdash; lightkurve 1.0b10 documentation</title>
   
 
   
@@ -24,8 +24,7 @@
 
   
 
-  
-    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -60,7 +59,7 @@
             
             
               <div class="version">
-                1.0b9
+                1.0b10
               </div>
             
           
@@ -87,154 +86,21 @@
               <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials/quickstart.html">Quickstart</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../install.html#requirements">Requirements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../install.html#installing-lightkurve">Installing lightkurve</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../install.html#stable-version">Stable version</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../install.html#development-version">Development version</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../../install.html#building-documentation">Building documentation</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../../api/index.html">API documentation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../api/targetpixelfile.html">TargetPixelFile classes</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../api/targetpixelfile.html#classes">Classes</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html">KeplerTargetPixelFile</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../api/lightkurve.targetpixelfile.TessTargetPixelFile.html">TessTargetPixelFile</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../../api/targetpixelfile.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../../api/lightcurve.html">LightCurve classes</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../api/lightcurve.html#functions">Functions</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../api/lightkurve.lightcurve.iterative_box_period_search.html">iterative_box_period_search</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../../api/lightcurve.html#classes">Classes</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../api/lightkurve.lightcurve.LightCurve.html">LightCurve</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../api/lightkurve.lightcurve.KeplerLightCurve.html">KeplerLightCurve</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../api/lightkurve.lightcurve.TessLightCurve.html">TessLightCurve</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../../api/lightcurve.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../../api/lightcurvefile.html">LightCurveFile classes</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../api/lightcurvefile.html#classes">Classes</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../api/lightkurve.lightcurvefile.KeplerLightCurveFile.html">KeplerLightCurveFile</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../api/lightkurve.lightcurvefile.TessLightCurveFile.html">TessLightCurveFile</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../../api/lightcurvefile.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../../api/correctors.html">Systematics correction classes</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../api/correctors.html#classes">Classes</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../api/lightkurve.correctors.KeplerCBVCorrector.html">KeplerCBVCorrector</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../api/lightkurve.correctors.SFFCorrector.html">SFFCorrector</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../../api/correctors.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../../api/prf.html">PSF photometry classes</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../api/prf.html#functions">Functions</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../api/lightkurve.prf.get_initial_guesses.html">get_initial_guesses</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../../api/prf.html#classes">Classes</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../api/lightkurve.prf.KeplerPRF.html">KeplerPRF</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../api/lightkurve.prf.PRFPhotometry.html">PRFPhotometry</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../api/lightkurve.prf.SceneModel.html">SceneModel</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../api/lightkurve.prf.SimpleKeplerPRF.html">SimpleKeplerPRF</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../../api/prf.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../../api/utils.html">Utility functions</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../api/utils.html#functions">Functions</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../api/lightkurve.utils.bkjd_to_astropy_time.html">bkjd_to_astropy_time</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../api/lightkurve.utils.btjd_to_astropy_time.html">btjd_to_astropy_time</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../api/lightkurve.utils.channel_to_module_output.html">channel_to_module_output</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../api/lightkurve.utils.module_output_to_channel.html">module_output_to_channel</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../api/lightkurve.utils.running_mean.html">running_mean</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../../api/utils.html#classes">Classes</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../api/lightkurve.utils.KeplerQualityFlags.html">KeplerQualityFlags</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../api/lightkurve.utils.TessQualityFlags.html">TessQualityFlags</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../../api/utils.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/index.html">API documentation</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../tutorials/section1.html">Introduction to lightkurve</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../tutorials/1.02-target-pixel-files.html">What are Target Pixel File objects?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../tutorials/1.03-what-are-lightcurves.html">What are Light Curve objects?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../tutorials/1.04-lightcurve-files.html">What are Light Curve File objects?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../tutorials/1.05-interact-with-lightcurves-and-tpf.html">Interactively inspecting Target Pixel Files and Lightcurves</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../tutorials/1.05-interact-with-lightcurves-and-tpf.html#Using-.interact()">Using <code class="docutils literal notranslate"><span class="pre">.interact()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../tutorials/1.05-interact-with-lightcurves-and-tpf.html#Passing-in-a-preprocessed-lightcurve">Passing in a preprocessed lightcurve</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../../tutorials/section2.html">Science with lightkurve</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../tutorials/2.02-recover-a-planet.html">How to recover a known planet in Kepler data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../tutorials/2.03-appending-lightcurves.html">How to combine lightcurves from different Kepler quarters</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../tutorials/2.05-making-custom-apertures.html">How to perform aperture photometry with custom apertures</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../tutorials/cutting-out-tpfs-from-tess-ffis.html">How to cut out Target Pixel Files from Kepler Super Stamps or TESS FFIs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../tutorials/2.08-making-fits-files.html">How to store a light curve in FITS format?</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../tutorials/2.08-making-fits-files.html#Example:-editing-and-writing-a-lightcurve">Example: editing and writing a lightcurve</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../../tutorials/2.09-how-to-use-lightkurve-for-asteroseismology.html">How to use lightkurve for asteroseismology</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../../tutorials/section3.html">Systematics correction using lightkurve</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../tutorials/2.04-removing-cbvs.html">How to remove common systematics using basis vectors (CBVs)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../tutorials/2.01-how-to-detrend.html">How to remove K2 motion systematics with SFF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html">How does the SFF method work?</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html#Retrieve-the-K2SFF-data-for-ENG-test-source-60021426">Retrieve the K2SFF data for ENG test source <code class="docutils literal notranslate"><span class="pre">60021426</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html#Manually-reproduce-with-the-Vanderburg-provided-diagnostic-data">Manually reproduce with the Vanderburg-provided diagnostic data</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../../tutorials/motion-correction/replicate-vanderburg-2014-lightkurve.html">Replicating Vanderburg &amp; Johnson 2014 using lightkurve</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../tutorials/motion-correction/replicate-vanderburg-2014-lightkurve.html#Data-Exclusion">Data Exclusion</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../../tutorials/2.06-identify-rolling-band.html">How to identify time-variable background noise (“rolling bands”)?</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/section1.html">Introduction to lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/section2.html">Science with lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/section3.html">Extracting lightcurves</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/section4.html">Systematics correction</a></li>
 </ul>
 <p class="caption"><span class="caption-text">About lightkurve</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing and reporting issues</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#proposing-changes-to-lightkurve-using-github-pull-requests">Proposing changes to lightkurve using GitHub pull requests</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../contributing.html#coding-and-documentation-guidelines">Coding and documentation guidelines</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing and reporting issues</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../citing.html">Citing and acknowledging lightkurve</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../other_software.html">Other software</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../other_software.html#detrending-analysis">Detrending &amp; Analysis</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../other_software.html#full-frame-images">Full Frame Images</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../other_software.html#data-access">Data access</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../other_software.html#metadata">Metadata</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../other_software.html#planet-search">Planet Search</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../other_software.html#population-statistics">Population Statistics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../other_software.html#positional">Positional</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../other_software.html#science-astrophysics">Science / Astrophysics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../other_software.html#other">Other</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../other_software.html">Other software</a></li>
 </ul>
 
             
@@ -254,7 +120,6 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
         
         <div class="rst-content">
@@ -316,7 +181,7 @@
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">PACKAGEDIR</span>
 <span class="kn">from</span> <span class="nn">.lightcurve</span> <span class="k">import</span> <span class="n">KeplerLightCurve</span><span class="p">,</span> <span class="n">TessLightCurve</span><span class="p">,</span> <span class="n">LightCurve</span>
-<span class="kn">from</span> <span class="nn">.prf</span> <span class="k">import</span> <span class="n">SimpleKeplerPRF</span>
+<span class="kn">from</span> <span class="nn">.prf</span> <span class="k">import</span> <span class="n">KeplerPRF</span>
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="k">import</span> <span class="n">KeplerQualityFlags</span><span class="p">,</span> <span class="n">plot_image</span><span class="p">,</span> <span class="n">bkjd_to_astropy_time</span><span class="p">,</span> <span class="n">btjd_to_astropy_time</span>
 <span class="kn">from</span> <span class="nn">.mast</span> <span class="k">import</span> <span class="n">download_kepler_products</span>
 
@@ -486,6 +351,28 @@
             <span class="n">mywcs</span><span class="p">[</span><span class="n">newkey</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="n">oldkey</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">WCS</span><span class="p">(</span><span class="n">mywcs</span><span class="p">)</span>
 
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_fits</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path_or_url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Open a Target Pixel File using the path or url of a FITS file.</span>
+
+<span class="sd">        This is identical to opening a Target Pixel File via the constructor.</span>
+<span class="sd">        This method was added because many tutorials use the `from_archive`</span>
+<span class="sd">        method, therefore users may expect a `from_fits` equivalent.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        path_or_url : str</span>
+<span class="sd">            Path or URL of a FITS file.</span>
+<span class="sd">        **kwargs : dict</span>
+<span class="sd">            Keyword arguments that will be passed to the constructor.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tpf : TargetPixelFile object</span>
+<span class="sd">            The loaded target pixel file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">path_or_url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
     <span class="k">def</span> <span class="nf">get_coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns two 3D arrays of RA and Dec values in decimal degrees.</span>
 
@@ -587,6 +474,41 @@
                     <span class="n">output</span><span class="o">.</span><span class="n">add_row</span><span class="p">([</span><span class="n">attr</span><span class="p">,</span> <span class="n">dic</span><span class="p">[</span><span class="s1">&#39;print&#39;</span><span class="p">]])</span>
                     <span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="n">output</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">max_lines</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_width</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">to_lightcurve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;aperture&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Performs photometry.</span>
+
+<span class="sd">        See the docstring of `aperture_photometry()` for valid</span>
+<span class="sd">        arguments if the method is &#39;aperture&#39;.  Otherwise, see the docstring</span>
+<span class="sd">        of `prf_photometry()` for valid arguments if the method is &#39;prf&#39;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        method : &#39;aperture&#39; or &#39;prf&#39;.</span>
+<span class="sd">            Photometry method to use.</span>
+<span class="sd">        **kwargs : dict</span>
+<span class="sd">            Extra arguments to be passed to the `aperture_photometry` or the</span>
+<span class="sd">            `prf_photometry` method of this class.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        lc : LightCurve object</span>
+<span class="sd">            Object containing the resulting lightcurve.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;aperture&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">aperture_photometry</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;prf&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">prf_lightcurve</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Photometry method must be &#39;aperture&#39; or &#39;prf&#39;.&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">aperture_photometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;This is an abstract method that is &quot;</span>
+                                  <span class="s2">&quot;implemented in the subclasses.&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">prf_photometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;This is an abstract method that is &quot;</span>
+                                  <span class="s2">&quot;implemented in the subclasses.&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_parse_aperture_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Parse the `aperture_mask` parameter as given by a user.</span>
@@ -1020,7 +942,7 @@
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;QUALITY&#39;</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">bitmask</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
 
 <div class="viewcode-block" id="KeplerTargetPixelFile.get_prf_model"><a class="viewcode-back" href="../../api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_prf_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_prf_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns an object of SimpleKeplerPRF initialized using the</span>
+        <span class="sd">&quot;&quot;&quot;Returns an object of KeplerPRF initialized using the</span>
 <span class="sd">        necessary metadata in the tpf object.</span>
 
 <span class="sd">        Returns</span>
@@ -1028,8 +950,8 @@
 <span class="sd">        prf : instance of SimpleKeplerPRF</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">return</span> <span class="n">SimpleKeplerPRF</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
-                               <span class="n">column</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">column</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">row</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">KeplerPRF</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
+                         <span class="n">column</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">column</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">row</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">keplerid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1078,10 +1000,10 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="n">ext</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="s1">&#39;MISSION&#39;</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="kc">None</span>        
 
-<div class="viewcode-block" id="KeplerTargetPixelFile.to_lightcurve"><a class="viewcode-back" href="../../api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.to_lightcurve">[docs]</a>    <span class="k">def</span> <span class="nf">to_lightcurve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="o">=</span><span class="s1">&#39;pipeline&#39;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Performs aperture photometry.</span>
+    <span class="k">def</span> <span class="nf">aperture_photometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="o">=</span><span class="s1">&#39;pipeline&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a LightCurve obtained using aperture photometry.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1122,7 +1044,7 @@
                                 <span class="n">time_scale</span><span class="o">=</span><span class="s1">&#39;tdb&#39;</span><span class="p">,</span>
                                 <span class="n">flux</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">[:,</span> <span class="n">aperture_mask</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
                                 <span class="n">flux_err</span><span class="o">=</span><span class="n">flux_err</span><span class="p">,</span>
-                                <span class="o">**</span><span class="n">keys</span><span class="p">)</span></div>
+                                <span class="o">**</span><span class="n">keys</span><span class="p">)</span>
 
 <div class="viewcode-block" id="KeplerTargetPixelFile.get_bkg_lightcurve"><a class="viewcode-back" href="../../api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_bkg_lightcurve">[docs]</a>    <span class="k">def</span> <span class="nf">get_bkg_lightcurve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">aperture_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_aperture_mask</span><span class="p">(</span><span class="n">aperture_mask</span><span class="p">)</span>
@@ -1131,6 +1053,90 @@
                           <span class="n">time_scale</span><span class="o">=</span><span class="s1">&#39;tdb&#39;</span><span class="p">,</span>
                           <span class="n">flux</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux_bkg</span><span class="p">[:,</span> <span class="n">aperture_mask</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
                           <span class="n">flux_err</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">flux_bkg_err</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">star_priors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a default `TPFModel` object for PRF fitting.</span>
+
+<span class="sd">        The default model only includes one star and only allows its flux</span>
+<span class="sd">        and position to change.  A different set of stars can be added using</span>
+<span class="sd">        the `star_priors` parameter.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        **kwargs : dict</span>
+<span class="sd">            Arguments to be passed to the `TPFModel` constructor, e.g.</span>
+<span class="sd">            `star_priors`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        model : TPFModel object</span>
+<span class="sd">            Model with appropriate defaults for this Target Pixel File.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">.prf</span> <span class="k">import</span> <span class="n">TPFModel</span><span class="p">,</span> <span class="n">StarPrior</span><span class="p">,</span> <span class="n">BackgroundPrior</span>
+        <span class="kn">from</span> <span class="nn">.prf</span> <span class="k">import</span> <span class="n">UniformPrior</span><span class="p">,</span> <span class="n">GaussianPrior</span>
+        <span class="c1"># Set up the model</span>
+        <span class="k">if</span> <span class="s1">&#39;star_priors&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">centr_col</span><span class="p">,</span> <span class="n">centr_row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">centroids</span><span class="p">()</span>
+            <span class="n">star_priors</span> <span class="o">=</span> <span class="p">[</span><span class="n">StarPrior</span><span class="p">(</span><span class="n">col</span><span class="o">=</span><span class="n">GaussianPrior</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">centr_col</span><span class="p">),</span>
+                                                       <span class="n">var</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nanstd</span><span class="p">(</span><span class="n">centr_col</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span>
+                                     <span class="n">row</span><span class="o">=</span><span class="n">GaussianPrior</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">centr_row</span><span class="p">),</span>
+                                                       <span class="n">var</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nanstd</span><span class="p">(</span><span class="n">centr_row</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span>
+                                     <span class="n">flux</span><span class="o">=</span><span class="n">UniformPrior</span><span class="p">(</span><span class="n">lb</span><span class="o">=</span><span class="mf">0.5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                                                       <span class="n">ub</span><span class="o">=</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="mf">1e-10</span><span class="p">),</span>
+                                     <span class="n">targetid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">targetid</span><span class="p">)]</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;star_priors&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">star_priors</span>
+        <span class="k">if</span> <span class="s1">&#39;prfmodel&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;prfmodel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_prf_model</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s1">&#39;background_prior&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">flux_prior</span> <span class="o">=</span> <span class="n">GaussianPrior</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux_bkg</span><span class="p">),</span>
+                                       <span class="n">var</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nanstd</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux_bkg</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;background_prior&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">BackgroundPrior</span><span class="p">(</span><span class="n">flux</span><span class="o">=</span><span class="n">flux_prior</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">TPFModel</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">prf_photometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cadences</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the results of PRF photometry applied to the pixel file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        cadences : list of int</span>
+<span class="sd">            Cadences to fit.  If `None` (default) then all cadences will be fit.</span>
+<span class="sd">        parallel : bool</span>
+<span class="sd">            If `True`, fitting cadences will be distributed across multiple</span>
+<span class="sd">            cores using Python&#39;s `multiprocessing` module.</span>
+<span class="sd">        **kwargs : dict</span>
+<span class="sd">            Keywords to be passed to `tpf.get_model()` to create the</span>
+<span class="sd">            `TPFModel` object that will be fit.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        results : PRFPhotometry object</span>
+<span class="sd">            Object that provides access to PRF-fitting photometry results and</span>
+<span class="sd">            various diagnostics.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">.prf</span> <span class="k">import</span> <span class="n">PRFPhotometry</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Warning: PRF-fitting photometry is experimental &#39;</span>
+                    <span class="s1">&#39;in this version of lightkurve.&#39;</span><span class="p">)</span>
+        <span class="n">prfphot</span> <span class="o">=</span> <span class="n">PRFPhotometry</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_model</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+        <span class="n">prfphot</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">flux_bkg</span><span class="p">,</span> <span class="n">cadences</span><span class="o">=</span><span class="n">cadences</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="n">parallel</span><span class="p">,</span>
+                    <span class="n">pos_corr1</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pos_corr1</span><span class="p">,</span> <span class="n">pos_corr2</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pos_corr2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">prfphot</span>
+
+    <span class="k">def</span> <span class="nf">prf_lightcurve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">lc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prf_photometry</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">lightcurves</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;quality&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">quality</span><span class="p">,</span>
+                <span class="s1">&#39;channel&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">,</span>
+                <span class="s1">&#39;campaign&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">campaign</span><span class="p">,</span>
+                <span class="s1">&#39;quarter&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">quarter</span><span class="p">,</span>
+                <span class="s1">&#39;mission&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mission</span><span class="p">,</span>
+                <span class="s1">&#39;cadenceno&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">cadenceno</span><span class="p">,</span>
+                <span class="s1">&#39;ra&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ra</span><span class="p">,</span>
+                <span class="s1">&#39;dec&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dec</span><span class="p">,</span>
+                <span class="s1">&#39;keplerid&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">keplerid</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">KeplerLightCurve</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+                                <span class="n">flux</span><span class="o">=</span><span class="n">lc</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span>
+                                <span class="n">time_format</span><span class="o">=</span><span class="s1">&#39;bkjd&#39;</span><span class="p">,</span>
+                                <span class="n">time_scale</span><span class="o">=</span><span class="s1">&#39;tdb&#39;</span><span class="p">,</span>
+                                <span class="o">**</span><span class="n">keys</span><span class="p">)</span>
 
 <div class="viewcode-block" id="KeplerTargetPixelFile.from_fits_images"><a class="viewcode-back" href="../../api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.from_fits_images">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">from_fits_images</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">extension</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1427,7 +1433,7 @@
         <span class="sd">&quot;&quot;&quot;Returns an AstroPy Time object for all good-quality cadences.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">btjd_to_astropy_time</span><span class="p">(</span><span class="n">btjd</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
 
-<div class="viewcode-block" id="TessTargetPixelFile.to_lightcurve"><a class="viewcode-back" href="../../api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile.to_lightcurve">[docs]</a>    <span class="k">def</span> <span class="nf">to_lightcurve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="o">=</span><span class="s1">&#39;pipeline&#39;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">aperture_photometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="o">=</span><span class="s1">&#39;pipeline&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Performs aperture photometry.</span>
 
 <span class="sd">        Parameters</span>
@@ -1466,7 +1472,7 @@
                               <span class="n">time_scale</span><span class="o">=</span><span class="s1">&#39;tdb&#39;</span><span class="p">,</span>
                               <span class="n">flux</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">[:,</span> <span class="n">aperture_mask</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
                               <span class="n">flux_err</span><span class="o">=</span><span class="n">flux_err</span><span class="p">,</span>
-                              <span class="o">**</span><span class="n">keys</span><span class="p">)</span></div>
+                              <span class="o">**</span><span class="n">keys</span><span class="p">)</span>
 
 <div class="viewcode-block" id="TessTargetPixelFile.get_bkg_lightcurve"><a class="viewcode-back" href="../../api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile.get_bkg_lightcurve">[docs]</a>    <span class="k">def</span> <span class="nf">get_bkg_lightcurve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">aperture_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_aperture_mask</span><span class="p">(</span><span class="n">aperture_mask</span><span class="p">)</span>
@@ -1509,7 +1515,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'1.0b9',
+            VERSION:'1.0b10',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -1524,16 +1530,11 @@
 
   
 
-  
-  
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
   <script type="text/javascript">
       jQuery(function () {
-          
-          SphinxRtdTheme.Navigation.enableSticky();
-          
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script> 
 

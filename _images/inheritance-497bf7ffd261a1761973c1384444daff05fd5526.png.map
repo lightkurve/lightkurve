@@ -1,5 +1,5 @@
 <map id="inheritanced621a4b1ce" name="inheritanced621a4b1ce">
-<area shape="rect" id="node1" href="lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile" target="_top" title="Defines a TargetPixelFile class for the Kepler/K2 Mission." alt="" coords="162,5,309,29"/>
-<area shape="rect" id="node2" title="Generic TargetPixelFile class for Kepler, K2, and TESS data." alt="" coords="5,29,114,53"/>
-<area shape="rect" id="node3" href="lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile" target="_top" title="Defines a TargetPixelFile class for the TESS Mission." alt="" coords="168,53,304,77"/>
+<area shape="rect" id="node1" href="lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile" target="_top" title="Defines a TargetPixelFile class for the Kepler/K2 Mission." alt="" coords="169,5,327,31"/>
+<area shape="rect" id="node2" title="Generic TargetPixelFile class for Kepler, K2, and TESS data." alt="" coords="5,31,121,56"/>
+<area shape="rect" id="node3" href="lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile" target="_top" title="Defines a TargetPixelFile class for the TESS Mission." alt="" coords="176,55,320,80"/>
 </map>

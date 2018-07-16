@@ -1,0 +1,481 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>FixedValuePrior &mdash; lightkurve 1.0b10 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="FocusParameters" href="lightkurve.prf.FocusParameters.html" />
+    <link rel="prev" title="BackgroundPrior" href="lightkurve.prf.BackgroundPrior.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> lightkurve
+          
+
+          
+            
+            <img src="../_static/lightkurve.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0b10
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="targetpixelfile.html">TargetPixelFile classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lightcurve.html">LightCurve classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lightcurvefile.html">LightCurveFile classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="correctors.html">Systematics correction classes</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="prf.html">PSF photometry classes</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="prf.html#classes">Classes</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.BackgroundParameters.html">BackgroundParameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.BackgroundPrior.html">BackgroundPrior</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">FixedValuePrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.FocusParameters.html">FocusParameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.FocusPrior.html">FocusPrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.KeplerPRF.html">KeplerPRF</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.MotionParameters.html">MotionParameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.MotionPrior.html">MotionPrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.PRFPhotometry.html">PRFPhotometry</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.SimpleKeplerPRF.html">SimpleKeplerPRF</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.StarParameters.html">StarParameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.StarPrior.html">StarPrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.TPFModel.html">TPFModel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.TPFModelParameters.html">TPFModelParameters</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="prf.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">Utility functions</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section1.html">Introduction to lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section2.html">Science with lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section3.html">Extracting lightcurves</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section4.html">Systematics correction</a></li>
+</ul>
+<p class="caption"><span class="caption-text">About lightkurve</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing and reporting issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../citing.html">Citing and acknowledging lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../other_software.html">Other software</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">lightkurve</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">API documentation</a> &raquo;</li>
+        
+          <li><a href="prf.html">PSF photometry classes</a> &raquo;</li>
+        
+      <li>FixedValuePrior</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/api/lightkurve.prf.FixedValuePrior.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+</style>
+<div class="section" id="fixedvalueprior">
+<h1>FixedValuePrior<a class="headerlink" href="#fixedvalueprior" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="lightkurve.prf.FixedValuePrior">
+<em class="property">class </em><code class="descclassname">lightkurve.prf.</code><code class="descname">FixedValuePrior</code><span class="sig-paren">(</span><em>value</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/prf/tpfmodel.html#FixedValuePrior"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.prf.FixedValuePrior" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">oktopus.prior.Prior</span></code></p>
+<p>An improper prior with a negative log probability of 0 at a single fixed
+value and inf elsewhere. This is similar to a Dirac Delta function,
+except this function does not peak at infinity so that it can be used
+in numerical optimization functions.  It does not integrate to one as a
+result and is therefore an “improper distribution”.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fp</span> <span class="o">=</span> <span class="n">FixedValuePrior</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fp</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">-0.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fp</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="go">inf</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Attributes:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>value</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int or array-like of ints</span></dt>
+<dd><p class="first last">The fixed value.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes Summary</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.prf.FixedValuePrior.mean" title="lightkurve.prf.FixedValuePrior.mean"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mean</span></code></a></td>
+<td>Returns the fixed value.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#lightkurve.prf.FixedValuePrior.name" title="lightkurve.prf.FixedValuePrior.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a></td>
+<td>A name associated with the prior</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.prf.FixedValuePrior.variance" title="lightkurve.prf.FixedValuePrior.variance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variance</span></code></a></td>
+<td>Returns zero.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods Summary</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.prf.FixedValuePrior.__call__" title="lightkurve.prf.FixedValuePrior.__call__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__call__</span></code></a>(params)</td>
+<td>Calls <a class="reference internal" href="#lightkurve.prf.FixedValuePrior.evaluate" title="lightkurve.prf.FixedValuePrior.evaluate"><code class="xref py py-func docutils literal notranslate"><span class="pre">evaluate()</span></code></a></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#lightkurve.prf.FixedValuePrior.evaluate" title="lightkurve.prf.FixedValuePrior.evaluate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluate</span></code></a>(params)</td>
+<td>Returns the negative log pdf.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.prf.FixedValuePrior.fit" title="lightkurve.prf.FixedValuePrior.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>([optimizer])</td>
+<td>Minimizes the <a class="reference internal" href="#lightkurve.prf.FixedValuePrior.evaluate" title="lightkurve.prf.FixedValuePrior.evaluate"><code class="xref py py-func docutils literal notranslate"><span class="pre">evaluate()</span></code></a> function using <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html#scipy.optimize.minimize" title="(in SciPy v1.1.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.optimize.minimize()</span></code></a>, <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.differential_evolution.html#scipy.optimize.differential_evolution" title="(in SciPy v1.1.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.optimize.differential_evolution()</span></code></a>, <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.basinhopping.html#scipy.optimize.basinhopping" title="(in SciPy v1.1.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.optimize.basinhopping()</span></code></a>, or <code class="xref py py-func docutils literal notranslate"><span class="pre">skopt.gp.gp_minimize()</span></code>.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#lightkurve.prf.FixedValuePrior.gradient" title="lightkurve.prf.FixedValuePrior.gradient"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gradient</span></code></a>(params)</td>
+<td>Returns the gradient of the loss function evaluated at <code class="docutils literal notranslate"><span class="pre">params</span></code></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.prf.FixedValuePrior.hessian" title="lightkurve.prf.FixedValuePrior.hessian"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hessian</span></code></a>(params)</td>
+<td>Returns the Hessian matrix of the loss function evaluated at <code class="docutils literal notranslate"><span class="pre">params</span></code></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes Documentation</p>
+<dl class="attribute">
+<dt id="lightkurve.prf.FixedValuePrior.mean">
+<code class="descname">mean</code><a class="headerlink" href="#lightkurve.prf.FixedValuePrior.mean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the fixed value.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lightkurve.prf.FixedValuePrior.name">
+<code class="descname">name</code><a class="headerlink" href="#lightkurve.prf.FixedValuePrior.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>A name associated with the prior</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="lightkurve.prf.FixedValuePrior.variance">
+<code class="descname">variance</code><a class="headerlink" href="#lightkurve.prf.FixedValuePrior.variance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns zero.</p>
+</dd></dl>
+
+<p class="rubric">Methods Documentation</p>
+<dl class="method">
+<dt id="lightkurve.prf.FixedValuePrior.__call__">
+<code class="descname">__call__</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.FixedValuePrior.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls <a class="reference internal" href="#lightkurve.prf.FixedValuePrior.evaluate" title="lightkurve.prf.FixedValuePrior.evaluate"><code class="xref py py-func docutils literal notranslate"><span class="pre">evaluate()</span></code></a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lightkurve.prf.FixedValuePrior.evaluate">
+<code class="descname">evaluate</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/prf/tpfmodel.html#FixedValuePrior.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.prf.FixedValuePrior.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the negative log pdf.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lightkurve.prf.FixedValuePrior.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>optimizer='minimize'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.FixedValuePrior.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Minimizes the <a class="reference internal" href="#lightkurve.prf.FixedValuePrior.evaluate" title="lightkurve.prf.FixedValuePrior.evaluate"><code class="xref py py-func docutils literal notranslate"><span class="pre">evaluate()</span></code></a> function using <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html#scipy.optimize.minimize" title="(in SciPy v1.1.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.optimize.minimize()</span></code></a>,
+<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.differential_evolution.html#scipy.optimize.differential_evolution" title="(in SciPy v1.1.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.optimize.differential_evolution()</span></code></a>,
+<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.basinhopping.html#scipy.optimize.basinhopping" title="(in SciPy v1.1.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.optimize.basinhopping()</span></code></a>, or <code class="xref py py-func docutils literal notranslate"><span class="pre">skopt.gp.gp_minimize()</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>optimizer</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first">Optimization algorithm. Options are:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>- ``&#39;minimize&#39;`` uses :func:`scipy.optimize.minimize`
+
+- ``&#39;differential_evolution&#39;`` uses :func:`scipy.optimize.differential_evolution`
+
+- ``&#39;basinhopping&#39;`` uses :func:`scipy.optimize.basinhopping`
+
+- ``&#39;gp_minimize&#39;`` uses :func:`skopt.gp.gp_minimize`
+</pre></div>
+</div>
+<p class="last"><cite>‘minimize’</cite> is usually robust enough and therefore recommended
+whenever a good initial guess can be provided. The remaining options
+are global optimizers which might provide better results precisely
+in cases where a close engouh initial guess cannot be obtained
+trivially.</p>
+</dd>
+<dt><strong>kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd><p class="first last">Dictionary for additional arguments.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>opt_result</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.OptimizeResult.html#scipy.optimize.OptimizeResult" title="(in SciPy v1.1.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">scipy.optimize.OptimizeResult</span></code></a> object</span></dt>
+<dd><p class="first last">Object containing the results of the optimization process.
+Note: this is also stored in <strong>self.opt_result</strong>.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="lightkurve.prf.FixedValuePrior.gradient">
+<code class="descname">gradient</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/prf/tpfmodel.html#FixedValuePrior.gradient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.prf.FixedValuePrior.gradient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the gradient of the loss function evaluated at <code class="docutils literal notranslate"><span class="pre">params</span></code></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>params</strong> <span class="classifier-delimiter">:</span> <span class="classifier">ndarray</span></dt>
+<dd><p class="first last">parameter vector of the model</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="lightkurve.prf.FixedValuePrior.hessian">
+<code class="descname">hessian</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.FixedValuePrior.hessian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the Hessian matrix of the loss function evaluated at <code class="docutils literal notranslate"><span class="pre">params</span></code></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>params</strong> <span class="classifier-delimiter">:</span> <span class="classifier">ndarray</span></dt>
+<dd><p class="first last">parameter vector of the model</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="lightkurve.prf.FocusParameters.html" class="btn btn-neutral float-right" title="FocusParameters" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="lightkurve.prf.BackgroundPrior.html" class="btn btn-neutral" title="BackgroundPrior" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright lightkurve developers and contributors.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'1.0b10',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

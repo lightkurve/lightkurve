@@ -13,9 +13,10 @@ TessLightCurveFile
       ~TessLightCurveFile.PDCSAP_FLUX
       ~TessLightCurveFile.SAP_FLUX
       ~TessLightCurveFile.cadenceno
+      ~TessLightCurveFile.dec
+      ~TessLightCurveFile.ra
       ~TessLightCurveFile.ticid
       ~TessLightCurveFile.time
-      ~TessLightCurveFile.timeobj
 
    .. rubric:: Methods Summary
 
@@ -29,9 +30,10 @@ TessLightCurveFile
    .. autoattribute:: PDCSAP_FLUX
    .. autoattribute:: SAP_FLUX
    .. autoattribute:: cadenceno
+   .. autoattribute:: dec
+   .. autoattribute:: ra
    .. autoattribute:: ticid
    .. autoattribute:: time
-   .. autoattribute:: timeobj
 
    .. rubric:: Methods Documentation
 

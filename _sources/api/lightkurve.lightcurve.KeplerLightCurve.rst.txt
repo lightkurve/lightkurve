@@ -6,6 +6,12 @@ KeplerLightCurve
 .. autoclass:: KeplerLightCurve
    :show-inheritance:
 
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~KeplerLightCurve.astropy_time
+
    .. rubric:: Methods Summary
 
    .. autosummary::
@@ -22,8 +28,13 @@ KeplerLightCurve
       ~KeplerLightCurve.remove_nans
       ~KeplerLightCurve.remove_outliers
       ~KeplerLightCurve.to_csv
+      ~KeplerLightCurve.to_fits
       ~KeplerLightCurve.to_pandas
       ~KeplerLightCurve.to_table
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: astropy_time
 
    .. rubric:: Methods Documentation
 
@@ -39,5 +50,6 @@ KeplerLightCurve
    .. automethod:: remove_nans
    .. automethod:: remove_outliers
    .. automethod:: to_csv
+   .. automethod:: to_fits
    .. automethod:: to_pandas
    .. automethod:: to_table

@@ -6,6 +6,12 @@ TessLightCurve
 .. autoclass:: TessLightCurve
    :show-inheritance:
 
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~TessLightCurve.astropy_time
+
    .. rubric:: Methods Summary
 
    .. autosummary::
@@ -21,8 +27,13 @@ TessLightCurve
       ~TessLightCurve.remove_nans
       ~TessLightCurve.remove_outliers
       ~TessLightCurve.to_csv
+      ~TessLightCurve.to_fits
       ~TessLightCurve.to_pandas
       ~TessLightCurve.to_table
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: astropy_time
 
    .. rubric:: Methods Documentation
 
@@ -37,5 +48,6 @@ TessLightCurve
    .. automethod:: remove_nans
    .. automethod:: remove_outliers
    .. automethod:: to_csv
+   .. automethod:: to_fits
    .. automethod:: to_pandas
    .. automethod:: to_table

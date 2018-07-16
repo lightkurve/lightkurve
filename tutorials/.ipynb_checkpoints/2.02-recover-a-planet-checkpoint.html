@@ -1,0 +1,624 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>How to recover a known planet &mdash; lightkurve 1.0b10 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> lightkurve
+          
+
+          
+            
+            <img src="../../_static/lightkurve.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0b10
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/index.html">API documentation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../section1.html">Introduction to lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../section2.html">Science with lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../section3.html">Extracting lightcurves</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../section4.html">Systematics correction</a></li>
+</ul>
+<p class="caption"><span class="caption-text">About lightkurve</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing and reporting issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../citing.html">Citing and acknowledging lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../other_software.html">Other software</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">lightkurve</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+      <li>How to recover a known planet</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/tutorials/.ipynb_checkpoints/2.02-recover-a-planet-checkpoint.ipynb.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput div.prompt,
+div.nbinput div.input_area,
+div.nbinput div[class*=highlight],
+div.nbinput div[class*=highlight] pre,
+div.nboutput,
+div.nbinput div.prompt,
+div.nbinput div.output_area,
+div.nboutput div[class*=highlight],
+div.nboutput div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput,
+    div.nboutput {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput div.prompt pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput div.prompt pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput div.prompt,
+div.nboutput div.prompt {
+    min-width: 8ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+@media (max-width: 540px) {
+    div.nbinput div.prompt,
+    div.nboutput div.prompt {
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput div.prompt.empty {
+        padding: 0;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput div.prompt pre,
+div.nboutput div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput div.input_area,
+div.nboutput div.output_area {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput div.input_area,
+    div.nboutput div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput div.input_area {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+</style>
+<div class="section" id="How-to-recover-a-known-planet">
+<h1>How to recover a known planet<a class="headerlink" href="#How-to-recover-a-known-planet" title="Permalink to this headline">¶</a></h1>
+<p>This tutorial demonstrates the basic steps required to recover a
+transiting planet candidate in the Kepler data.</p>
+<p>We will show how you can recover the signal of
+<a class="reference external" href="https://en.wikipedia.org/wiki/Kepler-10b">Kepler-10b</a>, the first
+rocky planet that was discovered by Kepler! Kepler-10 is a Sun-like
+(G-type) star approximately 600 light years away in the constellation of
+Cygnus. In this tutorial, we will download the pixel data of Kepler-10,
+extract a lightcurve, and recover the planet.</p>
+<p>Kepler pixel data is distributed in “Target Pixel Files”. You can read
+more about them in our tutorial
+<a class="reference external" href="http://lightkurve.keplerscience.org/tutorials/target-pixel-files.html">here</a>.
+The <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> package provides a <code class="docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code> class,
+which enables you to load and interact with data in this format.</p>
+<p>The class can take a path (local or url), or you can load data straight
+from the <a class="reference external" href="https://archive.stsci.edu/kepler/">MAST archive</a>, which
+holds all of the Kepler and K2 data archive. We’ll download the
+Kepler-10 light curve using the <code class="docutils literal notranslate"><span class="pre">from_archive</span></code> function, as shown
+below. <em>(Note: we’re adding the keyword ``quarter=3`` to download only
+the data from the third Kepler quarter. There were 17 quarters during
+the Kepler mission.)</em></p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">lightkurve</span> <span class="k">import</span> <span class="n">KeplerTargetPixelFile</span>
+<span class="n">tpf</span> <span class="o">=</span> <span class="n">KeplerTargetPixelFile</span><span class="o">.</span><span class="n">from_archive</span><span class="p">(</span><span class="s2">&quot;Kepler-10&quot;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Downloading URL https://mast.stsci.edu/api/v0/download/file?uri=mast:Kepler/url/missions/kepler/target_pixel_files/0119/011904151/kplr011904151-2009350155506_lpd-targ.fits.gz to ./mastDownload/Kepler/kplr011904151_lc_Q111111110111011101/kplr011904151-2009350155506_lpd-targ.fits.gz ... [Done]
+</pre></div></div>
+</div>
+<p>Let’s use the <code class="docutils literal notranslate"><span class="pre">plot</span></code> method and pass along an aperture mask and a few
+plotting arguments.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_.ipynb_checkpoints_2.02-recover-a-planet-checkpoint_5_0.png" src="../../_images/tutorials_.ipynb_checkpoints_2.02-recover-a-planet-checkpoint_5_0.png" />
+</div>
+</div>
+<p>The target pixel file contains one bright star with approximately 50,000
+counts.</p>
+<p>Now, we will use the <code class="docutils literal notranslate"><span class="pre">to_lightcurve</span></code> method to create a simple
+aperture photometry lightcurve using the mask defined by the pipeline
+which is stored in <code class="docutils literal notranslate"><span class="pre">tpf.pipeline_mask</span></code>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">lc</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">tpf</span><span class="o">.</span><span class="n">pipeline_mask</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Let’s take a look at the output lightcurve.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">lc</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_.ipynb_checkpoints_2.02-recover-a-planet-checkpoint_10_0.png" src="../../_images/tutorials_.ipynb_checkpoints_2.02-recover-a-planet-checkpoint_10_0.png" />
+</div>
+</div>
+<p>Now let’s use the <code class="docutils literal notranslate"><span class="pre">flatten</span></code> method, which applies a Savitzky-Golay
+filter, to remove long-term variability that we are not interested in.
+We’ll use the <code class="docutils literal notranslate"><span class="pre">return_trend</span></code> keyword so that it returns both the
+corrected <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> object and a new <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code>
+object called ‘trend’. This contains only the long term variability.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">flat</span><span class="p">,</span> <span class="n">trend</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">window_length</span><span class="o">=</span><span class="mi">301</span><span class="p">,</span> <span class="n">return_trend</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Let’s plot the trend estimated by the Savitzky-Golay filter:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>                         <span class="c1">#plot() returns a matplotlib axis</span>
+<span class="n">trend</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">);</span>           <span class="c1">#which we can pass to the next plot() to use the same plotting window</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_.ipynb_checkpoints_2.02-recover-a-planet-checkpoint_14_0.png" src="../../_images/tutorials_.ipynb_checkpoints_2.02-recover-a-planet-checkpoint_14_0.png" />
+</div>
+</div>
+<p>and the flat lightcurve:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">flat</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_.ipynb_checkpoints_2.02-recover-a-planet-checkpoint_16_0.png" src="../../_images/tutorials_.ipynb_checkpoints_2.02-recover-a-planet-checkpoint_16_0.png" />
+</div>
+</div>
+<p>Now, let’s run a period search function using the Box-Least Squares
+algorithm (<a class="reference external" href="http://adsabs.harvard.edu/abs/2002A%26A">http://adsabs.harvard.edu/abs/2002A%26A</a>…391..369K). We will
+shortly have a built in BLS implementation, but until then you can
+download and install it separately from lightkurve using</p>
+<p><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">git+https://github.com/mirca/transit-periodogram.git</span></code></p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">transit_periodogram</span> <span class="k">import</span> <span class="n">transit_periodogram</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">periods</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">0.0001</span><span class="p">)</span>
+<span class="n">durations</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.005</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">)</span>
+<span class="n">power</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">transit_periodogram</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">flat</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+                                              <span class="n">flux</span><span class="o">=</span><span class="n">flat</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span>
+                                              <span class="n">flux_err</span><span class="o">=</span><span class="n">flat</span><span class="o">.</span><span class="n">flux_err</span><span class="p">,</span>
+                                              <span class="n">periods</span><span class="o">=</span><span class="n">periods</span><span class="p">,</span>
+                                              <span class="n">durations</span><span class="o">=</span><span class="n">durations</span><span class="p">)</span>
+<span class="n">best_fit</span> <span class="o">=</span> <span class="n">periods</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">power</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Best Fit Period: </span><span class="si">{}</span><span class="s1"> days&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">best_fit</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Best Fit Period: 0.8375999999999408 days
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">flat</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">best_fit</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.4</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_.ipynb_checkpoints_2.02-recover-a-planet-checkpoint_22_0.png" src="../../_images/tutorials_.ipynb_checkpoints_2.02-recover-a-planet-checkpoint_22_0.png" />
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright lightkurve developers and contributors.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'1.0b10',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

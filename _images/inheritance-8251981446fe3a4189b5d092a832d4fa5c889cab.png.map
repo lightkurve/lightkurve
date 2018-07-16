@@ -1,4 +1,4 @@
 <map id="inheritance6a9d478090" name="inheritance6a9d478090">
-<area shape="rect" id="node1" href="lightkurve.utils.KeplerQualityFlags.html#lightkurve.utils.KeplerQualityFlags" target="_top" title="This class encodes the meaning of the various Kepler QUALITY bitmask flags," alt="" coords="5,5,139,29"/>
-<area shape="rect" id="node2" href="lightkurve.utils.TessQualityFlags.html#lightkurve.utils.TessQualityFlags" target="_top" title="TessQualityFlags" alt="" coords="187,5,310,29"/>
+<area shape="rect" id="node1" href="lightkurve.utils.KeplerQualityFlags.html#lightkurve.utils.KeplerQualityFlags" target="_top" title="This class encodes the meaning of the various Kepler QUALITY bitmask flags," alt="" coords="5,5,149,31"/>
+<area shape="rect" id="node2" href="lightkurve.utils.TessQualityFlags.html#lightkurve.utils.TessQualityFlags" target="_top" title="TessQualityFlags" alt="" coords="197,5,328,31"/>
 </map>

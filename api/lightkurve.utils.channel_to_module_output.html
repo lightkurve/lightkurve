@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>channel_to_module_output &mdash; lightkurve 1.0b9 documentation</title>
+  <title>channel_to_module_output &mdash; lightkurve 1.0b10 documentation</title>
   
 
   
@@ -24,8 +24,7 @@
 
   
 
-  
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -62,7 +61,7 @@
             
             
               <div class="version">
-                1.0b9
+                1.0b10
               </div>
             
           
@@ -89,73 +88,13 @@
               <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/quickstart.html">Quickstart</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../install.html#requirements">Requirements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../install.html#installing-lightkurve">Installing lightkurve</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../install.html#stable-version">Stable version</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../install.html#development-version">Development version</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../install.html#building-documentation">Building documentation</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">API documentation</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="targetpixelfile.html">TargetPixelFile classes</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="targetpixelfile.html#classes">Classes</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.targetpixelfile.KeplerTargetPixelFile.html">KeplerTargetPixelFile</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.targetpixelfile.TessTargetPixelFile.html">TessTargetPixelFile</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="targetpixelfile.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="lightcurve.html">LightCurve classes</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="lightcurve.html#functions">Functions</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurve.iterative_box_period_search.html">iterative_box_period_search</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="lightcurve.html#classes">Classes</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurve.LightCurve.html">LightCurve</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurve.KeplerLightCurve.html">KeplerLightCurve</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurve.TessLightCurve.html">TessLightCurve</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="lightcurve.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="lightcurvefile.html">LightCurveFile classes</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="lightcurvefile.html#classes">Classes</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurvefile.KeplerLightCurveFile.html">KeplerLightCurveFile</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurvefile.TessLightCurveFile.html">TessLightCurveFile</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="lightcurvefile.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="correctors.html">Systematics correction classes</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="correctors.html#classes">Classes</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.correctors.KeplerCBVCorrector.html">KeplerCBVCorrector</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.correctors.SFFCorrector.html">SFFCorrector</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="correctors.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="prf.html">PSF photometry classes</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="prf.html#functions">Functions</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.get_initial_guesses.html">get_initial_guesses</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="prf.html#classes">Classes</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.KeplerPRF.html">KeplerPRF</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.PRFPhotometry.html">PRFPhotometry</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.SceneModel.html">SceneModel</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.SimpleKeplerPRF.html">SimpleKeplerPRF</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="prf.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="targetpixelfile.html">TargetPixelFile classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lightcurve.html">LightCurve classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lightcurvefile.html">LightCurveFile classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="correctors.html">Systematics correction classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prf.html">PSF photometry classes</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="utils.html">Utility functions</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="utils.html#functions">Functions</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="lightkurve.utils.bkjd_to_astropy_time.html">bkjd_to_astropy_time</a></li>
@@ -165,11 +104,7 @@
 <li class="toctree-l4"><a class="reference internal" href="lightkurve.utils.running_mean.html">running_mean</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="utils.html#classes">Classes</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.utils.KeplerQualityFlags.html">KeplerQualityFlags</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.utils.TessQualityFlags.html">TessQualityFlags</a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#classes">Classes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="utils.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
 </ul>
 </li>
@@ -178,65 +113,16 @@
 </ul>
 <p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/section1.html">Introduction to lightkurve</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/1.02-target-pixel-files.html">What are Target Pixel File objects?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/1.03-what-are-lightcurves.html">What are Light Curve objects?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/1.04-lightcurve-files.html">What are Light Curve File objects?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/1.05-interact-with-lightcurves-and-tpf.html">Interactively inspecting Target Pixel Files and Lightcurves</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/1.05-interact-with-lightcurves-and-tpf.html#Using-.interact()">Using <code class="docutils literal notranslate"><span class="pre">.interact()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/1.05-interact-with-lightcurves-and-tpf.html#Passing-in-a-preprocessed-lightcurve">Passing in a preprocessed lightcurve</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/section2.html">Science with lightkurve</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.02-recover-a-planet.html">How to recover a known planet in Kepler data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.03-appending-lightcurves.html">How to combine lightcurves from different Kepler quarters</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.05-making-custom-apertures.html">How to perform aperture photometry with custom apertures</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/cutting-out-tpfs-from-tess-ffis.html">How to cut out Target Pixel Files from Kepler Super Stamps or TESS FFIs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.08-making-fits-files.html">How to store a light curve in FITS format?</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/2.08-making-fits-files.html#Example:-editing-and-writing-a-lightcurve">Example: editing and writing a lightcurve</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.09-how-to-use-lightkurve-for-asteroseismology.html">How to use lightkurve for asteroseismology</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/section3.html">Systematics correction using lightkurve</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.04-removing-cbvs.html">How to remove common systematics using basis vectors (CBVs)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.01-how-to-detrend.html">How to remove K2 motion systematics with SFF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html">How does the SFF method work?</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html#Retrieve-the-K2SFF-data-for-ENG-test-source-60021426">Retrieve the K2SFF data for ENG test source <code class="docutils literal notranslate"><span class="pre">60021426</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html#Manually-reproduce-with-the-Vanderburg-provided-diagnostic-data">Manually reproduce with the Vanderburg-provided diagnostic data</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/motion-correction/replicate-vanderburg-2014-lightkurve.html">Replicating Vanderburg &amp; Johnson 2014 using lightkurve</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/motion-correction/replicate-vanderburg-2014-lightkurve.html#Data-Exclusion">Data Exclusion</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.06-identify-rolling-band.html">How to identify time-variable background noise (“rolling bands”)?</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section1.html">Introduction to lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section2.html">Science with lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section3.html">Extracting lightcurves</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section4.html">Systematics correction</a></li>
 </ul>
 <p class="caption"><span class="caption-text">About lightkurve</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing and reporting issues</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../contributing.html#proposing-changes-to-lightkurve-using-github-pull-requests">Proposing changes to lightkurve using GitHub pull requests</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../contributing.html#coding-and-documentation-guidelines">Coding and documentation guidelines</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing and reporting issues</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../citing.html">Citing and acknowledging lightkurve</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../other_software.html">Other software</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../other_software.html#detrending-analysis">Detrending &amp; Analysis</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../other_software.html#full-frame-images">Full Frame Images</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../other_software.html#data-access">Data access</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../other_software.html#metadata">Metadata</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../other_software.html#planet-search">Planet Search</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../other_software.html#population-statistics">Population Statistics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../other_software.html#positional">Positional</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../other_software.html#science-astrophysics">Science / Astrophysics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../other_software.html#other">Other</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../other_software.html">Other software</a></li>
 </ul>
 
             
@@ -256,7 +142,6 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
         
         <div class="rst-content">
@@ -321,21 +206,6 @@
     margin-top: -19px;
 }
 
-/* nice headers on first paragraph of info/warning boxes */
-.admonition .first {
-    margin: -12px;
-    padding: 6px 12px;
-    margin-bottom: 12px;
-    color: #fff;
-    line-height: 1;
-    display: block;
-}
-.admonition.warning .first {
-    background: #f0b37e;
-}
-.admonition.note .first {
-    background: #6ab0de;
-}
 .admonition > p:before {
     margin-right: 4px;  /* make room for the exclamation icon */
 }
@@ -350,16 +220,18 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>channel</strong> : int</p>
-<blockquote>
-<div><p>Channel number</p>
-</div></blockquote>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>channel</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">Channel number</p>
+</dd>
+</dl>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>module, output</strong> : tuple of ints</p>
-<blockquote class="last">
-<div><p>Module and Output number</p>
-</div></blockquote>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>module, output</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple of ints</span></dt>
+<dd><p class="first last">Module and Output number</p>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -410,7 +282,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'1.0b9',
+            VERSION:'1.0b10',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -425,16 +297,11 @@
 
   
 
-  
-  
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
 
   <script type="text/javascript">
       jQuery(function () {
-          
-          SphinxRtdTheme.Navigation.enableSticky();
-          
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script> 
 

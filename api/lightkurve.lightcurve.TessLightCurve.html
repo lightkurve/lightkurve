@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>TessLightCurve &mdash; lightkurve 1.0b9 documentation</title>
+  <title>TessLightCurve &mdash; lightkurve 1.0b10 documentation</title>
   
 
   
@@ -24,8 +24,7 @@
 
   
 
-  
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -62,7 +61,7 @@
             
             
               <div class="version">
-                1.0b9
+                1.0b10
               </div>
             
           
@@ -89,31 +88,11 @@
               <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/quickstart.html">Quickstart</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../install.html#requirements">Requirements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../install.html#installing-lightkurve">Installing lightkurve</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../install.html#stable-version">Stable version</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../install.html#development-version">Development version</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../install.html#building-documentation">Building documentation</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">API documentation</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="targetpixelfile.html">TargetPixelFile classes</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="targetpixelfile.html#classes">Classes</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.targetpixelfile.KeplerTargetPixelFile.html">KeplerTargetPixelFile</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.targetpixelfile.TessTargetPixelFile.html">TessTargetPixelFile</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="targetpixelfile.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="targetpixelfile.html">TargetPixelFile classes</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="lightcurve.html">LightCurve classes</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="lightcurve.html#functions">Functions</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurve.iterative_box_period_search.html">iterative_box_period_search</a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="lightcurve.html#functions">Functions</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="lightcurve.html#classes">Classes</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurve.LightCurve.html">LightCurve</a></li>
 <li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurve.KeplerLightCurve.html">KeplerLightCurve</a></li>
@@ -123,120 +102,25 @@
 <li class="toctree-l3"><a class="reference internal" href="lightcurve.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="lightcurvefile.html">LightCurveFile classes</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="lightcurvefile.html#classes">Classes</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurvefile.KeplerLightCurveFile.html">KeplerLightCurveFile</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurvefile.TessLightCurveFile.html">TessLightCurveFile</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="lightcurvefile.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="correctors.html">Systematics correction classes</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="correctors.html#classes">Classes</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.correctors.KeplerCBVCorrector.html">KeplerCBVCorrector</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.correctors.SFFCorrector.html">SFFCorrector</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="correctors.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="prf.html">PSF photometry classes</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="prf.html#functions">Functions</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.get_initial_guesses.html">get_initial_guesses</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="prf.html#classes">Classes</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.KeplerPRF.html">KeplerPRF</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.PRFPhotometry.html">PRFPhotometry</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.SceneModel.html">SceneModel</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.SimpleKeplerPRF.html">SimpleKeplerPRF</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="prf.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html">Utility functions</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="utils.html#functions">Functions</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.utils.bkjd_to_astropy_time.html">bkjd_to_astropy_time</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.utils.btjd_to_astropy_time.html">btjd_to_astropy_time</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.utils.channel_to_module_output.html">channel_to_module_output</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.utils.module_output_to_channel.html">module_output_to_channel</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.utils.running_mean.html">running_mean</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="utils.html#classes">Classes</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.utils.KeplerQualityFlags.html">KeplerQualityFlags</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.utils.TessQualityFlags.html">TessQualityFlags</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="utils.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="lightcurvefile.html">LightCurveFile classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="correctors.html">Systematics correction classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prf.html">PSF photometry classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">Utility functions</a></li>
 </ul>
 </li>
 </ul>
 <p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/section1.html">Introduction to lightkurve</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/1.02-target-pixel-files.html">What are Target Pixel File objects?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/1.03-what-are-lightcurves.html">What are Light Curve objects?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/1.04-lightcurve-files.html">What are Light Curve File objects?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/1.05-interact-with-lightcurves-and-tpf.html">Interactively inspecting Target Pixel Files and Lightcurves</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/1.05-interact-with-lightcurves-and-tpf.html#Using-.interact()">Using <code class="docutils literal notranslate"><span class="pre">.interact()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/1.05-interact-with-lightcurves-and-tpf.html#Passing-in-a-preprocessed-lightcurve">Passing in a preprocessed lightcurve</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/section2.html">Science with lightkurve</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.02-recover-a-planet.html">How to recover a known planet in Kepler data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.03-appending-lightcurves.html">How to combine lightcurves from different Kepler quarters</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.05-making-custom-apertures.html">How to perform aperture photometry with custom apertures</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/cutting-out-tpfs-from-tess-ffis.html">How to cut out Target Pixel Files from Kepler Super Stamps or TESS FFIs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.08-making-fits-files.html">How to store a light curve in FITS format?</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/2.08-making-fits-files.html#Example:-editing-and-writing-a-lightcurve">Example: editing and writing a lightcurve</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.09-how-to-use-lightkurve-for-asteroseismology.html">How to use lightkurve for asteroseismology</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/section3.html">Systematics correction using lightkurve</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.04-removing-cbvs.html">How to remove common systematics using basis vectors (CBVs)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.01-how-to-detrend.html">How to remove K2 motion systematics with SFF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html">How does the SFF method work?</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html#Retrieve-the-K2SFF-data-for-ENG-test-source-60021426">Retrieve the K2SFF data for ENG test source <code class="docutils literal notranslate"><span class="pre">60021426</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html#Manually-reproduce-with-the-Vanderburg-provided-diagnostic-data">Manually reproduce with the Vanderburg-provided diagnostic data</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/motion-correction/replicate-vanderburg-2014-lightkurve.html">Replicating Vanderburg &amp; Johnson 2014 using lightkurve</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/motion-correction/replicate-vanderburg-2014-lightkurve.html#Data-Exclusion">Data Exclusion</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.06-identify-rolling-band.html">How to identify time-variable background noise (“rolling bands”)?</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section1.html">Introduction to lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section2.html">Science with lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section3.html">Extracting lightcurves</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section4.html">Systematics correction</a></li>
 </ul>
 <p class="caption"><span class="caption-text">About lightkurve</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing and reporting issues</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../contributing.html#proposing-changes-to-lightkurve-using-github-pull-requests">Proposing changes to lightkurve using GitHub pull requests</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../contributing.html#coding-and-documentation-guidelines">Coding and documentation guidelines</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing and reporting issues</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../citing.html">Citing and acknowledging lightkurve</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../other_software.html">Other software</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../other_software.html#detrending-analysis">Detrending &amp; Analysis</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../other_software.html#full-frame-images">Full Frame Images</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../other_software.html#data-access">Data access</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../other_software.html#metadata">Metadata</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../other_software.html#planet-search">Planet Search</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../other_software.html#population-statistics">Population Statistics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../other_software.html#positional">Positional</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../other_software.html#science-astrophysics">Science / Astrophysics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../other_software.html#other">Other</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../other_software.html">Other software</a></li>
 </ul>
 
             
@@ -256,7 +140,6 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
         
         <div class="rst-content">
@@ -321,21 +204,6 @@
     margin-top: -19px;
 }
 
-/* nice headers on first paragraph of info/warning boxes */
-.admonition .first {
-    margin: -12px;
-    padding: 6px 12px;
-    margin-bottom: 12px;
-    color: #fff;
-    line-height: 1;
-    display: block;
-}
-.admonition.warning .first {
-    background: #f0b37e;
-}
-.admonition.note .first {
-    background: #6ab0de;
-}
 .admonition > p:before {
     margin-right: 4px;  /* make room for the exclamation icon */
 }
@@ -347,42 +215,57 @@
 <em class="property">class </em><code class="descclassname">lightkurve.lightcurve.</code><code class="descname">TessLightCurve</code><span class="sig-paren">(</span><em>time</em>, <em>flux=None</em>, <em>flux_err=None</em>, <em>time_format=None</em>, <em>time_scale=None</em>, <em>centroid_col=None</em>, <em>centroid_row=None</em>, <em>quality=None</em>, <em>quality_bitmask=None</em>, <em>cadenceno=None</em>, <em>sector=None</em>, <em>camera=None</em>, <em>ccd=None</em>, <em>ticid=None</em>, <em>ra=None</em>, <em>dec=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#TessLightCurve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-class docutils literal notranslate"><span class="pre">lightkurve.lightcurve.LightCurve</span></code></a></p>
 <p>Defines a light curve class for NASA’s TESS mission.</p>
-<p class="rubric">Attributes</p>
-<table border="1" class="docutils">
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Attributes:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>time</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array-like</span></dt>
+<dd><p class="first last">Time measurements</p>
+</dd>
+<dt><strong>flux</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array-like</span></dt>
+<dd><p class="first last">Data flux for every time point</p>
+</dd>
+<dt><strong>flux_err</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array-like</span></dt>
+<dd><p class="first last">Uncertainty on each flux data point</p>
+</dd>
+<dt><strong>time_format</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">String specifying how an instant of time is represented,
+e.g. ‘bkjd’ or ‘jd’.</p>
+</dd>
+<dt><strong>time_scale</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">String which specifies how the time is measured,
+e.g. tdb’, ‘tt’, ‘ut1’, or ‘utc’.</p>
+</dd>
+<dt><strong>centroid_col, centroid_row</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array-like, array-like</span></dt>
+<dd><p class="first last">Centroid column and row coordinates as a function of time</p>
+</dd>
+<dt><strong>quality</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array-like</span></dt>
+<dd><p class="first last">Array indicating the quality of each data point</p>
+</dd>
+<dt><strong>quality_bitmask</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">Bitmask specifying quality flags of cadences that should be ignored</p>
+</dd>
+<dt><strong>cadenceno</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array-like</span></dt>
+<dd><p class="first last">Cadence numbers corresponding to every time measurement</p>
+</dd>
+<dt><strong>ticid</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">Tess Input Catalog ID number</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes Summary</p>
+<table border="1" class="longtable docutils">
 <colgroup>
-<col width="25%" />
-<col width="75%" />
+<col width="10%" />
+<col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><strong>time</strong></td>
-<td>(array-like) Time measurements</td>
-</tr>
-<tr class="row-even"><td><strong>flux</strong></td>
-<td>(array-like) Data flux for every time point</td>
-</tr>
-<tr class="row-odd"><td><strong>flux_err</strong></td>
-<td>(array-like) Uncertainty on each flux data point</td>
-</tr>
-<tr class="row-even"><td><strong>time_format</strong></td>
-<td>(str) String specifying how an instant of time is represented, e.g. ‘bkjd’ or ‘jd’.</td>
-</tr>
-<tr class="row-odd"><td><strong>time_scale</strong></td>
-<td>(str) String which specifies how the time is measured, e.g. tdb’, ‘tt’, ‘ut1’, or ‘utc’.</td>
-</tr>
-<tr class="row-even"><td><strong>centroid_col, centroid_row</strong></td>
-<td>(array-like, array-like) Centroid column and row coordinates as a function of time</td>
-</tr>
-<tr class="row-odd"><td><strong>quality</strong></td>
-<td>(array-like) Array indicating the quality of each data point</td>
-</tr>
-<tr class="row-even"><td><strong>quality_bitmask</strong></td>
-<td>(int) Bitmask specifying quality flags of cadences that should be ignored</td>
-</tr>
-<tr class="row-odd"><td><strong>cadenceno</strong></td>
-<td>(array-like) Cadence numbers corresponding to every time measurement</td>
-</tr>
-<tr class="row-even"><td><strong>ticid</strong></td>
-<td>(int) Tess Input Catalog ID number</td>
+<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.TessLightCurve.astropy_time" title="lightkurve.lightcurve.TessLightCurve.astropy_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy_time</span></code></a></td>
+<td>Returns an <cite>astropy.time.Time</cite> object.</td>
 </tr>
 </tbody>
 </table>
@@ -426,14 +309,41 @@
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.TessLightCurve.to_csv" title="lightkurve.lightcurve.TessLightCurve.to_csv"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_csv</span></code></a>([path_or_buf])</td>
 <td>Writes the LightCurve to a csv file.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.TessLightCurve.to_pandas" title="lightkurve.lightcurve.TessLightCurve.to_pandas"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_pandas</span></code></a>([columns])</td>
+<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.TessLightCurve.to_fits" title="lightkurve.lightcurve.TessLightCurve.to_fits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_fits</span></code></a>([path,&nbsp;overwrite])</td>
+<td>Writes the KeplerLightCurve to a fits file.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.TessLightCurve.to_pandas" title="lightkurve.lightcurve.TessLightCurve.to_pandas"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_pandas</span></code></a>([columns])</td>
 <td>Export the LightCurve as a Pandas DataFrame.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.TessLightCurve.to_table" title="lightkurve.lightcurve.TessLightCurve.to_table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_table</span></code></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.TessLightCurve.to_table" title="lightkurve.lightcurve.TessLightCurve.to_table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_table</span></code></a>()</td>
 <td>Export the LightCurve as an AstroPy Table.</td>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Attributes Documentation</p>
+<dl class="attribute">
+<dt id="lightkurve.lightcurve.TessLightCurve.astropy_time">
+<code class="descname">astropy_time</code><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.astropy_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an <cite>astropy.time.Time</cite> object.</p>
+<p>The Time object will be created using the values in <cite>self.time</cite>
+and the <cite>self.time_format</cite> and <cite>self.time_scale</cite> attributes.
+For Kepler data products, the times are Barycentric.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>ValueError</strong></dt>
+<dd><p class="first last">If <cite>self.time_format</cite> is not set or not one of the formats
+allowed by AstroPy.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <p class="rubric">Methods Documentation</p>
 <dl class="method">
 <dt id="lightkurve.lightcurve.TessLightCurve.append">
@@ -443,16 +353,18 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>others</strong> : LightCurve object or list of LightCurve objects</p>
-<blockquote>
-<div><p>Light curves to be appended to the current one.</p>
-</div></blockquote>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>others</strong> <span class="classifier-delimiter">:</span> <span class="classifier">LightCurve object or list of LightCurve objects</span></dt>
+<dd><p class="first last">Light curves to be appended to the current one.</p>
+</dd>
+</dl>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>new_lc</strong> : LightCurve object</p>
-<blockquote class="last">
-<div><p>Concatenated light curve.</p>
-</div></blockquote>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>new_lc</strong> <span class="classifier-delimiter">:</span> <span class="classifier">LightCurve object</span></dt>
+<dd><p class="first last">Concatenated light curve.</p>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -468,20 +380,21 @@ on blocks of samples of size <cite>binsize</cite>.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>binsize</strong> : int</p>
-<blockquote>
-<div><p>Number of cadences to include in every bin.</p>
-</div></blockquote>
-<p><strong>method: str, one of ‘mean’ or ‘median’</strong></p>
-<blockquote>
-<div><p>The summary statistic to return for each bin. Default: ‘mean’.</p>
-</div></blockquote>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>binsize</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">Number of cadences to include in every bin.</p>
+</dd>
+<dt><strong>method: str, one of ‘mean’ or ‘median’</strong></dt>
+<dd><p class="first last">The summary statistic to return for each bin. Default: ‘mean’.</p>
+</dd>
+</dl>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>binned_lc</strong> : LightCurve object</p>
-<blockquote class="last">
-<div><p>Binned lightcurve.</p>
-</div></blockquote>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>binned_lc</strong> <span class="classifier-delimiter">:</span> <span class="classifier">LightCurve object</span></dt>
+<dd><p class="first last">Binned lightcurve.</p>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -532,34 +445,33 @@ limit to 1/transit_duration.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>transit_duration</strong> : int, optional</p>
-<blockquote>
-<div><p>The transit duration in units of number of cadences. This is the
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>transit_duration</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int, optional</span></dt>
+<dd><p class="first last">The transit duration in units of number of cadences. This is the
 length of the window used to compute the running mean. The default
 is 13, which corresponds to a 6.5 hour transit in data sampled at
 30-min cadence.</p>
-</div></blockquote>
-<p><strong>savgol_window</strong> : int, optional</p>
-<blockquote>
-<div><p>Width of Savitsky-Golay filter in cadences (odd number).
+</dd>
+<dt><strong>savgol_window</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int, optional</span></dt>
+<dd><p class="first last">Width of Savitsky-Golay filter in cadences (odd number).
 Default value 101 (2.0 days in Kepler Long Cadence mode).</p>
-</div></blockquote>
-<p><strong>savgol_polyorder</strong> : int, optional</p>
-<blockquote>
-<div><p>Polynomial order of the Savitsky-Golay filter.
+</dd>
+<dt><strong>savgol_polyorder</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int, optional</span></dt>
+<dd><p class="first last">Polynomial order of the Savitsky-Golay filter.
 The recommended value is 2.</p>
-</div></blockquote>
-<p><strong>sigma_clip</strong> : float, optional</p>
-<blockquote>
-<div><p>The number of standard deviations to use for clipping outliers.
+</dd>
+<dt><strong>sigma_clip</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float, optional</span></dt>
+<dd><p class="first last">The number of standard deviations to use for clipping outliers.
 The default is 5.</p>
-</div></blockquote>
+</dd>
+</dl>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>cdpp</strong> : float</p>
-<blockquote class="last">
-<div><p>Savitzky-Golay CDPP noise metric in units parts-per-million (ppm).</p>
-</div></blockquote>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>cdpp</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd><p class="first last">Savitzky-Golay CDPP noise metric in units parts-per-million (ppm).</p>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -579,44 +491,42 @@ svn+ssh://murzim/repo/so/trunk/Develop/jvc/common/compute_SG_noise.m</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>window_length</strong> : int</p>
-<blockquote>
-<div><p>The length of the filter window (i.e. the number of coefficients).
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>window_length</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">The length of the filter window (i.e. the number of coefficients).
 <code class="docutils literal notranslate"><span class="pre">window_length</span></code> must be a positive odd integer.</p>
-</div></blockquote>
-<p><strong>polyorder</strong> : int</p>
-<blockquote>
-<div><p>The order of the polynomial used to fit the samples. <code class="docutils literal notranslate"><span class="pre">polyorder</span></code>
+</dd>
+<dt><strong>polyorder</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">The order of the polynomial used to fit the samples. <code class="docutils literal notranslate"><span class="pre">polyorder</span></code>
 must be less than window_length.</p>
-</div></blockquote>
-<p><strong>return_trend</strong> : bool</p>
-<blockquote>
-<div><p>If <cite>True</cite>, the method will return a tuple of two elements
+</dd>
+<dt><strong>return_trend</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd><p class="first last">If <cite>True</cite>, the method will return a tuple of two elements
 (flattened_lc, trend_lc) where trend_lc is the removed trend.</p>
-</div></blockquote>
-<p><strong>break_tolerance</strong> : int</p>
-<blockquote>
-<div><p>If there are large gaps in time, flatten will split the flux into
+</dd>
+<dt><strong>break_tolerance</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">If there are large gaps in time, flatten will split the flux into
 several sub-lightcurves and apply <cite>savgol_filter</cite> to each
 individually. A gap is defined as a period in time larger than
 <cite>break_tolerance</cite> times the median gap.  To disable this feature,
 set <cite>break_tolerance</cite> to None.</p>
-</div></blockquote>
-<p><strong>**kwargs</strong> : dict</p>
-<blockquote>
-<div><p>Dictionary of arguments to be passed to <cite>scipy.signal.savgol_filter</cite>.</p>
-</div></blockquote>
+</dd>
+<dt><strong>**kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd><p class="first last">Dictionary of arguments to be passed to <cite>scipy.signal.savgol_filter</cite>.</p>
+</dd>
+</dl>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>flatten_lc</strong> : LightCurve object</p>
-<blockquote>
-<div><p>Flattened lightcurve.</p>
-</div></blockquote>
-<p>If <cite>return_trend</cite> is <cite>True</cite>, the method will also return:</p>
-<p><strong>trend_lc</strong> : LightCurve object</p>
-<blockquote class="last">
-<div><p>Trend in the lightcurve data</p>
-</div></blockquote>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>flatten_lc</strong> <span class="classifier-delimiter">:</span> <span class="classifier">LightCurve object</span></dt>
+<dd><p class="first last">Flattened lightcurve.</p>
+</dd>
+<dt><strong>If `return_trend` is `True`, the method will also return:</strong></dt>
+<dd></dd>
+<dt><strong>trend_lc</strong> <span class="classifier-delimiter">:</span> <span class="classifier">LightCurve object</span></dt>
+<dd><p class="first last">Trend in the lightcurve data</p>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -635,21 +545,22 @@ value 0.0.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>period</strong> : float</p>
-<blockquote>
-<div><p>The period upon which to fold.</p>
-</div></blockquote>
-<p><strong>phase</strong> : float, optional</p>
-<blockquote>
-<div><p>Time reference point.</p>
-</div></blockquote>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>period</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd><p class="first last">The period upon which to fold.</p>
+</dd>
+<dt><strong>phase</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float, optional</span></dt>
+<dd><p class="first last">Time reference point.</p>
+</dd>
+</dl>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>folded_lightcurve</strong> : LightCurve object</p>
-<blockquote class="last">
-<div><p>A new <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> in which the data are folded and sorted by
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>folded_lightcurve</strong> <span class="classifier-delimiter">:</span> <span class="classifier">LightCurve object</span></dt>
+<dd><p class="first last">A new <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> in which the data are folded and sorted by
 phase.</p>
-</div></blockquote>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -666,11 +577,12 @@ by the median flux.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>normalized_lightcurve</strong> : LightCurve object</p>
-<blockquote class="last">
-<div><p>A new <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> in which <cite>flux</cite> and <cite>flux_err</cite> are divided
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>normalized_lightcurve</strong> <span class="classifier-delimiter">:</span> <span class="classifier">LightCurve object</span></dt>
+<dd><p class="first last">A new <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> in which <cite>flux</cite> and <cite>flux_err</cite> are divided
 by the median.</p>
-</div></blockquote>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -685,53 +597,46 @@ by the median.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>ax</strong> : matplotlib.axes._subplots.AxesSubplot</p>
-<blockquote>
-<div><p>A matplotlib axes object to plot into. If no axes is provided,
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>ax</strong> <span class="classifier-delimiter">:</span> <span class="classifier">matplotlib.axes._subplots.AxesSubplot</span></dt>
+<dd><p class="first last">A matplotlib axes object to plot into. If no axes is provided,
 a new one will be generated.</p>
-</div></blockquote>
-<p><strong>normalize</strong> : bool</p>
-<blockquote>
-<div><p>Normalize the lightcurve before plotting?</p>
-</div></blockquote>
-<p><strong>xlabel</strong> : str</p>
-<blockquote>
-<div><p>Plot x axis label</p>
-</div></blockquote>
-<p><strong>ylabel</strong> : str</p>
-<blockquote>
-<div><p>Plot y axis label</p>
-</div></blockquote>
-<p><strong>title</strong> : str</p>
-<blockquote>
-<div><p>Plot set_title</p>
-</div></blockquote>
-<p><strong>color</strong> : str</p>
-<blockquote>
-<div><p>Color to plot line in</p>
-</div></blockquote>
-<p><strong>fill</strong> : bool</p>
-<blockquote>
-<div><p>Shade the region between 0 and flux</p>
-</div></blockquote>
-<p><strong>grid</strong> : bool</p>
-<blockquote>
-<div><p>Plot with a grid</p>
-</div></blockquote>
-<p><strong>style</strong> : str</p>
-<blockquote>
-<div><p>matplotlib.pyplot.style.context, default is ‘fast’</p>
-</div></blockquote>
-<p><strong>kwargs</strong> : dict</p>
-<blockquote>
-<div><p>Dictionary of arguments to be passed to <cite>matplotlib.pyplot.plot</cite>.</p>
-</div></blockquote>
+</dd>
+<dt><strong>normalize</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd><p class="first last">Normalize the lightcurve before plotting?</p>
+</dd>
+<dt><strong>xlabel</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">Plot x axis label</p>
+</dd>
+<dt><strong>ylabel</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">Plot y axis label</p>
+</dd>
+<dt><strong>title</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">Plot set_title</p>
+</dd>
+<dt><strong>color</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">Color to plot line in</p>
+</dd>
+<dt><strong>fill</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd><p class="first last">Shade the region between 0 and flux</p>
+</dd>
+<dt><strong>grid</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd><p class="first last">Plot with a grid</p>
+</dd>
+<dt><strong>style</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">matplotlib.pyplot.style.context, default is ‘fast’</p>
+</dd>
+<dt><strong>kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd><p class="first last">Dictionary of arguments to be passed to <cite>matplotlib.pyplot.plot</cite>.</p>
+</dd>
+</dl>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>ax</strong> : matplotlib.axes._subplots.AxesSubplot</p>
-<blockquote class="last">
-<div><p>The matplotlib axes object.</p>
-</div></blockquote>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>ax</strong> <span class="classifier-delimiter">:</span> <span class="classifier">matplotlib.axes._subplots.AxesSubplot</span></dt>
+<dd><p class="first last">The matplotlib axes object.</p>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -755,10 +660,11 @@ Prints in alphabetical order.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>clean_lightcurve</strong> : LightCurve object</p>
-<blockquote class="last">
-<div><p>A new <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> from which NaNs fluxes have been removed.</p>
-</div></blockquote>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>clean_lightcurve</strong> <span class="classifier-delimiter">:</span> <span class="classifier">LightCurve object</span></dt>
+<dd><p class="first last">A new <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> from which NaNs fluxes have been removed.</p>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -776,26 +682,26 @@ the standard deviation.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>sigma</strong> : float</p>
-<blockquote>
-<div><p>The number of standard deviations to use for clipping outliers.
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>sigma</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd><p class="first last">The number of standard deviations to use for clipping outliers.
 Defaults to 5.</p>
-</div></blockquote>
-<p><strong>return_mask</strong> : bool</p>
-<blockquote>
-<div><p>Whether or not to return the mask indicating which data points
+</dd>
+<dt><strong>return_mask</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd><p class="first last">Whether or not to return the mask indicating which data points
 were removed. Entries marked as <cite>True</cite> are considered outliers.</p>
-</div></blockquote>
-<p><strong>**kwargs</strong> : dict</p>
-<blockquote>
-<div><p>Dictionary of arguments to be passed to <cite>astropy.stats.sigma_clip</cite>.</p>
-</div></blockquote>
+</dd>
+<dt><strong>**kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd><p class="first last">Dictionary of arguments to be passed to <cite>astropy.stats.sigma_clip</cite>.</p>
+</dd>
+</dl>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>clean_lightcurve</strong> : LightCurve object</p>
-<blockquote class="last">
-<div><p>A new <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> in which outliers have been removed.</p>
-</div></blockquote>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>clean_lightcurve</strong> <span class="classifier-delimiter">:</span> <span class="classifier">LightCurve object</span></dt>
+<dd><p class="first last">A new <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> in which outliers have been removed.</p>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -810,22 +716,59 @@ were removed. Entries marked as <cite>True</cite> are considered outliers.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>path_or_buf</strong> : string or file handle, default None</p>
-<blockquote>
-<div><p>File path or object, if None is provided the result is returned as
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>path_or_buf</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string or file handle, default None</span></dt>
+<dd><p class="first last">File path or object, if None is provided the result is returned as
 a string.</p>
-</div></blockquote>
-<p><strong>**kwargs</strong> : dict</p>
-<blockquote>
-<div><p>Dictionary of arguments to be passed to <cite>pandas.DataFrame.to_csv()</cite>.</p>
-</div></blockquote>
+</dd>
+<dt><strong>**kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd><p class="first last">Dictionary of arguments to be passed to <cite>pandas.DataFrame.to_csv()</cite>.</p>
+</dd>
+</dl>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>csv</strong> : str or None</p>
-<blockquote class="last">
-<div><p>Returns a csv-formatted string if <cite>path_or_buf=None</cite>,
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>csv</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str or None</span></dt>
+<dd><p class="first last">Returns a csv-formatted string if <cite>path_or_buf=None</cite>,
 returns None otherwise.</p>
-</div></blockquote>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="lightkurve.lightcurve.TessLightCurve.to_fits">
+<code class="descname">to_fits</code><span class="sig-paren">(</span><em>path=None</em>, <em>overwrite=False</em>, <em>**extra_data</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.to_fits" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes the KeplerLightCurve to a fits file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>path</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string, default None</span></dt>
+<dd><p class="first last">File path, if None returns an astropy.io.fits object.</p>
+</dd>
+<dt><strong>overwrite</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd><p class="first last">Whether or not to overwrite the file</p>
+</dd>
+<dt><strong>extra_data</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd><p class="first last">Extra keywords or columns to include in the FITS file.
+Arguments of type str, int, float, or bool will be stored as
+keywords in the primary header.
+Arguments of type np.array or list will be stored as columns
+in the first extension.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>hdu</strong> <span class="classifier-delimiter">:</span> <span class="classifier">astropy.io.fits</span></dt>
+<dd><p class="first last">Returns an astropy.io.fits object if path is None</p>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -840,18 +783,20 @@ returns None otherwise.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>columns</strong> : list of str</p>
-<blockquote>
-<div><p>List of columns to include in the DataFrame.  The names must match
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>columns</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of str</span></dt>
+<dd><p class="first last">List of columns to include in the DataFrame.  The names must match
 attributes of the <cite>LightCurve</cite> object (e.g. <cite>time</cite>, <cite>flux</cite>).</p>
-</div></blockquote>
+</dd>
+</dl>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>dataframe</strong> : <cite>pandas.DataFrame</cite> object</p>
-<blockquote class="last">
-<div><p>A dataframe indexed by <cite>time</cite> and containing the columns <cite>flux</cite>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>dataframe</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><cite>pandas.DataFrame</cite> object</span></dt>
+<dd><p class="first last">A dataframe indexed by <cite>time</cite> and containing the columns <cite>flux</cite>
 and <cite>flux_err</cite>.</p>
-</div></blockquote>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -866,10 +811,11 @@ and <cite>flux_err</cite>.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>table</strong> : <cite>astropy.table.Table</cite> object</p>
-<blockquote class="last">
-<div><p>An AstroPy Table with columns ‘time’, ‘flux’, and ‘flux_err’.</p>
-</div></blockquote>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>table</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><cite>astropy.table.Table</cite> object</span></dt>
+<dd><p class="first last">An AstroPy Table with columns ‘time’, ‘flux’, and ‘flux_err’.</p>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -922,7 +868,7 @@ and <cite>flux_err</cite>.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'1.0b9',
+            VERSION:'1.0b10',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -937,16 +883,11 @@ and <cite>flux_err</cite>.</p>
 
   
 
-  
-  
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
 
   <script type="text/javascript">
       jQuery(function () {
-          
-          SphinxRtdTheme.Navigation.enableSticky();
-          
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script> 
 

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>PSF photometry classes &mdash; lightkurve 1.0b9 documentation</title>
+  <title>PRF photometry classes &mdash; lightkurve 1.0b10 documentation</title>
   
 
   
@@ -24,12 +24,11 @@
 
   
 
-  
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="get_initial_guesses" href="lightkurve.prf.get_initial_guesses.html" />
+    <link rel="next" title="BackgroundParameters" href="lightkurve.prf.BackgroundParameters.html" />
     <link rel="prev" title="SFFCorrector" href="lightkurve.correctors.SFFCorrector.html" /> 
 
   
@@ -62,7 +61,7 @@
             
             
               <div class="version">
-                1.0b9
+                1.0b10
               </div>
             
           
@@ -89,154 +88,49 @@
               <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/quickstart.html">Quickstart</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../install.html#requirements">Requirements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../install.html#installing-lightkurve">Installing lightkurve</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../install.html#stable-version">Stable version</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../install.html#development-version">Development version</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../install.html#building-documentation">Building documentation</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">API documentation</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="targetpixelfile.html">TargetPixelFile classes</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="targetpixelfile.html#classes">Classes</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.targetpixelfile.KeplerTargetPixelFile.html">KeplerTargetPixelFile</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.targetpixelfile.TessTargetPixelFile.html">TessTargetPixelFile</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="targetpixelfile.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="lightcurve.html">LightCurve classes</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="lightcurve.html#functions">Functions</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurve.iterative_box_period_search.html">iterative_box_period_search</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="lightcurve.html#classes">Classes</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurve.LightCurve.html">LightCurve</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurve.KeplerLightCurve.html">KeplerLightCurve</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurve.TessLightCurve.html">TessLightCurve</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="lightcurve.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="lightcurvefile.html">LightCurveFile classes</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="lightcurvefile.html#classes">Classes</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurvefile.KeplerLightCurveFile.html">KeplerLightCurveFile</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurvefile.TessLightCurveFile.html">TessLightCurveFile</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="lightcurvefile.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="correctors.html">Systematics correction classes</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="correctors.html#classes">Classes</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.correctors.KeplerCBVCorrector.html">KeplerCBVCorrector</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.correctors.SFFCorrector.html">SFFCorrector</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="correctors.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
-</ul>
-</li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">PSF photometry classes</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#functions">Functions</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.get_initial_guesses.html">get_initial_guesses</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="targetpixelfile.html">TargetPixelFile classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lightcurve.html">LightCurve classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lightcurvefile.html">LightCurveFile classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="correctors.html">Systematics correction classes</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">PRF photometry classes</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#classes">Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.BackgroundParameters.html">BackgroundParameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.BackgroundPrior.html">BackgroundPrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.FixedValuePrior.html">FixedValuePrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.FocusParameters.html">FocusParameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.FocusPrior.html">FocusPrior</a></li>
 <li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.KeplerPRF.html">KeplerPRF</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.MotionParameters.html">MotionParameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.MotionPrior.html">MotionPrior</a></li>
 <li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.PRFPhotometry.html">PRFPhotometry</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.SceneModel.html">SceneModel</a></li>
 <li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.SimpleKeplerPRF.html">SimpleKeplerPRF</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.StarParameters.html">StarParameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.StarPrior.html">StarPrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.TPFModel.html">TPFModel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.TPFModelParameters.html">TPFModelParameters</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#class-inheritance-diagram">Class Inheritance Diagram</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html">Utility functions</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="utils.html#functions">Functions</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.utils.bkjd_to_astropy_time.html">bkjd_to_astropy_time</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.utils.btjd_to_astropy_time.html">btjd_to_astropy_time</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.utils.channel_to_module_output.html">channel_to_module_output</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.utils.module_output_to_channel.html">module_output_to_channel</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.utils.running_mean.html">running_mean</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="utils.html#classes">Classes</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.utils.KeplerQualityFlags.html">KeplerQualityFlags</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.utils.TessQualityFlags.html">TessQualityFlags</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="utils.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">Utility functions</a></li>
 </ul>
 </li>
 </ul>
 <p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/section1.html">Introduction to lightkurve</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/1.02-target-pixel-files.html">What are Target Pixel File objects?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/1.03-what-are-lightcurves.html">What are Light Curve objects?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/1.04-lightcurve-files.html">What are Light Curve File objects?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/1.05-interact-with-lightcurves-and-tpf.html">Interactively inspecting Target Pixel Files and Lightcurves</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/1.05-interact-with-lightcurves-and-tpf.html#Using-.interact()">Using <code class="docutils literal notranslate"><span class="pre">.interact()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/1.05-interact-with-lightcurves-and-tpf.html#Passing-in-a-preprocessed-lightcurve">Passing in a preprocessed lightcurve</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/section2.html">Science with lightkurve</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.02-recover-a-planet.html">How to recover a known planet in Kepler data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.03-appending-lightcurves.html">How to combine lightcurves from different Kepler quarters</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.05-making-custom-apertures.html">How to perform aperture photometry with custom apertures</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/cutting-out-tpfs-from-tess-ffis.html">How to cut out Target Pixel Files from Kepler Super Stamps or TESS FFIs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.08-making-fits-files.html">How to store a light curve in FITS format?</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/2.08-making-fits-files.html#Example:-editing-and-writing-a-lightcurve">Example: editing and writing a lightcurve</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.09-how-to-use-lightkurve-for-asteroseismology.html">How to use lightkurve for asteroseismology</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/section3.html">Systematics correction using lightkurve</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.04-removing-cbvs.html">How to remove common systematics using basis vectors (CBVs)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.01-how-to-detrend.html">How to remove K2 motion systematics with SFF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html">How does the SFF method work?</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html#Retrieve-the-K2SFF-data-for-ENG-test-source-60021426">Retrieve the K2SFF data for ENG test source <code class="docutils literal notranslate"><span class="pre">60021426</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html#Manually-reproduce-with-the-Vanderburg-provided-diagnostic-data">Manually reproduce with the Vanderburg-provided diagnostic data</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/motion-correction/replicate-vanderburg-2014-lightkurve.html">Replicating Vanderburg &amp; Johnson 2014 using lightkurve</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/motion-correction/replicate-vanderburg-2014-lightkurve.html#Data-Exclusion">Data Exclusion</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.06-identify-rolling-band.html">How to identify time-variable background noise (“rolling bands”)?</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section1.html">Introduction to lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section2.html">Science with lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section3.html">Extracting lightcurves</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section4.html">Systematics correction</a></li>
 </ul>
 <p class="caption"><span class="caption-text">About lightkurve</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing and reporting issues</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../contributing.html#proposing-changes-to-lightkurve-using-github-pull-requests">Proposing changes to lightkurve using GitHub pull requests</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../contributing.html#coding-and-documentation-guidelines">Coding and documentation guidelines</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing and reporting issues</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../citing.html">Citing and acknowledging lightkurve</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../other_software.html">Other software</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../other_software.html#detrending-analysis">Detrending &amp; Analysis</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../other_software.html#full-frame-images">Full Frame Images</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../other_software.html#data-access">Data access</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../other_software.html#metadata">Metadata</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../other_software.html#planet-search">Planet Search</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../other_software.html#population-statistics">Population Statistics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../other_software.html#positional">Positional</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../other_software.html#science-astrophysics">Science / Astrophysics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../other_software.html#other">Other</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../other_software.html">Other software</a></li>
 </ul>
 
             
@@ -256,7 +150,6 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
         
         <div class="rst-content">
@@ -285,7 +178,7 @@
         
           <li><a href="index.html">API documentation</a> &raquo;</li>
         
-      <li>PSF photometry classes</li>
+      <li>PRF photometry classes</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -319,42 +212,13 @@
     margin-top: -19px;
 }
 
-/* nice headers on first paragraph of info/warning boxes */
-.admonition .first {
-    margin: -12px;
-    padding: 6px 12px;
-    margin-bottom: 12px;
-    color: #fff;
-    line-height: 1;
-    display: block;
-}
-.admonition.warning .first {
-    background: #f0b37e;
-}
-.admonition.note .first {
-    background: #6ab0de;
-}
 .admonition > p:before {
     margin-right: 4px;  /* make room for the exclamation icon */
 }
 </style>
 <div class="section" id="module-lightkurve.prf">
-<span id="psf-photometry-classes"></span><h1>PSF photometry classes<a class="headerlink" href="#module-lightkurve.prf" title="Permalink to this headline">¶</a></h1>
-<span class="target" id="module-lightkurve.prf"></span><div class="section" id="functions">
-<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="lightkurve.prf.get_initial_guesses.html#lightkurve.prf.get_initial_guesses" title="lightkurve.prf.get_initial_guesses"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_initial_guesses</span></code></a>(data,&nbsp;ref_col,&nbsp;ref_row)</td>
-<td>Compute the initial guesses for total flux, centers position, and PSF width using the sample moments of the data.</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="section" id="classes">
+<span id="prf-photometry-classes"></span><h1>PRF photometry classes<a class="headerlink" href="#module-lightkurve.prf" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-lightkurve.prf"></span><div class="section" id="classes">
 <h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -362,29 +226,75 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="lightkurve.prf.BackgroundParameters.html#lightkurve.prf.BackgroundParameters" title="lightkurve.prf.BackgroundParameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BackgroundParameters</span></code></a>([flux,&nbsp;err_flux,&nbsp;fitted])</td>
+<td>Container class to hold the parameters of the background in a <code class="docutils literal notranslate"><span class="pre">TPFModel</span></code>.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="lightkurve.prf.BackgroundPrior.html#lightkurve.prf.BackgroundPrior" title="lightkurve.prf.BackgroundPrior"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BackgroundPrior</span></code></a>([flux])</td>
+<td>Container class to capture a user’s beliefs about the background flux.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="lightkurve.prf.FixedValuePrior.html#lightkurve.prf.FixedValuePrior" title="lightkurve.prf.FixedValuePrior"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FixedValuePrior</span></code></a>(value[,&nbsp;name])</td>
+<td>An improper prior with a negative log probability of 0 at a single fixed value and inf elsewhere.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="lightkurve.prf.FocusParameters.html#lightkurve.prf.FocusParameters" title="lightkurve.prf.FocusParameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FocusParameters</span></code></a>([scale_col,&nbsp;scale_row,&nbsp;…])</td>
+<td>Container class to hold the parameters of the telescope focus in a <code class="docutils literal notranslate"><span class="pre">TPFModel</span></code>.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="lightkurve.prf.FocusPrior.html#lightkurve.prf.FocusPrior" title="lightkurve.prf.FocusPrior"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FocusPrior</span></code></a>([scale_col,&nbsp;var,&nbsp;scale_row,&nbsp;var,&nbsp;…])</td>
+<td>Container class to capture a user’s beliefs about the telescope focus.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">GaussianPrior</span></code>(mean,&nbsp;var[,&nbsp;name])</td>
+<td>Computes the negative log pdf for a n-dimensional independent Gaussian distribution.</td>
+</tr>
 <tr class="row-odd"><td><a class="reference internal" href="lightkurve.prf.KeplerPRF.html#lightkurve.prf.KeplerPRF" title="lightkurve.prf.KeplerPRF"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerPRF</span></code></a>(channel,&nbsp;shape,&nbsp;column,&nbsp;row)</td>
-<td>Kepler’s Pixel Response Function as designed by [R5].</td>
+<td>Kepler’s Pixel Response Function as designed by <a class="reference internal" href="lightkurve.prf.KeplerPRF.html#r2d3bf0a39f5d-1" id="id1">[R2d3bf0a39f5d-1]</a>.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="lightkurve.prf.PRFPhotometry.html#lightkurve.prf.PRFPhotometry" title="lightkurve.prf.PRFPhotometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PRFPhotometry</span></code></a>(scene_model,&nbsp;prior[,&nbsp;…])</td>
-<td>This class performs PRF Photometry on TPF-like files.</td>
+<tr class="row-even"><td><a class="reference internal" href="lightkurve.prf.MotionParameters.html#lightkurve.prf.MotionParameters" title="lightkurve.prf.MotionParameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MotionParameters</span></code></a>([shift_col,&nbsp;shift_row,&nbsp;fitted])</td>
+<td>Container class to hold the parameters of the telescope motion in a <code class="docutils literal notranslate"><span class="pre">TPFModel</span></code>.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="lightkurve.prf.SceneModel.html#lightkurve.prf.SceneModel" title="lightkurve.prf.SceneModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SceneModel</span></code></a>(prfs[,&nbsp;bkg_model])</td>
-<td>This class builds a generic model for a scene.</td>
+<tr class="row-odd"><td><a class="reference internal" href="lightkurve.prf.MotionPrior.html#lightkurve.prf.MotionPrior" title="lightkurve.prf.MotionPrior"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MotionPrior</span></code></a>([shift_col,&nbsp;var,&nbsp;shift_row,&nbsp;var])</td>
+<td>Container class to capture a user’s beliefs about the telescope motion.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="lightkurve.prf.SimpleKeplerPRF.html#lightkurve.prf.SimpleKeplerPRF" title="lightkurve.prf.SimpleKeplerPRF"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimpleKeplerPRF</span></code></a>(channel,&nbsp;shape,&nbsp;column,&nbsp;row)</td>
+<tr class="row-even"><td><a class="reference internal" href="lightkurve.prf.PRFPhotometry.html#lightkurve.prf.PRFPhotometry" title="lightkurve.prf.PRFPhotometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PRFPhotometry</span></code></a>(model)</td>
+<td>This class performs PRF Photometry on TPF-like data given a <code class="docutils literal notranslate"><span class="pre">TPFModel</span></code>.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="lightkurve.prf.SimpleKeplerPRF.html#lightkurve.prf.SimpleKeplerPRF" title="lightkurve.prf.SimpleKeplerPRF"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimpleKeplerPRF</span></code></a>(channel,&nbsp;shape,&nbsp;column,&nbsp;row)</td>
 <td>Simple model of KeplerPRF.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="lightkurve.prf.StarParameters.html#lightkurve.prf.StarParameters" title="lightkurve.prf.StarParameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StarParameters</span></code></a>(col,&nbsp;row,&nbsp;flux[,&nbsp;err_col,&nbsp;…])</td>
+<td>Container class to hold the parameters of a star in a <code class="docutils literal notranslate"><span class="pre">TPFModel</span></code>.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="lightkurve.prf.StarPrior.html#lightkurve.prf.StarPrior" title="lightkurve.prf.StarPrior"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StarPrior</span></code></a>(col,&nbsp;row[,&nbsp;flux,&nbsp;ub,&nbsp;targetid])</td>
+<td>Container class to capture a user’s beliefs about a star’s position and flux.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="lightkurve.prf.TPFModel.html#lightkurve.prf.TPFModel" title="lightkurve.prf.TPFModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TPFModel</span></code></a>([star_priors,&nbsp;background_prior,&nbsp;…])</td>
+<td>A model which describes a single-cadence Kepler image.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="lightkurve.prf.TPFModelParameters.html#lightkurve.prf.TPFModelParameters" title="lightkurve.prf.TPFModelParameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TPFModelParameters</span></code></a>([stars,&nbsp;background,&nbsp;…])</td>
+<td>Container class to combine all parameters that parameterize a <code class="docutils literal notranslate"><span class="pre">TPFModel</span></code>.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">UniformPrior</span></code>(lb,&nbsp;ub[,&nbsp;name])</td>
+<td>Computes the negative log pdf for a n-dimensional independent uniform distribution.</td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="section" id="class-inheritance-diagram">
 <h2>Class Inheritance Diagram<a class="headerlink" href="#class-inheritance-diagram" title="Permalink to this headline">¶</a></h2>
-<img src="../_images/inheritance-c82f930dfa0002b1064ed7b3b650a07e0c8117fd.png" alt="Inheritance diagram of lightkurve.prf.KeplerPRF, lightkurve.prf.PRFPhotometry, lightkurve.prf.SceneModel, lightkurve.prf.SimpleKeplerPRF" usemap="#inheritance35d8fed1f5" class="inheritance"/>
-<map id="inheritance35d8fed1f5" name="inheritance35d8fed1f5">
-<area shape="rect" id="node1" href="lightkurve.prf.KeplerPRF.html#lightkurve.prf.KeplerPRF" target="_top" title="Kepler&#39;s Pixel Response Function as designed by [1]_." alt="" coords="20,101,107,125"/>
-<area shape="rect" id="node4" href="lightkurve.prf.SimpleKeplerPRF.html#lightkurve.prf.SimpleKeplerPRF" target="_top" title="Simple model of KeplerPRF." alt="" coords="170,101,297,125"/>
-<area shape="rect" id="node2" href="lightkurve.prf.PRFPhotometry.html#lightkurve.prf.PRFPhotometry" target="_top" title="This class performs PRF Photometry on TPF&#45;like files." alt="" coords="5,53,122,77"/>
-<area shape="rect" id="node3" href="lightkurve.prf.SceneModel.html#lightkurve.prf.SceneModel" target="_top" title="This class builds a generic model for a scene." alt="" coords="16,5,111,29"/>
+<img src="../_images/inheritance-06f02cfa7d6f1992268c5c389617ca8e3f08b42f.png" alt="Inheritance diagram of lightkurve.prf.tpfmodel.BackgroundParameters, lightkurve.prf.tpfmodel.BackgroundPrior, lightkurve.prf.tpfmodel.FixedValuePrior, lightkurve.prf.tpfmodel.FocusParameters, lightkurve.prf.tpfmodel.FocusPrior, lightkurve.prf.prfmodel.KeplerPRF, lightkurve.prf.tpfmodel.MotionParameters, lightkurve.prf.tpfmodel.MotionPrior, lightkurve.prf.tpfmodel.PRFPhotometry, lightkurve.prf.prfmodel.SimpleKeplerPRF, lightkurve.prf.tpfmodel.StarParameters, lightkurve.prf.tpfmodel.StarPrior, lightkurve.prf.tpfmodel.TPFModel, lightkurve.prf.tpfmodel.TPFModelParameters" usemap="#inheritance2633681e36" class="inheritance"/>
+<map id="inheritance2633681e36" name="inheritance2633681e36">
+<area shape="rect" id="node1" href="lightkurve.prf.BackgroundParameters.html#lightkurve.prf.BackgroundParameters" target="_top" title="Container class to hold the parameters of the background in a ``TPFModel``." alt="" coords="5,524,179,549"/>
+<area shape="rect" id="node2" href="lightkurve.prf.BackgroundPrior.html#lightkurve.prf.BackgroundPrior" target="_top" title="Container class to capture a user&#39;s beliefs about the background flux." alt="" coords="228,400,357,425"/>
+<area shape="rect" id="node7" href="lightkurve.prf.FocusPrior.html#lightkurve.prf.FocusPrior" target="_top" title="Container class to capture a user&#39;s beliefs about the telescope focus." alt="" coords="248,449,337,475"/>
+<area shape="rect" id="node11" href="lightkurve.prf.MotionPrior.html#lightkurve.prf.MotionPrior" target="_top" title="Container class to capture a user&#39;s beliefs about the telescope motion." alt="" coords="245,499,341,524"/>
+<area shape="rect" id="node15" href="lightkurve.prf.StarPrior.html#lightkurve.prf.StarPrior" target="_top" title="Container class to capture a user&#39;s beliefs about a star&#39;s position and flux." alt="" coords="253,548,332,573"/>
+<area shape="rect" id="node4" href="lightkurve.prf.FixedValuePrior.html#lightkurve.prf.FixedValuePrior" target="_top" title="An improper prior with a negative log probability of 0 at a single fixed" alt="" coords="407,351,529,376"/>
+<area shape="rect" id="node6" href="lightkurve.prf.FocusParameters.html#lightkurve.prf.FocusParameters" target="_top" title="Container class to hold the parameters of the telescope focus in a ``TPFModel``." alt="" coords="25,301,159,327"/>
+<area shape="rect" id="node8" href="lightkurve.prf.KeplerPRF.html#lightkurve.prf.KeplerPRF" target="_top" title="Kepler&#39;s Pixel Response Function as designed by [1]_." alt="" coords="49,252,135,277"/>
+<area shape="rect" id="node13" href="lightkurve.prf.SimpleKeplerPRF.html#lightkurve.prf.SimpleKeplerPRF" target="_top" title="Simple model of KeplerPRF." alt="" coords="227,252,359,277"/>
+<area shape="rect" id="node10" href="lightkurve.prf.MotionParameters.html#lightkurve.prf.MotionParameters" target="_top" title="Container class to hold the parameters of the telescope motion in a ``TPFModel``." alt="" coords="22,203,162,228"/>
+<area shape="rect" id="node12" href="lightkurve.prf.PRFPhotometry.html#lightkurve.prf.PRFPhotometry" target="_top" title="This class performs PRF Photometry on TPF&#45;like data given a ``TPFModel``." alt="" coords="31,153,153,179"/>
+<area shape="rect" id="node14" href="lightkurve.prf.StarParameters.html#lightkurve.prf.StarParameters" target="_top" title="Container class to hold the parameters of a star in a ``TPFModel``." alt="" coords="31,104,153,129"/>
+<area shape="rect" id="node16" href="lightkurve.prf.TPFModel.html#lightkurve.prf.TPFModel" target="_top" title="A model which describes a single&#45;cadence Kepler image." alt="" coords="50,55,134,80"/>
+<area shape="rect" id="node17" href="lightkurve.prf.TPFModelParameters.html#lightkurve.prf.TPFModelParameters" target="_top" title="Container class to combine all parameters that parameterize a ``TPFModel``." alt="" coords="13,5,171,31"/>
 </map></div>
 </div>
 
@@ -396,7 +306,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="lightkurve.prf.get_initial_guesses.html" class="btn btn-neutral float-right" title="get_initial_guesses" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="lightkurve.prf.BackgroundParameters.html" class="btn btn-neutral float-right" title="BackgroundParameters" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="lightkurve.correctors.SFFCorrector.html" class="btn btn-neutral" title="SFFCorrector" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
@@ -430,7 +340,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'1.0b9',
+            VERSION:'1.0b10',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -445,16 +355,11 @@
 
   
 
-  
-  
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
 
   <script type="text/javascript">
       jQuery(function () {
-          
-          SphinxRtdTheme.Navigation.enableSticky();
-          
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script> 
 

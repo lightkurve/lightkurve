@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>TessTargetPixelFile &mdash; lightkurve 1.0b9 documentation</title>
+  <title>TessTargetPixelFile &mdash; lightkurve 1.0b10 documentation</title>
   
 
   
@@ -24,8 +24,7 @@
 
   
 
-  
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -62,7 +61,7 @@
             
             
               <div class="version">
-                1.0b9
+                1.0b10
               </div>
             
           
@@ -89,16 +88,7 @@
               <p class="caption"><span class="caption-text">Getting started</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/quickstart.html">Quickstart</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../install.html#requirements">Requirements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../install.html#installing-lightkurve">Installing lightkurve</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../install.html#stable-version">Stable version</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../install.html#development-version">Development version</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../install.html#building-documentation">Building documentation</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">API documentation</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="targetpixelfile.html">TargetPixelFile classes</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="targetpixelfile.html#classes">Classes</a><ul class="current">
@@ -109,134 +99,26 @@
 <li class="toctree-l3"><a class="reference internal" href="targetpixelfile.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="lightcurve.html">LightCurve classes</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="lightcurve.html#functions">Functions</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurve.iterative_box_period_search.html">iterative_box_period_search</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="lightcurve.html#classes">Classes</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurve.LightCurve.html">LightCurve</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurve.KeplerLightCurve.html">KeplerLightCurve</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurve.TessLightCurve.html">TessLightCurve</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="lightcurve.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="lightcurvefile.html">LightCurveFile classes</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="lightcurvefile.html#classes">Classes</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurvefile.KeplerLightCurveFile.html">KeplerLightCurveFile</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurvefile.TessLightCurveFile.html">TessLightCurveFile</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="lightcurvefile.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="correctors.html">Systematics correction classes</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="correctors.html#classes">Classes</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.correctors.KeplerCBVCorrector.html">KeplerCBVCorrector</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.correctors.SFFCorrector.html">SFFCorrector</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="correctors.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="prf.html">PSF photometry classes</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="prf.html#functions">Functions</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.get_initial_guesses.html">get_initial_guesses</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="prf.html#classes">Classes</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.KeplerPRF.html">KeplerPRF</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.PRFPhotometry.html">PRFPhotometry</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.SceneModel.html">SceneModel</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.SimpleKeplerPRF.html">SimpleKeplerPRF</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="prf.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html">Utility functions</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="utils.html#functions">Functions</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.utils.bkjd_to_astropy_time.html">bkjd_to_astropy_time</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.utils.btjd_to_astropy_time.html">btjd_to_astropy_time</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.utils.channel_to_module_output.html">channel_to_module_output</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.utils.module_output_to_channel.html">module_output_to_channel</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.utils.running_mean.html">running_mean</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="utils.html#classes">Classes</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.utils.KeplerQualityFlags.html">KeplerQualityFlags</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.utils.TessQualityFlags.html">TessQualityFlags</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="utils.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="lightcurve.html">LightCurve classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lightcurvefile.html">LightCurveFile classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="correctors.html">Systematics correction classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prf.html">PSF photometry classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">Utility functions</a></li>
 </ul>
 </li>
 </ul>
 <p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/section1.html">Introduction to lightkurve</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/1.02-target-pixel-files.html">What are Target Pixel File objects?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/1.03-what-are-lightcurves.html">What are Light Curve objects?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/1.04-lightcurve-files.html">What are Light Curve File objects?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/1.05-interact-with-lightcurves-and-tpf.html">Interactively inspecting Target Pixel Files and Lightcurves</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/1.05-interact-with-lightcurves-and-tpf.html#Using-.interact()">Using <code class="docutils literal notranslate"><span class="pre">.interact()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/1.05-interact-with-lightcurves-and-tpf.html#Passing-in-a-preprocessed-lightcurve">Passing in a preprocessed lightcurve</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/section2.html">Science with lightkurve</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.02-recover-a-planet.html">How to recover a known planet in Kepler data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.03-appending-lightcurves.html">How to combine lightcurves from different Kepler quarters</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.05-making-custom-apertures.html">How to perform aperture photometry with custom apertures</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/cutting-out-tpfs-from-tess-ffis.html">How to cut out Target Pixel Files from Kepler Super Stamps or TESS FFIs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.08-making-fits-files.html">How to store a light curve in FITS format?</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/2.08-making-fits-files.html#Example:-editing-and-writing-a-lightcurve">Example: editing and writing a lightcurve</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.09-how-to-use-lightkurve-for-asteroseismology.html">How to use lightkurve for asteroseismology</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/section3.html">Systematics correction using lightkurve</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.04-removing-cbvs.html">How to remove common systematics using basis vectors (CBVs)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.01-how-to-detrend.html">How to remove K2 motion systematics with SFF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html">How does the SFF method work?</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html#Retrieve-the-K2SFF-data-for-ENG-test-source-60021426">Retrieve the K2SFF data for ENG test source <code class="docutils literal notranslate"><span class="pre">60021426</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html#Manually-reproduce-with-the-Vanderburg-provided-diagnostic-data">Manually reproduce with the Vanderburg-provided diagnostic data</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/motion-correction/replicate-vanderburg-2014-lightkurve.html">Replicating Vanderburg &amp; Johnson 2014 using lightkurve</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/motion-correction/replicate-vanderburg-2014-lightkurve.html#Data-Exclusion">Data Exclusion</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/2.06-identify-rolling-band.html">How to identify time-variable background noise (“rolling bands”)?</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section1.html">Introduction to lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section2.html">Science with lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section3.html">Extracting lightcurves</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section4.html">Systematics correction</a></li>
 </ul>
 <p class="caption"><span class="caption-text">About lightkurve</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing and reporting issues</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../contributing.html#proposing-changes-to-lightkurve-using-github-pull-requests">Proposing changes to lightkurve using GitHub pull requests</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../contributing.html#coding-and-documentation-guidelines">Coding and documentation guidelines</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing and reporting issues</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../citing.html">Citing and acknowledging lightkurve</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../other_software.html">Other software</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../other_software.html#detrending-analysis">Detrending &amp; Analysis</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../other_software.html#full-frame-images">Full Frame Images</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../other_software.html#data-access">Data access</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../other_software.html#metadata">Metadata</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../other_software.html#planet-search">Planet Search</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../other_software.html#population-statistics">Population Statistics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../other_software.html#positional">Positional</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../other_software.html#science-astrophysics">Science / Astrophysics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../other_software.html#other">Other</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../other_software.html">Other software</a></li>
 </ul>
 
             
@@ -256,7 +138,6 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
         
         <div class="rst-content">
@@ -321,21 +202,6 @@
     margin-top: -19px;
 }
 
-/* nice headers on first paragraph of info/warning boxes */
-.admonition .first {
-    margin: -12px;
-    padding: 6px 12px;
-    margin-bottom: 12px;
-    color: #fff;
-    line-height: 1;
-    display: block;
-}
-.admonition.warning .first {
-    background: #f0b37e;
-}
-.admonition.note .first {
-    background: #6ab0de;
-}
 .admonition > p:before {
     margin-right: 4px;  /* make room for the exclamation icon */
 }
@@ -348,21 +214,22 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">lightkurve.targetpixelfile.TargetPixelFile</span></code></p>
 <p>Defines a TargetPixelFile class for the TESS Mission.
 Enables extraction of raw lightcurves and centroid positions.</p>
-<p class="rubric">Attributes</p>
-<table border="1" class="docutils">
-<colgroup>
-<col width="19%" />
-<col width="81%" />
-</colgroup>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
 <tbody valign="top">
-<tr class="row-odd"><td><strong>path</strong></td>
-<td>(str) Path to a Kepler Target Pixel (FITS) File.</td>
-</tr>
-<tr class="row-even"><td><strong>quality_bitmask</strong></td>
-<td>(str or int) Bitmask specifying quality flags of cadences that should be ignored.</td>
-</tr>
-<tr class="row-odd"><td><strong>kwargs</strong></td>
-<td>(dict) Keyword arguments passed to <cite>astropy.io.fits.open()</cite>.</td>
+<tr class="field-odd field"><th class="field-name">Attributes:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>path</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">Path to a Kepler Target Pixel (FITS) File.</p>
+</dd>
+<dt><strong>quality_bitmask</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str or int</span></dt>
+<dd><p class="first last">Bitmask specifying quality flags of cadences that should be ignored.</p>
+</dd>
+<dt><strong>kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd><p class="first last">Keyword arguments passed to <cite>astropy.io.fits.open()</cite>.</p>
+</dd>
+</dl>
+</td>
 </tr>
 </tbody>
 </table>
@@ -478,8 +345,8 @@ Enables extraction of raw lightcurves and centroid positions.</p>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.to_fits" title="lightkurve.targetpixelfile.TessTargetPixelFile.to_fits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_fits</span></code></a>([output_fn,&nbsp;overwrite])</td>
 <td>Writes the TPF to a FITS file on disk.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.to_lightcurve" title="lightkurve.targetpixelfile.TessTargetPixelFile.to_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_lightcurve</span></code></a>([aperture_mask])</td>
-<td>Performs aperture photometry.</td>
+<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.to_lightcurve" title="lightkurve.targetpixelfile.TessTargetPixelFile.to_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_lightcurve</span></code></a>([method])</td>
+<td>Performs photometry.</td>
 </tr>
 </tbody>
 </table>
@@ -620,10 +487,11 @@ solution for the target pixel file.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>w</strong> : astropy.wcs.WCS object</p>
-<blockquote class="last">
-<div><p>WCS solution</p>
-</div></blockquote>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>w</strong> <span class="classifier-delimiter">:</span> <span class="classifier">astropy.wcs.WCS object</span></dt>
+<dd><p class="first last">WCS solution</p>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -639,19 +507,21 @@ solution for the target pixel file.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>aperture_mask</strong> : array-like, ‘pipeline’, or ‘all’</p>
-<blockquote>
-<div><p>A boolean array describing the aperture such that <cite>False</cite> means
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>aperture_mask</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array-like, ‘pipeline’, or ‘all’</span></dt>
+<dd><p class="first last">A boolean array describing the aperture such that <cite>False</cite> means
 that the pixel will be masked out.
 If the string ‘all’ is passed, all pixels will be used.
 The default behaviour is to use the Kepler pipeline mask.</p>
-</div></blockquote>
+</dd>
+</dl>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>col_centr, row_centr</strong> : tuple</p>
-<blockquote class="last">
-<div><p>Arrays containing centroids for column and row at each cadence</p>
-</div></blockquote>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>col_centr, row_centr</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tuple</span></dt>
+<dd><p class="first last">Arrays containing centroids for column and row at each cadence</p>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -674,20 +544,21 @@ Uses the WCS solution and the POS_CORR data from TPF header.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>cadence</strong> : ‘all’ or int</p>
-<blockquote>
-<div><p>Which cadences to return the RA Dec coordinates for.</p>
-</div></blockquote>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>cadence</strong> <span class="classifier-delimiter">:</span> <span class="classifier">‘all’ or int</span></dt>
+<dd><p class="first last">Which cadences to return the RA Dec coordinates for.</p>
+</dd>
+</dl>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>ra</strong> : numpy array, same shape as tpf.flux[cadence]</p>
-<blockquote>
-<div><p>Array containing RA values for every pixel, for every cadence.</p>
-</div></blockquote>
-<p><strong>dec</strong> : numpy array, same shape as tpf.flux[cadence]</p>
-<blockquote class="last">
-<div><p>Array containing Dec values for every pixel, for every cadence.</p>
-</div></blockquote>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>ra</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array, same shape as tpf.flux[cadence]</span></dt>
+<dd><p class="first last">Array containing RA values for every pixel, for every cadence.</p>
+</dd>
+<dt><strong>dec</strong> <span class="classifier-delimiter">:</span> <span class="classifier">numpy array, same shape as tpf.flux[cadence]</span></dt>
+<dd><p class="first last">Array containing Dec values for every pixel, for every cadence.</p>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -714,10 +585,11 @@ are contained in the TPF (e.g. short cadence data).</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>lc</strong> : LightCurve object</p>
-<blockquote class="last">
-<div><p>An optional pre-processed lightcurve object to show.</p>
-</div></blockquote>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>lc</strong> <span class="classifier-delimiter">:</span> <span class="classifier">LightCurve object</span></dt>
+<dd><p class="first last">An optional pre-processed lightcurve object to show.</p>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -732,50 +604,44 @@ are contained in the TPF (e.g. short cadence data).</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>ax</strong> : matplotlib.axes._subplots.AxesSubplot</p>
-<blockquote>
-<div><p>A matplotlib axes object to plot into. If no axes is provided,
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>ax</strong> <span class="classifier-delimiter">:</span> <span class="classifier">matplotlib.axes._subplots.AxesSubplot</span></dt>
+<dd><p class="first last">A matplotlib axes object to plot into. If no axes is provided,
 a new one will be generated.</p>
-</div></blockquote>
-<p><strong>frame</strong> : int</p>
-<blockquote>
-<div><p>Frame number. The default is 0, i.e. the first frame.</p>
-</div></blockquote>
-<p><strong>cadenceno</strong> : int, optional</p>
-<blockquote>
-<div><p>Alternatively, a cadence number can be provided.
+</dd>
+<dt><strong>frame</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">Frame number. The default is 0, i.e. the first frame.</p>
+</dd>
+<dt><strong>cadenceno</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int, optional</span></dt>
+<dd><p class="first last">Alternatively, a cadence number can be provided.
 This argument has priority over frame number.</p>
-</div></blockquote>
-<p><strong>bkg</strong> : bool</p>
-<blockquote>
-<div><p>If True, background will be added to the pixel values.</p>
-</div></blockquote>
-<p><strong>aperture_mask</strong> : ndarray</p>
-<blockquote>
-<div><p>Highlight pixels selected by aperture_mask.</p>
-</div></blockquote>
-<p><strong>show_colorbar</strong> : bool</p>
-<blockquote>
-<div><p>Whether or not to show the colorbar</p>
-</div></blockquote>
-<p><strong>mask_color</strong> : str</p>
-<blockquote>
-<div><p>Color to show the aperture mask</p>
-</div></blockquote>
-<p><strong>style</strong> : str</p>
-<blockquote>
-<div><p>matplotlib.pyplot.style.context, default is ‘fast’</p>
-</div></blockquote>
-<p><strong>kwargs</strong> : dict</p>
-<blockquote>
-<div><p>Keywords arguments passed to <cite>lightkurve.utils.plot_image</cite>.</p>
-</div></blockquote>
+</dd>
+<dt><strong>bkg</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd><p class="first last">If True, background will be added to the pixel values.</p>
+</dd>
+<dt><strong>aperture_mask</strong> <span class="classifier-delimiter">:</span> <span class="classifier">ndarray</span></dt>
+<dd><p class="first last">Highlight pixels selected by aperture_mask.</p>
+</dd>
+<dt><strong>show_colorbar</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd><p class="first last">Whether or not to show the colorbar</p>
+</dd>
+<dt><strong>mask_color</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">Color to show the aperture mask</p>
+</dd>
+<dt><strong>style</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">matplotlib.pyplot.style.context, default is ‘fast’</p>
+</dd>
+<dt><strong>kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd><p class="first last">Keywords arguments passed to <cite>lightkurve.utils.plot_image</cite>.</p>
+</dd>
+</dl>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>ax</strong> : matplotlib.axes._subplots.AxesSubplot</p>
-<blockquote class="last">
-<div><p>The matplotlib axes object.</p>
-</div></blockquote>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>ax</strong> <span class="classifier-delimiter">:</span> <span class="classifier">matplotlib.axes._subplots.AxesSubplot</span></dt>
+<dd><p class="first last">The matplotlib axes object.</p>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -799,25 +665,31 @@ Prints in alphabetical order.</p>
 
 <dl class="method">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.to_lightcurve">
-<code class="descname">to_lightcurve</code><span class="sig-paren">(</span><em>aperture_mask='pipeline'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/targetpixelfile.html#TessTargetPixelFile.to_lightcurve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.to_lightcurve" title="Permalink to this definition">¶</a></dt>
-<dd><p>Performs aperture photometry.</p>
+<code class="descname">to_lightcurve</code><span class="sig-paren">(</span><em>method='aperture'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.to_lightcurve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs photometry.</p>
+<p>See the docstring of <cite>aperture_photometry()</cite> for valid
+arguments if the method is ‘aperture’.  Otherwise, see the docstring
+of <cite>prf_photometry()</cite> for valid arguments if the method is ‘prf’.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>aperture_mask</strong> : array-like, ‘pipeline’, or ‘all’</p>
-<blockquote>
-<div><p>A boolean array describing the aperture such that <cite>False</cite> means
-that the pixel will be masked out.
-If the string ‘all’ is passed, all pixels will be used.
-The default behaviour is to use the TESS pipeline mask.</p>
-</div></blockquote>
-<p><strong>Returns</strong></p>
-<p><strong>——-</strong></p>
-<p><strong>lc</strong> : TessLightCurve object</p>
-<blockquote class="last">
-<div><p>Contains the summed flux within the aperture for each cadence.</p>
-</div></blockquote>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>method</strong> <span class="classifier-delimiter">:</span> <span class="classifier">‘aperture’ or ‘prf’.</span></dt>
+<dd><p class="first last">Photometry method to use.</p>
+</dd>
+<dt><strong>**kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd><p class="first last">Extra arguments to be passed to the <cite>aperture_photometry</cite> or the
+<cite>prf_photometry</cite> method of this class.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>lc</strong> <span class="classifier-delimiter">:</span> <span class="classifier">LightCurve object</span></dt>
+<dd><p class="first last">Object containing the resulting lightcurve.</p>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>
@@ -870,7 +742,7 @@ The default behaviour is to use the TESS pipeline mask.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'1.0b9',
+            VERSION:'1.0b10',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -885,16 +757,11 @@ The default behaviour is to use the TESS pipeline mask.</p>
 
   
 
-  
-  
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
 
   <script type="text/javascript">
       jQuery(function () {
-          
-          SphinxRtdTheme.Navigation.enableSticky();
-          
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script> 
 
