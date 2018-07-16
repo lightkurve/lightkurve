@@ -4,7 +4,7 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "# What are Light Curve File objects?"
+    "# What are LightCurveFile objects?"
    ]
   },
   {
@@ -222,7 +222,7 @@
    "name": "python",
    "nbconvert_exporter": "python",
    "pygments_lexer": "ipython3",
-   "version": "3.6.2"
+   "version": "3.6.6"
   }
  },
  "nbformat": 4,
