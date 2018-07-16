@@ -622,6 +622,66 @@ class TargetPixelFile(object):
                                                   'log_stretch': screen_slider})
         display(ui, out)
 
+def _get_pos_corrs(mid_img, hdu, position, extension):
+    """
+    Stand alone helper function called in KeplerTargetPixelFile.from_fits().
+    Calculates the position correction values (both in row and column) and
+    WCS for an image relative to a reference image, defined as the middle
+    cadence of the FITS file. Returns pos corr values, as well as other
+    data needed to populate the Target Pixel File header.
+
+    Attributes
+    ----------
+    hdu : astropy.PrimaryHDU
+        PrimaryHDU of the image being looked at.
+    mid_img : fits.ImageHDU
+        Reference image from the FITS file.
+    position : astropy.SkyCoord
+        Position around which to cut out pixels.
+    extension : integer
+        Number of the file extension containing data, depends on the file
+        type and source.
+
+    Returns
+    -------
+    poscorr1 :  float32
+        Position correction in the vertical direction (column).
+    poscorr2 :  float32
+        Position correction in the horizontal direction (row).
+    column : integer
+        Column number of the center pixel.
+    row : integer
+        Row number of the center pixel.
+    ractr :
+        Right ascension of the center of the center pixel.
+    decctr:
+        Declination of the center of the center pixel.
+    """
+    #Check if the image is a single FITS image, or a FITS file and get the appropriate PrimaryHDU or ImageHDU,
+    if isinstance(mid_img, fits.ImageHDU):
+        mid_hdu = mid_img
+    elif isinstance(mid_img, fits.HDUList):
+        mid_hdu = mid_img[extension]
+    else:
+        mid_hdu = fits.open(mid_img)[extension]
+    # Calculate reference WCS coords from the middle image to use later to
+    # do pos_corr calcs. Get the middle pixel column and row.
+    wcs = WCS(mid_hdu)
+    pixelpos = skycoord_to_pixel(position, wcs=wcs)
+    column, row = int(np.round(pixelpos[0])), int(np.round(pixelpos[1]))
+
+    # Calculate the ra and dec of the center pixel of the middle image
+    skyposctr = pixel_to_skycoord(column, row, wcs=wcs)
+    ractr = skyposctr.ra.deg
+    decctr = skyposctr.dec.deg
+
+    # Get positional shift of the image compared to the reference file
+    wcs1 = WCS(hdu)
+    pixelpos1 = skycoord_to_pixel(position, wcs=wcs1)
+    poscorr1 = pixelpos1[0] - pixelpos[0]
+    poscorr2 = pixelpos1[1] - pixelpos[1]
+    
+    return [poscorr1, poscorr2, column, row, ractr, decctr]
 
 class KeplerTargetPixelFile(TargetPixelFile):
     """
@@ -833,84 +893,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
                           flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
                           flux_err=self.flux_bkg_err)
 
-
-    def _get_hdu(image, extension):
-        """Checks if an image is a single FITS image, or a FITS file,
-        and returns the appropriate PrimaryHDU.
-
-        Attributes
-        ----------
-        image : fits.ImageHDU or fits.HDUList object
-            FITS filename path or ImageHDU object to get the data from.
-        extension: integer
-            Number of the file extension containing data, depends on the file
-            type and source.
-
-        Returns
-        -------
-        hdu : astropy.PrimaryHDU
-            PrimaryHDU of the image inputted.
-        """
-        if isinstance(image, fits.ImageHDU):
-            hdu = image
-        elif isinstance(image, fits.HDUList):
-            hdu = image[extension]
-        else:
-            hdu = fits.open(image)[extension]
-        return hdu
-
-    def _get_pos_corrs(mid_img, hdu, position, extension):
-        """Calculates the position correction values (both in row and column) and
-        WCS for an image relative to the reference image, defined as the middle
-        cadence of the FITS file.
-
-        Attributes
-        ----------
-        hdu : astropy.PrimaryHDU
-            PrimaryHDU of the image being looked at.
-        mid_img : fits.ImageHDU
-            Reference image from the FITS file.
-        position : astropy.SkyCoord
-            Position around which to cut out pixels.
-        extension : integer
-            Number of the file extension containing data, depends on the file
-            type and source.
-
-        Returns
-        -------
-        poscorr1 :  float32
-            Position correction in the vertical direction (column).
-        poscorr2 :  float32
-            Position correction in the horizontal direction (row).
-        column : integer
-            Column number of the center pixel.
-        row : integer
-            Row number of the center pixel.
-        ractr :
-            Right ascension of the center of the center pixel.
-        decctr:
-            Declination of the center of the center pixel.
-        """
-        # Calculate reference WCS coords from the middle image to use later to
-        # do pos_corr calcs. Get the middle pixel column and row.
-        mid_hdu = KeplerTargetPixelFile._get_hdu(mid_img, extension)
-        wcs = WCS(mid_hdu)
-        pixelpos = skycoord_to_pixel(position, wcs=wcs)
-        column, row = int(np.round(pixelpos[0])), int(np.round(pixelpos[1]))
-
-        # Calculate the ra and dec of the center pixel of the middle image
-        skyposctr = pixel_to_skycoord(column, row, wcs=wcs)
-        ractr = skyposctr.ra.deg
-        decctr = skyposctr.dec.deg
-
-        # Get positional shift of the image compared to the reference file
-        wcs1 = WCS(hdu)
-        pixelpos1 = skycoord_to_pixel(position, wcs=wcs1)
-        poscorr1 = pixelpos1[0] - pixelpos[0]
-        poscorr2 = pixelpos1[1] - pixelpos[1]
-
-        return [poscorr1, poscorr2, column, row, ractr, decctr]
-
     @staticmethod
     def from_fits_images(images, position=None, size=(10, 10), extension=None,
                          target_id="unnamed-target", **kwargs):
@@ -941,11 +923,13 @@ class KeplerTargetPixelFile(TargetPixelFile):
         tpf : KeplerTargetPixelFile
             A new Target Pixel File assembled from the images.
         """
+        from lightkurve.targetpixelfile import _get_pos_corrs
         if extension is None:
             if isinstance(images[0], str) and images[0].endswith("ffic.fits"):
                 extension = 1  # TESS FFIs have the image data in extension #1
             else:
                 extension = 0  # Default is to use the primary HDU
+
 
         factory = KeplerTargetPixelFileFactory(n_cadences=len(images),
                                                n_rows=size[0],
@@ -955,7 +939,14 @@ class KeplerTargetPixelFile(TargetPixelFile):
         mid_img = images[int(len(images)/2)-1]
 
         for idx, img in tqdm(enumerate(images), total=len(images)):
-            hdu = KeplerTargetPixelFile._get_hdu(img, extension)
+            #Check if an image is a single FITS image, or a FITS file, and return the appropriate PrimaryHDU or ImageHDU.
+            if isinstance(img, fits.ImageHDU):
+                hdu = img
+            elif isinstance(img, fits.HDUList):
+                hdu = img[extension]
+            else:
+                hdu = fits.open(img)[extension]
+
             if idx == 0:  # Get default keyword values from the first image
                 factory.keywords = hdu.header
             if position is None:
@@ -964,7 +955,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 cutout = Cutout2D(hdu.data, position, wcs=WCS(hdu.header),
                                   size=size, mode='partial')
             pos_corr1, pos_corr2, col, row, ractr, decctr = \
-                KeplerTargetPixelFile._get_pos_corrs(mid_img, hdu, position, extension)
+                _get_pos_corrs(mid_img, hdu, position, extension)
             # Add calculated pos corr shifts to the keywords dictionary
             hdu.header['POSCORR1'] = pos_corr1
             hdu.header['POSCORR2'] = pos_corr2
