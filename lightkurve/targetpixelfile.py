@@ -181,10 +181,13 @@ class TargetPixelFile(object):
                         '11PC5': 'PC1_1',
                         '12PC5': 'PC1_2',
                         '21PC5': 'PC2_1',
-                        '22PC5': 'PC2_2'}
+                        '22PC5': 'PC2_2',
+                        'NAXIS1': 'NAXIS1',
+                        'NAXIS2': 'NAXIS2'}
         mywcs = {}
         for oldkey, newkey in wcs_keywords.items():
             mywcs[newkey] = self.hdu[1].header[oldkey]
+        print ('h',mywcs)
         return WCS(mywcs)
 
     @classmethod
@@ -1047,15 +1050,15 @@ class KeplerTargetPixelFile(TargetPixelFile):
             if position is None:
                 cutout = hdu
             else:
-                cutout = Cutout2D(hdu.data, position, wcs=WCS(hdu.header),
-                                  size=size, mode='partial')
-            factory.add_cadence(frameno=idx, wcs=WCS(hdu.header), flux=cutout.data, header=hdu.header)
+                cutout = Cutout2D(hdu.data, position, size=size, wcs=wcs, mode='partial')
+            factory.add_cadence(frameno=idx, wcs=wcs, flux=cutout.data, header=hdu.header)
 
         # Override the defaults where necessary, and pass into the header generating functions
         tpfsize = size[0] # Use column value assuming a square TPF
         ext_info = {}
         ext_info['TFORM4'] = '{}J'.format(size[0]*size[1])
         ext_info['TDIM4'] = '({},{})'.format(size[0],size[1])
+        ext_info.update(wcs.to_header()) # Add WCS entries
 
         for m in [4, 5, 6, 7, 8, 9]:
             if m > 4:
@@ -1067,7 +1070,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
             elif (tpfsize % 2 == 0): # If tpfsize is even
                 ext_info['1CRV{}P'.format(m)] = column - int((tpfsize-1)/2+1) + factory.keywords['CRVAL1P']
                 ext_info['2CRV{}P'.format(m)] = row - int((tpfsize-1)/2+1) + factory.keywords['CRVAL2P']
-                
+
+
         return factory.get_tpf(ext_info)
 
 class KeplerTargetPixelFileFactory(object):
@@ -1227,10 +1231,27 @@ class KeplerTargetPixelFileFactory(object):
                 except KeyError:
                     hdu.header[kw] = (template[kw],
                                       template.comments[kw])
+        wcs_keywords = {'CTYPE1':'1CTYP{}',
+                        'CTYPE2':'2CTYP{}',
+                        'CRPIX1':'1CRPX{}',
+                        'CRPIX2':'2CRPX{}',
+                        'CRVAL1':'1CRVL{}',
+                        'CRVAL2':'2CRVL{}',
+                        'CUNIT1':'1CUNI{}',
+                        'CUNIT2':'2CUNI{}',
+                        'CDELT1':'1CDLT{}',
+                        'CDELT2':'2CDLT{}',
+                        'PC1_1':'11PC{}',
+                        'PC1_2':'12PC{}',
+                        'PC2_1':'21PC{}',
+                        'PC2_2':'22PC{}'}
         # Override defaults using data calculated in from_fits_images
         for kw in ext_info.keys():
-            hdu.header[kw] = ext_info[kw]
-
+            if kw in wcs_keywords.keys():
+                for x in [4, 5, 6, 7, 8, 9]:
+                    hdu.header[wcs_keywords[kw].format(x)] = ext_info[kw]
+            else:
+                hdu.header[kw] = ext_info[kw]
         return hdu
 
     def _make_aperture_extension(self):
