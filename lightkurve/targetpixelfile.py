@@ -974,7 +974,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                 **keys)
 
     @staticmethod
-    def from_fits_images(images, position=None, size=(10, 10), extension=None,
+    def from_fits_images(images, position=None, size=(5, 5), extension=None,
                          target_id="unnamed-target", **kwargs):
         """Creates a new Target Pixel File from a set of images.
 
@@ -1003,7 +1003,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
         tpf : KeplerTargetPixelFile
             A new Target Pixel File assembled from the images.
         """
-        from lightkurve.targetpixelfile import _get_pos_corrs
         if extension is None:
             if isinstance(images[0], str) and images[0].endswith("ffic.fits"):
                 extension = 1  # TESS FFIs have the image data in extension #1
@@ -1016,27 +1015,22 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                                target_id=target_id)
 
         mid_img = images[int(len(images)/2)-1] # Find middle image to use as a reference
-        #Check if the image is a single FITS image, or a FITS file and get the appropriate PrimaryHDU or ImageHDU,
+        # Check if the image is a single FITS image, or a FITS file and get the appropriate PrimaryHDU or ImageHDU
         if isinstance(mid_img, fits.ImageHDU):
             mid_hdu = mid_img
         elif isinstance(mid_img, fits.HDUList):
             mid_hdu = mid_img[extension]
         else:
             mid_hdu = fits.open(mid_img)[extension]
-        # Calculate reference WCS coords from the middle image. Get the middle pixel column and row.
+        # Calculate reference WCS coords from the middle image. Get the middle pixel column and row
         wcs = WCS(mid_hdu)
         pixelpos = skycoord_to_pixel(position, wcs=wcs)
         column, row = int(np.round(pixelpos[0])), int(np.round(pixelpos[1]))
 
-        # Calculate the ra and dec of the center pixel of the middle image
-        skyposctr = pixel_to_skycoord(column, row, wcs=wcs)
-        ractr = skyposctr.ra.deg
-        decctr = skyposctr.dec.deg
-
         factory.keywords = mid_hdu.header  # Get default keyword values from the first image
 
         for idx, img in tqdm(enumerate(images), total=len(images)):
-            #Check if an image is a single FITS image, or a FITS file, and return the appropriate PrimaryHDU or ImageHDU.
+            # Check if an image is a single FITS image, or a FITS file, and return the appropriate PrimaryHDU or ImageHDU
             if isinstance(img, fits.ImageHDU):
                 hdu = img
             elif isinstance(img, fits.HDUList):
@@ -1044,14 +1038,11 @@ class KeplerTargetPixelFile(TargetPixelFile):
             else:
                 hdu = fits.open(img)[extension]
 
-            # Get positional shift of the image compared to the reference file
+            # Get positional shift of the image compared to the reference file and add to header
             wcs1 = WCS(hdu)
             pixelpos1 = skycoord_to_pixel(position, wcs=wcs1)
-            poscorr1 = pixelpos1[0] - pixelpos[0]
-            poscorr2 = pixelpos1[1] - pixelpos[1]
-            # Add calculated pos corr shifts to the keywords dictionary
-            hdu.header['POSCORR1'] = pos_corr1
-            hdu.header['POSCORR2'] = pos_corr2
+            hdu.header['POSCORR1'] = pixelpos1[0] - pixelpos[0]
+            hdu.header['POSCORR2'] = pixelpos1[1] - pixelpos[1]
 
             if position is None:
                 cutout = hdu
@@ -1060,35 +1051,23 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                   size=size, mode='partial')
             factory.add_cadence(frameno=idx, wcs=WCS(hdu.header), flux=cutout.data, header=hdu.header)
 
-        tpfsize = size[0] # Use column value assuming a square TPF
-        if (tpfsize % 2 == 0): # Make sure tpfsize is odd to center the star
-             tpfsize += 1
-
         # Override the defaults where necessary, and pass into the header generating functions
+        tpfsize = size[0] # Use column value assuming a square TPF
         ext_info = {}
         ext_info['TFORM4'] = '{}J'.format(size[0]*size[1])
         ext_info['TDIM4'] = '({},{})'.format(size[0],size[1])
-
-        cd11 = factory.keywords['CD1_1']
-        cd12 = factory.keywords['CD1_2']
-        cd21 = factory.keywords['CD2_1']
-        cd22 = factory.keywords['CD2_2']
-        ext_info['11PC5'] = -1.0*cd11/0.001102672560321 # hard coded from the template file
-        ext_info['12PC5'] = -1.0*cd12/0.001102672560321
-        ext_info['21PC5'] = cd21/0.001102672560321
-        ext_info['22PC5'] = cd22/0.001102672560321
-        ext_info['1CRVL5'] = ractr
-        ext_info['2CRVL5'] = decctr
 
         for m in [4, 5, 6, 7, 8, 9]:
             if m > 4:
                 ext_info["TFORM{}".format(m)] = '{}E'.format(size[0]*size[1])
             ext_info['TDIM{}'.format(m)] = '({},{})'.format(size[0],size[1])
-            ext_info['1CRV{}P'.format(m)] = col - int((tpfsize-1)/2) + factory.keywords['CRVAL1P']
-            ext_info['2CRV{}P'.format(m)] = row - int((tpfsize-1)/2) + factory.keywords['CRVAL2P']
-            ext_info['1CRPX{}'.format(m)] = (tpfsize + 1)/2
-            ext_info['2CRPX{}'.format(m)] = (tpfsize + 1)/2
-
+            if (tpfsize % 2 != 0): # If tpfsize is odd
+                ext_info['1CRV{}P'.format(m)] = column - int((tpfsize-1)/2) + factory.keywords['CRVAL1P']
+                ext_info['2CRV{}P'.format(m)] = row - int((tpfsize-1)/2) + factory.keywords['CRVAL2P']
+            elif (tpfsize % 2 == 0): # If tpfsize is even
+                ext_info['1CRV{}P'.format(m)] = column - int((tpfsize-1)/2+1) + factory.keywords['CRVAL1P']
+                ext_info['2CRV{}P'.format(m)] = row - int((tpfsize-1)/2+1) + factory.keywords['CRVAL2P']
+                
         return factory.get_tpf(ext_info)
 
 class KeplerTargetPixelFileFactory(object):
