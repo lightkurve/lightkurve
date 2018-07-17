@@ -356,14 +356,10 @@ def recover(time, flux, flux_err, signal_type, source='hsiao', bandpass='kepler'
         bls_period = results[1]
         depth = results[3]
         bls_rprs = np.sqrt(depth)
-        print(results[5])
-        print(results[6])
 
         midtime = ((float(results[6])-float(results[5])) / 2) + results[5]
-        print(midtime)
 
         bls_T0 =  ((midtime / nbins) * bls_period) + min(time)
-        print(bls_T0)
 
         #Then optimization fitting:
         def ln_like(theta):
@@ -462,11 +458,11 @@ def injrec_test(lc, signal_type, ntests, constr, period=None, rprs=None, T0=None
 
             period_f, rprs_f, T0_f = lcinj.recover('Planet')
 
-            if abs(period_f-period_test) < constr*period_test and abs(rprs_f-rprs_test) < constr*rprs_test and abs(T0_f-T0_test) < constr*T0_test:
+            if abs(period_f-period_test) < constr*period_test and abs(rprs_f-rprs_test) < constr*rprs_test:
                 nrecovered += 1
                 print('Recovered: ' + str(period_test) + ' ' + str(rprs_test))
-
-        return (nrecovered / ntests)
+                print(nrecovered)
+        return (float(nrecovered)/ float(ntests))
 
 
     else:
