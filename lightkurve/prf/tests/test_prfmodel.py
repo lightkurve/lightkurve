@@ -61,8 +61,7 @@ def test_get_model_prf():
     assert prf.column == prf_from_tpf.column
     assert prf.row == prf_from_tpf.row
 
-
-def test_keplerprf_gradient():
+def test_keplerprf_gradient_against_simplekeplerprf():
     """is the gradient of KeplerPRF consistent with
     the gradient of SimpleKeplerPRF?
     """
@@ -70,5 +69,21 @@ def test_keplerprf_gradient():
     params = {'center_col': 7, 'center_row': 7, 'flux': 1.}
     simple_prf = SimpleKeplerPRF(**kwargs)
     prf = KeplerPRF(**kwargs)
-    assert_allclose(prf.gradient(rotation_angle=0., scale_col=1., scale_row=1., **params)[:-3],
-                    simple_prf.gradient(**params))
+    prf_grad = prf.gradient(rotation_angle=0., scale_col=1., scale_row=1., **params)
+    assert_allclose(prf_grad[:-3], simple_prf.gradient(**params))
+
+def test_keplerprf_gradient_against_calculus():
+    """is the gradient of KeplerPRF consistent with Calculus?
+    """
+    params = {'center_col': 7, 'center_row': 7, 'flux': 1., 'scale_col': 1,
+              'scale_row': 1}
+    kwargs = {'channel': 56, 'shape': [15, 15], 'column': 0, 'row': 0}
+    prf = KeplerPRF(**kwargs)
+
+    h = 1e-8
+    f = prf.evaluate
+    t = 42 * np.pi / 180
+    prf_grad = prf.gradient(rotation_angle=t, **params)
+
+    diff_prf_rotation_angle = (f(rotation_angle=t+h, **params) - f(rotation_angle=t, **params)) / h
+    assert np.max(np.abs(prf_grad[-1] - diff_prf_rotation_angle)) < 1e-2
