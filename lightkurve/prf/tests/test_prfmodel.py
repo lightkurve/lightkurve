@@ -60,3 +60,15 @@ def test_get_model_prf():
     assert prf.shape == prf_from_tpf.shape
     assert prf.column == prf_from_tpf.column
     assert prf.row == prf_from_tpf.row
+
+
+def test_keplerprf_gradient():
+    """is the gradient of KeplerPRF consistent with
+    the gradient of SimpleKeplerPRF?
+    """
+    kwargs = {'channel': 56, 'shape': [15, 15], 'column': 0, 'row': 0}
+    params = {'center_col': 7, 'center_row': 7, 'flux': 1.}
+    simple_prf = SimpleKeplerPRF(**kwargs)
+    prf = KeplerPRF(**kwargs)
+    assert_allclose(prf.gradient(rotation_angle=0., scale_col=1., scale_row=1., **params)[:-3],
+                    simple_prf.gradient(**params))
