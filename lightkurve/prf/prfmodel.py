@@ -108,6 +108,66 @@ class KeplerPRF(object):
                                                  grid=False).reshape(self.shape)
         return self.prf_model
 
+    def gradient(self, center_col, center_row, flux=1., scale_col=1., scale_row=1.,
+                 rotation_angle=0.):
+        """
+        This function returns the gradient of the KeplerPRF model with
+        respect to center_col, center_row, flux, scale_col, scale_row,
+        and rotation_angle.
+
+        Parameters
+        ----------
+        center_col, center_row : float
+            Column and row coordinates of the center
+        flux : float
+            Total integrated flux of the PRF
+        scale_col, scale_row : float
+            Pixel scale in the column and row directions
+        rotation_angle : float
+            Rotation angle in radians
+
+        Returns
+        -------
+        grad_prf : list
+            Returns a list of arrays where the elements are the partial derivatives
+            of the KeplerPRF model with respect to center_col, center_row, flux, scale_col,
+            scale_row, and rotation_angle, respectively.
+        """
+        cosa = math.cos(rotation_angle)
+        sina = math.sin(rotation_angle)
+
+        delta_col = self.col_coord - center_col
+        delta_row = self.row_coord - center_row
+        delta_col, delta_row = np.meshgrid(delta_col, delta_row)
+
+        rot_row = delta_row * cosa - delta_col * sina
+        rot_col = delta_row * sina + delta_col * cosa
+
+        deriv_flux = self.interpolate(rot_row.flatten() * scale_row,
+                                      rot_col.flatten() * scale_col,
+                                      grid=False).reshape(self.shape)
+
+        interp_dy = self.interpolate(rot_row.flatten() * scale_row,
+                                     rot_col.flatten() * scale_col,
+                                     grid=False, dy=1).reshape(self.shape)
+
+        interp_dx = self.interpolate(rot_row.flatten() * scale_row,
+                                     rot_col.flatten() * scale_col,
+                                     grid=False, dx=1).reshape(self.shape)
+
+        scale_row_times_interp_dx = scale_row * interp_dx
+        scale_col_times_interp_dy = scale_col * interp_dy
+
+        deriv_center_col = - flux * (cosa * scale_col_times_interp_dy - sina * scale_row_times_interp_dx)
+        deriv_center_row = - flux * (sina * scale_col_times_interp_dy + cosa * scale_row_times_interp_dx)
+        deriv_scale_row = flux * interp_dx * rot_row
+        deriv_scale_col = flux * interp_dy * rot_col
+        deriv_rotation_angle = flux * (interp_dy * scale_col * (delta_row * cosa - delta_col * sina)
+                                       - interp_dx * scale_row * (delta_row * sina + delta_col * cosa))
+
+        return [deriv_center_col, deriv_center_row, deriv_flux,
+                deriv_scale_col, deriv_scale_row, deriv_rotation_angle]
+
     def _read_prf_calibration_file(self, path, ext):
         prf_cal_file = pyfits.open(path)
         data = prf_cal_file[ext].data
@@ -180,34 +240,6 @@ class KeplerPRF(object):
                    extent=(self.column, self.column + self.shape[1],
                            self.row, self.row + self.shape[0]), **kwargs)
 
-    def gradient(self, center_col, center_row, flux):
-        """
-        This function returns the gradient of the SimpleKeplerPRF model with
-        respect to flux, center_col, and center_row.
-
-        Parameters
-        ----------
-        center_col, center_row : float
-            Column and row coordinates of the center
-        flux : float
-            Total integrated flux of the PRF
-
-        Returns
-        -------
-        grad_prf : list
-            Returns a list of arrays where the elements are the derivative
-            of the KeplerPRF model with respect to center_col, center_row,
-            and flux respectively.
-        """
-        delta_col = self.col_coord - center_col
-        delta_row = self.row_coord - center_row
-
-        deriv_flux = self.interpolate(delta_row, delta_col)
-        deriv_center_col = - flux * self.interpolate(delta_row, delta_col, dy=1)
-        deriv_center_row = - flux * self.interpolate(delta_row, delta_col, dx=1)
-
-        return [deriv_center_col, deriv_center_row, deriv_flux]
-
 
 class SimpleKeplerPRF(KeplerPRF):
     """
@@ -218,10 +250,10 @@ class SimpleKeplerPRF(KeplerPRF):
     and angle are fixed to 1.0 and 0, respectivelly.
     """
 
-    def __call__(self, center_col, center_row, flux=1., **kwargs):
+    def __call__(self, center_col, center_row, flux=1.):
         return self.evaluate(center_col, center_row, flux)
 
-    def evaluate(self, center_col, center_row, flux=1., **kwargs):
+    def evaluate(self, center_col, center_row, flux=1.):
         """
         Interpolates the PRF model onto detector coordinates.
 
@@ -243,3 +275,31 @@ class SimpleKeplerPRF(KeplerPRF):
         self.prf_model = flux * self.interpolate(delta_row, delta_col)
 
         return self.prf_model
+
+    def gradient(self, center_col, center_row, flux):
+        """
+        This function returns the gradient of the SimpleKeplerPRF model with
+        respect to flux, center_col, and center_row.
+
+        Parameters
+        ----------
+        center_col, center_row : float
+            Column and row coordinates of the center
+        flux : float
+            Total integrated flux of the PRF
+
+        Returns
+        -------
+        grad_prf : list
+            Returns a list of arrays where the elements are the derivative
+            of the KeplerPRF model with respect to center_col, center_row,
+            and flux, respectively.
+        """
+        delta_col = self.col_coord - center_col
+        delta_row = self.row_coord - center_row
+
+        deriv_flux = self.interpolate(delta_row, delta_col)
+        deriv_center_col = - flux * self.interpolate(delta_row, delta_col, dy=1)
+        deriv_center_row = - flux * self.interpolate(delta_row, delta_col, dx=1)
+
+        return [deriv_center_col, deriv_center_row, deriv_flux]
