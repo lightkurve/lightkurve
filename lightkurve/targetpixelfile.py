@@ -187,7 +187,6 @@ class TargetPixelFile(object):
         mywcs = {}
         for oldkey, newkey in wcs_keywords.items():
             mywcs[newkey] = self.hdu[1].header[oldkey]
-        print ('h',mywcs)
         return WCS(mywcs)
 
     @classmethod
@@ -1050,7 +1049,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
             if position is None:
                 cutout = hdu
             else:
-                cutout = Cutout2D(hdu.data, position, size=size, wcs=wcs, mode='partial')
+                cutout = Cutout2D(hdu.data, position, size=size, wcs=wcs1, mode='partial')
             factory.add_cadence(frameno=idx, wcs=wcs, flux=cutout.data, header=hdu.header)
 
         # Override the defaults where necessary, and pass into the header generating functions
