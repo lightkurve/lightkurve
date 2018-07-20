@@ -976,7 +976,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                 **keys)
 
     @staticmethod
-    def from_fits_images(images, position=None, size=(5, 5), extension=None,
+    def from_fits_images(images, position=None, size=(11, 11), extension=None,
                          target_id="unnamed-target", **kwargs):
         """Creates a new Target Pixel File from a set of images.
 
@@ -1016,7 +1016,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                                n_cols=size[1],
                                                target_id=target_id)
 
-        mid_img = images[int(len(images)/2)-1] # Find middle image to use as a reference
+        mid_img = images[int(len(images) / 2) - 1]  # Find middle image to use as a reference
         # Check if the image is a single FITS image, or a FITS file and get the appropriate PrimaryHDU or ImageHDU
         if isinstance(mid_img, fits.ImageHDU):
             mid_hdu = mid_img
@@ -1025,9 +1025,9 @@ class KeplerTargetPixelFile(TargetPixelFile):
         else:
             mid_hdu = fits.open(mid_img)[extension]
         # Calculate reference WCS coords from the middle image. Get the middle pixel column and row
-        wcs = WCS(mid_hdu)
-        pixelpos = skycoord_to_pixel(position, wcs=wcs)
-        column, row = int(np.round(pixelpos[0])), int(np.round(pixelpos[1]))
+        wcs_ref = WCS(mid_hdu)
+        pixelpos_ref = skycoord_to_pixel(position, wcs=wcs_ref)
+        column, row = int(np.round(pixelpos_ref[0])), int(np.round(pixelpos_ref[1]))
 
         factory.keywords = mid_hdu.header  # Get default keyword values from the first image
 
@@ -1041,35 +1041,33 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 hdu = fits.open(img)[extension]
 
             # Get positional shift of the image compared to the reference file and add to header
-            wcs1 = WCS(hdu)
-            pixelpos1 = skycoord_to_pixel(position, wcs=wcs1)
-            hdu.header['POSCORR1'] = pixelpos1[0] - pixelpos[0]
-            hdu.header['POSCORR2'] = pixelpos1[1] - pixelpos[1]
-
+            wcs_current = WCS(hdu)
+            pixelpos_current = skycoord_to_pixel(position, wcs=wcs_current)
+            hdu.header['POS_CORR1'] = pixelpos_current[0] - pixelpos_ref[0]
+            hdu.header['POS_CORR2'] = pixelpos_current[1] - pixelpos_ref[1]
             if position is None:
                 cutout = hdu
             else:
-                cutout = Cutout2D(hdu.data, position, size=size, wcs=wcs1, mode='partial')
-            factory.add_cadence(frameno=idx, wcs=wcs, flux=cutout.data, header=hdu.header)
+                cutout = Cutout2D(hdu.data, position, size=size, wcs=wcs_ref, mode='partial')
+            factory.add_cadence(frameno=idx, wcs=wcs_ref, flux=cutout.data, header=hdu.header)
 
         # Override the defaults where necessary, and pass into the header generating functions
-        tpfsize = size[0] # Use column value assuming a square TPF
         ext_info = {}
-        ext_info['TFORM4'] = '{}J'.format(size[0]*size[1])
+        ext_info['TFORM4'] = '{}J'.format(size[0] * size[1])
         ext_info['TDIM4'] = '({},{})'.format(size[0],size[1])
-        ext_info.update(wcs.to_header()) # Add WCS entries
+        ext_info.update(wcs_ref.to_header()) # Add WCS entries
 
+        # TPF contains multiple data columns that require WCS
         for m in [4, 5, 6, 7, 8, 9]:
             if m > 4:
-                ext_info["TFORM{}".format(m)] = '{}E'.format(size[0]*size[1])
+                ext_info["TFORM{}".format(m)] = '{}E'.format(size[0] * size[1])
             ext_info['TDIM{}'.format(m)] = '({},{})'.format(size[0],size[1])
-            if (tpfsize % 2 != 0): # If tpfsize is odd
-                ext_info['1CRV{}P'.format(m)] = column - int((tpfsize-1)/2) + factory.keywords['CRVAL1P']
-                ext_info['2CRV{}P'.format(m)] = row - int((tpfsize-1)/2) + factory.keywords['CRVAL2P']
-            elif (tpfsize % 2 == 0): # If tpfsize is even
-                ext_info['1CRV{}P'.format(m)] = column - int((tpfsize-1)/2+1) + factory.keywords['CRVAL1P']
-                ext_info['2CRV{}P'.format(m)] = row - int((tpfsize-1)/2+1) + factory.keywords['CRVAL2P']
-
+            # Compute location of TPF lower left corner
+            # Int statement contains modulus so that .5 values always round up. We cannot use numpy.round() as it rounds to the even number.
+            half_tpfsize_col = int((size[0] - 1) / 2 + (size[0] + 1) % 2)
+            half_tpfsize_row = int((size[1] - 1) / 2 + (size[1] + 1) % 2)
+            ext_info['1CRV{}P'.format(m)] = column - half_tpfsize_col + factory.keywords['CRVAL1P']
+            ext_info['2CRV{}P'.format(m)] = row - half_tpfsize_row + factory.keywords['CRVAL2P']
 
         return factory.get_tpf(ext_info)
 
@@ -1128,11 +1126,11 @@ class KeplerTargetPixelFileFactory(object):
         if 'QUALITY' in header:
             self.quality[frameno] = header['QUALITY']
         if 'POSCORR1' in header:
-            self.pos_corr1[frameno] = header['POSCORR1']
+            self.pos_corr1[frameno] = header['POS_CORR1']
         if 'POSCORR2' in header:
-            self.pos_corr2[frameno] = header['POSCORR2']
+            self.pos_corr2[frameno] = header['POS_CORR2']
         if wcs == None:
-            self.pos_corr1[frameno], self.pos_corr2[frameno] = 'nan','nan'
+            self.pos_corr1[frameno], self.pos_corr2[frameno] = None, None
 
     def get_tpf(self, ext_info={}, **kwargs):
         """Returns a KeplerTargetPixelFile object."""
@@ -1163,21 +1161,14 @@ class KeplerTargetPixelFileFactory(object):
         hdu.header['CREATOR'] = "lightkurve"
         hdu.header['OBJECT'] = self.target_id
         hdu.header['KEPLERID'] = self.target_id
-        try:
-            hdu.header['RA_OBJ'] = self.keywords['RA_OBJ']
-            hdu.header['DEC_OBJ'] = self.keywords['DEC_OBJ']
-            hdu.header['CHANNEL'] = self.keywords['CHANNEL']
-            hdu.header['CAMPAIGN'] = self.keywords['CAMPAIGN']
-        except:
-            hdu.header['RA_OBJ'] = 'nan'
-            hdu.header['DEC_OBJ'] = 'nan'
-            hdu.header['CHANNEL'] = 'nan'
-            hdu.header['CAMPAIGN'] = 'nan'
 
-        # Empty a bunch of keywords rather than having incorrect info
-        for kw in ["PROCVER", "FILEVER", "MODULE", "OUTPUT",
-                   "TIMVERSN", "DATA_REL", "TTABLEID"]:
-            hdu.header[kw] = ""
+        for keyword in ['RA_OBJ', 'DEC_OBJ', 'CHANNEL', 'CAMPAIGN', "PROCVER",
+                        "FILEVER", "MODULE", "OUTPUT", "TIMVERSN", "DATA_REL", "TTABLEID"]:
+            try:
+                hdu.header[keyword] = self.keywords[keyword]
+            except KeyError:
+                hdu.header[keyword] = None
+
         return hdu
 
     def _make_target_extension(self, ext_info={}):
@@ -1270,9 +1261,9 @@ class KeplerTargetPixelFileFactory(object):
                                       template.comments[kw])
 
         # Override the defaults where necessary
-        for keyword in ['CTYPE1','CTYPE2','CRPIX1','CRPIX2', 'CRVAL1','CRVAL2', 'CUNIT1',
-                        'CUNIT2', 'CDELT1', 'CDELT2','PC1_1','PC1_2','PC2_1','PC2_2']:
-                hdu.header[keyword] = "" #override wcs keywords
+        for keyword in ['CTYPE1', 'CTYPE2', 'CRPIX1', 'CRPIX2', 'CRVAL1', 'CRVAL2', 'CUNIT1',
+                        'CUNIT2', 'CDELT1', 'CDELT2', 'PC1_1', 'PC1_2', 'PC2_1', 'PC2_2']:
+                hdu.header[keyword] = ""  #override wcs keywords
         hdu.header['EXTNAME'] = 'APERTURE'
         return hdu
 

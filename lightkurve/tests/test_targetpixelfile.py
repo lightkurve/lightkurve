@@ -6,7 +6,6 @@ import numpy as np
 from numpy.testing import assert_array_equal
 import pytest
 import tempfile
-from astropy.wcs import WCS
 from ..targetpixelfile import KeplerTargetPixelFile, KeplerTargetPixelFileFactory
 from ..targetpixelfile import TessTargetPixelFile
 from ..utils import KeplerQualityFlags
