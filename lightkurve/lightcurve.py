@@ -22,6 +22,8 @@ from astropy.time import Time
 
 from .utils import running_mean, bkjd_to_astropy_time
 from . import PACKAGEDIR
+from lightkurve import injection
+
 
 __all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve',
            'iterative_box_period_search']
@@ -575,9 +577,14 @@ class LightCurve(object):
 
 
     def inject(self, model):
-        from lightkurve import injection as inj
+        """Convenience function for injecting signals into lightcurves
 
-        return inj.inject(self.time, self.flux, self.flux_err, model)
+        Returns
+        -------
+        synthetic lightcurve : `lightkurve.lightcurve.SyntheticLightCurve` object
+        """
+
+        return injection.inject(self.time, self.flux, self.flux_err, model)
 
 
     def to_table(self):
@@ -794,17 +801,14 @@ class SyntheticLightCurve(LightCurve):
         lc = super(SyntheticLightCurve, self).__getitem__(key)
         return lc
 
-    #TO DO: fix repr
     def __repr__(self):
-        pass
         if self.signaltype is None:
-            return('No signal injected')
+            return('SyntheticLightCurve: No signal injected')
         elif self.signaltype is 'Supernova':
-            pass
-            #return('Supernova Source: {})'.format(self.source))
+            return('SyntheticLightCurve: Supernova Source')
         elif self.signaltype is 'Planet':
-            pass
-            #return('Planet period: {} '.format(self.period)
+            return('SyntheticLightCurve: Planet')
+            #period: {} '.format(self.period)
             #        + 'Planet Rp/Rs: {}'.format(self.rprs))
 
     def recover(self, signal_type, source='hsiao', bandpass='kepler', initial_guess=None):
