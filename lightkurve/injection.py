@@ -248,8 +248,8 @@ def inject(time, flux, flux_err, model):
 
 def recover(time, flux, flux_err, signal_type, source='hsiao', bandpass='kepler', initial_guess=None):
     """Recovers a signal from a lightcurve using optimization.  Coming soon: MCMC
-    Right now, we can only recover SALT1 and SALT2 supernovae, and any source that
-    takes only T0, z, and amplitude (which are most of them). I'm not sure if there are any
+    Right now, we can recover any sncosmo source that
+    takes only T0, z, and amplitude (most of them). I'm not sure if there are any
     others but I'll have to check.
 
     Parameters
@@ -278,34 +278,27 @@ def recover(time, flux, flux_err, signal_type, source='hsiao', bandpass='kepler'
 
 
     def create_initial_guess():
-        if signal_type == "Supernova":
-            if source == 'SALT1' or source == 'SALT2':
-                return initial_guess
+        if signal_type == 'Supernova':
+            if initial_guess is None:
+                T0 = np.median(time)
+                z = 0.5
+                amplitude = 3.e-7
+                background = np.percentile(flux, 3)
+                return [T0, z, amplitude, background]
             else:
-                if initial_guess is None:
-                    T0 = np.median(time)
-                    z = 0.5
-                    amplitude = 3.e-7
-                    background = np.percentile(flux, 3)
-                    return [T0, z, amplitude, background]
-                else:
-                    return initial_guess
+                return initial_guess
+        elif signal_type == 'Planet':
+            if initial_guess is not None:
+                print('Planet fitting does not take initial guess.')
+                    #raise error?
 
     if signal_type == 'Supernova':
 
         def ln_like(theta):
-            if source == 'SALT1' or source == 'SALT2':
-                T0, z, x0, x1, c, background = theta
-                #this makes no sense lol -- TODO: FIND OUT WHAT SALT1 AND SALT2 VALS VIOLATE THE BANDPASS
-                if (z < 0) or (z > 3) or (T0 < np.min(time)) or (T0 > np.max(time)) or (x0 < 0) or (x0 > 1) or (x1 < 0) or (x1 > 1) or (c < -0.5) or (c > 0.5):
-                    return -1.e99
-                model = SupernovaModel(T0, z=z, x0=x0, x1=x1, c=c, source=source, bandpass=bandpass)
-            else:
-                T0, z, amplitude, background = theta
-                if (z < 0) or (z > 3) or (T0 < np.min(time)) or (T0 > np.max(time)):
-                    return -1.e99
-                model = SupernovaModel(T0, z=z, amplitude=amplitude, source=source, bandpass=bandpass)
-
+            T0, z, amplitude, background = theta
+            if (z < 0) or (z > 3) or (T0 < np.min(time)) or (T0 > np.max(time)):
+                return -1.e99
+            model = SupernovaModel(T0, z=z, amplitude=amplitude, source=source, bandpass=bandpass)
             model = model.evaluate(time) + background
             inv_sigma2 = 1.0/(flux_err**2)
             chisq = (np.sum((flux-model)**2*inv_sigma2))
@@ -314,14 +307,10 @@ def recover(time, flux, flux_err, signal_type, source='hsiao', bandpass='kepler'
 
 
         def lnprior_optimization(theta):
-            if source == 'SALT1' or source == 'SALT2':
-                T0, z, x0, x1, c, background = theta
-            else:
-                T0, z, amplitude, background = theta
+            T0, z, amplitude, background = theta
             if (z < 0) or (z > 3):
                 return -1.e99
             return 0.0
-
 
         def neg_ln_posterior(theta):
             log_posterior = lnprior_optimization(theta) + ln_like(theta)
@@ -344,10 +333,12 @@ def recover(time, flux, flux_err, signal_type, source='hsiao', bandpass='kepler'
         u = np.array(u)
         v = np.array(v)
 
-        nf = 1000.0
-        fmin = .035
+#time, flux, u, v, number of freq bins (nf), min freq to test (fmin), freq spacing (df), number of bins (nb), min transit dur (qmi), max transit dur (qma)
+        nf = 10000.0
+        #we can only recover periods up to 33 days or else the ipynb dies??? hmm
+        fmin = .03
         df = 0.001
-        nbins = 500
+        nbins = 300
         qmi = 0.001
         qma = 0.3
 
@@ -359,7 +350,7 @@ def recover(time, flux, flux_err, signal_type, source='hsiao', bandpass='kepler'
 
         midtime = ((float(results[6])-float(results[5])) / 2) + results[5]
 
-        bls_T0 =  ((midtime / nbins) * bls_period) + min(time)
+        bls_T0 = ((midtime / nbins) * bls_period) + min(time)
 
         #Then optimization fitting:
         def ln_like(theta):
@@ -400,19 +391,19 @@ def injrec_test(lc, signal_type, ntests, constr, period=None, rprs=None, T0=None
         parameter constraint to determine a recovered signal (for example. 0.03
         demands that all parameters must be within 3% of the injected value to be
         considered recovered)
-    period : Distribution class
+    period : Distribution class, default None
         A GaussianDistribution or UniformDistribution object from which to draw
         period values.
-    rprs : Distribution class
+    rprs : Distribution class, default None
         A GaussianDistribution or UniformDistribution object from which to draw
         rprs values.
-    T0 : Distribution class
+    T0 : Distribution class, default None
         A GaussianDistribution or UniformDistribution object from which to draw
         T0 values.
-    z : Distribution class
+    z : Distribution class, default None
         A GaussianDistribution or UniformDistribution object from which to draw
         z values.
-    amplitude : Distribution class
+    amplitude : Distribution class, default None
         A GaussianDistribution or UniformDistribution object from which to draw
         amplitude values.
 
@@ -420,6 +411,8 @@ def injrec_test(lc, signal_type, ntests, constr, period=None, rprs=None, T0=None
     -------
     fraction : float
         Fraction of lightcurves recovered.
+
+    Do we want to return a fraction? or nrecovered?
 
     """
     import lightkurve.injection as inj
@@ -441,7 +434,9 @@ def injrec_test(lc, signal_type, ntests, constr, period=None, rprs=None, T0=None
                 nrecovered += 1
                 print('Recovered: ' + str(T0_test) + ' ' + str(amplitude_test))
 
-        return (nrecovered / ntests)
+        fraction = (float(nrecovered)/ float(ntests))
+
+        return fraction
 
     elif signal_type == 'Planet':
 
@@ -462,7 +457,10 @@ def injrec_test(lc, signal_type, ntests, constr, period=None, rprs=None, T0=None
                 nrecovered += 1
                 print('Recovered: ' + str(period_test) + ' ' + str(rprs_test))
                 print(nrecovered)
-        return (float(nrecovered)/ float(ntests))
+
+        fraction = (float(nrecovered)/ float(ntests))
+
+        return fraction
 
 
     else:
