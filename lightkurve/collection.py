@@ -10,7 +10,7 @@ class Collection:
     data: array
         List of data objects.
     k_id: dictionary
-        Mapping keplerid to index in self.data
+        Mapping target to index in self.data
     """
     __metaclass__ = ABCMeta #Needs to be set for Python 2.x to work properly
     def __init__(self, data):
@@ -19,10 +19,10 @@ class Collection:
 
     def assign_hash_values(self):
         """
-        Assigns the keplerid to indexes in self.data
+        Assigns the targetid to indexes in self.data
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         None
 
         Returns
@@ -43,36 +43,36 @@ class Collection:
         return len(self.data)
 
     def __getitem__(self, index):
-        """Called when indexing into LCC or such as when looping.
+        """Called when accessing an element in the collection
+        by index or target id
 
-        Parameters:
-        -----------
-        Index: int
-            This is either the index of the array or
-            the keplerid of the LC.
+        Parameters
+        ----------
+        index: int
+            This is either the index of the element in the collection,
+            or the target id of the object
 
-        Returns:
-        --------
-        Lightcurve Object
+        Returns
+        -------
+        Lightcurve or TargetPixelFile object
         """
         try:
             if index > len(self.data):
-                return self.data[self.k_id[index]]
+                return self.data[self.keplerid[index]]
             else:
                 return self.data[index]
-        except KeyError:
-            print("Object has no keplerid")
+        except:
+            raise KeyError("The collection does not contain an object with target ID {}.".format(self.k_id[index]))
 
     def append(self, obj):
-        """Appends lightcurve object to LCC
+        """Adds a new object to the collection.
 
-        Parameters:
-        -----------
-        lc: LightCurve object
-            Lightcurve target
+        Parameters
+        ----------
+        obj: LightCurve or TargetPixelFile object
 
-        Returns:
-        --------
+        Returns
+        -------
         None
         """
         self.data.append(obj)
