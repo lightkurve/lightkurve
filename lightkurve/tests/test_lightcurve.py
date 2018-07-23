@@ -471,7 +471,21 @@ def test_from_fits():
     lcf = KeplerLightCurveFile.from_fits(TABBY_Q8)
     assert isinstance(lcf, KeplerLightCurveFile)
     assert lcf.keplerid == KeplerLightCurveFile(TABBY_Q8).keplerid
+    assert lcf.keplerid == lcf.targetid
     # Execute the same test for TESS
     lcf = TessLightCurveFile.from_fits(TESS_SIM)
     assert isinstance(lcf, TessLightCurveFile)
     assert lcf.ticid == TessLightCurveFile(TESS_SIM).ticid
+    assert lcf.ticid == lcf.targetid
+
+
+def test_targetid():
+    """Is a generic targetid available on each type of LighCurve object?"""
+    lc = LightCurve(time=[], targetid=5)
+    lc.targetid == 5
+    lc = KeplerLightCurve(time=[], keplerid=10)
+    lc.targetid == 10
+    lc.keplerid == 10
+    lc = TessLightCurve(time=[], ticid=20)
+    lc.targetid == 20
+    lc.ticid == 20

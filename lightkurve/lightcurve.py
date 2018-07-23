@@ -869,12 +869,13 @@ class KeplerLightCurve(LightCurve):
     keplerid : int
         Kepler ID number
     """
-    def __init__(self, time, flux=None, flux_err=None, time_format=None, time_scale=None,
+    def __init__(self, time=None, flux=None, flux_err=None, time_format=None, time_scale=None,
                  centroid_col=None, centroid_row=None, quality=None, quality_bitmask=None,
                  channel=None, campaign=None, quarter=None, mission=None,
-                 cadenceno=None, keplerid=None, ra=None, dec=None):
+                 cadenceno=None, keplerid=None, ra=None, dec=None, meta={}):
         super(KeplerLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err,
-                                               time_format=time_format, time_scale=time_scale)
+                                               time_format=time_format, time_scale=time_scale,
+                                               targetid=keplerid, meta=meta)
         self.centroid_col = self._validate_array(centroid_col, name='centroid_col')
         self.centroid_row = self._validate_array(centroid_row, name='centroid_row')
         self.quality = self._validate_array(quality, name='quality')
@@ -884,7 +885,6 @@ class KeplerLightCurve(LightCurve):
         self.campaign = campaign
         self.quarter = quarter
         self.mission = mission
-        self.keplerid = keplerid
         self.ra = ra
         self.dec = dec
 
@@ -904,6 +904,14 @@ class KeplerLightCurve(LightCurve):
             return('KeplerLightCurve(KIC: {})'.format(self.keplerid))
         elif self.mission.lower() == 'k2':
             return('KeplerLightCurve(EPIC: {})'.format(self.keplerid))
+
+    @property
+    def keplerid(self):
+        return self.targetid
+
+    @keplerid.setter
+    def keplerid(self, value):
+        self.targetid = value
 
     def correct(self, method='sff', **kwargs):
         """Corrects a lightcurve for motion-dependent systematic errors.
@@ -1025,12 +1033,13 @@ class TessLightCurve(LightCurve):
     ticid : int
         Tess Input Catalog ID number
     """
-    def __init__(self, time, flux=None, flux_err=None, time_format=None, time_scale=None,
+    def __init__(self, time=None, flux=None, flux_err=None, time_format=None, time_scale=None,
                  centroid_col=None, centroid_row=None, quality=None, quality_bitmask=None,
                  cadenceno=None, sector=None, camera=None, ccd=None,
-                 ticid=None, ra=None, dec=None):
+                 ticid=None, ra=None, dec=None, meta={}):
         super(TessLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err,
-                                             time_format=time_format, time_scale=time_scale)
+                                             time_format=time_format, time_scale=time_scale,
+                                             targetid=ticid, meta=meta)
         self.centroid_col = self._validate_array(centroid_col, name='centroid_col')
         self.centroid_row = self._validate_array(centroid_row, name='centroid_row')
         self.quality = self._validate_array(quality, name='quality')
@@ -1040,7 +1049,6 @@ class TessLightCurve(LightCurve):
         self.sector = sector
         self.camera = camera
         self.ccd = ccd
-        self.ticid = ticid
         self.ra = ra
         self.dec = dec
 
@@ -1055,6 +1063,14 @@ class TessLightCurve(LightCurve):
 
     def __repr__(self):
         return('TessLightCurve(TICID: {})'.format(self.ticid))
+
+    @property
+    def ticid(self):
+        return self.targetid
+
+    @ticid.setter
+    def ticid(self, value):
+        self.targetid = value
 
 
 def iterative_box_period_search(lc, niters=2, min_period=0.5, max_period=30,

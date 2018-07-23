@@ -277,6 +277,10 @@ class KeplerLightCurveFile(LightCurveFile):
         return self.header(ext=0)['KEPLERID']
 
     @property
+    def targetid(self):
+        return self.keplerid
+
+    @property
     def obsmode(self):
         return self.header()['OBSMODE']
 
@@ -388,6 +392,10 @@ class TessLightCurveFile(LightCurveFile):
     @property
     def ticid(self):
         return self.header(ext=0)['TICID']
+
+    @property
+    def targetid(self):
+        return self.ticid
 
     def get_lightcurve(self, flux_type, centroid_type='MOM_CENTR'):
         if flux_type in self._flux_types():
