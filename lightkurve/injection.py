@@ -246,13 +246,12 @@ def inject(time, flux, flux_err, model):
                                signaltype=model.signaltype)#, **model.params)
 
 
-def recover(time, flux, flux_err, signal_type, source='hsiao', bandpass='kepler', initial_guess=None):
+def recover(time, flux, flux_err, signal_type, method='optimize', source='hsiao', bandpass='kepler', initial_guess=None, ndim=None, nwalkers=None, nsteps=None):
     """Recovers a signal from a lightcurve using optimization.  Coming soon: MCMC
     Right now, we can recover any sncosmo source that
     takes only T0, z, and amplitude (most of them). I'm not sure if there are any
     others but I'll have to check.
 
-    Parameters
         ----------
     time : array-like
         Time array
@@ -262,6 +261,7 @@ def recover(time, flux, flux_err, signal_type, source='hsiao', bandpass='kepler'
         Flux error array
     signal_type : 'Supernova' or 'Planet'
          Signal to recover
+    method: optimization or mcmc
     source : str (one of built in sources in sncosmo), default None
         The source of the fitted supernova.
     initial_guess : [T0, z, amplitude, background] or [T0, z, x0, x1, c], default None
@@ -275,6 +275,7 @@ def recover(time, flux, flux_err, signal_type, source='hsiao', bandpass='kepler'
     """
 
     import scipy.optimize as op
+    import emcee
 
 
     def create_initial_guess():
@@ -294,42 +295,47 @@ def recover(time, flux, flux_err, signal_type, source='hsiao', bandpass='kepler'
     if signal_type == 'Supernova':
 
         def ln_like(theta):
-            if source == 'SALT1' or source == 'SALT2':
-                T0, z, x0, x1, c, background = theta
-                #this makes no sense lol -- TODO: FIND OUT WHAT SALT1 AND SALT2 VALS VIOLATE THE BANDPASS
-                if (z < 0) or (z > 1) or (T0 < np.min(time)) or (T0 > np.max(time)) or (x0 < 0) or (x0 > 1) or (x1 < 0) or (x1 > 1) or (c < -0.5) or (c > 0.5):
+            T0, z, amplitude, background = theta
+            if (z < 0) or (z > 1) or (T0 < np.min(time)) or (T0 > np.max(time)):
+                if method == 'optimize':
                     return -1.e99
-                model = SupernovaModel(T0, z=z, x0=x0, x1=x1, c=c, source=source, bandpass=bandpass)
-            else:
-                T0, z, amplitude, background = theta
-                if (z < 0) or (z > 1) or (T0 < np.min(time)) or (T0 > np.max(time)):
-                    return -1.e99
-                model = SupernovaModel(T0, z=z, amplitude=amplitude, source=source, bandpass=bandpass)
-
+                elif method == 'mcmc':
+                    return -np.inf
+            model = SupernovaModel(T0, z=z, amplitude=amplitude, source=source, bandpass=bandpass)
             model = model.evaluate(time) + background
             inv_sigma2 = 1.0/(flux_err**2)
             chisq = (np.sum((flux-model)**2*inv_sigma2))
             lnlikelihood = -0.5*chisq
             return lnlikelihood
 
-
-        def lnprior_optimization(theta):
-            if source == 'SALT1' or source == 'SALT2':
-                T0, z, x0, x1, c, background = theta
-            else:
-                T0, z, amplitude, background = theta
+        def lnprior(theta):
+            T0, z, amplitude, background = theta
             if (z < 0) or (z > 1):
-                return -1.e99
+                if method == 'optimize':
+                    return -1.e99
+                elif method == 'mcmc':
+                    return -np.inf
             return 0.0
 
 
         def neg_ln_posterior(theta):
-            log_posterior = lnprior_optimization(theta) + ln_like(theta)
+            log_posterior = lnprior(theta) + ln_like(theta)
             return -1 * log_posterior
 
-        result = op.minimize(neg_ln_posterior, x0=create_initial_guess())
+        if method == 'optimize':
+            result = op.minimize(neg_ln_posterior, x0=create_initial_guess())
+            return result.x
 
-        return result.x
+        elif method == 'mcmc':
+            ndim, nwalkers = ndim, nwalkers
+            guess=create_initial_guess()
+            pos = [[guess[0], guess[1], guess[2], guess[3]] + 1e-7*np.random.randn(ndim) for i in range(nwalkers)]
+
+            sampler = emcee.EnsembleSampler(nwalkers, ndim, ln_like)
+
+            x = sampler.run_mcmc(pos, nsteps)
+
+            return sampler, x
 
 
     elif signal_type == 'Planet':
@@ -377,7 +383,17 @@ def recover(time, flux, flux_err, signal_type, source='hsiao', bandpass='kepler'
 
             return -lnlikelihood
 
-        result = op.minimize(ln_like, [bls_period, bls_rprs, bls_T0])
+        if method == 'optimize':
+            result = op.minimize(ln_like, [bls_period, bls_rprs, bls_T0])
+        elif method == 'mcmc':
+            ndim, nwalkers = ndim, nwalkers
+            pos = [[bls_period, bls_rprs, bls_T0] + 1e-4*np.random.randn(ndim) for i in range(nwalkers)]
+
+            sampler = emcee.EnsembleSampler(nwalkers, ndim, ln_like)
+
+            x = sampler.run_mcmc(pos, nsteps)
+
+            return sampler, x
 
         return result.x
 
