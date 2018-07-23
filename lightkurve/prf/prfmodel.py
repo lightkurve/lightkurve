@@ -143,6 +143,8 @@ class KeplerPRF(object):
         rot_row = delta_row * cosa - delta_col * sina
         rot_col = delta_row * sina + delta_col * cosa
 
+        # for a proof of the maths that follow, see the pdf attached
+        # on pull request #198 in lightkurve GitHub repo.
         deriv_flux = self.interpolate(rot_row.flatten() * scale_row,
                                       rot_col.flatten() * scale_col,
                                       grid=False).reshape(self.shape)
