@@ -467,11 +467,11 @@ def test_fill_gaps():
 @pytest.mark.remote_data
 def test_lc_collection():
     lc = LightCurve(time=np.arange(1, 5), flux=np.arange(1, 5), flux_err=np.arange(1, 5))
-    
+
     lcf = KeplerLightCurveFile(TABBY_Q8)
     lcc = LightCurveCollection([lcf])
     lcf2 = lcf
-    
+
     assert(len(lcc) == 1)
     assert(lcc[0] == lcf)
     assert(type(lcc[lcf.keplerid]) == type(lcf))
@@ -481,14 +481,9 @@ def test_lc_collection():
     assert(len(lcc) == 2)
     assert(lcc[1] == lc)
 
-    lcc.plot()
-
-    for lc in lcc:
-        print(lc)
-
     #What happens when I try to append the same obj twice?
     lcc.append(lcf2)
-        
+
 @pytest.mark.remote_data
 def test_from_fits():
     """Does the lcf.from_fits() method work like the constructor?"""

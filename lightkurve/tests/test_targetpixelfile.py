@@ -238,7 +238,7 @@ def test_tpf_collection():
     tpf1 = KeplerTargetPixelFile.from_archive(filename_tpf_all_zeros)
     tpf2 = KeplerTargetPixelFile(filename_tpf_one_center)
     tpfc = TargetPixelFileCollection([tpf1])
-    
+
     assert(len(tpfc) == 1)
     assert(tpfc[0] == tpf1)
     assert(type(tpfc[tpf1.keplerid]) == type(tpf1))
@@ -247,9 +247,6 @@ def test_tpf_collection():
 
     assert(len(tpfc) == 2)
     assert(tpfc[1] == tpf2)
-    
-    for tpf in tpfc:
-        print(tpf)
 
     #What happens if I try to append the same target twice?
     tpf3 = tpf2
@@ -264,4 +261,3 @@ def test_from_fits():
     tpf = TessTargetPixelFile.from_fits(filename_tpf_one_center)
     assert isinstance(tpf, TessTargetPixelFile)
     assert tpf.ticid == TessTargetPixelFile(filename_tpf_one_center).ticid
-

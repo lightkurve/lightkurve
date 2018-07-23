@@ -58,7 +58,8 @@ class Collection:
         """
         try:
             if index > len(self.data):
-                return self.data[self.keplerid[index]]
+
+                return self.data[self.k_id[index]]
             else:
                 return self.data[index]
         except:
