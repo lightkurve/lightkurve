@@ -1055,7 +1055,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         ext_info = {}
         ext_info['TFORM4'] = '{}J'.format(size[0] * size[1])
         ext_info['TDIM4'] = '({},{})'.format(size[0],size[1])
-        ext_info.update(wcs_ref.to_header()) # Add WCS entries
+        ext_info.update(cutout.wcs.to_header()) # Add WCS entries
 
         # TPF contains multiple data columns that require WCS
         for m in [4, 5, 6, 7, 8, 9]:
