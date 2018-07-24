@@ -68,14 +68,14 @@ class GaussianDistribution(object):
 class TransitModel(object):
     """
     Implements a class for creating a planetary transit model using
-    batman - documentation at https://www.cfa.harvard.edu/~lkreidberg/batman/.
+    'batman' - documentation at https://www.cfa.harvard.edu/~lkreidberg/batman/.
 
     Attributes
     ----------
     signaltype : 'Planet'
         The signal type is a planetary transit.
     multiplicative : True
-        A planetary transit is multiplied with a lightcurve; therefore,
+        A planetary transit must be multiplied with a lightcurve; therefore,
         the attribute 'multiplicative' is True
     """
 
@@ -111,7 +111,7 @@ class TransitModel(object):
             Limb darkening coefficients
         limb_dark : choice of 'nonlinear', 'quadratic', 'exponential', 'logarithmic', 'squareroot',
                     'linear', 'uniform', 'power2'
-            Limb darkening model
+            Limb darkening model to be used
         """
 
         params = {'period':period, 'rprs':rprs, 'T0':T0, 'a':a, 'inc':inc, 'ecc':ecc, 'w':w, 'limb_dark':limb_dark, 'u':u}
@@ -130,6 +130,8 @@ class TransitModel(object):
         self.model.w = self.w                       #longitude of periastron (in degrees)
         self.model.limb_dark = limb_dark        #limb darkening model
         self.model.u = u      #limb darkening coefficients [u1, u2, u3, u4]
+
+
 
     def evaluate(self, time):
         import batman
@@ -254,10 +256,9 @@ def inject(time, flux, flux_err, model):
 
 
 def recover(time, flux, flux_err, signal_type, method='optimize', source='hsiao', bandpass='kepler', initial_guess=None,
-                                    ndim=None, nwalkers=None, nsteps=None, a=15., inc=90., ecc=0., w=90., limb_dark='quadratic', u=[0.1, 0.3]):
-    """Recovers a signal from a lightcurve using optimization.  Coming soon: MCMC
-    Right now, we can recover any sncosmo source that
-    takes only T0, z, and amplitude.
+                                    nwalkers=None, nsteps=None, ecc=0.0, a=15., w=90., limb_dark='quadratic', u=[0.1, 0.3]):
+    """Recovers a signal from a lightcurve using either optimization or mcmc. Period, rprs, T0, inclination, and eccentricity
+        are all fit.
 
         ----------
     time : array-like
@@ -268,15 +269,17 @@ def recover(time, flux, flux_err, signal_type, method='optimize', source='hsiao'
         Flux error array
     signal_type : 'Supernova' or 'Planet'
         Signal to recover
-    method: 'optimize' or 'mcmc'
-        Fitting method.  If 'mcmc' is chosen, 'ndim', 'nwalkers', and 'nsteps' must be defined
+    method: 'optimize' or 'mcmc', default 'optimize'
+        Fitting method.  If 'mcmc' is chosen, nwalkers', and 'nsteps' must be defined.
+        A four-dimensional MCMC will fit period, rp/rs, T0, and inclination.
     source : string, default 'hsiao'
         The source of the fitted supernova. Right now, we can only fit
         hsiao models (http://adsabs.harvard.edu/abs/2007ApJ...663.1187H) to supernovae.
     initial_guess : [T0, z, amplitude, background], default None
         Guess vector of parameters.  Planet fitting does not take x0, as a
         Box Least-Squares search (http://adsabs.harvard.edu/abs/2002A%26A...391..369K) is performed.
-
+    ndim : int
+        Num
     Returns
     -------
     result.x : tuple (?)
@@ -292,7 +295,7 @@ def recover(time, flux, flux_err, signal_type, method='optimize', source='hsiao'
             if initial_guess is None:
                 T0 = np.median(time)
                 z = 0.5
-                amplitude = 3.e-7
+                amplitude = 3.e-7#is there a better way to guess this?
                 background = np.percentile(flux, 3)
                 return [T0, z, amplitude, background]
             else:
@@ -314,18 +317,9 @@ def recover(time, flux, flux_err, signal_type, method='optimize', source='hsiao'
             lnlikelihood = -0.5*chisq
             return lnlikelihood
 
-        def lnprior(theta):
-            T0, z, amplitude, background = theta
-            if (z < 0) or (z > 1):
-                if method == 'optimize':
-                    return -1.e99
-                elif method == 'mcmc':
-                    return -np.inf
-            return 0.0
-
 
         def neg_ln_posterior(theta):
-            log_posterior = lnprior(theta) + ln_like(theta)
+            log_posterior = ln_like(theta)
             return -1 * log_posterior
 
         if method == 'optimize':
@@ -333,7 +327,7 @@ def recover(time, flux, flux_err, signal_type, method='optimize', source='hsiao'
             return result.x
 
         elif method == 'mcmc':
-            ndim, nwalkers = ndim, nwalkers
+            ndim = 4
             guess=create_initial_guess()
             pos = [[guess[0], guess[1], guess[2], guess[3]] + 1e-7*np.random.randn(ndim) for i in range(nwalkers)]
 
@@ -345,20 +339,18 @@ def recover(time, flux, flux_err, signal_type, method='optimize', source='hsiao'
 
 
     elif signal_type == 'Planet':
-
         import batman
 
         #First a BLS search:
         import bls
 
-        u1 = [0.0]*len(time)
-        v1 = [0.0]*len(time)
-        u1 = np.array(u1)
-        v1 = np.array(v1)
+        u1 = np.array([0.0]*len(time))
+        v1 = np.array([0.0]*len(time))
 
-#time, flux, u, v, number of freq bins (nf), min freq to test (fmin), freq spacing (df), number of bins (nb), min transit dur (qmi), max transit dur (qma)
+        #time, flux, u, v, number of freq bins (nf), min freq to test (fmin), freq spacing (df), number of bins (nb), min transit dur (qmi), max transit dur (qma)
         nf = 10000.0
-        fmin = .035
+        #we can only fit periods up to 33.3 or the jupyter notebook kernel dies? hmm
+        fmin = .03
         df = 0.001
         nbins = 300
         qmi = 0.001
@@ -367,16 +359,14 @@ def recover(time, flux, flux_err, signal_type, method='optimize', source='hsiao'
         results = bls.eebls(time, flux, u1, v1, nf, fmin, df, nbins, qmi, qma)
 
         bls_period = results[1]
-        depth = results[3]
-        bls_rprs = np.sqrt(depth)
+        bls_rprs = np.sqrt(results[3])
 
         midtime = ((float(results[6])-float(results[5])) / 2) + results[5]
-
         bls_T0 = ((midtime / nbins) * bls_period) + min(time)
 
         #Then optimization fitting:
         def ln_like(theta):
-            period, rprs, T0, inc, ecc = theta
+            period, rprs, T0, inc = theta
 
             model = TransitModel()
             model.add_planet(period=period, rprs=rprs, T0=T0, a=a, inc=inc, ecc=ecc, w=w, limb_dark=limb_dark, u=u)
@@ -390,10 +380,12 @@ def recover(time, flux, flux_err, signal_type, method='optimize', source='hsiao'
             return -lnlikelihood
 
         if method == 'optimize':
-            result = op.minimize(ln_like, [bls_period, bls_rprs, bls_T0, 87, 0.0])
+            result = op.minimize(ln_like, [bls_period, bls_rprs, bls_T0, 87])
+            return result.x
+
         elif method == 'mcmc':
-            ndim, nwalkers = ndim, nwalkers
-            pos = [[bls_period, bls_rprs, bls_T0] + 1e-4*np.random.randn(ndim) for i in range(nwalkers)]
+            ndim = 4
+            pos = [[bls_period, bls_rprs, bls_T0, 90] + 1e-4*np.random.randn(ndim) for i in range(nwalkers)]
 
             sampler = emcee.EnsembleSampler(nwalkers, ndim, ln_like)
 
@@ -401,13 +393,12 @@ def recover(time, flux, flux_err, signal_type, method='optimize', source='hsiao'
 
             return sampler, x
 
-        return result.x
-
     else:
         print('Signal Type not supported.')
         return
 
-def injrec_test(lc, signal_type, ntests, constr, period=None, rprs=None, T0=None, z=None, amplitude=None):
+def injrec_test(lc, signal_type, ntests, constr, period=None, rprs=None, T0=None, inc=None, z=None, amplitude=None,
+                        ecc=0.0, a=15., w=90., limb_dark='quadratic', u=[0.1, 0.3]):
     """Runs an injection and recovery test for many models and one real lightcurve.
     Right now we can only recover SN that take T0, z, and amplitude.
 
@@ -462,9 +453,9 @@ def injrec_test(lc, signal_type, ntests, constr, period=None, rprs=None, T0=None
 
             if abs(T0_f-T0_test) < constr*T0_test and abs(z_f-z_test) < constr*z_test and abs(amplitude_f-amplitude_test) < constr*amplitude_test:
                 nrecovered += 1
-                print('Recovered: ' + str(T0_test) + ' ' + str(amplitude_test))
+                print('Recovered - T0: ' + str(T0_test) + ' amplitude: ' + str(amplitude_test) + ' z: ' + str(z_test))
 
-        return (nrecovered / ntests)
+        return (float(nrecovered)/ float(ntests))
 
     elif signal_type == 'Planet':
 
@@ -474,17 +465,23 @@ def injrec_test(lc, signal_type, ntests, constr, period=None, rprs=None, T0=None
             period_test = period.sample()
             rprs_test = rprs.sample()
             T0_test = T0.sample()
+            inc_test = inc.sample()
+
+            period_rec = []
+            rprs_rec = []
+            T0_rec = []
+            inc_rec = []
 
             model = inj.TransitModel()
-            model.add_planet(period=period_test, rprs=rprs_test, T0=T0_test)
+            model.add_planet(period=period_test, rprs=rprs_test, T0=T0_test, inc=inc_test, ecc=ecc, a=a, w=w, limb_dark=limb_dark, u=u)
             lcinj = lc.inject(model)
 
-            period_f, rprs_f, T0_f = lcinj.recover('Planet')
+            period_f, rprs_f, T0_f, inc_f = lcinj.recover('Planet')
 
             if abs(period_f-period_test) < constr*period_test and abs(rprs_f-rprs_test) < constr*rprs_test:
                 nrecovered += 1
-                print('Recovered: ' + str(period_test) + ' ' + str(rprs_test))
-                print(nrecovered)
+                print('Recovered - period: ' + str(period_test) + ' rprs: ' + str(rprs_test) + ' T0: ' + str(T0_test) + ' inclination: ' + str(inc_test))
+
         return (float(nrecovered)/ float(ntests))
 
 

@@ -808,8 +808,6 @@ class SyntheticLightCurve(LightCurve):
             return('SyntheticLightCurve: Supernova Source')
         elif self.signaltype is 'Planet':
             return('SyntheticLightCurve: Planet')
-            #period: {} '.format(self.period)
-            #        + 'Planet Rp/Rs: {}'.format(self.rprs))
 
     def recover(self, signal_type,  method='optimize', source='hsiao', bandpass='kepler', initial_guess=None, ndim=None, nwalkers=None, nsteps=None):
         '''TBD'''
