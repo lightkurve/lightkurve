@@ -67,15 +67,16 @@ class GaussianDistribution(object):
 
 class TransitModel(object):
     """
-    Implements a class for creating a planetary transit model using ktransit.
+    Implements a class for creating a planetary transit model using
+    batman - documentation at https://www.cfa.harvard.edu/~lkreidberg/batman/.
 
     Attributes
     ----------
-    zpt : float
-        A photometric zeropoint
-    **kwargs : dict
-        Star parameters
-
+    signaltype : 'Planet'
+        The signal type is a planetary transit.
+    multiplicative : True
+        A planetary transit is multiplied with a lightcurve; therefore,
+        the attribute 'multiplicative' is True
     """
 
     def __init__(self):
@@ -98,13 +99,19 @@ class TransitModel(object):
             Planet radius/star radius of new planet
         T0 : float
             A transit mid-time
-        **kwargs : dict
-            Dictonary of planet parameters. Requires:
-                period
-                rprs
-                a
-                inc
-                ec
+        a : float
+            A semimajor axis in stellar radii
+        inc : float
+            An orbital inclination in degrees
+        ecc : float
+            An orbital eccentricity
+        w : float
+            Argument of pariapse in degrees
+        u : array-like
+            Limb darkening coefficients
+        limb_dark : choice of 'nonlinear', 'quadratic', 'exponential', 'logarithmic', 'squareroot',
+                    'linear', 'uniform', 'power2'
+            Limb darkening model
         """
 
         params = {'period':period, 'rprs':rprs, 'T0':T0, 'a':a, 'inc':inc, 'ecc':ecc, 'w':w, 'limb_dark':limb_dark, 'u':u}
@@ -126,7 +133,7 @@ class TransitModel(object):
 
     def evaluate(self, time):
         import batman
-        """Creates lightcurve from model.
+        """Creates flux array of lightcurve from model.
 
         Parameters
         ----------
@@ -141,9 +148,9 @@ class TransitModel(object):
         """
 
         t = time.astype(np.float)  #times at which to calculate light curve
-        m_fit = batman.TransitModel(self.model, t, fac=1.0)    #initializes model
-        flux_fit = m_fit.light_curve(self.model)
-        return flux_fit
+        m = batman.TransitModel(self.model, t, fac=1.0)    #initializes model
+        transit_flux = m.light_curve(self.model)
+        return transit_flux
 
 class SupernovaModel(object):
     """
@@ -234,8 +241,8 @@ def inject(time, flux, flux_err, model):
 
     Returns
     -------
-    lc : LightCurve class
-        Returns a lightcurve possessing a synthetic signal.
+    SyntheticLightCurve class
+        Returns a SyntheticLightCurve object possessing a synthetic signal.
     """
 
     if model.multiplicative is True:
@@ -243,14 +250,14 @@ def inject(time, flux, flux_err, model):
     else:
         mergedflux = flux + model.evaluate(time)
     return lightkurve.lightcurve.SyntheticLightCurve(time, flux=mergedflux, flux_err=flux_err,
-                               signaltype=model.signaltype)#, **model.params)
+                               signaltype=model.signaltype)
 
 
-def recover(time, flux, flux_err, signal_type, method='optimize', source='hsiao', bandpass='kepler', initial_guess=None, ndim=None, nwalkers=None, nsteps=None):
+def recover(time, flux, flux_err, signal_type, method='optimize', source='hsiao', bandpass='kepler', initial_guess=None,
+                                    ndim=None, nwalkers=None, nsteps=None, a=15., inc=90., ecc=0., w=90., limb_dark='quadratic', u=[0.1, 0.3]):
     """Recovers a signal from a lightcurve using optimization.  Coming soon: MCMC
     Right now, we can recover any sncosmo source that
-    takes only T0, z, and amplitude (most of them). I'm not sure if there are any
-    others but I'll have to check.
+    takes only T0, z, and amplitude.
 
         ----------
     time : array-like
@@ -260,13 +267,15 @@ def recover(time, flux, flux_err, signal_type, method='optimize', source='hsiao'
     flux_err : array-like
         Flux error array
     signal_type : 'Supernova' or 'Planet'
-         Signal to recover
-    method: optimization or mcmc
-    source : str (one of built in sources in sncosmo), default None
-        The source of the fitted supernova.
-    initial_guess : [T0, z, amplitude, background] or [T0, z, x0, x1, c], default None
-        Guess vector of parameters. Supernovae must take x0,
-        and Planets do not take x0.
+        Signal to recover
+    method: 'optimize' or 'mcmc'
+        Fitting method.  If 'mcmc' is chosen, 'ndim', 'nwalkers', and 'nsteps' must be defined
+    source : string, default 'hsiao'
+        The source of the fitted supernova. Right now, we can only fit
+        hsiao models (http://adsabs.harvard.edu/abs/2007ApJ...663.1187H) to supernovae.
+    initial_guess : [T0, z, amplitude, background], default None
+        Guess vector of parameters.  Planet fitting does not take x0, as a
+        Box Least-Squares search (http://adsabs.harvard.edu/abs/2002A%26A...391..369K) is performed.
 
     Returns
     -------
@@ -280,17 +289,14 @@ def recover(time, flux, flux_err, signal_type, method='optimize', source='hsiao'
 
     def create_initial_guess():
         if signal_type == "Supernova":
-            if source == 'SALT1' or source == 'SALT2':
-                return initial_guess
+            if initial_guess is None:
+                T0 = np.median(time)
+                z = 0.5
+                amplitude = 3.e-7
+                background = np.percentile(flux, 3)
+                return [T0, z, amplitude, background]
             else:
-                if initial_guess is None:
-                    T0 = np.median(time)
-                    z = 0.5
-                    amplitude = 3.e-7
-                    background = np.percentile(flux, 3)
-                    return [T0, z, amplitude, background]
-                else:
-                    return initial_guess
+                return initial_guess
 
     if signal_type == 'Supernova':
 
@@ -345,10 +351,10 @@ def recover(time, flux, flux_err, signal_type, method='optimize', source='hsiao'
         #First a BLS search:
         import bls
 
-        u = [0.0]*len(time)
-        v = [0.0]*len(time)
-        u = np.array(u)
-        v = np.array(v)
+        u1 = [0.0]*len(time)
+        v1 = [0.0]*len(time)
+        u1 = np.array(u1)
+        v1 = np.array(v1)
 
 #time, flux, u, v, number of freq bins (nf), min freq to test (fmin), freq spacing (df), number of bins (nb), min transit dur (qmi), max transit dur (qma)
         nf = 10000.0
@@ -358,7 +364,7 @@ def recover(time, flux, flux_err, signal_type, method='optimize', source='hsiao'
         qmi = 0.001
         qma = 0.3
 
-        results = bls.eebls(time, flux, u, v, nf, fmin, df, nbins, qmi, qma)
+        results = bls.eebls(time, flux, u1, v1, nf, fmin, df, nbins, qmi, qma)
 
         bls_period = results[1]
         depth = results[3]
@@ -370,10 +376,10 @@ def recover(time, flux, flux_err, signal_type, method='optimize', source='hsiao'
 
         #Then optimization fitting:
         def ln_like(theta):
-            period, rprs, T0 = theta
+            period, rprs, T0, inc, ecc = theta
 
             model = TransitModel()
-            model.add_planet(period=period, rprs=rprs, T0=T0)
+            model.add_planet(period=period, rprs=rprs, T0=T0, a=a, inc=inc, ecc=ecc, w=w, limb_dark=limb_dark, u=u)
             t = time.astype(np.float)
             flux_model = model.evaluate(t)
 
@@ -384,7 +390,7 @@ def recover(time, flux, flux_err, signal_type, method='optimize', source='hsiao'
             return -lnlikelihood
 
         if method == 'optimize':
-            result = op.minimize(ln_like, [bls_period, bls_rprs, bls_T0])
+            result = op.minimize(ln_like, [bls_period, bls_rprs, bls_T0, 87, 0.0])
         elif method == 'mcmc':
             ndim, nwalkers = ndim, nwalkers
             pos = [[bls_period, bls_rprs, bls_T0] + 1e-4*np.random.randn(ndim) for i in range(nwalkers)]
