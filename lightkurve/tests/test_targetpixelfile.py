@@ -178,9 +178,18 @@ def test_to_lightcurve():
         tpf.to_lightcurve(aperture_mask='all')
         lc = tpf.to_lightcurve(aperture_mask='pipeline')
         assert lc.astropy_time.scale == 'tdb'
-        bglc = tpf.get_bkg_lightcurve()
-        assert bglc.astropy_time.scale == 'tdb'
-        tpf.get_bkg_lightcurve(aperture_mask='all')
+
+
+def test_bkg_lightcurve():
+    for tpf in [KeplerTargetPixelFile(filename_tpf_all_zeros),
+                TessTargetPixelFile(filename_tpf_all_zeros)]:
+        lc = tpf.get_bkg_lightcurve()
+        lc = tpf.get_bkg_lightcurve(aperture_mask=None)
+        lc = tpf.get_bkg_lightcurve(aperture_mask='all')
+        assert lc.astropy_time.scale == 'tdb'
+        assert lc.flux.shape == lc.flux_err.shape
+        assert len(lc.time) == len(lc.flux)
+
 
 def test_aperture_photometry():
     for tpf in [KeplerTargetPixelFile(filename_tpf_all_zeros),

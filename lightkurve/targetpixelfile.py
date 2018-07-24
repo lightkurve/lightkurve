@@ -882,11 +882,25 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
     def get_bkg_lightcurve(self, aperture_mask=None):
         aperture_mask = self._parse_aperture_mask(aperture_mask)
-        return LightCurve(time=self.time,
-                          time_format='bkjd',
-                          time_scale='tdb',
-                          flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
-                          flux_err=self.flux_bkg_err)
+        # Ignore warnings related to zero or negative errors
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RuntimeWarning)
+            flux_bkg_err = np.nansum(self.flux_bkg_err[:, aperture_mask]**2, axis=1)**0.5
+        keys = {'quality': self.quality,
+                'channel': self.channel,
+                'campaign': self.campaign,
+                'quarter': self.quarter,
+                'mission': self.mission,
+                'cadenceno': self.cadenceno,
+                'ra': self.ra,
+                'dec': self.dec,
+                'keplerid': self.keplerid}
+        return KeplerLightCurve(time=self.time,
+                                time_format='bkjd',
+                                time_scale='tdb',
+                                flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
+                                flux_err=flux_bkg_err,
+                                **keys)
 
     def get_model(self, star_priors=None, **kwargs):
         """Returns a default `TPFModel` object for PRF fitting.
@@ -1310,8 +1324,21 @@ class TessTargetPixelFile(TargetPixelFile):
 
     def get_bkg_lightcurve(self, aperture_mask=None):
         aperture_mask = self._parse_aperture_mask(aperture_mask)
-        return LightCurve(time=self.time,
-                          time_format='btjd',
-                          time_scale='tdb',
-                          flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
-                          flux_err=self.flux_bkg_err)
+        # Ignore warnings related to zero or negative errors
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RuntimeWarning)
+            flux_bkg_err = np.nansum(self.flux_bkg_err[:, aperture_mask]**2, axis=1)**0.5
+        keys = {'quality': self.quality,
+                'sector': self.sector,
+                'camera': self.camera,
+                'ccd': self.ccd,
+                'cadenceno': self.cadenceno,
+                'ra': self.ra,
+                'dec': self.dec,
+                'ticid': self.ticid}
+        return TessLightCurve(time=self.time,
+                              time_format='btjd',
+                              time_scale='tdb',
+                              flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
+                              flux_err=flux_bkg_err,
+                              **keys)
