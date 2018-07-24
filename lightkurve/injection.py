@@ -255,7 +255,7 @@ def inject(time, flux, flux_err, model):
                                signaltype=model.signaltype)
 
 
-def recover(time, flux, flux_err, signal_type, method='optimize', source='hsiao', bandpass='kepler', initial_guess=None,
+def recover(time, flux, flux_err, signal_type, threads=None, method='optimize', source='hsiao', bandpass='kepler', initial_guess=None,
                                     nwalkers=None, nsteps=None, ecc=0.0, a=15., w=90., limb_dark='quadratic', u=[0.1, 0.3]):
     """Recovers a signal from a lightcurve using either optimization or mcmc. Period, rprs, T0, inclination, and eccentricity
         are all fit.
@@ -332,7 +332,6 @@ def recover(time, flux, flux_err, signal_type, method='optimize', source='hsiao'
             pos = [[guess[0], guess[1], guess[2], guess[3]] + 1e-7*np.random.randn(ndim) for i in range(nwalkers)]
 
             sampler = emcee.EnsembleSampler(nwalkers, ndim, ln_like)
-
             x = sampler.run_mcmc(pos, nsteps)
 
             return sampler, x
@@ -387,7 +386,7 @@ def recover(time, flux, flux_err, signal_type, method='optimize', source='hsiao'
             ndim = 4
             pos = [[bls_period, bls_rprs, bls_T0, 90] + 1e-4*np.random.randn(ndim) for i in range(nwalkers)]
 
-            sampler = emcee.EnsembleSampler(nwalkers, ndim, ln_like)
+            sampler = emcee.EnsembleSampler(nwalkers, ndim, ln_like, threads=threads)
 
             x = sampler.run_mcmc(pos, nsteps)
 

@@ -809,10 +809,10 @@ class SyntheticLightCurve(LightCurve):
         elif self.signaltype is 'Planet':
             return('SyntheticLightCurve: Planet')
 
-    def recover(self, signal_type,  method='optimize', source='hsiao', bandpass='kepler', initial_guess=None, ndim=None, nwalkers=None, nsteps=None):
+    def recover(self, signal_type,  threads=None, method='optimize', source='hsiao', bandpass='kepler', initial_guess=None, nwalkers=None, nsteps=None):
         '''TBD'''
         from lightkurve import injection as inj
-        return inj.recover(self.time, self.flux, self.flux_err, signal_type, method=method, source=source, bandpass=bandpass, initial_guess=initial_guess, ndim=ndim, nwalkers=nwalkers, nsteps=nsteps)
+        return inj.recover(self.time, self.flux, self.flux_err, signal_type, threads=threads, method=method, source=source, bandpass=bandpass, initial_guess=initial_guess, nwalkers=nwalkers, nsteps=nsteps)
 
 
 
