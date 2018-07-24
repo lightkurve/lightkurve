@@ -16,15 +16,9 @@ from astropy import units as u
 from astropy.coordinates import SkyCoord
 
 from . import PACKAGEDIR
-<<<<<<< HEAD
-from .lightcurve import KeplerLightCurve, LightCurve
-from .prf import SimpleKeplerPRF
-from .utils import KeplerQualityFlags, plot_image, bkjd_to_astropy_time, query_catalog
-=======
 from .lightcurve import KeplerLightCurve, TessLightCurve, LightCurve
 from .prf import KeplerPRF
-from .utils import KeplerQualityFlags, plot_image, bkjd_to_astropy_time, btjd_to_astropy_time
->>>>>>> master
+from .utils import KeplerQualityFlags, plot_image, bkjd_to_astropy_time, btjd_to_astropy_time, query_catalog
 from .mast import download_kepler_products
 
 
@@ -47,56 +41,7 @@ class TargetPixelFile(object):
             self.hdu = fits.open(self.path, **kwargs)
         self.quality_bitmask = quality_bitmask
         self.quality_mask = self._quality_mask(quality_bitmask)
-<<<<<<< HEAD
-
-
-    @staticmethod
-    def from_archive(target, cadence='long', quarter=None, month=None,
-                     campaign=None, radius=1., targetlimit=1, **kwargs):
-        """Fetch a Target Pixel File from the Kepler/K2 data archive at MAST.
-
-        Raises an `ArchiveError` if a unique TPF cannot be found.  For example,
-        this is the case if a target was observed in multiple Quarters and the
-        quarter parameter is unspecified.
-
-        Parameters
-        ----------
-        target : str or int
-            KIC/EPIC ID or object name.
-        cadence : str
-            'long' or 'short'.
-        quarter, campaign : int, list of ints, or 'all'
-            Kepler Quarter or K2 Campaign number.
-        month : 1, 2, 3, list or 'all'
-            For Kepler's prime mission, there are three short-cadence
-            Target Pixel Files for each quarter, each covering one month.
-            Hence, if cadence='short' you need to specify month=1, 2, or 3.
-        radius : float
-            Search radius in arcseconds. Default is 1 arcsecond.
-        targetlimit : None or int
-            If multiple targets are present within `radius`, limit the number
-            of returned TargetPixelFile objects to `targetlimit`.
-            If `None`, no limit is applied.
-        kwargs : dict
-            Keywords arguments passed to `KeplerTargetPixelFile`.
-
-        Returns
-        -------
-        tpf : KeplerTargetPixelFile object.
-        """
-        path = download_kepler_products(
-            target=target, filetype='Target Pixel', cadence=cadence,
-            quarter=quarter, campaign=campaign, month=month,
-            radius=radius, targetlimit=targetlimit)
-        if len(path) == 1:
-            return KeplerTargetPixelFile(path[0], **kwargs)
-        return [KeplerTargetPixelFile(p, **kwargs) for p in path]
-
-    def __repr__(self):
-        return('KeplerTargetPixelFile Object (ID: {})'.format(self.keplerid))
-=======
         self.targetid = targetid
->>>>>>> master
 
 
     def get_sources(self, catalog=None, magnitude_limit=18, dist_tolerance=2):
@@ -199,7 +144,6 @@ class TargetPixelFile(object):
         """Returns the header for a given extension."""
         return self.hdu[ext].header
 
-<<<<<<< HEAD
     def get_prf_model(self):
         """Returns an object of SimpleKeplerPRF initialized using the
         necessary metadata in the tpf object.
@@ -308,12 +252,11 @@ class TargetPixelFile(object):
     @property
     def output(self):
         return self.header()['OUTPUT']
-=======
+
     def _quality_mask(self, bitmask):
         if bitmask is None:
             return np.ones(len(self.hdu[1].data['TIME']), dtype=bool)
         return (self.hdu[1].data['QUALITY'] & bitmask) == 0
->>>>>>> master
 
     @property
     def ra(self):
@@ -1083,7 +1026,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         try:
             return self.header(ext=0)['MISSION']
         except KeyError:
-            return None        
+            return None
 
     def aperture_photometry(self, aperture_mask='pipeline'):
         """Returns a LightCurve obtained using aperture photometry.
