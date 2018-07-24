@@ -17,3 +17,4 @@ from .correctors import *
 from .targetpixelfile import *
 from .utils import *
 from .convenience import *
+from .periodogram import *

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import os
 import sys
-from setuptools import setup
+from setuptools import setup, find_packages
 
 # Prepare and send a new release to PyPI
 if "release" in sys.argv[-1]:
@@ -22,11 +22,15 @@ setup(name='lightkurve',
       author='KeplerGO',
       author_email='keplergo@mail.arc.nasa.gov',
       license='MIT',
-      packages=['lightkurve'],
+      package_dir={
+            'lightkurve': 'lightkurve',
+            'lightkurve.prf': 'lightkurve/prf'},
+      packages=['lightkurve', 'lightkurve.prf'],
       install_requires=['numpy>=1.11', 'astropy>=1.3', 'scipy>=0.19.0',
                         'matplotlib>=1.5.3', 'tqdm', 'oktopus', 'bs4',
                         'requests', 'astroquery>=0.3.7',
-                        'bokeh>=0.12.15', 'ipywidgets>=7.2.0'],
+                        'bokeh>=0.12.15', 'ipywidgets>=7.2.0',
+                        'pandas'],
       setup_requires=['pytest-runner'],
       tests_require=['pytest', 'pytest-cov', 'pytest-remotedata'],
       include_package_data=True,
