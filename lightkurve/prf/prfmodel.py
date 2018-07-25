@@ -83,7 +83,9 @@ class KeplerPRF(object):
         flux : float
             Total integrated flux of the PRF
         scale_col, scale_row : float
-            Pixel scale in the column and row directions
+            Pixel scale stretch parameter, i.e. the numbers by which the PRF
+            model needs to be multiplied in the column and row directions to
+            account for focus changes
         rotation_angle : float
             Rotation angle in radians
 
@@ -122,7 +124,9 @@ class KeplerPRF(object):
         flux : float
             Total integrated flux of the PRF
         scale_col, scale_row : float
-            Pixel scale in the column and row directions
+            Pixel scale stretch parameter, i.e. the numbers by which the PRF
+            model needs to be multiplied in the column and row directions to
+            account for focus changes
         rotation_angle : float
             Rotation angle in radians
 
