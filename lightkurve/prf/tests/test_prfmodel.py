@@ -79,10 +79,9 @@ def test_keplerprf_gradient_against_simplekeplerprf():
 def test_keplerprf_gradient_against_calculus(param_to_test):
     """is the gradient of KeplerPRF consistent with Calculus?
     """
-    params = OrderedDict(center_col=7., center_row=7., flux=1000.,
-                         scale_col=1., scale_row=1., rotation_angle=0.)
-    param_order = OrderedDict(center_col=0, center_row=1, flux=2,
-                              scale_col=3, scale_row=4, rotation_angle=5)
+    params = OrderedDict([('center_col', 7), ('center_row', 7), ('flux', 1000.),
+                          ('scale_col', 1.), ('scale_row', 1.), ('rotation_angle', 0)])
+    param_order = OrderedDict(zip(params.keys(), range(0, 6)))
     kwargs = {'channel': 56, 'shape': [15, 15], 'column': 0, 'row': 0}
 
     prf = KeplerPRF(**kwargs)
