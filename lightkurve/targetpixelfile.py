@@ -924,10 +924,10 @@ class KeplerTargetPixelFile(TargetPixelFile):
             kwargs['prfmodel'] = self.get_prf_model()
         if 'background_prior' not in kwargs:
             if np.all(np.isnan(self.flux_bkg)):  # If TargetPixelFile has no background flux data
-                # 5 sigma clip the flux until convergence, and use as an estimate for flux_bkg
-                clipped_flux = sigma_clip(self.flux, sigma=5, iters=None)
-                flux_prior = GaussianPrior(mean=np.nanmedian(clipped_flux),
-                                           var=np.nanstd(clipped_flux)**2)
+                # Use the median of the lower half of flux as an estimate for flux_bkg
+                clipped_flux = np.ma.masked_where(self.flux > np.percentile(self.flux,50), self.flux)
+                flux_prior = GaussianPrior(mean=np.ma.nanmedian(clipped_flux),
+                                           var=np.ma.nanstd(clipped_flux)**2)
             else:
                 flux_prior = GaussianPrior(mean=np.nanmedian(self.flux_bkg),
                                            var=np.nanstd(self.flux_bkg)**2)
