@@ -834,7 +834,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         try:
             return self.header(ext=0)['MISSION']
         except KeyError:
-            return None        
+            return None
 
     def aperture_photometry(self, aperture_mask='pipeline'):
         """Returns a LightCurve obtained using aperture photometry.
@@ -887,6 +887,19 @@ class KeplerTargetPixelFile(TargetPixelFile):
                           time_scale='tdb',
                           flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
                           flux_err=self.flux_bkg_err)
+
+    def get_local_bkg_est(self):
+        """ Returns an estimate of the local background flux for a given
+        TargetPixelFile as an array of the same dimensions as the TargetPixelFile.
+        """
+        # 5 sigma clip the TargetPixelFile flux until convergence
+        clipped_flux = sigma_clip(self.flux, sigma=5, iters=None)
+        bkg_est = []
+        for cadence in clipped_flux:
+            # Set background flux as the median of the clipped flux for each cadence
+            cadence_bkg = bkg_est.append(np.full(self.shape[1:],np.ma.median(cadence))
+        local_bkg_est = np.stack(bkg_est, axis=0)
+        return local_bkg_est
 
     def get_model(self, star_priors=None, **kwargs):
         """Returns a default `TPFModel` object for PRF fitting.
