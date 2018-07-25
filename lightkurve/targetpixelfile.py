@@ -15,7 +15,7 @@ from tqdm import tqdm
 
 from . import PACKAGEDIR
 from .lightcurve import KeplerLightCurve, TessLightCurve, LightCurve
-from .prf import SimpleKeplerPRF
+from .prf import KeplerPRF
 from .utils import KeplerQualityFlags, plot_image, bkjd_to_astropy_time, btjd_to_astropy_time
 from .mast import download_kepler_products
 from .collection import Collection
@@ -308,6 +308,41 @@ class TargetPixelFile(object):
                     output.add_row([attr, dic['print']])
                     idx += 1
         output.pprint(max_lines=-1, max_width=-1)
+
+    def to_lightcurve(self, method='aperture', **kwargs):
+        """Performs photometry.
+
+        See the docstring of `aperture_photometry()` for valid
+        arguments if the method is 'aperture'.  Otherwise, see the docstring
+        of `prf_photometry()` for valid arguments if the method is 'prf'.
+
+        Parameters
+        ----------
+        method : 'aperture' or 'prf'.
+            Photometry method to use.
+        **kwargs : dict
+            Extra arguments to be passed to the `aperture_photometry` or the
+            `prf_photometry` method of this class.
+
+        Returns
+        -------
+        lc : LightCurve object
+            Object containing the resulting lightcurve.
+        """
+        if method == 'aperture':
+            return self.aperture_photometry(**kwargs)
+        elif method == 'prf':
+            return self.prf_lightcurve(**kwargs)
+        else:
+            raise ValueError("Photometry method must be 'aperture' or 'prf'.")
+
+    def aperture_photometry(self):
+        raise NotImplementedError("This is an abstract method that is "
+                                  "implemented in the subclasses.")
+
+    def prf_photometry(self):
+        raise NotImplementedError("This is an abstract method that is "
+                                  "implemented in the subclasses.")
 
     def _parse_aperture_mask(self, aperture_mask):
         """Parse the `aperture_mask` parameter as given by a user.
@@ -741,7 +776,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         return (self.hdu[1].data['QUALITY'] & bitmask) == 0
 
     def get_prf_model(self):
-        """Returns an object of SimpleKeplerPRF initialized using the
+        """Returns an object of KeplerPRF initialized using the
         necessary metadata in the tpf object.
 
         Returns
@@ -749,8 +784,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
         prf : instance of SimpleKeplerPRF
         """
 
-        return SimpleKeplerPRF(channel=self.channel, shape=self.shape[1:],
-                               column=self.column, row=self.row)
+        return KeplerPRF(channel=self.channel, shape=self.shape[1:],
+                         column=self.column, row=self.row)
 
     @property
     def keplerid(self):
@@ -799,10 +834,10 @@ class KeplerTargetPixelFile(TargetPixelFile):
         try:
             return self.header(ext=0)['MISSION']
         except KeyError:
-            return None
+            return None        
 
-    def to_lightcurve(self, aperture_mask='pipeline'):
-        """Performs aperture photometry.
+    def aperture_photometry(self, aperture_mask='pipeline'):
+        """Returns a LightCurve obtained using aperture photometry.
 
         Parameters
         ----------
@@ -847,11 +882,109 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
     def get_bkg_lightcurve(self, aperture_mask=None):
         aperture_mask = self._parse_aperture_mask(aperture_mask)
-        return LightCurve(time=self.time,
-                          time_format='bkjd',
-                          time_scale='tdb',
-                          flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
-                          flux_err=self.flux_bkg_err)
+        # Ignore warnings related to zero or negative errors
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RuntimeWarning)
+            flux_bkg_err = np.nansum(self.flux_bkg_err[:, aperture_mask]**2, axis=1)**0.5
+        keys = {'quality': self.quality,
+                'channel': self.channel,
+                'campaign': self.campaign,
+                'quarter': self.quarter,
+                'mission': self.mission,
+                'cadenceno': self.cadenceno,
+                'ra': self.ra,
+                'dec': self.dec,
+                'keplerid': self.keplerid}
+        return KeplerLightCurve(time=self.time,
+                                time_format='bkjd',
+                                time_scale='tdb',
+                                flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
+                                flux_err=flux_bkg_err,
+                                **keys)
+
+    def get_model(self, star_priors=None, **kwargs):
+        """Returns a default `TPFModel` object for PRF fitting.
+
+        The default model only includes one star and only allows its flux
+        and position to change.  A different set of stars can be added using
+        the `star_priors` parameter.
+
+        Parameters
+        ----------
+        **kwargs : dict
+            Arguments to be passed to the `TPFModel` constructor, e.g.
+            `star_priors`.
+
+        Returns
+        -------
+        model : TPFModel object
+            Model with appropriate defaults for this Target Pixel File.
+        """
+        from .prf import TPFModel, StarPrior, BackgroundPrior
+        from .prf import UniformPrior, GaussianPrior
+        # Set up the model
+        if 'star_priors' not in kwargs:
+            centr_col, centr_row = self.centroids()
+            star_priors = [StarPrior(col=GaussianPrior(mean=np.nanmedian(centr_col),
+                                                       var=np.nanstd(centr_col)**2),
+                                     row=GaussianPrior(mean=np.nanmedian(centr_row),
+                                                       var=np.nanstd(centr_row)**2),
+                                     flux=UniformPrior(lb=0.5*np.nanmax(self.flux[0]),
+                                                       ub=2*np.nansum(self.flux[0]) + 1e-10),
+                                     targetid=self.targetid)]
+            kwargs['star_priors'] = star_priors
+        if 'prfmodel' not in kwargs:
+            kwargs['prfmodel'] = self.get_prf_model()
+        if 'background_prior' not in kwargs:
+            flux_prior = GaussianPrior(mean=np.nanmean(self.flux_bkg),
+                                       var=np.nanstd(self.flux_bkg)**2)
+            kwargs['background_prior'] = BackgroundPrior(flux=flux_prior)
+        return TPFModel(**kwargs)
+
+    def prf_photometry(self, cadences=None, parallel=True, **kwargs):
+        """Returns the results of PRF photometry applied to the pixel file.
+
+        Parameters
+        ----------
+        cadences : list of int
+            Cadences to fit.  If `None` (default) then all cadences will be fit.
+        parallel : bool
+            If `True`, fitting cadences will be distributed across multiple
+            cores using Python's `multiprocessing` module.
+        **kwargs : dict
+            Keywords to be passed to `tpf.get_model()` to create the
+            `TPFModel` object that will be fit.
+
+        Returns
+        -------
+        results : PRFPhotometry object
+            Object that provides access to PRF-fitting photometry results and
+            various diagnostics.
+        """
+        from .prf import PRFPhotometry
+        log.warning('Warning: PRF-fitting photometry is experimental '
+                    'in this version of lightkurve.')
+        prfphot = PRFPhotometry(model=self.get_model(**kwargs))
+        prfphot.run(self.flux + self.flux_bkg, cadences=cadences, parallel=parallel,
+                    pos_corr1=self.pos_corr1, pos_corr2=self.pos_corr2)
+        return prfphot
+
+    def prf_lightcurve(self, **kwargs):
+        lc = self.prf_photometry(**kwargs).lightcurves[0]
+        keys = {'quality': self.quality,
+                'channel': self.channel,
+                'campaign': self.campaign,
+                'quarter': self.quarter,
+                'mission': self.mission,
+                'cadenceno': self.cadenceno,
+                'ra': self.ra,
+                'dec': self.dec,
+                'keplerid': self.keplerid}
+        return KeplerLightCurve(time=self.time,
+                                flux=lc.flux,
+                                time_format='bkjd',
+                                time_scale='tdb',
+                                **keys)
 
     @staticmethod
     def from_fits_images(images, position=None, size=(10, 10), extension=None,
@@ -1148,7 +1281,7 @@ class TessTargetPixelFile(TargetPixelFile):
         """Returns an AstroPy Time object for all good-quality cadences."""
         return btjd_to_astropy_time(btjd=self.time)
 
-    def to_lightcurve(self, aperture_mask='pipeline'):
+    def aperture_photometry(self, aperture_mask='pipeline'):
         """Performs aperture photometry.
 
         Parameters
@@ -1191,11 +1324,24 @@ class TessTargetPixelFile(TargetPixelFile):
 
     def get_bkg_lightcurve(self, aperture_mask=None):
         aperture_mask = self._parse_aperture_mask(aperture_mask)
-        return LightCurve(time=self.time,
-                          time_format='btjd',
-                          time_scale='tdb',
-                          flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
-                          flux_err=self.flux_bkg_err)
+        # Ignore warnings related to zero or negative errors
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RuntimeWarning)
+            flux_bkg_err = np.nansum(self.flux_bkg_err[:, aperture_mask]**2, axis=1)**0.5
+        keys = {'quality': self.quality,
+                'sector': self.sector,
+                'camera': self.camera,
+                'ccd': self.ccd,
+                'cadenceno': self.cadenceno,
+                'ra': self.ra,
+                'dec': self.dec,
+                'ticid': self.ticid}
+        return TessLightCurve(time=self.time,
+                              time_format='btjd',
+                              time_scale='tdb',
+                              flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
+                              flux_err=flux_bkg_err,
+                              **keys)
 
 class TargetPixelFileCollection(Collection):
     """Represents a set of Target Pixel Files
@@ -1227,3 +1373,4 @@ class TargetPixelFileCollection(Collection):
         ax : matplotlib.axes._subplots.AxesSubplot
         """
         raise NotImplementedError('Plotting TPFs has not been implemented')
+        

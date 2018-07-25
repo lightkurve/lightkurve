@@ -1,4 +1,4 @@
-PSF photometry classes
+PRF photometry classes
 ======================
 
 .. module:: lightkurve.prf
