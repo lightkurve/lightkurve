@@ -93,5 +93,5 @@ def test_keplerprf_gradient_against_calculus(param_to_test):
     diff_prf = (f(**inc_params) - f(**params)) / h
     # compute analytical gradient
     prf_grad = prf.gradient(**params)
-    # assert that the worst case absolute/relative error is less than 1e-5
-    assert np.max(np.abs(prf_grad[param_order[param_to_test]] - diff_prf) / (1. + np.abs(diff_prf))) < 1e-5
+    # assert that the average absolute/relative error is less than 1e-5
+    assert np.mean(np.abs(prf_grad[param_order[param_to_test]] - diff_prf) / (1. + np.abs(diff_prf))) < 1e-5
