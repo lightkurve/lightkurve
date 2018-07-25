@@ -893,11 +893,11 @@ class KeplerTargetPixelFile(TargetPixelFile):
         TargetPixelFile as an array of the same dimensions as the TargetPixelFile.
         """
         # 5 sigma clip the TargetPixelFile flux until convergence
-        clipped_flux = sigma_clip(self.flux, sigma=5, iters=None)
+        clipped_flux = np.ma.masked_where(self.flux > np.percentile(self.flux, 50), self.flux)
         bkg_est = []
         for cadence in clipped_flux:
             # Set background flux as the median of the clipped flux for each cadence
-            cadence_bkg = bkg_est.append(np.full(self.shape[1:],np.ma.median(cadence))
+            cadence_bkg = bkg_est.append(np.full(self.shape[1:],np.ma.median(cadence)))
         local_bkg_est = np.stack(bkg_est, axis=0)
         return local_bkg_est
 
