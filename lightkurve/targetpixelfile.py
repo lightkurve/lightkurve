@@ -892,7 +892,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         """ Returns an estimate of the local background flux for a given
         TargetPixelFile as an array of the same dimensions as the TargetPixelFile.
         """
-        # 5 sigma clip the TargetPixelFile flux until convergence
+        # Mask the upper half of the flux data to exclude star fluxes from bkg estimate
         clipped_flux = np.ma.masked_where(self.flux > np.percentile(self.flux, 50), self.flux)
         bkg_est = []
         for cadence in clipped_flux:
