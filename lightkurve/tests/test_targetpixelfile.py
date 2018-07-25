@@ -256,10 +256,12 @@ def test_from_fits():
     tpf = KeplerTargetPixelFile.from_fits(filename_tpf_one_center)
     assert isinstance(tpf, KeplerTargetPixelFile)
     assert tpf.keplerid == KeplerTargetPixelFile(filename_tpf_one_center).keplerid
+    assert tpf.keplerid == tpf.targetid
     # Execute the same test for TESS
     tpf = TessTargetPixelFile.from_fits(filename_tpf_one_center)
     assert isinstance(tpf, TessTargetPixelFile)
     assert tpf.ticid == TessTargetPixelFile(filename_tpf_one_center).ticid
+    assert tpf.ticid == tpf.targetid
 
 
 def test_get_models():
