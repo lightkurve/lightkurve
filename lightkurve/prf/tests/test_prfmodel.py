@@ -1,5 +1,6 @@
 """Test the features of the lightkurve.prf.prfmodels module."""
 from __future__ import division, print_function
+from collections import OrderedDict
 
 from astropy.io import fits
 from astropy.utils.data import get_pkg_data_filename
@@ -78,9 +79,10 @@ def test_keplerprf_gradient_against_simplekeplerprf():
 def test_keplerprf_gradient_against_calculus(param_to_test):
     """is the gradient of KeplerPRF consistent with Calculus?
     """
-    params = {'center_col': 7., 'center_row': 7., 'flux': 1000., 'scale_col': 1.,
-              'scale_row': 1., 'rotation_angle': 0.}
-    param_order = dict(zip(params.keys(), range(0, 6)))
+    params = OrderedDict(center_col=7., center_row=7., flux=1000.,
+                         scale_col=1., scale_row=1., rotation_angle=0.)
+    param_order = OrderedDict(center_col=0, center_row=1, flux=2,
+                              scale_col=3, scale_row=4, rotation_angle=5)
     kwargs = {'channel': 56, 'shape': [15, 15], 'column': 0, 'row': 0}
 
     prf = KeplerPRF(**kwargs)
@@ -94,4 +96,4 @@ def test_keplerprf_gradient_against_calculus(param_to_test):
     # compute analytical gradient
     prf_grad = prf.gradient(**params)
     # assert that the average absolute/relative error is less than 1e-5
-    assert np.mean(np.abs(prf_grad[param_order[param_to_test]] - diff_prf) / (1. + np.abs(diff_prf))) < 1e-5
+    assert np.max(np.abs(prf_grad[param_order[param_to_test]] - diff_prf) / (1. + np.abs(diff_prf))) < 1e-5
