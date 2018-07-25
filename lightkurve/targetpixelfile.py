@@ -12,6 +12,7 @@ from matplotlib import patches
 import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
+from astropy.stats import sigma_clip
 
 from . import PACKAGEDIR
 from .lightcurve import KeplerLightCurve, TessLightCurve, LightCurve
@@ -834,7 +835,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         try:
             return self.header(ext=0)['MISSION']
         except KeyError:
-            return None        
+            return None
 
     def aperture_photometry(self, aperture_mask='pipeline'):
         """Returns a LightCurve obtained using aperture photometry.
@@ -922,6 +923,14 @@ class KeplerTargetPixelFile(TargetPixelFile):
         if 'prfmodel' not in kwargs:
             kwargs['prfmodel'] = self.get_prf_model()
         if 'background_prior' not in kwargs:
+            if np.all(np.isnan(self.flux_bkg)):  # If TargetPixelFile has no background flux data
+                # 5 sigma clip the TargetPixelFile flux until convergence
+                clipped_flux = sigma_clip(self.flux, sigma=5, iters=None)
+                bkg = []
+                for cadence in self.flux:
+                    # Set background flux as the median of the clipped flux for each cadence
+                    cadence_bkg = bkg.append(np.full(self.shape[1:],np.ma.median(cadence))
+                self.flux_bkg = np.stack(bkg, axis=0)
             flux_prior = GaussianPrior(mean=np.nanmean(self.flux_bkg),
                                        var=np.nanstd(self.flux_bkg)**2)
             kwargs['background_prior'] = BackgroundPrior(flux=flux_prior)
