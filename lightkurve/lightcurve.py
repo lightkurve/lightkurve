@@ -575,7 +575,6 @@ class LightCurve(object):
             ax.set_ylabel(ylabel)
         return ax
 
-
     def inject(self, model):
         """Convenience function for injecting signals into lightcurves
 
@@ -585,7 +584,6 @@ class LightCurve(object):
         """
 
         return injection.inject(self.time, self.flux, self.flux_err, model)
-
 
     def to_table(self):
         """Export the LightCurve as an AstroPy Table.
@@ -790,10 +788,11 @@ class SyntheticLightCurve(LightCurve):
         injection.py.
     """
 
-    def __init__(self, time, flux=None, flux_err=None, time_format=None, time_scale=None, signaltype=None, **kwargs):
+    def __init__(self, time, flux=None, flux_err=None, time_format=None, time_scale=None, signaltype=None, heritage=None, **kwargs):
         super(SyntheticLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err, time_format=time_format, time_scale=time_scale)
 
         self.signaltype = signaltype
+        self.heritage = heritage
         for key, value in kwargs.items():
             setattr(self, key, value)
 
@@ -809,13 +808,17 @@ class SyntheticLightCurve(LightCurve):
         elif self.signaltype is 'Planet':
             return('SyntheticLightCurve: Planet')
 
-    def recover(self, signal_type,  threads=None, method='optimize', source='hsiao', bandpass='kepler', initial_guess=None, nwalkers=None, nsteps=None):
-        '''TBD'''
-        from lightkurve import injection as inj
-        return inj.recover(self.time, self.flux, self.flux_err, signal_type, threads=threads, method=method, source=source, bandpass=bandpass, initial_guess=initial_guess, nwalkers=nwalkers, nsteps=nsteps)
+
+    def recover_planet(self, fit_params=['period', 'rprs', 'inc'], method='optimize', nwalkers=10, nsteps=100, threads=1):
+
+        return injection.recover_planet(self.time, self.flux, self.flux_err, self.period, self.rprs,
+                                    self.T0, self.a, self.inc, self.ecc, self.w, self.limb_dark, self.u, fit_params=fit_params, method=method, nwalkers=nwalkers, nsteps=nsteps, threads=threads)
 
 
+    def recover_supernova(self, fit_params=['T0', 'z', 'amplitude', 'background'], method='optimize', nwalkers=10, nsteps=100, threads=1):
 
+        return injection.recover_supernova(self.time, self.flux, self.flux_err, self.t0, self.z, self.amplitude, source='hsiao', bandpass='kepler', initial_guess=None,
+                            fit_params=fit_params, method='optimize', nwalkers=10, nsteps=100, threads=1)
 
 class KeplerLightCurve(LightCurve):
     """Defines a light curve class for NASA's Kepler and K2 missions.

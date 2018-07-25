@@ -82,6 +82,7 @@ class TransitModel(object):
     def __init__(self):
         import batman
         self.signaltype = 'Planet'
+        self.heritage = 'batman'
         self.multiplicative = True
         self.model = batman.TransitParams()
 
@@ -114,8 +115,8 @@ class TransitModel(object):
             Limb darkening model to be used
         """
 
-        params = {'period':period, 'rprs':rprs, 'T0':T0, 'a':a, 'inc':inc, 'ecc':ecc, 'w':w, 'limb_dark':limb_dark, 'u':u}
-        for key, val in params.items():
+        self.params = {'period':period, 'rprs':rprs, 'T0':T0, 'a':a, 'inc':inc, 'ecc':ecc, 'w':w, 'limb_dark':limb_dark, 'u':u}
+        for key, val in self.params.items():
             if isinstance(val, (GaussianDistribution, UniformDistribution)):
                 setattr(self, key, val.sample())
             else:
@@ -172,16 +173,13 @@ class SupernovaModel(object):
     **kwargs : dicts
         List of parameters depending on chosen source.
     """
-    def __init__(self, T0, source='hsiao', bandpass='kepler', z=0.5, **kwargs):
+    def __init__(self, source='hsiao', bandpass='kepler', **kwargs):
 
         self.signaltype = 'Supernova'
+        self.heritage = 'sncosmo'
         self.source = source
-        self.T0 = T0
+        #T0 should also have an isinstance Distribution Class if statement
         self.bandpass = bandpass
-        if isinstance(z, (GaussianDistribution, UniformDistribution)):
-            self.z = z.sample()
-        else:
-            self.z = z
         self.multiplicative = False
 
         self.sn_params = {}
@@ -190,6 +188,10 @@ class SupernovaModel(object):
                 self.sn_params[key] = value.sample()
             else:
                 self.sn_params[key] = value
+
+        if 'T0' in self.sn_params:
+            self.sn_params['t0'] = self.sn_params['T0']
+            self.sn_params.pop('T0', None)
 
     def __repr__(self):
         return 'SupernovaModel(' + str(self.__dict__) + ')'
@@ -214,9 +216,8 @@ class SupernovaModel(object):
         """
 
         import sncosmo
-
         model = sncosmo.Model(source=self.source)
-        model.set(t0=self.T0, z=self.z, **self.sn_params)
+        model.set(**self.sn_params)
         band_intensity = model.bandflux(self.bandpass, time)  #Units: e/s/cm^2
         if self.bandpass == 'kepler':
             # Spectral response already includes QE: units are e- not photons.
@@ -225,8 +226,9 @@ class SupernovaModel(object):
             bandflux = band_intensity * A_eff_cm2  #e/s
         else:
             bandflux = band_intensity # Units: photons/s/cm^2
+
         self.params = self.sn_params.copy()
-        signal_dict = {'signal':bandflux}
+        signal_dict = {'signal':bandflux, 'bandpass':self.bandpass}
         self.params.update(signal_dict)
 
         return bandflux
@@ -252,12 +254,209 @@ def inject(time, flux, flux_err, model):
     else:
         mergedflux = flux + model.evaluate(time)
     return lightkurve.lightcurve.SyntheticLightCurve(time, flux=mergedflux, flux_err=flux_err,
-                               signaltype=model.signaltype)
+                               **model.params)
+
+"""
+def recover_planet(time, flux, flux_err, method='optimize')
+#synlc.recover_planet(method="optimize"...)
+#IN RECOVER METHOD IN SyntheticLightCurve:
+    self.period
+    self.rprs
+
+    for param:
+        if not in list passed in:
+            create TransitModel(....inc=self.inc)
+            try it on, and then minimize
+            .....
 
 
-def recover(time, flux, flux_err, signal_type, threads=None, method='optimize', source='hsiao', bandpass='kepler', initial_guess=None,
-                                    nwalkers=None, nsteps=None, ecc=0.0, a=15., w=90., limb_dark='quadratic', u=[0.1, 0.3]):
-    """Recovers a signal from a lightcurve using either optimization or mcmc. Period, rprs, T0, inclination, and eccentricity
+
+
+
+
+    Which params do we want to fit? (for example...)
+    ['period', 'rprs', 'T0']
+    We could pass in a list of strings - the names of the params we want to fit.
+
+    Which params do we want to fix?
+    Everything besides what is in the list above.
+
+
+
+
+
+_____________
+
+def recover(time, flux, .... , period, rprs, inc...... ['period', 'rprs'])
+
+
+
+
+
+IN SyntheticLightCurve:
+import injection as inj
+    def recover(fit_params = ['period', 'rprs'])
+        inj.recover()
+
+"""
+
+
+def recover_planet(time, flux, flux_err, period, rprs, T0, a, inc, ecc, w, limb_dark, u,
+                    fit_params=['period', 'rprs', 'inc'], method='optimize', nwalkers=10, nsteps=100, threads=1):
+
+    import scipy.optimize as op
+    import emcee
+    import batman
+    import bls
+
+    def create_initial_guess(fit_params=fit_params):
+        u1 = np.array([0.0]*len(time))
+        v1 = np.array([0.0]*len(time))
+
+        #time, flux, u, v, number of freq bins (nf), min freq to test (fmin), freq spacing (df), number of bins (nb), min transit dur (qmi), max transit dur (qma)
+        nf = 10000.0
+        #we can only fit periods up to 33.3 or the jupyter notebook kernel dies? hmm
+        fmin = .03
+        df = 0.001
+        nbins = 300
+        qmi = 0.001
+        qma = 0.3
+
+        results = bls.eebls(time, flux, u1, v1, nf, fmin, df, nbins, qmi, qma)
+
+        bls_period = results[1]
+        bls_rprs = np.sqrt(results[3])
+
+        midtime = ((float(results[6])-float(results[5])) / 2) + results[5]
+        bls_T0 = ((midtime / nbins) * bls_period) + min(time)
+
+        guess = {}
+        if 'period' in fit_params:
+            guess['period'] = bls_period
+        if 'rprs' in fit_params:
+            guess['rprs'] = bls_rprs
+        if 'T0' in fit_params:
+            guess['T0'] = bls_T0
+        if 'a' in fit_params:
+            guess['a'] = 15.
+        if 'inc' in fit_params:
+            guess['inc'] = 90.
+        if 'ecc' in fit_params:
+            guess['ecc'] = 0.
+        if 'w' in fit_params:
+            guess['w'] = 90.
+
+        return guess
+
+    def ln_like(theta):
+        for i in range(len(theta)):
+            create_initial_guess().keys()[i] = theta[i]
+
+        model = TransitModel()
+        model.add_planet(period=period, rprs=rprs, T0=T0, a=a, inc=inc, ecc=ecc, w=w, limb_dark=limb_dark, u=u)
+        t = time.astype(np.float)
+        flux_model = model.evaluate(t)
+
+        inv_sigma2 = 1.0/(flux_err**2)
+        chisq = (np.sum((flux - flux_model)**2 * inv_sigma2))
+        lnlikelihood = -0.5*chisq
+
+        return -lnlikelihood
+
+
+    if method == 'optimize':
+        x0 = create_initial_guess().values()
+        result = op.minimize(ln_like, x0)
+
+        results = dict(zip(create_initial_guess().keys(), result.x))
+
+        return results
+
+    elif method == 'mcmc':
+        ndim = len(fit_params)
+        pos = [create_initial_guess().values() + 1e-4*np.random.randn(ndim) for i in range(nwalkers)]
+        sampler = emcee.EnsembleSampler(nwalkers, ndim, ln_like, threads=threads)
+        x = sampler.run_mcmc(pos, nsteps)
+        return sampler
+
+
+def recover_supernova(time, flux, flux_err, T0, z, amplitude, fit_params, source='hsiao', bandpass='kepler', initial_guess=None,
+                     method='optimize', nwalkers=10, nsteps=100, threads=1):
+
+    import scipy.optimize as op
+    import emcee
+
+    def create_initial_guess(fit_params=fit_params):
+        if initial_guess is None:
+            T0 = np.median(time)
+            z = 0.45
+            amplitude = 6.e-8#is there a better way to guess this?
+            background = np.percentile(flux, 3)
+
+            guess = {}
+            if 'T0' in fit_params:
+                guess['T0'] = T0
+            if 'z' in fit_params:
+                guess['z'] = z
+            if 'amplitude' in fit_params:
+                guess['amplitude'] = amplitude
+            if 'background' in fit_params:
+                guess['background'] = background
+
+            return guess
+
+        else:
+            return initial_guess
+
+
+    def ln_like(theta):
+        dict = {}
+        dict['T0'] = T0
+        dict['z'] = z
+        dict['amplitude'] = amplitude
+        dict['background'] = 7800
+        for i in range(len(theta)):
+            dict[create_initial_guess().keys()[i]] = theta[i]
+        print(dict)
+        if (dict['z'] < 0) or (dict['z'] > 1.5) or (dict['T0'] < np.min(time)) or (dict['T0'] > np.max(time)):
+            if method == 'optimize':
+                return -1.e99
+            elif method == 'mcmc':
+                return -np.inf
+        model = SupernovaModel(T0=dict['T0'], source=source, bandpass=bandpass, z=dict['z'], amplitude=dict['amplitude'])
+        model = model.evaluate(time) + dict['background']
+        inv_sigma2 = 1.0/(flux_err**2)
+        chisq = (np.sum((flux-model)**2*inv_sigma2))
+        lnlikelihood = -0.5*chisq
+        return lnlikelihood
+
+
+
+    def neg_ln_posterior(theta):
+        log_posterior = ln_like(theta)
+        return -1 * log_posterior
+
+    if method == 'optimize':
+        x0 = create_initial_guess().values()
+        result = op.minimize(neg_ln_posterior, x0)
+
+        results = dict(zip(create_initial_guess().keys(), result.x))
+
+        return results
+
+    elif method == 'mcmc':
+        ndim = len(fit_params)
+        pos = [create_initial_guess().values() + 1e-4*np.random.randn(ndim) for i in range(nwalkers)]
+        sampler = emcee.EnsembleSampler(nwalkers, ndim, ln_like, threads=threads)
+        x = sampler.run_mcmc(pos, nsteps)
+        return sampler
+
+
+
+"""
+def recover(time, flux, flux_err, signal_type, method='optimize', source='hsiao', bandpass='kepler', initial_guess=None,
+                                    nwalkers=8, nsteps=100, threads=1, ecc=0.0, a=15., w=90., limb_dark='quadratic', u=[0.1, 0.3]):
+    Recovers a signal from a lightcurve using either optimization or mcmc. Period, rprs, T0, and inclination
         are all fit.
 
         ----------
@@ -273,18 +472,17 @@ def recover(time, flux, flux_err, signal_type, threads=None, method='optimize', 
         Fitting method.  If 'mcmc' is chosen, nwalkers', and 'nsteps' must be defined.
         A four-dimensional MCMC will fit period, rp/rs, T0, and inclination.
     source : string, default 'hsiao'
-        The source of the fitted supernova. Right now, we can only fit
-        hsiao models (http://adsabs.harvard.edu/abs/2007ApJ...663.1187H) to supernovae.
+        The source of the fitted supernova. Right now, we only support fitting
+        Hsiao models (http://adsabs.harvard.edu/abs/2007ApJ...663.1187H) to supernovae.
     initial_guess : [T0, z, amplitude, background], default None
         Guess vector of parameters.  Planet fitting does not take x0, as a
         Box Least-Squares search (http://adsabs.harvard.edu/abs/2002A%26A...391..369K) is performed.
-    ndim : int
-        Num
+
     Returns
     -------
     result.x : tuple (?)
         Fitted parameters.
-    """
+
 
     import scipy.optimize as op
     import emcee
@@ -334,7 +532,7 @@ def recover(time, flux, flux_err, signal_type, threads=None, method='optimize', 
             sampler = emcee.EnsembleSampler(nwalkers, ndim, ln_like)
             x = sampler.run_mcmc(pos, nsteps)
 
-            return sampler, x
+            return sampler
 
 
     elif signal_type == 'Planet':
@@ -390,13 +588,15 @@ def recover(time, flux, flux_err, signal_type, threads=None, method='optimize', 
 
             x = sampler.run_mcmc(pos, nsteps)
 
-            return sampler, x
+            return sampler
 
     else:
         print('Signal Type not supported.')
         return
+"""
 
-def injrec_test(lc, signal_type, ntests, constr, period=None, rprs=None, T0=None, inc=None, z=None, amplitude=None,
+
+def injection_and_recovery(lc, signal_type, ntests, constr, period=None, rprs=None, T0=None, inc=None, z=None, amplitude=None,
                         ecc=0.0, a=15., w=90., limb_dark='quadratic', u=[0.1, 0.3]):
     """Runs an injection and recovery test for many models and one real lightcurve.
     Right now we can only recover SN that take T0, z, and amplitude.
