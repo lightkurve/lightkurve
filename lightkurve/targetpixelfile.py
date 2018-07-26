@@ -834,7 +834,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         try:
             return self.header(ext=0)['MISSION']
         except KeyError:
-            return None        
+            return None
 
     def aperture_photometry(self, aperture_mask='pipeline'):
         """Returns a LightCurve obtained using aperture photometry.
@@ -936,8 +936,14 @@ class KeplerTargetPixelFile(TargetPixelFile):
         if 'prfmodel' not in kwargs:
             kwargs['prfmodel'] = self.get_prf_model()
         if 'background_prior' not in kwargs:
-            flux_prior = GaussianPrior(mean=np.nanmean(self.flux_bkg),
-                                       var=np.nanstd(self.flux_bkg)**2)
+            if np.all(np.isnan(self.flux_bkg)):  # If TargetPixelFile has no background flux data
+                # Use the median of the lower half of flux as an estimate for flux_bkg
+                clipped_flux = np.ma.masked_where(self.flux > np.percentile(self.flux,50), self.flux)
+                flux_prior = GaussianPrior(mean=np.ma.median(clipped_flux),
+                                           var=np.ma.std(clipped_flux)**2)
+            else:
+                flux_prior = GaussianPrior(mean=np.nanmedian(self.flux_bkg),
+                                           var=np.nanstd(self.flux_bkg)**2)
             kwargs['background_prior'] = BackgroundPrior(flux=flux_prior)
         return TPFModel(**kwargs)
 
