@@ -484,6 +484,11 @@ class TargetPixelFile(object):
         the lightcurve shown is obtained by calling the `to_lightcurve()` method,
         unless the user supplies a custom `LightCurve` object.
 
+        This feature requires two optional dependencies:
+        - bokeh>=0.12.15
+        - ipywidgets>=7.2.0
+        These can be installed using e.g. `conda install bokeh ipywidgets`.
+
         Note: at this time, this feature only works inside an active Jupyter
         Notebook, and tends to be too slow when more than ~30,000 cadences
         are contained in the TPF (e.g. short cadence data).
@@ -494,7 +499,6 @@ class TargetPixelFile(object):
             An optional pre-processed lightcurve object to show.
         """
         try:
-            from ipywidgets import interact
             import ipywidgets as widgets
             from bokeh.io import push_notebook, show, output_notebook
             from bokeh.plotting import figure, ColumnDataSource
@@ -504,8 +508,9 @@ class TargetPixelFile(object):
             from IPython.display import display
             output_notebook()
         except ImportError:
-            raise ImportError('The quicklook tool requires Bokeh and ipywidgets. '
-                              'See the .interact() tutorial')
+            log.error("The interact() tool requires `bokeh` and `ipywidgets` to be installed. "
+                      "These can be installed using `conda install bokeh ipywidgets`.")
+            return None
 
         ytitle = 'Flux'
         if lc is None:
@@ -649,9 +654,8 @@ class TargetPixelFile(object):
             try:
                 push_notebook()
             except AttributeError:
-                log.error('Interact tool must be run in a Jupyter Notebook.\n')
+                log.error('ERROR: interact() can only be used inside a Jupyter Notebook.\n')
                 return None
-
 
         # Define the widgets that enable the interactivity
         play = widgets.Play(interval=10, value=min_cadence, min=min_cadence,
