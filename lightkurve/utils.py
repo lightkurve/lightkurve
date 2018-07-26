@@ -393,3 +393,12 @@ def query_catalog(coordinate, catalog="KIC", radius=0.5):
             result[viz_id].rename_column(result[viz_id].colnames[i], new_pars[i])
 
         return (result[viz_id])
+
+def kpmag_to_flux(kpmag):
+    """
+    Returns the flux in e-/s of a given Kp magnitude source.
+    Source: Kepler Science Center.
+    """
+    f12 = 1.74 * 10**5
+    exponent = -0.4*(kpmag - 12)
+    return 10**(exponent) * f12

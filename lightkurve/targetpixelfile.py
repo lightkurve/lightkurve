@@ -14,11 +14,12 @@ import numpy as np
 from tqdm import tqdm
 from astropy import units as u
 from astropy.coordinates import SkyCoord
+from astropy.table import Column
 
 from . import PACKAGEDIR
 from .lightcurve import KeplerLightCurve, TessLightCurve, LightCurve
 from .prf import KeplerPRF
-from .utils import KeplerQualityFlags, plot_image, bkjd_to_astropy_time, btjd_to_astropy_time, query_catalog
+from .utils import KeplerQualityFlags, plot_image, bkjd_to_astropy_time, btjd_to_astropy_time, query_catalog, kpmag_to_flux
 from .mast import download_kepler_products
 
 
@@ -44,7 +45,7 @@ class TargetPixelFile(object):
         self.targetid = targetid
 
 
-    def get_sources(self, catalog=None, magnitude_limit=18, dist_tolerance=2):
+    def get_sources(self, catalog=None, magnitude_limit=18, dist_tolerance=3):
         """
         Returns a table of stars that are centered on the target
         of the tpf file. Current catalog supported are KIC, EPIC and Gaia DR2.
@@ -66,14 +67,20 @@ class TargetPixelFile(object):
         result : astropy.table
             Astropy table with the following columns
             ID : Catalog ID from catalog.
-            RAJ200: Right ascension [degrees] (KIC & EPIC)
-            DEJ2000: Declination [degrees]    (KIC & EPIC)
-            RAJ2015.5: Right ascension [degrees] (Gaia)
-            DEJ2015.5: Declination [degrees] (Gaia)
+            RA: Right ascension [degrees] (KIC & EPIC)
+            DEC: Declination [degrees]    (KIC & EPIC)
+            RA: Right ascension [degrees] (Gaia)
+            DEC: Declination [degrees] (Gaia)
             pmRA: Proper motion for right ascension [mas/year]
             pmDEC: Proper motion for declination [mas/year]
             Kpmag: Magnitude in Kepler band [mag] (KIC & EPIC)
             Gmag: Magnitude in Gaia band [mag]  (Gaia)
+            column: Pixel column coordinate [pix]
+            column_err: Pixel column error coordinate [pix]
+            row: Pixel row coordinate [pix]
+            row_err: Pixel row error coordinate [pix]
+            flux: Predicted flux of source [e-/s]
+            epoch: Epoch of data [years]
 
         """
 
@@ -83,46 +90,61 @@ class TargetPixelFile(object):
             elif self.mission == 'K2':
                 catalog = 'EPIC'
             else:
-                raise ValueError('Please provide a catalog.')
+                raise ValueError('Please provide a catalog. Catalog must be KIC, EPIC or Gaia.')
 
-        if dist_tolerance < 2:
-            log.warning('Distance tolerance is too low')
+        if dist_tolerance < 3:
+            log.warning('Distance tolerance is less than 3 pixels. Sources near the edge will likely be missed.')
 
         #Skycoord the centre of target
         cent = SkyCoord(ra=self.ra, dec=self.dec, frame='icrs', unit=(u.deg, u.deg))
 
         #Find the size of the TPF
-        radius = ((np.max(self.flux.shape[1:2]) * 4) + dist_tolerance)/ 60.0
+        radius = ((np.max(self.flux.shape[1:2]) * 4) + dist_tolerance)/ 60.0  # arcmin
 
         # query around centre with radius
-        data = query_catalog(cent, radius=radius, catalog=catalog)
+        tbl = query_catalog(cent, radius=radius, catalog=catalog)
 
         # Find where nans are in cadence
         tpf_mask = np.any(np.isfinite(self.flux), axis=0)
 
         # Load ra & dec of all tpf pixels
         pixels_ra, pixels_dec = self.get_coordinates(cadence=int(len(self.cadenceno)/2))
-
-        # Load pixel ra, dec with no nans
         pixels_radec = np.asarray([pixels_ra[tpf_mask].ravel(), pixels_dec[tpf_mask].ravel()])
-
-        # Make pixel pairs into SkyCoord
         sky_pixel_pairs = SkyCoord(ra=pixels_radec[0], dec=pixels_radec[1], frame='icrs', unit=(u.deg, u.deg))
-        # Make pairs in sky_sources
-        sky_sources = SkyCoord(ra=data['ra'], dec=data['dec'], frame='icrs', unit=(u.deg, u.deg))
+        sky_sources = SkyCoord(ra=tbl['ra'], dec=tbl['dec'], frame='icrs', unit=(u.deg, u.deg))
 
-        separation_mask = np.zeros(len(data), dtype=bool)
-        for idx in range (len(data)):
-            s = sky_pixel_pairs.separation(sky_sources[idx])  # Estimate separation
-            separation = np.any(s.arcsec <= dist_tolerance)
+        separation_mask = np.zeros(len(tbl), dtype=bool)
+        for idx in range (len(tbl)):
+            sep = sky_pixel_pairs.separation(sky_sources[idx])  # Estimate separation
+            separation = np.any(sep.arcsec <= dist_tolerance)
             separation_mask[idx] = separation
 
         sep_mask = np.array(separation_mask, dtype=bool)
-
         # Make sure it's bright enough
-        sep_mask &= data['mag'] < magnitude_limit
+        sep_mask &= tbl['mag'] < magnitude_limit
 
-        return data[sep_mask]
+        # After applying filters we can now correct the posistions
+        source_list = tbl[sep_mask]
+
+        # Transform coordinates to median epoch of data
+        if catalog == "Gaia":
+            catalog_epoch = 2015.5
+        else:
+            catalog_epoch = 2000
+        tpf_epoch = np.median(self.astropy_time.byear)
+        has_pm = ~(source_list['pmra'].mask | source_list['pmdec'].mask)
+        source_list['ra'][has_pm] += (tpf_epoch - catalog_epoch) * (source_list['pmra'][has_pm] * (2.778e-7)) # mas to degree
+        source_list['dec'][has_pm] += (tpf_epoch - catalog_epoch) * (source_list['pmdec'][has_pm] * (2.778e-7)) # mas to degree
+
+        col_transform, row_transform = self.wcs.wcs_world2pix(source_list['ra'], source_list['dec'], 0)
+
+        # Create extra columns in source_list
+        column = Column(col_transform + self.column + np.nanmedian(self.pos_corr1), name='column', unit=u.pixel)
+        row = Column(row_transform + self.row + np.nanmedian(self.pos_corr2), name='row', unit=u.pixel)
+        source_flux = Column(kpmag_to_flux(source_list['mag']), name='predicted_flux', unit=(u.electron/u.second))
+        epoch = Column([tpf_epoch] * len(column), name='epoch', unit=(u.year))
+        source_list.add_columns([source_flux, column, row, epoch])
+        return source_list
 
     @property
     def hdu(self):
