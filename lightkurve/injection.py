@@ -302,7 +302,7 @@ import injection as inj
 
 
 def recover_planet(time, flux, flux_err, period, rprs, T0, a, inc, ecc, w, limb_dark, u,
-                    fit_params=['period', 'rprs', 'inc'], method='optimize', nwalkers=10, nsteps=100, threads=1):
+                    fit_params, method='optimize', nwalkers=10, nsteps=100, threads=1):
 
     import scipy.optimize as op
     import emcee
@@ -348,30 +348,35 @@ def recover_planet(time, flux, flux_err, period, rprs, T0, a, inc, ecc, w, limb_
 
         return guess
 
+
     def ln_like(theta):
+        dict = {'period':period, 'rprs':rprs, 'T0':T0, 'a':a, 'inc':inc, 'ecc':ecc, 'w':w}
         for i in range(len(theta)):
-            create_initial_guess().keys()[i] = theta[i]
+            dict[create_initial_guess().keys()[i]] = theta[i]
 
+        if (dict['rprs'] < 0):
+            if method == 'optimize':
+                return -1.e99
+            elif method == 'mcmc':
+                return -np.inf
+
+        print(dict)
         model = TransitModel()
-        model.add_planet(period=period, rprs=rprs, T0=T0, a=a, inc=inc, ecc=ecc, w=w, limb_dark=limb_dark, u=u)
+        model.add_planet(period=dict['period'], rprs=dict['rprs'], T0=dict['T0'], a=dict['a'], inc=dict['inc'], ecc=dict['ecc'], w=dict['w'], limb_dark=limb_dark, u=u)
         t = time.astype(np.float)
-        flux_model = model.evaluate(t)
-
+        model = model.evaluate(t)
         inv_sigma2 = 1.0/(flux_err**2)
-        chisq = (np.sum((flux - flux_model)**2 * inv_sigma2))
+        chisq = (np.sum((flux-model)**2*inv_sigma2))
         lnlikelihood = -0.5*chisq
+        return lnlikelihood
 
-        return -lnlikelihood
-
+    def neg_ln_posterior(theta):
+        log_posterior = ln_like(theta)
+        return -1 * log_posterior
 
     if method == 'optimize':
-                dict = {}
-                dict['T0'] = T0
-                dict['z'] = z
-                dict['amplitude'] = amplitude
-                dict['background'] = 7800
         x0 = create_initial_guess().values()
-        result = op.minimize(ln_like, x0)
+        result = op.minimize(neg_ln_posterior, x0)
 
         results = dict(zip(create_initial_guess().keys(), result.x))
 

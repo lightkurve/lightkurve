@@ -809,7 +809,7 @@ class SyntheticLightCurve(LightCurve):
             return('SyntheticLightCurve: Planet')
 
 
-    def recover_planet(self, fit_params=['period', 'rprs', 'inc'], method='optimize', nwalkers=10, nsteps=100, threads=1):
+    def recover_planet(self, fit_params=['period', 'rprs'], method='optimize', nwalkers=10, nsteps=100, threads=1):
 
         return injection.recover_planet(self.time, self.flux, self.flux_err, self.period, self.rprs,
                                     self.T0, self.a, self.inc, self.ecc, self.w, self.limb_dark, self.u, fit_params=fit_params, method=method, nwalkers=nwalkers, nsteps=nsteps, threads=threads)
