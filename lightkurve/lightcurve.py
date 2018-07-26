@@ -666,7 +666,6 @@ class LightCurve(object):
                 data[col] = vars(self)[col]
         df = pd.DataFrame(data=data, index=self.time, columns=columns)
         df.index.name = 'time'
-        df.meta = self.meta
         return df
 
     def to_csv(self, path_or_buf=None, **kwargs):

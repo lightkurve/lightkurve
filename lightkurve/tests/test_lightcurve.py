@@ -1,10 +1,12 @@
 from __future__ import division, print_function
 
-import pytest
+from astropy.io import fits as pyfits
+import matplotlib.pyplot as plt
 import numpy as np
 from numpy.testing import (assert_almost_equal, assert_array_equal,
                            assert_allclose)
-from astropy.io import fits as pyfits
+import pytest
+
 from ..lightcurve import (LightCurve, KeplerLightCurve, TessLightCurve,
                           iterative_box_period_search)
 from ..lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
@@ -118,6 +120,7 @@ def test_lightcurve_fold():
     assert_almost_equal(np.min(fold.phase), -0.5, 2)
     assert_almost_equal(np.max(fold.phase), 0.5, 2)
     fold.plot()
+    plt.close('all')
 
 
 def test_lightcurve_append():
@@ -156,6 +159,7 @@ def test_lightcurve_plot():
         lcf.plot(flux_types=['SAP_FLUX', 'PDCSAP_FLUX'])
         lcf.SAP_FLUX.plot()
         lcf.SAP_FLUX.plot(normalize=False, fill=False, title="Not the default")
+        plt.close('all')
 
 
 def test_cdpp():

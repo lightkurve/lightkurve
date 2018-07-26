@@ -1077,6 +1077,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 extension = 1  # TESS FFIs have the image data in extension #1
             else:
                 extension = 0  # Default is to use the primary HDU
+        if position is None:
+            size = _open_image(images[0]).data.shape
 
         # If no position is given, ensure the cut-out size matches the image size
         if position is None:
