@@ -365,6 +365,11 @@ def recover_planet(time, flux, flux_err, period, rprs, T0, a, inc, ecc, w, limb_
 
 
     if method == 'optimize':
+                dict = {}
+                dict['T0'] = T0
+                dict['z'] = z
+                dict['amplitude'] = amplitude
+                dict['background'] = 7800
         x0 = create_initial_guess().values()
         result = op.minimize(ln_like, x0)
 
