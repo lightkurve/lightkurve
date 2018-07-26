@@ -307,7 +307,10 @@ def recover_planet(time, flux, flux_err, period, rprs, T0, a, inc, ecc, w, limb_
     import scipy.optimize as op
     import emcee
     import batman
-    import bls
+    try:
+        import bls
+    except ImportError:
+        print()
 
     def create_initial_guess(fit_params=fit_params):
         u1 = np.array([0.0]*len(time))
@@ -340,7 +343,7 @@ def recover_planet(time, flux, flux_err, period, rprs, T0, a, inc, ecc, w, limb_
         if 'a' in fit_params:
             guess['a'] = 15.
         if 'inc' in fit_params:
-            guess['inc'] = 90.
+            guess['inc'] = 88.
         if 'ecc' in fit_params:
             guess['ecc'] = 0.
         if 'w' in fit_params:
@@ -348,21 +351,24 @@ def recover_planet(time, flux, flux_err, period, rprs, T0, a, inc, ecc, w, limb_
 
         return guess
 
+    guess = create_initial_guess()
+    keys = list(guess.keys())
+    vals = list(guess.values())
 
     def ln_like(theta):
-        dict = {'period':period, 'rprs':rprs, 'T0':T0, 'a':a, 'inc':inc, 'ecc':ecc, 'w':w}
-        for i in range(len(theta)):
-            dict[create_initial_guess().keys()[i]] = theta[i]
 
-        if (dict['rprs'] < 0):
+        d = {'period':period, 'rprs':rprs, 'T0':T0, 'a':a, 'inc':inc, 'ecc':ecc, 'w':w}
+        for i in range(len(theta)):
+            d[keys[i]] = theta[i]
+
+        if (d['rprs'] < 0):
             if method == 'optimize':
                 return -1.e99
             elif method == 'mcmc':
                 return -np.inf
 
-        print(dict)
         model = TransitModel()
-        model.add_planet(period=dict['period'], rprs=dict['rprs'], T0=dict['T0'], a=dict['a'], inc=dict['inc'], ecc=dict['ecc'], w=dict['w'], limb_dark=limb_dark, u=u)
+        model.add_planet(period=d['period'], rprs=d['rprs'], T0=d['T0'], a=d['a'], inc=d['inc'], ecc=d['ecc'], w=d['w'], limb_dark=limb_dark, u=u)
         #model.add_planet(period=period, rprs=rprs, T0=T0, a=a, inc=inc, ecc=ecc, w=w, limb_dark=limb_dark, u=u)
 
         t = time.astype(np.float)
@@ -422,21 +428,20 @@ def recover_supernova(time, flux, flux_err, T0, z, amplitude, fit_params, source
 
 
     def ln_like(theta):
-        dict = {}
-        dict['T0'] = T0
-        dict['z'] = z
-        dict['amplitude'] = amplitude
-        dict['background'] = 7800
+        d = {}
+        d['T0'] = T0
+        d['z'] = z
+        d['amplitude'] = amplitude
+        d['background'] = 7800
         for i in range(len(theta)):
-            dict[create_initial_guess().keys()[i]] = theta[i]
-        print(dict)
-        if (dict['z'] < 0) or (dict['z'] > 1.5) or (dict['T0'] < np.min(time)) or (dict['T0'] > np.max(time)):
+            d[create_initial_guess().keys()[i]] = theta[i]
+        if (d['z'] < 0) or (d['z'] > 1.5) or (d['T0'] < np.min(time)) or (d['T0'] > np.max(time)):
             if method == 'optimize':
                 return -1.e99
             elif method == 'mcmc':
                 return -np.inf
-        model = SupernovaModel(T0=dict['T0'], source=source, bandpass=bandpass, z=dict['z'], amplitude=dict['amplitude'])
-        model = model.evaluate(time) + dict['background']
+        model = SupernovaModel(T0=d['T0'], source=source, bandpass=bandpass, z=d['z'], amplitude=d['amplitude'])
+        model = model.evaluate(time) + d['background']
         inv_sigma2 = 1.0/(flux_err**2)
         chisq = (np.sum((flux-model)**2*inv_sigma2))
         lnlikelihood = -0.5*chisq
