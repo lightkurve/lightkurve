@@ -360,7 +360,7 @@ def query_catalog(coordinate, catalog="KIC", radius=0.5):
         """
 
         if catalog is "Gaia":
-            log.warn('Gaia RAs and Decs are at EPOC 2015.5. These RA/Decs have not been corrected.')
+            log.warn('Gaia RAs and Decs are at epoch 2015.5. These RA/Decs have not been corrected.')
             log.warn('Gaia magnitudes are in Gaia Gmag not KepMag')
 
         # Vizier id's
@@ -377,7 +377,7 @@ def query_catalog(coordinate, catalog="KIC", radius=0.5):
         if catalog not in ID.keys():
             raise ValueError('catalog not one of {}'.format([key for key in ID.keys()]))
 
-        # identifies catalog
+        # Identifies catalog
         viz_id = ID[catalog]['vizier']
 
         # Choose columns from Vizier
@@ -392,13 +392,13 @@ def query_catalog(coordinate, catalog="KIC", radius=0.5):
         for i in range(len(new_pars)):
             result[viz_id].rename_column(result[viz_id].colnames[i], new_pars[i])
 
-        return (result[viz_id])
+        return result[viz_id]
 
 def kpmag_to_flux(kpmag):
     """
-    Returns the flux in e-/s of a given Kp magnitude source.
+    Returns the predicted flux in e-/s of a given Kp magnitude source, estimated by pre-flight zero-point.
     Source: Kepler Science Center.
     """
-    f12 = 1.74 * 10**5
+    f12 = 1.74 * 10**5 # pre-flight zero point
     exponent = -0.4*(kpmag - 12)
     return 10**(exponent) * f12
