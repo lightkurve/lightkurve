@@ -1,5 +1,6 @@
 """Test the features of the lightkurve.prf.prfmodels module."""
 from __future__ import division, print_function
+from collections import OrderedDict
 
 from astropy.io import fits
 from astropy.utils.data import get_pkg_data_filename
@@ -60,3 +61,38 @@ def test_get_model_prf():
     assert prf.shape == prf_from_tpf.shape
     assert prf.column == prf_from_tpf.column
     assert prf.row == prf_from_tpf.row
+
+def test_keplerprf_gradient_against_simplekeplerprf():
+    """is the gradient of KeplerPRF consistent with
+    the gradient of SimpleKeplerPRF?
+    """
+    kwargs = {'channel': 56, 'shape': [15, 15], 'column': 0, 'row': 0}
+    params = {'center_col': 7, 'center_row': 7, 'flux': 1.}
+    simple_prf = SimpleKeplerPRF(**kwargs)
+    prf = KeplerPRF(**kwargs)
+    prf_grad = prf.gradient(rotation_angle=0., scale_col=1., scale_row=1., **params)
+    assert_allclose(prf_grad[:-3], simple_prf.gradient(**params))
+
+
+@pytest.mark.parametrize("param_to_test", [("center_col"), ("center_row"), ("flux"),
+                                           ("scale_col"), ("scale_row"), ("rotation_angle")])
+def test_keplerprf_gradient_against_calculus(param_to_test):
+    """is the gradient of KeplerPRF consistent with Calculus?
+    """
+    params = OrderedDict([('center_col', 7), ('center_row', 7), ('flux', 1000.),
+                          ('scale_col', 1.), ('scale_row', 1.), ('rotation_angle', 0)])
+    param_order = OrderedDict(zip(params.keys(), range(0, 6)))
+    kwargs = {'channel': 56, 'shape': [15, 15], 'column': 0, 'row': 0}
+
+    prf = KeplerPRF(**kwargs)
+    h = 1e-8
+    f = prf.evaluate
+    inc_params = params.copy()
+    # increment the parameter under test for later finite difference computation
+    inc_params[param_to_test] += h
+    # compute finite differences
+    diff_prf = (f(**inc_params) - f(**params)) / h
+    # compute analytical gradient
+    prf_grad = prf.gradient(**params)
+    # assert that the average absolute/relative error is less than 1e-5
+    assert np.max(np.abs(prf_grad[param_order[param_to_test]] - diff_prf) / (1. + np.abs(diff_prf))) < 1e-5
