@@ -363,6 +363,8 @@ def recover_planet(time, flux, flux_err, period, rprs, T0, a, inc, ecc, w, limb_
         print(dict)
         model = TransitModel()
         model.add_planet(period=dict['period'], rprs=dict['rprs'], T0=dict['T0'], a=dict['a'], inc=dict['inc'], ecc=dict['ecc'], w=dict['w'], limb_dark=limb_dark, u=u)
+        #model.add_planet(period=period, rprs=rprs, T0=T0, a=a, inc=inc, ecc=ecc, w=w, limb_dark=limb_dark, u=u)
+
         t = time.astype(np.float)
         model = model.evaluate(t)
         inv_sigma2 = 1.0/(flux_err**2)
@@ -461,149 +463,6 @@ def recover_supernova(time, flux, flux_err, T0, z, amplitude, fit_params, source
         x = sampler.run_mcmc(pos, nsteps)
         return sampler
 
-
-
-"""
-def recover(time, flux, flux_err, signal_type, method='optimize', source='hsiao', bandpass='kepler', initial_guess=None,
-                                    nwalkers=8, nsteps=100, threads=1, ecc=0.0, a=15., w=90., limb_dark='quadratic', u=[0.1, 0.3]):
-    Recovers a signal from a lightcurve using either optimization or mcmc. Period, rprs, T0, and inclination
-        are all fit.
-
-        ----------
-    time : array-like
-        Time array
-    flux : array-like
-        Flux array (with injected or real signal)
-    flux_err : array-like
-        Flux error array
-    signal_type : 'Supernova' or 'Planet'
-        Signal to recover
-    method: 'optimize' or 'mcmc', default 'optimize'
-        Fitting method.  If 'mcmc' is chosen, nwalkers', and 'nsteps' must be defined.
-        A four-dimensional MCMC will fit period, rp/rs, T0, and inclination.
-    source : string, default 'hsiao'
-        The source of the fitted supernova. Right now, we only support fitting
-        Hsiao models (http://adsabs.harvard.edu/abs/2007ApJ...663.1187H) to supernovae.
-    initial_guess : [T0, z, amplitude, background], default None
-        Guess vector of parameters.  Planet fitting does not take x0, as a
-        Box Least-Squares search (http://adsabs.harvard.edu/abs/2002A%26A...391..369K) is performed.
-
-    Returns
-    -------
-    result.x : tuple (?)
-        Fitted parameters.
-
-
-    import scipy.optimize as op
-    import emcee
-
-
-    def create_initial_guess():
-        if signal_type == "Supernova":
-            if initial_guess is None:
-                T0 = np.median(time)
-                z = 0.5
-                amplitude = 3.e-7#is there a better way to guess this?
-                background = np.percentile(flux, 3)
-                return [T0, z, amplitude, background]
-            else:
-                return initial_guess
-
-    if signal_type == 'Supernova':
-
-        def ln_like(theta):
-            T0, z, amplitude, background = theta
-            if (z < 0) or (z > 1) or (T0 < np.min(time)) or (T0 > np.max(time)):
-                if method == 'optimize':
-                    return -1.e99
-                elif method == 'mcmc':
-                    return -np.inf
-            model = SupernovaModel(T0, z=z, amplitude=amplitude, source=source, bandpass=bandpass)
-            model = model.evaluate(time) + background
-            inv_sigma2 = 1.0/(flux_err**2)
-            chisq = (np.sum((flux-model)**2*inv_sigma2))
-            lnlikelihood = -0.5*chisq
-            return lnlikelihood
-
-
-        def neg_ln_posterior(theta):
-            log_posterior = ln_like(theta)
-            return -1 * log_posterior
-
-        if method == 'optimize':
-            result = op.minimize(neg_ln_posterior, x0=create_initial_guess())
-            return result.x
-
-        elif method == 'mcmc':
-            ndim = 4
-            guess=create_initial_guess()
-            pos = [[guess[0], guess[1], guess[2], guess[3]] + 1e-7*np.random.randn(ndim) for i in range(nwalkers)]
-
-            sampler = emcee.EnsembleSampler(nwalkers, ndim, ln_like)
-            x = sampler.run_mcmc(pos, nsteps)
-
-            return sampler
-
-
-    elif signal_type == 'Planet':
-        import batman
-
-        #First a BLS search:
-        import bls
-
-        u1 = np.array([0.0]*len(time))
-        v1 = np.array([0.0]*len(time))
-
-        #time, flux, u, v, number of freq bins (nf), min freq to test (fmin), freq spacing (df), number of bins (nb), min transit dur (qmi), max transit dur (qma)
-        nf = 10000.0
-        #we can only fit periods up to 33.3 or the jupyter notebook kernel dies? hmm
-        fmin = .03
-        df = 0.001
-        nbins = 300
-        qmi = 0.001
-        qma = 0.3
-
-        results = bls.eebls(time, flux, u1, v1, nf, fmin, df, nbins, qmi, qma)
-
-        bls_period = results[1]
-        bls_rprs = np.sqrt(results[3])
-
-        midtime = ((float(results[6])-float(results[5])) / 2) + results[5]
-        bls_T0 = ((midtime / nbins) * bls_period) + min(time)
-
-        #Then optimization fitting:
-        def ln_like(theta):
-            period, rprs, T0, inc = theta
-
-            model = TransitModel()
-            model.add_planet(period=period, rprs=rprs, T0=T0, a=a, inc=inc, ecc=ecc, w=w, limb_dark=limb_dark, u=u)
-            t = time.astype(np.float)
-            flux_model = model.evaluate(t)
-
-            inv_sigma2 = 1.0/(flux_err**2)
-            chisq = (np.sum((flux - flux_model)**2 * inv_sigma2))
-            lnlikelihood = -0.5*chisq
-
-            return -lnlikelihood
-
-        if method == 'optimize':
-            result = op.minimize(ln_like, [bls_period, bls_rprs, bls_T0, 87])
-            return result.x
-
-        elif method == 'mcmc':
-            ndim = 4
-            pos = [[bls_period, bls_rprs, bls_T0, 90] + 1e-4*np.random.randn(ndim) for i in range(nwalkers)]
-
-            sampler = emcee.EnsembleSampler(nwalkers, ndim, ln_like, threads=threads)
-
-            x = sampler.run_mcmc(pos, nsteps)
-
-            return sampler
-
-    else:
-        print('Signal Type not supported.')
-        return
-"""
 
 
 def injection_and_recovery(lc, signal_type, ntests, constr, period=None, rprs=None, T0=None, inc=None, z=None, amplitude=None,
