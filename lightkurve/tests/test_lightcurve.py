@@ -464,7 +464,6 @@ def test_fill_gaps():
     assert(np.all(nlc.flux == 1))
     assert(np.all(np.isfinite(nlc.flux)))
 
-
 @pytest.mark.remote_data
 def test_from_fits():
     """Does the lcf.from_fits() method work like the constructor?"""

@@ -24,7 +24,6 @@ from astropy.time import Time
 from . import PACKAGEDIR
 from .utils import running_mean, bkjd_to_astropy_time, btjd_to_astropy_time
 
-
 __all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve',
            'iterative_box_period_search']
 

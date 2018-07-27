@@ -14,11 +14,10 @@ import numpy as np
 from tqdm import tqdm
 
 from . import PACKAGEDIR
-from .lightcurve import KeplerLightCurve, TessLightCurve, LightCurve
+from .lightcurve import KeplerLightCurve, TessLightCurve
 from .prf import KeplerPRF
 from .utils import KeplerQualityFlags, plot_image, bkjd_to_astropy_time, btjd_to_astropy_time
 from .mast import download_kepler_products
-
 
 __all__ = ['KeplerTargetPixelFile', 'TessTargetPixelFile']
 log = logging.getLogger(__name__)
@@ -713,7 +712,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
         super(KeplerTargetPixelFile, self).__init__(path,
                                                     quality_bitmask=quality_bitmask,
                                                     **kwargs)
-        self.targetid = self.header()['KEPLERID']
+        if self.targetid is None:
+            self.targetid = self.header()['KEPLERID']
 
     @staticmethod
     def from_archive(target, cadence='long', quarter=None, month=None,

@@ -250,7 +250,6 @@ def test_from_archive_should_accept_path():
     """If a path is accidentally passed to `from_archive` it should still just work."""
     KeplerTargetPixelFile.from_archive(filename_tpf_all_zeros)
 
-
 def test_from_fits():
     """Does the tpf.from_fits() method work like the constructor?"""
     tpf = KeplerTargetPixelFile.from_fits(filename_tpf_one_center)
