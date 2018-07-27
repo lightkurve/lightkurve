@@ -808,17 +808,16 @@ class SyntheticLightCurve(LightCurve):
         elif self.signaltype is 'Planet':
             return('SyntheticLightCurve: Planet')
 
-
     def recover_planet(self, fit_params=['period', 'rprs'], method='optimize', nwalkers=10, nsteps=100, threads=1):
 
         return injection.recover_planet(self.time, self.flux, self.flux_err, self.period, self.rprs,
                                     self.T0, self.a, self.inc, self.ecc, self.w, self.limb_dark, self.u, fit_params=fit_params, method=method, nwalkers=nwalkers, nsteps=nsteps, threads=threads)
 
+    def recover_supernova(self, fit_params=['T0', 'z', 'amplitude', 'background'], method='optimize', nwalkers=10, nsteps=100, threads=1, initial_guess=None):
 
-    def recover_supernova(self, fit_params=['T0', 'z', 'amplitude', 'background'], method='optimize', nwalkers=10, nsteps=100, threads=1):
+        return injection.recover_supernova(self.time, self.flux, self.flux_err, self.t0, self.z, self.amplitude, self.background, source=self.source, bandpass=self.bandpass, initial_guess=initial_guess,
+                            fit_params=fit_params, method=method, nwalkers=nwalkers, nsteps=nsteps, threads=threads)
 
-        return injection.recover_supernova(self.time, self.flux, self.flux_err, self.t0, self.z, self.amplitude, source='hsiao', bandpass='kepler', initial_guess=None,
-                            fit_params=fit_params, method='optimize', nwalkers=10, nsteps=100, threads=1)
 
 class KeplerLightCurve(LightCurve):
     """Defines a light curve class for NASA's Kepler and K2 missions.

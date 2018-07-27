@@ -64,7 +64,6 @@ class GaussianDistribution(object):
         plt.plot(t, vals)
         plt.ylim(0, np.max(vals))
 
-
 class TransitModel(object):
     """
     Implements a class for creating a planetary transit model using
@@ -153,6 +152,13 @@ class TransitModel(object):
         t = time.astype(np.float)  #times at which to calculate light curve
         m = batman.TransitModel(self.model, t, fac=1.0)    #initializes model
         transit_flux = m.light_curve(self.model)
+
+        self.params = self.params.copy()
+        signal_dict = {'signal':transit_flux, 'multiplicative':self.multiplicative,
+                            'heritage':self.heritage, 'signaltype':self.signaltype}
+        self.params.update(signal_dict)
+
+
         return transit_flux
 
 class SupernovaModel(object):
@@ -228,7 +234,9 @@ class SupernovaModel(object):
             bandflux = band_intensity # Units: photons/s/cm^2
 
         self.params = self.sn_params.copy()
-        signal_dict = {'signal':bandflux, 'bandpass':self.bandpass}
+        signal_dict = {'signal':bandflux, 'bandpass':self.bandpass, 'source':self.source,
+                            'multiplicative':self.multiplicative, 'heritage':self.heritage,
+                            'signaltype':self.signaltype}
         self.params.update(signal_dict)
 
         return bandflux
@@ -253,66 +261,24 @@ def inject(time, flux, flux_err, model):
         mergedflux = flux * model.evaluate(time.astype(np.float))
     else:
         mergedflux = flux + model.evaluate(time)
+        print(model.params)
+        model.params['background'] = np.percentile(flux, 3)
     return lightkurve.lightcurve.SyntheticLightCurve(time, flux=mergedflux, flux_err=flux_err,
-                               **model.params)
-
-"""
-def recover_planet(time, flux, flux_err, method='optimize')
-#synlc.recover_planet(method="optimize"...)
-#IN RECOVER METHOD IN SyntheticLightCurve:
-    self.period
-    self.rprs
-
-    for param:
-        if not in list passed in:
-            create TransitModel(....inc=self.inc)
-            try it on, and then minimize
-            .....
-
-
-
-
-
-
-    Which params do we want to fit? (for example...)
-    ['period', 'rprs', 'T0']
-    We could pass in a list of strings - the names of the params we want to fit.
-
-    Which params do we want to fix?
-    Everything besides what is in the list above.
-
-
-
-
-
-_____________
-
-def recover(time, flux, .... , period, rprs, inc...... ['period', 'rprs'])
-
-
-
-
-
-IN SyntheticLightCurve:
-import injection as inj
-    def recover(fit_params = ['period', 'rprs'])
-        inj.recover()
-
-"""
-
+                                **model.params)
 
 def recover_planet(time, flux, flux_err, period, rprs, T0, a, inc, ecc, w, limb_dark, u,
                     fit_params, method='optimize', nwalkers=10, nsteps=100, threads=1):
 
     import scipy.optimize as op
-    import emcee
-    import batman
+
     try:
         import bls
     except ImportError:
-        print()
+        log.error('BLS module must be installed.\n')
 
-    def create_initial_guess(fit_params=fit_params):
+
+    def create_initial_guess():
+        """Performs a BLS search."""
         u1 = np.array([0.0]*len(time))
         v1 = np.array([0.0]*len(time))
 
@@ -333,81 +299,78 @@ def recover_planet(time, flux, flux_err, period, rprs, T0, a, inc, ecc, w, limb_
         midtime = ((float(results[6])-float(results[5])) / 2) + results[5]
         bls_T0 = ((midtime / nbins) * bls_period) + min(time)
 
-        guess = {}
+        initial_guess = {}
         if 'period' in fit_params:
-            guess['period'] = bls_period
+            initial_guess['period'] = bls_period
         if 'rprs' in fit_params:
-            guess['rprs'] = bls_rprs
+            initial_guess['rprs'] = bls_rprs
         if 'T0' in fit_params:
-            guess['T0'] = bls_T0
+            initial_guess['T0'] = bls_T0
         if 'a' in fit_params:
-            guess['a'] = 15.
+            initial_guess['a'] = 15.
         if 'inc' in fit_params:
-            guess['inc'] = 88.
+            initial_guess['inc'] = 88.
         if 'ecc' in fit_params:
-            guess['ecc'] = 0.
+            initial_guess['ecc'] = 0.
         if 'w' in fit_params:
-            guess['w'] = 90.
+            initial_guess['w'] = 90.
 
-        return guess
+        return initial_guess
 
     guess = create_initial_guess()
     keys = list(guess.keys())
-    vals = list(guess.values())
+    x0 = list(guess.values())
 
     def ln_like(theta):
 
-        d = {'period':period, 'rprs':rprs, 'T0':T0, 'a':a, 'inc':inc, 'ecc':ecc, 'w':w}
-        for i in range(len(theta)):
-            d[keys[i]] = theta[i]
+        param_dict = {'period':period, 'rprs':rprs, 'T0':T0, 'a':a, 'inc':inc, 'ecc':ecc, 'w':w}
+        for i, key in enumerate(keys):
+            param_dict[key] = theta[i]
 
-        if (d['rprs'] < 0):
+        if (param_dict['rprs'] < 0):
             if method == 'optimize':
                 return -1.e99
             elif method == 'mcmc':
                 return -np.inf
 
         model = TransitModel()
-        model.add_planet(period=d['period'], rprs=d['rprs'], T0=d['T0'], a=d['a'], inc=d['inc'], ecc=d['ecc'], w=d['w'], limb_dark=limb_dark, u=u)
-        #model.add_planet(period=period, rprs=rprs, T0=T0, a=a, inc=inc, ecc=ecc, w=w, limb_dark=limb_dark, u=u)
+        model.add_planet(period=param_dict['period'], rprs=param_dict['rprs'], T0=param_dict['T0'], a=param_dict['a'], inc=param_dict['inc'], ecc=param_dict['ecc'], w=param_dict['w'], limb_dark=limb_dark, u=u)
+        model = model.evaluate(time.astype(np.float))
 
-        t = time.astype(np.float)
-        model = model.evaluate(t)
         inv_sigma2 = 1.0/(flux_err**2)
         chisq = (np.sum((flux-model)**2*inv_sigma2))
         lnlikelihood = -0.5*chisq
         return lnlikelihood
 
     def neg_ln_posterior(theta):
-        log_posterior = ln_like(theta)
-        return -1 * log_posterior
+        return -1 * ln_like(theta)
 
     if method == 'optimize':
-        x0 = create_initial_guess().values()
         result = op.minimize(neg_ln_posterior, x0)
-
-        results = dict(zip(create_initial_guess().keys(), result.x))
-
+        results = dict(zip(keys, result.x))
         return results
 
     elif method == 'mcmc':
+        try:
+            import emcee
+        except ImportError:
+            log.error('emcee module must be installed.\n')
+
         ndim = len(fit_params)
-        pos = [create_initial_guess().values() + 1e-4*np.random.randn(ndim) for i in range(nwalkers)]
+        pos = [x0 + 1e-4*np.random.randn(ndim) for i in range(nwalkers)]
         sampler = emcee.EnsembleSampler(nwalkers, ndim, ln_like, threads=threads)
         x = sampler.run_mcmc(pos, nsteps)
         return sampler
 
-
-def recover_supernova(time, flux, flux_err, T0, z, amplitude, fit_params, source='hsiao', bandpass='kepler', initial_guess=None,
+def recover_supernova(time, flux, flux_err, T0, z, amplitude, background, fit_params, source='hsiao', bandpass='kepler', initial_guess=None,
                      method='optimize', nwalkers=10, nsteps=100, threads=1):
 
     import scipy.optimize as op
-    import emcee
 
-    def create_initial_guess(fit_params=fit_params):
+    def create_initial_guess():
         if initial_guess is None:
             T0 = np.median(time)
-            z = 0.45
+            z = 0.2
             amplitude = 6.e-8#is there a better way to guess this?
             background = np.percentile(flux, 3)
 
@@ -426,51 +389,51 @@ def recover_supernova(time, flux, flux_err, T0, z, amplitude, fit_params, source
         else:
             return initial_guess
 
+    guess = create_initial_guess()
+    keys = list(guess.keys())
+    x0 = list(guess.values())
 
     def ln_like(theta):
-        d = {}
-        d['T0'] = T0
-        d['z'] = z
-        d['amplitude'] = amplitude
-        d['background'] = 7800
-        for i in range(len(theta)):
-            d[create_initial_guess().keys()[i]] = theta[i]
-        if (d['z'] < 0) or (d['z'] > 1.5) or (d['T0'] < np.min(time)) or (d['T0'] > np.max(time)):
+        param_dict = {'T0':T0, 'z':z, 'amplitude':amplitude, 'background':background}
+
+        for i, key in enumerate(keys):
+            param_dict[key] = theta[i]
+
+        if (param_dict['z'] < 0) or (param_dict['z'] > 1.5) or (param_dict['T0'] < np.min(time)) or (param_dict['T0'] > np.max(time)):
             if method == 'optimize':
                 return -1.e99
             elif method == 'mcmc':
                 return -np.inf
-        model = SupernovaModel(T0=d['T0'], source=source, bandpass=bandpass, z=d['z'], amplitude=d['amplitude'])
-        model = model.evaluate(time) + d['background']
+
+        model = SupernovaModel(T0=param_dict['T0'], source=source, bandpass=bandpass, z=param_dict['z'], amplitude=param_dict['amplitude'])
+        model = model.evaluate(time) + param_dict['background']
         inv_sigma2 = 1.0/(flux_err**2)
         chisq = (np.sum((flux-model)**2*inv_sigma2))
         lnlikelihood = -0.5*chisq
         return lnlikelihood
-
-
 
     def neg_ln_posterior(theta):
         log_posterior = ln_like(theta)
         return -1 * log_posterior
 
     if method == 'optimize':
-        x0 = create_initial_guess().values()
         result = op.minimize(neg_ln_posterior, x0)
-
-        results = dict(zip(create_initial_guess().keys(), result.x))
-
+        results = dict(zip(keys, result.x))
         return results
 
     elif method == 'mcmc':
+        try:
+            import emcee
+        except ImportError:
+            log.error('emcee module must be installed.\n')
+
         ndim = len(fit_params)
-        pos = [create_initial_guess().values() + 1e-4*np.random.randn(ndim) for i in range(nwalkers)]
+        pos = [x0 + 1e-4*np.random.randn(ndim) for i in range(nwalkers)]
         sampler = emcee.EnsembleSampler(nwalkers, ndim, ln_like, threads=threads)
         x = sampler.run_mcmc(pos, nsteps)
         return sampler
 
-
-
-def injection_and_recovery(lc, signal_type, ntests, constr, period=None, rprs=None, T0=None, inc=None, z=None, amplitude=None,
+def injection_and_recovery(lc, signal_type, ntests, constr, period=10, rprs=0.1, T0=5, inc=90, z=0.2, amplitude=3.e-8,
                         ecc=0.0, a=15., w=90., limb_dark='quadratic', u=[0.1, 0.3]):
     """Runs an injection and recovery test for many models and one real lightcurve.
     Right now we can only recover SN that take T0, z, and amplitude.
@@ -510,52 +473,108 @@ def injection_and_recovery(lc, signal_type, ntests, constr, period=None, rprs=No
 
     """
     import lightkurve.injection as inj
+    from astropy.table import Table, Column
 
     if signal_type == 'Supernova':
         nrecovered = 0
+        rec_dict = []
+
+        fit_params = []
 
         for i in range(ntests):
-            T0_test = T0.sample()
-            z_test = z.sample()
-            amplitude_test = amplitude.sample()
 
-            model = inj.SupernovaModel(T0=T0_test, z=z_test, amplitude=amplitude_test, source='Hsiao', bandpass='Kepler')
+            T0_t = T0
+            z_t = z
+            amplitude_t = amplitude
+
+            if isinstance(T0, (GaussianDistribution, UniformDistribution)):
+                T0_t = T0.sample()
+                fit_params.append('T0')
+            if isinstance(z, (GaussianDistribution, UniformDistribution)):
+                z_t = z.sample()
+                fit_params.append('z')
+            if isinstance(amplitude, (GaussianDistribution, UniformDistribution)):
+                amplitude_t = amplitude.sample()
+                fit_params.append('amplitude')
+
+            model = inj.SupernovaModel(T0=T0_t, z=z_t, amplitude=amplitude_t, source='hsiao', bandpass='kepler')
             lcinj = lc.inject(model)
 
-            T0_f, z_f, amplitude_f = lcinj.recover('Supernova')
+            results = {'T0':T0_t, 'z':z_t, 'amplitude':amplitude_t}
+            results_x = lcinj.recover_supernova(fit_params=fit_params)
 
-            if abs(T0_f-T0_test) < constr*T0_test and abs(z_f-z_test) < constr*z_test and abs(amplitude_f-amplitude_test) < constr*amplitude_test:
+            for key, val in results_x.items():
+                results[key] = val
+
+            if abs(results['T0']-T0_t) < constr*T0_t and abs(results['z']-z_t) < constr*z_t and abs(results['amplitude']-amplitude_t) < constr*amplitude_t:
                 nrecovered += 1
-                print('Recovered - T0: ' + str(T0_test) + ' amplitude: ' + str(amplitude_test) + ' z: ' + str(z_test))
+                rec_dict += {'T0':T0_t, 'z':z_t, 'amplitude':amplitude_t}
+                print('Recovered - T0: ' + str(T0_t) + ' amplitude: ' + str(amplitude_t) + ' z: ' + str(z_t))
 
-        return (float(nrecovered)/ float(ntests))
+        return rec_dict, float(nrecovered)/ float(ntests)
 
     elif signal_type == 'Planet':
 
         nrecovered = 0
+        fit_params = []
+        rec_dict = Table(names=('period', 'rprs', 'T0', 'inc', 'a', 'ecc', 'w'))
 
         for i in range(ntests):
-            period_test = period.sample()
-            rprs_test = rprs.sample()
-            T0_test = T0.sample()
-            inc_test = inc.sample()
+            period_t = period
+            rprs_t = rprs
+            T0_t = T0
+            inc_t = inc
+            a_t = a
+            ecc_t = ecc
+            w_t = w
 
-            period_rec = []
-            rprs_rec = []
-            T0_rec = []
-            inc_rec = []
+            if isinstance(period, (GaussianDistribution, UniformDistribution)):
+                period_t = period.sample()
+                if 'period' not in fit_params:
+                    fit_params.append('period')
+            if isinstance(rprs, (GaussianDistribution, UniformDistribution)):
+                rprs_t = rprs.sample()
+                if 'rprs' not in fit_params:
+                    fit_params.append('rprs')
+            if isinstance(T0, (GaussianDistribution, UniformDistribution)):
+                T0_t = T0.sample()
+                if 'T0' not in fit_params:
+                    fit_params.append('T0')
+            if isinstance(inc, (GaussianDistribution, UniformDistribution)):
+                inc_t = inc.sample()
+                if 'inc' not in fit_params:
+                    fit_params.append('inc')
+            if isinstance(a, (GaussianDistribution, UniformDistribution)):
+                a_t = a.sample()
+                if 'a' not in fit_params:
+                    fit_params.append('a')
+            if isinstance(ecc, (GaussianDistribution, UniformDistribution)):
+                ecc_t = ecc.sample()
+                if 'ecc' not in fit_params:
+                    fit_params.append('ecc')
+            if isinstance(w, (GaussianDistribution, UniformDistribution)):
+                w_t = w.sample()
+                if 'w' not in fit_params:
+                    fit_params.append('w')
 
-            model = inj.TransitModel()
-            model.add_planet(period=period_test, rprs=rprs_test, T0=T0_test, inc=inc_test, ecc=ecc, a=a, w=w, limb_dark=limb_dark, u=u)
+
+            model = TransitModel()
+            model.add_planet(T0=T0_t, period=period_t, rprs=rprs_t, inc=inc_t, ecc=ecc_t, a=a_t, w=w_t, limb_dark=limb_dark, u=u)
             lcinj = lc.inject(model)
 
-            period_f, rprs_f, T0_f, inc_f = lcinj.recover('Planet')
+            results_x = lcinj.recover_planet(fit_params=fit_params)
 
-            if abs(period_f-period_test) < constr*period_test and abs(rprs_f-rprs_test) < constr*rprs_test:
+            results = {'T0':T0_t, 'period':period_t, 'rprs':rprs_t, 'inc':inc_t, 'a':a_t, 'ecc':ecc_t, 'w':w_t, 'limb_dark':limb_dark, 'u':u}
+
+            for key, val in results_x.items():
+                results[key] = val
+
+            if abs(results['period']-period_t) < constr*period_t and abs(results['rprs']-rprs_t) < constr*rprs_t and abs(results['inc']-inc_t) < constr*inc_t and abs(results['a']-a_t) < constr*a_t and abs(results['ecc']-ecc_t) < constr*ecc_t+0.01 and abs(results['w']-w_t) < constr*w_t:
                 nrecovered += 1
-                print('Recovered - period: ' + str(period_test) + ' rprs: ' + str(rprs_test) + ' T0: ' + str(T0_test) + ' inclination: ' + str(inc_test))
+                rec_dict.add_row([period_t, rprs_t, T0_t, inc_t, a_t, ecc_t, w_t])
+                print('Recovered - period: ' + str(period_t) + ' rprs: ' + str(rprs_t) + ' inc: ' + str(inc_t))
 
-        return (float(nrecovered)/ float(ntests))
+        return rec_dict, (float(nrecovered)/ float(ntests))
 
 
     else:
