@@ -106,7 +106,7 @@ class Collection:
         result: str
             String containing the resulting lightcurves.
         """
-        result = "Collection:\n"
+        result = "{} of {} objects:\n".format(self.__class__.__name__, len(self.data))
         for obj in self.data:
             result += obj.__repr__() + " "
             result += "\n"
