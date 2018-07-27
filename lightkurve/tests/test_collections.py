@@ -4,7 +4,7 @@ import numpy as np
 
 from ..lightcurve import LightCurve
 from ..targetpixelfile import KeplerTargetPixelFile
-from ..collection import LightCurveCollection, TargetPixelFileCollection
+from ..collections import LightCurveCollection, TargetPixelFileCollection
 
 filename_tpf_all_zeros = get_pkg_data_filename("data/test-tpf-all-zeros.fits")
 filename_tpf_one_center = get_pkg_data_filename("data/test-tpf-non-zero-center.fits")

@@ -14,11 +14,10 @@ import numpy as np
 from tqdm import tqdm
 
 from . import PACKAGEDIR
-from .lightcurve import KeplerLightCurve, TessLightCurve, LightCurve
+from .lightcurve import KeplerLightCurve, TessLightCurve
 from .prf import KeplerPRF
 from .utils import KeplerQualityFlags, plot_image, bkjd_to_astropy_time, btjd_to_astropy_time
 from .mast import download_kepler_products
-from .collection import Collection
 
 __all__ = ['KeplerTargetPixelFile', 'TessTargetPixelFile']
 log = logging.getLogger(__name__)

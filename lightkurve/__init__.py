@@ -18,4 +18,4 @@ from .targetpixelfile import *
 from .utils import *
 from .convenience import *
 from .periodogram import *
-from .collection import *
+from .collections import *

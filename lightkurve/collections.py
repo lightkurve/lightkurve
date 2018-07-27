@@ -1,5 +1,5 @@
+"""Defines collections of data products."""
 from abc import ABCMeta
-import matplotlib.pyplot as plt
 import logging
 
 log = logging.getLogger(__name__)
@@ -8,7 +8,7 @@ __all__ = ['LightCurveCollection', 'TargetPixelFileCollection']
 
 
 class Collection:
-    """Abstract Base Class for LightCurveCollections, TPFCollections
+    """Abstract Base Class for LightCurveCollection and TargetPixelFileCollection.
 
     Attributes
     ----------
@@ -142,6 +142,7 @@ class LightCurveCollection(Collection):
             The matplotlib axes object.
         """
         if ax is None:
+            import matplotlib.pyplot as plt
             _, ax = plt.subplots()
         for lc in self.data:
             lc.plot(ax=ax, label=lc.targetid, **kwargs)
