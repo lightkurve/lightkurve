@@ -7,7 +7,7 @@ from numpy.testing import assert_array_equal
 import pytest
 import tempfile
 from ..targetpixelfile import KeplerTargetPixelFile, KeplerTargetPixelFileFactory
-from ..targetpixelfile import TessTargetPixelFile, TargetPixelFileCollection
+from ..targetpixelfile import TessTargetPixelFile
 from ..utils import KeplerQualityFlags
 
 
@@ -249,26 +249,6 @@ def test_interact():
 def test_from_archive_should_accept_path():
     """If a path is accidentally passed to `from_archive` it should still just work."""
     KeplerTargetPixelFile.from_archive(filename_tpf_all_zeros)
-
-
-@pytest.mark.remote_data
-def test_tpf_collection():
-    tpf1 = KeplerTargetPixelFile.from_archive(filename_tpf_all_zeros)
-    tpf2 = KeplerTargetPixelFile(filename_tpf_one_center)
-    tpfc = TargetPixelFileCollection([tpf1])
-
-    assert(len(tpfc) == 1)
-    assert(tpfc[0] == tpf1)
-    assert(type(tpfc[tpf1.keplerid]) == type(tpf1))
-
-    tpfc.append(tpf2)
-
-    assert(len(tpfc) == 2)
-    assert(tpfc[1] == tpf2)
-
-    #What happens if I try to append the same target twice?
-    tpf3 = tpf2
-    tpfc.append(tpf3)
 
 def test_from_fits():
     """Does the tpf.from_fits() method work like the constructor?"""

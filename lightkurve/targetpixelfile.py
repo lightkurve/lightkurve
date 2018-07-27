@@ -709,7 +709,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
         super(KeplerTargetPixelFile, self).__init__(path,
                                                     quality_bitmask=quality_bitmask,
                                                     **kwargs)
-        self.targetid = self.header()['KEPLERID']
+        if self.targetid is None:
+            self.targetid = self.header()['KEPLERID']
 
     @staticmethod
     def from_archive(target, cadence='long', quarter=None, month=None,
@@ -834,7 +835,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         try:
             return self.header(ext=0)['MISSION']
         except KeyError:
-            return None        
+            return None
 
     def aperture_photometry(self, aperture_mask='pipeline'):
         """Returns a LightCurve obtained using aperture photometry.
@@ -1342,35 +1343,3 @@ class TessTargetPixelFile(TargetPixelFile):
                               flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
                               flux_err=flux_bkg_err,
                               **keys)
-
-class TargetPixelFileCollection(Collection):
-    """Represents a set of Target Pixel Files
-
-    Attributes
-    ----------
-    data: array
-        List of TPF objects.
-    k_id: dictionary
-        Mapping keplerid to index in self.data
-    """
-    def __init__(self, tpfs):
-        super(TargetPixelFileCollection, self).__init__(tpfs)
-
-    def plot(self, ax=None, **kwargs):
-        """Plots a collection of TPF objects in space.
-
-        Parameters
-        ----------
-        ax : matplotlib.axes._subplots.AxesSubplot
-            A matplotlib axes object to plot into. If no axes is provided,
-            a new one will be generated.
-
-        kwargs : dict
-            Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
-
-        Returns
-        -------
-        ax : matplotlib.axes._subplots.AxesSubplot
-        """
-        raise NotImplementedError('Plotting TPFs has not been implemented')
-        
