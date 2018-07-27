@@ -1,111 +1,101 @@
-from abc import abstractmethod, ABCMeta
+from abc import ABCMeta
+import matplotlib.pyplot as plt
 import logging
 
 log = logging.getLogger(__name__)
 
-__all__ = ['Collection', 'LightCurveCollection', 'TargetPixelFileCollection']
+__all__ = ['LightCurveCollection', 'TargetPixelFileCollection']
+
 
 class Collection:
     """Abstract Base Class for LightCurveCollections, TPFCollections
 
     Attributes
     ----------
-    data: array
+    data: array-like
         List of data objects.
-    k_id: dictionary
-        Mapping target to index in self.data
     """
-    __metaclass__ = ABCMeta #Needs to be set for Python 2.x to work properly
+    __metaclass__ = ABCMeta  # Needs to be set for Python 2.x to work properly
+
     def __init__(self, data):
         self.data = data
-        self.k_id = self._update_target_map()
+        # At any given time, `self._targetid_map` maps targetid's onto the
+        # indexes into self.data.
+        self._targetid_map = self._create_targetid_map()
 
-    def _update_target_map(self):
-        """
-        Assigns the targetid to indexes in self.data
-
-        Parameters
-        ----------
-        None
+    def _create_targetid_map(self):
+        """Returns a dictionary that maps targetid's onto `self.data` indexes.
 
         Returns
         -------
         result: Dictionary
-            With keys of targetid (int) and
-            values of indexes (int) in the data array.
+            The keys are targetid's and the values are indexes (int) into
+            the `self.data` array.
         """
-        result = {}
-        for idx,obj in enumerate(self.data):
+        targetid_map = {}
+        for idx, obj in enumerate(self.data):
             try:
-                result[obj.targetid] = idx
+                targetid_map[obj.targetid] = idx
             except AttributeError:
-                print("Object "+ str(idx) + " has no targetid")
-        return result
+                pass
+        return targetid_map
 
     def __len__(self):
         return len(self.data)
 
-    def __getitem__(self, index):
-        """Called when accessing an element in the collection
-        by index or target id
+    def __getitem__(self, index_or_targetid):
+        """Access an element by index or targetid.
 
         Parameters
         ----------
-        index: int
+        index_or_targetid: int or str
             This is either the index of the element in the collection,
-            or the target id of the object
+            or the targetid of the object.
 
         Returns
         -------
-        Lightcurve or TargetPixelFile object
+        data : object
+            Typically a LightCurve or TargetPixelFile object.
 
-        Raises KeyError when given trying to index with an invalid array position
-        or targetid
+        Raises
+        ------
+        KeyError
+            If the index or targetid does not exist.
         """
         try:
-            if index > len(self.data):
-                return self.data[self.k_id[index]]
-            else:
-                return self.data[index]
-        except:
-            raise KeyError("Invalid key")
+            return self.data[self._targetid_map[index_or_targetid]]
+        except KeyError:
+            try:
+                return self.data[index_or_targetid]
+            except IndexError:
+                raise KeyError("{} is not a valid index or targetid".format(index_or_targetid))
 
-    def __setitem__(self, key, value):
-        """Implicitly called during assignment
+    def __setitem__(self, index_or_targetid, obj):
+        """Set an item in the collection.
 
         Parameters
         ----------
-        key: int
-            Array slice or targetid
-        value: lightcurve or target pixel file object
+        index_or_targetid : int or str
+            Index or targetid.
+        obj : object
+            Typically a LightCurve or TargetPixelFile object
         """
-        if key > len(self.data):
-            #indexed by targetid
-            self.data[self.k_id[key]] = value
-            self.k_id = self._update_target_map()
+        if index_or_targetid in self._targetid_map.keys():
+            self.data[self._targetid_map[index_or_targetid]] = obj
         else:
-            #indexed by array
-            self.data[key] = value
-            self.k_id = self._update_target_map()
+            self.data[index_or_targetid] = obj
+        self._targetid_map = self._create_targetid_map()
 
     def append(self, obj):
-        """Adds a new object to the collection.
+        """Appends a new object to the collection.
 
         Parameters
         ----------
-        obj: LightCurve or TargetPixelFile object
-
-        Returns
-        -------
-        None
+        obj : object
+            Typically a LightCurve or TargetPixelFile object
         """
         self.data.append(obj)
-        if obj.targetid and obj.targetid in self.k_id:
-            raise AttributeError("Cannot add multiple objects with same targetid")
-        try:
-            self.k_id[obj.targetid] = len(self.data)-1
-        except AttributeError:
-            print("Object has no targetid")
+        self._targetid_map = self._create_targetid_map()
 
     def __repr__(self):
         """Used in printing
@@ -116,39 +106,34 @@ class Collection:
         result: str
             String containing the resulting lightcurves.
         """
-        result = ""
+        result = "Collection:\n"
         for obj in self.data:
             result += obj.__repr__() + " "
             result += "\n"
         return result
 
-    @abstractmethod
-    def plot(self, ax=None, **kwargs):
-        pass
 
 class LightCurveCollection(Collection):
-    """Represents a set of LightCurves
+    """Class to hold a collection of LightCurve objects.
 
     Attributes
     ----------
-    data: array
-        List of lightcurve objects.
-    k_id: dictionary
-        Mapping targetid to index in self.data
+    lightcurves : array-like
+        List of LightCurve objects.
     """
     def __init__(self, lightcurves):
         super(LightCurveCollection, self).__init__(lightcurves)
 
     def plot(self, ax=None, **kwargs):
-        """Plots a collection of light curve.
+        """Plots all lightcurves in the collection on a single plot.
 
         Parameters
         ----------
         ax : matplotlib.axes._subplots.AxesSubplot
             A matplotlib axes object to plot into. If no axes is provided,
-            a new one will be generated.
+            a new one will be created.
 
-        kwargs : dict
+        **kwargs : dict
             Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
 
         Returns
@@ -158,42 +143,18 @@ class LightCurveCollection(Collection):
         """
         if ax is None:
             _, ax = plt.subplots()
-        for lightcurve in self.data:
-           lightcurve.plot(ax=ax, label=lightcurve.targetid)
+        for lc in self.data:
+            lc.plot(ax=ax, label=lc.targetid, **kwargs)
         return ax
 
-    def pca(self):
-        '''Creates the Principle Components of a collection of LightCurves
-        '''
-        raise NotImplementedError('Should be able to run a PCA on a collection.')
 
 class TargetPixelFileCollection(Collection):
-    """Represents a set of Target Pixel Files
+    """Class to hold a collection of TargetPixelFile objects.
 
-    Attributes
+    Parameters
     ----------
-    data: array
-        List of TPF objects.
-    k_id: dictionary
-        Mapping targetid to index in self.data
+    tpfs : array-like
+        List of TargetPixelFile objects.
     """
     def __init__(self, tpfs):
         super(TargetPixelFileCollection, self).__init__(tpfs)
-
-    def plot(self, ax=None, **kwargs):
-        """Plots a collection of TPF objects in space.
-
-        Parameters
-        ----------
-        ax : matplotlib.axes._subplots.AxesSubplot
-            A matplotlib axes object to plot into. If no axes is provided,
-            a new one will be generated.
-
-        kwargs : dict
-            Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
-
-        Returns
-        -------
-        ax : matplotlib.axes._subplots.AxesSubplot
-        """
-        raise NotImplementedError('Plotting TPFs has not been implemented')
