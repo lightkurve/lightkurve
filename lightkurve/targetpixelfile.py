@@ -1005,42 +1005,48 @@ class KeplerTargetPixelFile(TargetPixelFile):
         tpf : KeplerTargetPixelFile
             A new Target Pixel File assembled from the images.
         """
-        if extension is None:
-            if isinstance(images[0], str) and images[0].endswith("ffic.fits"):
-                extension = 1  # TESS FFIs have the image data in extension #1
-            else:
-                extension = 0  # Default is to use the primary HDU
-
-        factory = KeplerTargetPixelFileFactory(n_cadences=len(images),
-                                               n_rows=size[0],
-                                               n_cols=size[1],
-                                               target_id=target_id)
-
-        mid_img = images[int(len(images) / 2) - 1]  # Find middle image to use as a reference
-        # Check if the image is a single FITS image, or a FITS file and get the appropriate PrimaryHDU or ImageHDU
-        if isinstance(mid_img, fits.ImageHDU):
-            mid_hdu = mid_img
-        elif isinstance(mid_img, fits.HDUList):
-            mid_hdu = mid_img[extension]
-        else:
-            mid_hdu = fits.open(mid_img)[extension]
-        # Calculate reference WCS coords from the middle image. Get the middle pixel column and row
-        wcs_ref = WCS(mid_hdu)
-        pixelpos_ref = skycoord_to_pixel(position, wcs=wcs_ref)
-        column, row = int(np.round(pixelpos_ref[0])), int(np.round(pixelpos_ref[1]))
-
-        factory.keywords = mid_hdu.header  # Get default keyword values from the first image
-
-        for idx, img in tqdm(enumerate(images), total=len(images)):
-            # Check if an image is a single FITS image, or a FITS file, and return the appropriate PrimaryHDU or ImageHDU
+        # Define a helper function to accept images in a flexible way
+        def _open_image(img):
             if isinstance(img, fits.ImageHDU):
                 hdu = img
             elif isinstance(img, fits.HDUList):
                 hdu = img[extension]
             else:
                 hdu = fits.open(img)[extension]
+            return hdu
 
-            # Get positional shift of the image compared to the reference file and add to header
+        # Set the default extension if unspecified
+        if extension is None:
+            if isinstance(images[0], str) and images[0].endswith("ffic.fits"):
+                extension = 1  # TESS FFIs have the image data in extension #1
+            else:
+                extension = 0  # Default is to use the primary HDU
+
+        # If no position is given, ensure the cut-out size matches the image size
+        if position is None:
+            size = _open_image(images[0]).data.shape
+
+        # Find middle image to use as a WCS reference
+        try:
+            mid_hdu = _open_image(images[int(len(images) / 2) - 1])
+            wcs_ref = WCS(mid_hdu)
+            pixelpos_ref = skycoord_to_pixel(position, wcs=wcs_ref)
+            column, row = int(np.round(pixelpos_ref[0])), int(np.round(pixelpos_ref[1]))
+        except Exception:
+            log.error("Images must have a valid WCS astrometric solution.")
+            return None
+
+        # Create a factory and set default keyword values based on the middle image
+        factory = KeplerTargetPixelFileFactory(n_cadences=len(images),
+                                               n_rows=size[0],
+                                               n_cols=size[1],
+                                               target_id=target_id)
+        factory.keywords = mid_hdu.header
+
+        # Add all images one-by-one
+        for idx, img in tqdm(enumerate(images), total=len(images)):
+            hdu = _open_image(img)
+            # Get positional shift of the image compared to the reference WCS
             wcs_current = WCS(hdu)
             pixelpos_current = skycoord_to_pixel(position, wcs=wcs_current)
             hdu.header['POS_CORR1'] = pixelpos_current[0] - pixelpos_ref[0]
@@ -1051,25 +1057,27 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 cutout = Cutout2D(hdu.data, position, size=size, wcs=wcs_ref, mode='partial')
             factory.add_cadence(frameno=idx, wcs=wcs_ref, flux=cutout.data, header=hdu.header)
 
-        # Override the defaults where necessary, and pass into the header generating functions
+        # Override the defaults where necessary
         ext_info = {}
         ext_info['TFORM4'] = '{}J'.format(size[0] * size[1])
-        ext_info['TDIM4'] = '({},{})'.format(size[0],size[1])
-        ext_info.update(cutout.wcs.to_header()) # Add WCS entries
+        ext_info['TDIM4'] = '({},{})'.format(size[0], size[1])
+        ext_info.update(cutout.wcs.to_header())
 
         # TPF contains multiple data columns that require WCS
         for m in [4, 5, 6, 7, 8, 9]:
             if m > 4:
                 ext_info["TFORM{}".format(m)] = '{}E'.format(size[0] * size[1])
-            ext_info['TDIM{}'.format(m)] = '({},{})'.format(size[0],size[1])
+            ext_info['TDIM{}'.format(m)] = '({},{})'.format(size[0], size[1])
             # Compute location of TPF lower left corner
-            # Int statement contains modulus so that .5 values always round up. We cannot use numpy.round() as it rounds to the even number.
+            # Int statement contains modulus so that .5 values always round up.
+            # We cannot use numpy.round() as it rounds to the even number.
             half_tpfsize_col = int((size[0] - 1) / 2 + (size[0] + 1) % 2)
             half_tpfsize_row = int((size[1] - 1) / 2 + (size[1] + 1) % 2)
             ext_info['1CRV{}P'.format(m)] = column - half_tpfsize_col + factory.keywords['CRVAL1P']
             ext_info['2CRV{}P'.format(m)] = row - half_tpfsize_row + factory.keywords['CRVAL2P']
 
-        return factory.get_tpf(ext_info)
+        return factory.get_tpf(ext_info=ext_info)
+
 
 class KeplerTargetPixelFileFactory(object):
     """Class to create a KeplerTargetPixelFile."""

@@ -219,6 +219,13 @@ def test_tpf_factory():
     assert(tpf.time[9] == 95)
 
 
+def test_tpf_from_images():
+    """Basic tests of tpf.from_fits_images()"""
+    from astropy.io.fits import ImageHDU
+    images = [ImageHDU(data=np.ones((5, 5))) for i in range(5)]
+    tpf = KeplerTargetPixelFile.from_fits_images(images, size=(3, 3))
+
+
 def test_properties2(capfd):
     '''Test if the describe function produces an output.
     The output is 1870 characters at the moment, but we might add more properties.'''
