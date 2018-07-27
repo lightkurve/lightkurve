@@ -64,16 +64,15 @@ def test_tpf_plot():
 
 @pytest.mark.remote_data
 def test_get_sources():
-    "Minimum sanity chech of the table it returns contains the coordinates of the tpf"
+    "Sanity check that get_sources returns sources"
     tpf = KeplerTargetPixelFile(TABBY_TPF)
     dat = tpf.get_sources()
     # Smallest number the query should find is at least 1
-    assert (len(dat['ra']) >= 1)
-    assert (len(dat['id'])) >= 1
-    assert np.any([d == tpf.keplerid for d in dat['id']])
+    assert (len(dat['id'])) >= 1 # must return at least one source
+    assert np.any([d == tpf.keplerid for d in dat['id']]) # check if query id matched tpf.keplerid
     c = SkyCoord(60, 10, unit=(u.deg, u.deg))
     result = query_catalog(c, 'Gaia', radius=1)
-    assert len(result) == 3
+    assert len(result) == 3 # check if it finds all 3 sources
 
 def test_tpf_zeros():
     """Does the LightCurve of a zero-flux TPF make sense?"""

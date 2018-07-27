@@ -45,7 +45,7 @@ class TargetPixelFile(object):
         self.targetid = targetid
 
 
-    def get_sources(self, catalog=None, magnitude_limit=18, dist_tolerance=3):
+    def get_sources(self, catalog=None, magnitude_limit=18, edge_tolerance=3):
         """
         Returns a table of stars that are centered on the target
         of the tpf file. Current catalog supported are KIC, EPIC and Gaia DR2.
@@ -58,7 +58,7 @@ class TargetPixelFile(object):
         magnitude_limit : int or float
             Limit the returned magnitudes to only stars brighter than magnitude_limit.
             Default 18 for both Kepmag and Gmag.
-        dist_tolerance: float
+        edge_tolerance: float
             Maximum distance (in arcseconds) a source may be separated from the edge
             of the target pixel file.
 
@@ -67,10 +67,8 @@ class TargetPixelFile(object):
         result : astropy.table
             Astropy table with the following columns
             ID : Catalog ID from catalog.
-            RA: Right ascension [degrees] (KIC & EPIC)
-            DEC: Declination [degrees]    (KIC & EPIC)
-            RA: Right ascension [degrees] (Gaia)
-            DEC: Declination [degrees] (Gaia)
+            RA: Right ascension of data epoch [degrees] (KIC & EPIC & Gaia DR2)
+            DEC: Declination of data epoch [degrees]    (KIC & EPIC & Gaia DR2)
             pmRA: Proper motion for right ascension [mas/year]
             pmDEC: Proper motion for declination [mas/year]
             Kpmag: Magnitude in Kepler band [mag] (KIC & EPIC)
@@ -93,14 +91,14 @@ class TargetPixelFile(object):
         else:
             catalog_epoch = 2015.5
 
-        if dist_tolerance < 3:
-            log.warning('Distance tolerance is less than 3 pixels. Sources near the edge will likely be missed.')
+        if edge_tolerance < 3:
+            log.warning('Edge tolerance is less than 3 pixels. Bright sources near the edge of the Target Pixel File may not be included.')
 
         #Skycoord the centre of target
         cent = SkyCoord(ra=self.ra, dec=self.dec, frame='icrs', unit=(u.deg, u.deg))
 
         #Find the size of the TPF
-        radius = ((np.max(self.flux.shape[1:2]) * 4) + dist_tolerance)/ 60.0  # arcmin
+        radius = ((np.max(self.flux.shape[1:2]) * 4) + edge_tolerance)/ 60.0  # arcmin
 
         # query around centre with radius and catalog
         tbl = query_catalog(cent, radius=radius, catalog=catalog)
@@ -108,7 +106,7 @@ class TargetPixelFile(object):
         # Find where nans are in cadence
         tpf_mask = np.any(np.isfinite(self.flux), axis=0)
 
-        # Coordinates of sky sources and tpf pixels
+        # Define skycoord of TPF pixels and queried source coordinates
         pixels_ra, pixels_dec = self.get_coordinates(cadence=int(len(self.cadenceno)/2))
         pixels_radec = np.asarray([pixels_ra[tpf_mask].ravel(), pixels_dec[tpf_mask].ravel()])
         sky_pixel_pairs = SkyCoord(ra=pixels_radec[0], dec=pixels_radec[1], frame='icrs', unit=(u.deg, u.deg))
@@ -117,21 +115,21 @@ class TargetPixelFile(object):
         separation_mask = np.zeros(len(tbl), dtype=bool)
         for idx in range (len(tbl)):
             sep = sky_pixel_pairs.separation(sky_sources[idx])  # Estimate separation
-            separation = np.any(sep.arcsec <= dist_tolerance)
+            separation = np.any(sep.arcsec <= edge_tolerance)
             separation_mask[idx] = separation
         sep_mask = np.array(separation_mask, dtype=bool)
 
         # constrain with magnitude limit
         sep_mask &= tbl['mag'] < magnitude_limit
 
-        # After applying filters we can now correct the posistions
+        # Sources constrained by edge_tolerance and magnitude limit
         source_list = tbl[sep_mask]
 
         # Transform coordinates to median epoch of data
         tpf_epoch = np.median(self.astropy_time.byear)
         has_pm = ~(source_list['pmra'].mask | source_list['pmdec'].mask)
-        source_list['ra'][has_pm] += (tpf_epoch - catalog_epoch) * (source_list['pmra'][has_pm] * (2.778e-7)) # mas to degree
-        source_list['dec'][has_pm] += (tpf_epoch - catalog_epoch) * (source_list['pmdec'][has_pm] * (2.778e-7)) # mas to degree
+        source_list['ra'][has_pm] += (tpf_epoch - catalog_epoch) * (source_list['pmra'][has_pm].to(u.degree/u.year)) # mas to degree
+        source_list['dec'][has_pm] += (tpf_epoch - catalog_epoch) * (source_list['pmdec'][has_pm].to(u.degree/u.year)) # mas to degree
 
         col_transform, row_transform = self.wcs.wcs_world2pix(source_list['ra'], source_list['dec'], 0)
 
@@ -147,6 +145,7 @@ class TargetPixelFile(object):
             source_list.rename_column('mag', 'Kpmag')
 
         return source_list
+
 
     @property
     def hdu(self):
