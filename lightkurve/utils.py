@@ -360,7 +360,7 @@ def query_catalog(coordinate, catalog="KIC", radius=0.5):
         """
 
         if catalog is "Gaia":
-            log.warn('Gaia RAs and Decs are at epoch 2015.5. These RA/Decs have not been corrected.')
+            log.warn('Gaia RAs and Decs are at epoch 2015.5')
             log.warn('Gaia magnitudes are in Gaia Gmag not KepMag')
 
         # Vizier id's
