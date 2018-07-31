@@ -20,7 +20,6 @@ TABBY_TPF = ("https://archive.stsci.edu/missions/kepler/target_pixel_files"
 TESS_SIM = ("https://archive.stsci.edu/missions/tess/ete-6/tid/00/000"
             "/004/176/tess2019128220341-0000000417699452-0016-s_tp.fits")
 
-
 @pytest.mark.remote_data
 def test_load_bad_file():
     '''Test if a light curve can be opened without exception.'''
@@ -227,6 +226,13 @@ def test_tpf_factory():
     assert_array_equal(tpf.flux[9], flux_9)
     assert(tpf.time[0] == 5)
     assert(tpf.time[9] == 95)
+
+
+def test_tpf_from_images():
+    """Basic tests of tpf.from_fits_images()"""
+    from astropy.io.fits import ImageHDU
+    images = [ImageHDU(data=np.ones((5, 5))) for i in range(5)]
+    tpf = KeplerTargetPixelFile.from_fits_images(images, size=(3, 3))
 
 
 def test_properties2(capfd):
