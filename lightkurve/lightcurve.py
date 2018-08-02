@@ -694,7 +694,9 @@ class LightCurve(object):
         Parameters
         ----------
         frequencies : array-like
-            Frequencies in microhertz. (Optional.)
+            The regular grid of frequencies to use.  The frequencies must be
+            in units microhertz.  Alternatively, an AstroPy Quantity object can
+            be passed with any unit of type '1/time'.
 
         Returns
         -------
@@ -702,7 +704,7 @@ class LightCurve(object):
             Returns a Periodogram object extracted from the lightcurve.
         """
         from . import Periodogram
-        return Periodogram.from_lightcurve(lc=self)
+        return Periodogram.from_lightcurve(lc=self, frequencies=frequencies)
 
     def to_fits(self, path=None, overwrite=False, **extra_data):
         """Writes the KeplerLightCurve to a fits file.
