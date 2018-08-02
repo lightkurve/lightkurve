@@ -14,15 +14,20 @@ TABBY_Q8 = ("https://archive.stsci.edu/missions/kepler/lightcurves"
 
 @pytest.mark.remote_data
 def test_from_lightcurve():
-    """Sanity check to verify that periodogram plotting works"""
+    """Can we create a Periodogram using `from_lightcurve`?"""
     lc = KeplerLightCurveFile(TABBY_Q8).PDCSAP_FLUX
     Periodogram.from_lightcurve(lc=lc)
     # Can we provide frequencies as a list?
     frequencies = [0.1, 0.2, 0.3]
     pg = Periodogram.from_lightcurve(lc=lc, frequencies=frequencies)
     assert_array_equal(pg.frequencies.value, frequencies)
-    # Can we provide frequencies as a Quantity?
+    assert(pg.frequencies.unit == u.microhertz)
+    # Can we provide frequencies as a Quantity in uHz?
     frequencies = np.array(frequencies) * u.microhertz
+    pg = Periodogram.from_lightcurve(lc=lc, frequencies=frequencies)
+    assert_array_equal(pg.frequencies, frequencies)
+    # Can we provide frequencies as a Quantity in Hz?
+    frequencies = np.array(frequencies) * u.hertz
     pg = Periodogram.from_lightcurve(lc=lc, frequencies=frequencies)
     assert_array_equal(pg.frequencies, frequencies)
 

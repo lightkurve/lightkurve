@@ -25,16 +25,23 @@ class Periodogram(object):
         """Creates a Periodogram object from a LightCurve instance using
         the Lomb-Scargle method.
 
-        Caution: for the time being, this method assumes that lc.time is
-        given in units of days.  In the future, we should use the lc.time_format
-        attribute to verify this.
+        By default, the periodogram will be created for a regular grid of
+        frequencies from 1 microhertz to the Nyquist frequency.  Alternatively,
+        the user can provide a custom regular grid using the `frequencies`
+        parameter.
+
+        Caution: this method assumes that the LightCurve's time (lc.time)
+        is given in units of days.  In the future, we should use the
+        lc.time_format attribute to verify this.
 
         Parameters
         ----------
         lc : LightCurve object
             The LightCurve from which to compute the Periodogram.
         frequencies : array-like
-            Frequencies in microhertz. (Optional.)
+            The regular grid of frequencies to use.  The frequencies must be
+            in units microhertz.  Alternatively, an AstroPy Quantity object can
+            be passed with any unit of type '1/time'.
 
         Returns
         -------

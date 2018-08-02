@@ -694,7 +694,9 @@ class LightCurve(object):
         Parameters
         ----------
         frequencies : array-like
-            Frequencies in microhertz. (Optional.)
+            The regular grid of frequencies to use.  The frequencies must be
+            in units microhertz.  Alternatively, an AstroPy Quantity object can
+            be passed with any unit of type '1/time'.
 
         Returns
         -------
