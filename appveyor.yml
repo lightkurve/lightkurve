@@ -20,6 +20,7 @@ install:
   - pip install oktopus
   - pip install sphinx_rtd_theme
   - pip install bs4
+  - pip install astroquery
 
 test_script:
   - "python setup.py test"
