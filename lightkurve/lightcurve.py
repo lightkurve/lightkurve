@@ -702,7 +702,7 @@ class LightCurve(object):
             Returns a Periodogram object extracted from the lightcurve.
         """
         from . import Periodogram
-        return Periodogram.from_lightcurve(lc=self)
+        return Periodogram.from_lightcurve(lc=self, frequencies=frequencies)
 
     def to_fits(self, path=None, overwrite=False, **extra_data):
         """Writes the KeplerLightCurve to a fits file.

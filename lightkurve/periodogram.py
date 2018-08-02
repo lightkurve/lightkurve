@@ -21,16 +21,31 @@ class Periodogram(object):
         self.powers = powers
 
     @staticmethod
-    def from_lightcurve(lc):
+    def from_lightcurve(lc, frequencies=None):
         """Creates a Periodogram object from a LightCurve instance using
         the Lomb-Scargle method.
 
         Caution: for the time being, this method assumes that lc.time is
         given in units of days.  In the future, we should use the lc.time_format
         attribute to verify this.
+
+        Parameters
+        ----------
+        lc : LightCurve object
+            The LightCurve from which to compute the Periodogram.
+        frequencies : array-like
+            Frequencies in microhertz. (Optional.)
+
+        Returns
+        -------
+        Periodogram : `Periodogram` object
+            Returns a Periodogram object extracted from the lightcurve.
         """
-        nyquist_frequency = 0.5 * (1./((np.median(lc.time[1:] - lc.time[0:-1])*u.day).to(u.second))).to(u.microhertz).value
-        frequencies = np.linspace(1, nyquist_frequency, len(lc.time) // 2) * u.microhertz
+        if frequencies is None:
+            nyquist_frequency = 0.5 * (1./((np.median(lc.time[1:] - lc.time[0:-1])*u.day).to(u.second))).to(u.microhertz).value
+            frequencies = np.linspace(1, nyquist_frequency, len(lc.time) // 2) * u.microhertz
+        if not isinstance(frequencies, u.Quantity):
+            frequencies = u.Quantity(frequencies, u.microhertz)
         lombscargle = LombScargle((lc.time * u.day).to(u.second), lc.flux * 1e6)
         uHz_conv = 1./(((1./u.day).to(u.microhertz)))
         powers = lombscargle.power(frequencies, method="fast", normalization="psd")
