@@ -4,22 +4,23 @@ import os
 import warnings
 import logging
 
+from astropy import units as u
+from astropy.coordinates import SkyCoord
 from astropy.io import fits
 from astropy.nddata import Cutout2D
-from astropy.table import Table
+from astropy.table import Table, Column
 from astropy.wcs import WCS
+
 from matplotlib import patches
 import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
-from astropy import units as u
-from astropy.coordinates import SkyCoord
-from astropy.table import Column
 
 from . import PACKAGEDIR
 from .lightcurve import KeplerLightCurve, TessLightCurve, LightCurve
 from .prf import KeplerPRF
-from .utils import KeplerQualityFlags, plot_image, bkjd_to_astropy_time, btjd_to_astropy_time, query_catalog, kpmag_to_flux
+from .utils import (KeplerQualityFlags, plot_image, bkjd_to_astropy_time,
+                    btjd_to_astropy_time, query_catalog, kpmag_to_flux)
 from .mast import download_kepler_products
 
 
@@ -46,18 +47,21 @@ class TargetPixelFile(object):
 
 
     def get_sources(self, catalog=None, magnitude_limit=18, edge_tolerance=3):
-        """
-        Returns a table of stars that are centered on the target
-        of the tpf file. Current catalog supported are KIC, EPIC and Gaia DR2.
+        """Returns a table of sources known to exist in the TPF file.
+
+        The sources are taken from one of the following supported catalogs:
+        - the Kepler Input Catalog (KIC);
+        - the K2 Ecliptic Plane Input Catalog (EPIC);
+        - Gaia Data Release 2 (GaiaDR2).
 
         Parameters
         -----------
-        catalog: 'KIC', 'EPIC' or 'Gaia'
+        catalog: 'KIC', 'EPIC' or 'GaiaDR2'
             Catalog to query. For Kepler target pixel files the default is 'KIC',
             for K2 target pixel files the default is 'EPIC'.
         magnitude_limit : int or float
-            Limit the returned magnitudes to only stars brighter than magnitude_limit.
-            Default 18 for both Kepmag and Gmag.
+            Only return sources brighter than this magnitude_limit.
+            Defaults to 18 for both KIC/EPIC (Kp) and Gaia (Gmag).
         edge_tolerance: float
             Maximum distance (in arcseconds) a source may be separated from the edge
             of the target pixel file.
