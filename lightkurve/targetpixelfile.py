@@ -45,89 +45,87 @@ class TargetPixelFile(object):
         self.quality_mask = self._quality_mask(quality_bitmask)
         self.targetid = targetid
 
-
     def get_sources(self, catalog=None, magnitude_limit=18, edge_tolerance=3):
         """Returns a table of sources known to exist in the TPF file.
 
         The sources are taken from one of the following supported catalogs:
+
         - the Kepler Input Catalog (KIC);
         - the K2 Ecliptic Plane Input Catalog (EPIC);
-        - Gaia Data Release 2 (GaiaDR2).
+        - Gaia Data Release 2 (Gaia2).
 
         Parameters
         -----------
-        catalog: 'KIC', 'EPIC' or 'GaiaDR2'
+        catalog: 'KIC', 'EPIC' or 'Gaia2'
             Catalog to query. For Kepler target pixel files the default is 'KIC',
             for K2 target pixel files the default is 'EPIC'.
         magnitude_limit : int or float
             Only return sources brighter than this magnitude_limit.
             Defaults to 18 for both KIC/EPIC (Kp) and Gaia (Gmag).
         edge_tolerance: float
-            Maximum distance (in arcseconds) a source may be separated from the edge
-            of the target pixel file.
+            Maximum distance (in arcseconds) a source may be located beyond
+            the edge of the target pixel file.
 
         Returns
         -------
         result : astropy.table
-            Astropy table with the following columns
-            ID : Catalog ID from catalog.
-            RA: Right ascension of data epoch [degrees] (KIC & EPIC & Gaia DR2)
-            DEC: Declination of data epoch [degrees]    (KIC & EPIC & Gaia DR2)
-            pmRA: Proper motion for right ascension [mas/year]
-            pmDEC: Proper motion for declination [mas/year]
-            Kpmag: Magnitude in Kepler band [mag] (KIC & EPIC)
-            Gmag: Magnitude in Gaia band [mag]  (Gaia)
-            column: Pixel column coordinate [pix]
-            row: Pixel row coordinate [pix]
-            predicted_flux: Predicted flux of source [e-/s]
-            epoch: Epoch of data [years]
+            Astropy table with the following columns:
 
+            - ID : Catalog ID from catalog.
+            - RA: Right ascension of data epoch [degrees] (KIC & EPIC & Gaia DR2)
+            - DEC: Declination of data epoch [degrees]    (KIC & EPIC & Gaia DR2)
+            - pmRA: Proper motion for right ascension [mas/year]
+            - pmDEC: Proper motion for declination [mas/year]
+            - Kpmag: Magnitude in Kepler band [mag] (KIC & EPIC)
+            - Gmag: Magnitude in Gaia band [mag]  (Gaia)
+            - column: Pixel column coordinate [pix]
+            - row: Pixel row coordinate [pix]
+            - predicted_flux: Predicted flux of source [e-/s]
+            - epoch: Epoch of data [years]
         """
         if catalog is None:
             if self.mission == 'Kepler':
                 catalog = 'KIC'
-                catalog_epoch = 2000.0
             elif self.mission == 'K2':
                 catalog = 'EPIC'
-                catalog_epoch = 2000.0
             else:
-                raise ValueError('Please provide a catalog. Catalog must be KIC, EPIC or Gaia.')
-        else:
+                raise ValueError('Please provide a catalog (KIC, EPIC, or GaiaDR2).')
+        if catalog == 'Gaia2':
             catalog_epoch = 2015.5
+        else:
+            catalog_epoch = 2000.0
 
-        if edge_tolerance < 3:
-            log.warning('Edge tolerance is less than 3 pixels. Bright sources near the edge of the Target Pixel File may not be included.')
+        if edge_tolerance < 12:
+            log.warning('Edge tolerance is less than 3 pixels (12 arcsec). '
+                        'Bright sources near the edge of the Target Pixel File '
+                        'may not be included.')
+        # Tolerance can't be smaller than 4 or the code below will break
+        if edge_tolerance < 4:
+            edge_tolerance = 4
 
-        #Skycoord the centre of target
+        # Query the catalog around the center of the TPF
         cent = SkyCoord(ra=self.ra, dec=self.dec, frame='icrs', unit=(u.deg, u.deg))
+        radius = ((np.max(self.flux.shape[1:2]) * 4) + edge_tolerance) * u.arcsec
+        catalog = query_catalog(cent, radius=radius, catalog=catalog)
+        catalog_skycoords = SkyCoord(ra=catalog['ra'], dec=catalog['dec'],
+                                     frame='icrs', unit=(u.deg, u.deg))
 
-        #Find the size of the TPF
-        radius = ((np.max(self.flux.shape[1:2]) * 4) + edge_tolerance)/ 60.0  # arcmin
+        # Obtain the celestial coordinates of all pixels across all cadences
+        not_nan = np.any(np.isfinite(self.flux), axis=0)
+        pixels_ra, pixels_dec = self.get_coordinates(cadence=int(len(self.cadenceno) / 2))
+        pixels_radec = np.asarray([pixels_ra[not_nan].ravel(), pixels_dec[not_nan].ravel()])
+        sky_pixel_pairs = SkyCoord(ra=pixels_radec[0], dec=pixels_radec[1],
+                                   frame='icrs', unit=(u.deg, u.deg))
+        # Create a `separation_mask` which is True for the sources in the catalog
+        # which which are separated by less than `edge_tolerance` from any pixel
+        is_source_in_tpf = np.zeros(len(catalog), dtype=bool)
+        for idx in range(len(catalog)):
+            sep = sky_pixel_pairs.separation(catalog_skycoords[idx])
+            is_source_in_tpf[idx] = np.any(sep.arcsec <= edge_tolerance)
+        is_source_in_tpf = np.array(is_source_in_tpf, dtype=bool)
 
-        # query around centre with radius and catalog
-        tbl = query_catalog(cent, radius=radius, catalog=catalog)
-
-        # Find where nans are in cadence
-        tpf_mask = np.any(np.isfinite(self.flux), axis=0)
-
-        # Define skycoord of TPF pixels and queried source coordinates
-        pixels_ra, pixels_dec = self.get_coordinates(cadence=int(len(self.cadenceno)/2))
-        pixels_radec = np.asarray([pixels_ra[tpf_mask].ravel(), pixels_dec[tpf_mask].ravel()])
-        sky_pixel_pairs = SkyCoord(ra=pixels_radec[0], dec=pixels_radec[1], frame='icrs', unit=(u.deg, u.deg))
-        sky_sources = SkyCoord(ra=tbl['ra'], dec=tbl['dec'], frame='icrs', unit=(u.deg, u.deg))
-
-        separation_mask = np.zeros(len(tbl), dtype=bool)
-        for idx in range (len(tbl)):
-            sep = sky_pixel_pairs.separation(sky_sources[idx])  # Estimate separation
-            separation = np.any(sep.arcsec <= edge_tolerance)
-            separation_mask[idx] = separation
-        sep_mask = np.array(separation_mask, dtype=bool)
-
-        # constrain with magnitude limit
-        sep_mask &= tbl['mag'] < magnitude_limit
-
-        # Sources constrained by edge_tolerance and magnitude limit
-        source_list = tbl[sep_mask]
+        # Also apply the magnitude limit
+        source_list = catalog[is_source_in_tpf & (catalog['mag'] < magnitude_limit)]
 
         # Transform coordinates to median epoch of data
         tpf_epoch = np.median(self.astropy_time.byear)
