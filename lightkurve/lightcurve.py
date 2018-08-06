@@ -819,6 +819,7 @@ class SyntheticLightCurve(LightCurve):
                             fit_params=fit_params, method=method, nwalkers=nwalkers, nsteps=nsteps, threads=threads)
 
 
+
 class KeplerLightCurve(LightCurve):
     """Defines a light curve class for NASA's Kepler and K2 missions.
 

@@ -188,12 +188,16 @@ class SupernovaModel(object):
         self.bandpass = bandpass
         self.multiplicative = False
 
+
         self.sn_params = {}
-        for key, value in kwargs.items():
-            if isinstance(value, (GaussianDistribution, UniformDistribution)):
-                self.sn_params[key] = value.sample()
+        for key, val in kwargs.items():
+            if isinstance(val, (GaussianDistribution, UniformDistribution)):
+                setattr(self, key, val.sample())
+                self.sn_params[key] = val.sample()
             else:
-                self.sn_params[key] = value
+                setattr(self, key, val)
+                self.sn_params[key] = val
+
 
         if 'T0' in self.sn_params:
             self.sn_params['t0'] = self.sn_params['T0']
@@ -223,6 +227,7 @@ class SupernovaModel(object):
 
         import sncosmo
         model = sncosmo.Model(source=self.source)
+        self.sn_params.pop('background', None)
         model.set(**self.sn_params)
         band_intensity = model.bandflux(self.bandpass, time)  #Units: e/s/cm^2
         if self.bandpass == 'kepler':
@@ -261,7 +266,6 @@ def inject(time, flux, flux_err, model):
         mergedflux = flux * model.evaluate(time.astype(np.float))
     else:
         mergedflux = flux + model.evaluate(time)
-        print(model.params)
         model.params['background'] = np.percentile(flux, 3)
     return lightkurve.lightcurve.SyntheticLightCurve(time, flux=mergedflux, flux_err=flux_err,
                                 **model.params)
@@ -276,6 +280,7 @@ def recover_planet(time, flux, flux_err, period, rprs, T0, a, inc, ecc, w, limb_
     except ImportError:
         log.error('BLS module must be installed.\n')
 
+    params = {'period':period, 'rprs':rprs, 'T0':T0, 'a':a, 'inc':inc, 'ecc':ecc, 'w':w}
 
     def create_initial_guess():
         """Performs a BLS search."""
@@ -348,7 +353,13 @@ def recover_planet(time, flux, flux_err, period, rprs, T0, a, inc, ecc, w, limb_
     if method == 'optimize':
         result = op.minimize(neg_ln_posterior, x0)
         results = dict(zip(keys, result.x))
-        return results
+
+        for key, val in results.items():
+            params[key] = val
+
+        mod = TransitModel()
+        mod.add_planet(limb_dark=limb_dark, u=u, **params)
+        return mod
 
     elif method == 'mcmc':
         try:
@@ -366,6 +377,8 @@ def recover_supernova(time, flux, flux_err, T0, z, amplitude, background, fit_pa
                      method='optimize', nwalkers=10, nsteps=100, threads=1):
 
     import scipy.optimize as op
+
+    params = {'T0':T0, 'z':z, 'amplitude':amplitude, 'background':background}
 
     def create_initial_guess():
         if initial_guess is None:
@@ -419,7 +432,11 @@ def recover_supernova(time, flux, flux_err, T0, z, amplitude, background, fit_pa
     if method == 'optimize':
         result = op.minimize(neg_ln_posterior, x0)
         results = dict(zip(keys, result.x))
-        return results
+
+        for key, val in results.items():
+            params[key] = val
+
+        return SupernovaModel(source=source, bandpass=bandpass, **params)
 
     elif method == 'mcmc':
         try:
