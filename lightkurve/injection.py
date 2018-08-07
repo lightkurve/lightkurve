@@ -273,6 +273,16 @@ def inject(time, flux, flux_err, model):
 def recover_planet(time, flux, flux_err, period, rprs, T0, a, inc, ecc, w, limb_dark, u,
                     fit_params, method='optimize', nwalkers=10, nsteps=100, threads=1):
 
+    """Injects synthetic model into a light curve.
+
+    Parameters
+    ----------
+    
+    Returns
+    -------
+
+    """
+
     import scipy.optimize as op
 
     try:
@@ -450,15 +460,18 @@ def recover_supernova(time, flux, flux_err, T0, z, amplitude, background, fit_pa
         x = sampler.run_mcmc(pos, nsteps)
         return sampler
 
-def injection_and_recovery(lc, signal_type, ntests, constr, period=10, rprs=0.1, T0=5, inc=90, z=0.2, amplitude=3.e-8,
+def injection_and_recovery(time, flux, flux_err, signal_type, ntests, constr, initial_guess=None, period=10, rprs=0.1, T0=5, inc=90, z=0.2, amplitude=3.e-8,
                         ecc=0.0, a=15., w=90., limb_dark='quadratic', u=[0.1, 0.3]):
+
     """Runs an injection and recovery test for many models and one real lightcurve.
     Right now we can only recover SN that take T0, z, and amplitude.
 
     Parameters
         ----------
-    lc : LightCurve class
-        Lightcurve object to inject models into.
+    time : array-like
+        Time array of lightcurve
+    flux : array-like
+        Flux array of lightcurve to inject into
     signal_type : "Supernova" or "Planet"
         Type of signal to be injected.
     ntests : int
@@ -467,42 +480,36 @@ def injection_and_recovery(lc, signal_type, ntests, constr, period=10, rprs=0.1,
         parameter constraint to determine a recovered signal (for example. 0.03
         demands that all parameters must be within 3% of the injected value to be
         considered recovered)
-    period : Distribution class
-        A GaussianDistribution or UniformDistribution object from which to draw
-        period values.
-    rprs : Distribution class
-        A GaussianDistribution or UniformDistribution object from which to draw
-        rprs values.
-    T0 : Distribution class
-        A GaussianDistribution or UniformDistribution object from which to draw
-        T0 values.
-    z : Distribution class
-        A GaussianDistribution or UniformDistribution object from which to draw
-        z values.
-    amplitude : Distribution class
-        A GaussianDistribution or UniformDistribution object from which to draw
-        amplitude values.
+    period, rprs, ecc, a, w, T0 : Distribution class or float
+        If signal_type is 'Planet': a GaussianDistribution or UniformDistribution object from which to draw
+        values, or a float to fix the value.
+    T0, z, amplitude : Distribution class or float
+        If signal_type is 'Supernova': a GaussianDistribution or UniformDistribution object from which to draw
+        values, or a float to fix the value.
 
     Returns
     -------
-    fraction : float
-        Fraction of lightcurves recovered.
+    rec_dict : Astropy table
+        Astropy table containing all parameters for each injection, and a boolean value
+        True if recovered and False if not recovered.
 
     """
     import lightkurve.injection as inj
     from astropy.table import Table, Column
+    import time as t
+    from tqdm import tqdm_notebook as tqdm
 
     if signal_type == 'Supernova':
         nrecovered = 0
-        rec_dict = []
-
+        rec_dict = Table(names=('$Recovered$', '$To$', '$z$', '$Amplitude$', '$Background$'))
         fit_params = []
 
-        for i in range(ntests):
+        for i in tqdm(range(ntests)):
 
             T0_t = T0
             z_t = z
             amplitude_t = amplitude
+            background_t = np.percentile(flux, 3)
 
             if isinstance(T0, (GaussianDistribution, UniformDistribution)):
                 T0_t = T0.sample()
@@ -515,28 +522,30 @@ def injection_and_recovery(lc, signal_type, ntests, constr, period=10, rprs=0.1,
                 fit_params.append('amplitude')
 
             model = inj.SupernovaModel(T0=T0_t, z=z_t, amplitude=amplitude_t, source='hsiao', bandpass='kepler')
-            lcinj = lc.inject(model)
+            lcinj = inj.inject(time, flux, flux_err, model)
 
-            results = {'T0':T0_t, 'z':z_t, 'amplitude':amplitude_t}
-            results_x = lcinj.recover_supernova(fit_params=fit_params)
+            fit = lcinj.recover_supernova(fit_params=fit_params, initial_guess=initial_guess)
 
-            for key, val in results_x.items():
-                results[key] = val
+            recovered = False
 
-            if abs(results['T0']-T0_t) < constr*T0_t and abs(results['z']-z_t) < constr*z_t and abs(results['amplitude']-amplitude_t) < constr*amplitude_t:
+            if abs(fit.T0-T0_t) < constr*T0_t and abs(fit.z-z_t) < constr*z_t and abs(fit.amplitude-amplitude_t) < constr*amplitude_t and abs(fit.background-background_t) < constr*background_t:
                 nrecovered += 1
-                rec_dict += {'T0':T0_t, 'z':z_t, 'amplitude':amplitude_t}
-                print('Recovered - T0: ' + str(T0_t) + ' amplitude: ' + str(amplitude_t) + ' z: ' + str(z_t))
+                recovered = True
 
-        return rec_dict, float(nrecovered)/ float(ntests)
+            row = [recovered]
+            row += [T0_t, z_t, amplitude_t, background_t]
+            rec_dict.add_row(row)
+            t.sleep(3)
+
+        return rec_dict
 
     elif signal_type == 'Planet':
 
         nrecovered = 0
         fit_params = []
-        rec_dict = Table(names=('period', 'rprs', 'T0', 'inc', 'a', 'ecc', 'w'))
+        rec_dict = Table(names=('$Recovered$', '$Period$', '$Rp/Rs$', '$To$', '$inc$', '$a$', '$ecc$', '$w$'))
 
-        for i in range(ntests):
+        for i in tqdm(range(ntests)):
             period_t = period
             rprs_t = rprs
             T0_t = T0
@@ -575,23 +584,25 @@ def injection_and_recovery(lc, signal_type, ntests, constr, period=10, rprs=0.1,
                     fit_params.append('w')
 
 
+            recovered = False
+
             model = TransitModel()
             model.add_planet(T0=T0_t, period=period_t, rprs=rprs_t, inc=inc_t, ecc=ecc_t, a=a_t, w=w_t, limb_dark=limb_dark, u=u)
-            lcinj = lc.inject(model)
+            lcinj = inj.inject(time, flux, flux_err, model)
 
-            results_x = lcinj.recover_planet(fit_params=fit_params)
+            fit = lcinj.recover_planet(fit_params=fit_params)
 
-            results = {'T0':T0_t, 'period':period_t, 'rprs':rprs_t, 'inc':inc_t, 'a':a_t, 'ecc':ecc_t, 'w':w_t, 'limb_dark':limb_dark, 'u':u}
-
-            for key, val in results_x.items():
-                results[key] = val
-
-            if abs(results['period']-period_t) < constr*period_t and abs(results['rprs']-rprs_t) < constr*rprs_t and abs(results['inc']-inc_t) < constr*inc_t and abs(results['a']-a_t) < constr*a_t and abs(results['ecc']-ecc_t) < constr*ecc_t+0.01 and abs(results['w']-w_t) < constr*w_t:
+            if abs(fit.period-period_t) < constr*period_t and abs(fit.rprs-rprs_t) < constr*rprs_t and abs(fit.inc-inc_t) < constr*inc_t and abs(fit.a-a_t) < constr*a_t and abs(fit.ecc-ecc_t) < constr*ecc_t+0.01 and abs(fit.w-w_t) < constr*w_t:
                 nrecovered += 1
-                rec_dict.add_row([period_t, rprs_t, T0_t, inc_t, a_t, ecc_t, w_t])
-                print('Recovered - period: ' + str(period_t) + ' rprs: ' + str(rprs_t) + ' inc: ' + str(inc_t))
+                recovered = True
+                #print('Recovered - period: ' + str(period_t) + ' rprs: ' + str(rprs_t) + ' inc: ' + str(inc_t))
 
-        return rec_dict, (float(nrecovered)/ float(ntests))
+            row = [recovered]
+            row += [period_t, rprs_t, T0_t, inc_t, a_t, ecc_t, w_t]
+            rec_dict.add_row(row)
+            t.sleep(3)
+
+        return rec_dict
 
 
     else:

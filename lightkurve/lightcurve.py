@@ -585,6 +585,13 @@ class LightCurve(object):
 
         return injection.inject(self.time, self.flux, self.flux_err, model)
 
+    def injection_and_recovery(self, signal_type, ntests, constr, initial_guess=None, period=10, rprs=0.1, T0=5, inc=90, z=0.2, amplitude=3.e-8,
+                            ecc=0.0, a=15., w=90., limb_dark='quadratic', u=[0.1, 0.3]):
+
+        return injection.injection_and_recovery(self.time, self.flux, self.flux_err, signal_type=signal_type, ntests=ntests, constr=constr, initial_guess=initial_guess, period=period, rprs=rprs, T0=T0,
+                                inc=inc, z=z, amplitude=amplitude,
+                                ecc=ecc, a=a, w=w, limb_dark=limb_dark, u=u)
+
     def to_table(self):
         """Export the LightCurve as an AstroPy Table.
 
