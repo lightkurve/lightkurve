@@ -105,9 +105,10 @@ class KeplerPRF(object):
         rot_row = delta_row * cosa - delta_col * sina
         rot_col = delta_row * sina + delta_col * cosa
 
-        self.prf_model = flux * self.interpolate(rot_row.flatten() * scale_row,
-                                                 rot_col.flatten() * scale_col,
-                                                 grid=False).reshape(self.shape)
+        self.prf_model = flux * scale_col * scale_row \
+            * self.interpolate(rot_row.flatten() * scale_row,
+                               rot_col.flatten() * scale_col,
+                               grid=False).reshape(self.shape)
         return self.prf_model
 
     def gradient(self, center_col, center_row, flux=1., scale_col=1., scale_row=1.,

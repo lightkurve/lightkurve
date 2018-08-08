@@ -96,3 +96,13 @@ def test_keplerprf_gradient_against_calculus(param_to_test):
     prf_grad = prf.gradient(**params)
     # assert that the average absolute/relative error is less than 1e-5
     assert np.max(np.abs(prf_grad[param_order[param_to_test]] - diff_prf) / (1. + np.abs(diff_prf))) < 1e-5
+
+
+def test_focus_normalization():
+    """PRF should integrate to one, even if focus parameters are passed."""
+    prf = KeplerPRF(channel=56, shape=[30, 30], column=0, row=0)
+    for scale_col in [0.9, 1.0, 1.1]:
+        for scale_row in [0.9, 1.0, 1.1]:
+                myprf = prf.evaluate(center_col=15, center_row=15, flux=1.,
+                                     scale_col=scale_col, scale_row=scale_row)
+                assert np.isclose(myprf.sum(), 1., rtol=0.05)
