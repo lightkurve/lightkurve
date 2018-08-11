@@ -168,8 +168,8 @@ class KeplerPRF(object):
 
         deriv_center_col = - scale_row * scale_col * flux * (cosa * scale_col_times_interp_dy - sina * scale_row_times_interp_dx)
         deriv_center_row = - scale_row * scale_col * flux * (sina * scale_col_times_interp_dy + cosa * scale_row_times_interp_dx)
-        deriv_scale_row = flux * (interp_dx * rot_row + scale_col * interp)
-        deriv_scale_col = flux * (interp_dy * rot_col + scale_row * interp)
+        deriv_scale_row = flux * scale_col * (scale_row * interp_dx * rot_row + interp)
+        deriv_scale_col = flux * scale_row * (scale_col * interp_dy * rot_col + interp)
         deriv_rotation_angle = scale_row * scale_col * flux * (interp_dy * scale_col * (delta_row * cosa - delta_col * sina)
                                        - interp_dx * scale_row * (delta_row * sina + delta_col * cosa))
 
