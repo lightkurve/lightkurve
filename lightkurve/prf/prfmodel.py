@@ -149,9 +149,11 @@ class KeplerPRF(object):
 
         # for a proof of the maths that follow, see the pdf attached
         # on pull request #198 in lightkurve GitHub repo.
-        deriv_flux = self.interpolate(rot_row.flatten() * scale_row,
-                                      rot_col.flatten() * scale_col,
-                                      grid=False).reshape(self.shape)
+        interp = self.interpolate(rot_row.flatten() * scale_row,
+                                  rot_col.flatten() * scale_col,
+                                  grid=False).reshape(self.shape)
+
+        deriv_flux = scale_row * scale_col * interp
 
         interp_dy = self.interpolate(rot_row.flatten() * scale_row,
                                      rot_col.flatten() * scale_col,
@@ -164,11 +166,11 @@ class KeplerPRF(object):
         scale_row_times_interp_dx = scale_row * interp_dx
         scale_col_times_interp_dy = scale_col * interp_dy
 
-        deriv_center_col = - flux * (cosa * scale_col_times_interp_dy - sina * scale_row_times_interp_dx)
-        deriv_center_row = - flux * (sina * scale_col_times_interp_dy + cosa * scale_row_times_interp_dx)
-        deriv_scale_row = flux * interp_dx * rot_row
-        deriv_scale_col = flux * interp_dy * rot_col
-        deriv_rotation_angle = flux * (interp_dy * scale_col * (delta_row * cosa - delta_col * sina)
+        deriv_center_col = - scale_row * scale_col * flux * (cosa * scale_col_times_interp_dy - sina * scale_row_times_interp_dx)
+        deriv_center_row = - scale_row * scale_col * flux * (sina * scale_col_times_interp_dy + cosa * scale_row_times_interp_dx)
+        deriv_scale_row = flux * (interp_dx * rot_row + scale_col * interp)
+        deriv_scale_col = flux * (interp_dy * rot_col + scale_row * interp)
+        deriv_rotation_angle = scale_row * scale_col * flux * (interp_dy * scale_col * (delta_row * cosa - delta_col * sina)
                                        - interp_dx * scale_row * (delta_row * sina + delta_col * cosa))
 
         return [deriv_center_col, deriv_center_row, deriv_flux,
