@@ -27,3 +27,4 @@ Comments, corrections & suggestions:
 - Jeff Van Cleve
 - Ashley Villar
 - `Benjamin Pope <https://github.com/benjaminpope>`_
+- `J. K. Carlberg <https://github.com/jkcarlberg>`_
