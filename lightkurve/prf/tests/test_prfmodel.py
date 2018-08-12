@@ -76,12 +76,15 @@ def test_keplerprf_gradient_against_simplekeplerprf():
 
 @pytest.mark.parametrize("param_to_test", [("center_col"), ("center_row"), ("flux"),
                                            ("scale_col"), ("scale_row"), ("rotation_angle")])
-def test_keplerprf_gradient_against_calculus(param_to_test):
+@pytest.mark.parametrize("scale_col", [0.9, 1.0, 1.1])
+@pytest.mark.parametrize("scale_row", [0.9, 1.0, 1.1])
+@pytest.mark.parametrize("rotation_angle", [0., 1., 2.])
+def test_keplerprf_gradient_against_calculus(param_to_test, scale_col, scale_row, rotation_angle):
     """is the gradient of KeplerPRF consistent with Calculus?
     """
     params = OrderedDict([('center_col', 7), ('center_row', 7), ('flux', 1000.),
-                          ('scale_col', 1.), ('scale_row', 1.), ('rotation_angle', 0),
-                          ('scale_col', 0.8), ('scale_row', 1.2), ('rotation_angle', 1)])
+                          ('scale_col', scale_col), ('scale_row', scale_row),
+                          ('rotation_angle', rotation_angle)])
     param_order = OrderedDict(zip(params.keys(), range(0, 6)))
     kwargs = {'channel': 56, 'shape': [15, 15], 'column': 0, 'row': 0}
 
