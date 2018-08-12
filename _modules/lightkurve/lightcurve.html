@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>lightkurve.lightcurve &mdash; lightkurve 1.0b10 documentation</title>
+  <title>lightkurve.lightcurve &mdash; lightkurve 1.0b13 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.0b10
+                1.0b13
               </div>
             
           
@@ -189,7 +189,6 @@
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">PACKAGEDIR</span>
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="k">import</span> <span class="n">running_mean</span><span class="p">,</span> <span class="n">bkjd_to_astropy_time</span><span class="p">,</span> <span class="n">btjd_to_astropy_time</span>
-
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;LightCurve&#39;</span><span class="p">,</span> <span class="s1">&#39;KeplerLightCurve&#39;</span><span class="p">,</span> <span class="s1">&#39;TessLightCurve&#39;</span><span class="p">,</span>
            <span class="s1">&#39;iterative_box_period_search&#39;</span><span class="p">]</span>
@@ -861,7 +860,9 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        frequencies : array-like</span>
-<span class="sd">            Frequencies in microhertz. (Optional.)</span>
+<span class="sd">            The regular grid of frequencies to use.  The frequencies must be</span>
+<span class="sd">            in units microhertz.  Alternatively, an AstroPy Quantity object can</span>
+<span class="sd">            be passed with any unit of type &#39;1/time&#39;.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -869,7 +870,7 @@
 <span class="sd">            Returns a Periodogram object extracted from the lightcurve.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">Periodogram</span>
-        <span class="k">return</span> <span class="n">Periodogram</span><span class="o">.</span><span class="n">from_lightcurve</span><span class="p">(</span><span class="n">lc</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Periodogram</span><span class="o">.</span><span class="n">from_lightcurve</span><span class="p">(</span><span class="n">lc</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">frequencies</span><span class="o">=</span><span class="n">frequencies</span><span class="p">)</span>
 
 <div class="viewcode-block" id="LightCurve.to_fits"><a class="viewcode-back" href="../../api/lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve.to_fits">[docs]</a>    <span class="k">def</span> <span class="nf">to_fits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">extra_data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Writes the KeplerLightCurve to a fits file.</span>
@@ -1035,12 +1036,13 @@
 <span class="sd">    keplerid : int</span>
 <span class="sd">        Kepler ID number</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">flux</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flux_err</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_format</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_scale</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flux</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flux_err</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_format</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_scale</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">centroid_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">centroid_row</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quality</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quality_bitmask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">channel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mission</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">cadenceno</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">keplerid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ra</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dec</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                 <span class="n">cadenceno</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">keplerid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ra</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="p">{}):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">KeplerLightCurve</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">,</span> <span class="n">flux</span><span class="o">=</span><span class="n">flux</span><span class="p">,</span> <span class="n">flux_err</span><span class="o">=</span><span class="n">flux_err</span><span class="p">,</span>
-                                               <span class="n">time_format</span><span class="o">=</span><span class="n">time_format</span><span class="p">,</span> <span class="n">time_scale</span><span class="o">=</span><span class="n">time_scale</span><span class="p">)</span>
+                                               <span class="n">time_format</span><span class="o">=</span><span class="n">time_format</span><span class="p">,</span> <span class="n">time_scale</span><span class="o">=</span><span class="n">time_scale</span><span class="p">,</span>
+                                               <span class="n">targetid</span><span class="o">=</span><span class="n">keplerid</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">meta</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">centroid_col</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_array</span><span class="p">(</span><span class="n">centroid_col</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;centroid_col&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">centroid_row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_array</span><span class="p">(</span><span class="n">centroid_row</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;centroid_row&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">quality</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_array</span><span class="p">(</span><span class="n">quality</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;quality&#39;</span><span class="p">)</span>
@@ -1050,7 +1052,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">campaign</span> <span class="o">=</span> <span class="n">campaign</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">quarter</span> <span class="o">=</span> <span class="n">quarter</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mission</span> <span class="o">=</span> <span class="n">mission</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">keplerid</span> <span class="o">=</span> <span class="n">keplerid</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ra</span> <span class="o">=</span> <span class="n">ra</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dec</span> <span class="o">=</span> <span class="n">dec</span>
 
@@ -1070,6 +1071,14 @@
             <span class="k">return</span><span class="p">(</span><span class="s1">&#39;KeplerLightCurve(KIC: </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keplerid</span><span class="p">))</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mission</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;k2&#39;</span><span class="p">:</span>
             <span class="k">return</span><span class="p">(</span><span class="s1">&#39;KeplerLightCurve(EPIC: </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keplerid</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">keplerid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">targetid</span>
+
+    <span class="nd">@keplerid</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">keplerid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">targetid</span> <span class="o">=</span> <span class="n">value</span>
 
 <div class="viewcode-block" id="KeplerLightCurve.correct"><a class="viewcode-back" href="../../api/lightkurve.lightcurve.KeplerLightCurve.html#lightkurve.lightcurve.KeplerLightCurve.correct">[docs]</a>    <span class="k">def</span> <span class="nf">correct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;sff&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Corrects a lightcurve for motion-dependent systematic errors.</span>
@@ -1191,12 +1200,13 @@
 <span class="sd">    ticid : int</span>
 <span class="sd">        Tess Input Catalog ID number</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">flux</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flux_err</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_format</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_scale</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flux</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flux_err</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_format</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_scale</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">centroid_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">centroid_row</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quality</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quality_bitmask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">cadenceno</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sector</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">camera</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ccd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">ticid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ra</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dec</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                 <span class="n">ticid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ra</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="p">{}):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TessLightCurve</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">,</span> <span class="n">flux</span><span class="o">=</span><span class="n">flux</span><span class="p">,</span> <span class="n">flux_err</span><span class="o">=</span><span class="n">flux_err</span><span class="p">,</span>
-                                             <span class="n">time_format</span><span class="o">=</span><span class="n">time_format</span><span class="p">,</span> <span class="n">time_scale</span><span class="o">=</span><span class="n">time_scale</span><span class="p">)</span>
+                                             <span class="n">time_format</span><span class="o">=</span><span class="n">time_format</span><span class="p">,</span> <span class="n">time_scale</span><span class="o">=</span><span class="n">time_scale</span><span class="p">,</span>
+                                             <span class="n">targetid</span><span class="o">=</span><span class="n">ticid</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">meta</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">centroid_col</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_array</span><span class="p">(</span><span class="n">centroid_col</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;centroid_col&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">centroid_row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_array</span><span class="p">(</span><span class="n">centroid_row</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;centroid_row&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">quality</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_array</span><span class="p">(</span><span class="n">quality</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;quality&#39;</span><span class="p">)</span>
@@ -1206,7 +1216,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">sector</span> <span class="o">=</span> <span class="n">sector</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">camera</span> <span class="o">=</span> <span class="n">camera</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ccd</span> <span class="o">=</span> <span class="n">ccd</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ticid</span> <span class="o">=</span> <span class="n">ticid</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ra</span> <span class="o">=</span> <span class="n">ra</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dec</span> <span class="o">=</span> <span class="n">dec</span>
 
@@ -1220,7 +1229,15 @@
         <span class="k">return</span> <span class="n">lc</span>
 
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span><span class="p">(</span><span class="s1">&#39;TessLightCurve(TICID: </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ticid</span><span class="p">))</span></div>
+        <span class="k">return</span><span class="p">(</span><span class="s1">&#39;TessLightCurve(TICID: </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ticid</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ticid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">targetid</span>
+
+    <span class="nd">@ticid</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">ticid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">targetid</span> <span class="o">=</span> <span class="n">value</span></div>
 
 
 <div class="viewcode-block" id="iterative_box_period_search"><a class="viewcode-back" href="../../api/lightkurve.lightcurve.iterative_box_period_search.html#lightkurve.lightcurve.iterative_box_period_search">[docs]</a><span class="k">def</span> <span class="nf">iterative_box_period_search</span><span class="p">(</span><span class="n">lc</span><span class="p">,</span> <span class="n">niters</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">min_period</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">max_period</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
@@ -1379,7 +1396,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'1.0b10',
+            VERSION:'1.0b13',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

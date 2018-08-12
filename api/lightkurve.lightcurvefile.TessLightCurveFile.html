@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>TessLightCurveFile &mdash; lightkurve 1.0b10 documentation</title>
+  <title>TessLightCurveFile &mdash; lightkurve 1.0b13 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                1.0b10
+                1.0b13
               </div>
             
           
@@ -218,21 +218,26 @@ mission.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Attributes:</th><td class="field-body"><dl class="first last docutils">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
 <dt><strong>path</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
-<dd><p class="first last">Directory path or url to a lightcurve FITS file.</p>
+<dd><p class="first last">Local path or remote url of a FITS file in TESS’s lightcurve format.</p>
 </dd>
 <dt><strong>quality_bitmask</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str or int</span></dt>
-<dd><p class="first">Bitmask specifying quality flags of cadences that should be ignored.
-If a string is passed, it has the following meaning:</p>
+<dd><p class="first">Bitmask (integer) which identifies the quality flag bitmask that should
+be used to mask out bad cadences. If a string is passed, it has the
+following meaning:</p>
 <blockquote>
 <div><ul class="simple">
-<li>default: recommended quality mask</li>
-<li>hard: removes more flags, known to remove good data</li>
-<li>hardest: removes all data that has been flagged</li>
+<li>“none”: no cadences will be ignored (<cite>quality_bitmask=0</cite>).</li>
+<li>“default”: cadences with severe quality issues will be ignored
+(<cite>quality_bitmask=1130799</cite>).</li>
+<li>“hard”: more conservative choice of flags to ignore
+(<cite>quality_bitmask=1664431</cite>). This is known to remove good data.</li>
+<li>“hardest”: removes all data that has been flagged
+(<cite>quality_bitmask=2096639</cite>). This mask is not recommended.</li>
 </ul>
 </div></blockquote>
-<p class="last">See the <cite>TessQualityFlags</cite> class for details on the bitmasks.</p>
+<p class="last">See the <code class="xref py py-class docutils literal notranslate"><span class="pre">TessQualityFlags</span></code> class for details on the bitmasks.</p>
 </dd>
 <dt><strong>kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
 <dd><p class="first last">Keyword arguments to be passed to astropy.io.fits.open.</p>
@@ -387,7 +392,7 @@ If a string is passed, it has the following meaning:</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'1.0b10',
+            VERSION:'1.0b13',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

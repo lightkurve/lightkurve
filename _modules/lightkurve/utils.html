@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>lightkurve.utils &mdash; lightkurve 1.0b10 documentation</title>
+  <title>lightkurve.utils &mdash; lightkurve 1.0b13 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.0b10
+                1.0b13
               </div>
             
           
@@ -164,7 +164,8 @@
            <div itemprop="articleBody">
             
   <h1>Source code for lightkurve.utils</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span></span><span class="sd">&quot;&quot;&quot;This module provides various helper functions.&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 
 <span class="kn">from</span> <span class="nn">astropy.visualization</span> <span class="k">import</span> <span class="p">(</span><span class="n">PercentileInterval</span><span class="p">,</span> <span class="n">ImageNormalize</span><span class="p">,</span>
@@ -207,25 +208,22 @@
     <span class="n">PossibleThrusterFiring</span> <span class="o">=</span> <span class="mi">524288</span>
     <span class="n">ThrusterFiring</span> <span class="o">=</span> <span class="mi">1048576</span>
 
-    <span class="c1"># Which is the recommended QUALITY mask to identify bad data?</span>
+    <span class="c1">#: DEFAULT bitmask identifies all cadences which are definitely useless.</span>
     <span class="n">DEFAULT_BITMASK</span> <span class="o">=</span> <span class="p">(</span><span class="n">AttitudeTweak</span> <span class="o">|</span> <span class="n">SafeMode</span> <span class="o">|</span> <span class="n">CoarsePoint</span> <span class="o">|</span> <span class="n">EarthPoint</span> <span class="o">|</span>
-                       <span class="n">Desat</span> <span class="o">|</span> <span class="n">ManualExclude</span> <span class="o">|</span>
-                       <span class="n">DetectorAnomaly</span> <span class="o">|</span> <span class="n">NoData</span> <span class="o">|</span> <span class="n">ThrusterFiring</span><span class="p">)</span>
-
-    <span class="c1"># This bitmask includes flags that are known to identify both good and bad cadences.</span>
-    <span class="c1"># Use it wisely.</span>
+                       <span class="n">Desat</span> <span class="o">|</span> <span class="n">ManualExclude</span> <span class="o">|</span> <span class="n">DetectorAnomaly</span> <span class="o">|</span> <span class="n">NoData</span> <span class="o">|</span> <span class="n">ThrusterFiring</span><span class="p">)</span>
+    <span class="c1">#: HARD bitmask is conservative and may identify cadences which are useful.</span>
     <span class="n">HARD_BITMASK</span> <span class="o">=</span> <span class="p">(</span><span class="n">DEFAULT_BITMASK</span> <span class="o">|</span> <span class="n">SensitivityDropout</span> <span class="o">|</span> <span class="n">ApertureCosmic</span> <span class="o">|</span>
                     <span class="n">CollateralCosmic</span> <span class="o">|</span> <span class="n">PossibleThrusterFiring</span><span class="p">)</span>
-
-    <span class="c1"># Using this bitmask only QUALITY == 0 cadences will remain</span>
+    <span class="c1">#: HARDEST bitmask identifies cadences with any flag set. Its use is not recommended.</span>
     <span class="n">HARDEST_BITMASK</span> <span class="o">=</span> <span class="mi">2096639</span>
 
-    <span class="c1"># Give the recommended bitmask options friendly names</span>
-    <span class="n">OPTIONS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="n">DEFAULT_BITMASK</span><span class="p">,</span>
+    <span class="c1">#: Dictionary which provides friendly names for the various bitmasks.</span>
+    <span class="n">OPTIONS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;none&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+               <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="n">DEFAULT_BITMASK</span><span class="p">,</span>
                <span class="s1">&#39;hard&#39;</span><span class="p">:</span> <span class="n">HARD_BITMASK</span><span class="p">,</span>
                <span class="s1">&#39;hardest&#39;</span><span class="p">:</span> <span class="n">HARDEST_BITMASK</span><span class="p">}</span>
 
-    <span class="c1"># Pretty string descriptions for each flag</span>
+    <span class="c1">#: Pretty string descriptions for each flag</span>
     <span class="n">STRINGS</span> <span class="o">=</span> <span class="p">{</span>
         <span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;Attitude tweak&quot;</span><span class="p">,</span>
         <span class="mi">2</span><span class="p">:</span> <span class="s2">&quot;Safe mode&quot;</span><span class="p">,</span>
@@ -521,7 +519,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'1.0b10',
+            VERSION:'1.0b13',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

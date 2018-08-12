@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>KeplerQualityFlags &mdash; lightkurve 1.0b10 documentation</title>
+  <title>KeplerQualityFlags &mdash; lightkurve 1.0b13 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                1.0b10
+                1.0b13
               </div>
             
           
@@ -241,7 +241,7 @@ as documented in the Kepler Archive Manual (Table 2.3).</p>
 <td></td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.utils.KeplerQualityFlags.DEFAULT_BITMASK" title="lightkurve.utils.KeplerQualityFlags.DEFAULT_BITMASK"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DEFAULT_BITMASK</span></code></a></td>
-<td></td>
+<td>DEFAULT bitmask identifies all cadences which are definitely useless.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.utils.KeplerQualityFlags.Desat" title="lightkurve.utils.KeplerQualityFlags.Desat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Desat</span></code></a></td>
 <td></td>
@@ -253,10 +253,10 @@ as documented in the Kepler Archive Manual (Table 2.3).</p>
 <td></td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.utils.KeplerQualityFlags.HARDEST_BITMASK" title="lightkurve.utils.KeplerQualityFlags.HARDEST_BITMASK"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HARDEST_BITMASK</span></code></a></td>
-<td></td>
+<td>HARDEST bitmask identifies cadences with any flag set.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.utils.KeplerQualityFlags.HARD_BITMASK" title="lightkurve.utils.KeplerQualityFlags.HARD_BITMASK"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HARD_BITMASK</span></code></a></td>
-<td></td>
+<td>HARD bitmask is conservative and may identify cadences which are useful.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.utils.KeplerQualityFlags.ImpulsiveOutlier" title="lightkurve.utils.KeplerQualityFlags.ImpulsiveOutlier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ImpulsiveOutlier</span></code></a></td>
 <td></td>
@@ -271,7 +271,7 @@ as documented in the Kepler Archive Manual (Table 2.3).</p>
 <td></td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.utils.KeplerQualityFlags.OPTIONS" title="lightkurve.utils.KeplerQualityFlags.OPTIONS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OPTIONS</span></code></a></td>
-<td></td>
+<td>Dictionary which provides friendly names for the various bitmasks.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.utils.KeplerQualityFlags.PossibleThrusterFiring" title="lightkurve.utils.KeplerQualityFlags.PossibleThrusterFiring"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PossibleThrusterFiring</span></code></a></td>
 <td></td>
@@ -283,7 +283,7 @@ as documented in the Kepler Archive Manual (Table 2.3).</p>
 <td></td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.utils.KeplerQualityFlags.STRINGS" title="lightkurve.utils.KeplerQualityFlags.STRINGS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">STRINGS</span></code></a></td>
-<td></td>
+<td>Pretty string descriptions for each flag</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.utils.KeplerQualityFlags.SafeMode" title="lightkurve.utils.KeplerQualityFlags.SafeMode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SafeMode</span></code></a></td>
 <td></td>
@@ -345,7 +345,8 @@ as documented in the Kepler Archive Manual (Table 2.3).</p>
 <dl class="attribute">
 <dt id="lightkurve.utils.KeplerQualityFlags.DEFAULT_BITMASK">
 <code class="descname">DEFAULT_BITMASK</code><em class="property"> = 1130799</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.DEFAULT_BITMASK" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>DEFAULT bitmask identifies all cadences which are definitely useless.</p>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.utils.KeplerQualityFlags.Desat">
@@ -365,12 +366,14 @@ as documented in the Kepler Archive Manual (Table 2.3).</p>
 <dl class="attribute">
 <dt id="lightkurve.utils.KeplerQualityFlags.HARDEST_BITMASK">
 <code class="descname">HARDEST_BITMASK</code><em class="property"> = 2096639</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.HARDEST_BITMASK" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>HARDEST bitmask identifies cadences with any flag set. Its use is not recommended.</p>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.utils.KeplerQualityFlags.HARD_BITMASK">
 <code class="descname">HARD_BITMASK</code><em class="property"> = 1664431</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.HARD_BITMASK" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>HARD bitmask is conservative and may identify cadences which are useful.</p>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.utils.KeplerQualityFlags.ImpulsiveOutlier">
@@ -394,8 +397,9 @@ as documented in the Kepler Archive Manual (Table 2.3).</p>
 
 <dl class="attribute">
 <dt id="lightkurve.utils.KeplerQualityFlags.OPTIONS">
-<code class="descname">OPTIONS</code><em class="property"> = {'default': 1130799, 'hard': 1664431, 'hardest': 2096639}</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.OPTIONS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descname">OPTIONS</code><em class="property"> = {'default': 1130799, 'hard': 1664431, 'hardest': 2096639, 'none': 0}</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.OPTIONS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dictionary which provides friendly names for the various bitmasks.</p>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.utils.KeplerQualityFlags.PossibleThrusterFiring">
@@ -415,7 +419,8 @@ as documented in the Kepler Archive Manual (Table 2.3).</p>
 <dl class="attribute">
 <dt id="lightkurve.utils.KeplerQualityFlags.STRINGS">
 <code class="descname">STRINGS</code><em class="property"> = {1: 'Attitude tweak', 2: 'Safe mode', 4: 'Coarse point', 8: 'Earth point', 16: 'Zero crossing', 32: 'Desaturation event', 64: 'Argabrightening', 128: 'Cosmic ray in optimal aperture', 256: 'Manual exclude', 1024: 'Sudden sensitivity dropout', 2048: 'Impulsive outlier', 4096: 'Argabrightening on CCD', 8192: 'Cosmic ray in collateral data', 16384: 'Detector anomaly', 32768: 'No fine point', 65536: 'No data', 131072: 'Rolling band in optimal aperture', 262144: 'Rolling band in full mask', 524288: 'Possible thruster firing', 1048576: 'Thruster firing'}</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.STRINGS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Pretty string descriptions for each flag</p>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.utils.KeplerQualityFlags.SafeMode">
@@ -514,7 +519,7 @@ quality flags raised.  Returns an empty list if no flags raised.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'1.0b10',
+            VERSION:'1.0b13',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

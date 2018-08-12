@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>SimpleKeplerPRF &mdash; lightkurve 1.0b10 documentation</title>
+  <title>SimpleKeplerPRF &mdash; lightkurve 1.0b13 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                1.0b10
+                1.0b13
               </div>
             
           
@@ -252,13 +252,13 @@ and angle are fixed to 1.0 and 0, respectivelly.</p>
 <p class="rubric">Methods Documentation</p>
 <dl class="method">
 <dt id="lightkurve.prf.SimpleKeplerPRF.__call__">
-<code class="descname">__call__</code><span class="sig-paren">(</span><em>center_col</em>, <em>center_row</em>, <em>flux=1.0</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/prf/prfmodel.html#SimpleKeplerPRF.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.prf.SimpleKeplerPRF.__call__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__call__</code><span class="sig-paren">(</span><em>center_col</em>, <em>center_row</em>, <em>flux=1.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/prf/prfmodel.html#SimpleKeplerPRF.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.prf.SimpleKeplerPRF.__call__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Call self as a function.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="lightkurve.prf.SimpleKeplerPRF.evaluate">
-<code class="descname">evaluate</code><span class="sig-paren">(</span><em>center_col</em>, <em>center_row</em>, <em>flux=1.0</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/prf/prfmodel.html#SimpleKeplerPRF.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.prf.SimpleKeplerPRF.evaluate" title="Permalink to this definition">¶</a></dt>
+<code class="descname">evaluate</code><span class="sig-paren">(</span><em>center_col</em>, <em>center_row</em>, <em>flux=1.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/prf/prfmodel.html#SimpleKeplerPRF.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.prf.SimpleKeplerPRF.evaluate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Interpolates the PRF model onto detector coordinates.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -288,7 +288,7 @@ by flux and centroids.</p>
 
 <dl class="method">
 <dt id="lightkurve.prf.SimpleKeplerPRF.gradient">
-<code class="descname">gradient</code><span class="sig-paren">(</span><em>center_col</em>, <em>center_row</em>, <em>flux</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.SimpleKeplerPRF.gradient" title="Permalink to this definition">¶</a></dt>
+<code class="descname">gradient</code><span class="sig-paren">(</span><em>center_col</em>, <em>center_row</em>, <em>flux</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/prf/prfmodel.html#SimpleKeplerPRF.gradient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.prf.SimpleKeplerPRF.gradient" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function returns the gradient of the SimpleKeplerPRF model with
 respect to flux, center_col, and center_row.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -309,7 +309,7 @@ respect to flux, center_col, and center_row.</p>
 <dt><strong>grad_prf</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list</span></dt>
 <dd><p class="first last">Returns a list of arrays where the elements are the derivative
 of the KeplerPRF model with respect to center_col, center_row,
-and flux respectively.</p>
+and flux, respectively.</p>
 </dd>
 </dl>
 </td>
@@ -369,7 +369,7 @@ and flux respectively.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'1.0b10',
+            VERSION:'1.0b13',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

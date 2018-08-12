@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>lightkurve.prf.prfmodel &mdash; lightkurve 1.0b10 documentation</title>
+  <title>lightkurve.prf.prfmodel &mdash; lightkurve 1.0b13 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.0b10
+                1.0b13
               </div>
             
           
@@ -249,7 +249,9 @@
 <span class="sd">        flux : float</span>
 <span class="sd">            Total integrated flux of the PRF</span>
 <span class="sd">        scale_col, scale_row : float</span>
-<span class="sd">            Pixel scale in the column and row directions</span>
+<span class="sd">            Pixel scale stretch parameter, i.e. the numbers by which the PRF</span>
+<span class="sd">            model needs to be multiplied in the column and row directions to</span>
+<span class="sd">            account for focus changes</span>
 <span class="sd">        rotation_angle : float</span>
 <span class="sd">            Rotation angle in radians</span>
 
@@ -273,6 +275,70 @@
                                                  <span class="n">rot_col</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="o">*</span> <span class="n">scale_col</span><span class="p">,</span>
                                                  <span class="n">grid</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">prf_model</span></div>
+
+    <span class="k">def</span> <span class="nf">gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center_col</span><span class="p">,</span> <span class="n">center_row</span><span class="p">,</span> <span class="n">flux</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">scale_col</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">scale_row</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span>
+                 <span class="n">rotation_angle</span><span class="o">=</span><span class="mf">0.</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function returns the gradient of the KeplerPRF model with</span>
+<span class="sd">        respect to center_col, center_row, flux, scale_col, scale_row,</span>
+<span class="sd">        and rotation_angle.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        center_col, center_row : float</span>
+<span class="sd">            Column and row coordinates of the center</span>
+<span class="sd">        flux : float</span>
+<span class="sd">            Total integrated flux of the PRF</span>
+<span class="sd">        scale_col, scale_row : float</span>
+<span class="sd">            Pixel scale stretch parameter, i.e. the numbers by which the PRF</span>
+<span class="sd">            model needs to be multiplied in the column and row directions to</span>
+<span class="sd">            account for focus changes</span>
+<span class="sd">        rotation_angle : float</span>
+<span class="sd">            Rotation angle in radians</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        grad_prf : list</span>
+<span class="sd">            Returns a list of arrays where the elements are the partial derivatives</span>
+<span class="sd">            of the KeplerPRF model with respect to center_col, center_row, flux, scale_col,</span>
+<span class="sd">            scale_row, and rotation_angle, respectively.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cosa</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">rotation_angle</span><span class="p">)</span>
+        <span class="n">sina</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">rotation_angle</span><span class="p">)</span>
+
+        <span class="n">delta_col</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">col_coord</span> <span class="o">-</span> <span class="n">center_col</span>
+        <span class="n">delta_row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">row_coord</span> <span class="o">-</span> <span class="n">center_row</span>
+        <span class="n">delta_col</span><span class="p">,</span> <span class="n">delta_row</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">delta_col</span><span class="p">,</span> <span class="n">delta_row</span><span class="p">)</span>
+
+        <span class="n">rot_row</span> <span class="o">=</span> <span class="n">delta_row</span> <span class="o">*</span> <span class="n">cosa</span> <span class="o">-</span> <span class="n">delta_col</span> <span class="o">*</span> <span class="n">sina</span>
+        <span class="n">rot_col</span> <span class="o">=</span> <span class="n">delta_row</span> <span class="o">*</span> <span class="n">sina</span> <span class="o">+</span> <span class="n">delta_col</span> <span class="o">*</span> <span class="n">cosa</span>
+
+        <span class="c1"># for a proof of the maths that follow, see the pdf attached</span>
+        <span class="c1"># on pull request #198 in lightkurve GitHub repo.</span>
+        <span class="n">deriv_flux</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">rot_row</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="o">*</span> <span class="n">scale_row</span><span class="p">,</span>
+                                      <span class="n">rot_col</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="o">*</span> <span class="n">scale_col</span><span class="p">,</span>
+                                      <span class="n">grid</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+        <span class="n">interp_dy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">rot_row</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="o">*</span> <span class="n">scale_row</span><span class="p">,</span>
+                                     <span class="n">rot_col</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="o">*</span> <span class="n">scale_col</span><span class="p">,</span>
+                                     <span class="n">grid</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+        <span class="n">interp_dx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">rot_row</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="o">*</span> <span class="n">scale_row</span><span class="p">,</span>
+                                     <span class="n">rot_col</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span> <span class="o">*</span> <span class="n">scale_col</span><span class="p">,</span>
+                                     <span class="n">grid</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+        <span class="n">scale_row_times_interp_dx</span> <span class="o">=</span> <span class="n">scale_row</span> <span class="o">*</span> <span class="n">interp_dx</span>
+        <span class="n">scale_col_times_interp_dy</span> <span class="o">=</span> <span class="n">scale_col</span> <span class="o">*</span> <span class="n">interp_dy</span>
+
+        <span class="n">deriv_center_col</span> <span class="o">=</span> <span class="o">-</span> <span class="n">flux</span> <span class="o">*</span> <span class="p">(</span><span class="n">cosa</span> <span class="o">*</span> <span class="n">scale_col_times_interp_dy</span> <span class="o">-</span> <span class="n">sina</span> <span class="o">*</span> <span class="n">scale_row_times_interp_dx</span><span class="p">)</span>
+        <span class="n">deriv_center_row</span> <span class="o">=</span> <span class="o">-</span> <span class="n">flux</span> <span class="o">*</span> <span class="p">(</span><span class="n">sina</span> <span class="o">*</span> <span class="n">scale_col_times_interp_dy</span> <span class="o">+</span> <span class="n">cosa</span> <span class="o">*</span> <span class="n">scale_row_times_interp_dx</span><span class="p">)</span>
+        <span class="n">deriv_scale_row</span> <span class="o">=</span> <span class="n">flux</span> <span class="o">*</span> <span class="n">interp_dx</span> <span class="o">*</span> <span class="n">rot_row</span>
+        <span class="n">deriv_scale_col</span> <span class="o">=</span> <span class="n">flux</span> <span class="o">*</span> <span class="n">interp_dy</span> <span class="o">*</span> <span class="n">rot_col</span>
+        <span class="n">deriv_rotation_angle</span> <span class="o">=</span> <span class="n">flux</span> <span class="o">*</span> <span class="p">(</span><span class="n">interp_dy</span> <span class="o">*</span> <span class="n">scale_col</span> <span class="o">*</span> <span class="p">(</span><span class="n">delta_row</span> <span class="o">*</span> <span class="n">cosa</span> <span class="o">-</span> <span class="n">delta_col</span> <span class="o">*</span> <span class="n">sina</span><span class="p">)</span>
+                                       <span class="o">-</span> <span class="n">interp_dx</span> <span class="o">*</span> <span class="n">scale_row</span> <span class="o">*</span> <span class="p">(</span><span class="n">delta_row</span> <span class="o">*</span> <span class="n">sina</span> <span class="o">+</span> <span class="n">delta_col</span> <span class="o">*</span> <span class="n">cosa</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">deriv_center_col</span><span class="p">,</span> <span class="n">deriv_center_row</span><span class="p">,</span> <span class="n">deriv_flux</span><span class="p">,</span>
+                <span class="n">deriv_scale_col</span><span class="p">,</span> <span class="n">deriv_scale_row</span><span class="p">,</span> <span class="n">deriv_rotation_angle</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">_read_prf_calibration_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">ext</span><span class="p">):</span>
         <span class="n">prf_cal_file</span> <span class="o">=</span> <span class="n">pyfits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
@@ -344,35 +410,7 @@
         <span class="n">pflux</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="o">*</span><span class="n">params</span><span class="p">)</span>
         <span class="n">plot_image</span><span class="p">(</span><span class="n">pflux</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Kepler PRF Model, Channel: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">),</span>
                    <span class="n">extent</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">column</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-                           <span class="bp">self</span><span class="o">.</span><span class="n">row</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">row</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
-
-    <span class="k">def</span> <span class="nf">gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center_col</span><span class="p">,</span> <span class="n">center_row</span><span class="p">,</span> <span class="n">flux</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This function returns the gradient of the SimpleKeplerPRF model with</span>
-<span class="sd">        respect to flux, center_col, and center_row.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        center_col, center_row : float</span>
-<span class="sd">            Column and row coordinates of the center</span>
-<span class="sd">        flux : float</span>
-<span class="sd">            Total integrated flux of the PRF</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        grad_prf : list</span>
-<span class="sd">            Returns a list of arrays where the elements are the derivative</span>
-<span class="sd">            of the KeplerPRF model with respect to center_col, center_row,</span>
-<span class="sd">            and flux respectively.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">delta_col</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">col_coord</span> <span class="o">-</span> <span class="n">center_col</span>
-        <span class="n">delta_row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">row_coord</span> <span class="o">-</span> <span class="n">center_row</span>
-
-        <span class="n">deriv_flux</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">delta_row</span><span class="p">,</span> <span class="n">delta_col</span><span class="p">)</span>
-        <span class="n">deriv_center_col</span> <span class="o">=</span> <span class="o">-</span> <span class="n">flux</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">delta_row</span><span class="p">,</span> <span class="n">delta_col</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">deriv_center_row</span> <span class="o">=</span> <span class="o">-</span> <span class="n">flux</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">delta_row</span><span class="p">,</span> <span class="n">delta_col</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="p">[</span><span class="n">deriv_center_col</span><span class="p">,</span> <span class="n">deriv_center_row</span><span class="p">,</span> <span class="n">deriv_flux</span><span class="p">]</span></div>
+                           <span class="bp">self</span><span class="o">.</span><span class="n">row</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">row</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="SimpleKeplerPRF"><a class="viewcode-back" href="../../../api/lightkurve.prf.SimpleKeplerPRF.html#lightkurve.prf.SimpleKeplerPRF">[docs]</a><span class="k">class</span> <span class="nc">SimpleKeplerPRF</span><span class="p">(</span><span class="n">KeplerPRF</span><span class="p">):</span>
@@ -384,10 +422,10 @@
 <span class="sd">    and angle are fixed to 1.0 and 0, respectivelly.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="SimpleKeplerPRF.__call__"><a class="viewcode-back" href="../../../api/lightkurve.prf.SimpleKeplerPRF.html#lightkurve.prf.SimpleKeplerPRF.__call__">[docs]</a>    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center_col</span><span class="p">,</span> <span class="n">center_row</span><span class="p">,</span> <span class="n">flux</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="SimpleKeplerPRF.__call__"><a class="viewcode-back" href="../../../api/lightkurve.prf.SimpleKeplerPRF.html#lightkurve.prf.SimpleKeplerPRF.__call__">[docs]</a>    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center_col</span><span class="p">,</span> <span class="n">center_row</span><span class="p">,</span> <span class="n">flux</span><span class="o">=</span><span class="mf">1.</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">center_col</span><span class="p">,</span> <span class="n">center_row</span><span class="p">,</span> <span class="n">flux</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SimpleKeplerPRF.evaluate"><a class="viewcode-back" href="../../../api/lightkurve.prf.SimpleKeplerPRF.html#lightkurve.prf.SimpleKeplerPRF.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center_col</span><span class="p">,</span> <span class="n">center_row</span><span class="p">,</span> <span class="n">flux</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="SimpleKeplerPRF.evaluate"><a class="viewcode-back" href="../../../api/lightkurve.prf.SimpleKeplerPRF.html#lightkurve.prf.SimpleKeplerPRF.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center_col</span><span class="p">,</span> <span class="n">center_row</span><span class="p">,</span> <span class="n">flux</span><span class="o">=</span><span class="mf">1.</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Interpolates the PRF model onto detector coordinates.</span>
 
@@ -408,7 +446,35 @@
         <span class="n">delta_row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">row_coord</span> <span class="o">-</span> <span class="n">center_row</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">prf_model</span> <span class="o">=</span> <span class="n">flux</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">delta_row</span><span class="p">,</span> <span class="n">delta_col</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">prf_model</span></div></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">prf_model</span></div>
+
+<div class="viewcode-block" id="SimpleKeplerPRF.gradient"><a class="viewcode-back" href="../../../api/lightkurve.prf.SimpleKeplerPRF.html#lightkurve.prf.SimpleKeplerPRF.gradient">[docs]</a>    <span class="k">def</span> <span class="nf">gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center_col</span><span class="p">,</span> <span class="n">center_row</span><span class="p">,</span> <span class="n">flux</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function returns the gradient of the SimpleKeplerPRF model with</span>
+<span class="sd">        respect to flux, center_col, and center_row.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        center_col, center_row : float</span>
+<span class="sd">            Column and row coordinates of the center</span>
+<span class="sd">        flux : float</span>
+<span class="sd">            Total integrated flux of the PRF</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        grad_prf : list</span>
+<span class="sd">            Returns a list of arrays where the elements are the derivative</span>
+<span class="sd">            of the KeplerPRF model with respect to center_col, center_row,</span>
+<span class="sd">            and flux, respectively.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">delta_col</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">col_coord</span> <span class="o">-</span> <span class="n">center_col</span>
+        <span class="n">delta_row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">row_coord</span> <span class="o">-</span> <span class="n">center_row</span>
+
+        <span class="n">deriv_flux</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">delta_row</span><span class="p">,</span> <span class="n">delta_col</span><span class="p">)</span>
+        <span class="n">deriv_center_col</span> <span class="o">=</span> <span class="o">-</span> <span class="n">flux</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">delta_row</span><span class="p">,</span> <span class="n">delta_col</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">deriv_center_row</span> <span class="o">=</span> <span class="o">-</span> <span class="n">flux</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">delta_row</span><span class="p">,</span> <span class="n">delta_col</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">deriv_center_col</span><span class="p">,</span> <span class="n">deriv_center_row</span><span class="p">,</span> <span class="n">deriv_flux</span><span class="p">]</span></div></div>
 </pre></div>
 
            </div>
@@ -443,7 +509,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'1.0b10',
+            VERSION:'1.0b13',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

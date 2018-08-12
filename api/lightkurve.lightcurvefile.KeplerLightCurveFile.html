@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>KeplerLightCurveFile &mdash; lightkurve 1.0b10 documentation</title>
+  <title>KeplerLightCurveFile &mdash; lightkurve 1.0b13 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                1.0b10
+                1.0b13
               </div>
             
           
@@ -218,22 +218,26 @@ K2 missions.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Attributes:</th><td class="field-body"><dl class="first last docutils">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
 <dt><strong>path</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
-<dd><p class="first last">Directory path or url to a lightcurve FITS file.</p>
+<dd><p class="first last">Local path or remote url of a FITS file in Kepler’s lightcurve format.</p>
 </dd>
 <dt><strong>quality_bitmask</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str or int</span></dt>
-<dd><p class="first">Bitmask specifying quality flags of cadences that should be ignored.
-If <cite>None</cite> is passed, then no cadences are ignored.
-If a string is passed, it has the following meaning:</p>
+<dd><p class="first">Bitmask (integer) which identifies the quality flag bitmask that should
+be used to mask out bad cadences. If a string is passed, it has the
+following meaning:</p>
 <blockquote>
 <div><ul class="simple">
-<li>default: recommended quality mask</li>
-<li>hard: removes more flags, known to remove good data</li>
-<li>hardest: removes all data that has been flagged</li>
+<li>“none”: no cadences will be ignored (<cite>quality_bitmask=0</cite>).</li>
+<li>“default”: cadences with severe quality issues will be ignored
+(<cite>quality_bitmask=1130799</cite>).</li>
+<li>“hard”: more conservative choice of flags to ignore
+(<cite>quality_bitmask=1664431</cite>). This is known to remove good data.</li>
+<li>“hardest”: removes all data that has been flagged
+(<cite>quality_bitmask=2096639</cite>). This mask is not recommended.</li>
 </ul>
 </div></blockquote>
-<p class="last">See the <cite>KeplerQualityFlags</cite> class for details on the bitmasks.</p>
+<p class="last">See the <code class="xref py py-class docutils literal notranslate"><span class="pre">KeplerQualityFlags</span></code> class for details on the bitmasks.</p>
 </dd>
 <dt><strong>kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
 <dd><p class="first last">Keyword arguments to be passed to astropy.io.fits.open.</p>
@@ -263,10 +267,10 @@ If a string is passed, it has the following meaning:</p>
 <td>Cadence number</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.campaign" title="lightkurve.lightcurvefile.KeplerLightCurveFile.campaign"><code class="xref py py-obj docutils literal notranslate"><span class="pre">campaign</span></code></a></td>
-<td>Campaign number</td>
+<td>K2 Campaign number.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.channel" title="lightkurve.lightcurvefile.KeplerLightCurveFile.channel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">channel</span></code></a></td>
-<td>Channel number</td>
+<td>Kepler CCD channel number.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.dec" title="lightkurve.lightcurvefile.KeplerLightCurveFile.dec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dec</span></code></a></td>
 <td>Declination of the target.</td>
@@ -275,10 +279,10 @@ If a string is passed, it has the following meaning:</p>
 <td></td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.mission" title="lightkurve.lightcurvefile.KeplerLightCurveFile.mission"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mission</span></code></a></td>
-<td>Mission name</td>
+<td>‘Kepler’ or ‘K2’.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.obsmode" title="lightkurve.lightcurvefile.KeplerLightCurveFile.obsmode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">obsmode</span></code></a></td>
-<td></td>
+<td>‘short cadence’ or ‘long cadence’.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.pos_corr1" title="lightkurve.lightcurvefile.KeplerLightCurveFile.pos_corr1"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pos_corr1</span></code></a></td>
 <td>Returns the column position correction.</td>
@@ -287,7 +291,7 @@ If a string is passed, it has the following meaning:</p>
 <td>Returns the row position correction.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.quarter" title="lightkurve.lightcurvefile.KeplerLightCurveFile.quarter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">quarter</span></code></a></td>
-<td>Quarter number</td>
+<td>Kepler quarter number.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.ra" title="lightkurve.lightcurvefile.KeplerLightCurveFile.ra"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ra</span></code></a></td>
 <td>Right Ascension of the target.</td>
@@ -349,13 +353,13 @@ If a string is passed, it has the following meaning:</p>
 <dl class="attribute">
 <dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.campaign">
 <code class="descname">campaign</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.campaign" title="Permalink to this definition">¶</a></dt>
-<dd><p>Campaign number</p>
+<dd><p>K2 Campaign number. (‘CAMPAIGN’ header keyword)</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.channel">
 <code class="descname">channel</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.channel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Channel number</p>
+<dd><p>Kepler CCD channel number. (‘CHANNEL’ header keyword)</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -372,13 +376,14 @@ If a string is passed, it has the following meaning:</p>
 <dl class="attribute">
 <dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.mission">
 <code class="descname">mission</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.mission" title="Permalink to this definition">¶</a></dt>
-<dd><p>Mission name</p>
+<dd><p>‘Kepler’ or ‘K2’. (‘MISSION’ header keyword)</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.obsmode">
 <code class="descname">obsmode</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.obsmode" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>‘short cadence’ or ‘long cadence’. (‘OBSMODE’ header keyword)</p>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.pos_corr1">
@@ -395,7 +400,7 @@ If a string is passed, it has the following meaning:</p>
 <dl class="attribute">
 <dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.quarter">
 <code class="descname">quarter</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.quarter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Quarter number</p>
+<dd><p>Kepler quarter number. (‘QUARTER’ header keyword)</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -445,7 +450,7 @@ KeplerCBVCorrector.correct.</p>
 
 <dl class="staticmethod">
 <dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.from_archive">
-<em class="property">static </em><code class="descname">from_archive</code><span class="sig-paren">(</span><em>target</em>, <em>cadence='long'</em>, <em>quarter=None</em>, <em>month=None</em>, <em>campaign=None</em>, <em>radius=1.0</em>, <em>targetlimit=1</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurvefile.html#KeplerLightCurveFile.from_archive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.from_archive" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">from_archive</code><span class="sig-paren">(</span><em>target</em>, <em>cadence='long'</em>, <em>quarter=None</em>, <em>month=None</em>, <em>campaign=None</em>, <em>radius=1.0</em>, <em>targetlimit=1</em>, <em>quality_bitmask='default'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurvefile.html#KeplerLightCurveFile.from_archive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.from_archive" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetches a LightCurveFile (or list thereof) from the data archive at MAST.</p>
 <p>If a target was observed across multiple quarters or campaigns, a
 list of <cite>LightCurveFile</cite> objects will only be returned if the string
@@ -481,6 +486,23 @@ Hence, if cadence=’short’ you need to specify month=1, 2, or 3.</p>
 <dd><p class="first last">If multiple targets are present within <cite>radius</cite>, limit the number
 of returned LightCurveFile objects to <cite>targetlimit</cite>.
 If <cite>None</cite>, no limit is applied.</p>
+</dd>
+<dt><strong>quality_bitmask</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str or int</span></dt>
+<dd><p class="first">Bitmask (integer) which identifies the quality flag bitmask that should
+be used to mask out bad cadences. If a string is passed, it has the
+following meaning:</p>
+<blockquote>
+<div><ul class="simple">
+<li>“none”: no cadences will be ignored (<cite>quality_bitmask=0</cite>).</li>
+<li>“default”: cadences with severe quality issues will be ignored
+(<cite>quality_bitmask=1130799</cite>).</li>
+<li>“hard”: more conservative choice of flags to ignore
+(<cite>quality_bitmask=1664431</cite>). This is known to remove good data.</li>
+<li>“hardest”: removes all data that has been flagged
+(<cite>quality_bitmask=2096639</cite>). This mask is not recommended.</li>
+</ul>
+</div></blockquote>
+<p class="last">See the <code class="xref py py-class docutils literal notranslate"><span class="pre">KeplerQualityFlags</span></code> class for details on the bitmasks.</p>
 </dd>
 <dt><strong>kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
 <dd><p class="first last">Keywords arguments passed to <cite>KeplerLightCurveFile</cite>.</p>
@@ -582,7 +604,7 @@ If <cite>None</cite>, no limit is applied.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'1.0b10',
+            VERSION:'1.0b13',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

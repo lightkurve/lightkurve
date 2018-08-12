@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>TessTargetPixelFile &mdash; lightkurve 1.0b10 documentation</title>
+  <title>TessTargetPixelFile &mdash; lightkurve 1.0b13 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                1.0b10
+                1.0b13
               </div>
             
           
@@ -218,7 +218,7 @@ Enables extraction of raw lightcurves and centroid positions.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Attributes:</th><td class="field-body"><dl class="first last docutils">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
 <dt><strong>path</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
 <dd><p class="first last">Path to a Kepler Target Pixel (FITS) File.</p>
 </dd>
@@ -256,7 +256,7 @@ Enables extraction of raw lightcurves and centroid positions.</p>
 <td></td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.dec" title="lightkurve.targetpixelfile.TessTargetPixelFile.dec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dec</span></code></a></td>
-<td></td>
+<td>Declination of target (‘DEC_OBJ’ header keyword).</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.flux" title="lightkurve.targetpixelfile.TessTargetPixelFile.flux"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flux</span></code></a></td>
 <td>Returns the flux for all good-quality cadences.</td>
@@ -292,7 +292,7 @@ Enables extraction of raw lightcurves and centroid positions.</p>
 <td>Returns the quality flag integer of every good cadence.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.ra" title="lightkurve.targetpixelfile.TessTargetPixelFile.ra"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ra</span></code></a></td>
-<td></td>
+<td>Right Ascension of target (‘RA_OBJ’ header keyword).</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.row" title="lightkurve.targetpixelfile.TessTargetPixelFile.row"><code class="xref py py-obj docutils literal notranslate"><span class="pre">row</span></code></a></td>
 <td></td>
@@ -381,7 +381,8 @@ Enables extraction of raw lightcurves and centroid positions.</p>
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.dec">
 <code class="descname">dec</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.dec" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Declination of target (‘DEC_OBJ’ header keyword).</p>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.flux">
@@ -449,7 +450,8 @@ Enables extraction of raw lightcurves and centroid positions.</p>
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.ra">
 <code class="descname">ra</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.ra" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Right Ascension of target (‘RA_OBJ’ header keyword).</p>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.row">
@@ -578,6 +580,10 @@ Uses the WCS solution and the POS_CORR data from TPF header.</p>
 <p>The widget will show both the lightcurve and pixel data.  By default,
 the lightcurve shown is obtained by calling the <cite>to_lightcurve()</cite> method,
 unless the user supplies a custom <cite>LightCurve</cite> object.</p>
+<p>This feature requires two optional dependencies:
+- bokeh&gt;=0.12.15
+- ipywidgets&gt;=7.2.0
+These can be installed using e.g. <cite>conda install bokeh ipywidgets</cite>.</p>
 <p>Note: at this time, this feature only works inside an active Jupyter
 Notebook, and tends to be too slow when more than ~30,000 cadences
 are contained in the TPF (e.g. short cadence data).</p>
@@ -742,7 +748,7 @@ of <cite>prf_photometry()</cite> for valid arguments if the method is ‘prf’.
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'1.0b10',
+            VERSION:'1.0b13',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

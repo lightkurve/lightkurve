@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>KeplerTargetPixelFile &mdash; lightkurve 1.0b10 documentation</title>
+  <title>KeplerTargetPixelFile &mdash; lightkurve 1.0b13 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                1.0b10
+                1.0b13
               </div>
             
           
@@ -214,34 +214,30 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">lightkurve.targetpixelfile.TargetPixelFile</span></code></p>
 <p>Defines a TargetPixelFile class for the Kepler/K2 Mission.
 Enables extraction of raw lightcurves and centroid positions.</p>
-<p class="rubric">References</p>
-<table class="docutils citation" frame="void" id="r59afa7b5afd4-1" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Kepler: A Search for Terrestrial Planets. Kepler Archive Manual.
-<a class="reference external" href="http://archive.stsci.edu/kepler/manuals/archive_manual.pdf">http://archive.stsci.edu/kepler/manuals/archive_manual.pdf</a></td></tr>
-</tbody>
-</table>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Attributes:</th><td class="field-body"><dl class="first last docutils">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
 <dt><strong>path</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str or <cite>astropy.io.fits.HDUList</cite></span></dt>
 <dd><p class="first last">Path to a Kepler Target Pixel (FITS) File or a <cite>HDUList</cite> object.</p>
 </dd>
 <dt><strong>quality_bitmask</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str or int</span></dt>
-<dd><p class="first">Bitmask specifying quality flags of cadences that should be ignored.
-If <cite>None</cite> is passed, then no cadences are ignored.
-If a string is passed, it has the following meaning:</p>
+<dd><p class="first">Bitmask (integer) which identifies the quality flag bitmask that should
+be used to mask out bad cadences. If a string is passed, it has the
+following meaning:</p>
 <blockquote>
 <div><ul class="simple">
-<li>“default”: recommended quality mask</li>
-<li>“hard”: removes more flags, known to remove good data</li>
-<li>“hardest”: removes all data that has been flagged</li>
+<li>“none”: no cadences will be ignored (<cite>quality_bitmask=0</cite>).</li>
+<li>“default”: cadences with severe quality issues will be ignored
+(<cite>quality_bitmask=1130799</cite>).</li>
+<li>“hard”: more conservative choice of flags to ignore
+(<cite>quality_bitmask=1664431</cite>). This is known to remove good data.</li>
+<li>“hardest”: removes all data that has been flagged
+(<cite>quality_bitmask=2096639</cite>). This mask is not recommended.</li>
 </ul>
 </div></blockquote>
-<p class="last">See the <cite>KeplerQualityFlags</cite> class for details on the bitmasks.</p>
+<p class="last">See the <code class="xref py py-class docutils literal notranslate"><span class="pre">KeplerQualityFlags</span></code> class for details on the bitmasks.</p>
 </dd>
 <dt><strong>kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
 <dd><p class="first last">Keyword arguments passed to <cite>astropy.io.fits.open()</cite>.</p>
@@ -249,6 +245,14 @@ If a string is passed, it has the following meaning:</p>
 </dl>
 </td>
 </tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<table class="docutils citation" frame="void" id="r59afa7b5afd4-1" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Kepler: A Search for Terrestrial Planets. Kepler Archive Manual.
+<a class="reference external" href="http://archive.stsci.edu/kepler/manuals/archive_manual.pdf">http://archive.stsci.edu/kepler/manuals/archive_manual.pdf</a></td></tr>
 </tbody>
 </table>
 <p class="rubric">Attributes Summary</p>
@@ -265,16 +269,16 @@ If a string is passed, it has the following meaning:</p>
 <td>Return the cadence number for all good-quality cadences.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.campaign" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.campaign"><code class="xref py py-obj docutils literal notranslate"><span class="pre">campaign</span></code></a></td>
-<td>Campaign number</td>
+<td>K2 Campaign number.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.channel" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.channel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">channel</span></code></a></td>
-<td></td>
+<td>Kepler CCD channel number.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.column" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.column"><code class="xref py py-obj docutils literal notranslate"><span class="pre">column</span></code></a></td>
 <td></td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.dec" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.dec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dec</span></code></a></td>
-<td></td>
+<td>Declination of target (‘DEC_OBJ’ header keyword).</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.flux" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.flux"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flux</span></code></a></td>
 <td>Returns the flux for all good-quality cadences.</td>
@@ -295,19 +299,19 @@ If a string is passed, it has the following meaning:</p>
 <td></td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.mission" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.mission"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mission</span></code></a></td>
-<td>Mission name, defaults to None if Not available</td>
+<td>‘Kepler’ or ‘K2’.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.module" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.module"><code class="xref py py-obj docutils literal notranslate"><span class="pre">module</span></code></a></td>
-<td></td>
+<td>Kepler CCD module number.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.nan_time_mask" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.nan_time_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nan_time_mask</span></code></a></td>
 <td>Returns a boolean mask flagging cadences whose time is <cite>nan</cite>.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.obsmode" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.obsmode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">obsmode</span></code></a></td>
-<td></td>
+<td>‘short cadence’ or ‘long cadence’.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.output" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.output"><code class="xref py py-obj docutils literal notranslate"><span class="pre">output</span></code></a></td>
-<td></td>
+<td>Kepler CCD module output number.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.pipeline_mask" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.pipeline_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pipeline_mask</span></code></a></td>
 <td>Returns the aperture mask used by the pipeline</td>
@@ -322,10 +326,10 @@ If a string is passed, it has the following meaning:</p>
 <td>Returns the quality flag integer of every good cadence.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.quarter" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.quarter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">quarter</span></code></a></td>
-<td>Quarter number</td>
+<td>Kepler quarter number.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.ra" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.ra"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ra</span></code></a></td>
-<td></td>
+<td>Right Ascension of target (‘RA_OBJ’ header keyword).</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.row" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.row"><code class="xref py py-obj docutils literal notranslate"><span class="pre">row</span></code></a></td>
 <td></td>
@@ -402,13 +406,14 @@ If a string is passed, it has the following meaning:</p>
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.campaign">
 <code class="descname">campaign</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.campaign" title="Permalink to this definition">¶</a></dt>
-<dd><p>Campaign number</p>
+<dd><p>K2 Campaign number. (‘CAMPAIGN’ header keyword)</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.channel">
 <code class="descname">channel</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.channel" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Kepler CCD channel number. (‘CHANNEL’ header keyword)</p>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.column">
@@ -418,7 +423,8 @@ If a string is passed, it has the following meaning:</p>
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.dec">
 <code class="descname">dec</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.dec" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Declination of target (‘DEC_OBJ’ header keyword).</p>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.flux">
@@ -456,13 +462,14 @@ If a string is passed, it has the following meaning:</p>
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.mission">
 <code class="descname">mission</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.mission" title="Permalink to this definition">¶</a></dt>
-<dd><p>Mission name, defaults to None if Not available</p>
+<dd><p>‘Kepler’ or ‘K2’. (‘MISSION’ header keyword)</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.module">
 <code class="descname">module</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.module" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Kepler CCD module number. (‘MODULE’ header keyword)</p>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.nan_time_mask">
@@ -473,12 +480,14 @@ If a string is passed, it has the following meaning:</p>
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.obsmode">
 <code class="descname">obsmode</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.obsmode" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>‘short cadence’ or ‘long cadence’. (‘OBSMODE’ header keyword)</p>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.output">
 <code class="descname">output</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.output" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Kepler CCD module output number. (‘OUTPUT’ header keyword)</p>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.pipeline_mask">
@@ -507,13 +516,14 @@ If a string is passed, it has the following meaning:</p>
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.quarter">
 <code class="descname">quarter</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.quarter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Quarter number</p>
+<dd><p>Kepler quarter number. (‘QUARTER’ header keyword)</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.ra">
 <code class="descname">ra</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.ra" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Right Ascension of target (‘RA_OBJ’ header keyword).</p>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.row">
@@ -584,8 +594,9 @@ The default behaviour is to use the Kepler pipeline mask.</p>
 
 <dl class="staticmethod">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.from_archive">
-<em class="property">static </em><code class="descname">from_archive</code><span class="sig-paren">(</span><em>target</em>, <em>cadence='long'</em>, <em>quarter=None</em>, <em>month=None</em>, <em>campaign=None</em>, <em>radius=1.0</em>, <em>targetlimit=1</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/targetpixelfile.html#KeplerTargetPixelFile.from_archive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.from_archive" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">from_archive</code><span class="sig-paren">(</span><em>target</em>, <em>cadence='long'</em>, <em>quarter=None</em>, <em>month=None</em>, <em>campaign=None</em>, <em>radius=1.0</em>, <em>targetlimit=1</em>, <em>quality_bitmask='default'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/targetpixelfile.html#KeplerTargetPixelFile.from_archive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.from_archive" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetch a Target Pixel File from the Kepler/K2 data archive at MAST.</p>
+<p>See the <code class="xref py py-class docutils literal notranslate"><span class="pre">KeplerQualityFlags</span></code> class for details on the bitmasks.</p>
 <p>Raises an <cite>ArchiveError</cite> if a unique TPF cannot be found.  For example,
 this is the case if a target was observed in multiple Quarters and the
 quarter parameter is unspecified.</p>
@@ -616,14 +627,32 @@ Hence, if cadence=’short’ you need to specify month=1, 2, or 3.</p>
 of returned TargetPixelFile objects to <cite>targetlimit</cite>.
 If <cite>None</cite>, no limit is applied.</p>
 </dd>
+<dt><strong>quality_bitmask</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str or int</span></dt>
+<dd><p class="first">Bitmask (integer) which identifies the quality flag bitmask that should
+be used to mask out bad cadences. If a string is passed, it has the
+following meaning:</p>
+<blockquote>
+<div><ul class="simple">
+<li>“none”: no cadences will be ignored (<cite>quality_bitmask=0</cite>).</li>
+<li>“default”: cadences with severe quality issues will be ignored
+(<cite>quality_bitmask=1130799</cite>).</li>
+<li>“hard”: more conservative choice of flags to ignore
+(<cite>quality_bitmask=1664431</cite>). This is known to remove good data.</li>
+<li>“hardest”: removes all data that has been flagged
+(<cite>quality_bitmask=2096639</cite>). This mask is not recommended.</li>
+</ul>
+</div></blockquote>
+<p class="last">See the <code class="xref py py-class docutils literal notranslate"><span class="pre">KeplerQualityFlags</span></code> class for details on the bitmasks.</p>
+</dd>
 <dt><strong>kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
-<dd><p class="first last">Keywords arguments passed to <cite>KeplerTargetPixelFile</cite>.</p>
+<dd><p class="first last">Keywords arguments passed to the constructor of
+<a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile" title="lightkurve.targetpixelfile.KeplerTargetPixelFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code></a>.</p>
 </dd>
 </dl>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>tpf</strong> <span class="classifier-delimiter">:</span> <span class="classifier">KeplerTargetPixelFile object.</span></dt>
+<dt><strong>tpf</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile" title="lightkurve.targetpixelfile.KeplerTargetPixelFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code></a> object.</span></dt>
 <dd></dd>
 </dl>
 </td>
@@ -634,7 +663,7 @@ If <cite>None</cite>, no limit is applied.</p>
 
 <dl class="staticmethod">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.from_fits_images">
-<em class="property">static </em><code class="descname">from_fits_images</code><span class="sig-paren">(</span><em>images</em>, <em>position=None</em>, <em>size=(10</em>, <em>10)</em>, <em>extension=None</em>, <em>target_id='unnamed-target'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/targetpixelfile.html#KeplerTargetPixelFile.from_fits_images"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.from_fits_images" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">from_fits_images</code><span class="sig-paren">(</span><em>images</em>, <em>position=None</em>, <em>size=(11</em>, <em>11)</em>, <em>extension=None</em>, <em>target_id='unnamed-target'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/targetpixelfile.html#KeplerTargetPixelFile.from_fits_images"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.from_fits_images" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a new Target Pixel File from a set of images.</p>
 <p>This method is intended to make it easy to cut out targets from
 Kepler/K2 “superstamp” regions or TESS FFI images.</p>
@@ -642,14 +671,7 @@ Kepler/K2 “superstamp” regions or TESS FFI images.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>tpf</strong> <span class="classifier-delimiter">:</span> <span class="classifier">KeplerTargetPixelFile</span></dt>
-<dd><p class="first last">A new Target Pixel File assembled from the images.</p>
-</dd>
-</dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Attributes:</th><td class="field-body"><dl class="first last docutils">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
 <dt><strong>images</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of str, or list of fits.ImageHDU objects</span></dt>
 <dd><p class="first last">Sorted list of FITS filename paths or ImageHDU objects to get
 the data from.</p>
@@ -669,6 +691,13 @@ or name to use. Default: 0.</p>
 </dd>
 <dt><strong>**kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
 <dd><p class="first last">Extra arguments to be passed to the <cite>KeplerTargetPixelFile</cite> constructor.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>tpf</strong> <span class="classifier-delimiter">:</span> <span class="classifier">KeplerTargetPixelFile</span></dt>
+<dd><p class="first last">A new Target Pixel File assembled from the images.</p>
 </dd>
 </dl>
 </td>
@@ -746,6 +775,10 @@ necessary metadata in the tpf object.</p>
 <p>The widget will show both the lightcurve and pixel data.  By default,
 the lightcurve shown is obtained by calling the <cite>to_lightcurve()</cite> method,
 unless the user supplies a custom <cite>LightCurve</cite> object.</p>
+<p>This feature requires two optional dependencies:
+- bokeh&gt;=0.12.15
+- ipywidgets&gt;=7.2.0
+These can be installed using e.g. <cite>conda install bokeh ipywidgets</cite>.</p>
 <p>Note: at this time, this feature only works inside an active Jupyter
 Notebook, and tends to be too slow when more than ~30,000 cadences
 are contained in the TPF (e.g. short cadence data).</p>
@@ -910,7 +943,7 @@ of <cite>prf_photometry()</cite> for valid arguments if the method is ‘prf’.
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'1.0b10',
+            VERSION:'1.0b13',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
