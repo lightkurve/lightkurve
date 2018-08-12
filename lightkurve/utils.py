@@ -1,3 +1,4 @@
+"""This module provides various helper functions."""
 from __future__ import division, print_function
 import sys
 
@@ -41,25 +42,22 @@ class KeplerQualityFlags(object):
     PossibleThrusterFiring = 524288
     ThrusterFiring = 1048576
 
-    # Which is the recommended QUALITY mask to identify bad data?
+    #: DEFAULT bitmask identifies all cadences which are definitely useless.
     DEFAULT_BITMASK = (AttitudeTweak | SafeMode | CoarsePoint | EarthPoint |
-                       Desat | ManualExclude |
-                       DetectorAnomaly | NoData | ThrusterFiring)
-
-    # This bitmask includes flags that are known to identify both good and bad cadences.
-    # Use it wisely.
+                       Desat | ManualExclude | DetectorAnomaly | NoData | ThrusterFiring)
+    #: HARD bitmask is conservative and may identify cadences which are useful.
     HARD_BITMASK = (DEFAULT_BITMASK | SensitivityDropout | ApertureCosmic |
                     CollateralCosmic | PossibleThrusterFiring)
-
-    # Using this bitmask only QUALITY == 0 cadences will remain
+    #: HARDEST bitmask identifies cadences with any flag set. Its use is not recommended.
     HARDEST_BITMASK = 2096639
 
-    # Give the recommended bitmask options friendly names
-    OPTIONS = {'default': DEFAULT_BITMASK,
+    #: Dictionary which provides friendly names for the various bitmasks.
+    OPTIONS = {'none': 0,
+               'default': DEFAULT_BITMASK,
                'hard': HARD_BITMASK,
                'hardest': HARDEST_BITMASK}
 
-    # Pretty string descriptions for each flag
+    #: Pretty string descriptions for each flag
     STRINGS = {
         1: "Attitude tweak",
         2: "Safe mode",

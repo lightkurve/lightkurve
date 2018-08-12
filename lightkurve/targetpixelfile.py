@@ -69,6 +69,7 @@ class TargetPixelFile(object):
 
     @property
     def ra(self):
+        """Right Ascension of target ('RA_OBJ' header keyword)."""
         try:
             return self.header()['RA_OBJ']
         except KeyError:
@@ -76,6 +77,7 @@ class TargetPixelFile(object):
 
     @property
     def dec(self):
+        """Declination of target ('DEC_OBJ' header keyword)."""
         try:
             return self.header()['DEC_OBJ']
         except KeyError:
@@ -684,25 +686,30 @@ class TargetPixelFile(object):
                                                   'log_stretch': screen_slider})
         display(ui, out)
 
+
 class KeplerTargetPixelFile(TargetPixelFile):
     """
     Defines a TargetPixelFile class for the Kepler/K2 Mission.
     Enables extraction of raw lightcurves and centroid positions.
 
-    Attributes
+    Parameters
     ----------
     path : str or `astropy.io.fits.HDUList`
         Path to a Kepler Target Pixel (FITS) File or a `HDUList` object.
     quality_bitmask : str or int
-        Bitmask specifying quality flags of cadences that should be ignored.
-        If `None` is passed, then no cadences are ignored.
-        If a string is passed, it has the following meaning:
+        Bitmask (integer) which identifies the quality flags that should be used
+        to mask out bad cadences. If a string is passed, it has the following
+        meaning:
 
-            * "default": recommended quality mask
-            * "hard": removes more flags, known to remove good data
+            * "none": no cadences will be ignored (`quality_bitmask=0`).
+            * "default": cadences with severe quality issues will be ignored
+              (`quality_bitmask=1130799`).
+            * "hard": more conservative choice of flags to ignore (`quality_bitmask=1664431`).
+              This is known to remove good data.
             * "hardest": removes all data that has been flagged
+              (`quality_bitmask=2096639`). This mask is not recommended.
 
-        See the `KeplerQualityFlags` class for details on the bitmasks.
+        See the :class:`KeplerQualityFlags` class for details on the bitmasks.
     kwargs : dict
         Keyword arguments passed to `astropy.io.fits.open()`.
 
@@ -746,11 +753,12 @@ class KeplerTargetPixelFile(TargetPixelFile):
             of returned TargetPixelFile objects to `targetlimit`.
             If `None`, no limit is applied.
         kwargs : dict
-            Keywords arguments passed to `KeplerTargetPixelFile`.
+            Keywords arguments passed to the constructor of
+            :class:`KeplerTargetPixelFile`.
 
         Returns
         -------
-        tpf : KeplerTargetPixelFile object.
+        tpf : :class:`KeplerTargetPixelFile` object.
         """
         if os.path.exists(str(target)) or str(target).startswith('http'):
             log.warning('Warning: from_archive() is not intended to accept a '
@@ -800,19 +808,23 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
     @property
     def obsmode(self):
+        """One of 'short cadence' or 'long cadence'. ('OBSMODE' header keyword)"""
         return self.header()['OBSMODE']
 
     @property
     def module(self):
+        """Kepler CCD module number. ('MODULE' header keyword)"""
         return self.header()['MODULE']
 
     @property
-    def channel(self):
-        return self.header()['CHANNEL']
+    def output(self):
+        """Kepler CCD module output number. ('OUTPUT' header keyword)"""
+        return self.header()['OUTPUT']
 
     @property
-    def output(self):
-        return self.header()['OUTPUT']
+    def channel(self):
+        """Kepler CCD channel number. ('CHANNEL' header keyword)"""
+        return self.header()['CHANNEL']
 
     @property
     def astropy_time(self):
@@ -821,7 +833,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
     @property
     def quarter(self):
-        """Quarter number"""
+        """Kepler quarter number. ('QUARTER' header keyword)"""
         try:
             return self.header(ext=0)['QUARTER']
         except KeyError:
@@ -829,7 +841,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
     @property
     def campaign(self):
-        """Campaign number"""
+        """K2 Campaign number. ('CAMPAIGN' header keyword)"""
         try:
             return self.header(ext=0)['CAMPAIGN']
         except KeyError:
@@ -837,7 +849,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
     @property
     def mission(self):
-        """Mission name, defaults to None if Not available"""
+        """'Kepler' or 'K2'. ('MISSION' header keyword)"""
         try:
             return self.header(ext=0)['MISSION']
         except KeyError:
@@ -1007,7 +1019,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         This method is intended to make it easy to cut out targets from
         Kepler/K2 "superstamp" regions or TESS FFI images.
 
-        Attributes
+        Parameters
         ----------
         images : list of str, or list of fits.ImageHDU objects
             Sorted list of FITS filename paths or ImageHDU objects to get
@@ -1305,7 +1317,7 @@ class TessTargetPixelFile(TargetPixelFile):
     Defines a TargetPixelFile class for the TESS Mission.
     Enables extraction of raw lightcurves and centroid positions.
 
-    Attributes
+    Parameters
     ----------
     path : str
         Path to a Kepler Target Pixel (FITS) File.

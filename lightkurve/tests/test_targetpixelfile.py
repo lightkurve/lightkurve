@@ -99,8 +99,9 @@ def test_quality_flag_decoding():
         == [flags[3][1], flags[4][1], flags[5][1]]
 
 
-@pytest.mark.parametrize("quality_bitmask,answer", [('hardest', 1101),
-                                                    ('hard', 1101), ('default', 1233), (None, 1290),
+@pytest.mark.parametrize("quality_bitmask,answer", [(None, 1290), ('none', 1290),
+                                                    ('default', 1233),
+                                                    ('hard', 1101), ('hardest', 1101),
                                                     (1, 1290), (100, 1278), (2096639, 1101)])
 def test_bitmasking(quality_bitmask, answer):
     '''Test whether the bitmasking behaves like it should'''
