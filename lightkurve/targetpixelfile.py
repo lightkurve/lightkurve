@@ -697,15 +697,15 @@ class KeplerTargetPixelFile(TargetPixelFile):
     path : str or `astropy.io.fits.HDUList`
         Path to a Kepler Target Pixel (FITS) File or a `HDUList` object.
     quality_bitmask : str or int
-        Bitmask (integer) which identifies the quality flags that should be used
-        to mask out bad cadences. If a string is passed, it has the following
-        meaning:
+        Bitmask (integer) which identifies the quality flag bitmask that should
+        be used to mask out bad cadences. If a string is passed, it has the
+        following meaning:
 
             * "none": no cadences will be ignored (`quality_bitmask=0`).
             * "default": cadences with severe quality issues will be ignored
               (`quality_bitmask=1130799`).
-            * "hard": more conservative choice of flags to ignore (`quality_bitmask=1664431`).
-              This is known to remove good data.
+            * "hard": more conservative choice of flags to ignore
+              (`quality_bitmask=1664431`). This is known to remove good data.
             * "hardest": removes all data that has been flagged
               (`quality_bitmask=2096639`). This mask is not recommended.
 
@@ -727,8 +727,11 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
     @staticmethod
     def from_archive(target, cadence='long', quarter=None, month=None,
-                     campaign=None, radius=1., targetlimit=1, **kwargs):
+                     campaign=None, radius=1., targetlimit=1,
+                     quality_bitmask='default', **kwargs):
         """Fetch a Target Pixel File from the Kepler/K2 data archive at MAST.
+
+        See the :class:`KeplerQualityFlags` class for details on the bitmasks.
 
         Raises an `ArchiveError` if a unique TPF cannot be found.  For example,
         this is the case if a target was observed in multiple Quarters and the
@@ -752,6 +755,20 @@ class KeplerTargetPixelFile(TargetPixelFile):
             If multiple targets are present within `radius`, limit the number
             of returned TargetPixelFile objects to `targetlimit`.
             If `None`, no limit is applied.
+        quality_bitmask : str or int
+            Bitmask (integer) which identifies the quality flag bitmask that should
+            be used to mask out bad cadences. If a string is passed, it has the
+            following meaning:
+
+                * "none": no cadences will be ignored (`quality_bitmask=0`).
+                * "default": cadences with severe quality issues will be ignored
+                  (`quality_bitmask=1130799`).
+                * "hard": more conservative choice of flags to ignore
+                  (`quality_bitmask=1664431`). This is known to remove good data.
+                * "hardest": removes all data that has been flagged
+                  (`quality_bitmask=2096639`). This mask is not recommended.
+
+            See the :class:`KeplerQualityFlags` class for details on the bitmasks.
         kwargs : dict
             Keywords arguments passed to the constructor of
             :class:`KeplerTargetPixelFile`.
@@ -770,8 +787,11 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 quarter=quarter, campaign=campaign, month=month,
                 radius=radius, targetlimit=targetlimit)
         if len(path) == 1:
-            return KeplerTargetPixelFile(path[0], **kwargs)
-        return [KeplerTargetPixelFile(p, **kwargs) for p in path]
+            return KeplerTargetPixelFile(path[0],
+                                         quality_bitmask=quality_bitmask,
+                                         **kwargs)
+        return [KeplerTargetPixelFile(p, quality_bitmask=quality_bitmask, **kwargs)
+                for p in path]
 
     def __repr__(self):
         return('KeplerTargetPixelFile Object (ID: {})'.format(self.keplerid))
@@ -808,7 +828,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
     @property
     def obsmode(self):
-        """One of 'short cadence' or 'long cadence'. ('OBSMODE' header keyword)"""
+        """'short cadence' or 'long cadence'. ('OBSMODE' header keyword)"""
         return self.header()['OBSMODE']
 
     @property

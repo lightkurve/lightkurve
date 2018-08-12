@@ -22,14 +22,13 @@ log = logging.getLogger(__name__)
 class LightCurveFile(object):
     """Defines a generic class to handle light curve files.
 
-    Attributes
+    Parameters
     ----------
     path : str
-        Directory path or url to a lightcurve FITS file.
+        Local path or remote url of a lightcurve FITS file.
     kwargs : dict
         Keyword arguments to be passed to astropy.io.fits.open.
     """
-
     def __init__(self, path, **kwargs):
         self.path = path
         self.hdu = pyfits.open(self.path, **kwargs)
@@ -130,24 +129,27 @@ class KeplerLightCurveFile(LightCurveFile):
     """Defines a class for a given light curve FITS file from NASA's Kepler and
     K2 missions.
 
-    Attributes
+    Parameters
     ----------
     path : str
-        Directory path or url to a lightcurve FITS file.
+        Local path or remote url of a FITS file in Kepler's lightcurve format.
     quality_bitmask : str or int
-        Bitmask specifying quality flags of cadences that should be ignored.
-        If `None` is passed, then no cadences are ignored.
-        If a string is passed, it has the following meaning:
+        Bitmask (integer) which identifies the quality flag bitmask that should
+        be used to mask out bad cadences. If a string is passed, it has the
+        following meaning:
 
-            * default: recommended quality mask
-            * hard: removes more flags, known to remove good data
-            * hardest: removes all data that has been flagged
+            * "none": no cadences will be ignored (`quality_bitmask=0`).
+            * "default": cadences with severe quality issues will be ignored
+              (`quality_bitmask=1130799`).
+            * "hard": more conservative choice of flags to ignore
+              (`quality_bitmask=1664431`). This is known to remove good data.
+            * "hardest": removes all data that has been flagged
+              (`quality_bitmask=2096639`). This mask is not recommended.
 
-        See the `KeplerQualityFlags` class for details on the bitmasks.
+        See the :class:`KeplerQualityFlags` class for details on the bitmasks.
     kwargs : dict
         Keyword arguments to be passed to astropy.io.fits.open.
     """
-
     def __init__(self, path, quality_bitmask='default', **kwargs):
         super(KeplerLightCurveFile, self).__init__(path, **kwargs)
         self.quality_bitmask = quality_bitmask
@@ -155,7 +157,8 @@ class KeplerLightCurveFile(LightCurveFile):
 
     @staticmethod
     def from_archive(target, cadence='long', quarter=None, month=None,
-                     campaign=None, radius=1., targetlimit=1, **kwargs):
+                     campaign=None, radius=1., targetlimit=1,
+                     quality_bitmask="default", **kwargs):
         """Fetches a LightCurveFile (or list thereof) from the data archive at MAST.
 
         If a target was observed across multiple quarters or campaigns, a
@@ -187,6 +190,20 @@ class KeplerLightCurveFile(LightCurveFile):
             If multiple targets are present within `radius`, limit the number
             of returned LightCurveFile objects to `targetlimit`.
             If `None`, no limit is applied.
+        quality_bitmask : str or int
+            Bitmask (integer) which identifies the quality flag bitmask that should
+            be used to mask out bad cadences. If a string is passed, it has the
+            following meaning:
+
+                * "none": no cadences will be ignored (`quality_bitmask=0`).
+                * "default": cadences with severe quality issues will be ignored
+                  (`quality_bitmask=1130799`).
+                * "hard": more conservative choice of flags to ignore
+                  (`quality_bitmask=1664431`). This is known to remove good data.
+                * "hardest": removes all data that has been flagged
+                  (`quality_bitmask=2096639`). This mask is not recommended.
+
+            See the :class:`KeplerQualityFlags` class for details on the bitmasks.
         kwargs : dict
             Keywords arguments passed to `KeplerLightCurveFile`.
 
@@ -205,8 +222,11 @@ class KeplerLightCurveFile(LightCurveFile):
                 quarter=quarter, campaign=campaign, month=month,
                 radius=radius, targetlimit=targetlimit)
         if len(path) == 1:
-            return KeplerLightCurveFile(path[0], **kwargs)
-        return [KeplerLightCurveFile(p, **kwargs) for p in path]
+            return KeplerLightCurveFile(path[0],
+                                        quality_bitmask=quality_bitmask,
+                                        **kwargs)
+        return [KeplerLightCurveFile(p, quality_bitmask=quality_bitmask, **kwargs)
+                for p in path]
 
     def __repr__(self):
         if self.mission is None:
@@ -269,7 +289,7 @@ class KeplerLightCurveFile(LightCurveFile):
 
     @property
     def channel(self):
-        """Channel number"""
+        """Kepler CCD channel number. ('CHANNEL' header keyword)"""
         return self.header(ext=0)['CHANNEL']
 
     @property
@@ -282,6 +302,7 @@ class KeplerLightCurveFile(LightCurveFile):
 
     @property
     def obsmode(self):
+        """'short cadence' or 'long cadence'. ('OBSMODE' header keyword)"""
         return self.header()['OBSMODE']
 
     @property
@@ -296,7 +317,7 @@ class KeplerLightCurveFile(LightCurveFile):
 
     @property
     def quarter(self):
-        """Quarter number"""
+        """Kepler quarter number. ('QUARTER' header keyword)"""
         try:
             return self.header(ext=0)['QUARTER']
         except KeyError:
@@ -304,7 +325,7 @@ class KeplerLightCurveFile(LightCurveFile):
 
     @property
     def campaign(self):
-        """Campaign number"""
+        """K2 Campaign number. ('CAMPAIGN' header keyword)"""
         try:
             return self.header(ext=0)['CAMPAIGN']
         except KeyError:
@@ -312,7 +333,7 @@ class KeplerLightCurveFile(LightCurveFile):
 
     @property
     def mission(self):
-        """Mission name"""
+        """'Kepler' or 'K2'. ('MISSION' header keyword)"""
         try:
             return self.header(ext=0)['MISSION']
         except KeyError:
@@ -344,23 +365,27 @@ class TessLightCurveFile(LightCurveFile):
     """Defines a class for a given light curve FITS file from NASA's TESS
     mission.
 
-    Attributes
+    Parameters
     ----------
     path : str
-        Directory path or url to a lightcurve FITS file.
+        Local path or remote url of a FITS file in TESS's lightcurve format.
     quality_bitmask : str or int
-        Bitmask specifying quality flags of cadences that should be ignored.
-        If a string is passed, it has the following meaning:
+        Bitmask (integer) which identifies the quality flag bitmask that should
+        be used to mask out bad cadences. If a string is passed, it has the
+        following meaning:
 
-            * default: recommended quality mask
-            * hard: removes more flags, known to remove good data
-            * hardest: removes all data that has been flagged
+            * "none": no cadences will be ignored (`quality_bitmask=0`).
+            * "default": cadences with severe quality issues will be ignored
+              (`quality_bitmask=1130799`).
+            * "hard": more conservative choice of flags to ignore
+              (`quality_bitmask=1664431`). This is known to remove good data.
+            * "hardest": removes all data that has been flagged
+              (`quality_bitmask=2096639`). This mask is not recommended.
 
-        See the `TessQualityFlags` class for details on the bitmasks.
+        See the :class:`TessQualityFlags` class for details on the bitmasks.
     kwargs : dict
         Keyword arguments to be passed to astropy.io.fits.open.
     """
-
     def __init__(self, path, quality_bitmask='default', **kwargs):
         super(TessLightCurveFile, self).__init__(path, **kwargs)
         self.quality_bitmask = quality_bitmask
