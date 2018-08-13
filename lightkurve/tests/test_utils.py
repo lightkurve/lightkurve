@@ -54,3 +54,7 @@ def test_quality_mask():
     assert np.all(KeplerQualityFlags.create_quality_mask(quality, bitmask='none'))
     assert (KeplerQualityFlags.create_quality_mask(quality, bitmask=1)).sum() == 2
     assert (KeplerQualityFlags.create_quality_mask(quality, bitmask='hardest')).sum() == 2
+    # Do we see a ValueError if an invalid bitmask is passed?
+    with pytest.raises(ValueError) as err:
+        KeplerQualityFlags.create_quality_mask(quality, bitmask='invalidoption')
+    assert "not supported" in err.value.args[0]

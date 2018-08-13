@@ -142,8 +142,9 @@ class KeplerQualityFlags(object):
                 bitmask = cls.OPTIONS[bitmask]
             except KeyError:
                 valid_options = tuple(cls.OPTIONS.keys())
-                raise ValueError('quality_bitmask string must be one of '
-                                 '{}'.format(valid_options))
+                raise ValueError("quality_bitmask='{}' is not supported, "
+                                 "expected one of {}"
+                                 "".format(bitmask, valid_options))
         # The bitmask is applied using the bitwise AND operator
         quality_mask = (quality_array & bitmask) == 0
         log.info("{} cadences will be ignored (bitmask={})"
