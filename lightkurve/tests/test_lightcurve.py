@@ -1,10 +1,12 @@
 from __future__ import division, print_function
 
-import pytest
+from astropy.io import fits as pyfits
+import matplotlib.pyplot as plt
 import numpy as np
 from numpy.testing import (assert_almost_equal, assert_array_equal,
                            assert_allclose)
-from astropy.io import fits as pyfits
+import pytest
+
 from ..lightcurve import (LightCurve, KeplerLightCurve, TessLightCurve,
                           iterative_box_period_search)
 from ..lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
@@ -22,14 +24,22 @@ TESS_SIM = ("https://archive.stsci.edu/missions/tess/ete-6/tid/00/000/"
             "004/104/tess2019128220341-0000000410458113-0016-s_lc.fits")
 
 
-def test_LightCurve():
+def test_invalid_lightcurve():
+    """Invalid LightCurves should not be allowed."""
     err_string = ("Input arrays have different lengths."
                   " len(time)=5, len(flux)=4")
     time = np.array([1, 2, 3, 4, 5])
     flux = np.array([1, 2, 3, 4])
-
     with pytest.raises(ValueError) as err:
         LightCurve(time=time, flux=flux)
+    assert err_string == err.value.args[0]
+
+
+def test_empty_lightcurve():
+    """LightCurves with no data should not be allowed."""
+    err_string = ("either time or flux must be given")
+    with pytest.raises(ValueError) as err:
+        LightCurve()
     assert err_string == err.value.args[0]
 
 
@@ -118,6 +128,7 @@ def test_lightcurve_fold():
     assert_almost_equal(np.min(fold.phase), -0.5, 2)
     assert_almost_equal(np.max(fold.phase), 0.5, 2)
     fold.plot()
+    plt.close('all')
 
 
 def test_lightcurve_append():
@@ -156,6 +167,7 @@ def test_lightcurve_plot():
         lcf.plot(flux_types=['SAP_FLUX', 'PDCSAP_FLUX'])
         lcf.SAP_FLUX.plot()
         lcf.SAP_FLUX.plot(normalize=False, fill=False, title="Not the default")
+        plt.close('all')
 
 
 def test_cdpp():

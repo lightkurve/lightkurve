@@ -2,10 +2,12 @@ from __future__ import division, print_function
 
 import os
 from astropy.utils.data import get_pkg_data_filename
+import matplotlib.pyplot as plt
 import numpy as np
 from numpy.testing import assert_array_equal
 import pytest
 import tempfile
+
 from ..targetpixelfile import KeplerTargetPixelFile, KeplerTargetPixelFileFactory
 from ..targetpixelfile import TessTargetPixelFile
 from ..utils import KeplerQualityFlags
@@ -43,7 +45,7 @@ def test_tpf_plot():
     """Sanity check to verify that tpf plotting works"""
     for tpf in [KeplerTargetPixelFile(filename_tpf_one_center),
                 TessTargetPixelFile(filename_tpf_one_center)]:
-        tpf.plot()
+        ax = tpf.plot()
         tpf.plot(aperture_mask=tpf.pipeline_mask)
         tpf.plot(aperture_mask='all')
         tpf.plot(frame=5)
@@ -57,6 +59,7 @@ def test_tpf_plot():
         tpf.plot(scale="log")
         with pytest.raises(ValueError):
             tpf.plot(scale="blabla")
+        plt.close('all')
 
 
 def test_tpf_zeros():
@@ -275,3 +278,14 @@ def test_get_models():
     tpf = KeplerTargetPixelFile(filename_tpf_all_zeros, quality_bitmask=None)
     tpf.get_model()
     tpf.get_prf_model()
+
+
+#@pytest.mark.remote_data
+def test_tess_simulation():
+    """Can we read simulated TESS data?"""
+    tpf = TessTargetPixelFile(TESS_SIM)
+    assert tpf.mission == 'TESS'
+    assert tpf.astropy_time.scale == 'tdb'
+    assert tpf.flux.shape == tpf.flux_err.shape
+    tpf.wcs
+    col, row = tpf.centroids()

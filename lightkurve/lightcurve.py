@@ -8,6 +8,7 @@ import os
 import datetime
 import logging
 import pandas as pd
+import warnings
 
 import oktopus
 import numpy as np
@@ -280,7 +281,9 @@ class LightCurve(object):
         lc_clean = self.remove_nans()
         # Split the lightcurve into segments by finding large gaps in time
         dt = lc_clean.time[1:] - lc_clean.time[0:-1]
-        cut = np.where(dt > break_tolerance * np.nanmedian(dt))[0] + 1
+        with warnings.catch_warnings():  # Ignore warnings due to NaNs
+            warnings.simplefilter("ignore", RuntimeWarning)
+            cut = np.where(dt > break_tolerance * np.nanmedian(dt))[0] + 1
         low = np.append([0], cut)
         high = np.append(cut, len(lc_clean.time))
         # Then, apply the savgol_filter to each segment separately
@@ -430,7 +433,10 @@ class LightCurve(object):
         clean_lightcurve : LightCurve object
             A new ``LightCurve`` in which outliers have been removed.
         """
-        outlier_mask = sigma_clip(data=self.flux, sigma=sigma, **kwargs).mask
+        with warnings.catch_warnings():  # Ignore warnings due to NaNs or Infs
+            warnings.simplefilter("ignore")
+            outlier_mask = sigma_clip(data=self.flux, sigma=sigma, **kwargs).mask
+
         if return_mask:
             return self[~outlier_mask], outlier_mask
         return self[~outlier_mask]
@@ -666,7 +672,6 @@ class LightCurve(object):
                 data[col] = vars(self)[col]
         df = pd.DataFrame(data=data, index=self.time, columns=columns)
         df.index.name = 'time'
-        df.meta = self.meta
         return df
 
     def to_csv(self, path_or_buf=None, **kwargs):
