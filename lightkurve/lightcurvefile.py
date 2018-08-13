@@ -153,7 +153,9 @@ class KeplerLightCurveFile(LightCurveFile):
     def __init__(self, path, quality_bitmask='default', **kwargs):
         super(KeplerLightCurveFile, self).__init__(path, **kwargs)
         self.quality_bitmask = quality_bitmask
-        self.quality_mask = self._quality_mask(quality_bitmask)
+        self.quality_mask = KeplerQualityFlags.create_quality_mask(
+                                quality_array=self.hdu[1].data['SAP_QUALITY'],
+                                bitmask=quality_bitmask)
 
     @staticmethod
     def from_archive(target, cadence='long', quarter=None, month=None,
@@ -235,26 +237,6 @@ class KeplerLightCurveFile(LightCurveFile):
             return('KeplerLightCurveFile(KIC: {})'.format(self.keplerid))
         elif self.mission.lower() == 'k2':
             return('KeplerLightCurveFile(EPIC: {})'.format(self.keplerid))
-
-    def _quality_mask(self, bitmask):
-        """Returns a boolean mask which flags all good-quality cadences.
-
-        Parameters
-        ----------
-        bitmask : str or int
-            Bitmask. See ref. [1], table 2-3.
-
-        Returns
-        -------
-        boolean_mask : array of bool
-            Boolean array in which `True` means the data is of good quality.
-        """
-        if bitmask is None:
-            return np.ones(len(self.hdu[1].data['TIME']), dtype=bool)
-
-        if isinstance(bitmask, str):
-            bitmask = KeplerQualityFlags.OPTIONS[bitmask]
-        return (self.hdu[1].data['SAP_QUALITY'] & bitmask) == 0
 
     @property
     def astropy_time(self):
@@ -389,30 +371,12 @@ class TessLightCurveFile(LightCurveFile):
     def __init__(self, path, quality_bitmask='default', **kwargs):
         super(TessLightCurveFile, self).__init__(path, **kwargs)
         self.quality_bitmask = quality_bitmask
-        self.quality_mask = self._quality_mask(quality_bitmask)
+        self.quality_mask = KeplerQualityFlags.create_quality_mask(
+                                quality_array=self.hdu[1].data['QUALITY'],
+                                bitmask=quality_bitmask)
 
     def __repr__(self):
         return('TessLightCurveFile(TICID: {})'.format(self.ticid))
-
-    def _quality_mask(self, bitmask):
-        """Returns a boolean mask which flags all good-quality cadences.
-
-        Parameters
-        ----------
-        bitmask : str or int
-            Bitmask. See ref. [1], table 2-3.
-
-        Returns
-        -------
-        boolean_mask : array of bool
-            Boolean array in which `True` means the data is of good quality.
-        """
-        if bitmask is None:
-            return np.ones(len(self.hdu[1].data['TIME']), dtype=bool)
-
-        if isinstance(bitmask, str):
-            bitmask = TessQualityFlags.OPTIONS[bitmask]
-        return (self.hdu[1].data['QUALITY'] & bitmask) == 0
 
     @property
     def ticid(self):

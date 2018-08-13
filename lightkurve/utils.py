@@ -1,5 +1,6 @@
 """This module provides various helper functions."""
 from __future__ import division, print_function
+import logging
 import sys
 
 from astropy.visualization import (PercentileInterval, ImageNormalize,
@@ -9,6 +10,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 import numpy as np
 
+log = logging.getLogger(__name__)
 
 __all__ = ['KeplerQualityFlags', 'TessQualityFlags',
            'bkjd_to_astropy_time', 'btjd_to_astropy_time',
@@ -19,7 +21,12 @@ __all__ = ['KeplerQualityFlags', 'TessQualityFlags',
 class KeplerQualityFlags(object):
     """
     This class encodes the meaning of the various Kepler QUALITY bitmask flags,
-    as documented in the Kepler Archive Manual (Table 2.3).
+    as documented in the Kepler Archive Manual (Ref. [1], Table 2.3).
+
+    References
+    ----------
+    .. [1] Kepler: A Search for Terrestrial Planets. Kepler Archive Manual.
+        http://archive.stsci.edu/kepler/manuals/archive_manual.pdf
     """
     AttitudeTweak = 1
     SafeMode = 2
@@ -105,6 +112,43 @@ class KeplerQualityFlags(object):
             if quality & flag > 0:
                 result.append(cls.STRINGS[flag])
         return result
+
+    @classmethod
+    def create_quality_mask(cls, quality_array, bitmask=None):
+        """Returns a boolean array which flags good cadences given a bitmask.
+
+        This method is used by the constructors of :class:`KeplerTargetPixelFile`
+        and :class:`KeplerLightCurveFile` to initialize their `quality_mask`
+        class attribute which is used to ignore bad-quality data.
+
+        Parameters
+        ----------
+        quality_array : array of int
+            'QUALITY' column of a Kepler target pixel or lightcurve file.
+        bitmask : int or str
+            Bitmask (int) or one of 'none', 'default', 'hard', or 'hardest'.
+
+        Returns
+        -------
+        boolean_mask : array of bool
+            Boolean array in which `True` means the data is of good quality.
+        """
+        # Return an array filled with `True` by default (i.e. ignore nothing)
+        if bitmask is None:
+            return np.ones(len(quality_array), dtype=bool)
+        # A few pre-defined bitmasks can be specified as strings
+        if isinstance(bitmask, str):
+            try:
+                bitmask = cls.OPTIONS[bitmask]
+            except KeyError:
+                valid_options = tuple(cls.OPTIONS.keys())
+                raise ValueError('quality_bitmask string must be one of '
+                                 '{}'.format(valid_options))
+        # The bitmask is applied using the bitwise AND operator
+        quality_mask = (quality_array & bitmask) == 0
+        log.info("{} cadences will be ignored (bitmask={})"
+                 "".format((~quality_mask).sum(), bitmask))
+        return quality_mask
 
 
 class TessQualityFlags(KeplerQualityFlags):

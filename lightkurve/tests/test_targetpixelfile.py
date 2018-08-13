@@ -8,7 +8,6 @@ import pytest
 import tempfile
 from ..targetpixelfile import KeplerTargetPixelFile, KeplerTargetPixelFileFactory
 from ..targetpixelfile import TessTargetPixelFile
-from ..utils import KeplerQualityFlags
 
 
 filename_tpf_all_zeros = get_pkg_data_filename("data/test-tpf-all-zeros.fits")
@@ -86,17 +85,6 @@ def test_tpf_ones():
                       * (lc.centroid_col > tpf.column).all())
         assert np.all((lc.centroid_row < tpf.row+tpf.shape[2]).all()
                       * (lc.centroid_row > tpf.row).all())
-
-
-def test_quality_flag_decoding():
-    """Can the QUALITY flags be parsed correctly?"""
-    flags = list(KeplerQualityFlags.STRINGS.items())
-    for key, value in flags:
-        assert KeplerQualityFlags.decode(key)[0] == value
-    # Can we recover combinations of flags?
-    assert KeplerQualityFlags.decode(flags[5][0] + flags[7][0]) == [flags[5][1], flags[7][1]]
-    assert KeplerQualityFlags.decode(flags[3][0] + flags[4][0] + flags[5][0]) \
-        == [flags[3][1], flags[4][1], flags[5][1]]
 
 
 @pytest.mark.parametrize("quality_bitmask,answer", [(None, 1290), ('none', 1290),
