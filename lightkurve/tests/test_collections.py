@@ -86,5 +86,3 @@ def test_tpfcollection():
     tpfc[1] = tpf3
     assert(tpfc[1] == tpf3)
     str(tpfc)  # Does repr work?
-    tpfc.plot()
-    plt.close('all')
