@@ -24,14 +24,22 @@ TESS_SIM = ("https://archive.stsci.edu/missions/tess/ete-6/tid/00/000/"
             "004/104/tess2019128220341-0000000410458113-0016-s_lc.fits")
 
 
-def test_LightCurve():
+def test_invalid_lightcurve():
+    """Invalid LightCurves should not be allowed."""
     err_string = ("Input arrays have different lengths."
                   " len(time)=5, len(flux)=4")
     time = np.array([1, 2, 3, 4, 5])
     flux = np.array([1, 2, 3, 4])
-
     with pytest.raises(ValueError) as err:
         LightCurve(time=time, flux=flux)
+    assert err_string == err.value.args[0]
+
+
+def test_empty_lightcurve():
+    """LightCurves with no data should not be allowed."""
+    err_string = ("either time or flux must be given")
+    with pytest.raises(ValueError) as err:
+        LightCurve()
     assert err_string == err.value.args[0]
 
 
