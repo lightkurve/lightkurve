@@ -39,7 +39,9 @@ class TargetPixelFile(object):
         else:
             self.hdu = fits.open(self.path, **kwargs)
         self.quality_bitmask = quality_bitmask
-        self.quality_mask = self._quality_mask(quality_bitmask)
+        self.quality_mask = KeplerQualityFlags.create_quality_mask(
+                                quality_array=self.hdu[1].data['QUALITY'],
+                                bitmask=quality_bitmask)
         self.targetid = targetid
 
     @property
@@ -61,11 +63,6 @@ class TargetPixelFile(object):
     def header(self, ext=0):
         """Returns the header for a given extension."""
         return self.hdu[ext].header
-
-    def _quality_mask(self, bitmask):
-        if bitmask is None:
-            return np.ones(len(self.hdu[1].data['TIME']), dtype=bool)
-        return (self.hdu[1].data['QUALITY'] & bitmask) == 0
 
     @property
     def ra(self):
@@ -795,20 +792,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
     def __repr__(self):
         return('KeplerTargetPixelFile Object (ID: {})'.format(self.keplerid))
-
-    def _quality_mask(self, bitmask):
-        """Returns a boolean mask which flags all good-quality cadences.
-
-        Parameters
-        ----------
-        bitmask : str or int
-            Bitmask. See ref. [1], table 2-3.
-        """
-        if bitmask is None:
-            return np.ones(len(self.hdu[1].data['TIME']), dtype=bool)
-        elif isinstance(bitmask, str):
-            bitmask = KeplerQualityFlags.OPTIONS[bitmask]
-        return (self.hdu[1].data['QUALITY'] & bitmask) == 0
 
     def get_prf_model(self):
         """Returns an object of KeplerPRF initialized using the
