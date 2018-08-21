@@ -3,6 +3,8 @@ from __future__ import division, print_function
 from astropy.io import fits as pyfits
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import pyplot as plt
+
 from numpy.testing import (assert_almost_equal, assert_array_equal,
                            assert_allclose)
 import pytest
@@ -167,6 +169,25 @@ def test_lightcurve_plot():
         lcf.SAP_FLUX.plot(normalize=False, fill=False, title="Not the default")
         plt.close('all')
 
+@pytest.mark.remote_data
+def test_lightcurve_scatter():
+    """Sanity check to verify that lightcurve scatter plotting works"""
+    lcf = KeplerLightCurveFile(KEPLER10)
+    lc = lcf.PDCSAP_FLUX.flatten()
+
+    # get an array of original times, in the same order as the folded lightcurve
+    foldkw = dict(period=0.837491)
+    originaltime = LightCurve(lc.time, lc.time)
+    foldedtimeinorder = originaltime.fold(**foldkw).flux
+
+    # plot a grid of phase-folded and not, with colors
+    fi, ax = plt.subplots(2, 2, figsize=(10,6), sharey=True, sharex='col')
+    scatterkw = dict( s=5, cmap='winter')
+    lc.scatter(ax=ax[0,0])
+    lc.fold(**foldkw).scatter(ax=ax[0,1])
+    lc.scatter(ax=ax[1,0], c=lc.time, **scatterkw)
+    lc.fold(**foldkw).scatter(ax=ax[1,1], c=foldedtimeinorder, **scatterkw)
+    plt.ylim(0.999, 1.001)
 
 def test_cdpp():
     """Test the basics of the CDPP noise metric."""
