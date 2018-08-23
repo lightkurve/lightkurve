@@ -684,17 +684,16 @@ class TargetPixelFile(object):
                                                   'log_stretch': screen_slider})
         display(ui, out)
 
-    def pixel_selector():
+    def pixel_selector(self):
         """Display an interactive IPython Notebook widget to select pixel masks.
 
         The widget will show both the lightcurve and pixel data.  The pixel data
         supports pixel selection via Bokeh tap and box select tools in an
         interactive javascript user interface similar to `.interact()`.
 
-        This feature requires two optional dependencies:
+        This feature requires one optional dependency:
         - bokeh>=0.12.15
-        - ipywidgets>=7.2.0
-        These can be installed using e.g. `conda install bokeh ipywidgets`.
+        Which can be installed using e.g. `conda install bokeh`.
 
         Note: at this time, this feature only works inside an active Jupyter
         Notebook, and tends to be too slow when more than ~30,000 cadences
@@ -705,7 +704,80 @@ class TargetPixelFile(object):
         lc : LightCurve object
             An optional pre-processed lightcurve object to show.
         """
-        pass
+        try:
+            from bokeh.io import show, output_notebook
+            from bokeh.plotting import figure, ColumnDataSource
+            from bokeh.models import LogColorMapper
+            from bokeh.layouts import row
+            from bokeh.models.tools import HoverTool
+            output_notebook()
+        except ImportError:
+            raise ImportError('The Pixel Selector tool requires Bokeh.  See the Installation Guide.')
+
+        tpf = self
+        lc = tpf.to_lightcurve()
+        xx=tpf.column + np.arange(tpf.shape[2])
+        yy=tpf.row + np.arange(tpf.shape[1])
+        xa, ya = np.meshgrid(xx, yy)
+
+        n_pixels = tpf.flux[0,:,:].size
+        pixel_index_array = np.arange(0,n_pixels, 1, dtype=int).reshape(tpf.flux[0,:,:].shape)
+
+        def modify_doc(doc):
+            source = ColumnDataSource(data=dict(
+                time=lc.time, flux=lc.flux,
+                cadence=lc.cadenceno,
+                quality=lc.quality))
+
+            title = "Quicklook lightcurve for {} target {}".format(tpf.mission, tpf.keplerid)
+            ymax = np.nanpercentile(tpf.to_lightcurve(aperture_mask='all').flux, 80)*1.2
+            p = figure(title=title, plot_height=300, plot_width=600, y_range=(0, ymax),
+                       tools="tap,pan,wheel_zoom,box_zoom,reset")#, theme=theme)
+            p.yaxis.axis_label = 'Normalized Flux'
+            p.xaxis.axis_label = 'Time - 2454833 (days)'
+            p.step('time', 'flux', line_width=1, color='gray', source=source, nonselection_line_color='gray')
+
+            r = p.circle('time', 'flux', source=source, fill_alpha=0.3, size=8,line_color=None,
+                         selection_color="firebrick", nonselection_fill_alpha=0.0,
+                         nonselection_fill_color="grey",nonselection_line_color=None,
+                         nonselection_line_alpha=0.0, fill_color=None,
+                         hover_fill_color="firebrick",hover_alpha=0.9,hover_line_color="white")
+
+
+            s2 = figure(plot_width=300, plot_height=300, title='Target Pixel File',
+                        tools='tap, box_select, reset')
+            s2.yaxis.axis_label = 'Pixel Row Number'
+            s2.xaxis.axis_label = 'Pixel Column Number'
+
+            pedestal = np.nanmin(tpf.flux)
+            vlo, lo, med, hi, vhi = np.fix(np.nanpercentile(tpf.flux-pedestal, [0.2, 1, 50, 95, 99.8]))
+            color_mapper = LogColorMapper(palette="Viridis256", low=lo, high=hi)
+
+            s2_dat = s2.image([pedestal+tpf.flux[0,:,:]], x=tpf.column, y=tpf.row,
+                              dw=tpf.shape[2], dh=tpf.shape[1], dilate=True,
+                              color_mapper=color_mapper)
+
+            #source2 = ColumnDataSource(data=dict(xx=x_vals+0.5, yy=y_vals+0.5))
+            source2 = ColumnDataSource(data=dict(xx=xa+0.5, yy=ya+0.5))
+            r1 = s2.rect('xx', 'yy', 1, 1, source=source2, fill_color='gray', fill_alpha=0.4, line_color='white')
+
+            def callback(attr, old, new):
+                if (new is None):
+                    source.data = dict(time=lc.time, flux=lc.flux,
+                                    cadence=lc.cadenceno, quality=lc.quality)
+                else:
+                    selected_indices = np.array(source2.selected.indices)
+                    selected_mask = np.isin(pixel_index_array, selected_indices)
+                    lc_new = tpf.to_lightcurve(aperture_mask=selected_mask)
+                    source.data = dict(time=lc.time, flux=lc_new.flux,
+                                    cadence=lc.cadenceno, quality=lc.quality)
+
+            source2.on_change('selected', callback)
+            row1 = row(p, s2)
+            doc.add_root(row1)
+
+        show(modify_doc)
+
 
 class KeplerTargetPixelFile(TargetPixelFile):
     """
