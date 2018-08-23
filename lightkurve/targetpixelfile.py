@@ -684,6 +684,29 @@ class TargetPixelFile(object):
                                                   'log_stretch': screen_slider})
         display(ui, out)
 
+    def pixel_selector():
+        """Display an interactive IPython Notebook widget to select pixel masks.
+
+        The widget will show both the lightcurve and pixel data.  The pixel data
+        supports pixel selection via Bokeh tap and box select tools in an
+        interactive javascript user interface similar to `.interact()`.
+
+        This feature requires two optional dependencies:
+        - bokeh>=0.12.15
+        - ipywidgets>=7.2.0
+        These can be installed using e.g. `conda install bokeh ipywidgets`.
+
+        Note: at this time, this feature only works inside an active Jupyter
+        Notebook, and tends to be too slow when more than ~30,000 cadences
+        are contained in the TPF (e.g. short cadence data).
+
+        Parameters
+        ----------
+        lc : LightCurve object
+            An optional pre-processed lightcurve object to show.
+        """
+        pass
+
 class KeplerTargetPixelFile(TargetPixelFile):
     """
     Defines a TargetPixelFile class for the Kepler/K2 Mission.
