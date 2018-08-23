@@ -701,13 +701,12 @@ class TargetPixelFile(object):
 
         Parameters
         ----------
-        lc : LightCurve object
-            An optional pre-processed lightcurve object to show.
+        None
         """
         try:
             from bokeh.io import show, output_notebook
             from bokeh.plotting import figure, ColumnDataSource
-            from bokeh.models import LogColorMapper
+            from bokeh.models import LogColorMapper, Selection
             from bokeh.layouts import row
             from bokeh.models.tools import HoverTool
             output_notebook()
@@ -732,7 +731,7 @@ class TargetPixelFile(object):
             title = "Quicklook lightcurve for {} target {}".format(tpf.mission, tpf.keplerid)
             ymax = np.nanpercentile(tpf.to_lightcurve(aperture_mask='all').flux, 80)*1.2
             p = figure(title=title, plot_height=300, plot_width=600, y_range=(0, ymax),
-                       tools="tap,pan,wheel_zoom,box_zoom,reset")#, theme=theme)
+                       tools="pan,wheel_zoom,box_zoom,reset")#, theme=theme)
             p.yaxis.axis_label = 'Normalized Flux'
             p.xaxis.axis_label = 'Time - 2454833 (days)'
             p.step('time', 'flux', line_width=1, color='gray', source=source, nonselection_line_color='gray')
@@ -744,8 +743,9 @@ class TargetPixelFile(object):
                          hover_fill_color="firebrick",hover_alpha=0.9,hover_line_color="white")
 
 
-            s2 = figure(plot_width=300, plot_height=300, title='Target Pixel File',
-                        tools='tap, box_select, reset')
+            s2 = figure(plot_width=300, plot_height=300, x_range=(min(xx), max(xx+1)),
+                        y_range=(min(yy), max(yy+1)), title='Target Pixel File',
+                        tools='tap, box_select, wheel_zoom, reset')
             s2.yaxis.axis_label = 'Pixel Row Number'
             s2.xaxis.axis_label = 'Pixel Column Number'
 
@@ -757,19 +757,20 @@ class TargetPixelFile(object):
                               dw=tpf.shape[2], dh=tpf.shape[1], dilate=True,
                               color_mapper=color_mapper)
 
-            #source2 = ColumnDataSource(data=dict(xx=x_vals+0.5, yy=y_vals+0.5))
-            source2 = ColumnDataSource(data=dict(xx=xa+0.5, yy=ya+0.5))
+            preselection = Selection()
+            preselection.indices=pixel_index_array[tpf.pipeline_mask].reshape(-1).tolist()
+            source2 = ColumnDataSource(data=dict(xx=xa+0.5, yy=ya+0.5), selected=preselection)
             r1 = s2.rect('xx', 'yy', 1, 1, source=source2, fill_color='gray', fill_alpha=0.4, line_color='white')
 
             def callback(attr, old, new):
-                if (new is None):
-                    source.data = dict(time=lc.time, flux=lc.flux,
-                                    cadence=lc.cadenceno, quality=lc.quality)
-                else:
+                if len(source2.selected.indices) > 0:
                     selected_indices = np.array(source2.selected.indices)
                     selected_mask = np.isin(pixel_index_array, selected_indices)
                     lc_new = tpf.to_lightcurve(aperture_mask=selected_mask)
                     source.data = dict(time=lc.time, flux=lc_new.flux,
+                                    cadence=lc.cadenceno, quality=lc.quality)
+                else:
+                    source.data = dict(time=lc.time, flux=lc.flux*0.0,
                                     cadence=lc.cadenceno, quality=lc.quality)
 
             source2.on_change('selected', callback)
