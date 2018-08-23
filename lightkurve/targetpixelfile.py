@@ -706,8 +706,8 @@ class TargetPixelFile(object):
         try:
             from bokeh.io import show, output_notebook
             from bokeh.plotting import figure, ColumnDataSource
-            from bokeh.models import LogColorMapper, Selection
-            from bokeh.layouts import row
+            from bokeh.models import LogColorMapper, Selection, Slider, RangeSlider
+            from bokeh.layouts import row, column, widgetbox
             from bokeh.models.tools import HoverTool
             output_notebook()
         except ImportError:
@@ -750,7 +750,8 @@ class TargetPixelFile(object):
             s2.xaxis.axis_label = 'Pixel Column Number'
 
             pedestal = np.nanmin(tpf.flux)
-            vlo, lo, med, hi, vhi = np.fix(np.nanpercentile(tpf.flux-pedestal, [0.2, 1, 50, 95, 99.8]))
+            vlo, lo, med, hi, vhi = np.nanpercentile(tpf.flux-pedestal, [0.2, 1, 50, 95, 99.8])
+            vstep = (np.log10(vhi) - np.log10(vlo)) / 300.0  # assumes counts >> 1.0!
             color_mapper = LogColorMapper(palette="Viridis256", low=lo, high=hi)
 
             s2_dat = s2.image([pedestal+tpf.flux[0,:,:]], x=tpf.column, y=tpf.row,
@@ -774,8 +775,31 @@ class TargetPixelFile(object):
                                     cadence=lc.cadenceno, quality=lc.quality)
 
             source2.on_change('selected', callback)
+
+            n_cadences = len(tpf.time)
+            amp_slider = Slider(start=0, end=n_cadences-1, value=0, step=1,
+                    title="TPF slice index", width = 500)
+
+            def callback2(attr, old, new):
+                s2_dat.data_source.data['image'] = [self.flux[new, :, :]
+                                                          - pedestal]
+
+            amp_slider.on_change('value', callback2)
+
+            def callback3(attr, old, new):
+                s2_dat.glyph.color_mapper.high = 10**new[1]
+                s2_dat.glyph.color_mapper.low = 10**new[0]
+
+            screen_slider = RangeSlider(start=np.log10(vlo), end=np.log10(vhi),
+                step=vstep, title="Pixel Stretch (log)",
+                value=(np.log10(lo), np.log10(hi)), width = 250)
+
+            screen_slider.on_change('value', callback3)
+
             row1 = row(p, s2)
-            doc.add_root(row1)
+            widgets = widgetbox(amp_slider, screen_slider)
+            row_and_col = column(row1, widgets)
+            doc.add_root(row_and_col)
 
         show(modify_doc)
 
