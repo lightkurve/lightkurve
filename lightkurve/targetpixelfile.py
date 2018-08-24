@@ -13,7 +13,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
 from astropy.coordinates import SkyCoord
-from astropy.io.fits.card import Undefined
+from astropy.wcs.utils import skycoord_to_pixel, pixel_to_skycoord
+from astropy.stats.funcs import median_absolute_deviation as MAD
 
 from . import PACKAGEDIR, MPLSTYLE
 from .lightcurve import KeplerLightCurve, TessLightCurve
@@ -345,13 +346,15 @@ class TargetPixelFile(object):
 
         Parameters
         ----------
-        aperture_mask : array-like, 'pipeline', 'all', or None
+        aperture_mask : array-like, 'pipeline', 'all', 'threshold', or None
             A boolean array describing the aperture such that `False` means
             that the pixel will be masked out.
             If None or 'all' are passed, a mask that is `True` everywhere will
             be returned.
             If 'pipeline' is passed, the mask suggested by the pipeline
             will be returned.
+            If 'threshold' is passed, all pixels contigious with the central pixel
+            that are above the threshold (in sigma) are returned.
 
         Returns
         -------
@@ -366,6 +369,8 @@ class TargetPixelFile(object):
                 aperture_mask = np.ones((self.shape[1], self.shape[2]), dtype=bool)
             elif aperture_mask == 'pipeline':
                 aperture_mask = self.pipeline_mask
+            elif aperture_mask == 'threshold':
+                aperture_mask = self._threshold_mask(threshold)
         self._last_aperture_mask = aperture_mask
         return aperture_mask
 
@@ -421,7 +426,10 @@ class TargetPixelFile(object):
         bkg : bool
             If True, background will be added to the pixel values.
         aperture_mask : ndarray
-            Highlight pixels selected by aperture_mask.
+            Number of sigma above the background to draw an aperture.
+            Used if aperture_mask is 'threshold'.
+        threshold : float
+
         show_colorbar : bool
             Whether or not to show the colorbar
         mask_color : str
@@ -463,7 +471,7 @@ class TargetPixelFile(object):
                             show_colorbar=show_colorbar, **kwargs)
             ax.grid(False)
         if aperture_mask is not None:
-            aperture_mask = self._parse_aperture_mask(aperture_mask)
+            aperture_mask = self._parse_aperture_mask(aperture_mask, threshold=threshold)
             for i in range(self.shape[1]):
                 for j in range(self.shape[2]):
                     if aperture_mask[i, j]:
