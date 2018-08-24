@@ -704,10 +704,11 @@ class TargetPixelFile(object):
         None
         """
         try:
-            from bokeh.io import show, output_notebook
+            from bokeh.io import show, output_notebook, push_notebook
             from bokeh.plotting import figure, ColumnDataSource
-            from bokeh.models import LogColorMapper, Selection, Slider, RangeSlider, Span
+            from bokeh.models import LogColorMapper, Selection, Slider, RangeSlider, Span, Range1d
             from bokeh.layouts import row, column, widgetbox
+            from bokeh.models.widgets import CheckboxGroup
             from bokeh.models.tools import HoverTool
             output_notebook()
         except ImportError:
@@ -786,7 +787,7 @@ class TargetPixelFile(object):
                        tools="pan,wheel_zoom,box_zoom,reset")#, theme=theme)
             fig1.yaxis.axis_label = 'Normalized Flux'
             fig1.xaxis.axis_label = 'Time - 2454833 (days)'
-            fig1.step('time', 'flux', line_width=1, color='gray', source=source, nonselection_line_color='gray')
+            step_dat = fig1.step('time', 'flux', line_width=1, color='gray', source=source, nonselection_line_color='gray')
 
             r = fig1.circle('time', 'flux', source=source, fill_alpha=0.3, size=8,line_color=None,
                          selection_color="firebrick", nonselection_fill_alpha=0.0,
@@ -839,12 +840,13 @@ class TargetPixelFile(object):
                 else:
                     source.data = dict(time=lc.time, flux=lc.flux*0.0,
                                     cadence=lc.cadenceno, quality=lc.quality)
+                callback4('junk')
 
             source2.on_change('selected', callback)
 
             n_cadences = len(self.time)
             amp_slider = Slider(start=0, end=n_cadences-1, value=0, step=1,
-                    title="TPF slice index", width = 500)
+                    title="TPF slice index", width = 800)
 
             def callback2(attr, old, new):
                 fig2_dat.data_source.data['image'] = [self.flux[new, :, :]
@@ -863,8 +865,29 @@ class TargetPixelFile(object):
 
             screen_slider.on_change('value', callback3)
 
+            checkbox_group = CheckboxGroup(
+            labels=["Normalize Lightcurve", "Overplot Complement"])
+
+            def callback4(new):
+                if 0 in checkbox_group.active:
+                    source.data['flux'] = source.data['flux'] / np.nanmedian(source.data['flux'])
+                    sig_lo, med, sig_hi = np.nanpercentile(source.data['flux'], (16,50,84))
+                    robust_sigma = (sig_hi - sig_lo)/2.0
+                    fig1.y_range.start = med-5.0*robust_sigma
+                    fig1.y_range.end   = med+5.0*robust_sigma
+                else:
+                    fig1.y_range.start = 0.0
+                    fig1.y_range.end   = ymax
+                if 1 in checkbox_group.active:
+                    selected_indices = np.array(source2.selected.indices)
+                    nonselected_mask = ~np.isin(pixel_index_array, selected_indices)
+                    lc_bak = self.to_lightcurve(aperture_mask=nonselected_mask)
+                    step_dat2 = fig1.step(lc_bak.time, lc_bak.flux, line_width=1, color='red')
+
+            checkbox_group.on_click(callback4)
+
             row1 = row(fig1, fig2)
-            widgets = widgetbox(amp_slider, screen_slider)
+            widgets = widgetbox(amp_slider, screen_slider, checkbox_group)
             row_and_col = column(row1, widgets)
             doc.add_root(row_and_col)
 
