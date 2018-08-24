@@ -353,8 +353,9 @@ class TargetPixelFile(object):
             be returned.
             If 'pipeline' is passed, the mask suggested by the pipeline
             will be returned.
-            If 'threshold' is passed, all pixels contigious with the central pixel
-            that are above the threshold (in sigma) are returned.
+            If 'threshold' is passed, all pixels contigious with the brightest 
+            pixel (within +/- 2 pixels of the central pixel) that are above the 
+            threshold (in sigma) are returned.
 
         Returns
         -------
@@ -370,6 +371,10 @@ class TargetPixelFile(object):
             elif aperture_mask == 'pipeline':
                 aperture_mask = self.pipeline_mask
             elif aperture_mask == 'threshold':
+                if 'threshold' in kwargs:
+                    threshold = kwargs['threshold']
+                else:
+                    threshold = 3.
                 aperture_mask = self._threshold_mask(threshold)
         self._last_aperture_mask = aperture_mask
         return aperture_mask
@@ -396,7 +401,7 @@ class TargetPixelFile(object):
         col_centr, row_centr : tuple
             Arrays containing centroids for column and row at each cadence
         """
-        aperture_mask = self._parse_aperture_mask(aperture_mask)
+        aperture_mask = self._parse_aperture_mask(aperture_mask, **kwargs)
         yy, xx = np.indices(self.shape[1:]) + 0.5
         yy = self.row + yy
         xx = self.column + xx
@@ -426,10 +431,10 @@ class TargetPixelFile(object):
         bkg : bool
             If True, background will be added to the pixel values.
         aperture_mask : ndarray
+            Highlight pixels selected by aperture_mask.
+        threshold : float
             Number of sigma above the background to draw an aperture.
             Used if aperture_mask is 'threshold'.
-        threshold : float
-
         show_colorbar : bool
             Whether or not to show the colorbar
         mask_color : str
@@ -714,7 +719,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
             Array containing the summed flux within the aperture for each
             cadence.
         """
-        aperture_mask = self._parse_aperture_mask(aperture_mask)
+        aperture_mask = self._parse_aperture_mask(aperture_mask, **kwargs)
         if aperture_mask.sum() == 0:
             log.warning('Warning: aperture mask contains zero pixels.')
         centroid_col, centroid_row = self.estimate_centroids(aperture_mask)
@@ -1283,7 +1288,7 @@ class TessTargetPixelFile(TargetPixelFile):
         lc : TessLightCurve object
             Contains the summed flux within the aperture for each cadence.
         """
-        aperture_mask = self._parse_aperture_mask(aperture_mask)
+        aperture_mask = self._parse_aperture_mask(aperture_mask, **kwargs)
         if aperture_mask.sum() == 0:
             log.warning('Warning: aperture mask contains zero pixels.')
         centroid_col, centroid_row = self.estimate_centroids(aperture_mask)
