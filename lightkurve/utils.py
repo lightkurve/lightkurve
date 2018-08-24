@@ -329,9 +329,9 @@ def plot_image(image, ax=None, scale='linear', origin='lower',
     return ax
 
 
-
 def query_catalog(coordinate, catalog="KIC", radius=30.):
-        """
+        """Returns an astropy table of sources obtained using a conesearch query.
+
         This helper function allows the key catalogs that are relevant to
         Kepler/K2/TESS to be queried such that they return uniform columns.
         Current catalogs supported are 'KIC', 'EPIC', and 'Gaia2'.
@@ -342,7 +342,7 @@ def query_catalog(coordinate, catalog="KIC", radius=30.):
             Coordinate to query around.
         catalog: 'KIC', 'EPIC', or 'Gaia2'
             Which catalog to query?
-        radius: float
+        radius: float or astropy.units.Quantity object
             Radius of cone search centered on the target. If a float is given
             then it is assumed to be in units arcseconds. (Default: 30 arcsec.)
 
@@ -350,18 +350,19 @@ def query_catalog(coordinate, catalog="KIC", radius=30.):
         -------
         result : astropy.table.Table object
             Astropy table with the following columns:
-             - id : Catalog ID from catalog.
+            - id : Catalog ID from catalog.
             - ra: Right ascension [degrees]
             - dec: Declination [degrees]
             - pmra: Proper motion for right ascension [mas/year]
             - pmdec: Proper motion for declination [mas/year]
             - mag: Magnitude in the Kepler or Gaia band [mag]
         """
-        #First, validate and convert the inputs:
-        # if the search radius is a float, assume is it in unit arcseconds
+
+        # First, validate and convert the inputs:
+        # If the search radius is a float, assume it is in unit arcseconds
         if not isinstance(radius, u.Quantity):
             radius = u.Quantity(radius, u.arcsec)
-        # Use lowercase catalog names to avoide case sensitivity
+        # Use lowercase catalog names to avoid case sensitivity
         catalog = catalog.lower()
         # Ensure `catalog` is one of our supported catalogs
         supported_catalogs = \
@@ -380,7 +381,7 @@ def query_catalog(coordinate, catalog="KIC", radius=30.):
         if catalog not in supported_catalogs.keys():
             raise ValueError('catalog must be one of {}'.format(list(supported_catalogs.keys())))
 
-        # Query Vizier
+         # Query Vizier
         vizier_id = supported_catalogs[catalog]['vizier']
         v = Vizier(catalog=[vizier_id], columns=supported_catalogs[catalog]['cols'])
         result = v.query_region(coordinate, radius=radius, catalog=vizier_id)
@@ -392,7 +393,7 @@ def query_catalog(coordinate, catalog="KIC", radius=30.):
         for i in range(len(new_pars)):
             result[vizier_id].rename_column(result[vizier_id].colnames[i], new_pars[i])
 
-        return result[vizier_id]
+         return result[vizier_id]
 
 def kpmag_to_flux(kpmag):
     """

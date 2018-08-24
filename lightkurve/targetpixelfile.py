@@ -44,7 +44,6 @@ class TargetPixelFile(object):
         self.quality_mask = self._quality_mask(quality_bitmask)
         self.targetid = targetid
 
-
     def get_sources(self, catalog=None, magnitude_limit=18, edge_tolerance=12):
         """Returns a table of sources known to exist in the TPF file.
 
@@ -60,7 +59,7 @@ class TargetPixelFile(object):
             Catalog to query. For Kepler target pixel files the default is 'KIC',
             for K2 target pixel files the default is 'EPIC'.
         magnitude_limit : int or float
-            Only return sources brighter than this magnitude limit.
+            Only return sources brighter than this magnitud
             Defaults to 18 for both KIC/EPIC (Kp) and Gaia (Gmag).
         edge_tolerance: float
             Maximum distance (in arcseconds) a source may be located beyond
@@ -98,11 +97,11 @@ class TargetPixelFile(object):
             log.warning('Edge tolerance is less than 3 pixels (12 arcsec). '
                         'Bright sources near the edge of the Target Pixel File '
                         'may not be included.')
-        # Tolerance can't be smaller than 4 or the code below will break
+        # Tolerance can't be smaller than 12 or the code below will break
         if edge_tolerance < 12:
             edge_tolerance = 12
 
-        # Query the catalog around the center of the TPF
+# Query the catalog around the center of the TPF
         cent = SkyCoord(ra=self.ra, dec=self.dec, frame='icrs', unit=(u.deg, u.deg))
         radius = ((np.max(self.flux.shape[1:2]) * 4) + edge_tolerance) * u.arcsec
         sky_catalog = query_catalog(cent, radius=radius, catalog=catalog)
@@ -119,14 +118,12 @@ class TargetPixelFile(object):
         # Create a `separation_mask` which is True for the sources in the catalog
         # which which are separated by less than `edge_tolerance` from any pixel
         is_source_in_tpf = np.zeros(len(sky_catalog), dtype=bool)
-        for idx in range(len(sky_catalog)):
-            sep = sky_pixel_pairs.separation(catalog_skycoords[idx])
+        for idx in range(len(           sep = sky_pixel_pairs.separation(catalog_skycoords[idx])
             is_source_in_tpf[idx] = np.any(sep.arcsec <= edge_tolerance)
         is_source_in_tpf = np.array(is_source_in_tpf, dtype=bool)
 
          # Also apply the magnitude limit
         source_list = sky_catalog[is_source_in_tpf & (sky_catalog['mag'] < magnitude_limit)]
-
         # Transform coordinates to median epoch of data
         tpf_epoch = np.median(self.astropy_time.byear)
         has_pm = ~(source_list['pmra'].mask | source_list['pmdec'].mask)
