@@ -1,16 +1,32 @@
 import pytest
-
 from astropy import units as u
 import numpy as np
 from numpy.testing import assert_array_equal
-
-from ..periodogram import Periodogram
+from ..periodogram import *
 from ..lightcurvefile import KeplerLightCurveFile
+from ..targetpixelfile import KeplerTargetPixelFile
 
-# 8th Quarter of Tabby's star
 TABBY_Q8 = ("https://archive.stsci.edu/missions/kepler/lightcurves"
             "/0084/008462852/kplr008462852-2011073133259_llc.fits")
 
+@pytest.mark.remote_data
+def test_periodogram():
+    """Sanity check to verify that periodogram functions works"""
+    ID = "09775454"
+    tpf = KeplerTargetPixelFile.from_archive(ID, quarter=0,  quality_bitmask='hardest')
+    lc =  tpf.to_lightcurve().normalize().remove_nans().remove_outliers()
+    clc = lc.correct().remove_outliers().fill_gaps()
+    p = clc.periodogram()
+
+    numax = p.estimate_numax()
+    dnu = p.estimate_delta_nu(numax)
+
+    m, r, rho = p.estimate_stellar_parameters(numax, dnu, 5000)
+
+    #test that calling stellar parameters works outside of the class
+    assert(m == estimate_mass(numax, dnu, 5000))
+    assert(r == estimate_radius(numax, dnu, 5000))
+    assert(rho == estimate_mean_density(m,r))
 
 @pytest.mark.remote_data
 def test_from_lightcurve():
