@@ -706,9 +706,10 @@ class TargetPixelFile(object):
         try:
             from bokeh.io import show, output_notebook, push_notebook
             from bokeh.plotting import figure, ColumnDataSource
-            from bokeh.models import LogColorMapper, Selection, Slider, RangeSlider, Span, Range1d
+            from bokeh.models import LogColorMapper, Selection, Slider, RangeSlider, \
+                        Span, Range1d, ColorBar, LogTicker
             from bokeh.layouts import row, column, widgetbox
-            from bokeh.models.widgets import CheckboxGroup
+            from bokeh.models.widgets import CheckboxGroup, Toggle
             from bokeh.models.tools import HoverTool
             output_notebook()
         except ImportError:
@@ -783,7 +784,7 @@ class TargetPixelFile(object):
                 title = "Quicklook lightcurve for target {}".format(self.targetid)
 
             ymax = np.nanpercentile(self.to_lightcurve(aperture_mask='all').flux, 80)*1.2
-            fig1 = figure(title=title, plot_height=300, plot_width=600, y_range=(0, ymax),
+            fig1 = figure(title=title, plot_height=300, plot_width=550, y_range=(0, ymax),
                        tools="pan,wheel_zoom,box_zoom,reset")#, theme=theme)
             fig1.yaxis.axis_label = 'Normalized Flux'
             fig1.xaxis.axis_label = 'Time - 2454833 (days)'
@@ -810,7 +811,7 @@ class TargetPixelFile(object):
             fig1.add_layout(vert)
 
 
-            fig2 = figure(plot_width=300, plot_height=300, x_range=(min(xx), max(xx+1)),
+            fig2 = figure(plot_width=370, plot_height=300, x_range=(min(xx), max(xx+1)),
                         y_range=(min(yy), max(yy+1)), title='Target Pixel File',
                         tools='tap, box_select, wheel_zoom, reset')
             fig2.yaxis.axis_label = 'Pixel Row Number'
@@ -846,7 +847,7 @@ class TargetPixelFile(object):
 
             n_cadences = len(self.time)
             amp_slider = Slider(start=0, end=n_cadences-1, value=0, step=1,
-                    title="TPF slice index", width = 800)
+                    title="TPF slice index", width = 600)
 
             def callback2(attr, old, new):
                 fig2_dat.data_source.data['image'] = [self.flux[new, :, :]
@@ -866,7 +867,7 @@ class TargetPixelFile(object):
             screen_slider.on_change('value', callback3)
 
             checkbox_group = CheckboxGroup(
-            labels=["Normalize Lightcurve", "Overplot Complement"])
+            labels=["Normalize Lightcurve"])#, "Overplot Complement"])
 
             def callback4(new):
                 if 0 in checkbox_group.active:
@@ -878,16 +879,30 @@ class TargetPixelFile(object):
                 else:
                     fig1.y_range.start = 0.0
                     fig1.y_range.end   = ymax
-                if 1 in checkbox_group.active:
-                    selected_indices = np.array(source2.selected.indices)
-                    nonselected_mask = ~np.isin(pixel_index_array, selected_indices)
-                    lc_bak = self.to_lightcurve(aperture_mask=nonselected_mask)
-                    step_dat2 = fig1.step(lc_bak.time, lc_bak.flux, line_width=1, color='red')
+                #if 1 in checkbox_group.active:
+                #    selected_indices = np.array(source2.selected.indices)
+                #    nonselected_mask = ~np.isin(pixel_index_array, selected_indices)
+                #    lc_bak = self.to_lightcurve(aperture_mask=nonselected_mask)
+                #    step_dat2 = fig1.step(lc_bak.time, lc_bak.flux, line_width=1, color='red')
 
             checkbox_group.on_click(callback4)
 
+            toggle = Toggle(label="Save Mask", button_type="success")
+
+            def callback5(new):
+                mask_out = "mask_ID_{}_C{}.npy".format(self.targetid, self.campaign)
+                selected_indices = np.array(source2.selected.indices)
+                selected_mask = np.isin(pixel_index_array, selected_indices)
+                np.save(mask_out, selected_mask)
+
+            toggle.on_click(callback5)
+
+            color_bar = ColorBar(color_mapper=color_mapper,ticker=LogTicker(), label_standoff=12, border_line_color=None, location=(0,0))
+            fig2.add_layout(color_bar, 'right')
+
+
             row1 = row(fig1, fig2)
-            widgets = widgetbox(amp_slider, screen_slider, checkbox_group)
+            widgets = widgetbox(amp_slider, screen_slider, checkbox_group, toggle)
             row_and_col = column(row1, widgets)
             doc.add_root(row_and_col)
 
