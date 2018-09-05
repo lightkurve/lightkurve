@@ -371,7 +371,7 @@ class TessLightCurveFile(LightCurveFile):
     def __init__(self, path, quality_bitmask='default', **kwargs):
         super(TessLightCurveFile, self).__init__(path, **kwargs)
         self.quality_bitmask = quality_bitmask
-        self.quality_mask = KeplerQualityFlags.create_quality_mask(
+        self.quality_mask = TessQualityFlags.create_quality_mask(
                                 quality_array=self.hdu[1].data['QUALITY'],
                                 bitmask=quality_bitmask)
 

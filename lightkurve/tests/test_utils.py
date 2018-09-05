@@ -4,7 +4,7 @@ import numpy as np
 from numpy.testing import assert_almost_equal
 import pytest
 
-from ..utils import KeplerQualityFlags
+from ..utils import KeplerQualityFlags, TessQualityFlags
 from ..utils import module_output_to_channel, channel_to_module_output
 from ..utils import running_mean
 
@@ -35,7 +35,7 @@ def test_running_mean():
     assert_almost_equal(running_mean([2, 2, 2], window_size=3), [2])
 
 
-def test_quality_flag_decoding():
+def test_quality_flag_decoding_kepler():
     """Can the QUALITY flags be parsed correctly?"""
     flags = list(KeplerQualityFlags.STRINGS.items())
     for key, value in flags:
@@ -43,6 +43,17 @@ def test_quality_flag_decoding():
     # Can we recover combinations of flags?
     assert KeplerQualityFlags.decode(flags[5][0] + flags[7][0]) == [flags[5][1], flags[7][1]]
     assert KeplerQualityFlags.decode(flags[3][0] + flags[4][0] + flags[5][0]) \
+        == [flags[3][1], flags[4][1], flags[5][1]]
+
+
+def test_quality_flag_decoding_tess():
+    """Can the QUALITY flags be parsed correctly?"""
+    flags = list(TessQualityFlags.STRINGS.items())
+    for key, value in flags:
+        assert TessQualityFlags.decode(key)[0] == value
+    # Can we recover combinations of flags?
+    assert TessQualityFlags.decode(flags[5][0] + flags[7][0]) == [flags[5][1], flags[7][1]]
+    assert TessQualityFlags.decode(flags[3][0] + flags[4][0] + flags[5][0]) \
         == [flags[3][1], flags[4][1], flags[5][1]]
 
 
