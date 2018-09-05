@@ -44,27 +44,69 @@ def stylize_bokeh(tpf):
     """
     return None
 
-def map_cadences(tpf):
+def map_cadences(tpf, lc):
     """Create a lookup dictionary to map cadences to indices
-
-    Parameters
-    ----------
-    tpf: TargetPixelFile object
-    """
-    return None
-
-def prepare_lightcurve_datasource(tpf):
-    """Prepare a bokeh DataSource object for tool tips
 
     Parameters
     ----------
     tpf: TargetPixelFile object
 
     Returns
+    -------
+    cadence_lookup, missing_cadences: dict, list
+        A dictionary mapping each existing tpf cadence to a TPF slice index;
+        A list of cadences for which data is unavailable
+    """
+    # Map cadence to index for quick array slicing.
+    lc_cad_matches = np.in1d(tpf.cadenceno, lc.cadenceno)
+    if (lc_cad_matches.sum() != len(lc.cadenceno)) :
+        raise ValueError("The lightcurve provided has cadences that are not "
+                         "present in the Target Pixel File.")
+    min_cadence, max_cadence = np.min(tpf.cadenceno), np.max(tpf.cadenceno)
+    cadence_lookup = {cad: j for j, cad in enumerate(tpf.cadenceno)}
+    cadence_full_range = np.arange(min_cadence, max_cadence, 1, dtype=np.int)
+    missing_cadences = list(set(cadence_full_range)-set(tpf.cadenceno))
+    return (cadence_lookup, missing_cadences)
+
+
+def prepare_lightcurve_datasource(lc):
+    """Prepare a bokeh DataSource object for tool tips
+
+    Parameters
+    ----------
+    lc: LightCurve object
+
+    Returns
     ----------
     bokeh DataSource
     """
-    return None
+    # Convert time into human readable strings, breaks with NaN time
+    # See https://github.com/KeplerGO/lightkurve/issues/116
+    if (lc.time == lc.time).all():
+        human_time = lc.astropy_time.isot
+    else:
+        human_time = [' '] * len(lc.flux)
+
+    # Convert binary quality numbers into human readable strings
+    qual_strings = []
+    for bitmask in lc.quality:
+        flag_str_list = KeplerQualityFlags.decode(bitmask)
+        if len(flag_str_list) == 0:
+            qual_strings.append(' ')
+        if len(flag_str_list) == 1:
+            qual_strings.append(flag_str_list[0])
+        if len(flag_str_list) > 1:
+            qual_strings.append("; ".join(flag_str_list))
+
+    source = ColumnDataSource(data=dict(
+        time=lc.time,
+        time_iso=human_time,
+        flux=lc.flux,
+        cadence=lc.cadenceno,
+        quality_code=lc.quality,
+        quality=np.array(qual_strings)))
+
+    return source
 
 def make_lightcurve_figure_elements(data_source):
     """Make the lightcurve figure elements
@@ -113,46 +155,10 @@ def pixel_selector_standalone(tpf):
     if len(lc.cadenceno) > 30000:
         raise RuntimeError('Interact cannot display more than 30000 cadences.')
 
-    # Map cadence to index for quick array slicing.
-    n_lc_cad = len(lc.cadenceno)
-    n_cad, nx, ny = tpf.flux.shape
-    lc_cad_matches = np.in1d(tpf.cadenceno, lc.cadenceno)
-    if lc_cad_matches.sum() != n_lc_cad:
-        raise ValueError("The lightcurve provided has cadences that are not "
-                         "present in the Target Pixel File.")
-    min_cadence, max_cadence = np.min(tpf.cadenceno), np.max(tpf.cadenceno)
-    cadence_lookup = {cad: j for j, cad in enumerate(tpf.cadenceno)}
-    cadence_full_range = np.arange(min_cadence, max_cadence, 1, dtype=np.int)
-    missing_cadences = list(set(cadence_full_range)-set(tpf.cadenceno))
-
-    # Convert binary quality numbers into human readable strings
-    qual_strings = []
-    for bitmask in lc.quality:
-        flag_str_list = KeplerQualityFlags.decode(bitmask)
-        if len(flag_str_list) == 0:
-            qual_strings.append(' ')
-        if len(flag_str_list) == 1:
-            qual_strings.append(flag_str_list[0])
-        if len(flag_str_list) > 1:
-            qual_strings.append("; ".join(flag_str_list))
-
-    # Convert time into human readable strings, breaks with NaN time
-    # See https://github.com/KeplerGO/lightkurve/issues/116
-    if (tpf.time == tpf.time).all():
-        human_time = tpf.astropy_time.isot[lc_cad_matches]
-    else:
-        human_time = [' '] * n_lc_cad
-
+    # The data source includes metadata for hover-over tooltips
+    source = prepare_lightcurve_datasource(lc)
 
     def modify_doc(doc):
-        # Each data source will later become a hover-over tooltip
-        source = ColumnDataSource(data=dict(
-            time=lc.time,
-            time_iso=human_time,
-            flux=lc.flux,
-            cadence=lc.cadenceno,
-            quality_code=lc.quality,
-            quality=np.array(qual_strings)))
 
         # Provide extra metadata in the title
         if tpf.mission == 'K2':
