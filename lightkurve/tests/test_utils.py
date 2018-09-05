@@ -50,10 +50,10 @@ def test_quality_flag_decoding_tess():
     """Can the QUALITY flags be parsed correctly?"""
     flags = list(TessQualityFlags.STRINGS.items())
     for key, value in flags:
-        assert KeplerQualityFlags.decode(key)[0] == value
+        assert TessQualityFlags.decode(key)[0] == value
     # Can we recover combinations of flags?
-    assert KeplerQualityFlags.decode(flags[5][0] + flags[7][0]) == [flags[5][1], flags[7][1]]
-    assert KeplerQualityFlags.decode(flags[3][0] + flags[4][0] + flags[5][0]) \
+    assert TessQualityFlags.decode(flags[5][0] + flags[7][0]) == [flags[5][1], flags[7][1]]
+    assert TessQualityFlags.decode(flags[3][0] + flags[4][0] + flags[5][0]) \
         == [flags[3][1], flags[4][1], flags[5][1]]
 
 
