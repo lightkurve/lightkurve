@@ -35,15 +35,6 @@ except ImportError:
 __all__ = []
 
 
-def stylize_bokeh(tpf):
-    """Stylize an interactive plot with themes and tpf-based metadata
-
-    Parameters
-    ----------
-    tpf: TargetPixelFile object
-    """
-    return None
-
 def map_cadences(tpf, lc):
     """Create a lookup dictionary to map cadences to indices
 
@@ -108,29 +99,158 @@ def prepare_lightcurve_datasource(lc):
 
     return source
 
-def make_lightcurve_figure_elements(data_source):
+def prepare_tpf_datasource(tpf):
+    """Prepare a bokeh DataSource object for selection glyphs
+
+    Parameters
+    ----------
+    tpf: TargetPixelFile
+
+    Returns
+    ----------
+    bokeh DataSource
+    """
+    n_pixels = tpf.flux[0, :, :].size
+    pixel_index_array = np.arange(0, n_pixels, 1, dtype=int).reshape(tpf.flux[0, :, :].shape)
+    xx = tpf.column + np.arange(tpf.shape[2])
+    yy = tpf.row + np.arange(tpf.shape[1])
+    xa, ya = np.meshgrid(xx, yy)
+    preselection = Selection()
+    preselection.indices = pixel_index_array[tpf.pipeline_mask].reshape(-1).tolist()
+    source2 = ColumnDataSource(data=dict(xx=xa+0.5, yy=ya+0.5), selected=preselection)
+    return source2
+
+def set_lightcurve_y_limits(fig, source):
     """Make the lightcurve figure elements
 
     Parameters
     ----------
-    data_source: bokeh DataSource object
+    fig: `bokeh.plotting.figure` instance
+    data_source: `bokeh.models.sources.ColumnDataSource` instance
+    """
+    source.data['flux'] = source.data['flux'] / np.nanmedian(source.data['flux'])
+    sig_lo, med, sig_hi = np.nanpercentile(source.data['flux'], (16, 50, 84))
+    robust_sigma = (sig_hi - sig_lo)/2.0
+    fig.y_range.start = med - 5.0 * robust_sigma
+    fig.y_range.end = med + 5.0 * robust_sigma
+
+
+def make_lightcurve_figure_elements(lc, source):
+    """Make the lightcurve figure elements
+
+    Parameters
+    ----------
+    tpf: `TargetPixelFile` instance
+    source: `bokeh.models.sources.ColumnDataSource` instance
 
     Returns
     ----------
-    tuple of Figure, Render, and Span objects
+    fig: `bokeh.plotting.figure` instance
     """
-    return None
+    if lc.mission == 'K2':
+        title = "Quicklook lightcurve for EPIC {} (K2 Campaign {})".format(
+            lc.keplerid, lc.campaign)
+    elif lc.mission == 'Kepler':
+        title = "Quicklook lightcurve for KIC {} (Kepler Quarter {})".format(
+            lc.keplerid, lc.quarter)
+    elif lc.mission == 'TESS':
+        title = "Quicklook lightcurve for TIC {} (TESS Sector {})".format(
+            lc.ticid, lc.sector)
+    else:
+        title = "Quicklook lightcurve for target {}".format(lc.targetid)
+
+    fig = figure(title=title, plot_height=300, plot_width=550,
+                 tools="pan,wheel_zoom,box_zoom,reset")#, theme=theme)
+
+    fig.yaxis.axis_label = 'Normalized Flux'
+    fig.xaxis.axis_label = 'Time - 2454833 (days)'
+
+    set_lightcurve_y_limits(fig, source)
+
+    step_dat = fig.step('time', 'flux', line_width=1, color='gray',
+                        source=source, nonselection_line_color='gray')
+
+    circ = fig.circle('time', 'flux', source=source, fill_alpha=0.3, size=8, line_color=None,
+                      selection_color="firebrick", nonselection_fill_alpha=0.0,
+                      nonselection_fill_color="grey", nonselection_line_color=None,
+                      nonselection_line_alpha=0.0, fill_color=None,
+                      hover_fill_color="firebrick", hover_alpha=0.9, hover_line_color="white")
+
+    fig.add_tools(HoverTool(tooltips=[("Cadence", "@cadence"),
+                                      ("Time ({})".format(lc.time_format.upper()),
+                                       "@time{0,0.000}"),
+                                      ("Time (ISO)", "@time_iso"),
+                                      ("Flux", "@flux"),
+                                      ("Quality Code", "@quality_code"),
+                                      ("Quality Flag", "@quality")],
+                            renderers=[circ],
+                            mode='mouse',
+                            point_policy="snap_to_data"))
+
+    # Vertical line to indicate the cadence
+    vert = Span(location=0, dimension='height', line_color='firebrick',
+                line_width=4, line_alpha=0.5)
+    fig.add_layout(vert)
+
+    return fig, step_dat, vert
+
+
+
+def make_tpf_figure_elements(tpf, source):
+    """Make the lightcurve figure elements
+
+    Parameters
+    ----------
+    tpf: `TargetPixelFile` instance
+    source: `bokeh.models.sources.ColumnDataSource` instance
+
+    Returns
+    ----------
+    fig: `bokeh.plotting.figure` instance
+    """
+
+    if tpf.mission in ['Kepler', 'K2']:
+        title = 'Pixel data (CCD {}.{})'.format(tpf.module, tpf.output)
+    elif tpf.mission == 'TESS':
+        title = 'Pixel data (Camera {}.{})'.format(tpf.camera, tpf.ccd)
+    else:
+        title = "Pixel data"
+
+    fig = figure(plot_width=370, plot_height=300,
+                 x_range=(tpf.column, tpf.column+tpf.shape[2]),
+                 y_range=(tpf.row, tpf.row+tpf.shape[1]),
+                 title=title, tools='tap, box_select, wheel_zoom, reset')
+
+    fig.yaxis.axis_label = 'Pixel Row Number'
+    fig.xaxis.axis_label = 'Pixel Column Number'
+
+
+    pedestal = np.nanmin(tpf.flux)
+    vlo, lo, med, hi, vhi = np.nanpercentile(tpf.flux-pedestal, [0.2, 1, 50, 95, 99.8])
+    vstep = (np.log10(vhi) - np.log10(vlo)) / 300.0  # assumes counts >> 1.0!
+    color_mapper = LogColorMapper(palette="Viridis256", low=lo, high=hi)
+
+    fig_dat = fig.image([pedestal + tpf.flux[0, :, :]], x=tpf.column, y=tpf.row,
+                        dw=tpf.shape[2], dh=tpf.shape[1], dilate=True,
+                        color_mapper=color_mapper)
+
+    color_bar = ColorBar(color_mapper=color_mapper,ticker=LogTicker(),
+                         label_standoff=12, border_line_color=None, location=(0,0))
+    fig.add_layout(color_bar, 'right')
+
+    pixels = fig.rect('xx', 'yy', 1, 1, source=source, fill_color='gray',
+                      fill_alpha=0.4, line_color='white')
+
+    return (fig, fig_dat, pixels,
+            {'pedestal':pedestal, 'vlo':vlo, 'lo':lo, 'med':med,
+             'hi':hi, 'vhi':vhi, 'vstep':vstep})
 
 def pixel_selector_standalone(tpf):
     """Display an interactive IPython Notebook widget to select pixel masks.
 
     The widget will show both the lightcurve and pixel data.  The pixel data
     supports pixel selection via Bokeh tap and box select tools in an
-    interactive javascript user interface similar to `.interact()`.
-
-    This feature requires one optional dependency:
-    - bokeh>=0.12.15
-    Which can be installed using e.g. `conda install bokeh`.
+    interactive javascript user interface.
 
     Note: at this time, this feature only works inside an active Jupyter
     Notebook, and tends to be too slow when more than ~30,000 cadences
@@ -141,14 +261,10 @@ def pixel_selector_standalone(tpf):
     None
     """
 
-    lc = tpf.to_lightcurve()
-    ytitle = 'Flux (e/s)'
-    xx=tpf.column + np.arange(tpf.shape[2])
-    yy=tpf.row + np.arange(tpf.shape[1])
-    xa, ya = np.meshgrid(xx, yy)
+    lc = tpf.to_lightcurve(aperture_mask=tpf.pipeline_mask)
 
-    n_pixels = tpf.flux[0,:,:].size
-    pixel_index_array = np.arange(0,n_pixels, 1, dtype=int).reshape(tpf.flux[0,:,:].shape)
+    n_pixels = tpf.flux[0, :, :].size
+    pixel_index_array = np.arange(0, n_pixels, 1, dtype=int).reshape(tpf.flux[0, :, :].shape)
 
     # Bokeh cannot handle many data points
     # https://github.com/bokeh/bokeh/issues/7490
@@ -157,142 +273,56 @@ def pixel_selector_standalone(tpf):
 
     # The data source includes metadata for hover-over tooltips
     source = prepare_lightcurve_datasource(lc)
+    source2 = prepare_tpf_datasource(tpf)
 
     def modify_doc(doc):
 
-        # Provide extra metadata in the title
-        if tpf.mission == 'K2':
-            title = "Quicklook lightcurve for EPIC {} (K2 Campaign {})".format(
-                tpf.keplerid, tpf.campaign)
-        elif tpf.mission == 'Kepler':
-            title = "Quicklook lightcurve for KIC {} (Kepler Quarter {})".format(
-                tpf.keplerid, tpf.quarter)
-        elif tpf.mission == 'TESS':
-            title = "Quicklook lightcurve for TIC {} (TESS Sector {})".format(
-                tpf.ticid, tpf.sector)
-        else:
-            title = "Quicklook lightcurve for target {}".format(tpf.targetid)
+        # Lightcurve plot
+        fig1, step_dat, vert = make_lightcurve_figure_elements(lc, source)
 
-        ymax = np.nanpercentile(tpf.to_lightcurve(aperture_mask='all').flux, 80)*1.2
-        fig1 = figure(title=title, plot_height=300, plot_width=550, y_range=(0, ymax),
-                   tools="pan,wheel_zoom,box_zoom,reset")#, theme=theme)
-        fig1.yaxis.axis_label = 'Normalized Flux'
-        fig1.xaxis.axis_label = 'Time - 2454833 (days)'
-        step_dat = fig1.step('time', 'flux', line_width=1, color='gray', source=source, nonselection_line_color='gray')
+        # Postage stamp image
+        fig2, fig2_dat, r1, stretch = make_tpf_figure_elements(tpf, source2)
 
-        r = fig1.circle('time', 'flux', source=source, fill_alpha=0.3, size=8, line_color=None,
-                     selection_color="firebrick", nonselection_fill_alpha=0.0,
-                     nonselection_fill_color="grey", nonselection_line_color=None,
-                     nonselection_line_alpha=0.0, fill_color=None,
-                     hover_fill_color="firebrick", hover_alpha=0.9, hover_line_color="white")
+        # Interactive slider widgets
+        cadence_slider = Slider(start=0, end=len(tpf.time)-1, value=0, step=1,
+                                title="TPF slice index", width = 600)
+        screen_slider = RangeSlider(start=np.log10(stretch['vlo']),
+                                    end=np.log10(stretch['vhi']),
+                                    step=stretch['vstep'],
+                                    title="Pixel Stretch (log)",
+                                    value=(np.log10(stretch['lo']), np.log10(stretch['hi'])),
+                                    width=250)
 
-        fig1.add_tools(HoverTool(tooltips=[("Cadence", "@cadence"),
-                                           ("Time ({})".format(lc.time_format.upper()), "@time{0,0.000}"),
-                                           ("Time (ISO)", "@time_iso"),
-                                           ("Flux", "@flux"),
-                                           ("Quality Code", "@quality_code"),
-                                           ("Quality Flag", "@quality")],
-                                 renderers=[r],
-                                 mode='mouse',
-                                 point_policy="snap_to_data"))
-        # Vertical line to indicate the cadence shown in Fig 2
-        vert = Span(location=0, dimension='height', line_color='firebrick',
-                    line_width=4, line_alpha=0.5)
-        fig1.add_layout(vert)
-
-
-        fig2 = figure(plot_width=370, plot_height=300, x_range=(min(xx), max(xx+1)),
-                    y_range=(min(yy), max(yy+1)), title='Target Pixel File',
-                    tools='tap, box_select, wheel_zoom, reset')
-        fig2.yaxis.axis_label = 'Pixel Row Number'
-        fig2.xaxis.axis_label = 'Pixel Column Number'
-
-        pedestal = np.nanmin(tpf.flux)
-        vlo, lo, med, hi, vhi = np.nanpercentile(tpf.flux-pedestal, [0.2, 1, 50, 95, 99.8])
-        vstep = (np.log10(vhi) - np.log10(vlo)) / 300.0  # assumes counts >> 1.0!
-        color_mapper = LogColorMapper(palette="Viridis256", low=lo, high=hi)
-
-        fig2_dat = fig2.image([pedestal+tpf.flux[0,:,:]], x=tpf.column, y=tpf.row,
-                          dw=tpf.shape[2], dh=tpf.shape[1], dilate=True,
-                          color_mapper=color_mapper)
-
-        preselection = Selection()
-        preselection.indices=pixel_index_array[tpf.pipeline_mask].reshape(-1).tolist()
-        source2 = ColumnDataSource(data=dict(xx=xa+0.5, yy=ya+0.5), selected=preselection)
-        r1 = fig2.rect('xx', 'yy', 1, 1, source=source2, fill_color='gray', fill_alpha=0.4, line_color='white')
-
-        def callback(attr, old, new):
+        # Callbacks
+        def update_upon_pixel_selection(attr, old, new):
             if len(source2.selected.indices) > 0:
                 selected_indices = np.array(source2.selected.indices)
                 selected_mask = np.isin(pixel_index_array, selected_indices)
                 lc_new = tpf.to_lightcurve(aperture_mask=selected_mask)
-                source.data = dict(time=lc.time, flux=lc_new.flux,
-                                cadence=lc.cadenceno, quality=lc.quality)
+                source.data['flux'] = lc_new.flux
+                set_lightcurve_y_limits(fig1, source)
             else:
-                source.data = dict(time=lc.time, flux=lc.flux*0.0,
-                                cadence=lc.cadenceno, quality=lc.quality)
-            callback4('junk')
+                source.data['flux'] = lc_new.flux * 0.0
 
-        source2.on_change('selected', callback)
-
-        n_cadences = len(tpf.time)
-        amp_slider = Slider(start=0, end=n_cadences-1, value=0, step=1,
-                title="TPF slice index", width = 600)
-
-        def callback2(attr, old, new):
+        def update_upon_cadence_change(attr, old, new):
             fig2_dat.data_source.data['image'] = [tpf.flux[new, :, :]
-                                                      - pedestal]
+                                                  - stretch['pedestal']]
             vert.update(location=tpf.time[new])
 
-        amp_slider.on_change('value', callback2)
-
-        def callback3(attr, old, new):
+        def update_upon_stetch_change(attr, old, new):
             fig2_dat.glyph.color_mapper.high = 10**new[1]
             fig2_dat.glyph.color_mapper.low = 10**new[0]
 
-        screen_slider = RangeSlider(start=np.log10(vlo), end=np.log10(vhi),
-            step=vstep, title="Pixel Stretch (log)",
-            value=(np.log10(lo), np.log10(hi)), width = 250)
 
-        screen_slider.on_change('value', callback3)
-
-        checkbox_group = CheckboxGroup(
-        labels=["Normalize Lightcurve"])#, "Overplot Complement"])
-
-        def callback4(new):
-            if 0 in checkbox_group.active:
-                source.data['flux'] = source.data['flux'] / np.nanmedian(source.data['flux'])
-                sig_lo, med, sig_hi = np.nanpercentile(source.data['flux'], (16,50,84))
-                robust_sigma = (sig_hi - sig_lo)/2.0
-                fig1.y_range.start = med-5.0*robust_sigma
-                fig1.y_range.end   = med+5.0*robust_sigma
-            else:
-                fig1.y_range.start = 0.0
-                fig1.y_range.end   = ymax
-            #if 1 in checkbox_group.active:
-            #    selected_indices = np.array(source2.selected.indices)
-            #    nonselected_mask = ~np.isin(pixel_index_array, selected_indices)
-            #    lc_bak = tpf.to_lightcurve(aperture_mask=nonselected_mask)
-            #    step_dat2 = fig1.step(lc_bak.time, lc_bak.flux, line_width=1, color='red')
-
-        checkbox_group.on_click(callback4)
-
-        toggle = Toggle(label="Save Mask", button_type="success")
-
-        def callback5(new):
-            mask_out = "mask_ID_{}_C{}.npy".format(tpf.targetid, tpf.campaign)
-            selected_indices = np.array(source2.selected.indices)
-            selected_mask = np.isin(pixel_index_array, selected_indices)
-            np.save(mask_out, selected_mask)
-
-        toggle.on_click(callback5)
-
-        color_bar = ColorBar(color_mapper=color_mapper,ticker=LogTicker(), label_standoff=12, border_line_color=None, location=(0,0))
-        fig2.add_layout(color_bar, 'right')
+        # Map changes to callbacks
+        source2.on_change('selected', update_upon_pixel_selection)
+        cadence_slider.on_change('value', update_upon_cadence_change)
+        screen_slider.on_change('value', update_upon_stetch_change)
 
 
-        row1 = row(fig1, fig2)
-        widgets = widgetbox(amp_slider, screen_slider, checkbox_group, toggle)
+        # Layout all of the plots
+        row1 = row(fig2, fig1)
+        widgets = widgetbox(cadence_slider, screen_slider)
         row_and_col = column(row1, widgets)
         doc.add_root(row_and_col)
 
