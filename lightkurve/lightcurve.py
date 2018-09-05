@@ -291,16 +291,13 @@ class LightCurve(object):
         for l, h in zip(low, high):
             # Reduce `window_length` and `polyorder` for short segments;
             # this prevents `savgol_filter` from raising an exception
-            segment_window_length, segment_polyorder = window_length, polyorder
-            if segment_window_length > (h - l):
-                segment_window_length = h - l
-                if (segment_window_length % 2) == 0:
-                    segment_window_length -= 1  # window_length must be odd
-            if segment_polyorder >= segment_window_length:
-                segment_polyorder = segment_window_length - 1
-            trend_signal[l:h] = signal.savgol_filter(x=lc_clean.flux[l:h],
-                                                     window_length=segment_window_length,
-                                                     polyorder=segment_polyorder, **kwargs)
+            # If the segment is too short, just take the median
+            if np.any([window_length > (h - l), (h - l) < break_tolerance]):
+                trend_signal[l:h] = np.nanmedian(lc_clean.flux[l:h])
+            else:
+                trend_signal[l:h] = signal.savgol_filter(x=lc_clean.flux[l:h],
+                                                     window_length=window_length,
+                                                     polyorder=polyorder, **kwargs)
         trend_signal = np.interp(self.time, lc_clean.time, trend_signal)
         flatten_lc = copy.deepcopy(self)
         flatten_lc.flux = flatten_lc.flux / trend_signal
