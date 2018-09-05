@@ -28,13 +28,56 @@ try:
     output_notebook()
 except ImportError:
     log.error("The interact() tool requires `bokeh` to be installed. "
-              "These can be installed using `conda install bokeh`.")
+              "bokeh can be installed using `conda install bokeh`.")
     raise
 
 
 __all__ = []
 
 
+def stylize_bokeh(tpf):
+    """Stylize an interactive plot with themes and tpf-based metadata
+
+    Parameters
+    ----------
+    tpf: TargetPixelFile object
+    """
+    return None
+
+def map_cadences(tpf):
+    """Create a lookup dictionary to map cadences to indices
+
+    Parameters
+    ----------
+    tpf: TargetPixelFile object
+    """
+    return None
+
+def prepare_lightcurve_datasource(tpf):
+    """Prepare a bokeh DataSource object for tool tips
+
+    Parameters
+    ----------
+    tpf: TargetPixelFile object
+
+    Returns
+    ----------
+    bokeh DataSource
+    """
+    return None
+
+def make_lightcurve_figure_elements(data_source):
+    """Make the lightcurve figure elements
+
+    Parameters
+    ----------
+    data_source: bokeh DataSource object
+
+    Returns
+    ----------
+    tuple of Figure, Render, and Span objects
+    """
+    return None
 
 def pixel_selector_standalone(tpf):
     """Display an interactive IPython Notebook widget to select pixel masks.
@@ -131,11 +174,11 @@ def pixel_selector_standalone(tpf):
         fig1.xaxis.axis_label = 'Time - 2454833 (days)'
         step_dat = fig1.step('time', 'flux', line_width=1, color='gray', source=source, nonselection_line_color='gray')
 
-        r = fig1.circle('time', 'flux', source=source, fill_alpha=0.3, size=8,line_color=None,
+        r = fig1.circle('time', 'flux', source=source, fill_alpha=0.3, size=8, line_color=None,
                      selection_color="firebrick", nonselection_fill_alpha=0.0,
-                     nonselection_fill_color="grey",nonselection_line_color=None,
+                     nonselection_fill_color="grey", nonselection_line_color=None,
                      nonselection_line_alpha=0.0, fill_color=None,
-                     hover_fill_color="firebrick",hover_alpha=0.9,hover_line_color="white")
+                     hover_fill_color="firebrick", hover_alpha=0.9, hover_line_color="white")
 
         fig1.add_tools(HoverTool(tooltips=[("Cadence", "@cadence"),
                                            ("Time ({})".format(lc.time_format.upper()), "@time{0,0.000}"),
