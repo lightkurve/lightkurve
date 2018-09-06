@@ -120,19 +120,16 @@ def prepare_tpf_datasource(tpf):
     source2 = ColumnDataSource(data=dict(xx=xa+0.5, yy=ya+0.5), selected=preselection)
     return source2
 
-def set_lightcurve_y_limits(fig, source):
+def set_lightcurve_y_limits(source):
     """Make the lightcurve figure elements
 
     Parameters
     ----------
-    fig: `bokeh.plotting.figure` instance
     data_source: `bokeh.models.sources.ColumnDataSource` instance
     """
-    source.data['flux'] = source.data['flux'] / np.nanmedian(source.data['flux'])
     sig_lo, med, sig_hi = np.nanpercentile(source.data['flux'], (16, 50, 84))
     robust_sigma = (sig_hi - sig_lo)/2.0
-    fig.y_range.start = med - 5.0 * robust_sigma
-    fig.y_range.end = med + 5.0 * robust_sigma
+    return med - 5.0 * robust_sigma, med + 5.0 * robust_sigma
 
 
 def make_lightcurve_figure_elements(lc, source):
@@ -165,7 +162,7 @@ def make_lightcurve_figure_elements(lc, source):
     fig.yaxis.axis_label = 'Normalized Flux'
     fig.xaxis.axis_label = 'Time - 2454833 (days)'
 
-    set_lightcurve_y_limits(fig, source)
+    fig.y_range.start, fig.y_range.end = set_lightcurve_y_limits(source)
 
     step_dat = fig.step('time', 'flux', line_width=1, color='gray',
                         source=source, nonselection_line_color='gray')
@@ -238,10 +235,10 @@ def make_tpf_figure_elements(tpf, source):
                          label_standoff=12, border_line_color=None, location=(0,0))
     fig.add_layout(color_bar, 'right')
 
-    pixels = fig.rect('xx', 'yy', 1, 1, source=source, fill_color='gray',
+    fig.rect('xx', 'yy', 1, 1, source=source, fill_color='gray',
                       fill_alpha=0.4, line_color='white')
 
-    return (fig, fig_dat, pixels,
+    return (fig, fig_dat,
             {'pedestal':pedestal, 'vlo':vlo, 'lo':lo, 'med':med,
              'hi':hi, 'vhi':vhi, 'vstep':vstep})
 
@@ -261,7 +258,7 @@ def pixel_selector_standalone(tpf):
     None
     """
 
-    lc = tpf.to_lightcurve(aperture_mask=tpf.pipeline_mask)
+    lc = tpf.to_lightcurve(aperture_mask=tpf.pipeline_mask).normalize()
 
     n_pixels = tpf.flux[0, :, :].size
     pixel_index_array = np.arange(0, n_pixels, 1, dtype=int).reshape(tpf.flux[0, :, :].shape)
@@ -271,21 +268,22 @@ def pixel_selector_standalone(tpf):
     if len(lc.cadenceno) > 30000:
         raise RuntimeError('Interact cannot display more than 30000 cadences.')
 
-    # The data source includes metadata for hover-over tooltips
-    source = prepare_lightcurve_datasource(lc)
-    source2 = prepare_tpf_datasource(tpf)
-
     def modify_doc(doc):
+
+        # The data source includes metadata for hover-over tooltips
+        source = prepare_lightcurve_datasource(lc)
+        source2 = prepare_tpf_datasource(tpf)
 
         # Lightcurve plot
         fig1, step_dat, vert = make_lightcurve_figure_elements(lc, source)
 
         # Postage stamp image
-        fig2, fig2_dat, r1, stretch = make_tpf_figure_elements(tpf, source2)
+        fig2, fig2_dat, stretch = make_tpf_figure_elements(tpf, source2)
 
         # Interactive slider widgets
         cadence_slider = Slider(start=0, end=len(tpf.time)-1, value=0, step=1,
                                 title="TPF slice index", width = 600)
+
         screen_slider = RangeSlider(start=np.log10(stretch['vlo']),
                                     end=np.log10(stretch['vhi']),
                                     step=stretch['vstep'],
@@ -298,11 +296,17 @@ def pixel_selector_standalone(tpf):
             if len(source2.selected.indices) > 0:
                 selected_indices = np.array(source2.selected.indices)
                 selected_mask = np.isin(pixel_index_array, selected_indices)
-                lc_new = tpf.to_lightcurve(aperture_mask=selected_mask)
-                source.data['flux'] = lc_new.flux
-                set_lightcurve_y_limits(fig1, source)
+                lc_new = tpf.to_lightcurve(aperture_mask=selected_mask).normalize()
+                source.data = dict(time=lc.time, flux=lc_new.flux,
+                                cadence=lc.cadenceno, quality=lc.quality)
             else:
-                source.data['flux'] = lc_new.flux * 0.0
+                source.data = dict(time=lc.time, flux=lc.flux*0.0,
+                                cadence=lc.cadenceno, quality=lc.quality)
+            source.data['flux'] = source.data['flux'] / np.nanmedian(source.data['flux'])
+            sig_lo, med, sig_hi = np.nanpercentile(source.data['flux'], (16,50,84)).copy(deep_copy=True)
+            robust_sigma = (sig_hi - sig_lo)/2.0
+            fig1.y_range.start = med-5.0*robust_sigma
+            fig1.y_range.end   = med+5.0*robust_sigma
 
         def update_upon_cadence_change(attr, old, new):
             fig2_dat.data_source.data['image'] = [tpf.flux[new, :, :]
