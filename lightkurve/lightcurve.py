@@ -573,7 +573,7 @@ class LightCurve(object):
     def _clean_ax(self, ax, kwargs, normalize=True):
         xlabel = ax.get_xlabel()
         if xlabel is '':
-            ax.set_xlabel('Time - 2454833 (days)')
+            ax.set_xlabel('Time - 2454833 [JD] ')
         ylabel = ax.get_ylabel()
         if ylabel is '':
             if normalize:
@@ -618,8 +618,6 @@ class LightCurve(object):
             The matplotlib axes object.
         """
 
-        if ax is None:
-            fig, ax = plt.subplots(1)
 
         # The "fast" style has only been in matplotlib since v2.1.
         # Let's make it optional until >v2.1 is mainstream and can
@@ -628,6 +626,10 @@ class LightCurve(object):
             style = STYLESHEET
         if (style == "fast") and ("fast" not in mpl.style.available):
             style = "default"
+
+        with plt.style.context(style):
+            if ax is None:
+                fig, ax = plt.subplots(1)
 
         # Normalize the data
         if normalize:
@@ -691,11 +693,6 @@ class LightCurve(object):
         ax : matplotlib.axes._subplots.AxesSubplot
             The matplotlib axes object.
         """
-        # The "fast" style has only been in matplotlib since v2.1.
-        # Let's make it optional until >v2.1 is mainstream and can
-        # be made the minimum requirement.
-        if ax is None:
-            fig, ax = plt.subplots(1)
 
         # The "fast" style has only been in matplotlib since v2.1.
         # Let's make it optional until >v2.1 is mainstream and can
@@ -704,6 +701,10 @@ class LightCurve(object):
             style = STYLESHEET
         if (style == "fast") and ("fast" not in mpl.style.available):
             style = "default"
+
+        with plt.style.context(style):
+            if ax is None:
+                fig, ax = plt.subplots(1)
 
         # Normalize the data
         if normalize:
