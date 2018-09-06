@@ -291,16 +291,29 @@ def pixel_selector_standalone(tpf):
                                     value=(np.log10(stretch['lo']), np.log10(stretch['hi'])),
                                     width=250)
 
+        existing_selection = source2.selected.to_json(True).copy()
+        existing_indices = existing_selection['indices']
+        existing_id = existing_selection['id']
+
         # Callbacks
         def update_upon_pixel_selection(attr, old, new):
-            if len(source2.selected.indices) > 0:
+            '''Callback to take action when pixels are selected'''
+            #check if a selection was "re-clicked".
+            if ( (sorted(existing_selection['indices']) == sorted(new.indices)) &
+                 (new.indices != []) ):
+                source2.selected = Selection(indices=new.indices[1:])
+                existing_selection['indices'] = new.indices[1:]
+            else:
+                existing_selection['indices'] = new.indices
+
+            if source2.selected.indices != []:
                 selected_indices = np.array(source2.selected.indices)
                 selected_mask = np.isin(pixel_index_array, selected_indices)
                 lc_new = tpf.to_lightcurve(aperture_mask=selected_mask).normalize()
                 source.data = dict(time=lc.time, flux=lc_new.flux,
                                    cadence=lc.cadenceno, quality=lc.quality)
                 ylims = get_lightcurve_y_limits(source)
-                fig1.y_range.start= ylims[0]
+                fig1.y_range.start = ylims[0]
                 fig1.y_range.end = ylims[1]
             else:
                 source.data = dict(time=lc.time, flux=lc.flux*0.0,
@@ -310,11 +323,13 @@ def pixel_selector_standalone(tpf):
 
 
         def update_upon_cadence_change(attr, old, new):
+            '''Callback to take action when cadence slider changes'''
             fig2_dat.data_source.data['image'] = [tpf.flux[new, :, :]
                                                   - stretch['pedestal']]
             vert.update(location=tpf.time[new])
 
         def update_upon_stetch_change(attr, old, new):
+            '''Callback to take action when screen stretch'''
             fig2_dat.glyph.color_mapper.high = 10**new[1]
             fig2_dat.glyph.color_mapper.low = 10**new[0]
 
