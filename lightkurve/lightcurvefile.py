@@ -374,6 +374,10 @@ class TessLightCurveFile(LightCurveFile):
         self.quality_mask = TessQualityFlags.create_quality_mask(
                                 quality_array=self.hdu[1].data['QUALITY'],
                                 bitmask=quality_bitmask)
+        # Early TESS releases had cadences with time=NaN (i.e. missing data)
+        # which were not flagged by a QUALITY flag yet; the line below prevents
+        # these cadences from being used. They would break most methods!
+        self.quality_mask &= np.isfinite(self.hdu[1].data['TIME'])
 
     def __repr__(self):
         return('TessLightCurveFile(TICID: {})'.format(self.ticid))
