@@ -23,7 +23,7 @@ try:
     from bokeh.models import LogColorMapper, Selection, Slider, RangeSlider, \
                 Span, ColorBar, LogTicker, Range1d
     from bokeh.layouts import row, column, widgetbox
-    from bokeh.models.tools import HoverTool
+    from bokeh.models.tools import HoverTool, LassoSelectTool
     output_notebook()
 except ImportError:
     log.error("The interact() tool requires `bokeh` to be installed. "
@@ -144,19 +144,22 @@ def make_lightcurve_figure_elements(lc, source):
     fig: `bokeh.plotting.figure` instance
     """
     if lc.mission == 'K2':
-        title = "Quicklook lightcurve for EPIC {} (K2 Campaign {})".format(
+        title = "Lightcurve for EPIC {} (K2 C{})".format(
             lc.keplerid, lc.campaign)
     elif lc.mission == 'Kepler':
-        title = "Quicklook lightcurve for KIC {} (Kepler Quarter {})".format(
+        title = "Lightcurve for KIC {} (Kepler Q{})".format(
             lc.keplerid, lc.quarter)
     elif lc.mission == 'TESS':
-        title = "Quicklook lightcurve for TIC {} (TESS Sector {})".format(
+        title = "Lightcurve for TIC {} (TESS Sec. {})".format(
             lc.ticid, lc.sector)
     else:
-        title = "Quicklook lightcurve for target {}".format(lc.targetid)
+        title = "Lightcurve for target {}".format(lc.targetid)
 
-    fig = figure(title=title, plot_height=300, plot_width=550,
-                 tools="pan,wheel_zoom,box_zoom,reset")#, theme=theme)
+    fig = figure(title=title, plot_height=300, plot_width=600,
+                 tools="pan,wheel_zoom,box_zoom,reset",
+                 toolbar_location="above", logo=None)
+    fig.title.offset = -10
+    fig.border_fill_color = "whitesmoke"
 
     fig.yaxis.axis_label = 'Normalized Flux'
     fig.xaxis.axis_label = 'Time - 2454833 (days)'
@@ -216,10 +219,12 @@ def make_tpf_figure_elements(tpf, source):
     fig = figure(plot_width=370, plot_height=300,
                  x_range=(tpf.column, tpf.column+tpf.shape[2]),
                  y_range=(tpf.row, tpf.row+tpf.shape[1]),
-                 title=title, tools='tap, box_select, wheel_zoom, reset')
+                 title=title, tools='tap,box_select,wheel_zoom,reset',
+                 toolbar_location="left", logo=None)
 
     fig.yaxis.axis_label = 'Pixel Row Number'
     fig.xaxis.axis_label = 'Pixel Column Number'
+    fig.border_fill_color = "whitesmoke"
 
 
     pedestal = np.nanmin(tpf.flux)
@@ -234,9 +239,14 @@ def make_tpf_figure_elements(tpf, source):
     color_bar = ColorBar(color_mapper=color_mapper,ticker=LogTicker(),
                          label_standoff=12, border_line_color=None, location=(0,0))
     fig.add_layout(color_bar, 'right')
+    color_bar.background_fill_color = 'whitesmoke'
 
-    fig.rect('xx', 'yy', 1, 1, source=source, fill_color='gray',
+    pixels = fig.rect('xx', 'yy', 1, 1, source=source, fill_color='gray',
                       fill_alpha=0.4, line_color='white')
+
+    # Lasso Select apparently does not work with boxes/quads/rect.
+    # See https://github.com/bokeh/bokeh/issues/964
+    #fig.add_tools(LassoSelectTool(renderers=[pixels], select_every_mousemove=False)
 
     return (fig, fig_dat,
             {'pedestal':pedestal, 'vlo':vlo, 'lo':lo, 'med':med,
@@ -316,8 +326,8 @@ def pixel_selector_standalone(tpf):
             else:
                 source.data = dict(time=lc.time, flux=lc.flux*0.0,
                                    cadence=lc.cadenceno, quality=lc.quality)
-                fig1.y_range.start = 0
-                fig1.y_range.end = 2
+                fig1.y_range.start = -1
+                fig1.y_range.end = 1
 
 
         def update_upon_cadence_change(attr, old, new):
@@ -374,7 +384,7 @@ def interact_classic(tpf, lc=None):
         from bokeh.plotting import figure, ColumnDataSource
         from bokeh.models import Span, LogColorMapper
         from bokeh.layouts import row
-        from bokeh.models.tools import HoverTool
+        from bokeh.models.tools import HoverTool, LassoSelectTool
         from IPython.display import display
         output_notebook()
     except ImportError:
