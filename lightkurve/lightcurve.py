@@ -278,6 +278,10 @@ class LightCurve(object):
         """
         if break_tolerance is None:
             break_tolerance = np.nan
+        if polyorder >= window_length:
+            polyorder = window_length - 1
+            log.warning("polyorder must be smaller than window_length, "
+                        "using polyorder={}.".format(polyorder))
         lc_clean = self.remove_nans()
         # Split the lightcurve into segments by finding large gaps in time
         dt = lc_clean.time[1:] - lc_clean.time[0:-1]
@@ -296,8 +300,9 @@ class LightCurve(object):
                 trend_signal[l:h] = np.nanmedian(lc_clean.flux[l:h])
             else:
                 trend_signal[l:h] = signal.savgol_filter(x=lc_clean.flux[l:h],
-                                                     window_length=window_length,
-                                                     polyorder=polyorder, **kwargs)
+                                                         window_length=window_length,
+                                                         polyorder=polyorder,
+                                                         **kwargs)
         trend_signal = np.interp(self.time, lc_clean.time, trend_signal)
         flatten_lc = copy.deepcopy(self)
         flatten_lc.flux = flatten_lc.flux / trend_signal
