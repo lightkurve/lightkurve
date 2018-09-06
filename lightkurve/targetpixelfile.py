@@ -25,7 +25,7 @@ from .mast import download_kepler_products
 __all__ = ['KeplerTargetPixelFile', 'TessTargetPixelFile']
 log = logging.getLogger(__name__)
 
-
+STYLESHEET = '{}/data/lightkurve.mplstyle'.format(PACKAGEDIR)
 class TargetPixelFile(object):
     """
     Generic TargetPixelFile class for Kepler, K2, and TESS data.
@@ -405,7 +405,7 @@ class TargetPixelFile(object):
         return col_centr, row_centr
 
     def plot(self, ax=None, frame=0, cadenceno=None, bkg=False, aperture_mask=None,
-             show_colorbar=True, mask_color='pink', style='fast', **kwargs):
+             show_colorbar=True, mask_color='pink', style=None, **kwargs):
         """
         Plot a target pixel file at a given frame (index) or cadence number.
 
@@ -437,6 +437,8 @@ class TargetPixelFile(object):
         ax : matplotlib.axes._subplots.AxesSubplot
             The matplotlib axes object.
         """
+        if style is None:
+            style = STYLESHEET
         if (style == "fast") and ("fast" not in plt.style.available):
             style = "default"
         if cadenceno is not None:

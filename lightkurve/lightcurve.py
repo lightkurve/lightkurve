@@ -21,14 +21,15 @@ from astropy.stats import sigma_clip
 from astropy.table import Table
 from astropy.io import fits
 from astropy.time import Time
-
 from . import PACKAGEDIR
+
 from .utils import running_mean, bkjd_to_astropy_time, btjd_to_astropy_time
 
 __all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve',
            'iterative_box_period_search']
 
 log = logging.getLogger(__name__)
+STYLESHEET = '{}/data/lightkurve.mplstyle'.format(PACKAGEDIR)
 
 
 class LightCurve(object):
@@ -569,9 +570,22 @@ class LightCurve(object):
         cdpp_ppm = np.std(mean) * 1e6
         return cdpp_ppm
 
-    def plot(self, ax=None, normalize=True, xlabel='Time - 2454833 (days)',
-             ylabel='Normalized Flux', title=None,
-             fill=False, grid=True, style='fast', **kwargs):
+    def _clean_ax(self, ax, kwargs, normalize=True):
+        xlabel = ax.get_xlabel()
+        if xlabel is '':
+            ax.set_xlabel('Time - 2454833 (days)')
+        ylabel = ax.get_ylabel()
+        if ylabel is '':
+            if normalize:
+                ax.set_ylabel('Normalized Flux')
+            else:
+                ax.set_ylabel('Flux [e$^-$s$^{-1}$]')
+
+        if (np.sum([len(a) for a in ax.get_legend_handles_labels()]) != 0):
+            ax.legend()
+
+    def plot(self, ax=None, normalize=True, xlabel='',
+             ylabel='', title='', style=None, **kwargs):
         """Plots the light curve.
 
         Parameters
@@ -603,41 +617,43 @@ class LightCurve(object):
         ax : matplotlib.axes._subplots.AxesSubplot
             The matplotlib axes object.
         """
+
+        if ax is None:
+            fig, ax = plt.subplots(1)
+
         # The "fast" style has only been in matplotlib since v2.1.
         # Let's make it optional until >v2.1 is mainstream and can
         # be made the minimum requirement.
+        if style is None:
+            style = STYLESHEET
         if (style == "fast") and ("fast" not in mpl.style.available):
             style = "default"
+
+        # Normalize the data
         if normalize:
             normalized_lc = self.normalize()
             flux, flux_err = normalized_lc.flux, normalized_lc.flux_err
         else:
-            if ylabel == 'Normalized Flux':
-                ylabel = 'Flux'
             flux, flux_err = self.flux, self.flux_err
+
+        if ('label' not in kwargs):
+            if hasattr(self, 'keplerid') & hasattr(self, 'mission'):
+                if self.mission == 'Kepler':
+                    kwargs['label'] = 'KIC {}'.format(self.keplerid)
+            if hasattr(self, 'keplerid') & hasattr(self, 'mission'):
+                if self.mission == 'K2':
+                    kwargs['label'] = 'EPIC {}'.format(self.keplerid)
+
+        # Actually plot
         with plt.style.context(style):
-            if ax is None:
-                fig, ax = plt.subplots(1)
-            if ('color' not in kwargs) and (len(ax.lines) == 0):
-                kwargs['color'] = 'black'
-            if np.any(~np.isfinite(flux_err)):
-                ax.plot(self.time, flux, **kwargs)
-            else:
-                ax.errorbar(self.time, flux, flux_err, **kwargs)
-            if fill:
-                ax.fill(self.time, flux, linewidth=0.0, alpha=0.3)
-            if 'label' in kwargs:
-                ax.legend()
-            if title is not None:
-                ax.set_title(title)
-            ax.grid(grid, alpha=0.3)
-            ax.set_xlabel(xlabel)
-            ax.set_ylabel(ylabel)
+            ax.plot(self.time, flux, **kwargs)
+            self._clean_ax(ax, kwargs, normalize)
         return ax
 
-    def scatter(self, ax=None, normalize=True, xlabel='Time - 2454833 (days)',
-                      ylabel='Normalized Flux', title=None,
-                      fill=False, grid=True, style='fast', **kwargs):
+    def scatter(self, ax=None, normalize=True, xlabel='',
+                      ylabel='', title='',colorbar=False,
+                      colorbar_label='',
+                      style=None, **kwargs):
         """Plots the light curve using matplotlib `scatter`.
 
         Parameters
@@ -678,33 +694,41 @@ class LightCurve(object):
         # The "fast" style has only been in matplotlib since v2.1.
         # Let's make it optional until >v2.1 is mainstream and can
         # be made the minimum requirement.
+        if ax is None:
+            fig, ax = plt.subplots(1)
+
+        # The "fast" style has only been in matplotlib since v2.1.
+        # Let's make it optional until >v2.1 is mainstream and can
+        # be made the minimum requirement.
+        if style is None:
+            style = STYLESHEET
         if (style == "fast") and ("fast" not in mpl.style.available):
             style = "default"
+
+        # Normalize the data
         if normalize:
             normalized_lc = self.normalize()
             flux, flux_err = normalized_lc.flux, normalized_lc.flux_err
         else:
-            if ylabel == 'Normalized Flux':
-                ylabel = 'Flux'
             flux, flux_err = self.flux, self.flux_err
+
+        if ('label' not in kwargs):
+            if hasattr(self, 'keplerid') & hasattr(self, 'mission'):
+                if self.mission == 'Kepler':
+                    kwargs['label'] = 'KIC {}'.format(self.keplerid)
+            if hasattr(self, 'keplerid') & hasattr(self, 'mission'):
+                if self.mission == 'K2':
+                    kwargs['label'] = 'EPIC {}'.format(self.keplerid)
+
+        # Actually plot
         with plt.style.context(style):
-            if ax is None:
-                fig, ax = plt.subplots(1)
-            if ('c' not in kwargs) and (len(ax.lines) == 0):
-                kwargs['c'] = 'black'
-            if np.any(~np.isfinite(flux_err)):
-                ax.scatter(self.time, flux, **kwargs)
-            else:
-                ax.errorbar(self.time, flux, flux_err, **kwargs)
-            if fill:
-                ax.fill(self.time, flux, linewidth=0.0, alpha=0.3)
-            if 'label' in kwargs:
-                ax.legend()
-            if title is not None:
-                ax.set_title(title)
-            ax.grid(grid, alpha=0.3)
-            ax.set_xlabel(xlabel)
-            ax.set_ylabel(ylabel)
+            im = ax.scatter(self.time, flux, **kwargs)
+            if colorbar and ('c' in kwargs):
+                cbar = plt.colorbar(im, ax=ax)
+                cbar.set_label(colorbar_label)
+                cbar.ax.yaxis.set_tick_params(tick1On=False, tick2On=False)
+                cbar.ax.minorticks_off()
+            self._clean_ax(ax, kwargs, normalize)
         return ax
 
     def to_table(self):
