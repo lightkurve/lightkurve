@@ -603,8 +603,6 @@ class LightCurve(object):
             Plot set_title
         color : str
             Color to plot line in
-        fill : bool
-            Shade the region between 0 and flux
         grid : bool
             Plot with a grid
         style : str
@@ -679,8 +677,6 @@ class LightCurve(object):
         s : int, array
             The marker size for scatter, either a single scalar
             or an array indicating different marker sizes.
-        fill : bool
-            Shade the region between 0 and flux
         grid : bool
             Plot with a grid
         style : str

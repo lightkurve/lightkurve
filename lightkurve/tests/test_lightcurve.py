@@ -166,7 +166,7 @@ def test_lightcurve_plot():
         lcf.plot()
         lcf.plot(flux_types=['SAP_FLUX', 'PDCSAP_FLUX'])
         lcf.SAP_FLUX.plot()
-        lcf.SAP_FLUX.plot(normalize=False, fill=False, title="Not the default")
+        lcf.SAP_FLUX.plot(normalize=False, title="Not the default")
         plt.close('all')
 
 @pytest.mark.remote_data
