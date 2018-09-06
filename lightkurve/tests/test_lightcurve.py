@@ -445,14 +445,14 @@ def test_flatten_robustness():
     assert_allclose(flat_lc.flux, expected_result)
     # flatten should work even if `window_length > len(flux)`
     flat_lc = lc.flatten(window_length=7, polyorder=1)
-    assert_allclose(flat_lc.flux, expected_result)
+    assert_allclose(flat_lc.flux, flat_lc.flux / np.median(flat_lc.flux))
     # flatten should work even if `polyorder >= window_length`
     flat_lc = lc.flatten(window_length=3, polyorder=3)
     assert_allclose(flat_lc.flux, expected_result)
     flat_lc = lc.flatten(window_length=3, polyorder=5)
     assert_allclose(flat_lc.flux, expected_result)
     # flatten should work even if `break_tolerance = None`
-    flat_lc = lc.flatten(break_tolerance=None)
+    flat_lc = lc.flatten(window_length=3, break_tolerance=None)
     assert_allclose(flat_lc.flux, expected_result)
 
 
