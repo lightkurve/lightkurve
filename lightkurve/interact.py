@@ -258,7 +258,7 @@ def pixel_selector_standalone(tpf):
     None
     """
 
-    lc = tpf.to_lightcurve(aperture_mask=tpf.pipeline_mask).normalize()
+    lc = tpf.to_lightcurve(aperture_mask=tpf.pipeline_mask)
 
     n_pixels = tpf.flux[0, :, :].size
     pixel_index_array = np.arange(0, n_pixels, 1, dtype=int).reshape(tpf.flux[0, :, :].shape)
@@ -292,8 +292,6 @@ def pixel_selector_standalone(tpf):
                                     width=250)
 
         existing_selection = source2.selected.to_json(True).copy()
-        existing_indices = existing_selection['indices']
-        existing_id = existing_selection['id']
 
         # Callbacks
         def update_upon_pixel_selection(attr, old, new):
@@ -309,7 +307,7 @@ def pixel_selector_standalone(tpf):
             if source2.selected.indices != []:
                 selected_indices = np.array(source2.selected.indices)
                 selected_mask = np.isin(pixel_index_array, selected_indices)
-                lc_new = tpf.to_lightcurve(aperture_mask=selected_mask).normalize()
+                lc_new = tpf.to_lightcurve(aperture_mask=selected_mask)
                 source.data = dict(time=lc.time, flux=lc_new.flux,
                                    cadence=lc.cadenceno, quality=lc.quality)
                 ylims = get_lightcurve_y_limits(source)
