@@ -570,7 +570,7 @@ class LightCurve(object):
         return cdpp_ppm
 
     @staticmethod
-    def _set_plot_labels(ax, kwargs, normalize=True):
+    def _set_plot_labels(ax, normalize=True):
         """Set the default labels of a matplotlib axes that shows a light curve."""
         # Configure labels
         if ax.get_xlabel() is '':
@@ -617,32 +617,32 @@ class LightCurve(object):
         ax : matplotlib.axes._subplots.AxesSubplot
             The matplotlib axes object.
         """
+        # Configure the default mpl style
         if style == 'lightkurve' or style is None:
             style = MPLSTYLE
 
-        with plt.style.context(style):
-            if ax is None:
-                fig, ax = plt.subplots(1)
+        # Configure the default label
+        if ('label' not in kwargs):
+            if hasattr(self, 'mission'):
+                if self.mission == 'Kepler':
+                    kwargs['label'] = 'KIC {}'.format(self.targetid)
+                elif self.mission == 'K2':
+                    kwargs['label'] = 'EPIC {}'.format(self.targetid)
+                elif self.mission == 'TESS':
+                    kwargs['label'] = 'TIC {}'.format(self.targetid)
 
         # Normalize the data
         if normalize:
-            normalized_lc = self.normalize()
-            flux, flux_err = normalized_lc.flux, normalized_lc.flux_err
+            flux = self.normalize().flux
         else:
-            flux, flux_err = self.flux, self.flux_err
+            flux = self.flux
 
-        if ('label' not in kwargs):
-            if hasattr(self, 'keplerid') & hasattr(self, 'mission'):
-                if self.mission == 'Kepler':
-                    kwargs['label'] = 'KIC {}'.format(self.keplerid)
-            if hasattr(self, 'keplerid') & hasattr(self, 'mission'):
-                if self.mission == 'K2':
-                    kwargs['label'] = 'EPIC {}'.format(self.keplerid)
-
-        # Actually plot
+        # Make the plot
         with plt.style.context(style):
+            if ax is None:
+                fig, ax = plt.subplots(1)
             ax.plot(self.time, flux, **kwargs)
-            self._set_plot_labels(ax, kwargs, normalize)
+            self._set_plot_labels(ax=ax, normalize=normalize)
         return ax
 
     def scatter(self, ax=None, normalize=True, xlabel='', ylabel='',
@@ -685,41 +685,37 @@ class LightCurve(object):
         ax : matplotlib.axes._subplots.AxesSubplot
             The matplotlib axes object.
         """
-
-        # The "fast" style has only been in matplotlib since v2.1.
-        # Let's make it optional until >v2.1 is mainstream and can
-        # be made the minimum requirement.
+        # Configure the default mpl style
         if style == 'lightkurve' or style is None:
             style = MPLSTYLE
 
-        with plt.style.context(style):
-            if ax is None:
-                fig, ax = plt.subplots(1)
+        # Configure the default label
+        if ('label' not in kwargs):
+            if hasattr(self, 'mission'):
+                if self.mission == 'Kepler':
+                    kwargs['label'] = 'KIC {}'.format(self.targetid)
+                elif self.mission == 'K2':
+                    kwargs['label'] = 'EPIC {}'.format(self.targetid)
+                elif self.mission == 'TESS':
+                    kwargs['label'] = 'TIC {}'.format(self.targetid)
 
         # Normalize the data
         if normalize:
-            normalized_lc = self.normalize()
-            flux, flux_err = normalized_lc.flux, normalized_lc.flux_err
+            flux = self.normalize().flux
         else:
-            flux, flux_err = self.flux, self.flux_err
+            flux = self.flux
 
-        if ('label' not in kwargs):
-            if hasattr(self, 'keplerid') & hasattr(self, 'mission'):
-                if self.mission == 'Kepler':
-                    kwargs['label'] = 'KIC {}'.format(self.keplerid)
-            if hasattr(self, 'keplerid') & hasattr(self, 'mission'):
-                if self.mission == 'K2':
-                    kwargs['label'] = 'EPIC {}'.format(self.keplerid)
-
-        # Actually plot
+        # Make the plot
         with plt.style.context(style):
+            if ax is None:
+                fig, ax = plt.subplots(1)
             im = ax.scatter(self.time, flux, **kwargs)
             if colorbar and ('c' in kwargs):
                 cbar = plt.colorbar(im, ax=ax)
                 cbar.set_label(colorbar_label)
                 cbar.ax.yaxis.set_tick_params(tick1On=False, tick2On=False)
                 cbar.ax.minorticks_off()
-            self._set_plot_labels(ax, kwargs, normalize)
+            self._set_plot_labels(ax=ax, normalize=normalize)
         return ax
 
     def to_table(self):
