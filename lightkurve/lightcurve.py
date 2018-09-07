@@ -569,17 +569,18 @@ class LightCurve(object):
         cdpp_ppm = np.std(mean) * 1e6
         return cdpp_ppm
 
-    def _clean_ax(self, ax, kwargs, normalize=True):
-        xlabel = ax.get_xlabel()
-        if xlabel is '':
+    @staticmethod
+    def _set_plot_labels(ax, kwargs, normalize=True):
+        """Set the default labels of a matplotlib axes that shows a light curve."""
+        # Configure labels
+        if ax.get_xlabel() is '':
             ax.set_xlabel('Time - 2454833 [JD] ')
-        ylabel = ax.get_ylabel()
-        if ylabel is '':
+        if ax.get_ylabel() is '':
             if normalize:
                 ax.set_ylabel('Normalized Flux')
             else:
                 ax.set_ylabel('Flux [e$^-$s$^{-1}$]')
-
+        # Show the legend if labels were set
         if (np.sum([len(a) for a in ax.get_legend_handles_labels()]) != 0):
             ax.legend()
 
@@ -641,7 +642,7 @@ class LightCurve(object):
         # Actually plot
         with plt.style.context(style):
             ax.plot(self.time, flux, **kwargs)
-            self._clean_ax(ax, kwargs, normalize)
+            self._set_plot_labels(ax, kwargs, normalize)
         return ax
 
     def scatter(self, ax=None, normalize=True, xlabel='', ylabel='',
@@ -718,7 +719,7 @@ class LightCurve(object):
                 cbar.set_label(colorbar_label)
                 cbar.ax.yaxis.set_tick_params(tick1On=False, tick2On=False)
                 cbar.ax.minorticks_off()
-            self._clean_ax(ax, kwargs, normalize)
+            self._set_plot_labels(ax, kwargs, normalize)
         return ax
 
     def to_table(self):
