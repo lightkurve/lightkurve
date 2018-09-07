@@ -21,15 +21,14 @@ from astropy.stats import sigma_clip
 from astropy.table import Table
 from astropy.io import fits
 from astropy.time import Time
-from . import PACKAGEDIR
+from . import PACKAGEDIR, MPLSTYLE
 
 from .utils import running_mean, bkjd_to_astropy_time, btjd_to_astropy_time
 
 __all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve',
-           'iterative_box_period_search']
+           'FoldedLightCurve']
 
 log = logging.getLogger(__name__)
-STYLESHEET = '{}/data/lightkurve.mplstyle'.format(PACKAGEDIR)
 
 
 class LightCurve(object):
@@ -585,8 +584,8 @@ class LightCurve(object):
             ax.legend()
 
     def plot(self, ax=None, normalize=True, xlabel='',
-             ylabel='', title='', style=None, **kwargs):
-        """Plots the light curve.
+             ylabel='', title='', style='lightkurve', **kwargs):
+        """Plot the light curve using matplotlib's `plot` method.
 
         Parameters
         ----------
@@ -606,7 +605,9 @@ class LightCurve(object):
         grid : bool
             Plot with a grid
         style : str
-            matplotlib.pyplot.style.context, default is 'fast'
+            Path or URL to a matplotlib style file, or name of one of
+            matplotlib's built-in stylesheets (e.g. 'ggplot').
+            Lightkurve's custom stylesheet is used by default.
         kwargs : dict
             Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
 
@@ -615,15 +616,8 @@ class LightCurve(object):
         ax : matplotlib.axes._subplots.AxesSubplot
             The matplotlib axes object.
         """
-
-
-        # The "fast" style has only been in matplotlib since v2.1.
-        # Let's make it optional until >v2.1 is mainstream and can
-        # be made the minimum requirement.
-        if style is None:
-            style = STYLESHEET
-        if (style == "fast") and ("fast" not in mpl.style.available):
-            style = "default"
+        if style == 'lightkurve' or style is None:
+            style = MPLSTYLE
 
         with plt.style.context(style):
             if ax is None:
@@ -650,11 +644,10 @@ class LightCurve(object):
             self._clean_ax(ax, kwargs, normalize)
         return ax
 
-    def scatter(self, ax=None, normalize=True, xlabel='',
-                      ylabel='', title='',colorbar=False,
-                      colorbar_label='',
-                      style=None, **kwargs):
-        """Plots the light curve using matplotlib `scatter`.
+    def scatter(self, ax=None, normalize=True, xlabel='', ylabel='',
+                title='', colorbar=False, colorbar_label='', style='lightkurve',
+                **kwargs):
+        """Plots the light curve using matplotlib's `scatter` method.
 
         Parameters
         ----------
@@ -680,7 +673,9 @@ class LightCurve(object):
         grid : bool
             Plot with a grid
         style : str
-            matplotlib.pyplot.style.context, default is 'fast'
+            Path or URL to a matplotlib style file, or name of one of
+            matplotlib's built-in stylesheets (e.g. 'ggplot').
+            Lightkurve's custom stylesheet is used by default.
         kwargs : dict
             Dictionary of arguments to be passed to `matplotlib.pyplot.scatter`.
 
@@ -693,10 +688,8 @@ class LightCurve(object):
         # The "fast" style has only been in matplotlib since v2.1.
         # Let's make it optional until >v2.1 is mainstream and can
         # be made the minimum requirement.
-        if style is None:
-            style = STYLESHEET
-        if (style == "fast") and ("fast" not in mpl.style.available):
-            style = "default"
+        if style == 'lightkurve' or style is None:
+            style = MPLSTYLE
 
         with plt.style.context(style):
             if ax is None:
@@ -926,12 +919,40 @@ class FoldedLightCurve(LightCurve):
         return self.time
 
     def plot(self, **kwargs):
+        """Plot the folded light curve usng matplotlib's `plot` method.
+
+        See `LightCurve.plot` for details on the accepted arguments.
+
+        Parameters
+        ----------
+        kwargs : dict
+            Dictionary of arguments to be passed to `LightCurve.plot`.
+
+        Returns
+        -------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            The matplotlib axes object.
+        """
         ax = super(FoldedLightCurve, self).plot(**kwargs)
         if 'xlabel' not in kwargs:
             ax.set_xlabel("Phase")
         return ax
 
     def scatter(self, **kwargs):
+        """Plot the folded light curve usng matplotlib's `scatter` method.
+
+        See `LightCurve.scatter` for details on the accepted arguments.
+
+        Parameters
+        ----------
+        kwargs : dict
+            Dictionary of arguments to be passed to `LightCurve.scatter`.
+
+        Returns
+        -------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            The matplotlib axes object.
+        """
         ax = super(FoldedLightCurve, self).scatter(**kwargs)
         if 'xlabel' not in kwargs:
             ax.set_xlabel("Phase")
