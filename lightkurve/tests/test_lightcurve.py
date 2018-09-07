@@ -99,6 +99,8 @@ def test_TessLightCurveFile(quality_bitmask):
     tess_file = TessLightCurveFile(TESS_SIM, quality_bitmask=quality_bitmask)
     tlc = tess_file.SAP_FLUX
     assert tlc.mission.lower() == 'tess'
+    # Regression test for https://github.com/KeplerGO/lightkurve/pull/236
+    assert np.isnan(tlc.time).sum() == 0
 
 
 @pytest.mark.remote_data

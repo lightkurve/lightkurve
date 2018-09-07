@@ -277,3 +277,5 @@ def test_tess_simulation():
     assert tpf.flux.shape == tpf.flux_err.shape
     tpf.wcs
     col, row = tpf.centroids()
+    # Regression test for https://github.com/KeplerGO/lightkurve/pull/236
+    assert np.isnan(tpf.time).sum() == 0
