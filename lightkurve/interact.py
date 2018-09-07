@@ -24,6 +24,8 @@ try:
                 Span, ColorBar, LogTicker, Range1d
     from bokeh.layouts import row, column, widgetbox
     from bokeh.models.tools import HoverTool, LassoSelectTool
+    from bokeh.models.formatters import NumeralTickFormatter, PrintfTickFormatter
+
     output_notebook()
 except ImportError:
     log.error("The interact() tool requires `bokeh` to be installed. "
@@ -155,13 +157,13 @@ def make_lightcurve_figure_elements(lc, source):
     else:
         title = "Lightcurve for target {}".format(lc.targetid)
 
-    fig = figure(title=title, plot_height=300, plot_width=600,
+    fig = figure(title=title, plot_height=340, plot_width=600,
                  tools="pan,wheel_zoom,box_zoom,reset",
-                 toolbar_location="above", logo=None)
+                 toolbar_location="below", logo=None)
     fig.title.offset = -10
     fig.border_fill_color = "whitesmoke"
 
-    fig.yaxis.axis_label = 'Normalized Flux'
+    fig.yaxis.axis_label = 'Flux (e/s)'
     fig.xaxis.axis_label = 'Time - 2454833 (days)'
 
     ylims = get_lightcurve_y_limits(source)
@@ -216,11 +218,11 @@ def make_tpf_figure_elements(tpf, source):
     else:
         title = "Pixel data"
 
-    fig = figure(plot_width=370, plot_height=300,
+    fig = figure(plot_width=370, plot_height=340,
                  x_range=(tpf.column, tpf.column+tpf.shape[2]),
                  y_range=(tpf.row, tpf.row+tpf.shape[1]),
                  title=title, tools='tap,box_select,wheel_zoom,reset',
-                 toolbar_location="left", logo=None)
+                 toolbar_location="below", logo=None)
 
     fig.yaxis.axis_label = 'Pixel Row Number'
     fig.xaxis.axis_label = 'Pixel Column Number'
@@ -236,10 +238,17 @@ def make_tpf_figure_elements(tpf, source):
                         dw=tpf.shape[2], dh=tpf.shape[1], dilate=True,
                         color_mapper=color_mapper)
 
+    # The colorbar will update with the screen stretch slider
+    # The colorbar margin increases as the length of the tick labels grows.
+    # This colorbar share of the plot window grows, shrinking plot area.
+    # This effect is known, some workarounds might work to fix the plot area:
+    # https://github.com/bokeh/bokeh/issues/5186
     color_bar = ColorBar(color_mapper=color_mapper,ticker=LogTicker(),
-                         label_standoff=12, border_line_color=None, location=(0,0))
-    fig.add_layout(color_bar, 'right')
-    color_bar.background_fill_color = 'whitesmoke'
+                         label_standoff=-10, border_line_color=None, location=(0,0),
+                         background_fill_color='whitesmoke',major_label_text_align = 'left',
+                         major_label_text_baseline = 'middle',title = 'e/s', margin = 0)
+    fig.add_layout(color_bar, 'left')
+    color_bar.formatter = PrintfTickFormatter(format="%14u")#NumeralTickFormatter(format='      0,0')
 
     pixels = fig.rect('xx', 'yy', 1, 1, source=source, fill_color='gray',
                       fill_alpha=0.4, line_color='white')
@@ -291,7 +300,7 @@ def pixel_selector_standalone(tpf):
         fig2, fig2_dat, stretch = make_tpf_figure_elements(tpf, source2)
 
         # Interactive slider widgets
-        cadence_slider = Slider(start=0, end=len(tpf.time)-1, value=0, step=1,
+        cadence_slider = Slider(start=0, end=len(tpf.time)-1, value=0, step=1.0,
                                 title="TPF slice index", width=600)
 
         screen_slider = RangeSlider(start=np.log10(stretch['vlo']),
@@ -307,8 +316,8 @@ def pixel_selector_standalone(tpf):
         def update_upon_pixel_selection(attr, old, new):
             '''Callback to take action when pixels are selected'''
             #check if a selection was "re-clicked".
-            if ( (sorted(existing_selection['indices']) == sorted(new.indices)) &
-                 (new.indices != []) ):
+            if ((sorted(existing_selection['indices']) == sorted(new.indices)) &
+                 (new.indices != [])):
                 source2.selected = Selection(indices=new.indices[1:])
                 existing_selection['indices'] = new.indices[1:]
             else:
@@ -318,14 +327,12 @@ def pixel_selector_standalone(tpf):
                 selected_indices = np.array(source2.selected.indices)
                 selected_mask = np.isin(pixel_index_array, selected_indices)
                 lc_new = tpf.to_lightcurve(aperture_mask=selected_mask)
-                source.data = dict(time=lc.time, flux=lc_new.flux,
-                                   cadence=lc.cadenceno, quality=lc.quality)
+                source.data['flux']= lc_new.flux
                 ylims = get_lightcurve_y_limits(source)
                 fig1.y_range.start = ylims[0]
                 fig1.y_range.end = ylims[1]
             else:
-                source.data = dict(time=lc.time, flux=lc.flux*0.0,
-                                   cadence=lc.cadenceno, quality=lc.quality)
+                source.data['flux'] = lc.flux * 0.0
                 fig1.y_range.start = -1
                 fig1.y_range.end = 1
 
