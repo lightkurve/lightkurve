@@ -928,13 +928,13 @@ class FoldedLightCurve(LightCurve):
     def plot(self, **kwargs):
         ax = super(FoldedLightCurve, self).plot(**kwargs)
         if 'xlabel' not in kwargs:
-            ax.set_xlabel("Phase", {'color': 'k'})
+            ax.set_xlabel("Phase")
         return ax
 
     def scatter(self, **kwargs):
         ax = super(FoldedLightCurve, self).scatter(**kwargs)
         if 'xlabel' not in kwargs:
-            ax.set_xlabel("Phase", {'color': 'k'})
+            ax.set_xlabel("Phase")
         return ax
 
 
