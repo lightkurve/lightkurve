@@ -18,7 +18,8 @@ from astropy.wcs.utils import skycoord_to_pixel, pixel_to_skycoord
 from . import PACKAGEDIR
 from .lightcurve import KeplerLightCurve, TessLightCurve
 from .prf import KeplerPRF
-from .utils import KeplerQualityFlags, plot_image, bkjd_to_astropy_time, btjd_to_astropy_time
+from .utils import KeplerQualityFlags, TessQualityFlags, \
+                   plot_image, bkjd_to_astropy_time, btjd_to_astropy_time
 from .mast import download_kepler_products
 
 __all__ = ['KeplerTargetPixelFile', 'TessTargetPixelFile']
@@ -39,9 +40,6 @@ class TargetPixelFile(object):
         else:
             self.hdu = fits.open(self.path, **kwargs)
         self.quality_bitmask = quality_bitmask
-        self.quality_mask = KeplerQualityFlags.create_quality_mask(
-                                quality_array=self.hdu[1].data['QUALITY'],
-                                bitmask=quality_bitmask)
         self.targetid = targetid
 
     @property
@@ -719,6 +717,9 @@ class KeplerTargetPixelFile(TargetPixelFile):
         super(KeplerTargetPixelFile, self).__init__(path,
                                                     quality_bitmask=quality_bitmask,
                                                     **kwargs)
+        self.quality_mask = KeplerQualityFlags.create_quality_mask(
+                                quality_array=self.hdu[1].data['QUALITY'],
+                                bitmask=quality_bitmask)
         if self.targetid is None:
             self.targetid = self.header()['KEPLERID']
 
@@ -1333,6 +1334,13 @@ class TessTargetPixelFile(TargetPixelFile):
         super(TessTargetPixelFile, self).__init__(path,
                                                   quality_bitmask=quality_bitmask,
                                                   **kwargs)
+        self.quality_mask = TessQualityFlags.create_quality_mask(
+                                quality_array=self.hdu[1].data['QUALITY'],
+                                bitmask=quality_bitmask)
+        # Early TESS releases had cadences with time=NaN (i.e. missing data)
+        # which were not flagged by a QUALITY flag yet; the line below prevents
+        # these cadences from being used. They would break most methods!
+        self.quality_mask &= np.isfinite(self.hdu[1].data['TIME'])
         try:
             self.targetid = self.header()['TICID']
         except KeyError:
