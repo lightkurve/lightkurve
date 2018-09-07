@@ -97,12 +97,8 @@ def test_KeplerLightCurveFile(path, mission):
                           1, 100, 2096639])
 def test_TessLightCurveFile(quality_bitmask):
     tess_file = TessLightCurveFile(TESS_SIM, quality_bitmask=quality_bitmask)
-    hdu = pyfits.open(TESS_SIM)
     tlc = tess_file.SAP_FLUX
-
     assert tlc.mission.lower() == 'tess'
-    assert_array_equal(tlc.time, hdu[1].data['TIME'])
-    assert_array_equal(tlc.flux, hdu[1].data['SAP_FLUX'])
 
 
 @pytest.mark.remote_data
