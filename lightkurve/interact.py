@@ -250,7 +250,7 @@ def make_tpf_figure_elements(tpf, source):
     fig.add_layout(color_bar, 'left')
     color_bar.formatter = PrintfTickFormatter(format="%14u")#NumeralTickFormatter(format='      0,0')
 
-    pixels = fig.rect('xx', 'yy', 1, 1, source=source, fill_color='gray',
+    fig.rect('xx', 'yy', 1, 1, source=source, fill_color='gray',
                       fill_alpha=0.4, line_color='white')
 
     # Lasso Select apparently does not work with boxes/quads/rect.
@@ -261,7 +261,7 @@ def make_tpf_figure_elements(tpf, source):
             {'pedestal':pedestal, 'vlo':vlo, 'lo':lo, 'med':med,
              'hi':hi, 'vhi':vhi, 'vstep':vstep})
 
-def pixel_selector_standalone(tpf):
+def pixel_selector_standalone(tpf, notebook_url='localhost:8888'):
     """Display an interactive IPython Notebook widget to select pixel masks.
 
     The widget will show both the lightcurve and pixel data.  The pixel data
@@ -274,7 +274,18 @@ def pixel_selector_standalone(tpf):
 
     Parameters
     ----------
-    None
+    tpf: `lightkurve.TargetPixelFile` instance
+        Target Pixel File to interact with
+    notebook_url: str
+        Location of the Jupyter notebook page (default: "localhost:8888")
+
+        When showing Bokeh applications, the Bokeh server must be
+        explicitly configured to allow connections originating from
+        different URLs. This parameter defaults to the standard notebook
+        host and port. If you are running on a different location, you
+        will need to supply this value for the application to display
+        properly. If no protocol is supplied in the URL, e.g. if it is
+        of the form "localhost:8888", then "http" will be used.
     """
 
     lc = tpf.to_lightcurve(aperture_mask=tpf.pipeline_mask)
@@ -361,7 +372,7 @@ def pixel_selector_standalone(tpf):
         row_and_col = column(row1, widgets)
         doc.add_root(row_and_col)
 
-    show(modify_doc)
+    show(modify_doc, notebook_url=notebook_url)
 
 
 def interact_classic(tpf, lc=None):

@@ -481,10 +481,10 @@ class TargetPixelFile(object):
         self.hdu.writeto(output_fn, overwrite=overwrite, checksum=True)
 
 
-    def interact(self, classic=False, lc=None):
+    def interact(self, classic=False, lc=None, notebook_url='localhost:8888'):
         from . import interact
         if not classic:
-            interact.pixel_selector_standalone(self)
+            interact.pixel_selector_standalone(self, notebook_url=notebook_url)
         else:
             interact.interact_classic(self, lc=lc)
 
