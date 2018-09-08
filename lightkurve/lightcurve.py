@@ -569,23 +569,69 @@ class LightCurve(object):
         cdpp_ppm = np.std(mean) * 1e6
         return cdpp_ppm
 
-    @staticmethod
-    def _set_plot_labels(ax, normalize=True):
-        """Set the default labels of a matplotlib axes that shows a light curve."""
-        # Configure labels
-        if ax.get_xlabel() is '':
-            ax.set_xlabel('Time - 2454833 [JD] ')
-        if ax.get_ylabel() is '':
-            if normalize:
-                ax.set_ylabel('Normalized Flux')
-            else:
-                ax.set_ylabel('Flux [e$^-$s$^{-1}$]')
-        # Show the legend if labels were set
-        if (np.sum([len(a) for a in ax.get_legend_handles_labels()]) != 0):
-            ax.legend()
+    def _create_plot(self, method='plot', ax=None, normalize=True,
+                     xlabel=None, ylabel=None, title='', style='lightkurve',
+                     **kwargs):
+        """Hidden method which implements the logic behind `plot()` and `scatter()`
+        to avoid code duplication.
 
-    def plot(self, ax=None, normalize=True, xlabel='',
-             ylabel='', title='', style='lightkurve', **kwargs):
+        Returns
+        -------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            The matplotlib axes object.
+        """
+        # Configure the default style
+        if style is None or style == 'lightkurve':
+            style = MPLSTYLE
+        # Default xlabel
+        if xlabel is None:
+            if self.time_format == 'bkjd':
+                xlabel = 'Time - 2454833 [BKJD days]'
+            elif self.time_format == 'btjd':
+                xlabel = 'Time - 2457000 [BTJD days]'
+            elif self.time_format == 'jd':
+                xlabel = 'Time [JD]'
+            else:
+                xlabel = 'Time'
+        # Default ylabel
+        if ylabel is None:
+            if normalize:
+                ylabel = 'Normalized Flux'
+            else:
+                ylabel = 'Flux [e$^-$s$^{-1}$]'
+        # Default legend label
+        if ('label' not in kwargs):
+            if hasattr(self, 'mission'):
+                if self.mission == 'Kepler':
+                    kwargs['label'] = 'KIC {}'.format(self.targetid)
+                elif self.mission == 'K2':
+                    kwargs['label'] = 'EPIC {}'.format(self.targetid)
+                elif self.mission == 'TESS':
+                    kwargs['label'] = 'TIC {}'.format(self.targetid)
+
+        # Normalize the data if requested
+        if normalize:
+            flux = self.normalize().flux
+        else:
+            flux = self.flux
+
+        # Make the plot
+        with plt.style.context(style):
+            if ax is None:
+                fig, ax = plt.subplots(1)
+            if method == 'scatter':
+                ax.scatter(self.time, flux, **kwargs)
+            else:
+                ax.plot(self.time, flux, **kwargs)
+            ax.set_xlabel(xlabel)
+            ax.set_ylabel(ylabel)
+            # Show the legend if labels were set
+            if (np.sum([len(a) for a in ax.get_legend_handles_labels()]) != 0):
+                ax.legend()
+
+        return ax
+
+    def plot(self, **kwargs):
         """Plot the light curve using matplotlib's `plot` method.
 
         Parameters
@@ -601,10 +647,6 @@ class LightCurve(object):
             Plot y axis label
         title : str
             Plot set_title
-        color : str
-            Color to plot line in
-        grid : bool
-            Plot with a grid
         style : str
             Path or URL to a matplotlib style file, or name of one of
             matplotlib's built-in stylesheets (e.g. 'ggplot').
@@ -617,37 +659,9 @@ class LightCurve(object):
         ax : matplotlib.axes._subplots.AxesSubplot
             The matplotlib axes object.
         """
-        # Configure the default mpl style
-        if style == 'lightkurve' or style is None:
-            style = MPLSTYLE
+        return self._create_plot(method='plot', **kwargs)
 
-        # Configure the default label
-        if ('label' not in kwargs):
-            if hasattr(self, 'mission'):
-                if self.mission == 'Kepler':
-                    kwargs['label'] = 'KIC {}'.format(self.targetid)
-                elif self.mission == 'K2':
-                    kwargs['label'] = 'EPIC {}'.format(self.targetid)
-                elif self.mission == 'TESS':
-                    kwargs['label'] = 'TIC {}'.format(self.targetid)
-
-        # Normalize the data
-        if normalize:
-            flux = self.normalize().flux
-        else:
-            flux = self.flux
-
-        # Make the plot
-        with plt.style.context(style):
-            if ax is None:
-                fig, ax = plt.subplots(1)
-            ax.plot(self.time, flux, **kwargs)
-            self._set_plot_labels(ax=ax, normalize=normalize)
-        return ax
-
-    def scatter(self, ax=None, normalize=True, xlabel='', ylabel='',
-                title='', colorbar=False, colorbar_label='', style='lightkurve',
-                **kwargs):
+    def scatter(self, **kwargs):
         """Plots the light curve using matplotlib's `scatter` method.
 
         Parameters
@@ -663,16 +677,6 @@ class LightCurve(object):
             Plot y axis label
         title : str
             Plot set_title
-        c : str, array
-            Color to plot the markers, either a single string,
-            or an array to dye each point according to a cmap
-        cmap : str, valid matplotlib cmap
-            The colormap to use for dying individual points according to `c`
-        s : int, array
-            The marker size for scatter, either a single scalar
-            or an array indicating different marker sizes.
-        grid : bool
-            Plot with a grid
         style : str
             Path or URL to a matplotlib style file, or name of one of
             matplotlib's built-in stylesheets (e.g. 'ggplot').
@@ -685,38 +689,7 @@ class LightCurve(object):
         ax : matplotlib.axes._subplots.AxesSubplot
             The matplotlib axes object.
         """
-        # Configure the default mpl style
-        if style == 'lightkurve' or style is None:
-            style = MPLSTYLE
-
-        # Configure the default label
-        if ('label' not in kwargs):
-            if hasattr(self, 'mission'):
-                if self.mission == 'Kepler':
-                    kwargs['label'] = 'KIC {}'.format(self.targetid)
-                elif self.mission == 'K2':
-                    kwargs['label'] = 'EPIC {}'.format(self.targetid)
-                elif self.mission == 'TESS':
-                    kwargs['label'] = 'TIC {}'.format(self.targetid)
-
-        # Normalize the data
-        if normalize:
-            flux = self.normalize().flux
-        else:
-            flux = self.flux
-
-        # Make the plot
-        with plt.style.context(style):
-            if ax is None:
-                fig, ax = plt.subplots(1)
-            im = ax.scatter(self.time, flux, **kwargs)
-            if colorbar and ('c' in kwargs):
-                cbar = plt.colorbar(im, ax=ax)
-                cbar.set_label(colorbar_label)
-                cbar.ax.yaxis.set_tick_params(tick1On=False, tick2On=False)
-                cbar.ax.minorticks_off()
-            self._set_plot_labels(ax=ax, normalize=normalize)
-        return ax
+        return self._create_plot(method='scatter', **kwargs)
 
     def to_table(self):
         """Export the LightCurve as an AstroPy Table.

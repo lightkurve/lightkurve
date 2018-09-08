@@ -395,8 +395,10 @@ class TessLightCurveFile(LightCurveFile):
             # We did not import lightcurve at the top to prevent circular imports
             from .lightcurve import TessLightCurve
             return TessLightCurve(
-                self.hdu[1].data['TIME'][self.quality_mask],
-                self.hdu[1].data[flux_type][self.quality_mask],
+                time=self.hdu[1].data['TIME'][self.quality_mask],
+                time_format='btjd',
+                time_scale='tdb',
+                flux=self.hdu[1].data[flux_type][self.quality_mask],
                 flux_err=self.hdu[1].data[flux_type + "_ERR"][self.quality_mask],
                 centroid_col=self.hdu[1].data[centroid_type + "1"][self.quality_mask],
                 centroid_row=self.hdu[1].data[centroid_type + "2"][self.quality_mask],
