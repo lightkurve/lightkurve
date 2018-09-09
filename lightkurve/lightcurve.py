@@ -569,7 +569,7 @@ class LightCurve(object):
         cdpp_ppm = np.std(mean) * 1e6
         return cdpp_ppm
 
-    def plot(self, ax=None, normalize=True, xlabel='Time - 2454833 (days)',
+    def plot_old(self, ax=None, normalize=True, xlabel='Time - 2454833 (days)',
              ylabel='Normalized Flux', title=None,
              fill=False, grid=True, style='fast', **kwargs):
         """Plots the light curve.
@@ -634,6 +634,79 @@ class LightCurve(object):
             ax.set_xlabel(xlabel)
             ax.set_ylabel(ylabel)
         return ax
+
+    def plot(self, ax=None, normalize=True, xlabel='Time - 2454833 (days)',
+             ylabel='Normalized Flux', title=None,
+             fill=False, grid=True, style='fast', scatter=False, **kwargs):
+        """Plots the light curve.
+
+        Parameters
+        ----------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            A matplotlib axes object to plot into. If no axes is provided,
+            a new one will be generated.
+        normalize : bool
+            Normalize the lightcurve before plotting?
+        xlabel : str
+            Plot x axis label
+        ylabel : str
+            Plot y axis label
+        title : str
+            Plot set_title
+        color : str
+            Color to plot line in
+        fill : bool
+            Shade the region between 0 and flux
+        grid : bool
+            Plot with a grid
+        style : str
+            matplotlib.pyplot.style.context, default is 'fast'
+        scatter : bool
+            Use ax.plot or ax.scatter, default (=False) uses ax.plot
+        kwargs : dict
+            Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
+
+        Returns
+        -------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            The matplotlib axes object.
+        """
+        # The "fast" style has only been in matplotlib since v2.1.
+        # Let's make it optional until >v2.1 is mainstream and can
+        # be made the minimum requirement.
+        if (style == "fast") and ("fast" not in mpl.style.available):
+            style = "default"
+        if normalize:
+            normalized_lc = self.normalize()
+            flux, flux_err = normalized_lc.flux, normalized_lc.flux_err
+        else:
+            if ylabel == 'Normalized Flux':
+                ylabel = 'Flux'
+            flux, flux_err = self.flux, self.flux_err
+        with plt.style.context(style):
+            if ax is None:
+                fig, ax = plt.subplots(1)
+            if ('color' not in kwargs) and (len(ax.lines) == 0):
+                kwargs['color'] = 'black'
+            if np.any(~np.isfinite(flux_err)):
+                #ax.plot(self.time, flux, **kwargs)
+                if (scatter):                    
+                    ax.scatter(self.time, flux, **kwargs)
+                else:
+                    ax.plot(self.time, flux, **kwargs)
+            else:
+                ax.errorbar(self.time, flux, flux_err, **kwargs)
+            if fill:
+                ax.fill(self.time, flux, linewidth=0.0, alpha=0.3)
+            if 'label' in kwargs:
+                ax.legend()
+            if title is not None:
+                ax.set_title(title)
+            ax.grid(grid, alpha=0.3)
+            ax.set_xlabel(xlabel)
+            ax.set_ylabel(ylabel)
+        return ax
+
 
     def to_table(self):
         """Export the LightCurve as an AstroPy Table.
