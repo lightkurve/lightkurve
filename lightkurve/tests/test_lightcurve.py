@@ -74,20 +74,23 @@ def test_rmath_operators():
 def test_KeplerLightCurveFile(path, mission):
     lcf = KeplerLightCurveFile(path, quality_bitmask=None)
     hdu = pyfits.open(path)
-    kplc = lcf.get_lightcurve('SAP_FLUX')
+    lc = lcf.get_lightcurve('SAP_FLUX')
 
-    assert kplc.channel == lcf.channel
-    assert kplc.mission.lower() == mission.lower()
-    if kplc.mission.lower() == 'kepler':
-        assert kplc.campaign is None
-        assert kplc.quarter == 8
-    elif kplc.mission.lower() == 'k2':
-        assert kplc.campaign == 8
-        assert kplc.quarter is None
-    assert kplc.astropy_time.scale == 'tdb'
+    assert lc.channel == lcf.channel
+    assert lc.mission.lower() == mission.lower()
+    if lc.mission.lower() == 'kepler':
+        assert lc.campaign is None
+        assert lc.quarter == 8
+    elif lc.mission.lower() == 'k2':
+        assert lc.campaign == 8
+        assert lc.quarter is None
+    assert lc.label == hdu[0].header['OBJECT']
+    assert lc.time_format == 'bkjd'
+    assert lc.time_scale == 'tdb'
+    assert lc.astropy_time.scale == 'tdb'
 
-    assert_array_equal(kplc.time, hdu[1].data['TIME'])
-    assert_array_equal(kplc.flux, hdu[1].data['SAP_FLUX'])
+    assert_array_equal(lc.time, hdu[1].data['TIME'])
+    assert_array_equal(lc.flux, hdu[1].data['SAP_FLUX'])
 
     with pytest.raises(KeyError):
         lcf.get_lightcurve('BLABLA')
@@ -99,10 +102,22 @@ def test_KeplerLightCurveFile(path, mission):
                           1, 100, 2096639])
 def test_TessLightCurveFile(quality_bitmask):
     tess_file = TessLightCurveFile(TESS_SIM, quality_bitmask=quality_bitmask)
-    tlc = tess_file.SAP_FLUX
-    assert tlc.mission.lower() == 'tess'
+    hdu = pyfits.open(TESS_SIM)
+    lc = tess_file.SAP_FLUX
+
+    assert lc.mission == 'TESS'
+    assert lc.label == hdu[0].header['OBJECT']
+    assert lc.time_format == 'btjd'
+    assert lc.time_scale == 'tdb'
+
+    assert_array_equal(lc.time, hdu[1].data['TIME'])
+    assert_array_equal(lc.flux, hdu[1].data['SAP_FLUX'])
+
     # Regression test for https://github.com/KeplerGO/lightkurve/pull/236
-    assert np.isnan(tlc.time).sum() == 0
+    assert np.isnan(lc.time).sum() == 0
+
+    with pytest.raises(KeyError):
+        tess_file.get_lightcurve('DOESNOTEXIST')
 
 
 @pytest.mark.remote_data

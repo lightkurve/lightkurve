@@ -393,7 +393,7 @@ class TessLightCurveFile(LightCurveFile):
 
     def get_lightcurve(self, flux_type, centroid_type='MOM_CENTR'):
         if flux_type in self._flux_types():
-            # We did not import lightcurve at the top to prevent circular imports
+            # We did not import TessLightCurve at the top to prevent circular imports
             from .lightcurve import TessLightCurve
             return TessLightCurve(
                 time=self.hdu[1].data['TIME'][self.quality_mask],
@@ -408,3 +408,6 @@ class TessLightCurveFile(LightCurveFile):
                 cadenceno=self.cadenceno,
                 ticid=self.ticid,
                 label=self.hdu[0].header['OBJECT'])
+        else:
+            raise KeyError("{} is not a valid flux type. Available types are: {}".
+                           format(flux_type, self._flux_types))
