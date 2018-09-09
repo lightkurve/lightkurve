@@ -6,6 +6,13 @@ Direct contributions to the code base:
 - `Christina Hedges <https://github.com/christinahedges>`_
 - `Michael Gully-Santiago <https://github.com/gully>`_
 - `Thomas Barclay <https://github.com/mrtommyb>`_
+- `Ken Mighell <https://github.com/KenMighell>`_
+- `Keaton Bell <https://github.com/keatonb>`_
+- `Johnny Zhang <https://github.com/johnnyzhang295>`_
+- `Andy Tzanidakis <https://github.com/AndyTza>`_
+- `Sheila Sagear <https://github.com/ssagear>`_
+- `Emma Turtelboom <https://github.com/Emmavt>`_
+- `Jeff Coughlin <https://github.com/JeffLCoughlin>`_
 
 Comments, corrections & suggestions:
 
@@ -19,3 +26,5 @@ Comments, corrections & suggestions:
 - `Elisa Quintana <https://github.com/elisaquintana>`_
 - Jeff Van Cleve
 - Ashley Villar
+- `Benjamin Pope <https://github.com/benjaminpope>`_
+- `J. K. Carlberg <https://github.com/jkcarlberg>`_

@@ -4,23 +4,31 @@ from __future__ import division, print_function
 
 import copy
 from tqdm import tqdm
+import os
+import datetime
+import logging
+import pandas as pd
+import warnings
 
 import oktopus
 import numpy as np
 from scipy import signal
 from scipy.optimize import minimize
 from matplotlib import pyplot as plt
-from cycler import cycler
 import matplotlib as mpl
 
 from astropy.stats import sigma_clip
 from astropy.table import Table
+from astropy.io import fits
+from astropy.time import Time
 
-from .utils import running_mean
-
+from . import PACKAGEDIR
+from .utils import running_mean, bkjd_to_astropy_time, btjd_to_astropy_time
 
 __all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve',
            'iterative_box_period_search']
+
+log = logging.getLogger(__name__)
 
 
 class LightCurve(object):
@@ -35,14 +43,30 @@ class LightCurve(object):
         Data flux for every time point
     flux_err : array-like
         Uncertainty on each flux data point
+    time_format : str
+        String specifying how an instant of time is represented,
+        e.g. 'bkjd' or 'jd'.
+    time_scale : str
+        String which specifies how the time is measured,
+        e.g. tdb', 'tt', 'ut1', or 'utc'.
+    targetid : str
+        Identifier of the target.
     meta : dict
         Free-form metadata associated with the LightCurve.
     """
-
-    def __init__(self, time, flux, flux_err=None, meta={}):
-        self.time = np.asarray(time)
+    def __init__(self, time=None, flux=None, flux_err=None, time_format=None,
+                 time_scale=None, targetid=None, meta={}):
+        if time is None and flux is None:
+            raise ValueError('either time or flux must be given')
+        if time is None:
+            self.time = np.arange(len(flux))
+        else:
+            self.time = np.asarray(time)
         self.flux = self._validate_array(flux, name='flux')
         self.flux_err = self._validate_array(flux_err, name='flux_err')
+        self.time_format = time_format
+        self.time_scale = time_scale
+        self.targetid = targetid
         self.meta = meta
 
     def _validate_array(self, arr, name='array'):
@@ -104,6 +128,34 @@ class LightCurve(object):
     def __rdiv__(self, other):
         return self.__rtruediv__(other)
 
+    @property
+    def astropy_time(self):
+        """Returns an `astropy.time.Time` object.
+
+        The Time object will be created using the values in `self.time`
+        and the `self.time_format` and `self.time_scale` attributes.
+        For Kepler data products, the times are Barycentric.
+
+        Raises
+        ------
+        ValueError
+            If `self.time_format` is not set or not one of the formats
+            allowed by AstroPy.
+        """
+        from astropy.time import Time
+        if self.time_format is None:
+            raise ValueError("To retrieve a `Time` object the `time_format` "
+                             "attribute must be set on the LightCurve object, "
+                             "e.g. `lightcurve.time_format = 'jd'`.")
+        # AstroPy does not support BKJD, so we call a function to convert to JD.
+        # In the future, we should think about making an AstroPy-compatible
+        # `TimeFormat` class for BKJD.
+        if self.time_format == 'bkjd':
+            return bkjd_to_astropy_time(self.time)
+        elif self.time_format == 'btjd':  # TESS
+            return btjd_to_astropy_time(self.time)
+        return Time(self.time, format=self.time_format, scale=self.time_scale)
+
     def properties(self):
         '''Print out a description of each of the non-callable attributes of a
         LightCurve object.
@@ -117,15 +169,16 @@ class LightCurve(object):
                 if callable(res):
                     continue
                 if attr == 'hdu':
-                    attrs[attr] = {'res':res, 'type':'list'}
+                    attrs[attr] = {'res': res, 'type': 'list'}
                     for idx, r in enumerate(res):
                         if idx == 0:
                             attrs[attr]['print'] = '{}'.format(r.header['EXTNAME'])
                         else:
-                            attrs[attr]['print'] = '{}, {}'.format(attrs[attr]['print'], '{}'.format(r.header['EXTNAME']))
+                            attrs[attr]['print'] = '{}, {}'.format(
+                                attrs[attr]['print'], '{}'.format(r.header['EXTNAME']))
                     continue
                 else:
-                    attrs[attr] = {'res':res}
+                    attrs[attr] = {'res': res}
                 if isinstance(res, int):
                     attrs[attr]['print'] = '{}'.format(res)
                     attrs[attr]['type'] = 'int'
@@ -154,7 +207,7 @@ class LightCurve(object):
             for attr, dic in attrs.items():
                 if dic['type'] == typ:
                     output.add_row([attr, dic['print']])
-                    idx+=1
+                    idx += 1
         output.pprint(max_lines=-1, max_width=-1)
 
     def append(self, others):
@@ -178,6 +231,8 @@ class LightCurve(object):
             new_lc.time = np.append(new_lc.time, others[i].time)
             new_lc.flux = np.append(new_lc.flux, others[i].flux)
             new_lc.flux_err = np.append(new_lc.flux_err, others[i].flux_err)
+            if hasattr(new_lc, 'cadenceno'):
+                new_lc.cadenceno = np.append(new_lc.cadenceno, others[i].cadenceno)  # KJM
             if hasattr(new_lc, 'quality'):
                 new_lc.quality = np.append(new_lc.quality, others[i].quality)
             if hasattr(new_lc, 'centroid_col'):
@@ -223,10 +278,16 @@ class LightCurve(object):
         """
         if break_tolerance is None:
             break_tolerance = np.nan
+        if polyorder >= window_length:
+            polyorder = window_length - 1
+            log.warning("polyorder must be smaller than window_length, "
+                        "using polyorder={}.".format(polyorder))
         lc_clean = self.remove_nans()
         # Split the lightcurve into segments by finding large gaps in time
         dt = lc_clean.time[1:] - lc_clean.time[0:-1]
-        cut = np.where(dt > break_tolerance * np.nanmedian(dt))[0] + 1
+        with warnings.catch_warnings():  # Ignore warnings due to NaNs
+            warnings.simplefilter("ignore", RuntimeWarning)
+            cut = np.where(dt > break_tolerance * np.nanmedian(dt))[0] + 1
         low = np.append([0], cut)
         high = np.append(cut, len(lc_clean.time))
         # Then, apply the savgol_filter to each segment separately
@@ -234,16 +295,14 @@ class LightCurve(object):
         for l, h in zip(low, high):
             # Reduce `window_length` and `polyorder` for short segments;
             # this prevents `savgol_filter` from raising an exception
-            segment_window_length, segment_polyorder = window_length, polyorder
-            if segment_window_length > (h - l):
-                segment_window_length = h - l
-                if (segment_window_length % 2) == 0:
-                    segment_window_length -= 1  # window_length must be odd
-            if segment_polyorder >= segment_window_length:
-                segment_polyorder = segment_window_length - 1
-            trend_signal[l:h] = signal.savgol_filter(x=lc_clean.flux[l:h],
-                                                     window_length=segment_window_length,
-                                                     polyorder=segment_polyorder, **kwargs)
+            # If the segment is too short, just take the median
+            if np.any([window_length > (h - l), (h - l) < break_tolerance]):
+                trend_signal[l:h] = np.nanmedian(lc_clean.flux[l:h])
+            else:
+                trend_signal[l:h] = signal.savgol_filter(x=lc_clean.flux[l:h],
+                                                         window_length=window_length,
+                                                         polyorder=polyorder,
+                                                         **kwargs)
         trend_signal = np.interp(self.time, lc_clean.time, trend_signal)
         flatten_lc = copy.deepcopy(self)
         flatten_lc.flux = flatten_lc.flux / trend_signal
@@ -310,6 +369,49 @@ class LightCurve(object):
         """
         return self[~np.isnan(self.flux)]  # This will return a sliced copy
 
+    def fill_gaps(lc, method='nearest'):
+        """Fill in gaps in time with linear interpolation.
+
+        Parameters
+        ----------
+        method : string {None, 'backfill'/'bfill', 'pad'/'ffill', 'nearest'}
+            Method to use for gap filling. 'nearest' by default.
+
+        Returns
+        -------
+        nlc : LightCurve object
+            A new ``LightCurve`` in which NaNs values and gaps in time have been
+            filled.
+        """
+        clc = copy.deepcopy(lc.remove_nans())
+        nlc = copy.deepcopy(lc)
+
+        # Average gap between cadences
+        dt = np.nanmedian(clc.time[1::] - clc.time[:-1:])
+
+        # Iterate over flux and flux_err
+        for idx, y in enumerate([clc.flux, clc.flux_err]):
+            # We need to ensure pandas gets the correct byteorder
+            # Background info: https://github.com/astropy/astropy/issues/1156
+            if y.dtype.byteorder == '>':
+                y = y.byteswap().newbyteorder()
+            ts = pd.Series(y, index=clc.time)
+            newindex = [clc.time[0]]
+            for t in clc.time[1::]:
+                prevtime = newindex[-1]
+                while (t - prevtime) > 1.2*dt:
+                    newindex.append(prevtime + dt)
+                    prevtime = newindex[-1]
+                newindex.append(t)
+            ts = ts.reindex(newindex, method=method)
+            if idx == 0:
+                nlc.flux = np.asarray(ts)
+            elif idx == 1:
+                nlc.flux_err = np.asarray(ts)
+
+        nlc.time = np.asarray(ts.index)
+        return nlc
+
     def remove_outliers(self, sigma=5., return_mask=False, **kwargs):
         """Removes outlier flux values using sigma-clipping.
 
@@ -333,7 +435,10 @@ class LightCurve(object):
         clean_lightcurve : LightCurve object
             A new ``LightCurve`` in which outliers have been removed.
         """
-        outlier_mask = sigma_clip(data=self.flux, sigma=sigma, **kwargs).mask
+        with warnings.catch_warnings():  # Ignore warnings due to NaNs or Infs
+            warnings.simplefilter("ignore")
+            outlier_mask = sigma_clip(data=self.flux, sigma=sigma, **kwargs).mask
+
         if return_mask:
             return self[~outlier_mask], outlier_mask
         return self[~outlier_mask]
@@ -379,9 +484,9 @@ class LightCurve(object):
         if np.any(np.isfinite(self.flux_err)):
             # root-mean-square error
             binned_lc.flux_err = np.array(
-                                    [np.sqrt(np.nansum(a**2))
-                                     for a in np.array_split(self.flux_err, n_bins)]
-                                 ) / binsize
+                [np.sqrt(np.nansum(a**2))
+                 for a in np.array_split(self.flux_err, n_bins)]
+            ) / binsize
         else:
             # compute the standard deviation from the data
             binned_lc.flux_err = np.array([np.nanstd(a)
@@ -569,7 +674,6 @@ class LightCurve(object):
                 data[col] = vars(self)[col]
         df = pd.DataFrame(data=data, index=self.time, columns=columns)
         df.index.name = 'time'
-        df.meta = self.meta
         return df
 
     def to_csv(self, path_or_buf=None, **kwargs):
@@ -591,9 +695,136 @@ class LightCurve(object):
         """
         return self.to_pandas().to_csv(path_or_buf=path_or_buf, **kwargs)
 
+    def periodogram(self, frequencies=None):
+        """Returns a `Periodogram`.
+
+        Parameters
+        ----------
+        frequencies : array-like
+            The regular grid of frequencies to use.  The frequencies must be
+            in units microhertz.  Alternatively, an AstroPy Quantity object can
+            be passed with any unit of type '1/time'.
+
+        Returns
+        -------
+        Periodogram : `Periodogram` object
+            Returns a Periodogram object extracted from the lightcurve.
+        """
+        from . import Periodogram
+        return Periodogram.from_lightcurve(lc=self, frequencies=frequencies)
+
+    def to_fits(self, path=None, overwrite=False, **extra_data):
+        """Writes the KeplerLightCurve to a fits file.
+
+        Parameters
+        ----------
+        path : string, default None
+            File path, if None returns an astropy.io.fits object.
+        overwrite : bool
+            Whether or not to overwrite the file
+        extra_data : dict
+            Extra keywords or columns to include in the FITS file.
+            Arguments of type str, int, float, or bool will be stored as
+            keywords in the primary header.
+            Arguments of type np.array or list will be stored as columns
+            in the first extension.
+
+        Returns
+        -------
+        hdu : astropy.io.fits
+            Returns an astropy.io.fits object if path is None
+        """
+        typedir = {int: 'J', str: 'A', float: 'D', bool: 'L',
+                   np.int32: 'J', np.int32: 'K', np.float32: 'E', np.float64: 'D'}
+
+        def _header_template(extension):
+            """Returns a template `fits.Header` object for a given extension."""
+            template_fn = os.path.join(PACKAGEDIR, "data",
+                                       "lc-ext{}-header.txt".format(extension))
+            return fits.Header.fromtextfile(template_fn)
+
+        def _make_primary_hdu(extra_data={}):
+            """Returns the primary extension (#0)."""
+            hdu = fits.PrimaryHDU()
+            # Copy the default keywords from a template file from the MAST archive
+            tmpl = _header_template(0)
+            for kw in tmpl:
+                hdu.header[kw] = (tmpl[kw], tmpl.comments[kw])
+
+            # Override the defaults where necessary
+            from . import __version__
+            default = default = {'ORIGIN': "Unofficial data product",
+                                 'DATE': datetime.datetime.now().strftime("%Y-%m-%d"),
+                                 'CREATOR': "lightkurve",
+                                 'PROCVER': str(__version__)}
+
+            for kw in default:
+                hdu.header['{}'.format(kw).upper()] = default[kw]
+                if default[kw] is None:
+                    log.warning('Value for {} is None.'.format(kw))
+            if ('quarter' in dir(self)) and (self.quarter is not None):
+                hdu.header['QUARTER'] = self.quarter
+            elif ('campaign' in dir(self)) and self.campaign is not None:
+                hdu.header['CAMPAIGN'] = self.campaign
+            else:
+                log.warning('Cannot find Campaign or Quarter number.')
+
+            for kw in extra_data:
+                if isinstance(extra_data[kw], (str, float, int, bool, type(None))):
+                    hdu.header['{}'.format(kw).upper()] = extra_data[kw]
+                    if extra_data[kw] is None:
+                        log.warning('Value for {} is None.'.format(kw))
+            return hdu
+
+        def _make_lightcurve_extension(extra_data={}):
+            """Create the 'LIGHTCURVE' extension (i.e. extension #1)."""
+            # Turn the data arrays into fits columns and initialize the HDU
+            cols = []
+            if ~np.asarray(['TIME' in k.upper() for k in extra_data.keys()]).any():
+                cols.append(fits.Column(name='TIME', format='D', unit=self.time_format,
+                                        array=self.time))
+            if ~np.asarray(['FLUX' in k.upper() for k in extra_data.keys()]).any():
+                cols.append(fits.Column(name='FLUX', format='E',
+                                        unit='counts', array=self.flux))
+            if 'flux_err' in dir(self):
+                if ~np.asarray(['FLUX_ERR' in k.upper() for k in extra_data.keys()]).any():
+                    cols.append(fits.Column(name='FLUX_ERR', format='E',
+                                            unit='counts', array=self.flux_err))
+            if 'cadenceno' in dir(self):
+                if ~np.asarray(['CADENCENO' in k.upper() for k in extra_data.keys()]).any():
+                    cols.append(fits.Column(name='CADENCENO', format='J',
+                                            array=self.cadenceno))
+            for kw in extra_data:
+                if isinstance(extra_data[kw], (np.ndarray, list)):
+                    cols.append(fits.Column(name='{}'.format(kw).upper(),
+                                            format=typedir[type(extra_data[kw][0])],
+                                            array=extra_data[kw]))
+
+            coldefs = fits.ColDefs(cols)
+            hdu = fits.BinTableHDU.from_columns(coldefs)
+            hdu.header['EXTNAME'] = 'LIGHTCURVE'
+            return hdu
+
+        def _hdulist(**extra_data):
+            """Returns an astropy.io.fits.HDUList object."""
+            return fits.HDUList([_make_primary_hdu(extra_data=extra_data),
+                                 _make_lightcurve_extension(extra_data=extra_data)])
+
+        def _header_template(extension):
+            """Returns a template `fits.Header` object for a given extension."""
+            template_fn = os.path.join(PACKAGEDIR, "data",
+                                       "lc-ext{}-header.txt".format(extension))
+            return fits.Header.fromtextfile(template_fn)
+
+        hdu = _hdulist(**extra_data)
+        if path is not None:
+            hdu.writeto(path, overwrite=overwrite, checksum=True)
+        return hdu
+
 
 class FoldedLightCurve(LightCurve):
     """Defines a folded lightcurve with different plotting defaults."""
+
     def __init__(self, *args, **kwargs):
         super(FoldedLightCurve, self).__init__(*args, **kwargs)
 
@@ -619,8 +850,16 @@ class KeplerLightCurve(LightCurve):
         Data flux for every time point
     flux_err : array-like
         Uncertainty on each flux data point
-    centroid_col, centroid_row : array-like, array-like
-        Centroid column and row coordinates as a function of time
+    time_format : str
+        String specifying how an instant of time is represented,
+        e.g. 'bkjd' or 'jd'.
+    time_scale : str
+        String which specifies how the time is measured,
+        e.g. tdb', 'tt', 'ut1', or 'utc'.
+    centroid_col : array-like
+        Centroid column coordinates as a function of time
+    centroid_row : array-like
+        Centroid row coordinates as a function of time
     quality : array-like
         Array indicating the quality of each data point
     quality_bitmask : int
@@ -638,12 +877,13 @@ class KeplerLightCurve(LightCurve):
     keplerid : int
         Kepler ID number
     """
-
-    def __init__(self, time, flux, flux_err=None, centroid_col=None,
-                 centroid_row=None, quality=None, quality_bitmask=None,
+    def __init__(self, time=None, flux=None, flux_err=None, time_format=None, time_scale=None,
+                 centroid_col=None, centroid_row=None, quality=None, quality_bitmask=None,
                  channel=None, campaign=None, quarter=None, mission=None,
-                 cadenceno=None, keplerid=None):
-        super(KeplerLightCurve, self).__init__(time, flux, flux_err)
+                 cadenceno=None, keplerid=None, ra=None, dec=None, meta={}):
+        super(KeplerLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err,
+                                               time_format=time_format, time_scale=time_scale,
+                                               targetid=keplerid, meta=meta)
         self.centroid_col = self._validate_array(centroid_col, name='centroid_col')
         self.centroid_row = self._validate_array(centroid_row, name='centroid_row')
         self.quality = self._validate_array(quality, name='quality')
@@ -653,7 +893,8 @@ class KeplerLightCurve(LightCurve):
         self.campaign = campaign
         self.quarter = quarter
         self.mission = mission
-        self.keplerid = keplerid
+        self.ra = ra
+        self.dec = dec
 
     def __getitem__(self, key):
         lc = super(KeplerLightCurve, self).__getitem__(key)
@@ -671,6 +912,14 @@ class KeplerLightCurve(LightCurve):
             return('KeplerLightCurve(KIC: {})'.format(self.keplerid))
         elif self.mission.lower() == 'k2':
             return('KeplerLightCurve(EPIC: {})'.format(self.keplerid))
+
+    @property
+    def keplerid(self):
+        return self.targetid
+
+    @keplerid.setter
+    def keplerid(self, value):
+        self.targetid = value
 
     def correct(self, method='sff', **kwargs):
         """Corrects a lightcurve for motion-dependent systematic errors.
@@ -724,6 +973,45 @@ class KeplerLightCurve(LightCurve):
         """
         return super(KeplerLightCurve, self).to_pandas(columns=columns)
 
+    def to_fits(self, path=None, overwrite=False, **extra_data):
+        """Export the KeplerLightCurve as an astropy.io.fits object.
+
+        Parameters
+        ----------
+        path : string, default None
+            File path, if None returns an astropy.io.fits object.
+        overwrite : bool
+            Whether or not to overwrite the file
+        extra_data : dict
+            Extra keywords or columns to include in the FITS file.
+            Arguments of type str, int, float, or bool will be stored as
+            keywords in the primary header.
+            Arguments of type np.array or list will be stored as columns
+            in the first extension.
+
+        Returns
+        -------
+        hdu : astropy.io.fits
+            Returns an astropy.io.fits object if path is None
+        """
+        kepler_specific_data = {
+            'TELESCOP': "KEPLER",
+            'INSTRUME': "Kepler Photometer",
+            'OBJECT': '{}'.format(self.keplerid),
+            'KEPLERID': self.keplerid,
+            'CHANNEL': self.channel,
+            'MISSION': self.mission,
+            'RA_OBJ': self.ra,
+            'DEC_OBJ': self.dec,
+            'EQUINOX': 2000,
+            'DATE-OBS': Time(self.time[0]+2454833., format=('jd')).isot}
+        for kw in kepler_specific_data:
+            if ~np.asarray([kw.lower == k.lower() for k in extra_data]).any():
+                extra_data[kw] = kepler_specific_data[kw]
+        return super(KeplerLightCurve, self).to_fits(path=path,
+                                                     overwrite=overwrite,
+                                                     **extra_data)
+
 
 class TessLightCurve(LightCurve):
     """Defines a light curve class for NASA's TESS mission.
@@ -736,6 +1024,12 @@ class TessLightCurve(LightCurve):
         Data flux for every time point
     flux_err : array-like
         Uncertainty on each flux data point
+    time_format : str
+        String specifying how an instant of time is represented,
+        e.g. 'bkjd' or 'jd'.
+    time_scale : str
+        String which specifies how the time is measured,
+        e.g. tdb', 'tt', 'ut1', or 'utc'.
     centroid_col, centroid_row : array-like, array-like
         Centroid column and row coordinates as a function of time
     quality : array-like
@@ -747,28 +1041,44 @@ class TessLightCurve(LightCurve):
     ticid : int
         Tess Input Catalog ID number
     """
-    def __init__(self, time, flux, flux_err=None, centroid_col=None,
-                 centroid_row=None, quality=None, quality_bitmask=None,
-                 cadenceno=None, ticid=None):
-        super(TessLightCurve, self).__init__(time, flux, flux_err)
+    def __init__(self, time=None, flux=None, flux_err=None, time_format=None, time_scale=None,
+                 centroid_col=None, centroid_row=None, quality=None, quality_bitmask=None,
+                 cadenceno=None, sector=None, camera=None, ccd=None,
+                 ticid=None, ra=None, dec=None, meta={}):
+        super(TessLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err,
+                                             time_format=time_format, time_scale=time_scale,
+                                             targetid=ticid, meta=meta)
         self.centroid_col = self._validate_array(centroid_col, name='centroid_col')
         self.centroid_row = self._validate_array(centroid_row, name='centroid_row')
         self.quality = self._validate_array(quality, name='quality')
         self.cadenceno = self._validate_array(cadenceno)
         self.quality_bitmask = quality_bitmask
         self.mission = "TESS"
-        self.ticid = ticid
+        self.sector = sector
+        self.camera = camera
+        self.ccd = ccd
+        self.ra = ra
+        self.dec = dec
 
     def __getitem__(self, key):
         lc = super(TessLightCurve, self).__getitem__(key)
         # Compared to `LightCurve`, we need to slice a few additional arrays:
         lc.quality = self.quality[key]
+        lc.cadenceno = self.cadenceno[key]
         lc.centroid_col = self.centroid_col[key]
         lc.centroid_row = self.centroid_row[key]
         return lc
 
     def __repr__(self):
         return('TessLightCurve(TICID: {})'.format(self.ticid))
+
+    @property
+    def ticid(self):
+        return self.targetid
+
+    @ticid.setter
+    def ticid(self, value):
+        self.targetid = value
 
 
 def iterative_box_period_search(lc, niters=2, min_period=0.5, max_period=30,
