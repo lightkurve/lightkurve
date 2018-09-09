@@ -263,6 +263,7 @@ class KeplerLightCurveFile(LightCurveFile):
                 mission=self.mission,
                 cadenceno=self.cadenceno,
                 keplerid=self.keplerid,
+                label=self.hdu[0].header['OBJECT'],
                 ra=self.ra,
                 dec=self.dec)
         else:
@@ -405,4 +406,5 @@ class TessLightCurveFile(LightCurveFile):
                 quality=self.hdu[1].data['QUALITY'][self.quality_mask],
                 quality_bitmask=self.quality_bitmask,
                 cadenceno=self.cadenceno,
-                ticid=self.ticid)
+                ticid=self.ticid,
+                label=self.hdu[0].header['OBJECT'])

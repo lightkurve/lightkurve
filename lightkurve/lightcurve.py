@@ -15,7 +15,6 @@ import numpy as np
 from scipy import signal
 from scipy.optimize import minimize
 from matplotlib import pyplot as plt
-import matplotlib as mpl
 
 from astropy.stats import sigma_clip
 from astropy.table import Table
@@ -51,11 +50,13 @@ class LightCurve(object):
         e.g. tdb', 'tt', 'ut1', or 'utc'.
     targetid : str
         Identifier of the target.
+    label : str
+        Human-friendly object label, e.g. "KIC 123456789"
     meta : dict
         Free-form metadata associated with the LightCurve.
     """
     def __init__(self, time=None, flux=None, flux_err=None, time_format=None,
-                 time_scale=None, targetid=None, meta={}):
+                 time_scale=None, targetid=None, label=None, meta={}):
         if time is None and flux is None:
             raise ValueError('either time or flux must be given')
         if time is None:
@@ -67,6 +68,7 @@ class LightCurve(object):
         self.time_format = time_format
         self.time_scale = time_scale
         self.targetid = targetid
+        self.label = label
         self.meta = meta
 
     def _validate_array(self, arr, name='array'):
@@ -572,8 +574,7 @@ class LightCurve(object):
     def _create_plot(self, method='plot', ax=None, normalize=True,
                      xlabel=None, ylabel=None, title='', style='lightkurve',
                      **kwargs):
-        """Hidden method which implements the logic behind `plot()` and `scatter()`
-        to avoid code duplication.
+        """Implements both `plot()` and `scatter()` to avoid code duplication.
 
         Returns
         -------
@@ -601,13 +602,7 @@ class LightCurve(object):
                 ylabel = 'Flux [e$^-$s$^{-1}$]'
         # Default legend label
         if ('label' not in kwargs):
-            if hasattr(self, 'mission'):
-                if self.mission == 'Kepler':
-                    kwargs['label'] = 'KIC {}'.format(self.targetid)
-                elif self.mission == 'K2':
-                    kwargs['label'] = 'EPIC {}'.format(self.targetid)
-                elif self.mission == 'TESS':
-                    kwargs['label'] = 'TIC {}'.format(self.targetid)
+            kwargs['label'] = self.label
 
         # Normalize the data if requested
         if normalize:
@@ -970,10 +965,10 @@ class KeplerLightCurve(LightCurve):
     def __init__(self, time=None, flux=None, flux_err=None, time_format=None, time_scale=None,
                  centroid_col=None, centroid_row=None, quality=None, quality_bitmask=None,
                  channel=None, campaign=None, quarter=None, mission=None,
-                 cadenceno=None, keplerid=None, ra=None, dec=None, meta={}):
+                 cadenceno=None, keplerid=None, ra=None, dec=None, label=None, meta={}):
         super(KeplerLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err,
                                                time_format=time_format, time_scale=time_scale,
-                                               targetid=keplerid, meta=meta)
+                                               targetid=keplerid, label=label, meta=meta)
         self.centroid_col = self._validate_array(centroid_col, name='centroid_col')
         self.centroid_row = self._validate_array(centroid_row, name='centroid_row')
         self.quality = self._validate_array(quality, name='quality')
@@ -1134,10 +1129,10 @@ class TessLightCurve(LightCurve):
     def __init__(self, time=None, flux=None, flux_err=None, time_format=None, time_scale=None,
                  centroid_col=None, centroid_row=None, quality=None, quality_bitmask=None,
                  cadenceno=None, sector=None, camera=None, ccd=None,
-                 ticid=None, ra=None, dec=None, meta={}):
+                 ticid=None, ra=None, dec=None, label=None, meta={}):
         super(TessLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err,
                                              time_format=time_format, time_scale=time_scale,
-                                             targetid=ticid, meta=meta)
+                                             targetid=ticid, label=label, meta=meta)
         self.centroid_col = self._validate_array(centroid_col, name='centroid_col')
         self.centroid_row = self._validate_array(centroid_row, name='centroid_row')
         self.quality = self._validate_array(quality, name='quality')
