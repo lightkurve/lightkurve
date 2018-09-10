@@ -573,8 +573,9 @@ class LightCurve(object):
 
     def _create_plot(self, method='plot', ax=None, normalize=True,
                      xlabel=None, ylabel=None, title='', style='lightkurve',
+                     show_colorbar=True, colorbar_label='',
                      **kwargs):
-        """Implements both `plot()` and `scatter()` to avoid code duplication.
+        """Implements `plot()`, `scatter()`, and `errorbar()` to avoid code duplication.
 
         Returns
         -------
@@ -606,22 +607,31 @@ class LightCurve(object):
 
         # Normalize the data if requested
         if normalize:
-            flux = self.normalize().flux
+            lc_normed = self.normalize()
+            flux, flux_err = lc_normed.flux, lc_normed.flux_err
         else:
-            flux = self.flux
+            flux, flux_err = self.flux, self.flux_err
 
         # Make the plot
         with plt.style.context(style):
             if ax is None:
                 fig, ax = plt.subplots(1)
             if method == 'scatter':
-                ax.scatter(self.time, flux, **kwargs)
+                sc = ax.scatter(x=self.time, y=flux, **kwargs)
+                if show_colorbar and ('c' in kwargs) and hasattr(kwargs['c'], '__iter__'):
+                    cbar = plt.colorbar(sc, ax=ax)
+                    cbar.set_label(colorbar_label)
+                    cbar.ax.yaxis.set_tick_params(tick1On=False, tick2On=False)
+                    cbar.ax.minorticks_off()
+            elif method == 'errorbar':
+                ax.errorbar(x=self.time, y=flux, yerr=flux_err, **kwargs)
             else:
-                ax.plot(self.time, flux, **kwargs)
+                ax.plot(x=self.time, y=flux, **kwargs)
             ax.set_xlabel(xlabel)
             ax.set_ylabel(ylabel)
             # Show the legend if labels were set
-            if (np.sum([len(a) for a in ax.get_legend_handles_labels()]) != 0):
+            legend_labels = ax.get_legend_handles_labels()
+            if (np.sum([len(a) for a in legend_labels]) != 0):
                 ax.legend()
 
         return ax
@@ -656,7 +666,7 @@ class LightCurve(object):
         """
         return self._create_plot(method='plot', **kwargs)
 
-    def scatter(self, **kwargs):
+    def scatter(self, colorbar_label='', show_colorbar=True, **kwargs):
         """Plots the light curve using matplotlib's `scatter` method.
 
         Parameters
@@ -676,6 +686,10 @@ class LightCurve(object):
             Path or URL to a matplotlib style file, or name of one of
             matplotlib's built-in stylesheets (e.g. 'ggplot').
             Lightkurve's custom stylesheet is used by default.
+        colorbar_label : str
+            Label to show next to the colorbar (if `c` is given).
+        show_colorbar : boolean
+            Show the colorbar if colors are given using the `c` argument?
         kwargs : dict
             Dictionary of arguments to be passed to `matplotlib.pyplot.scatter`.
 
@@ -684,7 +698,42 @@ class LightCurve(object):
         ax : matplotlib.axes._subplots.AxesSubplot
             The matplotlib axes object.
         """
-        return self._create_plot(method='scatter', **kwargs)
+        return self._create_plot(method='scatter', colorbar_label=colorbar_label,
+                                 show_colorbar=show_colorbar, **kwargs)
+
+    def errorbar(self, linestyle='', **kwargs):
+        """Plots the light curve using matplotlib's `errorbar` method.
+
+        Parameters
+        ----------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            A matplotlib axes object to plot into. If no axes is provided,
+            a new one will be generated.
+        normalize : bool
+            Normalize the lightcurve before plotting?
+        xlabel : str
+            Plot x axis label
+        ylabel : str
+            Plot y axis label
+        title : str
+            Plot set_title
+        style : str
+            Path or URL to a matplotlib style file, or name of one of
+            matplotlib's built-in stylesheets (e.g. 'ggplot').
+            Lightkurve's custom stylesheet is used by default.
+        linestyle : str
+            Connect the error bars using a line?
+        kwargs : dict
+            Dictionary of arguments to be passed to `matplotlib.pyplot.scatter`.
+
+        Returns
+        -------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            The matplotlib axes object.
+        """
+        if 'ls' not in kwargs:
+            kwargs['linestyle'] = linestyle
+        return self._create_plot(method='errorbar', **kwargs)
 
     def to_table(self):
         """Export the LightCurve as an AstroPy Table.

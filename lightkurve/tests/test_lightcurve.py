@@ -175,14 +175,18 @@ def test_lightcurve_append_multiple():
 
 
 @pytest.mark.remote_data
-def test_lightcurve_plot():
+def test_lightcurve_plots():
     """Sanity check to verify that lightcurve plotting works"""
     for lcf in [KeplerLightCurveFile(TABBY_Q8), TessLightCurveFile(TESS_SIM)]:
         lcf.plot()
         lcf.plot(flux_types=['SAP_FLUX', 'PDCSAP_FLUX'])
         lcf.SAP_FLUX.plot()
         lcf.SAP_FLUX.plot(normalize=False, title="Not the default")
+        lcf.SAP_FLUX.scatter()
+        lcf.SAP_FLUX.scatter(c=lcf.SAP_FLUX.time, show_colorbar=True, colorbar_label='Time')
+        lcf.SAP_FLUX.errorbar()
         plt.close('all')
+
 
 @pytest.mark.remote_data
 def test_lightcurve_scatter():
