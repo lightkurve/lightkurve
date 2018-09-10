@@ -11,6 +11,7 @@ TessLightCurve
    .. autosummary::
 
       ~TessLightCurve.astropy_time
+      ~TessLightCurve.ticid
 
    .. rubric:: Methods Summary
 
@@ -19,13 +20,16 @@ TessLightCurve
       ~TessLightCurve.append
       ~TessLightCurve.bin
       ~TessLightCurve.cdpp
+      ~TessLightCurve.fill_gaps
       ~TessLightCurve.flatten
       ~TessLightCurve.fold
       ~TessLightCurve.normalize
+      ~TessLightCurve.periodogram
       ~TessLightCurve.plot
       ~TessLightCurve.properties
       ~TessLightCurve.remove_nans
       ~TessLightCurve.remove_outliers
+      ~TessLightCurve.scatter
       ~TessLightCurve.to_csv
       ~TessLightCurve.to_fits
       ~TessLightCurve.to_pandas
@@ -34,19 +38,23 @@ TessLightCurve
    .. rubric:: Attributes Documentation
 
    .. autoattribute:: astropy_time
+   .. autoattribute:: ticid
 
    .. rubric:: Methods Documentation
 
    .. automethod:: append
    .. automethod:: bin
    .. automethod:: cdpp
+   .. automethod:: fill_gaps
    .. automethod:: flatten
    .. automethod:: fold
    .. automethod:: normalize
+   .. automethod:: periodogram
    .. automethod:: plot
    .. automethod:: properties
    .. automethod:: remove_nans
    .. automethod:: remove_outliers
+   .. automethod:: scatter
    .. automethod:: to_csv
    .. automethod:: to_fits
    .. automethod:: to_pandas

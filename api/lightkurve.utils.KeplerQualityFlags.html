@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>KeplerQualityFlags &mdash; lightkurve 1.0b13 documentation</title>
+  <title>KeplerQualityFlags &mdash; lightkurve 1.0b14 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                1.0b13
+                1.0b14
               </div>
             
           
@@ -212,9 +212,17 @@
 <dl class="class">
 <dt id="lightkurve.utils.KeplerQualityFlags">
 <em class="property">class </em><code class="descclassname">lightkurve.utils.</code><code class="descname">KeplerQualityFlags</code><a class="reference internal" href="../_modules/lightkurve/utils.html#KeplerQualityFlags"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">lightkurve.utils.QualityFlags</span></code></p>
 <p>This class encodes the meaning of the various Kepler QUALITY bitmask flags,
-as documented in the Kepler Archive Manual (Table 2.3).</p>
+as documented in the Kepler Archive Manual (Ref. [1], Table 2.3).</p>
+<p class="rubric">References</p>
+<table class="docutils citation" frame="void" id="r98c57f8b1d1e-1" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Kepler: A Search for Terrestrial Planets. Kepler Archive Manual.
+<a class="reference external" href="http://archive.stsci.edu/kepler/manuals/archive_manual.pdf">http://archive.stsci.edu/kepler/manuals/archive_manual.pdf</a></td></tr>
+</tbody>
+</table>
 <p class="rubric">Attributes Summary</p>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -445,7 +453,7 @@ as documented in the Kepler Archive Manual (Table 2.3).</p>
 <p class="rubric">Methods Documentation</p>
 <dl class="classmethod">
 <dt id="lightkurve.utils.KeplerQualityFlags.decode">
-<em class="property">classmethod </em><code class="descname">decode</code><span class="sig-paren">(</span><em>quality</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/utils.html#KeplerQualityFlags.decode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.decode" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">decode</code><span class="sig-paren">(</span><em>quality</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.decode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts a Kepler QUALITY value into a list of human-readable strings.</p>
 <p>This function takes the QUALITY bitstring that can be found for each
 cadence in Kepler/K2’s pixel and light curve files and converts into
@@ -519,7 +527,7 @@ quality flags raised.  Returns an empty list if no flags raised.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'1.0b13',
+            VERSION:'1.0b14',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

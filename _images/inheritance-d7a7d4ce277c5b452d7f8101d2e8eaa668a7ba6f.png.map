@@ -1,0 +1,5 @@
+<map id="inheritance6a9d478090" name="inheritance6a9d478090">
+<area shape="rect" id="node1" href="lightkurve.utils.KeplerQualityFlags.html#lightkurve.utils.KeplerQualityFlags" target="_top" title="This class encodes the meaning of the various Kepler QUALITY bitmask flags," alt="" coords="156,5,300,31"/>
+<area shape="rect" id="node2" title="Abstract class" alt="" coords="5,31,108,56"/>
+<area shape="rect" id="node3" href="lightkurve.utils.TessQualityFlags.html#lightkurve.utils.TessQualityFlags" target="_top" title="This class encodes the meaning of the various TESS QUALITY bitmask flags," alt="" coords="163,55,293,80"/>
+</map>

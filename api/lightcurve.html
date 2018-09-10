@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>LightCurve classes &mdash; lightkurve 1.0b13 documentation</title>
+  <title>LightCurve classes &mdash; lightkurve 1.0b14 documentation</title>
   
 
   
@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="iterative_box_period_search" href="lightkurve.lightcurve.iterative_box_period_search.html" />
+    <link rel="next" title="LightCurve" href="lightkurve.lightcurve.LightCurve.html" />
     <link rel="prev" title="TessTargetPixelFile" href="lightkurve.targetpixelfile.TessTargetPixelFile.html" /> 
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                1.0b13
+                1.0b14
               </div>
             
           
@@ -92,14 +92,11 @@
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">API documentation</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="targetpixelfile.html">TargetPixelFile classes</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">LightCurve classes</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#functions">Functions</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurve.iterative_box_period_search.html">iterative_box_period_search</a></li>
-</ul>
-</li>
 <li class="toctree-l3"><a class="reference internal" href="#classes">Classes</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurve.LightCurve.html">LightCurve</a></li>
 <li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurve.KeplerLightCurve.html">KeplerLightCurve</a></li>
 <li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurve.TessLightCurve.html">TessLightCurve</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurve.FoldedLightCurve.html">FoldedLightCurve</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#class-inheritance-diagram">Class Inheritance Diagram</a></li>
@@ -212,20 +209,6 @@
 <div class="section" id="module-lightkurve.lightcurve">
 <span id="lightcurve-classes"></span><h1>LightCurve classes<a class="headerlink" href="#module-lightkurve.lightcurve" title="Permalink to this headline">¶</a></h1>
 <span class="target" id="module-lightkurve.lightcurve"></span><p>Defines LightCurve, KeplerLightCurve, TessLightCurve, etc.</p>
-<div class="section" id="functions">
-<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="lightkurve.lightcurve.iterative_box_period_search.html#lightkurve.lightcurve.iterative_box_period_search" title="lightkurve.lightcurve.iterative_box_period_search"><code class="xref py py-obj docutils literal notranslate"><span class="pre">iterative_box_period_search</span></code></a>(lc[,&nbsp;niters,&nbsp;…])</td>
-<td>Implements a routine to find box-like transit events.</td>
-</tr>
-</tbody>
-</table>
-</div>
 <div class="section" id="classes">
 <h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="longtable docutils">
@@ -243,16 +226,20 @@
 <tr class="row-odd"><td><a class="reference internal" href="lightkurve.lightcurve.TessLightCurve.html#lightkurve.lightcurve.TessLightCurve" title="lightkurve.lightcurve.TessLightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TessLightCurve</span></code></a>([time,&nbsp;flux,&nbsp;flux_err,&nbsp;…])</td>
 <td>Defines a light curve class for NASA’s TESS mission.</td>
 </tr>
+<tr class="row-even"><td><a class="reference internal" href="lightkurve.lightcurve.FoldedLightCurve.html#lightkurve.lightcurve.FoldedLightCurve" title="lightkurve.lightcurve.FoldedLightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve</span></code></a>(*args,&nbsp;**kwargs)</td>
+<td>Defines a folded lightcurve with different plotting defaults.</td>
+</tr>
 </tbody>
 </table>
 </div>
 <div class="section" id="class-inheritance-diagram">
 <h2>Class Inheritance Diagram<a class="headerlink" href="#class-inheritance-diagram" title="Permalink to this headline">¶</a></h2>
-<img src="../_images/inheritance-063cc584cb3b0c894f44ce854f83b00b2ed64a3a.png" alt="Inheritance diagram of lightkurve.lightcurve.LightCurve, lightkurve.lightcurve.KeplerLightCurve, lightkurve.lightcurve.TessLightCurve" usemap="#inheritance7c28f86df0" class="inheritance"/>
-<map id="inheritance7c28f86df0" name="inheritance7c28f86df0">
-<area shape="rect" id="node1" href="lightkurve.lightcurve.KeplerLightCurve.html#lightkurve.lightcurve.KeplerLightCurve" target="_top" title="Defines a light curve class for NASA&#39;s Kepler and K2 missions." alt="" coords="145,5,279,31"/>
-<area shape="rect" id="node2" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" target="_top" title="Implements a simple class for a generic light curve." alt="" coords="5,31,97,56"/>
-<area shape="rect" id="node3" href="lightkurve.lightcurve.TessLightCurve.html#lightkurve.lightcurve.TessLightCurve" target="_top" title="Defines a light curve class for NASA&#39;s TESS mission." alt="" coords="152,55,272,80"/>
+<img src="../_images/inheritance-c547a209f573e7119b6c33893c2f658160352bf0.png" alt="Inheritance diagram of lightkurve.lightcurve.LightCurve, lightkurve.lightcurve.KeplerLightCurve, lightkurve.lightcurve.TessLightCurve, lightkurve.lightcurve.FoldedLightCurve" usemap="#inheritancec672026571" class="inheritance"/>
+<map id="inheritancec672026571" name="inheritancec672026571">
+<area shape="rect" id="node1" href="lightkurve.lightcurve.FoldedLightCurve.html#lightkurve.lightcurve.FoldedLightCurve" target="_top" title="Defines a folded lightcurve with different plotting defaults." alt="" coords="145,5,280,31"/>
+<area shape="rect" id="node2" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" target="_top" title="Implements a simple class for a generic light curve." alt="" coords="5,55,97,80"/>
+<area shape="rect" id="node3" href="lightkurve.lightcurve.KeplerLightCurve.html#lightkurve.lightcurve.KeplerLightCurve" target="_top" title="Defines a light curve class for NASA&#39;s Kepler and K2 missions." alt="" coords="146,55,279,80"/>
+<area shape="rect" id="node4" href="lightkurve.lightcurve.TessLightCurve.html#lightkurve.lightcurve.TessLightCurve" target="_top" title="Defines a light curve class for NASA&#39;s TESS mission." alt="" coords="153,104,273,129"/>
 </map></div>
 </div>
 
@@ -264,7 +251,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="lightkurve.lightcurve.iterative_box_period_search.html" class="btn btn-neutral float-right" title="iterative_box_period_search" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="lightkurve.lightcurve.LightCurve.html" class="btn btn-neutral float-right" title="LightCurve" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="lightkurve.targetpixelfile.TessTargetPixelFile.html" class="btn btn-neutral" title="TessTargetPixelFile" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
@@ -298,7 +285,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'1.0b13',
+            VERSION:'1.0b14',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

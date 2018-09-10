@@ -24,6 +24,7 @@ KeplerLightCurveFile
       ~KeplerLightCurveFile.poss_corr2
       ~KeplerLightCurveFile.quarter
       ~KeplerLightCurveFile.ra
+      ~KeplerLightCurveFile.targetid
       ~KeplerLightCurveFile.time
 
    .. rubric:: Methods Summary
@@ -32,6 +33,7 @@ KeplerLightCurveFile
 
       ~KeplerLightCurveFile.compute_cotrended_lightcurve
       ~KeplerLightCurveFile.from_archive
+      ~KeplerLightCurveFile.from_fits
       ~KeplerLightCurveFile.get_lightcurve
       ~KeplerLightCurveFile.header
       ~KeplerLightCurveFile.plot
@@ -52,12 +54,14 @@ KeplerLightCurveFile
    .. autoattribute:: poss_corr2
    .. autoattribute:: quarter
    .. autoattribute:: ra
+   .. autoattribute:: targetid
    .. autoattribute:: time
 
    .. rubric:: Methods Documentation
 
    .. automethod:: compute_cotrended_lightcurve
    .. automethod:: from_archive
+   .. automethod:: from_fits
    .. automethod:: get_lightcurve
    .. automethod:: header
    .. automethod:: plot

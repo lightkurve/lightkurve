@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>lightkurve.targetpixelfile &mdash; lightkurve 1.0b13 documentation</title>
+  <title>lightkurve.targetpixelfile &mdash; lightkurve 1.0b14 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.0b13
+                1.0b14
               </div>
             
           
@@ -181,10 +181,11 @@
 <span class="kn">from</span> <span class="nn">astropy.coordinates</span> <span class="k">import</span> <span class="n">SkyCoord</span>
 <span class="kn">from</span> <span class="nn">astropy.wcs.utils</span> <span class="k">import</span> <span class="n">skycoord_to_pixel</span><span class="p">,</span> <span class="n">pixel_to_skycoord</span>
 
-<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">PACKAGEDIR</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">PACKAGEDIR</span><span class="p">,</span> <span class="n">MPLSTYLE</span>
 <span class="kn">from</span> <span class="nn">.lightcurve</span> <span class="k">import</span> <span class="n">KeplerLightCurve</span><span class="p">,</span> <span class="n">TessLightCurve</span>
 <span class="kn">from</span> <span class="nn">.prf</span> <span class="k">import</span> <span class="n">KeplerPRF</span>
-<span class="kn">from</span> <span class="nn">.utils</span> <span class="k">import</span> <span class="n">KeplerQualityFlags</span><span class="p">,</span> <span class="n">plot_image</span><span class="p">,</span> <span class="n">bkjd_to_astropy_time</span><span class="p">,</span> <span class="n">btjd_to_astropy_time</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="k">import</span> <span class="n">KeplerQualityFlags</span><span class="p">,</span> <span class="n">TessQualityFlags</span><span class="p">,</span> \
+                   <span class="n">plot_image</span><span class="p">,</span> <span class="n">bkjd_to_astropy_time</span><span class="p">,</span> <span class="n">btjd_to_astropy_time</span>
 <span class="kn">from</span> <span class="nn">.mast</span> <span class="k">import</span> <span class="n">download_kepler_products</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;KeplerTargetPixelFile&#39;</span><span class="p">,</span> <span class="s1">&#39;TessTargetPixelFile&#39;</span><span class="p">]</span>
@@ -205,7 +206,6 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">quality_bitmask</span> <span class="o">=</span> <span class="n">quality_bitmask</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quality_mask</span><span class="p">(</span><span class="n">quality_bitmask</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">targetid</span> <span class="o">=</span> <span class="n">targetid</span>
 
     <span class="nd">@property</span>
@@ -227,11 +227,6 @@
     <span class="k">def</span> <span class="nf">header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ext</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns the header for a given extension.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="n">ext</span><span class="p">]</span><span class="o">.</span><span class="n">header</span>
-
-    <span class="k">def</span> <span class="nf">_quality_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bitmask</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">bitmask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;TIME&#39;</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;QUALITY&#39;</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">bitmask</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ra</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -576,7 +571,7 @@
         <span class="k">return</span> <span class="n">col_centr</span><span class="p">,</span> <span class="n">row_centr</span>
 
     <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">frame</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">cadenceno</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bkg</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-             <span class="n">show_colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mask_color</span><span class="o">=</span><span class="s1">&#39;pink&#39;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s1">&#39;fast&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+             <span class="n">show_colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mask_color</span><span class="o">=</span><span class="s1">&#39;pink&#39;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s1">&#39;lightkurve&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Plot a target pixel file at a given frame (index) or cadence number.</span>
 
@@ -599,7 +594,9 @@
 <span class="sd">        mask_color : str</span>
 <span class="sd">            Color to show the aperture mask</span>
 <span class="sd">        style : str</span>
-<span class="sd">            matplotlib.pyplot.style.context, default is &#39;fast&#39;</span>
+<span class="sd">            Path or URL to a matplotlib style file, or name of one of</span>
+<span class="sd">            matplotlib&#39;s built-in stylesheets (e.g. &#39;ggplot&#39;).</span>
+<span class="sd">            Lightkurve&#39;s custom stylesheet is used by default.</span>
 <span class="sd">        kwargs : dict</span>
 <span class="sd">            Keywords arguments passed to `lightkurve.utils.plot_image`.</span>
 
@@ -608,8 +605,8 @@
 <span class="sd">        ax : matplotlib.axes._subplots.AxesSubplot</span>
 <span class="sd">            The matplotlib axes object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;fast&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">&quot;fast&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">available</span><span class="p">):</span>
-            <span class="n">style</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span>
+        <span class="k">if</span> <span class="n">style</span> <span class="o">==</span> <span class="s1">&#39;lightkurve&#39;</span> <span class="ow">or</span> <span class="n">style</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">style</span> <span class="o">=</span> <span class="n">MPLSTYLE</span>
         <span class="k">if</span> <span class="n">cadenceno</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">frame</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">cadenceno</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">cadenceno</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
@@ -888,6 +885,9 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">KeplerTargetPixelFile</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">path</span><span class="p">,</span>
                                                     <span class="n">quality_bitmask</span><span class="o">=</span><span class="n">quality_bitmask</span><span class="p">,</span>
                                                     <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span> <span class="o">=</span> <span class="n">KeplerQualityFlags</span><span class="o">.</span><span class="n">create_quality_mask</span><span class="p">(</span>
+                                <span class="n">quality_array</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;QUALITY&#39;</span><span class="p">],</span>
+                                <span class="n">bitmask</span><span class="o">=</span><span class="n">quality_bitmask</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">targetid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">targetid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">()[</span><span class="s1">&#39;KEPLERID&#39;</span><span class="p">]</span>
 
@@ -961,20 +961,6 @@
 
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span><span class="p">(</span><span class="s1">&#39;KeplerTargetPixelFile Object (ID: </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keplerid</span><span class="p">))</span>
-
-    <span class="k">def</span> <span class="nf">_quality_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bitmask</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns a boolean mask which flags all good-quality cadences.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        bitmask : str or int</span>
-<span class="sd">            Bitmask. See ref. [1], table 2-3.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">bitmask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;TIME&#39;</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bitmask</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">bitmask</span> <span class="o">=</span> <span class="n">KeplerQualityFlags</span><span class="o">.</span><span class="n">OPTIONS</span><span class="p">[</span><span class="n">bitmask</span><span class="p">]</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;QUALITY&#39;</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">bitmask</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
 
 <div class="viewcode-block" id="KeplerTargetPixelFile.get_prf_model"><a class="viewcode-back" href="../../api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_prf_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_prf_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns an object of KeplerPRF initialized using the</span>
@@ -1516,6 +1502,13 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">TessTargetPixelFile</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">path</span><span class="p">,</span>
                                                   <span class="n">quality_bitmask</span><span class="o">=</span><span class="n">quality_bitmask</span><span class="p">,</span>
                                                   <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span> <span class="o">=</span> <span class="n">TessQualityFlags</span><span class="o">.</span><span class="n">create_quality_mask</span><span class="p">(</span>
+                                <span class="n">quality_array</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;QUALITY&#39;</span><span class="p">],</span>
+                                <span class="n">bitmask</span><span class="o">=</span><span class="n">quality_bitmask</span><span class="p">)</span>
+        <span class="c1"># Early TESS releases had cadences with time=NaN (i.e. missing data)</span>
+        <span class="c1"># which were not flagged by a QUALITY flag yet; the line below prevents</span>
+        <span class="c1"># these cadences from being used. They would break most methods!</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span> <span class="o">&amp;=</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;TIME&#39;</span><span class="p">])</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">targetid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">()[</span><span class="s1">&#39;TICID&#39;</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
@@ -1653,7 +1646,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'1.0b13',
+            VERSION:'1.0b14',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

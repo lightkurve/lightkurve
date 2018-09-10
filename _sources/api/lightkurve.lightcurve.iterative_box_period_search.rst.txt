@@ -1,6 +1,0 @@
-iterative_box_period_search
-===========================
-
-.. currentmodule:: lightkurve.lightcurve
-
-.. autofunction:: iterative_box_period_search

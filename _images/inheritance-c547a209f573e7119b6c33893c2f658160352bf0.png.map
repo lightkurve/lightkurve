@@ -1,0 +1,6 @@
+<map id="inheritancec672026571" name="inheritancec672026571">
+<area shape="rect" id="node1" href="lightkurve.lightcurve.FoldedLightCurve.html#lightkurve.lightcurve.FoldedLightCurve" target="_top" title="Defines a folded lightcurve with different plotting defaults." alt="" coords="145,5,280,31"/>
+<area shape="rect" id="node2" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" target="_top" title="Implements a simple class for a generic light curve." alt="" coords="5,55,97,80"/>
+<area shape="rect" id="node3" href="lightkurve.lightcurve.KeplerLightCurve.html#lightkurve.lightcurve.KeplerLightCurve" target="_top" title="Defines a light curve class for NASA&#39;s Kepler and K2 missions." alt="" coords="146,55,279,80"/>
+<area shape="rect" id="node4" href="lightkurve.lightcurve.TessLightCurve.html#lightkurve.lightcurve.TessLightCurve" target="_top" title="Defines a light curve class for NASA&#39;s TESS mission." alt="" coords="153,104,273,129"/>
+</map>

@@ -11,6 +11,7 @@ KeplerLightCurve
    .. autosummary::
 
       ~KeplerLightCurve.astropy_time
+      ~KeplerLightCurve.keplerid
 
    .. rubric:: Methods Summary
 
@@ -20,13 +21,16 @@ KeplerLightCurve
       ~KeplerLightCurve.bin
       ~KeplerLightCurve.cdpp
       ~KeplerLightCurve.correct
+      ~KeplerLightCurve.fill_gaps
       ~KeplerLightCurve.flatten
       ~KeplerLightCurve.fold
       ~KeplerLightCurve.normalize
+      ~KeplerLightCurve.periodogram
       ~KeplerLightCurve.plot
       ~KeplerLightCurve.properties
       ~KeplerLightCurve.remove_nans
       ~KeplerLightCurve.remove_outliers
+      ~KeplerLightCurve.scatter
       ~KeplerLightCurve.to_csv
       ~KeplerLightCurve.to_fits
       ~KeplerLightCurve.to_pandas
@@ -35,6 +39,7 @@ KeplerLightCurve
    .. rubric:: Attributes Documentation
 
    .. autoattribute:: astropy_time
+   .. autoattribute:: keplerid
 
    .. rubric:: Methods Documentation
 
@@ -42,13 +47,16 @@ KeplerLightCurve
    .. automethod:: bin
    .. automethod:: cdpp
    .. automethod:: correct
+   .. automethod:: fill_gaps
    .. automethod:: flatten
    .. automethod:: fold
    .. automethod:: normalize
+   .. automethod:: periodogram
    .. automethod:: plot
    .. automethod:: properties
    .. automethod:: remove_nans
    .. automethod:: remove_outliers
+   .. automethod:: scatter
    .. automethod:: to_csv
    .. automethod:: to_fits
    .. automethod:: to_pandas
