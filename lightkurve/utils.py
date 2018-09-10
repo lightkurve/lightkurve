@@ -420,5 +420,7 @@ def plot_image(image, ax=None, scale='linear', origin='lower',
     ax.set_ylabel(ylabel)
     ax.set_title(title)
     if show_colorbar:
-        plt.colorbar(cax, ax=ax, norm=norm, label=clabel)
+        cbar = plt.colorbar(cax, ax=ax, norm=norm, label=clabel)
+        cbar.ax.yaxis.set_tick_params(tick1On=False, tick2On=False)
+        cbar.ax.minorticks_off()
     return ax
