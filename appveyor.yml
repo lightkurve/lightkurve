@@ -21,6 +21,7 @@ install:
   - pip install sphinx_rtd_theme
   - pip install bs4
   - pip install celerite
+  - pip install astroquery
 
 test_script:
   - "python setup.py test"

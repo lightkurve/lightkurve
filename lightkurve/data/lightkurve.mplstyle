@@ -1,0 +1,50 @@
+# Matplotlib style used by lightkurve
+
+figure.facecolor : white
+figure.dpi       : 100
+figure.figsize   : 8.485, 4
+
+image.cmap : viridis
+
+text.color : 4c4c4c
+
+scatter.marker : o
+
+lines.linewidth  : 0.5
+lines.markersize : 1
+
+axes.formatter.use_mathtext : True
+axes.spines.top   : True
+axes.spines.right : True
+
+axes.titlepad   : 10
+axes.titlesize  : 18
+axes.facecolor  : white
+axes.edgecolor  : 4c4c4c
+axes.labelcolor : 4c4c4c
+axes.labelsize  : 15
+axes.grid       : False
+axes.prop_cycle : cycler('color', ['333333', '0072B2', '009E73', 'D55E00', 'CC79A7', 'F0E442', '56B4E9'])
+
+legend.fontsize      : 11
+legend.frameon       : True
+legend.numpoints     : 3
+legend.scatterpoints : 3
+legend.facecolor     : white
+legend.edgecolor     : 4c4c4c
+
+xtick.top           : False
+xtick.color         : 4c4c4c
+xtick.direction     : in
+xtick.major.size    : 8
+xtick.minor.size    : 4
+xtick.minor.visible : True
+xtick.labelsize     : 12
+
+ytick.minor.visible : True
+ytick.right         : False
+ytick.color         : 4c4c4c
+ytick.direction     : in
+ytick.major.size    : 8
+ytick.minor.size    : 4
+ytick.labelsize     : 12

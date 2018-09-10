@@ -7,24 +7,25 @@ from tqdm import tqdm
 import os
 import datetime
 import logging
+import pandas as pd
+import warnings
 
 import oktopus
 import numpy as np
 from scipy import signal
 from scipy.optimize import minimize
 from matplotlib import pyplot as plt
-import matplotlib as mpl
 
 from astropy.stats import sigma_clip
 from astropy.table import Table
 from astropy.io import fits
 from astropy.time import Time
+from . import PACKAGEDIR, MPLSTYLE
 
-from .utils import running_mean, bkjd_to_astropy_time
-from . import PACKAGEDIR
+from .utils import running_mean, bkjd_to_astropy_time, btjd_to_astropy_time
 
 __all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve',
-           'iterative_box_period_search']
+           'FoldedLightCurve']
 
 log = logging.getLogger(__name__)
 
@@ -47,16 +48,27 @@ class LightCurve(object):
     time_scale : str
         String which specifies how the time is measured,
         e.g. tdb', 'tt', 'ut1', or 'utc'.
+    targetid : str
+        Identifier of the target.
+    label : str
+        Human-friendly object label, e.g. "KIC 123456789"
     meta : dict
         Free-form metadata associated with the LightCurve.
     """
-    def __init__(self, time, flux=None, flux_err=None, time_format=None,
-                 time_scale=None, meta={}):
-        self.time = np.asarray(time)
+    def __init__(self, time=None, flux=None, flux_err=None, time_format=None,
+                 time_scale=None, targetid=None, label=None, meta={}):
+        if time is None and flux is None:
+            raise ValueError('either time or flux must be given')
+        if time is None:
+            self.time = np.arange(len(flux))
+        else:
+            self.time = np.asarray(time)
         self.flux = self._validate_array(flux, name='flux')
         self.flux_err = self._validate_array(flux_err, name='flux_err')
         self.time_format = time_format
         self.time_scale = time_scale
+        self.targetid = targetid
+        self.label = label
         self.meta = meta
 
     def _validate_array(self, arr, name='array'):
@@ -142,6 +154,8 @@ class LightCurve(object):
         # `TimeFormat` class for BKJD.
         if self.time_format == 'bkjd':
             return bkjd_to_astropy_time(self.time)
+        elif self.time_format == 'btjd':  # TESS
+            return btjd_to_astropy_time(self.time)
         return Time(self.time, format=self.time_format, scale=self.time_scale)
 
     def properties(self):
@@ -266,10 +280,16 @@ class LightCurve(object):
         """
         if break_tolerance is None:
             break_tolerance = np.nan
+        if polyorder >= window_length:
+            polyorder = window_length - 1
+            log.warning("polyorder must be smaller than window_length, "
+                        "using polyorder={}.".format(polyorder))
         lc_clean = self.remove_nans()
         # Split the lightcurve into segments by finding large gaps in time
         dt = lc_clean.time[1:] - lc_clean.time[0:-1]
-        cut = np.where(dt > break_tolerance * np.nanmedian(dt))[0] + 1
+        with warnings.catch_warnings():  # Ignore warnings due to NaNs
+            warnings.simplefilter("ignore", RuntimeWarning)
+            cut = np.where(dt > break_tolerance * np.nanmedian(dt))[0] + 1
         low = np.append([0], cut)
         high = np.append(cut, len(lc_clean.time))
         # Then, apply the savgol_filter to each segment separately
@@ -277,16 +297,14 @@ class LightCurve(object):
         for l, h in zip(low, high):
             # Reduce `window_length` and `polyorder` for short segments;
             # this prevents `savgol_filter` from raising an exception
-            segment_window_length, segment_polyorder = window_length, polyorder
-            if segment_window_length > (h - l):
-                segment_window_length = h - l
-                if (segment_window_length % 2) == 0:
-                    segment_window_length -= 1  # window_length must be odd
-            if segment_polyorder >= segment_window_length:
-                segment_polyorder = segment_window_length - 1
-            trend_signal[l:h] = signal.savgol_filter(x=lc_clean.flux[l:h],
-                                                     window_length=segment_window_length,
-                                                     polyorder=segment_polyorder, **kwargs)
+            # If the segment is too short, just take the median
+            if np.any([window_length > (h - l), (h - l) < break_tolerance]):
+                trend_signal[l:h] = np.nanmedian(lc_clean.flux[l:h])
+            else:
+                trend_signal[l:h] = signal.savgol_filter(x=lc_clean.flux[l:h],
+                                                         window_length=window_length,
+                                                         polyorder=polyorder,
+                                                         **kwargs)
         trend_signal = np.interp(self.time, lc_clean.time, trend_signal)
         flatten_lc = copy.deepcopy(self)
         flatten_lc.flux = flatten_lc.flux / trend_signal
@@ -353,6 +371,49 @@ class LightCurve(object):
         """
         return self[~np.isnan(self.flux)]  # This will return a sliced copy
 
+    def fill_gaps(lc, method='nearest'):
+        """Fill in gaps in time with linear interpolation.
+
+        Parameters
+        ----------
+        method : string {None, 'backfill'/'bfill', 'pad'/'ffill', 'nearest'}
+            Method to use for gap filling. 'nearest' by default.
+
+        Returns
+        -------
+        nlc : LightCurve object
+            A new ``LightCurve`` in which NaNs values and gaps in time have been
+            filled.
+        """
+        clc = copy.deepcopy(lc.remove_nans())
+        nlc = copy.deepcopy(lc)
+
+        # Average gap between cadences
+        dt = np.nanmedian(clc.time[1::] - clc.time[:-1:])
+
+        # Iterate over flux and flux_err
+        for idx, y in enumerate([clc.flux, clc.flux_err]):
+            # We need to ensure pandas gets the correct byteorder
+            # Background info: https://github.com/astropy/astropy/issues/1156
+            if y.dtype.byteorder == '>':
+                y = y.byteswap().newbyteorder()
+            ts = pd.Series(y, index=clc.time)
+            newindex = [clc.time[0]]
+            for t in clc.time[1::]:
+                prevtime = newindex[-1]
+                while (t - prevtime) > 1.2*dt:
+                    newindex.append(prevtime + dt)
+                    prevtime = newindex[-1]
+                newindex.append(t)
+            ts = ts.reindex(newindex, method=method)
+            if idx == 0:
+                nlc.flux = np.asarray(ts)
+            elif idx == 1:
+                nlc.flux_err = np.asarray(ts)
+
+        nlc.time = np.asarray(ts.index)
+        return nlc
+
     def remove_outliers(self, sigma=5., return_mask=False, **kwargs):
         """Removes outlier flux values using sigma-clipping.
 
@@ -376,7 +437,10 @@ class LightCurve(object):
         clean_lightcurve : LightCurve object
             A new ``LightCurve`` in which outliers have been removed.
         """
-        outlier_mask = sigma_clip(data=self.flux, sigma=sigma, **kwargs).mask
+        with warnings.catch_warnings():  # Ignore warnings due to NaNs or Infs
+            warnings.simplefilter("ignore")
+            outlier_mask = sigma_clip(data=self.flux, sigma=sigma, **kwargs).mask
+
         if return_mask:
             return self[~outlier_mask], outlier_mask
         return self[~outlier_mask]
@@ -507,10 +571,63 @@ class LightCurve(object):
         cdpp_ppm = np.std(mean) * 1e6
         return cdpp_ppm
 
-    def plot(self, ax=None, normalize=True, xlabel='Time - 2454833 (days)',
-             ylabel='Normalized Flux', title=None,
-             fill=False, grid=True, style='fast', **kwargs):
-        """Plots the light curve.
+    def _create_plot(self, method='plot', ax=None, normalize=True,
+                     xlabel=None, ylabel=None, title='', style='lightkurve',
+                     **kwargs):
+        """Implements both `plot()` and `scatter()` to avoid code duplication.
+
+        Returns
+        -------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            The matplotlib axes object.
+        """
+        # Configure the default style
+        if style is None or style == 'lightkurve':
+            style = MPLSTYLE
+        # Default xlabel
+        if xlabel is None:
+            if self.time_format == 'bkjd':
+                xlabel = 'Time - 2454833 [BKJD days]'
+            elif self.time_format == 'btjd':
+                xlabel = 'Time - 2457000 [BTJD days]'
+            elif self.time_format == 'jd':
+                xlabel = 'Time [JD]'
+            else:
+                xlabel = 'Time'
+        # Default ylabel
+        if ylabel is None:
+            if normalize:
+                ylabel = 'Normalized Flux'
+            else:
+                ylabel = 'Flux [e$^-$s$^{-1}$]'
+        # Default legend label
+        if ('label' not in kwargs):
+            kwargs['label'] = self.label
+
+        # Normalize the data if requested
+        if normalize:
+            flux = self.normalize().flux
+        else:
+            flux = self.flux
+
+        # Make the plot
+        with plt.style.context(style):
+            if ax is None:
+                fig, ax = plt.subplots(1)
+            if method == 'scatter':
+                ax.scatter(self.time, flux, **kwargs)
+            else:
+                ax.plot(self.time, flux, **kwargs)
+            ax.set_xlabel(xlabel)
+            ax.set_ylabel(ylabel)
+            # Show the legend if labels were set
+            if (np.sum([len(a) for a in ax.get_legend_handles_labels()]) != 0):
+                ax.legend()
+
+        return ax
+
+    def plot(self, **kwargs):
+        """Plot the light curve using matplotlib's `plot` method.
 
         Parameters
         ----------
@@ -525,14 +642,10 @@ class LightCurve(object):
             Plot y axis label
         title : str
             Plot set_title
-        color : str
-            Color to plot line in
-        fill : bool
-            Shade the region between 0 and flux
-        grid : bool
-            Plot with a grid
         style : str
-            matplotlib.pyplot.style.context, default is 'fast'
+            Path or URL to a matplotlib style file, or name of one of
+            matplotlib's built-in stylesheets (e.g. 'ggplot').
+            Lightkurve's custom stylesheet is used by default.
         kwargs : dict
             Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
 
@@ -541,37 +654,37 @@ class LightCurve(object):
         ax : matplotlib.axes._subplots.AxesSubplot
             The matplotlib axes object.
         """
-        # The "fast" style has only been in matplotlib since v2.1.
-        # Let's make it optional until >v2.1 is mainstream and can
-        # be made the minimum requirement.
-        if (style == "fast") and ("fast" not in mpl.style.available):
-            style = "default"
-        if normalize:
-            normalized_lc = self.normalize()
-            flux, flux_err = normalized_lc.flux, normalized_lc.flux_err
-        else:
-            if ylabel == 'Normalized Flux':
-                ylabel = 'Flux'
-            flux, flux_err = self.flux, self.flux_err
-        with plt.style.context(style):
-            if ax is None:
-                fig, ax = plt.subplots(1)
-            if ('color' not in kwargs) and (len(ax.lines) == 0):
-                kwargs['color'] = 'black'
-            if np.any(~np.isfinite(flux_err)):
-                ax.plot(self.time, flux, **kwargs)
-            else:
-                ax.errorbar(self.time, flux, flux_err, **kwargs)
-            if fill:
-                ax.fill(self.time, flux, linewidth=0.0, alpha=0.3)
-            if 'label' in kwargs:
-                ax.legend()
-            if title is not None:
-                ax.set_title(title)
-            ax.grid(grid, alpha=0.3)
-            ax.set_xlabel(xlabel)
-            ax.set_ylabel(ylabel)
-        return ax
+        return self._create_plot(method='plot', **kwargs)
+
+    def scatter(self, **kwargs):
+        """Plots the light curve using matplotlib's `scatter` method.
+
+        Parameters
+        ----------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            A matplotlib axes object to plot into. If no axes is provided,
+            a new one will be generated.
+        normalize : bool
+            Normalize the lightcurve before plotting?
+        xlabel : str
+            Plot x axis label
+        ylabel : str
+            Plot y axis label
+        title : str
+            Plot set_title
+        style : str
+            Path or URL to a matplotlib style file, or name of one of
+            matplotlib's built-in stylesheets (e.g. 'ggplot').
+            Lightkurve's custom stylesheet is used by default.
+        kwargs : dict
+            Dictionary of arguments to be passed to `matplotlib.pyplot.scatter`.
+
+        Returns
+        -------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            The matplotlib axes object.
+        """
+        return self._create_plot(method='scatter', **kwargs)
 
     def to_table(self):
         """Export the LightCurve as an AstroPy Table.
@@ -612,7 +725,6 @@ class LightCurve(object):
                 data[col] = vars(self)[col]
         df = pd.DataFrame(data=data, index=self.time, columns=columns)
         df.index.name = 'time'
-        df.meta = self.meta
         return df
 
     def to_csv(self, path_or_buf=None, **kwargs):
@@ -633,6 +745,24 @@ class LightCurve(object):
             returns None otherwise.
         """
         return self.to_pandas().to_csv(path_or_buf=path_or_buf, **kwargs)
+
+    def periodogram(self, frequencies=None):
+        """Returns a `Periodogram`.
+
+        Parameters
+        ----------
+        frequencies : array-like
+            The regular grid of frequencies to use.  The frequencies must be
+            in units microhertz.  Alternatively, an AstroPy Quantity object can
+            be passed with any unit of type '1/time'.
+
+        Returns
+        -------
+        Periodogram : `Periodogram` object
+            Returns a Periodogram object extracted from the lightcurve.
+        """
+        from . import Periodogram
+        return Periodogram.from_lightcurve(lc=self, frequencies=frequencies)
 
     def to_fits(self, path=None, overwrite=False, **extra_data):
         """Writes the KeplerLightCurve to a fits file.
@@ -754,9 +884,43 @@ class FoldedLightCurve(LightCurve):
         return self.time
 
     def plot(self, **kwargs):
+        """Plot the folded light curve usng matplotlib's `plot` method.
+
+        See `LightCurve.plot` for details on the accepted arguments.
+
+        Parameters
+        ----------
+        kwargs : dict
+            Dictionary of arguments to be passed to `LightCurve.plot`.
+
+        Returns
+        -------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            The matplotlib axes object.
+        """
         ax = super(FoldedLightCurve, self).plot(**kwargs)
         if 'xlabel' not in kwargs:
-            ax.set_xlabel("Phase", {'color': 'k'})
+            ax.set_xlabel("Phase")
+        return ax
+
+    def scatter(self, **kwargs):
+        """Plot the folded light curve usng matplotlib's `scatter` method.
+
+        See `LightCurve.scatter` for details on the accepted arguments.
+
+        Parameters
+        ----------
+        kwargs : dict
+            Dictionary of arguments to be passed to `LightCurve.scatter`.
+
+        Returns
+        -------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            The matplotlib axes object.
+        """
+        ax = super(FoldedLightCurve, self).scatter(**kwargs)
+        if 'xlabel' not in kwargs:
+            ax.set_xlabel("Phase")
         return ax
 
 
@@ -771,6 +935,12 @@ class KeplerLightCurve(LightCurve):
         Data flux for every time point
     flux_err : array-like
         Uncertainty on each flux data point
+    time_format : str
+        String specifying how an instant of time is represented,
+        e.g. 'bkjd' or 'jd'.
+    time_scale : str
+        String which specifies how the time is measured,
+        e.g. tdb', 'tt', 'ut1', or 'utc'.
     centroid_col : array-like
         Centroid column coordinates as a function of time
     centroid_row : array-like
@@ -792,11 +962,13 @@ class KeplerLightCurve(LightCurve):
     keplerid : int
         Kepler ID number
     """
-    def __init__(self, time, flux=None, flux_err=None, time_format=None, time_scale=None,
+    def __init__(self, time=None, flux=None, flux_err=None, time_format=None, time_scale=None,
                  centroid_col=None, centroid_row=None, quality=None, quality_bitmask=None,
                  channel=None, campaign=None, quarter=None, mission=None,
-                 cadenceno=None, keplerid=None, ra=None, dec=None):
-        super(KeplerLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err, time_format=time_format, time_scale=time_scale)
+                 cadenceno=None, keplerid=None, ra=None, dec=None, label=None, meta={}):
+        super(KeplerLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err,
+                                               time_format=time_format, time_scale=time_scale,
+                                               targetid=keplerid, label=label, meta=meta)
         self.centroid_col = self._validate_array(centroid_col, name='centroid_col')
         self.centroid_row = self._validate_array(centroid_row, name='centroid_row')
         self.quality = self._validate_array(quality, name='quality')
@@ -806,7 +978,6 @@ class KeplerLightCurve(LightCurve):
         self.campaign = campaign
         self.quarter = quarter
         self.mission = mission
-        self.keplerid = keplerid
         self.ra = ra
         self.dec = dec
 
@@ -826,6 +997,14 @@ class KeplerLightCurve(LightCurve):
             return('KeplerLightCurve(KIC: {})'.format(self.keplerid))
         elif self.mission.lower() == 'k2':
             return('KeplerLightCurve(EPIC: {})'.format(self.keplerid))
+
+    @property
+    def keplerid(self):
+        return self.targetid
+
+    @keplerid.setter
+    def keplerid(self, value):
+        self.targetid = value
 
     def correct(self, method='sff', **kwargs):
         """Corrects a lightcurve for motion-dependent systematic errors.
@@ -930,6 +1109,12 @@ class TessLightCurve(LightCurve):
         Data flux for every time point
     flux_err : array-like
         Uncertainty on each flux data point
+    time_format : str
+        String specifying how an instant of time is represented,
+        e.g. 'bkjd' or 'jd'.
+    time_scale : str
+        String which specifies how the time is measured,
+        e.g. tdb', 'tt', 'ut1', or 'utc'.
     centroid_col, centroid_row : array-like, array-like
         Centroid column and row coordinates as a function of time
     quality : array-like
@@ -941,29 +1126,44 @@ class TessLightCurve(LightCurve):
     ticid : int
         Tess Input Catalog ID number
     """
-
-    def __init__(self, time, flux, flux_err=None, centroid_col=None,
-                 centroid_row=None, quality=None, quality_bitmask=None,
-                 cadenceno=None, ticid=None):
-        super(TessLightCurve, self).__init__(time, flux, flux_err)
+    def __init__(self, time=None, flux=None, flux_err=None, time_format=None, time_scale=None,
+                 centroid_col=None, centroid_row=None, quality=None, quality_bitmask=None,
+                 cadenceno=None, sector=None, camera=None, ccd=None,
+                 ticid=None, ra=None, dec=None, label=None, meta={}):
+        super(TessLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err,
+                                             time_format=time_format, time_scale=time_scale,
+                                             targetid=ticid, label=label, meta=meta)
         self.centroid_col = self._validate_array(centroid_col, name='centroid_col')
         self.centroid_row = self._validate_array(centroid_row, name='centroid_row')
         self.quality = self._validate_array(quality, name='quality')
         self.cadenceno = self._validate_array(cadenceno)
         self.quality_bitmask = quality_bitmask
         self.mission = "TESS"
-        self.ticid = ticid
+        self.sector = sector
+        self.camera = camera
+        self.ccd = ccd
+        self.ra = ra
+        self.dec = dec
 
     def __getitem__(self, key):
         lc = super(TessLightCurve, self).__getitem__(key)
         # Compared to `LightCurve`, we need to slice a few additional arrays:
         lc.quality = self.quality[key]
+        lc.cadenceno = self.cadenceno[key]
         lc.centroid_col = self.centroid_col[key]
         lc.centroid_row = self.centroid_row[key]
         return lc
 
     def __repr__(self):
         return('TessLightCurve(TICID: {})'.format(self.ticid))
+
+    @property
+    def ticid(self):
+        return self.targetid
+
+    @ticid.setter
+    def ticid(self, value):
+        self.targetid = value
 
 
 def iterative_box_period_search(lc, niters=2, min_period=0.5, max_period=30,
