@@ -299,7 +299,7 @@ def pixel_selector_standalone(tpf, notebook_url='localhost:8888'):
     if len(lc.cadenceno) > 30000:
         raise RuntimeError('Interact cannot display more than 30000 cadences.')
 
-    def modify_doc(doc):
+    def create_interact_ui(doc):
 
         # The data source includes metadata for hover-over tooltips
         source = prepare_lightcurve_datasource(lc)
@@ -378,4 +378,4 @@ def pixel_selector_standalone(tpf, notebook_url='localhost:8888'):
         row_and_col = column(row1, widgets)
         doc.add_root(row_and_col)
 
-    show(modify_doc, notebook_url=notebook_url)
+    show(create_interact_ui, notebook_url=notebook_url)
