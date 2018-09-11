@@ -12,6 +12,7 @@ from astropy.io import fits as pyfits
 
 from .utils import (bkjd_to_astropy_time, KeplerQualityFlags, TessQualityFlags)
 from .mast import download_kepler_products
+from .collections import LightCurveFileCollection
 
 from . import MPLSTYLE
 
@@ -169,8 +170,7 @@ class KeplerLightCurveFile(LightCurveFile):
 
     @staticmethod
     def from_archive(target, cadence='long', quarter=None, month=None,
-                     campaign=None, radius=1., targetlimit=1,
-                     quality_bitmask="default", **kwargs):
+                     campaign=None, quality_bitmask="default", **kwargs):
         """Fetches a LightCurveFile (or list thereof) from the data archive at MAST.
 
         If a target was observed across multiple quarters or campaigns, a
@@ -196,12 +196,6 @@ class KeplerLightCurveFile(LightCurveFile):
             For Kepler's prime mission, there are three short-cadence
             LightCurveFile objects for each quarter, each covering one month.
             Hence, if cadence='short' you need to specify month=1, 2, or 3.
-        radius : float
-            Search radius in arcseconds. Default is 1 arcsecond.
-        targetlimit : None or int
-            If multiple targets are present within `radius`, limit the number
-            of returned LightCurveFile objects to `targetlimit`.
-            If `None`, no limit is applied.
         quality_bitmask : str or int
             Bitmask (integer) which identifies the quality flag bitmask that should
             be used to mask out bad cadences. If a string is passed, it has the
@@ -232,13 +226,84 @@ class KeplerLightCurveFile(LightCurveFile):
             path = download_kepler_products(
                 target=target, filetype='Lightcurve', cadence=cadence,
                 quarter=quarter, campaign=campaign, month=month,
+                radius=1., targetlimit=1)
+        return KeplerLightCurveFile(path[0], quality_bitmask=quality_bitmask,
+                                    **kwargs)
+
+    @staticmethod
+    def cone_search(target, cadence='long', quarter=None, month=None,
+                    campaign=None, radius=100., targetlimit=None,
+                    quality_bitmask='default', **kwargs):
+        """Fetch a collection of LightCurveFiles from the Kepler/K2 data
+        archive at MAST.
+
+        See the :class:`KeplerQualityFlags` class for details on the bitmasks.
+
+        Raises an `ArchiveError` if a unique light curve cannot be found.  For
+        example, this is the case if a target was observed in multiple Quarters and
+        the quarter parameter is unspecified.
+
+        Parameters
+        ----------
+        target : str or int
+            KIC/EPIC ID or object name.
+        cadence : str
+            'long' or 'short'.
+        quarter, campaign : int, list of ints, or 'all'
+            Kepler Quarter or K2 Campaign number.
+        month : 1, 2, 3, list or 'all'
+            For Kepler's prime mission, there are three short-cadence
+            Target Pixel Files for each quarter, each covering one month.
+            Hence, if cadence='short' you need to specify month=1, 2, or 3.
+        radius : float
+            Search radius in arcseconds. Default is 40 arcseconds,
+            roughly the size of an average K2 postage stamp.
+        targetlimit : None or int
+            If multiple targets are present within `radius`, limit the number
+            of returned TargetPixelFile objects to `targetlimit`.
+            If `None`, no limit is applied.
+        quality_bitmask : str or int
+            Bitmask (integer) which identifies the quality flag bitmask that should
+            be used to mask out bad cadences. If a string is passed, it has the
+            following meaning:
+
+                * "none": no cadences will be ignored (`quality_bitmask=0`).
+                * "default": cadences with severe quality issues will be ignored
+                  (`quality_bitmask=1130799`).
+                * "hard": more conservative choice of flags to ignore
+                  (`quality_bitmask=1664431`). This is known to remove good data.
+                * "hardest": removes all data that has been flagged
+                  (`quality_bitmask=2096639`). This mask is not recommended.
+
+            See the :class:`KeplerQualityFlags` class for details on the bitmasks.
+        kwargs : dict
+            Keywords arguments passed to the constructor of
+            :class:`KeplerTargetPixelFile`.
+
+        Returns
+        -------
+        tpf : :class:`KeplerTargetPixelFile` object.
+        """
+        if os.path.exists(str(target)) or str(target).startswith('http'):
+            log.warning('Warning: cone_search() is not intended to accept a '
+                        'direct path, use KeplerTargetPixelFile(path) instead.')
+            path = [target]
+        else:
+            path = download_kepler_products(
+                target=target, filetype='Lightcurve', cadence=cadence,
+                quarter=quarter, campaign=campaign, month=month,
                 radius=radius, targetlimit=targetlimit)
         if len(path) == 1:
-            return KeplerLightCurveFile(path[0],
-                                        quality_bitmask=quality_bitmask,
-                                        **kwargs)
-        return [KeplerLightCurveFile(p, quality_bitmask=quality_bitmask, **kwargs)
-                for p in path]
+            lightcurvefiles = [LightCurveFile(path[0],
+                                              quality_bitmask=quality_bitmask,
+                                              **kwargs)]
+            log.warning('Warning: only one target found within provided radius. '
+                        'Try increasing the search radius. (Radius currently '
+                        'set to {} arcseconds)'.format(radius))
+        else:
+            lightcurvefiles = [LightCurveFile(p, quality_bitmask=quality_bitmask,
+                               **kwargs) for p in path]
+        return LightCurveFileCollection(lightcurvefiles)
 
     def __repr__(self):
         return('KeplerLightCurveFile(ID: {})'.format(self.targetid))

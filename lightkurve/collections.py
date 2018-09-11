@@ -154,7 +154,8 @@ class LightCurveFileCollection(Collection):
 
     """
 
-    pass
+    def __init__(self, lightcurvefiles):
+        super(LightCurveFileCollection, self).__init__(lightcurvefiles)
 
 
 class TargetPixelFileCollection(Collection):
