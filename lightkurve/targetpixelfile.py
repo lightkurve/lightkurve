@@ -15,7 +15,7 @@ from tqdm import tqdm
 from astropy.coordinates import SkyCoord
 from astropy.wcs.utils import skycoord_to_pixel, pixel_to_skycoord
 
-from . import PACKAGEDIR
+from . import PACKAGEDIR, MPLSTYLE
 from .lightcurve import KeplerLightCurve, TessLightCurve
 from .prf import KeplerPRF
 from .utils import KeplerQualityFlags, TessQualityFlags, \
@@ -405,7 +405,7 @@ class TargetPixelFile(object):
         return col_centr, row_centr
 
     def plot(self, ax=None, frame=0, cadenceno=None, bkg=False, aperture_mask=None,
-             show_colorbar=True, mask_color='pink', style='fast', **kwargs):
+             show_colorbar=True, mask_color='pink', style='lightkurve', **kwargs):
         """
         Plot a target pixel file at a given frame (index) or cadence number.
 
@@ -428,7 +428,9 @@ class TargetPixelFile(object):
         mask_color : str
             Color to show the aperture mask
         style : str
-            matplotlib.pyplot.style.context, default is 'fast'
+            Path or URL to a matplotlib style file, or name of one of
+            matplotlib's built-in stylesheets (e.g. 'ggplot').
+            Lightkurve's custom stylesheet is used by default.
         kwargs : dict
             Keywords arguments passed to `lightkurve.utils.plot_image`.
 
@@ -437,8 +439,8 @@ class TargetPixelFile(object):
         ax : matplotlib.axes._subplots.AxesSubplot
             The matplotlib axes object.
         """
-        if (style == "fast") and ("fast" not in plt.style.available):
-            style = "default"
+        if style == 'lightkurve' or style is None:
+            style = MPLSTYLE
         if cadenceno is not None:
             try:
                 frame = np.argwhere(cadenceno == self.cadenceno)[0][0]

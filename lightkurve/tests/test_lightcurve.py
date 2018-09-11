@@ -3,6 +3,8 @@ from __future__ import division, print_function
 from astropy.io import fits as pyfits
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import pyplot as plt
+
 from numpy.testing import (assert_almost_equal, assert_array_equal,
                            assert_allclose)
 import pytest
@@ -72,20 +74,23 @@ def test_rmath_operators():
 def test_KeplerLightCurveFile(path, mission):
     lcf = KeplerLightCurveFile(path, quality_bitmask=None)
     hdu = pyfits.open(path)
-    kplc = lcf.get_lightcurve('SAP_FLUX')
+    lc = lcf.get_lightcurve('SAP_FLUX')
 
-    assert kplc.channel == lcf.channel
-    assert kplc.mission.lower() == mission.lower()
-    if kplc.mission.lower() == 'kepler':
-        assert kplc.campaign is None
-        assert kplc.quarter == 8
-    elif kplc.mission.lower() == 'k2':
-        assert kplc.campaign == 8
-        assert kplc.quarter is None
-    assert kplc.astropy_time.scale == 'tdb'
+    assert lc.channel == lcf.channel
+    assert lc.mission.lower() == mission.lower()
+    if lc.mission.lower() == 'kepler':
+        assert lc.campaign is None
+        assert lc.quarter == 8
+    elif lc.mission.lower() == 'k2':
+        assert lc.campaign == 8
+        assert lc.quarter is None
+    assert lc.label == hdu[0].header['OBJECT']
+    assert lc.time_format == 'bkjd'
+    assert lc.time_scale == 'tdb'
+    assert lc.astropy_time.scale == 'tdb'
 
-    assert_array_equal(kplc.time, hdu[1].data['TIME'])
-    assert_array_equal(kplc.flux, hdu[1].data['SAP_FLUX'])
+    assert_array_equal(lc.time, hdu[1].data['TIME'])
+    assert_array_equal(lc.flux, hdu[1].data['SAP_FLUX'])
 
     with pytest.raises(KeyError):
         lcf.get_lightcurve('BLABLA')
@@ -97,10 +102,22 @@ def test_KeplerLightCurveFile(path, mission):
                           1, 100, 2096639])
 def test_TessLightCurveFile(quality_bitmask):
     tess_file = TessLightCurveFile(TESS_SIM, quality_bitmask=quality_bitmask)
-    tlc = tess_file.SAP_FLUX
-    assert tlc.mission.lower() == 'tess'
+    hdu = pyfits.open(TESS_SIM)
+    lc = tess_file.SAP_FLUX
+
+    assert lc.mission == 'TESS'
+    assert lc.label == hdu[0].header['OBJECT']
+    assert lc.time_format == 'btjd'
+    assert lc.time_scale == 'tdb'
+
+    assert_array_equal(lc.time[0:10], hdu[1].data['TIME'][0:10])
+    assert_array_equal(lc.flux[0:10], hdu[1].data['SAP_FLUX'][0:10])
+
     # Regression test for https://github.com/KeplerGO/lightkurve/pull/236
-    assert np.isnan(tlc.time).sum() == 0
+    assert np.isnan(lc.time).sum() == 0
+
+    with pytest.raises(KeyError):
+        tess_file.get_lightcurve('DOESNOTEXIST')
 
 
 @pytest.mark.remote_data
@@ -158,15 +175,38 @@ def test_lightcurve_append_multiple():
 
 
 @pytest.mark.remote_data
-def test_lightcurve_plot():
+def test_lightcurve_plots():
     """Sanity check to verify that lightcurve plotting works"""
     for lcf in [KeplerLightCurveFile(TABBY_Q8), TessLightCurveFile(TESS_SIM)]:
         lcf.plot()
         lcf.plot(flux_types=['SAP_FLUX', 'PDCSAP_FLUX'])
         lcf.SAP_FLUX.plot()
-        lcf.SAP_FLUX.plot(normalize=False, fill=False, title="Not the default")
+        lcf.SAP_FLUX.plot(normalize=False, title="Not the default")
+        lcf.SAP_FLUX.scatter()
+        lcf.SAP_FLUX.scatter(c=lcf.SAP_FLUX.time, show_colorbar=True, colorbar_label='Time')
+        lcf.SAP_FLUX.errorbar()
         plt.close('all')
 
+
+@pytest.mark.remote_data
+def test_lightcurve_scatter():
+    """Sanity check to verify that lightcurve scatter plotting works"""
+    lcf = KeplerLightCurveFile(KEPLER10)
+    lc = lcf.PDCSAP_FLUX.flatten()
+
+    # get an array of original times, in the same order as the folded lightcurve
+    foldkw = dict(period=0.837491)
+    originaltime = LightCurve(lc.time, lc.time)
+    foldedtimeinorder = originaltime.fold(**foldkw).flux
+
+    # plot a grid of phase-folded and not, with colors
+    fi, ax = plt.subplots(2, 2, figsize=(10,6), sharey=True, sharex='col')
+    scatterkw = dict( s=5, cmap='winter')
+    lc.scatter(ax=ax[0,0])
+    lc.fold(**foldkw).scatter(ax=ax[0,1])
+    lc.scatter(ax=ax[1,0], c=lc.time, **scatterkw)
+    lc.fold(**foldkw).scatter(ax=ax[1,1], c=foldedtimeinorder, **scatterkw)
+    plt.ylim(0.999, 1.001)
 
 def test_cdpp():
     """Test the basics of the CDPP noise metric."""
