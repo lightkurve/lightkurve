@@ -91,7 +91,7 @@ def prepare_lightcurve_datasource(lc):
         if len(flag_str_list) > 1:
             qual_strings.append("; ".join(flag_str_list))
 
-    source = ColumnDataSource(data=dict(
+    lc_source = ColumnDataSource(data=dict(
         time=lc.time,
         time_iso=human_time,
         flux=lc.flux,
@@ -99,7 +99,7 @@ def prepare_lightcurve_datasource(lc):
         quality_code=lc.quality,
         quality=np.array(qual_strings)))
 
-    return source
+    return lc_source
 
 def prepare_tpf_datasource(tpf):
     """Prepare a bokeh DataSource object for selection glyphs
@@ -119,28 +119,28 @@ def prepare_tpf_datasource(tpf):
     xa, ya = np.meshgrid(xx, yy)
     preselection = Selection()
     preselection.indices = pixel_index_array[tpf.pipeline_mask].reshape(-1).tolist()
-    source2 = ColumnDataSource(data=dict(xx=xa+0.5, yy=ya+0.5), selected=preselection)
-    return source2
+    tpf_source = ColumnDataSource(data=dict(xx=xa+0.5, yy=ya+0.5), selected=preselection)
+    return tpf_source
 
-def get_lightcurve_y_limits(source):
+def get_lightcurve_y_limits(lc_source):
     """Make the lightcurve figure elements
 
     Parameters
     ----------
     data_source: `bokeh.models.sources.ColumnDataSource` instance
     """
-    sig_lo, med, sig_hi = np.nanpercentile(source.data['flux'], (16, 50, 84))
+    sig_lo, med, sig_hi = np.nanpercentile(lc_source.data['flux'], (16, 50, 84))
     robust_sigma = (sig_hi - sig_lo)/2.0
     return med - 5.0 * robust_sigma, med + 5.0 * robust_sigma
 
 
-def make_lightcurve_figure_elements(lc, source):
+def make_lightcurve_figure_elements(lc, lc_source):
     """Make the lightcurve figure elements
 
     Parameters
     ----------
     tpf: `TargetPixelFile` instance
-    source: `bokeh.models.sources.ColumnDataSource` instance
+    lc_source: `bokeh.models.sources.ColumnDataSource` instance
 
     Returns
     ----------
@@ -167,13 +167,13 @@ def make_lightcurve_figure_elements(lc, source):
     fig.yaxis.axis_label = 'Flux (e/s)'
     fig.xaxis.axis_label = 'Time - 2454833 (days)'
 
-    ylims = get_lightcurve_y_limits(source)
+    ylims = get_lightcurve_y_limits(lc_source)
     fig.y_range = Range1d(start=ylims[0], end=ylims[1])
 
     step_dat = fig.step('time', 'flux', line_width=1, color='gray',
-                        source=source, nonselection_line_color='gray')
+                        source=lc_source, nonselection_line_color='gray')
 
-    circ = fig.circle('time', 'flux', source=source, fill_alpha=0.3, size=8, line_color=None,
+    circ = fig.circle('time', 'flux', source=lc_source, fill_alpha=0.3, size=8, line_color=None,
                       selection_color="firebrick", nonselection_fill_alpha=0.0,
                       nonselection_fill_color="grey", nonselection_line_color=None,
                       nonselection_line_alpha=0.0, fill_color=None,
@@ -199,13 +199,13 @@ def make_lightcurve_figure_elements(lc, source):
 
 
 
-def make_tpf_figure_elements(tpf, source):
+def make_tpf_figure_elements(tpf, tpf_source):
     """Make the lightcurve figure elements
 
     Parameters
     ----------
     tpf: `TargetPixelFile` instance
-    source: `bokeh.models.sources.ColumnDataSource` instance
+    tpf_source: `bokeh.models.sources.ColumnDataSource` instance
 
     Returns
     ----------
@@ -251,7 +251,7 @@ def make_tpf_figure_elements(tpf, source):
     fig.add_layout(color_bar, 'right')
     color_bar.formatter = PrintfTickFormatter(format="%14u")#NumeralTickFormatter(format='      0,0')
 
-    fig.rect('xx', 'yy', 1, 1, source=source, fill_color='gray',
+    fig.rect('xx', 'yy', 1, 1, source=tpf_source, fill_color='gray',
                       fill_alpha=0.4, line_color='white')
 
     # Lasso Select apparently does not work with boxes/quads/rect.
@@ -302,14 +302,14 @@ def pixel_selector_standalone(tpf, notebook_url='localhost:8888'):
     def create_interact_ui(doc):
 
         # The data source includes metadata for hover-over tooltips
-        source = prepare_lightcurve_datasource(lc)
-        source2 = prepare_tpf_datasource(tpf)
+        lc_source = prepare_lightcurve_datasource(lc)
+        tpf_source = prepare_tpf_datasource(tpf)
 
         # Lightcurve plot
-        fig1, step_dat, vert = make_lightcurve_figure_elements(lc, source)
+        fig1, step_dat, vert = make_lightcurve_figure_elements(lc, lc_source)
 
         # Postage stamp image
-        fig2, fig2_dat, stretch = make_tpf_figure_elements(tpf, source2)
+        fig2, fig2_dat, stretch = make_tpf_figure_elements(tpf, tpf_source)
 
         # Interactive slider widgets
         cadence_slider = Slider(start=0, end=len(tpf.time)-1, value=0, step=1.0,
@@ -327,7 +327,7 @@ def pixel_selector_standalone(tpf, notebook_url='localhost:8888'):
         r_button = Button(label=">>", button_type="default", width=30)
         l_button = Button(label="<<", button_type="default", width=30)
 
-        existing_selection = source2.selected.to_json(True).copy()
+        existing_selection = tpf_source.selected.to_json(True).copy()
 
         # Callbacks
         def update_upon_pixel_selection(attr, old, new):
@@ -335,21 +335,21 @@ def pixel_selector_standalone(tpf, notebook_url='localhost:8888'):
             #check if a selection was "re-clicked".
             if ((sorted(existing_selection['indices']) == sorted(new.indices)) &
                  (new.indices != [])):
-                source2.selected = Selection(indices=new.indices[1:])
+                tpf_source.selected = Selection(indices=new.indices[1:])
                 existing_selection['indices'] = new.indices[1:]
             else:
                 existing_selection['indices'] = new.indices
 
-            if source2.selected.indices != []:
-                selected_indices = np.array(source2.selected.indices)
+            if tpf_source.selected.indices != []:
+                selected_indices = np.array(tpf_source.selected.indices)
                 selected_mask = np.isin(pixel_index_array, selected_indices)
                 lc_new = tpf.to_lightcurve(aperture_mask=selected_mask)
-                source.data['flux']= lc_new.flux
-                ylims = get_lightcurve_y_limits(source)
+                lc_source.data['flux']= lc_new.flux
+                ylims = get_lightcurve_y_limits(lc_source)
                 fig1.y_range.start = ylims[0]
                 fig1.y_range.end = ylims[1]
             else:
-                source.data['flux'] = lc.flux * 0.0
+                lc_source.data['flux'] = lc.flux * 0.0
                 fig1.y_range.start = -1
                 fig1.y_range.end = 1
 
@@ -367,7 +367,7 @@ def pixel_selector_standalone(tpf, notebook_url='localhost:8888'):
 
 
         # Map changes to callbacks
-        source2.on_change('selected', update_upon_pixel_selection)
+        tpf_source.on_change('selected', update_upon_pixel_selection)
         cadence_slider.on_change('value', update_upon_cadence_change)
         screen_slider.on_change('value', update_upon_stetch_change)
 
