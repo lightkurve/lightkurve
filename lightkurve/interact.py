@@ -22,12 +22,12 @@ try:
     from bokeh.plotting import figure, ColumnDataSource
     from bokeh.models import LogColorMapper, Selection, Slider, RangeSlider, \
                 Span, ColorBar, LogTicker, Range1d
-    from bokeh.layouts import row, column, widgetbox, layout
+    from bokeh.layouts import row, column, widgetbox, layout, Spacer
     from bokeh.models.tools import HoverTool, LassoSelectTool
     from bokeh.models.widgets import Button
     from bokeh.models.formatters import NumeralTickFormatter, PrintfTickFormatter
 
-    output_notebook()
+    output_notebook(verbose=False, hide_banner=True)
 except ImportError:
     log.error("The interact() tool requires `bokeh` to be installed. "
               "bokeh can be installed using `conda install bokeh`.")
@@ -312,8 +312,8 @@ def pixel_selector_standalone(tpf, notebook_url='localhost:8888'):
         fig2, fig2_dat, stretch = make_tpf_figure_elements(tpf, tpf_source)
 
         # Interactive slider widgets
-        cadence_slider = Slider(start=0, end=len(tpf.time)-1, value=0, step=1.0,
-                                title="TPF slice index", width=600)
+        cadence_slider = Slider(start=0, end=len(tpf.time)-1, value=0, step=1,
+                                title="TPF slice index", width=350)
 
         screen_slider = RangeSlider(start=np.log10(stretch['vlo']),
                                     end=np.log10(stretch['vhi']),
@@ -365,17 +365,29 @@ def pixel_selector_standalone(tpf, notebook_url='localhost:8888'):
             fig2_dat.glyph.color_mapper.high = 10**new[1]
             fig2_dat.glyph.color_mapper.low = 10**new[0]
 
+        def go_right_by_one():
+            existing_value = cadence_slider.value
+            if existing_value < (len(tpf.time) -1 ):
+                cadence_slider.value = existing_value + 1
+
+        def go_left_by_one():
+            existing_value = cadence_slider.value
+            if existing_value > 0:
+                cadence_slider.value = existing_value - 1
 
         # Map changes to callbacks
+        r_button.on_click(go_right_by_one)
+        l_button.on_click(go_left_by_one)
         tpf_source.on_change('selected', update_upon_pixel_selection)
         cadence_slider.on_change('value', update_upon_cadence_change)
         screen_slider.on_change('value', update_upon_stetch_change)
 
 
         # Layout all of the plots
-        row1 = row(fig1, fig2)
-        widgets = widgetbox([cadence_slider, screen_slider])
-        row_and_col = column(row1, widgets)
-        doc.add_root(row_and_col)
+        space1, space2, space3 = Spacer(width=25), Spacer(width=50), Spacer(width=50)
+        lay = layout([fig1, fig2],
+                     [l_button, space1, r_button, space2,
+                      cadence_slider, space3, screen_slider])
+        doc.add_root(lay)
 
     show(create_interact_ui, notebook_url=notebook_url)
