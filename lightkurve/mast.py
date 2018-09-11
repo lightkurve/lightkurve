@@ -82,7 +82,7 @@ def _query_kepler_products(target, radius=1):
         target = '{}, {}'.format(target.ra.deg, target.dec.deg)
 
     # query MAST for targets within radius
-    # Observations takes degrees, so the radius is converted from arcsec
+    # convert radius from arcsec to degrees to pass into query_criteria
     try:
         obs = Observations.query_criteria(objectname=target,
                                           radius='{} deg'.format(radius/3600),
