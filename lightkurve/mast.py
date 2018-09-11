@@ -81,31 +81,17 @@ def _query_kepler_products(target, radius=1):
     if isinstance(target, SkyCoord):
         target = '{}, {}'.format(target.ra.deg, target.dec.deg)
 
+    # query MAST for targets within radius
+    # Observations takes degrees, so the radius is converted from arcsec
     try:
-        # If `target` looks like a KIC or EPIC ID, we will pass the exact
-        # `target_name` under which MAST will know the object.
-        target = int(target)
-        if (target > 0) and (target < 200000000):
-            target_name = 'kplr{:09d}'.format(target)
-        elif (target > 200000000) and (target < 300000000):
-            target_name = 'ktwo{:09d}'.format(target)
-        else:
-            raise ValueError("{:09d}: not in the KIC or EPIC ID range".format(target))
-        obs = Observations.query_criteria(target_name=target_name,
+        obs = Observations.query_criteria(objectname=target,
+                                          radius='{} deg'.format(radius/3600),
                                           project=["Kepler", "K2"],
                                           obs_collection=["Kepler", "K2"])
-    except ValueError:
-        # If `target` did not look like a KIC or EPIC ID, then we let MAST
-        # resolve the target name to a sky position.
-        try:
-            obs = Observations.query_criteria(objectname=target,
-                                              radius='{} arcsec'.format(radius),
-                                              project=["Kepler", "K2"],
-                                              obs_collection=["Kepler", "K2"])
-            # Make sure the final table is in DISTANCE order
-            obs.sort('distance')
-        except ResolverError as exc:
-            raise ArchiveError(exc)
+        # Make sure the final table is in DISTANCE order
+        obs.sort('distance')
+    except ResolverError as exc:
+        raise ArchiveError(exc)
 
     obsids = np.asarray(obs['obsid'])
     products = Observations.get_product_list(obs)
@@ -200,27 +186,29 @@ def search_kepler_products(target, filetype='Target Pixel', cadence='long', quar
 
     # Limit to the correct number of hits based on ID. If there are multiple versions
     # of the same ID, this shouldn't count towards the limit.
-    if targetlimit is not None:
-        ids = np.asarray([p.split('/')[-1].split('-')[0].split('_')[0][4:]
-                          for p in products['dataURI']], dtype=int)
-        if len(np.unique(ids)) < targetlimit:
-            log.warning('Target return limit set to {} '
-                        'but only {} unique targets found. '
-                        'Try increasing the search radius. '
-                        '(Radius currently set to {} arcseconds)'
-                        ''.format(targetlimit, len(np.unique(ids)), radius))
-        okids = ids[np.sort(np.unique(ids, return_index=True)[1])[0:targetlimit]]
-        mask = np.zeros(len(ids), dtype=bool)
+    # if targetlimit is not None:
+    ids = np.asarray([p.split('/')[-1].split('-')[0].split('_')[0][4:]
+                      for p in products['dataURI']], dtype=int)
+    if targetlimit is None:
+        pass
+    elif len(np.unique(ids)) < targetlimit:
+        log.warning('Target return limit set to {} '
+                    'but only {} unique targets found. '
+                    'Try increasing the search radius. '
+                    '(Radius currently set to {} arcseconds)'
+                    ''.format(targetlimit, len(np.unique(ids)), radius))
+    okids = ids[np.sort(np.unique(ids, return_index=True)[1])[0:targetlimit]]
+    mask = np.zeros(len(ids), dtype=bool)
 
-        # Mask data.
-        # Make sure they still appear in the same order.
-        order = np.zeros(len(ids))
-        for idx, okid in enumerate(okids):
-            pos = ids == okid
-            order[pos] = int(idx)
-            mask |= pos
-        products['order'] = order
-        products = products[mask]
+    # Mask data.
+    # Make sure they still appear in the same order.
+    order = np.zeros(len(ids))
+    for idx, okid in enumerate(okids):
+        pos = ids == okid
+        order[pos] = int(idx)
+        mask |= pos
+    products['order'] = order
+    products = products[mask]
 
     return products
 

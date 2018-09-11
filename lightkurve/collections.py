@@ -149,6 +149,14 @@ class LightCurveCollection(Collection):
         return ax
 
 
+class LightCurveFileCollection(Collection):
+    """Class to hold a collection of LightCurveFile objects.
+
+    """
+
+    pass
+
+
 class TargetPixelFileCollection(Collection):
     """Class to hold a collection of TargetPixelFile objects.
 
