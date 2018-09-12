@@ -100,7 +100,7 @@ def test_kepler_tpf_from_archive():
     assert(isinstance(tpfs, list))
     assert(isinstance(tpfs[0], KeplerTargetPixelFile))
     assert(tpfs[0].campaign == tpfs[1].campaign)
-    assert(tpfs[0].keplerid != tpfs[1].keplerid)
+    assert(tpfs[0].targetid != tpfs[1].targetid)
 
 
 @pytest.mark.remote_data
@@ -137,7 +137,7 @@ def test_kepler_lightcurve_from_archive():
     assert(isinstance(lcfs, list))
     assert(isinstance(lcfs[0], KeplerLightCurveFile))
     assert(lcfs[0].quarter == lcfs[1].quarter)
-    assert(lcfs[0].keplerid != lcfs[1].keplerid)
+    assert(lcfs[0].targetid != lcfs[1].targetid)
 
 
 @pytest.mark.remote_data
@@ -165,4 +165,4 @@ def test_source_confusion():
     # See https://github.com/KeplerGO/lightkurve/issues/148
     desired_target = 6507433
     tpf = KeplerTargetPixelFile.from_archive(desired_target, quarter=8)
-    assert tpf.keplerid == desired_target
+    assert tpf.targetid == desired_target

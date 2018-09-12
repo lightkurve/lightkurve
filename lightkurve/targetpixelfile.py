@@ -566,13 +566,13 @@ class TargetPixelFile(object):
         # Provide extra metadata in the title
         if self.mission == 'K2':
             title = "Quicklook lightcurve for EPIC {} (K2 Campaign {})".format(
-                self.keplerid, self.campaign)
+                self.targetid, self.campaign)
         elif self.mission == 'Kepler':
             title = "Quicklook lightcurve for KIC {} (Kepler Quarter {})".format(
-                self.keplerid, self.quarter)
+                self.targetid, self.quarter)
         elif self.mission == 'TESS':
             title = "Quicklook lightcurve for TIC {} (TESS Sector {})".format(
-                self.ticid, self.sector)
+                self.targetid, self.sector)
         else:
             title = "Quicklook lightcurve for target {}".format(self.targetid)
 
@@ -723,7 +723,10 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                 quality_array=self.hdu[1].data['QUALITY'],
                                 bitmask=quality_bitmask)
         if self.targetid is None:
-            self.targetid = self.header()['KEPLERID']
+            try:
+                self.targetid = self.header()['KEPLERID']
+            except KeyError:
+                pass
 
     @staticmethod
     def from_archive(target, cadence='long', quarter=None, month=None,
@@ -794,7 +797,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 for p in path]
 
     def __repr__(self):
-        return('KeplerTargetPixelFile Object (ID: {})'.format(self.keplerid))
+        return('KeplerTargetPixelFile Object (ID: {})'.format(self.targetid))
 
     def get_prf_model(self):
         """Returns an object of KeplerPRF initialized using the
@@ -807,10 +810,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
         return KeplerPRF(channel=self.channel, shape=self.shape[1:],
                          column=self.column, row=self.row)
-
-    @property
-    def keplerid(self):
-        return self.targetid
 
     @property
     def obsmode(self):
@@ -897,7 +896,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
-                'keplerid': self.keplerid}
+                'targetid': self.targetid}
         return KeplerLightCurve(time=self.time,
                                 time_format='bkjd',
                                 time_scale='tdb',
@@ -919,7 +918,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
-                'keplerid': self.keplerid}
+                'targetid': self.targetid}
         return KeplerLightCurve(time=self.time,
                                 time_format='bkjd',
                                 time_scale='tdb',
@@ -1010,7 +1009,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
-                'keplerid': self.keplerid}
+                'targetid': self.targetid}
         return KeplerLightCurve(time=self.time,
                                 flux=lc.flux,
                                 time_format='bkjd',
@@ -1349,11 +1348,7 @@ class TessTargetPixelFile(TargetPixelFile):
             self.targetid = None
 
     def __repr__(self):
-        return('TessTargetPixelFile(TICID: {})'.format(self.ticid))
-
-    @property
-    def ticid(self):
-        return self.targetid
+        return('TessTargetPixelFile(TICID: {})'.format(self.targetid))
 
     @property
     def sector(self):
@@ -1418,7 +1413,7 @@ class TessTargetPixelFile(TargetPixelFile):
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
-                'ticid': self.ticid}
+                'targetid': self.targetid}
         return TessLightCurve(time=self.time,
                               time_format='btjd',
                               time_scale='tdb',
@@ -1439,7 +1434,7 @@ class TessTargetPixelFile(TargetPixelFile):
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
-                'ticid': self.ticid}
+                'targetid': self.targetid}
         return TessLightCurve(time=self.time,
                               time_format='btjd',
                               time_scale='tdb',

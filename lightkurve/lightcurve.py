@@ -1008,16 +1008,16 @@ class KeplerLightCurve(LightCurve):
         Mission name
     cadenceno : array-like
         Cadence numbers corresponding to every time measurement
-    keplerid : int
+    targetid : int
         Kepler ID number
     """
     def __init__(self, time=None, flux=None, flux_err=None, time_format=None, time_scale=None,
                  centroid_col=None, centroid_row=None, quality=None, quality_bitmask=None,
                  channel=None, campaign=None, quarter=None, mission=None,
-                 cadenceno=None, keplerid=None, ra=None, dec=None, label=None, meta={}):
+                 cadenceno=None, targetid=None, ra=None, dec=None, label=None, meta={}):
         super(KeplerLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err,
                                                time_format=time_format, time_scale=time_scale,
-                                               targetid=keplerid, label=label, meta=meta)
+                                               targetid=targetid, label=label, meta=meta)
         self.centroid_col = self._validate_array(centroid_col, name='centroid_col')
         self.centroid_row = self._validate_array(centroid_row, name='centroid_row')
         self.quality = self._validate_array(quality, name='quality')
@@ -1040,20 +1040,7 @@ class KeplerLightCurve(LightCurve):
         return lc
 
     def __repr__(self):
-        if self.mission is None:
-            return('KeplerLightCurve(ID: {})'.format(self.keplerid))
-        elif self.mission.lower() == 'kepler':
-            return('KeplerLightCurve(KIC: {})'.format(self.keplerid))
-        elif self.mission.lower() == 'k2':
-            return('KeplerLightCurve(EPIC: {})'.format(self.keplerid))
-
-    @property
-    def keplerid(self):
-        return self.targetid
-
-    @keplerid.setter
-    def keplerid(self, value):
-        self.targetid = value
+        return('KeplerLightCurve(ID: {})'.format(self.targetid))
 
     def correct(self, method='sff', **kwargs):
         """Corrects a lightcurve for motion-dependent systematic errors.
@@ -1131,8 +1118,8 @@ class KeplerLightCurve(LightCurve):
         kepler_specific_data = {
             'TELESCOP': "KEPLER",
             'INSTRUME': "Kepler Photometer",
-            'OBJECT': '{}'.format(self.keplerid),
-            'KEPLERID': self.keplerid,
+            'OBJECT': '{}'.format(self.targetid),
+            'KEPLERID': self.targetid,
             'CHANNEL': self.channel,
             'MISSION': self.mission,
             'RA_OBJ': self.ra,
@@ -1172,16 +1159,16 @@ class TessLightCurve(LightCurve):
         Bitmask specifying quality flags of cadences that should be ignored
     cadenceno : array-like
         Cadence numbers corresponding to every time measurement
-    ticid : int
+    targetid : int
         Tess Input Catalog ID number
     """
     def __init__(self, time=None, flux=None, flux_err=None, time_format=None, time_scale=None,
                  centroid_col=None, centroid_row=None, quality=None, quality_bitmask=None,
                  cadenceno=None, sector=None, camera=None, ccd=None,
-                 ticid=None, ra=None, dec=None, label=None, meta={}):
+                 targetid=None, ra=None, dec=None, label=None, meta={}):
         super(TessLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err,
                                              time_format=time_format, time_scale=time_scale,
-                                             targetid=ticid, label=label, meta=meta)
+                                             targetid=targetid, label=label, meta=meta)
         self.centroid_col = self._validate_array(centroid_col, name='centroid_col')
         self.centroid_row = self._validate_array(centroid_row, name='centroid_row')
         self.quality = self._validate_array(quality, name='quality')
@@ -1204,15 +1191,7 @@ class TessLightCurve(LightCurve):
         return lc
 
     def __repr__(self):
-        return('TessLightCurve(TICID: {})'.format(self.ticid))
-
-    @property
-    def ticid(self):
-        return self.targetid
-
-    @ticid.setter
-    def ticid(self, value):
-        self.targetid = value
+        return('TessLightCurve(TICID: {})'.format(self.targetid))
 
 
 def iterative_box_period_search(lc, niters=2, min_period=0.5, max_period=30,
