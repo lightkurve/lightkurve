@@ -226,9 +226,13 @@ class KeplerLightCurveFile(LightCurveFile):
             path = download_kepler_products(
                 target=target, filetype='Lightcurve', cadence=cadence,
                 quarter=quarter, campaign=campaign, month=month,
-                radius=1., targetlimit=1)
-        return KeplerLightCurveFile(path[0], quality_bitmask=quality_bitmask,
-                                    **kwargs)
+                searchtype='single', radius=1., targetlimit=1)
+        if len(path) == 1:
+            return KeplerLightCurveFile(path[0],
+                                        quality_bitmask=quality_bitmask,
+                                        **kwargs)
+        return [KeplerLightCurveFile(p, quality_bitmask=quality_bitmask, **kwargs)
+                for p in path]
 
     @staticmethod
     def cone_search(target, cadence='long', quarter=None, month=None,
@@ -282,7 +286,7 @@ class KeplerLightCurveFile(LightCurveFile):
 
         Returns
         -------
-        tpf : :class:`KeplerTargetPixelFile` object.
+        lcf : KeplerLightCurveFile object or list of KeplerLightCurveFile objects
         """
         if os.path.exists(str(target)) or str(target).startswith('http'):
             log.warning('Warning: cone_search() is not intended to accept a '
@@ -292,7 +296,7 @@ class KeplerLightCurveFile(LightCurveFile):
             path = download_kepler_products(
                 target=target, filetype='Lightcurve', cadence=cadence,
                 quarter=quarter, campaign=campaign, month=month,
-                radius=radius, targetlimit=targetlimit)
+                searchtype='cone', radius=radius, targetlimit=targetlimit)
         if len(path) == 1:
             lightcurvefiles = [LightCurveFile(path[0],
                                               quality_bitmask=quality_bitmask,

@@ -59,7 +59,7 @@ def download_products(products):
     return dl['Local Path']
 
 
-def _query_kepler_products(target, radius=1):
+def _query_kepler_products(target, searchtype='single', radius=1):
     """Helper function for `search_kepler_products`.
 
     Returns a table of Kepler/K2 pipeline products for a given target.
@@ -81,40 +81,37 @@ def _query_kepler_products(target, radius=1):
     if isinstance(target, SkyCoord):
         target = '{}, {}'.format(target.ra.deg, target.dec.deg)
 
-    try:
-        # If `target` looks like a KIC or EPIC ID, we will pass the exact
-        # `target_name` under which MAST will know the object.
-        target = int(target)
-        if (target > 0) and (target < 200000000):
-            target_name = 'kplr{:09d}'.format(target)
-        elif (target > 200000000) and (target < 300000000):
-            target_name = 'ktwo{:09d}'.format(target)
-        else:
-            raise ValueError("{:09d}: not in the KIC or EPIC ID range".format(target))
-        target_obs = Observations.query_criteria(target_name=target_name,
-                                                 radius='{} deg'.format(.0001),
-                                                 project=["Kepler", "K2"],
-                                                 obs_collection=["Kepler", "K2"])
-        ra = target_obs['s_ra'][0]
-        dec = target_obs['s_ra'][0]
-        obs = Observations.query_criteria(coordinates='{} {}'.format(ra, dec),
-                                          radius='{} deg'.format(radius/3600),
+    if searchtype == 'cone':
+        obs = Observations.query_criteria(objectname=target,
+                                          radius='{} deg'.format(radius/2500),
                                           project=["Kepler", "K2"],
                                           obs_collection=["Kepler", "K2"])
-    except ValueError:
-        # If `target` did not look like a KIC or EPIC ID, then we let MAST
-        # resolve the target name to a sky position. Convert radius from arcsec
-        # to degrees for query_criteria().
+    elif searchtype == 'single':
         try:
-            obs = Observations.query_criteria(objectname=target,
-                                              radius='{} deg'.format(radius/3600),
+            # If `target` looks like a KIC or EPIC ID, we will pass the exact
+            # `target_name` under which MAST will know the object.
+            target = int(target)
+            if (target > 0) and (target < 200000000):
+                target_name = 'kplr{:09d}'.format(target)
+            elif (target > 200000000) and (target < 300000000):
+                target_name = 'ktwo{:09d}'.format(target)
+            else:
+                raise ValueError("{:09d}: not in the KIC or EPIC ID range".format(target))
+            obs = Observations.query_criteria(target_name=target_name,
                                               project=["Kepler", "K2"],
                                               obs_collection=["Kepler", "K2"])
-            # Make sure the final table is in DISTANCE order
-            obs.sort('distance')
-        except ResolverError as exc:
-            raise ArchiveError(exc)
-
+        except ValueError:
+            # If `target` did not look like a KIC or EPIC ID, then we let MAST
+            # resolve the target name to a sky position. Convert radius from arcsec
+            # to degrees for query_criteria().
+            try:
+                obs = Observations.query_criteria(objectname=target,
+                                                  project=["Kepler", "K2"],
+                                                  obs_collection=["Kepler", "K2"])
+                # Make sure the final table is in DISTANCE order
+                obs.sort('distance')
+            except ResolverError as exc:
+                raise ArchiveError(exc)
     obsids = np.asarray(obs['obsid'])
     products = Observations.get_product_list(obs)
     order = [np.where(products['parent_obsid'] == o)[0] for o in obsids]
@@ -124,7 +121,7 @@ def _query_kepler_products(target, radius=1):
 
 
 def search_kepler_products(target, filetype='Target Pixel', cadence='long', quarter=None,
-                           campaign=None, radius=1, targetlimit=1):
+                           campaign=None, searchtype='single', radius=1, targetlimit=1):
     """Returns a table of Kepler or K2 Target Pixel Files or Lightcurve Files
      for a given target.
 
@@ -159,7 +156,7 @@ def search_kepler_products(target, filetype='Target Pixel', cadence='long', quar
     if (campaign is not None) | (quarter is not None):
         qoc = np.atleast_1d(np.asarray(qoc, dtype=int))
 
-    products = _query_kepler_products(target, radius)
+    products = _query_kepler_products(target, searchtype=searchtype, radius=radius)
     # Because MAST doesn't let us query based on Kepler-specific meta data
     # fields, we need to identify short/long-cadence TPFs by their filename.
     if cadence in ['short', 'sc']:
@@ -239,8 +236,9 @@ def search_kepler_products(target, filetype='Target Pixel', cadence='long', quar
 
 
 def download_kepler_products(target, filetype='Target Pixel', cadence='long',
-                             quarter=None, month=None, campaign=None, radius=1.,
-                             targetlimit=1, **kwargs):
+                             quarter=None, month=None, campaign=None,
+                             searchtype='single', radius=1., targetlimit=1,
+                             **kwargs):
     """Download and cache files from from the Kepler/K2 data archive at MAST.
 
     Returns paths to the cached files.
@@ -296,7 +294,7 @@ def download_kepler_products(target, filetype='Target Pixel', cadence='long',
 
     # Grab the products
     products = search_kepler_products(target=target, filetype=filetype, cadence=cadence,
-                                      quarter=quarter, campaign=campaign,
+                                      quarter=quarter, campaign=campaign, searchtype=searchtype,
                                       radius=radius, targetlimit=targetlimit)
     if len(products) == 0:
         raise ArchiveError("No {} File found for {} at MAST.".format(filetype, target))

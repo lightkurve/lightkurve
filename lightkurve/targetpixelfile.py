@@ -648,9 +648,13 @@ class KeplerTargetPixelFile(TargetPixelFile):
             path = download_kepler_products(
                 target=target, filetype='Target Pixel', cadence=cadence,
                 quarter=quarter, campaign=campaign, month=month,
-                radius=1., targetlimit=1)
-        return KeplerTargetPixelFile(path[0], quality_bitmask=quality_bitmask,
-                                     **kwargs)
+                searchtype='single', radius=1., targetlimit=1)
+        if len(path) == 1:
+            return KeplerTargetPixelFile(path[0],
+                                         quality_bitmask=quality_bitmask,
+                                         **kwargs)
+        return [KeplerTargetPixelFile(p, quality_bitmask=quality_bitmask, **kwargs)
+                for p in path]
 
     @staticmethod
     def cone_search(target, cadence='long', quarter=None, month=None,
@@ -714,7 +718,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
             path = download_kepler_products(
                 target=target, filetype='Target Pixel', cadence=cadence,
                 quarter=quarter, campaign=campaign, month=month,
-                radius=radius, targetlimit=targetlimit)
+                searchtype='cone', radius=radius, targetlimit=targetlimit)
         if len(path) == 1:
             tpfs = [KeplerTargetPixelFile(path[0],
                                          quality_bitmask=quality_bitmask,
