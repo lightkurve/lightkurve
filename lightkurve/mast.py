@@ -81,17 +81,33 @@ def _query_kepler_products(target, radius=1):
     if isinstance(target, SkyCoord):
         target = '{}, {}'.format(target.ra.deg, target.dec.deg)
 
-    # query MAST for targets within radius
-    # convert radius from arcsec to degrees to pass into query_criteria
     try:
-        obs = Observations.query_criteria(objectname=target,
+        # If `target` looks like a KIC or EPIC ID, we will pass the exact
+        # `target_name` under which MAST will know the object.
+        target = int(target)
+        if (target > 0) and (target < 200000000):
+            target_name = 'kplr{:09d}'.format(target)
+        elif (target > 200000000) and (target < 300000000):
+            target_name = 'ktwo{:09d}'.format(target)
+        else:
+            raise ValueError("{:09d}: not in the KIC or EPIC ID range".format(target))
+        obs = Observations.query_criteria(target_name=target_name,
                                           radius='{} deg'.format(radius/3600),
                                           project=["Kepler", "K2"],
                                           obs_collection=["Kepler", "K2"])
-        # Make sure the final table is in DISTANCE order
-        obs.sort('distance')
-    except ResolverError as exc:
-        raise ArchiveError(exc)
+    except ValueError:
+        # If `target` did not look like a KIC or EPIC ID, then we let MAST
+        # resolve the target name to a sky position. Convert radius from arcsec
+        # to degrees for query_criteria().
+        try:
+            obs = Observations.query_criteria(objectname=target,
+                                              radius='{} deg'.format(radius/3600),
+                                              project=["Kepler", "K2"],
+                                              obs_collection=["Kepler", "K2"])
+            # Make sure the final table is in DISTANCE order
+            obs.sort('distance')
+        except ResolverError as exc:
+            raise ArchiveError(exc)
 
     obsids = np.asarray(obs['obsid'])
     products = Observations.get_product_list(obs)
@@ -151,8 +167,9 @@ def search_kepler_products(target, filetype='Target Pixel', cadence='long', quar
     if len(products) == 0:
         return products
 
+
     # Identify the campaign or quarter by the description.
-    if qoc is not None:
+    if campaign is not None:
         mask = np.zeros(np.shape(products)[0], dtype=bool)
         for q in qoc:
             mask |= np.array([desc.lower().replace('-', '').endswith('q{}'.format(q)) or
@@ -161,10 +178,12 @@ def search_kepler_products(target, filetype='Target Pixel', cadence='long', quar
                               for desc in products['description']])
     else:
         mask = np.ones(np.shape(products)[0], dtype=bool)
+
     # Allow only the correct fits or fits.gz type
     mask &= np.array([desc.lower().endswith('fits') or
                       desc.lower().endswith('fits.gz')
                       for desc in products['dataURI']])
+
     # Allow only the correct cadence type
     mask &= np.array([suffix in desc for desc in products['description']])
     products = products[mask]
