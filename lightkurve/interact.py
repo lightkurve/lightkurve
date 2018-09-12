@@ -300,7 +300,7 @@ def pixel_selector_standalone(tpf, notebook_url='localhost:8888'):
         fig2, fig2_dat, stretch = make_tpf_figure_elements(tpf, tpf_source)
 
         # Interactive slider widgets
-        cadence_lookup = map_cadences(tpf, lc)
+        cadence_lookup = map_cadences(tpf)
         #cadence_slider = Slider(start=0, end=len(tpf.time)-1, value=0, step=1,
         #                        title="TPF slice index", width=350)
         cadence_slider = Slider(start=np.min(tpf.cadenceno), end=np.max(tpf.cadenceno),
