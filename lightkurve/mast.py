@@ -169,7 +169,7 @@ def search_kepler_products(target, filetype='Target Pixel', cadence='long', quar
 
 
     # Identify the campaign or quarter by the description.
-    if campaign is not None:
+    if qoc is not None:
         mask = np.zeros(np.shape(products)[0], dtype=bool)
         for q in qoc:
             mask |= np.array([desc.lower().replace('-', '').endswith('q{}'.format(q)) or
