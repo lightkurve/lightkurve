@@ -7,16 +7,17 @@ Installation
 Requirements
 ============
 
-**lightkurve** has the following requirements, all of which tend to be available
-by default in a modern installation of Python:
+**lightkurve** has the following requirements, all of which tend to be
+available by default in a modern installation of Python:
 
 - Python: 2.7, 3.5, 3.6 or later.
 - Astropy: 1.3 or later.
-- Numpy: 1.11.3 or later.
-- Scipy: 0.17 or later.
+- Numpy: 1.11 or later.
+- Scipy: 0.19 or later.
 - Matplotlib: 1.5.3 or later.
+- Astroquery 0.3.7 or later.
 
-We strongly recommend using the `Anaconda Python <https://www.continuum.io/downloads>`_
+We recommend using the `Anaconda Python <https://www.continuum.io/downloads>`_
 distribution, which will install Python alongside its most common scientific
 packages, including all those listed above.
 
@@ -28,17 +29,16 @@ Installing lightkurve
 Stable version
 --------------
 
-The easiest way to install or upgrade lightkurve is with ``pip``, simply run the
-following command on a terminal window::
+The easiest way to install or upgrade lightkurve is with ``pip``,
+simply run the following command on a terminal window::
 
-    $ pip install lightkurve --upgrade --no-deps
+    $ pip install lightkurve --upgrade
 
 
 .. note::
 
-    The ``--no-deps`` flag is optional, but highly recommended if you already
-    have Numpy installed, since otherwise pip will sometimes try to upgrade
-    your Numpy installation, which may not always be desired.
+    The ``--upgrade`` flag is optional, but recommended if you already
+    have lightkurve installed and want to upgrade to the latest version.
 
 .. note::
 
@@ -66,16 +66,32 @@ Building documentation
 
 .. note::
 
-    In general, building the documentation is not necessary unless you are
+    Building the documentation is not necessary unless you are
     writing new documentation or do not have internet access, because the
-    latest (and archive) versions of lightkurve's documentation should be available
-    at `lightkurve.keplerscience.org/ <http://lightkurve.keplerscience.org/>`_ .
+    latest version of lightkurve's documentation is available online at
+    `lightkurve.keplerscience.org <http://lightkurve.keplerscience.org/>`_ .
 
-.. note::
-    **lightkurve** documentation requires the `numpydoc sphinx extension <https://github.com/numpy/numpydoc>`_
-    which can be installed with ``pip install numpydoc``.
+Building the **lightkurve** documentation requires a few extra packages:
 
-To build the documentation to HTML format, you can do::
+- sphinx
+- sphinx-automodapi
+- nbsphinx
+- `numpydoc <https://github.com/numpy/numpydoc>`_
+
+These packages can be installed using `conda` or `pip`.
+
+To build the documentation in HTML format, you can do::
 
     cd docs
     make html
+
+This will save the documentation website in the `../../lightkurve-docs` directory
+on your system.  The notebook-based tutorials will not be recompiled by default
+because they take some time to build.  To recompile the notebooks, type::
+
+    make notebooks
+
+Finally, if you have write permission to lightkurve's GitHub repository,
+you can upload the documentation using::
+
+    make upload
