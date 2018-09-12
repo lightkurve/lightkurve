@@ -22,10 +22,10 @@ try:
     from bokeh.plotting import figure, ColumnDataSource
     from bokeh.models import LogColorMapper, Selection, Slider, RangeSlider, \
                 Span, ColorBar, LogTicker, Range1d
-    from bokeh.layouts import row, column, widgetbox, layout, Spacer
-    from bokeh.models.tools import HoverTool, LassoSelectTool
+    from bokeh.layouts import layout, Spacer
+    from bokeh.models.tools import HoverTool
     from bokeh.models.widgets import Button
-    from bokeh.models.formatters import NumeralTickFormatter, PrintfTickFormatter
+    from bokeh.models.formatters import PrintfTickFormatter
 
     output_notebook(verbose=False, hide_banner=True)
 except ImportError:
@@ -46,9 +46,8 @@ def map_cadences(tpf, lc):
 
     Returns
     -------
-    cadence_lookup, missing_cadences: dict, list
+    cadence_lookup: dict
         A dictionary mapping each existing tpf cadence to a TPF slice index;
-        A list of cadences for which data is unavailable
     """
     # Map cadence to index for quick array slicing.
     lc_cad_matches = np.in1d(tpf.cadenceno, lc.cadenceno)
@@ -58,8 +57,8 @@ def map_cadences(tpf, lc):
     min_cadence, max_cadence = np.min(tpf.cadenceno), np.max(tpf.cadenceno)
     cadence_lookup = {cad: j for j, cad in enumerate(tpf.cadenceno)}
     cadence_full_range = np.arange(min_cadence, max_cadence, 1, dtype=np.int)
-    missing_cadences = list(set(cadence_full_range)-set(tpf.cadenceno))
-    return (cadence_lookup, missing_cadences)
+    #missing_cadences = list(set(cadence_full_range)-set(tpf.cadenceno))
+    return cadence_lookup
 
 
 def prepare_lightcurve_datasource(lc):
@@ -159,7 +158,7 @@ def make_lightcurve_figure_elements(lc, lc_source):
         title = "Lightcurve for target {}".format(lc.targetid)
 
     fig = figure(title=title, plot_height=340, plot_width=600,
-                 tools="pan,wheel_zoom,box_zoom,reset",
+                 tools="pan,wheel_zoom,box_zoom,tap,reset",
                  toolbar_location="below", logo=None)
     fig.title.offset = -10
     fig.border_fill_color = "whitesmoke"
@@ -171,7 +170,8 @@ def make_lightcurve_figure_elements(lc, lc_source):
     fig.y_range = Range1d(start=ylims[0], end=ylims[1])
 
     step_dat = fig.step('time', 'flux', line_width=1, color='gray',
-                        source=lc_source, nonselection_line_color='gray')
+                        source=lc_source, nonselection_line_color='gray',
+                        nonselection_line_alpha=1.0)
 
     circ = fig.circle('time', 'flux', source=lc_source, fill_alpha=0.3, size=8, line_color=None,
                       selection_color="firebrick", nonselection_fill_alpha=0.0,
@@ -191,7 +191,7 @@ def make_lightcurve_figure_elements(lc, lc_source):
                             point_policy="snap_to_data"))
 
     # Vertical line to indicate the cadence
-    vert = Span(location=0, dimension='height', line_color='firebrick',
+    vert = Span(location=lc.time[0], dimension='height', line_color='firebrick',
                 line_width=4, line_alpha=0.5)
     fig.add_layout(vert)
 
@@ -312,8 +312,12 @@ def pixel_selector_standalone(tpf, notebook_url='localhost:8888'):
         fig2, fig2_dat, stretch = make_tpf_figure_elements(tpf, tpf_source)
 
         # Interactive slider widgets
-        cadence_slider = Slider(start=0, end=len(tpf.time)-1, value=0, step=1,
-                                title="TPF slice index", width=350)
+        cadence_lookup = map_cadences(tpf, lc)
+        #cadence_slider = Slider(start=0, end=len(tpf.time)-1, value=0, step=1,
+        #                        title="TPF slice index", width=350)
+        cadence_slider = Slider(start=np.min(tpf.cadenceno), end=np.max(tpf.cadenceno),
+                                value=np.min(tpf.cadenceno), step=1,
+                                title="Cadence Number", width=350)
 
         screen_slider = RangeSlider(start=np.log10(stretch['vlo']),
                                     end=np.log10(stretch['vhi']),
@@ -322,7 +326,6 @@ def pixel_selector_standalone(tpf, notebook_url='localhost:8888'):
                                     orientation='horizontal',
                                     width=200, direction='ltr', show_value=True,
                                     sizing_mode='fixed')
-
 
         r_button = Button(label=">>", button_type="default", width=30)
         l_button = Button(label="<<", button_type="default", width=30)
@@ -344,7 +347,7 @@ def pixel_selector_standalone(tpf, notebook_url='localhost:8888'):
                 selected_indices = np.array(tpf_source.selected.indices)
                 selected_mask = np.isin(pixel_index_array, selected_indices)
                 lc_new = tpf.to_lightcurve(aperture_mask=selected_mask)
-                lc_source.data['flux']= lc_new.flux
+                lc_source.data['flux'] = lc_new.flux
                 ylims = get_lightcurve_y_limits(lc_source)
                 fig1.y_range.start = ylims[0]
                 fig1.y_range.end = ylims[1]
@@ -356,9 +359,14 @@ def pixel_selector_standalone(tpf, notebook_url='localhost:8888'):
 
         def update_upon_cadence_change(attr, old, new):
             '''Callback to take action when cadence slider changes'''
-            fig2_dat.data_source.data['image'] = [tpf.flux[new, :, :]
-                                                  - stretch['pedestal']]
-            vert.update(location=tpf.time[new])
+            if new in tpf.cadenceno:
+                frameno = cadence_lookup[new]
+                fig2_dat.data_source.data['image'] = [tpf.flux[frameno, :, :]
+                                                    - stretch['pedestal']]
+                vert.update(location=tpf.time[frameno])
+            else:
+                fig2_dat.data_source.data['image'] = [tpf.flux[0, :, :] * np.NaN]
+            lc_source.selected.indices = []
 
         def update_upon_stetch_change(attr, old, new):
             '''Callback to take action when screen stretch'''
@@ -367,27 +375,32 @@ def pixel_selector_standalone(tpf, notebook_url='localhost:8888'):
 
         def go_right_by_one():
             existing_value = cadence_slider.value
-            if existing_value < (len(tpf.time) -1 ):
+            if existing_value < np.max(tpf.cadenceno):
                 cadence_slider.value = existing_value + 1
 
         def go_left_by_one():
             existing_value = cadence_slider.value
-            if existing_value > 0:
+            if existing_value > np.min(tpf.cadenceno):
                 cadence_slider.value = existing_value - 1
+
+        def jump_to_lightcurve_position(attr, old, new):
+            if new.indices != []:
+                cadence_slider.value = lc.cadenceno[new.indices[0]]
 
         # Map changes to callbacks
         r_button.on_click(go_right_by_one)
         l_button.on_click(go_left_by_one)
         tpf_source.on_change('selected', update_upon_pixel_selection)
+        lc_source.on_change('selected', jump_to_lightcurve_position)
         cadence_slider.on_change('value', update_upon_cadence_change)
         screen_slider.on_change('value', update_upon_stetch_change)
 
 
         # Layout all of the plots
         space1, space2, space3 = Spacer(width=25), Spacer(width=50), Spacer(width=50)
-        lay = layout([fig1, fig2],
-                     [l_button, space1, r_button, space2,
-                      cadence_slider, space3, screen_slider])
-        doc.add_root(lay)
+        widgets_and_figures = layout([fig1, fig2],
+                                     [l_button, space1, r_button, space2,
+                                      cadence_slider, space3, screen_slider])
+        doc.add_root(widgets_and_figures)
 
     show(create_interact_ui, notebook_url=notebook_url)
