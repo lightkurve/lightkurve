@@ -14,6 +14,7 @@ import numpy as np
 from tqdm import tqdm
 from astropy.coordinates import SkyCoord
 from astropy.wcs.utils import skycoord_to_pixel, pixel_to_skycoord
+from astropy.io.fits.card import Undefined
 
 from . import PACKAGEDIR, MPLSTYLE
 from .lightcurve import KeplerLightCurve, TessLightCurve
@@ -1018,7 +1019,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
     @staticmethod
     def from_fits_images(images, position=None, size=(11, 11), extension=None,
-                         target_id="unnamed-target", **kwargs):
+                         target_id="unnamed-target", hdu0_keywords={}, **kwargs):
         """Creates a new Target Pixel File from a set of images.
 
         This method is intended to make it easy to cut out targets from
@@ -1052,8 +1053,10 @@ class KeplerTargetPixelFile(TargetPixelFile):
                           'CAMPAIGN', 'CHANNEL', 'MODULE', 'OUTPUT']
         carry_keywords = {}
 
+        if not isinstance(position, SkyCoord):
+            log.error('Position must be an astropy.coordinates.SkyCoord.')
         # Define a helper function to accept images in a flexible way
-        def _open_image(img):
+        def _open_image(img, extension):
             if isinstance(img, fits.ImageHDU):
                 hdu = img
             elif isinstance(img, fits.HDUList):
@@ -1070,14 +1073,14 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
         # If no position is given, ensure the cut-out size matches the image size
         if position is None:
-            size = _open_image(images[0]).data.shape
+            size = _open_image(images[0], extension).data.shape
 
         # Find middle image to use as a WCS reference
         try:
-            mid_hdu = _open_image(images[int(len(images) / 2) - 1])
+            mid_hdu = _open_image(images[int(len(images) / 2) - 1], extension)
             wcs_ref = WCS(mid_hdu)
-            pixelpos_ref = skycoord_to_pixel(position, wcs=wcs_ref)
-            column, row = int(np.round(pixelpos_ref[0])), int(np.round(pixelpos_ref[1]))
+            column, row = wcs_ref.wcs_world2pix(np.asarray([[position.ra.deg], [position.dec.deg]]).T, 0)[0]
+            column, row = int(column), int(row)
         except Exception:
             log.error("Images must have a valid WCS astrometric solution.")
             return None
@@ -1088,20 +1091,21 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                                n_cols=size[1],
                                                target_id=target_id)
 
-        for idx, img in tqdm(enumerate(images), total=len(images)):
-            if isinstance(img, fits.ImageHDU):
-                hdu = img
-            elif isinstance(img, fits.HDUList):
-                hdu = img[extension]
-            else:
-                hdu = fits.open(img)[extension]
+        #Get some basic keywords
+        for kw in basic_keywords:
+            if kw in mid_hdu.header:
+                if not isinstance(mid_hdu.header[kw], Undefined):
+                    carry_keywords[kw] = mid_hdu.header[kw]
+        if ('MISSION' not in carry_keywords) and ('TELESCOP' in carry_keywords):
+            carry_keywords['MISSION'] = carry_keywords['TELESCOP']
 
-            #Get some basic keywords
-            for kw in basic_keywords:
-                if kw in hdu.header:
-                    carry_keywords[kw] = hdu.header[kw]
-            if ('MISSION' not in carry_keywords) and ('TELESCOP' in carry_keywords):
-                carry_keywords['MISSION'] = carry_keywords['TELESCOP']
+        allkeys = hdu0_keywords.copy()
+        allkeys.update(carry_keywords)
+
+        ext_info = {'1CRV5P':column, '2CRV5P':row}
+
+        for idx, img in tqdm(enumerate(images), total=len(images)):
+            hdu = _open_image(img, extension)
 
             if idx == 0:  # Get default keyword values from the first image
                 factory.keywords = hdu.header
@@ -1111,10 +1115,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 cutout = Cutout2D(hdu.data, position, wcs=WCS(hdu.header),
                                   size=size, mode='partial')
             factory.add_cadence(frameno=idx, flux=cutout.data, header=hdu.header)
-
-            allkeys = hdu0_keywords.copy()
-            allkeys.update(carry_keywords)
-        return factory.get_tpf(hdu0_keywords=allkeys, **kwargs)
+        return factory.get_tpf(hdu0_keywords=allkeys, ext_info=ext_info, **kwargs)
 
 
 class KeplerTargetPixelFileFactory(object):
@@ -1171,21 +1172,21 @@ class KeplerTargetPixelFileFactory(object):
             self.cadenceno[frameno] = header['CADENCEN']
         if 'QUALITY' in header:
             self.quality[frameno] = header['QUALITY']
-        if 'POSCORR1' in header:
+        if 'POS_CORR1' in header:
             self.pos_corr1[frameno] = header['POS_CORR1']
-        if 'POSCORR2' in header:
+        if 'POS_CORR2' in header:
             self.pos_corr2[frameno] = header['POS_CORR2']
         if wcs == None:
             self.pos_corr1[frameno], self.pos_corr2[frameno] = None, None
 
-    def get_tpf(self, hdu0_keywords={}, **kwargs):
+    def get_tpf(self, hdu0_keywords={}, ext_info={}, **kwargs):
         """Returns a KeplerTargetPixelFile object."""
-        return KeplerTargetPixelFile(self._hdulist(hdu0_keywords=hdu0_keywords), **kwargs)
+        return KeplerTargetPixelFile(self._hdulist(hdu0_keywords=hdu0_keywords, ext_info=ext_info), **kwargs)
 
-    def _hdulist(self, hdu0_keywords={}):
+    def _hdulist(self, hdu0_keywords={}, ext_info={}):
         """Returns an astropy.io.fits.HDUList object."""
-        return fits.HDUList([self._make_primary_hdu(keywords=hdu0_keywords),
-                             self._make_target_extension(),
+        return fits.HDUList([self._make_primary_hdu(hdu0_keywords=hdu0_keywords),
+                             self._make_target_extension(ext_info=ext_info),
                              self._make_aperture_extension()])
 
     def _header_template(self, extension):
@@ -1194,7 +1195,7 @@ class KeplerTargetPixelFileFactory(object):
                                    "tpf-ext{}-header.txt".format(extension))
         return fits.Header.fromtextfile(template_fn)
 
-    def _make_primary_hdu(self):
+    def _make_primary_hdu(self, hdu0_keywords={}):
         """Returns the primary extension (#0)."""
         hdu = fits.PrimaryHDU()
         # Copy the default keywords from a template file from the MAST archive
@@ -1217,7 +1218,7 @@ class KeplerTargetPixelFileFactory(object):
         bad_keys = ['ORIGIN', 'DATE', 'OBJECT', 'SIMPLE', 'BITPIX',
                     'NAXIS' ,'EXTEND', 'NEXTEND', 'EXTNAME', 'NAXIS1',
                     'NAXIS2', 'QUALITY']
-        for kw, val in keywords.items():
+        for kw, val in hdu0_keywords.items():
             if kw in bad_keys:
                 continue
             if kw in hdu.header:
