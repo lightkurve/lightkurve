@@ -617,7 +617,7 @@ class LightCurve(object):
             if ax is None:
                 fig, ax = plt.subplots(1)
             if method == 'scatter':
-                sc = ax.scatter(x=self.time, y=flux, **kwargs)
+                sc = ax.scatter(self.time, flux, **kwargs)
                 if show_colorbar and ('c' in kwargs) and hasattr(kwargs['c'], '__iter__'):
                     cbar = plt.colorbar(sc, ax=ax)
                     cbar.set_label(colorbar_label)
@@ -626,7 +626,7 @@ class LightCurve(object):
             elif method == 'errorbar':
                 ax.errorbar(x=self.time, y=flux, yerr=flux_err, **kwargs)
             else:
-                ax.plot(x=self.time, y=flux, **kwargs)
+                ax.plot(self.time, flux, **kwargs)
             ax.set_xlabel(xlabel)
             ax.set_ylabel(ylabel)
             # Show the legend if labels were set
