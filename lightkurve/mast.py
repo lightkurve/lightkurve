@@ -91,7 +91,13 @@ def _query_kepler_products(target, radius=1):
             target_name = 'ktwo{:09d}'.format(target)
         else:
             raise ValueError("{:09d}: not in the KIC or EPIC ID range".format(target))
-        obs = Observations.query_criteria(target_name=target_name,
+        target_obs = Observations.query_criteria(target_name=target_name,
+                                                 radius='{} deg'.format(.0001),
+                                                 project=["Kepler", "K2"],
+                                                 obs_collection=["Kepler", "K2"])
+        ra = target_obs['s_ra'][0]
+        dec = target_obs['s_ra'][0]
+        obs = Observations.query_criteria(coordinates='{} {}'.format(ra, dec),
                                           radius='{} deg'.format(radius/3600),
                                           project=["Kepler", "K2"],
                                           obs_collection=["Kepler", "K2"])
