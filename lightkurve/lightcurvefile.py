@@ -22,14 +22,13 @@ log = logging.getLogger(__name__)
 class LightCurveFile(object):
     """Defines a generic class to handle light curve files.
 
-    Attributes
+    Parameters
     ----------
     path : str
-        Directory path or url to a lightcurve FITS file.
+        Local path or remote url of a lightcurve FITS file.
     kwargs : dict
         Keyword arguments to be passed to astropy.io.fits.open.
     """
-
     def __init__(self, path, **kwargs):
         self.path = path
         self.hdu = pyfits.open(self.path, **kwargs)
@@ -130,32 +129,42 @@ class KeplerLightCurveFile(LightCurveFile):
     """Defines a class for a given light curve FITS file from NASA's Kepler and
     K2 missions.
 
-    Attributes
+    Parameters
     ----------
     path : str
-        Directory path or url to a lightcurve FITS file.
+        Local path or remote url of a FITS file in Kepler's lightcurve format.
     quality_bitmask : str or int
-        Bitmask specifying quality flags of cadences that should be ignored.
-        If `None` is passed, then no cadences are ignored.
-        If a string is passed, it has the following meaning:
+        Bitmask (integer) which identifies the quality flag bitmask that should
+        be used to mask out bad cadences. If a string is passed, it has the
+        following meaning:
 
-            * default: recommended quality mask
-            * hard: removes more flags, known to remove good data
-            * hardest: removes all data that has been flagged
+            * "none": no cadences will be ignored (`quality_bitmask=0`).
+            * "default": cadences with severe quality issues will be ignored
+              (`quality_bitmask=1130799`).
+            * "hard": more conservative choice of flags to ignore
+              (`quality_bitmask=1664431`). This is known to remove good data.
+            * "hardest": removes all data that has been flagged
+              (`quality_bitmask=2096639`). This mask is not recommended.
 
-        See the `KeplerQualityFlags` class for details on the bitmasks.
+        See the :class:`KeplerQualityFlags` class for details on the bitmasks.
     kwargs : dict
         Keyword arguments to be passed to astropy.io.fits.open.
     """
-
     def __init__(self, path, quality_bitmask='default', **kwargs):
         super(KeplerLightCurveFile, self).__init__(path, **kwargs)
         self.quality_bitmask = quality_bitmask
-        self.quality_mask = self._quality_mask(quality_bitmask)
+        self.quality_mask = KeplerQualityFlags.create_quality_mask(
+                                quality_array=self.hdu[1].data['SAP_QUALITY'],
+                                bitmask=quality_bitmask)
+        try:
+            self.targetid = self.header()['KEPLERID']
+        except KeyError:
+            self.targetid = None
 
     @staticmethod
     def from_archive(target, cadence='long', quarter=None, month=None,
-                     campaign=None, radius=1., targetlimit=1, **kwargs):
+                     campaign=None, radius=1., targetlimit=1,
+                     quality_bitmask="default", **kwargs):
         """Fetches a LightCurveFile (or list thereof) from the data archive at MAST.
 
         If a target was observed across multiple quarters or campaigns, a
@@ -187,6 +196,20 @@ class KeplerLightCurveFile(LightCurveFile):
             If multiple targets are present within `radius`, limit the number
             of returned LightCurveFile objects to `targetlimit`.
             If `None`, no limit is applied.
+        quality_bitmask : str or int
+            Bitmask (integer) which identifies the quality flag bitmask that should
+            be used to mask out bad cadences. If a string is passed, it has the
+            following meaning:
+
+                * "none": no cadences will be ignored (`quality_bitmask=0`).
+                * "default": cadences with severe quality issues will be ignored
+                  (`quality_bitmask=1130799`).
+                * "hard": more conservative choice of flags to ignore
+                  (`quality_bitmask=1664431`). This is known to remove good data.
+                * "hardest": removes all data that has been flagged
+                  (`quality_bitmask=2096639`). This mask is not recommended.
+
+            See the :class:`KeplerQualityFlags` class for details on the bitmasks.
         kwargs : dict
             Keywords arguments passed to `KeplerLightCurveFile`.
 
@@ -205,36 +228,14 @@ class KeplerLightCurveFile(LightCurveFile):
                 quarter=quarter, campaign=campaign, month=month,
                 radius=radius, targetlimit=targetlimit)
         if len(path) == 1:
-            return KeplerLightCurveFile(path[0], **kwargs)
-        return [KeplerLightCurveFile(p, **kwargs) for p in path]
+            return KeplerLightCurveFile(path[0],
+                                        quality_bitmask=quality_bitmask,
+                                        **kwargs)
+        return [KeplerLightCurveFile(p, quality_bitmask=quality_bitmask, **kwargs)
+                for p in path]
 
     def __repr__(self):
-        if self.mission is None:
-            return('KeplerLightCurveFile(ID: {})'.format(self.keplerid))
-        elif self.mission.lower() == 'kepler':
-            return('KeplerLightCurveFile(KIC: {})'.format(self.keplerid))
-        elif self.mission.lower() == 'k2':
-            return('KeplerLightCurveFile(EPIC: {})'.format(self.keplerid))
-
-    def _quality_mask(self, bitmask):
-        """Returns a boolean mask which flags all good-quality cadences.
-
-        Parameters
-        ----------
-        bitmask : str or int
-            Bitmask. See ref. [1], table 2-3.
-
-        Returns
-        -------
-        boolean_mask : array of bool
-            Boolean array in which `True` means the data is of good quality.
-        """
-        if bitmask is None:
-            return np.ones(len(self.hdu[1].data['TIME']), dtype=bool)
-
-        if isinstance(bitmask, str):
-            bitmask = KeplerQualityFlags.OPTIONS[bitmask]
-        return (self.hdu[1].data['SAP_QUALITY'] & bitmask) == 0
+        return('KeplerLightCurveFile(ID: {})'.format(self.targetid))
 
     @property
     def astropy_time(self):
@@ -260,7 +261,8 @@ class KeplerLightCurveFile(LightCurveFile):
                 quarter=self.quarter,
                 mission=self.mission,
                 cadenceno=self.cadenceno,
-                keplerid=self.keplerid,
+                targetid=self.targetid,
+                label=self.hdu[0].header['OBJECT'],
                 ra=self.ra,
                 dec=self.dec)
         else:
@@ -269,19 +271,12 @@ class KeplerLightCurveFile(LightCurveFile):
 
     @property
     def channel(self):
-        """Channel number"""
+        """Kepler CCD channel number. ('CHANNEL' header keyword)"""
         return self.header(ext=0)['CHANNEL']
 
     @property
-    def keplerid(self):
-        return self.header(ext=0)['KEPLERID']
-
-    @property
-    def targetid(self):
-        return self.keplerid
-
-    @property
     def obsmode(self):
+        """'short cadence' or 'long cadence'. ('OBSMODE' header keyword)"""
         return self.header()['OBSMODE']
 
     @property
@@ -296,7 +291,7 @@ class KeplerLightCurveFile(LightCurveFile):
 
     @property
     def quarter(self):
-        """Quarter number"""
+        """Kepler quarter number. ('QUARTER' header keyword)"""
         try:
             return self.header(ext=0)['QUARTER']
         except KeyError:
@@ -304,7 +299,7 @@ class KeplerLightCurveFile(LightCurveFile):
 
     @property
     def campaign(self):
-        """Campaign number"""
+        """K2 Campaign number. ('CAMPAIGN' header keyword)"""
         try:
             return self.header(ext=0)['CAMPAIGN']
         except KeyError:
@@ -312,7 +307,7 @@ class KeplerLightCurveFile(LightCurveFile):
 
     @property
     def mission(self):
-        """Mission name"""
+        """'Kepler' or 'K2'. ('MISSION' header keyword)"""
         try:
             return self.header(ext=0)['MISSION']
         except KeyError:
@@ -344,70 +339,62 @@ class TessLightCurveFile(LightCurveFile):
     """Defines a class for a given light curve FITS file from NASA's TESS
     mission.
 
-    Attributes
+    Parameters
     ----------
     path : str
-        Directory path or url to a lightcurve FITS file.
+        Local path or remote url of a FITS file in TESS's lightcurve format.
     quality_bitmask : str or int
-        Bitmask specifying quality flags of cadences that should be ignored.
-        If a string is passed, it has the following meaning:
+        Bitmask (integer) which identifies the quality flag bitmask that should
+        be used to mask out bad cadences. If a string is passed, it has the
+        following meaning:
 
-            * default: recommended quality mask
-            * hard: removes more flags, known to remove good data
-            * hardest: removes all data that has been flagged
+            * "none": no cadences will be ignored (`quality_bitmask=0`).
+            * "default": cadences with severe quality issues will be ignored
+              (`quality_bitmask=1130799`).
+            * "hard": more conservative choice of flags to ignore
+              (`quality_bitmask=1664431`). This is known to remove good data.
+            * "hardest": removes all data that has been flagged
+              (`quality_bitmask=2096639`). This mask is not recommended.
 
-        See the `TessQualityFlags` class for details on the bitmasks.
+        See the :class:`TessQualityFlags` class for details on the bitmasks.
     kwargs : dict
         Keyword arguments to be passed to astropy.io.fits.open.
     """
-
     def __init__(self, path, quality_bitmask='default', **kwargs):
         super(TessLightCurveFile, self).__init__(path, **kwargs)
         self.quality_bitmask = quality_bitmask
-        self.quality_mask = self._quality_mask(quality_bitmask)
+        self.quality_mask = TessQualityFlags.create_quality_mask(
+                                quality_array=self.hdu[1].data['QUALITY'],
+                                bitmask=quality_bitmask)
+        # Early TESS releases had cadences with time=NaN (i.e. missing data)
+        # which were not flagged by a QUALITY flag yet; the line below prevents
+        # these cadences from being used. They would break most methods!
+        self.quality_mask &= np.isfinite(self.hdu[1].data['TIME'])
+        try:
+            self.targetid = self.header()['TICID']
+        except KeyError:
+            self.targetid = None
 
     def __repr__(self):
-        return('TessLightCurveFile(TICID: {})'.format(self.ticid))
-
-    def _quality_mask(self, bitmask):
-        """Returns a boolean mask which flags all good-quality cadences.
-
-        Parameters
-        ----------
-        bitmask : str or int
-            Bitmask. See ref. [1], table 2-3.
-
-        Returns
-        -------
-        boolean_mask : array of bool
-            Boolean array in which `True` means the data is of good quality.
-        """
-        if bitmask is None:
-            return np.ones(len(self.hdu[1].data['TIME']), dtype=bool)
-
-        if isinstance(bitmask, str):
-            bitmask = TessQualityFlags.OPTIONS[bitmask]
-        return (self.hdu[1].data['QUALITY'] & bitmask) == 0
-
-    @property
-    def ticid(self):
-        return self.header(ext=0)['TICID']
-
-    @property
-    def targetid(self):
-        return self.ticid
+        return('TessLightCurveFile(TICID: {})'.format(self.targetid))
 
     def get_lightcurve(self, flux_type, centroid_type='MOM_CENTR'):
         if flux_type in self._flux_types():
-            # We did not import lightcurve at the top to prevent circular imports
+            # We did not import TessLightCurve at the top to prevent circular imports
             from .lightcurve import TessLightCurve
             return TessLightCurve(
-                self.hdu[1].data['TIME'][self.quality_mask],
-                self.hdu[1].data[flux_type][self.quality_mask],
+                time=self.hdu[1].data['TIME'][self.quality_mask],
+                time_format='btjd',
+                time_scale='tdb',
+                flux=self.hdu[1].data[flux_type][self.quality_mask],
                 flux_err=self.hdu[1].data[flux_type + "_ERR"][self.quality_mask],
                 centroid_col=self.hdu[1].data[centroid_type + "1"][self.quality_mask],
                 centroid_row=self.hdu[1].data[centroid_type + "2"][self.quality_mask],
                 quality=self.hdu[1].data['QUALITY'][self.quality_mask],
                 quality_bitmask=self.quality_bitmask,
                 cadenceno=self.cadenceno,
-                ticid=self.ticid)
+                targetid=self.targetid,
+                label=self.hdu[0].header['OBJECT'])
+        else:
+            raise KeyError("{} is not a valid flux type. Available types are: {}".
+                           format(flux_type, self._flux_types))

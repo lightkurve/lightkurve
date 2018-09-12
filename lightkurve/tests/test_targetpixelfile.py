@@ -2,13 +2,14 @@ from __future__ import division, print_function
 
 import os
 from astropy.utils.data import get_pkg_data_filename
+import matplotlib.pyplot as plt
 import numpy as np
 from numpy.testing import assert_array_equal
 import pytest
 import tempfile
+
 from ..targetpixelfile import KeplerTargetPixelFile, KeplerTargetPixelFileFactory
 from ..targetpixelfile import TessTargetPixelFile
-from ..utils import KeplerQualityFlags
 
 
 filename_tpf_all_zeros = get_pkg_data_filename("data/test-tpf-all-zeros.fits")
@@ -43,7 +44,7 @@ def test_tpf_plot():
     """Sanity check to verify that tpf plotting works"""
     for tpf in [KeplerTargetPixelFile(filename_tpf_one_center),
                 TessTargetPixelFile(filename_tpf_one_center)]:
-        tpf.plot()
+        ax = tpf.plot()
         tpf.plot(aperture_mask=tpf.pipeline_mask)
         tpf.plot(aperture_mask='all')
         tpf.plot(frame=5)
@@ -57,6 +58,7 @@ def test_tpf_plot():
         tpf.plot(scale="log")
         with pytest.raises(ValueError):
             tpf.plot(scale="blabla")
+        plt.close('all')
 
 
 def test_tpf_zeros():
@@ -88,19 +90,9 @@ def test_tpf_ones():
                       * (lc.centroid_row > tpf.row).all())
 
 
-def test_quality_flag_decoding():
-    """Can the QUALITY flags be parsed correctly?"""
-    flags = list(KeplerQualityFlags.STRINGS.items())
-    for key, value in flags:
-        assert KeplerQualityFlags.decode(key)[0] == value
-    # Can we recover combinations of flags?
-    assert KeplerQualityFlags.decode(flags[5][0] + flags[7][0]) == [flags[5][1], flags[7][1]]
-    assert KeplerQualityFlags.decode(flags[3][0] + flags[4][0] + flags[5][0]) \
-        == [flags[3][1], flags[4][1], flags[5][1]]
-
-
-@pytest.mark.parametrize("quality_bitmask,answer", [('hardest', 1101),
-                                                    ('hard', 1101), ('default', 1233), (None, 1290),
+@pytest.mark.parametrize("quality_bitmask,answer", [(None, 1290), ('none', 1290),
+                                                    ('default', 1233),
+                                                    ('hard', 1101), ('hardest', 1101),
                                                     (1, 1290), (100, 1278), (2096639, 1101)])
 def test_bitmasking(quality_bitmask, answer):
     '''Test whether the bitmasking behaves like it should'''
@@ -256,17 +248,16 @@ def test_from_archive_should_accept_path():
     """If a path is accidentally passed to `from_archive` it should still just work."""
     KeplerTargetPixelFile.from_archive(filename_tpf_all_zeros)
 
+
 def test_from_fits():
     """Does the tpf.from_fits() method work like the constructor?"""
     tpf = KeplerTargetPixelFile.from_fits(filename_tpf_one_center)
     assert isinstance(tpf, KeplerTargetPixelFile)
-    assert tpf.keplerid == KeplerTargetPixelFile(filename_tpf_one_center).keplerid
-    assert tpf.keplerid == tpf.targetid
+    assert tpf.targetid == KeplerTargetPixelFile(filename_tpf_one_center).targetid
     # Execute the same test for TESS
     tpf = TessTargetPixelFile.from_fits(filename_tpf_one_center)
     assert isinstance(tpf, TessTargetPixelFile)
-    assert tpf.ticid == TessTargetPixelFile(filename_tpf_one_center).ticid
-    assert tpf.ticid == tpf.targetid
+    assert tpf.targetid == TessTargetPixelFile(filename_tpf_one_center).targetid
 
 
 def test_get_models():
@@ -274,3 +265,16 @@ def test_get_models():
     tpf = KeplerTargetPixelFile(filename_tpf_all_zeros, quality_bitmask=None)
     tpf.get_model()
     tpf.get_prf_model()
+
+
+#@pytest.mark.remote_data
+def test_tess_simulation():
+    """Can we read simulated TESS data?"""
+    tpf = TessTargetPixelFile(TESS_SIM)
+    assert tpf.mission == 'TESS'
+    assert tpf.astropy_time.scale == 'tdb'
+    assert tpf.flux.shape == tpf.flux_err.shape
+    tpf.wcs
+    col, row = tpf.centroids()
+    # Regression test for https://github.com/KeplerGO/lightkurve/pull/236
+    assert np.isnan(tpf.time).sum() == 0
