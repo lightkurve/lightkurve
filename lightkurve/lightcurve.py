@@ -618,6 +618,8 @@ class LightCurve(object):
                 fig, ax = plt.subplots(1)
             if method == 'scatter':
                 sc = ax.scatter(self.time, flux, **kwargs)
+                # Colorbars should only be plotted if the user specifies, and there is
+                # a color specified that is not a string (e.g. 'C1') and is iterable.
                 if show_colorbar and ('c' in kwargs) and \
                   (not isinstance(kwargs['c'], str)) and hasattr(kwargs['c'], '__iter__'):
                     cbar = plt.colorbar(sc, ax=ax)
