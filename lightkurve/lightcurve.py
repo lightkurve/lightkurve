@@ -1074,6 +1074,12 @@ class KeplerLightCurve(LightCurve):
         new_lc.time = corrected_lc.time
         new_lc.flux = corrected_lc.flux
         new_lc.flux_err = self.normalize().flux_err[not_nan]
+        if hasattr(self, 'cadenceno'):
+            new_lc.cadenceno = self.cadenceno
+        if hasattr(self, 'quality'):
+            new_lc.quality = self.quality
+        if hasattr(self, 'time_format'):
+            new_lc.time_format = self.time_format
         return new_lc
 
     def to_pandas(self, columns=['time', 'flux', 'flux_err', 'quality',
