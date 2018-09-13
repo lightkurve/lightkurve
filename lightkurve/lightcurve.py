@@ -618,7 +618,8 @@ class LightCurve(object):
                 fig, ax = plt.subplots(1)
             if method == 'scatter':
                 sc = ax.scatter(self.time, flux, **kwargs)
-                if show_colorbar and ('c' in kwargs) and hasattr(kwargs['c'], '__iter__'):
+                if show_colorbar and ('c' in kwargs) and \
+                  (not isinstance(kwargs['c'], str)) and hasattr(kwargs['c'], '__iter__'):
                     cbar = plt.colorbar(sc, ax=ax)
                     cbar.set_label(colorbar_label)
                     cbar.ax.yaxis.set_tick_params(tick1On=False, tick2On=False)
