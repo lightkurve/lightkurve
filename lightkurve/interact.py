@@ -15,7 +15,10 @@ tpf.interact()
 from __future__ import division, print_function
 import logging
 import numpy as np
+from astropy.stats import sigma_clip
+
 log = logging.getLogger(__name__)
+
 from .utils import KeplerQualityFlags
 try:
     from bokeh.io import show, output_notebook
@@ -121,16 +124,19 @@ def prepare_tpf_datasource(tpf):
     tpf_source = ColumnDataSource(data=dict(xx=xa+0.5, yy=ya+0.5), selected=preselection)
     return tpf_source
 
+
 def get_lightcurve_y_limits(lc_source):
-    """Make the lightcurve figure elements
+    """Compute sensible defaults for the Y axis limits.
 
     Parameters
     ----------
     data_source: `bokeh.models.sources.ColumnDataSource` instance
+        The lightcurve being shown.
     """
-    sig_lo, med, sig_hi = np.nanpercentile(lc_source.data['flux'], (16, 50, 84))
-    robust_sigma = (sig_hi - sig_lo)/2.0
-    return med - 5.0 * robust_sigma, med + 5.0 * robust_sigma
+    flux = sigma_clip(lc_source.data['flux'], sigma=5)
+    low, high = np.nanpercentile(flux, (1, 99))
+    margin = 0.10 * (high - low)
+    return low - margin, high + margin
 
 
 def make_lightcurve_figure_elements(lc, lc_source):
@@ -397,7 +403,7 @@ def pixel_selector_standalone(tpf, notebook_url='localhost:8888'):
 
 
         # Layout all of the plots
-        space1, space2, space3 = Spacer(width=10), Spacer(width=30), Spacer(width=80)
+        space1, space2, space3 = Spacer(width=15), Spacer(width=30), Spacer(width=80)
         widgets_and_figures = layout([fig1, fig2],
                                      [l_button, space1, r_button, space2,
                                       cadence_slider, space3, screen_slider])
