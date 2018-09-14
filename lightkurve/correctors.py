@@ -283,6 +283,117 @@ class SFFCorrector(object):
         self.axs = None
         pass
 
+
+    def christina_correct(self, origtime, origflux, origcentroid_col, origcentroid_row, bins=15, windows=1,
+                            niters=3, sigma_1=3., knots=1.5, window_shift=0,
+                            sigma_2=5., restore_trend=False, plot=False):
+        self.windows = windows
+        self.bins = bins
+        self.knots = knots
+        self.nw = int(np.ceil(self.windows**0.5))
+
+        alltime = np.copy(origtime)
+        allflux = np.copy(origflux)
+
+        # How many points are there per window>
+        dw = len(origtime) // self.windows
+
+        #We shouldn't be able to shift the window more than this...
+        window_shift = window_shift % dw
+
+        if window_shift != 0:
+            self.windows+=1
+            
+        # Split up time, flux, column and row into windows
+        time = np.split(origtime, np.arange(self.windows) * dw + window_shift)
+        flux = np.split(origflux, np.arange(self.windows) * dw + window_shift)
+        centroid_col = np.split(origcentroid_col, np.arange(self.windows) * dw + window_shift)
+        centroid_row = np.split(origcentroid_row, np.arange(self.windows) * dw + window_shift)
+
+        if window_shift == 0:
+            time = time[1:]
+            flux = flux[1:]
+            centroid_col = centroid_col[1:]
+            centroid_row = centroid_row[1:]
+#        import pdb;pdb.set_trace()
+
+        for iter in range(niters):
+            mask = np.abs(allflux - np.median(allflux)) < sigma_1 * allflux.std()
+            self.bspline = self.fit_bspline(alltime[mask], allflux[mask], knot_separation=knots)
+#            plt.plot(alltime, allflux)
+#            plt.plot(alltime, self.bspline(alltime))
+#            plt.show()
+#            import pdb; pdb.set_trace();
+            # The SFF algorithm is going to be run on each window independently
+            if plot:
+                fig = plt.figure(figsize=(15, 2*self.windows))
+                plt.suptitle('Iteration {}'.format(iter + 1), fontsize=20)
+            for i in range(self.windows):
+                # To make it easier (and more numerically stable) to fit a
+                # characteristic polynomial that describes the spacecraft motion,
+                # we rotate the centroids to a new coordinate frame in which
+                # the dominant direction of motion is aligned with the x-axis.
+                self.rot_col, self.rot_row = self.rotate_centroids(centroid_col[i],
+                                                                   centroid_row[i])
+                # Next, we fit the motion polynomial after removing outliers
+                self.outliers = sigma_clip(data=self.rot_col,
+                                               sigma=sigma_2).mask
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore", category=np.RankWarning)
+                    coeffs = self._find_optimal_polynomial(self.rot_row[~self.outliers], self.rot_col[~self.outliers])
+
+                self.poly = np.poly1d(coeffs)
+                self.polyprime = np.poly1d(coeffs).deriv()
+#                if plot:
+#                    self._plot_fit(i)
+
+                # Compute the arclength s.  It is the length of the polynomial
+                # (fitted above) that describes the typical motion.
+                x = np.linspace(np.min(self.rot_row[~self.outliers]),
+                                np.max(self.rot_row[~self.outliers]), 10000)
+                self.s = np.array([self.arclength(x1=xp, x=x) for xp in self.rot_row])
+                self.trend = np.ones(len(flux[i]))
+
+                iter_trend = self.bspline(time[i])
+                self.normflux = flux[i] / iter_trend
+                self.trend = iter_trend
+
+                if plot:
+                    ax = plt.subplot2grid((self.windows, 4), (i, 0), colspan=3)
+                    ax.plot(time[i], flux[i], color='k')
+                    if remove_trend:
+                        ax.plot(time[i], self.bspline(time[i]), color='r')
+                    ax = plt.subplot2grid((self.windows, 4), (i, 3), colspan=1)
+                    ax.scatter(self.s, flux[i]/np.median(flux[i]), c='k', s=1, label='Flux')
+                    if remove_trend:
+                        ax.scatter(self.s, self.normflux, c='r', s=1, label='Normed Flux')
+                    ax.legend(fontsize=8)
+
+                self.interp = self.bin_and_interpolate(self.s, self.normflux,
+                                                       sigma=sigma_1)
+                # Correct the raw flux
+                correction = self.interp(self.s)
+#                correction /= (np.median(correction/self.normflux))
+#                correction /= np.median(correction)
+                corrected_flux = self.normflux / correction
+#                plt.figure()
+#                plt.plot(self.normflux*self.trend)
+#                plt.plot(flux[i])
+#                plt.plot(corrected_flux)
+                flux[i] = corrected_flux
+                if restore_trend:
+                    flux[i] *= self.trend
+            allflux = np.empty(0)
+            for f in flux:
+                allflux = np.append(allflux, f)
+
+
+        corr = LightCurve(time=alltime, flux=allflux)
+#        corr.plot(c='k')
+#        for t in time:
+#            plt.axvline(t[0], ls='--')
+        return corr
+
     def correct(self, time, flux, centroid_col, centroid_row, bins=15, windows=1,
                 polyorder=5, niters=3, sigma_1=3.,
                 sigma_2=5., restore_trend=False, plot=False):
@@ -375,11 +486,12 @@ class SFFCorrector(object):
             self.s = np.array([self.arclength(x1=xp, x=x) for xp in self.rot_row])
 
             # Next, we find and apply the correction iteratively
-            self.trend = np.ones(len(time[i]))
+            self.trend *= np.median(flux[i])
+            self.normflux = flux[i]/np.median(flux[i])
+
 
             fig = plt.figure(figsize=(15,3))
             for n in range(niters):
-
                 # Measure the correlation between arclength and flux
                 coeff = self._find_optimal_polynomial(self.s, flux[i] / np.median(flux[i]))
                 residuals = flux[i] / np.median(flux[i]) - np.polyval(coeff, self.s)
@@ -390,7 +502,11 @@ class SFFCorrector(object):
                 # Measure the correlation between arclength and NORMED flux
                 normed_coeff = self._find_optimal_polynomial(self.s, flux[i] / iter_trend)
                 normed_residuals = flux[i] / iter_trend - np.polyval(normed_coeff, self.s)
-                normed_residuals *= 1e10
+
+                # For the first iteration, don't remove trends.
+                if n == 0:
+                    normed_residuals *= 1e10
+
                 # If the normalization improved the correlation, then use it...
                 if normed_residuals.std() < residuals.std():
                     self.normflux = flux[i] / iter_trend
@@ -398,6 +514,7 @@ class SFFCorrector(object):
                     print('normalizing')
                 # Otherwise, don't do anything.
                 else:
+                    self.trend *= np.median(flux[i])
                     self.normflux = flux[i]/np.median(flux[i])
                     print('leaving')
                 # Bin and interpolate normalized flux to capture the dependency
@@ -542,9 +659,9 @@ class SFFCorrector(object):
         mask = x < x1
         return np.trapz(y=np.sqrt(1 + self.polyprime(x[mask]) ** 2), x=x[mask])
 
-    def fit_bspline(self, time, flux, s=0):
+    def fit_bspline(self, time, flux, s=0, knot_separation=1.5):
         """s describes the "smoothness" of the spline"""
-        knots = np.arange(time[0], time[-1], 1.5)
+        knots = np.arange(time[0] + knot_separation, time[-1] - knot_separation, knot_separation)
         t, c, k = interpolate.splrep(time, flux, t=knots[1:], s=s, task=-1)
         return interpolate.BSpline(t, c, k)
 
