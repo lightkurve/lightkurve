@@ -146,16 +146,16 @@ def make_lightcurve_figure_elements(lc, lc_source):
     fig: `bokeh.plotting.figure` instance
     """
     if lc.mission == 'K2':
-        title = "Lightcurve for EPIC {} (K2 C{})".format(
-            lc.keplerid, lc.campaign)
+        title = "Lightcurve for {} (K2 C{})".format(
+            lc.label, lc.campaign)
     elif lc.mission == 'Kepler':
-        title = "Lightcurve for KIC {} (Kepler Q{})".format(
-            lc.keplerid, lc.quarter)
+        title = "Lightcurve for {} (Kepler Q{})".format(
+            lc.label, lc.quarter)
     elif lc.mission == 'TESS':
-        title = "Lightcurve for TIC {} (TESS Sec. {})".format(
-            lc.ticid, lc.sector)
+        title = "Lightcurve for {} (TESS Sec. {})".format(
+            lc.label, lc.sector)
     else:
-        title = "Lightcurve for target {}".format(lc.targetid)
+        title = "Lightcurve for target {}".format(lc.label)
 
     fig = figure(title=title, plot_height=340, plot_width=600,
                  tools="pan,wheel_zoom,box_zoom,tap,reset",
@@ -317,7 +317,7 @@ def pixel_selector_standalone(tpf, notebook_url='localhost:8888'):
         #                        title="TPF slice index", width=350)
         cadence_slider = Slider(start=np.min(tpf.cadenceno), end=np.max(tpf.cadenceno),
                                 value=np.min(tpf.cadenceno), step=1,
-                                title="Cadence Number", width=350)
+                                title="Cadence Number", width=490)
 
         screen_slider = RangeSlider(start=np.log10(stretch['vlo']),
                                     end=np.log10(stretch['vhi']),
@@ -327,8 +327,8 @@ def pixel_selector_standalone(tpf, notebook_url='localhost:8888'):
                                     width=200, direction='ltr', show_value=True,
                                     sizing_mode='fixed')
 
-        r_button = Button(label=">>", button_type="default", width=30)
-        l_button = Button(label="<<", button_type="default", width=30)
+        r_button = Button(label=">", button_type="default", width=30)
+        l_button = Button(label="<", button_type="default", width=30)
 
         existing_selection = tpf_source.selected.to_json(True).copy()
 
@@ -397,7 +397,7 @@ def pixel_selector_standalone(tpf, notebook_url='localhost:8888'):
 
 
         # Layout all of the plots
-        space1, space2, space3 = Spacer(width=25), Spacer(width=50), Spacer(width=50)
+        space1, space2, space3 = Spacer(width=10), Spacer(width=30), Spacer(width=80)
         widgets_and_figures = layout([fig1, fig2],
                                      [l_button, space1, r_button, space2,
                                       cadence_slider, space3, screen_slider])
