@@ -48,3 +48,12 @@ def test_cadence_mapping():
         assert cadence_dict[tpf.cadenceno[0]] == 0
         extra_cadences = set(cadence_dict.keys()) - set(tpf.cadenceno)
         assert extra_cadences == set()
+
+def test_cadence_mapping():
+    """Test if the cadence mapping works"""
+    for tpf in [KeplerTargetPixelFile(filename_tpf_all_zeros),
+                TessTargetPixelFile(filename_tpf_all_zeros)]:
+        cadence_dict = map_cadences(tpf)
+        assert cadence_dict[tpf.cadenceno[0]] == 0
+        extra_cadences = set(cadence_dict.keys()) - set(tpf.cadenceno)
+        assert extra_cadences == set()

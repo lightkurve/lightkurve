@@ -40,29 +40,20 @@ except ImportError:
 __all__ = []
 
 
-def map_cadences(tpf, lc):
-    """Create a lookup dictionary to map cadences to indices
+def map_cadences(tpf):
+    """Create a lookup dictionary to map cadences to array slices
 
     Parameters
     ----------
-    tpf: TargetPixelFile object
+    tpf : TargetPixelFile
+        A target pixel file to map index slices to cadence numbers
 
     Returns
     -------
     cadence_lookup: dict
         A dictionary mapping each existing tpf cadence to a TPF slice index;
     """
-    # Map cadence to index for quick array slicing.
-    lc_cad_matches = np.in1d(tpf.cadenceno, lc.cadenceno)
-    if (lc_cad_matches.sum() != len(lc.cadenceno)) :
-        raise ValueError("The lightcurve provided has cadences that are not "
-                         "present in the Target Pixel File.")
-    min_cadence, max_cadence = np.min(tpf.cadenceno), np.max(tpf.cadenceno)
-    cadence_lookup = {cad: j for j, cad in enumerate(tpf.cadenceno)}
-    cadence_full_range = np.arange(min_cadence, max_cadence, 1, dtype=np.int)
-    #missing_cadences = list(set(cadence_full_range)-set(tpf.cadenceno))
-    return cadence_lookup
-
+    return {cad: j for j, cad in enumerate(tpf.cadenceno)}
 
 def prepare_lightcurve_datasource(lc):
     """Prepare a bokeh DataSource object for tool tips
@@ -138,7 +129,6 @@ def get_lightcurve_y_limits(lc_source):
     margin = 0.10 * (high - low)
     return low - margin, high + margin
 
-
 def make_lightcurve_figure_elements(lc, lc_source):
     """Make the lightcurve figure elements
 
@@ -202,8 +192,6 @@ def make_lightcurve_figure_elements(lc, lc_source):
     fig.add_layout(vert)
 
     return fig, step_dat, vert
-
-
 
 def make_tpf_figure_elements(tpf, tpf_source):
     """Make the lightcurve figure elements
@@ -318,7 +306,7 @@ def pixel_selector_standalone(tpf, notebook_url='localhost:8888'):
         fig2, fig2_dat, stretch = make_tpf_figure_elements(tpf, tpf_source)
 
         # Interactive slider widgets
-        cadence_lookup = map_cadences(tpf, lc)
+        cadence_lookup = map_cadences(tpf)
         #cadence_slider = Slider(start=0, end=len(tpf.time)-1, value=0, step=1,
         #                        title="TPF slice index", width=350)
         cadence_slider = Slider(start=np.min(tpf.cadenceno), end=np.max(tpf.cadenceno),
