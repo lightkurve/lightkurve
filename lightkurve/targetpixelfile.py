@@ -15,10 +15,11 @@ from tqdm import tqdm
 from astropy.coordinates import SkyCoord
 from astropy.wcs.utils import skycoord_to_pixel, pixel_to_skycoord
 
-from . import PACKAGEDIR
+from . import PACKAGEDIR, MPLSTYLE
 from .lightcurve import KeplerLightCurve, TessLightCurve
 from .prf import KeplerPRF
-from .utils import KeplerQualityFlags, plot_image, bkjd_to_astropy_time, btjd_to_astropy_time
+from .utils import KeplerQualityFlags, TessQualityFlags, \
+                   plot_image, bkjd_to_astropy_time, btjd_to_astropy_time
 from .mast import download_kepler_products
 
 __all__ = ['KeplerTargetPixelFile', 'TessTargetPixelFile']
@@ -39,7 +40,6 @@ class TargetPixelFile(object):
         else:
             self.hdu = fits.open(self.path, **kwargs)
         self.quality_bitmask = quality_bitmask
-        self.quality_mask = self._quality_mask(quality_bitmask)
         self.targetid = targetid
 
     @property
@@ -62,13 +62,9 @@ class TargetPixelFile(object):
         """Returns the header for a given extension."""
         return self.hdu[ext].header
 
-    def _quality_mask(self, bitmask):
-        if bitmask is None:
-            return np.ones(len(self.hdu[1].data['TIME']), dtype=bool)
-        return (self.hdu[1].data['QUALITY'] & bitmask) == 0
-
     @property
     def ra(self):
+        """Right Ascension of target ('RA_OBJ' header keyword)."""
         try:
             return self.header()['RA_OBJ']
         except KeyError:
@@ -76,6 +72,7 @@ class TargetPixelFile(object):
 
     @property
     def dec(self):
+        """Declination of target ('DEC_OBJ' header keyword)."""
         try:
             return self.header()['DEC_OBJ']
         except KeyError:
@@ -408,7 +405,7 @@ class TargetPixelFile(object):
         return col_centr, row_centr
 
     def plot(self, ax=None, frame=0, cadenceno=None, bkg=False, aperture_mask=None,
-             show_colorbar=True, mask_color='pink', style='fast', **kwargs):
+             show_colorbar=True, mask_color='pink', style='lightkurve', **kwargs):
         """
         Plot a target pixel file at a given frame (index) or cadence number.
 
@@ -431,7 +428,9 @@ class TargetPixelFile(object):
         mask_color : str
             Color to show the aperture mask
         style : str
-            matplotlib.pyplot.style.context, default is 'fast'
+            Path or URL to a matplotlib style file, or name of one of
+            matplotlib's built-in stylesheets (e.g. 'ggplot').
+            Lightkurve's custom stylesheet is used by default.
         kwargs : dict
             Keywords arguments passed to `lightkurve.utils.plot_image`.
 
@@ -440,8 +439,8 @@ class TargetPixelFile(object):
         ax : matplotlib.axes._subplots.AxesSubplot
             The matplotlib axes object.
         """
-        if (style == "fast") and ("fast" not in plt.style.available):
-            style = "default"
+        if style == 'lightkurve' or style is None:
+            style = MPLSTYLE
         if cadenceno is not None:
             try:
                 frame = np.argwhere(cadenceno == self.cadenceno)[0][0]
@@ -491,20 +490,24 @@ class KeplerTargetPixelFile(TargetPixelFile):
     Defines a TargetPixelFile class for the Kepler/K2 Mission.
     Enables extraction of raw lightcurves and centroid positions.
 
-    Attributes
+    Parameters
     ----------
     path : str or `astropy.io.fits.HDUList`
         Path to a Kepler Target Pixel (FITS) File or a `HDUList` object.
     quality_bitmask : str or int
-        Bitmask specifying quality flags of cadences that should be ignored.
-        If `None` is passed, then no cadences are ignored.
-        If a string is passed, it has the following meaning:
+        Bitmask (integer) which identifies the quality flag bitmask that should
+        be used to mask out bad cadences. If a string is passed, it has the
+        following meaning:
 
-            * "default": recommended quality mask
-            * "hard": removes more flags, known to remove good data
+            * "none": no cadences will be ignored (`quality_bitmask=0`).
+            * "default": cadences with severe quality issues will be ignored
+              (`quality_bitmask=1130799`).
+            * "hard": more conservative choice of flags to ignore
+              (`quality_bitmask=1664431`). This is known to remove good data.
             * "hardest": removes all data that has been flagged
+              (`quality_bitmask=2096639`). This mask is not recommended.
 
-        See the `KeplerQualityFlags` class for details on the bitmasks.
+        See the :class:`KeplerQualityFlags` class for details on the bitmasks.
     kwargs : dict
         Keyword arguments passed to `astropy.io.fits.open()`.
 
@@ -517,13 +520,22 @@ class KeplerTargetPixelFile(TargetPixelFile):
         super(KeplerTargetPixelFile, self).__init__(path,
                                                     quality_bitmask=quality_bitmask,
                                                     **kwargs)
+        self.quality_mask = KeplerQualityFlags.create_quality_mask(
+                                quality_array=self.hdu[1].data['QUALITY'],
+                                bitmask=quality_bitmask)
         if self.targetid is None:
-            self.targetid = self.header()['KEPLERID']
+            try:
+                self.targetid = self.header()['KEPLERID']
+            except KeyError:
+                pass
 
     @staticmethod
     def from_archive(target, cadence='long', quarter=None, month=None,
-                     campaign=None, radius=1., targetlimit=1, **kwargs):
+                     campaign=None, radius=1., targetlimit=1,
+                     quality_bitmask='default', **kwargs):
         """Fetch a Target Pixel File from the Kepler/K2 data archive at MAST.
+
+        See the :class:`KeplerQualityFlags` class for details on the bitmasks.
 
         Raises an `ArchiveError` if a unique TPF cannot be found.  For example,
         this is the case if a target was observed in multiple Quarters and the
@@ -547,12 +559,27 @@ class KeplerTargetPixelFile(TargetPixelFile):
             If multiple targets are present within `radius`, limit the number
             of returned TargetPixelFile objects to `targetlimit`.
             If `None`, no limit is applied.
+        quality_bitmask : str or int
+            Bitmask (integer) which identifies the quality flag bitmask that should
+            be used to mask out bad cadences. If a string is passed, it has the
+            following meaning:
+
+                * "none": no cadences will be ignored (`quality_bitmask=0`).
+                * "default": cadences with severe quality issues will be ignored
+                  (`quality_bitmask=1130799`).
+                * "hard": more conservative choice of flags to ignore
+                  (`quality_bitmask=1664431`). This is known to remove good data.
+                * "hardest": removes all data that has been flagged
+                  (`quality_bitmask=2096639`). This mask is not recommended.
+
+            See the :class:`KeplerQualityFlags` class for details on the bitmasks.
         kwargs : dict
-            Keywords arguments passed to `KeplerTargetPixelFile`.
+            Keywords arguments passed to the constructor of
+            :class:`KeplerTargetPixelFile`.
 
         Returns
         -------
-        tpf : KeplerTargetPixelFile object.
+        tpf : :class:`KeplerTargetPixelFile` object.
         """
         if os.path.exists(str(target)) or str(target).startswith('http'):
             log.warning('Warning: from_archive() is not intended to accept a '
@@ -564,25 +591,14 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 quarter=quarter, campaign=campaign, month=month,
                 radius=radius, targetlimit=targetlimit)
         if len(path) == 1:
-            return KeplerTargetPixelFile(path[0], **kwargs)
-        return [KeplerTargetPixelFile(p, **kwargs) for p in path]
+            return KeplerTargetPixelFile(path[0],
+                                         quality_bitmask=quality_bitmask,
+                                         **kwargs)
+        return [KeplerTargetPixelFile(p, quality_bitmask=quality_bitmask, **kwargs)
+                for p in path]
 
     def __repr__(self):
-        return('KeplerTargetPixelFile Object (ID: {})'.format(self.keplerid))
-
-    def _quality_mask(self, bitmask):
-        """Returns a boolean mask which flags all good-quality cadences.
-
-        Parameters
-        ----------
-        bitmask : str or int
-            Bitmask. See ref. [1], table 2-3.
-        """
-        if bitmask is None:
-            return np.ones(len(self.hdu[1].data['TIME']), dtype=bool)
-        elif isinstance(bitmask, str):
-            bitmask = KeplerQualityFlags.OPTIONS[bitmask]
-        return (self.hdu[1].data['QUALITY'] & bitmask) == 0
+        return('KeplerTargetPixelFile Object (ID: {})'.format(self.targetid))
 
     def get_prf_model(self):
         """Returns an object of KeplerPRF initialized using the
@@ -597,24 +613,24 @@ class KeplerTargetPixelFile(TargetPixelFile):
                          column=self.column, row=self.row)
 
     @property
-    def keplerid(self):
-        return self.targetid
-
-    @property
     def obsmode(self):
+        """'short cadence' or 'long cadence'. ('OBSMODE' header keyword)"""
         return self.header()['OBSMODE']
 
     @property
     def module(self):
+        """Kepler CCD module number. ('MODULE' header keyword)"""
         return self.header()['MODULE']
 
     @property
-    def channel(self):
-        return self.header()['CHANNEL']
+    def output(self):
+        """Kepler CCD module output number. ('OUTPUT' header keyword)"""
+        return self.header()['OUTPUT']
 
     @property
-    def output(self):
-        return self.header()['OUTPUT']
+    def channel(self):
+        """Kepler CCD channel number. ('CHANNEL' header keyword)"""
+        return self.header()['CHANNEL']
 
     @property
     def astropy_time(self):
@@ -623,7 +639,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
     @property
     def quarter(self):
-        """Quarter number"""
+        """Kepler quarter number. ('QUARTER' header keyword)"""
         try:
             return self.header(ext=0)['QUARTER']
         except KeyError:
@@ -631,7 +647,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
     @property
     def campaign(self):
-        """Campaign number"""
+        """K2 Campaign number. ('CAMPAIGN' header keyword)"""
         try:
             return self.header(ext=0)['CAMPAIGN']
         except KeyError:
@@ -639,7 +655,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
     @property
     def mission(self):
-        """Mission name, defaults to None if Not available"""
+        """'Kepler' or 'K2'. ('MISSION' header keyword)"""
         try:
             return self.header(ext=0)['MISSION']
         except KeyError:
@@ -681,7 +697,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
-                'keplerid': self.keplerid}
+                'targetid': self.targetid}
         return KeplerLightCurve(time=self.time,
                                 time_format='bkjd',
                                 time_scale='tdb',
@@ -703,7 +719,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
-                'keplerid': self.keplerid}
+                'targetid': self.targetid}
         return KeplerLightCurve(time=self.time,
                                 time_format='bkjd',
                                 time_scale='tdb',
@@ -794,7 +810,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
-                'keplerid': self.keplerid}
+                'targetid': self.targetid}
         return KeplerLightCurve(time=self.time,
                                 flux=lc.flux,
                                 time_format='bkjd',
@@ -809,7 +825,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         This method is intended to make it easy to cut out targets from
         Kepler/K2 "superstamp" regions or TESS FFI images.
 
-        Attributes
+        Parameters
         ----------
         images : list of str, or list of fits.ImageHDU objects
             Sorted list of FITS filename paths or ImageHDU objects to get
@@ -1107,7 +1123,7 @@ class TessTargetPixelFile(TargetPixelFile):
     Defines a TargetPixelFile class for the TESS Mission.
     Enables extraction of raw lightcurves and centroid positions.
 
-    Attributes
+    Parameters
     ----------
     path : str
         Path to a Kepler Target Pixel (FITS) File.
@@ -1120,17 +1136,20 @@ class TessTargetPixelFile(TargetPixelFile):
         super(TessTargetPixelFile, self).__init__(path,
                                                   quality_bitmask=quality_bitmask,
                                                   **kwargs)
+        self.quality_mask = TessQualityFlags.create_quality_mask(
+                                quality_array=self.hdu[1].data['QUALITY'],
+                                bitmask=quality_bitmask)
+        # Early TESS releases had cadences with time=NaN (i.e. missing data)
+        # which were not flagged by a QUALITY flag yet; the line below prevents
+        # these cadences from being used. They would break most methods!
+        self.quality_mask &= np.isfinite(self.hdu[1].data['TIME'])
         try:
             self.targetid = self.header()['TICID']
         except KeyError:
             self.targetid = None
 
     def __repr__(self):
-        return('TessTargetPixelFile(TICID: {})'.format(self.ticid))
-
-    @property
-    def ticid(self):
-        return self.targetid
+        return('TessTargetPixelFile(TICID: {})'.format(self.targetid))
 
     @property
     def sector(self):
@@ -1195,7 +1214,7 @@ class TessTargetPixelFile(TargetPixelFile):
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
-                'ticid': self.ticid}
+                'targetid': self.targetid}
         return TessLightCurve(time=self.time,
                               time_format='btjd',
                               time_scale='tdb',
@@ -1216,7 +1235,7 @@ class TessTargetPixelFile(TargetPixelFile):
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
-                'ticid': self.ticid}
+                'targetid': self.targetid}
         return TessLightCurve(time=self.time,
                               time_format='btjd',
                               time_scale='tdb',
