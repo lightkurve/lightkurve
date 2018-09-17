@@ -207,6 +207,8 @@ def test_tpf_to_fits():
 
 def test_tpf_factory():
     """Can we create TPFs using KeplerTargetPixelFileFactory?"""
+    from lightkurve.targetpixelfile import FactoryError
+
     factory = KeplerTargetPixelFileFactory(n_cadences=10, n_rows=6, n_cols=8)
     flux_0 = np.ones((6, 8))
     factory.add_cadence(frameno=0, flux=flux_0,
@@ -214,18 +216,109 @@ def test_tpf_factory():
     flux_9 = 3 * np.ones((6, 8))
     factory.add_cadence(frameno=9, flux=flux_9,
                         header={'TSTART': 90, 'TSTOP': 100})
+
+    # You shouldn't be able to build a TPF like this...because TPFs shouldn't
+    # have extensions where time stamps are duplicated (here frames 1-8 will have)
+    # time stamp zero
+    with pytest.raises(FactoryError) as exc:
+        tpf = factory.get_tpf()
+    [factory.add_cadence(frameno=i, flux=flux_0,
+                        header={'TSTART': i*10, 'TSTOP': (i*10)+10})  for i in np.arange(2, 9)]
+
+    # This should fail because the time stamps of the images are not in order...
+    with pytest.raises(FactoryError) as exc:
+        tpf = factory.get_tpf()
+
+    [factory.add_cadence(frameno=i, flux=flux_0,
+                        header={'TSTART': i*10, 'TSTOP': (i*10)+10})  for i in np.arange(1, 9)]
+
+    # This should pass
     tpf = factory.get_tpf()
+
     assert_array_equal(tpf.flux[0], flux_0)
     assert_array_equal(tpf.flux[9], flux_9)
     assert(tpf.time[0] == 5)
     assert(tpf.time[9] == 95)
 
+    # Can you add the WRONG sized frame?
+    flux_wrong = 3 * np.ones((6, 9))
+    with pytest.raises(FactoryError) as exc:
+        factory.add_cadence(frameno=2, flux=flux_wrong,
+                            header={'TSTART': 90, 'TSTOP': 100})
+
+    # Can you add the WRONG cadence?
+    flux_wrong = 3 * np.ones((6, 8))
+    with pytest.raises(FactoryError) as exc:
+        factory.add_cadence(frameno=11, flux=flux_wrong,
+                            header={'TSTART': 90, 'TSTOP': 100})
+
+    # Can we add our own keywords?
+    tpf = factory.get_tpf(hdu0_keywords = {'creator': 'Christina'})
+    assert tpf.header()['CREATOR'] == 'Christina'
+
 
 def test_tpf_from_images():
     """Basic tests of tpf.from_fits_images()"""
-    from astropy.io.fits import ImageHDU
-    images = [ImageHDU(data=np.ones((5, 5))) for i in range(5)]
-    tpf = KeplerTargetPixelFile.from_fits_images(images, size=(3, 3))
+    from glob import glob
+
+    from astropy.io import fits
+    from astropy import wcs
+    import astropy.units as u
+    from astropy.coordinates import SkyCoord
+    from lightkurve.targetpixelfile import FactoryError
+
+    # Can we read in a load of images?
+    header = fits.Header()
+    images = []
+    for i in range(5):
+        header['TSTART'] = i
+        header['TSTOP'] = i + 1
+        images.append(fits.ImageHDU(data=np.ones((5, 5)), header=header))
+
+    # Not without a wcs...
+    with pytest.raises(FactoryError) as exc:
+        tpf_list = KeplerTargetPixelFile.from_fits_images(images, size=(3, 3))
+
+    # Make a fake WCS based on astropy.docs...
+    w = wcs.WCS(naxis=2)
+    w.wcs.crpix = [-234.75, 8.3393]
+    w.wcs.cdelt = np.array([-0.066667, 0.066667])
+    w.wcs.crval = [0, -90]
+    w.wcs.ctype = ["RA---AIR", "DEC--AIR"]
+    w.wcs.set_pv([(2, 1, 45.0)])
+    pixcrd = np.array([[0, 0], [24, 38], [45, 98]], np.float_)
+    header = w.to_header()
+    ra, dec = 268.21686048, -73.66991904
+
+    # Add that header to our images...
+    images = []
+    for i in range(5):
+        header['TSTART'] = i
+        header['TSTOP'] = i + 1
+        images.append(fits.ImageHDU(data=np.ones((5, 5)), header=header))
+
+    # Now this should work.
+    tpf_list = KeplerTargetPixelFile.from_fits_images(images, size=(3, 3), position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
+    assert isinstance(tpf_list, KeplerTargetPixelFile)
+
+    # Can we read in a list of file names or a list of HDUlists?
+    hdus = []
+    for idx, im in enumerate(images):
+        hdu = fits.HDUList([fits.PrimaryHDU(), im])
+        hdu.writeto(get_pkg_data_filename('data/test_factory{}.fits'.format(idx)), overwrite=True)
+        hdus.append(hdu)
+
+    fnames = [get_pkg_data_filename('data/test_factory{}.fits'.format(i)) for i in range(5)]
+
+    # Should be able to run with a list of file names
+    tpf_fnames = KeplerTargetPixelFile.from_fits_images(fnames,
+                                                        size=(3, 3),
+                                                        position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
+
+    # Should be able to run with a list of HDUlists
+    tpf_hdus = KeplerTargetPixelFile.from_fits_images(hdus,
+                                                        size=(3, 3),
+                                                        position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
 
 
 def test_properties2(capfd):
