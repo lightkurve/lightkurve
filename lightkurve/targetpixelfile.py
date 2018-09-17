@@ -1020,7 +1020,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                 **keys)
 
     @staticmethod
-    def from_fits_images(images, position=None, size=(11, 11), extension=None,
+    def from_fits_images(images, position=None, size=(11, 11), extension=1,
                          target_id="unnamed-target", hdu0_keywords={}, **kwargs):
         """Creates a new Target Pixel File from a set of images.
 
@@ -1056,7 +1056,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
         carry_keywords = {}
 
         if not isinstance(position, SkyCoord):
-            log.error('Position must be an astropy.coordinates.SkyCoord.')
+            raise FactoryError('Position must be an astropy.coordinates.SkyCoord.')
+
         # Define a helper function to accept images in a flexible way
         def _open_image(img, extension):
             if isinstance(img, fits.ImageHDU):
@@ -1084,7 +1085,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
             column, row = wcs_ref.wcs_world2pix(np.asarray([[position.ra.deg], [position.dec.deg]]).T, 0)[0]
             column, row = int(column), int(row)
         except Exception:
-            log.error("Images must have a valid WCS astrometric solution.")
+            raise FactoryError("Images must have a valid WCS astrometric solution.")
             return None
 
         # Create a factory and set default keyword values based on the middle image
@@ -1118,6 +1119,11 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                   size=size, mode='partial')
             factory.add_cadence(frameno=idx, flux=cutout.data, header=hdu.header)
         return factory.get_tpf(hdu0_keywords=allkeys, ext_info=ext_info, **kwargs)
+
+
+class FactoryError(Exception):
+    """Raised if there is a problem creating a TPF."""
+    pass
 
 
 class KeplerTargetPixelFileFactory(object):
@@ -1160,11 +1166,18 @@ class KeplerTargetPixelFileFactory(object):
                     flux_bkg=None, flux_bkg_err=None, cosmic_rays=None,
                     header={}):
         """Populate the data for a single cadence."""
+        if frameno >= self.n_cadences:
+            raise FactoryError('Can not add cadence {}, n_cadences set to {}'.format(frameno, self.n_cadences))
+
         # 2D-data
         for col in ['raw_cnts', 'flux', 'flux_err', 'flux_bkg',
                     'flux_bkg_err', 'cosmic_rays']:
             if locals()[col] is not None:
+                if locals()[col].shape != (self.n_rows, self.n_cols):
+                    raise FactoryError('Can not add cadence with a different shape ({} x {})'.format(self.n_rows, self.n_cols))
+
                 vars(self)[col][frameno] = locals()[col]
+
         # 1D-data
         if 'TSTART' in header and 'TSTOP' in header:
             self.time[frameno] = (header['TSTART'] + header['TSTOP']) / 2.
@@ -1181,8 +1194,19 @@ class KeplerTargetPixelFileFactory(object):
         if wcs == None:
             self.pos_corr1[frameno], self.pos_corr2[frameno] = None, None
 
+    def _check_data(self):
+        ''' Check the data before writing to a TPF for any obvious errors
+        '''
+        if len(self.time) != len(np.unique(self.time)):
+            raise FactoryError('Duplicate time stamps in the TPF')
+        if ~np.all(self.time == np.sort(self.time)):
+            raise FactoryError('Starting time values are not sorted')
+        if np.nansum(self.flux) == 0:
+            raise FactoryError('No flux has been set.')
+
     def get_tpf(self, hdu0_keywords={}, ext_info={}, **kwargs):
         """Returns a KeplerTargetPixelFile object."""
+        self._check_data()
         return KeplerTargetPixelFile(self._hdulist(hdu0_keywords=hdu0_keywords, ext_info=ext_info), **kwargs)
 
     def _hdulist(self, hdu0_keywords={}, ext_info={}):
