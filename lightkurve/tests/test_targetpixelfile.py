@@ -169,6 +169,7 @@ def test_to_lightcurve():
         tpf.to_lightcurve(aperture_mask='all')
         lc = tpf.to_lightcurve(aperture_mask='pipeline')
         assert lc.astropy_time.scale == 'tdb'
+        assert lc.label == tpf.hdu[0].header['OBJECT']
 
 
 def test_bkg_lightcurve():

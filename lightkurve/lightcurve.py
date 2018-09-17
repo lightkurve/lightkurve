@@ -617,8 +617,11 @@ class LightCurve(object):
             if ax is None:
                 fig, ax = plt.subplots(1)
             if method == 'scatter':
-                sc = ax.scatter(x=self.time, y=flux, **kwargs)
-                if show_colorbar and ('c' in kwargs) and hasattr(kwargs['c'], '__iter__'):
+                sc = ax.scatter(self.time, flux, **kwargs)
+                # Colorbars should only be plotted if the user specifies, and there is
+                # a color specified that is not a string (e.g. 'C1') and is iterable.
+                if show_colorbar and ('c' in kwargs) and \
+                  (not isinstance(kwargs['c'], str)) and hasattr(kwargs['c'], '__iter__'):
                     cbar = plt.colorbar(sc, ax=ax)
                     cbar.set_label(colorbar_label)
                     cbar.ax.yaxis.set_tick_params(tick1On=False, tick2On=False)
@@ -626,7 +629,7 @@ class LightCurve(object):
             elif method == 'errorbar':
                 ax.errorbar(x=self.time, y=flux, yerr=flux_err, **kwargs)
             else:
-                ax.plot(x=self.time, y=flux, **kwargs)
+                ax.plot(self.time, flux, **kwargs)
             ax.set_xlabel(xlabel)
             ax.set_ylabel(ylabel)
             # Show the legend if labels were set

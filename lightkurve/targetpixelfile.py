@@ -897,6 +897,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
+                'label': self.hdu[0].header['OBJECT'],
                 'targetid': self.targetid}
         return KeplerLightCurve(time=self.time,
                                 time_format='bkjd',
@@ -919,6 +920,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
+                'label': self.hdu[0].header['OBJECT'],
                 'targetid': self.targetid}
         return KeplerLightCurve(time=self.time,
                                 time_format='bkjd',
@@ -1420,6 +1422,7 @@ class TessTargetPixelFile(TargetPixelFile):
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
+                'label': self.hdu[0].header['OBJECT'],
                 'targetid': self.targetid}
         return TessLightCurve(time=self.time,
                               time_format='btjd',
@@ -1441,6 +1444,7 @@ class TessTargetPixelFile(TargetPixelFile):
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
+                'label': self.hdu[0].header['OBJECT'],
                 'targetid': self.targetid}
         return TessLightCurve(time=self.time,
                               time_format='btjd',
