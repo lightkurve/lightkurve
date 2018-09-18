@@ -16,10 +16,11 @@ from __future__ import division, print_function
 import logging
 import numpy as np
 from astropy.stats import sigma_clip
+from .utils import KeplerQualityFlags
 
 log = logging.getLogger(__name__)
 
-from .utils import KeplerQualityFlags
+# Import the optional Bokeh dependency, or print a friendly error otherwise.
 try:
     from bokeh.io import show, output_notebook
     from bokeh.plotting import figure, ColumnDataSource
@@ -37,31 +38,13 @@ except ImportError:
     raise
 
 
-__all__ = []
-
-
-def map_cadences(tpf):
-    """Returns a lookup dictionary to map cadence numbers onto array indexes.
-
-    Parameters
-    ----------
-    tpf : TargetPixelFile
-        A target pixel file to be mapped.
-
-    Returns
-    -------
-    cadence_lookup: dict
-        A dictionary mapping cadenceno onto flux array index.
-    """
-    return {cad: j for j, cad in enumerate(tpf.cadenceno)}
-
-
 def prepare_lightcurve_datasource(lc):
-    """Prepare a bokeh ColumnDataSource object for tool tips
+    """Prepare a bokeh ColumnDataSource object for tool tips.
 
     Parameters
     ----------
-    lc: LightCurve object
+    lc : LightCurve object
+        The light curve to be shown.
 
     Returns
     -------
@@ -86,13 +69,12 @@ def prepare_lightcurve_datasource(lc):
             qual_strings.append("; ".join(flag_str_list))
 
     lc_source = ColumnDataSource(data=dict(
-        time=lc.time,
-        time_iso=human_time,
-        flux=lc.flux,
-        cadence=lc.cadenceno,
-        quality_code=lc.quality,
-        quality=np.array(qual_strings)))
-
+                                 time=lc.time,
+                                 time_iso=human_time,
+                                 flux=lc.flux,
+                                 cadence=lc.cadenceno,
+                                 quality_code=lc.quality,
+                                 quality=np.array(qual_strings)))
     return lc_source
 
 
@@ -127,6 +109,11 @@ def get_lightcurve_y_limits(lc_source):
     ----------
     lc_source : bokeh.plotting.ColumnDataSource
         The lightcurve being shown.
+
+    Returns
+    -------
+    ymin, ymax : float, float
+        Flux min and max limits.
     """
     flux = sigma_clip(lc_source.data['flux'], sigma=5)
     low, high = np.nanpercentile(flux, (1, 99))
@@ -147,6 +134,8 @@ def make_lightcurve_figure_elements(lc, lc_source):
     Returns
     ----------
     fig : `bokeh.plotting.figure` instance
+    step_renderer : GlyphRenderer
+    vertical_line : Span
     """
     if lc.mission == 'K2':
         title = "Lightcurve for {} (K2 C{})".format(
@@ -162,26 +151,25 @@ def make_lightcurve_figure_elements(lc, lc_source):
 
     fig = figure(title=title, plot_height=340, plot_width=600,
                  tools="pan,wheel_zoom,box_zoom,tap,reset",
-                 toolbar_location="below", logo=None)
+                 toolbar_location="below", logo=None,
+                 border_fill_color="whitesmoke")
     fig.title.offset = -10
-    fig.border_fill_color = "whitesmoke"
-
     fig.yaxis.axis_label = 'Flux (e/s)'
     fig.xaxis.axis_label = 'Time - 2454833 (days)'
 
     ylims = get_lightcurve_y_limits(lc_source)
     fig.y_range = Range1d(start=ylims[0], end=ylims[1])
 
-    step_dat = fig.step('time', 'flux', line_width=1, color='gray',
-                        source=lc_source, nonselection_line_color='gray',
-                        nonselection_line_alpha=1.0)
-
-    circ = fig.circle('time', 'flux', source=lc_source, fill_alpha=0.3, size=8, line_color=None,
-                      selection_color="firebrick", nonselection_fill_alpha=0.0,
-                      nonselection_fill_color="grey", nonselection_line_color=None,
-                      nonselection_line_alpha=0.0, fill_color=None,
-                      hover_fill_color="firebrick", hover_alpha=0.9, hover_line_color="white")
-
+    # Add step lines, circles, and hover-over tooltips
+    fig.step('time', 'flux', line_width=1, color='gray',
+             source=lc_source, nonselection_line_color='gray',
+             nonselection_line_alpha=1.0)
+    circ = fig.circle('time', 'flux', source=lc_source, fill_alpha=0.3, size=8,
+                      line_color=None, selection_color="firebrick",
+                      nonselection_fill_alpha=0.0, nonselection_fill_color="grey",
+                      nonselection_line_color=None, nonselection_line_alpha=0.0,
+                      fill_color=None, hover_fill_color="firebrick",
+                      hover_alpha=0.9, hover_line_color="white")
     fig.add_tools(HoverTool(tooltips=[("Cadence", "@cadence"),
                                       ("Time ({})".format(lc.time_format.upper()),
                                        "@time{0,0.000}"),
@@ -194,24 +182,26 @@ def make_lightcurve_figure_elements(lc, lc_source):
                             point_policy="snap_to_data"))
 
     # Vertical line to indicate the cadence
-    vert = Span(location=lc.time[0], dimension='height', line_color='firebrick',
-                line_width=4, line_alpha=0.5)
-    fig.add_layout(vert)
+    vertical_line = Span(location=lc.time[0], dimension='height',
+                         line_color='firebrick', line_width=4, line_alpha=0.5)
+    fig.add_layout(vertical_line)
 
-    return fig, step_dat, vert
+    return fig, vertical_line
 
 
-def make_tpf_figure_elements(tpf, tpf_source):
+def make_tpf_figure_elements(tpf, tpf_source, pedestal=0):
     """Returns the lightcurve figure elements.
 
     Parameters
     ----------
     tpf : TargetPixelFile
+        TPF to show.
     tpf_source : bokeh.plotting.ColumnDataSource
+        TPF data source.
 
     Returns
-    ----------
-    fig : bokeh.plotting.figure
+    -------
+    fig, stretch_slider : bokeh.plotting.figure.Figure, RangeSlider
     """
     if tpf.mission in ['Kepler', 'K2']:
         title = 'Pixel data (CCD {}.{})'.format(tpf.module, tpf.output)
@@ -224,43 +214,61 @@ def make_tpf_figure_elements(tpf, tpf_source):
                  x_range=(tpf.column, tpf.column+tpf.shape[2]),
                  y_range=(tpf.row, tpf.row+tpf.shape[1]),
                  title=title, tools='tap,box_select,wheel_zoom,reset',
-                 toolbar_location="below", logo=None)
+                 toolbar_location="below", logo=None,
+                 border_fill_color="whitesmoke")
 
     fig.yaxis.axis_label = 'Pixel Row Number'
     fig.xaxis.axis_label = 'Pixel Column Number'
-    fig.border_fill_color = "whitesmoke"
 
-    pedestal = np.nanmin(tpf.flux)
-    vlo, lo, med, hi, vhi = np.nanpercentile(tpf.flux-pedestal, [0.2, 1, 50, 95, 99.8])
+    vlo, lo, hi, vhi = np.nanpercentile(tpf.flux - pedestal, [0.2, 1, 95, 99.8])
     vstep = (np.log10(vhi) - np.log10(vlo)) / 300.0  # assumes counts >> 1.0!
     color_mapper = LogColorMapper(palette="Viridis256", low=lo, high=hi)
 
-    fig_dat = fig.image([pedestal + tpf.flux[0, :, :]], x=tpf.column, y=tpf.row,
-                        dw=tpf.shape[2], dh=tpf.shape[1], dilate=True,
-                        color_mapper=color_mapper)
+    fig.image([pedestal + tpf.flux[0, :, :]], x=tpf.column, y=tpf.row,
+              dw=tpf.shape[2], dh=tpf.shape[1], dilate=True,
+              color_mapper=color_mapper, name="tpfimg")
 
     # The colorbar will update with the screen stretch slider
     # The colorbar margin increases as the length of the tick labels grows.
     # This colorbar share of the plot window grows, shrinking plot area.
     # This effect is known, some workarounds might work to fix the plot area:
     # https://github.com/bokeh/bokeh/issues/5186
-    color_bar = ColorBar(color_mapper=color_mapper, ticker=LogTicker(),
+    color_bar = ColorBar(color_mapper=color_mapper, ticker=LogTicker(desired_num_ticks=8),
                          label_standoff=-10, border_line_color=None, location=(0, 0),
                          background_fill_color='whitesmoke', major_label_text_align='left',
                          major_label_text_baseline='middle', title='e/s', margin=0)
     fig.add_layout(color_bar, 'right')
+
     color_bar.formatter = PrintfTickFormatter(format="%14u")
 
     fig.rect('xx', 'yy', 1, 1, source=tpf_source, fill_color='gray',
              fill_alpha=0.4, line_color='white')
 
-    return (fig, fig_dat,
-            {'pedestal': pedestal, 'vlo': vlo, 'lo': lo, 'med': med,
-             'hi': hi, 'vhi': vhi, 'vstep': vstep})
+    # Configure the stretch slider and its callback function
+    stretch_slider = RangeSlider(start=np.log10(vlo),
+                                 end=np.log10(vhi),
+                                 step=vstep,
+                                 title='Screen Stretch (log)',
+                                 value=(np.log10(lo), np.log10(hi)),
+                                 orientation='horizontal',
+                                 width=200,
+                                 direction='ltr',
+                                 show_value=True,
+                                 sizing_mode='fixed',
+                                 name='tpfstretch')
+
+    def stretch_change_callback(attr, old, new):
+        """TPF stretch slider callback."""
+        fig.select('tpfimg')[0].glyph.color_mapper.high = 10**new[1]
+        fig.select('tpfimg')[0].glyph.color_mapper.low = 10**new[0]
+
+    stretch_slider.on_change('value', stretch_change_callback)
+
+    return fig, stretch_slider
 
 
-def pixel_selector_standalone(tpf, notebook_url='localhost:8888'):
-    """Display an interactive IPython Notebook widget to select pixel masks.
+def show_interact_widget(tpf, lc=None, notebook_url='localhost:8888', max_cadences=30000):
+    """Display an interactive Jupyter Notebook widget to inspect the pixel data.
 
     The widget will show both the lightcurve and pixel data.  The pixel data
     supports pixel selection via Bokeh tap and box select tools in an
@@ -276,7 +284,6 @@ def pixel_selector_standalone(tpf, notebook_url='localhost:8888'):
         Target Pixel File to interact with
     notebook_url: str
         Location of the Jupyter notebook page (default: "localhost:8888")
-
         When showing Bokeh applications, the Bokeh server must be
         explicitly configured to allow connections originating from
         different URLs. This parameter defaults to the standard notebook
@@ -284,44 +291,43 @@ def pixel_selector_standalone(tpf, notebook_url='localhost:8888'):
         will need to supply this value for the application to display
         properly. If no protocol is supplied in the URL, e.g. if it is
         of the form "localhost:8888", then "http" will be used.
+    max_cadences : int
+        Raise a RuntimeError if the number of cadences shown is larger than
+        this value. This limit helps keep browsers from becoming unresponsive.
     """
-
-    lc = tpf.to_lightcurve(aperture_mask=tpf.pipeline_mask)
+    if lc is None:
+        lc = tpf.to_lightcurve(aperture_mask=tpf.pipeline_mask)
 
     n_pixels = tpf.flux[0, :, :].size
     pixel_index_array = np.arange(0, n_pixels, 1, dtype=int).reshape(tpf.flux[0, :, :].shape)
 
     # Bokeh cannot handle many data points
     # https://github.com/bokeh/bokeh/issues/7490
-    if len(lc.cadenceno) > 30000:
-        raise RuntimeError('Interact cannot display more than 30000 cadences.')
+    if len(lc.cadenceno) > max_cadences:
+        raise RuntimeError('Interact cannot display more than {} cadences.'.format(max_cadences))
 
     def create_interact_ui(doc):
-
         # The data source includes metadata for hover-over tooltips
         lc_source = prepare_lightcurve_datasource(lc)
         tpf_source = prepare_tpf_datasource(tpf)
 
-        # Lightcurve plot
-        fig1, step_dat, vert = make_lightcurve_figure_elements(lc, lc_source)
+        # Create the lightcurve figure and its vertical marker
+        fig_lc, vertical_line = make_lightcurve_figure_elements(lc, lc_source)
 
-        # Postage stamp image
-        fig2, fig2_dat, stretch = make_tpf_figure_elements(tpf, tpf_source)
+        # Create the TPF figure and its stretch slider
+        pedestal = np.nanmin(tpf.flux)
+        fig_tpf, stretch_slider = make_tpf_figure_elements(tpf, tpf_source, pedestal=pedestal)
 
-        # Interactive slider widgets
-        cadence_lookup = map_cadences(tpf)
-        cadence_slider = Slider(start=np.min(tpf.cadenceno), end=np.max(tpf.cadenceno),
-                                value=np.min(tpf.cadenceno), step=1,
-                                title="Cadence Number", width=490)
+        # Helper lookup table which maps cadence number onto flux array index.
+        tpf_index_lookup = {cad: idx for idx, cad in enumerate(tpf.cadenceno)}
 
-        screen_slider = RangeSlider(start=np.log10(stretch['vlo']),
-                                    end=np.log10(stretch['vhi']),
-                                    step=stretch['vstep'], title='Screen Stretch',
-                                    value=(np.log10(stretch['lo']), np.log10(stretch['hi'])),
-                                    orientation='horizontal',
-                                    width=200, direction='ltr', show_value=True,
-                                    sizing_mode='fixed')
-
+        # Interactive slider widgets and buttons to select the cadence number
+        cadence_slider = Slider(start=np.min(tpf.cadenceno),
+                                end=np.max(tpf.cadenceno),
+                                value=np.min(tpf.cadenceno),
+                                step=1,
+                                title="Cadence Number",
+                                width=490)
         r_button = Button(label=">", button_type="default", width=30)
         l_button = Button(label="<", button_type="default", width=30)
 
@@ -329,7 +335,7 @@ def pixel_selector_standalone(tpf, notebook_url='localhost:8888'):
 
         # Callbacks
         def update_upon_pixel_selection(attr, old, new):
-            '''Callback to take action when pixels are selected'''
+            """Callback to take action when pixels are selected."""
             # check if a selection was "re-clicked".
             if ((sorted(existing_selection['indices']) == sorted(new.indices)) &
                     (new.indices != [])):
@@ -344,28 +350,23 @@ def pixel_selector_standalone(tpf, notebook_url='localhost:8888'):
                 lc_new = tpf.to_lightcurve(aperture_mask=selected_mask)
                 lc_source.data['flux'] = lc_new.flux
                 ylims = get_lightcurve_y_limits(lc_source)
-                fig1.y_range.start = ylims[0]
-                fig1.y_range.end = ylims[1]
+                fig_lc.y_range.start = ylims[0]
+                fig_lc.y_range.end = ylims[1]
             else:
                 lc_source.data['flux'] = lc.flux * 0.0
-                fig1.y_range.start = -1
-                fig1.y_range.end = 1
+                fig_lc.y_range.start = -1
+                fig_lc.y_range.end = 1
 
         def update_upon_cadence_change(attr, old, new):
             '''Callback to take action when cadence slider changes'''
             if new in tpf.cadenceno:
-                frameno = cadence_lookup[new]
-                fig2_dat.data_source.data['image'] = [tpf.flux[frameno, :, :]
-                                                      - stretch['pedestal']]
-                vert.update(location=tpf.time[frameno])
+                frameno = tpf_index_lookup[new]
+                fig_tpf.select('tpfimg')[0].data_source.data['image'] = [tpf.flux[frameno, :, :]
+                                                                         - pedestal]
+                vertical_line.update(location=tpf.time[frameno])
             else:
-                fig2_dat.data_source.data['image'] = [tpf.flux[0, :, :] * np.NaN]
+                fig_tpf.select('tpfimg')[0].data_source.data['image'] = [tpf.flux[0, :, :] * np.NaN]
             lc_source.selected.indices = []
-
-        def update_upon_stetch_change(attr, old, new):
-            '''Callback to take action when screen stretch'''
-            fig2_dat.glyph.color_mapper.high = 10**new[1]
-            fig2_dat.glyph.color_mapper.low = 10**new[0]
 
         def go_right_by_one():
             existing_value = cadence_slider.value
@@ -387,13 +388,12 @@ def pixel_selector_standalone(tpf, notebook_url='localhost:8888'):
         tpf_source.on_change('selected', update_upon_pixel_selection)
         lc_source.on_change('selected', jump_to_lightcurve_position)
         cadence_slider.on_change('value', update_upon_cadence_change)
-        screen_slider.on_change('value', update_upon_stetch_change)
 
         # Layout all of the plots
         space1, space2, space3 = Spacer(width=15), Spacer(width=30), Spacer(width=80)
-        widgets_and_figures = layout([fig1, fig2],
+        widgets_and_figures = layout([fig_lc, fig_tpf],
                                      [l_button, space1, r_button, space2,
-                                      cadence_slider, space3, screen_slider])
+                                      cadence_slider, space3, stretch_slider])
         doc.add_root(widgets_and_figures)
 
-    show(create_interact_ui, notebook_url=notebook_url)
+    return show(create_interact_ui, notebook_url=notebook_url)
