@@ -22,6 +22,7 @@ log = logging.getLogger(__name__)
 
 # Import the optional Bokeh dependency, or print a friendly error otherwise.
 try:
+    import bokeh  # Import bokeh first so we get an ImportError we can catch
     from bokeh.io import show, output_notebook
     from bokeh.plotting import figure, ColumnDataSource
     from bokeh.models import LogColorMapper, Selection, Slider, RangeSlider, \
