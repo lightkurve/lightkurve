@@ -183,6 +183,7 @@ def test_lightcurve_plots():
         lcf.SAP_FLUX.plot()
         lcf.SAP_FLUX.plot(normalize=False, title="Not the default")
         lcf.SAP_FLUX.scatter()
+        lcf.SAP_FLUX.scatter(c='C3')
         lcf.SAP_FLUX.scatter(c=lcf.SAP_FLUX.time, show_colorbar=True, colorbar_label='Time')
         lcf.SAP_FLUX.errorbar()
         plt.close('all')

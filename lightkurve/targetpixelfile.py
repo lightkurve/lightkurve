@@ -14,6 +14,7 @@ import numpy as np
 from tqdm import tqdm
 from astropy.coordinates import SkyCoord
 from astropy.wcs.utils import skycoord_to_pixel, pixel_to_skycoord
+from astropy.io.fits.card import Undefined
 
 from . import PACKAGEDIR, MPLSTYLE
 from .lightcurve import KeplerLightCurve, TessLightCurve
@@ -896,6 +897,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
+                'label': self.hdu[0].header['OBJECT'],
                 'targetid': self.targetid}
         return KeplerLightCurve(time=self.time,
                                 time_format='bkjd',
@@ -918,6 +920,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
+                'label': self.hdu[0].header['OBJECT'],
                 'targetid': self.targetid}
         return KeplerLightCurve(time=self.time,
                                 time_format='bkjd',
@@ -1017,8 +1020,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                 **keys)
 
     @staticmethod
-    def from_fits_images(images, position=None, size=(11, 11), extension=None,
-                         target_id="unnamed-target", **kwargs):
+    def from_fits_images(images, position=None, size=(11, 11), extension=1,
+                         target_id="unnamed-target", hdu0_keywords={}, **kwargs):
         """Creates a new Target Pixel File from a set of images.
 
         This method is intended to make it easy to cut out targets from
@@ -1038,6 +1041,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
             or name to use. Default: 0.
         target_id : int or str
             Unique identifier of the target to be recorded in the TPF.
+        hdu0_keywords : dict
+            Additional keywords to add to the first header file.
         **kwargs : dict
             Extra arguments to be passed to the `KeplerTargetPixelFile` constructor.
 
@@ -1046,8 +1051,15 @@ class KeplerTargetPixelFile(TargetPixelFile):
         tpf : KeplerTargetPixelFile
             A new Target Pixel File assembled from the images.
         """
+        basic_keywords = ['MISSION', 'TELESCOP', 'INSTRUME', 'QUARTER',
+                          'CAMPAIGN', 'CHANNEL', 'MODULE', 'OUTPUT']
+        carry_keywords = {}
+
+        if not isinstance(position, SkyCoord):
+            raise FactoryError('Position must be an astropy.coordinates.SkyCoord.')
+
         # Define a helper function to accept images in a flexible way
-        def _open_image(img):
+        def _open_image(img, extension):
             if isinstance(img, fits.ImageHDU):
                 hdu = img
             elif isinstance(img, fits.HDUList):
@@ -1058,23 +1070,22 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
         # Set the default extension if unspecified
         if extension is None:
+            extension = 0
             if isinstance(images[0], str) and images[0].endswith("ffic.fits"):
                 extension = 1  # TESS FFIs have the image data in extension #1
-            else:
-                extension = 0  # Default is to use the primary HDU
 
         # If no position is given, ensure the cut-out size matches the image size
         if position is None:
-            size = _open_image(images[0]).data.shape
+            size = _open_image(images[0], extension).data.shape
 
         # Find middle image to use as a WCS reference
         try:
-            mid_hdu = _open_image(images[int(len(images) / 2) - 1])
+            mid_hdu = _open_image(images[int(len(images) / 2) - 1], extension)
             wcs_ref = WCS(mid_hdu)
-            pixelpos_ref = skycoord_to_pixel(position, wcs=wcs_ref)
-            column, row = int(np.round(pixelpos_ref[0])), int(np.round(pixelpos_ref[1]))
+            column, row = wcs_ref.wcs_world2pix(np.asarray([[position.ra.deg], [position.dec.deg]]).T, 0)[0]
+            column, row = int(column), int(row)
         except Exception:
-            log.error("Images must have a valid WCS astrometric solution.")
+            raise FactoryError("Images must have a valid WCS astrometric solution.")
             return None
 
         # Create a factory and set default keyword values based on the middle image
@@ -1082,42 +1093,37 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                                n_rows=size[0],
                                                n_cols=size[1],
                                                target_id=target_id)
-        factory.keywords = mid_hdu.header
 
-        # Add all images one-by-one
+        #Get some basic keywords
+        for kw in basic_keywords:
+            if kw in mid_hdu.header:
+                if not isinstance(mid_hdu.header[kw], Undefined):
+                    carry_keywords[kw] = mid_hdu.header[kw]
+        if ('MISSION' not in carry_keywords) and ('TELESCOP' in carry_keywords):
+            carry_keywords['MISSION'] = carry_keywords['TELESCOP']
+
+        allkeys = hdu0_keywords.copy()
+        allkeys.update(carry_keywords)
+
+        ext_info = {'1CRV5P':column, '2CRV5P':row}
+
         for idx, img in tqdm(enumerate(images), total=len(images)):
-            hdu = _open_image(img)
-            # Get positional shift of the image compared to the reference WCS
-            wcs_current = WCS(hdu)
-            pixelpos_current = skycoord_to_pixel(position, wcs=wcs_current)
-            hdu.header['POS_CORR1'] = pixelpos_current[0] - pixelpos_ref[0]
-            hdu.header['POS_CORR2'] = pixelpos_current[1] - pixelpos_ref[1]
+            hdu = _open_image(img, extension)
+
+            if idx == 0:  # Get default keyword values from the first image
+                factory.keywords = hdu.header
             if position is None:
                 cutout = hdu
             else:
-                cutout = Cutout2D(hdu.data, position, size=size, wcs=wcs_ref, mode='partial')
-            factory.add_cadence(frameno=idx, wcs=wcs_ref, flux=cutout.data, header=hdu.header)
+                cutout = Cutout2D(hdu.data, position, wcs=WCS(hdu.header),
+                                  size=size, mode='partial')
+            factory.add_cadence(frameno=idx, flux=cutout.data, header=hdu.header)
+        return factory.get_tpf(hdu0_keywords=allkeys, ext_info=ext_info, **kwargs)
 
-        # Override the defaults where necessary
-        ext_info = {}
-        ext_info['TFORM4'] = '{}J'.format(size[0] * size[1])
-        ext_info['TDIM4'] = '({},{})'.format(size[0], size[1])
-        ext_info.update(cutout.wcs.to_header())
 
-        # TPF contains multiple data columns that require WCS
-        for m in [4, 5, 6, 7, 8, 9]:
-            if m > 4:
-                ext_info["TFORM{}".format(m)] = '{}E'.format(size[0] * size[1])
-            ext_info['TDIM{}'.format(m)] = '({},{})'.format(size[0], size[1])
-            # Compute location of TPF lower left corner
-            # Int statement contains modulus so that .5 values always round up.
-            # We cannot use numpy.round() as it rounds to the even number.
-            half_tpfsize_col = int((size[0] - 1) / 2 + (size[0] + 1) % 2)
-            half_tpfsize_row = int((size[1] - 1) / 2 + (size[1] + 1) % 2)
-            ext_info['1CRV{}P'.format(m)] = column - half_tpfsize_col + factory.keywords['CRVAL1P']
-            ext_info['2CRV{}P'.format(m)] = row - half_tpfsize_row + factory.keywords['CRVAL2P']
-
-        return factory.get_tpf(ext_info=ext_info)
+class FactoryError(Exception):
+    """Raised if there is a problem creating a TPF."""
+    pass
 
 
 class KeplerTargetPixelFileFactory(object):
@@ -1160,11 +1166,18 @@ class KeplerTargetPixelFileFactory(object):
                     flux_bkg=None, flux_bkg_err=None, cosmic_rays=None,
                     header={}):
         """Populate the data for a single cadence."""
+        if frameno >= self.n_cadences:
+            raise FactoryError('Can not add cadence {}, n_cadences set to {}'.format(frameno, self.n_cadences))
+
         # 2D-data
         for col in ['raw_cnts', 'flux', 'flux_err', 'flux_bkg',
                     'flux_bkg_err', 'cosmic_rays']:
             if locals()[col] is not None:
+                if locals()[col].shape != (self.n_rows, self.n_cols):
+                    raise FactoryError('Can not add cadence with a different shape ({} x {})'.format(self.n_rows, self.n_cols))
+
                 vars(self)[col][frameno] = locals()[col]
+
         # 1D-data
         if 'TSTART' in header and 'TSTOP' in header:
             self.time[frameno] = (header['TSTART'] + header['TSTOP']) / 2.
@@ -1174,21 +1187,32 @@ class KeplerTargetPixelFileFactory(object):
             self.cadenceno[frameno] = header['CADENCEN']
         if 'QUALITY' in header:
             self.quality[frameno] = header['QUALITY']
-        if 'POSCORR1' in header:
+        if 'POS_CORR1' in header:
             self.pos_corr1[frameno] = header['POS_CORR1']
-        if 'POSCORR2' in header:
+        if 'POS_CORR2' in header:
             self.pos_corr2[frameno] = header['POS_CORR2']
         if wcs == None:
             self.pos_corr1[frameno], self.pos_corr2[frameno] = None, None
 
-    def get_tpf(self, ext_info={}, **kwargs):
-        """Returns a KeplerTargetPixelFile object."""
-        return KeplerTargetPixelFile(self._hdulist(ext_info), **kwargs)
+    def _check_data(self):
+        ''' Check the data before writing to a TPF for any obvious errors
+        '''
+        if len(self.time) != len(np.unique(self.time)):
+            raise FactoryError('Duplicate time stamps in the TPF')
+        if ~np.all(self.time == np.sort(self.time)):
+            raise FactoryError('Starting time values are not sorted')
+        if np.nansum(self.flux) == 0:
+            raise FactoryError('No flux has been set.')
 
-    def _hdulist(self, ext_info={}):
+    def get_tpf(self, hdu0_keywords={}, ext_info={}, **kwargs):
+        """Returns a KeplerTargetPixelFile object."""
+        self._check_data()
+        return KeplerTargetPixelFile(self._hdulist(hdu0_keywords=hdu0_keywords, ext_info=ext_info), **kwargs)
+
+    def _hdulist(self, hdu0_keywords={}, ext_info={}):
         """Returns an astropy.io.fits.HDUList object."""
-        return fits.HDUList([self._make_primary_hdu(),
-                             self._make_target_extension(ext_info),
+        return fits.HDUList([self._make_primary_hdu(hdu0_keywords=hdu0_keywords),
+                             self._make_target_extension(ext_info=ext_info),
                              self._make_aperture_extension()])
 
     def _header_template(self, extension):
@@ -1197,7 +1221,7 @@ class KeplerTargetPixelFileFactory(object):
                                    "tpf-ext{}-header.txt".format(extension))
         return fits.Header.fromtextfile(template_fn)
 
-    def _make_primary_hdu(self):
+    def _make_primary_hdu(self, hdu0_keywords={}):
         """Returns the primary extension (#0)."""
         hdu = fits.PrimaryHDU()
         # Copy the default keywords from a template file from the MAST archive
@@ -1210,14 +1234,23 @@ class KeplerTargetPixelFileFactory(object):
         hdu.header['CREATOR'] = "lightkurve"
         hdu.header['OBJECT'] = self.target_id
         hdu.header['KEPLERID'] = self.target_id
+        # Empty a bunch of keywords rather than having incorrect info
+        for kw in ["PROCVER", "FILEVER", "CHANNEL", "MODULE", "OUTPUT",
+                   "TIMVERSN", "CAMPAIGN", "DATA_REL", "TTABLEID",
+                   "RA_OBJ", "DEC_OBJ"]:
+            hdu.header[kw] = ""
 
-        for keyword in ['RA_OBJ', 'DEC_OBJ', 'CHANNEL', 'CAMPAIGN', "PROCVER",
-                        "FILEVER", "MODULE", "OUTPUT", "TIMVERSN", "DATA_REL", "TTABLEID"]:
-            try:
-                hdu.header[keyword] = self.keywords[keyword]
-            except KeyError:
-                hdu.header[keyword] = None
-
+        #Some keywords just shouldn't be passed to the new header.
+        bad_keys = ['ORIGIN', 'DATE', 'OBJECT', 'SIMPLE', 'BITPIX',
+                    'NAXIS' ,'EXTEND', 'NEXTEND', 'EXTNAME', 'NAXIS1',
+                    'NAXIS2', 'QUALITY']
+        for kw, val in hdu0_keywords.items():
+            if kw in bad_keys:
+                continue
+            if kw in hdu.header:
+                hdu.header[kw] = val
+            else:
+                hdu.header.append((kw, val))
         return hdu
 
     def _make_target_extension(self, ext_info={}):
@@ -1413,6 +1446,7 @@ class TessTargetPixelFile(TargetPixelFile):
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
+                'label': self.hdu[0].header['OBJECT'],
                 'targetid': self.targetid}
         return TessLightCurve(time=self.time,
                               time_format='btjd',
@@ -1434,6 +1468,7 @@ class TessTargetPixelFile(TargetPixelFile):
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
+                'label': self.hdu[0].header['OBJECT'],
                 'targetid': self.targetid}
         return TessLightCurve(time=self.time,
                               time_format='btjd',
