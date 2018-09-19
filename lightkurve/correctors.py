@@ -325,8 +325,9 @@ class SFFCorrector(object):
             # First, fit a spline to capture the long-term varation
             # We don't want to fit the long-term trend because we know
             # that the K2 motion noise is a high-frequency effect.
-
-            self.bspline = self.fit_bspline(timecopy, np.asarray([item for sublist in flux for item in sublist]))
+            tempflux = np.asarray([item for sublist in flux for item in sublist])
+            flux_outliers = sigma_clip(data=tempflux, sigma=sigma_1).mask
+            self.bspline = self.fit_bspline(timecopy[~flux_outliers], tempflux[~flux_outliers])
 
             # The SFF algorithm is going to be run on each window independently
             for i in range(windows):
