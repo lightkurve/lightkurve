@@ -7,16 +7,17 @@ from .. import log
 
 filename_tpf_one_center = get_pkg_data_filename("data/test-tpf-non-zero-center.fits")
 
-def test_bokeh_import_error(capfd):
+
+def test_bokeh_import_error(caplog):
     """If bokeh is not installed (optional dependency),
     is a friendly error message printed?"""
     try:
         import bokeh
     except ImportError:
-        out, err = capfd.readouterr()
         tpf = KeplerTargetPixelFile(filename_tpf_one_center)
         tpf.interact()
-        assert "requires `bokeh` to be installed" in err
+        assert "requires the `bokeh` package" in caplog.text
+
 
 def test_malformed_notebook_url():
     """Test if malformed notebook_urls raise proper exceptions."""

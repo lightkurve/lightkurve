@@ -34,9 +34,7 @@ try:
 
     output_notebook(verbose=False, hide_banner=True)
 except ImportError:
-    log.error("The interact() tool requires `bokeh` to be installed. "
-              "bokeh can be installed using `conda install bokeh`.")
-    raise
+    pass  # We will print a nice error message in the `show_interact_widget` function
 
 
 def prepare_lightcurve_datasource(lc):
@@ -296,6 +294,13 @@ def show_interact_widget(tpf, lc=None, notebook_url='localhost:8888', max_cadenc
         Raise a RuntimeError if the number of cadences shown is larger than
         this value. This limit helps keep browsers from becoming unresponsive.
     """
+    try:
+        import bokeh
+    except ImportError:
+        log.error("The interact() tool requires the `bokeh` package; "
+                  "you can install bokeh using e.g. `conda install bokeh`.")
+        return None
+
     if lc is None:
         lc = tpf.to_lightcurve(aperture_mask=tpf.pipeline_mask)
 
