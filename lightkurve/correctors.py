@@ -315,6 +315,7 @@ class SFFCorrector(object):
 
         time = np.array_split(time, windows)
         flux = np.array_split(flux, windows)
+
         centroid_col = np.array_split(centroid_col, windows)
         centroid_row = np.array_split(centroid_row, windows)
 
