@@ -31,8 +31,6 @@ try:
     from bokeh.models.tools import HoverTool
     from bokeh.models.widgets import Button
     from bokeh.models.formatters import PrintfTickFormatter
-
-    output_notebook(verbose=False, hide_banner=True)
 except ImportError:
     pass  # We will print a nice error message in the `show_interact_widget` function
 
@@ -303,6 +301,12 @@ def show_interact_widget(tpf, lc=None, notebook_url='localhost:8888', max_cadenc
 
     if lc is None:
         lc = tpf.to_lightcurve(aperture_mask=tpf.pipeline_mask)
+    else:
+        if len(lc.time) != len(tpf.time):
+            log.error("The custom lightcurve provided to interact() does not contain "
+                      "the same number of cadences ({}) as the target pixel file ({})."
+                      "".format(len(lc.time), len(tpf.time)))
+            return None
 
     n_pixels = tpf.flux[0, :, :].size
     pixel_index_array = np.arange(0, n_pixels, 1, dtype=int).reshape(tpf.flux[0, :, :].shape)
@@ -402,4 +406,5 @@ def show_interact_widget(tpf, lc=None, notebook_url='localhost:8888', max_cadenc
                                       cadence_slider, space3, stretch_slider])
         doc.add_root(widgets_and_figures)
 
+    output_notebook(verbose=False, hide_banner=True)
     return show(create_interact_ui, notebook_url=notebook_url)
