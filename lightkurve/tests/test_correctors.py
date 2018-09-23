@@ -52,7 +52,7 @@ def test_sff_corrector():
     # the factor self.bspline(time-time[0]) accounts for
     # the long term trend which is divided out in order to get a "flat"
     # lightcurve.
-    assert_almost_equal(corrected_lc.flux*sff.bspline(time-time[0]),
+    assert_almost_equal(corrected_lc.flux*sff.bspline(time),
                         corrected_flux, decimal=3)
     assert_array_equal(time, corrected_lc.time)
     # the factor of 4 below accounts for the conversion
@@ -66,7 +66,7 @@ def test_sff_corrector():
     klc = klc.correct(niters=1)
     sff = klc.corrector
 
-    assert_almost_equal(klc.flux*sff.bspline(time-time[0]),
+    assert_almost_equal(klc.flux*sff.bspline(time),
                         corrected_flux, decimal=3)
     assert_almost_equal(4*sff.s, arclength, decimal=2)
     assert_almost_equal(sff.interp(sff.s), correction, decimal=3)
