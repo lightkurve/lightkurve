@@ -1136,6 +1136,7 @@ class KeplerLightCurve(LightCurve):
                                                      overwrite=overwrite,
                                                      **extra_data)
 
+    @staticmethod
     def from_archive(target, **kwargs):
         '''
         A function that throws an exception to indicate that
