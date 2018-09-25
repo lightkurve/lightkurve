@@ -750,7 +750,7 @@ class LightCurve(object):
                      names=('time', 'flux', 'flux_err'),
                      meta=self.meta)
 
-    def to_pandas(self, columns=['time', 'flux', 'flux_err']):
+    def to_pandas(self, columns=['time', 'flux', 'flux_err'], index=''):
         """Export the LightCurve as a Pandas DataFrame.
 
         Parameters
@@ -759,11 +759,16 @@ class LightCurve(object):
             List of columns to include in the DataFrame.  The names must match
             attributes of the `LightCurve` object (e.g. `time`, `flux`).
 
+        index : str
+            Name of the column to be set as the DataFrame's indices. The name
+            must match attributes of the `LightCurve` object (e.g. `time`,
+            `flux`). If no argument is passed no custom index is set.
+
         Returns
         -------
         dataframe : `pandas.DataFrame` object
-            A dataframe indexed by `time` and containing the columns `flux`
-            and `flux_err`.
+            A dataframe containing the columns `time`,
+             `flux`, and `flux_err`, and indexed by a column of choice.
         """
         try:
             import pandas as pd
@@ -775,8 +780,15 @@ class LightCurve(object):
         for col in columns:
             if hasattr(self, col):
                 data[col] = vars(self)[col]
-        df = pd.DataFrame(data=data, index=self.time, columns=columns)
-        df.index.name = 'time'
+        if index == '':
+            df = pd.DataFrame(data=data,columns=columns)
+        else:
+            try:
+                df = pd.DataFrame(data=data, index=vars(self)[index], columns=columns)
+                df.index.name = index
+            except KeyError:
+                log.warning('Label "{}" is not a LightCurve attribute.\nNo custom indices set.'.format(index))
+                df = pd.DataFrame(data=data,columns=columns)
         return df
 
     def to_csv(self, path_or_buf=None, **kwargs):
@@ -1080,7 +1092,7 @@ class KeplerLightCurve(LightCurve):
         return new_lc
 
     def to_pandas(self, columns=['time', 'flux', 'flux_err', 'quality',
-                                 'centroid_col', 'centroid_row']):
+                                 'centroid_col', 'centroid_row'], index=''):
         """Export the LightCurve as a Pandas DataFrame.
 
         Parameters
@@ -1089,13 +1101,18 @@ class KeplerLightCurve(LightCurve):
             List of columns to include in the DataFrame.  The names must match
             attributes of the `LightCurve` object (e.g. `time`, `flux`).
 
+        index : str
+            Name of the column to be set as the DataFrame's indices. The name
+            must match attributes of the `LightCurve` object (e.g. `time`,
+            `flux`). If no argument is passed no custom index is set.
+
         Returns
         -------
         dataframe : `pandas.DataFrame` object
-            A dataframe indexed by `time` and containing the columns `flux`
-            and `flux_err`.
+            A dataframe containing the columns `time`,
+             `flux`, and `flux_err`, and indexed by a column of choice.
         """
-        return super(KeplerLightCurve, self).to_pandas(columns=columns)
+        return super(KeplerLightCurve, self).to_pandas(columns=columns, index=index)
 
     def to_fits(self, path=None, overwrite=False, **extra_data):
         """Export the KeplerLightCurve as an astropy.io.fits object.
