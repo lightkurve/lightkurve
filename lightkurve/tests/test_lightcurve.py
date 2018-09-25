@@ -545,8 +545,11 @@ def test_targetid():
     assert lc.targetid == 20
 
 def test_lightcurve_from_archive():
-    """Does calling KeplerLightCurve.from_archive() throw a ValueError?"""
-    try:
+    """KeplerLightCurve.from_archive() is not implemented."""
+
+    err_string = ("KeplerLightCurve.from_archive() is not available."
+                  " Use KeplerLightCurveFile.from_archive() instead.")
+
+    with pytest.raises(ValueError) as err:
         KeplerLightCurve.from_archive('Kepler-10')
-    except ValueError:
-        pass
+    assert err_string == err.value.args[0]
