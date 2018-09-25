@@ -1138,8 +1138,7 @@ class KeplerLightCurve(LightCurve):
 
     def from_archive(target, **kwargs):
         '''
-        A function that can be called like KeplerLightCurve.from_archive()
-        but only throws an exception to indicate that
+        A function that throws an exception to indicate that
         KeplerLightCurveFile.from_archive() should be used instead.
 
         Parameters:
