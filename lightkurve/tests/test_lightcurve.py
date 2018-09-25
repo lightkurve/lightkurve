@@ -543,3 +543,10 @@ def test_targetid():
     # Does it work for TESS?
     lc = TessLightCurve(time=[], targetid=20)
     assert lc.targetid == 20
+
+def test_lightcurve_from_archive():
+    """Does calling KeplerLightCurve.from_archive() throw a ValueError?"""
+    try:
+        KeplerLightCurve.from_archive('Kepler-10')
+    except ValueError:
+        pass
