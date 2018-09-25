@@ -1136,6 +1136,23 @@ class KeplerLightCurve(LightCurve):
                                                      overwrite=overwrite,
                                                      **extra_data)
 
+    def from_archive(target, **kwargs):
+        '''
+        A function that can be called like KeplerLightCurve.from_archive()
+        but only throws an exception to indicate that
+        KeplerLightCurveFile.from_archive() should be used instead.
+
+        Parameters:
+        -------------
+        target : str or int
+            KIC/EPIC ID or object name.
+        **kwargs : dict
+            Keywords arguments passed to `KeplerLightCurveFile.from_archive().
+        '''
+
+        raise ValueError("KeplerLightCurve.from_archive() is not available. " \
+                         "Use KeplerLightCurveFile.from_archive() instead.")
+        return
 
 class TessLightCurve(LightCurve):
     """Defines a light curve class for NASA's TESS mission.
