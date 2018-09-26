@@ -7,7 +7,6 @@ from astroquery.mast import Observations
 from astroquery.exceptions import ResolverError
 from astropy.coordinates import SkyCoord
 from astropy.io import ascii, fits
-from .mast import download_kepler_products, _query_kepler_products
 
 from . import PACKAGEDIR
 log = logging.getLogger(__name__)
@@ -20,19 +19,108 @@ class SearchResult(object):
 
     @property
     def ID(self):
-        return np.asarray(star.info['obsID'], dtype='int')
+        return np.asarray(np.unique(self.info['obsID']), dtype='int')
 
     def download(self, filetype=None):
         """
 
         """
-        raise NotImplementedError("Functionality not yet added.")
-        if filetype == "TargetPixelFile":
-            pass
-        elif filetype == "LightCurve":
-            pass
-        elif filetype == "LightCurveFile":
-            pass
+
+        dl = Observations.download_products(self.info, mrp_only=False)
+        return dl['Local Path']
+
+def _query_kepler_products(target, searchtype='single', radius=1):
+    """Helper function for `search_kepler_products`.
+
+    Returns a table of Kepler/K2 pipeline products for a given target.
+
+    Raises an ArchiveError if no products are found.
+
+    Parameters
+    ----------
+    target : str or int
+        If the value is an integer in a specific range, we'll assume it is
+        a KIC or EPIC ID.  Otherwise we will pass it to MAST as an objectname.
+
+    Returns
+    -------
+    products : astropy.Table
+        Table detailing the available data products.
+    """
+    # If passed a SkyCoord, convert it to an RA and Dec
+    if isinstance(target, SkyCoord):
+        target = '{}, {}'.format(target.ra.deg, target.dec.deg)
+
+    # If performing a cone search and multiple targets are desired, query_criteria()
+    # must be called with `objectname` argument
+    if searchtype == 'cone':
+        try:
+        # If `target` looks like a KIC or EPIC ID, we will pass the exact
+        # `target_name` under which MAST will know the object.
+            target = int(target)
+            if (target > 0) and (target < 200000000):
+                target_name = 'kplr{:09d}'.format(target)
+            elif (target > 200000000) and (target < 300000000):
+                target_name = 'ktwo{:09d}'.format(target)
+            else:
+                raise ValueError("{:09d}: not in the KIC or EPIC ID range".format(target))
+            target_obs = Observations.query_criteria(target_name=target_name,
+                                                     radius='{} deg'.format(.0001),
+                                                     project=["Kepler", "K2"],
+                                                     obs_collection=["Kepler", "K2"])
+            ra = target_obs['s_ra'][0]
+            dec = target_obs['s_ra'][0]
+            obs = Observations.query_criteria(coordinates='{} {}'.format(ra, dec),
+                                              radius='{} deg'.format(radius/3600),
+                                              project=["Kepler", "K2"],
+                                              obs_collection=["Kepler", "K2"])
+        except ValueError:
+            # If `target` did not look like a KIC or EPIC ID, then we let MAST
+            # resolve the target name to a sky position. Convert radius from arcsec
+            # to degrees for query_criteria().
+            try:
+                obs = Observations.query_criteria(objectname=target,
+                                                  radius='{} deg'.format(radius/3600),
+                                                  project=["Kepler", "K2"],
+                                                  obs_collection=["Kepler", "K2"])
+                # Make sure the final table is in DISTANCE order
+                obs.sort('distance')
+            except ResolverError as exc:
+                raise ArchiveError(exc)
+
+    elif searchtype == 'single':
+        try:
+            # If `target` looks like a KIC or EPIC ID, we will pass the exact
+            # `target_name` under which MAST will know the object.
+            target = int(target)
+            if (target > 0) and (target < 200000000):
+                target_name = 'kplr{:09d}'.format(target)
+            elif (target > 200000000) and (target < 300000000):
+                target_name = 'ktwo{:09d}'.format(target)
+            else:
+                raise ValueError("{:09d}: not in the KIC or EPIC ID range".format(target))
+            obs = Observations.query_criteria(target_name=target_name,
+                                              project=["Kepler", "K2"],
+                                              obs_collection=["Kepler", "K2"])
+        except ValueError:
+            # If `target` did not look like a KIC or EPIC ID, then we let MAST
+            # resolve the target name to a sky position. Convert radius from arcsec
+            # to degrees for query_criteria().
+            try:
+                obs = Observations.query_criteria(objectname=target,
+                                                  project=["Kepler", "K2"],
+                                                  obs_collection=["Kepler", "K2"])
+                # Make sure the final table is in DISTANCE order
+                obs.sort('distance')
+            except ResolverError as exc:
+                raise ArchiveError(exc)
+    obsids = np.asarray(obs['obsid'])
+    products = Observations.get_product_list(obs)
+    order = [np.where(products['parent_obsid'] == o)[0] for o in obsids]
+    order = [item for sublist in order for item in sublist]
+    products = products[order]
+
+    return products
 
 
 def _search_kepler_products(target, filetype='Target Pixel', cadence='long', quarter=None,
@@ -74,12 +162,15 @@ def _search_kepler_products(target, filetype='Target Pixel', cadence='long', qua
     products = _query_kepler_products(target, searchtype=searchtype, radius=radius)
     # Because MAST doesn't let us query based on Kepler-specific meta data
     # fields, we need to identify short/long-cadence TPFs by their filename.
-    if cadence in ['short', 'sc']:
-        suffix = "{} Short".format(filetype)
-    elif cadence in ['any', 'both']:
-        suffix = "{}".format(filetype)
-    else:
-        suffix = "{} Long".format(filetype)
+
+    suffix = []
+    for f in ['Target Pixel', 'Lightcurve']:
+        if cadence in ['short', 'sc']:
+            suffix.append("{} Short".format(f))
+        elif cadence in ['any', 'both']:
+            suffix.append("{}".format(f))
+        else:
+            suffix.append("{} Long".format(f))
 
     # If there is nothing in the table, quit now.
     if len(products) == 0:
@@ -103,7 +194,9 @@ def _search_kepler_products(target, filetype='Target Pixel', cadence='long', qua
                       for desc in products['dataURI']])
 
     # Allow only the correct cadence type
-    mask &= np.array([suffix in desc for desc in products['description']])
+    for s in suffix:
+        mask |= np.array([s in desc for desc in products['description']])
+        mask &= np.array(['tar' not in desc for desc in products['description']])
     products = products[mask]
 
     # Add the quarter or campaign numbers
