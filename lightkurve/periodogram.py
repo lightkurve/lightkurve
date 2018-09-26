@@ -8,11 +8,13 @@ from astropy.units import cds
 __all__ = ['Periodogram', 'estimate_mass', 'estimate_radius',
             'estimate_mean_density', 'stellar_params', 'standardize_units']
 
+###Add uncertainties <- review these [astero]
 numax_s = 3090.0 # Huber et al 2013
 deltanu_s = 135.1
 teff_s = 5777.0
 
 class Periodogram(object):
+    ###Update this [houseekeping]
     """Represents a power spectrum.
     Attributes
     ----------
@@ -25,6 +27,7 @@ class Periodogram(object):
         self.frequencies = frequencies
         self.powers = powers
 
+    ###Add from .csv or from .fits staticmethods
     @staticmethod
     def from_lightcurve(lc, frequencies=None):
         """Creates a Periodogram object from a LightCurve instance using
@@ -33,49 +36,68 @@ class Periodogram(object):
         frequencies from 1 microhertz to the Nyquist frequency.  Alternatively,
         the user can provide a custom regular grid using the `frequencies`
         parameter.
+
         Caution: this method assumes that the LightCurve's time (lc.time)
         is given in units of days.  In the future, we should use the
         lc.time_format attribute to verify this.
+
         Parameters
         ----------
         lc : LightCurve object
             The LightCurve from which to compute the Periodogram.
+
         frequencies : array-like
             The regular grid of frequencies to use.  The frequencies must be
             in units microhertz.  Alternatively, an AstroPy Quantity object can
             be passed with any unit of type '1/time'.
+
         Returns
         -------
         Periodogram : `Periodogram` object
             Returns a Periodogram object extracted from the lightcurve.
         """
+        #Calculate Nyquist frequency & Frequency Bin Width
+        nyquist = 0.5 * (1./((np.median(np.diff(lc.time))*u.day).to(u.second))).to(u.microhertz).value
+        df = (1./((np.nanmax(lc.time - lc.time[0]))*u.day).to(u.second)).to(u.microhertz).value
 
-        nyquist_frequency = 0.5 * (1./((np.median(lc.time[1:] - lc.time[0:-1])*u.day).to(u.second))).to(u.microhertz).value
+        #Case if no frequency bins passed
         if frequencies is None:
-            nyquist_frequency = 0.5 * (1./((np.median(lc.time[1:] - lc.time[0:-1])*u.day).to(u.second))).to(u.microhertz).value
-            frequencies = np.linspace(1, nyquist_frequency, len(lc.time) // 2) * u.microhertz
+            frequencies = np.arange(df, nyquist, df)
+
+        #Give frequency bins units of microhertz
         if not isinstance(frequencies, u.Quantity):
             frequencies = u.Quantity(frequencies, u.microhertz)
+
+        #Apply the LombScargle method (in ppm, good)
         lombscargle = LombScargle((lc.time * u.day).to(u.second), lc.flux * 1e6)
         powers = lombscargle.power(frequencies, method="fast", normalization="psd")
-        powers = powers / (len(lc.time)** .5) * u.microhertz # Huber et. al 2010, https://arxiv.org/pdf/1010.4566.pdf
+
+        #I'm not 100% sure this normalisation is correct--- wait til Guy gets back to me
+        powers = powers / (len(lc.time)** .5) * u.microhertz #Normalize,  Huber et. al 2010, https://arxiv.org/pdf/1010.4566.pdf
+
+        ### Periodogram needs properties
         return Periodogram(frequencies=frequencies, powers=powers)
 
-    def plot(self, frequency=None, scale="linear", ax=None, numax=None, **kwargs):
+    def plot(self, frequency=None, scale="linear", ax=None, **kwargs):
+        ### Update this so nomenclature is identical to LightCurve.plot
+        ### Improve labels
         """Plots the periodogram.
+
         Parameters
         ----------
         frequency: array-like
             Over what frequencies (in microhertz) will periodogram plot
+
         scale: str
             Set x,y axis to be "linear" or "log". Default is linear.
+
         ax : matplotlib.axes._subplots.AxesSubplot
             A matplotlib axes object to plot into. If no axes is provided,
             a new one will be generated.
-        numax: bool
-            Plot the numax value as well?
+
         kwargs : dict
             Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
+
         Returns
         -------
         ax : matplotlib.axes._subplots.AxesSubplot
@@ -83,20 +105,30 @@ class Periodogram(object):
         """
         if ax is None:
             fig, ax = plt.subplots()
+
         # Plot frequency and power
         ax.plot(self.frequencies, self.powers, **kwargs)
         ax.set_xlabel("Frequency [$\mu$Hz]")
         ax.set_ylabel("Power [ppm$^2$/$\mu$Hz]")
-        if numax:
-            ax.fill_between([numax.value*0.8, numax.value*1.2],
-                            self.powers.value.min(),
-                            self.powers.value.max(),
-                            alpha=0.2, color='C3', zorder=10)
+
+
+        #Nonfunctional for now, removed
+        ### Try out this methodology
+        # if numax:
+        #     ax.fill_between([numax.value*0.8, numax.value*1.2],
+        #                     self.powers.value.min(),
+        #                     self.powers.value.max(),
+        #                     alpha=0.2, color='C3', zorder=10)
+
+        #I feel like scale should probably be log by default
         if scale == "log":
             ax.set_yscale('log')
             ax.set_xscale('log')
         return ax
 
+
+    ### Lets start with periodogram only, before moving on to the seismo stuff
+    ### All the seismo steps will have to be verified one by one
     def estimate_numax(self):
         """Estimates the nu max value based on the periodogram
 
