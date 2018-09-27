@@ -4,6 +4,9 @@ from astropy.stats import LombScargle
 from matplotlib import pyplot as plt
 from scipy.ndimage.filters import gaussian_filter
 from astropy.units import cds
+import logging
+
+log = logging.getLogger(__name__)
 
 __all__ = ['Periodogram', 'estimate_mass', 'estimate_radius',
             'estimate_mean_density', 'stellar_params', 'standardize_units']
@@ -23,62 +26,152 @@ class Periodogram(object):
     powers : array-like
         Power measurements.
     """
-    def __init__(self, frequencies=None, powers=None):
+    def __init__(self, frequencies=None, powers=None, nyquist=None, df=None):
         self.frequencies = frequencies
         self.powers = powers
+        self.nyquist = nyquist
+        self.df = df
 
     ###Add from .csv or from .fits staticmethods
     @staticmethod
-    def from_lightcurve(lc, frequencies=None):
-        """Creates a Periodogram object from a LightCurve instance using
+    def from_lightcurve(lc, nterms = 1, normalization = 'psd', nyquist_factor = 1,
+                        min_frequency = None, max_frequency = None,
+                        min_period = None, max_period = None,
+                        frequencies = None, periods = None,
+                        samples_per_peak = None, freq_unit = 1/u.day, **kwargs):
+        """
+        Creates a Periodogram object from a LightCurve instance using
         the Lomb-Scargle method.
         By default, the periodogram will be created for a regular grid of
-        frequencies from 1 microhertz to the Nyquist frequency.  Alternatively,
-        the user can provide a custom regular grid using the `frequencies`
-        parameter.
+        frequencies from one frequency separation to the Nyquist frequency,
+        where the frequency separation is determined as 1 / the time baseline.
+
+        Alternatively, the user can provide a custom regular grid using the
+        `frequencies' parameter or a custom regular grid of periods using the
+        `periods' parameter. The min frequency and/or max frequency
+        (or max period and/or min period) can be passed to set custom
+        limits for the frequency grid.
+
+        The number of samples per peak can be set using the
+        samples_per_peak parameter. The parameter nterms controls how many
+        Fourier terms are used in the model. Note that many terms could lead to
+        spurious peaks. Setting the Nyquist_factor will sample the space beyond
+        the Nyquist frequency, which may introduce aliasing.
+
+        The unit parameter allows a request for alternative units in frequency
+        space. By default frequency is in (1/day) and power in (ppm^2 * day).
+        Asteroseismologists for example may want frequency in (microHz) and
+        power in (ppm^2 / microHz), in which case they would pass
+        `unit = u.microhertz`.
+
+        # By default, x-axis units will be plotted in frequency. If any period-
+        # related parameters are passed (e.g. minimum_period, periods) the x-axis
+        # will be plotted in period. Alternatively, x_unit = 'period' will force
+        # x-axis units to be in period, and x_unit = 'frequency' will do the same
+        # for frequency.
 
         Caution: this method assumes that the LightCurve's time (lc.time)
-        is given in units of days.  In the future, we should use the
-        lc.time_format attribute to verify this.
+        is given in units of days.
 
         Parameters
         ----------
         lc : LightCurve object
             The LightCurve from which to compute the Periodogram.
-
-        frequencies : array-like
-            The regular grid of frequencies to use.  The frequencies must be
-            in units microhertz.  Alternatively, an AstroPy Quantity object can
-            be passed with any unit of type '1/time'.
+        nterms : int
+            Default 1. Number of terms to use in the Fourier fit.
+        normalization : {'standard', 'model', 'log', 'psd'}
+            Default 'psd'. Normalization to use for the periodogram.
+        nyquist_factor : int
+            Default 1. The multiple of the average Nyquist frequency. Is
+            overriden by maximum_frequency (or minimum period).
+        min_frequency : float
+            If specified, use this minimum frequency rather than one over the
+            time baseline.
+        max_frequency : float
+            If specified, use this maximum frequency rather than nyquist_factor
+            times the nyquist frequency.
+        min_period : float
+            If specified, use 1./minium_period as the maximum frequency rather
+            than nyquist_factor times the nyquist frequency.
+        max_period : float
+            If specified, use 1./maximum_period as the minimum frequency rather
+            than one over the time baseline.
+        frequencies :  array-like
+            The regular grid of frequencies to use. If given a unit, it is
+            converted to units of freq_unit. If not, it is assumed to be in
+            units of freq_unit.
+        periods : array-like
+            The regular grid of periods to use (as 1/period). If given a unit,
+            it is converted to units of freq_unit. If not, it is assumed to be
+            in units of 1/freq_unit.
+        samples_per_peak : int
+            The approximate number of desired samples across the typical peak.
+            Caution: this overrides any given parameters for frequencies or
+            period.
+        freq_unit : `astropy.units.core.CompositeUnit`
+            Default: 1/u.day. The desired frequency units for the Lomb Scargle
+            periodogram. This implies that 1/freq_unit is the units for period.
+        kwargs : dict
+            Keyword arguments passed to `astropy.stats.LombScargle()`
 
         Returns
         -------
         Periodogram : `Periodogram` object
             Returns a Periodogram object extracted from the lightcurve.
         """
-        #Calculate Nyquist frequency & Frequency Bin Width
-        nyquist = 0.5 * (1./((np.median(np.diff(lc.time))*u.day).to(u.second))).to(u.microhertz).value
-        df = (1./((np.nanmax(lc.time - lc.time[0]))*u.day).to(u.second)).to(u.microhertz).value
+
+        #Calculate Nyquist frequency & Frequency Bin Width in terms of days
+        nyquist = 0.5 * (1./(np.median(np.diff(lc.time))*u.day))
+        df = (1./((np.nanmax(lc.time - lc.time[0]))*u.day))
+
+        #Convert these values to requested frequency unit
+        try:
+            nyquist = nyquist.to(freq_unit)
+            df = df.to(freq_unit)
+        except UnitConversionError:
+            log.warning('This unit is not compatible with frequency.')
 
         #Case if no frequency bins passed
-        if frequencies is None:
-            frequencies = np.arange(df, nyquist, df)
+        if (frequencies is None):
+            if (min_frequency is not None) & (max_frequency is not None) & (max_frequency <= min frequency):
+                log.warning('User input max frequency is smaller than or equal to min frequency.\nFrequency range set to defaults.')
+                max_frequency = None
+                min_frequency = None
+            if min_frequency is None:
+                min_frequency = df.value
+            if max_frequency is None:
+                max_frequency = nyquist.value * nyquist_factor
 
-        #Give frequency bins units of microhertz
-        if not isinstance(frequencies, u.Quantity):
-            frequencies = u.Quantity(frequencies, u.microhertz)
+            frequencies = np.arange(min_frequency, max_frequency, df.value)
 
-        #Apply the LombScargle method (in ppm, good)
-        lombscargle = LombScargle((lc.time * u.day).to(u.second), lc.flux * 1e6)
-        powers = lombscargle.power(frequencies, method="fast", normalization="psd")
+        ########I need to make a flowchart to figure this out
 
-        #I'm not 100% sure this normalisation is correct--- wait til Guy gets back to me
-        powers = powers / (len(lc.time)** .5) * u.microhertz #Normalize,  Huber et. al 2010, https://arxiv.org/pdf/1010.4566.pdf
+        #Set in/convert to desired units
+        frequencies = u.Quantity(frequencies, freq_unit)
+
+        #######################Apply the LombScargle method
+        LS = LombScargle(lc.time * u.day, lc.flux * 1e6,
+                            nterms=nterms, normalization=normalization, **kwargs)
+        if samples_per_peak is None:
+            power = LS.power(frequencies, method="fast")
+        elif samples_per_peak is not None:
+            power = LS.autopower(samples_per_peak = samples_per_peak,
+                                minimum_frequency = min_frequency,
+                                maximum_frequency = max_frequency)
+        # Ask gully about this on friday
+
+        #Lets normalise the according to parsevals theorem
+        norm = np.std(lc.flux * 1e6)**2 / np.sum(power)
+        power *= norm
+
+        #Rescale power to units of ppm^2 / days (or other frequency unit)
+        power = power / df.value
 
         ### Periodogram needs properties
-        return Periodogram(frequencies=frequencies, powers=powers)
+        return Periodogram(frequencies=frequencies, powers=power,
+                            nyquist=nyquist, df=df)
 
-    def plot(self, frequency=None, scale="linear", ax=None, **kwargs):
+    def plot(self, scale="linear", ax=None, **kwargs):
         ### Update this so nomenclature is identical to LightCurve.plot
         ### Improve labels
         """Plots the periodogram.
@@ -108,8 +201,8 @@ class Periodogram(object):
 
         # Plot frequency and power
         ax.plot(self.frequencies, self.powers, **kwargs)
-        ax.set_xlabel("Frequency [$\mu$Hz]")
-        ax.set_ylabel("Power [ppm$^2$/$\mu$Hz]")
+        ax.set_xlabel("Frequency [{}]".format(self.df.unit.to_string('latex')))
+        ax.set_ylabel("Power [ppm$^2\ ${}]".format((1/self.df).unit.to_string('latex')))
 
 
         #Nonfunctional for now, removed

@@ -798,7 +798,7 @@ class LightCurve(object):
         """
         return self.to_pandas().to_csv(path_or_buf=path_or_buf, **kwargs)
 
-    def periodogram(self, frequencies=None):
+    def periodogram(self, units='days', frequencies=None):
         """Returns a `Periodogram`.
 
         Parameters
@@ -814,7 +814,7 @@ class LightCurve(object):
             Returns a Periodogram object extracted from the lightcurve.
         """
         from . import Periodogram
-        return Periodogram.from_lightcurve(lc=self, frequencies=frequencies)
+        return Periodogram.from_lightcurve(lc=self, units=units, frequencies=frequencies)
 
     def to_fits(self, path=None, overwrite=False, **extra_data):
         """Writes the KeplerLightCurve to a fits file.
