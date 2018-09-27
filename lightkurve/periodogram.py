@@ -34,11 +34,11 @@ class Periodogram(object):
 
     ###Add from .csv or from .fits staticmethods
     @staticmethod
-    def from_lightcurve(lc, nterms = 1, normalization = 'psd', nyquist_factor = 1,
+    def from_lightcurve(lc, nterms = 1, nyquist_factor = 1, samples_per_peak = 1,
                         min_frequency = None, max_frequency = None,
                         min_period = None, max_period = None,
                         frequencies = None, periods = None,
-                        samples_per_peak = None, freq_unit = 1/u.day, **kwargs):
+                        freq_unit = 1/u.day, **kwargs):
         """
         Creates a Periodogram object from a LightCurve instance using
         the Lomb-Scargle method.
@@ -46,29 +46,30 @@ class Periodogram(object):
         frequencies from one frequency separation to the Nyquist frequency,
         where the frequency separation is determined as 1 / the time baseline.
 
-        Alternatively, the user can provide a custom regular grid using the
-        `frequencies' parameter or a custom regular grid of periods using the
-        `periods' parameter. The min frequency and/or max frequency
-        (or max period and/or min period) can be passed to set custom
-        limits for the frequency grid.
+        The min frequency and/or max frequency (or max period and/or min period)
+        can be passed to set custom limits for the frequency grid. Alternatively,
+        the user can provide a custom regular grid using the `frequencies`
+        parameter or a custom regular grid of periods using the `periods`
+        parameter.
 
-        The number of samples per peak can be set using the
-        samples_per_peak parameter. The parameter nterms controls how many
-        Fourier terms are used in the model. Note that many terms could lead to
-        spurious peaks. Setting the Nyquist_factor will sample the space beyond
-        the Nyquist frequency, which may introduce aliasing.
+        The the spectrum can be oversampled by increasing the samples_per_peak
+        parameter. The parameter nterms controls how many Fourier terms are used
+        in the model. Note that many terms could lead to spurious peaks. Setting
+        the Nyquist_factor to be greater than 1 will sample the space beyond the
+        Nyquist frequency, which may introduce aliasing.
 
         The unit parameter allows a request for alternative units in frequency
         space. By default frequency is in (1/day) and power in (ppm^2 * day).
         Asteroseismologists for example may want frequency in (microHz) and
         power in (ppm^2 / microHz), in which case they would pass
-        `unit = u.microhertz`.
+        `unit = u.microhertz` where `u` is `astropy.units`
 
-        # By default, x-axis units will be plotted in frequency. If any period-
-        # related parameters are passed (e.g. minimum_period, periods) the x-axis
-        # will be plotted in period. Alternatively, x_unit = 'period' will force
-        # x-axis units to be in period, and x_unit = 'frequency' will do the same
-        # for frequency.
+        By default this method uses the LombScargle 'fast' method, which assumes
+        a regular grid. If a regular grid of periods (i.e. an irregular grid of
+        frequencies) it will use the 'slow' method. If nterms > 1 is passed, it
+        will use the 'fastchi2' method for regular grids, and 'chi2' for
+        irregular grids. The normalizatin of the Lomb Scargle periodogram is
+        fixed to `psd`, and cannot be overridden.
 
         Caution: this method assumes that the LightCurve's time (lc.time)
         is given in units of days.
@@ -79,11 +80,12 @@ class Periodogram(object):
             The LightCurve from which to compute the Periodogram.
         nterms : int
             Default 1. Number of terms to use in the Fourier fit.
-        normalization : {'standard', 'model', 'log', 'psd'}
-            Default 'psd'. Normalization to use for the periodogram.
         nyquist_factor : int
             Default 1. The multiple of the average Nyquist frequency. Is
             overriden by maximum_frequency (or minimum period).
+        samples_per_peak : int
+            The approximate number of desired samples across the typical peak.
+            This effectively oversamples the spectrum.
         min_frequency : float
             If specified, use this minimum frequency rather than one over the
             time baseline.
@@ -99,15 +101,11 @@ class Periodogram(object):
         frequencies :  array-like
             The regular grid of frequencies to use. If given a unit, it is
             converted to units of freq_unit. If not, it is assumed to be in
-            units of freq_unit.
+            units of freq_unit. This over rides any set frequency limits.
         periods : array-like
             The regular grid of periods to use (as 1/period). If given a unit,
             it is converted to units of freq_unit. If not, it is assumed to be
-            in units of 1/freq_unit.
-        samples_per_peak : int
-            The approximate number of desired samples across the typical peak.
-            Caution: this overrides any given parameters for frequencies or
-            period.
+            in units of 1/freq_unit. This overrides any set period limits.
         freq_unit : `astropy.units.core.CompositeUnit`
             Default: 1/u.day. The desired frequency units for the Lomb Scargle
             periodogram. This implies that 1/freq_unit is the units for period.
@@ -122,7 +120,7 @@ class Periodogram(object):
 
         #Calculate Nyquist frequency & Frequency Bin Width in terms of days
         nyquist = 0.5 * (1./(np.median(np.diff(lc.time))*u.day))
-        df = (1./((np.nanmax(lc.time - lc.time[0]))*u.day))
+        df = (1./((np.nanmax(lc.time - lc.time[0]))*u.day)) / samples_per_peak
 
         #Convert these values to requested frequency unit
         try:
@@ -131,40 +129,60 @@ class Periodogram(object):
         except UnitConversionError:
             log.warning('This unit is not compatible with frequency.')
 
+        #Check if period hsa been passed
+        if frequencies is not None:
+            log.warning('You have passed a grid of frequencies, which overrides any period/frequency limit kwargs.')
+        if periods is not None:
+            log.warning('You have passed a grid of periods, which overrides any period/frequency limit kwargs.')
+            frequencies = 1./periods
+        if max_period is not None:
+            min_frequency = 1./max_period
+        if min_period is not None:
+            max_frequency = 1./min_period
+
         #Case if no frequency bins passed
-        if (frequencies is None):
-            if (min_frequency is not None) & (max_frequency is not None) & (max_frequency <= min frequency):
-                log.warning('User input max frequency is smaller than or equal to min frequency.\nFrequency range set to defaults.')
-                max_frequency = None
-                min_frequency = None
+        if frequencies is None:
+            if min_frequency is not None:
+                min_frequency = u.Quantity(min_frequency, freq_unit)
+            if max_frequency is not None:
+                max_frequency = u.Quantity(max_frequency, freq_unit)
+            if (min_frequency is not None) & (max_frequency is not None):
+                if (max_frequency <= min_frequency):
+                    log.warning('User input max frequency is smaller than or equal to min frequency.\nFrequency range set to defaults.')
+                    max_frequency = None
+                    min_frequency = None
             if min_frequency is None:
-                min_frequency = df.value
+                min_frequency = df
             if max_frequency is None:
-                max_frequency = nyquist.value * nyquist_factor
+                max_frequency = nyquist * nyquist_factor
 
-            frequencies = np.arange(min_frequency, max_frequency, df.value)
-
-        ########I need to make a flowchart to figure this out
+            frequencies = np.arange(min_frequency.value, max_frequency.value, df.value)
 
         #Set in/convert to desired units
         frequencies = u.Quantity(frequencies, freq_unit)
 
-        #######################Apply the LombScargle method
-        LS = LombScargle(lc.time * u.day, lc.flux * 1e6,
-                            nterms=nterms, normalization=normalization, **kwargs)
-        if samples_per_peak is None:
-            power = LS.power(frequencies, method="fast")
-        elif samples_per_peak is not None:
-            power = LS.autopower(samples_per_peak = samples_per_peak,
-                                minimum_frequency = min_frequency,
-                                maximum_frequency = max_frequency)
-        # Ask gully about this on friday
+        if nterms > 1:
+            log.warning('Nterms has been set larger than 1. Method has been set to `fastchi2`')
+            method = 'fastchi2'
+            if periods is not None:
+                method = 'chi2'
+                log.warning('You have passed an evently-spaced grid of periods. These are not evenly spaced in frequency space.\n Method has been set to "chi2" to allow for this.')
+        else:
+            method='fast'
+            if periods is not None:
+                method = 'slow'
+                log.warning('You have passed an evently-spaced grid of periods. These are not evenly spaced in frequency space.\n Method has been set to "slow" to allow for this.')
 
-        #Lets normalise the according to parsevals theorem
+
+        LS = LombScargle(lc.time * u.day, lc.flux * 1e6,
+                            nterms=nterms, normalization='psd', **kwargs)
+        power = LS.power(frequencies, method=method)
+
+        #Normalise the according to Parseval's theorem
         norm = np.std(lc.flux * 1e6)**2 / np.sum(power)
         power *= norm
 
-        #Rescale power to units of ppm^2 / days (or other frequency unit)
+        #Rescale power to units of ppm^2 / [frequency unit]
         power = power / df.value
 
         ### Periodogram needs properties

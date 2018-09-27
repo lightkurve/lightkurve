@@ -20,6 +20,7 @@ from astropy.stats import sigma_clip
 from astropy.table import Table
 from astropy.io import fits
 from astropy.time import Time
+from astropy import units as u
 from . import PACKAGEDIR, MPLSTYLE
 
 from .utils import running_mean, bkjd_to_astropy_time, btjd_to_astropy_time
@@ -798,15 +799,48 @@ class LightCurve(object):
         """
         return self.to_pandas().to_csv(path_or_buf=path_or_buf, **kwargs)
 
-    def periodogram(self, units='days', frequencies=None):
+    def periodogram(self, nterms = 1, nyquist_factor = 1, samples_per_peak = 1,
+                        min_frequency = None, max_frequency = None,
+                        min_period = None, max_period = None,
+                        frequencies = None, periods = None,
+                        freq_unit = 1/u.day, **kwargs):
         """Returns a `Periodogram`.
 
         Parameters
         ----------
-        frequencies : array-like
-            The regular grid of frequencies to use.  The frequencies must be
-            in units microhertz.  Alternatively, an AstroPy Quantity object can
-            be passed with any unit of type '1/time'.
+        nterms : int
+            Default 1. Number of terms to use in the Fourier fit.
+        nyquist_factor : int
+            Default 1. The multiple of the average Nyquist frequency. Is
+            overriden by maximum_frequency (or minimum period).
+        samples_per_peak : int
+            The approximate number of desired samples across the typical peak.
+            This effectively oversamples the spectrum.
+        min_frequency : float
+            If specified, use this minimum frequency rather than one over the
+            time baseline.
+        max_frequency : float
+            If specified, use this maximum frequency rather than nyquist_factor
+            times the nyquist frequency.
+        min_period : float
+            If specified, use 1./minium_period as the maximum frequency rather
+            than nyquist_factor times the nyquist frequency.
+        max_period : float
+            If specified, use 1./maximum_period as the minimum frequency rather
+            than one over the time baseline.
+        frequencies :  array-like
+            The regular grid of frequencies to use. If given a unit, it is
+            converted to units of freq_unit. If not, it is assumed to be in
+            units of freq_unit. This over rides any set frequency limits.
+        periods : array-like
+            The regular grid of periods to use (as 1/period). If given a unit,
+            it is converted to units of freq_unit. If not, it is assumed to be
+            in units of 1/freq_unit. This overrides any set period limits.
+        freq_unit : `astropy.units.core.CompositeUnit`
+            Default: 1/u.day. The desired frequency units for the Lomb Scargle
+            periodogram. This implies that 1/freq_unit is the units for period.
+        kwargs : dict
+            Keyword arguments passed to `astropy.stats.LombScargle()`
 
         Returns
         -------
@@ -814,7 +848,17 @@ class LightCurve(object):
             Returns a Periodogram object extracted from the lightcurve.
         """
         from . import Periodogram
-        return Periodogram.from_lightcurve(lc=self, units=units, frequencies=frequencies)
+        return Periodogram.from_lightcurve(lc=self, nterms = nterms,
+                            nyquist_factor = nyquist_factor,
+                            samples_per_peak = samples_per_peak,
+                            min_frequency = min_frequency,
+                            max_frequency = max_frequency,
+                            min_period = min_period,
+                            max_period = max_period,
+                            frequencies = frequencies,
+                            periods = periods,
+                            freq_unit = freq_unit,
+                            **kwargs)
 
     def to_fits(self, path=None, overwrite=False, **extra_data):
         """Writes the KeplerLightCurve to a fits file.
