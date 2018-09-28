@@ -366,7 +366,6 @@ def download_kepler_products(target, filetype='Target Pixel', cadence='long',
 
     # If there is no specified quarter but there are many campaigns/quarters
     # returned, warn the user with an error
-    import pdb; pdb.set_trace()
     if (len(np.unique(products['qoc'])) > 1) & (campaign is None) & (quarter is None):
         raise ArchiveError("Found {} different Target Pixel Files "
                            "for target {}. Please specify quarter/month "
