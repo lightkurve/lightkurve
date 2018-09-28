@@ -300,10 +300,9 @@ class SFFCorrector(object):
 
         #We shouldn't be able to shift the window more than this...
         window_shift = window_shift % dw
-
         if window_shift != 0:
             self.windows+=1
-            
+
         # Split up time, flux, column and row into windows
         time = np.split(origtime, np.arange(self.windows) * dw + window_shift)
         flux = np.split(origflux, np.arange(self.windows) * dw + window_shift)
@@ -659,10 +658,22 @@ class SFFCorrector(object):
         mask = x < x1
         return np.trapz(y=np.sqrt(1 + self.polyprime(x[mask]) ** 2), x=x[mask])
 
-    def fit_bspline(self, time, flux, s=0, knot_separation=1.5):
+    def fit_bspline(self, time, flux, knot_separation=1.5):
         """s describes the "smoothness" of the spline"""
-        knots = np.arange(time[0] + knot_separation, time[-1] - knot_separation, knot_separation)
-        t, c, k = interpolate.splrep(time, flux, t=knots[1:], s=s, task=-1)
+        time = time
+        a = time[0:-1][np.diff(time) > knot_separation]
+        b = time[1:][np.diff(time) > knot_separation]
+        knots = np.arange(time[0], time[-1], knot_separation)
+
+        bad = []
+        for a1, b1 in zip(a, b):
+            bad_knots = np.where((knots > a1) & (knots < b1))[0][1:-1]
+            if len(bad_knots) > 0:
+                [bad.append(b) for b in bad_knots]
+
+        good_knots = list(set(list(np.arange(len(knots)))) - set(bad))
+        knots = knots[good_knots]
+        t, c, k = interpolate.splrep(time, flux, t=knots[1:])
         return interpolate.BSpline(t, c, k)
 
     def bin_and_interpolate(self, s, normflux, sigma):
