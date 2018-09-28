@@ -451,7 +451,7 @@ class SFFCorrector(object):
         for a1, b1 in zip(a, b):
             bad_knots = np.where((knots > a1) & (knots < b1))[0][1:-1]
             if len(bad_knots) > 0:
-                bad.append([b for b in bad_knots])
+                [bad.append(b) for b in bad_knots]
 
         good_knots = list(set(list(np.arange(len(knots)))) - set(bad))
         knots = knots[good_knots]
