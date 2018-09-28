@@ -12,6 +12,9 @@ from . import PACKAGEDIR
 log = logging.getLogger(__name__)
 
 class SearchResult(object):
+    """
+
+    """
 
     def __init__(self, info):
 
@@ -19,7 +22,22 @@ class SearchResult(object):
 
     @property
     def ID(self):
-        return np.asarray(np.unique(self.info['obsID']), dtype='int')
+        return np.asarray(np.unique(self.info['obsid']), dtype='int')
+
+    @property
+    def target_name(self):
+        return np.asarray(np.unique(self.info['target_name']))
+
+    @property
+    def pos(self):
+        coords = []
+        for i,ra in enumerate(self.info['s_ra']):
+            coords.append([ra, self.info['s_dec'][i]])
+        if len(coords) == 1:
+            return np.asarray(coords)[0]
+        else:
+            return np.asarray(coords)
+
 
     def download(self, filetype=None):
         """
@@ -30,7 +48,8 @@ class SearchResult(object):
         return dl['Local Path']
 
 def _query_kepler_products(target, searchtype='single', radius=1):
-    """Helper function for `search_kepler_products`.
+    """
+    Helper function for `search_kepler_products`.
 
     Returns a table of Kepler/K2 pipeline products for a given target.
 
@@ -120,12 +139,13 @@ def _query_kepler_products(target, searchtype='single', radius=1):
     order = [item for sublist in order for item in sublist]
     products = products[order]
 
-    return products
+    return obs
 
 
 def _search_kepler_products(target, filetype='Target Pixel', cadence='long', quarter=None,
                             campaign=None, searchtype='single', radius=1, targetlimit=1):
-    """Returns a table of Kepler or K2 Target Pixel Files or Lightcurve Files
+    """
+    Returns a table of Kepler or K2 Target Pixel Files or Lightcurve Files
      for a given target.
 
     Parameters
@@ -290,10 +310,8 @@ def search_target(target, cadence='long', quarter=None, month=None,
                     'direct path, use KeplerTargetPixelFile(path) instead.')
         path = [target]
     else:
-        path = _search_kepler_products(
-            target=target, filetype='Target Pixel', cadence=cadence,
-            quarter=quarter, campaign=campaign,
-            searchtype='single', radius=1., targetlimit=1)
+        path = _query_kepler_products(
+            target=target, searchtype='single', radius=1.)
 
     return SearchResult(path)
 
@@ -347,9 +365,7 @@ def search_region(target, cadence='long', quarter=None, month=None,
                     'direct path, use KeplerTargetPixelFile(path) instead.')
         path = [target]
     else:
-        path = _search_kepler_products(
-            target=target, filetype='Target Pixel', cadence=cadence,
-            quarter=quarter, campaign=campaign,
-            searchtype='cone', radius=radius, targetlimit=targetlimit)
+        path = _query_kepler_products(
+            target=target, searchtype='cone', radius=radius)
 
     return SearchResult(path)
