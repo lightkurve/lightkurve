@@ -440,11 +440,22 @@ class SFFCorrector(object):
         mask = x < x1
         return np.trapz(y=np.sqrt(1 + self.polyprime(x[mask]) ** 2), x=x[mask])
 
-    def fit_bspline(self, time, flux, s=0):
+    def fit_bspline(self, time, flux):
         """s describes the "smoothness" of the spline"""
         time = time
+        a = time[0:-1][np.diff(time) > 1.5]
+        b = time[1:][np.diff(time) > 1.5]
         knots = np.arange(time[0], time[-1], 1.5)
-        t, c, k = interpolate.splrep(time, flux, t=knots[1:], s=s, task=-1)
+
+        bad = []
+        for a1, b1 in zip(a, b):
+            bad_knots = np.where((knots > a1) & (knots < b1))[0][1:-1]
+            if len(bad_knots) > 0:
+                bad.append([b for b in bad_knots])
+
+        good_knots = list(set(list(np.arange(len(knots)))) - set(bad))
+        knots = knots[good_knots]
+        t, c, k = interpolate.splrep(time, flux, t=knots[1:])
         return interpolate.BSpline(t, c, k)
 
     def bin_and_interpolate(self, s, normflux, bins, sigma):
