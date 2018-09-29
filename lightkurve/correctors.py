@@ -440,21 +440,24 @@ class SFFCorrector(object):
         mask = x < x1
         return np.trapz(y=np.sqrt(1 + self.polyprime(x[mask]) ** 2), x=x[mask])
 
-    def fit_bspline(self, time, flux):
-        """s describes the "smoothness" of the spline"""
-        time = time
-        a = time[0:-1][np.diff(time) > 1.5]
-        b = time[1:][np.diff(time) > 1.5]
-        knots = np.arange(time[0], time[-1], 1.5)
+    def fit_bspline(self, time, flux, knotspacing=1.5):
+        # By default, knots are placed 1.5 days apart
+        knots = np.arange(time[0], time[-1], knotspacing)
 
-        bad = []
+        # If the light curve has breaks larger than the spacing between knots,
+        # we must remove the knots that fall in the breaks.
+        # This is necessary for e.g. K2 Campaigns 0 and 10.
+        bad_knots = []
+        a = time[0:-1][np.diff(time) > knotspacing]
+        b = time[1:][np.diff(time) > knotspacing]
         for a1, b1 in zip(a, b):
-            bad_knots = np.where((knots > a1) & (knots < b1))[0][1:-1]
+            bad = np.where((knots > a1) & (knots < b1))[0][1:-1]
             if len(bad_knots) > 0:
-                [bad.append(b) for b in bad_knots]
-
-        good_knots = list(set(list(np.arange(len(knots)))) - set(bad))
+                [bad_knots.append(b) for b in bad]
+        good_knots = list(set(list(np.arange(len(knots)))) - set(bad_knots))
         knots = knots[good_knots]
+
+        # Now fit and return the spline
         t, c, k = interpolate.splrep(time, flux, t=knots[1:])
         return interpolate.BSpline(t, c, k)
 
