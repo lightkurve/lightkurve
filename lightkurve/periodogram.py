@@ -5,6 +5,8 @@ from matplotlib import pyplot as plt
 from scipy.ndimage.filters import gaussian_filter
 from astropy.units import cds
 import logging
+from . import PACKAGEDIR, MPLSTYLE
+
 
 log = logging.getLogger(__name__)
 
@@ -16,6 +18,10 @@ numax_s = 3090.0 # Huber et al 2013
 deltanu_s = 135.1
 teff_s = 5777.0
 
+class InputError(Exception):
+    """Raised if user inputs both frequency and period kwargs"""
+    pass
+
 class Periodogram(object):
     ###Update this [houseekeping]
     """Represents a power spectrum.
@@ -23,24 +29,29 @@ class Periodogram(object):
     ----------
     frequencies : array-like
         List of frequencies.
-    powers : array-like
+    power : array-like
         Power measurements.
+    nyquist : float
+        The Nyquist frequency of the lightcurve
+    frequency_spacing : float
+        The frequency spacing of the periodogram.
     """
-    def __init__(self, frequencies=None, powers=None, nyquist=None, df=None):
+    def __init__(self, lc=None, frequencies=None, power=None, nyquist=None, fs=None,
+                _format = 'frequency'):
+        self.lc = lc
         self.frequencies = frequencies
-        self.powers = powers
+        self.power = power
         self.nyquist = nyquist
-        self.df = df
+        self.frequency_spacing = fs
+        self._format = _format
 
-    ###Add from .csv or from .fits staticmethods
     @staticmethod
     def from_lightcurve(lc, nterms = 1, nyquist_factor = 1, samples_per_peak = 1,
                         min_frequency = None, max_frequency = None,
                         min_period = None, max_period = None,
                         frequencies = None, periods = None,
-                        freq_unit = 1/u.day, **kwargs):
-        """
-        Creates a Periodogram object from a LightCurve instance using
+                        freq_unit = 1/u.day, _format = 'frequency', **kwargs):
+        """Creates a Periodogram object from a LightCurve instance using
         the Lomb-Scargle method.
         By default, the periodogram will be created for a regular grid of
         frequencies from one frequency separation to the Nyquist frequency,
@@ -109,6 +120,12 @@ class Periodogram(object):
         freq_unit : `astropy.units.core.CompositeUnit`
             Default: 1/u.day. The desired frequency units for the Lomb Scargle
             periodogram. This implies that 1/freq_unit is the units for period.
+        _format : str
+            {'frequency', 'period'}. Default 'frequency'. Determines the format
+            of the periodogram. If 'frequency', x-axis units will be frequency.
+            If 'period', the x-axis units will be period. _format is set
+            according to any frequency- or period- related input kwargs, e.g.
+            specifying a value of 'max_period' will set _format = 'period'.
         kwargs : dict
             Keyword arguments passed to `astropy.stats.LombScargle()`
 
@@ -117,21 +134,25 @@ class Periodogram(object):
         Periodogram : `Periodogram` object
             Returns a Periodogram object extracted from the lightcurve.
         """
+        #Check if any values of period have been passed and set format accordingly
+        if not all(b is None for b in [periods, min_period, max_period]):
+            _format = 'period'
+
+        #Check input consistency
+        if (not all(b is None for b in [periods, min_period, max_period])) &\
+            (not all(b is None for b in [frequencies, min_frequency, max_frequency])):
+            raise InputError('You have input keyword arguments for both frequency and period. Please only use one or the other.')
 
         #Calculate Nyquist frequency & Frequency Bin Width in terms of days
         nyquist = 0.5 * (1./(np.median(np.diff(lc.time))*u.day))
-        df = (1./((np.nanmax(lc.time - lc.time[0]))*u.day)) / samples_per_peak
+        fs = (1./((np.nanmax(lc.time - lc.time[0]))*u.day)) / samples_per_peak
 
         #Convert these values to requested frequency unit
         try:
             nyquist = nyquist.to(freq_unit)
-            df = df.to(freq_unit)
-        except UnitConversionError:
-            log.warning('This unit is not compatible with frequency.')
+            fs = fs.to(freq_unit)
 
-        #Check if period hsa been passed
-        if frequencies is not None:
-            log.warning('You have passed a grid of frequencies, which overrides any period/frequency limit kwargs.')
+        #Check if period has been passed
         if periods is not None:
             log.warning('You have passed a grid of periods, which overrides any period/frequency limit kwargs.')
             frequencies = 1./periods
@@ -140,23 +161,29 @@ class Periodogram(object):
         if min_period is not None:
             max_frequency = 1./min_period
 
-        #Case if no frequency bins passed
-        if frequencies is None:
+        if frequencies is not None:
+            log.warning('You have passed a grid of frequencies, which overrides any period/frequency limit kwargs.')
+
+        #Do unit conversions if user input min/max frequency or period
+        elif frequencies is None:
             if min_frequency is not None:
                 min_frequency = u.Quantity(min_frequency, freq_unit)
             if max_frequency is not None:
                 max_frequency = u.Quantity(max_frequency, freq_unit)
             if (min_frequency is not None) & (max_frequency is not None):
                 if (max_frequency <= min_frequency):
-                    log.warning('User input max frequency is smaller than or equal to min frequency.\nFrequency range set to defaults.')
-                    max_frequency = None
-                    min_frequency = None
+                    if _format == 'frequency':
+                        raise InputError('User input max frequency is smaller than or equal to min frequency.')
+                    if _format == 'period':
+                        raise InputError('User input max period is smaller than or equal to min period.')
+            #If nothing has been passed in, set them to the defaults
             if min_frequency is None:
-                min_frequency = df
+                min_frequency = fs
             if max_frequency is None:
                 max_frequency = nyquist * nyquist_factor
 
-            frequencies = np.arange(min_frequency.value, max_frequency.value, df.value)
+            #Create frequency grid evenly spaced in frequency
+            frequencies = np.arange(min_frequency.value, max_frequency.value, fs.value)
 
         #Set in/convert to desired units
         frequencies = u.Quantity(frequencies, freq_unit)
@@ -166,12 +193,12 @@ class Periodogram(object):
             method = 'fastchi2'
             if periods is not None:
                 method = 'chi2'
-                log.warning('You have passed an evently-spaced grid of periods. These are not evenly spaced in frequency space.\n Method has been set to "chi2" to allow for this.')
+                log.warning('You have passed an eventy-spaced grid of periods. These are not evenly spaced in frequency space.\n Method has been set to "chi2" to allow for this.')
         else:
             method='fast'
             if periods is not None:
                 method = 'slow'
-                log.warning('You have passed an evently-spaced grid of periods. These are not evenly spaced in frequency space.\n Method has been set to "slow" to allow for this.')
+                log.warning('You have passed an evenly-spaced grid of periods. These are not evenly spaced in frequency space.\n Method has been set to "slow" to allow for this.')
 
 
         LS = LombScargle(lc.time * u.day, lc.flux * 1e6,
@@ -183,29 +210,41 @@ class Periodogram(object):
         power *= norm
 
         #Rescale power to units of ppm^2 / [frequency unit]
-        power = power / df.value
+        power = power / fs.value
 
         ### Periodogram needs properties
-        return Periodogram(frequencies=frequencies, powers=power,
-                            nyquist=nyquist, df=df)
+        return Periodogram(lc = lc, frequencies=frequencies, power=power,
+                            nyquist=nyquist, fs=fs, _format=_format)
 
-    def plot(self, scale="linear", ax=None, **kwargs):
-        ### Update this so nomenclature is identical to LightCurve.plot
-        ### Improve labels
+    def plot(self, scale='linear', ax=None,
+                    xlabel=None, ylabel=None, title='',
+                    style='lightkurve',format=None,  **kwargs):
+
         """Plots the periodogram.
 
         Parameters
         ----------
         frequency: array-like
             Over what frequencies (in microhertz) will periodogram plot
-
         scale: str
             Set x,y axis to be "linear" or "log". Default is linear.
-
         ax : matplotlib.axes._subplots.AxesSubplot
             A matplotlib axes object to plot into. If no axes is provided,
             a new one will be generated.
-
+        xlabel : str
+            Plot x axis label
+        ylabel : str
+            Plot y axis label
+        title : str
+            Plot set_title
+        style : str
+            Path or URL to a matplotlib style file, or name of one of
+            matplotlib's built-in stylesheets (e.g. 'ggplot').
+            Lightkurve's custom stylesheet is used by default.
+        format : str
+            {'frequency', 'period'}. Is by default the _format property of the
+            Periodogram object. If 'frequency', x-axis units will be frequency.
+            If 'period', the x-axis units will be period and 'log' scale.
         kwargs : dict
             Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
 
@@ -214,32 +253,49 @@ class Periodogram(object):
         ax : matplotlib.axes._subplots.AxesSubplot
             The matplotlib axes object.
         """
-        if ax is None:
-            fig, ax = plt.subplots()
+        if format is None:
+            format = self._format
+        if style is None or style == 'lightkurve':
+            style = MPLSTYLE
+        if ylabel is None:
+            ylabel = "Power Spectral Density [ppm$^2\ ${}]".format((1/self.frequency_spacing).unit.to_string('latex'))
 
-        # Plot frequency and power
-        ax.plot(self.frequencies, self.powers, **kwargs)
-        ax.set_xlabel("Frequency [{}]".format(self.df.unit.to_string('latex')))
-        ax.set_ylabel("Power [ppm$^2\ ${}]".format((1/self.df).unit.to_string('latex')))
+        # This will need to be fixed with housekeeping. Self.label currently doesnt exist.
+        if ('label' not in kwargs):
+            kwargs['label'] = self.lc.label
 
+        with plt.style.context(style):
+            if ax is None:
+                fig, ax = plt.subplots()
 
-        #Nonfunctional for now, removed
-        ### Try out this methodology
-        # if numax:
-        #     ax.fill_between([numax.value*0.8, numax.value*1.2],
-        #                     self.powers.value.min(),
-        #                     self.powers.value.max(),
-        #                     alpha=0.2, color='C3', zorder=10)
+            # Plot frequency and power
+            if format == 'frequency':
+                ax.plot(self.frequencies, self.power, **kwargs)
+                if xlabel is None:
+                    xlabel = "Frequency [{}]".format(self.frequency_spacing.unit.to_string('latex'))
 
-        #I feel like scale should probably be log by default
-        if scale == "log":
-            ax.set_yscale('log')
-            ax.set_xscale('log')
+            if format == 'period':
+                ax.plot(1./self.frequencies, self.power, **kwargs)
+                ax.set_xscale('log')
+                if xlabel is None:
+                    xlabel = "Period [{}]".format((1./self.frequency_spacing).unit.to_string('latex'))
+
+            ax.set_xlabel(xlabel)
+            ax.set_ylabel(ylabel)
+            #Show the legend if labels were set
+            legend_labels = ax.get_legend_handles_labels()
+            if (np.sum([len(a) for a in legend_labels]) != 0):
+                ax.legend()
+            if scale == "log":
+                ax.set_yscale('log')
+                ax.set_xscale('log')
+            ax.set_title(title)
         return ax
 
 
-    ### Lets start with periodogram only, before moving on to the seismo stuff
-    ### All the seismo steps will have to be verified one by one
+################################################################################
+    ## Lets start with periodogram only, before moving on to the seismo stuff
+    ## All the seismo steps will have to be verified one by one
     def estimate_numax(self):
         """Estimates the nu max value based on the periodogram
 
@@ -259,6 +315,7 @@ class Periodogram(object):
         peak_freqs = self.frequencies[self.find_peaks(smoothed_ps)].value
         nu_max = peak_freqs[peak_freqs > 5][0]
         return nu_max
+
 
     def estimate_delta_nu(self, numax=None):
         """Estimates delta nu value, or large frequency spacing
