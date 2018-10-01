@@ -81,7 +81,7 @@ class SearchResult(object):
                                     **kwargs)
 
     def _mask_products(self, products, filetype='Target Pixel', cadence='long', quarter=None,
-                      campaign=None, searchtype='single', radius=1, targetlimit=1):
+                       campaign=None, searchtype='single', radius=1, targetlimit=1):
         """
 
         """
