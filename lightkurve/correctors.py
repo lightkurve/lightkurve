@@ -311,51 +311,56 @@ class SFFCorrector(object):
         corrected_lightcurve : LightCurve object
             Returns a corrected lightcurve object.
         """
-        timecopy = time
+        timecopy = np.copy(time)
+
         time = np.array_split(time, windows)
         flux = np.array_split(flux, windows)
+
         centroid_col = np.array_split(centroid_col, windows)
         centroid_row = np.array_split(centroid_row, windows)
 
-        flux_hat = np.array([])
-        # The SFF algorithm is going to be run on each window independently
+        self.trend = np.array_split(np.ones(len(timecopy)), windows)
 
-        for i in tqdm(range(windows)):
-            # To make it easier (and more numerically stable) to fit a
-            # characteristic polynomial that describes the spacecraft motion,
-            # we rotate the centroids to a new coordinate frame in which
-            # the dominant direction of motion is aligned with the x-axis.
-            self.rot_col, self.rot_row = self.rotate_centroids(centroid_col[i],
-                                                               centroid_row[i])
-            # Next, we fit the motion polynomial after removing outliers
-            self.outlier_cent = sigma_clip(data=self.rot_col,
-                                           sigma=sigma_2).mask
-            with warnings.catch_warnings():
-                # ignore warning messages related to polyfit being poorly conditioned
-                warnings.simplefilter("ignore", category=np.RankWarning)
-                coeffs = np.polyfit(self.rot_row[~self.outlier_cent],
-                                    self.rot_col[~self.outlier_cent], polyorder)
+        # Apply the correction iteratively
+        for n in range(niters):
+            # First, fit a spline to capture the long-term varation
+            # We don't want to fit the long-term trend because we know
+            # that the K2 motion noise is a high-frequency effect.
+            tempflux = np.asarray([item for sublist in flux for item in sublist])
+            flux_outliers = sigma_clip(data=tempflux, sigma=sigma_1).mask
+            self.bspline = self.fit_bspline(timecopy[~flux_outliers], tempflux[~flux_outliers])
 
-            self.poly = np.poly1d(coeffs)
-            self.polyprime = np.poly1d(coeffs).deriv()
+            # The SFF algorithm is going to be run on each window independently
+            for i in range(windows):
+                # To make it easier (and more numerically stable) to fit a
+                # characteristic polynomial that describes the spacecraft motion,
+                # we rotate the centroids to a new coordinate frame in which
+                # the dominant direction of motion is aligned with the x-axis.
+                self.rot_col, self.rot_row = self.rotate_centroids(centroid_col[i],
+                                                                   centroid_row[i])
+                # Next, we fit the motion polynomial after removing outliers
+                self.outlier_cent = sigma_clip(data=self.rot_col,
+                                               sigma=sigma_2).mask
+                with warnings.catch_warnings():
+                    # ignore warning messages related to polyfit being poorly conditioned
+                    warnings.simplefilter("ignore", category=np.RankWarning)
+                    coeffs = np.polyfit(self.rot_row[~self.outlier_cent],
+                                        self.rot_col[~self.outlier_cent], polyorder)
 
-            # Compute the arclength s.  It is the length of the polynomial
-            # (fitted above) that describes the typical motion.
-            x = np.linspace(np.min(self.rot_row[~self.outlier_cent]),
-                            np.max(self.rot_row[~self.outlier_cent]), 10000)
-            self.s = np.array([self.arclength(x1=xp, x=x) for xp in self.rot_row])
+                self.poly = np.poly1d(coeffs)
+                self.polyprime = np.poly1d(coeffs).deriv()
 
-            # Next, we find and apply the correction iteratively
-            self.trend = np.ones(len(time[i]))
-            for n in range(niters):
-                # First, fit a spline to capture the long-term varation
-                # We don't want to fit the long-term trend because we know
-                # that the K2 motion noise is a high-frequency effect.
-                self.bspline = self.fit_bspline(time[i], flux[i])
+                # Compute the arclength s.  It is the length of the polynomial
+                # (fitted above) that describes the typical motion.
+                x = np.linspace(np.min(self.rot_row[~self.outlier_cent]),
+                                np.max(self.rot_row[~self.outlier_cent]), 10000)
+                self.s = np.array([self.arclength(x1=xp, x=x) for xp in self.rot_row])
+
+
                 # Remove the long-term variation by dividing the flux by the spline
-                iter_trend = self.bspline(time[i] - time[i][0])
+                iter_trend = self.bspline(time[i])
                 self.normflux = flux[i] / iter_trend
-                self.trend *= iter_trend
+                self.trend[i] = iter_trend
                 # Bin and interpolate normalized flux to capture the dependency
                 # of the flux as a function of arclength
                 self.interp = self.bin_and_interpolate(self.s, self.normflux, bins,
@@ -363,10 +368,10 @@ class SFFCorrector(object):
                 # Correct the raw flux
                 corrected_flux = self.normflux / self.interp(self.s)
                 flux[i] = corrected_flux
+                if restore_trend:
+                    flux[i] *= self.trend[i]
 
-            if restore_trend:
-                flux[i] *= self.trend
-            flux_hat = np.append(flux_hat, flux[i])
+        flux_hat = np.asarray([item for sublist in flux for item in sublist])
 
         return LightCurve(time=timecopy, flux=flux_hat)
 
@@ -435,11 +440,25 @@ class SFFCorrector(object):
         mask = x < x1
         return np.trapz(y=np.sqrt(1 + self.polyprime(x[mask]) ** 2), x=x[mask])
 
-    def fit_bspline(self, time, flux, s=0):
-        """s describes the "smoothness" of the spline"""
-        time = time - time[0]
-        knots = np.arange(0, time[-1], 1.5)
-        t, c, k = interpolate.splrep(time, flux, t=knots[1:], s=s, task=-1)
+    def fit_bspline(self, time, flux, knotspacing=1.5):
+        # By default, knots are placed 1.5 days apart
+        knots = np.arange(time[0], time[-1], knotspacing)
+
+        # If the light curve has breaks larger than the spacing between knots,
+        # we must remove the knots that fall in the breaks.
+        # This is necessary for e.g. K2 Campaigns 0 and 10.
+        bad_knots = []
+        a = time[0:-1][np.diff(time) > knotspacing]
+        b = time[1:][np.diff(time) > knotspacing]
+        for a1, b1 in zip(a, b):
+            bad = np.where((knots > a1) & (knots < b1))[0][1:-1]
+            if len(bad_knots) > 0:
+                [bad_knots.append(b) for b in bad]
+        good_knots = list(set(list(np.arange(len(knots)))) - set(bad_knots))
+        knots = knots[good_knots]
+
+        # Now fit and return the spline
+        t, c, k = interpolate.splrep(time, flux, t=knots[1:])
         return interpolate.BSpline(t, c, k)
 
     def bin_and_interpolate(self, s, normflux, bins, sigma):

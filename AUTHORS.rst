@@ -30,3 +30,4 @@ Comments, corrections & suggestions:
 - Ashley Villar
 - `Benjamin Pope <https://github.com/benjaminpope>`_
 - `J. K. Carlberg <https://github.com/jkcarlberg>`_
+- `Brian Jackson <https://github.com/decaelus>`_

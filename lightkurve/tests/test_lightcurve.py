@@ -9,8 +9,7 @@ from numpy.testing import (assert_almost_equal, assert_array_equal,
                            assert_allclose)
 import pytest
 
-from ..lightcurve import (LightCurve, KeplerLightCurve, TessLightCurve,
-                          iterative_box_period_search)
+from ..lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
 from ..lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
 
 # 8th Quarter of Tabby's star
@@ -266,19 +265,6 @@ def test_normalize():
     lc = LightCurve(time=np.arange(10), flux=5*np.ones(10), flux_err=0.05*np.ones(10))
     assert_allclose(np.median(lc.normalize().flux), 1)
     assert_allclose(np.median(lc.normalize().flux_err), 0.05/5)
-
-
-@pytest.mark.remote_data
-def test_iterative_box_period_search():
-    """Can we recover the orbital period of Kepler-10b?"""
-    answer = 0.837495  # wikipedia
-    klc = KeplerLightCurveFile(KEPLER10)
-    pdc = klc.PDCSAP_FLUX
-    flat, trend = pdc.flatten(return_trend=True)
-
-    _, _, kepler10b_period = iterative_box_period_search(flat, min_period=.5, max_period=1,
-                                                         nperiods=101, period_scale='log')
-    assert abs(kepler10b_period - answer) < 1e-2
 
 
 def test_to_pandas():

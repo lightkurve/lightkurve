@@ -2,13 +2,15 @@ language: python
 python:
   - 2.7
   - 3.6
-before_install:
+before_install:  # optional dependencies
   - pip install codecov
   - pip install pytest-cov
   - pip install pytest-remotedata
   - pip install sphinx_rtd_theme
   - pip install numpydoc
   - pip install pandas
+  - pip install ipython  # required by bokeh
+  - pip install bokeh
 install:
   - pip install -r requirements.txt
 # command to run tests
