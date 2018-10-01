@@ -4,6 +4,9 @@ from astropy.stats import LombScargle
 from matplotlib import pyplot as plt
 from scipy.ndimage.filters import gaussian_filter
 from astropy.units import cds
+from astropy.table import Table
+import astropy
+
 import logging
 from . import PACKAGEDIR, MPLSTYLE
 
@@ -27,23 +30,48 @@ class Periodogram(object):
     """Represents a power spectrum.
     Attributes
     ----------
+    lc : `LightCurve` object
+        The LightCurve from which the Periodogram is computed. Holds all  of
+        the `LightCurve object's properties.
     frequencies : array-like
         List of frequencies.
+    periods : array-like
+        List of periods (1 / frequency)
     power : array-like
-        Power measurements.
+        The power-spectral-density of the Fourier timeseries.
     nyquist : float
-        The Nyquist frequency of the lightcurve
+        The Nyquist frequency of the lightcurve.
     frequency_spacing : float
         The frequency spacing of the periodogram.
+    max_power : float
+        The power of the highest peak in the periodogram
+    max_pow_frequency : float
+        The frequency corresponding to the highest power in the periodogram
+    max_pow_period : float
+        The periodod corresponding to the highest power in the periodogram.
+    _format : str
+        {'frequency', 'period'}. Default 'frequency'. Determines the format
+        of the periodogram. If 'frequency', preferred units will be frequency.
+        If 'period', preferred units will be period.
+    meta : dict
+        Free-form metadata associated with the LightCurve.
     """
-    def __init__(self, lc=None, frequencies=None, power=None, nyquist=None, fs=None,
-                _format = 'frequency'):
+    def __init__(self, lc=None, frequencies=None, periods = None, power=None,
+                nyquist=None, fs=None, _format = 'frequency', meta={}):
         self.lc = lc
         self.frequencies = frequencies
+        self.periods = periods
         self.power = power
         self.nyquist = nyquist
         self.frequency_spacing = fs
         self._format = _format
+
+        if self.periods is None:
+            self.periods = 1./self.frequencies
+
+        self.max_power = np.nanmax(self.power)
+        self.max_pow_frequency = self.frequencies[np.nanargmax(self.power)]
+        self.max_pow_period = self.periods[np.nanargmax(self.power)]
 
     @staticmethod
     def from_lightcurve(lc, nterms = 1, nyquist_factor = 1, samples_per_peak = 1,
@@ -212,8 +240,8 @@ class Periodogram(object):
         power = power / fs.value
 
         ### Periodogram needs properties
-        return Periodogram(lc = lc, frequencies=frequencies, power=power,
-                            nyquist=nyquist, fs=fs, _format=_format)
+        return Periodogram(lc = lc, frequencies=frequencies, periods=periods,
+                            power=power, nyquist=nyquist, fs=fs, _format=_format)
 
     def plot(self, scale='linear', ax=None,
                     xlabel=None, ylabel=None, title='',
@@ -274,7 +302,7 @@ class Periodogram(object):
                     xlabel = "Frequency [{}]".format(self.frequency_spacing.unit.to_string('latex'))
 
             if format == 'period':
-                ax.plot(1./self.frequencies, self.power, **kwargs)
+                ax.plot(self.periods, self.power, **kwargs)
                 ax.set_xscale('log')
                 if xlabel is None:
                     xlabel = "Period [{}]".format((1./self.frequency_spacing).unit.to_string('latex'))
@@ -291,6 +319,159 @@ class Periodogram(object):
             ax.set_title(title)
         return ax
 
+    def __repr__(self):
+        return('Periodogram(ID: {})'.format(self.lc.targetid))
+
+    def properties(self):
+        '''Print out a description of each of the non-callable attributes of a
+        Periodogram object, as well as those of the LightCurve object it was
+        made with.
+        Prints in order of type (ints, strings, lists, arrays and others)
+        Prints in alphabetical order.'''
+        attrs = {}
+        for attr in dir(self):
+            if not attr.startswith('_'):
+                res = getattr(self, attr)
+                if callable(res):
+                    continue
+
+                if isinstance(res, astropy.units.quantity.Quantity):
+                    unit = res.unit
+                    res = res.value
+                    attrs[attr] = {'res': res}
+                    attrs[attr]['unit'] = unit.to_string()
+                else:
+                    attrs[attr] = {'res': res}
+                    attrs[attr]['unit'] = ''
+
+                if attr == 'hdu':
+                    attrs[attr] = {'res': res, 'type': 'list'}
+                    for idx, r in enumerate(res):
+                        if idx == 0:
+                            attrs[attr]['print'] = '{}'.format(r.header['EXTNAME'])
+                        else:
+                            attrs[attr]['print'] = '{}, {}'.format(
+                                attrs[attr]['print'], '{}'.format(r.header['EXTNAME']))
+                    continue
+
+                if isinstance(res, int):
+                    attrs[attr]['print'] = '{}'.format(res)
+                    attrs[attr]['type'] = 'int'
+                elif isinstance(res, float):
+                    attrs[attr]['print'] = '{}'.format(np.round(res, 4))
+                    attrs[attr]['type'] = 'float'
+                elif isinstance(res, np.ndarray):
+                    attrs[attr]['print'] = 'array {}'.format(res.shape)
+                    attrs[attr]['type'] = 'array'
+                elif isinstance(res, list):
+                    attrs[attr]['print'] = 'list length {}'.format(len(res))
+                    attrs[attr]['type'] = 'list'
+                elif isinstance(res, str):
+                    if res == '':
+                        attrs[attr]['print'] = '{}'.format('None')
+                    else:
+                        attrs[attr]['print'] = '{}'.format(res)
+                    attrs[attr]['type'] = 'str'
+                elif attr == 'wcs':
+                    attrs[attr]['print'] = 'astropy.wcs.wcs.WCS'.format(attr)
+                    attrs[attr]['type'] = 'other'
+                else:
+                    attrs[attr]['print'] = '{}'.format(type(res))
+                    attrs[attr]['type'] = 'other'
+
+        output = Table(names=['Attribute', 'Description', 'Units'], dtype=[object, object, object])
+        idx = 0
+        types = ['int', 'str', 'float', 'list', 'array', 'other']
+        for typ in types:
+            for attr, dic in attrs.items():
+                if dic['type'] == typ:
+                    output.add_row([attr, dic['print'], dic['unit']])
+                    idx += 1
+        print('lightkurve.Periodogram properties:')
+        output.pprint(max_lines=-1, max_width=-1)
+        print('\nlightkurve.Periodogram.lc (LightCurve object) properties:')
+        self.lc.properties()
+
+    def to_table(self):
+        """Export the Periodogram as an AstroPy Table.
+        Returns
+        -------
+        table : `astropy.table.Table` object
+            An AstroPy Table with columns 'frequency', 'period', and 'power'.
+        """
+        return Table(data=(self.frequency, self.period, self.power),
+                     names=('frequency', 'period', 'power'),
+                     meta=self.meta)
+
+    def to_pandas(self, columns=['frequency','period','power']):
+        """Export the Periodogram as a Pandas DataFrame.
+        Parameters
+        ----------
+        columns : list of str
+            List of columns to include in the DataFrame.  The names must match
+            attributes of the `Periodogram` object (i.e. `frequency`, `power`)
+        Returns
+        -------
+        dataframe : `pandas.DataFrame` object
+            A dataframe indexed by `frequency` and containing the columns `power`
+            and `period`.
+        """
+        raise NotImpelmentedError('This should be a function!')
+
+    def to_csv(self, path_or_buf=None, **kwargs):
+        """Writes the Periodogram to a csv file.
+        Parameters
+        ----------
+        path_or_buf : string or file handle, default None
+            File path or object, if None is provided the result is returned as
+            a string.
+        **kwargs : dict
+            Dictionary of arguments to be passed to `pandas.DataFrame.to_csv()`.
+        Returns
+        -------
+        csv : str or None
+            Returns a csv-formatted string if `path_or_buf=None`,
+            returns None otherwise.
+        """
+        return self.to_pandas().to_csv(path_or_buf=path_or_buf, **kwargs)
+
+    def to_fits(self, path=None, overwrite=False, **extra_data):
+        """Export the Periodogram as an astropy.io.fits object.
+        Parameters
+        ----------
+        path : string, default None
+            File path, if None returns an astropy.io.fits object.
+        overwrite : bool
+            Whether or not to overwrite the file
+        extra_data : dict
+            Extra keywords or columns to include in the FITS file.
+            Arguments of type str, int, float, or bool will be stored as
+            keywords in the primary header.
+            Arguments of type np.array or list will be stored as columns
+            in the first extension.
+        Returns
+        -------
+        hdu : astropy.io.fits
+            Returns an astropy.io.fits object if path is None
+        """
+        # kepler_specific_data = {
+        #     'TELESCOP': "KEPLER",
+        #     'INSTRUME': "Kepler Photometer",
+        #     'OBJECT': '{}'.format(self.targetid),
+        #     'KEPLERID': self.targetid,
+        #     'CHANNEL': self.channel,
+        #     'MISSION': self.mission,
+        #     'RA_OBJ': self.ra,
+        #     'DEC_OBJ': self.dec,
+        #     'EQUINOX': 2000,
+        #     'DATE-OBS': Time(self.time[0]+2454833., format=('jd')).isot}
+        # for kw in kepler_specific_data:
+        #     if ~np.asarray([kw.lower == k.lower() for k in extra_data]).any():
+        #         extra_data[kw] = kepler_specific_data[kw]
+        # return super(KeplerLightCurve, self).to_fits(path=path,
+        #                                              overwrite=overwrite,
+        #                                              **extra_data)
+        raise NotImplementedError('This should be a function!')
 
 ################################################################################
     ## Lets start with periodogram only, before moving on to the seismo stuff
