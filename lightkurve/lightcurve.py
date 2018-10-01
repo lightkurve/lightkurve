@@ -10,7 +10,6 @@ import logging
 import pandas as pd
 import warnings
 
-import oktopus
 import numpy as np
 from scipy import signal
 from scipy.optimize import minimize
