@@ -6,6 +6,7 @@ from scipy.ndimage.filters import gaussian_filter
 from astropy.units import cds
 from astropy.table import Table
 import astropy
+import copy
 
 import logging
 from . import PACKAGEDIR, MPLSTYLE
@@ -54,7 +55,7 @@ class Periodogram(object):
         of the periodogram. If 'frequency', preferred units will be frequency.
         If 'period', preferred units will be period.
     meta : dict
-        Free-form metadata associated with the LightCurve.
+        Free-form metadata associated with the Periodogram.
     """
     def __init__(self, lc=None, frequencies=None, periods = None, power=None,
                 nyquist=None, fs=None, _format = 'frequency', meta={}):
@@ -65,6 +66,7 @@ class Periodogram(object):
         self.nyquist = nyquist
         self.frequency_spacing = fs
         self._format = _format
+        self.meta = meta
 
         if self.periods is None:
             self.periods = 1./self.frequencies
@@ -319,8 +321,152 @@ class Periodogram(object):
             ax.set_title(title)
         return ax
 
+
+    ############################### HOUSEKEEPING ###############################
+
+    def to_table(self):
+        """Export the Periodogram as an AstroPy Table.
+        Returns
+        -------
+        table : `astropy.table.Table` object
+            An AstroPy Table with columns 'frequency', 'period', and 'power'.
+        """
+        return Table(data=(self.frequencies, self.periods, self.power),
+                     names=('frequency', 'period', 'power'),
+                     meta=self.meta)
+
+    def to_pandas(self, columns=['frequencies','periods','power']):
+        """Export the Periodogram as a Pandas DataFrame.
+        Parameters
+        ----------
+        columns : list of str
+            List of columns to include in the DataFrame.  The names must match
+            attributes of the `Periodogram` object (i.e. `frequency`, `power`)
+        Returns
+        -------
+        dataframe : `pandas.DataFrame` object
+            A dataframe indexed by `frequency` and containing the columns `power`
+            and `period`.
+        """
+        try:
+            import pandas as pd
+        # lightkurve does not require pandas, so check for import success.
+        except ImportError:
+            raise ImportError("You need to install pandas to use the "
+                              "LightCurve.to_pandas() method.")
+        data = {}
+        for col in columns:
+            if hasattr(self, col):
+                if isinstance(vars(self)[col], astropy.units.quantity.Quantity):
+                    data[col] = vars(self)[col].value
+                else:
+                    data[col] = vars(self)[col].value
+        df = pd.DataFrame(data=data, index=self.frequencies, columns=columns)
+        df.index.name = 'frequencies'
+        return df
+
+    def to_csv(self, path_or_buf, **kwargs):
+        """Writes the Periodogram to a csv file.
+        Parameters
+        ----------
+        path_or_buf : string or file handle, default None
+            File path or object, if None is provided the result is returned as
+            a string.
+        **kwargs : dict
+            Dictionary of arguments to be passed to `pandas.DataFrame.to_csv()`.
+        Returns
+        -------
+        csv : str or None
+            Returns a csv-formatted string if `path_or_buf=None`,
+            returns None otherwise.
+        """
+        return self.to_pandas().to_csv(path_or_buf=path_or_buf, **kwargs)
+
+    def to_fits(self, path=None, overwrite=False, **extra_data):
+        """Export the Periodogram as an astropy.io.fits object.
+        Parameters
+        ----------
+        path : string, default None
+            File path, if None returns an astropy.io.fits object.
+        overwrite : bool
+            Whether or not to overwrite the file
+        extra_data : dict
+            Extra keywords or columns to include in the FITS file.
+            Arguments of type str, int, float, or bool will be stored as
+            keywords in the primary header.
+            Arguments of type np.array or list will be stored as columns
+            in the first extension.
+        Returns
+        -------
+        hdu : astropy.io.fits
+            Returns an astropy.io.fits object if path is None
+        """
+        # kepler_specific_data = {
+        #     'TELESCOP': "KEPLER",
+        #     'INSTRUME': "Kepler Photometer",
+        #     'OBJECT': '{}'.format(self.targetid),
+        #     'KEPLERID': self.targetid,
+        #     'CHANNEL': self.channel,
+        #     'MISSION': self.mission,
+        #     'RA_OBJ': self.ra,
+        #     'DEC_OBJ': self.dec,
+        #     'EQUINOX': 2000,
+        #     'DATE-OBS': Time(self.time[0]+2454833., format=('jd')).isot}
+        # for kw in kepler_specific_data:
+        #     if ~np.asarray([kw.lower == k.lower() for k in extra_data]).any():
+        #         extra_data[kw] = kepler_specific_data[kw]
+        # return super(KeplerLightCurve, self).to_fits(path=path,
+        #                                              overwrite=overwrite,
+        #                                              **extra_data)
+        raise NotImplementedError('This should be a function!')
+
     def __repr__(self):
         return('Periodogram(ID: {})'.format(self.lc.targetid))
+
+    def __getitem__(self, key):
+        copy_self = copy.copy(self)
+        copy_self.frequencies = self.frequencies[key]
+        copy_self.periods = self.periods[key]
+        copy_self.power = self.power[key]
+        return copy_self
+
+    def __add__(self, other):
+        copy_self = copy.copy(self)
+        copy_self.power = copy_self.power + other
+        return copy_self
+
+    def __radd__(self, other):
+        return self.__add__(other)
+
+    def __sub__(self, other):
+        return self.__add__(-other)
+
+    def __rsub__(self, other):
+        copy_self = copy.copy(self)
+        copy_self.power = other - copy_self.power
+        return copy_self
+
+    def __mul__(self, other):
+        copy_self = copy.copy(self)
+        copy_self.power = other * copy_self.power
+        return copy_self
+
+    def __rmul__(self, other):
+        return self.__mul__(other)
+
+    def __truediv__(self, other):
+        return self.__mul__(1./other)
+
+    def __rtruediv__(self, other):
+        copy_self = copy.copy(self)
+        copy_self.power = other / copy_self.power
+        return copy_self
+
+    def __div__(self, other):
+        return self.__truediv__(other)
+
+    def __rdiv__(self, other):
+        return self.__rtruediv__(other)
 
     def properties(self):
         '''Print out a description of each of the non-callable attributes of a
@@ -392,88 +538,9 @@ class Periodogram(object):
         print('\nlightkurve.Periodogram.lc (LightCurve object) properties:')
         self.lc.properties()
 
-    def to_table(self):
-        """Export the Periodogram as an AstroPy Table.
-        Returns
-        -------
-        table : `astropy.table.Table` object
-            An AstroPy Table with columns 'frequency', 'period', and 'power'.
-        """
-        return Table(data=(self.frequency, self.period, self.power),
-                     names=('frequency', 'period', 'power'),
-                     meta=self.meta)
 
-    def to_pandas(self, columns=['frequency','period','power']):
-        """Export the Periodogram as a Pandas DataFrame.
-        Parameters
-        ----------
-        columns : list of str
-            List of columns to include in the DataFrame.  The names must match
-            attributes of the `Periodogram` object (i.e. `frequency`, `power`)
-        Returns
-        -------
-        dataframe : `pandas.DataFrame` object
-            A dataframe indexed by `frequency` and containing the columns `power`
-            and `period`.
-        """
-        raise NotImpelmentedError('This should be a function!')
+    ############################## WIP, UNTOUCHED ##############################
 
-    def to_csv(self, path_or_buf=None, **kwargs):
-        """Writes the Periodogram to a csv file.
-        Parameters
-        ----------
-        path_or_buf : string or file handle, default None
-            File path or object, if None is provided the result is returned as
-            a string.
-        **kwargs : dict
-            Dictionary of arguments to be passed to `pandas.DataFrame.to_csv()`.
-        Returns
-        -------
-        csv : str or None
-            Returns a csv-formatted string if `path_or_buf=None`,
-            returns None otherwise.
-        """
-        return self.to_pandas().to_csv(path_or_buf=path_or_buf, **kwargs)
-
-    def to_fits(self, path=None, overwrite=False, **extra_data):
-        """Export the Periodogram as an astropy.io.fits object.
-        Parameters
-        ----------
-        path : string, default None
-            File path, if None returns an astropy.io.fits object.
-        overwrite : bool
-            Whether or not to overwrite the file
-        extra_data : dict
-            Extra keywords or columns to include in the FITS file.
-            Arguments of type str, int, float, or bool will be stored as
-            keywords in the primary header.
-            Arguments of type np.array or list will be stored as columns
-            in the first extension.
-        Returns
-        -------
-        hdu : astropy.io.fits
-            Returns an astropy.io.fits object if path is None
-        """
-        # kepler_specific_data = {
-        #     'TELESCOP': "KEPLER",
-        #     'INSTRUME': "Kepler Photometer",
-        #     'OBJECT': '{}'.format(self.targetid),
-        #     'KEPLERID': self.targetid,
-        #     'CHANNEL': self.channel,
-        #     'MISSION': self.mission,
-        #     'RA_OBJ': self.ra,
-        #     'DEC_OBJ': self.dec,
-        #     'EQUINOX': 2000,
-        #     'DATE-OBS': Time(self.time[0]+2454833., format=('jd')).isot}
-        # for kw in kepler_specific_data:
-        #     if ~np.asarray([kw.lower == k.lower() for k in extra_data]).any():
-        #         extra_data[kw] = kepler_specific_data[kw]
-        # return super(KeplerLightCurve, self).to_fits(path=path,
-        #                                              overwrite=overwrite,
-        #                                              **extra_data)
-        raise NotImplementedError('This should be a function!')
-
-################################################################################
     ## Lets start with periodogram only, before moving on to the seismo stuff
     ## All the seismo steps will have to be verified one by one
     def estimate_numax(self):
