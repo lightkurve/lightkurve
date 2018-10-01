@@ -317,7 +317,7 @@ class SFFCorrector(object):
 #        import pdb;pdb.set_trace()
 
         for iter in range(niters):
-            mask = np.abs(allflux - np.median(allflux)) < sigma_1 * allflux.std()
+            mask = np.abs(allflux - np.nanmedian(allflux)) < sigma_1 * np.nanstd(allflux)
             self.bspline = self.fit_bspline(alltime[mask], allflux[mask], knot_separation=knots)
 #            plt.plot(alltime, allflux)
 #            plt.plot(alltime, self.bspline(alltime))
