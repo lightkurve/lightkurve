@@ -148,9 +148,8 @@ class Periodogram(object):
         fs = (1./((np.nanmax(lc.time - lc.time[0]))*u.day)) / samples_per_peak
 
         #Convert these values to requested frequency unit
-        try:
-            nyquist = nyquist.to(freq_unit)
-            fs = fs.to(freq_unit)
+        nyquist = nyquist.to(freq_unit)
+        fs = fs.to(freq_unit)
 
         #Check if period has been passed
         if periods is not None:
