@@ -802,7 +802,7 @@ class LightCurve(object):
     def periodogram(self, nterms = 1, nyquist_factor = 1, oversample_factor = 1,
                         min_frequency = None, max_frequency = None,
                         min_period = None, max_period = None,
-                        frequencies = None, periods = None,
+                        frequency = None, period = None,
                         freq_unit = 1/u.day, **kwargs):
         """Returns a `Periodogram`.
 
@@ -830,11 +830,11 @@ class LightCurve(object):
         max_period : float
             If specified, use 1./maximum_period as the minimum frequency rather
             than one over the time baseline.
-        frequencies :  array-like
+        frequency :  array-like
             The regular grid of frequencies to use. If given a unit, it is
             converted to units of freq_unit. If not, it is assumed to be in
             units of freq_unit. This over rides any set frequency limits.
-        periods : array-like
+        period : array-like
             The regular grid of periods to use (as 1/period). If given a unit,
             it is converted to units of freq_unit. If not, it is assumed to be
             in units of 1/freq_unit. This overrides any set period limits.
@@ -857,8 +857,8 @@ class LightCurve(object):
                             max_frequency = max_frequency,
                             min_period = min_period,
                             max_period = max_period,
-                            frequencies = frequencies,
-                            periods = periods,
+                            frequency = frequency,
+                            period = period,
                             freq_unit = freq_unit,
                             **kwargs)
 

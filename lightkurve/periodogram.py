@@ -29,8 +29,13 @@ __all__ = ['Periodogram', 'estimate_mass', 'estimate_radius',
 
 ###Add uncertainties <- review these [astero]
 numax_s = 3090.0 # Huber et al 2013
+err_numax_s = 30.
 deltanu_s = 135.1
+err_deltanu_s = 0.1
 teff_s = 5777.0
+
+#To_do: Parition this into a Periodogram object and a LombScarglePeriodogram
+#object that inherits from periodogram
 
 class Periodogram(object):
     ###Update this [houseekeping]
@@ -40,20 +45,20 @@ class Periodogram(object):
     lc : `LightCurve` object
         The LightCurve from which the Periodogram is computed. Holds all  of
         the `LightCurve object's properties.
-    frequencies : array-like
+    frequency : array-like
         List of frequencies.
-    periods : array-like
-        List of periods (1 / frequencies)
+    period : array-like
+        List of periods (1 / frequency)
     power : array-like
         The power-spectral-density of the Fourier timeseries, in units of
-        ppm^2 / freq_unit, where freq_unit is the unit of the frequencies
+        ppm^2 / freq_unit, where freq_unit is the unit of the frequency
         attribute.
     nyquist : float
         The Nyquist frequency of the lightcurve. In units of freq_unit, where
-        freq_unit is the unit of the frequencies attribute.
+        freq_unit is the unit of the frequency attribute.
     frequency_spacing : float
         The frequency spacing of the periodogram. In units of freq_unit, where
-        freq_unit is the unit of the frequencies attribute.
+        freq_unit is the unit of the frequency attribute.
     max_power : float
         The power of the highest peak in the periodogram
     max_pow_frequency : float
@@ -67,29 +72,29 @@ class Periodogram(object):
     meta : dict
         Free-form metadata associated with the Periodogram.
     """
-    def __init__(self, lc=None, frequencies=None, periods = None, power=None,
+    def __init__(self, lc=None, frequency=None, period = None, power=None,
                 nyquist=None, fs=None, _format = 'frequency', meta={}):
         self.lc = lc
-        self.frequencies = frequencies
-        self.periods = periods
+        self.frequency = frequency
+        self.period = period
         self.power = power
         self.nyquist = nyquist
         self.frequency_spacing = fs
         self._format = _format
         self.meta = meta
 
-        if self.periods is None:
-            self.periods = 1./self.frequencies
+        if self.period is None:
+            self.period = 1./self.frequency
 
         self.max_power = np.nanmax(self.power)
-        self.max_pow_frequency = self.frequencies[np.nanargmax(self.power)]
-        self.max_pow_period = self.periods[np.nanargmax(self.power)]
+        self.max_pow_frequency = self.frequency[np.nanargmax(self.power)]
+        self.max_pow_period = self.period[np.nanargmax(self.power)]
 
     @staticmethod
     def from_lightcurve(lc, nterms = 1, nyquist_factor = 1, oversample_factor = 1,
                         min_frequency = None, max_frequency = None,
                         min_period = None, max_period = None,
-                        frequencies = None, periods = None,
+                        frequency = None, period = None,
                         freq_unit = 1/u.day, _format = 'frequency', **kwargs):
         """Creates a Periodogram object from a LightCurve instance using
         the Lomb-Scargle method.
@@ -99,8 +104,8 @@ class Periodogram(object):
 
         The min frequency and/or max frequency (or max period and/or min period)
         can be passed to set custom limits for the frequency grid. Alternatively,
-        the user can provide a custom regular grid using the `frequencies`
-        parameter or a custom regular grid of periods using the `periods`
+        the user can provide a custom regular grid using the `frequency`
+        parameter or a custom regular grid of periods using the `period`
         parameter.
 
         The the spectrum can be oversampled by increasing the oversample_factor
@@ -151,11 +156,11 @@ class Periodogram(object):
         max_period : float
             If specified, use 1./maximum_period as the minimum frequency rather
             than one over the time baseline.
-        frequencies :  array-like
+        frequency :  array-like
             The regular grid of frequencies to use. If given a unit, it is
             converted to units of freq_unit. If not, it is assumed to be in
             units of freq_unit. This over rides any set frequency limits.
-        periods : array-like
+        period : array-like
             The regular grid of periods to use (as 1/period). If given a unit,
             it is converted to units of freq_unit. If not, it is assumed to be
             in units of 1/freq_unit. This overrides any set period limits.
@@ -177,12 +182,12 @@ class Periodogram(object):
             Returns a Periodogram object extracted from the lightcurve.
         """
         #Check if any values of period have been passed and set format accordingly
-        if not all(b is None for b in [periods, min_period, max_period]):
+        if not all(b is None for b in [period, min_period, max_period]):
             _format = 'period'
 
         #Check input consistency
-        if (not all(b is None for b in [periods, min_period, max_period])) &\
-            (not all(b is None for b in [frequencies, min_frequency, max_frequency])):
+        if (not all(b is None for b in [period, min_period, max_period])) &\
+            (not all(b is None for b in [frequency, min_frequency, max_frequency])):
             raise ValueError('You have input keyword arguments for both frequency and period. Please only use one or the other.')
 
         #Calculate Nyquist frequency & Frequency Bin Width in terms of days
@@ -194,19 +199,19 @@ class Periodogram(object):
         fs = fs.to(freq_unit)
 
         #Check if period has been passed
-        if periods is not None:
+        if period is not None:
             log.warning('You have passed a grid of periods, which overrides any period/frequency limit kwargs.')
-            frequencies = 1./periods
+            frequency = 1./period
         if max_period is not None:
             min_frequency = 1./max_period
         if min_period is not None:
             max_frequency = 1./min_period
 
-        if frequencies is not None:
+        if frequency is not None:
             log.warning('You have passed a grid of frequencies, which overrides any period/frequency limit kwargs.')
 
         #Do unit conversions if user input min/max frequency or period
-        elif frequencies is None:
+        elif frequency is None:
             if min_frequency is not None:
                 min_frequency = u.Quantity(min_frequency, freq_unit)
             if max_frequency is not None:
@@ -224,27 +229,27 @@ class Periodogram(object):
                 max_frequency = nyquist * nyquist_factor
 
             #Create frequency grid evenly spaced in frequency
-            frequencies = np.arange(min_frequency.value, max_frequency.value, fs.value)
+            frequency = np.arange(min_frequency.value, max_frequency.value, fs.value)
 
         #Set in/convert to desired units
-        frequencies = u.Quantity(frequencies, freq_unit)
+        frequency = u.Quantity(frequency, freq_unit)
 
         if nterms > 1:
             log.warning('Nterms has been set larger than 1. Method has been set to `fastchi2`')
             method = 'fastchi2'
-            if periods is not None:
+            if period is not None:
                 method = 'chi2'
                 log.warning('You have passed an eventy-spaced grid of periods. These are not evenly spaced in frequency space.\n Method has been set to "chi2" to allow for this.')
         else:
             method='fast'
-            if periods is not None:
+            if period is not None:
                 method = 'slow'
                 log.warning('You have passed an evenly-spaced grid of periods. These are not evenly spaced in frequency space.\n Method has been set to "slow" to allow for this.')
 
 
         LS = LombScargle(lc.time * u.day, lc.flux * 1e6,
                             nterms=nterms, normalization='psd', **kwargs)
-        power = LS.power(frequencies, method=method)
+        power = LS.power(frequency, method=method)
 
         #Normalise the according to Parseval's theorem
         norm = np.std(lc.flux * 1e6)**2 / np.sum(power)
@@ -254,7 +259,7 @@ class Periodogram(object):
         power = power / fs.value
 
         ### Periodogram needs properties
-        return Periodogram(lc = lc, frequencies=frequencies, periods=periods,
+        return Periodogram(lc = lc, frequency=frequency, period=period,
                             power=power, nyquist=nyquist, fs=fs, _format=_format)
 
     def plot(self, scale='linear', ax=None,
@@ -265,8 +270,6 @@ class Periodogram(object):
 
         Parameters
         ----------
-        frequency: array-like
-            Over what frequencies (in microhertz) will periodogram plot
         scale: str
             Set x,y axis to be "linear" or "log". Default is linear.
         ax : matplotlib.axes._subplots.AxesSubplot
@@ -311,12 +314,12 @@ class Periodogram(object):
 
             # Plot frequency and power
             if format == 'frequency':
-                ax.plot(self.frequencies, self.power, **kwargs)
+                ax.plot(self.frequency, self.power, **kwargs)
                 if xlabel is None:
                     xlabel = "Frequency [{}]".format(self.frequency_spacing.unit.to_string('latex'))
 
             if format == 'period':
-                ax.plot(self.periods, self.power, **kwargs)
+                ax.plot(self.period, self.power, **kwargs)
                 ax.set_xscale('log')
                 if xlabel is None:
                     xlabel = "Period [{}]".format((1./self.frequency_spacing).unit.to_string('latex'))
@@ -343,11 +346,11 @@ class Periodogram(object):
         table : `astropy.table.Table` object
             An AstroPy Table with columns 'frequency', 'period', and 'power'.
         """
-        return Table(data=(self.frequencies, self.periods, self.power),
+        return Table(data=(self.frequency, self.period, self.power),
                      names=('frequency', 'period', 'power'),
                      meta=self.meta)
 
-    def to_pandas(self, columns=['frequencies','periods','power']):
+    def to_pandas(self, columns=['frequency','period','power']):
         """Export the Periodogram as a Pandas DataFrame.
         Parameters
         ----------
@@ -373,8 +376,8 @@ class Periodogram(object):
                     data[col] = vars(self)[col].value
                 else:
                     data[col] = vars(self)[col].value
-        df = pd.DataFrame(data=data, index=self.frequencies, columns=columns)
-        df.index.name = 'frequencies'
+        df = pd.DataFrame(data=data, index=self.frequency, columns=columns)
+        df.index.name = 'frequency'
         return df
 
     def to_csv(self, path_or_buf, **kwargs):
@@ -437,8 +440,8 @@ class Periodogram(object):
 
     def __getitem__(self, key):
         copy_self = copy.copy(self)
-        copy_self.frequencies = self.frequencies[key]
-        copy_self.periods = self.periods[key]
+        copy_self.frequency = self.frequency[key]
+        copy_self.period = self.period[key]
         copy_self.power = self.power[key]
         return copy_self
 
@@ -568,13 +571,12 @@ class Periodogram(object):
             The nu max of self.powers. Nu max is in microhertz
         """
 
-        bkg = self.estimate_background(self.frequencies.value, self.powers.value)
-        df = self.frequencies[1].value - self.frequencies[0].value
+        bkg = self.estimate_background(self.frequency.value, self.powers.value)
+        df = self.frequency[1].value - self.frequency[0].value
         smoothed_ps = gaussian_filter(self.powers.value / bkg, 10 / df)
-        peak_freqs = self.frequencies[self.find_peaks(smoothed_ps)].value
+        peak_freqs = self.frequency[self.find_peaks(smoothed_ps)].value
         nu_max = peak_freqs[peak_freqs > 5][0]
         return nu_max
-
 
     def estimate_delta_nu(self, numax=None):
         """Estimates delta nu value, or large frequency spacing
@@ -607,8 +609,8 @@ class Periodogram(object):
             return acf
 
         # And the autocorrelation function of a lightly smoothed power spectrum
-        bkg = self.estimate_background(self.frequencies.value, self.powers.value)
-        df = self.frequencies[1].value - self.frequencies[0].value
+        bkg = self.estimate_background(self.frequency.value, self.powers.value)
+        df = self.frequency[1].value - self.frequency[0].value
         acor = acor_function(gaussian_filter(self.powers.value / bkg, 0.5 / df))
         lags = df*np.arange(len(acor))
         acor = acor[lags < 30]
