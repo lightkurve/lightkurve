@@ -72,9 +72,9 @@ class SearchResult(object):
                                          quality_bitmask=quality_bitmask,
                                          **kwargs)
         elif type in ["lc", "Light Curve"]:
-            return KeplerLightCurve(path[0],
-                                    quality_bitmask=quality_bitmask,
-                                    **kwargs)
+            return KeplerLightCurveFile(path[0],
+                                        quality_bitmask=quality_bitmask,
+                                        **kwargs).PDCSAP_FLUX
         elif type in ["lcf", "Light Curve File"]:
             return KeplerLightCurveFile(path[0],
                                     quality_bitmask=quality_bitmask,
