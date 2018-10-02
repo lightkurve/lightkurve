@@ -46,9 +46,9 @@ class Periodogram(object):
         The LightCurve from which the Periodogram is computed. Holds all  of
         the `LightCurve object's properties.
     frequency : array-like
-        List of frequencies.
+        List of frequencies with associated astropy unit.
     period : array-like
-        List of periods (1 / frequency)
+        List of periods (1 / frequency) with associated astropy unit
     power : array-like
         The power-spectral-density of the Fourier timeseries, in units of
         ppm^2 / freq_unit, where freq_unit is the unit of the frequency
@@ -262,8 +262,38 @@ class Periodogram(object):
         return Periodogram(lc = lc, frequency=frequency, period=period,
                             power=power, nyquist=nyquist, fs=fs, _format=_format)
 
-    def plot(self, scale='linear', ax=None,
-                    xlabel=None, ylabel=None, title='',
+    def smooth_ps(self, smooth_factor = 10):
+        """Smooths the powerspectrum using a moving median filter.
+
+        Parameters
+        ----------
+        smooth_factor : int
+            Default 10. The factor by which to smooth the power spectrum, in the
+            sense that the power spectrum will be smoothed by taking the median
+            in bins of size N / smooth_factor, where N is the length of the
+            original periodogram.
+
+        Returns
+        -------
+        smooth_freq : array-like
+            The mean frequency in each bin evaluated by the moving median filter.
+            Has the same units as the Periodogram.frequency attribute.
+        smooth_power : array-like
+            The mean power in each bin evaluated by the moving median filter.
+            Has the same units as the Periodogram.power attribute.
+        """
+        if smooth_factor < 1:
+            raise ValueError('The smooth factor must be greater than 1.')
+
+        #Calculating the length of the smoothed array
+        m = int(len(self.power) / smooth_factor)
+
+        smooth_freq = self.frequency[:m*smooth_factor].reshape((m, smooth_factor)).mean(1)
+        smooth_power = self.power[:m*smooth_factor].reshape((m, smooth_factor)).mean(1)
+        return smooth_freq, smooth_power
+
+    def plot(self, scale='linear', ax=None, xlabel=None, ylabel=None, title='',
+                    smooth_factor = None,
                     style='lightkurve',format=None,  **kwargs):
 
         """Plots the periodogram.
@@ -281,6 +311,11 @@ class Periodogram(object):
             Plot y axis label
         title : str
             Plot set_title
+        smooth_factor : int
+            Default 10. The factor by which to smooth the power spectrum, in the
+            sense that the power spectrum will be smoothed by taking the median
+            in bins of size N / smooth_factor, where N is the length of the
+            original periodogram.
         style : str
             Path or URL to a matplotlib style file, or name of one of
             matplotlib's built-in stylesheets (e.g. 'ggplot').
@@ -315,12 +350,18 @@ class Periodogram(object):
             # Plot frequency and power
             if format == 'frequency':
                 ax.plot(self.frequency, self.power, **kwargs)
+                if smooth_factor is not None:
+                    smoo_f, smoo_p = self.smooth_ps(smooth_factor)
+                    ax.plot(smoo_f, smoo_p, ,c='r', label = 'Smoothed Power Spectrum')
                 if xlabel is None:
                     xlabel = "Frequency [{}]".format(self.frequency_spacing.unit.to_string('latex'))
 
             if format == 'period':
                 ax.plot(self.period, self.power, **kwargs)
                 ax.set_xscale('log')
+                if smooth_factor is not None:
+                    smoo_f, smoo_p = self.smooth_ps(smooth_factor)
+                    ax.plot(1./smoo_f, smoo_p, c='r', label='Smoothed Power Spectrum')
                 if xlabel is None:
                     xlabel = "Period [{}]".format((1./self.frequency_spacing).unit.to_string('latex'))
 
