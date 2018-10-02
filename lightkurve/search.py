@@ -19,11 +19,12 @@ class SearchResult(object):
 
     """
 
-    def __init__(self, info, campaign=None, quarter=None, cadence=None):
+    def __init__(self, info, campaign=None, quarter=None, month=None, cadence=None):
 
         self.info = info
         self.campaign = campaign
         self.quarter = quarter
+        self.month = month
         self.cadence = cadence
 
     @property
@@ -59,7 +60,7 @@ class SearchResult(object):
         order = [np.where(products['parent_obsid'] == o)[0] for o in obsids]
         order = [item for sublist in order for item in sublist]
         products = self._mask_products(products[order], filetype=filetype, campaign=self.campaign,
-                                       quarter=self.quarter)
+                                       quarter=self.quarter, month=self.month, cadence=self.cadence)
 
         path = Observations.download_products(products, mrp_only=False)['Local Path']
 
@@ -96,7 +97,8 @@ class SearchResult(object):
         order = [np.where(products['parent_obsid'] == o)[0] for o in obsids]
         order = [item for sublist in order for item in sublist]
 
-        products = self._mask_products(products[order])
+        products = self._mask_products(products[order],filetype=filetype, campaign=self.campaign,
+                                       quarter=self.quarter, cadence=self.cadence)
 
         path = Observations.download_products(products, mrp_only=False)['Local Path']
 
@@ -122,7 +124,7 @@ class SearchResult(object):
             return LightCurveFileCollection(lcfs)
 
     def _mask_products(self, products, filetype='Target Pixel', cadence='long', quarter=None,
-                       campaign=None, searchtype='single', radius=1, targetlimit=1):
+                       month=None, campaign=None, searchtype='single', radius=1, targetlimit=1):
         """
 
         """
@@ -223,7 +225,7 @@ class SearchResult(object):
                 raise ArchiveError("Found {} different Target Pixel Files "
                                    "for target {} in Quarter {}. "
                                    "Please specify the month (1, 2, or 3)."
-                                   "".format(len(products), target, quarter))
+                                   "".format(len(products), self.target_name, quarter))
             # Get the short cadence date lookup table.
             table = ascii.read(os.path.join(PACKAGEDIR, 'data', 'short_cadence_month_lookup.csv'))
             # Grab the dates of each of the short cadence files. Make sure every entry
@@ -254,6 +256,10 @@ class SearchResult(object):
 
         return products
 
+
+class ArchiveError(Exception):
+    """Raised if there is a problem accessing data."""
+    pass
 
 def _query_kepler_products(target, searchtype='single', radius=.0001):
     """
@@ -397,7 +403,7 @@ def search_target(target, cadence='long', quarter=None, month=None,
         path = _query_kepler_products(target=target,
                                       searchtype='single', radius=.0001)
 
-    return SearchResult(path, campaign=campaign, quarter=quarter)
+    return SearchResult(path, campaign=campaign, quarter=quarter, month=month, cadence=cadence)
 
 
 def search_region(target, cadence='long', quarter=None, month=None,
@@ -452,4 +458,4 @@ def search_region(target, cadence='long', quarter=None, month=None,
         path = _query_kepler_products(
             target=target, searchtype='cone', radius=radius)
 
-    return SearchResult(path, campaign=campaign, quarter=quarter)
+    return SearchResult(path, campaign=campaign, quarter=quarter, month=month, cadence=cadence)
