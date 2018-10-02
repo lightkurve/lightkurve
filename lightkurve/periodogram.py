@@ -1,16 +1,26 @@
-import numpy as np
-from astropy import units as u
-from astropy.stats import LombScargle
-from matplotlib import pyplot as plt
-from scipy.ndimage.filters import gaussian_filter
-from astropy.units import cds
-from astropy.table import Table
-import astropy
+"""Defines Periodogram"""
+from __future__ import division, print_function
+
 import copy
-
+import os
 import logging
-from . import PACKAGEDIR, MPLSTYLE
+import warnings
 
+import numpy as np
+from matplotlib import pyplot as plt
+import astropy
+from astropy.table import Table
+from astropy.io import fits
+from astropy.stats import LombScargle
+from astropy.units import cds
+from scipy.ndimage.filters import gaussian_filter
+
+"""This module lets us attack a unit to a value or an array of values. This
+allows us to keep track of what units our data are in, and easily switch
+between different units."""
+from astropy import units as u
+
+from . import PACKAGEDIR, MPLSTYLE
 
 log = logging.getLogger(__name__)
 
@@ -21,10 +31,6 @@ __all__ = ['Periodogram', 'estimate_mass', 'estimate_radius',
 numax_s = 3090.0 # Huber et al 2013
 deltanu_s = 135.1
 teff_s = 5777.0
-
-class InputError(Exception):
-    """Raised if user inputs both frequency and period kwargs"""
-    pass
 
 class Periodogram(object):
     ###Update this [houseekeping]
@@ -37,13 +43,17 @@ class Periodogram(object):
     frequencies : array-like
         List of frequencies.
     periods : array-like
-        List of periods (1 / frequency)
+        List of periods (1 / frequencies)
     power : array-like
-        The power-spectral-density of the Fourier timeseries.
+        The power-spectral-density of the Fourier timeseries, in units of
+        ppm^2 / freq_unit, where freq_unit is the unit of the frequencies
+        attribute.
     nyquist : float
-        The Nyquist frequency of the lightcurve.
+        The Nyquist frequency of the lightcurve. In units of freq_unit, where
+        freq_unit is the unit of the frequencies attribute.
     frequency_spacing : float
-        The frequency spacing of the periodogram.
+        The frequency spacing of the periodogram. In units of freq_unit, where
+        freq_unit is the unit of the frequencies attribute.
     max_power : float
         The power of the highest peak in the periodogram
     max_pow_frequency : float
@@ -76,7 +86,7 @@ class Periodogram(object):
         self.max_pow_period = self.periods[np.nanargmax(self.power)]
 
     @staticmethod
-    def from_lightcurve(lc, nterms = 1, nyquist_factor = 1, samples_per_peak = 1,
+    def from_lightcurve(lc, nterms = 1, nyquist_factor = 1, oversample_factor = 1,
                         min_frequency = None, max_frequency = None,
                         min_period = None, max_period = None,
                         frequencies = None, periods = None,
@@ -93,7 +103,7 @@ class Periodogram(object):
         parameter or a custom regular grid of periods using the `periods`
         parameter.
 
-        The the spectrum can be oversampled by increasing the samples_per_peak
+        The the spectrum can be oversampled by increasing the oversample_factor
         parameter. The parameter nterms controls how many Fourier terms are used
         in the model. Note that many terms could lead to spurious peaks. Setting
         the Nyquist_factor to be greater than 1 will sample the space beyond the
@@ -124,9 +134,11 @@ class Periodogram(object):
         nyquist_factor : int
             Default 1. The multiple of the average Nyquist frequency. Is
             overriden by maximum_frequency (or minimum period).
-        samples_per_peak : int
-            The approximate number of desired samples across the typical peak.
-            This effectively oversamples the spectrum.
+        oversample_factor : int
+            The frequency spacing, determined by the time baseline of the
+            lightcurve, is divided by this factor, oversampling the frequency
+            space. This parameter is identical to the samples_per_peak parameter
+            in astropy.LombScargle()
         min_frequency : float
             If specified, use this minimum frequency rather than one over the
             time baseline.
@@ -171,11 +183,11 @@ class Periodogram(object):
         #Check input consistency
         if (not all(b is None for b in [periods, min_period, max_period])) &\
             (not all(b is None for b in [frequencies, min_frequency, max_frequency])):
-            raise InputError('You have input keyword arguments for both frequency and period. Please only use one or the other.')
+            raise ValueError('You have input keyword arguments for both frequency and period. Please only use one or the other.')
 
         #Calculate Nyquist frequency & Frequency Bin Width in terms of days
         nyquist = 0.5 * (1./(np.median(np.diff(lc.time))*u.day))
-        fs = (1./((np.nanmax(lc.time - lc.time[0]))*u.day)) / samples_per_peak
+        fs = (1./((np.nanmax(lc.time - lc.time[0]))*u.day)) / oversample_factor
 
         #Convert these values to requested frequency unit
         nyquist = nyquist.to(freq_unit)
@@ -202,9 +214,9 @@ class Periodogram(object):
             if (min_frequency is not None) & (max_frequency is not None):
                 if (max_frequency <= min_frequency):
                     if _format == 'frequency':
-                        raise InputError('User input max frequency is smaller than or equal to min frequency.')
+                        raise ValueError('User input max frequency is smaller than or equal to min frequency.')
                     if _format == 'period':
-                        raise InputError('User input max period is smaller than or equal to min period.')
+                        raise ValueError('User input max period is smaller than or equal to min period.')
             #If nothing has been passed in, set them to the defaults
             if min_frequency is None:
                 min_frequency = fs

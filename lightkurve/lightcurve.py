@@ -799,7 +799,7 @@ class LightCurve(object):
         """
         return self.to_pandas().to_csv(path_or_buf=path_or_buf, **kwargs)
 
-    def periodogram(self, nterms = 1, nyquist_factor = 1, samples_per_peak = 1,
+    def periodogram(self, nterms = 1, nyquist_factor = 1, oversample_factor = 1,
                         min_frequency = None, max_frequency = None,
                         min_period = None, max_period = None,
                         frequencies = None, periods = None,
@@ -813,9 +813,11 @@ class LightCurve(object):
         nyquist_factor : int
             Default 1. The multiple of the average Nyquist frequency. Is
             overriden by maximum_frequency (or minimum period).
-        samples_per_peak : int
-            The approximate number of desired samples across the typical peak.
-            This effectively oversamples the spectrum.
+        oversample_factor : int
+            The frequency spacing, determined by the time baseline of the
+            lightcurve, is divided by this factor, oversampling frequency space.
+            This parameter is identical to the samples_per_peak parameter in
+            astropy.LombScargle()
         min_frequency : float
             If specified, use this minimum frequency rather than one over the
             time baseline.
@@ -850,7 +852,7 @@ class LightCurve(object):
         from . import Periodogram
         return Periodogram.from_lightcurve(lc=self, nterms = nterms,
                             nyquist_factor = nyquist_factor,
-                            samples_per_peak = samples_per_peak,
+                            oversample_factor = oversample_factor,
                             min_frequency = min_frequency,
                             max_frequency = max_frequency,
                             min_period = min_period,
