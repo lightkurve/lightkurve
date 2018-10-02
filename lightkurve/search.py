@@ -19,12 +19,15 @@ class SearchResult(object):
 
     """
 
-    def __init__(self, info):
+    def __init__(self, info, campaign=None, quarter=None, cadence=None):
 
         self.info = info
+        self.campaign = campaign
+        self.quarter = quarter
+        self.cadence = cadence
 
     @property
-    def ID(self):
+    def obsID(self):
         return np.asarray(np.unique(self.info['obsid']), dtype='int')
 
     @property
@@ -32,17 +35,52 @@ class SearchResult(object):
         return np.asarray(np.unique(self.info['target_name']))
 
     @property
-    def pos(self):
-        coords = []
-        for i,ra in enumerate(self.info['s_ra']):
-            coords.append([ra, self.info['s_dec'][i]])
-        if len(coords) == 1:
-            return np.asarray(coords)[0]
-        else:
-            return np.asarray(coords)
+    def RA(self):
+        return np.asarray(self.info['s_ra'])
+
+    @property
+    def dec(self):
+        return np.asarray(self.info['s_dec'])
 
 
     def download(self, type, quality_bitmask='default', **kwargs):
+        """
+
+        """
+        if type == None:
+            raise ValueError("Choose a filetype of 'Target Pixel' or 'Lightcurve'")
+        elif type == "tpf":
+            filetype = "Target Pixel"
+        elif type in ["lc", "lcf"]:
+            filetype = "Lightcurve"
+
+        obsids = np.asarray(self.info['obsid'])
+        products = Observations.get_product_list(self.info)
+        order = [np.where(products['parent_obsid'] == o)[0] for o in obsids]
+        order = [item for sublist in order for item in sublist]
+        products = self._mask_products(products[order], filetype=filetype, campaign=self.campaign,
+                                       quarter=self.quarter)
+
+        path = Observations.download_products(products, mrp_only=False)['Local Path']
+
+        if len(path) != 1:
+            log.warning('Multiple files available to download. Please use `download_all()` or '
+                        'specify a campaign, quarter, or cadence to limit your search.')
+
+        if type in ["tpf", "Target Pixel", "Target Pixel File"]:
+            return KeplerTargetPixelFile(path[0],
+                                         quality_bitmask=quality_bitmask,
+                                         **kwargs)
+        elif type in ["lc", "Light Curve"]:
+            return KeplerLightCurve(path[0],
+                                    quality_bitmask=quality_bitmask,
+                                    **kwargs)
+        elif type in ["lcf", "Light Curve File"]:
+            return KeplerLightCurveFile(path[0],
+                                    quality_bitmask=quality_bitmask,
+                                    **kwargs)
+
+    def download_all(self, type, quality_bitmask='default', **kwargs):
         """
 
         """
@@ -57,28 +95,31 @@ class SearchResult(object):
         products = Observations.get_product_list(self.info)
         order = [np.where(products['parent_obsid'] == o)[0] for o in obsids]
         order = [item for sublist in order for item in sublist]
+
         products = self._mask_products(products[order])
 
         path = Observations.download_products(products, mrp_only=False)['Local Path']
 
-        if len(path) == 1:
-            if type == "tpf":
-                return KeplerTargetPixelFile(path[0],
-                                             quality_bitmask=quality_bitmask,
-                                             **kwargs)
-            elif type == "lc":
-                return KeplerLightCurveFile(path[0],
-                                        quality_bitmask=quality_bitmask,
-                                        **kwargs)
+        if len(path) != 1:
+            log.warning('Multiple files available to download. Please use `download_all()` or '
+                        'specify a campaign, quarter, or cadence to limit your search.')
 
-        if type == "tpf":
-            return KeplerTargetPixelFile(path[0],
+        if type in ["tpf", "Target Pixel", "Target Pixel File"]:
+            tpfs = KeplerTargetPixelFile(path,
                                          quality_bitmask=quality_bitmask,
                                          **kwargs)
-        elif type == "lc":
-            return KeplerLightCurveFile(path[0],
-                                    quality_bitmask=quality_bitmask,
-                                    **kwargs)
+            return TargetPixelFileCollection(tpfs)
+        elif type in ["lc", "Light Curve"]:
+            lcs = KeplerLightCurve(path,
+                                   quality_bitmask=quality_bitmask,
+                                   **kwargs)
+            return LightCurveCollection(lcs)
+
+        elif type in ["lcf", "Light Curve File"]:
+            lcfs = KeplerLightCurveFile(path,
+                                        quality_bitmask=quality_bitmask,
+                                        **kwargs)
+            return LightCurveFileCollection(lcfs)
 
     def _mask_products(self, products, filetype='Target Pixel', cadence='long', quarter=None,
                        campaign=None, searchtype='single', radius=1, targetlimit=1):
@@ -214,7 +255,7 @@ class SearchResult(object):
         return products
 
 
-def _query_kepler_products(target, searchtype='single', radius=1):
+def _query_kepler_products(target, searchtype='single', radius=.0001):
     """
     Helper function for `search_kepler_products`.
 
@@ -286,6 +327,7 @@ def _query_kepler_products(target, searchtype='single', radius=1):
             else:
                 raise ValueError("{:09d}: not in the KIC or EPIC ID range".format(target))
             obs = Observations.query_criteria(target_name=target_name,
+                                              radius='{} deg'.format(radius/3600),
                                               project=["Kepler", "K2"],
                                               obs_collection=["Kepler", "K2"])
         except ValueError:
@@ -294,140 +336,15 @@ def _query_kepler_products(target, searchtype='single', radius=1):
             # to degrees for query_criteria().
             try:
                 obs = Observations.query_criteria(objectname=target,
+                                                  radius='{} deg'.format(radius/3600),
                                                   project=["Kepler", "K2"],
                                                   obs_collection=["Kepler", "K2"])
                 # Make sure the final table is in DISTANCE order
                 obs.sort('distance')
             except ResolverError as exc:
                 raise ArchiveError(exc)
-    obsids = np.asarray(obs['obsid'])
-    products = Observations.get_product_list(obs)
-    order = [np.where(products['parent_obsid'] == o)[0] for o in obsids]
-    order = [item for sublist in order for item in sublist]
-    products = products[order]
 
     return obs
-
-
-def _search_kepler_products(target, filetype='Target Pixel', cadence='long', quarter=None,
-                            campaign=None, searchtype='single', radius=1, targetlimit=1):
-    """
-    Returns a table of Kepler or K2 Target Pixel Files or Lightcurve Files
-     for a given target.
-
-    Parameters
-    ----------
-    filetype : 'Target Pixel' or 'Lightcurve'
-        Whether to return TPFs of LCs
-    cadence: 'short' or 'long'
-        Specify short (1-min) or long (30-min) cadence data.
-    quarter, campaign : int
-        Specify the Kepler Quarter or K2 Campaign Number.
-        If None, then return the products for all Quarters/Campaigns.
-    radius : float
-        Search radius in arcseconds
-    targetlimit : None or int
-        If multiple targets are present within `radius`, limit the number
-        of returned TargetPixelFile objects to `targetlimit`.
-        If `None`, no limit is applied.
-
-    Returns
-    -------
-    products : astropy.Table
-        Table detailing the available Target Pixel File products.
-    """
-    if filetype not in ['Target Pixel', 'Lightcurve']:
-        raise ValueError("Choose a filetype of 'Target Pixel' or 'Lightcurve'")
-
-    # Value for the quarter or campaign
-    qoc = campaign if campaign is not None else quarter
-
-    # Ensure quarter or campaign is iterable.
-    if (campaign is not None) | (quarter is not None):
-        qoc = np.atleast_1d(np.asarray(qoc, dtype=int))
-
-    products = _query_kepler_products(target, searchtype=searchtype, radius=radius)
-    # Because MAST doesn't let us query based on Kepler-specific meta data
-    # fields, we need to identify short/long-cadence TPFs by their filename.
-
-    suffix = []
-    for f in ['Target Pixel', 'Lightcurve']:
-        if cadence in ['short', 'sc']:
-            suffix.append("{} Short".format(f))
-        elif cadence in ['any', 'both']:
-            suffix.append("{}".format(f))
-        else:
-            suffix.append("{} Long".format(f))
-
-    # If there is nothing in the table, quit now.
-    if len(products) == 0:
-        return products
-
-
-    # Identify the campaign or quarter by the description.
-    if qoc is not None:
-        mask = np.zeros(np.shape(products)[0], dtype=bool)
-        for q in qoc:
-            mask |= np.array([desc.lower().replace('-', '').endswith('q{}'.format(q)) or
-                              'c{:02d}'.format(q) in desc.lower().replace('-', '') or
-                              'c{:03d}'.format(q) in desc.lower().replace('-', '')
-                              for desc in products['description']])
-    else:
-        mask = np.ones(np.shape(products)[0], dtype=bool)
-
-    # Allow only the correct fits or fits.gz type
-    mask &= np.array([desc.lower().endswith('fits') or
-                      desc.lower().endswith('fits.gz')
-                      for desc in products['dataURI']])
-
-    # Allow only the correct cadence type
-    for s in suffix:
-        mask |= np.array([s in desc for desc in products['description']])
-        mask &= np.array(['tar' not in desc for desc in products['description']])
-    products = products[mask]
-
-    # Add the quarter or campaign numbers
-    qoc = np.asarray([p.split(' - ')[-1][1:].replace('-', '')
-                      for p in products['description']], dtype=int)
-    products['qoc'] = qoc
-    # Add the dates of each short cadence observation to the product table.
-    # Note this will not produce a date for ktwo observations, but will not break.
-    dates = [p.split('/')[-1].split('-')[1].split('_')[0]
-             for p in products['dataURI']]
-    for idx, d in enumerate(dates):
-        try:
-            dates[idx] = float(d)
-        except:
-            dates[idx] = 0
-    products['dates'] = np.asarray(dates)
-
-    # Limit to the correct number of hits based on ID. If there are multiple versions
-    # of the same ID, this shouldn't count towards the limit.
-    # if targetlimit is not None:
-    ids = np.asarray([p.split('/')[-1].split('-')[0].split('_')[0][4:]
-                      for p in products['dataURI']], dtype=int)
-    if targetlimit is None:
-        pass
-    elif len(np.unique(ids)) < targetlimit:
-        log.warning('Target return limit set to {} '
-                    'but only {} unique targets found. '
-                    'Try increasing the search radius. '
-                    '(Radius currently set to {} arcseconds)'
-                    ''.format(targetlimit, len(np.unique(ids)), radius))
-    okids = ids[np.sort(np.unique(ids, return_index=True)[1])[0:targetlimit]]
-    mask = np.zeros(len(ids), dtype=bool)
-
-    # Mask data.
-    # Make sure they still appear in the same order.
-    order = np.zeros(len(ids))
-    for idx, okid in enumerate(okids):
-        pos = ids == okid
-        order[pos] = int(idx)
-        mask |= pos
-    products['order'] = order
-    products = products[mask]
-
-    return products
 
 def search_target(target, cadence='long', quarter=None, month=None,
                  campaign=None, quality_bitmask='default', **kwargs):
@@ -477,10 +394,10 @@ def search_target(target, cadence='long', quarter=None, month=None,
                     'direct path, use KeplerTargetPixelFile(path) instead.')
         path = [target]
     else:
-        path = _query_kepler_products(
-            target=target, searchtype='single', radius=1.)
+        path = _query_kepler_products(target=target,
+                                      searchtype='single', radius=.0001)
 
-    return SearchResult(path)
+    return SearchResult(path, campaign=campaign, quarter=quarter)
 
 
 def search_region(target, cadence='long', quarter=None, month=None,
@@ -535,4 +452,4 @@ def search_region(target, cadence='long', quarter=None, month=None,
         path = _query_kepler_products(
             target=target, searchtype='cone', radius=radius)
 
-    return SearchResult(path)
+    return SearchResult(path, campaign=campaign, quarter=quarter)
