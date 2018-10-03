@@ -293,8 +293,8 @@ class Periodogram(object):
         return smooth_freq, smooth_power
 
     def plot(self, scale='linear', ax=None, xlabel=None, ylabel=None, title='',
-                    smooth_factor = None,
-                    style='lightkurve',format=None,  **kwargs):
+                    smooth_factor = None, style='lightkurve',format=None,
+                    _snr = None, **kwargs):
 
         """Plots the periodogram.
 
@@ -324,6 +324,9 @@ class Periodogram(object):
             {'frequency', 'period'}. Is by default the _format property of the
             Periodogram object. If 'frequency', x-axis units will be frequency.
             If 'period', the x-axis units will be period and 'log' scale.
+        _snr : array-like
+            A signal-to-noise spectrum of the periodogram. If passed will plot
+            the signal-to-noise spectrum with appropriate y-axis labels.
         kwargs : dict
             Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
 
@@ -338,6 +341,8 @@ class Periodogram(object):
             style = MPLSTYLE
         if ylabel is None:
             ylabel = "Power Spectral Density [ppm$^2\ ${}]".format((1/self.frequency_spacing).unit.to_string('latex'))
+        if _snr is not None:
+            ylabel = "Signal to Noise Ratio (SNR)"
 
         # This will need to be fixed with housekeeping. Self.label currently doesnt exist.
         if ('label' not in kwargs):
@@ -349,15 +354,21 @@ class Periodogram(object):
 
             # Plot frequency and power
             if format == 'frequency':
-                ax.plot(self.frequency, self.power, **kwargs)
+                if _snr is None:
+                    ax.plot(self.frequency, self.power, **kwargs)
+                else:
+                    ax.plot(self.frequency, _snr, **kwargs)
                 if smooth_factor is not None:
                     smoo_f, smoo_p = self.smooth_ps(smooth_factor)
-                    ax.plot(smoo_f, smoo_p, ,c='r', label = 'Smoothed Power Spectrum')
+                    ax.plot(smoo_f, smoo_p, c='r', label = 'Smoothed Power Spectrum')
                 if xlabel is None:
                     xlabel = "Frequency [{}]".format(self.frequency_spacing.unit.to_string('latex'))
 
             if format == 'period':
-                ax.plot(self.period, self.power, **kwargs)
+                if _snr is None:
+                    ax.plot(self.period, self.power, **kwargs)
+                else:
+                    ax.plot(self.period, _snr, **kwargs)
                 ax.set_xscale('log')
                 if smooth_factor is not None:
                     smoo_f, smoo_p = self.smooth_ps(smooth_factor)
@@ -377,6 +388,110 @@ class Periodogram(object):
             ax.set_title(title)
         return ax
 
+    def estimate_background(self, log_width=0.01):
+        """Estimates background noise of the power spectrum, via moving filter
+        in log10 space. The filter defines a bin centered at a value x0 with a
+        spread of log_width either side. The median of the power in this bin
+        will be added to all indices within the bin in an empty array, `bkg`.
+        The bin then moves along in a step of x0 + 0.5 * log_width. This means
+        that each index will contain the sum of multiple medians of bins that
+        index is included in. To normalize this, we divide the background value
+        in each index by the number of median values that were added to that
+        index.
+
+        Parameters
+        ----------
+        log_width : float
+            Default 0.01. The width of the filter in log10 space.
+
+        Returns
+        -------
+        bkg : array-like
+            An estimate of the noise background of the power spectrum. Has the
+            same units as the `power` attribute.
+        """
+        count = np.zeros(len(self.frequency), dtype=int)
+        bkg = np.zeros_like(self.frequency.value)
+        x0 = np.log10(self.frequency[0].value)
+        while x0 < np.log10(self.frequency[-1].value):
+            m = np.abs(np.log10(self.frequency.value) - x0) < log_width
+            if len(bkg[m] > 0):
+                bkg[m] += np.nanmedian(self.power[m].value)
+                count[m] += 1
+            x0 += 0.5 * log_width
+        return bkg / count
+
+    def get_snr_spectrum(self, log_width=0.01):
+        """Calculates the Signal-To-Noise spectrum of the power spectrum by
+        dividing the power through by a background estimated using a moving
+        filter in log10 space.
+
+        Parameters
+        ----------
+        log_width : float
+            Default 0.01. The width of the filter in log10 space. Kwarg for the
+            Periodogram.estimate_background() function.
+
+        Returns
+        -------
+        snr : array-like
+            An estimate of the signal-to-noise of the spectrum, assuming a
+            simple estimate of the noise background using a moving filter in
+            log10 space.
+        """
+        snr = self.power / self.estimate_background(log_width=log_width)
+        return snr
+
+    def plot_snr(self, log_width=0.01, scale='linear', ax=None, xlabel=None,
+                    ylabel=None, title='', style='lightkurve', format=None,
+                    **kwargs):
+        """Plots the a signal-to-noise of the periodogram, by dividing the
+        periodogram object through by .
+
+        Parameters
+        ----------
+        log_width : float
+            Default 0.01. The width of the filter in log10 space. Kwarg for the
+            Periodogram.estimate_background() function.
+        scale: str
+            Set x,y axis to be "linear" or "log". Default is linear.
+        ax : matplotlib.axes._subplots.AxesSubplot
+            A matplotlib axes object to plot into. If no axes is provided,
+            a new one will be generated.
+        xlabel : str
+            Plot x axis label
+        ylabel : str
+            Plot y axis label
+        title : str
+            Plot set_title
+        style : str
+            Path or URL to a matplotlib style file, or name of one of
+            matplotlib's built-in stylesheets (e.g. 'ggplot').
+            Lightkurve's custom stylesheet is used by default.
+        format : str
+            {'frequency', 'period'}. Is by default the _format property of the
+            Periodogram object. If 'frequency', x-axis units will be frequency.
+            If 'period', the x-axis units will be period and 'log' scale.
+        kwargs : dict
+            Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
+
+        Returns
+        -------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            The matplotlib axes object.
+        """
+        snr = self.get_snr_spectrum(log_width=log_width)
+        ax = self.plot(scale=scale, ax=ax, xlabel=xlabel, ylabel=ylabel,
+                        title=title, style=style, format=format,
+                        _snr=snr, **kwargs)
+        return ax
+
+    def fit_background(self, numax):
+        """
+        Function to make a simple fit of polynomials to the powerspectrum
+        background, and returns the best fit coefficients.
+        """
+        raise NotImplementedError('This is semi-advanced asteroseismology, but doing this quickly may be valuable to people as a learning tool. Will enquire')
 
     ############################### HOUSEKEEPING ###############################
 
@@ -664,37 +779,6 @@ class Periodogram(object):
         peak_lags = lags[self.find_peaks(acor)]
         delta_nu = peak_lags[np.argmin(np.abs(peak_lags - dnu_expected))]
         return delta_nu
-
-    def estimate_background(self, x, y, log_width=0.01):
-        """Estimates background noise
-
-        Estimates the background noise via median value
-
-        Parameters
-        ----------
-        self : Periodogram object
-            Periodogram object
-        x : array-like
-            Time measurements
-        y : array-like
-            Flux measurements
-        log_width : float
-            The error range
-
-        Returns
-        -------
-        bkg : float, array-like
-            background trend
-        """
-        count = np.zeros(len(x), dtype=int)
-        bkg = np.zeros_like(x)
-        x0 = np.log10(x[0])
-        while x0 < np.log10(x[-1]):
-            m = np.abs(np.log10(x) - x0) < log_width
-            bkg[m] += np.nanmedian(y[m])
-            count[m] += 1
-            x0 += 0.5 * log_width
-        return bkg / count
 
     def find_peaks(self, z):
         """ Finds peak index in an array """
