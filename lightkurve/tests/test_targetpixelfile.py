@@ -365,7 +365,7 @@ def test_get_models():
     tpf.get_prf_model()
 
 
-#@pytest.mark.remote_data
+@pytest.mark.remote_data
 def test_tess_simulation():
     """Can we read simulated TESS data?"""
     tpf = TessTargetPixelFile(TESS_SIM)
@@ -377,9 +377,11 @@ def test_tess_simulation():
     # Regression test for https://github.com/KeplerGO/lightkurve/pull/236
     assert np.isnan(tpf.time).sum() == 0
 
+
 def test_tess_aperture():
     '''Can we parse the tess aperture?
     '''
     tpf = TessTargetPixelFile.from_fits(filename_tess)
     assert tpf.mission == 'TESS'
     assert tpf.pipeline_mask.sum() == 8
+    assert tpf.background_mask.sum() == 0
