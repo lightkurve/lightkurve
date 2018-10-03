@@ -1214,6 +1214,16 @@ class TessTargetPixelFile(TargetPixelFile):
         return('TessTargetPixelFile(TICID: {})'.format(self.targetid))
 
     @property
+    def pipeline_mask(self):
+        """Returns the aperture mask used by the pipeline"""
+        return self.hdu[2].data & 2 > 0
+
+    @property
+    def background_mask(self):
+        """Returns the aperture mask used by the pipeline"""
+        return self.hdu[2].data & 4 > 0
+
+    @property
     def sector(self):
         try:
             return self.header()['SECTOR']
