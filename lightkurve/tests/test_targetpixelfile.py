@@ -14,12 +14,16 @@ from ..targetpixelfile import TessTargetPixelFile
 
 filename_tpf_all_zeros = get_pkg_data_filename("data/test-tpf-all-zeros.fits")
 filename_tpf_one_center = get_pkg_data_filename("data/test-tpf-non-zero-center.fits")
+filename_tess = get_pkg_data_filename("data/test-tess-tpf.fits")
+
 TABBY_Q8 = ("https://archive.stsci.edu/missions/kepler/lightcurves"
             "/0084/008462852/kplr008462852-2011073133259_llc.fits")
 TABBY_TPF = ("https://archive.stsci.edu/missions/kepler/target_pixel_files"
              "/0084/008462852/kplr008462852-2011073133259_lpd-targ.fits.gz")
 TESS_SIM = ("https://archive.stsci.edu/missions/tess/ete-6/tid/00/000"
             "/004/176/tess2019128220341-0000000417699452-0016-s_tp.fits")
+
+
 
 @pytest.mark.remote_data
 def test_load_bad_file():
@@ -361,7 +365,7 @@ def test_get_models():
     tpf.get_prf_model()
 
 
-#@pytest.mark.remote_data
+@pytest.mark.remote_data
 def test_tess_simulation():
     """Can we read simulated TESS data?"""
     tpf = TessTargetPixelFile(TESS_SIM)
@@ -372,3 +376,12 @@ def test_tess_simulation():
     col, row = tpf.centroids()
     # Regression test for https://github.com/KeplerGO/lightkurve/pull/236
     assert np.isnan(tpf.time).sum() == 0
+
+
+def test_tess_aperture():
+    '''Can we parse the tess aperture?
+    '''
+    tpf = TessTargetPixelFile.from_fits(filename_tess)
+    assert tpf.mission == 'TESS'
+    assert tpf.pipeline_mask.sum() == 8
+    assert tpf.background_mask.sum() == 0
