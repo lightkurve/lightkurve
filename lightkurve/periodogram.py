@@ -339,13 +339,19 @@ class Periodogram(object):
         if style is None or style == 'lightkurve':
             style = MPLSTYLE
         if ylabel is None:
-            ylabel = "Power Spectral Density [ppm$^2\ ${}]".format((1/self.frequency_spacing).unit.to_string('latex'))
+            try:
+                ylabel = "Power Spectral Density [ppm$^2\ ${}]".format((1/self.frequency).unit.to_string('latex'))
+            except AttributeError:
+                pass
         if snr is not None:
             ylabel = "Signal to Noise Ratio (SNR)"
 
         # This will need to be fixed with housekeeping. Self.label currently doesnt exist.
         if ('label' not in kwargs):
-            kwargs['label'] = self.lc.label
+            try:
+                kwargs['label'] = self.lc.label
+            except AttributeError:
+                kwargs['label'] = None
 
         with plt.style.context(style):
             if ax is None:
@@ -361,8 +367,10 @@ class Periodogram(object):
                     smoo_f, smoo_p = self.smooth_ps(smooth_factor)
                     ax.plot(smoo_f, smoo_p, c='r', label = 'Smoothed Power Spectrum')
                 if xlabel is None:
-                    xlabel = "Frequency [{}]".format(self.frequency_spacing.unit.to_string('latex'))
-
+                    try:
+                        xlabel = "Frequency [{}]".format(self.frequency.unit.to_string('latex'))
+                    except AttributeError:
+                        pass
             if format == 'period':
                 if snr is None:
                     ax.plot(self.period, self.power, **kwargs)
@@ -373,7 +381,10 @@ class Periodogram(object):
                     smoo_f, smoo_p = self.smooth_ps(smooth_factor)
                     ax.plot(1./smoo_f, smoo_p, c='r', label='Smoothed Power Spectrum')
                 if xlabel is None:
-                    xlabel = "Period [{}]".format((1./self.frequency_spacing).unit.to_string('latex'))
+                    try:
+                        xlabel = "Period [{}]".format((1./self.frequency).unit.to_string('latex'))
+                    except AttributeError:
+                        pass
 
             ax.set_xlabel(xlabel)
             ax.set_ylabel(ylabel)
@@ -409,13 +420,22 @@ class Periodogram(object):
             An estimate of the noise background of the power spectrum. Has the
             same units as the `power` attribute.
         """
-        count = np.zeros(len(self.frequency), dtype=int)
-        bkg = np.zeros_like(self.frequency.value)
-        x0 = np.log10(self.frequency[0].value)
-        while x0 < np.log10(self.frequency[-1].value):
-            m = np.abs(np.log10(self.frequency.value) - x0) < log_width
+        if isinstance(self.frequency, astropy.units.quantity.Quantity):
+            f = self.frequency.value
+        else:
+            f = self.frequency
+        if isinstance(self.power, astropy.units.quantity.Quantity):
+            p = self.power.value
+        else:
+            p = self.power
+
+        count = np.zeros(len(f), dtype=int)
+        bkg = np.zeros_like(f)
+        x0 = np.log10(f[0])
+        while x0 < np.log10(f[-1]):
+            m = np.abs(np.log10(f) - x0) < log_width
             if len(bkg[m] > 0):
-                bkg[m] += np.nanmedian(self.power[m].value)
+                bkg[m] += np.nanmedian(p[m])
                 count[m] += 1
             x0 += 0.5 * log_width
         return bkg / count
@@ -480,7 +500,6 @@ class Periodogram(object):
             The matplotlib axes object.
         """
         snr = self.get_snr_spectrum(log_width=log_width)
-        print(snr)
         ax = self.plot(scale=scale, ax=ax, xlabel=xlabel, ylabel=ylabel,
                         title=title, style=style, format=format,
                         snr=snr, **kwargs)
@@ -706,8 +725,10 @@ class Periodogram(object):
                     idx += 1
         print('lightkurve.Periodogram properties:')
         output.pprint(max_lines=-1, max_width=-1)
-        print('\nlightkurve.Periodogram.lc (LightCurve object) properties:')
-        self.lc.properties()
+
+        if self.lc is not None:
+            print('\nlightkurve.Periodogram.lc (LightCurve object) properties:')
+            self.lc.properties()
 
 
     ############################## WIP, UNTOUCHED ##############################
