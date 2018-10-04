@@ -430,6 +430,16 @@ class LightCurve(object):
             were removed. Entries marked as `True` are considered outliers.
         **kwargs : dict
             Dictionary of arguments to be passed to `astropy.stats.sigma_clip`.
+            Examples:
+            ---------
+            sigma_lower: float
+                The number of standard deviations to use for clipping outliers
+                which are less than the median. Can be set to math.inf in order
+                to avoid clipping outliers below the median at all.
+            sigma_upper: float
+                The number of standard deviations to use for clipping outliers
+                which are greater than the median. Can be set to math.inf in order
+                to avoid clipping outliers above the median at all.
 
         Returns
         -------
