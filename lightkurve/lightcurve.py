@@ -427,7 +427,7 @@ class LightCurve(object):
         >>> lc_clean.time
         array([1, 2, 4, 5, 6, 7, 8])
         >>> lc_clean.flux
-        array([1, 1, 1, 1, -1000, 1, 1])
+        array([    1,     1,     1,     1, -1000,     1,     1])
 
         Parameters
         ----------
