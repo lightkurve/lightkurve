@@ -5,11 +5,13 @@ import numpy as np
 
 from astroquery.mast import Observations
 from astroquery.exceptions import ResolverError
+from astropy.table import Table
 from astropy.coordinates import SkyCoord
 from astropy.io import ascii, fits
 from .lightcurve import KeplerLightCurve, TessLightCurve
 from .lightcurvefile import KeplerLightCurveFile
 from .targetpixelfile import TargetPixelFile, KeplerTargetPixelFile
+from .collections import TargetPixelFileCollection, LightCurveCollection, LightCurveFileCollection
 
 from . import PACKAGEDIR
 log = logging.getLogger(__name__)
@@ -19,32 +21,35 @@ class SearchResult(object):
 
     """
 
-    def __init__(self, info, campaign=None, quarter=None, month=None, cadence=None):
+    def __init__(self, path, campaign=None, quarter=None, month=None, cadence=None):
 
-        self.info = info
+        self.path = path
         self.campaign = campaign
         self.quarter = quarter
         self.month = month
         self.cadence = cadence
 
     @property
+    def info(self):
+        return self._make_table(self.path)
+
+    @property
     def obsID(self):
-        return np.asarray(np.unique(self.info['obsid']), dtype='int')
+        return np.asarray(np.unique(self.path['obsid']), dtype='int')
 
     @property
     def target_name(self):
-        return np.asarray(np.unique(self.info['target_name']))
+        return np.asarray(np.unique(self.path['target_name']))
 
     @property
     def RA(self):
-        return np.asarray(self.info['s_ra'])
+        return np.asarray(self.path['s_ra'])
 
     @property
     def dec(self):
-        return np.asarray(self.info['s_dec'])
+        return np.asarray(self.path['s_dec'])
 
-
-    def download(self, type, quality_bitmask='default', **kwargs):
+    def download(self, type, quality_bitmask='default', cadence='long', **kwargs):
         """
 
         """
@@ -55,18 +60,20 @@ class SearchResult(object):
         elif type in ["lc", "lcf"]:
             filetype = "Lightcurve"
 
-        obsids = np.asarray(self.info['obsid'])
-        products = Observations.get_product_list(self.info)
+        obsids = np.asarray(self.path['obsid'])
+        products = Observations.get_product_list(self.path)
         order = [np.where(products['parent_obsid'] == o)[0] for o in obsids]
         order = [item for sublist in order for item in sublist]
+
         products = self._mask_products(products[order], filetype=filetype, campaign=self.campaign,
                                        quarter=self.quarter, month=self.month, cadence=self.cadence)
 
         path = Observations.download_products(products, mrp_only=False)['Local Path']
 
         if len(path) != 1:
-            log.warning('Multiple files available to download. Please use `download_all()` or '
-                        'specify a campaign, quarter, or cadence to limit your search.')
+            log.warning('Warning: Multiple files available to download. Only the first file has been '
+                        'downloaded. Please use `download_all()` or specify a campaign, quarter, or '
+                        'cadence to limit your search.')
 
         if type in ["tpf", "Target Pixel", "Target Pixel File"]:
             return KeplerTargetPixelFile(path[0],
@@ -92,39 +99,35 @@ class SearchResult(object):
         elif type == "lc":
             filetype = "Lightcurve"
 
-        obsids = np.asarray(self.info['obsid'])
-        products = Observations.get_product_list(self.info)
+        obsids = np.asarray(self.path['obsid'])
+        products = Observations.get_product_list(self.path)
         order = [np.where(products['parent_obsid'] == o)[0] for o in obsids]
         order = [item for sublist in order for item in sublist]
 
         products = self._mask_products(products[order],filetype=filetype, campaign=self.campaign,
-                                       quarter=self.quarter, cadence=self.cadence)
+                                       quarter=self.quarter, cadence=self.cadence, targetlimit=len(obsids))
 
         path = Observations.download_products(products, mrp_only=False)['Local Path']
 
-        if len(path) != 1:
-            log.warning('Multiple files available to download. Please use `download_all()` or '
-                        'specify a campaign, quarter, or cadence to limit your search.')
-
         if type in ["tpf", "Target Pixel", "Target Pixel File"]:
-            tpfs = KeplerTargetPixelFile(path,
+            tpfs = [KeplerTargetPixelFile(p,
                                          quality_bitmask=quality_bitmask,
-                                         **kwargs)
+                                         **kwargs) for p in path]
             return TargetPixelFileCollection(tpfs)
         elif type in ["lc", "Light Curve"]:
-            lcs = KeplerLightCurve(path,
+            lcs = [KeplerLightCurveFile(p,
                                    quality_bitmask=quality_bitmask,
-                                   **kwargs)
+                                   **kwargs).PDCSAP_FLUX for p in path]
             return LightCurveCollection(lcs)
 
         elif type in ["lcf", "Light Curve File"]:
-            lcfs = KeplerLightCurveFile(path,
+            lcfs = [KeplerLightCurveFile(p,
                                         quality_bitmask=quality_bitmask,
-                                        **kwargs)
+                                        **kwargs) for p in path]
             return LightCurveFileCollection(lcfs)
 
     def _mask_products(self, products, filetype='Target Pixel', cadence='long', quarter=None,
-                       month=None, campaign=None, searchtype='single', radius=1, targetlimit=1):
+                       month=None, campaign=None, searchtype='single', targetlimit=1):
         """
 
         """
@@ -195,8 +198,7 @@ class SearchResult(object):
             log.warning('Target return limit set to {} '
                         'but only {} unique targets found. '
                         'Try increasing the search radius. '
-                        '(Radius currently set to {} arcseconds)'
-                        ''.format(targetlimit, len(np.unique(ids)), radius))
+                        ''.format(targetlimit, len(np.unique(ids))))
         okids = ids[np.sort(np.unique(ids, return_index=True)[1])[0:targetlimit]]
         mask = np.zeros(len(ids), dtype=bool)
 
@@ -252,10 +254,24 @@ class SearchResult(object):
             raise ArchiveError("Found {} different Target Pixel Files "
                                "for target {}. Please specify quarter/month "
                                "or campaign number."
-                               "".format(len(products), target))
+                               "".format(len(products), self.target_name[0]))
 
         return products
 
+    def _make_table(self, path):
+        """
+
+        """
+
+        path.keep_columns(['dataproduct_type','obs_id','target_name','s_ra','s_dec','t_min',
+                           't_max','t_exptime','wavelength_region','filters','instrument_name',
+                           'proposal_pi','s_region','jpegURL','dataURL','dataRights','obsid',
+                           'objID','distance'])
+        order = ['target_name','instrument_name','dataproduct_type','s_ra','s_dec','distance',
+                 'objID','obs_id','obsid','t_min','t_max','t_exptime','wavelength_region',
+                 'filters','proposal_pi','s_region','jpegURL','dataURL','dataRights']
+
+        return path[order]
 
 class ArchiveError(Exception):
     """Raised if there is a problem accessing data."""
