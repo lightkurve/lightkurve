@@ -665,7 +665,9 @@ class KeplerTargetPixelFile(TargetPixelFile):
     @property
     def astropy_time(self):
         """Returns an AstroPy Time object for all good-quality cadences."""
-        return bkjd_to_astropy_time(bkjd=self.time)
+        timecorr = self.hdu[1].data['TIMECORR'][self.quality_mask]
+        return bkjd_to_astropy_time(bkjd=self.time, bkjdcorr=timecorr, 
+            timeslice=self.hdu[1].header['TIMSLICE'])
 
     @property
     def quarter(self):
@@ -1212,20 +1214,6 @@ class TessTargetPixelFile(TargetPixelFile):
 
     def __repr__(self):
         return('TessTargetPixelFile(TICID: {})'.format(self.targetid))
-
-    @property
-    def pipeline_mask(self):
-        """Returns the optimal aperture mask used by the TESS pipeline.
-
-        For details on how the mask is stored in a TPF, see Section 6 of the
-        Data Products documentation (EXP-TESS-ARC-ICD-TM-0014.pdf).
-        """
-        return self.hdu[2].data & 2 > 0
-
-    @property
-    def background_mask(self):
-        """Returns the background mask used by the TESS pipeline."""
-        return self.hdu[2].data & 4 > 0
 
     @property
     def sector(self):
