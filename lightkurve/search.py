@@ -21,13 +21,14 @@ class SearchResult(object):
 
     """
 
-    def __init__(self, path, campaign=None, quarter=None, month=None, cadence=None):
+    def __init__(self, path, campaign=None, quarter=None, month=None, cadence=None, filetype=None):
 
         self.path = path
         self.campaign = campaign
         self.quarter = quarter
         self.month = month
         self.cadence = cadence
+        self.filetype = filetype
 
     @property
     def info(self):
@@ -42,17 +43,21 @@ class SearchResult(object):
         return np.asarray(np.unique(self.path['target_name']))
 
     @property
-    def RA(self):
+    def ra(self):
         return np.asarray(self.path['s_ra'])
 
     @property
     def dec(self):
         return np.asarray(self.path['s_dec'])
 
-    def download(self, type, quality_bitmask='default', cadence='long', **kwargs):
+    def download(self, type=None, quality_bitmask='default', cadence='long', **kwargs):
         """
 
         """
+
+        if type is None:
+            type = self.filetype
+
         if type == None:
             raise ValueError("Choose a filetype of 'Target Pixel' or 'Lightcurve'")
         elif type == "tpf":
@@ -278,7 +283,7 @@ class ArchiveError(Exception):
     pass
 
 def search_target(target, cadence='long', quarter=None, month=None,
-                 campaign=None, quality_bitmask='default', **kwargs):
+                 campaign=None, quality_bitmask='default', filetype=None, **kwargs):
     """
     Fetch a data table for a given Kepler target. `search_result` is
     intended to only return information for a single star. To perform
@@ -341,7 +346,13 @@ def search_target(target, cadence='long', quarter=None, month=None,
                 target_name = 'ktwo{:09d}'.format(target)
             else:
                 raise ValueError("{:09d}: not in the KIC or EPIC ID range".format(target))
-            path = Observations.query_criteria(target_name=target_name,
+            target_obs = Observations.query_criteria(target_name=target_name,
+                                                     radius='{} deg'.format(.0001),
+                                                     project=["Kepler", "K2"],
+                                                     obs_collection=["Kepler", "K2"])
+            ra = target_obs['s_ra'][0]
+            dec = target_obs['s_ra'][0]
+            path = Observations.query_criteria(coordinates='{} {}'.format(ra, dec),
                                               radius='{} deg'.format(.0001),
                                               project=["Kepler", "K2"],
                                               obs_collection=["Kepler", "K2"])
@@ -358,14 +369,15 @@ def search_target(target, cadence='long', quarter=None, month=None,
 
             except ResolverError as exc:
                 raise ArchiveError(exc)
+    # Make sure the final table is in DISTANCE order
     path.sort('distance')
 
-    return SearchResult(path, campaign=campaign, quarter=quarter, month=month, cadence=cadence)
+    return SearchResult(path, campaign=campaign, quarter=quarter, month=month, cadence=cadence, filetype=filetype)
 
 
 def search_region(target=None, coords=[], cadence='long', quarter=None, month=None,
                   campaign=None, radius=100., targetlimit=None,
-                  quality_bitmask='default', **kwargs):
+                  quality_bitmask='default', filetype=None, **kwargs):
     """
     Fetch a data table for targets within a region of sky. Cone search is
     centered around the position of `target` and extends to a given `radius`.
@@ -451,10 +463,10 @@ def search_region(target=None, coords=[], cadence='long', quarter=None, month=No
                                                   radius='{} deg'.format(radius/3600),
                                                   project=["Kepler", "K2"],
                                                   obs_collection=["Kepler", "K2"])
-                # Make sure the final table is in DISTANCE order
 
             except ResolverError as exc:
                 raise ArchiveError(exc)
+    # Make sure the final table is in DISTANCE order
     path.sort('distance')
 
-    return SearchResult(path, campaign=campaign, quarter=quarter, month=month, cadence=cadence)
+    return SearchResult(path, campaign=campaign, quarter=quarter, month=month, cadence=cadence, filetype=filetype)
