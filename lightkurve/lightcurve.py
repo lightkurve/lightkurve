@@ -420,6 +420,15 @@ class LightCurve(object):
         are removed if they are separated from the mean flux by `sigma` times
         the standard deviation.
 
+        Examples
+        --------
+        >>> lc = LightCurve([1, 2, 3, 4, 5, 6, 7, 8], [1, 1, 1000, 1, 1, -1000, 1, 1])
+        >>> lc_clean = lc.remove_outliers(sigma=1, sigma_lower=float('inf'), sigma_upper=1)
+        >>> lc_clean.time
+        [1, 2, 4, 5, 6, 7, 8]
+        >>> lc_clean.flux
+        [1, 1, 1, 1, -1000, 1, 1])
+
         Parameters
         ----------
         sigma : float
@@ -428,18 +437,18 @@ class LightCurve(object):
         return_mask : bool
             Whether or not to return the mask indicating which data points
             were removed. Entries marked as `True` are considered outliers.
+        sigma_lower: float
+            The number of standard deviations to use for clipping outliers
+            which are less than the median. Can be set to float('inf') in order
+            to avoid clipping outliers below the median at all.
+            (part of **kwargs passed to sigma_clip)
+        sigma_upper: float
+            The number of standard deviations to use for clipping outliers
+            which are greater than the median. Can be set to float('inf') in order
+            to avoid clipping outliers above the median at all.
+            (part of **kwargs passed to sigma_clip)
         **kwargs : dict
             Dictionary of arguments to be passed to `astropy.stats.sigma_clip`.
-            Examples:
-            ---------
-            sigma_lower: float
-                The number of standard deviations to use for clipping outliers
-                which are less than the median. Can be set to float('inf') in order
-                to avoid clipping outliers below the median at all.
-            sigma_upper: float
-                The number of standard deviations to use for clipping outliers
-                which are greater than the median. Can be set to float('inf') in order
-                to avoid clipping outliers above the median at all.
 
         Returns
         -------
