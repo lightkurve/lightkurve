@@ -442,7 +442,7 @@ class Periodogram(object):
         return snr
 
     def plot_snr(self, log_width=0.01, scale='linear', ax=None, xlabel=None,
-                    ylabel=None, title='', style='lightkurve', format=None,
+                    ylabel=None, title='', style='lightkurve', format='frequency',
                     **kwargs):
         """Plots the a signal-to-noise of the periodogram, by dividing the
         periodogram object through by .
