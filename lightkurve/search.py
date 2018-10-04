@@ -277,97 +277,6 @@ class ArchiveError(Exception):
     """Raised if there is a problem accessing data."""
     pass
 
-def _query_kepler_products(target, searchtype='single', radius=.0001):
-    """
-    Helper function for `search_kepler_products`.
-
-    Returns a table of Kepler/K2 pipeline products for a given target.
-
-    Raises an ArchiveError if no products are found.
-
-    Parameters
-    ----------
-    target : str or int
-        If the value is an integer in a specific range, we'll assume it is
-        a KIC or EPIC ID.  Otherwise we will pass it to MAST as an objectname.
-
-    Returns
-    -------
-    products : astropy.Table
-        Table detailing the available data products.
-    """
-    # If passed a SkyCoord, convert it to an RA and Dec
-    if isinstance(target, SkyCoord):
-        target = '{}, {}'.format(target.ra.deg, target.dec.deg)
-
-    # If performing a cone search and multiple targets are desired, query_criteria()
-    # must be called with `objectname` argument
-    if searchtype == 'cone':
-        try:
-        # If `target` looks like a KIC or EPIC ID, we will pass the exact
-        # `target_name` under which MAST will know the object.
-            target = int(target)
-            if (target > 0) and (target < 200000000):
-                target_name = 'kplr{:09d}'.format(target)
-            elif (target > 200000000) and (target < 300000000):
-                target_name = 'ktwo{:09d}'.format(target)
-            else:
-                raise ValueError("{:09d}: not in the KIC or EPIC ID range".format(target))
-            target_obs = Observations.query_criteria(target_name=target_name,
-                                                     radius='{} deg'.format(.0001),
-                                                     project=["Kepler", "K2"],
-                                                     obs_collection=["Kepler", "K2"])
-            ra = target_obs['s_ra'][0]
-            dec = target_obs['s_ra'][0]
-            obs = Observations.query_criteria(coordinates='{} {}'.format(ra, dec),
-                                              radius='{} deg'.format(radius/3600),
-                                              project=["Kepler", "K2"],
-                                              obs_collection=["Kepler", "K2"])
-        except ValueError:
-            # If `target` did not look like a KIC or EPIC ID, then we let MAST
-            # resolve the target name to a sky position. Convert radius from arcsec
-            # to degrees for query_criteria().
-            try:
-                obs = Observations.query_criteria(objectname=target,
-                                                  radius='{} deg'.format(radius/3600),
-                                                  project=["Kepler", "K2"],
-                                                  obs_collection=["Kepler", "K2"])
-                # Make sure the final table is in DISTANCE order
-                obs.sort('distance')
-            except ResolverError as exc:
-                raise ArchiveError(exc)
-
-    elif searchtype == 'single':
-        try:
-            # If `target` looks like a KIC or EPIC ID, we will pass the exact
-            # `target_name` under which MAST will know the object.
-            target = int(target)
-            if (target > 0) and (target < 200000000):
-                target_name = 'kplr{:09d}'.format(target)
-            elif (target > 200000000) and (target < 300000000):
-                target_name = 'ktwo{:09d}'.format(target)
-            else:
-                raise ValueError("{:09d}: not in the KIC or EPIC ID range".format(target))
-            obs = Observations.query_criteria(target_name=target_name,
-                                              radius='{} deg'.format(radius/3600),
-                                              project=["Kepler", "K2"],
-                                              obs_collection=["Kepler", "K2"])
-        except ValueError:
-            # If `target` did not look like a KIC or EPIC ID, then we let MAST
-            # resolve the target name to a sky position. Convert radius from arcsec
-            # to degrees for query_criteria().
-            try:
-                obs = Observations.query_criteria(objectname=target,
-                                                  radius='{} deg'.format(radius/3600),
-                                                  project=["Kepler", "K2"],
-                                                  obs_collection=["Kepler", "K2"])
-                # Make sure the final table is in DISTANCE order
-                obs.sort('distance')
-            except ResolverError as exc:
-                raise ArchiveError(exc)
-
-    return obs
-
 def search_target(target, cadence='long', quarter=None, month=None,
                  campaign=None, quality_bitmask='default', **kwargs):
     """
@@ -411,18 +320,50 @@ def search_target(target, cadence='long', quarter=None, month=None,
     -------
     SearchResult : :class:`SearchResult` object.
     """
+
+    # If passed a SkyCoord, convert it to an RA and Dec
+    if isinstance(target, SkyCoord):
+        target = '{}, {}'.format(target.ra.deg, target.dec.deg)
+
     if os.path.exists(str(target)) or str(target).startswith('http'):
-        log.warning('Warning: from_archive() is not intended to accept a '
+        log.warning('Warning: search_target() is not intended to accept a '
                     'direct path, use KeplerTargetPixelFile(path) instead.')
         path = [target]
+
     else:
-        path = _query_kepler_products(target=target,
-                                      searchtype='single', radius=.0001)
+        try:
+            # If `target` looks like a KIC or EPIC ID, we will pass the exact
+            # `target_name` under which MAST will know the object.
+            target = int(target)
+            if (target > 0) and (target < 200000000):
+                target_name = 'kplr{:09d}'.format(target)
+            elif (target > 200000000) and (target < 300000000):
+                target_name = 'ktwo{:09d}'.format(target)
+            else:
+                raise ValueError("{:09d}: not in the KIC or EPIC ID range".format(target))
+            path = Observations.query_criteria(target_name=target_name,
+                                              radius='{} deg'.format(.0001),
+                                              project=["Kepler", "K2"],
+                                              obs_collection=["Kepler", "K2"])
+        except ValueError:
+            # If `target` did not look like a KIC or EPIC ID, then we let MAST
+            # resolve the target name to a sky position. Convert radius from arcsec
+            # to degrees for query_criteria().
+            try:
+                path = Observations.query_criteria(objectname=target,
+                                                  radius='{} deg'.format(.0001),
+                                                  project=["Kepler", "K2"],
+                                                  obs_collection=["Kepler", "K2"])
+                # Make sure the final table is in DISTANCE order
+
+            except ResolverError as exc:
+                raise ArchiveError(exc)
+    path.sort('distance')
 
     return SearchResult(path, campaign=campaign, quarter=quarter, month=month, cadence=cadence)
 
 
-def search_region(target, cadence='long', quarter=None, month=None,
+def search_region(target=None, coords=[], cadence='long', quarter=None, month=None,
                   campaign=None, radius=100., targetlimit=None,
                   quality_bitmask='default', **kwargs):
     """
@@ -466,12 +407,54 @@ def search_region(target, cadence='long', quarter=None, month=None,
     SearchResult : :class:`SearchResult` object.
     """
 
+    # If passed a SkyCoord, convert it to an RA and Dec
+    if isinstance(target, SkyCoord):
+        target = '{}, {}'.format(target.ra.deg, target.dec.deg)
+
     if os.path.exists(str(target)) or str(target).startswith('http'):
         log.warning('Warning: from_archive() is not intended to accept a '
                     'direct path, use KeplerTargetPixelFile(path) instead.')
         path = [target]
+    elif target == None:
+
+        path = Observations.query_criteria(coordinates='{} {}'.format(coords[0], coords[1]),
+                                          radius='{} deg'.format(radius/3600),
+                                          project=["Kepler", "K2"],
+                                          obs_collection=["Kepler", "K2"])
     else:
-        path = _query_kepler_products(
-            target=target, searchtype='cone', radius=radius)
+        try:
+        # If `target` looks like a KIC or EPIC ID, we will pass the exact
+        # `target_name` under which MAST will know the object.
+            target = int(target)
+            if (target > 0) and (target < 200000000):
+                target_name = 'kplr{:09d}'.format(target)
+            elif (target > 200000000) and (target < 300000000):
+                target_name = 'ktwo{:09d}'.format(target)
+            else:
+                raise ValueError("{:09d}: not in the KIC or EPIC ID range".format(target))
+            target_obs = Observations.query_criteria(target_name=target_name,
+                                                     radius='{} deg'.format(.0001),
+                                                     project=["Kepler", "K2"],
+                                                     obs_collection=["Kepler", "K2"])
+            ra = target_obs['s_ra'][0]
+            dec = target_obs['s_ra'][0]
+            path = Observations.query_criteria(coordinates='{} {}'.format(ra, dec),
+                                              radius='{} deg'.format(radius/3600),
+                                              project=["Kepler", "K2"],
+                                              obs_collection=["Kepler", "K2"])
+        except ValueError:
+            # If `target` did not look like a KIC or EPIC ID, then we let MAST
+            # resolve the target name to a sky position. Convert radius from arcsec
+            # to degrees for query_criteria().
+            try:
+                path = Observations.query_criteria(objectname=target,
+                                                  radius='{} deg'.format(radius/3600),
+                                                  project=["Kepler", "K2"],
+                                                  obs_collection=["Kepler", "K2"])
+                # Make sure the final table is in DISTANCE order
+
+            except ResolverError as exc:
+                raise ArchiveError(exc)
+    path.sort('distance')
 
     return SearchResult(path, campaign=campaign, quarter=quarter, month=month, cadence=cadence)
