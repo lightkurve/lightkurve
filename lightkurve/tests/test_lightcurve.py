@@ -437,11 +437,6 @@ def test_remove_outliers():
     lc_clean, outlier_mask = lc.remove_outliers(sigma=1, return_mask=True)
     assert(len(outlier_mask) == len(lc.flux))
     assert(outlier_mask.sum() == 1)
-    # Test asymmetric outlier removal
-    lc = LightCurve([1, 2, 3, 4, 5, 6, 7, 8], [1, 1, 1000, 1, 1, -1000, 1, 1])
-    lc_clean = lc.remove_outliers(sigma=1, sigma_lower=float('inf'), sigma_upper=1)
-    assert_array_equal(lc_clean.time, [1, 2, 4, 5, 6, 7, 8])
-    assert_array_equal(lc_clean.flux, [1, 1, 1, 1, -1000, 1, 1])
 
 
 @pytest.mark.remote_data

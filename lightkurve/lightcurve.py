@@ -425,9 +425,9 @@ class LightCurve(object):
         >>> lc = LightCurve([1, 2, 3, 4, 5, 6, 7, 8], [1, 1, 1000, 1, 1, -1000, 1, 1])
         >>> lc_clean = lc.remove_outliers(sigma=1, sigma_lower=float('inf'), sigma_upper=1)
         >>> lc_clean.time
-        [1, 2, 4, 5, 6, 7, 8]
+        array([1, 2, 4, 5, 6, 7, 8])
         >>> lc_clean.flux
-        [1, 1, 1, 1, -1000, 1, 1])
+        array([1, 1, 1, 1, -1000, 1, 1])
 
         Parameters
         ----------
