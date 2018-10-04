@@ -434,11 +434,11 @@ class LightCurve(object):
             ---------
             sigma_lower: float
                 The number of standard deviations to use for clipping outliers
-                which are less than the median. Can be set to math.inf in order
+                which are less than the median. Can be set to float('inf') in order
                 to avoid clipping outliers below the median at all.
             sigma_upper: float
                 The number of standard deviations to use for clipping outliers
-                which are greater than the median. Can be set to math.inf in order
+                which are greater than the median. Can be set to float('inf') in order
                 to avoid clipping outliers above the median at all.
 
         Returns
