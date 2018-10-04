@@ -168,3 +168,17 @@ class TargetPixelFileCollection(Collection):
     """
     def __init__(self, tpfs):
         super(TargetPixelFileCollection, self).__init__(tpfs)
+
+    def plot_all(self, ax=None):
+        """
+
+        """
+
+        if ax is None:
+            import matplotlib.pyplot as plt
+            _, ax = plt.subplots(len(self.data), 1,
+                                 figsize=(7,(7*len(self.data))))
+
+        for i,tpf in enumerate(self.data):
+            tpf.plot(ax=ax[i])
+        return ax
