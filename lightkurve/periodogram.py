@@ -36,8 +36,6 @@ deltanu_s = 135.1
 err_deltanu_s = 0.1
 teff_s = 5777.0
 
-#To_do: Parition this into a Periodogram object and a LombScarglePeriodogram
-#object that inherits from periodogram
 
 class Periodogram(object):
     ###Update this [houseekeping]
@@ -86,15 +84,15 @@ class Periodogram(object):
         """Returns the power of the highest peak in the periodogram."""
         return np.nanmax(self.power)
     @property
-    def max_pow_frequency(self):
+    def frequency_at_max_power(self):
         """Returns the frequency corresponding to the highest power in the
         periodogram"""
         return self.frequency[np.nanargmax(self.power)]
     @property
-    def max_pow_period(self):
+    def period_at_max_power(self):
         """Returns the period corresponding to the highest power in the
         periodogram."""
-        return 1./self.max_pow_frequency
+        return 1./self.frequency_at_max_power
 
     @staticmethod
     def from_lightcurve(lc, nterms = 1, nyquist_factor = 1, oversample_factor = 1,
@@ -263,7 +261,7 @@ class Periodogram(object):
         return Periodogram(frequency=frequency, power=power, lc=lc,
                             nyquist=nyquist, frequency_spacing=fs)
 
-    def smooth_ps(self, smooth_factor = 10):
+    def smooth(self, smooth_factor = 10):
         """Smooths the powerspectrum using a moving median filter.
 
         Parameters
@@ -276,12 +274,9 @@ class Periodogram(object):
 
         Returns
         -------
-        smooth_freq : array-like
-            The mean frequency in each bin evaluated by the moving median filter.
-            Has the same units as the Periodogram.frequency attribute.
-        smooth_power : array-like
-            The mean power in each bin evaluated by the moving median filter.
-            Has the same units as the Periodogram.power attribute.
+        smooth_periodogram : a `Periodogram` object
+            Returns a `Periodogram` object which has been smoothed in bins of
+            width `smooth_factor`.
         """
         if smooth_factor < 1:
             raise ValueError('The smooth factor must be greater than 1.')
@@ -291,11 +286,14 @@ class Periodogram(object):
 
         smooth_freq = self.frequency[:m*smooth_factor].reshape((m, smooth_factor)).mean(1)
         smooth_power = self.power[:m*smooth_factor].reshape((m, smooth_factor)).mean(1)
-        return smooth_freq, smooth_power
+
+        smooth_pg = copy.deepcopy(self)
+        smooth_pg.frequency = smooth_freq
+        smooth_pg.power = smooth_power
+        return smooth_pg
 
     def plot(self, scale='linear', ax=None, xlabel=None, ylabel=None, title='',
-                    smooth_factor = None, style='lightkurve',format='frequency',
-                    snr = None, **kwargs):
+                 style='lightkurve',format='frequency', **kwargs):
 
         """Plots the periodogram.
 
@@ -312,11 +310,6 @@ class Periodogram(object):
             Plot y axis label
         title : str
             Plot set_title
-        smooth_factor : int
-            Default 10. The factor by which to smooth the power spectrum, in the
-            sense that the power spectrum will be smoothed by taking the median
-            in bins of size N / smooth_factor, where N is the length of the
-            original periodogram.
         style : str
             Path or URL to a matplotlib style file, or name of one of
             matplotlib's built-in stylesheets (e.g. 'ggplot').
@@ -325,9 +318,6 @@ class Periodogram(object):
             {'frequency', 'period'}. Default 'frequency'. If 'frequency', x-axis
             units will be frequency. If 'period', the x-axis units will be
             period and 'log' scale.
-        snr : array-like
-            A signal-to-noise spectrum of the periodogram. If passed will plot
-            the signal-to-noise spectrum with appropriate y-axis labels.
         kwargs : dict
             Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
 
@@ -343,8 +333,6 @@ class Periodogram(object):
                 ylabel = "Power Spectral Density [ppm$^2\ ${}]".format((1/self.frequency).unit.to_string('latex'))
             except AttributeError:
                 pass
-        if snr is not None:
-            ylabel = "Signal to Noise Ratio (SNR)"
 
         # This will need to be fixed with housekeeping. Self.label currently doesnt exist.
         if ('label' not in kwargs):
@@ -359,27 +347,15 @@ class Periodogram(object):
 
             # Plot frequency and power
             if format == 'frequency':
-                if snr is None:
-                    ax.plot(self.frequency, self.power, **kwargs)
-                else:
-                    ax.plot(self.frequency, snr, **kwargs)
-                if smooth_factor is not None:
-                    smoo_f, smoo_p = self.smooth_ps(smooth_factor)
-                    ax.plot(smoo_f, smoo_p, c='r', label = 'Smoothed Power Spectrum')
+                ax.plot(self.frequency, self.power, **kwargs)
                 if xlabel is None:
                     try:
                         xlabel = "Frequency [{}]".format(self.frequency.unit.to_string('latex'))
                     except AttributeError:
                         pass
             if format == 'period':
-                if snr is None:
-                    ax.plot(self.period, self.power, **kwargs)
-                else:
-                    ax.plot(self.period, snr, **kwargs)
+                ax.plot(self.period, self.power, **kwargs)
                 ax.set_xscale('log')
-                if smooth_factor is not None:
-                    smoo_f, smoo_p = self.smooth_ps(smooth_factor)
-                    ax.plot(1./smoo_f, smoo_p, c='r', label='Smoothed Power Spectrum')
                 if xlabel is None:
                     try:
                         xlabel = "Period [{}]".format((1./self.frequency).unit.to_string('latex'))
@@ -440,7 +416,7 @@ class Periodogram(object):
             x0 += 0.5 * log_width
         return bkg / count
 
-    def get_snr_spectrum(self, log_width=0.01):
+    def remove_background(self, log_width=0.01):
         """Calculates the Signal-To-Noise spectrum of the power spectrum by
         dividing the power through by a background estimated using a moving
         filter in log10 space.
@@ -453,64 +429,16 @@ class Periodogram(object):
 
         Returns
         -------
-        snr : array-like
-            An estimate of the signal-to-noise of the spectrum, assuming a
-            simple estimate of the noise background using a moving filter in
-            log10 space.
+        snr_spectrum: a `Periodogram` object
+            Returns a periodogram object where the power is an estimate of the
+            signal-to-noise of the spectrum, assuming a simple estimate of the
+            noise background using a moving filter in log10 space.
         """
-        snr = self.power / self.estimate_background(log_width=log_width)
-        return snr
-
-    def plot_snr(self, log_width=0.01, scale='linear', ax=None, xlabel=None,
-                    ylabel=None, title='', style='lightkurve', format='frequency',
-                    **kwargs):
-        """Plots the a signal-to-noise of the periodogram, by dividing the
-        periodogram object through by .
-
-        Parameters
-        ----------
-        log_width : float
-            Default 0.01. The width of the filter in log10 space. Kwarg for the
-            Periodogram.estimate_background() function.
-        scale: str
-            Set x,y axis to be "linear" or "log". Default is linear.
-        ax : matplotlib.axes._subplots.AxesSubplot
-            A matplotlib axes object to plot into. If no axes is provided,
-            a new one will be generated.
-        xlabel : str
-            Plot x axis label
-        ylabel : str
-            Plot y axis label
-        title : str
-            Plot set_title
-        style : str
-            Path or URL to a matplotlib style file, or name of one of
-            matplotlib's built-in stylesheets (e.g. 'ggplot').
-            Lightkurve's custom stylesheet is used by default.
-        format : str
-            {'frequency', 'period'}. Is by default the _format property of the
-            Periodogram object. If 'frequency', x-axis units will be frequency.
-            If 'period', the x-axis units will be period and 'log' scale.
-        kwargs : dict
-            Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
-
-        Returns
-        -------
-        ax : matplotlib.axes._subplots.AxesSubplot
-            The matplotlib axes object.
-        """
-        snr = self.get_snr_spectrum(log_width=log_width)
-        ax = self.plot(scale=scale, ax=ax, xlabel=xlabel, ylabel=ylabel,
-                        title=title, style=style, format=format,
-                        snr=snr, **kwargs)
-        return ax
-
-    def fit_background(self, numax):
-        """
-        Function to make a simple fit of polynomials to the powerspectrum
-        background, and returns the best fit coefficients.
-        """
-        raise NotImplementedError('This is semi-advanced asteroseismology, but doing this quickly may be valuable to people as a learning tool. Will enquire')
+        snr_pg = self / self.estimate_background(log_width=log_width)
+        return SNR_Periodogram(snr_pg.frequency, snr_pg.power,
+                                lc = self.lc, nyquist = self.nyquist,
+                                frequency_spacing = self.frequency_spacing,
+                                meta = self.meta)
 
     ############################### HOUSEKEEPING ###############################
 
@@ -730,6 +658,13 @@ class Periodogram(object):
             print('\nlightkurve.Periodogram.lc (LightCurve object) properties:')
             self.lc.properties()
 
+    ############################## NOT IMPLEMENTED #############################
+    def fit_background(self, numax):
+        """
+        Function to make a simple fit of power laws to the powerspectrum
+        background, and returns the best fit coefficients.
+        """
+        raise NotImplementedError('This is semi-advanced asteroseismology, but doing this quickly may be valuable to people as a learning tool. Will enquire')
 
     ############################## WIP, UNTOUCHED ##############################
     ## Lets start with periodogram only, before moving on to the seismo stuff
@@ -833,135 +768,160 @@ class Periodogram(object):
         """
         return stellar_params(nu_max, delta_nu, temp)
 
-def standardize_units(numax, deltanu, temp):
-    """Nondimensionalization units to solar units.
 
-    Parameters
-    ----------
-    numax : float
-        Nu max value in microhertz.
-    deltanu : float
-        Large frequency separation in microhertz.
-    temp : float
-        Effective temperature in Kelvin.
+class SNR_Periodogram(Periodogram):
+    """Defines a periodogram with different plotting defaults"""
+    def __init__(self, *args, **kwargs):
+        super(SNR_Periodogram, self).__init__(*args, **kwargs)
 
-    Returns
-    -------
-    v_max : float
-        Nu max value in solar units.
-    delta_nu : float
-        Delta nu value in solar units.
-    temp_eff : float
-        Effective temperature in solar units.
-    """
-    if numax is None:
-        raise ValueError("No nu max value provided")
-    if deltanu is None:
-        raise ValueError("No delta nu value provided")
-    if temp is None:
-        raise ValueError("An assumed temperature must be given")
+    def plot(self, **kwargs):
+        """Plot the SNR spectrum using matplotlib's `plot` method.
+        See `Periodogram.plot` for details on the accepted arguments.
 
-    #Standardize nu max, delta nu, and effective temperature
-    v_max = numax / numax_s
-    delta_nu = deltanu / deltanu_s
-    temp_eff = temp / teff_s
+        Parameters
+        ----------
+        kwargs : dict
+            Dictionary of arguments ot be passed to `Periodogram.plot`.
 
-    return v_max, delta_nu, temp_eff
-
-def estimate_radius(numax, deltanu, temp_eff=None, scaling_relation=1):
-    """Estimates radius from nu max, delta nu, and effective temperature.
-
-    Uses scaling relations from Belkacem et al. 2011.
-
-    Parameters
-    ----------
-    numax : float
-        Nu max value in microhertz.
-    deltanu : float
-        Large frequency separation in microhertz.
-    temp : float
-        Effective temperature in Kelvin.
-
-    Returns
-    -------
-    radius : float
-        Radius of the target in solar units.
-    """
-    v_max, delta_nu, temp_eff = standardize_units(numax, deltanu, temp_eff)
-    # Scaling relation from Belkacem et al. 2011
-    radius = scaling_relation * v_max * (delta_nu ** -2) * (temp_eff ** .5)
-    return radius
-
-def estimate_mass(numax, deltanu, temp_eff=None, scaling_relation=1):
-    """Estimates mass from nu max, delta nu, and effective temperature.
-
-    Uses scaling relations from Kjeldsen & Bedding 1995.
-
-    Parameters
-    ----------
-    numax : float
-        Nu max value in microhertz.
-    deltanu : float
-        Large frequency separation in microhertz.
-    temp : float
-        Effective temperature in Kelvin.
-
-    Returns
-    -------
-    mass : float
-        mass of the target in solar units.
-    """
-    v_max, delta_nu, temp_eff = standardize_units(numax, deltanu, temp_eff)
-    #Scaling relation from Kjeldsen & Bedding 1995
-    mass = scaling_relation * (v_max ** 3) * (delta_nu ** -4) * (temp_eff ** 1.5)
-    return mass
-
-def estimate_mean_density(mass, radius):
-    """Estimates stellar mean density from the mass and radius.
-
-    Uses scaling relations from Ulrich 1986.
-
-    Parameters
-    ----------
-    mass : float
-        Mass in solar units.
-    radius : float
-        Radius in solar units.
-
-    Returns
-    -------
-    rho : float
-        Stellar mean density in solar units.
-    """
-    #Scaling relation from Ulrich 1986
-    rho = (3.0/(4*np.pi) * (mass / (radius ** 3))) ** .5
-    return np.square(rho)
-
-def stellar_params(numax, deltanu, temp):
-    """Returns radius, mass, and mean density from nu max, delta nu, and effective temperature.
-
-    This is a convenience function that allows users to retrieve all stellar parameters
-    with a single function call.
-
-    Parameters
-    ----------
-    numax : float
-        Nu max value in microhertz.
-    deltanu : float
-        Large frequency separation in microhertz.
-    temp : float
-        Effective temperature in Kelvin.
-
-    Returns
-    -------
-    m : float
-        Mass of the target in solar units.
-    r : float
-        Radius of the target in solar units.
-    rho : float
-        Mean stellar density of the target in solar units.
-    """
-    r = estimate_radius(numax, deltanu, temp)
-    m = estimate_mass(numax, deltanu, temp)
-    rho = estimate_mean_density(m, r)
-    return m, r, rho
+        Returns
+        -------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            The matplotlib axes object.
+        """
+        ax = super(SNR_Periodogram, self).plot(**kwargs)
+        if 'ylabel' not in kwargs:
+            ax.set_ylabel("Signal to Noise Ratio (SNR)")
+        return ax
+#
+# def standardize_units(numax, deltanu, temp):
+#     """Nondimensionalization units to solar units.
+#
+#     Parameters
+#     ----------
+#     numax : float
+#         Nu max value in microhertz.
+#     deltanu : float
+#         Large frequency separation in microhertz.
+#     temp : float
+#         Effective temperature in Kelvin.
+#
+#     Returns
+#     -------
+#     v_max : float
+#         Nu max value in solar units.
+#     delta_nu : float
+#         Delta nu value in solar units.
+#     temp_eff : float
+#         Effective temperature in solar units.
+#     """
+#     if numax is None:
+#         raise ValueError("No nu max value provided")
+#     if deltanu is None:
+#         raise ValueError("No delta nu value provided")
+#     if temp is None:
+#         raise ValueError("An assumed temperature must be given")
+#
+#     #Standardize nu max, delta nu, and effective temperature
+#     v_max = numax / numax_s
+#     delta_nu = deltanu / deltanu_s
+#     temp_eff = temp / teff_s
+#
+#     return v_max, delta_nu, temp_eff
+#
+# def estimate_radius(numax, deltanu, temp_eff=None, scaling_relation=1):
+#     """Estimates radius from nu max, delta nu, and effective temperature.
+#
+#     Uses scaling relations from Belkacem et al. 2011.
+#
+#     Parameters
+#     ----------
+#     numax : float
+#         Nu max value in microhertz.
+#     deltanu : float
+#         Large frequency separation in microhertz.
+#     temp : float
+#         Effective temperature in Kelvin.
+#
+#     Returns
+#     -------
+#     radius : float
+#         Radius of the target in solar units.
+#     """
+#     v_max, delta_nu, temp_eff = standardize_units(numax, deltanu, temp_eff)
+#     # Scaling relation from Belkacem et al. 2011
+#     radius = scaling_relation * v_max * (delta_nu ** -2) * (temp_eff ** .5)
+#     return radius
+#
+# def estimate_mass(numax, deltanu, temp_eff=None, scaling_relation=1):
+#     """Estimates mass from nu max, delta nu, and effective temperature.
+#
+#     Uses scaling relations from Kjeldsen & Bedding 1995.
+#
+#     Parameters
+#     ----------
+#     numax : float
+#         Nu max value in microhertz.
+#     deltanu : float
+#         Large frequency separation in microhertz.
+#     temp : float
+#         Effective temperature in Kelvin.
+#
+#     Returns
+#     -------
+#     mass : float
+#         mass of the target in solar units.
+#     """
+#     v_max, delta_nu, temp_eff = standardize_units(numax, deltanu, temp_eff)
+#     #Scaling relation from Kjeldsen & Bedding 1995
+#     mass = scaling_relation * (v_max ** 3) * (delta_nu ** -4) * (temp_eff ** 1.5)
+#     return mass
+#
+# def estimate_mean_density(mass, radius):
+#     """Estimates stellar mean density from the mass and radius.
+#
+#     Uses scaling relations from Ulrich 1986.
+#
+#     Parameters
+#     ----------
+#     mass : float
+#         Mass in solar units.
+#     radius : float
+#         Radius in solar units.
+#
+#     Returns
+#     -------
+#     rho : float
+#         Stellar mean density in solar units.
+#     """
+#     #Scaling relation from Ulrich 1986
+#     rho = (3.0/(4*np.pi) * (mass / (radius ** 3))) ** .5
+#     return np.square(rho)
+#
+# def stellar_params(numax, deltanu, temp):
+#     """Returns radius, mass, and mean density from nu max, delta nu, and effective temperature.
+#
+#     This is a convenience function that allows users to retrieve all stellar parameters
+#     with a single function call.
+#
+#     Parameters
+#     ----------
+#     numax : float
+#         Nu max value in microhertz.
+#     deltanu : float
+#         Large frequency separation in microhertz.
+#     temp : float
+#         Effective temperature in Kelvin.
+#
+#     Returns
+#     -------
+#     m : float
+#         Mass of the target in solar units.
+#     r : float
+#         Radius of the target in solar units.
+#     rho : float
+#         Mean stellar density of the target in solar units.
+#     """
+#     r = estimate_radius(numax, deltanu, temp)
+#     m = estimate_mass(numax, deltanu, temp)
+#     rho = estimate_mean_density(m, r)
+#     return m, r, rho
