@@ -15,19 +15,13 @@ from astropy.stats import LombScargle
 from astropy.units import cds
 from scipy.ndimage.filters import gaussian_filter
 from scipy import interpolate
-
-
-"""This module lets us attack a unit to a value or an array of values. This
-allows us to keep track of what units our data are in, and easily switch
-between different units."""
 from astropy import units as u
 
 from . import PACKAGEDIR, MPLSTYLE
 
 log = logging.getLogger(__name__)
 
-__all__ = ['Periodogram', 'estimate_mass', 'estimate_radius',
-            'estimate_mean_density', 'stellar_params', 'standardize_units']
+__all__ = ['Periodogram']
 
 ###Add uncertainties <- review these [astero]
 numax_s = 3090.0 # Huber et al 2013
@@ -38,12 +32,12 @@ teff_s = 5777.0
 
 
 class Periodogram(object):
-    ###Update this [houseekeping]
+    # Update this [houseekeping]
     """The Periodogram class represents a power spectrum, with values of
     frequency on the x-axis (in any frequency units) and values of power on the
     y-axis (in units of ppm^2 / [frequency units]). When calculated using a
     Lomb Scargle periodogram, it has additional attributes used in the calculation,
-    such as `nyquist` and `frqeuency_spacing`.
+    such as `nyquist` and `frequency_spacing`.
 
     Attributes
     ----------
@@ -65,13 +59,13 @@ class Periodogram(object):
     meta : dict
         Free-form metadata associated with the Periodogram.
     """
-    def __init__(self, frequency, power, lc=None,
-                nyquist=None, frequency_spacing=None, meta={}):
-        self.lc = lc
+    def __init__(self, frequency, power,
+                nyquist=None, frequency_spacing=None, targetid=None, meta={}):
         self.frequency = frequency
         self.power = power
         self.nyquist = nyquist
         self.frequency_spacing = frequency_spacing
+        self.targetid = targetid
         self.meta = meta
 
     @property
@@ -79,10 +73,12 @@ class Periodogram(object):
         """Returns list of periods (1 / frequency) with associated astropy unit
         """
         return (1./self.frequency)
+
     @property
     def max_power(self):
         """Returns the power of the highest peak in the periodogram."""
         return np.nanmax(self.power)
+
     @property
     def frequency_at_max_power(self):
         """Returns the frequency corresponding to the highest power in the
@@ -95,11 +91,11 @@ class Periodogram(object):
         return 1./self.frequency_at_max_power
 
     @staticmethod
-    def from_lightcurve(lc, nterms = 1, nyquist_factor = 1, oversample_factor = 1,
-                        min_frequency = None, max_frequency = None,
-                        min_period = None, max_period = None,
-                        frequency = None, period = None,
-                        freq_unit = 1/u.day, **kwargs):
+    def from_lightcurve(lc, nterms=1, nyquist_factor=1, oversample_factor=1,
+                        min_frequency=None, max_frequency=None,
+                        min_period=None, max_period=None,
+                        frequency=None, period=None,
+                        freq_unit=1/u.day, **kwargs):
         """Creates a Periodogram object from a LightCurve instance using
         the Lomb-Scargle method.
         By default, the periodogram will be created for a regular grid of
@@ -179,37 +175,54 @@ class Periodogram(object):
         Periodogram : `Periodogram` object
             Returns a Periodogram object extracted from the lightcurve.
         """
-        #Check if any values of period have been passed and set format accordingly
+        # Check if any values of period have been passed and set format accordingly
         if not all(b is None for b in [period, min_period, max_period]):
             format = 'period'
-        else: format = 'frequency'
+        else:
+            format = 'frequency'
 
-        #Check input consistency
+        # If period and frequency keywords have both been set, throw an error
         if (not all(b is None for b in [period, min_period, max_period])) &\
             (not all(b is None for b in [frequency, min_frequency, max_frequency])):
-            raise ValueError('You have input keyword arguments for both frequency and period. Please only use one or the other.')
+            raise ValueError('You have input keyword arguments for both frequency and period.'
+                             'Please only use one.')
 
-        #Calculate Nyquist frequency & Frequency Bin Width in terms of days
-        nyquist = 0.5 * (1./(np.median(np.diff(lc.time))*u.day))
-        fs = (1./((np.nanmax(lc.time - lc.time[0]))*u.day)) / oversample_factor
+        if (~np.isfinite(lc.flux)).any():
+            raise ValueError('Lightcurve contains NaN values. Use lc.remove_nans()'
+                             ' to remove NaN values from a LightCurve.')
+
+        # Hard coding that time is in days.
+        time = lc.time.copy() * u.day
+
+        #Calculate Nyquist Frequency and frequency bin eidth in terms of days
+        nyquist = 0.5 * (1./(np.median(np.diff(time))))
+        fs = (1./(time[-1] - time[0])) / oversample_factor
 
         #Convert these values to requested frequency unit
         nyquist = nyquist.to(freq_unit)
         fs = fs.to(freq_unit)
 
-        if frequency is not None:
+        # Warn if there is confusing input
+        if (frequency is not None) & (any([a is not None for a in [min_frequency, max_frequency]])):
             log.warning('You have passed a grid of frequencies, which overrides any period/frequency limit kwargs.')
-
-        #Check if period has been passed
-        if period is not None:
+        if (period is not None) & (any([a is not None for a in [min_period, max_period]])):
             log.warning('You have passed a grid of periods, which overrides any period/frequency limit kwargs.')
-            frequency = np.sort(1./period)
+
+
+
+        # Tidy up the period stuff...
         if max_period is not None:
+            # min_frequency MUST be none by this point.
             min_frequency = 1./max_period
         if min_period is not None:
+            # max_frequency MUST be none by this point.
             max_frequency = 1./min_period
+#        # If the user specified a period, copy it into the frequency.
+        if (period is not None):
+            frequency = 1./period
 
-        #Do unit conversions if user input min/max frequency or period
+
+        # Do unit conversions if user input min/max frequency or period
         if frequency is None:
             if min_frequency is not None:
                 min_frequency = u.Quantity(min_frequency, freq_unit)
@@ -228,9 +241,9 @@ class Periodogram(object):
                 max_frequency = nyquist * nyquist_factor
 
             #Create frequency grid evenly spaced in frequency
-            frequency = np.arange(min_frequency.value, max_frequency.value, fs.value)
+            frequency = np.arange(min_frequency.value, max_frequency.value, fs.to(freq_unit).value)
 
-        #Set in/convert to desired units
+        #Convert to desired units
         frequency = u.Quantity(frequency, freq_unit)
 
         if nterms > 1:
@@ -246,7 +259,7 @@ class Periodogram(object):
                 log.warning('You have passed an evenly-spaced grid of periods. These are not evenly spaced in frequency space.\n Method has been set to "slow" to allow for this.')
 
 
-        LS = LombScargle(lc.time * u.day, lc.flux * 1e6,
+        LS = LombScargle(time, lc.flux * 1e6,
                             nterms=nterms, normalization='psd', **kwargs)
         power = LS.power(frequency, method=method)
 
@@ -258,39 +271,51 @@ class Periodogram(object):
         power = power / fs.value
 
         ### Periodogram needs properties
-        return Periodogram(frequency=frequency, power=power, lc=lc,
-                            nyquist=nyquist, frequency_spacing=fs)
+        return Periodogram(frequency=frequency, power=power,
+                            nyquist=nyquist, frequency_spacing=fs, targetid=lc.targetid)
 
-    def smooth(self, smooth_factor = 10):
+    def bin(self, binsize=10, method='mean'):
         """Smooths the powerspectrum using a moving median filter.
 
         Parameters
         ----------
-        smooth_factor : int
-            Default 10. The factor by which to smooth the power spectrum, in the
-            sense that the power spectrum will be smoothed by taking the median
-            in bins of size N / smooth_factor, where N is the length of the
+        binsize : int
+            Default 10. The factor by which to bin the power spectrum, in the
+            sense that the power spectrum will be smoothed by taking the mean
+            in bins of size N / binsize, where N is the length of the
             original periodogram.
+        method : str
+            Method to use for binning. Default is mean.
 
         Returns
         -------
         smooth_periodogram : a `Periodogram` object
             Returns a `Periodogram` object which has been smoothed in bins of
-            width `smooth_factor`.
+            width `binsize`.
         """
-        if smooth_factor < 1:
+        if binsize < 1:
             raise ValueError('The smooth factor must be greater than 1.')
 
         #Calculating the length of the smoothed array
-        m = int(len(self.power) / smooth_factor)
-
-        smooth_freq = self.frequency[:m*smooth_factor].reshape((m, smooth_factor)).mean(1)
-        smooth_power = self.power[:m*smooth_factor].reshape((m, smooth_factor)).mean(1)
+        m = int(len(self.power) / binsize)
+        if method == 'mean':
+            smooth_freq = self.frequency[:m*binsize].reshape((m, binsize)).mean(1)
+            smooth_power = self.power[:m*binsize].reshape((m, binsize)).mean(1)
+        elif method == 'median':
+            smooth_freq = np.nanmedian(self.frequency[:m*binsize].reshape((m, binsize)), axis=1)
+            smooth_power = np.nanmedian(self.power[:m*binsize].reshape((m, binsize)), axis=1)
+        else:
+            raise ValueError('No such method as `{}`'.format(method))
 
         smooth_pg = copy.deepcopy(self)
         smooth_pg.frequency = smooth_freq
         smooth_pg.power = smooth_power
         return smooth_pg
+
+
+    def smooth(self, smooth_factor):
+        raise NotImplementedError('We need a smooth function!')
+
 
     def plot(self, scale='linear', ax=None, xlabel=None, ylabel=None, title='',
                  style='lightkurve',format='frequency', **kwargs):
@@ -355,7 +380,6 @@ class Periodogram(object):
                         pass
             if format == 'period':
                 ax.plot(self.period, self.power, **kwargs)
-                ax.set_xscale('log')
                 if xlabel is None:
                     try:
                         xlabel = "Period [{}]".format((1./self.frequency).unit.to_string('latex'))
@@ -368,9 +392,8 @@ class Periodogram(object):
             legend_labels = ax.get_legend_handles_labels()
             if (np.sum([len(a) for a in legend_labels]) != 0):
                 ax.legend()
-            if scale == "log":
-                ax.set_yscale('log')
-                ax.set_xscale('log')
+            ax.set_yscale(scale)
+            ax.set_xscale(scale)
             ax.set_title(title)
         return ax
 
@@ -416,7 +439,7 @@ class Periodogram(object):
             x0 += 0.5 * log_width
         return bkg / count
 
-    def remove_background(self, log_width=0.01):
+    def SNR(self, log_width=0.01):
         """Calculates the Signal-To-Noise spectrum of the power spectrum by
         dividing the power through by a background estimated using a moving
         filter in log10 space.
@@ -435,12 +458,9 @@ class Periodogram(object):
             noise background using a moving filter in log10 space.
         """
         snr_pg = self / self.estimate_background(log_width=log_width)
-        return SNR_Periodogram(snr_pg.frequency, snr_pg.power,
-                                lc = self.lc, nyquist = self.nyquist,
+        return SNR_Periodogram(snr_pg.frequency, snr_pg.power, nyquist = self.nyquist,
                                 frequency_spacing = self.frequency_spacing,
                                 meta = self.meta)
-
-    ############################### HOUSEKEEPING ###############################
 
     def to_table(self):
         """Export the Periodogram as an AstroPy Table.
@@ -453,7 +473,7 @@ class Periodogram(object):
                      names=('frequency', 'period', 'power'),
                      meta=self.meta)
 
-    def to_pandas(self, columns=['frequency','period','power']):
+    def to_pandas(self, columns=['frequency', 'power']):
         """Export the Periodogram as a Pandas DataFrame.
         Parameters
         ----------
@@ -500,51 +520,12 @@ class Periodogram(object):
         """
         return self.to_pandas().to_csv(path_or_buf=path_or_buf, **kwargs)
 
-    def to_fits(self, path=None, overwrite=False, **extra_data):
-        """Export the Periodogram as an astropy.io.fits object.
-        Parameters
-        ----------
-        path : string, default None
-            File path, if None returns an astropy.io.fits object.
-        overwrite : bool
-            Whether or not to overwrite the file
-        extra_data : dict
-            Extra keywords or columns to include in the FITS file.
-            Arguments of type str, int, float, or bool will be stored as
-            keywords in the primary header.
-            Arguments of type np.array or list will be stored as columns
-            in the first extension.
-        Returns
-        -------
-        hdu : astropy.io.fits
-            Returns an astropy.io.fits object if path is None
-        """
-        # kepler_specific_data = {
-        #     'TELESCOP': "KEPLER",
-        #     'INSTRUME': "Kepler Photometer",
-        #     'OBJECT': '{}'.format(self.targetid),
-        #     'KEPLERID': self.targetid,
-        #     'CHANNEL': self.channel,
-        #     'MISSION': self.mission,
-        #     'RA_OBJ': self.ra,
-        #     'DEC_OBJ': self.dec,
-        #     'EQUINOX': 2000,
-        #     'DATE-OBS': Time(self.time[0]+2454833., format=('jd')).isot}
-        # for kw in kepler_specific_data:
-        #     if ~np.asarray([kw.lower == k.lower() for k in extra_data]).any():
-        #         extra_data[kw] = kepler_specific_data[kw]
-        # return super(KeplerLightCurve, self).to_fits(path=path,
-        #                                              overwrite=overwrite,
-        #                                              **extra_data)
-        raise NotImplementedError('This should be a function!')
-
     def __repr__(self):
-        return('Periodogram(ID: {})'.format(self.lc.targetid))
+        return('Periodogram(ID: {})'.format(self.targetid))
 
     def __getitem__(self, key):
         copy_self = copy.copy(self)
         copy_self.frequency = self.frequency[key]
-        copy_self.period = self.period[key]
         copy_self.power = self.power[key]
         return copy_self
 
@@ -654,120 +635,6 @@ class Periodogram(object):
         print('lightkurve.Periodogram properties:')
         output.pprint(max_lines=-1, max_width=-1)
 
-        if self.lc is not None:
-            print('\nlightkurve.Periodogram.lc (LightCurve object) properties:')
-            self.lc.properties()
-
-    ############################## NOT IMPLEMENTED #############################
-    def fit_background(self, numax):
-        """
-        Function to make a simple fit of power laws to the powerspectrum
-        background, and returns the best fit coefficients.
-        """
-        raise NotImplementedError('This is semi-advanced asteroseismology, but doing this quickly may be valuable to people as a learning tool. Will enquire')
-
-    ############################## WIP, UNTOUCHED ##############################
-    ## Lets start with periodogram only, before moving on to the seismo stuff
-    ## All the seismo steps will have to be verified one by one
-    def estimate_numax(self):
-        """Estimates the nu max value based on the periodogram
-
-        find_numax() method first estimates the background trend
-        and then smoothes the power spectrum using a gaussian filter.
-        Peaks are then determined in the smoothed power spectrum.
-
-        Returns:
-        --------
-        nu_max : float
-            The nu max of self.powers. Nu max is in microhertz
-        """
-
-        bkg = self.estimate_background(self.frequency.value, self.powers.value)
-        df = self.frequency[1].value - self.frequency[0].value
-        smoothed_ps = gaussian_filter(self.powers.value / bkg, 10 / df)
-        peak_freqs = self.frequency[self.find_peaks(smoothed_ps)].value
-        nu_max = peak_freqs[peak_freqs > 5][0]
-        return nu_max
-
-    def estimate_delta_nu(self, numax=None):
-        """Estimates delta nu value, or large frequency spacing
-
-        Estimates the delta nu value centered around the numax value given. The autocorrelation
-        function will find the distancing between consecutive modesself.
-
-        Parameters
-        ----------
-        numax : float
-            The Nu max value to center our autocorrelation function
-
-        Returns
-        -------
-        delta_nu : float
-            So-called large frequency spacing
-        """
-        def next_pow_two(n):
-            i = 1
-            while i < n:
-                i = i << 1
-            return i
-
-        def acor_function(x):
-            x = np.atleast_1d(x)
-            n = next_pow_two(len(x))
-            f = np.fft.fft(x - np.nanmean(x), n=2*n)
-            acf = np.fft.ifft(f * np.conjugate(f))[:len(x)].real
-            acf /= acf[0]
-            return acf
-
-        # And the autocorrelation function of a lightly smoothed power spectrum
-        bkg = self.estimate_background(self.frequency.value, self.powers.value)
-        df = self.frequency[1].value - self.frequency[0].value
-        acor = acor_function(gaussian_filter(self.powers.value / bkg, 0.5 / df))
-        lags = df*np.arange(len(acor))
-        acor = acor[lags < 30]
-        lags = lags[lags < 30]
-
-        if numax is None:
-            raise ValueError("Must provide a nu max value")
-        # Expected delta_nu: Stello et al (2009)
-        dnu_expected = 0.263 * numax ** 0.772
-        peak_lags = lags[self.find_peaks(acor)]
-        delta_nu = peak_lags[np.argmin(np.abs(peak_lags - dnu_expected))]
-        return delta_nu
-
-    def find_peaks(self, z):
-        """ Finds peak index in an array """
-        peak_inds = (z[1:-1] > z[:-2]) * (z[1:-1] > z[2:])
-        peak_inds = np.arange(1, len(z)-1)[peak_inds]
-        peak_inds = peak_inds[np.argsort(z[peak_inds])][::-1]
-        return peak_inds
-
-    def estimate_stellar_parameters(self, nu_max, delta_nu, temp=None):
-        """ Estimates stellar parameters.
-
-        Estimates mass, radius, and mean density based on nu max, delta nu, and effective
-        temperature values.
-
-        Parameters
-        ----------
-        nu_max : float
-            The nu max of self.powers. Nu max is in microhertz.
-        delta_nu : float
-            Large frequency spacing in microhertz.
-        temp : float
-            Effective temperature in Kelvin.
-
-        Returns
-        -------
-        m : float
-            The estimated mass of the target. Mass is in solar units.
-        r : float
-            The estimated radius of the target. Radius is in solar units.
-        rho : float
-            The estimated mean density of the target. Rho is in solar units.
-        """
-        return stellar_params(nu_max, delta_nu, temp)
-
 
 class SNR_Periodogram(Periodogram):
     """Defines a periodogram with different plotting defaults"""
@@ -792,136 +659,3 @@ class SNR_Periodogram(Periodogram):
         if 'ylabel' not in kwargs:
             ax.set_ylabel("Signal to Noise Ratio (SNR)")
         return ax
-#
-# def standardize_units(numax, deltanu, temp):
-#     """Nondimensionalization units to solar units.
-#
-#     Parameters
-#     ----------
-#     numax : float
-#         Nu max value in microhertz.
-#     deltanu : float
-#         Large frequency separation in microhertz.
-#     temp : float
-#         Effective temperature in Kelvin.
-#
-#     Returns
-#     -------
-#     v_max : float
-#         Nu max value in solar units.
-#     delta_nu : float
-#         Delta nu value in solar units.
-#     temp_eff : float
-#         Effective temperature in solar units.
-#     """
-#     if numax is None:
-#         raise ValueError("No nu max value provided")
-#     if deltanu is None:
-#         raise ValueError("No delta nu value provided")
-#     if temp is None:
-#         raise ValueError("An assumed temperature must be given")
-#
-#     #Standardize nu max, delta nu, and effective temperature
-#     v_max = numax / numax_s
-#     delta_nu = deltanu / deltanu_s
-#     temp_eff = temp / teff_s
-#
-#     return v_max, delta_nu, temp_eff
-#
-# def estimate_radius(numax, deltanu, temp_eff=None, scaling_relation=1):
-#     """Estimates radius from nu max, delta nu, and effective temperature.
-#
-#     Uses scaling relations from Belkacem et al. 2011.
-#
-#     Parameters
-#     ----------
-#     numax : float
-#         Nu max value in microhertz.
-#     deltanu : float
-#         Large frequency separation in microhertz.
-#     temp : float
-#         Effective temperature in Kelvin.
-#
-#     Returns
-#     -------
-#     radius : float
-#         Radius of the target in solar units.
-#     """
-#     v_max, delta_nu, temp_eff = standardize_units(numax, deltanu, temp_eff)
-#     # Scaling relation from Belkacem et al. 2011
-#     radius = scaling_relation * v_max * (delta_nu ** -2) * (temp_eff ** .5)
-#     return radius
-#
-# def estimate_mass(numax, deltanu, temp_eff=None, scaling_relation=1):
-#     """Estimates mass from nu max, delta nu, and effective temperature.
-#
-#     Uses scaling relations from Kjeldsen & Bedding 1995.
-#
-#     Parameters
-#     ----------
-#     numax : float
-#         Nu max value in microhertz.
-#     deltanu : float
-#         Large frequency separation in microhertz.
-#     temp : float
-#         Effective temperature in Kelvin.
-#
-#     Returns
-#     -------
-#     mass : float
-#         mass of the target in solar units.
-#     """
-#     v_max, delta_nu, temp_eff = standardize_units(numax, deltanu, temp_eff)
-#     #Scaling relation from Kjeldsen & Bedding 1995
-#     mass = scaling_relation * (v_max ** 3) * (delta_nu ** -4) * (temp_eff ** 1.5)
-#     return mass
-#
-# def estimate_mean_density(mass, radius):
-#     """Estimates stellar mean density from the mass and radius.
-#
-#     Uses scaling relations from Ulrich 1986.
-#
-#     Parameters
-#     ----------
-#     mass : float
-#         Mass in solar units.
-#     radius : float
-#         Radius in solar units.
-#
-#     Returns
-#     -------
-#     rho : float
-#         Stellar mean density in solar units.
-#     """
-#     #Scaling relation from Ulrich 1986
-#     rho = (3.0/(4*np.pi) * (mass / (radius ** 3))) ** .5
-#     return np.square(rho)
-#
-# def stellar_params(numax, deltanu, temp):
-#     """Returns radius, mass, and mean density from nu max, delta nu, and effective temperature.
-#
-#     This is a convenience function that allows users to retrieve all stellar parameters
-#     with a single function call.
-#
-#     Parameters
-#     ----------
-#     numax : float
-#         Nu max value in microhertz.
-#     deltanu : float
-#         Large frequency separation in microhertz.
-#     temp : float
-#         Effective temperature in Kelvin.
-#
-#     Returns
-#     -------
-#     m : float
-#         Mass of the target in solar units.
-#     r : float
-#         Radius of the target in solar units.
-#     rho : float
-#         Mean stellar density of the target in solar units.
-#     """
-#     r = estimate_radius(numax, deltanu, temp)
-#     m = estimate_mass(numax, deltanu, temp)
-#     rho = estimate_mean_density(m, r)
-#     return m, r, rho
