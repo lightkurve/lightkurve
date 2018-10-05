@@ -2,10 +2,11 @@ from __future__ import division, print_function
 import os
 import logging
 import numpy as np
+import copy
 
 from astroquery.mast import Observations
 from astroquery.exceptions import ResolverError
-from astropy.table import Table
+from astropy.table import Table, unique
 from astropy.coordinates import SkyCoord
 from astropy.io import ascii, fits
 from .lightcurve import KeplerLightCurve, TessLightCurve
@@ -31,8 +32,31 @@ class SearchResult(object):
         self.filetype = filetype
 
     @property
-    def info(self):
-        return self._make_table(self.path)
+    def targets(self):
+        mask = ['target_name','s_ra','s_dec']
+        return unique(self.path[mask], keys='target_name')
+
+    @property
+    def products(self):
+        if self.filetype == None:
+            raise ValueError("Choose a filetype of 'Target Pixel' or 'Lightcurve'")
+        elif self.filetype == "tpf":
+            filetype = "Target Pixel"
+        elif self.filetype == "lc":
+            filetype = "Lightcurve"
+
+        obsids = np.asarray(self.path['obsid'])
+        products = Observations.get_product_list(self.path)
+        order = [np.where(products['parent_obsid'] == o)[0] for o in obsids]
+        order = [item for sublist in order for item in sublist]
+        ntargets = len(np.unique(self.path['target_name']))
+
+        mask = ['project','description','obs_id']
+        self.full_products = self._mask_products(products[order],filetype=filetype, campaign=self.campaign,
+                                                 quarter=self.quarter, cadence=self.cadence,
+                                                 targetlimit=ntargets)
+
+        return self.full_products[mask]
 
     @property
     def obsID(self):
@@ -54,7 +78,7 @@ class SearchResult(object):
         """
 
         """
-
+        '''
         if type is None:
             type = self.filetype
 
@@ -66,29 +90,39 @@ class SearchResult(object):
             filetype = "Lightcurve"
 
         obsids = np.asarray(self.path['obsid'])
-        products = Observations.get_product_list(self.path)
+        products = self.products
         order = [np.where(products['parent_obsid'] == o)[0] for o in obsids]
         order = [item for sublist in order for item in sublist]
 
         products = self._mask_products(products[order], filetype=filetype, campaign=self.campaign,
                                        quarter=self.quarter, month=self.month, cadence=self.cadence)
 
-        path = Observations.download_products(products, mrp_only=False)['Local Path']
+        '''
+        if self.filetype == None:
+            raise ValueError("Choose a filetype of 'Target Pixel' or 'Lightcurve'")
+        elif self.filetype == "tpf":
+            filetype = "Target Pixel"
+        elif self.filetype == "lc":
+            filetype = "Lightcurve"
 
-        if len(path) != 1:
-            log.warning('Warning: Multiple files available to download. Only the first file has been '
+        products = self.products
+
+        path = Observations.download_products(self.full_products[:1], mrp_only=False)['Local Path']
+
+        if len(self.full_products) != 1:
+            log.warning('Warning: {} files available to download. Only the first file has been '
                         'downloaded. Please use `download_all()` or specify a campaign, quarter, or '
-                        'cadence to limit your search.')
+                        'cadence to limit your search.'.format(len(self.full_products)))
 
-        if type in ["tpf", "Target Pixel", "Target Pixel File"]:
+        if self.filetype in ["tpf", "Target Pixel", "Target Pixel File"]:
             return KeplerTargetPixelFile(path[0],
                                          quality_bitmask=quality_bitmask,
                                          **kwargs)
-        elif type in ["lc", "Light Curve"]:
+        elif self.filetype in ["lc", "Light Curve"]:
             return KeplerLightCurveFile(path[0],
                                         quality_bitmask=quality_bitmask,
                                         **kwargs).PDCSAP_FLUX
-        elif type in ["lcf", "Light Curve File"]:
+        elif self.filetype in ["lcf", "Light Curve File"]:
             return KeplerLightCurveFile(path[0],
                                     quality_bitmask=quality_bitmask,
                                     **kwargs)
@@ -224,7 +258,7 @@ class SearchResult(object):
         # For Kepler short cadence data there are additional rules, so find anywhere
         # where there is short cadence data...
         scmask = np.asarray(['Short' in d for d in products['description']]) &\
-            np.asarray(['kplr' in d for d in products['dataURI']])
+                 np.asarray(['kplr' in d for d in products['dataURI']])
         if np.any(scmask):
             # Error check the user if there's multiple months and they didn't ask
             # for a specific one
@@ -253,14 +287,6 @@ class SearchResult(object):
                 raise ArchiveError("No {} File found for {} "
                                    "at month {} at MAST.".format(filetype, target, month))
 
-        # If there is no specified quarter but there are many campaigns/quarters
-        # returned, warn the user with an error
-        if (len(np.unique(products['qoc'])) > 1) & (campaign is None) & (quarter is None):
-            raise ArchiveError("Found {} different Target Pixel Files "
-                               "for target {}. Please specify quarter/month "
-                               "or campaign number."
-                               "".format(len(products), self.target_name[0]))
-
         return products
 
     def _make_table(self, path):
@@ -268,15 +294,9 @@ class SearchResult(object):
 
         """
 
-        path.keep_columns(['dataproduct_type','obs_id','target_name','s_ra','s_dec','t_min',
-                           't_max','t_exptime','wavelength_region','filters','instrument_name',
-                           'proposal_pi','s_region','jpegURL','dataURL','dataRights','obsid',
-                           'objID','distance'])
-        order = ['target_name','instrument_name','dataproduct_type','s_ra','s_dec','distance',
-                 'objID','obs_id','obsid','t_min','t_max','t_exptime','wavelength_region',
-                 'filters','proposal_pi','s_region','jpegURL','dataURL','dataRights']
+        path.keep_columns(['target_name','s_ra','s_dec'])
 
-        return path[order]
+        return path
 
 class ArchiveError(Exception):
     """Raised if there is a problem accessing data."""
@@ -346,16 +366,10 @@ def search_target(target, cadence='long', quarter=None, month=None,
                 target_name = 'ktwo{:09d}'.format(target)
             else:
                 raise ValueError("{:09d}: not in the KIC or EPIC ID range".format(target))
-            target_obs = Observations.query_criteria(target_name=target_name,
+            path = Observations.query_criteria(target_name=target_name,
                                                      radius='{} deg'.format(.0001),
                                                      project=["Kepler", "K2"],
                                                      obs_collection=["Kepler", "K2"])
-            ra = target_obs['s_ra'][0]
-            dec = target_obs['s_ra'][0]
-            path = Observations.query_criteria(coordinates='{} {}'.format(ra, dec),
-                                              radius='{} deg'.format(.0001),
-                                              project=["Kepler", "K2"],
-                                              obs_collection=["Kepler", "K2"])
         except ValueError:
             # If `target` did not look like a KIC or EPIC ID, then we let MAST
             # resolve the target name to a sky position. Convert radius from arcsec
@@ -365,12 +379,8 @@ def search_target(target, cadence='long', quarter=None, month=None,
                                                   radius='{} deg'.format(.0001),
                                                   project=["Kepler", "K2"],
                                                   obs_collection=["Kepler", "K2"])
-                # Make sure the final table is in DISTANCE order
-
             except ResolverError as exc:
                 raise ArchiveError(exc)
-    # Make sure the final table is in DISTANCE order
-    path.sort('distance')
 
     return SearchResult(path, campaign=campaign, quarter=quarter, month=month, cadence=cadence, filetype=filetype)
 
@@ -466,7 +476,5 @@ def search_region(target=None, coords=[], cadence='long', quarter=None, month=No
 
             except ResolverError as exc:
                 raise ArchiveError(exc)
-    # Make sure the final table is in DISTANCE order
-    path.sort('distance')
 
     return SearchResult(path, campaign=campaign, quarter=quarter, month=month, cadence=cadence, filetype=filetype)
