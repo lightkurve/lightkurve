@@ -12,10 +12,16 @@ import astropy
 from astropy.table import Table
 from astropy.io import fits
 from astropy.stats import LombScargle
-from astropy.units import cds
 from scipy.ndimage.filters import gaussian_filter
 from scipy import interpolate
+
+
+"""This module lets us attack a unit to a value or an array of values. This
+allows us to keep track of what units our data are in, and easily switch
+between different units. The cds module just contains some additional units not
+in the standard units module, such as parts per million (ppm)."""
 from astropy import units as u
+from astropy.units import cds
 
 from . import PACKAGEDIR, MPLSTYLE
 
@@ -39,24 +45,27 @@ class Periodogram(object):
         The power-spectral-density of the Fourier timeseries, in units of
         ppm^2 / freq_unit, where freq_unit is the unit of the frequency
         attribute.
-    lc : `LightCurve` object
-        The LightCurve from which the Periodogram is computed. Holds all  of
-        the `LightCurve object's properties.
     nyquist : float
         The Nyquist frequency of the lightcurve. In units of freq_unit, where
         freq_unit is the unit of the frequency attribute.
     frequency_spacing : float
         The frequency spacing of the periodogram. In units of freq_unit, where
         freq_unit is the unit of the frequency attribute.
+    targetid : str
+        Identifier of the target.
+    label : str
+        Human-friendly object label, e.g. "KIC 123456789"
     meta : dict
         Free-form metadata associated with the Periodogram.
     """
     def __init__(self, frequency, power,
-                nyquist=None, frequency_spacing=None, targetid=None, meta={}):
+                nyquist=None, frequency_spacing=None,
+                label=None, targetid=None, meta={}):
         self.frequency = frequency
         self.power = power
         self.nyquist = nyquist
         self.frequency_spacing = frequency_spacing
+        self.label = label
         self.targetid = targetid
         self.meta = meta
 
@@ -167,7 +176,10 @@ class Periodogram(object):
         Periodogram : `Periodogram` object
             Returns a Periodogram object extracted from the lightcurve.
         """
-        # Check if any values of period have been passed and set format accordingly
+        #Makes sure the lightcurve object is normalised
+        lc = lc.normalize()
+
+        #Check if any values of period have been passed and set format accordingly
         if not all(b is None for b in [period, min_period, max_period]):
             format = 'period'
         else:
@@ -259,12 +271,16 @@ class Periodogram(object):
         norm = np.std(lc.flux * 1e6)**2 / np.sum(power)
         power *= norm
 
+        power = power * (cds.ppm**2)
+
         #Rescale power to units of ppm^2 / [frequency unit]
-        power = power / fs.value
+        power = power / fs
+
 
         ### Periodogram needs properties
         return Periodogram(frequency=frequency, power=power,
-                            nyquist=nyquist, frequency_spacing=fs, targetid=lc.targetid)
+                            nyquist=nyquist, frequency_spacing=fs,
+                            targetid=lc.targetid, label=lc.label)
 
     def bin(self, binsize=10, method='mean'):
         """Smooths the powerspectrum using a moving median filter.
@@ -342,14 +358,14 @@ class Periodogram(object):
             style = MPLSTYLE
         if ylabel is None:
             try:
-                ylabel = "Power Spectral Density [ppm$^2\ ${}]".format((1/self.frequency).unit.to_string('latex'))
+                ylabel = "Power Spectral Density [{}]".format(self.power.unit.to_string('latex'))
             except AttributeError:
                 pass
 
         # This will need to be fixed with housekeeping. Self.label currently doesnt exist.
         if ('label' not in kwargs):
             try:
-                kwargs['label'] = self.targetid
+                kwargs['label'] = self.label
             except AttributeError:
                 kwargs['label'] = None
 
@@ -447,6 +463,7 @@ class Periodogram(object):
         snr_pg = self / self._estimate_background(log_width=log_width)
         return SNR_Periodogram(snr_pg.frequency, snr_pg.power, nyquist = self.nyquist,
                                 frequency_spacing = self.frequency_spacing, targetid=self.targetid,
+                                label=self.label,
                                 meta = self.meta)
 
     def to_table(self):
