@@ -53,25 +53,28 @@ class Periodogram(object):
         The power-spectral-density of the Fourier timeseries, in units of
         ppm^2 / freq_unit, where freq_unit is the unit of the frequency
         attribute.
-    lc : `LightCurve` object
-        The LightCurve from which the Periodogram is computed. Holds all  of
-        the `LightCurve object's properties.
     nyquist : float
         The Nyquist frequency of the lightcurve. In units of freq_unit, where
         freq_unit is the unit of the frequency attribute.
     frequency_spacing : float
         The frequency spacing of the periodogram. In units of freq_unit, where
         freq_unit is the unit of the frequency attribute.
+    targetid : str
+        Identifier of the target.
+    label : str
+        Human-friendly object label, e.g. "KIC 123456789"
     meta : dict
         Free-form metadata associated with the Periodogram.
     """
-    def __init__(self, frequency, power, lc=None,
-                nyquist=None, frequency_spacing=None, meta={}):
-        self.lc = lc
+    def __init__(self, frequency, power,
+                nyquist=None, frequency_spacing=None,
+                label=None, targetid=None, meta={}):
         self.frequency = frequency
         self.power = power
         self.nyquist = nyquist
         self.frequency_spacing = frequency_spacing
+        self.label = label
+        self.targetid = targetid
         self.meta = meta
 
     @property
@@ -258,8 +261,9 @@ class Periodogram(object):
         power = power / fs.value
 
         ### Periodogram needs properties
-        return Periodogram(frequency=frequency, power=power, lc=lc,
-                            nyquist=nyquist, frequency_spacing=fs)
+        return Periodogram(frequency=frequency, power=power,
+                            nyquist=nyquist, frequency_spacing=fs,
+                            targetid=lc.targetid, label=lc.label)
 
     def smooth(self, smooth_factor = 10):
         """Smooths the powerspectrum using a moving median filter.
@@ -337,7 +341,7 @@ class Periodogram(object):
         # This will need to be fixed with housekeeping. Self.label currently doesnt exist.
         if ('label' not in kwargs):
             try:
-                kwargs['label'] = self.lc.label
+                kwargs['label'] = self.label
             except AttributeError:
                 kwargs['label'] = None
 
@@ -436,7 +440,7 @@ class Periodogram(object):
         """
         snr_pg = self / self.estimate_background(log_width=log_width)
         return SNR_Periodogram(snr_pg.frequency, snr_pg.power,
-                                lc = self.lc, nyquist = self.nyquist,
+                                nyquist = self.nyquist,
                                 frequency_spacing = self.frequency_spacing,
                                 meta = self.meta)
 
@@ -539,7 +543,7 @@ class Periodogram(object):
         raise NotImplementedError('This should be a function!')
 
     def __repr__(self):
-        return('Periodogram(ID: {})'.format(self.lc.targetid))
+        return('Periodogram(ID: {})'.format(self.targetid))
 
     def __getitem__(self, key):
         copy_self = copy.copy(self)
@@ -653,10 +657,6 @@ class Periodogram(object):
                     idx += 1
         print('lightkurve.Periodogram properties:')
         output.pprint(max_lines=-1, max_width=-1)
-
-        if self.lc is not None:
-            print('\nlightkurve.Periodogram.lc (LightCurve object) properties:')
-            self.lc.properties()
 
     ############################## NOT IMPLEMENTED #############################
     def fit_background(self, numax):
