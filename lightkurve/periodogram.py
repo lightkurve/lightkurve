@@ -23,16 +23,8 @@ log = logging.getLogger(__name__)
 
 __all__ = ['Periodogram']
 
-###Add uncertainties <- review these [astero]
-numax_s = 3090.0 # Huber et al 2013
-err_numax_s = 30.
-deltanu_s = 135.1
-err_deltanu_s = 0.1
-teff_s = 5777.0
-
 
 class Periodogram(object):
-    # Update this [houseekeping]
     """The Periodogram class represents a power spectrum, with values of
     frequency on the x-axis (in any frequency units) and values of power on the
     y-axis (in units of ppm^2 / [frequency units]). When calculated using a
@@ -312,11 +304,6 @@ class Periodogram(object):
         smooth_pg.power = smooth_power
         return smooth_pg
 
-
-    def smooth(self, smooth_factor):
-        raise NotImplementedError('We need a smooth function!')
-
-
     def plot(self, scale='linear', ax=None, xlabel=None, ylabel=None, title='',
                  style='lightkurve',format='frequency', **kwargs):
 
@@ -362,7 +349,7 @@ class Periodogram(object):
         # This will need to be fixed with housekeeping. Self.label currently doesnt exist.
         if ('label' not in kwargs):
             try:
-                kwargs['label'] = self.lc.label
+                kwargs['label'] = self.targetid
             except AttributeError:
                 kwargs['label'] = None
 
@@ -397,7 +384,7 @@ class Periodogram(object):
             ax.set_title(title)
         return ax
 
-    def estimate_background(self, log_width=0.01):
+    def _estimate_background(self, log_width=0.01):
         """Estimates background noise of the power spectrum, via moving filter
         in log10 space. The filter defines a bin centered at a value x0 with a
         spread of log_width either side. The median of the power in this bin
@@ -439,7 +426,7 @@ class Periodogram(object):
             x0 += 0.5 * log_width
         return bkg / count
 
-    def SNR(self, log_width=0.01):
+    def flatten(self, log_width=0.01):
         """Calculates the Signal-To-Noise spectrum of the power spectrum by
         dividing the power through by a background estimated using a moving
         filter in log10 space.
@@ -457,9 +444,9 @@ class Periodogram(object):
             signal-to-noise of the spectrum, assuming a simple estimate of the
             noise background using a moving filter in log10 space.
         """
-        snr_pg = self / self.estimate_background(log_width=log_width)
+        snr_pg = self / self._estimate_background(log_width=log_width)
         return SNR_Periodogram(snr_pg.frequency, snr_pg.power, nyquist = self.nyquist,
-                                frequency_spacing = self.frequency_spacing,
+                                frequency_spacing = self.frequency_spacing, targetid=self.targetid,
                                 meta = self.meta)
 
     def to_table(self):
