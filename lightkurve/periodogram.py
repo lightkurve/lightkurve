@@ -12,15 +12,16 @@ import astropy
 from astropy.table import Table
 from astropy.io import fits
 from astropy.stats import LombScargle
-from astropy.units import cds
 from scipy.ndimage.filters import gaussian_filter
 from scipy import interpolate
 
 
 """This module lets us attack a unit to a value or an array of values. This
 allows us to keep track of what units our data are in, and easily switch
-between different units."""
+between different units. The cds module just contains some additional units not
+in the standard units module, such as parts per million (ppm)."""
 from astropy import units as u
+from astropy.units import cds
 
 from . import PACKAGEDIR, MPLSTYLE
 
@@ -182,6 +183,9 @@ class Periodogram(object):
         Periodogram : `Periodogram` object
             Returns a Periodogram object extracted from the lightcurve.
         """
+        #Makes sure the lightcurve object is normalised
+        lc = lc.normalize()
+
         #Check if any values of period have been passed and set format accordingly
         if not all(b is None for b in [period, min_period, max_period]):
             format = 'period'
@@ -257,8 +261,11 @@ class Periodogram(object):
         norm = np.std(lc.flux * 1e6)**2 / np.sum(power)
         power *= norm
 
+        power = power * (cds.ppm**2)
+
         #Rescale power to units of ppm^2 / [frequency unit]
-        power = power / fs.value
+        power = power / fs
+
 
         ### Periodogram needs properties
         return Periodogram(frequency=frequency, power=power,
@@ -334,7 +341,7 @@ class Periodogram(object):
             style = MPLSTYLE
         if ylabel is None:
             try:
-                ylabel = "Power Spectral Density [ppm$^2\ ${}]".format((1/self.frequency).unit.to_string('latex'))
+                ylabel = "Power Spectral Density [{}]".format(self.power.unit.to_string('latex'))
             except AttributeError:
                 pass
 
@@ -792,136 +799,136 @@ class SNR_Periodogram(Periodogram):
         if 'ylabel' not in kwargs:
             ax.set_ylabel("Signal to Noise Ratio (SNR)")
         return ax
-#
-# def standardize_units(numax, deltanu, temp):
-#     """Nondimensionalization units to solar units.
-#
-#     Parameters
-#     ----------
-#     numax : float
-#         Nu max value in microhertz.
-#     deltanu : float
-#         Large frequency separation in microhertz.
-#     temp : float
-#         Effective temperature in Kelvin.
-#
-#     Returns
-#     -------
-#     v_max : float
-#         Nu max value in solar units.
-#     delta_nu : float
-#         Delta nu value in solar units.
-#     temp_eff : float
-#         Effective temperature in solar units.
-#     """
-#     if numax is None:
-#         raise ValueError("No nu max value provided")
-#     if deltanu is None:
-#         raise ValueError("No delta nu value provided")
-#     if temp is None:
-#         raise ValueError("An assumed temperature must be given")
-#
-#     #Standardize nu max, delta nu, and effective temperature
-#     v_max = numax / numax_s
-#     delta_nu = deltanu / deltanu_s
-#     temp_eff = temp / teff_s
-#
-#     return v_max, delta_nu, temp_eff
-#
-# def estimate_radius(numax, deltanu, temp_eff=None, scaling_relation=1):
-#     """Estimates radius from nu max, delta nu, and effective temperature.
-#
-#     Uses scaling relations from Belkacem et al. 2011.
-#
-#     Parameters
-#     ----------
-#     numax : float
-#         Nu max value in microhertz.
-#     deltanu : float
-#         Large frequency separation in microhertz.
-#     temp : float
-#         Effective temperature in Kelvin.
-#
-#     Returns
-#     -------
-#     radius : float
-#         Radius of the target in solar units.
-#     """
-#     v_max, delta_nu, temp_eff = standardize_units(numax, deltanu, temp_eff)
-#     # Scaling relation from Belkacem et al. 2011
-#     radius = scaling_relation * v_max * (delta_nu ** -2) * (temp_eff ** .5)
-#     return radius
-#
-# def estimate_mass(numax, deltanu, temp_eff=None, scaling_relation=1):
-#     """Estimates mass from nu max, delta nu, and effective temperature.
-#
-#     Uses scaling relations from Kjeldsen & Bedding 1995.
-#
-#     Parameters
-#     ----------
-#     numax : float
-#         Nu max value in microhertz.
-#     deltanu : float
-#         Large frequency separation in microhertz.
-#     temp : float
-#         Effective temperature in Kelvin.
-#
-#     Returns
-#     -------
-#     mass : float
-#         mass of the target in solar units.
-#     """
-#     v_max, delta_nu, temp_eff = standardize_units(numax, deltanu, temp_eff)
-#     #Scaling relation from Kjeldsen & Bedding 1995
-#     mass = scaling_relation * (v_max ** 3) * (delta_nu ** -4) * (temp_eff ** 1.5)
-#     return mass
-#
-# def estimate_mean_density(mass, radius):
-#     """Estimates stellar mean density from the mass and radius.
-#
-#     Uses scaling relations from Ulrich 1986.
-#
-#     Parameters
-#     ----------
-#     mass : float
-#         Mass in solar units.
-#     radius : float
-#         Radius in solar units.
-#
-#     Returns
-#     -------
-#     rho : float
-#         Stellar mean density in solar units.
-#     """
-#     #Scaling relation from Ulrich 1986
-#     rho = (3.0/(4*np.pi) * (mass / (radius ** 3))) ** .5
-#     return np.square(rho)
-#
-# def stellar_params(numax, deltanu, temp):
-#     """Returns radius, mass, and mean density from nu max, delta nu, and effective temperature.
-#
-#     This is a convenience function that allows users to retrieve all stellar parameters
-#     with a single function call.
-#
-#     Parameters
-#     ----------
-#     numax : float
-#         Nu max value in microhertz.
-#     deltanu : float
-#         Large frequency separation in microhertz.
-#     temp : float
-#         Effective temperature in Kelvin.
-#
-#     Returns
-#     -------
-#     m : float
-#         Mass of the target in solar units.
-#     r : float
-#         Radius of the target in solar units.
-#     rho : float
-#         Mean stellar density of the target in solar units.
-#     """
-#     r = estimate_radius(numax, deltanu, temp)
-#     m = estimate_mass(numax, deltanu, temp)
-#     rho = estimate_mean_density(m, r)
-#     return m, r, rho
+
+def standardize_units(numax, deltanu, temp):
+    """Nondimensionalization units to solar units.
+
+    Parameters
+    ----------
+    numax : float
+        Nu max value in microhertz.
+    deltanu : float
+        Large frequency separation in microhertz.
+    temp : float
+        Effective temperature in Kelvin.
+
+    Returns
+    -------
+    v_max : float
+        Nu max value in solar units.
+    delta_nu : float
+        Delta nu value in solar units.
+    temp_eff : float
+        Effective temperature in solar units.
+    """
+    if numax is None:
+        raise ValueError("No nu max value provided")
+    if deltanu is None:
+        raise ValueError("No delta nu value provided")
+    if temp is None:
+        raise ValueError("An assumed temperature must be given")
+
+    #Standardize nu max, delta nu, and effective temperature
+    v_max = numax / numax_s
+    delta_nu = deltanu / deltanu_s
+    temp_eff = temp / teff_s
+
+    return v_max, delta_nu, temp_eff
+
+def estimate_radius(numax, deltanu, temp_eff=None, scaling_relation=1):
+    """Estimates radius from nu max, delta nu, and effective temperature.
+
+    Uses scaling relations from Belkacem et al. 2011.
+
+    Parameters
+    ----------
+    numax : float
+        Nu max value in microhertz.
+    deltanu : float
+        Large frequency separation in microhertz.
+    temp : float
+        Effective temperature in Kelvin.
+
+    Returns
+    -------
+    radius : float
+        Radius of the target in solar units.
+    """
+    v_max, delta_nu, temp_eff = standardize_units(numax, deltanu, temp_eff)
+    # Scaling relation from Belkacem et al. 2011
+    radius = scaling_relation * v_max * (delta_nu ** -2) * (temp_eff ** .5)
+    return radius
+
+def estimate_mass(numax, deltanu, temp_eff=None, scaling_relation=1):
+    """Estimates mass from nu max, delta nu, and effective temperature.
+
+    Uses scaling relations from Kjeldsen & Bedding 1995.
+
+    Parameters
+    ----------
+    numax : float
+        Nu max value in microhertz.
+    deltanu : float
+        Large frequency separation in microhertz.
+    temp : float
+        Effective temperature in Kelvin.
+
+    Returns
+    -------
+    mass : float
+        mass of the target in solar units.
+    """
+    v_max, delta_nu, temp_eff = standardize_units(numax, deltanu, temp_eff)
+    #Scaling relation from Kjeldsen & Bedding 1995
+    mass = scaling_relation * (v_max ** 3) * (delta_nu ** -4) * (temp_eff ** 1.5)
+    return mass
+
+def estimate_mean_density(mass, radius):
+    """Estimates stellar mean density from the mass and radius.
+
+    Uses scaling relations from Ulrich 1986.
+
+    Parameters
+    ----------
+    mass : float
+        Mass in solar units.
+    radius : float
+        Radius in solar units.
+
+    Returns
+    -------
+    rho : float
+        Stellar mean density in solar units.
+    """
+    #Scaling relation from Ulrich 1986
+    rho = (3.0/(4*np.pi) * (mass / (radius ** 3))) ** .5
+    return np.square(rho)
+
+def stellar_params(numax, deltanu, temp):
+    """Returns radius, mass, and mean density from nu max, delta nu, and effective temperature.
+
+    This is a convenience function that allows users to retrieve all stellar parameters
+    with a single function call.
+
+    Parameters
+    ----------
+    numax : float
+        Nu max value in microhertz.
+    deltanu : float
+        Large frequency separation in microhertz.
+    temp : float
+        Effective temperature in Kelvin.
+
+    Returns
+    -------
+    m : float
+        Mass of the target in solar units.
+    r : float
+        Radius of the target in solar units.
+    rho : float
+        Mean stellar density of the target in solar units.
+    """
+    r = estimate_radius(numax, deltanu, temp)
+    m = estimate_mass(numax, deltanu, temp)
+    rho = estimate_mean_density(m, r)
+    return m, r, rho
