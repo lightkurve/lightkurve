@@ -61,6 +61,25 @@ class Periodogram(object):
     def __init__(self, frequency, power,
                 nyquist=None, frequency_spacing=None,
                 label=None, targetid=None, meta={}):
+
+        if not isinstance(power, u.quantity.Quantity):
+            raise ValueError('Power must have units.')
+
+        if not isinstance(frequency, u.quantity.Quantity):
+            raise ValueError('Frequency must have units.')
+
+        # Must have frequency units
+        try:
+             frequency.to(u.Hz)
+        except u.UnitConversionError:
+            raise ValueError('Frequency must be in units of 1/time.')
+
+        if frequency.shape[0] <= 1:
+            raise ValueError('Frequency and power must have a length greater than 1.')
+
+        if frequency.shape != power.shape:
+            raise ValueError('Frequency and power must be the same length.')
+
         self.frequency = frequency
         self.power = power
         self.nyquist = nyquist
@@ -68,6 +87,7 @@ class Periodogram(object):
         self.label = label
         self.targetid = targetid
         self.meta = meta
+
 
     @property
     def period(self):
@@ -188,7 +208,7 @@ class Periodogram(object):
         # If period and frequency keywords have both been set, throw an error
         if (not all(b is None for b in [period, min_period, max_period])) &\
             (not all(b is None for b in [frequency, min_frequency, max_frequency])):
-            raise ValueError('You have input keyword arguments for both frequency and period.'
+            raise ValueError('You have input keyword arguments for both frequency and period. '
                              'Please only use one.')
 
         if (~np.isfinite(lc.flux)).any():
@@ -212,8 +232,6 @@ class Periodogram(object):
         if (period is not None) & (any([a is not None for a in [min_period, max_period]])):
             log.warning('You have passed a grid of periods, which overrides any period/frequency limit kwargs.')
 
-
-
         # Tidy up the period stuff...
         if max_period is not None:
             # min_frequency MUST be none by this point.
@@ -224,7 +242,6 @@ class Periodogram(object):
 #        # If the user specified a period, copy it into the frequency.
         if (period is not None):
             frequency = 1./period
-
 
         # Do unit conversions if user input min/max frequency or period
         if frequency is None:
@@ -442,7 +459,7 @@ class Periodogram(object):
             x0 += 0.5 * log_width
         return bkg / count
 
-    def flatten(self, log_width=0.01):
+    def flatten(self, log_width=0.01, return_trend=False):
         """Calculates the Signal-To-Noise spectrum of the power spectrum by
         dividing the power through by a background estimated using a moving
         filter in log10 space.
@@ -460,7 +477,13 @@ class Periodogram(object):
             signal-to-noise of the spectrum, assuming a simple estimate of the
             noise background using a moving filter in log10 space.
         """
-        snr_pg = self / self._estimate_background(log_width=log_width)
+        bkg = u.Quantity(self._estimate_background(log_width=log_width), self.power.unit)
+        snr_pg = self / bkg
+        if return_trend:
+            return Periodogram(snr_pg.frequency, bkg, nyquist = self.nyquist,
+                                    frequency_spacing = self.frequency_spacing, targetid=self.targetid,
+                                    label=self.label,
+                                    meta = self.meta)
         return SNR_Periodogram(snr_pg.frequency, snr_pg.power, nyquist = self.nyquist,
                                 frequency_spacing = self.frequency_spacing, targetid=self.targetid,
                                 label=self.label,
@@ -535,7 +558,7 @@ class Periodogram(object):
 
     def __add__(self, other):
         copy_self = copy.copy(self)
-        copy_self.power = copy_self.power + other
+        copy_self.power = copy_self.power + u.Quantity(other, self.power.unit)
         return copy_self
 
     def __radd__(self, other):
@@ -644,6 +667,9 @@ class SNR_Periodogram(Periodogram):
     """Defines a periodogram with different plotting defaults"""
     def __init__(self, *args, **kwargs):
         super(SNR_Periodogram, self).__init__(*args, **kwargs)
+
+    def __repr__(self):
+        return('SNRPeriodogram(ID: {})'.format(self.targetid))
 
     def plot(self, **kwargs):
         """Plot the SNR spectrum using matplotlib's `plot` method.
