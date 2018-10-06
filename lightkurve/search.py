@@ -131,22 +131,16 @@ class SearchResult(object):
         """
 
         """
-        if type == None:
+        if self.filetype == None:
             raise ValueError("Choose a filetype of 'Target Pixel' or 'Lightcurve'")
-        elif type == "tpf":
+        elif self.filetype == "tpf":
             filetype = "Target Pixel"
-        elif type == "lc":
+        elif self.filetype == "lc":
             filetype = "Lightcurve"
 
-        obsids = np.asarray(self.path['obsid'])
-        products = Observations.get_product_list(self.path)
-        order = [np.where(products['parent_obsid'] == o)[0] for o in obsids]
-        order = [item for sublist in order for item in sublist]
+        products = self.products
 
-        products = self._mask_products(products[order],filetype=filetype, campaign=self.campaign,
-                                       quarter=self.quarter, cadence=self.cadence, targetlimit=len(obsids))
-
-        path = Observations.download_products(products, mrp_only=False)['Local Path']
+        path = Observations.download_products(self.full_products, mrp_only=False)['Local Path']
 
         if type in ["tpf", "Target Pixel", "Target Pixel File"]:
             tpfs = [KeplerTargetPixelFile(p,
