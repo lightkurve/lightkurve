@@ -19,7 +19,7 @@ log = logging.getLogger(__name__)
 
 class SearchResult(object):
     """
-
+    Defines a generic SearchResult class returned by `search_tpf` or `search_lcf`.
     """
 
     def __init__(self, path, campaign=None, quarter=None, month=None, cadence=None,
@@ -35,12 +35,13 @@ class SearchResult(object):
 
     @property
     def targets(self):
+        """Returns a table of targets and their RA & dec values produced by search"""
         mask = ['target_name','s_ra','s_dec']
         return unique(self.path[mask], keys='target_name')
 
     @property
     def products(self):
-
+        """Returns a table of science products available to download"""
         obsids = np.asarray(self.path['obsid'])
         products = Observations.get_product_list(self.path)
         order = [np.where(products['parent_obsid'] == o)[0] for o in obsids]
@@ -56,27 +57,34 @@ class SearchResult(object):
 
     @property
     def mastID(self):
+        """Returns an array of MAST observation IDs"""
         return np.asarray(np.unique(self.path['obsid']), dtype='int')
 
     @property
     def target_name(self):
+        """Returns an array of target names"""
         return np.asarray(np.unique(self.path['target_name']))
 
     @property
     def ra(self):
+        """Returns an array of RA values for targets in search""""
         return np.asarray(self.path['s_ra'])
 
     @property
     def dec(self):
+        """Returns an array of dec values for targets in search""""
         return np.asarray(self.path['s_dec'])
 
     def download(self, **kwargs):
         """
-
+        Downloads a single KeplerTargetPixelFile or KeplerLightCurveFile object from search result.
+        If multiple files are present in `products`, only the first will be downloaded.
         """
 
+        # create products table
         products = self.products
 
+        # download first product in table
         path = Observations.download_products(self.full_products[:1], mrp_only=False)['Local Path']
 
         if len(self.full_products) != 1:
@@ -84,6 +92,7 @@ class SearchResult(object):
                         'downloaded. Please use `download_all()` or specify a campaign, quarter, or '
                         'cadence to limit your search.'.format(len(self.full_products)))
 
+        # return single tpf or lcf
         if self.filetype == "Target Pixel":
             return KeplerTargetPixelFile(path[0],
                                          quality_bitmask=self.quality_bitmask,
@@ -95,13 +104,16 @@ class SearchResult(object):
 
     def download_all(self, **kwargs):
         """
-
+        Downloads a KeplerTargetPixelFileCollection or KeplerLightCurveFileCollection from search results.
         """
 
+        # create products table
         products = self.products
 
+        # download all products in table
         path = Observations.download_products(self.full_products, mrp_only=False)['Local Path']
 
+        # return collection of tpf or lcf
         if self.filetype == "Target Pixel":
             tpfs = [KeplerTargetPixelFile(p,
                                          quality_bitmask=self.quality_bitmask,
@@ -116,7 +128,8 @@ class SearchResult(object):
     def _mask_products(self, products, filetype='Target Pixel', cadence='long', quarter=None,
                        month=None, campaign=None, searchtype='single', targetlimit=1):
         """
-
+        Masks contents of products table based on given `cadence`, `quarter`, `month`, `campaign`
+        constraints.
         """
         # Value for the quarter or campaign
         qoc = campaign if campaign is not None else quarter
@@ -241,9 +254,26 @@ class ArchiveError(Exception):
     """Raised if there is a problem accessing data."""
     pass
 
-def _search_mast(target, cadence='long', radius=.0001, targetlimit=None, **kwargs):
+def _query_mast(target, cadence='long', radius=.0001, targetlimit=None, **kwargs):
     """
+    Returns a table of Kepler or K2 Target Pixel Files or Lightcurve Files
+     for a given target.
 
+    Parameters
+    ----------
+    cadence: 'short' or 'long'
+        Specify short (1-min) or long (30-min) cadence data.
+    radius : float
+        Search radius in arcseconds
+    targetlimit : None or int
+        If multiple targets are present within `radius`, limit the number
+        of returned TargetPixelFile objects to `targetlimit`.
+        If `None`, no limit is applied.
+
+    Returns
+    -------
+    path : astropy.Table
+    Table detailing the available observations on MAST.
     """
 
     # If passed a SkyCoord, convert it to an RA and Dec
@@ -278,18 +308,18 @@ def _search_mast(target, cadence='long', radius=.0001, targetlimit=None, **kwarg
             ra = target_obs['s_ra'][0]
             dec = target_obs['s_ra'][0]
             path = Observations.query_criteria(coordinates='{} {}'.format(ra, dec),
-                                              radius='{} deg'.format(radius/3600),
-                                              project=["Kepler", "K2"],
-                                              obs_collection=["Kepler", "K2"])
+                                               radius='{} deg'.format(radius/3600),
+                                               project=["Kepler", "K2"],
+                                               obs_collection=["Kepler", "K2"])
         except ValueError:
             # If `target` did not look like a KIC or EPIC ID, then we let MAST
             # resolve the target name to a sky position. Convert radius from arcsec
             # to degrees for query_criteria().
             try:
                 path = Observations.query_criteria(objectname=target,
-                                                  radius='{} deg'.format(radius/3600),
-                                                  project=["Kepler", "K2"],
-                                                  obs_collection=["Kepler", "K2"])
+                                                   radius='{} deg'.format(radius/3600),
+                                                   project=["Kepler", "K2"],
+                                                   obs_collection=["Kepler", "K2"])
 
             except ResolverError as exc:
                 raise ArchiveError(exc)
@@ -302,8 +332,9 @@ def search_tpf(target, cadence='long', quarter=None, month=None,
                quality_bitmask='default', **kwargs):
 
     """
-    Fetch a data table for targets within a region of sky. Cone search is
+    Fetch a data table for Target Pixel Files within a region of sky. Cone search is
     centered around the position of `target` and extends to a given `radius`.
+    If no value is provided for `radius`, only a single target will be returned.
 
     See the :class:`KeplerQualityFlags` class for details on the bitmasks.
 
@@ -344,7 +375,8 @@ def search_tpf(target, cadence='long', quarter=None, month=None,
 
     filetype = "Target Pixel"
 
-    path = _search_mast(target, cadence='long', radius=radius, targetlimit=None)
+    # query mast for target (KIC/EPIC ID or skycoord value)
+    path = _query_mast(target, cadence='long', radius=radius, targetlimit=None)
 
     return SearchResult(path, campaign=campaign, quarter=quarter, month=month,
                         cadence=cadence, filetype=filetype, quality_bitmask=quality_bitmask)
@@ -354,8 +386,9 @@ def search_lcf(target, cadence='long', quarter=None, month=None,
                quality_bitmask='default', **kwargs):
 
     """
-    Fetch a data table for targets within a region of sky. Cone search is
+    Fetch a data table for Lightcurve Files within a region of sky. Cone search is
     centered around the position of `target` and extends to a given `radius`.
+    If no value is provided for `radius`, only a single target will be returned.
 
     See the :class:`KeplerQualityFlags` class for details on the bitmasks.
 
@@ -396,7 +429,8 @@ def search_lcf(target, cadence='long', quarter=None, month=None,
 
     filetype = "Lightcurve"
 
-    path = _search_mast(target, cadence='long', radius=radius, targetlimit=None)
+    # query mast for target (KIC/EPIC ID or skycoord value)
+    path = _query_mast(target, cadence='long', radius=radius, targetlimit=None)
 
     return SearchResult(path, campaign=campaign, quarter=quarter, month=month,
                         cadence=cadence, filetype=filetype, quality_bitmask=quality_bitmask)
