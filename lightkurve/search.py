@@ -67,12 +67,12 @@ class SearchResult(object):
 
     @property
     def ra(self):
-        """Returns an array of RA values for targets in search""""
+        """Returns an array of RA values for targets in search"""
         return np.asarray(self.path['s_ra'])
 
     @property
     def dec(self):
-        """Returns an array of dec values for targets in search""""
+        """Returns an array of dec values for targets in search"""
         return np.asarray(self.path['s_dec'])
 
     def download(self, **kwargs):
