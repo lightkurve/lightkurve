@@ -14,6 +14,7 @@ Direct contributions to the code base:
 - `Emma Turtelboom <https://github.com/Emmavt>`_
 - `Jeff Coughlin <https://github.com/JeffLCoughlin>`_
 - `Zachory K. Berta-Thompson <https://github.com/zkbt>`_
+- `Anand Sundaram <https://github.com/anand-sundaram-zocdoc>`_
 
 
 Comments, corrections & suggestions:
