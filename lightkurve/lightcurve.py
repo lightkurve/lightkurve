@@ -716,7 +716,7 @@ class LightCurve(object):
             legend_labels = ax.get_legend_handles_labels()
             if (np.sum([len(a) for a in legend_labels]) != 0):
                 ax.legend()
-                        
+
         return ax
 
     def plot(self, **kwargs):
