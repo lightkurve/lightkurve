@@ -151,7 +151,11 @@ class LightCurveCollection(Collection):
 
 class LightCurveFileCollection(Collection):
     """Class to hold a collection of LightCurveFile objects.
-
+    
+    Parameters
+    ----------
+    lightcurvefiles : array-like
+        List of KeplerLightCurveFile or TessLightCurveFile objects.
     """
 
     def __init__(self, lightcurvefiles):
