@@ -108,7 +108,7 @@ def test_error_messages():
     # No unitless periodograms
     with pytest.raises(ValueError) as err:
         Periodogram([0], [1])
-    assert err.value.args[0] == 'Power must have units.'
+    assert err.value.args[0] == 'Frequency must have units.'
 
     # No single value periodograms
     with pytest.raises(ValueError) as err:
