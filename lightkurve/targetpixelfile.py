@@ -47,112 +47,7 @@ class TargetPixelFile(object):
         else:
             self.hdu = fits.open(self.path, **kwargs)
         self.quality_bitmask = quality_bitmask
-        self.quality_mask = self._quality_mask(quality_bitmask)
         self.targetid = targetid
-
-    def get_sources(self, catalog=None, magnitude_limit=18, edge_tolerance=12):
-        """Returns a table of sources known to exist in the TPF file.
-
-
-          The sources are taken from one of the following supported catalogs:
-          - the Kepler Input Catalog (KIC);
-          - the K2 Eliptic Plane Input Catalog (EPIC);
-          - Gaia Data Release 2 (Gaia2)
-
-        Parameters
-        -----------
-        catalog: 'KIC', 'EPIC' or 'Gaia2'
-            Catalog to query. For Kepler target pixel files the default is 'KIC',
-            for K2 target pixel files the default is 'EPIC'.
-        magnitude_limit : int or float
-            Only return sources brighter than this magnitud
-            Defaults to 18 for both KIC/EPIC (Kp) and Gaia (Gmag).
-        edge_tolerance: float
-            Maximum distance (in arcseconds) a source may be located beyond
-            the edge of the target pixel file.
-
-        Returns
-        -------
-        result : astropy.table
-            Astropy table with the following columns:
-            - ID : Catalog ID from catalog.
-            - RA: Right ascension of data epoch [degrees] (KIC & EPIC & Gaia DR2)
-            - DEC: Declination of data epoch [degrees]    (KIC & EPIC & Gaia DR2)
-            - pmRA: Proper motion for right ascension [mas/year]
-            - pmDEC: Proper motion for declination [mas/year]
-            - Kpmag: Magnitude in Kepler band [mag] (KIC & EPIC)
-            - Gmag: Magnitude in Gaia band [mag]  (Gaia)
-            - column: Pixel column coordinate [pix]
-            - row: Pixel row coordinate [pix]
-            - predicted_flux: Predicted flux of source [e-/s]
-            - epoch: Epoch of data [years]
-        """
-        if catalog is None:
-            if self.mission == 'Kepler':
-                catalog = 'KIC'
-            elif self.mission == 'K2':
-                catalog = 'EPIC'
-            else:
-                raise ValueError('Please provide a catalog (KIC, EPIC, or GaiaDR2).')
-        if catalog == 'Gaia2':
-            catalog_epoch = 2015.5
-        else:
-            catalog_epoch = 2000.0
-
-        if edge_tolerance < 12:
-            log.warning('Edge tolerance is less than 3 pixels (12 arcsec). '
-                        'Bright sources near the edge of the Target Pixel File '
-                        'may not be included.')
-        # Tolerance can't be smaller than 12 or the code below will break
-        if edge_tolerance < 12:
-            edge_tolerance = 12
-
-# Query the catalog around the center of the TPF
-        cent = SkyCoord(ra=self.ra, dec=self.dec, frame='icrs', unit=(u.deg, u.deg))
-        radius = ((np.max(self.flux.shape[1:2]) * 4) + edge_tolerance) * u.arcsec
-        sky_catalog = query_catalog(cent, radius=radius, catalog=catalog)
-        catalog_skycoords = SkyCoord(ra=sky_catalog['ra'], dec=sky_catalog['dec'],
-                                     frame='icrs', unit=(u.deg, u.deg))
-
-         # Obtain the celestial coordinates of all pixels across all cadences
-        not_nan = np.any(np.isfinite(self.flux), axis=0)
-        pixels_ra, pixels_dec = self.get_coordinates(cadence=int(len(self.cadenceno) / 2))
-        pixels_radec = np.asarray([pixels_ra[not_nan].ravel(), pixels_dec[not_nan].ravel()])
-        sky_pixel_pairs = SkyCoord(ra=pixels_radec[0], dec=pixels_radec[1],
-                                   frame='icrs', unit=(u.deg, u.deg))
-
-        # Create a `separation_mask` which is True for the sources in the catalog
-        # which which are separated by less than `edge_tolerance` from any pixel
-        is_source_in_tpf = np.zeros(len(sky_catalog), dtype=bool)
-        for idx in range(len(source_list)):
-            sep = sky_pixel_pairs.separation(catalog_skycoords[idx])
-            is_source_in_tpf[idx] = np.any(sep.arcsec <= edge_tolerance)
-        is_source_in_tpf = np.array(is_source_in_tpf, dtype=bool)
-
-         # Also apply the magnitude limit
-        source_list = sky_catalog[is_source_in_tpf & (sky_catalog['mag'] < magnitude_limit)]
-        # Transform coordinates to median epoch of data
-        tpf_epoch = np.median(self.astropy_time.byear)
-        has_pm = ~(source_list['pmra'].mask | source_list['pmdec'].mask)
-        source_list['ra'][has_pm] += (tpf_epoch - catalog_epoch) * (source_list['pmra'][has_pm].to(u.degree/u.year)) # mas to degree
-        source_list['dec'][has_pm] += (tpf_epoch - catalog_epoch) * (source_list['pmdec'][has_pm].to(u.degree/u.year)) # mas to degree
-
-        col_transform, row_transform = self.wcs.wcs_world2pix(source_list['ra'], source_list['dec'], 0)
-
-        # Create extra columns in source_list
-        column = Column(col_transform + self.column + np.nanmedian(self.pos_corr1), name='column', unit=u.pixel)
-        row = Column(row_transform + self.row + np.nanmedian(self.pos_corr2), name='row', unit=u.pixel)
-        source_flux = Column(kpmag_to_flux(source_list['mag']), name='predicted_flux', unit=(u.electron/u.second))
-        epoch = Column([tpf_epoch] * len(column), name='epoch', unit=(u.year))
-        source_list.add_columns([source_flux, column, row, epoch])
-
-        if catalog == 'Gaia2':
-            source_list.rename_column('mag', 'Gmag')
-        else:
-            source_list.rename_column('mag', 'Kpmag')
-
-        return source_list
-
 
     @property
     def hdu(self):
@@ -261,6 +156,121 @@ class TargetPixelFile(object):
         if cadence is not 'all':
             return ra[cadence], dec[cadence]
         return ra, dec
+
+    def _validate_wcs(self):
+        '''Validates the WCS object. Returns False if WCS is invalid.
+        '''
+        # Find target RA and Dec, use WCS to find the pixel location
+        x, y = self.wcs.wcs_world2pix(np.asarray([[self.ra], [self.dec]]).T, 0).T
+        # Must be included within the TPF
+        validation = (x > 0) & (x <= self.flux.shape[2]) & (y > 0) & (y < self.flux.shape[1])
+        return validation
+
+
+    def get_sources(self, catalog=None, magnitude_limit=18):
+        """Returns a table of sources known to exist in the TPF file.
+
+
+          The sources are taken from one of the following supported catalogs:
+          - the Kepler Input Catalog (KIC);
+          - the K2 Eliptic Plane Input Catalog (EPIC);
+          - Gaia Data Release 2 (Gaia2)
+
+        Parameters
+        -----------
+        catalog: 'KIC', 'EPIC' or 'Gaia2'
+            Catalog to query. For Kepler target pixel files the default is 'KIC',
+            for K2 target pixel files the default is 'EPIC'.
+        magnitude_limit : int or float
+            Only return sources brighter than this magnitud
+            Defaults to 18 for both KIC/EPIC (Kp) and Gaia (Gmag).
+
+        Returns
+        -------
+        result : astropy.table
+            Astropy table with the following columns:
+            - ID : Catalog ID from catalog.
+            - RA: Right ascension of data epoch [degrees] (KIC & EPIC & Gaia DR2)
+            - DEC: Declination of data epoch [degrees]    (KIC & EPIC & Gaia DR2)
+            - pmRA: Proper motion for right ascension [mas/year]
+            - pmDEC: Proper motion for declination [mas/year]
+            - Kpmag: Magnitude in Kepler band [mag] (KIC & EPIC)
+            - Gmag: Magnitude in Gaia band [mag]  (Gaia)
+            - column: Pixel column coordinate [pix]
+            - row: Pixel row coordinate [pix]
+            - predicted_flux: Predicted flux of source [e-/s]
+            - epoch: Epoch of data [years]
+        """
+        if catalog is None:
+            if self.mission == 'Kepler':
+                catalog = 'kic'
+            elif self.mission == 'K2':
+                catalog = 'epic'
+            else:
+                raise ValueError('Please provide a catalog (KIC, EPIC, or Gaia2).')
+
+        if catalog.lower() not in ['kic', 'epic', 'gaia2']:
+            raise ValueError('Please provide a catalog (KIC, EPIC, or Gaia2).')
+
+        # EPIC and KIC are in J2000
+        catalog_epoch = 2000.0
+        if catalog == 'gaia2':
+            # But Gaia is J2015.5
+            catalog_epoch = 2015.5
+
+        # Query the catalog around the center of the TPF
+        cent = SkyCoord(ra=self.ra, dec=self.dec, frame='icrs', unit=(u.deg, u.deg))
+        radius = ((np.max(self.flux.shape[1:2]) * 4) + 12) * u.arcsec
+        sky_catalog = query_catalog(cent, radius=radius, catalog=catalog.lower())
+        catalog_skycoords = SkyCoord(ra=sky_catalog['ra'], dec=sky_catalog['dec'],
+                                     frame='icrs', unit=(u.deg, u.deg))
+
+         # Obtain the celestial coordinates of all pixels across all cadences
+        not_nan = np.any(np.isfinite(self.flux), axis=0)
+        pixels_ra, pixels_dec = self.get_coordinates(cadence=int(len(self.cadenceno) / 2))
+        pixels_radec = np.asarray([pixels_ra[not_nan].ravel(), pixels_dec[not_nan].ravel()])
+        sky_pixel_pairs = SkyCoord(ra=pixels_radec[0], dec=pixels_radec[1],
+                                   frame='icrs', unit=(u.deg, u.deg))
+
+        # Create a `separation_mask` which is True for the sources in the catalog
+        is_source_in_tpf = np.zeros(len(sky_catalog), dtype=bool)
+        for idx in range(len(catalog_skycoords)):
+            sep = sky_pixel_pairs.separation(catalog_skycoords[idx])
+            is_source_in_tpf[idx] = np.any(sep.arcsec <= 4)
+        is_source_in_tpf = np.array(is_source_in_tpf, dtype=bool)
+
+         # Also apply the magnitude limit
+        source_list = sky_catalog[is_source_in_tpf & (sky_catalog['mag'] < magnitude_limit)]
+
+        # Factor in proper motion, use the median epoch of data
+        tpf_epoch = np.nanmedian(self.astropy_time.byear)
+        has_pm  = np.isfinite(source_list['pmra']) & np.isfinite(source_list['pmdec'])
+        source_list[has_pm]['ra'] += (tpf_epoch - catalog_epoch) * (source_list[has_pm]['pmra'].to(u.degree/u.year)) # mas to degree
+        source_list[has_pm]['dec'] += (tpf_epoch - catalog_epoch) * (source_list[has_pm]['pmdec'].to(u.degree/u.year)) # mas to degree
+
+        # Create pixel locations
+        if self._validate_wcs():
+            col_transform, row_transform = self.wcs.wcs_world2pix(source_list['ra'], source_list['dec'], 0)
+            p1, p2 = np.nanmedian(self.pos_corr1), np.nanmedian(self.pos_corr2)
+            if ~np.isfinite(p1):
+                p1 = 0
+            if ~np.isfinite(p2):
+                p2 = 0
+            column = Column(col_transform + self.column + p1, name='column', unit=u.pixel)
+            row = Column(row_transform + self.row + p2, name='row', unit=u.pixel)
+        else:
+            column = np.zeros(len(source_list)) * np.nan
+            row = np.zeros(len(source_list)) * np.nan
+
+        source_flux = Column(kpmag_to_flux(source_list['mag']), name='predicted_flux', unit=(u.electron/u.second))
+        epoch = Column([tpf_epoch] * len(column), name='epoch', unit=(u.year))
+        source_list.add_columns([source_flux, column, row, epoch])
+
+        if catalog.lower() == 'gaia2':
+            source_list.rename_column('mag', 'Gmag')
+        else:
+            source_list.rename_column('mag', 'Kpmag')
+        return source_list
 
 
     @property
@@ -525,15 +535,17 @@ class TargetPixelFile(object):
                 else:
                     attrs[attr]['print'] = '{}'.format(type(res))
                     attrs[attr]['type'] = 'other'
-        output = Table(names=['Attribute', 'Description'], dtype=[object, object])
+        output = Table(names=['Attribute', 'Description', 'Type'], dtype=[object, object, object])
         idx = 0
         types = ['int', 'str', 'list', 'array', 'other']
         for typ in types:
             for attr, dic in attrs.items():
                 if dic['type'] == typ:
-                    output.add_row([attr, dic['print']])
+                    output.add_row([attr, dic['print'], typ])
                     idx += 1
-        output.pprint(max_lines=-1, max_width=-1)
+        output = output.to_pandas()
+        output = output.set_index('Attribute')
+        return output
 
     def to_lightcurve(self, method='aperture', **kwargs):
         """Performs photometry.

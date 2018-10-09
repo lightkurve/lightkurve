@@ -210,7 +210,9 @@ class LightCurve(object):
                 if dic['type'] == typ:
                     output.add_row([attr, dic['print']])
                     idx += 1
-        output.pprint(max_lines=-1, max_width=-1)
+        output = output.to_pandas()
+        output = output.set_index('Attribute')
+        return output
 
     def append(self, others):
         """

@@ -489,7 +489,7 @@ def query_catalog(coordinate, catalog="KIC", radius=30.):
         v = Vizier(catalog=[vizier_id], columns=supported_catalogs[catalog]['cols'])
         result = v.query_region(coordinate, radius=radius, catalog=vizier_id)
         if len(result) == 0:
-            log.info('No sources found in queried region. Try another catalog.')
+            raise ValueError('No sources found in queried region. Try another catalog.')
 
         # Rename columns to be uniform for all catalogs
         new_pars = ['id', 'ra', 'dec', 'pmra', 'pmdec', 'mag']
