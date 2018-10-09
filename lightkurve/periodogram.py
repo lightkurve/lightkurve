@@ -488,6 +488,17 @@ class Periodogram(object):
                                 label=self.label,
                                 meta = self.meta)
 
+    def to_table(self):
+        """Export the Periodogram as an AstroPy Table.
+        Returns
+        -------
+        table : `astropy.table.Table` object
+            An AstroPy Table with columns 'frequency', 'period', and 'power'.
+        """
+        return Table(data=(self.frequency, self.period, self.power),
+                     names=('frequency', 'period', 'power'),
+                     meta=self.meta)
+                     
     def __repr__(self):
         return('Periodogram(ID: {})'.format(self.targetid))
 
