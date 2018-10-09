@@ -295,10 +295,15 @@ def _query_mast(target, cadence='long', radius=.0001, targetlimit=None, **kwargs
                 target_name = 'ktwo{:09d}'.format(target)
             else:
                 raise ValueError("{:09d}: not in the KIC or EPIC ID range".format(target))
+
+            # query_criteria does not allow a cone search when target_name is passed in
+            # so first grab desired target with ~0 arcsecond radius
             target_obs = Observations.query_criteria(target_name=target_name,
                                                      radius='{} deg'.format(.0001),
                                                      project=["Kepler", "K2"],
                                                      obs_collection=["Kepler", "K2"])
+            # check if a cone search is being performed
+            # if yes, perform a cone search around coordinates of desired target
             if radius < 1:
                 path = target_obs
             else:
@@ -308,6 +313,7 @@ def _query_mast(target, cadence='long', radius=.0001, targetlimit=None, **kwargs
                                                    radius='{} deg'.format(radius/3600),
                                                    project=["Kepler", "K2"],
                                                    obs_collection=["Kepler", "K2"])
+                # if a cone search has been performed, targets will be sorted by `distance`
                 path.sort('distance')
         except ValueError:
             # If `target` did not look like a KIC or EPIC ID, then we let MAST
@@ -321,6 +327,7 @@ def _query_mast(target, cadence='long', radius=.0001, targetlimit=None, **kwargs
             except ResolverError as exc:
                 raise ArchiveError(exc)
 
+    # only take the nearest targets up to `targetlimit`
     if targetlimit is not None:
         path = path[:targetlimit]
     return path
