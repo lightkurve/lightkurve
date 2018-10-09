@@ -6,6 +6,7 @@ import pytest
 
 from astropy.coordinates import SkyCoord
 import astropy.units as u
+from numpy.testing import assert_almost_equal
 
 from ..search import search_lcf, search_tpf, ArchiveError
 from .. import log
@@ -65,3 +66,36 @@ def test_collections():
     assert(len(search_tpf(205998445, radius=900).download_all()) == 4)
     # LightCurveFileCollection class
     assert(len(search_lcf(205998445, radius=900).download_all()) == 4)
+
+@pytest.mark.remote_data
+def test_properties():
+    c = SkyCoord('297.5835 40.98339', unit=(u.deg, u.deg))
+    assert_almost_equal(search_tpf(c, quarter=6).ra, 297.5835)
+    assert_almost_equal(search_tpf(c, quarter=6).dec, 40.98339)
+    assert(len(search_tpf(c, quarter=6, quality_bitmask='best').target_name) == 1)
+    assert(len(search_tpf(c, quarter=6, quality_bitmask='best').mastID) == 1)
+
+@pytest.mark.remote_data
+def test_verbosity(capfd):
+    # Verbose
+    log.setLevel('DEBUG')
+    search_tpf(5728079, quarter=1).download()
+    out, err = capfd.readouterr()
+    assert log.isEnabledFor(logging.DEBUG)
+    assert len(out) > 0
+    # Non-verbose
+    log.setLevel('ERROR')
+    search_tpf(5728079, quarter=1).download()
+    out, err = capfd.readouterr()
+    assert log.isEnabledFor(logging.ERROR)
+    assert not log.isEnabledFor(logging.DEBUG)
+
+@pytest.mark.remote_data
+def test_source_confusion():
+    # Regression test for issue #148.
+    # When obtaining the TPF for target 6507433, @benmontet noticed that
+    # a target 4 arcsec away was returned instead.
+    # See https://github.com/KeplerGO/lightkurve/issues/148
+    desired_target = 6507433
+    tpf = search_tpf(desired_target, quarter=8).download()
+    assert tpf.targetid == desired_target
