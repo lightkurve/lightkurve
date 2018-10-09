@@ -64,8 +64,8 @@ def test_month():
 def test_collections():
     # TargetPixelFileCollection class
     assert(len(search_tpf(205998445, radius=900).download_all()) == 4)
-    # LightCurveFileCollection class
-    assert(len(search_lcf(205998445, radius=900).download_all()) == 4)
+    # LightCurveFileCollection class with set targetlimit
+    assert(len(search_lcf(205998445, radius=900, targetlimit=3).download_all()) == 3)
 
 @pytest.mark.remote_data
 def test_properties():
