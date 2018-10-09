@@ -298,14 +298,14 @@ class KeplerLightCurveFile(LightCurveFile):
                 quarter=quarter, campaign=campaign, month=month,
                 searchtype='cone', radius=radius, targetlimit=targetlimit)
         if len(path) == 1:
-            lightcurvefiles = [LightCurveFile(path[0],
+            lightcurvefiles = [KeplerLightCurveFile(path[0],
                                               quality_bitmask=quality_bitmask,
                                               **kwargs)]
             log.warning('Warning: only one target found within provided radius. '
                         'Try increasing the search radius. (Radius currently '
                         'set to {} arcseconds)'.format(radius))
         else:
-            lightcurvefiles = [LightCurveFile(p, quality_bitmask=quality_bitmask,
+            lightcurvefiles = [KeplerLightCurveFile(p, quality_bitmask=quality_bitmask,
                                **kwargs) for p in path]
         return LightCurveFileCollection(lightcurvefiles)
 
