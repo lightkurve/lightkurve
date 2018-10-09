@@ -759,6 +759,19 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                 flux_err=flux_bkg_err,
                                 **keys)
 
+    def get_local_bkg_est(self):
+        """ Returns an estimate of the local background flux for a given
+        TargetPixelFile as an array of the same dimensions as the TargetPixelFile.
+        """
+        # Mask the upper half of the flux data to exclude star fluxes from bkg estimate
+        clipped_flux = np.ma.masked_where(self.flux > np.percentile(self.flux, 50), self.flux)
+        bkg_est = []
+        for cadence in clipped_flux:
+            # Set background flux as the median of the clipped flux for each cadence
+            cadence_bkg = bkg_est.append(np.full(self.shape[1:],np.ma.median(cadence)))
+        local_bkg_est = np.stack(bkg_est, axis=0)
+        return local_bkg_est
+
     def get_model(self, star_priors=None, **kwargs):
         """Returns a default `TPFModel` object for PRF fitting.
 
