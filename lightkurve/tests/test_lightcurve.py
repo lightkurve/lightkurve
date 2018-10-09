@@ -534,3 +534,13 @@ def test_targetid():
     # Does it work for TESS?
     lc = TessLightCurve(time=[], targetid=20)
     assert lc.targetid == 20
+
+def test_lightcurve_from_archive():
+    """KeplerLightCurve.from_archive() is not implemented."""
+
+    err_string = ("KeplerLightCurve.from_archive() is not available."
+                  " Use KeplerLightCurveFile.from_archive() instead.")
+
+    with pytest.raises(ValueError) as err:
+        KeplerLightCurve.from_archive('Kepler-10')
+    assert err_string == err.value.args[0]
