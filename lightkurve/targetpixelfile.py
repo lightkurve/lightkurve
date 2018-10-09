@@ -373,10 +373,6 @@ class TargetPixelFile(object):
             elif aperture_mask == 'pipeline':
                 aperture_mask = self.pipeline_mask
             elif aperture_mask == 'threshold':
-                if 'threshold' in kwargs:
-                    threshold = kwargs['threshold']
-                else:
-                    threshold = 3.
                 aperture_mask = self._threshold_mask(threshold)
         self._last_aperture_mask = aperture_mask
         return aperture_mask
@@ -405,24 +401,16 @@ class TargetPixelFile(object):
         """
 
         # calculate a median image
-        median_image = np.nanmedian(self.flux + self.flux_bkg, axis=0)
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            median_image = np.nanmedian(self.flux, axis=0)
         vals = median_image[np.isfinite(median_image)].flatten()
-
         # calculate what the theshold value is in counts
-        mad_cut = (1.4826 * MAD(vals) * threshold) + np.median(median_image)
+        mad_cut = (1.4826 * MAD(vals) * threshold) + np.nanmedian(median_image)
 
-        # identify pixel above the threshold and label contiguous regions
-        threshold_region = np.where(median_image > mad_cut, 1, 0)
-        labeled_values = label(threshold_region)[0]
-
-        # Find brightest pixel
-        brightest_pixel = np.unravel_index(median_image.argmax(),
-                                            median_image.shape)
-        brightest_pixel_y, brightest_pixel_x = brightest_pixel
-
-        region_value = labeled_values[brightest_pixel_y, brightest_pixel_x]
-        aperture_mask = np.where(labeled_values == region_value, 1, 0)
-        return aperture_mask.astype(bool)
+        # identify pixel above the threshold
+        threshold_region = np.nan_to_num(median_image) > mad_cut
+        return threshold_region
 
     def estimate_centroids(self, aperture_mask='pipeline'):
         """Returns centroid positions estimated using sample moments.

@@ -400,9 +400,13 @@ def plot_image(image, ax=None, scale='linear', origin='lower',
     """
     if ax is None:
         _, ax = plt.subplots()
+<<<<<<< HEAD
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", RuntimeWarning)  # ignore image NaN values
         vmin, vmax = PercentileInterval(95.).get_limits(image[image > 0])
+=======
+    vmin, vmax = PercentileInterval(95.).get_limits(image[np.nan_to_num(image) > 0])
+>>>>>>> added a unit test
 
     norm = None
     if scale is not None:
