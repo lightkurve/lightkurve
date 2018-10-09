@@ -76,21 +76,6 @@ def test_properties():
     assert(len(search_tpf(c, quarter=6, quality_bitmask='best').mastID) == 1)
 
 @pytest.mark.remote_data
-def test_verbosity(capfd):
-    # Verbose
-    log.setLevel('DEBUG')
-    search_tpf(5728079, quarter=1).download()
-    out, err = capfd.readouterr()
-    assert log.isEnabledFor(logging.DEBUG)
-    assert len(out) > 0
-    # Non-verbose
-    log.setLevel('ERROR')
-    search_tpf(5728079, quarter=1).download()
-    out, err = capfd.readouterr()
-    assert log.isEnabledFor(logging.ERROR)
-    assert not log.isEnabledFor(logging.DEBUG)
-
-@pytest.mark.remote_data
 def test_source_confusion():
     # Regression test for issue #148.
     # When obtaining the TPF for target 6507433, @benmontet noticed that
