@@ -305,21 +305,26 @@ def running_mean(data, window_size):
     return (cumsum[window_size:] - cumsum[:-window_size]) / float(window_size)
 
 
-def bkjd_to_astropy_time(bkjd, bjdref=2454833.):
+def bkjd_to_astropy_time(bkjd, bkjdcorr, timeslice, bjdref=2454833.):
     """Converts BKJD time values to an `astropy.time.Time` object.
 
-    Kepler Barycentric Julian Day (BKJD) is a Julian day minus 2454833.0
-    (UTC=January 1, 2009 12:00:00) and corrected to the arrival times
+    The time recorded by Kepler is the Kepler Barycentric Julian Day (BKJD) minus
+    the Julian day 2454833.0 (UTC=January 1, 2009 12:00:00) and corrected to the arrival times
     at the barycenter of the Solar System.
     BKJD is the format in which times are recorded in the Kepler data products.
     The time is in the Barycentric Dynamical Time frame (TDB), which is a
     time system that is not affected by leap seconds.
-    See Section 2.3.2 in the Kepler Archive Manual for details.
+    To convert to JD and an astropy.time.Time object we must follow the procedure in
+    Section 2.3.2 in the Kepler Archive Manual. This procedure will convert BJD to JD.
 
     Parameters
     ----------
     bkjd : array of floats
         Barycentric Kepler Julian Day.
+    bkjdcorr : array of floats
+        The calculated barycenter correction factor.
+    timeslice : float
+        Time-slice readout sequence section.
     bjdref : float
         BJD reference date, for Kepler this is 2454833.
 
@@ -328,7 +333,7 @@ def bkjd_to_astropy_time(bkjd, bjdref=2454833.):
     time : astropy.time.Time object
         Resulting time object
     """
-    jd = bkjd + bjdref
+    jd = bkjd + bjdref - bkjdcorr + (0.25 + 0.62 * (5 - timeslice)) / (86400)
     # Some data products have missing time values;
     # we need to set these to zero or `Time` cannot be instantiated.
     jd[~np.isfinite(jd)] = 0
