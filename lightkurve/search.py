@@ -84,8 +84,13 @@ class SearchResult(object):
         # create products table
         products = self.products
 
+        # check if download directory exists
+        if not os.path.isdir(os.path.expanduser('~')+'/.astropy'):
+            os.mkdir(os.path.expanduser('~')+'/.astropy')
         # download first product in table
-        path = Observations.download_products(self.full_products[:1], mrp_only=False)['Local Path']
+        download_dir = os.path.expanduser('~')+'/.astropy'
+        path = Observations.download_products(self.full_products[:1], mrp_only=False,
+                                              download_dir=download_dir)['Local Path']
 
         if len(self.full_products) != 1:
             log.warning('Warning: {} files available to download. Only the first file has been '
@@ -110,8 +115,15 @@ class SearchResult(object):
         # create products table
         products = self.products
 
+        # check if download directory exists
+        if not os.path.isdir(os.path.expanduser('~')+'/.astropy'):
+            os.mkdir(os.path.expanduser('~')+'/.astropy')
+        # download first product in table
+        download_dir = os.path.expanduser('~')+'/.astropy'
+
         # download all products in table
-        path = Observations.download_products(self.full_products, mrp_only=False)['Local Path']
+        path = Observations.download_products(self.full_products, mrp_only=False,
+                                              download_dir=download_dir)['Local Path']
 
         # return collection of tpf or lcf
         if self.filetype == "Target Pixel":
