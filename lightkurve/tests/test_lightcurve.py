@@ -9,8 +9,7 @@ from numpy.testing import (assert_almost_equal, assert_array_equal,
                            assert_allclose)
 import pytest
 
-from ..lightcurve import (LightCurve, KeplerLightCurve, TessLightCurve,
-                          iterative_box_period_search)
+from ..lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
 from ..lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
 
 # 8th Quarter of Tabby's star
@@ -183,6 +182,7 @@ def test_lightcurve_plots():
         lcf.SAP_FLUX.plot()
         lcf.SAP_FLUX.plot(normalize=False, title="Not the default")
         lcf.SAP_FLUX.scatter()
+        lcf.SAP_FLUX.scatter(c='C3')
         lcf.SAP_FLUX.scatter(c=lcf.SAP_FLUX.time, show_colorbar=True, colorbar_label='Time')
         lcf.SAP_FLUX.errorbar()
         plt.close('all')
@@ -265,19 +265,6 @@ def test_normalize():
     lc = LightCurve(time=np.arange(10), flux=5*np.ones(10), flux_err=0.05*np.ones(10))
     assert_allclose(np.median(lc.normalize().flux), 1)
     assert_allclose(np.median(lc.normalize().flux_err), 0.05/5)
-
-
-@pytest.mark.remote_data
-def test_iterative_box_period_search():
-    """Can we recover the orbital period of Kepler-10b?"""
-    answer = 0.837495  # wikipedia
-    klc = KeplerLightCurveFile(KEPLER10)
-    pdc = klc.PDCSAP_FLUX
-    flat, trend = pdc.flatten(return_trend=True)
-
-    _, _, kepler10b_period = iterative_box_period_search(flat, min_period=.5, max_period=1,
-                                                         nperiods=101, period_scale='log')
-    assert abs(kepler10b_period - answer) < 1e-2
 
 
 def test_to_pandas():
@@ -450,6 +437,11 @@ def test_remove_outliers():
     lc_clean, outlier_mask = lc.remove_outliers(sigma=1, return_mask=True)
     assert(len(outlier_mask) == len(lc.flux))
     assert(outlier_mask.sum() == 1)
+    # Can we set sigma_lower and sigma_upper?
+    lc = LightCurve(time=[1, 2, 3, 4, 5], flux=[1, 1000, 1, -1000, 1])
+    lc_clean = lc.remove_outliers(sigma_lower=float('inf'), sigma_upper=1)
+    assert_array_equal(lc_clean.time, [1, 3, 4, 5])
+    assert_array_equal(lc_clean.flux, [1, 1, -1000, 1])
 
 
 @pytest.mark.remote_data

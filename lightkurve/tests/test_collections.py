@@ -2,6 +2,10 @@ import pytest
 from astropy.utils.data import get_pkg_data_filename
 import matplotlib.pyplot as plt
 import numpy as np
+from ..lightcurve import LightCurve
+from ..targetpixelfile import KeplerTargetPixelFile
+from astropy.utils.data import get_pkg_data_filename
+import numpy as np
 
 from ..lightcurve import LightCurve
 from ..targetpixelfile import KeplerTargetPixelFile
@@ -20,7 +24,6 @@ def test_collection_init():
     str(lcc)  # Does repr work?
     lcc.plot()
     plt.close('all')
-
 
 def test_collection_append():
     """Does Collection.append() work?"""
@@ -85,4 +88,5 @@ def test_tpfcollection():
     tpf3 = KeplerTargetPixelFile(filename_tpf_one_center, targetid=55)
     tpfc[1] = tpf3
     assert(tpfc[1] == tpf3)
-    str(tpfc)  # Does repr work?
+    tpfc.append(tpf2)
+    assert(tpfc[2] == tpf2)

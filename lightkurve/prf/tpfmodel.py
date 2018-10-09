@@ -406,8 +406,10 @@ class TPFModel(object):
                  background_prior=BackgroundPrior(),
                  focus_prior=FocusPrior(),
                  motion_prior=MotionPrior(),
-                 prfmodel=KeplerPRF(1, shape=(10, 10), column=0, row=0),
+                 prfmodel=None,
                  fit_background=True, fit_focus=False, fit_motion=False):
+        if prfmodel is None:
+            prfmodel = KeplerPRF(1, shape=(10, 10), column=0, row=0)
         self.star_priors = star_priors
         self.background_prior = background_prior
         self.focus_prior = focus_prior
