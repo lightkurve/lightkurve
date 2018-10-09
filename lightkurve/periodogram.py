@@ -371,7 +371,7 @@ class Periodogram(object):
             ylabel = "Power Spectral Density [{}]".format(self.power.unit.to_string('latex'))
 
         # This will need to be fixed with housekeeping. Self.label currently doesnt exist.
-        if ('label' not in kwargs) and ('label' in self.__dir__()):
+        if ('label' not in kwargs) and ('label' in dir(self)):
             kwargs['label'] = self.label
 
         with plt.style.context(style):
@@ -475,6 +475,17 @@ class Periodogram(object):
             return snr, bkg
         return snr
 
+    def to_table(self):
+        """Export the Periodogram as an AstroPy Table.
+        Returns
+        -------
+        table : `astropy.table.Table` object
+            An AstroPy Table with columns 'frequency', 'period', and 'power'.
+        """
+        return Table(data=(self.frequency, self.period, self.power),
+                     names=('frequency', 'period', 'power'),
+                     meta=self.meta)
+                     
     def __repr__(self):
         return('Periodogram(ID: {})'.format(self.targetid))
 
