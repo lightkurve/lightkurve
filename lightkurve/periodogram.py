@@ -13,6 +13,7 @@ from astropy.table import Table
 from astropy.io import fits
 from astropy.stats import LombScargle
 from scipy.ndimage.filters import gaussian_filter
+from astropy import __version__
 from scipy import interpolate
 
 
@@ -276,10 +277,14 @@ class Periodogram(object):
             method = 'slow'
             log.warning('You have passed an evenly-spaced grid of periods. These are not evenly spaced in frequency space.\n Method has been set to "slow" to allow for this.')
 
-
-        LS = LombScargle(time, lc.flux * 1e6,
-                            nterms=nterms, normalization='psd', **kwargs)
-        power = LS.power(frequency, method=method)
+        if float(__version__[0]) >= 3:
+            LS = LombScargle(time, lc.flux * 1e6,
+                                nterms=nterms, normalization='psd', **kwargs)
+            power = LS.power(frequency, method=method)
+        else:
+            LS = LombScargle(time, lc.flux * 1e6,
+                                nterms=nterms, **kwargs)
+            power = LS.power(frequency, method=method, normalization='psd')
 
         #Normalise the according to Parseval's theorem
         norm = np.std(lc.flux * 1e6)**2 / np.sum(power)
