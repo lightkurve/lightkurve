@@ -445,14 +445,15 @@ def test_remove_outliers():
 
 
 @pytest.mark.remote_data
-def test_properties(capfd):
+def test_properties():
     '''Test if the describe function produces an output.
     The output is 624 characters at the moment, but we might add more properties.'''
     lcf = KeplerLightCurveFile(TABBY_Q8)
     kplc = lcf.get_lightcurve('SAP_FLUX')
-    kplc.properties()
-    out, err = capfd.readouterr()
-    assert len(out) > 500
+    k = kplc.properties()
+    assert isinstance(p, pd.core.frame.DataFrame)
+    assert (len(p) > 3)
+
 
 
 def test_flatten_with_nans():

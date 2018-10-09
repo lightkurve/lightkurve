@@ -7,6 +7,7 @@ import astropy.units as u
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy.testing import assert_array_equal
+import pandas as pd
 import pytest
 import tempfile
 
@@ -341,14 +342,13 @@ def test_tpf_from_images():
                                                         position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
 
 
-def test_properties2(capfd):
+def test_properties2():
     '''Test if the describe function produces an output.
     The output is 1870 characters at the moment, but we might add more properties.'''
     tpf = KeplerTargetPixelFile(filename_tpf_all_zeros)
-    tpf.properties()
-    out, err = capfd.readouterr()
-    assert len(out) > 1000
-
+    p = tpf.properties()
+    assert isinstance(p, pd.core.frame.DataFrame)
+    assert (len(p) > 3)
 
 def test_interact():
     """Test the Jupyter notebook interact() widget."""
