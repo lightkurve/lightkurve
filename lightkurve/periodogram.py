@@ -483,64 +483,6 @@ class Periodogram(object):
                                 label=self.label,
                                 meta = self.meta)
 
-    def to_table(self):
-        """Export the Periodogram as an AstroPy Table.
-        Returns
-        -------
-        table : `astropy.table.Table` object
-            An AstroPy Table with columns 'frequency', 'period', and 'power'.
-        """
-        return Table(data=(self.frequency, self.period, self.power),
-                     names=('frequency', 'period', 'power'),
-                     meta=self.meta)
-
-    def to_pandas(self, columns=['frequency', 'power']):
-        """Export the Periodogram as a Pandas DataFrame.
-        Parameters
-        ----------
-        columns : list of str
-            List of columns to include in the DataFrame.  The names must match
-            attributes of the `Periodogram` object (i.e. `frequency`, `power`)
-        Returns
-        -------
-        dataframe : `pandas.DataFrame` object
-            A dataframe indexed by `frequency` and containing the columns `power`
-            and `period`.
-        """
-        try:
-            import pandas as pd
-        # lightkurve does not require pandas, so check for import success.
-        except ImportError:
-            raise ImportError("You need to install pandas to use the "
-                              "LightCurve.to_pandas() method.")
-        data = {}
-        for col in columns:
-            if hasattr(self, col):
-                if isinstance(vars(self)[col], astropy.units.quantity.Quantity):
-                    data[col] = vars(self)[col].value
-                else:
-                    data[col] = vars(self)[col].value
-        df = pd.DataFrame(data=data, index=self.frequency, columns=columns)
-        df.index.name = 'frequency'
-        return df
-
-    def to_csv(self, path_or_buf, **kwargs):
-        """Writes the Periodogram to a csv file.
-        Parameters
-        ----------
-        path_or_buf : string or file handle, default None
-            File path or object, if None is provided the result is returned as
-            a string.
-        **kwargs : dict
-            Dictionary of arguments to be passed to `pandas.DataFrame.to_csv()`.
-        Returns
-        -------
-        csv : str or None
-            Returns a csv-formatted string if `path_or_buf=None`,
-            returns None otherwise.
-        """
-        return self.to_pandas().to_csv(path_or_buf=path_or_buf, **kwargs)
-
     def __repr__(self):
         return('Periodogram(ID: {})'.format(self.targetid))
 
