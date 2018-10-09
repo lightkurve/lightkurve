@@ -2,6 +2,7 @@ from __future__ import division, print_function
 
 from astropy.io import fits as pyfits
 import matplotlib.pyplot as plt
+import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
 
