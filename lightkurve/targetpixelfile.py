@@ -15,12 +15,14 @@ from tqdm import tqdm
 from astropy.coordinates import SkyCoord
 from astropy.wcs.utils import skycoord_to_pixel, pixel_to_skycoord
 from astropy.io.fits.card import Undefined
+import astropy.units as u
 
 from . import PACKAGEDIR, MPLSTYLE
 from .lightcurve import KeplerLightCurve, TessLightCurve
 from .prf import KeplerPRF
 from .utils import KeplerQualityFlags, TessQualityFlags, \
-                   plot_image, bkjd_to_astropy_time, btjd_to_astropy_time
+                   plot_image, bkjd_to_astropy_time, btjd_to_astropy_time, \
+                   query_catalog
 from .mast import download_kepler_products
 
 __all__ = ['KeplerTargetPixelFile', 'TessTargetPixelFile']

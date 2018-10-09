@@ -10,7 +10,7 @@ from numpy.testing import assert_array_equal
 import pytest
 import tempfile
 
-from ..targetpixelfile import Kepl[erTargetPixelFile, KeplerTargetPixelFileFactory
+from ..targetpixelfile import KeplerTargetPixelFile, KeplerTargetPixelFileFactory
 from ..utils import KeplerQualityFlags, query_catalog
 
 from ..targetpixelfile import TessTargetPixelFile
@@ -75,12 +75,10 @@ def test_find():
     # Smallest number the query should find is at least 1
     assert (len(dat['RA']) >= 1)
     assert (len(dat['ID'])) >= 1
-    assert np.any([d == tpf.keplerid for d in dat['ID']])
+    assert np.any([d == tpf.targetid for d in dat['ID']])
     c = SkyCoord(60, 10, unit=(u.deg, u.deg))
     result = query_catalog(c, 'Gaia', radius=1*u.arcmin)
     assert len(result) == 3
-
-
 
 
 def test_tpf_zeros():
