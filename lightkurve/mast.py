@@ -38,7 +38,16 @@ def download_products(products):
     # Note: by default, MAST will only let us download "Minimum Recommended
     # Products" (MRPs), which do not include e.g. Target Pixel Files.
     # We need to set `mrp=False` to ensure MAST downloads whatever we want.
-    dl = Observations.download_products(products, mrp_only=False)
+
+    # check if download directory exists
+    if not os.path.isdir(os.path.expanduser('~')+'/.astropy'):
+        os.mkdir(os.path.expanduser('~')+'/.astropy')
+
+    # download to astropy cache (~/.astropy)
+    download_dir = os.path.expanduser('~')+'/.astropy'
+
+    dl = Observations.download_products(products, mrp_only=False,
+                                        download_dir=download_dir)
     return dl['Local Path']
 
 
