@@ -11,9 +11,14 @@ import pytest
 import tempfile
 
 from ..targetpixelfile import KeplerTargetPixelFile, KeplerTargetPixelFileFactory
+<<<<<<< HEAD
 from ..utils import KeplerQualityFlags, query_catalog
 
 from ..targetpixelfile import TessTargetPixelFile
+=======
+from ..targetpixelfile import TessTargetPixelFile
+from ..utils import KeplerQualityFlags, query_catalog
+>>>>>>> e95b90fe439438093aec8d31399cbe2f0f98186c
 
 
 filename_tpf_all_zeros = get_pkg_data_filename("data/test-tpf-all-zeros.fits")
@@ -68,8 +73,9 @@ def test_tpf_plot():
             tpf.plot(scale="blabla")
         plt.close('all')
 
-def test_find():
-    "Minimum sanity chech of the table it returns contains the coordinates of the tpf"
+@pytest.mark.remote_data
+def test_get_sources():
+    "Sanity check that get_sources returns sources"
     tpf = KeplerTargetPixelFile(TABBY_TPF)
     dat = tpf.get_sources()
     # Smallest number the query should find is at least 1

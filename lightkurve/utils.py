@@ -7,7 +7,6 @@ from astropy.visualization import (PercentileInterval, ImageNormalize,
                                    SqrtStretch, LinearStretch)
 from astropy.time import Time
 from astroquery.vizier import Vizier
-from astropy.table import Table
 import astropy.units as u
 
 import matplotlib.pyplot as plt
@@ -433,70 +432,77 @@ def plot_image(image, ax=None, scale='linear', origin='lower',
     return ax
 
 
+def query_catalog(coordinate, catalog="KIC", radius=30.):
+        """Returns an astropy table of sources obtained using a conesearch query.
 
-def query_catalog(coordinate, catalog="KIC", radius=0.5):
-        """
-        Returns an astropy table of the sources inside a radius query.
-        Current catalogs supported are KIC, EPIC and Gaia DR2.
+        This helper function allows the key catalogs that are relevant to
+        Kepler/K2/TESS to be queried such that they return uniform columns.
+        Current catalogs supported are 'KIC', 'EPIC', and 'Gaia2'.
 
         Parameters
         -----------
-        coordinate : astropy.coordinates.SkyCoord
+        coordinate : astropy.coordinates.SkyCoord object
             Coordinate to query around.
-        catalog: string
-            Indicate catalog assigned for mission. If Kepler, catalog will be KIC
-            if K2 catalog is EPIC.
-        radius: float
-            Radius of cone search centered on the target in arcminutes.
-            Default radius is 0.5 arcmin.
+        catalog: 'KIC', 'EPIC', or 'Gaia2'
+            Which catalog to query?
+        radius: float or astropy.units.Quantity object
+            Radius of cone search centered on the target. If a float is given
+            then it is assumed to be in units arcseconds. (Default: 30 arcsec.)
 
         Returns
         -------
-        result : astropy.table
-            Astropy table with the following columns
-        ID : astropy.table.column (KIC & EPIC)
-            Catalog ID from catalog.
-        RAJ200: astropy.table.column (KIC & EPIC)
-            Right ascension [degrees]
-        DEJ2000: astropy.table.column (KIC & EPIC)
-            Declination [deg]
-        pmRA: astropy.table.column (KIC & EPIC)
-            Proper motion for right ascension [mas/year]
-        pmDEC: astropy.table.column (KIC & EPIC)
-        Kpmag: astropy.table.column (KIC & EPIC)
-            Magnitude in Kepler band [mag]
+        result : astropy.table.Table object
+            Astropy table with the following columns:
+            - id : Catalog ID from catalog.
+            - ra: Right ascension [degrees]
+            - dec: Declination [degrees]
+            - pmra: Proper motion for right ascension [mas/year]
+            - pmdec: Proper motion for declination [mas/year]
+            - mag: Magnitude in the Kepler or Gaia band [mag]
         """
 
-        if catalog is "Gaia":
-            log.warn('Gaia RAs and Decs are at EPOC 2015.5. These RA/Decs have not been corrected.')
-            log.warn('Gaia magnitudes are in Gaia Gmag not KepMag')
+        # First, validate and convert the inputs:
+        # If the search radius is a float, assume it is in unit arcseconds
+        if not isinstance(radius, u.Quantity):
+            radius = u.Quantity(radius, u.arcsec)
+        # Use lowercase catalog names to avoid case sensitivity
+        catalog = catalog.lower()
+        # Ensure `catalog` is one of our supported catalogs
+        supported_catalogs = \
+            {"kic":
+             {"vizier": "V/133/kic",
+              "cols": ["KIC", "RAJ2000", "DEJ2000", "pmRA", "pmDE", "kepmag"],
+              "epoch": 2000.},
+             "epic":
+             {"vizier": "IV/34/epic",
+              "cols": ["ID", "RAJ2000", "DEJ2000", "pmRA", "pmDEC", "Kpmag"],
+              "epoch": 2000.},
+             "gaia2":
+             {"vizier": "I/345/gaia2",
+              "cols": ["DR2Name", "RA_ICRS", "DE_ICRS", "pmRA", "pmDE", "Gmag"],
+              "epoch": 2015.5}}
+        if catalog not in supported_catalogs.keys():
+            raise ValueError('catalog must be one of {}'.format(list(supported_catalogs.keys())))
 
-        # Vizier id's
-        ID = {"KIC":
-                    {'vizier':"V/133/kic",
-                     'parameters': ["KIC", "RAJ2000", "DEJ2000", "pmRA", "pmDE", "kepmag"]},
-             "EPIC":
-                    {'vizier': "IV/34/epic",
-                     'parameters': ["ID", "RAJ2000", "DEJ2000", "pmRA", "pmDEC", "Kpmag"]},
-             "Gaia":
-                    {'vizier': "I/345/gaia2",
-                     'parameters': ["DR2Name", "RA_ICRS", "DE_ICRS", "pmRA", "pmDE", "Gmag"]}}
-
-        # identifies catalog
-        viz_id = ID[catalog]['vizier']
-
-        # Choose columns from Vizier
-        v = Vizier(catalog=[viz_id], columns=ID[catalog]['parameters'])
-        # query around centre with radius
-        result = v.query_region(coordinate, radius=radius, catalog=viz_id)
+         # Query Vizier
+        vizier_id = supported_catalogs[catalog]['vizier']
+        v = Vizier(catalog=[vizier_id], columns=supported_catalogs[catalog]['cols'])
+        result = v.query_region(coordinate, radius=radius, catalog=vizier_id)
         if len(result) == 0:
-            log.error('No sources found in queried region. Try another catalog.')
+            log.info('No sources found in queried region. Try another catalog.')
 
-        # Rename column names
-        new_pars = ['ID', 'RA', 'Dec', 'pmRA', 'pmDec', "mag"]
+        # Rename columns to be uniform for all catalogs
+        new_pars = ['id', 'ra', 'dec', 'pmra', 'pmdec', 'mag']
         for i in range(len(new_pars)):
-            result[viz_id].rename_column(result[viz_id].colnames[i], new_pars[i])
+            result[vizier_id].rename_column(result[vizier_id].colnames[i], new_pars[i])
+        return result[vizier_id]
 
-        # Queried stats
-        data = result[viz_id]
-        return data
+def kpmag_to_flux(kpmag):
+    """
+    Returns the predicted flux in e-/s of a given Kp magnitude source,
+    estimated by pre-flight zero-point.
+    Source: Kepler Science Center.
+    """
+    f12 = 1.74 * 10**5  # pre-flight zero point
+    exponent = -0.4*(kpmag - 12)
+    return 10**(exponent) * f12
