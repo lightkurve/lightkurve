@@ -108,19 +108,19 @@ def test_error_messages():
     # No unitless periodograms
     with pytest.raises(ValueError) as err:
         Periodogram([0], [1])
-    assert err.value.args[0] == 'Frequency must have units.'
+    assert err.value.args[0] == 'frequency must be an `astropy.units.Quantity` object.'
 
     # No single value periodograms
     with pytest.raises(ValueError) as err:
         Periodogram([0]*u.Hz, [1]*u.K)
-    assert err.value.args[0] == 'Frequency and power must have a length greater than 1.'
+    assert err.value.args[0] == 'frequency and power must have a length greater than 1.'
 
     # No uneven arrays
     with pytest.raises(ValueError) as err:
         Periodogram([0, 1, 2, 3]*u.Hz, [1, 1]*u.K)
-    assert err.value.args[0] == 'Frequency and power must be the same length.'
+    assert err.value.args[0] == 'frequency and power must have the same length.'
 
     # Bad frequency units
     with pytest.raises(ValueError) as err:
-        Periodogram([0,1,2]*u.K, [1,1,1]*u.K)
+        Periodogram([0, 1, 2]*u.K, [1, 1, 1]*u.K)
     assert err.value.args[0] == 'Frequency must be in units of 1/time.'

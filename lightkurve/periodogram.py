@@ -33,38 +33,36 @@ class Periodogram(object):
     frequency : `astropy.units.Quantity` object
         Array of frequencies with associated astropy unit.
     power : `astropy.units.Quantity` object
-        Array of power-spectral-densities in units of ppm^2 / freq_unit,
-        where freq_unit is the unit of the frequency attribute.
-    nyquist : float
+        Array of power-spectral-densities. The Quantity array must have units
+        of `ppm^2 / freq_unit`, where freq_unit is the unit of the frequency
+        attribute.
+    nyquist : float, optional
         The Nyquist frequency of the lightcurve. In units of freq_unit, where
         freq_unit is the unit of the frequency attribute.
-    targetid : str
+    targetid : str, optional
         Identifier of the target.
-    label : str
-        Human-friendly object label, e.g. "KIC 123456789"
-    meta : dict
+    label : str, optional
+        Human-friendly object label, e.g. "KIC 123456789".
+    meta : dict, optional
         Free-form metadata associated with the Periodogram.
     """
-    def __init__(self, frequency, power, nyquist=None,
-                 label=None, targetid=None, meta={}):
-
+    def __init__(self, frequency, power, nyquist=None, label=None,
+                 targetid=None, meta={}):
+        # Input validation
         if not isinstance(frequency, u.quantity.Quantity):
-            raise ValueError('Frequency must have units.')
-
+            raise ValueError('frequency must be an `astropy.units.Quantity` object.')
         if not isinstance(power, u.quantity.Quantity):
-            raise ValueError('Power must have units.')
-
-        # Must have frequency units
+            raise ValueError('power must be an `astropy.units.Quantity` object.')
+        # Frequency must have frequency units
         try:
             frequency.to(u.Hz)
         except u.UnitConversionError:
             raise ValueError('Frequency must be in units of 1/time.')
-
+        # Frequency and power must have sensible shapes
         if frequency.shape[0] <= 1:
-            raise ValueError('Frequency and power must have a length greater than 1.')
-
+            raise ValueError('frequency and power must have a length greater than 1.')
         if frequency.shape != power.shape:
-            raise ValueError('Frequency and power must be the same length.')
+            raise ValueError('frequency and power must have the same length.')
 
         self.frequency = frequency
         self.power = power
@@ -75,7 +73,7 @@ class Periodogram(object):
 
     @property
     def period(self):
-        """Returns the array of periods (i.e. 1 / frequency)."""
+        """Returns the array of periods, i.e. 1/frequency."""
         return 1. / self.frequency
 
     @property
@@ -236,11 +234,11 @@ class Periodogram(object):
             if max_frequency is not None:
                 max_frequency = u.Quantity(max_frequency, freq_unit)
             if (min_frequency is not None) & (max_frequency is not None):
-                if (max_frequency <= min_frequency):
+                if (min_frequency > max_frequency):
                     if format == 'frequency':
-                        raise ValueError('User input max frequency is smaller than or equal to min frequency.')
+                        raise ValueError('min_frequency cannot be larger than max_frequency')
                     if format == 'period':
-                        raise ValueError('User input max period is smaller than or equal to min period.')
+                        raise ValueError('min_period cannot be larger than max_period')
             # If nothing has been passed in, set them to the defaults
             if min_frequency is None:
                 min_frequency = fs
@@ -292,37 +290,36 @@ class Periodogram(object):
         Parameters
         ----------
         binsize : int
-            The factor by which to bin the power spectrum, in the
-            sense that the power spectrum will be smoothed by taking the mean
-            in bins of size N / binsize, where N is the length of the
-            original periodogram. Defaults to 10.
-        method : 'mean' or 'median'
+            The factor by which to bin the power spectrum, in the sense that
+            the power spectrum will be smoothed by taking the mean in bins
+            of size N / binsize, where N is the length of the original
+            frequency array. Defaults to 10.
+        method : str, one of 'mean' or 'median'
             Method to use for binning. Default is 'mean'.
 
         Returns
         -------
         binned_periodogram : a `Periodogram` object
-            Returns a `Periodogram` object which has been smoothed in bins of
-            width `binsize`.
+            Returns a new `Periodogram` object which has been binned.
         """
+        # Input validation
         if binsize < 1:
-            raise ValueError('The binsize must be at least 1.')
+            raise ValueError('binsize must be larger than or equal to 1')
+        if method not in ('mean', 'median'):
+            raise ValueError("{} is not a valid method, must be 'mean' or 'median'.".format(method))
 
-        # Calculating the length of the smoothed array
-        m = int(len(self.power) / binsize)
+        m = int(len(self.power) / binsize)  # length of the binned arrays
         if method == 'mean':
-            smooth_freq = self.frequency[:m*binsize].reshape((m, binsize)).mean(1)
-            smooth_power = self.power[:m*binsize].reshape((m, binsize)).mean(1)
+            binned_freq = self.frequency[:m*binsize].reshape((m, binsize)).mean(1)
+            binned_power = self.power[:m*binsize].reshape((m, binsize)).mean(1)
         elif method == 'median':
-            smooth_freq = np.nanmedian(self.frequency[:m*binsize].reshape((m, binsize)), axis=1)
-            smooth_power = np.nanmedian(self.power[:m*binsize].reshape((m, binsize)), axis=1)
-        else:
-            raise ValueError('{} is not a valid method.'.format(method))
+            binned_freq = np.nanmedian(self.frequency[:m*binsize].reshape((m, binsize)), axis=1)
+            binned_power = np.nanmedian(self.power[:m*binsize].reshape((m, binsize)), axis=1)
 
-        smooth_pg = copy.deepcopy(self)
-        smooth_pg.frequency = smooth_freq
-        smooth_pg.power = smooth_power
-        return smooth_pg
+        binned_pg = copy.deepcopy(self)
+        binned_pg.frequency = binned_freq
+        binned_pg.power = binned_power
+        return binned_pg
 
     def plot(self, scale='linear', ax=None, xlabel=None, ylabel=None, title='',
              style='lightkurve', format='frequency', unit=None, **kwargs):
@@ -476,7 +473,8 @@ class Periodogram(object):
         return snr
 
     def to_table(self):
-        """Export the Periodogram as an AstroPy Table.
+        """Exports the Periodogram as an Astropy Table.
+
         Returns
         -------
         table : `astropy.table.Table` object
@@ -485,7 +483,7 @@ class Periodogram(object):
         return Table(data=(self.frequency, self.period, self.power),
                      names=('frequency', 'period', 'power'),
                      meta=self.meta)
-                     
+
     def __repr__(self):
         return('Periodogram(ID: {})'.format(self.targetid))
 
@@ -534,11 +532,11 @@ class Periodogram(object):
         return self.__rtruediv__(other)
 
     def properties(self):
-        '''Print out a description of each of the non-callable attributes of a
-        Periodogram object, as well as those of the LightCurve object it was
-        made with.
-        Prints in order of type (ints, strings, lists, arrays and others)
-        Prints in alphabetical order.'''
+        """Prints a summary of the non-callable attributes of the Periodogram object.
+
+        Prints in order of type (ints, strings, lists, arrays and others).
+        Prints in alphabetical order.
+        """
         attrs = {}
         for attr in dir(self):
             if not attr.startswith('_'):
@@ -603,7 +601,11 @@ class Periodogram(object):
 
 
 class SNRPeriodogram(Periodogram):
-    """Defines a SNR periodogram with different plotting defaults"""
+    """Defines a Signal-to-Noise Ratio (SNR) Periodogram class.
+
+    This class is nearly identical to the standard :class:`Periodogram` class,
+    but has different plotting defaults.
+    """
     def __init__(self, *args, **kwargs):
         super(SNRPeriodogram, self).__init__(*args, **kwargs)
 
