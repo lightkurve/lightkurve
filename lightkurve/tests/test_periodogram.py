@@ -32,7 +32,7 @@ def test_periodogram_can_find_periods():
     # Light curve that is noisy
     lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000), flux_err=np.zeros(1000)+0.1)
     # Add a 100 day period signal
-    lc.flux *= np.sin((lc.time/lc.time.max()) * 20 * np.pi)
+    lc.flux *= np.sin((lc.time/float(lc.time.max())) * 20 * np.pi)
     p = lc.periodogram()
     assert np.isclose(p.period_at_max_power.value, 100, rtol=1e-3)
 
