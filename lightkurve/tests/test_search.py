@@ -9,6 +9,7 @@ import astropy.units as u
 from numpy.testing import assert_almost_equal
 
 from ..search import search_lcf, search_tpf, ArchiveError
+from ..targetpixelfile import KeplerTargetPixelFile
 from .. import log
 
 @pytest.mark.remote_data
@@ -36,6 +37,7 @@ def test_search_tpf():
         assert(len(cc) == 2)
     search_tpf(11904151, quarter=11).download()
 
+
 @pytest.mark.remote_data
 def test_search_lcf():
     # We should also be able to resolve it by its name instead of KIC ID
@@ -55,10 +57,12 @@ def test_search_lcf():
     assert(len(search_lcf(c, quarter=6).products) == 1)
     search_lcf(c, quarter=6).download()
 
+
 @pytest.mark.remote_data
 def test_month():
     # In short cadence, if we specify both quarter and month it should work:
-    search_tpf('Kepler-10', quarter=11, month=1, cadence='short')
+    search_tpf('Kepler-10', quarter=11, month=1, cadence='short').products
+
 
 @pytest.mark.remote_data
 def test_collections():
@@ -66,6 +70,12 @@ def test_collections():
     assert(len(search_tpf(205998445, radius=900).download_all()) == 4)
     # LightCurveFileCollection class with set targetlimit
     assert(len(search_lcf(205998445, radius=900, targetlimit=3).download_all()) == 3)
+    # should log a warning if fewer targets are found than targetlimit,
+    # but should still download all available
+    assert(len(search_tpf(205998445, radius=900, targetlimit=6).download_all()) == 4)
+    # if download() is used when multiple files are available, should only download 1
+    assert(isinstance(search_tpf(205998445, radius=900).download(), KeplerTargetPixelFile))
+
 
 @pytest.mark.remote_data
 def test_properties():
@@ -74,6 +84,7 @@ def test_properties():
     assert_almost_equal(search_tpf(c, quarter=6).dec, 40.98339)
     assert(len(search_tpf(c, quarter=6, quality_bitmask='best').target_name) == 1)
     assert(len(search_tpf(c, quarter=6, quality_bitmask='best').mastID) == 1)
+
 
 @pytest.mark.remote_data
 def test_source_confusion():

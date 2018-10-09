@@ -8,11 +8,11 @@ from astroquery.mast import Observations
 from astroquery.exceptions import ResolverError
 from astropy.table import Table, unique
 from astropy.coordinates import SkyCoord
-from astropy.io import ascii, fits
+from astropy.io import ascii
 from .lightcurve import KeplerLightCurve, TessLightCurve
 from .lightcurvefile import KeplerLightCurveFile
-from .targetpixelfile import TargetPixelFile, KeplerTargetPixelFile
-from .collections import TargetPixelFileCollection, LightCurveCollection, LightCurveFileCollection
+from .targetpixelfile import KeplerTargetPixelFile
+from .collections import TargetPixelFileCollection, LightCurveFileCollection
 
 from . import PACKAGEDIR
 log = logging.getLogger(__name__)
@@ -147,11 +147,6 @@ class SearchResult(object):
         else:
             suffix = "{} Long".format(filetype)
 
-        # If there is nothing in the table, quit now.
-        if len(products) == 0:
-            return products
-
-
         # Identify the campaign or quarter by the description.
         if qoc is not None:
             mask = np.zeros(np.shape(products)[0], dtype=bool)
@@ -192,9 +187,8 @@ class SearchResult(object):
         # if targetlimit is not None:
         ids = np.asarray([p.split('/')[-1].split('-')[0].split('_')[0][4:]
                           for p in products['dataURI']], dtype=int)
-        if targetlimit is None:
-            pass
-        elif len(np.unique(ids)) < targetlimit:
+
+        if len(np.unique(ids)) < targetlimit:
             log.warning('Target return limit set to {} '
                         'but only {} unique targets found. '
                         'Try increasing the search radius. '
@@ -280,8 +274,6 @@ def _query_mast(target, cadence='long', radius=.0001, targetlimit=None, **kwargs
         target = '{}, {}'.format(target.ra.deg, target.dec.deg)
 
     if os.path.exists(str(target)) or str(target).startswith('http'):
-        log.warning('Warning: from_archive() is not intended to accept a '
-                    'direct path, use KeplerTargetPixelFile(path) instead.')
         path = [target]
 
     else:
