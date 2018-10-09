@@ -212,22 +212,21 @@ class SearchResult(object):
         products['order'] = order
         products = products[mask]
 
+        # If there is nothing in the table, quit now.
         if len(products) == 0:
-            raise ArchiveError("No {} File found for {} at MAST.".format(filetype, target))
+            return products
         products.sort(['order', 'dates', 'qoc'])
 
         # For Kepler short cadence data there are additional rules, so find anywhere
         # where there is short cadence data...
         scmask = np.asarray(['Short' in d for d in products['description']]) &\
                  np.asarray(['kplr' in d for d in products['dataURI']])
+
         if np.any(scmask):
-            # Error check the user if there's multiple months and they didn't ask
-            # for a specific one
-            if month is None:
-                raise ArchiveError("Found {} different Target Pixel Files "
-                                   "for target {} in Quarter {}. "
-                                   "Please specify the month (1, 2, or 3)."
-                                   "".format(len(products), self.target_name, quarter))
+            # If no month is specified, return all
+            if self.month is None:
+                return products
+
             # Get the short cadence date lookup table.
             table = ascii.read(os.path.join(PACKAGEDIR, 'data', 'short_cadence_month_lookup.csv'))
             # Grab the dates of each of the short cadence files. Make sure every entry
@@ -236,7 +235,7 @@ class SearchResult(object):
             for c in np.unique(products[scmask]['qoc']):
                 ok = (products['qoc'] == c) & (scmask)
                 mask = np.zeros(np.shape(products[ok])[0], dtype=bool)
-                for m in month:
+                for m in self.month:
                     udate = (table['StartTime'][np.where(
                         (table['Month'] == m) & (table['Quarter'] == c))[0][0]])
                     mask |= np.asarray(products['dates'][ok]) == udate
@@ -245,8 +244,7 @@ class SearchResult(object):
             # Sort by id, then date and quarter
             products.sort(['order', 'dates', 'qoc'])
             if len(products) < 1:
-                raise ArchiveError("No {} File found for {} "
-                                   "at month {} at MAST.".format(filetype, target, month))
+                return products
 
         return products
 
@@ -284,16 +282,11 @@ def _query_mast(target, cadence='long', radius=.0001, targetlimit=None, **kwargs
         log.warning('Warning: from_archive() is not intended to accept a '
                     'direct path, use KeplerTargetPixelFile(path) instead.')
         path = [target]
-    elif target == None:
 
-        path = Observations.query_criteria(coordinates='{} {}'.format(coords[0], coords[1]),
-                                          radius='{} deg'.format(radius/3600),
-                                          project=["Kepler", "K2"],
-                                          obs_collection=["Kepler", "K2"])
     else:
         try:
-        # If `target` looks like a KIC or EPIC ID, we will pass the exact
-        # `target_name` under which MAST will know the object.
+            # If `target` looks like a KIC or EPIC ID, we will pass the exact
+            # `target_name` under which MAST will know the object.
             target = int(target)
             if (target > 0) and (target < 200000000):
                 target_name = 'kplr{:09d}'.format(target)
@@ -305,12 +298,16 @@ def _query_mast(target, cadence='long', radius=.0001, targetlimit=None, **kwargs
                                                      radius='{} deg'.format(.0001),
                                                      project=["Kepler", "K2"],
                                                      obs_collection=["Kepler", "K2"])
-            ra = target_obs['s_ra'][0]
-            dec = target_obs['s_ra'][0]
-            path = Observations.query_criteria(coordinates='{} {}'.format(ra, dec),
-                                               radius='{} deg'.format(radius/3600),
-                                               project=["Kepler", "K2"],
-                                               obs_collection=["Kepler", "K2"])
+            if radius < 1:
+                path = target_obs
+            else:
+                ra = target_obs['s_ra'][0]
+                dec = target_obs['s_dec'][0]
+                path = Observations.query_criteria(coordinates='{} {}'.format(ra, dec),
+                                                   radius='{} deg'.format(radius/3600),
+                                                   project=["Kepler", "K2"],
+                                                   obs_collection=["Kepler", "K2"])
+                path.sort('distance')
         except ValueError:
             # If `target` did not look like a KIC or EPIC ID, then we let MAST
             # resolve the target name to a sky position. Convert radius from arcsec
@@ -320,10 +317,11 @@ def _query_mast(target, cadence='long', radius=.0001, targetlimit=None, **kwargs
                                                    radius='{} deg'.format(radius/3600),
                                                    project=["Kepler", "K2"],
                                                    obs_collection=["Kepler", "K2"])
-
             except ResolverError as exc:
                 raise ArchiveError(exc)
 
+    if targetlimit is not None:
+        path = path[:targetlimit]
     return path
 
 
@@ -376,7 +374,7 @@ def search_tpf(target, cadence='long', quarter=None, month=None,
     filetype = "Target Pixel"
 
     # query mast for target (KIC/EPIC ID or skycoord value)
-    path = _query_mast(target, cadence='long', radius=radius, targetlimit=None)
+    path = _query_mast(target, cadence='long', radius=radius, targetlimit=targetlimit)
 
     return SearchResult(path, campaign=campaign, quarter=quarter, month=month,
                         cadence=cadence, filetype=filetype, quality_bitmask=quality_bitmask)
@@ -430,7 +428,7 @@ def search_lcf(target, cadence='long', quarter=None, month=None,
     filetype = "Lightcurve"
 
     # query mast for target (KIC/EPIC ID or skycoord value)
-    path = _query_mast(target, cadence='long', radius=radius, targetlimit=None)
+    path = _query_mast(target, cadence='long', radius=radius, targetlimit=targetlimit)
 
     return SearchResult(path, campaign=campaign, quarter=quarter, month=month,
                         cadence=cadence, filetype=filetype, quality_bitmask=quality_bitmask)
