@@ -227,6 +227,7 @@ class SearchResult(object):
             if self.month is None:
                 return products
 
+            self.month = np.atleast_1d(self.month)
             # Get the short cadence date lookup table.
             table = ascii.read(os.path.join(PACKAGEDIR, 'data', 'short_cadence_month_lookup.csv'))
             # Grab the dates of each of the short cadence files. Make sure every entry
