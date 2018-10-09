@@ -15,6 +15,7 @@ Direct contributions to the code base:
 - `Jeff Coughlin <https://github.com/JeffLCoughlin>`_
 - `Zachory K. Berta-Thompson <https://github.com/zkbt>`_
 - `Anand Sundaram <https://github.com/anand-sundaram-zocdoc>`_
+- `Oliver Hall <https://github.com/ojhall94>`_
 
 
 Comments, corrections & suggestions:
