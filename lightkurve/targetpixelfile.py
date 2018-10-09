@@ -356,6 +356,8 @@ class TargetPixelFile(object):
             If 'threshold' is passed, all pixels contigious with the brightest 
             pixel (within +/- 2 pixels of the central pixel) that are above the 
             threshold (in sigma) are returned.
+        threshold : int
+            The threshold above which to create the mask, in sigma.
 
         Returns
         -------
@@ -379,11 +381,48 @@ class TargetPixelFile(object):
         self._last_aperture_mask = aperture_mask
         return aperture_mask
 
+
     def centroids(self, **kwargs):
         """DEPRECATED: use `estimate_cdpp()` instead."""
         log.warning("WARNING: centroids() is deprecated and will be removed in v1.0.0; "
                     "please use estimate_centroids() instead.")
         return self.estimate_centroids(**kwargs)
+
+    def _threshold_mask(self, threshold):
+        """Identify region that is above the threshold and contiguous
+        with the central pixel
+
+        Parameters
+        ----------
+        threshold : float
+            A value for the number of sigma above the background to draw the
+            aperture.
+
+        Returns
+        -------
+        aperture_mask : ndarray
+            2D boolean numpy array containing `True` for selected pixels.
+        """
+
+        # calculate a median image
+        median_image = np.nanmedian(self.flux + self.flux_bkg, axis=0)
+        vals = median_image[np.isfinite(median_image)].flatten()
+
+        # calculate what the theshold value is in counts
+        mad_cut = (1.4826 * MAD(vals) * threshold) + np.median(median_image)
+
+        # identify pixel above the threshold and label contiguous regions
+        threshold_region = np.where(median_image > mad_cut, 1, 0)
+        labeled_values = label(threshold_region)[0]
+
+        # Find brightest pixel
+        brightest_pixel = np.unravel_index(median_image.argmax(),
+                                            median_image.shape)
+        brightest_pixel_y, brightest_pixel_x = brightest_pixel
+
+        region_value = labeled_values[brightest_pixel_y, brightest_pixel_x]
+        aperture_mask = np.where(labeled_values == region_value, 1, 0)
+        return aperture_mask.astype(bool)
 
     def estimate_centroids(self, aperture_mask='pipeline'):
         """Returns centroid positions estimated using sample moments.
@@ -395,6 +434,9 @@ class TargetPixelFile(object):
             that the pixel will be masked out.
             If the string 'all' is passed, all pixels will be used.
             The default behaviour is to use the Kepler pipeline mask.
+        threshold : float
+            A value for the number of sigma above the background to draw the
+            aperture.
 
         Returns
         -------
@@ -432,9 +474,6 @@ class TargetPixelFile(object):
             If True, background will be added to the pixel values.
         aperture_mask : ndarray
             Highlight pixels selected by aperture_mask.
-        threshold : float
-            Number of sigma above the background to draw an aperture.
-            Used if aperture_mask is 'threshold'.
         show_colorbar : bool
             Whether or not to show the colorbar
         mask_color : str
@@ -707,11 +746,15 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
         Parameters
         ----------
-        aperture_mask : array-like, 'pipeline', or 'all'
+        aperture_mask : array-like, 'pipeline', 'threshold' or 'all'
             A boolean array describing the aperture such that `False` means
             that the pixel will be masked out.
             If the string 'all' is passed, all pixels will be used.
             The default behaviour is to use the Kepler pipeline mask.
+        threshold : float
+            A value for the number of sigma above the background to draw the
+            aperture.
+
 
         Returns
         -------
