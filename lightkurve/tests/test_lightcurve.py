@@ -3,12 +3,13 @@ from __future__ import division, print_function
 from astropy.io import fits as pyfits
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import pyplot as plt
+
 from numpy.testing import (assert_almost_equal, assert_array_equal,
                            assert_allclose)
 import pytest
 
-from ..lightcurve import (LightCurve, KeplerLightCurve, TessLightCurve,
-                          iterative_box_period_search)
+from ..lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
 from ..lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
 
 # 8th Quarter of Tabby's star
@@ -72,20 +73,23 @@ def test_rmath_operators():
 def test_KeplerLightCurveFile(path, mission):
     lcf = KeplerLightCurveFile(path, quality_bitmask=None)
     hdu = pyfits.open(path)
-    kplc = lcf.get_lightcurve('SAP_FLUX')
+    lc = lcf.get_lightcurve('SAP_FLUX')
 
-    assert kplc.channel == lcf.channel
-    assert kplc.mission.lower() == mission.lower()
-    if kplc.mission.lower() == 'kepler':
-        assert kplc.campaign is None
-        assert kplc.quarter == 8
-    elif kplc.mission.lower() == 'k2':
-        assert kplc.campaign == 8
-        assert kplc.quarter is None
-    assert kplc.astropy_time.scale == 'tdb'
+    assert lc.channel == lcf.channel
+    assert lc.mission.lower() == mission.lower()
+    if lc.mission.lower() == 'kepler':
+        assert lc.campaign is None
+        assert lc.quarter == 8
+    elif lc.mission.lower() == 'k2':
+        assert lc.campaign == 8
+        assert lc.quarter is None
+    assert lc.label == hdu[0].header['OBJECT']
+    assert lc.time_format == 'bkjd'
+    assert lc.time_scale == 'tdb'
+    assert lc.astropy_time.scale == 'tdb'
 
-    assert_array_equal(kplc.time, hdu[1].data['TIME'])
-    assert_array_equal(kplc.flux, hdu[1].data['SAP_FLUX'])
+    assert_array_equal(lc.time, hdu[1].data['TIME'])
+    assert_array_equal(lc.flux, hdu[1].data['SAP_FLUX'])
 
     with pytest.raises(KeyError):
         lcf.get_lightcurve('BLABLA')
@@ -97,10 +101,22 @@ def test_KeplerLightCurveFile(path, mission):
                           1, 100, 2096639])
 def test_TessLightCurveFile(quality_bitmask):
     tess_file = TessLightCurveFile(TESS_SIM, quality_bitmask=quality_bitmask)
-    tlc = tess_file.SAP_FLUX
-    assert tlc.mission.lower() == 'tess'
+    hdu = pyfits.open(TESS_SIM)
+    lc = tess_file.SAP_FLUX
+
+    assert lc.mission == 'TESS'
+    assert lc.label == hdu[0].header['OBJECT']
+    assert lc.time_format == 'btjd'
+    assert lc.time_scale == 'tdb'
+
+    assert_array_equal(lc.time[0:10], hdu[1].data['TIME'][0:10])
+    assert_array_equal(lc.flux[0:10], hdu[1].data['SAP_FLUX'][0:10])
+
     # Regression test for https://github.com/KeplerGO/lightkurve/pull/236
-    assert np.isnan(tlc.time).sum() == 0
+    assert np.isnan(lc.time).sum() == 0
+
+    with pytest.raises(KeyError):
+        tess_file.get_lightcurve('DOESNOTEXIST')
 
 
 @pytest.mark.remote_data
@@ -158,15 +174,39 @@ def test_lightcurve_append_multiple():
 
 
 @pytest.mark.remote_data
-def test_lightcurve_plot():
+def test_lightcurve_plots():
     """Sanity check to verify that lightcurve plotting works"""
     for lcf in [KeplerLightCurveFile(TABBY_Q8), TessLightCurveFile(TESS_SIM)]:
         lcf.plot()
         lcf.plot(flux_types=['SAP_FLUX', 'PDCSAP_FLUX'])
         lcf.SAP_FLUX.plot()
-        lcf.SAP_FLUX.plot(normalize=False, fill=False, title="Not the default")
+        lcf.SAP_FLUX.plot(normalize=False, title="Not the default")
+        lcf.SAP_FLUX.scatter()
+        lcf.SAP_FLUX.scatter(c='C3')
+        lcf.SAP_FLUX.scatter(c=lcf.SAP_FLUX.time, show_colorbar=True, colorbar_label='Time')
+        lcf.SAP_FLUX.errorbar()
         plt.close('all')
 
+
+@pytest.mark.remote_data
+def test_lightcurve_scatter():
+    """Sanity check to verify that lightcurve scatter plotting works"""
+    lcf = KeplerLightCurveFile(KEPLER10)
+    lc = lcf.PDCSAP_FLUX.flatten()
+
+    # get an array of original times, in the same order as the folded lightcurve
+    foldkw = dict(period=0.837491)
+    originaltime = LightCurve(lc.time, lc.time)
+    foldedtimeinorder = originaltime.fold(**foldkw).flux
+
+    # plot a grid of phase-folded and not, with colors
+    fi, ax = plt.subplots(2, 2, figsize=(10,6), sharey=True, sharex='col')
+    scatterkw = dict( s=5, cmap='winter')
+    lc.scatter(ax=ax[0,0])
+    lc.fold(**foldkw).scatter(ax=ax[0,1])
+    lc.scatter(ax=ax[1,0], c=lc.time, **scatterkw)
+    lc.fold(**foldkw).scatter(ax=ax[1,1], c=foldedtimeinorder, **scatterkw)
+    plt.ylim(0.999, 1.001)
 
 def test_cdpp():
     """Test the basics of the CDPP noise metric."""
@@ -225,19 +265,6 @@ def test_normalize():
     lc = LightCurve(time=np.arange(10), flux=5*np.ones(10), flux_err=0.05*np.ones(10))
     assert_allclose(np.median(lc.normalize().flux), 1)
     assert_allclose(np.median(lc.normalize().flux_err), 0.05/5)
-
-
-@pytest.mark.remote_data
-def test_iterative_box_period_search():
-    """Can we recover the orbital period of Kepler-10b?"""
-    answer = 0.837495  # wikipedia
-    klc = KeplerLightCurveFile(KEPLER10)
-    pdc = klc.PDCSAP_FLUX
-    flat, trend = pdc.flatten(return_trend=True)
-
-    _, _, kepler10b_period = iterative_box_period_search(flat, min_period=.5, max_period=1,
-                                                         nperiods=101, period_scale='log')
-    assert abs(kepler10b_period - answer) < 1e-2
 
 
 def test_to_pandas():
@@ -410,6 +437,11 @@ def test_remove_outliers():
     lc_clean, outlier_mask = lc.remove_outliers(sigma=1, return_mask=True)
     assert(len(outlier_mask) == len(lc.flux))
     assert(outlier_mask.sum() == 1)
+    # Can we set sigma_lower and sigma_upper?
+    lc = LightCurve(time=[1, 2, 3, 4, 5], flux=[1, 1000, 1, -1000, 1])
+    lc_clean = lc.remove_outliers(sigma_lower=float('inf'), sigma_upper=1)
+    assert_array_equal(lc_clean.time, [1, 3, 4, 5])
+    assert_array_equal(lc_clean.flux, [1, 1, -1000, 1])
 
 
 @pytest.mark.remote_data
@@ -479,13 +511,11 @@ def test_from_fits():
     """Does the lcf.from_fits() method work like the constructor?"""
     lcf = KeplerLightCurveFile.from_fits(TABBY_Q8)
     assert isinstance(lcf, KeplerLightCurveFile)
-    assert lcf.keplerid == KeplerLightCurveFile(TABBY_Q8).keplerid
-    assert lcf.keplerid == lcf.targetid
+    assert lcf.targetid == KeplerLightCurveFile(TABBY_Q8).targetid
     # Execute the same test for TESS
     lcf = TessLightCurveFile.from_fits(TESS_SIM)
     assert isinstance(lcf, TessLightCurveFile)
-    assert lcf.ticid == TessLightCurveFile(TESS_SIM).ticid
-    assert lcf.ticid == lcf.targetid
+    assert lcf.targetid == TessLightCurveFile(TESS_SIM).targetid
 
 
 def test_targetid():
@@ -496,18 +526,11 @@ def test_targetid():
     lc.targetid = 99
     assert lc.targetid == 99
     # Does it work for Kepler?
-    lc = KeplerLightCurve(time=[], keplerid=10)
+    lc = KeplerLightCurve(time=[], targetid=10)
     assert lc.targetid == 10
-    assert lc.keplerid == 10
-    # Can we assign a new value?
-    lc.keplerid = 99
-    assert lc.keplerid == 99
-    assert lc.targetid == 99
-    # Does it work for TESS?
-    lc = TessLightCurve(time=[], ticid=20)
-    assert lc.targetid == 20
-    assert lc.ticid == 20
     # Can we assign a new value?
     lc.targetid = 99
-    assert lc.ticid == 99
     assert lc.targetid == 99
+    # Does it work for TESS?
+    lc = TessLightCurve(time=[], targetid=20)
+    assert lc.targetid == 20

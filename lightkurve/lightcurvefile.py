@@ -156,6 +156,10 @@ class KeplerLightCurveFile(LightCurveFile):
         self.quality_mask = KeplerQualityFlags.create_quality_mask(
                                 quality_array=self.hdu[1].data['SAP_QUALITY'],
                                 bitmask=quality_bitmask)
+        try:
+            self.targetid = self.header()['KEPLERID']
+        except KeyError:
+            self.targetid = None
 
     @staticmethod
     def from_archive(target, cadence='long', quarter=None, month=None,
@@ -231,12 +235,7 @@ class KeplerLightCurveFile(LightCurveFile):
                 for p in path]
 
     def __repr__(self):
-        if self.mission is None:
-            return('KeplerLightCurveFile(ID: {})'.format(self.keplerid))
-        elif self.mission.lower() == 'kepler':
-            return('KeplerLightCurveFile(KIC: {})'.format(self.keplerid))
-        elif self.mission.lower() == 'k2':
-            return('KeplerLightCurveFile(EPIC: {})'.format(self.keplerid))
+        return('KeplerLightCurveFile(ID: {})'.format(self.targetid))
 
     @property
     def astropy_time(self):
@@ -262,7 +261,8 @@ class KeplerLightCurveFile(LightCurveFile):
                 quarter=self.quarter,
                 mission=self.mission,
                 cadenceno=self.cadenceno,
-                keplerid=self.keplerid,
+                targetid=self.targetid,
+                label=self.hdu[0].header['OBJECT'],
                 ra=self.ra,
                 dec=self.dec)
         else:
@@ -273,14 +273,6 @@ class KeplerLightCurveFile(LightCurveFile):
     def channel(self):
         """Kepler CCD channel number. ('CHANNEL' header keyword)"""
         return self.header(ext=0)['CHANNEL']
-
-    @property
-    def keplerid(self):
-        return self.header(ext=0)['KEPLERID']
-
-    @property
-    def targetid(self):
-        return self.keplerid
 
     @property
     def obsmode(self):
@@ -378,29 +370,31 @@ class TessLightCurveFile(LightCurveFile):
         # which were not flagged by a QUALITY flag yet; the line below prevents
         # these cadences from being used. They would break most methods!
         self.quality_mask &= np.isfinite(self.hdu[1].data['TIME'])
+        try:
+            self.targetid = self.header()['TICID']
+        except KeyError:
+            self.targetid = None
 
     def __repr__(self):
-        return('TessLightCurveFile(TICID: {})'.format(self.ticid))
-
-    @property
-    def ticid(self):
-        return self.header(ext=0)['TICID']
-
-    @property
-    def targetid(self):
-        return self.ticid
+        return('TessLightCurveFile(TICID: {})'.format(self.targetid))
 
     def get_lightcurve(self, flux_type, centroid_type='MOM_CENTR'):
         if flux_type in self._flux_types():
-            # We did not import lightcurve at the top to prevent circular imports
+            # We did not import TessLightCurve at the top to prevent circular imports
             from .lightcurve import TessLightCurve
             return TessLightCurve(
-                self.hdu[1].data['TIME'][self.quality_mask],
-                self.hdu[1].data[flux_type][self.quality_mask],
+                time=self.hdu[1].data['TIME'][self.quality_mask],
+                time_format='btjd',
+                time_scale='tdb',
+                flux=self.hdu[1].data[flux_type][self.quality_mask],
                 flux_err=self.hdu[1].data[flux_type + "_ERR"][self.quality_mask],
                 centroid_col=self.hdu[1].data[centroid_type + "1"][self.quality_mask],
                 centroid_row=self.hdu[1].data[centroid_type + "2"][self.quality_mask],
                 quality=self.hdu[1].data['QUALITY'][self.quality_mask],
                 quality_bitmask=self.quality_bitmask,
                 cadenceno=self.cadenceno,
-                ticid=self.ticid)
+                targetid=self.targetid,
+                label=self.hdu[0].header['OBJECT'])
+        else:
+            raise KeyError("{} is not a valid flux type. Available types are: {}".
+                           format(flux_type, self._flux_types))
