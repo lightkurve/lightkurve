@@ -268,16 +268,13 @@ class Periodogram(object):
         frequency = u.Quantity(frequency, freq_unit)
 
         if nterms > 1:
-            log.warning('Nterms has been set larger than 1. Method has been set to `fastchi2`')
-            method = 'fastchi2'
-            if period is not None:
-                method = 'chi2'
-                log.warning('You have passed an eventy-spaced grid of periods. These are not evenly spaced in frequency space.\n Method has been set to "chi2" to allow for this.')
+            raise NotImplementedError('Increasing the number of terms is not yet implemented.')
         else:
             method='fast'
-            if period is not None:
-                method = 'slow'
-                log.warning('You have passed an evenly-spaced grid of periods. These are not evenly spaced in frequency space.\n Method has been set to "slow" to allow for this.')
+
+        if period is not None:
+            method = 'slow'
+            log.warning('You have passed an evenly-spaced grid of periods. These are not evenly spaced in frequency space.\n Method has been set to "slow" to allow for this.')
 
 
         LS = LombScargle(time, lc.flux * 1e6,
@@ -338,7 +335,7 @@ class Periodogram(object):
         return smooth_pg
 
     def plot(self, scale='linear', ax=None, xlabel=None, ylabel=None, title='',
-                 style='lightkurve',format='frequency', **kwargs):
+                 style='lightkurve', format='frequency', unit=None, **kwargs):
 
         """Plots the periodogram.
 
@@ -371,41 +368,38 @@ class Periodogram(object):
         ax : matplotlib.axes._subplots.AxesSubplot
             The matplotlib axes object.
         """
+        if isinstance(unit, u.quantity.Quantity):
+            unit = unit.unit
+
+        if unit is None:
+            unit = self.frequency.unit
+            if format == 'period':
+                unit = self.period.unit
+
         if style is None or style == 'lightkurve':
             style = MPLSTYLE
         if ylabel is None:
-            try:
-                ylabel = "Power Spectral Density [{}]".format(self.power.unit.to_string('latex'))
-            except AttributeError:
-                pass
+            ylabel = "Power Spectral Density [{}]".format(self.power.unit.to_string('latex'))
 
         # This will need to be fixed with housekeeping. Self.label currently doesnt exist.
-        if ('label' not in kwargs):
-            try:
-                kwargs['label'] = self.label
-            except AttributeError:
-                kwargs['label'] = None
+        if ('label' not in kwargs) and ('label' in self.__dir__()):
+            kwargs['label'] = self.label
 
         with plt.style.context(style):
             if ax is None:
                 fig, ax = plt.subplots()
 
             # Plot frequency and power
-            if format == 'frequency':
-                ax.plot(self.frequency, self.power, **kwargs)
+            if format.lower() == 'frequency':
+                ax.plot(self.frequency.to(unit), self.power, **kwargs)
                 if xlabel is None:
-                    try:
-                        xlabel = "Frequency [{}]".format(self.frequency.unit.to_string('latex'))
-                    except AttributeError:
-                        pass
-            if format == 'period':
-                ax.plot(self.period, self.power, **kwargs)
+                    xlabel = "Frequency [{}]".format(unit.to_string('latex'))
+            elif format.lower() == 'period':
+                ax.plot(self.period.to(unit), self.power, **kwargs)
                 if xlabel is None:
-                    try:
-                        xlabel = "Period [{}]".format((1./self.frequency).unit.to_string('latex'))
-                    except AttributeError:
-                        pass
-
+                    xlabel = "Period [{}]".format(unit.to_string('latex'))
+            else:
+                raise ValueError('{} is not a valid plotting format'.format(format))
             ax.set_xlabel(xlabel)
             ax.set_ylabel(ylabel)
             #Show the legend if labels were set
