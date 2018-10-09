@@ -94,10 +94,10 @@ class Periodogram(object):
         return 1. / self.frequency_at_max_power
 
     @staticmethod
-    def from_lightcurve(lc, nterms=1, nyquist_factor=1, oversample_factor=1,
-                        min_frequency=None, max_frequency=None,
+    def from_lightcurve(lc, min_frequency=None, max_frequency=None,
                         min_period=None, max_period=None,
                         frequency=None, period=None,
+                        nterms=1, nyquist_factor=1, oversample_factor=1,
                         freq_unit=1/u.day, **kwargs):
         """Creates a Periodogram from a LightCurve using the Lomb-Scargle method.
 
@@ -137,16 +137,6 @@ class Periodogram(object):
         ----------
         lc : LightCurve object
             The LightCurve from which to compute the Periodogram.
-        nterms : int
-            Default 1. Number of terms to use in the Fourier fit.
-        nyquist_factor : int
-            Default 1. The multiple of the average Nyquist frequency. Is
-            overriden by maximum_frequency (or minimum period).
-        oversample_factor : int
-            The frequency spacing, determined by the time baseline of the
-            lightcurve, is divided by this factor, oversampling the frequency
-            space. This parameter is identical to the samples_per_peak parameter
-            in astropy.LombScargle()
         min_frequency : float
             If specified, use this minimum frequency rather than one over the
             time baseline.
@@ -167,6 +157,16 @@ class Periodogram(object):
             The regular grid of periods to use (as 1/period). If given a unit,
             it is converted to units of freq_unit. If not, it is assumed to be
             in units of 1/freq_unit. This overrides any set period limits.
+        nterms : int
+            Default 1. Number of terms to use in the Fourier fit.
+        nyquist_factor : int
+            Default 1. The multiple of the average Nyquist frequency. Is
+            overriden by maximum_frequency (or minimum period).
+        oversample_factor : int
+            The frequency spacing, determined by the time baseline of the
+            lightcurve, is divided by this factor, oversampling the frequency
+            space. This parameter is identical to the samples_per_peak parameter
+            in astropy.LombScargle()
         freq_unit : `astropy.units.core.CompositeUnit`
             Default: 1/u.day. The desired frequency units for the Lomb Scargle
             periodogram. This implies that 1/freq_unit is the units for period.

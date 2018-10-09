@@ -799,25 +799,15 @@ class LightCurve(object):
         """
         return self.to_pandas().to_csv(path_or_buf=path_or_buf, **kwargs)
 
-    def periodogram(self, nterms = 1, nyquist_factor = 1, oversample_factor = 1,
-                        min_frequency = None, max_frequency = None,
-                        min_period = None, max_period = None,
-                        frequency = None, period = None,
-                        freq_unit = 1/u.day, **kwargs):
-        """Returns a `Periodogram`.
+    def periodogram(self, nterms=1, nyquist_factor=1, oversample_factor=1,
+                    min_frequency=None, max_frequency=None,
+                    min_period=None, max_period=None,
+                    frequency=None, period=None,
+                    freq_unit=1/u.day, **kwargs):
+        """Returns a `Periodogram` power spectrum object.
 
         Parameters
         ----------
-        nterms : int
-            Default 1. Number of terms to use in the Fourier fit.
-        nyquist_factor : int
-            Default 1. The multiple of the average Nyquist frequency. Is
-            overriden by maximum_frequency (or minimum period).
-        oversample_factor : int
-            The frequency spacing, determined by the time baseline of the
-            lightcurve, is divided by this factor, oversampling frequency space.
-            This parameter is identical to the samples_per_peak parameter in
-            astropy.LombScargle()
         min_frequency : float
             If specified, use this minimum frequency rather than one over the
             time baseline.
@@ -838,6 +828,16 @@ class LightCurve(object):
             The regular grid of periods to use (as 1/period). If given a unit,
             it is converted to units of freq_unit. If not, it is assumed to be
             in units of 1/freq_unit. This overrides any set period limits.
+        nterms : int
+            Default 1. Number of terms to use in the Fourier fit.
+        nyquist_factor : int
+            Default 1. The multiple of the average Nyquist frequency. Is
+            overriden by maximum_frequency (or minimum period).
+        oversample_factor : int
+            The frequency spacing, determined by the time baseline of the
+            lightcurve, is divided by this factor, oversampling frequency space.
+            This parameter is identical to the samples_per_peak parameter in
+            astropy.LombScargle()
         freq_unit : `astropy.units.core.CompositeUnit`
             Default: 1/u.day. The desired frequency units for the Lomb Scargle
             periodogram. This implies that 1/freq_unit is the units for period.
@@ -850,17 +850,18 @@ class LightCurve(object):
             Returns a Periodogram object extracted from the lightcurve.
         """
         from . import Periodogram
-        return Periodogram.from_lightcurve(lc=self, nterms = nterms,
-                            nyquist_factor = nyquist_factor,
-                            oversample_factor = oversample_factor,
-                            min_frequency = min_frequency,
-                            max_frequency = max_frequency,
-                            min_period = min_period,
-                            max_period = max_period,
-                            frequency = frequency,
-                            period = period,
-                            freq_unit = freq_unit,
-                            **kwargs)
+        return Periodogram.from_lightcurve(lc=self,
+                                           min_frequency=min_frequency,
+                                           max_frequency=max_frequency,
+                                           min_period=min_period,
+                                           max_period=max_period,
+                                           frequency=frequency,
+                                           period=period,
+                                           nterms=nterms,
+                                           nyquist_factor=nyquist_factor,
+                                           oversample_factor=oversample_factor,
+                                           freq_unit=freq_unit,
+                                           **kwargs)
 
     def to_fits(self, path=None, overwrite=False, **extra_data):
         """Writes the KeplerLightCurve to a fits file.
