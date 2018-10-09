@@ -11,14 +11,8 @@ import pytest
 import tempfile
 
 from ..targetpixelfile import KeplerTargetPixelFile, KeplerTargetPixelFileFactory
-<<<<<<< HEAD
-from ..utils import KeplerQualityFlags, query_catalog
-
-from ..targetpixelfile import TessTargetPixelFile
-=======
 from ..targetpixelfile import TessTargetPixelFile
 from ..utils import KeplerQualityFlags, query_catalog
->>>>>>> e95b90fe439438093aec8d31399cbe2f0f98186c
 
 
 filename_tpf_all_zeros = get_pkg_data_filename("data/test-tpf-all-zeros.fits")
