@@ -414,32 +414,89 @@ class LightCurve(object):
         return nlc
 
     def remove_outliers(self, sigma=5., return_mask=False, **kwargs):
-        """Removes outlier flux values using sigma-clipping.
+        """Removes outlier data points using sigma-clipping.
 
-        This method returns a new LightCurve object from which flux values
-        are removed if they are separated from the mean flux by `sigma` times
-        the standard deviation.
+        This method returns a new :class:`LightCurve` object from which data
+        points are removed if their flux values are greater or smaller than
+        the median flux by at least ``sigma`` times the standard deviation.
+
+        Sigma-clipping works by iterating over data points, each time rejecting
+        values that are discrepant by more than a specified number of standard
+        deviations from a center value. If the data contains invalid values
+        (NaNs or infs), they are automatically masked before performing the
+        sigma clipping.
+
+        .. note::
+            This function is a convenience wrapper around
+            `astropy.stats.sigma_clip
+            <http://docs.astropy.org/en/stable/api/astropy.stats.sigma_clip.html>`_
+            and provides the same functionality.
 
         Parameters
         ----------
         sigma : float
-            The number of standard deviations to use for clipping outliers.
-            Defaults to 5.
+            The number of standard deviations to use for both the lower and
+            upper clipping limit. These limits are overridden by
+            ``sigma_lower`` and ``sigma_upper``, if input. Defaults to 5.
+        sigma_lower : float or `None`
+            The number of standard deviations to use as the lower bound for
+            the clipping limit. Can be set to float('inf') in order to avoid
+            clipping outliers below the median at all. If `None` then the
+            value of ``sigma`` is used. Defaults to `None`.
+        sigma_upper : float or `None`
+            The number of standard deviations to use as the upper bound for
+            the clipping limit. Can be set to float('inf') in order to avoid
+            clipping outliers above the median at all. If `None` then the
+            value of ``sigma`` is used. Defaults to `None`.
         return_mask : bool
-            Whether or not to return the mask indicating which data points
-            were removed. Entries marked as `True` are considered outliers.
+            Whether or not to return a mask (i.e. a boolean array) indicating
+            which data points were removed. Entries marked as `True` in the
+            mask are considered outliers. Defaults to `True`.
+        iters : int or `None`
+            The number of iterations to perform sigma clipping, or `None` to
+            clip until convergence is achieved (i.e., continue until the
+            last iteration clips nothing). Defaults to 5.
+        cenfunc : callable
+            The function used to compute the center for the clipping. Must
+            be a callable that takes in a masked array and outputs the
+            central value. Defaults to the median (`numpy.ma.median`).
         **kwargs : dict
             Dictionary of arguments to be passed to `astropy.stats.sigma_clip`.
 
         Returns
         -------
-        clean_lightcurve : LightCurve object
-            A new ``LightCurve`` in which outliers have been removed.
+        clean_lc : LightCurve object
+            A new :class:`LightCurve` from which outlier data points have been
+            removed.
+
+        Examples
+        --------
+        This example generates a new LightCurve in which all points
+        that are more than 1 standard deviation from the median are removed::
+
+            >>> lc = LightCurve(time=[1, 2, 3, 4, 5], flux=[1, 1000, 1, -1000, 1])
+            >>> lc_clean = lc.remove_outliers(sigma=1)
+            >>> lc_clean.time
+            array([1, 3, 5])
+            >>> lc_clean.flux
+            array([1, 1, 1])
+
+        This example removes only points where the flux is larger than 1
+        standard deviation from the median, but leaves negative outliers
+        in place::
+
+            >>> lc = LightCurve(time=[1, 2, 3, 4, 5], flux=[1, 1000, 1, -1000, 1])
+            >>> lc_clean = lc.remove_outliers(sigma_lower=float('inf'), sigma_upper=1)
+            >>> lc_clean.time
+            array([1, 3, 4, 5])
+            >>> lc_clean.flux
+            array([    1,     1, -1000,     1])
         """
+        # First, we create the outlier mask using AstroPy's sigma_clip function
         with warnings.catch_warnings():  # Ignore warnings due to NaNs or Infs
             warnings.simplefilter("ignore")
             outlier_mask = sigma_clip(data=self.flux, sigma=sigma, **kwargs).mask
-
+        # Second, we return the masked lightcurve and optionally the mask itself
         if return_mask:
             return self[~outlier_mask], outlier_mask
         return self[~outlier_mask]
