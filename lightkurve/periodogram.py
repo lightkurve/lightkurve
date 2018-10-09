@@ -387,7 +387,7 @@ class Periodogram(object):
             ylabel = "Power Spectral Density [{}]".format(self.power.unit.to_string('latex'))
 
         # This will need to be fixed with housekeeping. Self.label currently doesnt exist.
-        if ('label' not in kwargs) and ('label' in self.__dir__()):
+        if ('label' not in kwargs) and ('label' in dir(self)):
             kwargs['label'] = self.label
 
         with plt.style.context(style):
