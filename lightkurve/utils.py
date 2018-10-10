@@ -2,6 +2,7 @@
 from __future__ import division, print_function
 import logging
 import sys
+import warnings
 
 from astropy.visualization import (PercentileInterval, ImageNormalize,
                                    SqrtStretch, LinearStretch)
@@ -399,7 +400,9 @@ def plot_image(image, ax=None, scale='linear', origin='lower',
     """
     if ax is None:
         _, ax = plt.subplots()
-    vmin, vmax = PercentileInterval(95.).get_limits(image[image > 0])
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", RuntimeWarning)  # ignore image NaN values
+        vmin, vmax = PercentileInterval(95.).get_limits(image[image > 0])
 
     norm = None
     if scale is not None:
