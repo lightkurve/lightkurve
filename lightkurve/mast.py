@@ -50,7 +50,7 @@ def download_products(products):
             download_dir = cache_dir
         # downloads locally if OS error occurs
         except OSError:
-            log.warning('Warning: unable to create astropy cache directory. '
+            log.warning('Warning: unable to create .lightkurve-cache directory. '
                         'Downloading MAST files to local directory.')
             download_dir = '.'
 
