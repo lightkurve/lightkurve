@@ -5,10 +5,10 @@ import numpy as np
 from .lightcurve import LightCurve
 
 
-__all__ = ['cdpp']
+__all__ = ['estimate_cdpp']
 
 
-def cdpp(flux, **kwargs):
+def estimate_cdpp(flux, **kwargs):
     """A convenience function which wraps LightCurve.estimate_cdpp().
 
     For details on the algorithm used to compute the Combined Differential
