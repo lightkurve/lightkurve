@@ -794,7 +794,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
         if 'background_prior' not in kwargs:
             if np.all(np.isnan(self.flux_bkg)):  # If TargetPixelFile has no background flux data
                 # Use the median of the lower half of flux as an estimate for flux_bkg
-                clipped_flux = np.ma.masked_where(self.flux > np.percentile(self.flux,50), self.flux)
+                clipped_flux = np.ma.masked_where(self.flux > np.percentile(self.flux, 50),
+                                                  self.flux)
                 flux_prior = GaussianPrior(mean=np.ma.median(clipped_flux),
                                            var=np.ma.std(clipped_flux)**2)
             else:
@@ -911,7 +912,9 @@ class KeplerTargetPixelFile(TargetPixelFile):
         try:
             mid_hdu = _open_image(images[int(len(images) / 2) - 1], extension)
             wcs_ref = WCS(mid_hdu)
-            column, row = wcs_ref.wcs_world2pix(np.asarray([[position.ra.deg], [position.dec.deg]]).T, 0)[0]
+            column, row = wcs_ref.wcs_world2pix(
+                            np.asarray([[position.ra.deg], [position.dec.deg]]).T,
+                            0)[0]
             column, row = int(column), int(row)
         except Exception:
             raise FactoryError("Images must have a valid WCS astrometric solution.")
@@ -923,7 +926,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                                n_cols=size[1],
                                                target_id=target_id)
 
-        #Get some basic keywords
+        # Get some basic keywords
         for kw in basic_keywords:
             if kw in mid_hdu.header:
                 if not isinstance(mid_hdu.header[kw], Undefined):
@@ -934,7 +937,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         allkeys = hdu0_keywords.copy()
         allkeys.update(carry_keywords)
 
-        ext_info = {'1CRV5P':column, '2CRV5P':row}
+        ext_info = {'1CRV5P': column, '2CRV5P': row}
 
         for idx, img in tqdm(enumerate(images), total=len(images)):
             hdu = _open_image(img, extension)
@@ -1020,7 +1023,7 @@ class KeplerTargetPixelFileFactory(object):
             self.pos_corr1[frameno] = header['POS_CORR1']
         if 'POS_CORR2' in header:
             self.pos_corr2[frameno] = header['POS_CORR2']
-        if wcs == None:
+        if wcs is None:
             self.pos_corr1[frameno], self.pos_corr2[frameno] = None, None
 
     def _check_data(self):
@@ -1036,7 +1039,9 @@ class KeplerTargetPixelFileFactory(object):
     def get_tpf(self, hdu0_keywords={}, ext_info={}, **kwargs):
         """Returns a KeplerTargetPixelFile object."""
         self._check_data()
-        return KeplerTargetPixelFile(self._hdulist(hdu0_keywords=hdu0_keywords, ext_info=ext_info), **kwargs)
+        return KeplerTargetPixelFile(self._hdulist(hdu0_keywords=hdu0_keywords,
+                                                   ext_info=ext_info),
+                                     **kwargs)
 
     def _hdulist(self, hdu0_keywords={}, ext_info={}):
         """Returns an astropy.io.fits.HDUList object."""
@@ -1069,9 +1074,9 @@ class KeplerTargetPixelFileFactory(object):
                    "RA_OBJ", "DEC_OBJ"]:
             hdu.header[kw] = ""
 
-        #Some keywords just shouldn't be passed to the new header.
+        # Some keywords just shouldn't be passed to the new header.
         bad_keys = ['ORIGIN', 'DATE', 'OBJECT', 'SIMPLE', 'BITPIX',
-                    'NAXIS' ,'EXTEND', 'NEXTEND', 'EXTNAME', 'NAXIS1',
+                    'NAXIS', 'EXTEND', 'NEXTEND', 'EXTNAME', 'NAXIS1',
                     'NAXIS2', 'QUALITY']
         for kw, val in hdu0_keywords.items():
             if kw in bad_keys:
@@ -1132,20 +1137,20 @@ class KeplerTargetPixelFileFactory(object):
                 except KeyError:
                     hdu.header[kw] = (template[kw],
                                       template.comments[kw])
-        wcs_keywords = {'CTYPE1':'1CTYP{}',
-                        'CTYPE2':'2CTYP{}',
-                        'CRPIX1':'1CRPX{}',
-                        'CRPIX2':'2CRPX{}',
-                        'CRVAL1':'1CRVL{}',
-                        'CRVAL2':'2CRVL{}',
-                        'CUNIT1':'1CUNI{}',
-                        'CUNIT2':'2CUNI{}',
-                        'CDELT1':'1CDLT{}',
-                        'CDELT2':'2CDLT{}',
-                        'PC1_1':'11PC{}',
-                        'PC1_2':'12PC{}',
-                        'PC2_1':'21PC{}',
-                        'PC2_2':'22PC{}'}
+        wcs_keywords = {'CTYPE1': '1CTYP{}',
+                        'CTYPE2': '2CTYP{}',
+                        'CRPIX1': '1CRPX{}',
+                        'CRPIX2': '2CRPX{}',
+                        'CRVAL1': '1CRVL{}',
+                        'CRVAL2': '2CRVL{}',
+                        'CUNIT1': '1CUNI{}',
+                        'CUNIT2': '2CUNI{}',
+                        'CDELT1': '1CDLT{}',
+                        'CDELT2': '2CDLT{}',
+                        'PC1_1': '11PC{}',
+                        'PC1_2': '12PC{}',
+                        'PC2_1': '21PC{}',
+                        'PC2_2': '22PC{}'}
         # Override defaults using data calculated in from_fits_images
         for kw in ext_info.keys():
             if kw in wcs_keywords.keys():
@@ -1174,7 +1179,7 @@ class KeplerTargetPixelFileFactory(object):
         # Override the defaults where necessary
         for keyword in ['CTYPE1', 'CTYPE2', 'CRPIX1', 'CRPIX2', 'CRVAL1', 'CRVAL2', 'CUNIT1',
                         'CUNIT2', 'CDELT1', 'CDELT2', 'PC1_1', 'PC1_2', 'PC2_1', 'PC2_2']:
-                hdu.header[keyword] = ""  #override wcs keywords
+                hdu.header[keyword] = ""  # override wcs keywords
         hdu.header['EXTNAME'] = 'APERTURE'
         return hdu
 
