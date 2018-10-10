@@ -17,10 +17,10 @@ lightkurve
               :target: https://doi.org/10.5281/zenodo.1181928
 
 
-The **lightkurve** Python package offers a beautiful and user-friendly way
+**Lightkurve** is a community-developed, open-source Python package which offers a beautiful and user-friendly way
 to analyze astronomical flux time series data,
 in particular the pixels and lightcurves obtained by
-**NASA's Kepler, K2, and TESS missions**.
+**NASA's Kepler, K2, and TESS exoplanet missions**.
 
 .. image:: http://lightkurve.keplerscience.org/_images/lightkurve-teaser.gif
 
