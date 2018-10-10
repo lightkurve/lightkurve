@@ -75,6 +75,7 @@ Building the **lightkurve** documentation requires a few extra packages:
 
 - sphinx
 - sphinx-automodapi
+- sphinx-rtd-theme
 - nbsphinx
 - `numpydoc <https://github.com/numpy/numpydoc>`_
 
