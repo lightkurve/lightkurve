@@ -75,7 +75,7 @@ class SearchResult(object):
         """Returns an array of dec values for targets in search"""
         return np.asarray(self.path['s_dec'])
 
-    def download(self, **kwargs):
+    def download(self):
         """
         Downloads a single KeplerTargetPixelFile or KeplerLightCurveFile object from search result.
         If multiple files are present in `products`, only the first will be downloaded.
@@ -100,14 +100,12 @@ class SearchResult(object):
         # return single tpf or lcf
         if self.filetype == "Target Pixel":
             return KeplerTargetPixelFile(path[0],
-                                         quality_bitmask=self.quality_bitmask,
-                                         **kwargs)
+                                         quality_bitmask=self.quality_bitmask)
         elif self.filetype == "Lightcurve":
             return KeplerLightCurveFile(path[0],
-                                        quality_bitmask=self.quality_bitmask,
-                                        **kwargs)
+                                        quality_bitmask=self.quality_bitmask)
 
-    def download_all(self, **kwargs):
+    def download_all(self):
         """
         Downloads a KeplerTargetPixelFileCollection or KeplerLightCurveFileCollection from search results.
         """
@@ -125,13 +123,11 @@ class SearchResult(object):
         # return collection of tpf or lcf
         if self.filetype == "Target Pixel":
             tpfs = [KeplerTargetPixelFile(p,
-                                         quality_bitmask=self.quality_bitmask,
-                                         **kwargs) for p in path]
+                                         quality_bitmask=self.quality_bitmask) for p in path]
             return TargetPixelFileCollection(tpfs)
         elif self.filetype == "Lightcurve":
             lcs = [KeplerLightCurveFile(p,
-                                   quality_bitmask=self.quality_bitmask,
-                                   **kwargs) for p in path]
+                                   quality_bitmask=self.quality_bitmask) for p in path]
             return LightCurveFileCollection(lcs)
 
     def _mask_products(self, products, filetype='Target Pixel', cadence='long', quarter=None,
@@ -283,7 +279,7 @@ class ArchiveError(Exception):
     """Raised if there is a problem accessing data."""
     pass
 
-def _query_mast(target, cadence='long', radius=.0001, targetlimit=None, **kwargs):
+def _query_mast(target, cadence='long', radius=.0001, targetlimit=None):
     """
     Returns a table of Kepler or K2 Target Pixel Files or Lightcurve Files
      for a given target.
@@ -363,7 +359,7 @@ def _query_mast(target, cadence='long', radius=.0001, targetlimit=None, **kwargs
 
 def search_targetpixelfile(target, cadence='long', quarter=None, month=None,
                            campaign=None, radius=.0001, targetlimit=None,
-                           quality_bitmask='default', **kwargs):
+                           quality_bitmask='default'):
 
     """
     Fetch a data table for Target Pixel Files within a region of sky. Cone search is
@@ -398,9 +394,6 @@ def search_targetpixelfile(target, cadence='long', quarter=None, month=None,
               (`quality_bitmask=2096639`). This mask is not recommended.
 
         See the :class:`KeplerQualityFlags` class for details on the bitmasks.
-    kwargs : dict
-        Keywords arguments passed to the constructor of
-        :class:`KeplerTargetPixelFile`.
 
     Returns
     -------
@@ -417,7 +410,7 @@ def search_targetpixelfile(target, cadence='long', quarter=None, month=None,
 
 def search_lightcurvefile(target, cadence='long', quarter=None, month=None,
                           campaign=None, radius=.0001, targetlimit=None,
-                          quality_bitmask='default', **kwargs):
+                          quality_bitmask='default'):
 
     """
     Fetch a data table for Lightcurve Files within a region of sky. Cone search is
@@ -452,9 +445,6 @@ def search_lightcurvefile(target, cadence='long', quarter=None, month=None,
               (`quality_bitmask=2096639`). This mask is not recommended.
 
         See the :class:`KeplerQualityFlags` class for details on the bitmasks.
-    kwargs : dict
-        Keywords arguments passed to the constructor of
-        :class:`KeplerTargetPixelFile`.
 
     Returns
     -------
