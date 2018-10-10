@@ -115,11 +115,8 @@ class SearchResult(object):
         # create products table
         products = self.products
 
-        # check if download directory exists
-        if not os.path.isdir(os.path.expanduser('~')+'/.astropy'):
-            os.mkdir(os.path.expanduser('~')+'/.astropy')
-        # download first product in table
-        download_dir = os.path.expanduser('~')+'/.astropy'
+        # should download to `~/.lightkurve-cache`, make sure dir exists and is accessible
+        download_dir = self._fetch_dir()
 
         # download all products in table
         path = Observations.download_products(self.full_products, mrp_only=False,
@@ -255,6 +252,33 @@ class SearchResult(object):
 
         return products
 
+    def _fetch_dir(self):
+        '''
+        Checks existance of `~/.lightkurve-cache` directory and creates one if
+        none is found.
+
+        Returns
+        -------
+        download_dir : str
+            Path to location of `mastDownload` folder where data downloaded from MAST are stored
+        '''
+        # check if download directory exists (~/.lightkurve-cache)
+        cache_dir = os.path.join(os.path.expanduser('~'), '.lightkurve-cache')
+        if os.path.isdir(cache_dir):
+            download_dir = cache_dir
+        else:
+            # if it doesn't exist, make a new cache directory
+            try:
+                os.mkdir(cache_dir)
+                download_dir = cache_dir
+            # downloads locally if OS error occurs
+            except OSError:
+                log.warning('Warning: unable to create .lightkurve-cache directory. '
+                            'Downloading MAST files to local directory.')
+                download_dir = '.'
+
+        return download_dir
+
 class ArchiveError(Exception):
     """Raised if there is a problem accessing data."""
     pass
@@ -278,7 +302,7 @@ def _query_mast(target, cadence='long', radius=.0001, targetlimit=None, **kwargs
     Returns
     -------
     path : astropy.Table
-    Table detailing the available observations on MAST.
+        Table detailing the available observations on MAST.
     """
 
     # If passed a SkyCoord, convert it to an RA and Dec
