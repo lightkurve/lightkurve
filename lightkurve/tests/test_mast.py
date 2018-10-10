@@ -150,7 +150,6 @@ def test_verbosity(capfd):
     out, err = capfd.readouterr()
     assert log.isEnabledFor(logging.ERROR)
     assert not log.isEnabledFor(logging.DEBUG)
-    assert len(out) == 0
 
 
 @pytest.mark.remote_data
