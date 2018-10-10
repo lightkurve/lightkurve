@@ -19,7 +19,7 @@ log = logging.getLogger(__name__)
 
 class SearchResult(object):
     """
-    Defines a generic SearchResult class returned by `search_tpf` or `search_lcf`.
+    Defines a generic SearchResult class returned by `search_targetpixelfile` or `search_lightcurvefile`.
     """
 
     def __init__(self, path, campaign=None, quarter=None, month=None, cadence=None,
@@ -361,9 +361,9 @@ def _query_mast(target, cadence='long', radius=.0001, targetlimit=None, **kwargs
     return path
 
 
-def search_tpf(target, cadence='long', quarter=None, month=None,
-               campaign=None, radius=.0001, targetlimit=None,
-               quality_bitmask='default', **kwargs):
+def search_targetpixelfile(target, cadence='long', quarter=None, month=None,
+                           campaign=None, radius=.0001, targetlimit=None,
+                           quality_bitmask='default', **kwargs):
 
     """
     Fetch a data table for Target Pixel Files within a region of sky. Cone search is
@@ -415,9 +415,9 @@ def search_tpf(target, cadence='long', quarter=None, month=None,
     return SearchResult(path, campaign=campaign, quarter=quarter, month=month,
                         cadence=cadence, filetype=filetype, quality_bitmask=quality_bitmask)
 
-def search_lcf(target, cadence='long', quarter=None, month=None,
-               campaign=None, radius=.0001, targetlimit=None,
-               quality_bitmask='default', **kwargs):
+def search_lightcurvefile(target, cadence='long', quarter=None, month=None,
+                          campaign=None, radius=.0001, targetlimit=None,
+                          quality_bitmask='default', **kwargs):
 
     """
     Fetch a data table for Lightcurve Files within a region of sky. Cone search is
