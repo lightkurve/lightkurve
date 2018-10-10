@@ -1,5 +1,6 @@
 from __future__ import division, print_function
 import os
+import sys
 import logging
 import numpy as np
 import copy
@@ -20,6 +21,35 @@ log = logging.getLogger(__name__)
 class SearchResult(object):
     """
     Defines a generic SearchResult class returned by `search_targetpixelfile` or `search_lightcurvefile`.
+
+    Parameters
+    ----------
+    path : astropy table
+        Astropy table returned by the astroquery `Observations.query_criteria()` function
+    campaign : int or list
+        Desired campaign of observation for data products
+    quarter : int or list
+        Desired quarter of observation for data products
+    month : int or list
+        Desired month of observation for data products
+    cadence : str
+        Desired cadence (`long`, `short`, `any`)
+    filetpye : str
+        Type of files queried at MAST (`Target Pixel` or `Lightcurve`)
+    quality_bitmask : str or int
+        Bitmask (integer) which identifies the quality flag bitmask that should
+        be used to mask out bad cadences. If a string is passed, it has the
+        following meaning:
+
+            * "none": no cadences will be ignored (`quality_bitmask=0`).
+            * "default": cadences with severe quality issues will be ignored
+              (`quality_bitmask=1130799`).
+            * "hard": more conservative choice of flags to ignore
+              (`quality_bitmask=1664431`). This is known to remove good data.
+            * "hardest": removes all data that has been flagged
+              (`quality_bitmask=2096639`). This mask is not recommended.
+
+        See the :class:`KeplerQualityFlags` class for details on the bitmasks.
     """
 
     def __init__(self, path, campaign=None, quarter=None, month=None, cadence=None,
@@ -79,6 +109,13 @@ class SearchResult(object):
         """
         Downloads a single KeplerTargetPixelFile or KeplerLightCurveFile object from search result.
         If multiple files are present in `products`, only the first will be downloaded.
+
+        Returns
+        -------
+        KeplerTargetPixelFile : `KeplerTargetPixelFile` object
+            Returns a single `KeplerTargetPixelFile` for first entry in products table
+        KeplerLightCurveFile : `KeplerLightCurve` object
+            Returns a single `KeplerLightCurveFile` for first entry in products table
         """
 
         # create products table
@@ -108,6 +145,13 @@ class SearchResult(object):
     def download_all(self):
         """
         Downloads a KeplerTargetPixelFileCollection or KeplerLightCurveFileCollection from search results.
+
+        Returns
+        -------
+        KeplerTargetPixelFileCollection : `KeplerTargetPixelFileCollection` object
+            Returns a single `KeplerTargetPixelFileCollection` containing all entries in products table
+        KeplerLightCurveFileCollection : `KeplerLightCurveFileCollection` object
+            Returns a single `KeplerLightCurveFileCollection` containing all entries in products table
         """
 
         # create products table
@@ -130,11 +174,33 @@ class SearchResult(object):
                                    quality_bitmask=self.quality_bitmask) for p in path]
             return LightCurveFileCollection(lcs)
 
-    def _mask_products(self, products, filetype='Target Pixel', cadence='long', quarter=None,
-                       month=None, campaign=None, searchtype='single', targetlimit=1):
+    def _mask_products(self, products, campaign=None, quarter=None, month=None, cadence='long',
+                       filetype='Target Pixel', targetlimit=1):
         """
         Masks contents of products table based on given `cadence`, `quarter`, `month`, `campaign`
         constraints.
+
+        Parameters
+        ----------
+        products : astropy table
+            Full astropy table containing data products returned by MAST
+        campaign : int or list
+            Desired campaign of observation for data products
+        quarter : int or list
+            Desired quarter of observation for data products
+        month : int or list
+            Desired month of observation for data products
+        cadence : str
+            Desired cadence (`long`, `short`, `any`)
+        filetpye : str
+            Type of files queried at MAST (`Target Pixel` or `Lightcurve`)
+        targetlimit : int
+            Maximum number of targets in astropy table
+
+        Returns
+        -------
+        products : astropy table
+            Masked astropy table containing desired data products
         """
         # Value for the quarter or campaign
         qoc = campaign if campaign is not None else quarter
