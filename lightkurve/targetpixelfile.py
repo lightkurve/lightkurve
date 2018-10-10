@@ -59,15 +59,16 @@ class TargetPixelFile(object):
         else:
             self._hdu = value
 
-    def header(self, ext=0):
-        """Returns the header for a given extension."""
-        return self.hdu[ext].header
+    @property
+    def header(self):
+        """Returns the header of the primary extension."""
+        return self.hdu[0].header
 
     @property
     def ra(self):
         """Right Ascension of target ('RA_OBJ' header keyword)."""
         try:
-            return self.header()['RA_OBJ']
+            return self.header['RA_OBJ']
         except KeyError:
             return None
 
@@ -75,7 +76,7 @@ class TargetPixelFile(object):
     def dec(self):
         """Declination of target ('DEC_OBJ' header keyword)."""
         try:
-            return self.header()['DEC_OBJ']
+            return self.header['DEC_OBJ']
         except KeyError:
             return None
 
@@ -256,7 +257,7 @@ class TargetPixelFile(object):
             return ra[cadence], dec[cadence]
         return ra, dec
 
-    def properties(self):
+    def show_properties(self):
         '''Print out a description of each of the non-callable attributes of a
         TargetPixelFile object.
 
@@ -331,19 +332,11 @@ class TargetPixelFile(object):
             Object containing the resulting lightcurve.
         """
         if method == 'aperture':
-            return self.aperture_photometry(**kwargs)
+            return self.extract_aperture_photometry(**kwargs)
         elif method == 'prf':
             return self.prf_lightcurve(**kwargs)
         else:
             raise ValueError("Photometry method must be 'aperture' or 'prf'.")
-
-    def aperture_photometry(self):
-        raise NotImplementedError("This is an abstract method that is "
-                                  "implemented in the subclasses.")
-
-    def prf_photometry(self):
-        raise NotImplementedError("This is an abstract method that is "
-                                  "implemented in the subclasses.")
 
     def _parse_aperture_mask(self, aperture_mask):
         """Parse the `aperture_mask` parameter as given by a user.
@@ -377,8 +370,8 @@ class TargetPixelFile(object):
         self._last_aperture_mask = aperture_mask
         return aperture_mask
 
-    def centroids(self, aperture_mask='pipeline'):
-        """Returns centroids based on sample moments.
+    def estimate_centroids(self, aperture_mask='pipeline'):
+        """Returns centroid positions estimated using sample moments.
 
         Parameters
         ----------
@@ -555,7 +548,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                 bitmask=quality_bitmask)
         if self.targetid is None:
             try:
-                self.targetid = self.header()['KEPLERID']
+                self.targetid = self.header['KEPLERID']
             except KeyError:
                 pass
 
@@ -645,22 +638,22 @@ class KeplerTargetPixelFile(TargetPixelFile):
     @property
     def obsmode(self):
         """'short cadence' or 'long cadence'. ('OBSMODE' header keyword)"""
-        return self.header()['OBSMODE']
+        return self.header['OBSMODE']
 
     @property
     def module(self):
         """Kepler CCD module number. ('MODULE' header keyword)"""
-        return self.header()['MODULE']
+        return self.header['MODULE']
 
     @property
     def output(self):
         """Kepler CCD module output number. ('OUTPUT' header keyword)"""
-        return self.header()['OUTPUT']
+        return self.header['OUTPUT']
 
     @property
     def channel(self):
         """Kepler CCD channel number. ('CHANNEL' header keyword)"""
-        return self.header()['CHANNEL']
+        return self.header['CHANNEL']
 
     @property
     def astropy_time(self):
@@ -671,7 +664,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
     def quarter(self):
         """Kepler quarter number. ('QUARTER' header keyword)"""
         try:
-            return self.header(ext=0)['QUARTER']
+            return self.header['QUARTER']
         except KeyError:
             return None
 
@@ -679,7 +672,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
     def campaign(self):
         """K2 Campaign number. ('CAMPAIGN' header keyword)"""
         try:
-            return self.header(ext=0)['CAMPAIGN']
+            return self.header['CAMPAIGN']
         except KeyError:
             return None
 
@@ -687,11 +680,11 @@ class KeplerTargetPixelFile(TargetPixelFile):
     def mission(self):
         """'Kepler' or 'K2'. ('MISSION' header keyword)"""
         try:
-            return self.header(ext=0)['MISSION']
+            return self.header['MISSION']
         except KeyError:
             return None
 
-    def aperture_photometry(self, aperture_mask='pipeline'):
+    def extract_aperture_photometry(self, aperture_mask='pipeline'):
         """Returns a LightCurve obtained using aperture photometry.
 
         Parameters
@@ -711,7 +704,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         aperture_mask = self._parse_aperture_mask(aperture_mask)
         if aperture_mask.sum() == 0:
             log.warning('Warning: aperture mask contains zero pixels.')
-        centroid_col, centroid_row = self.centroids(aperture_mask)
+        centroid_col, centroid_row = self.estimate_centroids(aperture_mask)
         # Ignore warnings related to zero or negative errors
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", RuntimeWarning)
@@ -727,7 +720,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
-                'label': self.hdu[0].header['OBJECT'],
+                'label': self.header['OBJECT'],
                 'targetid': self.targetid}
         return KeplerLightCurve(time=self.time,
                                 time_format='bkjd',
@@ -750,7 +743,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
-                'label': self.hdu[0].header['OBJECT'],
+                'label': self.header['OBJECT'],
                 'targetid': self.targetid}
         return KeplerLightCurve(time=self.time,
                                 time_format='bkjd',
@@ -781,7 +774,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         from .prf import UniformPrior, GaussianPrior
         # Set up the model
         if 'star_priors' not in kwargs:
-            centr_col, centr_row = self.centroids()
+            centr_col, centr_row = self.estimate_centroids()
             star_priors = [StarPrior(col=GaussianPrior(mean=np.nanmedian(centr_col),
                                                        var=np.nanstd(centr_col)**2),
                                      row=GaussianPrior(mean=np.nanmedian(centr_row),
@@ -804,7 +797,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
             kwargs['background_prior'] = BackgroundPrior(flux=flux_prior)
         return TPFModel(**kwargs)
 
-    def prf_photometry(self, cadences=None, parallel=True, **kwargs):
+    def extract_prf_photometry(self, cadences=None, parallel=True, **kwargs):
         """Returns the results of PRF photometry applied to the pixel file.
 
         Parameters
@@ -833,7 +826,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         return prfphot
 
     def prf_lightcurve(self, **kwargs):
-        lc = self.prf_photometry(**kwargs).lightcurves[0]
+        lc = self.extract_prf_photometry(**kwargs).lightcurves[0]
         keys = {'quality': self.quality,
                 'channel': self.channel,
                 'campaign': self.campaign,
@@ -1206,7 +1199,7 @@ class TessTargetPixelFile(TargetPixelFile):
         # these cadences from being used. They would break most methods!
         self.quality_mask &= np.isfinite(self.hdu[1].data['TIME'])
         try:
-            self.targetid = self.header()['TICID']
+            self.targetid = self.header['TICID']
         except KeyError:
             self.targetid = None
 
@@ -1230,21 +1223,21 @@ class TessTargetPixelFile(TargetPixelFile):
     @property
     def sector(self):
         try:
-            return self.header()['SECTOR']
+            return self.header['SECTOR']
         except KeyError:
             return None
 
     @property
     def camera(self):
         try:
-            return self.header()['CAMERA']
+            return self.header['CAMERA']
         except KeyError:
             return None
 
     @property
     def ccd(self):
         try:
-            return self.header()['CCD']
+            return self.header['CCD']
         except KeyError:
             return None
 
@@ -1257,7 +1250,7 @@ class TessTargetPixelFile(TargetPixelFile):
         """Returns an AstroPy Time object for all good-quality cadences."""
         return btjd_to_astropy_time(btjd=self.time)
 
-    def aperture_photometry(self, aperture_mask='pipeline'):
+    def extract_aperture_photometry(self, aperture_mask='pipeline'):
         """Performs aperture photometry.
 
         Parameters
@@ -1275,7 +1268,7 @@ class TessTargetPixelFile(TargetPixelFile):
         aperture_mask = self._parse_aperture_mask(aperture_mask)
         if aperture_mask.sum() == 0:
             log.warning('Warning: aperture mask contains zero pixels.')
-        centroid_col, centroid_row = self.centroids(aperture_mask)
+        centroid_col, centroid_row = self.estimate_centroids(aperture_mask)
         # Ignore warnings related to zero or negative errors
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", RuntimeWarning)
@@ -1290,7 +1283,7 @@ class TessTargetPixelFile(TargetPixelFile):
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
-                'label': self.hdu[0].header['OBJECT'],
+                'label': self.header['OBJECT'],
                 'targetid': self.targetid}
         return TessLightCurve(time=self.time,
                               time_format='btjd',
@@ -1312,7 +1305,7 @@ class TessTargetPixelFile(TargetPixelFile):
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
-                'label': self.hdu[0].header['OBJECT'],
+                'label': self.header['OBJECT'],
                 'targetid': self.targetid}
         return TessLightCurve(time=self.time,
                               time_format='btjd',

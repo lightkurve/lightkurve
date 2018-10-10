@@ -158,7 +158,7 @@ class LightCurve(object):
             return btjd_to_astropy_time(self.time)
         return Time(self.time, format=self.time_format, scale=self.time_scale)
 
-    def properties(self):
+    def show_properties(self):
         '''Print out a description of each of the non-callable attributes of a
         LightCurve object.
 
@@ -563,8 +563,8 @@ class LightCurve(object):
 
         return binned_lc
 
-    def cdpp(self, transit_duration=13, savgol_window=101, savgol_polyorder=2,
-             sigma_clip=5.):
+    def estimate_cdpp(self, transit_duration=13, savgol_window=101,
+                      savgol_polyorder=2, sigma_clip=5.):
         """Estimate the CDPP noise metric using the Savitzky-Golay (SG) method.
 
         A common estimate of the noise in a lightcurve is the scatter that
@@ -855,11 +855,11 @@ class LightCurve(object):
         """
         return self.to_pandas().to_csv(path_or_buf=path_or_buf, **kwargs)
 
-    def periodogram(self, nterms=1, nyquist_factor=1, oversample_factor=1,
-                    min_frequency=None, max_frequency=None,
-                    min_period=None, max_period=None,
-                    frequency=None, period=None,
-                    freq_unit=1/u.day, **kwargs):
+    def to_periodogram(self, nterms=1, nyquist_factor=1, oversample_factor=1,
+                       min_frequency=None, max_frequency=None,
+                       min_period=None, max_period=None,
+                       frequency=None, period=None,
+                       freq_unit=1/u.day, **kwargs):
         """Returns a `Periodogram` power spectrum object.
 
         Parameters

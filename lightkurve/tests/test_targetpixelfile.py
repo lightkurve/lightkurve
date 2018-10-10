@@ -122,7 +122,7 @@ def test_wcs_tabby():
     tpf = KeplerTargetPixelFile(TABBY_TPF)
     w = tpf.wcs
     ra, dec = tpf.get_coordinates(0)
-    col, row = tpf.centroids()
+    col, row = tpf.estimate_centroids()
     col -= tpf.column
     row -= tpf.row
     y, x = int(np.round(col[0])), int(np.round(row[1]))
@@ -190,10 +190,10 @@ def test_bkg_lightcurve():
 def test_aperture_photometry():
     for tpf in [KeplerTargetPixelFile(filename_tpf_all_zeros),
                 TessTargetPixelFile(filename_tpf_all_zeros)]:
-        tpf.aperture_photometry()
-        tpf.aperture_photometry(aperture_mask=None)
-        tpf.aperture_photometry(aperture_mask='all')
-        tpf.aperture_photometry(aperture_mask='pipeline')
+        tpf.extract_aperture_photometry()
+        tpf.extract_aperture_photometry(aperture_mask=None)
+        tpf.extract_aperture_photometry(aperture_mask='all')
+        tpf.extract_aperture_photometry(aperture_mask='pipeline')
 
 def test_tpf_to_fits():
     """Can we write a TPF back to a fits file?"""
@@ -258,7 +258,7 @@ def test_tpf_factory():
 
     # Can we add our own keywords?
     tpf = factory.get_tpf(hdu0_keywords = {'creator': 'Christina'})
-    assert tpf.header()['CREATOR'] == 'Christina'
+    assert tpf.header['CREATOR'] == 'Christina'
 
 
 def test_tpf_from_images():
@@ -329,7 +329,7 @@ def test_properties2(capfd):
     '''Test if the describe function produces an output.
     The output is 1870 characters at the moment, but we might add more properties.'''
     tpf = KeplerTargetPixelFile(filename_tpf_all_zeros)
-    tpf.properties()
+    tpf.show_properties()
     out, err = capfd.readouterr()
     assert len(out) > 1000
 
@@ -373,7 +373,7 @@ def test_tess_simulation():
     assert tpf.astropy_time.scale == 'tdb'
     assert tpf.flux.shape == tpf.flux_err.shape
     tpf.wcs
-    col, row = tpf.centroids()
+    col, row = tpf.estimate_centroids()
     # Regression test for https://github.com/KeplerGO/lightkurve/pull/236
     assert np.isnan(tpf.time).sum() == 0
 

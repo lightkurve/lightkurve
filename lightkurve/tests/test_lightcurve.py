@@ -208,16 +208,17 @@ def test_lightcurve_scatter():
     lc.fold(**foldkw).scatter(ax=ax[1,1], c=foldedtimeinorder, **scatterkw)
     plt.ylim(0.999, 1.001)
 
+
 def test_cdpp():
     """Test the basics of the CDPP noise metric."""
     # A flat lightcurve should have a CDPP close to zero
-    assert_almost_equal(LightCurve(np.arange(200), np.ones(200)).cdpp(), 0)
+    assert_almost_equal(LightCurve(np.arange(200), np.ones(200)).estimate_cdpp(), 0)
     # An artificial lightcurve with sigma=100ppm should have cdpp=100ppm
     lc = LightCurve(np.arange(10000), np.random.normal(loc=1, scale=100e-6, size=10000))
-    assert_almost_equal(lc.cdpp(transit_duration=1), 100, decimal=-0.5)
+    assert_almost_equal(lc.estimate_cdpp(transit_duration=1), 100, decimal=-0.5)
     # Transit_duration must be an integer (cadences)
     with pytest.raises(ValueError):
-        lc.cdpp(transit_duration=6.5)
+        lc.estimate_cdpp(transit_duration=6.5)
 
 
 @pytest.mark.remote_data
@@ -226,7 +227,7 @@ def test_cdpp_tabby():
     lcf = KeplerLightCurveFile(TABBY_Q8)
     # Tabby's star shows dips after cadence 1000 which increase the cdpp
     lc = LightCurve(lcf.PDCSAP_FLUX.time[:1000], lcf.PDCSAP_FLUX.flux[:1000])
-    assert(np.abs(lc.cdpp() - lcf.header(ext=1)['CDPP6_0']) < 30)
+    assert(np.abs(lc.estimate_cdpp() - lcf.header(ext=1)['CDPP6_0']) < 30)
 
 
 def test_bin():
@@ -450,7 +451,7 @@ def test_properties(capfd):
     The output is 624 characters at the moment, but we might add more properties.'''
     lcf = KeplerLightCurveFile(TABBY_Q8)
     kplc = lcf.get_lightcurve('SAP_FLUX')
-    kplc.properties()
+    kplc.show_properties()
     out, err = capfd.readouterr()
     assert len(out) > 500
 
