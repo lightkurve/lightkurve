@@ -13,6 +13,7 @@ from astropy.io import fits as pyfits
 from .utils import (bkjd_to_astropy_time, KeplerQualityFlags, TessQualityFlags)
 from .mast import download_kepler_products
 
+from . import PACKAGEDIR, MPLSTYLE
 
 __all__ = ['KeplerLightCurveFile', 'TessLightCurveFile']
 
@@ -95,7 +96,7 @@ class LightCurveFile(object):
         types = [n for n in types if not ('ERR' in n)]
         return types
 
-    def plot(self, flux_types=None, style='fast', **kwargs):
+    def plot(self, flux_types=None, style='lightkurve', **kwargs):
         """Plot all the light curves contained in this light curve file.
 
         Parameters
@@ -109,8 +110,8 @@ class LightCurveFile(object):
             Dictionary of keyword arguments to be passed to
             `KeplerLightCurve.plot()`.
         """
-        if (style == "fast") and ("fast" not in mpl.style.available):
-            style = "default"
+        if style is None or style == 'lightkurve':
+            style = MPLSTYLE
         with plt.style.context(style):
             if not ('ax' in kwargs):
                 fig, ax = plt.subplots(1)
