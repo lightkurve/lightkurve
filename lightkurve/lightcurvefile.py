@@ -13,7 +13,7 @@ from astropy.io import fits as pyfits
 from .utils import (bkjd_to_astropy_time, KeplerQualityFlags, TessQualityFlags)
 from .mast import download_kepler_products
 
-from . import PACKAGEDIR, MPLSTYLE
+from . import MPLSTYLE
 
 __all__ = ['KeplerLightCurveFile', 'TessLightCurveFile']
 

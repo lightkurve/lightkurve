@@ -3,7 +3,6 @@
 from __future__ import division, print_function
 
 import copy
-from tqdm import tqdm
 import os
 import datetime
 import logging
@@ -12,7 +11,6 @@ import warnings
 
 import numpy as np
 from scipy import signal
-from scipy.optimize import minimize
 from matplotlib import pyplot as plt
 
 from astropy.stats import sigma_clip

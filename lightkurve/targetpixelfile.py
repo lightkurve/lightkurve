@@ -13,7 +13,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
 from astropy.coordinates import SkyCoord
-from astropy.wcs.utils import skycoord_to_pixel, pixel_to_skycoord
 from astropy.io.fits.card import Undefined
 
 from . import PACKAGEDIR, MPLSTYLE
