@@ -322,7 +322,7 @@ class Periodogram(object):
         binned_pg.power = binned_power
         return binned_pg
 
-    def smooth(self, filter_width = 0.1):
+    def smooth(self, filter_width = 0.1/u.day):
         """Smooths the power spectrum using a simple one dimensional smoothing
         filter. This method requires a Periodogram class built using an evenly
         spaced grid of periods.
@@ -337,14 +337,18 @@ class Periodogram(object):
 
         Returns
         -------
-        smoothed_periodogram : a `Periodogram` object
+        smoothed_pg : a `Periodogram` object
             Returns a new `Periodogram` object which has been smoothed.
         """
         # Input validation
         if filter_width <= 0.:
             raise ValueError('Filter width must be larger than 0')
 
-        filter_width = u.Quantity(filter_width, self.frequency.unit)
+        try:
+            filter_width = u.Quantity(filter_width, self.frequency.unit)
+        except u.UnitConversionError:
+            raise ValueError('filter_width must be in units of frequency.')
+
         fs = np.mean(np.diff(self.frequency))
 
         #Check to see if we have a grid of evenly spaced periods instead.

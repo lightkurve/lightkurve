@@ -81,21 +81,22 @@ def test_bin():
 def test_smooth():
     '''Test if you can smooth the periodogram and check any pitfalls'''
     lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000), flux_err=np.zeros(1000)+0.1)
-    p = lc.periodogram()
-    assert p.smooth().frequency == p.frequency
+    p = lc.to_periodogram()
+    assert all(p.smooth().frequency == p.frequency)
     assert p.smooth().power.unit == p.power.unit
 
     #Can't pass filter_width below 0.
     with pytest.raises(ValueError) as err:
         p.smooth(filter_width=-5.)
     #Can't pass a filter_width in the wrong units
-    with pytest.raises(UnitConversionError) as err:
-        p.smooth(filter_width=5.*u.Msol)
+    with pytest.raises(ValueError) as err:
+        p.smooth(filter_width=5.*u.day)
+    assert err.value.args[0] == 'filter_width must be in units of frequency.'
+
     #Can't (yet) use a periodogram with a non-evenly spaced frqeuencies
     with pytest.raises(NotImplementedError) as err:
         p = np.arange(100)
-        pow = np.arange(100)
-        p = Periodogram(1./p, pow)
+        p = lc.to_periodogram(period=p)
         p.smooth()
 
 def test_index():
