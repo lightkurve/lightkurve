@@ -38,10 +38,7 @@ def download_products(products):
     # Note: by default, MAST will only let us download "Minimum Recommended
     # Products" (MRPs), which do not include e.g. Target Pixel Files.
     # We need to set `mrp=False` to ensure MAST downloads whatever we want.
-<<<<<<< HEAD
 
-=======
->>>>>>> consistent with master
     # check if download directory exists (~/.lightkurve-cache)
     cache_dir = os.path.join(os.path.expanduser('~'), '.lightkurve-cache')
     if os.path.isdir(cache_dir):
