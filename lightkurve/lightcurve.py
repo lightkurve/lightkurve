@@ -156,7 +156,7 @@ class LightCurve(object):
             return btjd_to_astropy_time(self.time)
         return Time(self.time, format=self.time_format, scale=self.time_scale)
 
-    def properties(self):
+    def show_properties(self):
         '''Print out a description of each of the non-callable attributes of a
         LightCurve object.
 
@@ -305,8 +305,11 @@ class LightCurve(object):
                                                          **kwargs)
         trend_signal = np.interp(self.time, lc_clean.time, trend_signal)
         flatten_lc = copy.deepcopy(self)
-        flatten_lc.flux = flatten_lc.flux / trend_signal
-        flatten_lc.flux_err = flatten_lc.flux_err / trend_signal
+        with warnings.catch_warnings():
+            # ignore invalid division warnings
+            warnings.simplefilter("ignore", RuntimeWarning)
+            flatten_lc.flux = flatten_lc.flux / trend_signal
+            flatten_lc.flux_err = flatten_lc.flux_err / trend_signal
         if return_trend:
             trend_lc = copy.deepcopy(self)
             trend_lc.flux = trend_signal
@@ -561,8 +564,14 @@ class LightCurve(object):
 
         return binned_lc
 
-    def cdpp(self, transit_duration=13, savgol_window=101, savgol_polyorder=2,
-             sigma_clip=5.):
+    def cdpp(self, **kwargs):
+        """DEPRECATED: use `estimate_cdpp()` instead."""
+        log.warning("WARNING: cdpp() is deprecated and will be removed in v1.0.0; "
+                    "please use estimate_cdpp() instead.")
+        return self.estimate_cdpp(**kwargs)
+
+    def estimate_cdpp(self, transit_duration=13, savgol_window=101,
+                      savgol_polyorder=2, sigma_clip=5.):
         """Estimate the CDPP noise metric using the Savitzky-Golay (SG) method.
 
         A common estimate of the noise in a lightcurve is the scatter that
@@ -853,11 +862,11 @@ class LightCurve(object):
         """
         return self.to_pandas().to_csv(path_or_buf=path_or_buf, **kwargs)
 
-    def periodogram(self, nterms=1, nyquist_factor=1, oversample_factor=1,
-                    min_frequency=None, max_frequency=None,
-                    min_period=None, max_period=None,
-                    frequency=None, period=None,
-                    freq_unit=1/u.day, **kwargs):
+    def to_periodogram(self, nterms=1, nyquist_factor=1, oversample_factor=1,
+                       min_frequency=None, max_frequency=None,
+                       min_period=None, max_period=None,
+                       frequency=None, period=None,
+                       freq_unit=1/u.day, **kwargs):
         """Returns a `Periodogram` power spectrum object.
 
         Parameters

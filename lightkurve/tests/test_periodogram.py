@@ -11,13 +11,13 @@ from ..periodogram import Periodogram
 def test_lightcurve_seismology_plot():
     """Sanity check to verify that periodogram plotting works"""
     lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000), flux_err=np.zeros(1000)+0.1)
-    lc.periodogram().plot()
+    lc.to_periodogram().plot()
 
 def test_periodogram_units():
     """Tests whether periodogram has correct units"""
     # Fake, noisy data
     lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000), flux_err=np.zeros(1000)+0.1)
-    p = lc.periodogram()
+    p = lc.to_periodogram()
     # Has units
     assert hasattr(p.frequency, 'unit')
 
@@ -33,14 +33,14 @@ def test_periodogram_can_find_periods():
     lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000), flux_err=np.zeros(1000)+0.1)
     # Add a 100 day period signal
     lc.flux *= np.sin((lc.time/float(lc.time.max())) * 20 * np.pi)
-    p = lc.periodogram()
+    p = lc.to_periodogram()
     assert np.isclose(p.period_at_max_power.value, 100, rtol=1e-3)
 
 def test_periodogram_slicing():
     """Tests whether periodograms can be sliced"""
     # Fake, noisy data
     lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000), flux_err=np.zeros(1000)+0.1)
-    p = lc.periodogram()
+    p = lc.to_periodogram()
     assert len(p[0:200].frequency) == 200
 
     # Test divide
@@ -65,25 +65,25 @@ def test_assign_periods():
     '''
     lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000), flux_err=np.zeros(1000)+0.1)
     periods = np.arange(0, 100) * u.day
-    p = lc.periodogram(period=periods)
+    p = lc.to_periodogram(period=periods)
     # Get around the floating point error
     assert np.isclose(np.sum(periods - p.period).value, 0, rtol=1e-14)
     frequency = np.arange(0, 100) * u.Hz
-    p = lc.periodogram(frequency=frequency)
+    p = lc.to_periodogram(frequency=frequency)
     assert np.isclose(np.sum(frequency - p.frequency).value, 0, rtol=1e-14)
 
 def test_bin():
     ''' Test if you can bin the periodogram
     '''
     lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000), flux_err=np.zeros(1000)+0.1)
-    p = lc.periodogram()
+    p = lc.to_periodogram()
     assert len(p.bin(binsize=10).frequency) == len(p.frequency)//10
 
 def test_index():
     '''Test if you can mask out periodogram
     '''
     lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000), flux_err=np.zeros(1000)+0.1)
-    p = lc.periodogram()
+    p = lc.to_periodogram()
     mask = (p.frequency > 0.1*(1/u.day)) & (p.frequency < 0.2*(1/u.day))
     assert len(p[mask].frequency) == mask.sum()
 
@@ -95,15 +95,15 @@ def test_error_messages():
 
     # Can't specify period range and frequency range
     with pytest.raises(ValueError) as err:
-        lc.periodogram(max_frequency=0.1, min_period=10)
+        lc.to_periodogram(max_frequency=0.1, min_period=10)
 
     # Can't have a minimum frequency > maximum frequency
     with pytest.raises(ValueError) as err:
-        lc.periodogram(max_frequency=0.1, min_frequency=10)
+        lc.to_periodogram(max_frequency=0.1, min_frequency=10)
 
     # Can't specify periods and frequencies
     with pytest.raises(ValueError) as err:
-        lc.periodogram(frequency=np.arange(10), period=np.arange(10))
+        lc.to_periodogram(frequency=np.arange(10), period=np.arange(10))
 
     # No unitless periodograms
     with pytest.raises(ValueError) as err:
