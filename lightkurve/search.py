@@ -35,24 +35,10 @@ class SearchResult(object):
         Desired cadence (`long`, `short`, `any`)
     filetpye : str
         Type of files queried at MAST (`Target Pixel` or `Lightcurve`)
-    quality_bitmask : str or int
-        Bitmask (integer) which identifies the quality flag bitmask that should
-        be used to mask out bad cadences. If a string is passed, it has the
-        following meaning:
-
-            * "none": no cadences will be ignored (`quality_bitmask=0`).
-            * "default": cadences with severe quality issues will be ignored
-              (`quality_bitmask=1130799`).
-            * "hard": more conservative choice of flags to ignore
-              (`quality_bitmask=1664431`). This is known to remove good data.
-            * "hardest": removes all data that has been flagged
-              (`quality_bitmask=2096639`). This mask is not recommended.
-
-        See the :class:`KeplerQualityFlags` class for details on the bitmasks.
     """
 
     def __init__(self, path, campaign=None, quarter=None, month=None, cadence=None,
-                 filetype=None, quality_bitmask='default'):
+                 filetype=None):
 
         self.path = path
         self.campaign = campaign
@@ -60,7 +46,6 @@ class SearchResult(object):
         self.month = month
         self.cadence = cadence
         self.filetype = filetype
-        self.quality_bitmask = quality_bitmask
 
     @property
     def targets(self):
@@ -104,7 +89,7 @@ class SearchResult(object):
         """Returns an array of dec values for targets in search"""
         return np.asarray(self.path['s_dec'])
 
-    def download(self):
+    def download(self, quality_bitmask='default'):
         """
         Downloads a single KeplerTargetPixelFile or KeplerLightCurveFile object from search result.
         If multiple files are present in `products`, only the first will be downloaded.
@@ -115,6 +100,20 @@ class SearchResult(object):
             Returns a single `KeplerTargetPixelFile` for first entry in products table
         KeplerLightCurveFile : `KeplerLightCurveFile` object
             Returns a single `KeplerLightCurveFile` for first entry in products table
+        quality_bitmask : str or int
+            Bitmask (integer) which identifies the quality flag bitmask that should
+            be used to mask out bad cadences. If a string is passed, it has the
+            following meaning:
+
+                * "none": no cadences will be ignored (`quality_bitmask=0`).
+                * "default": cadences with severe quality issues will be ignored
+                  (`quality_bitmask=1130799`).
+                * "hard": more conservative choice of flags to ignore
+                  (`quality_bitmask=1664431`). This is known to remove good data.
+                * "hardest": removes all data that has been flagged
+                  (`quality_bitmask=2096639`). This mask is not recommended.
+
+            See the :class:`KeplerQualityFlags` class for details on the bitmasks.
         """
         # Make sure astroquery uses the same level of verbosity
         logging.getLogger('astropy').setLevel(log.getEffectiveLevel())
@@ -138,12 +137,12 @@ class SearchResult(object):
         # return single tpf or lcf
         if self.filetype == "Target Pixel":
             return KeplerTargetPixelFile(path[0],
-                                         quality_bitmask=self.quality_bitmask)
+                                         quality_bitmask=quality_bitmask)
         elif self.filetype == "Lightcurve":
             return KeplerLightCurveFile(path[0],
-                                        quality_bitmask=self.quality_bitmask)
+                                        quality_bitmask=quality_bitmask)
 
-    def download_all(self):
+    def download_all(self, quality_bitmask='default'):
         """
         Downloads a KeplerTargetPixelFileCollection or KeplerLightCurveFileCollection from search results.
 
@@ -153,6 +152,20 @@ class SearchResult(object):
             Returns a single `KeplerTargetPixelFileCollection` containing all entries in products table
         KeplerLightCurveFileCollection : `KeplerLightCurveFileCollection` object
             Returns a single `KeplerLightCurveFileCollection` containing all entries in products table
+        quality_bitmask : str or int
+            Bitmask (integer) which identifies the quality flag bitmask that should
+            be used to mask out bad cadences. If a string is passed, it has the
+            following meaning:
+
+                * "none": no cadences will be ignored (`quality_bitmask=0`).
+                * "default": cadences with severe quality issues will be ignored
+                  (`quality_bitmask=1130799`).
+                * "hard": more conservative choice of flags to ignore
+                  (`quality_bitmask=1664431`). This is known to remove good data.
+                * "hardest": removes all data that has been flagged
+                  (`quality_bitmask=2096639`). This mask is not recommended.
+
+            See the :class:`KeplerQualityFlags` class for details on the bitmasks.
         """
         # Make sure astroquery uses the same level of verbosity
         logging.getLogger('astropy').setLevel(log.getEffectiveLevel())
@@ -170,11 +183,11 @@ class SearchResult(object):
         # return collection of tpf or lcf
         if self.filetype == "Target Pixel":
             tpfs = [KeplerTargetPixelFile(p,
-                                         quality_bitmask=self.quality_bitmask) for p in path]
+                                         quality_bitmask=quality_bitmask) for p in path]
             return TargetPixelFileCollection(tpfs)
         elif self.filetype == "Lightcurve":
             lcs = [KeplerLightCurveFile(p,
-                                   quality_bitmask=self.quality_bitmask) for p in path]
+                                   quality_bitmask=quality_bitmask) for p in path]
             return LightCurveFileCollection(lcs)
 
     def _mask_products(self, products, campaign=None, quarter=None, month=None, cadence='long',
@@ -427,8 +440,7 @@ def _query_mast(target, cadence='long', radius=.0001, targetlimit=None):
 
 
 def search_targetpixelfile(target, cadence='long', quarter=None, month=None,
-                           campaign=None, radius=.0001, targetlimit=None,
-                           quality_bitmask='default'):
+                           campaign=None, radius=.0001, targetlimit=None):
 
     """
     Fetch a data table for Target Pixel Files within a region of sky. Cone search is
@@ -449,20 +461,6 @@ def search_targetpixelfile(target, cadence='long', quarter=None, month=None,
         For Kepler's prime mission, there are three short-cadence
         Target Pixel Files for each quarter, each covering one month.
         Hence, if cadence='short' you need to specify month=1, 2, or 3.
-    quality_bitmask : str or int
-        Bitmask (integer) which identifies the quality flag bitmask that should
-        be used to mask out bad cadences. If a string is passed, it has the
-        following meaning:
-
-            * "none": no cadences will be ignored (`quality_bitmask=0`).
-            * "default": cadences with severe quality issues will be ignored
-              (`quality_bitmask=1130799`).
-            * "hard": more conservative choice of flags to ignore
-              (`quality_bitmask=1664431`). This is known to remove good data.
-            * "hardest": removes all data that has been flagged
-              (`quality_bitmask=2096639`). This mask is not recommended.
-
-        See the :class:`KeplerQualityFlags` class for details on the bitmasks.
 
     Returns
     -------
@@ -475,11 +473,10 @@ def search_targetpixelfile(target, cadence='long', quarter=None, month=None,
     path = _query_mast(target, cadence='long', radius=radius, targetlimit=targetlimit)
 
     return SearchResult(path, campaign=campaign, quarter=quarter, month=month,
-                        cadence=cadence, filetype=filetype, quality_bitmask=quality_bitmask)
+                        cadence=cadence, filetype=filetype)
 
 def search_lightcurvefile(target, cadence='long', quarter=None, month=None,
-                          campaign=None, radius=.0001, targetlimit=None,
-                          quality_bitmask='default'):
+                          campaign=None, radius=.0001, targetlimit=None):
 
     """
     Fetch a data table for Lightcurve Files within a region of sky. Cone search is
@@ -500,20 +497,6 @@ def search_lightcurvefile(target, cadence='long', quarter=None, month=None,
         For Kepler's prime mission, there are three short-cadence
         Target Pixel Files for each quarter, each covering one month.
         Hence, if cadence='short' you need to specify month=1, 2, or 3.
-    quality_bitmask : str or int
-        Bitmask (integer) which identifies the quality flag bitmask that should
-        be used to mask out bad cadences. If a string is passed, it has the
-        following meaning:
-
-            * "none": no cadences will be ignored (`quality_bitmask=0`).
-            * "default": cadences with severe quality issues will be ignored
-              (`quality_bitmask=1130799`).
-            * "hard": more conservative choice of flags to ignore
-              (`quality_bitmask=1664431`). This is known to remove good data.
-            * "hardest": removes all data that has been flagged
-              (`quality_bitmask=2096639`). This mask is not recommended.
-
-        See the :class:`KeplerQualityFlags` class for details on the bitmasks.
 
     Returns
     -------
@@ -526,4 +509,4 @@ def search_lightcurvefile(target, cadence='long', quarter=None, month=None,
     path = _query_mast(target, cadence='long', radius=radius, targetlimit=targetlimit)
 
     return SearchResult(path, campaign=campaign, quarter=quarter, month=month,
-                        cadence=cadence, filetype=filetype, quality_bitmask=quality_bitmask)
+                        cadence=cadence, filetype=filetype)
