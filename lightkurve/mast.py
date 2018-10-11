@@ -38,7 +38,24 @@ def download_products(products):
     # Note: by default, MAST will only let us download "Minimum Recommended
     # Products" (MRPs), which do not include e.g. Target Pixel Files.
     # We need to set `mrp=False` to ensure MAST downloads whatever we want.
-    dl = Observations.download_products(products, mrp_only=False)
+
+    # check if download directory exists (~/.lightkurve-cache)
+    cache_dir = os.path.join(os.path.expanduser('~'), '.lightkurve-cache')
+    if os.path.isdir(cache_dir):
+        download_dir = cache_dir
+    else:
+        # if it doesn't exist, make a new cache directory
+        try:
+            os.mkdir(cache_dir)
+            download_dir = cache_dir
+        # downloads locally if OS error occurs
+        except OSError:
+            log.warning('Warning: unable to create .lightkurve-cache directory. '
+                        'Downloading MAST files to local directory.')
+            download_dir = '.'
+
+    dl = Observations.download_products(products, mrp_only=False,
+                                        download_dir=download_dir)
     return dl['Local Path']
 
 
