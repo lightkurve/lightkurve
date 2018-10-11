@@ -60,8 +60,8 @@ def test_periodogram_slicing():
     assert np.sum(p.power) == 0
 
 def test_assign_periods():
-    ''' Test if you can assign periods and frequencies
-    '''
+    """ Test if you can assign periods and frequencies
+    """
     lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000), flux_err=np.zeros(1000)+0.1)
     periods = np.arange(0, 100) * u.day
     p = lc.to_periodogram(period=periods)
@@ -72,14 +72,15 @@ def test_assign_periods():
     assert np.isclose(np.sum(frequency - p.frequency).value, 0, rtol=1e-14)
 
 def test_bin():
-    ''' Test if you can bin the periodogram
-    '''
+    """ Test if you can bin the periodogram
+    """
     lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000), flux_err=np.zeros(1000)+0.1)
     p = lc.to_periodogram()
     assert len(p.bin(binsize=10).frequency) == len(p.frequency)//10
 
 def test_smooth():
-    '''Test if you can smooth the periodogram and check any pitfalls'''
+    """Test if you can smooth the periodogram and check any pitfalls
+    """
     lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000), flux_err=np.zeros(1000)+0.1)
     p = lc.to_periodogram()
     assert all(p.smooth().frequency == p.frequency)
@@ -100,16 +101,16 @@ def test_smooth():
         p.smooth()
 
 def test_index():
-    '''Test if you can mask out periodogram
-    '''
+    """Test if you can mask out periodogram
+    """
     lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000), flux_err=np.zeros(1000)+0.1)
     p = lc.to_periodogram()
     mask = (p.frequency > 0.1*(1/u.day)) & (p.frequency < 0.2*(1/u.day))
     assert len(p[mask].frequency) == mask.sum()
 
 def test_error_messages():
-    '''Test periodogram raises reasonable errors
-    '''
+    """Test periodogram raises reasonable errors
+    """
     # Fake, noisy data
     lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000), flux_err=np.zeros(1000)+0.1)
 

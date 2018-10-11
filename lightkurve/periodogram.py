@@ -323,8 +323,8 @@ class Periodogram(object):
         return binned_pg
 
     def smooth(self, filter_width = 0.1/u.day):
-        """Smooths the power spectrum using a simple one dimensional smoothing
-        filter. This method requires a Periodogram class built using an evenly
+        """Smooths the power spectrum by convolving with a numpy Box1DKernel.
+        This method requires a Periodogram class built using an evenly
         spaced grid of periods.
 
         Parameters
@@ -360,7 +360,7 @@ class Periodogram(object):
             smooth_pg = copy.deepcopy(self)
             smooth_pg.power = smooth_power
         else:
-            raise NotImplementedError("This smoothing function is not yet compatible with a grid of unevenly spaced frequencies.")
+            raise NotImplementedError("The smooth() function requires a grid of evently spaced frequencies at this time.")
         return smooth_pg
 
 
