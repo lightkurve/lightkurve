@@ -285,7 +285,7 @@ class KeplerLightCurveFile(LightCurveFile):
         return self.hdu[1].data['POS_CORR1'][self.quality_mask]
 
     @property
-    def poss_corr2(self):
+    def pos_corr2(self):
         """Returns the row position correction."""
         return self.hdu[1].data['POS_CORR2'][self.quality_mask]
 

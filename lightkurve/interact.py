@@ -118,7 +118,8 @@ def get_lightcurve_y_limits(lc_source):
     return low - margin, high + margin
 
 
-def make_lightcurve_figure_elements(lc, lc_source):
+def make_lightcurve_figure_elements(lc, lc_source, tools="pan,wheel_zoom,box_zoom,tap,reset",
+                                    tooltips=True, line=True, figsize=(340, 600)):
     """Make the lightcurve figure elements.
 
     Parameters
@@ -146,8 +147,8 @@ def make_lightcurve_figure_elements(lc, lc_source):
     else:
         title = "Lightcurve for target {}".format(lc.label)
 
-    fig = figure(title=title, plot_height=340, plot_width=600,
-                 tools="pan,wheel_zoom,box_zoom,tap,reset",
+    fig = figure(title=title, plot_height=figsize[0], plot_width=figsize[1],
+                 tools=tools,
                  toolbar_location="below", logo=None,
                  border_fill_color="whitesmoke")
     fig.title.offset = -10
@@ -167,24 +168,26 @@ def make_lightcurve_figure_elements(lc, lc_source):
                       nonselection_line_color=None, nonselection_line_alpha=0.0,
                       fill_color=None, hover_fill_color="firebrick",
                       hover_alpha=0.9, hover_line_color="white")
-    fig.add_tools(HoverTool(tooltips=[("Cadence", "@cadence"),
-                                      ("Time ({})".format(lc.time_format.upper()),
-                                       "@time{0,0.000}"),
-                                      ("Time (ISO)", "@time_iso"),
-                                      ("Flux", "@flux"),
-                                      ("Quality Code", "@quality_code"),
-                                      ("Quality Flag", "@quality")],
-                            renderers=[circ],
-                            mode='mouse',
-                            point_policy="snap_to_data"))
+    if tooltips:
+        # YEAHHHHHH
+        fig.add_tools(HoverTool(tooltips=[("Cadence", "@cadence"),
+                                          ("Time ({})".format(lc.time_format.upper()),
+                                           "@time{0,0.000}"),
+                                          ("Time (ISO)", "@time_iso"),
+                                          ("Flux", "@flux"),
+                                          ("Quality Code", "@quality_code"),
+                                          ("Quality Flag", "@quality")],
+                                renderers=[circ],
+                                mode='mouse',
+                                point_policy="snap_to_data"))
 
-    # Vertical line to indicate the cadence
-    vertical_line = Span(location=lc.time[0], dimension='height',
-                         line_color='firebrick', line_width=4, line_alpha=0.5)
-    fig.add_layout(vertical_line)
-
-    return fig, vertical_line
-
+    if line:
+        # Vertical line to indicate the cadence
+        vertical_line = Span(location=lc.time[0], dimension='height',
+                             line_color='firebrick', line_width=4, line_alpha=0.5)
+        fig.add_layout(vertical_line)
+        return fig, vertical_line
+    return fig
 
 def make_tpf_figure_elements(tpf, tpf_source, pedestal=0):
     """Returns the lightcurve figure elements.
