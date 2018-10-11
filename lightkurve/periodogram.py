@@ -13,6 +13,7 @@ from astropy.stats import LombScargle
 from astropy import __version__
 from astropy import units as u
 from astropy.units import cds
+from astropy.convolution import convolve, Box1DKernel
 
 from . import MPLSTYLE
 
@@ -320,6 +321,44 @@ class Periodogram(object):
         binned_pg.frequency = binned_freq
         binned_pg.power = binned_power
         return binned_pg
+
+    def smooth(self, filter_width = 0.1):
+        """Smooths the power spectrum using a simple one dimensional smoothing
+        filter. This method requires a Periodogram class built using an evenly
+        spaced grid of periods.
+
+        Parameters
+        ----------
+        filter_width : float
+            The width of the smoothing filter in units of frequency. If given
+            astropy units of frequency, will convert to the same units as the
+            Periodogram frequency attribute. If unitless, will be given same
+            units as the Periodogram frequency attribute.
+
+        Returns
+        -------
+        smoothed_periodogram : a `Periodogram` object
+            Returns a new `Periodogram` object which has been smoothed.
+        """
+        # Input validation
+        if filter_width <= 0.:
+            raise ValueError('Filter width must be larger than 0')
+
+        filter_width = u.Quantity(filter_width, self.frequency.unit)
+        fs = np.mean(np.diff(self.frequency))
+
+        #Check to see if we have a grid of evenly spaced periods instead.
+        if np.isclose(np.median(np.diff(self.frequency.value)), fs.value):
+            box_kernel = Box1DKernel(np.ceil(filter_width/fs))
+            smooth_power = convolve(self.power.value, box_kernel)
+            smooth_power = u.Quantity(smooth_power, self.power.unit)
+
+            smooth_pg = copy.deepcopy(self)
+            smooth_pg.power = smooth_power
+        else:
+            raise NotImplementedError("This smoothing function is not yet compatible with a grid of unevenly spaced frequencies.")
+        return smooth_pg
+
 
     def plot(self, scale='linear', ax=None, xlabel=None, ylabel=None, title='',
              style='lightkurve', format='frequency', unit=None, **kwargs):
