@@ -117,6 +117,8 @@ class SearchResult(object):
         KeplerLightCurveFile : `KeplerLightCurve` object
             Returns a single `KeplerLightCurveFile` for first entry in products table
         """
+        # Make sure astroquery uses the same level of verbosity
+        logging.getLogger('astropy').setLevel(log.getEffectiveLevel())
 
         # create products table
         products = self.products
@@ -153,6 +155,8 @@ class SearchResult(object):
         KeplerLightCurveFileCollection : `KeplerLightCurveFileCollection` object
             Returns a single `KeplerLightCurveFileCollection` containing all entries in products table
         """
+        # Make sure astroquery uses the same level of verbosity
+        logging.getLogger('astropy').setLevel(log.getEffectiveLevel())
 
         # create products table
         products = self.products
