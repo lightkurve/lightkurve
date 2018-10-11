@@ -10,7 +10,6 @@ from astroquery.exceptions import ResolverError
 from astropy.table import Table, unique
 from astropy.coordinates import SkyCoord
 from astropy.io import ascii
-from .lightcurve import KeplerLightCurve, TessLightCurve
 from .lightcurvefile import KeplerLightCurveFile
 from .targetpixelfile import KeplerTargetPixelFile
 from .collections import TargetPixelFileCollection, LightCurveFileCollection
@@ -66,7 +65,7 @@ class SearchResult(object):
     @property
     def targets(self):
         """Returns a table of targets and their RA & dec values produced by search"""
-        mask = ['target_name','s_ra','s_dec']
+        mask = ['target_name', 's_ra', 's_dec']
         return unique(self.path[mask], keys='target_name')
 
     @property
@@ -78,7 +77,7 @@ class SearchResult(object):
         order = [item for sublist in order for item in sublist]
         ntargets = len(np.unique(self.path['target_name']))
 
-        mask = ['project','description','obs_id']
+        mask = ['project', 'description', 'obs_id']
         self.full_products = self._mask_products(products[order],filetype=self.filetype,
                                                  campaign=self.campaign, quarter=self.quarter,
                                                  cadence=self.cadence, targetlimit=ntargets)
@@ -114,7 +113,7 @@ class SearchResult(object):
         -------
         KeplerTargetPixelFile : `KeplerTargetPixelFile` object
             Returns a single `KeplerTargetPixelFile` for first entry in products table
-        KeplerLightCurveFile : `KeplerLightCurve` object
+        KeplerLightCurveFile : `KeplerLightCurveFile` object
             Returns a single `KeplerLightCurveFile` for first entry in products table
         """
         # Make sure astroquery uses the same level of verbosity
