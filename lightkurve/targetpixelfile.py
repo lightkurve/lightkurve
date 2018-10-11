@@ -370,6 +370,12 @@ class TargetPixelFile(object):
         self._last_aperture_mask = aperture_mask
         return aperture_mask
 
+    def centroids(self, **kwargs):
+        """DEPRECATED: use `estimate_cdpp()` instead."""
+        log.warning("WARNING: centroids() is deprecated and will be removed in v1.0.0; "
+                    "please use estimate_centroids() instead.")
+        return self.estimate_centroids(**kwargs)
+
     def estimate_centroids(self, aperture_mask='pipeline'):
         """Returns centroid positions estimated using sample moments.
 
