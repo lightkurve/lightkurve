@@ -228,32 +228,32 @@ class KeplerLightCurveFile(LightCurveFile):
         downloading any science products, we can identify potential desired targets with
         `search_lightcurvefile`::
 
-            >>> search_result = search_lightcurvefile('kepler-10')
-            >>> search_result.products
+            >>> search_result = search_lightcurvefile('kepler-10') # doctest: +SKIP
+            >>> search_result.products # doctest: +SKIP
 
         The above code will query mast for lightcurve files available for kepler-10, and
         display a table containing available science products. Because kepler-10 was observed
         in 15 quarters, the table will have 15 entries. If we want to download a
         `LightCurveFileCollection` object containing all 15 observations, use::
 
-            >>> search_result.download_all()
+            >>> search_result.download_all() # doctest: +SKIP
 
         or we can specify the downloaded products by limiting our search::
 
-            >>> lcf = search_lightcurvefile('kepler-10', quarter=2).download()
+            >>> lcf = search_lightcurvefile('kepler-10', quarter=2).download() # doctest: +SKIP
 
         The above line of code will only quarter 2 and create a `LightCurveFile` object called
         lcf.
 
         We can also pass a radius into `search_lightcurvefile` to perform a cone search::
 
-            >>> search_lightcurvefile('kepler-10', radius=100).targets
+            >>> search_lightcurvefile('kepler-10', radius=100).targets # doctest: +SKIP
 
         This will display a table containing all targets within 100 arcseconds of kepler-10.
         We can download a `LightCurveFileCollection` object containing all available products
         for these targets in quarter 4 with::
 
-            >>> search_lightcurvefile('kepler-10', quarter=4, radius=100).download_all()
+            >>> search_lightcurvefile('kepler-10', quarter=4, radius=100).download_all() # doctest: +SKIP
         """
         # deprication warning
         log.warning('WARNING: This function is depricated. Please use `search_lightcurvefile()`. '
