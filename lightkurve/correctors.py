@@ -15,9 +15,11 @@ from scipy import linalg, interpolate
 from matplotlib import pyplot as plt
 
 from astropy.io import fits as pyfits
-from astropy.stats import sigma_clip
+from astropy.stats import sigma_clip, sigma_clipped_stats
+from astropy.convolution import convolve, Gaussian1DKernel
 
 from scipy.stats import chisquare
+from scipy.optimize import minimize
 
 from .utils import channel_to_module_output
 from .lightcurve import LightCurve
@@ -284,6 +286,78 @@ class SFFCorrector(object):
         pass
 
 
+    def stitch(self, x, y, break_points, knotspacing=1.5, sigma=3, mask=None):
+        '''Stitches a light curve back together
+        '''
+        if mask is None:
+            mask = np.ones(len(x), dtype=bool)
+
+        def _build_offsets(x, y, break_points, mask, knotspacing=1.5, sigma=3):
+
+            offsets = np.zeros(len(break_points) + 1)
+            for i in range(len(break_points) - 1):
+                # Cut out two segments
+                if i == len(break_points) - 2:
+                    data = np.copy(y[break_points[i]:])
+                    time = x[break_points[i]:]
+                    cutmask = mask[break_points[i]:]
+                else:
+                    data = np.copy(y[break_points[i]:break_points[i+2]])
+                    time = x[break_points[i]:break_points[i+2]]
+                    cutmask = mask[break_points[i]:break_points[i+2]]
+                b = break_points[i+1] - break_points[i]
+
+                # Check if there is a gap LONGER than the knotspacing at the breakpoint
+                if np.any(np.diff(time[b-2:b+3]) > knotspacing):
+                    # If there is a long gap...you really can't do anything.
+                    # So do nothing.
+                    continue
+
+                # Reject some outliers
+                mask_a = _outlier_mask(time[:b], data[:b], knotspacing=knotspacing, sigma=sigma)
+                mask_b = _outlier_mask(time[b:], data[b:], knotspacing=knotspacing, sigma=sigma)
+                outliers = np.append(mask_a, mask_b)
+                outliers |= ~np.isfinite(data)
+                outliers |= ~cutmask
+
+                # Find the offset
+                def func(*params):
+                    data1 = np.copy(data)
+                    data1[b:] += params[0]
+                    model = self.fit_bspline(time[~outliers], data1[~outliers], knotspacing=knotspacing)(time[~outliers])
+                    return(np.nansum((data1[~outliers] - model)**2))
+                r = minimize(func, [0], method='L-BFGS-B')
+                if not r.success:
+                    r.x[0] = 0
+
+                data[b:] += r.x[0]
+
+                # Store the offset
+                offsets[i+1:] += r.x[0]
+            return offsets
+
+        def _reconstruct(y, offsets, break_points):
+            result = np.copy(y)
+            for o, b1, b2 in zip(offsets, break_points[:-1], break_points[1:]):
+                result[b1:b2] += o
+            result[b2:] += offsets[-1]
+            result /= np.nanmedian(result)
+            return result
+
+        def _outlier_mask(x, y, knotspacing=1.5, sigma=3):
+            model = self.fit_bspline(x[np.isfinite(y)], y[np.isfinite(y)], knotspacing)(x)
+            mask = np.abs(np.nan_to_num(y - model)) > (sigma * np.nanstd(y - model))
+            mask = convolve(mask, Gaussian1DKernel(2)) > 0.01
+            return mask
+
+        data = np.copy(y)
+        outliers = _outlier_mask(x, y, knotspacing=knotspacing, sigma=sigma)
+        data[outliers] *= np.nan
+
+        offsets = _build_offsets(x, data, break_points=break_points, mask=mask, knotspacing=knotspacing)
+        result = _reconstruct(y, offsets=offsets, break_points=break_points)
+        return result
+
     def build_window_positions(self, origtime, windows=20, window_shift=0, min_size=50, extra_break_points=None, break_tolerance=5):
         """Evenly space a user specified number of windows, given some break points, shift and optimal size.
 
@@ -363,7 +437,7 @@ class SFFCorrector(object):
         return time
 
     def christina_correct(self, origtime, origflux, origcentroid_col, origcentroid_row, bins=15, windows=1,
-                            niters=3, sigma_1=3., knotspacing=1.5, window_shift=0, polyorder=None,
+                            niters=3, sigma_1=3., knotspacing=1.5, window_shift=0,
                             sigma_2=5., restore_trend=False, plot=False):
         self.windows = windows
         self.bins = bins
@@ -373,13 +447,24 @@ class SFFCorrector(object):
         alltime = np.copy(origtime)
         allflux = np.copy(origflux)
 
+        # Get thruster firings
+        rad = (origcentroid_col**2 + origcentroid_row**2)**0.5
+        _, med, std = sigma_clipped_stats(np.diff(rad), sigma=sigma_1, iters=3)
+        thrusters = np.ones(len(origcentroid_col), dtype=bool)
+        thrusters[1:] &= np.abs(np.diff(rad)) > sigma_2 * std
+
         # Split up time, flux, column and row into windows
+        break_points = self.build_window_positions(origtime, self.windows, window_shift)
+        break_points = [np.where(origtime == b[0])[0][0] + 1 for b in break_points]
+
         time = self.build_window_positions(origtime, self.windows, window_shift)
-        flux, centroid_col, centroid_row = [], [], []
+        flux, centroid_col, centroid_row, thrust = [], [], [], []
         for t in time:
-            flux.append(origflux[np.in1d(origtime, t)])
-            centroid_col.append(origcentroid_col[np.in1d(origtime, t)])
-            centroid_row.append(origcentroid_row[np.in1d(origtime, t)])
+            ok = np.in1d(origtime, t)
+            flux.append(origflux[ok])
+            centroid_col.append(origcentroid_col[ok])
+            centroid_row.append(origcentroid_row[ok])
+            thrust.append(thrusters[ok])
         self.windows = len(time)
 
         # To make it easier (and more numerically stable) to fit a
@@ -389,31 +474,28 @@ class SFFCorrector(object):
 
         # Here we are going to calculate the arclength for each point
         self.rot_col, self.rot_row, self.poly, self.polyprime = [None] * self.windows, [None] * self.windows, [None] * self.windows, [None] * self.windows
-        self.coeffs, self.s =  [None] * self.windows, [None] * self.windows
+        self.coeffs, self.s = [None] * self.windows, [None] * self.windows
         for i in range(self.windows):
             self.rot_col[i], self.rot_row[i] = self.rotate_centroids(centroid_col[i],
                                                                        centroid_row[i])
             # Removing outliers apparently just in row?
             # CHRISTINA
-            outliers = sigma_clip(data=self.rot_col[i],
-                                           sigma=sigma_2).mask
-            outliers &= sigma_clip(data=self.rot_row[i],
-                                           sigma=sigma_2).mask
-
+#            outliers = sigma_clip(data=self.rot_col[i],
+#                                           sigma=sigma_2).mask
+#            outliers &= sigma_clip(data=self.rot_row[i],
+#                                           sigma=sigma_2).mask
+#            import pdb;pdb.set_trace()
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore", category=np.RankWarning)
-                if polyorder is None:
-                    self.coeffs[i] = self._find_optimal_polynomial(self.rot_row[i][~outliers], self.rot_col[i][~outliers])
-                else:
-                    self.coeffs[i] = self._find_optimal_polynomial(self.rot_row[i][~outliers], self.rot_col[i][~outliers], [polyorder])
+                self.coeffs[i] = self._find_optimal_polynomial(self.rot_row[i][~thrust[i]], self.rot_col[i][~thrust[i]])
 
-            self.poly[i] = np.poly1d(self.coeffs[i])
-
+#            plt.plot(self.rot_row[i] - np.nanmedian(self.rot_row[i]), self.rot_col[i] - np.nanmedian(self.rot_col[i]), 'k.', alpha=0.3)
+#           self.poly[i] = np.poly1d(self.coeffs[i])
             self.polyprime[i] = np.poly1d(self.coeffs[i]).deriv()
             # Compute the arclength s.  It is the length of the polynomial
             # (fitted above) that describes the typical motion.
-            x = np.linspace(np.min(self.rot_row[i][~outliers]),
-                            np.max(self.rot_row[i][~outliers]), 10000)
+            x = np.linspace(np.min(self.rot_row[i][~thrust[i]]),
+                            np.max(self.rot_row[i][~thrust[i]]), 10000)
 
             # THIS IS HECKIN' SLOW
             self.s[i] = np.array([self.arclength(x1=np.asarray(xp), x=x, index=i) for xp in self.rot_row[i]])
@@ -422,10 +504,22 @@ class SFFCorrector(object):
             fig, axs = plt.subplots(1, 3, figsize=(niters * 5, 4), sharex=True, sharey=True)
 
         for iter in range(niters):
-            mask = np.abs(allflux - np.nanmedian(allflux)) < sigma_1 * np.nanstd(allflux)
-            self.bspline = self.fit_bspline(alltime[mask], allflux[mask], knotspacing=self.knotspacing)
-            # The SFF algorithm is going to be run on each window independently
+            # Get rid of the worst quality data.
+            mask = np.copy(~thrusters)
+            mask |= ~np.isfinite(allflux)
+            mask |= np.abs(np.nan_to_num(allflux - np.nanmedian(allflux))) < sigma_1 * np.nanstd(allflux)
+            tempflux = self.stitch(alltime, allflux, break_points, mask=mask, knotspacing=self.knotspacing)
+            self.bspline = self.fit_bspline(alltime[mask], tempflux[mask], knotspacing=self.knotspacing)
 
+            # Stitch the light curve together and find the best fit smooth.
+            _, med, std = sigma_clipped_stats(tempflux, sigma=sigma_1, iters=3)
+            mask = np.copy(~thrusters)
+            mask |= ~np.isfinite(allflux)
+            mask |= np.abs(np.nan_to_num(tempflux/self.bspline(alltime)) - med) < sigma_1 * std
+            allflux = self.stitch(alltime, allflux, break_points, mask=mask, knotspacing=self.knotspacing)
+            self.bspline = self.fit_bspline(alltime[mask], allflux[mask], knotspacing=self.knotspacing)
+
+            # The SFF algorithm is going to be run on each window independently
             for i in range(self.windows):
                 if plot:
                     axs[iter].set_title('Iteration {}'.format(iter + 1))
@@ -439,22 +533,30 @@ class SFFCorrector(object):
 
 
                 self.trend = iter_trend
-                self.interp = self.bin_and_interpolate(self.s[i], self.normflux,
+                self.interp = self.bin_and_interpolate(self.s[i][~thrust[i]], self.normflux[~thrust[i]],
                                                        sigma=sigma_1)
                 # Correct the raw flux
                 correction = self.interp(self.s[i])
                 if plot:
                     axs[iter].scatter(self.s[i], self.normflux, c='k', alpha=0.4, s=1, zorder=1)
+                    axs[iter].scatter(self.s[i][thrust[i]], self.normflux[thrust[i]], c='r', alpha=0.4, s=4, zorder=1)
                     axs[iter].plot(np.sort(self.s[i]), correction[np.argsort(self.s[i])], c='C1', zorder=2)
 
                 corrected_flux = self.normflux / correction
                 flux[i] = corrected_flux
-                if restore_trend:
-                    flux[i] *= self.trend
+                flux[i] *= self.trend
             allflux = np.empty(0)
             for f in flux:
                 allflux = np.append(allflux, f)
 
+
+        allflux[thrusters] *= np.nan
+        allflux = self.stitch(alltime, allflux, break_points, knotspacing=knotspacing)
+        if not restore_trend:
+            mask = np.abs(np.nan_to_num(allflux - np.nanmedian(allflux))) < sigma_1 * np.nanstd(allflux)
+            mask &= ~thrusters
+            bspline = self.fit_bspline(alltime[mask], allflux[mask], knotspacing=self.knotspacing)
+            allflux /= bspline(alltime)
 
         corr = LightCurve(time=alltime, flux=allflux)
         return corr
@@ -747,13 +849,14 @@ class SFFCorrector(object):
         return interpolate.BSpline(t, c, k)
 
     def bin_and_interpolate(self, s, normflux, sigma):
+
         idx = np.argsort(s)
         s_srtd = s[idx]
         normflux_srtd = normflux[idx]
 
         self.outlier_mask = sigma_clip(data=normflux_srtd, sigma=sigma).mask
-        normflux_srtd = normflux_srtd[~self.outlier_mask]
-        s_srtd = s_srtd[~self.outlier_mask]
+        normflux_srtd = normflux_srtd[(~self.outlier_mask)]
+        s_srtd = s_srtd[(~self.outlier_mask)]
 
         knots = np.array([np.min(s_srtd)]
                          + [np.median(split) for split in np.array_split(s_srtd, self.bins)]
