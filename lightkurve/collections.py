@@ -151,7 +151,7 @@ class LightCurveCollection(Collection):
 
 class LightCurveFileCollection(Collection):
     """Class to hold a collection of LightCurveFile objects.
-    
+
     Parameters
     ----------
     lightcurvefiles : array-like
@@ -174,8 +174,19 @@ class TargetPixelFileCollection(Collection):
         super(TargetPixelFileCollection, self).__init__(tpfs)
 
     def plot_all(self, ax=None):
-        """
+        """Individually plots all TargetPixelFile objects in a single 
+        matplotlib axes object.
 
+        Parameters
+        ----------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            A matplotlib axes object to plot into. If no axes is provided,
+            a new one will be created.
+
+        Returns
+        -------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            The matplotlib axes object.
         """
 
         if ax is None:
