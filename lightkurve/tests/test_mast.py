@@ -95,13 +95,6 @@ def test_kepler_tpf_from_archive():
     assert(isinstance(tpfs, list))
     assert(isinstance(tpfs[0], KeplerTargetPixelFile))
     assert(tpfs[0].quarter == 1)
-    # Ask for one extra nearby target
-    tpfs = KeplerTargetPixelFile.cone_search(
-        "GJ 9827", cadence='long', radius=60, campaign=12, targetlimit=2)
-    assert(isinstance(tpfs, TargetPixelFileCollection))
-    assert(isinstance(tpfs[0], KeplerTargetPixelFile))
-    assert(tpfs[0].campaign == tpfs[1].campaign)
-    assert(tpfs[0].targetid != tpfs[1].targetid)
 
 
 @pytest.mark.remote_data
@@ -127,13 +120,6 @@ def test_kepler_lightcurve_from_archive():
     assert('month' in str(exc))
     # In short cadence, if we specify both quarter and month it should work:
     KeplerLightCurveFile.from_archive('Kepler-10', quarter=11, month=1, cadence='short')
-    # If we ask for a nearby target, it should only give back one extra with the same quarter.
-    lcfs = KeplerLightCurveFile.cone_search(
-        "GJ 9827", cadence='long', radius=60, campaign=12, targetlimit=2)
-    assert(isinstance(lcfs, LightCurveFileCollection))
-    assert(isinstance(lcfs[0], KeplerLightCurveFile))
-    assert(lcfs[0].quarter == lcfs[1].quarter)
-    assert(lcfs[0].targetid != lcfs[1].targetid)
 
 
 @pytest.mark.remote_data
