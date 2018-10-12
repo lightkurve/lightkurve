@@ -598,7 +598,10 @@ class KeplerTargetPixelFile(TargetPixelFile):
     @staticmethod
     def from_archive(target, cadence='long', quarter=None, month=None,
                      campaign=None, quality_bitmask='default', **kwargs):
-        """Fetch a Target Pixel File from the Kepler/K2 data archive at MAST.
+        """WARNING: This function is depricated. Please use `search_targetpixelfile`.
+        Use examples are provided in the section below.
+
+        Fetch a Target Pixel File from the Kepler/K2 data archive at MAST.
 
         See the :class:`KeplerQualityFlags` class for details on the bitmasks.
 
@@ -639,7 +642,44 @@ class KeplerTargetPixelFile(TargetPixelFile):
         Returns
         -------
         tpf : :class:`KeplerTargetPixelFile` object.
+
+        Examples
+        --------
+        This example demonstrates how to use the new `search_targetpixelfile()` function to
+        query and download data. Before instantiating a `KeplerTargetPixelFile` object or
+        downloading any science products, we can identify potential desired targets with
+        `search_targetpixelfile()`::
+
+            >>> search_result = search_targetpixelfile('kepler-10')
+            >>> search_result.products
+
+        The above code will query mast for lightcurve files available for kepler-10, and
+        display a table containing available science products. Because kepler-10 was observed
+        in 15 quarters, the table will have 15 entries. If we want to download a
+        `TargetPixelFileCollection` object containing all 15 observations, use::
+
+            >>> search_result.download_all()
+
+        or we can specify the downloaded products by limiting our search::
+
+            >>> lcf = search_targetpixelfile('kepler-10', quarter=2).download()
+
+        The above line of code will only quarter 2 and create a `KeplerTargetPixelFile` object
+        called lcf.
+
+        We can also pass a radius into `search_targetpixelfile` to perform a cone search::
+
+            >>> search_targetpixelfile('kepler-10', radius=100).targets
+
+        This will display a table containing all targets within 100 arcseconds of kepler-10.
+        We can download a `TargetPixelFileCollection` object containing all available products
+        for these targets in quarter 4 with::
+
+            >>> search_targetpixelfile('kepler-10', quarter=4, radius=100).download_all()
         """
+        # deprication warning
+        log.warning('WARNING: This function is depricated. Please use `search_targetpixelfile()`.
+                    'Use examples are provided in the documentation.')
         if os.path.exists(str(target)) or str(target).startswith('http'):
             log.warning('Warning: from_archive() is not intended to accept a '
                         'direct path, use KeplerTargetPixelFile(path) instead.')
@@ -656,80 +696,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
         return [KeplerTargetPixelFile(p, quality_bitmask=quality_bitmask, **kwargs)
                 for p in path]
 
-    @staticmethod
-    def cone_search(target, cadence='long', quarter=None, month=None,
-                    campaign=None, radius=100., targetlimit=None,
-                    quality_bitmask='default', **kwargs):
-        """Fetch a collection of Target Pixel Files from the Kepler/K2 data
-        archive at MAST.
-
-        See the :class:`KeplerQualityFlags` class for details on the bitmasks.
-
-        Raises an `ArchiveError` if a unique TPF cannot be found.  For example,
-        this is the case if a target was observed in multiple Quarters and the
-        quarter parameter is unspecified.
-
-        Parameters
-        ----------
-        target : str or int
-            KIC/EPIC ID or object name.
-        cadence : str
-            'long' or 'short'.
-        quarter, campaign : int, list of ints, or 'all'
-            Kepler Quarter or K2 Campaign number.
-        month : 1, 2, 3, list or 'all'
-            For Kepler's prime mission, there are three short-cadence
-            Target Pixel Files for each quarter, each covering one month.
-            Hence, if cadence='short' you need to specify month=1, 2, or 3.
-        radius : float
-            Search radius in arcseconds. Default is 40 arcseconds,
-            roughly the size of an average K2 postage stamp.
-        targetlimit : None or int
-            If multiple targets are present within `radius`, limit the number
-            of returned TargetPixelFile objects to `targetlimit`.
-            If `None`, no limit is applied.
-        quality_bitmask : str or int
-            Bitmask (integer) which identifies the quality flag bitmask that should
-            be used to mask out bad cadences. If a string is passed, it has the
-            following meaning:
-
-                * "none": no cadences will be ignored (`quality_bitmask=0`).
-                * "default": cadences with severe quality issues will be ignored
-                  (`quality_bitmask=1130799`).
-                * "hard": more conservative choice of flags to ignore
-                  (`quality_bitmask=1664431`). This is known to remove good data.
-                * "hardest": removes all data that has been flagged
-                  (`quality_bitmask=2096639`). This mask is not recommended.
-
-            See the :class:`KeplerQualityFlags` class for details on the bitmasks.
-        kwargs : dict
-            Keywords arguments passed to the constructor of
-            :class:`KeplerTargetPixelFile`.
-
-        Returns
-        -------
-        tpf : :class:`KeplerTargetPixelFile` object.
-        """
-        if os.path.exists(str(target)) or str(target).startswith('http'):
-            log.warning('Warning: cone_search() is not intended to accept a '
-                        'direct path, use KeplerTargetPixelFile(path) instead.')
-            path = [target]
-        else:
-            path = download_kepler_products(
-                target=target, filetype='Target Pixel', cadence=cadence,
-                quarter=quarter, campaign=campaign, month=month,
-                searchtype='cone', radius=radius, targetlimit=targetlimit)
-        if len(path) == 1:
-            tpfs = [KeplerTargetPixelFile(path[0],
-                                         quality_bitmask=quality_bitmask,
-                                         **kwargs)]
-            log.warning('Warning: only one target found within provided radius. '
-                        'Try increasing the search radius. (Radius currently '
-                        'set to {} arcseconds)'.format(radius))
-        else:
-            tpfs = [KeplerTargetPixelFile(p, quality_bitmask=quality_bitmask,
-                    **kwargs) for p in path]
-        return TargetPixelFileCollection(tpfs)
 
     def __repr__(self):
         return('KeplerTargetPixelFile Object (ID: {})'.format(self.targetid))
