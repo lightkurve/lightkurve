@@ -22,7 +22,7 @@ def test_search_targetpixelfile():
     assert(len(search_targetpixelfile(11904151).products) == 15)
     # ...including quarter 11 but not 12:
     assert(len(search_targetpixelfile(11904151, quarter=11).targets) == 1)
-    assert(len(search_targetpixelfile(11904151, quarter=12).products) == 0) ### NOTE fails for .targets
+    assert(len(search_targetpixelfile(11904151, quarter=12).products) == 0)
     # should work for all split campaigns
     campaigns = [[91, 92, 9], [101, 102, 10], [111, 112, 11]]
     ids = [200068780, 200071712, 202975993]
