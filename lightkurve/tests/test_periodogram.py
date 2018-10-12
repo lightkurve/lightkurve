@@ -83,15 +83,19 @@ def test_smooth():
     """
     lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000), flux_err=np.zeros(1000)+0.1)
     p = lc.to_periodogram()
-    assert all(p.smooth().frequency == p.frequency)
+    #Test boxkernel method works
+    assert all(p.smooth(method='boxkernel').frequency == p.frequency)
+    #Test logmedian method works
+    assert all(p.smooth(method='logmedian').frequency == p.frequency)
+    #Check output units
     assert p.smooth().power.unit == p.power.unit
 
     #Can't pass filter_width below 0.
     with pytest.raises(ValueError) as err:
-        p.smooth(filter_width=-5.)
+        p.smooth(method='boxkernel', filter_width=-5.)
     #Can't pass a filter_width in the wrong units
     with pytest.raises(ValueError) as err:
-        p.smooth(filter_width=5.*u.day)
+        p.smooth(method='boxkernel', filter_width=5.*u.day)
     assert err.value.args[0] == 'filter_width must be in units of frequency.'
 
     #Can't (yet) use a periodogram with a non-evenly spaced frqeuencies
@@ -99,6 +103,23 @@ def test_smooth():
         p = np.arange(100)
         p = lc.to_periodogram(period=p)
         p.smooth()
+
+    #Check logmedian doesn't work if I give the filter width units
+    with pytest.raises(ValueError) as err:
+        p.smooth(method='logmedian',  filter_width=5.*u.day)
+
+def test_flatten():
+    lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000), flux_err=np.zeros(1000)+0.1)
+    p = lc.to_periodogram()
+
+    #Check method returns equal frequency
+    assert all(p.flatten(method='logmedian').frequency == p.frequency)
+    assert all(p.flatten(method='boxkernel').frequency == p.frequency)
+
+    #Check return trend works
+    s, b = p.flatten(return_trend=True)
+    assert all(b.power == p.smooth(method='logmedian', filter_width=0.01).power)
+    assert all(s.power == p.flatten().power)
 
 def test_index():
     """Test if you can mask out periodogram
