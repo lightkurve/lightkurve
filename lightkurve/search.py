@@ -1,13 +1,11 @@
 from __future__ import division, print_function
 import os
-import sys
 import logging
 import numpy as np
-import copy
 
 from astroquery.mast import Observations
 from astroquery.exceptions import ResolverError
-from astropy.table import Table, unique
+from astropy.table import unique, join
 from astropy.coordinates import SkyCoord
 from astropy.io import ascii
 from .lightcurvefile import KeplerLightCurveFile
@@ -17,14 +15,16 @@ from .collections import TargetPixelFileCollection, LightCurveFileCollection
 from . import PACKAGEDIR
 log = logging.getLogger(__name__)
 
+
 class SearchResult(object):
     """
     Defines a generic SearchResult class returned by `search_targetpixelfile` or `search_lightcurvefile`.
 
     Parameters
     ----------
-    path : astropy table
-        Astropy table returned by the astroquery `Observations.query_criteria()` function
+    products : astropy table
+        Astropy table returned by a join of the astroquery `Observations.query_criteria()`
+        and `Observations.get_product_list()` methods.
     campaign : int or list
         Desired campaign of observation for data products
     quarter : int or list
@@ -37,37 +37,19 @@ class SearchResult(object):
         Type of files queried at MAST (`Target Pixel` or `Lightcurve`)
     """
 
-    def __init__(self, path, campaign=None, quarter=None, month=None, cadence=None,
-                 filetype=None):
-
-        self.path = path
-        self.campaign = campaign
-        self.quarter = quarter
-        self.month = month
-        self.cadence = cadence
+    def __init__(self, products, filetype):
+        self.products = products
         self.filetype = filetype
+
+    def __repr__(self):
+        columns = ['obsID', 'target_name', 'productFilename', 'description', 'distance']
+        return '\n'.join(self.products[columns].pformat(max_width=300))
 
     @property
     def targets(self):
         """Returns a table of targets and their RA & dec values produced by search"""
         mask = ['target_name', 's_ra', 's_dec']
-        return unique(self.path[mask], keys='target_name')
-
-    @property
-    def products(self):
-        """Returns a table of science products available to download"""
-        obsids = np.asarray(self.path['obsid'])
-        products = Observations.get_product_list(self.path)
-        order = [np.where(products['parent_obsid'] == o)[0] for o in obsids]
-        order = [item for sublist in order for item in sublist]
-        ntargets = len(np.unique(self.path['target_name']))
-
-        mask = ['project', 'description', 'obs_id']
-        self.full_products = self._mask_products(products[order],filetype=self.filetype,
-                                                 campaign=self.campaign, quarter=self.quarter,
-                                                 cadence=self.cadence, targetlimit=ntargets)
-
-        return self.full_products[mask]
+        return unique(self.products[mask], keys='target_name')
 
     @property
     def mastID(self):
@@ -77,17 +59,17 @@ class SearchResult(object):
     @property
     def target_name(self):
         """Returns an array of target names"""
-        return np.asarray(np.unique(self.path['target_name']))
+        return self.products['target_name'].data.data
 
     @property
     def ra(self):
         """Returns an array of RA values for targets in search"""
-        return np.asarray(self.path['s_ra'])
+        return self.products['s_ra'].data.data
 
     @property
     def dec(self):
         """Returns an array of dec values for targets in search"""
-        return np.asarray(self.path['s_dec'])
+        return self.products['s_dec'].data.data
 
     def download(self, quality_bitmask='default'):
         """
@@ -118,21 +100,18 @@ class SearchResult(object):
         # Make sure astroquery uses the same level of verbosity
         logging.getLogger('astropy').setLevel(log.getEffectiveLevel())
 
-        # create products table
-        products = self.products
-
         # check if download directory exists
         if not os.path.isdir(os.path.expanduser('~')+'/.astropy'):
             os.mkdir(os.path.expanduser('~')+'/.astropy')
         # download first product in table
         download_dir = os.path.expanduser('~')+'/.astropy'
-        path = Observations.download_products(self.full_products[:1], mrp_only=False,
+        path = Observations.download_products(self.products[:1], mrp_only=False,
                                               download_dir=download_dir)['Local Path']
 
-        if len(self.full_products) != 1:
+        if len(self.products) != 1:
             log.warning('Warning: {} files available to download. Only the first file has been '
                         'downloaded. Please use `download_all()` or specify a campaign, quarter, or '
-                        'cadence to limit your search.'.format(len(self.full_products)))
+                        'cadence to limit your search.'.format(len(self.products)))
 
         # return single tpf or lcf
         if self.filetype == "Target Pixel":
@@ -170,14 +149,11 @@ class SearchResult(object):
         # Make sure astroquery uses the same level of verbosity
         logging.getLogger('astropy').setLevel(log.getEffectiveLevel())
 
-        # create products table
-        products = self.products
-
         # should download to `~/.lightkurve-cache`, make sure dir exists and is accessible
         download_dir = self._fetch_dir()
 
         # download all products in table
-        path = Observations.download_products(self.full_products, mrp_only=False,
+        path = Observations.download_products(self.products, mrp_only=False,
                                               download_dir=download_dir)['Local Path']
 
         # return collection of tpf or lcf
@@ -357,9 +333,11 @@ class SearchResult(object):
 
         return download_dir
 
+
 class ArchiveError(Exception):
     """Raised if there is a problem accessing data."""
     pass
+
 
 def _query_mast(target, cadence='long', radius=.0001, targetlimit=None):
     """
@@ -440,7 +418,7 @@ def _query_mast(target, cadence='long', radius=.0001, targetlimit=None):
 
 
 def search_targetpixelfile(target, cadence='long', quarter=None, month=None,
-                           campaign=None, radius=.0001, targetlimit=None):
+                           campaign=None, radius=.0001, targetlimit=1000):
 
     """
     Fetch a data table for Target Pixel Files within a region of sky. Cone search is
@@ -466,14 +444,10 @@ def search_targetpixelfile(target, cadence='long', quarter=None, month=None,
     -------
     SearchResult : :class:`SearchResult` object.
     """
+    return search_products(target, filetype="Target Pixel", cadence=cadence,
+                           quarter=quarter, month=month, campaign=campaign,
+                           radius=radius, targetlimit=targetlimit)
 
-    filetype = "Target Pixel"
-
-    # query mast for target (KIC/EPIC ID or skycoord value)
-    path = _query_mast(target, cadence='long', radius=radius, targetlimit=targetlimit)
-
-    return SearchResult(path, campaign=campaign, quarter=quarter, month=month,
-                        cadence=cadence, filetype=filetype)
 
 def search_lightcurvefile(target, cadence='long', quarter=None, month=None,
                           campaign=None, radius=.0001, targetlimit=None):
@@ -502,11 +476,160 @@ def search_lightcurvefile(target, cadence='long', quarter=None, month=None,
     -------
     SearchResult : :class:`SearchResult` object.
     """
+    return search_products(target, filetype="Lightcurve", cadence=cadence,
+                           quarter=quarter, month=month, campaign=campaign,
+                           radius=radius, targetlimit=targetlimit)
 
-    filetype = "Lightcurve"
 
-    # query mast for target (KIC/EPIC ID or skycoord value)
-    path = _query_mast(target, cadence='long', radius=radius, targetlimit=targetlimit)
+def search_products(target, filetype="Lightcurve", cadence='long', quarter=None, month=None,
+                    campaign=None, radius=.0001, targetlimit=1000):
+    """Returns a SearchResult object."""
+    observations = _query_mast(target, cadence='long', radius=radius, targetlimit=targetlimit)
+    products = Observations.get_product_list(observations)
+    result = join(products, observations, join_type='left')  # will join on obs_id
+    result.sort(['distance', 'obs_id'])
+    masked_result = _mask_products(result, filetype=filetype,
+                                   campaign=campaign, quarter=quarter,
+                                   cadence=cadence, targetlimit=targetlimit)
+    return SearchResult(masked_result, filetype)
 
-    return SearchResult(path, campaign=campaign, quarter=quarter, month=month,
-                        cadence=cadence, filetype=filetype)
+
+def _mask_products(products, campaign=None, quarter=None, month=None, cadence='long',
+                   filetype='Target Pixel', targetlimit=1):
+    """
+    Masks contents of products table based on given `cadence`, `quarter`, `month`, `campaign`
+    constraints.
+
+    Parameters
+    ----------
+    products : astropy table
+        Full astropy table containing data products returned by MAST
+    campaign : int or list
+        Desired campaign of observation for data products
+    quarter : int or list
+        Desired quarter of observation for data products
+    month : int or list
+        Desired month of observation for data products
+    cadence : str
+        Desired cadence (`long`, `short`, `any`)
+    filetpye : str
+        Type of files queried at MAST (`Target Pixel` or `Lightcurve`)
+    targetlimit : int
+        Maximum number of targets in astropy table
+
+    Returns
+    -------
+    products : astropy table
+        Masked astropy table containing desired data products
+    """
+    # Value for the quarter or campaign
+    qoc = campaign if campaign is not None else quarter
+
+    # Ensure quarter or campaign is iterable.
+    if (campaign is not None) | (quarter is not None):
+        qoc = np.atleast_1d(np.asarray(qoc, dtype=int))
+
+    # Because MAST doesn't let us query based on Kepler-specific meta data
+    # fields, we need to identify short/long-cadence TPFs by their filename.
+    if cadence in ['short', 'sc']:
+        suffix = "{} Short".format(filetype)
+    elif cadence in ['any', 'both']:
+        suffix = "{}".format(filetype)
+    else:
+        suffix = "{} Long".format(filetype)
+
+    # Identify the campaign or quarter by the description.
+    if qoc is not None:
+        mask = np.zeros(np.shape(products)[0], dtype=bool)
+        for q in qoc:
+            mask |= np.array([desc.lower().replace('-', '').endswith('q{}'.format(q)) or
+                              'c{:02d}'.format(q) in desc.lower().replace('-', '') or
+                              'c{:03d}'.format(q) in desc.lower().replace('-', '')
+                              for desc in products['description']])
+    else:
+        mask = np.ones(np.shape(products)[0], dtype=bool)
+
+    # Allow only the correct fits or fits.gz type
+    mask &= np.array([desc.lower().endswith('fits') or
+                      desc.lower().endswith('fits.gz')
+                      for desc in products['dataURI']])
+
+    # Allow only the correct cadence type
+    mask &= np.array([suffix in desc for desc in products['description']])
+    products = products[mask]
+
+    # Add the quarter or campaign numbers
+    qoc = np.asarray([p.split(' - ')[-1][1:].replace('-', '')
+                      for p in products['description']], dtype=int)
+    products['qoc'] = qoc
+    # Add the dates of each short cadence observation to the product table.
+    # Note this will not produce a date for ktwo observations, but will not break.
+    dates = [p.split('/')[-1].split('-')[1].split('_')[0]
+             for p in products['dataURI']]
+    for idx, d in enumerate(dates):
+        try:
+            dates[idx] = float(d)
+        except:
+            dates[idx] = 0
+    products['dates'] = np.asarray(dates)
+
+    # Limit to the correct number of hits based on ID. If there are multiple versions
+    # of the same ID, this shouldn't count towards the limit.
+    # if targetlimit is not None:
+    ids = np.asarray([p.split('/')[-1].split('-')[0].split('_')[0][4:]
+                      for p in products['dataURI']], dtype=int)
+
+    if len(np.unique(ids)) < targetlimit:
+        log.warning('Target return limit set to {} '
+                    'but only {} unique targets found. '
+                    'Try increasing the search radius. '
+                    ''.format(targetlimit, len(np.unique(ids))))
+    okids = ids[np.sort(np.unique(ids, return_index=True)[1])[0:targetlimit]]
+    mask = np.zeros(len(ids), dtype=bool)
+
+    # Mask data.
+    # Make sure they still appear in the same order.
+    order = np.zeros(len(ids))
+    for idx, okid in enumerate(okids):
+        pos = ids == okid
+        order[pos] = int(idx)
+        mask |= pos
+    products['order'] = order
+    products = products[mask]
+
+    # If there is nothing in the table, quit now.
+    if len(products) == 0:
+        return products
+    products.sort(['order', 'dates', 'qoc'])
+
+    # For Kepler short cadence data there are additional rules, so find anywhere
+    # where there is short cadence data...
+    scmask = np.asarray(['Short' in d for d in products['description']]) &\
+             np.asarray(['kplr' in d for d in products['dataURI']])
+
+    if np.any(scmask):
+        # If no month is specified, return all
+        if month is None:
+            return products
+
+        month = np.atleast_1d(month)
+        # Get the short cadence date lookup table.
+        table = ascii.read(os.path.join(PACKAGEDIR, 'data', 'short_cadence_month_lookup.csv'))
+        # Grab the dates of each of the short cadence files. Make sure every entry
+        # has the correct month
+        finalmask = np.ones(len(products), dtype=bool)
+        for c in np.unique(products[scmask]['qoc']):
+            ok = (products['qoc'] == c) & (scmask)
+            mask = np.zeros(np.shape(products[ok])[0], dtype=bool)
+            for m in month:
+                udate = (table['StartTime'][np.where(
+                    (table['Month'] == m) & (table['Quarter'] == c))[0][0]])
+                mask |= np.asarray(products['dates'][ok]) == udate
+            finalmask[ok] = mask
+        products = products[finalmask]
+        # Sort by id, then date and quarter
+        products.sort(['order', 'dates', 'qoc'])
+        if len(products) < 1:
+            return products
+
+    return products
