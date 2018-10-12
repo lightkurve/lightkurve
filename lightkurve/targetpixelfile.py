@@ -678,7 +678,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
             >>> search_targetpixelfile('kepler-10', quarter=4, radius=100).download_all()
         """
         # deprication warning
-        log.warning('WARNING: This function is depricated. Please use `search_targetpixelfile()`.
+        log.warning('WARNING: This function is depricated. Please use `search_targetpixelfile()`. '
                     'Use examples are provided in the documentation.')
         if os.path.exists(str(target)) or str(target).startswith('http'):
             log.warning('Warning: from_archive() is not intended to accept a '

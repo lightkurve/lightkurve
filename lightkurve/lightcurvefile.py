@@ -256,7 +256,7 @@ class KeplerLightCurveFile(LightCurveFile):
             >>> search_lightcurvefile('kepler-10', quarter=4, radius=100).download_all()
         """
         # deprication warning
-        log.warning('WARNING: This function is depricated. Please use `search_lightcurvefile()`.
+        log.warning('WARNING: This function is depricated. Please use `search_lightcurvefile()`. '
                     'Use examples are provided in the documentation.')
 
         # Be tolerant if a direct path or url is passed to this function by accident
@@ -275,7 +275,7 @@ class KeplerLightCurveFile(LightCurveFile):
                                         **kwargs)
         return [KeplerLightCurveFile(p, quality_bitmask=quality_bitmask, **kwargs)
                 for p in path]
-                
+
 
     def __repr__(self):
         return('KeplerLightCurveFile(ID: {})'.format(self.targetid))
