@@ -42,7 +42,11 @@ class SearchResult(object):
         self.filetype = filetype
 
     def __repr__(self):
-        columns = ['obsID', 'target_name', 'productFilename', 'description', 'distance']
+        try:
+            columns = ['obsID', 'target_name', 'productFilename', 'description', 'distance']
+        # some MAST queries do not include a distance column
+        except KeyError:
+            columns = ['obsID', 'target_name', 'productFilename', 'description']
         return '\n'.join(self.products[columns].pformat(max_width=300))
 
     @property
@@ -54,7 +58,7 @@ class SearchResult(object):
     @property
     def mastID(self):
         """Returns an array of MAST observation IDs"""
-        return np.asarray(np.unique(self.path['obsid']), dtype='int')
+        return np.asarray(np.unique(self.products['obsid']), dtype='int')
 
     @property
     def target_name(self):
@@ -251,6 +255,7 @@ class SearchResult(object):
         ids = np.asarray([p.split('/')[-1].split('-')[0].split('_')[0][4:]
                           for p in products['dataURI']], dtype=int)
 
+        import pdb; pdb.set_trace()
         if len(np.unique(ids)) < targetlimit:
             log.warning('Target return limit set to {} '
                         'but only {} unique targets found. '
@@ -487,7 +492,10 @@ def search_products(target, filetype="Lightcurve", cadence='long', quarter=None,
     observations = _query_mast(target, cadence='long', radius=radius, targetlimit=targetlimit)
     products = Observations.get_product_list(observations)
     result = join(products, observations, join_type='left')  # will join on obs_id
-    result.sort(['distance', 'obs_id'])
+    try:
+        result.sort(['distance', 'obs_id'])
+    except KeyError:
+        result.sort('obs_id')
     masked_result = _mask_products(result, filetype=filetype,
                                    campaign=campaign, quarter=quarter,
                                    cadence=cadence, targetlimit=targetlimit)
@@ -577,9 +585,9 @@ def _mask_products(products, campaign=None, quarter=None, month=None, cadence='l
     # of the same ID, this shouldn't count towards the limit.
     # if targetlimit is not None:
     ids = np.asarray([p.split('/')[-1].split('-')[0].split('_')[0][4:]
-                      for p in products['dataURI']], dtype=int)
+                     for p in products['dataURI']], dtype=int)
 
-    if len(np.unique(ids)) < targetlimit:
+    if targetlimit is not None and len(np.unique(ids)) < targetlimit:
         log.warning('Target return limit set to {} '
                     'but only {} unique targets found. '
                     'Try increasing the search radius. '
