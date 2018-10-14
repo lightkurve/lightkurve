@@ -173,6 +173,57 @@ def test_lightcurve_append_multiple():
     assert_array_equal(lc.time, 4*[1, 2, 3])
 
 
+def test_lightcurve_copy():
+    """Test ``LightCurve.copy()``."""
+    time = np.array([1, 2, 3, 4])
+    flux = np.array([1, 2, 3, 4])
+    error = np.array([0.1, 0.2, 0.3, 0.4])
+    lc = LightCurve(time=time, flux=flux, flux_err=error)
+
+    nlc = lc.copy()
+    assert_array_equal(lc.time, nlc.time)
+    assert_array_equal(lc.flux, nlc.flux)
+    assert_array_equal(lc.flux_err, nlc.flux_err)
+
+    np.put(nlc.time, 1, 5)
+    np.put(nlc.flux, 1, 6)
+    np.put(nlc.flux_err, 1, 7)
+
+    with pytest.raises(AssertionError) as err:
+        assert_array_equal(lc.time, nlc.time)
+        assert_array_equal(lc.flux, nlc.flux)
+        assert_array_equal(lc.flux_err, nlc.flux_err)
+    assert '(mismatch 25.0%)' in str(err.value)
+
+    # KeplerLightCurve has extra data
+    lc = KeplerLightCurve(time=[1, 2, 3], flux=[1, .5, 1],
+                          centroid_col=[4, 5, 6], centroid_row=[7, 8, 9],
+                          cadenceno=[10, 11, 12], quality=[10, 20, 30])
+    nlc = lc.copy()
+    assert_array_equal(lc.time, nlc.time)
+    assert_array_equal(lc.flux, nlc.flux)
+    assert_array_equal(lc.centroid_col, nlc.centroid_col)
+    assert_array_equal(lc.centroid_row, nlc.centroid_row)
+    assert_array_equal(lc.cadenceno, nlc.cadenceno)
+    assert_array_equal(lc.quality, nlc.quality)
+
+    np.put(nlc.time, 1, 6)
+    np.put(nlc.flux, 1, 7)
+    np.put(nlc.centroid_col, 1, 8)
+    np.put(nlc.centroid_row, 1, 9)
+    np.put(nlc.cadenceno, 1, 10)
+    np.put(nlc.quality, 1, 11)
+
+    with pytest.raises(AssertionError) as err:
+        assert_array_equal(lc.time, nlc.time)
+        assert_array_equal(lc.flux, nlc.flux)
+        assert_array_equal(lc.centroid_col, nlc.centroid_col)
+        assert_array_equal(lc.centroid_row, nlc.centroid_row)
+        assert_array_equal(lc.cadenceno, nlc.cadenceno)
+        assert_array_equal(lc.quality, nlc.quality)
+    assert '(mismatch 33.33333333333333%)' in str(err.value)
+
+
 @pytest.mark.remote_data
 def test_lightcurve_plots():
     """Sanity check to verify that lightcurve plotting works"""
