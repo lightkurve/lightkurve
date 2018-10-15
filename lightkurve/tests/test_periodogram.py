@@ -59,6 +59,7 @@ def test_periodogram_slicing():
     p -= 100
     assert np.sum(p.power) == 0
 
+
 def test_assign_periods():
     """ Test if you can assign periods and frequencies
     """
@@ -71,6 +72,7 @@ def test_assign_periods():
     p = lc.to_periodogram(frequency=frequency)
     assert np.isclose(np.sum(frequency - p.frequency).value, 0, rtol=1e-14)
 
+
 def test_bin():
     """ Test if you can bin the periodogram
     """
@@ -78,48 +80,54 @@ def test_bin():
     p = lc.to_periodogram()
     assert len(p.bin(binsize=10).frequency) == len(p.frequency)//10
 
+
 def test_smooth():
     """Test if you can smooth the periodogram and check any pitfalls
     """
-    lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000), flux_err=np.zeros(1000)+0.1)
+    lc = LightCurve(time=np.arange(1000),
+                    flux=np.random.normal(1, 0.1, 1000),
+                    flux_err=np.zeros(1000)+0.1)
     p = lc.to_periodogram()
-    #Test boxkernel method works
+    # Test boxkernel and logmedian methods
     assert all(p.smooth(method='boxkernel').frequency == p.frequency)
-    #Test logmedian method works
     assert all(p.smooth(method='logmedian').frequency == p.frequency)
-    #Check output units
+    # Check output units
     assert p.smooth().power.unit == p.power.unit
 
-    #Can't pass filter_width below 0.
+    # Can't pass filter_width below 0.
     with pytest.raises(ValueError) as err:
         p.smooth(method='boxkernel', filter_width=-5.)
-    #Can't pass a filter_width in the wrong units
+    # Can't pass a filter_width in the wrong units
     with pytest.raises(ValueError) as err:
         p.smooth(method='boxkernel', filter_width=5.*u.day)
-    assert err.value.args[0] == 'filter_width must be in units of frequency.'
+    assert err.value.args[0] == 'the `filter_width` parameter must have frequency units.'
 
-    #Can't (yet) use a periodogram with a non-evenly spaced frqeuencies
-    with pytest.raises(NotImplementedError) as err:
+    # Can't (yet) use a periodogram with a non-evenly spaced frqeuencies
+    with pytest.raises(ValueError) as err:
         p = np.arange(100)
         p = lc.to_periodogram(period=p)
         p.smooth()
 
-    #Check logmedian doesn't work if I give the filter width units
+    # Check logmedian doesn't work if I give the filter width units
     with pytest.raises(ValueError) as err:
         p.smooth(method='logmedian',  filter_width=5.*u.day)
 
+
 def test_flatten():
-    lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000), flux_err=np.zeros(1000)+0.1)
+    lc = LightCurve(time=np.arange(1000),
+                    flux=np.random.normal(1, 0.1, 1000),
+                    flux_err=np.zeros(1000)+0.1)
     p = lc.to_periodogram()
 
-    #Check method returns equal frequency
+    # Check method returns equal frequency
     assert all(p.flatten(method='logmedian').frequency == p.frequency)
     assert all(p.flatten(method='boxkernel').frequency == p.frequency)
 
-    #Check return trend works
+    # Check return trend works
     s, b = p.flatten(return_trend=True)
     assert all(b.power == p.smooth(method='logmedian', filter_width=0.01).power)
     assert all(s.power == p.flatten().power)
+
 
 def test_index():
     """Test if you can mask out periodogram

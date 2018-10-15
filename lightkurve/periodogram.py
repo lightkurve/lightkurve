@@ -322,17 +322,19 @@ class Periodogram(object):
         binned_pg.power = binned_power
         return binned_pg
 
-    def smooth(self, method='boxkernel', filter_width = 0.1):
-        """Smooths the power spectrum using one of two methods.
+    def smooth(self, method='boxkernel', filter_width=0.1):
+        """Smooths the power spectrum using the 'boxkernel' or 'logmedian' method.
 
-        If method = `boxkernel`, smooths the power spectrum by convolving with a
-        numpy Box1DKernel with a width of `filter_width`, where `filter width` is
-        in units of frequency. This is best for filtering out noise but maintaining
-        seismic mode peaks. This method requires a Periodogram class built using
-        an evenly spaced grid of periods.
+        If `method` is set to 'boxkernel', this method will smooth the power
+        spectrum by convolving with a numpy Box1DKernel with a width of
+        `filter_width`, where `filter width` is in units of frequency.
+        This is best for filtering out noise while maintaining seismic mode
+        peaks. This method requires the Periodogram to have an evenly spaced
+        grid of frequencies. A `ValueError` exception will be raised if this is
+        not the case.
 
-        If method = `logmedian`, smooths the power spectrum using a moving median
-        moves across the power spectrum in a steps of
+        If `method` is set to 'logmedian', it smooths the power spectrum using
+        a moving median which moves across the power spectrum in a steps of
 
         log10(x0) + 0.5 * filter_width
 
@@ -341,50 +343,51 @@ class Periodogram(object):
 
         Parameters
         ----------
-        method : str
-            {'boxkernel', 'logmedian'}. Default 'boxkernel'.
-
+        method : str, one of 'boxkernel' or 'logmedian'
+            The smoothing method to use. Defaults to 'boxkernel'.
         filter_width : float
-            If method = `boxkernel`, the width of the smoothing filter in units
-            of frequency. Will convert to the same units as the Periodogram
-            frequency attribute.
-            If method = `logmedian`, the width of the smoothing filter in log10
-            space.
+            If `method` = 'boxkernel', this is the width of the smoothing filter
+            in units of frequency.
+            If method = `logmedian`, this is the width of the smoothing filter
+            in log10(frequency) space.
 
         Returns
         -------
-        smoothed_pg : a `Periodogram` object
-            Returns a new `Periodogram` object which has been smoothed.
+        smoothed_pg : `Periodogram` object
+            Returns a new `Periodogram` object in which the power spectrum
+            has been smoothed.
         """
         # Input validation
+        if method not in ('boxkernel', 'logmedian'):
+            raise ValueError("the `method` parameter must be one of "
+                             "'boxkernel' or 'logmedian'.")
+
         if method == 'boxkernel':
             if filter_width <= 0.:
-                raise ValueError('Filter width must be larger than 0 for `boxkernel` method.')
+                raise ValueError("the `filter_width` parameter must be "
+                                 "larger than 0 for the 'boxkernel' method.")
             try:
                 filter_width = u.Quantity(filter_width, self.frequency.unit)
-
             except u.UnitConversionError:
-                raise ValueError('filter_width must be in units of frequency.')
+                raise ValueError("the `filter_width` parameter must have "
+                                 "frequency units.")
 
+            # Check to see if we have a grid of evenly spaced periods instead.
             fs = np.mean(np.diff(self.frequency))
+            if not np.isclose(np.median(np.diff(self.frequency.value)), fs.value):
+                raise ValueError("the 'boxkernel' method requires the periodogram "
+                                 "to have a grid of evenly spaced frequencies.")
 
-            #Check to see if we have a grid of evenly spaced periods instead.
-            if np.isclose(np.median(np.diff(self.frequency.value)), fs.value):
-                box_kernel = Box1DKernel(np.ceil(filter_width/fs))
-                smooth_power = convolve(self.power.value, box_kernel)
-                smooth_power = u.Quantity(smooth_power, self.power.unit)
-
-                smooth_pg = copy.deepcopy(self)
-                smooth_pg.power = smooth_power
-                return smooth_pg
-
-            else:
-                raise NotImplementedError("The `boxkernel` method requires a grid of evently spaced frequencies at this time.")
+            box_kernel = Box1DKernel(np.ceil(filter_width/fs))
+            smooth_power = convolve(self.power.value, box_kernel)
+            smooth_pg = copy.deepcopy(self)
+            smooth_pg.power = u.Quantity(smooth_power, self.power.unit)
+            return smooth_pg
 
         if method == 'logmedian':
             if isinstance(filter_width, astropy.units.quantity.Quantity):
-                raise ValueError('When using the `logmedian` method, please pass a dimensionless width in log10() space.')
-
+                raise ValueError("the 'logmedian' method requires a dimensionless "
+                                 "value for `filter_width` in log10(frequency) space.")
             count = np.zeros(len(self.frequency.value), dtype=int)
             bkg = np.zeros_like(self.frequency.value)
             x0 = np.log10(self.frequency[0].value)
@@ -395,11 +398,8 @@ class Periodogram(object):
                     count[m] += 1
                 x0 += 0.5 * filter_width
             bkg /= count
-            bkg = u.Quantity(bkg, self.power.unit)
-
             smooth_pg = copy.deepcopy(self)
-            smooth_pg.power = bkg
-
+            smooth_pg.power = u.Quantity(bkg, self.power.unit)
             return smooth_pg
 
     def plot(self, scale='linear', ax=None, xlabel=None, ylabel=None, title='',
@@ -484,30 +484,29 @@ class Periodogram(object):
 
         This method divides the power spectrum by a background estimated
         using a moving filter in log10 space by default. For details on the
-        keyword arguments, see `Periodogram.smooth()`
+        `method` and `filter_width` parameters, see `Periodogram.smooth()`
 
         Dividing the power through by the noise background produces a spectrum
-        with no units of power. Since the signal is divided through by a a measure
+        with no units of power. Since the signal is divided through by a measure
         of the noise, we refer to this as a `Signal-To-Noise` spectrum.
 
         Parameters
         ----------
-        method : str
-            {'boxkernel', 'logmedian'}. Default 'logmedian'.
-
+        method : str, one of 'boxkernel' or 'logmedian'
+            Background estimation method passed on to `Periodogram.smooth()`.
+            Defaults to 'logmedian'.
         filter_width : float
-            If method = `boxkernel`, the width of the smoothing filter in units
-            of frequency. Will convert to the same units as the Periodogram
-            frequency attribute.
-            If method = `logmedian`, the width of the smoothing filter in log10
-            space.
+            If `method` = 'boxkernel', this is the width of the smoothing filter
+            in units of frequency.
+            If method = `logmedian`, this is the width of the smoothing filter
+            in log10(frequency) space.
 
         Returns
         -------
-        snr_spectrum : a `Periodogram` object
+        snr_spectrum : `Periodogram` object
             Returns a periodogram object where the power is an estimate of the
-            signal-to-noise of the spectrum, assuming a simple estimate of the
-            noise background using a moving filter in log10 space.
+            signal-to-noise of the spectrum, creating by dividing the powers
+            with a simple estimate of the noise background using a smoothing filter.
         """
         bkg = self.smooth(method=method, filter_width=filter_width)
         snr_pg = self / bkg.power
