@@ -221,7 +221,7 @@ def test_lightcurve_copy():
         assert_array_equal(lc.centroid_row, nlc.centroid_row)
         assert_array_equal(lc.cadenceno, nlc.cadenceno)
         assert_array_equal(lc.quality, nlc.quality)
-    assert '(mismatch 33.33333333333333%)' in str(err.value)
+    assert 'mismatch 33.3333333333' in str(err.value)
 
 
 @pytest.mark.remote_data
