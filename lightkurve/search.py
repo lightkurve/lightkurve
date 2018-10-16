@@ -76,12 +76,8 @@ class SearchResult(object):
         Downloads a single KeplerTargetPixelFile or KeplerLightCurveFile object from search result.
         If multiple files are present in `products`, only the first will be downloaded.
 
-        Returns
-        -------
-        KeplerTargetPixelFile : `KeplerTargetPixelFile` object
-            Returns a single `KeplerTargetPixelFile` for first entry in products table
-        KeplerLightCurveFile : `KeplerLightCurveFile` object
-            Returns a single `KeplerLightCurveFile` for first entry in products table
+        Parameters
+        ----------
         quality_bitmask : str or int
             Bitmask (integer) which identifies the quality flag bitmask that should
             be used to mask out bad cadences. If a string is passed, it has the
@@ -96,6 +92,13 @@ class SearchResult(object):
                   (`quality_bitmask=2096639`). This mask is not recommended.
 
             See the :class:`KeplerQualityFlags` class for details on the bitmasks.
+
+        Returns
+        -------
+        KeplerTargetPixelFile : `KeplerTargetPixelFile` object
+            Returns a single `KeplerTargetPixelFile` for first entry in products table
+        KeplerLightCurveFile : `KeplerLightCurveFile` object
+            Returns a single `KeplerLightCurveFile` for first entry in products table
         """
         # Make sure astroquery uses the same level of verbosity
         logging.getLogger('astropy').setLevel(log.getEffectiveLevel())
@@ -125,26 +128,29 @@ class SearchResult(object):
         """
         Downloads a KeplerTargetPixelFileCollection or KeplerLightCurveFileCollection from search results.
 
+         Parameters
+         ----------
+         quality_bitmask : str or int
+             Bitmask (integer) which identifies the quality flag bitmask that should
+             be used to mask out bad cadences. If a string is passed, it has the
+             following meaning:
+
+                 * "none": no cadences will be ignored (`quality_bitmask=0`).
+                 * "default": cadences with severe quality issues will be ignored
+                   (`quality_bitmask=1130799`).
+                 * "hard": more conservative choice of flags to ignore
+                   (`quality_bitmask=1664431`). This is known to remove good data.
+                 * "hardest": removes all data that has been flagged
+                   (`quality_bitmask=2096639`). This mask is not recommended.
+
+             See the :class:`KeplerQualityFlags` class for details on the bitmasks.
+
         Returns
         -------
         KeplerTargetPixelFileCollection : `KeplerTargetPixelFileCollection` object
             Returns a single `KeplerTargetPixelFileCollection` containing all entries in products table
         KeplerLightCurveFileCollection : `KeplerLightCurveFileCollection` object
             Returns a single `KeplerLightCurveFileCollection` containing all entries in products table
-        quality_bitmask : str or int
-            Bitmask (integer) which identifies the quality flag bitmask that should
-            be used to mask out bad cadences. If a string is passed, it has the
-            following meaning:
-
-                * "none": no cadences will be ignored (`quality_bitmask=0`).
-                * "default": cadences with severe quality issues will be ignored
-                  (`quality_bitmask=1130799`).
-                * "hard": more conservative choice of flags to ignore
-                  (`quality_bitmask=1664431`). This is known to remove good data.
-                * "hardest": removes all data that has been flagged
-                  (`quality_bitmask=2096639`). This mask is not recommended.
-
-            See the :class:`KeplerQualityFlags` class for details on the bitmasks.
         """
         # Make sure astroquery uses the same level of verbosity
         logging.getLogger('astropy').setLevel(log.getEffectiveLevel())
@@ -165,147 +171,6 @@ class SearchResult(object):
             lcs = [KeplerLightCurveFile(p,
                                    quality_bitmask=quality_bitmask) for p in path]
             return LightCurveFileCollection(lcs)
-
-    def _mask_products(self, products, campaign=None, quarter=None, month=None, cadence='long',
-                       filetype='Target Pixel', targetlimit=1):
-        """
-        Masks contents of products table based on given `cadence`, `quarter`, `month`, `campaign`
-        constraints.
-
-        Parameters
-        ----------
-        products : astropy table
-            Full astropy table containing data products returned by MAST
-        campaign : int or list
-            Desired campaign of observation for data products
-        quarter : int or list
-            Desired quarter of observation for data products
-        month : int or list
-            Desired month of observation for data products
-        cadence : str
-            Desired cadence (`long`, `short`, `any`)
-        filetpye : str
-            Type of files queried at MAST (`Target Pixel` or `Lightcurve`)
-        targetlimit : int
-            Maximum number of targets in astropy table
-
-        Returns
-        -------
-        products : astropy table
-            Masked astropy table containing desired data products
-        """
-        # Value for the quarter or campaign
-        qoc = campaign if campaign is not None else quarter
-
-        # Ensure quarter or campaign is iterable.
-        if (campaign is not None) | (quarter is not None):
-            qoc = np.atleast_1d(np.asarray(qoc, dtype=int))
-
-        # Because MAST doesn't let us query based on Kepler-specific meta data
-        # fields, we need to identify short/long-cadence TPFs by their filename.
-        if cadence in ['short', 'sc']:
-            suffix = "{} Short".format(filetype)
-        elif cadence in ['any', 'both']:
-            suffix = "{}".format(filetype)
-        else:
-            suffix = "{} Long".format(filetype)
-
-        # Identify the campaign or quarter by the description.
-        if qoc is not None:
-            mask = np.zeros(np.shape(products)[0], dtype=bool)
-            for q in qoc:
-                mask |= np.array([desc.lower().replace('-', '').endswith('q{}'.format(q)) or
-                                  'c{:02d}'.format(q) in desc.lower().replace('-', '') or
-                                  'c{:03d}'.format(q) in desc.lower().replace('-', '')
-                                  for desc in products['description']])
-        else:
-            mask = np.ones(np.shape(products)[0], dtype=bool)
-
-        # Allow only the correct fits or fits.gz type
-        mask &= np.array([desc.lower().endswith('fits') or
-                          desc.lower().endswith('fits.gz')
-                          for desc in products['dataURI']])
-
-        # Allow only the correct cadence type
-        mask &= np.array([suffix in desc for desc in products['description']])
-        products = products[mask]
-
-        # Add the quarter or campaign numbers
-        qoc = np.asarray([p.split(' - ')[-1][1:].replace('-', '')
-                          for p in products['description']], dtype=int)
-        products['qoc'] = qoc
-        # Add the dates of each short cadence observation to the product table.
-        # Note this will not produce a date for ktwo observations, but will not break.
-        dates = [p.split('/')[-1].split('-')[1].split('_')[0]
-                 for p in products['dataURI']]
-        for idx, d in enumerate(dates):
-            try:
-                dates[idx] = float(d)
-            except:
-                dates[idx] = 0
-        products['dates'] = np.asarray(dates)
-
-        # Limit to the correct number of hits based on ID. If there are multiple versions
-        # of the same ID, this shouldn't count towards the limit.
-        # if targetlimit is not None:
-        ids = np.asarray([p.split('/')[-1].split('-')[0].split('_')[0][4:]
-                          for p in products['dataURI']], dtype=int)
-
-        import pdb; pdb.set_trace()
-        if len(np.unique(ids)) < targetlimit:
-            log.warning('Target return limit set to {} '
-                        'but only {} unique targets found. '
-                        'Try increasing the search radius. '
-                        ''.format(targetlimit, len(np.unique(ids))))
-        okids = ids[np.sort(np.unique(ids, return_index=True)[1])[0:targetlimit]]
-        mask = np.zeros(len(ids), dtype=bool)
-
-        # Mask data.
-        # Make sure they still appear in the same order.
-        order = np.zeros(len(ids))
-        for idx, okid in enumerate(okids):
-            pos = ids == okid
-            order[pos] = int(idx)
-            mask |= pos
-        products['order'] = order
-        products = products[mask]
-
-        # If there is nothing in the table, quit now.
-        if len(products) == 0:
-            return products
-        products.sort(['order', 'dates', 'qoc'])
-
-        # For Kepler short cadence data there are additional rules, so find anywhere
-        # where there is short cadence data...
-        scmask = np.asarray(['Short' in d for d in products['description']]) &\
-                 np.asarray(['kplr' in d for d in products['dataURI']])
-
-        if np.any(scmask):
-            # If no month is specified, return all
-            if self.month is None:
-                return products
-
-            self.month = np.atleast_1d(self.month)
-            # Get the short cadence date lookup table.
-            table = ascii.read(os.path.join(PACKAGEDIR, 'data', 'short_cadence_month_lookup.csv'))
-            # Grab the dates of each of the short cadence files. Make sure every entry
-            # has the correct month
-            finalmask = np.ones(len(products), dtype=bool)
-            for c in np.unique(products[scmask]['qoc']):
-                ok = (products['qoc'] == c) & (scmask)
-                mask = np.zeros(np.shape(products[ok])[0], dtype=bool)
-                for m in self.month:
-                    udate = (table['StartTime'][np.where(
-                        (table['Month'] == m) & (table['Quarter'] == c))[0][0]])
-                    mask |= np.asarray(products['dates'][ok]) == udate
-                finalmask[ok] = mask
-            products = products[finalmask]
-            # Sort by id, then date and quarter
-            products.sort(['order', 'dates', 'qoc'])
-            if len(products) < 1:
-                return products
-
-        return products
 
     def _fetch_dir(self):
         '''
