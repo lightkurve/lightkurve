@@ -1169,7 +1169,7 @@ class KeplerLightCurve(LightCurve):
         if method == 'sff':
             from .correctors import SFFCorrector
             self.corrector = SFFCorrector()
-            corrected_lc = self.corrector.christina_correct(origtime=self.time[not_nan],
+            corrected_lc = self.corrector.correct(origtime=self.time[not_nan],
                                                   origflux=self.flux[not_nan],
                                                   origcentroid_col=self.centroid_col[not_nan],
                                                   origcentroid_row=self.centroid_row[not_nan],
@@ -1187,6 +1187,41 @@ class KeplerLightCurve(LightCurve):
         if hasattr(self, 'time_format'):
             new_lc.time_format = self.time_format
         return new_lc
+
+    def interactive_SFF(self, notebook_url='localhost:8888', postprocessing=None):
+        """Display an interactive Jupyter Notebook widget to inspect the pixel data.
+
+        The widget will show both the lightcurve and pixel data.  By default,
+        the lightcurve shown is obtained by calling the `to_lightcurve()` method,
+        unless the user supplies a custom `LightCurve` object.
+        This feature requires an optional dependency, bokeh (v0.12.15 or later).
+        This dependency can be installed using e.g. `conda install bokeh`.
+
+        At this time, this feature only works inside an active Jupyter
+        Notebook, and tends to be too slow when more than ~30,000 cadences
+        are contained in the TPF (e.g. short cadence data).
+
+        Parameters
+        ----------
+        lc : LightCurve object
+            An optional pre-processed lightcurve object to show.
+        notebook_url: str
+            Location of the Jupyter notebook page (default: "localhost:8888")
+            When showing Bokeh applications, the Bokeh server must be
+            explicitly configured to allow connections originating from
+            different URLs. This parameter defaults to the standard notebook
+            host and port. If you are running on a different location, you
+            will need to supply this value for the application to display
+            properly. If no protocol is supplied in the URL, e.g. if it is
+            of the form "localhost:8888", then "http" will be used.
+        max_cadences : int
+            Raise a RuntimeError if the number of cadences shown is larger than
+            this value. This limit helps keep browsers from becoming unresponsive.
+        """
+        from .interact import show_SFF_interact_widget
+        return show_SFF_interact_widget(self, notebook_url=notebook_url,
+                                        postprocessing=postprocessing)
+
 
     def to_pandas(self, columns=['time', 'flux', 'flux_err', 'quality',
                                  'centroid_col', 'centroid_row']):

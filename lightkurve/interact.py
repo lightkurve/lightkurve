@@ -18,6 +18,8 @@ import numpy as np
 from astropy.stats import sigma_clip
 from .utils import KeplerQualityFlags
 
+from .correctors import SFFCorrector
+
 log = logging.getLogger(__name__)
 
 # Import the optional Bokeh dependency, or print a friendly error otherwise.
@@ -29,7 +31,7 @@ try:
         Span, ColorBar, LogTicker, Range1d
     from bokeh.layouts import layout, Spacer
     from bokeh.models.tools import HoverTool
-    from bokeh.models.widgets import Button
+    from bokeh.models.widgets import Button, RadioButtonGroup, CheckboxGroup
     from bokeh.models.formatters import PrintfTickFormatter
 except ImportError:
     pass  # We will print a nice error message in the `show_interact_widget` function
@@ -408,6 +410,123 @@ def show_interact_widget(tpf, lc=None, notebook_url='localhost:8888', max_cadenc
                                      [l_button, space1, r_button, space2,
                                       cadence_slider, space3, stretch_slider])
         doc.add_root(widgets_and_figures)
+
+    output_notebook(verbose=False, hide_banner=True)
+    return show(create_interact_ui, notebook_url=notebook_url)
+
+
+def show_SFF_interact_widget(orig_lc, notebook_url='localhost:8888', postprocessing=None):
+    '''Show an interactive SFF widget...
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+
+
+    '''
+
+    lc_source = prepare_lightcurve_datasource(orig_lc)
+    def create_interact_ui(doc):
+        SFF = SFFCorrector()
+
+        # WIDGETS
+        #-----------------------------
+        # Window Slider
+        window_slider = Slider(start=1,
+                                end=50,
+                                value=0,
+                                step=1,
+                                title="Window Number",
+                                width=600)
+
+        # Bin Slider
+        bin_slider = Slider(start=1,
+                                end=50,
+                                value=0,
+                                step=1,
+                                title="Bin Number",
+                                width=600)
+
+                # Window Slider
+        window_shift_slider = Slider(start=0,
+                                end=1000,
+                                value=0,
+                                step=1,
+                                title="Window Shift",
+                                width=600)
+
+
+        niters_button = RadioButtonGroup(labels=["1 Iter", "2 Iter", "3 Iter"], active=2)
+        restore_trend = CheckboxGroup(labels=["Restore Trend"], active=[])
+        show_windows = CheckboxGroup(labels=["Show Window Edges"], active=[])
+        correct_thrusters = CheckboxGroup(labels=["Correct Thrusters"], active=[])
+        #-----------------------------
+
+        # Make plot
+        fig_lc = make_lightcurve_figure_elements(orig_lc, lc_source, line=False, tools="pan,wheel_zoom,box_zoom,reset", tooltips=False)
+
+        #Make INVISIBLE lines.
+        line_dict = {}
+        for i in range(50):
+            line_dict[i] = Span(location=0, dimension='height',
+                                 line_color='firebrick', line_width=0, line_alpha=0.6)
+            fig_lc.add_layout(line_dict[i])
+
+        # Callback
+        def compute(attr, old, new):
+            '''When sliders change, compute the new correction'''
+            if (window_slider.value != 0) & (bin_slider.value!=0):
+                lc = SFF.correct(orig_lc.time, orig_lc.flux, orig_lc.centroid_col, orig_lc.centroid_row,
+                                                       windows=window_slider.value, bins=bin_slider.value,
+                                                       niters=niters_button.active + 1,
+                                                       window_shift=window_shift_slider.value,
+                                                       restore_trend = bool(len(restore_trend.active)),
+                                                       correct_thrusters=bool(len(correct_thrusters.active)))
+                if postprocessing is not None:
+                    if not callable(postprocessing):
+                        raise ValueError('Post Processing must be a function.')
+                    lc = postprocessing(lc)
+                    show_windows.active=[]
+                    restore_trend.active=[]
+                    restore_trend.disabled=True
+                    show_windows.disabled=True
+
+                lc_source.data['flux'] = lc.flux
+                lc_source.data['time'] = lc.time
+            else:
+                lc_source.data['flux'] = orig_lc.flux
+
+
+        def do_lines(attr, old, new):
+            '''When window or window shift changes, change the lines
+            '''
+            windows = window_slider.value
+            window_shift = window_shift_slider.value
+            idx = 0
+            if bool(len(show_windows.active)):
+                time = SFF.build_window_positions(orig_lc.time, windows=windows, window_shift=window_shift)
+                for idx, t in enumerate(time):
+                    line_dict[idx].update(location=t[0])
+                    line_dict[idx].update(line_width=1.5)
+            for jdx in range(idx, 50):
+                line_dict[jdx].update(location=0)
+                line_dict[idx].update(line_width=0)
+
+
+        window_slider.on_change('value', compute)
+        window_shift_slider.on_change('value', compute)
+        bin_slider.on_change('value', compute)
+        niters_button.on_change('active', compute)
+        restore_trend.on_change('active', compute)
+        correct_thrusters.on_change('active', compute)
+
+        show_windows.on_change('active', do_lines)
+        window_slider.on_change('value', do_lines)
+        window_shift_slider.on_change('value', do_lines)
+
+        doc.add_root(layout([fig_lc, Spacer(width=30), [niters_button, restore_trend, show_windows, correct_thrusters]], [window_slider], [bin_slider], [window_shift_slider]))
 
     output_notebook(verbose=False, hide_banner=True)
     return show(create_interact_ui, notebook_url=notebook_url)
