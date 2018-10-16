@@ -41,9 +41,6 @@ class TargetPixelFile(object):
             self.hdu = fits.open(self.path, **kwargs)
         self.quality_bitmask = quality_bitmask
         self.targetid = targetid
-        # Trigger warning if time=NaN are present
-        if np.isnan(self.hdu[1].data['TIME']).any():
-                log.warning('Warning: NaN times are present in TargetPixelFile')
 
     @property
     def hdu(self):
