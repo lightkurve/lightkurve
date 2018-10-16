@@ -61,6 +61,9 @@ class LightCurve(object):
             self.time = np.arange(len(flux))
         else:
             self.time = np.asarray(time)
+            # Trigger warning if time=NaN are present
+            if np.isnan(self.time).any():
+                log.warning('Warning: NaN times are present in LightCurve')
         self.flux = self._validate_array(flux, name='flux')
         self.flux_err = self._validate_array(flux_err, name='flux_err')
         self.time_format = time_format
