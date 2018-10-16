@@ -44,4 +44,6 @@ of manual steps:
 .. code-block:: bash
 
     $ cd docs
+    $ make clean
+    $ make html
     $ make upload
