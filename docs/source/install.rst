@@ -69,7 +69,7 @@ Building documentation
     Building the documentation is not necessary unless you are
     writing new documentation or do not have internet access, because the
     latest version of lightkurve's documentation is available online at
-    `lightkurve.keplerscience.org <http://lightkurve.keplerscience.org/>`_ .
+    `docs.lightkurve.org <http://docs.lightkurve.org/>`_ .
 
 Building the **lightkurve** documentation requires a few extra packages:
 

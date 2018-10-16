@@ -13,6 +13,7 @@ from astropy.stats import LombScargle
 from astropy import __version__
 from astropy import units as u
 from astropy.units import cds
+from astropy.convolution import convolve, Box1DKernel
 
 from . import MPLSTYLE
 
@@ -321,6 +322,86 @@ class Periodogram(object):
         binned_pg.power = binned_power
         return binned_pg
 
+    def smooth(self, method='boxkernel', filter_width=0.1):
+        """Smooths the power spectrum using the 'boxkernel' or 'logmedian' method.
+
+        If `method` is set to 'boxkernel', this method will smooth the power
+        spectrum by convolving with a numpy Box1DKernel with a width of
+        `filter_width`, where `filter width` is in units of frequency.
+        This is best for filtering out noise while maintaining seismic mode
+        peaks. This method requires the Periodogram to have an evenly spaced
+        grid of frequencies. A `ValueError` exception will be raised if this is
+        not the case.
+
+        If `method` is set to 'logmedian', it smooths the power spectrum using
+        a moving median which moves across the power spectrum in a steps of
+
+        log10(x0) + 0.5 * filter_width
+
+        where `filter width` is in log10(frequency) space. This is best for
+        estimating the noise background, as it filters over the seismic peaks.
+
+        Parameters
+        ----------
+        method : str, one of 'boxkernel' or 'logmedian'
+            The smoothing method to use. Defaults to 'boxkernel'.
+        filter_width : float
+            If `method` = 'boxkernel', this is the width of the smoothing filter
+            in units of frequency.
+            If method = `logmedian`, this is the width of the smoothing filter
+            in log10(frequency) space.
+
+        Returns
+        -------
+        smoothed_pg : `Periodogram` object
+            Returns a new `Periodogram` object in which the power spectrum
+            has been smoothed.
+        """
+        # Input validation
+        if method not in ('boxkernel', 'logmedian'):
+            raise ValueError("the `method` parameter must be one of "
+                             "'boxkernel' or 'logmedian'.")
+
+        if method == 'boxkernel':
+            if filter_width <= 0.:
+                raise ValueError("the `filter_width` parameter must be "
+                                 "larger than 0 for the 'boxkernel' method.")
+            try:
+                filter_width = u.Quantity(filter_width, self.frequency.unit)
+            except u.UnitConversionError:
+                raise ValueError("the `filter_width` parameter must have "
+                                 "frequency units.")
+
+            # Check to see if we have a grid of evenly spaced periods instead.
+            fs = np.mean(np.diff(self.frequency))
+            if not np.isclose(np.median(np.diff(self.frequency.value)), fs.value):
+                raise ValueError("the 'boxkernel' method requires the periodogram "
+                                 "to have a grid of evenly spaced frequencies.")
+
+            box_kernel = Box1DKernel(np.ceil(filter_width/fs))
+            smooth_power = convolve(self.power.value, box_kernel)
+            smooth_pg = copy.deepcopy(self)
+            smooth_pg.power = u.Quantity(smooth_power, self.power.unit)
+            return smooth_pg
+
+        if method == 'logmedian':
+            if isinstance(filter_width, astropy.units.quantity.Quantity):
+                raise ValueError("the 'logmedian' method requires a dimensionless "
+                                 "value for `filter_width` in log10(frequency) space.")
+            count = np.zeros(len(self.frequency.value), dtype=int)
+            bkg = np.zeros_like(self.frequency.value)
+            x0 = np.log10(self.frequency[0].value)
+            while x0 < np.log10(self.frequency[-1].value):
+                m = np.abs(np.log10(self.frequency.value) - x0) < filter_width
+                if len(bkg[m] > 0):
+                    bkg[m] += np.nanmedian(self.power[m].value)
+                    count[m] += 1
+                x0 += 0.5 * filter_width
+            bkg /= count
+            smooth_pg = copy.deepcopy(self)
+            smooth_pg.power = u.Quantity(bkg, self.power.unit)
+            return smooth_pg
+
     def plot(self, scale='linear', ax=None, xlabel=None, ylabel=None, title='',
              style='lightkurve', format='frequency', unit=None, **kwargs):
         """Plots the Periodogram.
@@ -397,78 +478,42 @@ class Periodogram(object):
             ax.set_title(title)
         return ax
 
-    def _estimate_background(self, log_width=0.01):
-        """Estimates the background noise of the power spectrum.
-
-        This method uses a moving filter in log10 space. The filter defines
-        a bin centered at a value x0 with a spread of ``log_width`` either side.
-        The median of the power in this bin will be added to all indices
-        within the bin in an empty array, `bkg`.
-        The bin then moves along in a step of x0 + 0.5 * log_width. This means
-        that each index will contain the sum of multiple medians of bins that
-        index is included in. To normalize this, we divide the background value
-        in each index by the number of median values that were added to that
-        index.
-
-        Parameters
-        ----------
-        log_width : float
-            Default 0.01. The width of the filter in log10 space.
-
-        Returns
-        -------
-        bkg : array-like
-            An estimate of the noise background of the power spectrum. Has the
-            same units as the `power` attribute.
-        """
-        if isinstance(self.frequency, astropy.units.quantity.Quantity):
-            f = self.frequency.value
-        else:
-            f = self.frequency
-        if isinstance(self.power, astropy.units.quantity.Quantity):
-            p = self.power.value
-        else:
-            p = self.power
-
-        count = np.zeros(len(f), dtype=int)
-        bkg = np.zeros_like(f)
-        x0 = np.log10(f[0])
-        while x0 < np.log10(f[-1]):
-            m = np.abs(np.log10(f) - x0) < log_width
-            if len(bkg[m] > 0):
-                bkg[m] += np.nanmedian(p[m])
-                count[m] += 1
-            x0 += 0.5 * log_width
-        return bkg / count
-
-    def estimate_snr(self, log_width=0.01, return_trend=False):
-        """Estimates the Signal-To-Noise (SNR) spectrum.
+    def flatten(self, method='logmedian', filter_width=0.01, return_trend=False):
+        """Estimates the Signal-To-Noise (SNR) spectrum by dividing out an
+        estimate of the noise background.
 
         This method divides the power spectrum by a background estimated
-        using a moving filter in log10 space.
+        using a moving filter in log10 space by default. For details on the
+        `method` and `filter_width` parameters, see `Periodogram.smooth()`
+
+        Dividing the power through by the noise background produces a spectrum
+        with no units of power. Since the signal is divided through by a measure
+        of the noise, we refer to this as a `Signal-To-Noise` spectrum.
 
         Parameters
         ----------
-        log_width : float
-            Default 0.01. The width of the filter in log10 space. Kwarg for the
-            Periodogram.estimate_background() function.
+        method : str, one of 'boxkernel' or 'logmedian'
+            Background estimation method passed on to `Periodogram.smooth()`.
+            Defaults to 'logmedian'.
+        filter_width : float
+            If `method` = 'boxkernel', this is the width of the smoothing filter
+            in units of frequency.
+            If method = `logmedian`, this is the width of the smoothing filter
+            in log10(frequency) space.
 
         Returns
         -------
-        snr_spectrum : a `Periodogram` object
+        snr_spectrum : `Periodogram` object
             Returns a periodogram object where the power is an estimate of the
-            signal-to-noise of the spectrum, assuming a simple estimate of the
-            noise background using a moving filter in log10 space.
+            signal-to-noise of the spectrum, creating by dividing the powers
+            with a simple estimate of the noise background using a smoothing filter.
         """
-        bkg = u.Quantity(self._estimate_background(log_width=log_width), self.power.unit)
-        snr_pg = self / bkg
+        bkg = self.smooth(method=method, filter_width=filter_width)
+        snr_pg = self / bkg.power
         snr = SNRPeriodogram(snr_pg.frequency, snr_pg.power,
                              nyquist=self.nyquist, targetid=self.targetid,
                              label=self.label, meta=self.meta)
         if return_trend:
-            bkg = Periodogram(snr_pg.frequency, bkg,
-                              nyquist=self.nyquist, targetid=self.targetid,
-                              label=self.label, meta=self.meta)
             return snr, bkg
         return snr
 
