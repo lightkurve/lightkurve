@@ -4,9 +4,9 @@
 Contributing and reporting issues
 =================================
 
-**lightkurve** is actively developed on its `GitHub repository <https://github.com/KeplerGO/lightkurve>`_.
+Lightkurve is actively developed on its `GitHub repository <https://github.com/KeplerGO/lightkurve>`_.
 
-If you encounter a problem with **lightkurve**, we encourage you to
+If you encounter a problem with Lightkurve, we encourage you to
 `open an issue on the GitHub repository <https://github.com/KeplerGO/lightkurve/issues>`_
 or to e-mail the Kepler/K2 Guest Observer Office at keplergo@mail.arc.nasa.gov.
 
@@ -16,7 +16,7 @@ If you would like to contribute a patch for a bugfix, please go ahead and open a
 Proposing changes to lightkurve using GitHub pull requests
 ----------------------------------------------------------
 
-We welcome suggestions for enhancements or new features to **lightkurve** via GitHub.
+We welcome suggestions for enhancements or new features to Lightkurve via GitHub.
 
 If you want to make a significant change such as adding a new feature, we recommend opening a GitHub issue to discuss the changes.
 Once you are ready to propose the changes, please go ahead and open a pull request.
@@ -87,10 +87,3 @@ You should see something like this:
 
 
 10. That's it! :)
-
-
-Coding and documentation guidelines
------------------------------------
-
-**lightkurve** adopts AstroPy's coding guidelines and standards,
-as documented in `AstroPy's Development Documentation <http://docs.astropy.org/en/stable/index.html#developer-documentation>`_. 

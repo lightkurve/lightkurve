@@ -49,5 +49,6 @@ and everyone is :ref:`invited to contribute<contributing>`.
     :maxdepth: 1
 
     contributing
+    developer
     citing
     other_software
