@@ -1314,7 +1314,7 @@ class TessTargetPixelFile(TargetPixelFile):
         lc : TessLightCurve object
             Contains the summed flux within the aperture for each cadence.
         """
-        aperture_mask = self._parse_aperture_mask(aperture_mask, **kwargs)
+        aperture_mask = self._parse_aperture_mask(aperture_mask)
         if aperture_mask.sum() == 0:
             log.warning('Warning: aperture mask contains zero pixels.')
         centroid_col, centroid_row = self.estimate_centroids(aperture_mask)
