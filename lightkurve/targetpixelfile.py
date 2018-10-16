@@ -373,11 +373,13 @@ class TargetPixelFile(object):
         return aperture_mask
 
     def create_threshold_mask(self, threshold=3):
-        """Returns an aperture mask using the thresholding method.
+        """Returns an aperture mask creating using the thresholding method.
 
-        This method will identify the pixels in the Target Pixel File
-        for which the median flux is brighter than `threshold` * sigma
-        above the median flux.
+        This method will identify the pixels in the TargetPixelFile which show
+        a median flux that is brighter than `threshold` times the standard
+        deviation above the overall median. The standard deviation is estimated
+        in a robust way by multiplying the Median Absolute Deviation (MAD)
+        with 1.4826.
 
         Parameters
         ----------
