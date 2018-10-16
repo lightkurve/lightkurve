@@ -25,14 +25,19 @@ class LightCurveFile(object):
 
     Parameters
     ----------
-    path : str
+    path : str or `astropy.io.fits.HDUList` object
         Local path or remote url of a lightcurve FITS file.
+        Also accepts a FITS file object already opened using AstroPy.
     kwargs : dict
         Keyword arguments to be passed to astropy.io.fits.open.
     """
     def __init__(self, path, **kwargs):
-        self.path = path
-        self.hdu = pyfits.open(self.path, **kwargs)
+        if isinstance(path, pyfits.HDUList):
+            self.path = None
+            self.hdu = path
+        else:
+            self.path = path
+            self.hdu = pyfits.open(self.path, **kwargs)
 
     def header(self, ext=0):
         """Header of the object at extension `ext`"""

@@ -61,6 +61,9 @@ class LightCurve(object):
             self.time = np.arange(len(flux))
         else:
             self.time = np.asarray(time)
+            # Trigger warning if time=NaN are present
+            if np.isnan(self.time).any():
+                log.warning('Warning: NaN times are present in LightCurve')
         self.flux = self._validate_array(flux, name='flux')
         self.flux_err = self._validate_array(flux_err, name='flux_err')
         self.time_format = time_format
@@ -938,12 +941,12 @@ class LightCurve(object):
                                            **kwargs)
 
     def to_fits(self, path=None, overwrite=False, **extra_data):
-        """Writes the KeplerLightCurve to a fits file.
+        """Writes the LightCurve to a FITS file.
 
         Parameters
         ----------
         path : string, default None
-            File path, if None returns an astropy.io.fits object.
+            File path, if `None` returns an astropy.io.fits.HDUList object.
         overwrite : bool
             Whether or not to overwrite the file
         extra_data : dict
@@ -1023,6 +1026,10 @@ class LightCurve(object):
                     cols.append(fits.Column(name='{}'.format(kw).upper(),
                                             format=typedir[type(extra_data[kw][0])],
                                             array=extra_data[kw]))
+            if 'SAP_QUALITY' not in extra_data:
+                cols.append(fits.Column(name='SAP_QUALITY',
+                                        format='J',
+                                        array=np.zeros(len(self.flux))))
 
             coldefs = fits.ColDefs(cols)
             hdu = fits.BinTableHDU.from_columns(coldefs)
@@ -1033,12 +1040,6 @@ class LightCurve(object):
             """Returns an astropy.io.fits.HDUList object."""
             return fits.HDUList([_make_primary_hdu(extra_data=extra_data),
                                  _make_lightcurve_extension(extra_data=extra_data)])
-
-        def _header_template(extension):
-            """Returns a template `fits.Header` object for a given extension."""
-            template_fn = os.path.join(PACKAGEDIR, "data",
-                                       "lc-ext{}-header.txt".format(extension))
-            return fits.Header.fromtextfile(template_fn)
 
         hdu = _hdulist(**extra_data)
         if path is not None:
@@ -1219,12 +1220,12 @@ class KeplerLightCurve(LightCurve):
         return super(KeplerLightCurve, self).to_pandas(columns=columns)
 
     def to_fits(self, path=None, overwrite=False, **extra_data):
-        """Export the KeplerLightCurve as an astropy.io.fits object.
+        """Writes the KeplerLightCurve to a FITS file.
 
         Parameters
         ----------
         path : string, default None
-            File path, if None returns an astropy.io.fits object.
+            File path, if `None` returns an astropy.io.fits.HDUList object.
         overwrite : bool
             Whether or not to overwrite the file
         extra_data : dict
@@ -1249,7 +1250,8 @@ class KeplerLightCurve(LightCurve):
             'RA_OBJ': self.ra,
             'DEC_OBJ': self.dec,
             'EQUINOX': 2000,
-            'DATE-OBS': Time(self.time[0]+2454833., format=('jd')).isot}
+            'DATE-OBS': Time(self.time[0]+2454833., format=('jd')).isot,
+            'SAP_QUALITY': self.quality}
         for kw in kepler_specific_data:
             if ~np.asarray([kw.lower == k.lower() for k in extra_data]).any():
                 extra_data[kw] = kepler_specific_data[kw]
