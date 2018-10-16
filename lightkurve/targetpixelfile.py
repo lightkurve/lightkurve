@@ -13,7 +13,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
 from astropy.coordinates import SkyCoord
-from astropy.wcs.utils import skycoord_to_pixel, pixel_to_skycoord
 from astropy.stats.funcs import median_absolute_deviation as MAD
 
 from . import PACKAGEDIR, MPLSTYLE
