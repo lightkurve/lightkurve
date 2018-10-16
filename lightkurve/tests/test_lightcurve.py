@@ -190,7 +190,7 @@ def test_lightcurve_copy():
     np.put(nlc.flux_err, 1, 7)
 
     with pytest.raises(AssertionError, match='(mismatch 25.0%)'):
-        assert_array_equal(lc.time, nlc.time
+        assert_array_equal(lc.time, nlc.time)
 
     with pytest.raises(AssertionError, match='(mismatch 25.0%)'):
         assert_array_equal(lc.flux, nlc.flux)
