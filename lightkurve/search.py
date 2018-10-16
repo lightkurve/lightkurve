@@ -42,11 +42,7 @@ class SearchResult(object):
         self.filetype = filetype
 
     def __repr__(self):
-        try:
-            columns = ['obsID', 'target_name', 'productFilename', 'description', 'distance']
-        # some MAST queries do not include a distance column
-        except KeyError:
-            columns = ['obsID', 'target_name', 'productFilename', 'description']
+        columns = ['obsID', 'target_name', 'productFilename', 'description', 'distance']
         return '\n'.join(self.products[columns].pformat(max_width=300))
 
     @property
@@ -395,6 +391,8 @@ def _query_mast(target, cadence='long', radius=.0001, targetlimit=None):
             # if yes, perform a cone search around coordinates of desired target
             if radius < 1:
                 path = target_obs
+
+                # append distance column to astropy table
                 path['distance'] = 0.
             else:
                 ra = target_obs['s_ra'][0]
@@ -495,10 +493,8 @@ def search_products(target, filetype="Lightcurve", cadence='long', quarter=None,
     observations = _query_mast(target, cadence='long', radius=radius, targetlimit=targetlimit)
     products = Observations.get_product_list(observations)
     result = join(products, observations, join_type='left')  # will join on obs_id
-    try:
-        result.sort(['distance', 'obs_id'])
-    except KeyError:
-        result.sort('obs_id')
+    result.sort(['distance', 'obs_id'])
+
     masked_result = _mask_products(result, filetype=filetype,
                                    campaign=campaign, quarter=quarter,
                                    cadence=cadence, targetlimit=targetlimit)
