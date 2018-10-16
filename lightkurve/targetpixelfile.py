@@ -347,17 +347,13 @@ class TargetPixelFile(object):
         Parameters
         ----------
         aperture_mask : array-like, 'pipeline', 'all', 'threshold', or None
-            A boolean array describing the aperture such that `False` means
-            that the pixel will be masked out.
-            If None or 'all' are passed, a mask that is `True` everywhere will
-            be returned.
-            If 'pipeline' is passed, the mask suggested by the pipeline
+            A boolean array describing the aperture such that `True` means
+            that the pixel will be used.
+            If None or 'all' are passed, all pixels will be used.
+            If 'pipeline' is passed, the mask suggested by the official pipeline
             will be returned.
-            If 'threshold' is passed, all pixels contigious with the brightest 
-            pixel (within +/- 2 pixels of the central pixel) that are above the 
-            threshold (in sigma) are returned.
-        threshold : int
-            The threshold above which to create the mask, in sigma.
+            If 'threshold' is passed, all pixels brighter than 3-sigma above
+            the median flux will be used.
 
         Returns
         -------
@@ -373,10 +369,38 @@ class TargetPixelFile(object):
             elif aperture_mask == 'pipeline':
                 aperture_mask = self.pipeline_mask
             elif aperture_mask == 'threshold':
-                aperture_mask = self._threshold_mask(threshold)
+                aperture_mask = self.create_threshold_mask()
         self._last_aperture_mask = aperture_mask
         return aperture_mask
 
+    def create_threshold_mask(self, threshold=3):
+        """Returns an aperture mask using the thresholding method.
+
+        This method will identify the pixels in the Target Pixel File
+        for which the median flux is brighter than `threshold` * sigma
+        above the median flux.
+
+        Parameters
+        ----------
+        threshold : float
+            A value for the number of sigma by which a pixel needs to be
+            brighter than the median flux to be included in the aperture mask.
+
+        Returns
+        -------
+        aperture_mask : ndarray
+            2D boolean numpy array containing `True` for pixels above the
+            threshold.
+        """
+        # Calculate the median image
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            median_image = np.nanmedian(self.flux, axis=0)
+        vals = median_image[np.isfinite(median_image)].flatten()
+        # Calculate the theshold value in flux units
+        mad_cut = (1.4826 * MAD(vals) * threshold) + np.nanmedian(median_image)
+        # Create a mask containing the pixels above the threshold flux
+        return np.nan_to_num(median_image) > mad_cut
 
     def centroids(self, **kwargs):
         """DEPRECATED: use `estimate_cdpp()` instead."""
@@ -384,54 +408,26 @@ class TargetPixelFile(object):
                     "please use estimate_centroids() instead.")
         return self.estimate_centroids(**kwargs)
 
-    def _threshold_mask(self, threshold):
-        """Identify region that is above the threshold and contiguous
-        with the central pixel
-
-        Parameters
-        ----------
-        threshold : float
-            A value for the number of sigma above the background to draw the
-            aperture.
-
-        Returns
-        -------
-        aperture_mask : ndarray
-            2D boolean numpy array containing `True` for selected pixels.
-        """
-
-        # calculate a median image
-        with warnings.catch_warnings():
-            warnings.simplefilter('ignore')
-            median_image = np.nanmedian(self.flux, axis=0)
-        vals = median_image[np.isfinite(median_image)].flatten()
-        # calculate what the theshold value is in counts
-        mad_cut = (1.4826 * MAD(vals) * threshold) + np.nanmedian(median_image)
-
-        # identify pixel above the threshold
-        threshold_region = np.nan_to_num(median_image) > mad_cut
-        return threshold_region
-
     def estimate_centroids(self, aperture_mask='pipeline'):
         """Returns centroid positions estimated using sample moments.
 
         Parameters
         ----------
         aperture_mask : array-like, 'pipeline', or 'all'
-            A boolean array describing the aperture such that `False` means
-            that the pixel will be masked out.
-            If the string 'all' is passed, all pixels will be used.
-            The default behaviour is to use the Kepler pipeline mask.
-        threshold : float
-            A value for the number of sigma above the background to draw the
-            aperture.
+            A boolean array describing the aperture such that `True` means
+            that the pixel will be used.
+            If None or 'all' are passed, all pixels will be used.
+            If 'pipeline' is passed, the mask suggested by the official pipeline
+            will be returned.
+            If 'threshold' is passed, all pixels brighter than 3-sigma above
+            the median flux will be used.
 
         Returns
         -------
         col_centr, row_centr : tuple
             Arrays containing centroids for column and row at each cadence
         """
-        aperture_mask = self._parse_aperture_mask(aperture_mask, **kwargs)
+        aperture_mask = self._parse_aperture_mask(aperture_mask)
         yy, xx = np.indices(self.shape[1:]) + 0.5
         yy = self.row + yy
         xx = self.column + xx
@@ -460,7 +456,7 @@ class TargetPixelFile(object):
             This argument has priority over frame number.
         bkg : bool
             If True, background will be added to the pixel values.
-        aperture_mask : ndarray
+        aperture_mask : ndarray or str
             Highlight pixels selected by aperture_mask.
         show_colorbar : bool
             Whether or not to show the colorbar
@@ -503,7 +499,7 @@ class TargetPixelFile(object):
                             show_colorbar=show_colorbar, **kwargs)
             ax.grid(False)
         if aperture_mask is not None:
-            aperture_mask = self._parse_aperture_mask(aperture_mask, threshold=threshold)
+            aperture_mask = self._parse_aperture_mask(aperture_mask)
             for i in range(self.shape[1]):
                 for j in range(self.shape[2]):
                     if aperture_mask[i, j]:
@@ -735,14 +731,13 @@ class KeplerTargetPixelFile(TargetPixelFile):
         Parameters
         ----------
         aperture_mask : array-like, 'pipeline', 'threshold' or 'all'
-            A boolean array describing the aperture such that `False` means
-            that the pixel will be masked out.
-            If the string 'all' is passed, all pixels will be used.
-            The default behaviour is to use the Kepler pipeline mask.
-        threshold : float
-            A value for the number of sigma above the background to draw the
-            aperture.
-
+            A boolean array describing the aperture such that `True` means
+            that the pixel will be used.
+            If None or 'all' are passed, all pixels will be used.
+            If 'pipeline' is passed, the mask suggested by the official pipeline
+            will be returned.
+            If 'threshold' is passed, all pixels brighter than 3-sigma above
+            the median flux will be used.
 
         Returns
         -------
@@ -750,7 +745,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
             Array containing the summed flux within the aperture for each
             cadence.
         """
-        aperture_mask = self._parse_aperture_mask(aperture_mask, **kwargs)
+        aperture_mask = self._parse_aperture_mask(aperture_mask)
         if aperture_mask.sum() == 0:
             log.warning('Warning: aperture mask contains zero pixels.')
         centroid_col, centroid_row = self.estimate_centroids(aperture_mask)
