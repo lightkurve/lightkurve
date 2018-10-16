@@ -44,6 +44,13 @@ def test_empty_lightcurve():
     assert err_string == err.value.args[0]
 
 
+def test_lc_nan_time():
+    time = np.array([1, 2, 3, np.nan])
+    flux = np.array([1, 2, 3, 4])
+    with pytest.warns(UserWarning, match='Warning: NaN times are present in LightCurve'):
+        lc = LightCurve(time=time, flux=flux)
+
+
 def test_math_operators():
     lc = LightCurve(time=np.arange(1, 5), flux=np.arange(1, 5), flux_err=np.arange(1, 5))
     lc_add = lc + 1
