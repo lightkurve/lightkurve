@@ -189,11 +189,14 @@ def test_lightcurve_copy():
     np.put(nlc.flux, 1, 6)
     np.put(nlc.flux_err, 1, 7)
 
-    with pytest.raises(AssertionError) as err:
-        assert_array_equal(lc.time, nlc.time)
+    with pytest.raises(AssertionError, match='(mismatch 25.0%)'):
+        assert_array_equal(lc.time, nlc.time
+
+    with pytest.raises(AssertionError, match='(mismatch 25.0%)'):
         assert_array_equal(lc.flux, nlc.flux)
+
+    with pytest.raises(AssertionError, match='(mismatch 25.0%)'):
         assert_array_equal(lc.flux_err, nlc.flux_err)
-    assert '(mismatch 25.0%)' in str(err.value)
 
     # KeplerLightCurve has extra data
     lc = KeplerLightCurve(time=[1, 2, 3], flux=[1, .5, 1],
@@ -214,14 +217,23 @@ def test_lightcurve_copy():
     np.put(nlc.cadenceno, 1, 10)
     np.put(nlc.quality, 1, 11)
 
-    with pytest.raises(AssertionError) as err:
+    with pytest.raises(AssertionError, match='mismatch 33.3333333333'):
         assert_array_equal(lc.time, nlc.time)
+
+    with pytest.raises(AssertionError, match='mismatch 33.3333333333'):
         assert_array_equal(lc.flux, nlc.flux)
+
+    with pytest.raises(AssertionError, match='mismatch 33.3333333333'):
         assert_array_equal(lc.centroid_col, nlc.centroid_col)
+
+    with pytest.raises(AssertionError, match='mismatch 33.3333333333'):
         assert_array_equal(lc.centroid_row, nlc.centroid_row)
+
+    with pytest.raises(AssertionError, match='mismatch 33.3333333333'):
         assert_array_equal(lc.cadenceno, nlc.cadenceno)
+
+    with pytest.raises(AssertionError, match='mismatch 33.3333333333'):
         assert_array_equal(lc.quality, nlc.quality)
-    assert 'mismatch 33.3333333333' in str(err.value)
 
 
 @pytest.mark.remote_data
