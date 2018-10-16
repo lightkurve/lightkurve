@@ -178,7 +178,8 @@ texinfo_documents = [
 intersphinx_mapping = {'python': ('https://docs.python.org/', None),
                        'numpy': ('http://docs.scipy.org/doc/numpy/', None),
                        'scipy': ('http://docs.scipy.org/doc/scipy/reference', None),
-                       'oktopus': ('http://keplergo.github.io/oktopus')}
+                       'oktopus': ('http://keplergo.github.io/oktopus'),
+                       'celerite': ('http://celerite.readthedocs.io/en/stable/')}
 
 
 sys.path += ['exts']

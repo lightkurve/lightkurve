@@ -5,11 +5,60 @@ import numpy as np
 from numpy.testing import assert_almost_equal, assert_array_equal
 from astropy.utils.data import get_pkg_data_filename
 
-from ..lightcurve import KeplerLightCurve
+from ..lightcurve import KeplerLightCurve, LightCurve
 from ..lightcurvefile import KeplerLightCurveFile
-from ..correctors import KeplerCBVCorrector, SFFCorrector
+from ..correctors import KeplerCBVCorrector, SFFCorrector, GPCorrector
 
 from .test_lightcurve import TABBY_Q8
+
+
+def test_basic_GPcorrector():
+    # Make a short, fake light curve
+    x = np.arange(0, 10, 0.01)
+    y = np.ones(len(x))
+    y = np.sin(5 * (x/np.pi))
+    y += np.random.normal(0, 0.1, len(y))
+    y += 10
+    y[400:410] = np.nan
+    y_err = np.zeros(len(y)) + 0.1
+    lc = LightCurve(x, y, flux_err=y_err)
+
+    with pytest.raises(ValueError) as exc:
+        GPCorrector(lc).correct()
+    assert('Light curve contains NaN values.' in str(exc))
+
+    with pytest.raises(ValueError) as exc:
+        GPCorrector(lc.remove_nans()).correct()
+    assert('Flux is unnormalized.' in str(exc))
+    lc = lc.remove_nans().normalize()
+    corr = GPCorrector(lc).correct()
+    assert corr.flux.shape == lc.flux.shape
+    assert np.nansum(corr.flux) != np.nansum(lc.flux)
+    # Standard deviation should go down
+    assert corr.flux.std() < lc.flux.std()
+    # But all the errors should increase
+    assert np.all(corr.flux_err - lc.flux_err > 0)
+
+
+@pytest.mark.remote_data
+def test_GPcorrector():
+    lc = KeplerLightCurveFile.from_archive(
+        'Kepler-102', quarter=5).PDCSAP_FLUX.remove_nans().normalize()
+    gp = GPCorrector(lc)
+    corr, trend = gp.correct(iters=5, sigma=3, return_trend=True)
+    flat = lc.flatten()
+    assert lc.flux.shape == corr.flux.shape
+    assert corr.flux.shape == trend.flux.shape
+    # Corr should be detrended
+    assert corr.flux.std() < trend.flux.std()
+    # Corrected should have larger errors than trend
+    assert np.all((corr.flux_err - trend.flux_err > 0))
+    # Should have a mask object
+    assert gp.mask.shape == lc.flux.shape
+    # Should have a mask object
+    assert not np.all(gp.mask)
+    # Should beat out savgol for a transit case
+    assert corr.fold(16.14570).bin(10).flux.min() < flat.fold(16.14570).bin(10).flux.min()
 
 
 @pytest.mark.remote_data

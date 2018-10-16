@@ -260,9 +260,9 @@ class LightCurve(object):
             must be less than window_length.
         return_trend : bool
             If `True`, the method will return a tuple of two elements
-            (flattened_lc, trend_lc) where trend_lc is the removed trend.
+            (remove_smooth_lc, trend_lc) where trend_lc is the removed trend.
         break_tolerance : int
-            If there are large gaps in time, flatten will split the flux into
+            If there are large gaps in time, remove_smooth will split the flux into
             several sub-lightcurves and apply `savgol_filter` to each
             individually. A gap is defined as a period in time larger than
             `break_tolerance` times the median gap.  To disable this feature,
@@ -272,7 +272,7 @@ class LightCurve(object):
 
         Returns
         -------
-        flatten_lc : LightCurve object
+        remove_smooth_lc : LightCurve object
             Flattened lightcurve.
         If `return_trend` is `True`, the method will also return:
         trend_lc : LightCurve object
