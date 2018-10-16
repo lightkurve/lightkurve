@@ -395,6 +395,7 @@ def _query_mast(target, cadence='long', radius=.0001, targetlimit=None):
             # if yes, perform a cone search around coordinates of desired target
             if radius < 1:
                 path = target_obs
+                path['distance'] = 0.
             else:
                 ra = target_obs['s_ra'][0]
                 dec = target_obs['s_dec'][0]
@@ -403,7 +404,6 @@ def _query_mast(target, cadence='long', radius=.0001, targetlimit=None):
                                                    project=["Kepler", "K2"],
                                                    obs_collection=["Kepler", "K2"])
                 # if a cone search has been performed, targets will be sorted by `distance`
-                path.sort('distance')
         except ValueError:
             # If `target` did not look like a KIC or EPIC ID, then we let MAST
             # resolve the target name to a sky position. Convert radius from arcsec
@@ -415,6 +415,9 @@ def _query_mast(target, cadence='long', radius=.0001, targetlimit=None):
                                                    obs_collection=["Kepler", "K2"])
             except ResolverError as exc:
                 raise ArchiveError(exc)
+
+    # make sure table is sorted by distance
+    path.sort('distance')
 
     # only take the nearest targets up to `targetlimit`
     if targetlimit is not None:
