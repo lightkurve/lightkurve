@@ -217,22 +217,22 @@ def test_lightcurve_copy():
     np.put(nlc.cadenceno, 1, 10)
     np.put(nlc.quality, 1, 11)
 
-    with pytest.raises(AssertionError, match='mismatch 33.3333333333'):
+    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
         assert_array_equal(lc.time, nlc.time)
 
-    with pytest.raises(AssertionError, match='mismatch 33.3333333333'):
+    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
         assert_array_equal(lc.flux, nlc.flux)
 
-    with pytest.raises(AssertionError, match='mismatch 33.3333333333'):
+    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
         assert_array_equal(lc.centroid_col, nlc.centroid_col)
 
-    with pytest.raises(AssertionError, match='mismatch 33.3333333333'):
+    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
         assert_array_equal(lc.centroid_row, nlc.centroid_row)
 
-    with pytest.raises(AssertionError, match='mismatch 33.3333333333'):
+    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
         assert_array_equal(lc.cadenceno, nlc.cadenceno)
 
-    with pytest.raises(AssertionError, match='mismatch 33.3333333333'):
+    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
         assert_array_equal(lc.quality, nlc.quality)
 
 
