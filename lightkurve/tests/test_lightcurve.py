@@ -185,9 +185,9 @@ def test_lightcurve_copy():
     assert_array_equal(lc.flux, nlc.flux)
     assert_array_equal(lc.flux_err, nlc.flux_err)
 
-    np.put(nlc.time, 1, 5)
-    np.put(nlc.flux, 1, 6)
-    np.put(nlc.flux_err, 1, 7)
+    nlc.time[1] = 5
+    nlc.flux[1] = 6
+    nlc.flux_err[1] = 7
 
     with pytest.raises(AssertionError, match='(mismatch 25.0%)'):
         assert_array_equal(lc.time, nlc.time)
@@ -208,12 +208,12 @@ def test_lightcurve_copy():
     assert_array_equal(lc.cadenceno, nlc.cadenceno)
     assert_array_equal(lc.quality, nlc.quality)
 
-    np.put(nlc.time, 1, 6)
-    np.put(nlc.flux, 1, 7)
-    np.put(nlc.centroid_col, 1, 8)
-    np.put(nlc.centroid_row, 1, 9)
-    np.put(nlc.cadenceno, 1, 10)
-    np.put(nlc.quality, 1, 11)
+    nlc.time[1] = 6
+    nlc.flux[1] = 7
+    nlc.centroid_col[1] = 8
+    nlc.centroid_row[1] = 9
+    nlc.cadenceno[1] = 10
+    nlc.quality[1] = 11
 
     with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
         assert_array_equal(lc.time, nlc.time)
