@@ -189,6 +189,9 @@ def test_lightcurve_copy():
     nlc.flux[1] = 6
     nlc.flux_err[1] = 7
 
+    # By changing 1 of the 4 data points in the new lightcurve's array-like
+    # attributes, we expect assert_array_equal to raise an AssertionError
+    # indicating a mismatch of 1/4 (or 25%).
     with pytest.raises(AssertionError, match='(mismatch 25.0%)'):
         assert_array_equal(lc.time, nlc.time)
     with pytest.raises(AssertionError, match='(mismatch 25.0%)'):
@@ -215,6 +218,10 @@ def test_lightcurve_copy():
     nlc.cadenceno[1] = 10
     nlc.quality[1] = 11
 
+    # As before, by changing 1/3 data points, we expect a mismatch of 33.3%
+    # with a repeating decimal. However, float precision for python 2.7 is 10
+    # decimal digits, while python 3.6's is 13 decimal digits. Therefore,
+    # a regular expression is needed for both versions.
     with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
         assert_array_equal(lc.time, nlc.time)
     with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
