@@ -20,7 +20,7 @@ from astropy.time import Time
 from astropy import units as u
 from . import PACKAGEDIR, MPLSTYLE
 
-from .utils import running_mean, bkjd_to_astropy_time, btjd_to_astropy_time
+from .utils import running_mean, bkjd_to_astropy_time, btjd_to_astropy_time, LightkurveWarning
 
 __all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve',
            'FoldedLightCurve']
@@ -63,7 +63,7 @@ class LightCurve(object):
             self.time = np.asarray(time)
             # Trigger warning if time=NaN are present
             if np.isnan(self.time).any():
-                warnings.warn('Warning: NaN times are present in LightCurve', UserWarning)
+                warnings.warn('Warning: NaN times are present in LightCurve', LightkurveWarning)
         self.flux = self._validate_array(flux, name='flux')
         self.flux_err = self._validate_array(flux_err, name='flux_err')
         self.time_format = time_format
