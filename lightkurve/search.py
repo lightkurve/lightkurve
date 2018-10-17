@@ -354,7 +354,31 @@ def search_lightcurvefile(target, cadence='long', quarter=None, month=None,
 
 def search_products(target, filetype="Lightcurve", cadence='long', quarter=None, month=None,
                     campaign=None, radius=.0001, targetlimit=1000):
-    """Returns a SearchResult object."""
+    """Returns a SearchResult object.
+
+    Parameters
+    ----------
+    target : str or int
+        KIC/EPIC ID or object name.
+    filetpye : str
+        Type of files queried at MAST (`Target Pixel` or `Lightcurve`)
+    cadence : str
+        Desired cadence (`long`, `short`, `any`)
+    quarter : int or list
+        Desired quarter of observation for data products
+    month : int or list
+        Desired month of observation for data products
+    campaign : int or list
+        Desired campaign of observation for data products
+    radius : float
+        Search radius in arcseconds
+    targetlimit : int
+        Maximum number of targets in astropy table
+
+    Returns
+    -------
+    SearchResult : :class:`SearchResult` object.
+    """
     observations = _query_mast(target, cadence='long', radius=radius, targetlimit=targetlimit)
     products = Observations.get_product_list(observations)
     result = join(products, observations, join_type='left')  # will join on obs_id
