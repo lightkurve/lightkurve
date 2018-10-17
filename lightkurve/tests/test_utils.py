@@ -3,10 +3,13 @@ from __future__ import division, print_function
 import numpy as np
 from numpy.testing import assert_almost_equal
 import pytest
+import warnings
+from lightkurve.lightcurve import LightCurve
 
 from ..utils import KeplerQualityFlags, TessQualityFlags
 from ..utils import module_output_to_channel, channel_to_module_output
 from ..utils import running_mean
+from ..utils import LightkurveWarning
 
 
 def test_channel_to_module_output():
@@ -69,3 +72,13 @@ def test_quality_mask():
     with pytest.raises(ValueError) as err:
         KeplerQualityFlags.create_quality_mask(quality, bitmask='invalidoption')
     assert "not supported" in err.value.args[0]
+
+
+def test_lightkurve_warning():
+    """Can we ignore Lightkurve warnings?"""
+    with warnings.catch_warnings(record=True) as warns:
+        warnings.simplefilter('ignore', LightkurveWarning)
+        time = np.array([1, 2, 3, np.nan])
+        flux = np.array([1, 2, 3, 4])
+        lc = LightCurve(time=time, flux=flux)
+        assert len(warns) == 0
