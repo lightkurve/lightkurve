@@ -427,3 +427,10 @@ def plot_image(image, ax=None, scale='linear', origin='lower',
         cbar.ax.yaxis.set_tick_params(tick1On=False, tick2On=False)
         cbar.ax.minorticks_off()
     return ax
+
+
+class LightkurveWarning(Warning):
+    """
+    The base warning class for all Lightkurve warnings.
+    """
+    pass
