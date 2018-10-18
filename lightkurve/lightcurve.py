@@ -318,14 +318,14 @@ class LightCurve(object):
                                                          polyorder=polyorder,
                                                          **kwargs)
         trend_signal = np.interp(self.time, lc_clean.time, trend_signal)
-        flatten_lc = copy.deepcopy(self)
+        flatten_lc = self.copy()
         with warnings.catch_warnings():
             # ignore invalid division warnings
             warnings.simplefilter("ignore", RuntimeWarning)
             flatten_lc.flux = flatten_lc.flux / trend_signal
             flatten_lc.flux_err = flatten_lc.flux_err / trend_signal
         if return_trend:
-            trend_lc = copy.deepcopy(self)
+            trend_lc = self.copy()
             trend_lc.flux = trend_signal
             return flatten_lc, trend_lc
         return flatten_lc

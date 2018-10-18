@@ -317,7 +317,7 @@ class Periodogram(object):
             binned_freq = np.nanmedian(self.frequency[:m*binsize].reshape((m, binsize)), axis=1)
             binned_power = np.nanmedian(self.power[:m*binsize].reshape((m, binsize)), axis=1)
 
-        binned_pg = copy.deepcopy(self)
+        binned_pg =self.copy()
         binned_pg.frequency = binned_freq
         binned_pg.power = binned_power
         return binned_pg
@@ -380,7 +380,7 @@ class Periodogram(object):
 
             box_kernel = Box1DKernel(np.ceil(filter_width/fs))
             smooth_power = convolve(self.power.value, box_kernel)
-            smooth_pg = copy.deepcopy(self)
+            smooth_pg = self.copy()
             smooth_pg.power = u.Quantity(smooth_power, self.power.unit)
             return smooth_pg
 
@@ -398,7 +398,7 @@ class Periodogram(object):
                     count[m] += 1
                 x0 += 0.5 * filter_width
             bkg /= count
-            smooth_pg = copy.deepcopy(self)
+            smooth_pg = self.copy()
             smooth_pg.power = u.Quantity(bkg, self.power.unit)
             return smooth_pg
 
