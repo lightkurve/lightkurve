@@ -17,6 +17,7 @@ Direct contributions to the code base:
 - `Anand Sundaram <https://github.com/anand-sundaram-zocdoc>`_
 - `Oliver Hall <https://github.com/ojhall94>`_
 - `Nicholas Saunders <https://github.com/nksaunders>`_
+- `Jose A. Lerma III <https://github.com/JoseALermaIII>`_
 
 
 Comments, corrections & suggestions:

@@ -244,6 +244,17 @@ class LightCurve(object):
                 new_lc.centroid_row = np.append(new_lc.centroid_row, others[i].centroid_row)
         return new_lc
 
+    def copy(self):
+        """
+        Creates a deepcopy of a LightCurve object.
+
+        Returns
+        -------
+        LightCurve object
+            A new ``LightCurve`` object based on the original.
+        """
+        return copy.deepcopy(self)
+
     def flatten(self, window_length=101, polyorder=2, return_trend=False,
                 break_tolerance=5, **kwargs):
         """

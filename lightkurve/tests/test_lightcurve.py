@@ -173,6 +173,69 @@ def test_lightcurve_append_multiple():
     assert_array_equal(lc.time, 4*[1, 2, 3])
 
 
+def test_lightcurve_copy():
+    """Test ``LightCurve.copy()``."""
+    time = np.array([1, 2, 3, 4])
+    flux = np.array([1, 2, 3, 4])
+    error = np.array([0.1, 0.2, 0.3, 0.4])
+    lc = LightCurve(time=time, flux=flux, flux_err=error)
+
+    nlc = lc.copy()
+    assert_array_equal(lc.time, nlc.time)
+    assert_array_equal(lc.flux, nlc.flux)
+    assert_array_equal(lc.flux_err, nlc.flux_err)
+
+    nlc.time[1] = 5
+    nlc.flux[1] = 6
+    nlc.flux_err[1] = 7
+
+    # By changing 1 of the 4 data points in the new lightcurve's array-like
+    # attributes, we expect assert_array_equal to raise an AssertionError
+    # indicating a mismatch of 1/4 (or 25%).
+    with pytest.raises(AssertionError, match='(mismatch 25.0%)'):
+        assert_array_equal(lc.time, nlc.time)
+    with pytest.raises(AssertionError, match='(mismatch 25.0%)'):
+        assert_array_equal(lc.flux, nlc.flux)
+    with pytest.raises(AssertionError, match='(mismatch 25.0%)'):
+        assert_array_equal(lc.flux_err, nlc.flux_err)
+
+    # KeplerLightCurve has extra data
+    lc = KeplerLightCurve(time=[1, 2, 3], flux=[1, .5, 1],
+                          centroid_col=[4, 5, 6], centroid_row=[7, 8, 9],
+                          cadenceno=[10, 11, 12], quality=[10, 20, 30])
+    nlc = lc.copy()
+    assert_array_equal(lc.time, nlc.time)
+    assert_array_equal(lc.flux, nlc.flux)
+    assert_array_equal(lc.centroid_col, nlc.centroid_col)
+    assert_array_equal(lc.centroid_row, nlc.centroid_row)
+    assert_array_equal(lc.cadenceno, nlc.cadenceno)
+    assert_array_equal(lc.quality, nlc.quality)
+
+    nlc.time[1] = 6
+    nlc.flux[1] = 7
+    nlc.centroid_col[1] = 8
+    nlc.centroid_row[1] = 9
+    nlc.cadenceno[1] = 10
+    nlc.quality[1] = 11
+
+    # As before, by changing 1/3 data points, we expect a mismatch of 33.3%
+    # with a repeating decimal. However, float precision for python 2.7 is 10
+    # decimal digits, while python 3.6's is 13 decimal digits. Therefore,
+    # a regular expression is needed for both versions.
+    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
+        assert_array_equal(lc.time, nlc.time)
+    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
+        assert_array_equal(lc.flux, nlc.flux)
+    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
+        assert_array_equal(lc.centroid_col, nlc.centroid_col)
+    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
+        assert_array_equal(lc.centroid_row, nlc.centroid_row)
+    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
+        assert_array_equal(lc.cadenceno, nlc.cadenceno)
+    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
+        assert_array_equal(lc.quality, nlc.quality)
+
+
 @pytest.mark.remote_data
 def test_lightcurve_plots():
     """Sanity check to verify that lightcurve plotting works"""
