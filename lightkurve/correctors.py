@@ -492,22 +492,8 @@ class SFFCorrector(object):
         raise NotImplementedError()
 
 class PLDCorrector(object):
-    """Implements the Self-Flat-Fielding (SFF) systematics removal method.
-
-    This method is described in detail by Vanderburg and Johnson (2014).
-    Briefly, the algorithm implemented in this class can be described
-    as follows
-
-       (1) Rotate the centroid measurements onto the subspace spanned by the
-           eigenvectors of the centroid covariance matrix
-       (2) Fit a polynomial to the rotated centroids
-       (3) Compute the arclength of such polynomial
-       (4) Fit a BSpline of the raw flux as a function of time
-       (5) Normalize the raw flux by the fitted BSpline computed in step (4)
-       (6) Bin and interpolate the normalized flux as a function of the arclength
-       (7) Divide the raw flux by the piecewise linear interpolation done in step (6)
-       (8) Set raw flux as the flux computed in step (7) and repeat
-       (9) Multiply back the fitted BSpline
+    """Implements the Pixel Level Decorrelation (PLD) method to de-trend
+    Target Pixel Files.
     """
 
     def __init__(self):
