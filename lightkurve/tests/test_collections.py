@@ -90,3 +90,6 @@ def test_tpfcollection():
     assert(tpfc[1] == tpf3)
     tpfc.append(tpf2)
     assert(tpfc[2] == tpf2)
+    tpfc2 = TargetPixelFileCollection([tpf2, tpf2])
+    ax = tpfc2.plot_all()
+    plt.close('all')
