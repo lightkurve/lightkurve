@@ -245,13 +245,15 @@ class LightCurve(object):
         return new_lc
 
     def copy(self):
-        """
-        Creates a deepcopy of a LightCurve object.
+        """Returns a copy of the LightCurve object.
+
+        This method uses the `copy.deepcopy` function to ensure that all
+        objects stored within the LightCurve are copied (e.g. time and flux).
 
         Returns
         -------
-        LightCurve object
-            A new ``LightCurve`` object based on the original.
+        lc_copy : LightCurve
+            A new `LightCurve` object which is a copy of the original.
         """
         return copy.deepcopy(self)
 
@@ -318,14 +320,14 @@ class LightCurve(object):
                                                          polyorder=polyorder,
                                                          **kwargs)
         trend_signal = np.interp(self.time, lc_clean.time, trend_signal)
-        flatten_lc = copy.deepcopy(self)
+        flatten_lc = self.copy()
         with warnings.catch_warnings():
             # ignore invalid division warnings
             warnings.simplefilter("ignore", RuntimeWarning)
             flatten_lc.flux = flatten_lc.flux / trend_signal
             flatten_lc.flux_err = flatten_lc.flux_err / trend_signal
         if return_trend:
-            trend_lc = copy.deepcopy(self)
+            trend_lc = self.copy()
             trend_lc.flux = trend_signal
             return flatten_lc, trend_lc
         return flatten_lc
@@ -371,7 +373,7 @@ class LightCurve(object):
             A new ``LightCurve`` in which `flux` and `flux_err` are divided
             by the median.
         """
-        lc = copy.copy(self)
+        lc = self.copy()
         lc.flux_err = lc.flux_err / np.nanmedian(lc.flux)
         lc.flux = lc.flux / np.nanmedian(lc.flux)
         return lc
@@ -400,8 +402,8 @@ class LightCurve(object):
             A new ``LightCurve`` in which NaNs values and gaps in time have been
             filled.
         """
-        clc = copy.deepcopy(lc.remove_nans())
-        nlc = copy.deepcopy(lc)
+        clc = lc.remove_nans().copy()
+        nlc = lc.copy()
 
         # Average gap between cadences
         dt = np.nanmedian(clc.time[1::] - clc.time[:-1:])
@@ -551,7 +553,7 @@ class LightCurve(object):
         methodf = np.__dict__['nan' + method]
 
         n_bins = self.flux.size // binsize
-        binned_lc = copy.copy(self)
+        binned_lc = self.copy()
         binned_lc.time = np.array([methodf(a) for a in np.array_split(self.time, n_bins)])
         binned_lc.flux = np.array([methodf(a) for a in np.array_split(self.flux, n_bins)])
 
@@ -1195,7 +1197,7 @@ class KeplerLightCurve(LightCurve):
                                                   **kwargs)
         else:
             raise ValueError("method {} is not available.".format(method))
-        new_lc = copy.copy(self)
+        new_lc = self.copy()
         new_lc.time = corrected_lc.time
         new_lc.flux = corrected_lc.flux
         new_lc.flux_err = self.normalize().flux_err[not_nan]
