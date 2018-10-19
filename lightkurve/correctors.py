@@ -20,6 +20,9 @@ from .utils import channel_to_module_output
 from .lightcurve import LightCurve
 from .lightcurvefile import KeplerLightCurveFile
 
+from sklearn.decomposition import PCA
+from itertools import combinations_with_replacement as multichoose
+import george
 
 __all__ = ['KeplerCBVCorrector', 'SFFCorrector']
 
@@ -487,3 +490,100 @@ class SFFCorrector(object):
         independently. However, this is not implemented yet in this version.
         """
         raise NotImplementedError()
+
+class PLDCorrector(object):
+    """Implements the Self-Flat-Fielding (SFF) systematics removal method.
+
+    This method is described in detail by Vanderburg and Johnson (2014).
+    Briefly, the algorithm implemented in this class can be described
+    as follows
+
+       (1) Rotate the centroid measurements onto the subspace spanned by the
+           eigenvectors of the centroid covariance matrix
+       (2) Fit a polynomial to the rotated centroids
+       (3) Compute the arclength of such polynomial
+       (4) Fit a BSpline of the raw flux as a function of time
+       (5) Normalize the raw flux by the fitted BSpline computed in step (4)
+       (6) Bin and interpolate the normalized flux as a function of the arclength
+       (7) Divide the raw flux by the piecewise linear interpolation done in step (6)
+       (8) Set raw flux as the flux computed in step (7) and repeat
+       (9) Multiply back the fitted BSpline
+    """
+
+    def __init__(self):
+        pass
+
+    def correct(self, fpix, ferr, trninds, time, aperture):
+        """Returns a systematics-corrected LightCurve.
+
+        Note that it is assumed that time and flux do not contain NaNs.
+
+        Parameters
+        ----------
+        time : array-like
+            Time measurements
+        flux : array-like
+            Data flux for every time point
+
+        Returns
+        -------
+        corrected_lightcurve : LightCurve object
+            Returns a corrected lightcurve object.
+        """
+
+        aperture_mask = np.zeros(aperture.shape)
+        aperture_mask[np.where(aperture)] = 1.
+        aperture = aperture_mask
+
+        aperture = [aperture for i in range(len(fpix))]
+
+        M = lambda x: np.delete(x, trninds, axis=0)
+
+        #  generate flux light curve
+        fpix = M(fpix)
+        aperture = M(aperture)
+        fpix_rs = (fpix*aperture).reshape(len(fpix),-1)
+        fpix_ap = np.zeros((len(fpix),len(np.delete(fpix_rs[0],np.where(np.isnan(fpix_rs[0]))))))
+
+        for c in range(len(fpix_rs)):
+            naninds = np.where(np.isnan(fpix_rs[c]))
+            fpix_ap[c] = np.delete(fpix_rs[c],naninds)
+
+        fpix = fpix_ap
+        rawflux = np.sum(fpix.reshape(len(fpix),-1), axis=1)
+
+        # First order PLD
+        f1 = fpix / rawflux.reshape(-1, 1)
+        pca = PCA(n_components=10)
+        X1 = pca.fit_transform(f1)
+
+        # Second order PLD
+        f2 = np.product(list(multichoose(f1.T, 2)), axis = 1).T
+        pca = PCA(n_components=10)
+        X2 = pca.fit_transform(f2)
+
+        # Combine them and add a column vector of 1s for stability
+        X = np.hstack([np.ones(X1.shape[0]).reshape(-1, 1), X1, X2])
+
+        # Mask transits in design matrix
+        MX = M(X)
+
+        # Define gaussian process parameters
+        y = M(rawflux) - np.dot(MX, np.linalg.solve(np.dot(MX.T, MX), np.dot(MX.T, M(rawflux))))
+        amp = np.nanstd(y)
+        tau = 30.
+
+        # Set up gaussian process
+        gp = george.GP(amp ** 2 * george.kernels.Matern32Kernel(tau ** 2))
+        sigma = gp.get_matrix(M(time)) + np.diag(M(np.sum(ferr.reshape(len(ferr),-1), axis = 1))**2)
+
+        # Compute
+        A = np.dot(X.T, np.linalg.solve(sigma, X))
+        B = np.dot(X.T, np.linalg.solve(sigma, rawflux))
+        C = np.linalg.solve(A, B)
+
+        # Compute detrended light curve
+        model = np.dot(X, C)
+        flux = rawflux - model + np.nanmean(rawflux)
+
+        return LightCurve(time=time, flux=flux)
