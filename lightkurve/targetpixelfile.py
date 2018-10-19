@@ -4,6 +4,7 @@ import os
 import warnings
 import logging
 
+import copy
 from astropy.io import fits
 from astropy.nddata import Cutout2D
 from astropy.table import Table
@@ -951,6 +952,25 @@ class KeplerTargetPixelFile(TargetPixelFile):
             factory.add_cadence(frameno=idx, flux=cutout.data, header=hdu.header)
         return factory.get_tpf(hdu0_keywords=allkeys, ext_info=ext_info, **kwargs)
 
+    def correct(self, method='pld'):
+        """
+
+        """
+
+        from .correctors import PLDCorrector
+
+        self.corrector = PLDCorrector()
+        corrected_lc = self.corrector.correct(fpix=np.nan_to_num(self.flux),
+                                              ferr=np.nan_to_num(self.flux_err),
+                                              trninds=[],
+                                              time=self.time,
+                                              aperture=self.pipeline_mask)
+        new_lc = self.to_lightcurve()
+        new_lc.time = corrected_lc.time
+        new_lc.flux = corrected_lc.flux
+        new_lc.flux_err = new_lc.normalize().flux_err
+
+        return new_lc
 
 class FactoryError(Exception):
     """Raised if there is a problem creating a TPF."""
