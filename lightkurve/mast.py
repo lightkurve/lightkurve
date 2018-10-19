@@ -205,9 +205,8 @@ def search_kepler_products(target, filetype='Target Pixel', cadence='long', quar
     # if targetlimit is not None:
     ids = np.asarray([p.split('/')[-1].split('-')[0].split('_')[0][4:]
                       for p in products['dataURI']], dtype=int)
-    if targetlimit is None:
-        pass
-    elif len(np.unique(ids)) < targetlimit:
+
+    if targetlimit is not None and (len(np.unique(ids)) < targetlimit):
         log.warning('Target return limit set to {} '
                     'but only {} unique targets found. '
                     'Try increasing the search radius. '
