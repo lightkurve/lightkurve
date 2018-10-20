@@ -96,16 +96,17 @@ def _query_kepler_products(target, radius=1):
                                           obs_collection=["Kepler", "K2"])
     except ValueError:
         # If `target` did not look like a KIC or EPIC ID, then we let MAST
-        # resolve the target name to a sky position. Convert radius from arcsec
-        # to degrees for query_criteria().
+        # resolve the target name to a sky position.
         try:
             obs = Observations.query_criteria(objectname=target,
+                                              radius='{} arcsec'.format(radius),
                                               project=["Kepler", "K2"],
                                               obs_collection=["Kepler", "K2"])
             # Make sure the final table is in DISTANCE order
             obs.sort('distance')
         except ResolverError as exc:
             raise ArchiveError(exc)
+
     obsids = np.asarray(obs['obsid'])
     products = Observations.get_product_list(obs)
     order = [np.where(products['parent_obsid'] == o)[0] for o in obsids]
@@ -150,7 +151,7 @@ def search_kepler_products(target, filetype='Target Pixel', cadence='long', quar
     if (campaign is not None) | (quarter is not None):
         qoc = np.atleast_1d(np.asarray(qoc, dtype=int))
 
-    products = _query_kepler_products(target, radius=radius)
+    products = _query_kepler_products(target, radius)
     # Because MAST doesn't let us query based on Kepler-specific meta data
     # fields, we need to identify short/long-cadence TPFs by their filename.
     if cadence in ['short', 'sc']:
@@ -164,7 +165,6 @@ def search_kepler_products(target, filetype='Target Pixel', cadence='long', quar
     if len(products) == 0:
         return products
 
-
     # Identify the campaign or quarter by the description.
     if qoc is not None:
         mask = np.zeros(np.shape(products)[0], dtype=bool)
@@ -175,12 +175,10 @@ def search_kepler_products(target, filetype='Target Pixel', cadence='long', quar
                               for desc in products['description']])
     else:
         mask = np.ones(np.shape(products)[0], dtype=bool)
-
     # Allow only the correct fits or fits.gz type
     mask &= np.array([desc.lower().endswith('fits') or
                       desc.lower().endswith('fits.gz')
                       for desc in products['dataURI']])
-
     # Allow only the correct cadence type
     mask &= np.array([suffix in desc for desc in products['description']])
     products = products[mask]
@@ -202,35 +200,34 @@ def search_kepler_products(target, filetype='Target Pixel', cadence='long', quar
 
     # Limit to the correct number of hits based on ID. If there are multiple versions
     # of the same ID, this shouldn't count towards the limit.
-    # if targetlimit is not None:
-    ids = np.asarray([p.split('/')[-1].split('-')[0].split('_')[0][4:]
-                      for p in products['dataURI']], dtype=int)
+    if targetlimit is not None:
+        ids = np.asarray([p.split('/')[-1].split('-')[0].split('_')[0][4:]
+                          for p in products['dataURI']], dtype=int)
+        if len(np.unique(ids)) < targetlimit:
+            log.warning('Target return limit set to {} '
+                        'but only {} unique targets found. '
+                        'Try increasing the search radius. '
+                        '(Radius currently set to {} arcseconds)'
+                        ''.format(targetlimit, len(np.unique(ids)), radius))
+        okids = ids[np.sort(np.unique(ids, return_index=True)[1])[0:targetlimit]]
+        mask = np.zeros(len(ids), dtype=bool)
 
-    if targetlimit is not None and (len(np.unique(ids)) < targetlimit):
-        log.warning('Target return limit set to {} '
-                    'but only {} unique targets found. '
-                    'Try increasing the search radius. '
-                    '(Radius currently set to {} arcseconds)'
-                    ''.format(targetlimit, len(np.unique(ids)), radius))
-    okids = ids[np.sort(np.unique(ids, return_index=True)[1])[0:targetlimit]]
-    mask = np.zeros(len(ids), dtype=bool)
-
-    # Mask data.
-    # Make sure they still appear in the same order.
-    order = np.zeros(len(ids))
-    for idx, okid in enumerate(okids):
-        pos = ids == okid
-        order[pos] = int(idx)
-        mask |= pos
-    products['order'] = order
-    products = products[mask]
+        # Mask data.
+        # Make sure they still appear in the same order.
+        order = np.zeros(len(ids))
+        for idx, okid in enumerate(okids):
+            pos = ids == okid
+            order[pos] = int(idx)
+            mask |= pos
+        products['order'] = order
+        products = products[mask]
 
     return products
 
 
 def download_kepler_products(target, filetype='Target Pixel', cadence='long',
-                             quarter=None, month=None, campaign=None,
-                             radius=1., targetlimit=1, **kwargs):
+                             quarter=None, month=None, campaign=None, radius=1.,
+                             targetlimit=1, **kwargs):
     """Download and cache files from from the Kepler/K2 data archive at MAST.
 
     Returns paths to the cached files.
