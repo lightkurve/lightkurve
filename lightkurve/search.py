@@ -15,6 +15,7 @@ from .collections import TargetPixelFileCollection, LightCurveFileCollection
 from . import PACKAGEDIR
 log = logging.getLogger(__name__)
 
+__all__ = ['search_targetpixelfile', 'search_lightcurvefile']
 
 class SearchResult(object):
     """
