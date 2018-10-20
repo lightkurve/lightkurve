@@ -564,8 +564,8 @@ class PLDCorrector(object):
         sigma = gp.get_matrix(M(time)) + np.diag(M(np.sum(ferr.reshape(len(ferr),-1), axis = 1))**2)
 
         # Compute
-        A = np.dot(X.T, np.linalg.solve(sigma, X))
-        B = np.dot(X.T, np.linalg.solve(sigma, rawflux))
+        A = np.dot(MX.T, np.linalg.solve(sigma, MX))
+        B = np.dot(MX.T, np.linalg.solve(sigma, M(rawflux)))
         C = np.linalg.solve(A, B)
 
         # Compute detrended light curve
