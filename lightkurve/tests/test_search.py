@@ -82,7 +82,7 @@ def test_properties():
     assert_almost_equal(search_targetpixelfile(c, quarter=6).ra, 297.5835)
     assert_almost_equal(search_targetpixelfile(c, quarter=6).dec, 40.98339)
     assert(len(search_targetpixelfile(c, quarter=6).target_name) == 1)
-    assert(len(search_targetpixelfile(c, quarter=6).mastID) == 1)
+    assert(len(search_targetpixelfile(c, quarter=6).obsid) == 1)
 
 
 @pytest.mark.remote_data
