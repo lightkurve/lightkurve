@@ -385,3 +385,11 @@ def test_tess_aperture():
     assert tpf.mission == 'TESS'
     assert tpf.pipeline_mask.sum() == 8
     assert tpf.background_mask.sum() == 0
+
+
+def test_threshold_aperture_mask():
+    """Does the threshold mask work?"""
+    tpf = KeplerTargetPixelFile.from_fits(filename_tpf_one_center)
+    tpf.plot(aperture_mask='threshold')
+    lc = tpf.to_lightcurve(aperture_mask=tpf.create_threshold_mask(threshold=1))
+    assert (lc.flux == 1).all()

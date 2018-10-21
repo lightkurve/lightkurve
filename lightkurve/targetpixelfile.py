@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
 from astropy.coordinates import SkyCoord
-from astropy.io.fits.card import Undefined
+from astropy.stats.funcs import median_absolute_deviation as MAD
 
 from . import PACKAGEDIR, MPLSTYLE
 from .lightcurve import KeplerLightCurve, TessLightCurve
@@ -345,13 +345,14 @@ class TargetPixelFile(object):
 
         Parameters
         ----------
-        aperture_mask : array-like, 'pipeline', 'all', or None
-            A boolean array describing the aperture such that `False` means
-            that the pixel will be masked out.
-            If None or 'all' are passed, a mask that is `True` everywhere will
-            be returned.
-            If 'pipeline' is passed, the mask suggested by the pipeline
+        aperture_mask : array-like, 'pipeline', 'all', 'threshold', or None
+            A boolean array describing the aperture such that `True` means
+            that the pixel will be used.
+            If None or 'all' are passed, all pixels will be used.
+            If 'pipeline' is passed, the mask suggested by the official pipeline
             will be returned.
+            If 'threshold' is passed, all pixels brighter than 3-sigma above
+            the median flux will be used.
 
         Returns
         -------
@@ -366,8 +367,41 @@ class TargetPixelFile(object):
                 aperture_mask = np.ones((self.shape[1], self.shape[2]), dtype=bool)
             elif aperture_mask == 'pipeline':
                 aperture_mask = self.pipeline_mask
+            elif aperture_mask == 'threshold':
+                aperture_mask = self.create_threshold_mask()
         self._last_aperture_mask = aperture_mask
         return aperture_mask
+
+    def create_threshold_mask(self, threshold=3):
+        """Returns an aperture mask creating using the thresholding method.
+
+        This method will identify the pixels in the TargetPixelFile which show
+        a median flux that is brighter than `threshold` times the standard
+        deviation above the overall median. The standard deviation is estimated
+        in a robust way by multiplying the Median Absolute Deviation (MAD)
+        with 1.4826.
+
+        Parameters
+        ----------
+        threshold : float
+            A value for the number of sigma by which a pixel needs to be
+            brighter than the median flux to be included in the aperture mask.
+
+        Returns
+        -------
+        aperture_mask : ndarray
+            2D boolean numpy array containing `True` for pixels above the
+            threshold.
+        """
+        # Calculate the median image
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            median_image = np.nanmedian(self.flux, axis=0)
+        vals = median_image[np.isfinite(median_image)].flatten()
+        # Calculate the theshold value in flux units
+        mad_cut = (1.4826 * MAD(vals) * threshold) + np.nanmedian(median_image)
+        # Create a mask containing the pixels above the threshold flux
+        return np.nan_to_num(median_image) > mad_cut
 
     def centroids(self, **kwargs):
         """DEPRECATED: use `estimate_cdpp()` instead."""
@@ -381,10 +415,13 @@ class TargetPixelFile(object):
         Parameters
         ----------
         aperture_mask : array-like, 'pipeline', or 'all'
-            A boolean array describing the aperture such that `False` means
-            that the pixel will be masked out.
-            If the string 'all' is passed, all pixels will be used.
-            The default behaviour is to use the Kepler pipeline mask.
+            A boolean array describing the aperture such that `True` means
+            that the pixel will be used.
+            If None or 'all' are passed, all pixels will be used.
+            If 'pipeline' is passed, the mask suggested by the official pipeline
+            will be returned.
+            If 'threshold' is passed, all pixels brighter than 3-sigma above
+            the median flux will be used.
 
         Returns
         -------
@@ -420,7 +457,7 @@ class TargetPixelFile(object):
             This argument has priority over frame number.
         bkg : bool
             If True, background will be added to the pixel values.
-        aperture_mask : ndarray
+        aperture_mask : ndarray or str
             Highlight pixels selected by aperture_mask.
         show_colorbar : bool
             Whether or not to show the colorbar
@@ -694,11 +731,14 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
         Parameters
         ----------
-        aperture_mask : array-like, 'pipeline', or 'all'
-            A boolean array describing the aperture such that `False` means
-            that the pixel will be masked out.
-            If the string 'all' is passed, all pixels will be used.
-            The default behaviour is to use the Kepler pipeline mask.
+        aperture_mask : array-like, 'pipeline', 'threshold' or 'all'
+            A boolean array describing the aperture such that `True` means
+            that the pixel will be used.
+            If None or 'all' are passed, all pixels will be used.
+            If 'pipeline' is passed, the mask suggested by the official pipeline
+            will be returned.
+            If 'threshold' is passed, all pixels brighter than 3-sigma above
+            the median flux will be used.
 
         Returns
         -------
