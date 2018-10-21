@@ -1,16 +1,15 @@
 from __future__ import division, print_function
 
-import logging
-import numpy as np
 import pytest
+import numpy as np
+from numpy.testing import assert_almost_equal
 
 from astropy.coordinates import SkyCoord
 import astropy.units as u
-from numpy.testing import assert_almost_equal
 
 from ..search import search_lightcurvefile, search_targetpixelfile, ArchiveError
 from ..targetpixelfile import KeplerTargetPixelFile
-from .. import log
+
 
 @pytest.mark.remote_data
 def test_search_targetpixelfile():

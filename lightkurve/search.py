@@ -1,25 +1,34 @@
+"""Defines tools to retrieve Kepler and TESS data from the archives."""
 from __future__ import division, print_function
 import os
 import logging
 import numpy as np
 
-from astroquery.mast import Observations
-from astroquery.exceptions import ResolverError
 from astropy.table import unique, join
 from astropy.coordinates import SkyCoord
 from astropy.io import ascii
+
+from astroquery.mast import Observations
+from astroquery.exceptions import ResolverError
+
 from .lightcurvefile import KeplerLightCurveFile
 from .targetpixelfile import KeplerTargetPixelFile
 from .collections import TargetPixelFileCollection, LightCurveFileCollection
-
 from . import PACKAGEDIR
+
 log = logging.getLogger(__name__)
 
 __all__ = ['search_targetpixelfile', 'search_lightcurvefile']
 
+
+class ArchiveError(Exception):
+    """Raised if there is a problem accessing data."""
+    pass
+
+
 class SearchResult(object):
-    """
-    Defines a generic SearchResult class returned by `search_targetpixelfile` or `search_lightcurvefile`.
+    """Generic SearchResult class returned by `search_targetpixelfile` and
+    `search_lightcurvefile`.
 
     Parameters
     ----------
@@ -37,7 +46,6 @@ class SearchResult(object):
     filetpye : str
         Type of files queried at MAST (`Target Pixel` or `Lightcurve`)
     """
-
     def __init__(self, products, filetype):
         self.products = products
         self.filetype = filetype
@@ -53,7 +61,7 @@ class SearchResult(object):
         return unique(self.products[mask], keys='target_name')
 
     @property
-    def mastID(self):
+    def obsid(self):
         """Returns an array of MAST observation IDs"""
         return np.asarray(np.unique(self.products['obsid']), dtype='int')
 
@@ -73,9 +81,10 @@ class SearchResult(object):
         return self.products['s_dec'].data.data
 
     def download(self, quality_bitmask='default'):
-        """
-        Downloads a single KeplerTargetPixelFile or KeplerLightCurveFile object from search result.
-        If multiple files are present in `products`, only the first will be downloaded.
+        """Returns a single `KeplerTargetPixelFile` or `KeplerLightCurveFile` object.
+
+        If multiple files are present in `SearchResult.products`, only the first
+        will be downloaded.
 
         Parameters
         ----------
@@ -96,10 +105,8 @@ class SearchResult(object):
 
         Returns
         -------
-        KeplerTargetPixelFile : `KeplerTargetPixelFile` object
-            Returns a single `KeplerTargetPixelFile` for first entry in products table
-        KeplerLightCurveFile : `KeplerLightCurveFile` object
-            Returns a single `KeplerLightCurveFile` for first entry in products table
+        data : `TargetPixelFile` or `LightCurveFile` object
+            The first entry in the products table.
         """
         # Make sure astroquery uses the same level of verbosity
         logging.getLogger('astropy').setLevel(log.getEffectiveLevel())
@@ -126,8 +133,7 @@ class SearchResult(object):
                                         quality_bitmask=quality_bitmask)
 
     def download_all(self, quality_bitmask='default'):
-        """
-        Downloads a KeplerTargetPixelFileCollection or KeplerLightCurveFileCollection from search results.
+        """Returns a `TargetPixelFileCollection or `LightCurveFileCollection`.
 
          Parameters
          ----------
@@ -148,16 +154,15 @@ class SearchResult(object):
 
         Returns
         -------
-        KeplerTargetPixelFileCollection : `KeplerTargetPixelFileCollection` object
-            Returns a single `KeplerTargetPixelFileCollection` containing all entries in products table
-        KeplerLightCurveFileCollection : `KeplerLightCurveFileCollection` object
-            Returns a single `KeplerLightCurveFileCollection` containing all entries in products table
+        collection : `lightkurve.Collection` object
+            Returns a `LightCurveFileCollection`  or `TargetPixelFileCollection`,
+            containing all entries in the products table
         """
         # Make sure astroquery uses the same level of verbosity
         logging.getLogger('astropy').setLevel(log.getEffectiveLevel())
 
         # should download to `~/.lightkurve-cache`, make sure dir exists and is accessible
-        download_dir = self._fetch_dir()
+        download_dir = self._download_dir()
 
         # download all products in table
         path = Observations.download_products(self.products, mrp_only=False,
@@ -165,24 +170,26 @@ class SearchResult(object):
 
         # return collection of tpf or lcf
         if self.filetype == "Target Pixel":
-            tpfs = [KeplerTargetPixelFile(p,
-                                         quality_bitmask=quality_bitmask) for p in path]
+            tpfs = [KeplerTargetPixelFile(p, quality_bitmask=quality_bitmask)
+                    for p in path]
             return TargetPixelFileCollection(tpfs)
         elif self.filetype == "Lightcurve":
-            lcs = [KeplerLightCurveFile(p,
-                                   quality_bitmask=quality_bitmask) for p in path]
+            lcs = [KeplerLightCurveFile(p, quality_bitmask=quality_bitmask)
+                   for p in path]
             return LightCurveFileCollection(lcs)
 
-    def _fetch_dir(self):
-        '''
-        Checks existance of `~/.lightkurve-cache` directory and creates one if
-        none is found.
+    def _download_dir(self):
+        """Returns the path to the directory where files will be downloaded.
+
+        By default, this method will return "~/.lightkurve-cache" and create
+        this directory if it does not exist.  If the directory cannot be
+        access or created, then it returns the local directory (".").
 
         Returns
         -------
         download_dir : str
             Path to location of `mastDownload` folder where data downloaded from MAST are stored
-        '''
+        """
         # check if download directory exists (~/.lightkurve-cache)
         cache_dir = os.path.join(os.path.expanduser('~'), '.lightkurve-cache')
         if os.path.isdir(cache_dir):
@@ -199,11 +206,6 @@ class SearchResult(object):
                 download_dir = '.'
 
         return download_dir
-
-
-class ArchiveError(Exception):
-    """Raised if there is a problem accessing data."""
-    pass
 
 
 def _query_mast(target, cadence='long', radius=.0001, targetlimit=None):
