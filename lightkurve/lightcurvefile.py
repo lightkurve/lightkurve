@@ -4,13 +4,15 @@ from __future__ import division, print_function
 
 import os
 import logging
+import warnings
+
 import numpy as np
 import matplotlib as mpl
 from matplotlib import pyplot as plt
-
 from astropy.io import fits as pyfits
 
-from .utils import (bkjd_to_astropy_time, KeplerQualityFlags, TessQualityFlags)
+from .utils import (bkjd_to_astropy_time, KeplerQualityFlags, TessQualityFlags,
+                    LightkurveWarning)
 from .mast import download_kepler_products
 
 from . import MPLSTYLE
@@ -254,9 +256,8 @@ class KeplerLightCurveFile(LightCurveFile):
 
             >>> search_lightcurvefile('kepler-10', quarter=4, radius=100).download_all() # doctest: +SKIP
         """
-        # deprication warning
-        log.warning('WARNING: This function is deprecated. Please use `search_lightcurvefile()`. '
-                    'Use examples are provided in the documentation.')
+        warnings.warn('`from_archive` is deprecated, please use `search_lightcurvefile()` instead.',
+                      LightkurveWarning)
 
         # Be tolerant if a direct path or url is passed to this function by accident
         if os.path.exists(str(target)) or str(target).startswith('http'):

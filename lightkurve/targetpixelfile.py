@@ -19,9 +19,9 @@ from . import PACKAGEDIR, MPLSTYLE
 from .lightcurve import KeplerLightCurve, TessLightCurve
 from .prf import KeplerPRF
 from .utils import KeplerQualityFlags, TessQualityFlags, \
-                   plot_image, bkjd_to_astropy_time, btjd_to_astropy_time
+                   plot_image, bkjd_to_astropy_time, btjd_to_astropy_time, \
+                   LightkurveWarning
 from .mast import download_kepler_products
-from .collections import TargetPixelFileCollection
 
 __all__ = ['KeplerTargetPixelFile', 'TessTargetPixelFile']
 log = logging.getLogger(__name__)
@@ -677,9 +677,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
             >>> search_targetpixelfile('kepler-10', quarter=4, radius=100).download_all() # doctest: +SKIP
         """
-        # deprication warning
-        log.warning('WARNING: This function is depricated. Please use `search_targetpixelfile()`. '
-                    'Use examples are provided in the documentation.')
+        warnings.warn('`from_archive` is deprecated, please use `search_targetpixelfile()` instead.',
+                      LightkurveWarning)
         if os.path.exists(str(target)) or str(target).startswith('http'):
             log.warning('Warning: from_archive() is not intended to accept a '
                         'direct path, use KeplerTargetPixelFile(path) instead.')
