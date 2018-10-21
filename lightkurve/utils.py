@@ -430,7 +430,5 @@ def plot_image(image, ax=None, scale='linear', origin='lower',
 
 
 class LightkurveWarning(Warning):
-    """
-    The base warning class for all Lightkurve warnings.
-    """
+    """Class for all Lightkurve warnings."""
     pass

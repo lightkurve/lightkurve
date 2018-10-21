@@ -4,12 +4,12 @@ import numpy as np
 from numpy.testing import assert_almost_equal
 import pytest
 import warnings
-from lightkurve.lightcurve import LightCurve
 
 from ..utils import KeplerQualityFlags, TessQualityFlags
 from ..utils import module_output_to_channel, channel_to_module_output
 from ..utils import running_mean
 from ..utils import LightkurveWarning
+from ..lightcurve import LightCurve
 
 
 def test_channel_to_module_output():
