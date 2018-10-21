@@ -12,7 +12,6 @@ from astropy.io import fits as pyfits
 
 from .utils import (bkjd_to_astropy_time, KeplerQualityFlags, TessQualityFlags)
 from .mast import download_kepler_products
-from .collections import LightCurveFileCollection
 
 from . import MPLSTYLE
 
@@ -256,7 +255,7 @@ class KeplerLightCurveFile(LightCurveFile):
             >>> search_lightcurvefile('kepler-10', quarter=4, radius=100).download_all() # doctest: +SKIP
         """
         # deprication warning
-        log.warning('WARNING: This function is depricated. Please use `search_lightcurvefile()`. '
+        log.warning('WARNING: This function is deprecated. Please use `search_lightcurvefile()`. '
                     'Use examples are provided in the documentation.')
 
         # Be tolerant if a direct path or url is passed to this function by accident
