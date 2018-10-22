@@ -20,7 +20,7 @@ def test_search_targetpixelfile():
     # KIC 11904151 (Kepler-10) was observed in LC in 15 Quarters
     assert(len(search_targetpixelfile(11904151).products) == 15)
     # ...including quarter 11 but not 12:
-    assert(len(search_targetpixelfile(11904151, quarter=11).targets) == 1)
+    assert(len(search_targetpixelfile(11904151, quarter=11).unique_targets) == 1)
     assert(len(search_targetpixelfile(11904151, quarter=12).products) == 0)
     # should work for all split campaigns
     campaigns = [[91, 92, 9], [101, 102, 10], [111, 112, 11]]
@@ -66,12 +66,11 @@ def test_month():
 @pytest.mark.remote_data
 def test_collections():
     # TargetPixelFileCollection class
-    assert(len(search_targetpixelfile(205998445, radius=900).download_all()) == 4)
+    assert(len(search_targetpixelfile(205998445, radius=900).products) == 4)
     # LightCurveFileCollection class with set targetlimit
-    assert(len(search_lightcurvefile(205998445, radius=900, targetlimit=3).download_all()) == 3)
-    # should log a warning if fewer targets are found than targetlimit,
-    # but should still download all available
-    assert(len(search_targetpixelfile(205998445, radius=900, targetlimit=6).download_all()) == 4)
+    assert(len(search_lightcurvefile(205998445, radius=900, limit=3).download_all()) == 3)
+    # if fewer targets are found than targetlimit, should still download all available
+    assert(len(search_targetpixelfile(205998445, radius=900, limit=6).products) == 4)
     # if download() is used when multiple files are available, should only download 1
     assert(isinstance(search_targetpixelfile(205998445, radius=900).download(), KeplerTargetPixelFile))
 

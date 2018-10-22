@@ -50,7 +50,7 @@ class SearchResult(object):
         return '\n'.join(self.products[columns].pformat(max_width=300))
 
     @property
-    def targets(self):
+    def unique_targets(self):
         """Returns a table of targets and their RA & dec values produced by search"""
         mask = ['target_name', 's_ra', 's_dec']
         return unique(self.products[mask], keys='target_name')
@@ -204,7 +204,7 @@ class SearchResult(object):
         return download_dir
 
 
-def _query_mast(target, cadence='long', radius=.0001, targetlimit=None):
+def _query_mast(target, cadence='long', radius=.0001):
     """Returns a table of all Kepler or K2 observations of a given target.
 
     This function wraps the `astroquery.mast.Observations.query_criteria()`
@@ -216,10 +216,6 @@ def _query_mast(target, cadence='long', radius=.0001, targetlimit=None):
         Specify short (1-min) or long (30-min) cadence data.
     radius : float
         Search radius in arcseconds
-    targetlimit : None or int
-        If multiple targets are present within `radius`, limit the number
-        of targets returned to the `targetlimit` nearest objects.
-        If `None`, no limit is applied.
 
     Returns
     -------
@@ -276,13 +272,11 @@ def _query_mast(target, cadence='long', radius=.0001, targetlimit=None):
             raise ArchiveError(exc)
 
     obs.sort('distance')  # ensure table returned is sorted by distance
-    if targetlimit is not None:
-        obs = obs[:targetlimit]  # only return the N nearest targets
     return obs
 
 
 def search_targetpixelfile(target, cadence='long', quarter=None, month=None,
-                           campaign=None, radius=.0001, targetlimit=1000):
+                           campaign=None, radius=.0001, limit=None):
 
     """
     Fetch a data table for Target Pixel Files within a region of sky. Cone search is
@@ -310,11 +304,11 @@ def search_targetpixelfile(target, cadence='long', quarter=None, month=None,
     """
     return search_products(target, filetype="Target Pixel", cadence=cadence,
                            quarter=quarter, month=month, campaign=campaign,
-                           radius=radius, targetlimit=targetlimit)
+                           radius=radius, limit=limit)
 
 
 def search_lightcurvefile(target, cadence='long', quarter=None, month=None,
-                          campaign=None, radius=.0001, targetlimit=None):
+                          campaign=None, radius=.0001, limit=None):
 
     """
     Fetch a data table for Lightcurve Files within a region of sky. Cone search is
@@ -342,11 +336,11 @@ def search_lightcurvefile(target, cadence='long', quarter=None, month=None,
     """
     return search_products(target, filetype="Lightcurve", cadence=cadence,
                            quarter=quarter, month=month, campaign=campaign,
-                           radius=radius, targetlimit=targetlimit)
+                           radius=radius, limit=limit)
 
 
 def search_products(target, filetype="Lightcurve", cadence='long', quarter=None, month=None,
-                    campaign=None, radius=.0001, targetlimit=1000):
+                    campaign=None, radius=.0001, limit=None):
     """Returns a SearchResult object.
 
     Parameters
@@ -365,26 +359,25 @@ def search_products(target, filetype="Lightcurve", cadence='long', quarter=None,
         Desired campaign of observation for data products
     radius : float
         Search radius in arcseconds
-    targetlimit : int
-        Maximum number of targets in astropy table
+    limit : int
+        Maximum number of products to return
 
     Returns
     -------
     SearchResult : :class:`SearchResult` object.
     """
-    observations = _query_mast(target, cadence='long', radius=radius, targetlimit=targetlimit)
+    observations = _query_mast(target, cadence='long', radius=radius)
     products = Observations.get_product_list(observations)
     result = join(products, observations, join_type='left')  # will join on obs_id
     result.sort(['distance', 'obs_id'])
 
-    masked_result = _filter_products(result, filetype=filetype,
-                                     campaign=campaign, quarter=quarter,
-                                     cadence=cadence, targetlimit=targetlimit)
+    masked_result = _filter_products(result, filetype=filetype, campaign=campaign,
+                                     quarter=quarter, cadence=cadence, limit=limit)
     return SearchResult(masked_result, filetype)
 
 
-def _filter_products(products, campaign=None, quarter=None, month=None, cadence='long',
-                     filetype='Target Pixel', targetlimit=1):
+def _filter_products(products, campaign=None, quarter=None, month=None,
+                     cadence='long', filetype='Target Pixel', limit=None):
     """Returns a products table filtered by one or more criteria.
 
     This function can filter based on `cadence`, `quarter`, `month`, `campaign`
@@ -403,9 +396,7 @@ def _filter_products(products, campaign=None, quarter=None, month=None, cadence=
     cadence : str
         Desired cadence (`long`, `short`, `any`)
     filetpye : str
-        Type of files queried at MAST (`Target Pixel` or `Lightcurve`)
-    targetlimit : int
-        Maximum number of targets in astropy table
+        Type of files queried at MAST (`Target Pixel` or `Lightcurve`).
 
     Returns
     -------
@@ -463,34 +454,10 @@ def _filter_products(products, campaign=None, quarter=None, month=None, cadence=
             dates[idx] = 0
     products['dates'] = np.asarray(dates)
 
-    # Limit to the correct number of hits based on ID. If there are multiple versions
-    # of the same ID, this shouldn't count towards the limit.
-    # if targetlimit is not None:
-    ids = np.asarray([p.split('/')[-1].split('-')[0].split('_')[0][4:]
-                     for p in products['dataURI']], dtype=int)
-
-    if targetlimit is not None and len(np.unique(ids)) < targetlimit:
-        log.warning('Target return limit set to {} '
-                    'but only {} unique targets found. '
-                    'Try increasing the search radius. '
-                    ''.format(targetlimit, len(np.unique(ids))))
-    okids = ids[np.sort(np.unique(ids, return_index=True)[1])[0:targetlimit]]
-    mask = np.zeros(len(ids), dtype=bool)
-
-    # Mask data.
-    # Make sure they still appear in the same order.
-    order = np.zeros(len(ids))
-    for idx, okid in enumerate(okids):
-        pos = ids == okid
-        order[pos] = int(idx)
-        mask |= pos
-    products['order'] = order
-    products = products[mask]
-
     # If there is nothing in the table, quit now.
     if len(products) == 0:
         return products
-    products.sort(['order', 'dates', 'qoc'])
+    products.sort(['distance', 'dates', 'qoc'])
 
     # For Kepler short cadence data there are additional rules, so find anywhere
     # where there is short cadence data...
@@ -518,8 +485,8 @@ def _filter_products(products, campaign=None, quarter=None, month=None, cadence=
             finalmask[ok] = mask
         products = products[finalmask]
         # Sort by id, then date and quarter
-        products.sort(['order', 'dates', 'qoc'])
-        if len(products) < 1:
-            return products
+        products.sort(['distance', 'dates', 'qoc'])
 
+    if limit is not None:
+        return products[0:limit]
     return products
