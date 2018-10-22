@@ -174,7 +174,7 @@ class TargetPixelFileCollection(Collection):
         super(TargetPixelFileCollection, self).__init__(tpfs)
 
     def plot_all(self, ax=None):
-        """Individually plots all TargetPixelFile objects in a single 
+        """Individually plots all TargetPixelFile objects in a single
         matplotlib axes object.
 
         Parameters
@@ -192,8 +192,11 @@ class TargetPixelFileCollection(Collection):
         if ax is None:
             import matplotlib.pyplot as plt
             _, ax = plt.subplots(len(self.data), 1,
-                                 figsize=(7,(7*len(self.data))))
+                                 figsize=(7, (7*len(self.data))))
 
-        for i,tpf in enumerate(self.data):
-            tpf.plot(ax=ax[i])
+        if len(self.data) == 1:
+            self.data[0].plot(ax=ax)
+        else:
+            for i, tpf in enumerate(self.data):
+                tpf.plot(ax=ax[i])
         return ax
