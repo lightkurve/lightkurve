@@ -163,11 +163,11 @@ class SearchResult(object):
                                               download_dir=download_dir)['Local Path']
 
         # return collection of tpf or lcf
-        if 'lpd-targ' in self.products['productFilename'][0]:
+        if 'lpd-targ.fits' in self.products['productFilename'][0]:
             tpfs = [KeplerTargetPixelFile(p, quality_bitmask=quality_bitmask)
                     for p in path]
             return TargetPixelFileCollection(tpfs)
-        elif 'llc' in self.products['productFilename'][0]:
+        elif 'llc.fits' in self.products['productFilename'][0]:
             lcs = [KeplerLightCurveFile(p, quality_bitmask=quality_bitmask)
                    for p in path]
             return LightCurveFileCollection(lcs)
