@@ -198,19 +198,18 @@ class SearchResult(object):
         download_dir : str
             Path to location of `mastDownload` folder where data downloaded from MAST are stored
         """
-        # check if download directory exists (~/.lightkurve-cache)
-        cache_dir = os.path.join(os.path.expanduser('~'), '.lightkurve-cache')
-        if os.path.isdir(cache_dir):
-            download_dir = cache_dir
+        download_dir = os.path.join(os.path.expanduser('~'), '.lightkurve-cache')
+        if os.path.isdir(download_dir):
+            return download_dir
         else:
             # if it doesn't exist, make a new cache directory
             try:
-                os.mkdir(cache_dir)
-                download_dir = cache_dir
+                os.mkdir(download_dir)
             # downloads locally if OS error occurs
             except OSError:
-                log.warning('Warning: unable to create .lightkurve-cache directory. '
-                            'Downloading MAST files to the current working directory instead.')
+                log.warning('Warning: unable to create {}. '
+                            'Downloading MAST files to the current '
+                            'working directory instead.'.format(download_dir))
                 download_dir = '.'
 
         return download_dir
