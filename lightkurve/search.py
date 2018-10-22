@@ -48,6 +48,7 @@ class SearchResult(object):
 
     def __getitem__(self, key):
         products_slice = self.products[key]
+        # Indexing a Table with a single integer will return a Row
         if isinstance(products_slice, Row):
             products_slice = Table(products_slice)
         return SearchResult(products=products_slice)
