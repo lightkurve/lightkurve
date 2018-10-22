@@ -121,9 +121,11 @@ class SearchResult(object):
                         'cadence to limit your search.'.format(len(self.products)))
 
         # return single tpf or lcf
-        if 'lpd-targ.fits' in self.products['productFilename'][0]:
+        tpf_files = ['lpd-targ.fits', 'spd-targ.fits']
+        lcf_files = ['llc.fits', 'slc.fits']
+        if any(file in self.products['productFilename'][0] for file in tpf_files):
             return KeplerTargetPixelFile(path[0], quality_bitmask=quality_bitmask)
-        elif 'llc.fits' in self.products['productFilename'][0]:
+        elif any(file in self.products['productFilename'][0] for file in lcf_files):
             return KeplerLightCurveFile(path[0], quality_bitmask=quality_bitmask)
 
     def download_all(self, quality_bitmask='default'):
@@ -163,11 +165,13 @@ class SearchResult(object):
                                               download_dir=download_dir)['Local Path']
 
         # return collection of tpf or lcf
-        if 'lpd-targ.fits' in self.products['productFilename'][0]:
+        tpf_files = ['lpd-targ.fits', 'spd-targ.fits']
+        lcf_files = ['llc.fits', 'slc.fits']
+        if any(file in self.products['productFilename'][0] for file in tpf_files):
             tpfs = [KeplerTargetPixelFile(p, quality_bitmask=quality_bitmask)
                     for p in path]
             return TargetPixelFileCollection(tpfs)
-        elif 'llc.fits' in self.products['productFilename'][0]:
+        elif any(file in self.products['productFilename'][0] for file in lcf_files):
             lcs = [KeplerLightCurveFile(p, quality_bitmask=quality_bitmask)
                    for p in path]
             return LightCurveFileCollection(lcs)
