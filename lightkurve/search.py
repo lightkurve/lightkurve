@@ -38,16 +38,16 @@ class SearchResult(object):
     products : `astropy.table.Table` object
         Astropy table returned by a join of the astroquery `Observations.query_criteria()`
         and `Observations.get_product_list()` methods.
-    filetype : str, one of `Target Pixel` or `Lightcurve`
-        Type of files queried at MAST.
     """
-    def __init__(self, products, filetype):
+    def __init__(self, products):
         self.products = products
-        self.filetype = filetype
 
     def __repr__(self):
         columns = ['obsID', 'target_name', 'productFilename', 'description', 'distance']
         return '\n'.join(self.products[columns].pformat(max_width=300))
+
+    def __getitem__(self, key):
+        return SearchResult(products=self.products[key])
 
     @property
     def unique_targets(self):
@@ -121,12 +121,10 @@ class SearchResult(object):
                         'cadence to limit your search.'.format(len(self.products)))
 
         # return single tpf or lcf
-        if self.filetype == "Target Pixel":
-            return KeplerTargetPixelFile(path[0],
-                                         quality_bitmask=quality_bitmask)
-        elif self.filetype == "Lightcurve":
-            return KeplerLightCurveFile(path[0],
-                                        quality_bitmask=quality_bitmask)
+        if 'lpd-targ.fits' in self.products['productFilename'][0]:
+            return KeplerTargetPixelFile(path[0], quality_bitmask=quality_bitmask)
+        elif 'llc.fits' in self.products['productFilename'][0]:
+            return KeplerLightCurveFile(path[0], quality_bitmask=quality_bitmask)
 
     def download_all(self, quality_bitmask='default'):
         """Returns a `TargetPixelFileCollection or `LightCurveFileCollection`.
@@ -165,11 +163,11 @@ class SearchResult(object):
                                               download_dir=download_dir)['Local Path']
 
         # return collection of tpf or lcf
-        if self.filetype == "Target Pixel":
+        if 'lpd-targ' in self.products['productFilename'][0]:
             tpfs = [KeplerTargetPixelFile(p, quality_bitmask=quality_bitmask)
                     for p in path]
             return TargetPixelFileCollection(tpfs)
-        elif self.filetype == "Lightcurve":
+        elif 'llc' in self.products['productFilename'][0]:
             lcs = [KeplerLightCurveFile(p, quality_bitmask=quality_bitmask)
                    for p in path]
             return LightCurveFileCollection(lcs)
@@ -347,7 +345,7 @@ def search_products(target, filetype="Lightcurve", cadence='long', quarter=None,
     ----------
     target : str or int
         KIC/EPIC ID or object name.
-    filetpye : str
+    filetype : str
         Type of files queried at MAST (`Target Pixel` or `Lightcurve`)
     cadence : str
         Desired cadence (`long`, `short`, `any`)
@@ -373,7 +371,7 @@ def search_products(target, filetype="Lightcurve", cadence='long', quarter=None,
 
     masked_result = _filter_products(result, filetype=filetype, campaign=campaign,
                                      quarter=quarter, cadence=cadence, limit=limit)
-    return SearchResult(masked_result, filetype)
+    return SearchResult(masked_result)
 
 
 def _filter_products(products, campaign=None, quarter=None, month=None,
