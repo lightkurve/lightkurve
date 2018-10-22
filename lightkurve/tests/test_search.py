@@ -58,6 +58,15 @@ def test_search_lightcurvefile():
 
 
 @pytest.mark.remote_data
+def test_searchresult():
+    sr = search_lightcurvefile('Kepler-10')
+    assert len(sr) == len(sr.products)  # Tests SearchResult.__len__
+    assert len(sr[2:7]) == 5  # Tests SearchResult.__get__
+    assert len(sr[2]) == 1
+    assert "kplr" in str(sr)  # Tests SearchResult.__repr__
+
+
+@pytest.mark.remote_data
 def test_month():
     # In short cadence, if we specify both quarter and month it should work:
     search_targetpixelfile('Kepler-10', quarter=11, month=1, cadence='short').products

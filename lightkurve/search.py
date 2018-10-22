@@ -4,7 +4,7 @@ import os
 import logging
 import numpy as np
 
-from astropy.table import unique, join
+from astropy.table import unique, join, Table, Row
 from astropy.coordinates import SkyCoord
 from astropy.io import ascii
 
@@ -47,7 +47,13 @@ class SearchResult(object):
         return '\n'.join(self.products[columns].pformat(max_width=300))
 
     def __getitem__(self, key):
-        return SearchResult(products=self.products[key])
+        products_slice = self.products[key]
+        if isinstance(products_slice, Row):
+            products_slice = Table(products_slice)
+        return SearchResult(products=products_slice)
+
+    def __len__(self):
+        return len(self.products)
 
     @property
     def unique_targets(self):
@@ -75,7 +81,7 @@ class SearchResult(object):
         """Returns an array of dec values for targets in search"""
         return self.products['s_dec'].data.data
 
-    def download(self, quality_bitmask='default'):
+    def download(self, quality_bitmask='default', download_dir=None):
         """Returns a single `KeplerTargetPixelFile` or `KeplerLightCurveFile` object.
 
         If multiple files are present in `SearchResult.products`, only the first
@@ -97,6 +103,9 @@ class SearchResult(object):
                   (`quality_bitmask=2096639`). This mask is not recommended.
 
             See the :class:`KeplerQualityFlags` class for details on the bitmasks.
+        download_dir : str
+            Location where the data files will be stored.
+            Defaults to "~/.lightkurve-cache" if `None` is passed.
 
         Returns
         -------
@@ -106,11 +115,9 @@ class SearchResult(object):
         # Make sure astroquery uses the same level of verbosity
         logging.getLogger('astropy').setLevel(log.getEffectiveLevel())
 
-        # check if download directory exists
-        if not os.path.isdir(os.path.expanduser('~')+'/.astropy'):
-            os.mkdir(os.path.expanduser('~')+'/.astropy')
         # download first product in table
-        download_dir = os.path.expanduser('~')+'/.astropy'
+        if download_dir is None:
+            download_dir = self._default_download_dir()
         path = Observations.download_products(self.products[:1], mrp_only=False,
                                               download_dir=download_dir)['Local Path']
 
@@ -128,7 +135,7 @@ class SearchResult(object):
         elif any(file in self.products['productFilename'][0] for file in lcf_files):
             return KeplerLightCurveFile(path[0], quality_bitmask=quality_bitmask)
 
-    def download_all(self, quality_bitmask='default'):
+    def download_all(self, quality_bitmask='default', download_dir=None):
         """Returns a `TargetPixelFileCollection or `LightCurveFileCollection`.
 
          Parameters
@@ -147,6 +154,9 @@ class SearchResult(object):
                    (`quality_bitmask=2096639`). This mask is not recommended.
 
              See the :class:`KeplerQualityFlags` class for details on the bitmasks.
+        download_dir : str
+            Location where the data files will be stored.
+            Defaults to "~/.lightkurve-cache" if `None` is passed.
 
         Returns
         -------
@@ -157,10 +167,9 @@ class SearchResult(object):
         # Make sure astroquery uses the same level of verbosity
         logging.getLogger('astropy').setLevel(log.getEffectiveLevel())
 
-        # should download to `~/.lightkurve-cache`, make sure dir exists and is accessible
-        download_dir = self._download_dir()
-
-        # download all products in table
+        # download all products listed in self.products
+        if download_dir is None:
+            download_dir = self._default_download_dir()
         path = Observations.download_products(self.products, mrp_only=False,
                                               download_dir=download_dir)['Local Path']
 
@@ -176,8 +185,8 @@ class SearchResult(object):
                    for p in path]
             return LightCurveFileCollection(lcs)
 
-    def _download_dir(self):
-        """Returns the path to the directory where files will be downloaded.
+    def _default_download_dir(self):
+        """Returns the default path to the directory where files will be downloaded.
 
         By default, this method will return "~/.lightkurve-cache" and create
         this directory if it does not exist.  If the directory cannot be
