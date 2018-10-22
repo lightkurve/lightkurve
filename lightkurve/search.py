@@ -1,5 +1,5 @@
-"""Defines tools to retrieve Kepler and TESS data from the archives."""
-from __future__ import division, print_function
+"""Defines tools to retrieve Kepler data from the archive at MAST."""
+from __future__ import division
 import os
 import logging
 import numpy as np
@@ -27,24 +27,19 @@ class ArchiveError(Exception):
 
 
 class SearchResult(object):
-    """Generic SearchResult class returned by `search_targetpixelfile` and
-    `search_lightcurvefile`.
+    """Holds results returned by `search_targetpixelfile` or `search_lightcurvefile`.
+
+    The purpose of this class is to provide a convenient way to inspect and
+    download products that have been identified using one of the data search
+    functions.
 
     Parameters
     ----------
-    products : astropy table
+    products : `astropy.table.Table` object
         Astropy table returned by a join of the astroquery `Observations.query_criteria()`
         and `Observations.get_product_list()` methods.
-    campaign : int or list
-        Desired campaign of observation for data products
-    quarter : int or list
-        Desired quarter of observation for data products
-    month : int or list
-        Desired month of observation for data products
-    cadence : str
-        Desired cadence (`long`, `short`, `any`)
-    filetpye : str
-        Type of files queried at MAST (`Target Pixel` or `Lightcurve`)
+    filetype : str, one of `Target Pixel` or `Lightcurve`
+        Type of files queried at MAST.
     """
     def __init__(self, products, filetype):
         self.products = products
@@ -120,8 +115,9 @@ class SearchResult(object):
                                               download_dir=download_dir)['Local Path']
 
         if len(self.products) != 1:
-            log.warning('Warning: {} files available to download. Only the first file has been '
-                        'downloaded. Please use `download_all()` or specify a campaign, quarter, or '
+            log.warning('Warning: {} files available to download. '
+                        'Only the first file has been downloaded. '
+                        'Please use `download_all()` or specify a campaign, quarter, or '
                         'cadence to limit your search.'.format(len(self.products)))
 
         # return single tpf or lcf
@@ -202,16 +198,17 @@ class SearchResult(object):
             # downloads locally if OS error occurs
             except OSError:
                 log.warning('Warning: unable to create .lightkurve-cache directory. '
-                            'Downloading MAST files to local directory.')
+                            'Downloading MAST files to the current working directory instead.')
                 download_dir = '.'
 
         return download_dir
 
 
 def _query_mast(target, cadence='long', radius=.0001, targetlimit=None):
-    """
-    Returns a table of Kepler or K2 Target Pixel Files or Lightcurve Files
-     for a given target.
+    """Returns a table of all Kepler or K2 observations of a given target.
+
+    This function wraps the `astroquery.mast.Observations.query_criteria()`
+    method.
 
     Parameters
     ----------
@@ -221,12 +218,12 @@ def _query_mast(target, cadence='long', radius=.0001, targetlimit=None):
         Search radius in arcseconds
     targetlimit : None or int
         If multiple targets are present within `radius`, limit the number
-        of returned TargetPixelFile objects to `targetlimit`.
+        of targets returned to the `targetlimit` nearest objects.
         If `None`, no limit is applied.
 
     Returns
     -------
-    path : astropy.Table
+    obs : astropy.Table
         Table detailing the available observations on MAST.
     """
 
@@ -234,61 +231,54 @@ def _query_mast(target, cadence='long', radius=.0001, targetlimit=None):
     if isinstance(target, SkyCoord):
         target = '{}, {}'.format(target.ra.deg, target.dec.deg)
 
-    if os.path.exists(str(target)) or str(target).startswith('http'):
-        path = [target]
+    try:
+        # If `target` looks like a KIC or EPIC ID, we will pass the exact
+        # `target_name` under which MAST will know the object to prevent
+        # source confusion (see GitHub issue #148).
+        target = int(target)
+        if (target > 0) and (target < 200000000):
+            target_name = 'kplr{:09d}'.format(target)
+        elif (target > 200000000) and (target < 300000000):
+            target_name = 'ktwo{:09d}'.format(target)
+        else:
+            raise ValueError("{:09d}: not in the KIC or EPIC ID range".format(target))
 
-    else:
+        # query_criteria does not allow a cone search when target_name is passed in
+        # so first grab desired target with ~0 arcsecond radius
+        target_obs = Observations.query_criteria(target_name=target_name,
+                                                 radius='{} deg'.format(.0001),
+                                                 project=["Kepler", "K2"],
+                                                 obs_collection=["Kepler", "K2"])
+        # check if a cone search is being performed
+        # if yes, perform a cone search around coordinates of desired target
+        if radius < 0.1:
+            obs = target_obs
+            # astroquery does not return distance if target_name is given;
+            # we add it here so that the table returned always has this column.
+            obs['distance'] = 0.
+        else:
+            ra = target_obs['s_ra'][0]
+            dec = target_obs['s_dec'][0]
+            obs = Observations.query_criteria(coordinates='{} {}'.format(ra, dec),
+                                              radius='{} deg'.format(radius/3600),
+                                              project=["Kepler", "K2"],
+                                              obs_collection=["Kepler", "K2"])
+    except ValueError:
+        # If `target` did not look like a KIC or EPIC ID, then we let MAST
+        # resolve the target name to a sky position. Convert radius from arcsec
+        # to degrees for query_criteria().
         try:
-            # If `target` looks like a KIC or EPIC ID, we will pass the exact
-            # `target_name` under which MAST will know the object.
-            target = int(target)
-            if (target > 0) and (target < 200000000):
-                target_name = 'kplr{:09d}'.format(target)
-            elif (target > 200000000) and (target < 300000000):
-                target_name = 'ktwo{:09d}'.format(target)
-            else:
-                raise ValueError("{:09d}: not in the KIC or EPIC ID range".format(target))
+            obs = Observations.query_criteria(objectname=target,
+                                              radius='{} deg'.format(radius/3600),
+                                              project=["Kepler", "K2"],
+                                              obs_collection=["Kepler", "K2"])
+        except ResolverError as exc:
+            raise ArchiveError(exc)
 
-            # query_criteria does not allow a cone search when target_name is passed in
-            # so first grab desired target with ~0 arcsecond radius
-            target_obs = Observations.query_criteria(target_name=target_name,
-                                                     radius='{} deg'.format(.0001),
-                                                     project=["Kepler", "K2"],
-                                                     obs_collection=["Kepler", "K2"])
-            # check if a cone search is being performed
-            # if yes, perform a cone search around coordinates of desired target
-            if radius < 1:
-                path = target_obs
-
-                # append distance column to astropy table
-                path['distance'] = 0.
-            else:
-                ra = target_obs['s_ra'][0]
-                dec = target_obs['s_dec'][0]
-                path = Observations.query_criteria(coordinates='{} {}'.format(ra, dec),
-                                                   radius='{} deg'.format(radius/3600),
-                                                   project=["Kepler", "K2"],
-                                                   obs_collection=["Kepler", "K2"])
-                # if a cone search has been performed, targets will be sorted by `distance`
-        except ValueError:
-            # If `target` did not look like a KIC or EPIC ID, then we let MAST
-            # resolve the target name to a sky position. Convert radius from arcsec
-            # to degrees for query_criteria().
-            try:
-                path = Observations.query_criteria(objectname=target,
-                                                   radius='{} deg'.format(radius/3600),
-                                                   project=["Kepler", "K2"],
-                                                   obs_collection=["Kepler", "K2"])
-            except ResolverError as exc:
-                raise ArchiveError(exc)
-
-    # make sure table is sorted by distance
-    path.sort('distance')
-
-    # only take the nearest targets up to `targetlimit`
+    obs.sort('distance')  # ensure table returned is sorted by distance
     if targetlimit is not None:
-        path = path[:targetlimit]
-    return path
+        obs = obs[:targetlimit]  # only return the N nearest targets
+    return obs
 
 
 def search_targetpixelfile(target, cadence='long', quarter=None, month=None,
@@ -387,22 +377,23 @@ def search_products(target, filetype="Lightcurve", cadence='long', quarter=None,
     result = join(products, observations, join_type='left')  # will join on obs_id
     result.sort(['distance', 'obs_id'])
 
-    masked_result = _mask_products(result, filetype=filetype,
-                                   campaign=campaign, quarter=quarter,
-                                   cadence=cadence, targetlimit=targetlimit)
+    masked_result = _filter_products(result, filetype=filetype,
+                                     campaign=campaign, quarter=quarter,
+                                     cadence=cadence, targetlimit=targetlimit)
     return SearchResult(masked_result, filetype)
 
 
-def _mask_products(products, campaign=None, quarter=None, month=None, cadence='long',
-                   filetype='Target Pixel', targetlimit=1):
-    """
-    Masks contents of products table based on given `cadence`, `quarter`, `month`, `campaign`
+def _filter_products(products, campaign=None, quarter=None, month=None, cadence='long',
+                     filetype='Target Pixel', targetlimit=1):
+    """Returns a products table filtered by one or more criteria.
+
+    This function can filter based on `cadence`, `quarter`, `month`, `campaign`
     constraints.
 
     Parameters
     ----------
-    products : astropy table
-        Full astropy table containing data products returned by MAST
+    products : `astropy.table.Table` object
+        Astropy table containing data products returned by MAST
     campaign : int or list
         Desired campaign of observation for data products
     quarter : int or list
@@ -418,7 +409,7 @@ def _mask_products(products, campaign=None, quarter=None, month=None, cadence='l
 
     Returns
     -------
-    products : astropy table
+    products : `astropy.table.Table` object
         Masked astropy table containing desired data products
     """
     # Value for the quarter or campaign
