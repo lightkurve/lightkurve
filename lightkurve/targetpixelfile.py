@@ -19,7 +19,8 @@ from . import PACKAGEDIR, MPLSTYLE
 from .lightcurve import KeplerLightCurve, TessLightCurve
 from .prf import KeplerPRF
 from .utils import KeplerQualityFlags, TessQualityFlags, \
-                   plot_image, bkjd_to_astropy_time, btjd_to_astropy_time
+                   plot_image, bkjd_to_astropy_time, btjd_to_astropy_time, \
+                   LightkurveWarning
 from .mast import download_kepler_products
 
 __all__ = ['KeplerTargetPixelFile', 'TessTargetPixelFile']
@@ -596,15 +597,9 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
     @staticmethod
     def from_archive(target, cadence='long', quarter=None, month=None,
-                     campaign=None, radius=1., targetlimit=1,
-                     quality_bitmask='default', **kwargs):
-        """Fetch a Target Pixel File from the Kepler/K2 data archive at MAST.
-
-        See the :class:`KeplerQualityFlags` class for details on the bitmasks.
-
-        Raises an `ArchiveError` if a unique TPF cannot be found.  For example,
-        this is the case if a target was observed in multiple Quarters and the
-        quarter parameter is unspecified.
+                     campaign=None, quality_bitmask='default', **kwargs):
+        """WARNING: THIS FUNCTION IS DEPRECATED AND WILL BE REMOVED VERY SOON.
+        Use `lightkurve.search_targetpixelfile()` instead.
 
         Parameters
         ----------
@@ -618,12 +613,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
             For Kepler's prime mission, there are three short-cadence
             Target Pixel Files for each quarter, each covering one month.
             Hence, if cadence='short' you need to specify month=1, 2, or 3.
-        radius : float
-            Search radius in arcseconds. Default is 1 arcsecond.
-        targetlimit : None or int
-            If multiple targets are present within `radius`, limit the number
-            of returned TargetPixelFile objects to `targetlimit`.
-            If `None`, no limit is applied.
         quality_bitmask : str or int
             Bitmask (integer) which identifies the quality flag bitmask that should
             be used to mask out bad cadences. If a string is passed, it has the
@@ -646,6 +635,9 @@ class KeplerTargetPixelFile(TargetPixelFile):
         -------
         tpf : :class:`KeplerTargetPixelFile` object.
         """
+        warnings.warn('`TargetPixelFile.from_archive` is deprecated and will be removed soon, '
+                      'please use `lightkurve.search_targetpixelfile()` instead.',
+                      LightkurveWarning)
         if os.path.exists(str(target)) or str(target).startswith('http'):
             log.warning('Warning: from_archive() is not intended to accept a '
                         'direct path, use KeplerTargetPixelFile(path) instead.')
@@ -654,7 +646,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
             path = download_kepler_products(
                 target=target, filetype='Target Pixel', cadence=cadence,
                 quarter=quarter, campaign=campaign, month=month,
-                radius=radius, targetlimit=targetlimit)
+                searchtype='single', radius=1., targetlimit=1)
         if len(path) == 1:
             return KeplerTargetPixelFile(path[0],
                                          quality_bitmask=quality_bitmask,

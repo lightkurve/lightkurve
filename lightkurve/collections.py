@@ -149,6 +149,19 @@ class LightCurveCollection(Collection):
         return ax
 
 
+class LightCurveFileCollection(Collection):
+    """Class to hold a collection of LightCurveFile objects.
+
+    Parameters
+    ----------
+    lightcurvefiles : array-like
+        List of KeplerLightCurveFile or TessLightCurveFile objects.
+    """
+
+    def __init__(self, lightcurvefiles):
+        super(LightCurveFileCollection, self).__init__(lightcurvefiles)
+
+
 class TargetPixelFileCollection(Collection):
     """Class to hold a collection of TargetPixelFile objects.
 
@@ -159,3 +172,31 @@ class TargetPixelFileCollection(Collection):
     """
     def __init__(self, tpfs):
         super(TargetPixelFileCollection, self).__init__(tpfs)
+
+    def plot_all(self, ax=None):
+        """Individually plots all TargetPixelFile objects in a single
+        matplotlib axes object.
+
+        Parameters
+        ----------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            A matplotlib axes object to plot into. If no axes is provided,
+            a new one will be created.
+
+        Returns
+        -------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            The matplotlib axes object.
+        """
+
+        if ax is None:
+            import matplotlib.pyplot as plt
+            _, ax = plt.subplots(len(self.data), 1,
+                                 figsize=(7, (7*len(self.data))))
+
+        if len(self.data) == 1:
+            self.data[0].plot(ax=ax)
+        else:
+            for i, tpf in enumerate(self.data):
+                tpf.plot(ax=ax[i])
+        return ax
