@@ -28,7 +28,8 @@ class ArchiveError(Exception):
 
 
 class SearchResult(object):
-    """Holds results returned by `search_targetpixelfile` or `search_lightcurvefile`.
+    """Container for the results returned by `search_targetpixelfile` or
+    `search_lightcurvefile`.
 
     The purpose of this class is to provide a convenient way to inspect and
     download products that have been identified using one of the data search
@@ -36,57 +37,59 @@ class SearchResult(object):
 
     Parameters
     ----------
-    products : `astropy.table.Table` object
+    table : `astropy.table.Table` object
         Astropy table returned by a join of the astroquery `Observations.query_criteria()`
         and `Observations.get_product_list()` methods.
     """
-    def __init__(self, products):
-        self.products = products
+    def __init__(self, table):
+        self.table = table
 
     def __repr__(self):
         columns = ['obsID', 'target_name', 'productFilename', 'description', 'distance']
-        return '\n'.join(self.products[columns].pformat(max_width=300))
+        return '\n'.join(self.table[columns].pformat(max_width=300))
 
     def __getitem__(self, key):
-        products_slice = self.products[key]
-        # Indexing a Table with a single integer will return a Row
-        if isinstance(products_slice, Row):
-            products_slice = Table(products_slice)
-        return SearchResult(products=products_slice)
+        """Implements indexing and slicing, e.g. SearchResult[2:5]."""
+        selection = self.table[key]
+        # Indexing a Table with an integer will return a Row
+        if isinstance(selection, Row):
+            selection = Table(selection)
+        return SearchResult(table=selection)
 
     def __len__(self):
-        return len(self.products)
+        """Returns the number of products in the SearchResult table."""
+        return len(self.table)
 
     @property
     def unique_targets(self):
         """Returns a table of targets and their RA & dec values produced by search"""
         mask = ['target_name', 's_ra', 's_dec']
-        return unique(self.products[mask], keys='target_name')
+        return unique(self.table[mask], keys='target_name')
 
     @property
     def obsid(self):
         """Returns an array of MAST observation IDs"""
-        return np.asarray(np.unique(self.products['obsid']), dtype='int')
+        return np.asarray(np.unique(self.table['obsid']), dtype='int')
 
     @property
     def target_name(self):
         """Returns an array of target names"""
-        return self.products['target_name'].data.data
+        return self.table['target_name'].data.data
 
     @property
     def ra(self):
         """Returns an array of RA values for targets in search"""
-        return self.products['s_ra'].data.data
+        return self.table['s_ra'].data.data
 
     @property
     def dec(self):
         """Returns an array of dec values for targets in search"""
-        return self.products['s_dec'].data.data
+        return self.table['s_dec'].data.data
 
     def download(self, quality_bitmask='default', download_dir=None):
         """Returns a single `KeplerTargetPixelFile` or `KeplerLightCurveFile` object.
 
-        If multiple files are present in `SearchResult.products`, only the first
+        If multiple files are present in `SearchResult.table`, only the first
         will be downloaded.
 
         Parameters
@@ -120,21 +123,21 @@ class SearchResult(object):
         # download first product in table
         if download_dir is None:
             download_dir = self._default_download_dir()
-        path = Observations.download_products(self.products[:1], mrp_only=False,
+        path = Observations.download_products(self.table[:1], mrp_only=False,
                                               download_dir=download_dir)['Local Path']
 
-        if len(self.products) != 1:
+        if len(self.table) != 1:
             log.warning('Warning: {} files available to download. '
                         'Only the first file has been downloaded. '
                         'Please use `download_all()` or specify a campaign, quarter, or '
-                        'cadence to limit your search.'.format(len(self.products)))
+                        'cadence to limit your search.'.format(len(self.table)))
 
         # return single tpf or lcf
         tpf_files = ['lpd-targ.fits', 'spd-targ.fits']
         lcf_files = ['llc.fits', 'slc.fits']
-        if any(file in self.products['productFilename'][0] for file in tpf_files):
+        if any(file in self.table['productFilename'][0] for file in tpf_files):
             return KeplerTargetPixelFile(path[0], quality_bitmask=quality_bitmask)
-        elif any(file in self.products['productFilename'][0] for file in lcf_files):
+        elif any(file in self.table['productFilename'][0] for file in lcf_files):
             return KeplerLightCurveFile(path[0], quality_bitmask=quality_bitmask)
 
     def download_all(self, quality_bitmask='default', download_dir=None):
@@ -172,17 +175,17 @@ class SearchResult(object):
         # download all products listed in self.products
         if download_dir is None:
             download_dir = self._default_download_dir()
-        path = Observations.download_products(self.products, mrp_only=False,
+        path = Observations.download_products(self.table, mrp_only=False,
                                               download_dir=download_dir)['Local Path']
 
         # return collection of tpf or lcf
         tpf_files = ['lpd-targ.fits', 'spd-targ.fits']
         lcf_files = ['llc.fits', 'slc.fits']
-        if any(file in self.products['productFilename'][0] for file in tpf_files):
+        if any(file in self.table['productFilename'][0] for file in tpf_files):
             tpfs = [KeplerTargetPixelFile(p, quality_bitmask=quality_bitmask)
                     for p in path]
             return TargetPixelFileCollection(tpfs)
-        elif any(file in self.products['productFilename'][0] for file in lcf_files):
+        elif any(file in self.table['productFilename'][0] for file in lcf_files):
             lcs = [KeplerLightCurveFile(p, quality_bitmask=quality_bitmask)
                    for p in path]
             return LightCurveFileCollection(lcs)
@@ -218,7 +221,7 @@ class SearchResult(object):
 
 def search_targetpixelfile(target, radius=None, cadence='long', quarter=None,
                            month=None, campaign=None, limit=None):
-    """Returns a SearchResult with MAST TPFs that match the criteria.
+    """Searches MAST for Target Pixel Files.
 
     This function fetches a data table that lists the Target Pixel Files (TPFs)
     that fall within a region of sky centered around the position of `target`
@@ -227,8 +230,14 @@ def search_targetpixelfile(target, radius=None, cadence='long', quarter=None,
 
     Parameters
     ----------
-    target : str or int
-        KIC/EPIC ID or object name.
+    target : str, int, or `astropy.coordinates.SkyCoord` object
+        Target around which to search. Valid inputs include:
+
+            * The name of the object as a string, e.g. "Kepler-10".
+            * The KIC or EPIC identifier as an integer, e.g. 11904151.
+            * A coordinate string in decimal format, e.g. "285.67942179 +50.24130576".
+            * A coordinate string in sexagesimal format, e.g. "19:02:43.1 +50:14:28.7".
+            * An `astropy.coordinates.SkyCoord` object.
     radius : float or `astropy.units.Quantity` object
         Conesearch radius.  If a float is given it will be assumed to be in
         units of arcseconds.  If `None` then we default to 0.0001 arcsec.
@@ -247,7 +256,8 @@ def search_targetpixelfile(target, radius=None, cadence='long', quarter=None,
 
     Returns
     -------
-    SearchResult : :class:`SearchResult` object.
+    result : :class:`SearchResult` object
+        Object detailing the data products found.
     """
     return _search_products(target, radius=radius, filetype="Target Pixel",
                             cadence=cadence, quarter=quarter, month=month,
@@ -265,8 +275,14 @@ def search_lightcurvefile(target, radius=None, cadence='long', quarter=None,
 
     Parameters
     ----------
-    target : str or int
-        KIC/EPIC ID or object name.
+    target : str, int, or `astropy.coordinates.SkyCoord` object
+        Target around which to search. Valid inputs include:
+
+            * The name of the object as a string, e.g. "Kepler-10".
+            * The KIC or EPIC identifier as an integer, e.g. 11904151.
+            * A coordinate string in decimal format, e.g. "285.67942179 +50.24130576".
+            * A coordinate string in sexagesimal format, e.g. "19:02:43.1 +50:14:28.7".
+            * An `astropy.coordinates.SkyCoord` object.
     radius : float or `astropy.units.Quantity` object
         Conesearch radius.  If a float is given it will be assumed to be in
         units of arcseconds.  If `None` then we default to 0.0001 arcsec.
@@ -285,7 +301,8 @@ def search_lightcurvefile(target, radius=None, cadence='long', quarter=None,
 
     Returns
     -------
-    SearchResult : :class:`SearchResult` object.
+    result : :class:`SearchResult` object
+        Object detailing the data products found.
     """
     return _search_products(target, radius=radius, filetype="Lightcurve",
                             cadence=cadence, quarter=quarter, month=month,
@@ -299,8 +316,8 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
 
     Parameters
     ----------
-    target : str or int
-        KIC/EPIC ID or object name.
+    target : str, int, or `astropy.coordinates.SkyCoord` object
+        See docstrings above.
     radius : float or `astropy.units.Quantity` object
         Conesearch radius.  If a float is given it will be assumed to be in
         units of arcseconds.  If `None` then we default to 0.0001 arcsec.
@@ -338,6 +355,8 @@ def _query_mast(target, radius=None, cadence='long'):
 
     Parameters
     ----------
+    target : str, int, or `astropy.coordinates.SkyCoord` object
+        See docstrings above.
     radius : float or `astropy.units.Quantity` object
         Conesearch radius.  If a float is given it will be assumed to be in
         units of arcseconds.  If `None` then we default to 0.0001 arcsec.
@@ -423,7 +442,7 @@ def _filter_products(products, campaign=None, quarter=None, month=None,
         Desired month of observation for data products
     cadence : str
         Desired cadence (`long`, `short`, `any`)
-    filetpye : str
+    filetype : str
         Type of files queried at MAST (`Target Pixel` or `Lightcurve`).
 
     Returns
