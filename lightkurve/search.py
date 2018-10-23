@@ -258,6 +258,41 @@ def search_targetpixelfile(target, radius=None, cadence='long', quarter=None,
     -------
     result : :class:`SearchResult` object
         Object detailing the data products found.
+
+    Examples
+    --------
+    This example demonstrates how to use the `search_targetpixelfile()` function to
+    query and download data. Before instantiating a `KeplerTargetPixelFile` object or
+    downloading any science products, we can identify potential desired targets with
+    `search_targetpixelfile()`::
+
+        >>> search_result = search_targetpixelfile('Kepler-10')  # doctest: +SKIP
+        >>> print(search_result)  # doctest: +SKIP
+
+    The above code will query mast for Target Pixel Files (TPFs) available for
+    the known planet system Kepler-10, and display a table containing the
+    available science products. Because Kepler-10 was observed during 15 Quarters,
+    the table will have 15 entries. If we want to download a
+    `TargetPixelFileCollection` object containing all 15 observations, use::
+
+        >>> search_result.download_all()  # doctest: +SKIP
+
+    or we can download a single product by limiting our search::
+
+        >>> lcf = search_targetpixelfile('Kepler-10', quarter=2).download()  # doctest: +SKIP
+
+    The above line of code will only download Quarter 2 and create a single
+    `KeplerTargetPixelFile` object called lcf.
+
+    We can also pass a radius into `search_targetpixelfile` to perform a cone search::
+
+        >>> search_targetpixelfile('Kepler-10', radius=100).targets  # doctest: +SKIP
+
+    This will display a table containing all targets within 100 arcseconds of Kepler-10.
+    We can download a `TargetPixelFileCollection` object containing all available products
+    for these targets in Quarter 4 with::
+
+        >>> search_targetpixelfile('Kepler-10', radius=100, quarter=4).download_all()  # doctest: +SKIP
     """
     return _search_products(target, radius=radius, filetype="Target Pixel",
                             cadence=cadence, quarter=quarter, month=month,
@@ -303,6 +338,42 @@ def search_lightcurvefile(target, radius=None, cadence='long', quarter=None,
     -------
     result : :class:`SearchResult` object
         Object detailing the data products found.
+
+    Examples
+    --------
+    This example demonstrates how to use the `search_lightcurvefile()` function to
+    query and download data. Before instantiating a `KeplerLightCurveFile` object or
+    downloading any science products, we can identify potential desired targets with
+    `search_lightcurvefile`::
+
+        >>> from lightkurve import search_lightcurvefile  # doctest: +SKIP
+        >>> search_result = search_lightcurvefile("Kepler-10")  # doctest: +SKIP
+        >>> print(search_result)  # doctest: +SKIP
+
+    The above code will query mast for lightcurve files available for the known
+    planet system Kepler-10, and display a table containing the available
+    data products. Because Kepler-10 was observed in 15 quarters, the search
+    result will list 15 different files. If we want to download a
+    `LightCurveFileCollection` object containing all 15 observations, use::
+
+        >>> search_result.download_all()  # doctest: +SKIP
+
+    or we can specify the downloaded products by limiting our search::
+
+        >>> lcf = search_lightcurvefile('Kepler-10', quarter=2).download()  # doctest: +SKIP
+
+    The above line of code will only search and download Quarter 2 data and
+    create a `LightCurveFile` object called lcf.
+
+    We can also pass a radius into `search_lightcurvefile` to perform a cone search::
+
+        >>> search_lightcurvefile('Kepler-10', radius=100, quarter=4)  # doctest: +SKIP
+
+    This will display a table containing all targets within 100 arcseconds of
+    Kepler-10 and in Quarter 4.  We can then download a `LightCurveFileCollection`
+    containing all these products using::
+
+        >>> search_lightcurvefile('kepler-10', radius=100, quarter=4).download_all()  # doctest: +SKIP
     """
     return _search_products(target, radius=radius, filetype="Lightcurve",
                             cadence=cadence, quarter=quarter, month=month,

@@ -172,22 +172,8 @@ class KeplerLightCurveFile(LightCurveFile):
     @staticmethod
     def from_archive(target, cadence='long', quarter=None, month=None,
                      campaign=None, quality_bitmask="default", **kwargs):
-        """
-        WARNING: This function is depricated. Please use `search_lightcurvefile`.
-        Use examples are provided in the section below.
-
-        Fetches a LightCurveFile (or list thereof) from the data archive at MAST.
-
-        If a target was observed across multiple quarters or campaigns, a
-        list of `LightCurveFile` objects will only be returned if the string
-        'all' is passed to `quarter` or `campaign`.  Alternatively, a list of
-        numbers can be pased to these arguments.
-
-        An `ArchiveError` will be raised if no (unique) LightCurveFile
-        can be found.
-
-        If `targetlimit` is set to more than one (or None) then will return a list
-        of `KeplerLightCurveFile`. Will only return hits within the specified radius.
+        """WARNING: THIS FUNCTION IS DEPRECATED AND WILL BE REMOVED VERY SOON.
+        Use `lightkurve.search_lightcurvefile()` instead.
 
         Parameters
         ----------
@@ -221,42 +207,9 @@ class KeplerLightCurveFile(LightCurveFile):
         Returns
         -------
         lcf : KeplerLightCurveFile object or list of KeplerLightCurveFile objects
-
-        Examples
-        --------
-        This example demonstrates how to use the new `search_lightcurvefile()` function to
-        query and download data. Before instantiating a `KeplerLightCurveFile` object or
-        downloading any science products, we can identify potential desired targets with
-        `search_lightcurvefile`::
-
-            >>> search_result = search_lightcurvefile('kepler-10') # doctest: +SKIP
-            >>> search_result.products # doctest: +SKIP
-
-        The above code will query mast for lightcurve files available for kepler-10, and
-        display a table containing available science products. Because kepler-10 was observed
-        in 15 quarters, the table will have 15 entries. If we want to download a
-        `LightCurveFileCollection` object containing all 15 observations, use::
-
-            >>> search_result.download_all() # doctest: +SKIP
-
-        or we can specify the downloaded products by limiting our search::
-
-            >>> lcf = search_lightcurvefile('kepler-10', quarter=2).download() # doctest: +SKIP
-
-        The above line of code will only quarter 2 and create a `LightCurveFile` object called
-        lcf.
-
-        We can also pass a radius into `search_lightcurvefile` to perform a cone search::
-
-            >>> search_lightcurvefile('kepler-10', radius=100).targets # doctest: +SKIP
-
-        This will display a table containing all targets within 100 arcseconds of kepler-10.
-        We can download a `LightCurveFileCollection` object containing all available products
-        for these targets in quarter 4 with::
-
-            >>> search_lightcurvefile('kepler-10', quarter=4, radius=100).download_all() # doctest: +SKIP
         """
-        warnings.warn('`from_archive` is deprecated, please use `search_lightcurvefile()` instead.',
+        warnings.warn("`LightCurveFile.from_archive()` is deprecated and will be removed soon, "
+                      "please use `lightkurve.search_lightcurvefile()` instead.",
                       LightkurveWarning)
 
         # Be tolerant if a direct path or url is passed to this function by accident
@@ -275,7 +228,6 @@ class KeplerLightCurveFile(LightCurveFile):
                                         **kwargs)
         return [KeplerLightCurveFile(p, quality_bitmask=quality_bitmask, **kwargs)
                 for p in path]
-
 
     def __repr__(self):
         return('KeplerLightCurveFile(ID: {})'.format(self.targetid))

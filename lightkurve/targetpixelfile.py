@@ -598,16 +598,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
     @staticmethod
     def from_archive(target, cadence='long', quarter=None, month=None,
                      campaign=None, quality_bitmask='default', **kwargs):
-        """WARNING: This function is depricated. Please use `search_targetpixelfile`.
-        Use examples are provided in the section below.
-
-        Fetch a Target Pixel File from the Kepler/K2 data archive at MAST.
-
-        See the :class:`KeplerQualityFlags` class for details on the bitmasks.
-
-        Raises an `ArchiveError` if a unique TPF cannot be found.  For example,
-        this is the case if a target was observed in multiple Quarters and the
-        quarter parameter is unspecified.
+        """WARNING: THIS FUNCTION IS DEPRECATED AND WILL BE REMOVED VERY SOON.
+        Use `lightkurve.search_targetpixelfile()` instead.
 
         Parameters
         ----------
@@ -642,42 +634,9 @@ class KeplerTargetPixelFile(TargetPixelFile):
         Returns
         -------
         tpf : :class:`KeplerTargetPixelFile` object.
-
-        Examples
-        --------
-        This example demonstrates how to use the new `search_targetpixelfile()` function to
-        query and download data. Before instantiating a `KeplerTargetPixelFile` object or
-        downloading any science products, we can identify potential desired targets with
-        `search_targetpixelfile()`::
-
-            >>> search_result = search_targetpixelfile('kepler-10') # doctest: +SKIP
-            >>> search_result.products # doctest: +SKIP
-
-        The above code will query mast for lightcurve files available for kepler-10, and
-        display a table containing available science products. Because kepler-10 was observed
-        in 15 quarters, the table will have 15 entries. If we want to download a
-        `TargetPixelFileCollection` object containing all 15 observations, use::
-
-            >>> search_result.download_all() # doctest: +SKIP
-
-        or we can specify the downloaded products by limiting our search::
-
-            >>> lcf = search_targetpixelfile('kepler-10', quarter=2).download() # doctest: +SKIP
-
-        The above line of code will only quarter 2 and create a `KeplerTargetPixelFile` object
-        called lcf.
-
-        We can also pass a radius into `search_targetpixelfile` to perform a cone search::
-
-            >>> search_targetpixelfile('kepler-10', radius=100).targets # doctest: +SKIP
-
-        This will display a table containing all targets within 100 arcseconds of kepler-10.
-        We can download a `TargetPixelFileCollection` object containing all available products
-        for these targets in quarter 4 with::
-
-            >>> search_targetpixelfile('kepler-10', quarter=4, radius=100).download_all() # doctest: +SKIP
         """
-        warnings.warn('`from_archive` is deprecated, please use `search_targetpixelfile()` instead.',
+        warnings.warn('`TargetPixelFile.from_archive` is deprecated and will be removed soon, '
+                      'please use `lightkurve.search_targetpixelfile()` instead.',
                       LightkurveWarning)
         if os.path.exists(str(target)) or str(target).startswith('http'):
             log.warning('Warning: from_archive() is not intended to accept a '
@@ -694,7 +653,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                          **kwargs)
         return [KeplerTargetPixelFile(p, quality_bitmask=quality_bitmask, **kwargs)
                 for p in path]
-
 
     def __repr__(self):
         return('KeplerTargetPixelFile Object (ID: {})'.format(self.targetid))
