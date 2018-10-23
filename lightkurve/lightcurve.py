@@ -582,8 +582,10 @@ class LightCurve(object):
 
     def cdpp(self, **kwargs):
         """DEPRECATED: use `estimate_cdpp()` instead."""
-        log.warning("WARNING: cdpp() is deprecated and will be removed in v1.0.0; "
-                    "please use estimate_cdpp() instead.")
+        warnings.warn('`LightCurve.cdpp()` is deprecated and will be '
+                      'removed in Lightkurve v1.0.0, '
+                      'please use `LightCurve.estimate_cdpp()` instead.',
+                      LightkurveWarning)
         return self.estimate_cdpp(**kwargs)
 
     def estimate_cdpp(self, transit_duration=13, savgol_window=101,

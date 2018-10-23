@@ -406,8 +406,10 @@ class TargetPixelFile(object):
 
     def centroids(self, **kwargs):
         """DEPRECATED: use `estimate_cdpp()` instead."""
-        log.warning("WARNING: centroids() is deprecated and will be removed in v1.0.0; "
-                    "please use estimate_centroids() instead.")
+        warnings.warn('`TargetPixelFile.centroids()` is deprecated and will be '
+                      'removed in Lightkurve v1.0.0, '
+                      'please use `TargetPixelFile.estimate_centroids()` instead.',
+                      LightkurveWarning)
         return self.estimate_centroids(**kwargs)
 
     def estimate_centroids(self, aperture_mask='pipeline'):
