@@ -7,6 +7,7 @@ import numpy as np
 from astropy.table import unique, join, Table, Row
 from astropy.coordinates import SkyCoord
 from astropy.io import ascii
+from astropy import units as u
 
 from astroquery.mast import Observations
 from astroquery.exceptions import ResolverError
@@ -215,8 +216,8 @@ class SearchResult(object):
         return download_dir
 
 
-def search_targetpixelfile(target, cadence='long', quarter=None, month=None,
-                           campaign=None, radius=.0001, limit=None):
+def search_targetpixelfile(target, radius=None, cadence='long', quarter=None,
+                           month=None, campaign=None, limit=None):
     """Returns a SearchResult with MAST TPFs that match the criteria.
 
     This function fetches a data table that lists the Target Pixel Files (TPFs)
@@ -228,14 +229,19 @@ def search_targetpixelfile(target, cadence='long', quarter=None, month=None,
     ----------
     target : str or int
         KIC/EPIC ID or object name.
+    radius : float or `astropy.units.Quantity` object
+        Conesearch radius.  If a float is given it will be assumed to be in
+        units of arcseconds.  If `None` then we default to 0.0001 arcsec.
     cadence : str
         'long' or 'short'.
     quarter, campaign : int, list of ints
         Kepler Quarter or K2 Campaign number.
-    month : 1, 2, 3, list or 'all'
+        By default all quarters and campaigns will be returned.
+    month : 1, 2, 3, or list of int
         For Kepler's prime mission, there are three short-cadence
-        Target Pixel Files for each quarter, each covering one month.
+        TargetPixelFiles for each quarter, each covering one month.
         Hence, if cadence='short' you need to specify month=1, 2, or 3.
+        By default all months will be returned.
     limit : int
         Maximum number of products to return.
 
@@ -243,13 +249,13 @@ def search_targetpixelfile(target, cadence='long', quarter=None, month=None,
     -------
     SearchResult : :class:`SearchResult` object.
     """
-    return _search_products(target, filetype="Target Pixel", cadence=cadence,
-                            quarter=quarter, month=month, campaign=campaign,
-                            radius=radius, limit=limit)
+    return _search_products(target, radius=radius, filetype="Target Pixel",
+                            cadence=cadence, quarter=quarter, month=month,
+                            campaign=campaign, limit=limit)
 
 
-def search_lightcurvefile(target, cadence='long', quarter=None, month=None,
-                          campaign=None, radius=.0001, limit=None):
+def search_lightcurvefile(target, radius=None, cadence='long', quarter=None,
+                          month=None, campaign=None, limit=None):
     """Returns a SearchResult with MAST LightCurveFiles which match the criteria.
 
     This function fetches a data table that lists the Light Curve Files
@@ -261,14 +267,19 @@ def search_lightcurvefile(target, cadence='long', quarter=None, month=None,
     ----------
     target : str or int
         KIC/EPIC ID or object name.
+    radius : float or `astropy.units.Quantity` object
+        Conesearch radius.  If a float is given it will be assumed to be in
+        units of arcseconds.  If `None` then we default to 0.0001 arcsec.
     cadence : str
         'long' or 'short'.
-    quarter, campaign : int, list of ints, or 'all'
+    quarter, campaign : int, list of ints
         Kepler Quarter or K2 Campaign number.
-    month : 1, 2, 3, list or 'all'
+        By default all quarters and campaigns will be returned.
+    month : 1, 2, 3, or list of int
         For Kepler's prime mission, there are three short-cadence
-        Target Pixel Files for each quarter, each covering one month.
+        LightCurveFiles for each quarter, each covering one month.
         Hence, if cadence='short' you need to specify month=1, 2, or 3.
+        By default all months will be returned.
     limit : int
         Maximum number of products to return.
 
@@ -276,13 +287,13 @@ def search_lightcurvefile(target, cadence='long', quarter=None, month=None,
     -------
     SearchResult : :class:`SearchResult` object.
     """
-    return _search_products(target, filetype="Lightcurve", cadence=cadence,
-                            quarter=quarter, month=month, campaign=campaign,
-                            radius=radius, limit=limit)
+    return _search_products(target, radius=radius, filetype="Lightcurve",
+                            cadence=cadence, quarter=quarter, month=month,
+                            campaign=campaign, limit=limit)
 
 
-def _search_products(target, filetype="Lightcurve", cadence='long', quarter=None,
-                     month=None, campaign=None, radius=.0001, limit=None):
+def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
+                     quarter=None, month=None, campaign=None, limit=None):
     """Helper function which returns a SearchResult object containing MAST
     products that match several criteria.
 
@@ -290,6 +301,9 @@ def _search_products(target, filetype="Lightcurve", cadence='long', quarter=None
     ----------
     target : str or int
         KIC/EPIC ID or object name.
+    radius : float or `astropy.units.Quantity` object
+        Conesearch radius.  If a float is given it will be assumed to be in
+        units of arcseconds.  If `None` then we default to 0.0001 arcsec.
     filetype : str
         Type of files queried at MAST (`Target Pixel` or `Lightcurve`)
     cadence : str
@@ -300,8 +314,6 @@ def _search_products(target, filetype="Lightcurve", cadence='long', quarter=None
         Desired month of observation for data products
     campaign : int or list
         Desired campaign of observation for data products
-    radius : float
-        Search radius in arcseconds
     limit : int
         Maximum number of products to return
 
@@ -320,26 +332,31 @@ def _search_products(target, filetype="Lightcurve", cadence='long', quarter=None
     return SearchResult(masked_result)
 
 
-def _query_mast(target, cadence='long', radius=.0001):
+def _query_mast(target, radius=None, cadence='long'):
     """Helper function which wraps `astroquery.mast.Observations.query_criteria()`
     to returns a table of all Kepler or K2 observations of a given target.
 
     Parameters
     ----------
+    radius : float or `astropy.units.Quantity` object
+        Conesearch radius.  If a float is given it will be assumed to be in
+        units of arcseconds.  If `None` then we default to 0.0001 arcsec.
     cadence: 'short' or 'long'
         Specify short (1-min) or long (30-min) cadence data.
-    radius : float
-        Search radius in arcseconds
 
     Returns
     -------
     obs : astropy.Table
         Table detailing the available observations on MAST.
     """
-
     # If passed a SkyCoord, convert it to an RA and Dec
     if isinstance(target, SkyCoord):
         target = '{}, {}'.format(target.ra.deg, target.dec.deg)
+
+    if radius is None:
+        radius = .0001 * u.arcsec
+    elif not isinstance(radius, u.quantity.Quantity):
+        radius = radius * u.arcsec
 
     try:
         # If `target` looks like a KIC or EPIC ID, we will pass the exact
@@ -356,12 +373,12 @@ def _query_mast(target, cadence='long', radius=.0001):
         # query_criteria does not allow a cone search when target_name is passed in
         # so first grab desired target with ~0 arcsecond radius
         target_obs = Observations.query_criteria(target_name=target_name,
-                                                 radius='{} deg'.format(.0001),
+                                                 radius=str(radius.to(u.deg)),
                                                  project=["Kepler", "K2"],
                                                  obs_collection=["Kepler", "K2"])
         # check if a cone search is being performed
         # if yes, perform a cone search around coordinates of desired target
-        if radius < 0.1:
+        if radius < (0.1 * u.arcsec):
             obs = target_obs
             # astroquery does not return distance if target_name is given;
             # we add it here so that the table returned always has this column.
@@ -370,7 +387,7 @@ def _query_mast(target, cadence='long', radius=.0001):
             ra = target_obs['s_ra'][0]
             dec = target_obs['s_dec'][0]
             obs = Observations.query_criteria(coordinates='{} {}'.format(ra, dec),
-                                              radius='{} deg'.format(radius/3600),
+                                              radius=str(radius.to(u.deg)),
                                               project=["Kepler", "K2"],
                                               obs_collection=["Kepler", "K2"])
     except ValueError:
@@ -379,7 +396,7 @@ def _query_mast(target, cadence='long', radius=.0001):
         # to degrees for query_criteria().
         try:
             obs = Observations.query_criteria(objectname=target,
-                                              radius='{} deg'.format(radius/3600),
+                                              radius=str(radius.to(u.deg)),
                                               project=["Kepler", "K2"],
                                               obs_collection=["Kepler", "K2"])
         except ResolverError as exc:
