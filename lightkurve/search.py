@@ -22,8 +22,7 @@ log = logging.getLogger(__name__)
 __all__ = ['search_targetpixelfile', 'search_lightcurvefile']
 
 
-class ArchiveError(Exception):
-    """Raised if there is a problem accessing data."""
+class SearchError(Exception):
     pass
 
 
@@ -294,9 +293,13 @@ def search_targetpixelfile(target, radius=None, cadence='long', quarter=None,
 
         >>> search_targetpixelfile('Kepler-10', radius=100, quarter=4).download_all()  # doctest: +SKIP
     """
-    return _search_products(target, radius=radius, filetype="Target Pixel",
-                            cadence=cadence, quarter=quarter, month=month,
-                            campaign=campaign, limit=limit)
+    try:
+        return _search_products(target, radius=radius, filetype="Target Pixel",
+                                cadence=cadence, quarter=quarter, month=month,
+                                campaign=campaign, limit=limit)
+    except SearchError as exc:
+        log.error(exc)
+        return None
 
 
 def search_lightcurvefile(target, radius=None, cadence='long', quarter=None,
@@ -375,9 +378,13 @@ def search_lightcurvefile(target, radius=None, cadence='long', quarter=None,
 
         >>> search_lightcurvefile('kepler-10', radius=100, quarter=4).download_all()  # doctest: +SKIP
     """
-    return _search_products(target, radius=radius, filetype="Lightcurve",
-                            cadence=cadence, quarter=quarter, month=month,
-                            campaign=campaign, limit=limit)
+    try:
+        return _search_products(target, radius=radius, filetype="Lightcurve",
+                                cadence=cadence, quarter=quarter, month=month,
+                                campaign=campaign, limit=limit)
+    except SearchError as exc:
+        log.error(exc)
+        return None
 
 
 def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
@@ -410,6 +417,8 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
     SearchResult : :class:`SearchResult` object.
     """
     observations = _query_mast(target, cadence='long', radius=radius)
+    if len(observations) == 0:
+        raise SearchError('No data found for target "{}."'.format(target))
     products = Observations.get_product_list(observations)
     result = join(products, observations, join_type='left')  # will join on obs_id
     result.sort(['distance', 'obs_id'])
@@ -466,6 +475,9 @@ def _query_mast(target, radius=None, cadence='long'):
                                                  radius=str(radius.to(u.deg)),
                                                  project=["Kepler", "K2"],
                                                  obs_collection=["Kepler", "K2"])
+        if len(target_obs) == 0:
+            raise ValueError("No observations found for {}".format(target_name))
+
         # check if a cone search is being performed
         # if yes, perform a cone search around coordinates of desired target
         if radius < (0.1 * u.arcsec):
@@ -490,7 +502,7 @@ def _query_mast(target, radius=None, cadence='long'):
                                               project=["Kepler", "K2"],
                                               obs_collection=["Kepler", "K2"])
         except ResolverError as exc:
-            raise ArchiveError(exc)
+            raise SearchError(exc)
 
     obs.sort('distance')  # ensure table returned is sorted by distance
     return obs

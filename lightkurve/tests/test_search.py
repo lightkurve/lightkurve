@@ -7,7 +7,7 @@ from numpy.testing import assert_almost_equal, assert_array_equal
 from astropy.coordinates import SkyCoord
 import astropy.units as u
 
-from ..search import search_lightcurvefile, search_targetpixelfile, ArchiveError
+from ..search import search_lightcurvefile, search_targetpixelfile, SearchError
 from ..targetpixelfile import KeplerTargetPixelFile
 
 
@@ -38,13 +38,14 @@ def test_search_targetpixelfile():
 
 
 @pytest.mark.remote_data
-def test_search_lightcurvefile():
+def test_search_lightcurvefile(caplog):
     # We should also be able to resolve it by its name instead of KIC ID
     assert(len(search_lightcurvefile('Kepler-10').table) == 15)
-    # An invalid KIC/EPIC ID should be dealt with gracefully
-    with pytest.raises(ArchiveError) as exc:
-        search_lightcurvefile(-999)
-    assert('Could not resolve' in str(exc))
+    # An invalid KIC/EPIC ID or target name should be dealt with gracefully
+    search_lightcurvefile(-999)
+    assert "Could not resolve" in caplog.text
+    search_lightcurvefile("DOES_NOT_EXIST (UNIT TEST)")
+    assert "Could not resolve" in caplog.text
     # If we ask for all cadence types, there should be four Kepler files given
     assert(len(search_lightcurvefile(4914423, quarter=6, cadence='any').table) == 4)
     # ...and only one should have long cadence
@@ -66,7 +67,7 @@ def test_search_with_skycoord():
     sr_skycoord = search_targetpixelfile(SkyCoord.from_name("Kepler_10"))
     assert_array_equal(sr_name.table['productFilename'], sr_skycoord.table['productFilename'])
     # Can we search using a string of "ra dec" decimals?
-    sr_decimal = search_targetpixelfile("285.6794217927134 +50.2413057664939")
+    sr_decimal = search_targetpixelfile("285.67942179 +50.24130576")
     assert_array_equal(sr_name.table['productFilename'], sr_decimal.table['productFilename'])
     # Can we search using a sexagesimal string?
     sr_sexagesimal = search_targetpixelfile("19:02:43.1 +50:14:28.7")
