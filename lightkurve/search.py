@@ -215,11 +215,114 @@ class SearchResult(object):
         return download_dir
 
 
-def _query_mast(target, cadence='long', radius=.0001):
-    """Returns a table of all Kepler or K2 observations of a given target.
+def search_targetpixelfile(target, cadence='long', quarter=None, month=None,
+                           campaign=None, radius=.0001, limit=None):
+    """Returns a SearchResult with MAST TPFs that match the criteria.
 
-    This function wraps the `astroquery.mast.Observations.query_criteria()`
-    method.
+    This function fetches a data table that lists the Target Pixel Files (TPFs)
+    that fall within a region of sky centered around the position of `target`
+    and within a cone of a given `radius`. If no value is provided for `radius`,
+    only a single target will be returned.
+
+    Parameters
+    ----------
+    target : str or int
+        KIC/EPIC ID or object name.
+    cadence : str
+        'long' or 'short'.
+    quarter, campaign : int, list of ints
+        Kepler Quarter or K2 Campaign number.
+    month : 1, 2, 3, list or 'all'
+        For Kepler's prime mission, there are three short-cadence
+        Target Pixel Files for each quarter, each covering one month.
+        Hence, if cadence='short' you need to specify month=1, 2, or 3.
+    limit : int
+        Maximum number of products to return.
+
+    Returns
+    -------
+    SearchResult : :class:`SearchResult` object.
+    """
+    return _search_products(target, filetype="Target Pixel", cadence=cadence,
+                            quarter=quarter, month=month, campaign=campaign,
+                            radius=radius, limit=limit)
+
+
+def search_lightcurvefile(target, cadence='long', quarter=None, month=None,
+                          campaign=None, radius=.0001, limit=None):
+    """Returns a SearchResult with MAST LightCurveFiles which match the criteria.
+
+    This function fetches a data table that lists the Light Curve Files
+    that fall within a region of sky centered around the position of `target`
+    and within a cone of a given `radius`. If no value is provided for `radius`,
+    only a single target will be returned.
+
+    Parameters
+    ----------
+    target : str or int
+        KIC/EPIC ID or object name.
+    cadence : str
+        'long' or 'short'.
+    quarter, campaign : int, list of ints, or 'all'
+        Kepler Quarter or K2 Campaign number.
+    month : 1, 2, 3, list or 'all'
+        For Kepler's prime mission, there are three short-cadence
+        Target Pixel Files for each quarter, each covering one month.
+        Hence, if cadence='short' you need to specify month=1, 2, or 3.
+    limit : int
+        Maximum number of products to return.
+
+    Returns
+    -------
+    SearchResult : :class:`SearchResult` object.
+    """
+    return _search_products(target, filetype="Lightcurve", cadence=cadence,
+                            quarter=quarter, month=month, campaign=campaign,
+                            radius=radius, limit=limit)
+
+
+def _search_products(target, filetype="Lightcurve", cadence='long', quarter=None,
+                     month=None, campaign=None, radius=.0001, limit=None):
+    """Helper function which returns a SearchResult object containing MAST
+    products that match several criteria.
+
+    Parameters
+    ----------
+    target : str or int
+        KIC/EPIC ID or object name.
+    filetype : str
+        Type of files queried at MAST (`Target Pixel` or `Lightcurve`)
+    cadence : str
+        Desired cadence (`long`, `short`, `any`)
+    quarter : int or list
+        Desired quarter of observation for data products
+    month : int or list
+        Desired month of observation for data products
+    campaign : int or list
+        Desired campaign of observation for data products
+    radius : float
+        Search radius in arcseconds
+    limit : int
+        Maximum number of products to return
+
+    Returns
+    -------
+    SearchResult : :class:`SearchResult` object.
+    """
+    observations = _query_mast(target, cadence='long', radius=radius)
+    products = Observations.get_product_list(observations)
+    result = join(products, observations, join_type='left')  # will join on obs_id
+    result.sort(['distance', 'obs_id'])
+
+    masked_result = _filter_products(result, filetype=filetype, campaign=campaign,
+                                     quarter=quarter, cadence=cadence, month=month,
+                                     limit=limit)
+    return SearchResult(masked_result)
+
+
+def _query_mast(target, cadence='long', radius=.0001):
+    """Helper function which wraps `astroquery.mast.Observations.query_criteria()`
+    to returns a table of all Kepler or K2 observations of a given target.
 
     Parameters
     ----------
@@ -286,113 +389,10 @@ def _query_mast(target, cadence='long', radius=.0001):
     return obs
 
 
-def search_targetpixelfile(target, cadence='long', quarter=None, month=None,
-                           campaign=None, radius=.0001, limit=None):
-
-    """
-    Fetch a data table for Target Pixel Files within a region of sky. Cone search is
-    centered around the position of `target` and extends to a given `radius`.
-    If no value is provided for `radius`, only a single target will be returned.
-
-    See the :class:`KeplerQualityFlags` class for details on the bitmasks.
-
-    Parameters
-    ----------
-    target : str or int
-        KIC/EPIC ID or object name.
-    cadence : str
-        'long' or 'short'.
-    quarter, campaign : int, list of ints, or 'all'
-        Kepler Quarter or K2 Campaign number.
-    month : 1, 2, 3, list or 'all'
-        For Kepler's prime mission, there are three short-cadence
-        Target Pixel Files for each quarter, each covering one month.
-        Hence, if cadence='short' you need to specify month=1, 2, or 3.
-
-    Returns
-    -------
-    SearchResult : :class:`SearchResult` object.
-    """
-    return search_products(target, filetype="Target Pixel", cadence=cadence,
-                           quarter=quarter, month=month, campaign=campaign,
-                           radius=radius, limit=limit)
-
-
-def search_lightcurvefile(target, cadence='long', quarter=None, month=None,
-                          campaign=None, radius=.0001, limit=None):
-
-    """
-    Fetch a data table for Lightcurve Files within a region of sky. Cone search is
-    centered around the position of `target` and extends to a given `radius`.
-    If no value is provided for `radius`, only a single target will be returned.
-
-    See the :class:`KeplerQualityFlags` class for details on the bitmasks.
-
-    Parameters
-    ----------
-    target : str or int
-        KIC/EPIC ID or object name.
-    cadence : str
-        'long' or 'short'.
-    quarter, campaign : int, list of ints, or 'all'
-        Kepler Quarter or K2 Campaign number.
-    month : 1, 2, 3, list or 'all'
-        For Kepler's prime mission, there are three short-cadence
-        Target Pixel Files for each quarter, each covering one month.
-        Hence, if cadence='short' you need to specify month=1, 2, or 3.
-
-    Returns
-    -------
-    SearchResult : :class:`SearchResult` object.
-    """
-    return search_products(target, filetype="Lightcurve", cadence=cadence,
-                           quarter=quarter, month=month, campaign=campaign,
-                           radius=radius, limit=limit)
-
-
-def search_products(target, filetype="Lightcurve", cadence='long', quarter=None, month=None,
-                    campaign=None, radius=.0001, limit=None):
-    """Returns a SearchResult object.
-
-    Parameters
-    ----------
-    target : str or int
-        KIC/EPIC ID or object name.
-    filetype : str
-        Type of files queried at MAST (`Target Pixel` or `Lightcurve`)
-    cadence : str
-        Desired cadence (`long`, `short`, `any`)
-    quarter : int or list
-        Desired quarter of observation for data products
-    month : int or list
-        Desired month of observation for data products
-    campaign : int or list
-        Desired campaign of observation for data products
-    radius : float
-        Search radius in arcseconds
-    limit : int
-        Maximum number of products to return
-
-    Returns
-    -------
-    SearchResult : :class:`SearchResult` object.
-    """
-    observations = _query_mast(target, cadence='long', radius=radius)
-    products = Observations.get_product_list(observations)
-    result = join(products, observations, join_type='left')  # will join on obs_id
-    result.sort(['distance', 'obs_id'])
-
-    masked_result = _filter_products(result, filetype=filetype, campaign=campaign,
-                                     quarter=quarter, cadence=cadence, limit=limit)
-    return SearchResult(masked_result)
-
-
 def _filter_products(products, campaign=None, quarter=None, month=None,
                      cadence='long', filetype='Target Pixel', limit=None):
-    """Returns a products table filtered by one or more criteria.
-
-    This function can filter based on `cadence`, `quarter`, `month`, `campaign`
-    constraints.
+    """Helper function which filters a SearchResult's products table by one or
+    more criteria.
 
     Parameters
     ----------

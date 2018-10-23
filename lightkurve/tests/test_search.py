@@ -68,8 +68,11 @@ def test_searchresult():
 
 @pytest.mark.remote_data
 def test_month():
-    # In short cadence, if we specify both quarter and month it should work:
-    search_targetpixelfile('Kepler-10', quarter=11, month=1, cadence='short').products
+    # In short cadence, if we specify both quarter and month
+    sr = search_targetpixelfile('Kepler-10', quarter=11, month=1, cadence='short')
+    assert(len(sr) == 1)
+    sr = search_targetpixelfile('Kepler-10', quarter=11, month=[1, 3], cadence='short')
+    assert(len(sr) == 2)
 
 
 @pytest.mark.remote_data
