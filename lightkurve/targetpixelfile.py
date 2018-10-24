@@ -44,6 +44,23 @@ class TargetPixelFile(object):
         self.quality_bitmask = quality_bitmask
         self.targetid = targetid
 
+    def __getitem__(self, key):
+        """Implements indexing and slicing."""
+        with warnings.catch_warnings():
+            # Ignore warnings about empty fields
+            warnings.simplefilter('ignore', UserWarning)
+            # AstroPy added `HDUList.copy()` in v3.1, but we don't want to make
+            # v3.1 a minimum requirement yet, so we copy in a funny way.
+            copy = fits.HDUList([myhdu.copy() for myhdu in self.hdu])
+            # The below ensures we always assign a `FITS_rec` instead of a `FITS_record`
+            if key == -1:
+                copy[1].data = copy[1].data[key:]
+            elif isinstance(key, int):
+                copy[1].data = copy[1].data[key:key+1]
+            else:
+                copy[1].data = copy[1].data[key]
+        return self.__class__(copy, quality_bitmask=self.quality_bitmask, targetid=self.targetid)
+
     @property
     def hdu(self):
         return self._hdu
