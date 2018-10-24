@@ -46,19 +46,28 @@ class TargetPixelFile(object):
 
     def __getitem__(self, key):
         """Implements indexing and slicing."""
+        # Step 1: determine the indexes of the data to return.
+        # We start by determining the indexes of the good-quality cadences.
+        quality_idx = np.where(self.quality_mask)[0]
+        # Then we apply the index or slice to the good-quality indexes.
+        if isinstance(key, int):
+            # Ensure we always have a range; this is necessary to ensure
+            # that we always ge a  `FITS_rec` instead of a `FITS_record` below.
+            if key == -1:
+                selected_idx = quality_idx[key:]
+            else:
+                selected_idx = quality_idx[key:key+1]
+        else:
+            selected_idx = quality_idx[key]
+
+        # Step 2: use the indexes to create a new copy of the data.
         with warnings.catch_warnings():
             # Ignore warnings about empty fields
             warnings.simplefilter('ignore', UserWarning)
             # AstroPy added `HDUList.copy()` in v3.1, but we don't want to make
             # v3.1 a minimum requirement yet, so we copy in a funny way.
             copy = fits.HDUList([myhdu.copy() for myhdu in self.hdu])
-            # The below ensures we always assign a `FITS_rec` instead of a `FITS_record`
-            if key == -1:
-                copy[1].data = copy[1].data[key:]
-            elif isinstance(key, int):
-                copy[1].data = copy[1].data[key:key+1]
-            else:
-                copy[1].data = copy[1].data[key]
+            copy[1].data = copy[1].data[selected_idx]
         return self.__class__(copy, quality_bitmask=self.quality_bitmask, targetid=self.targetid)
 
     @property

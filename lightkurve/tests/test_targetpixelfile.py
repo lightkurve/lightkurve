@@ -401,3 +401,4 @@ def test_tpf_slicing():
     assert tpf[-1].time == tpf.time[-1]
     assert tpf[5:10].shape == tpf.flux[5:10].shape
     assert tpf[0].targetid == tpf.targetid
+    assert_array_equal(tpf[tpf.time < tpf.time[5]].time, tpf.time[0:5])
