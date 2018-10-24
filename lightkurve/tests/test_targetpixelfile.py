@@ -10,6 +10,7 @@ import tempfile
 
 from ..targetpixelfile import KeplerTargetPixelFile, KeplerTargetPixelFileFactory
 from ..targetpixelfile import TessTargetPixelFile
+from ..lightcurve import TessLightCurve
 
 
 filename_tpf_all_zeros = get_pkg_data_filename("data/test-tpf-all-zeros.fits")
@@ -396,6 +397,7 @@ def test_tpf_tess():
     assert tpf.pipeline_mask.sum() == 9
     assert tpf.background_mask.sum() == 30
     lc = tpf.to_lightcurve()
+    assert isinstance(lc, TessLightCurve)
     assert_array_equal(lc.time, tpf.time)
     assert tpf.astropy_time.scale == 'tdb'
     assert tpf.flux.shape == tpf.flux_err.shape
