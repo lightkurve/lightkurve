@@ -45,7 +45,12 @@ class TargetPixelFile(object):
         self.targetid = targetid
 
     def __getitem__(self, key):
-        """Implements indexing and slicing."""
+        """Implements indexing and slicing.
+
+        Note: the implementation below cannot be be simplified using
+            `copy[1].data = copy[1].data[self.quality_mask][key]`
+        due to the complicated behavior of AstroPy's `FITS_rec`.
+        """
         # Step 1: determine the indexes of the data to return.
         # We start by determining the indexes of the good-quality cadences.
         quality_idx = np.where(self.quality_mask)[0]
