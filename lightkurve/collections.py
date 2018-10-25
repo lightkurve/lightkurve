@@ -202,9 +202,23 @@ class TargetPixelFileCollection(Collection):
         return ax
 
     def to_lightcurvecollection(self, method='aperture', **kwargs):
-        """A function to
+        """Performs photometry on each TargetPixelFile in a collection.
+
+        Parameters
+        ----------
+        method : str
+            Photometry method to use ('aperture' or 'prf').
+        **kwargs : dict
+            Extra arguments to be passed to the `aperture_photometry` or the
+            `prf_photometry` method of this class.
+
+        Returns
+        -------
+        LightCurveCollection : `lightkurve.Collection` object
+            Returns a `LightCurveCollection`
+            containing all entries in the products table
         """
-        
+
         lightcurves = [tpf.to_lightcurve(method=method, **kwargs) for tpf in self.data]
 
         return LightCurveCollection(lightcurves)
