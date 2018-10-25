@@ -200,3 +200,11 @@ class TargetPixelFileCollection(Collection):
             for i, tpf in enumerate(self.data):
                 tpf.plot(ax=ax[i])
         return ax
+
+    def to_lightcurvecollection(self, method='aperture', **kwargs):
+        """A function to
+        """
+        
+        lightcurves = [tpf.to_lightcurve(method=method, **kwargs) for tpf in self.data]
+
+        return LightCurveCollection(lightcurves)
