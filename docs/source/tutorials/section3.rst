@@ -8,4 +8,5 @@ Extracting lightcurves
     2.10-how-to-use-prf-photometry.ipynb
     cutting-out-tpfs-from-tess-ffis.ipynb
     2.08-making-fits-files.ipynb
+    how-to-save-data-locally.ipynb
     2.03-appending-lightcurves.ipynb
