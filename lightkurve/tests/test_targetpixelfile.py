@@ -393,3 +393,12 @@ def test_threshold_aperture_mask():
     tpf.plot(aperture_mask='threshold')
     lc = tpf.to_lightcurve(aperture_mask=tpf.create_threshold_mask(threshold=1))
     assert (lc.flux == 1).all()
+
+
+def test_tpf_slicing():
+    tpf = KeplerTargetPixelFile(filename_tpf_one_center)
+    assert tpf[0].time == tpf.time[0]
+    assert tpf[-1].time == tpf.time[-1]
+    assert tpf[5:10].shape == tpf.flux[5:10].shape
+    assert tpf[0].targetid == tpf.targetid
+    assert_array_equal(tpf[tpf.time < tpf.time[5]].time, tpf.time[0:5])
