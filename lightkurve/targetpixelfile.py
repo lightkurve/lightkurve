@@ -6,7 +6,6 @@ import os
 import warnings
 import logging
 
-import copy
 from astropy.io import fits
 from astropy.io.fits import Undefined
 from astropy.nddata import Cutout2D
