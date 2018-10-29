@@ -4,7 +4,6 @@ import os
 import warnings
 import logging
 
-import copy
 from astropy.io import fits
 from astropy.nddata import Cutout2D
 from astropy.table import Table
