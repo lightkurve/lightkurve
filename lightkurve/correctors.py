@@ -170,7 +170,7 @@ class GPCorrector(object):
             flat = LightCurve(time=self.lc.time, flux=self.lc.flux*0, flux_err=self.lc.flux_err*0)
             # Run over each 'portion' of the data, defined where breaks are greater
             # than break_tolerance
-            for idx in tqdm(range(len(self.breaks)-1), desc='Iteration {} ({}% Masked)'.format(iter + 1, int(100.*np.nansum(~self.mask)/len(self.mask)))):
+            for idx in range(len(self.breaks)-1):
                 l = self.lc[self.breaks[idx]:self.breaks[idx+1]]
                 x = l.time - self.lc.time[0]
                 # Calculate the best fit mean and errors
@@ -508,7 +508,7 @@ class SFFCorrector(object):
             result = np.copy(y)
             for o, b1, b2 in zip(offsets, break_points[:-1], break_points[1:]):
                 result[b1:b2] += o
-            result[b2:] += offsets[-1]
+            result[break_points[-1]:] += offsets[-1]
             result /= np.nanmedian(result)
             return result
 
