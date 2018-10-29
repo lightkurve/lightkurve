@@ -148,6 +148,31 @@ class LightCurveCollection(Collection):
             lc.plot(ax=ax, label=lc.targetid, **kwargs)
         return ax
 
+    def scatter(self, ax=None, **kwargs):
+        """Plots all lightcurves in the collection on a single plot
+        using matplotlib's `scatter` method.
+
+        Parameters
+        ----------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            A matplotlib axes object to plot into. If no axes is provided,
+            a new one will be created.
+
+        **kwargs : dict
+            Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
+
+        Returns
+        -------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            The matplotlib axes object.
+        """
+        if ax is None:
+            import matplotlib.pyplot as plt
+            _, ax = plt.subplots()
+        for lc in self.data:
+            lc.scatter(ax=ax, label=lc.targetid, **kwargs)
+        return ax
+
 
 class LightCurveFileCollection(Collection):
     """Class to hold a collection of LightCurveFile objects.
