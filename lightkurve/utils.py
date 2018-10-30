@@ -11,6 +11,7 @@ from astropy.time import Time
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 import numpy as np
+import contextlib
 
 log = logging.getLogger(__name__)
 
@@ -439,7 +440,6 @@ class LightkurveWarning(Warning):
     pass
 
 
-import contextlib
 @contextlib.contextmanager
 def suppress():
     '''
@@ -460,9 +460,10 @@ def suppress():
 
     # redirect output to `null`
     with open(os.devnull, 'w') as devnull:
+        old_out = sys.stdout
         sys.stdout = devnull
         try:
             yield
         # restore to default
         finally:
-            sys.stdout = sys.__stdout__
+            sys.stdout = old_out
