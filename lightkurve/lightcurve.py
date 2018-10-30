@@ -6,7 +6,6 @@ import copy
 import os
 import datetime
 import logging
-from collections import Sequence
 import pandas as pd
 import warnings
 
