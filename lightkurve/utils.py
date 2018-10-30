@@ -439,7 +439,9 @@ class LightkurveWarning(Warning):
     pass
 
 
-def suppress(f, *args):
+import contextlib
+@contextlib.contextmanager
+def suppress():
     '''
     A simple decorator to suppress function print outputs.
 
@@ -455,14 +457,12 @@ def suppress(f, *args):
     call : function
         A function call wrapper that includes suppressed outputs
     '''
-    def call(*args):
-        # redirect output to `null`
-        with open(os.devnull, 'w') as devnull:
-            sys.stdout = devnull
-            try:
-                yield
-            # restore to default
-            finally:
-                sys.stdout = sys.__stdout__
 
-    return call
+    # redirect output to `null`
+    with open(os.devnull, 'w') as devnull:
+        sys.stdout = devnull
+        try:
+            yield
+        # restore to default
+        finally:
+            sys.stdout = sys.__stdout__
