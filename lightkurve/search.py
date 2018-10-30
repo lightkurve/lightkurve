@@ -86,7 +86,6 @@ class SearchResult(object):
         """Returns an array of dec values for targets in search"""
         return self.table['s_dec'].data.data
 
-    @suppress
     def download(self, quality_bitmask='default', download_dir=None):
         """Returns a single `KeplerTargetPixelFile` or `KeplerLightCurveFile` object.
 
@@ -124,8 +123,9 @@ class SearchResult(object):
         # download first product in table
         if download_dir is None:
             download_dir = self._default_download_dir()
-        path = Observations.download_products(self.table[:1], mrp_only=False,
-                                              download_dir=download_dir)['Local Path']
+        with suppress():
+            path = Observations.download_products(self.table[:1], mrp_only=False,
+                                                  download_dir=download_dir)['Local Path']
 
         if len(self.table) != 1:
             log.warning('Warning: {} files available to download. '
@@ -141,7 +141,6 @@ class SearchResult(object):
         elif any(file in self.table['productFilename'][0] for file in lcf_files):
             return KeplerLightCurveFile(path[0], quality_bitmask=quality_bitmask)
 
-    @suppress
     def download_all(self, quality_bitmask='default', download_dir=None):
         """Returns a `TargetPixelFileCollection or `LightCurveFileCollection`.
 
@@ -177,8 +176,9 @@ class SearchResult(object):
         # download all products listed in self.products
         if download_dir is None:
             download_dir = self._default_download_dir()
-        path = Observations.download_products(self.table, mrp_only=False,
-                                              download_dir=download_dir)['Local Path']
+        with suppress():
+            path = Observations.download_products(self.table, mrp_only=False,
+                                                  download_dir=download_dir)['Local Path']
 
         # return collection of tpf or lcf
         tpf_files = ['lpd-targ.fits', 'spd-targ.fits']
