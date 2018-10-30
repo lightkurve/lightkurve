@@ -323,7 +323,6 @@ class LightCurve(object):
                                                              window_length=window_length,
                                                              polyorder=polyorder,
                                                              **kwargs)
-        return(0)
 
         trend_signal = np.interp(self.time, lc_clean.time, trend_signal)
         flatten_lc = self.copy()
