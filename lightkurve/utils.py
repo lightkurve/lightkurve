@@ -439,7 +439,7 @@ class LightkurveWarning(Warning):
     pass
 
 
-def suppress(f, **kwargs):
+def suppress(f, *args):
     '''
     A simple decorator to suppress function print outputs.
 
@@ -447,7 +447,7 @@ def suppress(f, **kwargs):
     ----------
     f : function
         A function that outputs undesired print statements
-    kwargs : dict
+    args : dict
         Keyword arguments passed into function `f`
 
     Returns
@@ -461,6 +461,7 @@ def suppress(f, **kwargs):
             sys.stdout = devnull
             try:
                 yield
+            # restore to default
             finally:
                 sys.stdout = sys.__stdout__
 
