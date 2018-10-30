@@ -2,6 +2,7 @@
 from __future__ import division, print_function
 import logging
 import sys
+import os
 import warnings
 
 from astropy.visualization import (PercentileInterval, ImageNormalize,
@@ -436,3 +437,31 @@ def plot_image(image, ax=None, scale='linear', origin='lower',
 class LightkurveWarning(Warning):
     """Class for all Lightkurve warnings."""
     pass
+
+
+def suppress(f, **kwargs):
+    '''
+    A simple decorator to suppress function print outputs.
+
+    Parameters
+    ----------
+    f : function
+        A function that outputs undesired print statements
+    kwargs : dict
+        Keyword arguments passed into function `f`
+
+    Returns
+    -------
+    call : function
+        A function call wrapper that includes suppressed outputs
+    '''
+    def call(*args):
+        # redirect output to `null`
+        with open(os.devnull, 'w') as devnull:
+            sys.stdout = devnull
+            try:
+                yield
+            finally:
+                sys.stdout = sys.__stdout__
+
+    return call
