@@ -4,6 +4,7 @@ from __future__ import absolute_import
 
 import os
 PACKAGEDIR = os.path.abspath(os.path.dirname(__file__))
+MPLSTYLE = '{}/data/lightkurve.mplstyle'.format(PACKAGEDIR)
 
 import logging
 log = logging.getLogger(__name__)
@@ -17,3 +18,6 @@ from .correctors import *
 from .targetpixelfile import *
 from .utils import *
 from .convenience import *
+from .periodogram import *
+from .collections import *
+from .search import *

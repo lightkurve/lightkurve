@@ -7,6 +7,18 @@ Direct contributions to the code base:
 - `Michael Gully-Santiago <https://github.com/gully>`_
 - `Thomas Barclay <https://github.com/mrtommyb>`_
 - `Ken Mighell <https://github.com/KenMighell>`_
+- `Keaton Bell <https://github.com/keatonb>`_
+- `Johnny Zhang <https://github.com/johnnyzhang295>`_
+- `Andy Tzanidakis <https://github.com/AndyTza>`_
+- `Sheila Sagear <https://github.com/ssagear>`_
+- `Emma Turtelboom <https://github.com/Emmavt>`_
+- `Jeff Coughlin <https://github.com/JeffLCoughlin>`_
+- `Zachory K. Berta-Thompson <https://github.com/zkbt>`_
+- `Anand Sundaram <https://github.com/anand-sundaram-zocdoc>`_
+- `Oliver Hall <https://github.com/ojhall94>`_
+- `Nicholas Saunders <https://github.com/nksaunders>`_
+- `Jose A. Lerma III <https://github.com/JoseALermaIII>`_
+
 
 Comments, corrections & suggestions:
 
@@ -20,3 +32,6 @@ Comments, corrections & suggestions:
 - `Elisa Quintana <https://github.com/elisaquintana>`_
 - Jeff Van Cleve
 - Ashley Villar
+- `Benjamin Pope <https://github.com/benjaminpope>`_
+- `J. K. Carlberg <https://github.com/jkcarlberg>`_
+- `Brian Jackson <https://github.com/decaelus>`_
