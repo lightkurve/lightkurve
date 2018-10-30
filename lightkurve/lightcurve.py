@@ -1050,7 +1050,6 @@ class LightCurve(object):
             hdu.writeto(path, overwrite=overwrite, checksum=True)
         return hdu
 
-
 class FoldedLightCurve(LightCurve):
     """Defines a folded lightcurve with different plotting defaults."""
 
