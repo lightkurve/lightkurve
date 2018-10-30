@@ -444,20 +444,7 @@ class LightkurveWarning(Warning):
 def suppress():
     '''
     A simple decorator to suppress function print outputs.
-
-    Parameters
-    ----------
-    f : function
-        A function that outputs undesired print statements
-    args : dict
-        Keyword arguments passed into function `f`
-
-    Returns
-    -------
-    call : function
-        A function call wrapper that includes suppressed outputs
     '''
-
     # redirect output to `null`
     with open(os.devnull, 'w') as devnull:
         old_out = sys.stdout
