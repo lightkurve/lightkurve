@@ -10,11 +10,12 @@ import tempfile
 
 from ..targetpixelfile import KeplerTargetPixelFile, KeplerTargetPixelFileFactory
 from ..targetpixelfile import TessTargetPixelFile
+from ..lightcurve import TessLightCurve
 
 
 filename_tpf_all_zeros = get_pkg_data_filename("data/test-tpf-all-zeros.fits")
 filename_tpf_one_center = get_pkg_data_filename("data/test-tpf-non-zero-center.fits")
-filename_tess = get_pkg_data_filename("data/test-tess-tpf.fits")
+filename_tess = get_pkg_data_filename("data/tess25155310-s01-first-cadences.fits.gz")
 
 TABBY_Q8 = ("https://archive.stsci.edu/missions/kepler/lightcurves"
             "/0084/008462852/kplr008462852-2011073133259_llc.fits")
@@ -22,7 +23,6 @@ TABBY_TPF = ("https://archive.stsci.edu/missions/kepler/target_pixel_files"
              "/0084/008462852/kplr008462852-2011073133259_lpd-targ.fits.gz")
 TESS_SIM = ("https://archive.stsci.edu/missions/tess/ete-6/tid/00/000"
             "/004/176/tess2019128220341-0000000417699452-0016-s_tp.fits")
-
 
 
 @pytest.mark.remote_data
@@ -378,15 +378,6 @@ def test_tess_simulation():
     assert np.isnan(tpf.time).sum() == 0
 
 
-def test_tess_aperture():
-    '''Can we parse the tess aperture?
-    '''
-    tpf = TessTargetPixelFile.from_fits(filename_tess)
-    assert tpf.mission == 'TESS'
-    assert tpf.pipeline_mask.sum() == 8
-    assert tpf.background_mask.sum() == 0
-
-
 def test_threshold_aperture_mask():
     """Does the threshold mask work?"""
     tpf = KeplerTargetPixelFile.from_fits(filename_tpf_one_center)
@@ -394,7 +385,26 @@ def test_threshold_aperture_mask():
     lc = tpf.to_lightcurve(aperture_mask=tpf.create_threshold_mask(threshold=1))
     assert (lc.flux == 1).all()
 
+    
+def test_tpf_tess():
+    """Does a TESS Sector 1 TPF work?"""
+    tpf = TessTargetPixelFile(filename_tess, quality_bitmask=None)
+    assert tpf.mission == 'TESS'
+    assert tpf.targetid == 25155310
+    assert tpf.sector == 1
+    assert tpf.camera == 4
+    assert tpf.ccd == 1
+    assert tpf.pipeline_mask.sum() == 9
+    assert tpf.background_mask.sum() == 30
+    lc = tpf.to_lightcurve()
+    assert isinstance(lc, TessLightCurve)
+    assert_array_equal(lc.time, tpf.time)
+    assert tpf.astropy_time.scale == 'tdb'
+    assert tpf.flux.shape == tpf.flux_err.shape
+    tpf.wcs
+    col, row = tpf.estimate_centroids()
 
+    
 def test_tpf_slicing():
     tpf = KeplerTargetPixelFile(filename_tpf_one_center)
     assert tpf[0].time == tpf.time[0]
