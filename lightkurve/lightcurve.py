@@ -318,7 +318,7 @@ class LightCurve(object):
             else:
                 # Scipy outputs a warning here that is not useful, will be fixed in version 1.2
                 with warnings.catch_warnings():
-                    warnings.simplefilter('ignore')
+                    warnings.simplefilter('ignore', FutureWarning)
                     trend_signal[l:h] = signal.savgol_filter(x=lc_clean.flux[l:h],
                                                              window_length=window_length,
                                                              polyorder=polyorder,
