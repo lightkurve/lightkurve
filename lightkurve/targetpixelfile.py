@@ -1407,7 +1407,6 @@ def open_fits(path):
             return KeplerTargetPixelFile(path)
         elif mission == 'TESS':
             return TessTargetPixelFile(path)
-    except:
-        warnings.warn('Mission not recognized as Kepler or TESS. '
-                      'A `KeplerTargetPixelFile` has been returned.')
-        return KeplerTargetPixelFile(path)
+    except KeyError:
+        pass
+    raise ValueError('Given fits file not recognized as Kepler or TESS observation.')
