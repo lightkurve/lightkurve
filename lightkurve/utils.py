@@ -442,7 +442,7 @@ class LightkurveWarning(Warning):
 
 @contextlib.contextmanager
 def suppress():
-    '''
+    """A simple decorator to suppress function print outputs."""
     A simple decorator to suppress function print outputs.
     '''
     # redirect output to `null`
