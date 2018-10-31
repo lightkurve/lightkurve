@@ -1400,21 +1400,13 @@ def open_fits(path):
     Opens a fits file, detects its type, and returns the appopriate
     `KeplerTargetPixelFile` or `TessTargetPixelFile`.
     """
-    if isinstance(path, fits.HDUList):
-        hdu = path
-    else:
-        hdu = fits.open(path)
-
+    hdulist = fits.open(path)
     try:
-        mission = hdu[0].header['telescop']
+        mission = hdulist[0].header['telescop']
         if mission == 'Kepler':
             return KeplerTargetPixelFile(path)
         elif mission == 'TESS':
             return TessTargetPixelFile(path)
-        else:
-            warnings.warn('Mission not recognized as Kepler or TESS. '
-                          'A `KeplerTargetPixelFile` has been returned.')
-            return KeplerTargetPixelFile(path)
     except:
         warnings.warn('Mission not recognized as Kepler or TESS. '
                       'A `KeplerTargetPixelFile` has been returned.')

@@ -9,7 +9,7 @@ import pytest
 import tempfile
 
 from ..targetpixelfile import KeplerTargetPixelFile, KeplerTargetPixelFileFactory
-from ..targetpixelfile import TessTargetPixelFile
+from ..targetpixelfile import TessTargetPixelFile, open_fits
 from ..lightcurve import TessLightCurve
 from ..utils import LightkurveWarning
 
@@ -398,7 +398,7 @@ def test_threshold_aperture_mask():
     lc = tpf.to_lightcurve(aperture_mask=tpf.create_threshold_mask(threshold=1))
     assert (lc.flux == 1).all()
 
-    
+
 def test_tpf_tess():
     """Does a TESS Sector 1 TPF work?"""
     tpf = TessTargetPixelFile(filename_tess, quality_bitmask=None)
@@ -417,7 +417,7 @@ def test_tpf_tess():
     tpf.wcs
     col, row = tpf.estimate_centroids()
 
-    
+
 def test_tpf_slicing():
     tpf = KeplerTargetPixelFile(filename_tpf_one_center)
     assert tpf[0].time == tpf.time[0]
@@ -425,3 +425,17 @@ def test_tpf_slicing():
     assert tpf[5:10].shape == tpf.flux[5:10].shape
     assert tpf[0].targetid == tpf.targetid
     assert_array_equal(tpf[tpf.time < tpf.time[5]].time, tpf.time[0:5])
+
+
+def test_open_fits():
+    k2tpf = open_fits(os.path.dirname(os.path.abspath(__file__)) +
+                      '/data/test-tpf-star.fits')
+    assert isinstance(k2tpf, KeplerTargetPixelFile)
+    tesstpf = open_fits(os.path.dirname(os.path.abspath(__file__)) +
+                        '/data/tess25155310-s01-first-cadences.fits.gz')
+    assert isinstance(tesstpf, TessTargetPixelFile)
+    try:
+        open_fits(os.path.dirname(os.path.abspath(__file__)) +
+                  '/data/test_factory0.fits')
+    except ValueError:
+        pass
