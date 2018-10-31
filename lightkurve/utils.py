@@ -11,7 +11,7 @@ from astropy.time import Time
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 import numpy as np
-import contextlib
+from functools import wraps
 
 log = logging.getLogger(__name__)
 
@@ -440,17 +440,17 @@ class LightkurveWarning(Warning):
     pass
 
 
-@contextlib.contextmanager
-def suppress():
+def suppress_stdout(f, *args):
     """A simple decorator to suppress function print outputs."""
-    A simple decorator to suppress function print outputs.
-    '''
-    # redirect output to `null`
-    with open(os.devnull, 'w') as devnull:
-        old_out = sys.stdout
-        sys.stdout = devnull
-        try:
-            yield
-        # restore to default
-        finally:
-            sys.stdout = old_out
+    @wraps(f)
+    def wrapper(*args):
+        # redirect output to `null`
+        with open(os.devnull, 'w') as devnull:
+            old_out = sys.stdout
+            sys.stdout = devnull
+            try:
+                return f(*args)
+            # restore to default
+            finally:
+                sys.stdout = old_out
+    return wrapper
