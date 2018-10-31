@@ -428,14 +428,16 @@ def test_tpf_slicing():
 
 
 def test_open_fits():
-    k2tpf = open_fits(os.path.dirname(os.path.abspath(__file__)) +
-                      '/data/test-tpf-star.fits')
+    k2_path = os.path.dirname(os.path.abspath(__file__)) + '/data/test-tpf-star.fits'
+    tess_path = os.path.dirname(os.path.abspath(__file__)) + '/data/tess25155310-s01-first-cadences.fits.gz'
+    k2tpf = open_fits(k2_path)
     assert isinstance(k2tpf, KeplerTargetPixelFile)
-    tesstpf = open_fits(os.path.dirname(os.path.abspath(__file__)) +
-                        '/data/tess25155310-s01-first-cadences.fits.gz')
+    tesstpf = open_fits(tess_path)
     assert isinstance(tesstpf, TessTargetPixelFile)
     try:
         open_fits(os.path.dirname(os.path.abspath(__file__)) +
                   '/data/test_factory0.fits')
     except ValueError:
         pass
+    assert isinstance(KeplerTargetPixelFile(tess_path), KeplerTargetPixelFile)
+    assert isinstance(TessTargetPixelFile(k2_path), TessTargetPixelFile)
