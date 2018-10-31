@@ -583,13 +583,6 @@ class TargetPixelFile(object):
         return show_interact_widget(self, lc=lc, notebook_url=notebook_url,
                                     max_cadences=max_cadences)
 
-    def open(self, path):
-        """
-        Opens a fits file, detects its type, and returns the appopriate
-        `KeplerTargetPixelFile` or `TessTargetPixelFile`.
-        """
-        pass
-
 
 class KeplerTargetPixelFile(TargetPixelFile):
     """
@@ -1401,3 +1394,28 @@ class TessTargetPixelFile(TargetPixelFile):
                               flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
                               flux_err=flux_bkg_err,
                               **keys)
+
+def open_fits(path):
+    """
+    Opens a fits file, detects its type, and returns the appopriate
+    `KeplerTargetPixelFile` or `TessTargetPixelFile`.
+    """
+    if isinstance(path, fits.HDUList):
+        hdu = path
+    else:
+        hdu = fits.open(path)
+
+    try:
+        mission = hdu[0].header['telescop']
+        if mission == 'Kepler':
+            return KeplerTargetPixelFile(path)
+        elif mission == 'TESS':
+            return TessTargetPixelFile(path)
+        else:
+            warnings.warn('Mission not recognized as Kepler or TESS. '
+                          'A `KeplerTargetPixelFile` has been returned.')
+            return KeplerTargetPixelFile(path)
+    except:
+        warnings.warn('Mission not recognized as Kepler or TESS. '
+                      'A `KeplerTargetPixelFile` has been returned.')
+        return KeplerTargetPixelFile(path)
