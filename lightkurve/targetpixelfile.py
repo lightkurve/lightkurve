@@ -583,6 +583,13 @@ class TargetPixelFile(object):
         return show_interact_widget(self, lc=lc, notebook_url=notebook_url,
                                     max_cadences=max_cadences)
 
+    def open(self, path):
+        """
+        Opens a fits file, detects its type, and returns the appopriate
+        `KeplerTargetPixelFile` or `TessTargetPixelFile`.
+        """
+        pass
+
 
 class KeplerTargetPixelFile(TargetPixelFile):
     """
