@@ -622,6 +622,13 @@ class KeplerTargetPixelFile(TargetPixelFile):
         self.quality_mask = KeplerQualityFlags.create_quality_mask(
                                 quality_array=self.hdu[1].data['QUALITY'],
                                 bitmask=quality_bitmask)
+        try:
+            mission = fits.open(path)[0].header['telescop']
+            if mission == 'TESS':
+                warnings.warn('The provided file path appears to be a TESS observation. '
+                              'Please instantiate as a `TessTargetPixelFile`.')
+        except KeyError:
+            warnings.warn('The provided file path not recognized as Kepler observation.')
         if self.targetid is None:
             try:
                 self.targetid = self.header['KEPLERID']
@@ -1279,6 +1286,13 @@ class TessTargetPixelFile(TargetPixelFile):
         # which were not flagged by a QUALITY flag yet; the line below prevents
         # these cadences from being used. They would break most methods!
         self.quality_mask &= np.isfinite(self.hdu[1].data['TIME'])
+        try:
+            mission = fits.open(path)[0].header['telescop']
+            if mission == 'Kepler':
+                warnings.warn('The provided file path appears to be a Kepler observation. '
+                              'Please instantiate as a `KeplerTargetPixelFile`.')
+        except KeyError:
+            warnings.warn('The provided file path not recognized as TESS observation.')
         try:
             self.targetid = self.header['TICID']
         except KeyError:
