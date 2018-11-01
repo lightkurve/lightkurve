@@ -1419,7 +1419,7 @@ class TessTargetPixelFile(TargetPixelFile):
                               flux_err=flux_bkg_err,
                               **keys)
 
-def open_fits(path):
+def open(path):
     """
     Opens a fits file, detects its type, and returns the appopriate
     `KeplerTargetPixelFile` or `TessTargetPixelFile`.

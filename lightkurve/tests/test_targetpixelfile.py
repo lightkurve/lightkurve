@@ -9,7 +9,7 @@ import pytest
 import tempfile
 
 from ..targetpixelfile import KeplerTargetPixelFile, KeplerTargetPixelFileFactory
-from ..targetpixelfile import TessTargetPixelFile, open_fits
+from ..targetpixelfile import TessTargetPixelFile, open
 from ..lightcurve import TessLightCurve
 from ..utils import LightkurveWarning
 
@@ -427,15 +427,15 @@ def test_tpf_slicing():
     assert_array_equal(tpf[tpf.time < tpf.time[5]].time, tpf.time[0:5])
 
 
-def test_open_fits():
+def test_open():
     k2_path = os.path.dirname(os.path.abspath(__file__)) + '/data/test-tpf-star.fits'
     tess_path = os.path.dirname(os.path.abspath(__file__)) + '/data/tess25155310-s01-first-cadences.fits.gz'
-    k2tpf = open_fits(k2_path)
+    k2tpf = open(k2_path)
     assert isinstance(k2tpf, KeplerTargetPixelFile)
-    tesstpf = open_fits(tess_path)
+    tesstpf = open(tess_path)
     assert isinstance(tesstpf, TessTargetPixelFile)
     try:
-        open_fits(os.path.dirname(os.path.abspath(__file__)) +
+        open(os.path.dirname(os.path.abspath(__file__)) +
                   '/data/test_factory0.fits')
     except ValueError:
         pass
