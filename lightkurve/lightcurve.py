@@ -3,26 +3,24 @@
 from __future__ import division, print_function
 
 import copy
-from tqdm import tqdm
 import os
 import datetime
 import logging
 import pandas as pd
 import warnings
 
-import oktopus
 import numpy as np
 from scipy import signal
-from scipy.optimize import minimize
 from matplotlib import pyplot as plt
 
 from astropy.stats import sigma_clip
 from astropy.table import Table
 from astropy.io import fits
 from astropy.time import Time
+from astropy import units as u
 from . import PACKAGEDIR, MPLSTYLE
 
-from .utils import running_mean, bkjd_to_astropy_time, btjd_to_astropy_time
+from .utils import running_mean, bkjd_to_astropy_time, btjd_to_astropy_time, LightkurveWarning
 
 __all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve',
            'FoldedLightCurve']
@@ -63,6 +61,9 @@ class LightCurve(object):
             self.time = np.arange(len(flux))
         else:
             self.time = np.asarray(time)
+            # Trigger warning if time=NaN are present
+            if np.isnan(self.time).any():
+                warnings.warn('LightCurve object contains NaN times', LightkurveWarning)
         self.flux = self._validate_array(flux, name='flux')
         self.flux_err = self._validate_array(flux_err, name='flux_err')
         self.time_format = time_format
@@ -158,7 +159,7 @@ class LightCurve(object):
             return btjd_to_astropy_time(self.time)
         return Time(self.time, format=self.time_format, scale=self.time_scale)
 
-    def properties(self):
+    def show_properties(self):
         '''Print out a description of each of the non-callable attributes of a
         LightCurve object.
 
@@ -243,6 +244,19 @@ class LightCurve(object):
                 new_lc.centroid_row = np.append(new_lc.centroid_row, others[i].centroid_row)
         return new_lc
 
+    def copy(self):
+        """Returns a copy of the LightCurve object.
+
+        This method uses the `copy.deepcopy` function to ensure that all
+        objects stored within the LightCurve are copied (e.g. time and flux).
+
+        Returns
+        -------
+        lc_copy : LightCurve
+            A new `LightCurve` object which is a copy of the original.
+        """
+        return copy.deepcopy(self)
+
     def flatten(self, window_length=101, polyorder=2, return_trend=False,
                 break_tolerance=5, **kwargs):
         """
@@ -298,19 +312,27 @@ class LightCurve(object):
             # Reduce `window_length` and `polyorder` for short segments;
             # this prevents `savgol_filter` from raising an exception
             # If the segment is too short, just take the median
+
             if np.any([window_length > (h - l), (h - l) < break_tolerance]):
                 trend_signal[l:h] = np.nanmedian(lc_clean.flux[l:h])
             else:
-                trend_signal[l:h] = signal.savgol_filter(x=lc_clean.flux[l:h],
-                                                         window_length=window_length,
-                                                         polyorder=polyorder,
-                                                         **kwargs)
+                # Scipy outputs a warning here that is not useful, will be fixed in version 1.2
+                with warnings.catch_warnings():
+                    warnings.simplefilter('ignore', FutureWarning)
+                    trend_signal[l:h] = signal.savgol_filter(x=lc_clean.flux[l:h],
+                                                             window_length=window_length,
+                                                             polyorder=polyorder,
+                                                             **kwargs)
+
         trend_signal = np.interp(self.time, lc_clean.time, trend_signal)
-        flatten_lc = copy.deepcopy(self)
-        flatten_lc.flux = flatten_lc.flux / trend_signal
-        flatten_lc.flux_err = flatten_lc.flux_err / trend_signal
+        flatten_lc = self.copy()
+        with warnings.catch_warnings():
+            # ignore invalid division warnings
+            warnings.simplefilter("ignore", RuntimeWarning)
+            flatten_lc.flux = flatten_lc.flux / trend_signal
+            flatten_lc.flux_err = flatten_lc.flux_err / trend_signal
         if return_trend:
-            trend_lc = copy.deepcopy(self)
+            trend_lc = self.copy()
             trend_lc.flux = trend_signal
             return flatten_lc, trend_lc
         return flatten_lc
@@ -356,7 +378,7 @@ class LightCurve(object):
             A new ``LightCurve`` in which `flux` and `flux_err` are divided
             by the median.
         """
-        lc = copy.copy(self)
+        lc = self.copy()
         lc.flux_err = lc.flux_err / np.nanmedian(lc.flux)
         lc.flux = lc.flux / np.nanmedian(lc.flux)
         return lc
@@ -385,8 +407,8 @@ class LightCurve(object):
             A new ``LightCurve`` in which NaNs values and gaps in time have been
             filled.
         """
-        clc = copy.deepcopy(lc.remove_nans())
-        nlc = copy.deepcopy(lc)
+        clc = lc.remove_nans().copy()
+        nlc = lc.copy()
 
         # Average gap between cadences
         dt = np.nanmedian(clc.time[1::] - clc.time[:-1:])
@@ -415,32 +437,89 @@ class LightCurve(object):
         return nlc
 
     def remove_outliers(self, sigma=5., return_mask=False, **kwargs):
-        """Removes outlier flux values using sigma-clipping.
+        """Removes outlier data points using sigma-clipping.
 
-        This method returns a new LightCurve object from which flux values
-        are removed if they are separated from the mean flux by `sigma` times
-        the standard deviation.
+        This method returns a new :class:`LightCurve` object from which data
+        points are removed if their flux values are greater or smaller than
+        the median flux by at least ``sigma`` times the standard deviation.
+
+        Sigma-clipping works by iterating over data points, each time rejecting
+        values that are discrepant by more than a specified number of standard
+        deviations from a center value. If the data contains invalid values
+        (NaNs or infs), they are automatically masked before performing the
+        sigma clipping.
+
+        .. note::
+            This function is a convenience wrapper around
+            `astropy.stats.sigma_clip
+            <http://docs.astropy.org/en/stable/api/astropy.stats.sigma_clip.html>`_
+            and provides the same functionality.
 
         Parameters
         ----------
         sigma : float
-            The number of standard deviations to use for clipping outliers.
-            Defaults to 5.
+            The number of standard deviations to use for both the lower and
+            upper clipping limit. These limits are overridden by
+            ``sigma_lower`` and ``sigma_upper``, if input. Defaults to 5.
+        sigma_lower : float or `None`
+            The number of standard deviations to use as the lower bound for
+            the clipping limit. Can be set to float('inf') in order to avoid
+            clipping outliers below the median at all. If `None` then the
+            value of ``sigma`` is used. Defaults to `None`.
+        sigma_upper : float or `None`
+            The number of standard deviations to use as the upper bound for
+            the clipping limit. Can be set to float('inf') in order to avoid
+            clipping outliers above the median at all. If `None` then the
+            value of ``sigma`` is used. Defaults to `None`.
         return_mask : bool
-            Whether or not to return the mask indicating which data points
-            were removed. Entries marked as `True` are considered outliers.
+            Whether or not to return a mask (i.e. a boolean array) indicating
+            which data points were removed. Entries marked as `True` in the
+            mask are considered outliers. Defaults to `True`.
+        iters : int or `None`
+            The number of iterations to perform sigma clipping, or `None` to
+            clip until convergence is achieved (i.e., continue until the
+            last iteration clips nothing). Defaults to 5.
+        cenfunc : callable
+            The function used to compute the center for the clipping. Must
+            be a callable that takes in a masked array and outputs the
+            central value. Defaults to the median (`numpy.ma.median`).
         **kwargs : dict
             Dictionary of arguments to be passed to `astropy.stats.sigma_clip`.
 
         Returns
         -------
-        clean_lightcurve : LightCurve object
-            A new ``LightCurve`` in which outliers have been removed.
+        clean_lc : LightCurve object
+            A new :class:`LightCurve` from which outlier data points have been
+            removed.
+
+        Examples
+        --------
+        This example generates a new LightCurve in which all points
+        that are more than 1 standard deviation from the median are removed::
+
+            >>> lc = LightCurve(time=[1, 2, 3, 4, 5], flux=[1, 1000, 1, -1000, 1])
+            >>> lc_clean = lc.remove_outliers(sigma=1)
+            >>> lc_clean.time
+            array([1, 3, 5])
+            >>> lc_clean.flux
+            array([1, 1, 1])
+
+        This example removes only points where the flux is larger than 1
+        standard deviation from the median, but leaves negative outliers
+        in place::
+
+            >>> lc = LightCurve(time=[1, 2, 3, 4, 5], flux=[1, 1000, 1, -1000, 1])
+            >>> lc_clean = lc.remove_outliers(sigma_lower=float('inf'), sigma_upper=1)
+            >>> lc_clean.time
+            array([1, 3, 4, 5])
+            >>> lc_clean.flux
+            array([    1,     1, -1000,     1])
         """
+        # First, we create the outlier mask using AstroPy's sigma_clip function
         with warnings.catch_warnings():  # Ignore warnings due to NaNs or Infs
             warnings.simplefilter("ignore")
             outlier_mask = sigma_clip(data=self.flux, sigma=sigma, **kwargs).mask
-
+        # Second, we return the masked lightcurve and optionally the mask itself
         if return_mask:
             return self[~outlier_mask], outlier_mask
         return self[~outlier_mask]
@@ -479,7 +558,7 @@ class LightCurve(object):
         methodf = np.__dict__['nan' + method]
 
         n_bins = self.flux.size // binsize
-        binned_lc = copy.copy(self)
+        binned_lc = self.copy()
         binned_lc.time = np.array([methodf(a) for a in np.array_split(self.time, n_bins)])
         binned_lc.flux = np.array([methodf(a) for a in np.array_split(self.flux, n_bins)])
 
@@ -506,8 +585,16 @@ class LightCurve(object):
 
         return binned_lc
 
-    def cdpp(self, transit_duration=13, savgol_window=101, savgol_polyorder=2,
-             sigma_clip=5.):
+    def cdpp(self, **kwargs):
+        """DEPRECATED: use `estimate_cdpp()` instead."""
+        warnings.warn('`LightCurve.cdpp()` is deprecated and will be '
+                      'removed in Lightkurve v1.0.0, '
+                      'please use `LightCurve.estimate_cdpp()` instead.',
+                      LightkurveWarning)
+        return self.estimate_cdpp(**kwargs)
+
+    def estimate_cdpp(self, transit_duration=13, savgol_window=101,
+                      savgol_polyorder=2, sigma_clip=5.):
         """Estimate the CDPP noise metric using the Savitzky-Golay (SG) method.
 
         A common estimate of the noise in a lightcurve is the scatter that
@@ -617,8 +704,11 @@ class LightCurve(object):
             if ax is None:
                 fig, ax = plt.subplots(1)
             if method == 'scatter':
-                sc = ax.scatter(x=self.time, y=flux, **kwargs)
-                if show_colorbar and ('c' in kwargs) and hasattr(kwargs['c'], '__iter__'):
+                sc = ax.scatter(self.time, flux, **kwargs)
+                # Colorbars should only be plotted if the user specifies, and there is
+                # a color specified that is not a string (e.g. 'C1') and is iterable.
+                if show_colorbar and ('c' in kwargs) and \
+                  (not isinstance(kwargs['c'], str)) and hasattr(kwargs['c'], '__iter__'):
                     cbar = plt.colorbar(sc, ax=ax)
                     cbar.set_label(colorbar_label)
                     cbar.ax.yaxis.set_tick_params(tick1On=False, tick2On=False)
@@ -626,7 +716,7 @@ class LightCurve(object):
             elif method == 'errorbar':
                 ax.errorbar(x=self.time, y=flux, yerr=flux_err, **kwargs)
             else:
-                ax.plot(x=self.time, y=flux, **kwargs)
+                ax.plot(self.time, flux, **kwargs)
             ax.set_xlabel(xlabel)
             ax.set_ylabel(ylabel)
             # Show the legend if labels were set
@@ -795,15 +885,50 @@ class LightCurve(object):
         """
         return self.to_pandas().to_csv(path_or_buf=path_or_buf, **kwargs)
 
-    def periodogram(self, frequencies=None):
-        """Returns a `Periodogram`.
+    def to_periodogram(self, nterms=1, nyquist_factor=1, oversample_factor=1,
+                       min_frequency=None, max_frequency=None,
+                       min_period=None, max_period=None,
+                       frequency=None, period=None,
+                       freq_unit=1/u.day, **kwargs):
+        """Returns a `Periodogram` power spectrum object.
 
         Parameters
         ----------
-        frequencies : array-like
-            The regular grid of frequencies to use.  The frequencies must be
-            in units microhertz.  Alternatively, an AstroPy Quantity object can
-            be passed with any unit of type '1/time'.
+        min_frequency : float
+            If specified, use this minimum frequency rather than one over the
+            time baseline.
+        max_frequency : float
+            If specified, use this maximum frequency rather than nyquist_factor
+            times the nyquist frequency.
+        min_period : float
+            If specified, use 1./minium_period as the maximum frequency rather
+            than nyquist_factor times the nyquist frequency.
+        max_period : float
+            If specified, use 1./maximum_period as the minimum frequency rather
+            than one over the time baseline.
+        frequency :  array-like
+            The regular grid of frequencies to use. If given a unit, it is
+            converted to units of freq_unit. If not, it is assumed to be in
+            units of freq_unit. This over rides any set frequency limits.
+        period : array-like
+            The regular grid of periods to use (as 1/period). If given a unit,
+            it is converted to units of freq_unit. If not, it is assumed to be
+            in units of 1/freq_unit. This overrides any set period limits.
+        nterms : int
+            Default 1. Number of terms to use in the Fourier fit.
+        nyquist_factor : int
+            Default 1. The multiple of the average Nyquist frequency. Is
+            overriden by maximum_frequency (or minimum period).
+        oversample_factor : int
+            The frequency spacing, determined by the time baseline of the
+            lightcurve, is divided by this factor, oversampling frequency space.
+            This parameter is identical to the samples_per_peak parameter in
+            astropy.LombScargle()
+        freq_unit : `astropy.units.core.CompositeUnit`
+            Default: 1/u.day. The desired frequency units for the Lomb Scargle
+            periodogram. This implies that 1/freq_unit is the units for period.
+        kwargs : dict
+            Keyword arguments passed to `astropy.stats.LombScargle()`
 
         Returns
         -------
@@ -811,15 +936,26 @@ class LightCurve(object):
             Returns a Periodogram object extracted from the lightcurve.
         """
         from . import Periodogram
-        return Periodogram.from_lightcurve(lc=self, frequencies=frequencies)
+        return Periodogram.from_lightcurve(lc=self,
+                                           min_frequency=min_frequency,
+                                           max_frequency=max_frequency,
+                                           min_period=min_period,
+                                           max_period=max_period,
+                                           frequency=frequency,
+                                           period=period,
+                                           nterms=nterms,
+                                           nyquist_factor=nyquist_factor,
+                                           oversample_factor=oversample_factor,
+                                           freq_unit=freq_unit,
+                                           **kwargs)
 
     def to_fits(self, path=None, overwrite=False, **extra_data):
-        """Writes the KeplerLightCurve to a fits file.
+        """Writes the LightCurve to a FITS file.
 
         Parameters
         ----------
         path : string, default None
-            File path, if None returns an astropy.io.fits object.
+            File path, if `None` returns an astropy.io.fits.HDUList object.
         overwrite : bool
             Whether or not to overwrite the file
         extra_data : dict
@@ -899,6 +1035,10 @@ class LightCurve(object):
                     cols.append(fits.Column(name='{}'.format(kw).upper(),
                                             format=typedir[type(extra_data[kw][0])],
                                             array=extra_data[kw]))
+            if 'SAP_QUALITY' not in extra_data:
+                cols.append(fits.Column(name='SAP_QUALITY',
+                                        format='J',
+                                        array=np.zeros(len(self.flux))))
 
             coldefs = fits.ColDefs(cols)
             hdu = fits.BinTableHDU.from_columns(coldefs)
@@ -910,17 +1050,10 @@ class LightCurve(object):
             return fits.HDUList([_make_primary_hdu(extra_data=extra_data),
                                  _make_lightcurve_extension(extra_data=extra_data)])
 
-        def _header_template(extension):
-            """Returns a template `fits.Header` object for a given extension."""
-            template_fn = os.path.join(PACKAGEDIR, "data",
-                                       "lc-ext{}-header.txt".format(extension))
-            return fits.Header.fromtextfile(template_fn)
-
         hdu = _hdulist(**extra_data)
         if path is not None:
             hdu.writeto(path, overwrite=overwrite, checksum=True)
         return hdu
-
 
 class FoldedLightCurve(LightCurve):
     """Defines a folded lightcurve with different plotting defaults."""
@@ -1008,16 +1141,16 @@ class KeplerLightCurve(LightCurve):
         Mission name
     cadenceno : array-like
         Cadence numbers corresponding to every time measurement
-    keplerid : int
+    targetid : int
         Kepler ID number
     """
     def __init__(self, time=None, flux=None, flux_err=None, time_format=None, time_scale=None,
                  centroid_col=None, centroid_row=None, quality=None, quality_bitmask=None,
                  channel=None, campaign=None, quarter=None, mission=None,
-                 cadenceno=None, keplerid=None, ra=None, dec=None, label=None, meta={}):
+                 cadenceno=None, targetid=None, ra=None, dec=None, label=None, meta={}):
         super(KeplerLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err,
                                                time_format=time_format, time_scale=time_scale,
-                                               targetid=keplerid, label=label, meta=meta)
+                                               targetid=targetid, label=label, meta=meta)
         self.centroid_col = self._validate_array(centroid_col, name='centroid_col')
         self.centroid_row = self._validate_array(centroid_row, name='centroid_row')
         self.quality = self._validate_array(quality, name='quality')
@@ -1040,20 +1173,7 @@ class KeplerLightCurve(LightCurve):
         return lc
 
     def __repr__(self):
-        if self.mission is None:
-            return('KeplerLightCurve(ID: {})'.format(self.keplerid))
-        elif self.mission.lower() == 'kepler':
-            return('KeplerLightCurve(KIC: {})'.format(self.keplerid))
-        elif self.mission.lower() == 'k2':
-            return('KeplerLightCurve(EPIC: {})'.format(self.keplerid))
-
-    @property
-    def keplerid(self):
-        return self.targetid
-
-    @keplerid.setter
-    def keplerid(self, value):
-        self.targetid = value
+        return('KeplerLightCurve(ID: {})'.format(self.targetid))
 
     def correct(self, method='sff', **kwargs):
         """Corrects a lightcurve for motion-dependent systematic errors.
@@ -1083,7 +1203,7 @@ class KeplerLightCurve(LightCurve):
                                                   **kwargs)
         else:
             raise ValueError("method {} is not available.".format(method))
-        new_lc = copy.copy(self)
+        new_lc = self.copy()
         new_lc.time = corrected_lc.time
         new_lc.flux = corrected_lc.flux
         new_lc.flux_err = self.normalize().flux_err[not_nan]
@@ -1108,12 +1228,12 @@ class KeplerLightCurve(LightCurve):
         return super(KeplerLightCurve, self).to_pandas(columns=columns)
 
     def to_fits(self, path=None, overwrite=False, **extra_data):
-        """Export the KeplerLightCurve as an astropy.io.fits object.
+        """Writes the KeplerLightCurve to a FITS file.
 
         Parameters
         ----------
         path : string, default None
-            File path, if None returns an astropy.io.fits object.
+            File path, if `None` returns an astropy.io.fits.HDUList object.
         overwrite : bool
             Whether or not to overwrite the file
         extra_data : dict
@@ -1131,14 +1251,15 @@ class KeplerLightCurve(LightCurve):
         kepler_specific_data = {
             'TELESCOP': "KEPLER",
             'INSTRUME': "Kepler Photometer",
-            'OBJECT': '{}'.format(self.keplerid),
-            'KEPLERID': self.keplerid,
+            'OBJECT': '{}'.format(self.targetid),
+            'KEPLERID': self.targetid,
             'CHANNEL': self.channel,
             'MISSION': self.mission,
             'RA_OBJ': self.ra,
             'DEC_OBJ': self.dec,
             'EQUINOX': 2000,
-            'DATE-OBS': Time(self.time[0]+2454833., format=('jd')).isot}
+            'DATE-OBS': Time(self.time[0]+2454833., format=('jd')).isot,
+            'SAP_QUALITY': self.quality}
         for kw in kepler_specific_data:
             if ~np.asarray([kw.lower == k.lower() for k in extra_data]).any():
                 extra_data[kw] = kepler_specific_data[kw]
@@ -1172,16 +1293,16 @@ class TessLightCurve(LightCurve):
         Bitmask specifying quality flags of cadences that should be ignored
     cadenceno : array-like
         Cadence numbers corresponding to every time measurement
-    ticid : int
+    targetid : int
         Tess Input Catalog ID number
     """
     def __init__(self, time=None, flux=None, flux_err=None, time_format=None, time_scale=None,
                  centroid_col=None, centroid_row=None, quality=None, quality_bitmask=None,
                  cadenceno=None, sector=None, camera=None, ccd=None,
-                 ticid=None, ra=None, dec=None, label=None, meta={}):
+                 targetid=None, ra=None, dec=None, label=None, meta={}):
         super(TessLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err,
                                              time_format=time_format, time_scale=time_scale,
-                                             targetid=ticid, label=label, meta=meta)
+                                             targetid=targetid, label=label, meta=meta)
         self.centroid_col = self._validate_array(centroid_col, name='centroid_col')
         self.centroid_row = self._validate_array(centroid_row, name='centroid_row')
         self.quality = self._validate_array(quality, name='quality')
@@ -1204,136 +1325,4 @@ class TessLightCurve(LightCurve):
         return lc
 
     def __repr__(self):
-        return('TessLightCurve(TICID: {})'.format(self.ticid))
-
-    @property
-    def ticid(self):
-        return self.targetid
-
-    @ticid.setter
-    def ticid(self, value):
-        self.targetid = value
-
-
-def iterative_box_period_search(lc, niters=2, min_period=0.5, max_period=30,
-                                nperiods=501, period_scale='log'):
-    """
-    Implements a routine to find box-like transit events.
-    This function fits a "box" model defined as:
-
-    .. math::
-
-        \Pi (t) = h - d\cdot \mathbb{I}(t_0 \leq t_i \leq t_0 + w)
-
-    in which :math:`\mathbb{I}` is the indicator function.
-
-    It turns out that, in a iid Gaussian noise setting, the parameters
-    :math:`h` and :math:`d`, respectively, the amplitude and the depth
-    of the box, can be solved analytically.
-
-    Hence, this function iterates between two procedures:
-    (i) compute :math:`h` and :math:`d` for given :math:`t_0` and :math:`w`
-    (ii) numerically optimize for :math:`t_0` and :math:`w` given :math:`h`
-    and :math:`d`.
-
-    This procedure is done to a list of `nperiods` periods between `min_period`
-    and `max_period`. It's assumed that the best period is the one that
-    maximizes the posterior probability of the fit.
-
-    Parameters
-    ----------
-    lc : LightCurve object
-        An object from KeplerLightCurve or LightCurve.
-        Note that flattening the lightcurve beforehand does aid the quest
-        for the transit period.
-    min_period : float
-        Minimum period to search for. Units must be the same as `lc.time`.
-    max_period : float
-        Maximum period to search for. Units must be the same as `lc.time`.
-    nperiods : int
-        Number of periods to search between `min_period` and `max_period`.
-    period_scale : str
-        Type of the scale used to create the grid of periods between `min_period`
-        and `max_period` used to search for the best period.
-        Options are `linear`, `log`, or `inverse`.
-
-    Returns
-    -------
-    log_posterior : list
-        Log posterior (up to an additive constant) of the fit. The "best"
-        period is therefore the one that maximizes the log posterior
-        probability.
-    trial_periods : numpy array
-        List of trial periods.
-    best_period : float
-        Best period.
-
-    Notes
-    -----
-    This function is experimental. Changes may be made in both its signature
-    and implementation.
-    """
-
-    t = np.linspace(-.5, .5, len(lc.time))
-    logprior_to = oktopus.prior.UniformPrior(lb=-.5, ub=.5)
-    logprior_width = oktopus.prior.UniformPrior(lb=1e-3, ub=.2)
-    m = np.nanmean(lc.flux)
-
-    def logposterior(args, amplitude=None, depth=None, data=None):
-        """Defines the negative of log of the joint posterior distribution of
-        the start time of the transit `to` and the transit duration `w`.
-        """
-        to, width = args
-        out_of_transit = (t < to) + (t >= to + width)
-        in_transit = np.logical_not(out_of_transit)
-        ll = ((data - amplitude) ** 2 * out_of_transit
-              + (data - (amplitude - depth)) ** 2 * in_transit)
-        return np.nansum(ll) + logprior_to(to) + logprior_width(width)
-
-    def opt_amplitude(width, depth):
-        """The MAP estimator for the amplitude of the lightcurve given that
-        `to` and `w` have joint uniform prior distribution.
-        """
-        return width * depth + m
-
-    def opt_depth(to, width, data):
-        """The MAP estimator for the transit depth given that `to` and `w`
-        have joint uniform prior distribution.
-        """
-        in_transit = (t < to + width) * (t >= to)
-        n = np.nanmean(data[in_transit])
-        return (m - n) / (1 - width)
-
-    if period_scale == 'linear':
-        trial_periods = np.linspace(min_period, max_period, nperiods)
-    elif period_scale == 'log':
-        trial_periods = np.logspace(np.log10(min_period), np.log10(max_period), nperiods)
-    elif period_scale == 'inverse':
-        trial_periods = 1 / np.linspace(1/max_period, 1/min_period, nperiods)
-    else:
-        raise ValueError("period_scale must be one of {}. Got {}."
-                         .format("{'linear', 'log', 'inverse'}", period_scale))
-
-    log_posterior, snr_d = [], []
-    for p in tqdm(trial_periods):
-        folded = lc.fold(period=p)
-        # heuristically define initial guesses for the parameters
-        amplitude_star, depth_star = m, 1e-4
-        width_star = .1
-        if np.nanmean(folded.flux[t < 0]) > np.nanmean(folded.flux[t > 0]):
-            to_star = .25
-        else:
-            to_star = -.25
-        for i in range(niters):
-            # optimize the joint log posterior of to and width
-            res = minimize(logposterior, x0=(to_star, width_star),
-                           args=(amplitude_star, depth_star, folded.flux),
-                           method='powell')
-            to_star, width_star = res.x
-            # compute the depth and amplitude using MAP
-            depth_star = opt_depth(to_star, width_star, folded.flux)
-            amplitude_star = opt_amplitude(width_star, depth_star)
-        log_posterior.append(-res.fun)
-        snr_d.append(depth_star * np.sqrt(width_star))
-
-    return log_posterior, trial_periods, trial_periods[np.argmax(log_posterior)]
+        return('TessLightCurve(TICID: {})'.format(self.targetid))

@@ -43,9 +43,7 @@ def test_collection_getitem():
     lcc.append(lc2)
     assert(lcc[0] == lc)
     assert(lcc[1] == lc2)
-    assert(lcc[lc.targetid] == lc)
-    assert(lcc[lc2.targetid] == lc2)
-    with pytest.raises(KeyError):
+    with pytest.raises(IndexError):
         lcc[50]
 
 
@@ -77,12 +75,23 @@ def test_tpfcollection():
     assert(tpfc[0] == tpf)
     assert(tpfc[1] == tpf2)
     assert(tpfc[2] == tpf2)
-    assert(tpfc[tpf.targetid].targetid == tpf.targetid)
-    assert(tpfc[tpf2.targetid].targetid == tpf2.targetid)
-    with pytest.raises(KeyError):
+    with pytest.raises(IndexError):
         tpfc[51]
     # Test __setitem__
     tpf3 = KeplerTargetPixelFile(filename_tpf_one_center, targetid=55)
     tpfc[1] = tpf3
     assert(tpfc[1] == tpf3)
-    str(tpfc)  # Does repr work?
+    tpfc.append(tpf2)
+    assert(tpfc[2] == tpf2)
+
+
+def test_tpfcollection_plot_all():
+    tpf = KeplerTargetPixelFile(filename_tpf_all_zeros)
+    tpf2 = KeplerTargetPixelFile(filename_tpf_one_center)
+    # Does plotting work with 3 TPFs?
+    coll = TargetPixelFileCollection([tpf, tpf2, tpf2])
+    coll.plot_all()
+    # Does plotting work with one TPF?
+    coll = TargetPixelFileCollection([tpf])
+    coll.plot_all()
+    plt.close('all')

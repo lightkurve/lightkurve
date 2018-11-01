@@ -9,9 +9,9 @@ from numpy.testing import (assert_almost_equal, assert_array_equal,
                            assert_allclose)
 import pytest
 
-from ..lightcurve import (LightCurve, KeplerLightCurve, TessLightCurve,
-                          iterative_box_period_search)
+from ..lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
 from ..lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
+from ..utils import LightkurveWarning
 
 # 8th Quarter of Tabby's star
 TABBY_Q8 = ("https://archive.stsci.edu/missions/kepler/lightcurves"
@@ -43,6 +43,13 @@ def test_empty_lightcurve():
     with pytest.raises(ValueError) as err:
         LightCurve()
     assert err_string == err.value.args[0]
+
+
+def test_lc_nan_time():
+    time = np.array([1, 2, 3, np.nan])
+    flux = np.array([1, 2, 3, 4])
+    with pytest.warns(LightkurveWarning, match='contains NaN times'):
+        lc = LightCurve(time=time, flux=flux)
 
 
 def test_math_operators():
@@ -174,6 +181,69 @@ def test_lightcurve_append_multiple():
     assert_array_equal(lc.time, 4*[1, 2, 3])
 
 
+def test_lightcurve_copy():
+    """Test ``LightCurve.copy()``."""
+    time = np.array([1, 2, 3, 4])
+    flux = np.array([1, 2, 3, 4])
+    error = np.array([0.1, 0.2, 0.3, 0.4])
+    lc = LightCurve(time=time, flux=flux, flux_err=error)
+
+    nlc = lc.copy()
+    assert_array_equal(lc.time, nlc.time)
+    assert_array_equal(lc.flux, nlc.flux)
+    assert_array_equal(lc.flux_err, nlc.flux_err)
+
+    nlc.time[1] = 5
+    nlc.flux[1] = 6
+    nlc.flux_err[1] = 7
+
+    # By changing 1 of the 4 data points in the new lightcurve's array-like
+    # attributes, we expect assert_array_equal to raise an AssertionError
+    # indicating a mismatch of 1/4 (or 25%).
+    with pytest.raises(AssertionError, match='(mismatch 25.0%)'):
+        assert_array_equal(lc.time, nlc.time)
+    with pytest.raises(AssertionError, match='(mismatch 25.0%)'):
+        assert_array_equal(lc.flux, nlc.flux)
+    with pytest.raises(AssertionError, match='(mismatch 25.0%)'):
+        assert_array_equal(lc.flux_err, nlc.flux_err)
+
+    # KeplerLightCurve has extra data
+    lc = KeplerLightCurve(time=[1, 2, 3], flux=[1, .5, 1],
+                          centroid_col=[4, 5, 6], centroid_row=[7, 8, 9],
+                          cadenceno=[10, 11, 12], quality=[10, 20, 30])
+    nlc = lc.copy()
+    assert_array_equal(lc.time, nlc.time)
+    assert_array_equal(lc.flux, nlc.flux)
+    assert_array_equal(lc.centroid_col, nlc.centroid_col)
+    assert_array_equal(lc.centroid_row, nlc.centroid_row)
+    assert_array_equal(lc.cadenceno, nlc.cadenceno)
+    assert_array_equal(lc.quality, nlc.quality)
+
+    nlc.time[1] = 6
+    nlc.flux[1] = 7
+    nlc.centroid_col[1] = 8
+    nlc.centroid_row[1] = 9
+    nlc.cadenceno[1] = 10
+    nlc.quality[1] = 11
+
+    # As before, by changing 1/3 data points, we expect a mismatch of 33.3%
+    # with a repeating decimal. However, float precision for python 2.7 is 10
+    # decimal digits, while python 3.6's is 13 decimal digits. Therefore,
+    # a regular expression is needed for both versions.
+    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
+        assert_array_equal(lc.time, nlc.time)
+    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
+        assert_array_equal(lc.flux, nlc.flux)
+    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
+        assert_array_equal(lc.centroid_col, nlc.centroid_col)
+    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
+        assert_array_equal(lc.centroid_row, nlc.centroid_row)
+    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
+        assert_array_equal(lc.cadenceno, nlc.cadenceno)
+    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
+        assert_array_equal(lc.quality, nlc.quality)
+
+
 @pytest.mark.remote_data
 def test_lightcurve_plots():
     """Sanity check to verify that lightcurve plotting works"""
@@ -183,6 +253,7 @@ def test_lightcurve_plots():
         lcf.SAP_FLUX.plot()
         lcf.SAP_FLUX.plot(normalize=False, title="Not the default")
         lcf.SAP_FLUX.scatter()
+        lcf.SAP_FLUX.scatter(c='C3')
         lcf.SAP_FLUX.scatter(c=lcf.SAP_FLUX.time, show_colorbar=True, colorbar_label='Time')
         lcf.SAP_FLUX.errorbar()
         plt.close('all')
@@ -208,16 +279,17 @@ def test_lightcurve_scatter():
     lc.fold(**foldkw).scatter(ax=ax[1,1], c=foldedtimeinorder, **scatterkw)
     plt.ylim(0.999, 1.001)
 
+
 def test_cdpp():
     """Test the basics of the CDPP noise metric."""
     # A flat lightcurve should have a CDPP close to zero
-    assert_almost_equal(LightCurve(np.arange(200), np.ones(200)).cdpp(), 0)
+    assert_almost_equal(LightCurve(np.arange(200), np.ones(200)).estimate_cdpp(), 0)
     # An artificial lightcurve with sigma=100ppm should have cdpp=100ppm
     lc = LightCurve(np.arange(10000), np.random.normal(loc=1, scale=100e-6, size=10000))
-    assert_almost_equal(lc.cdpp(transit_duration=1), 100, decimal=-0.5)
+    assert_almost_equal(lc.estimate_cdpp(transit_duration=1), 100, decimal=-0.5)
     # Transit_duration must be an integer (cadences)
     with pytest.raises(ValueError):
-        lc.cdpp(transit_duration=6.5)
+        lc.estimate_cdpp(transit_duration=6.5)
 
 
 @pytest.mark.remote_data
@@ -226,7 +298,7 @@ def test_cdpp_tabby():
     lcf = KeplerLightCurveFile(TABBY_Q8)
     # Tabby's star shows dips after cadence 1000 which increase the cdpp
     lc = LightCurve(lcf.PDCSAP_FLUX.time[:1000], lcf.PDCSAP_FLUX.flux[:1000])
-    assert(np.abs(lc.cdpp() - lcf.header(ext=1)['CDPP6_0']) < 30)
+    assert(np.abs(lc.estimate_cdpp() - lcf.header(ext=1)['CDPP6_0']) < 30)
 
 
 def test_bin():
@@ -265,19 +337,6 @@ def test_normalize():
     lc = LightCurve(time=np.arange(10), flux=5*np.ones(10), flux_err=0.05*np.ones(10))
     assert_allclose(np.median(lc.normalize().flux), 1)
     assert_allclose(np.median(lc.normalize().flux_err), 0.05/5)
-
-
-@pytest.mark.remote_data
-def test_iterative_box_period_search():
-    """Can we recover the orbital period of Kepler-10b?"""
-    answer = 0.837495  # wikipedia
-    klc = KeplerLightCurveFile(KEPLER10)
-    pdc = klc.PDCSAP_FLUX
-    flat, trend = pdc.flatten(return_trend=True)
-
-    _, _, kepler10b_period = iterative_box_period_search(flat, min_period=.5, max_period=1,
-                                                         nperiods=101, period_scale='log')
-    assert abs(kepler10b_period - answer) < 1e-2
 
 
 def test_to_pandas():
@@ -332,6 +391,7 @@ def test_to_fits():
     """Test the KeplerLightCurve.to_fits() method"""
     lcf = KeplerLightCurveFile(TABBY_Q8)
     hdu = lcf.PDCSAP_FLUX.to_fits()
+    lcf_new = KeplerLightCurveFile(hdu)  # Regression test for #233
     assert type(hdu).__name__ is 'HDUList'
     assert len(hdu) == 2
     assert hdu[0].header['EXTNAME'] == 'PRIMARY'
@@ -341,6 +401,7 @@ def test_to_fits():
     assert hdu[1].header['TTYPE3'] == 'FLUX_ERR'
     assert hdu[1].header['TTYPE4'] == 'CADENCENO'
     hdu = LightCurve([0, 1, 2, 3, 4], [1, 1, 1, 1, 1]).to_fits()
+    lcf_new = KeplerLightCurveFile(hdu)  # Regression test for #233
     assert hdu[0].header['EXTNAME'] == 'PRIMARY'
     assert hdu[1].header['EXTNAME'] == 'LIGHTCURVE'
     assert hdu[1].header['TTYPE1'] == 'TIME'
@@ -450,6 +511,11 @@ def test_remove_outliers():
     lc_clean, outlier_mask = lc.remove_outliers(sigma=1, return_mask=True)
     assert(len(outlier_mask) == len(lc.flux))
     assert(outlier_mask.sum() == 1)
+    # Can we set sigma_lower and sigma_upper?
+    lc = LightCurve(time=[1, 2, 3, 4, 5], flux=[1, 1000, 1, -1000, 1])
+    lc_clean = lc.remove_outliers(sigma_lower=float('inf'), sigma_upper=1)
+    assert_array_equal(lc_clean.time, [1, 3, 4, 5])
+    assert_array_equal(lc_clean.flux, [1, 1, -1000, 1])
 
 
 @pytest.mark.remote_data
@@ -458,7 +524,7 @@ def test_properties(capfd):
     The output is 624 characters at the moment, but we might add more properties.'''
     lcf = KeplerLightCurveFile(TABBY_Q8)
     kplc = lcf.get_lightcurve('SAP_FLUX')
-    kplc.properties()
+    kplc.show_properties()
     out, err = capfd.readouterr()
     assert len(out) > 500
 
@@ -519,13 +585,11 @@ def test_from_fits():
     """Does the lcf.from_fits() method work like the constructor?"""
     lcf = KeplerLightCurveFile.from_fits(TABBY_Q8)
     assert isinstance(lcf, KeplerLightCurveFile)
-    assert lcf.keplerid == KeplerLightCurveFile(TABBY_Q8).keplerid
-    assert lcf.keplerid == lcf.targetid
+    assert lcf.targetid == KeplerLightCurveFile(TABBY_Q8).targetid
     # Execute the same test for TESS
     lcf = TessLightCurveFile.from_fits(TESS_SIM)
     assert isinstance(lcf, TessLightCurveFile)
-    assert lcf.ticid == TessLightCurveFile(TESS_SIM).ticid
-    assert lcf.ticid == lcf.targetid
+    assert lcf.targetid == TessLightCurveFile(TESS_SIM).targetid
 
 
 def test_targetid():
@@ -536,18 +600,11 @@ def test_targetid():
     lc.targetid = 99
     assert lc.targetid == 99
     # Does it work for Kepler?
-    lc = KeplerLightCurve(time=[], keplerid=10)
+    lc = KeplerLightCurve(time=[], targetid=10)
     assert lc.targetid == 10
-    assert lc.keplerid == 10
-    # Can we assign a new value?
-    lc.keplerid = 99
-    assert lc.keplerid == 99
-    assert lc.targetid == 99
-    # Does it work for TESS?
-    lc = TessLightCurve(time=[], ticid=20)
-    assert lc.targetid == 20
-    assert lc.ticid == 20
     # Can we assign a new value?
     lc.targetid = 99
-    assert lc.ticid == 99
     assert lc.targetid == 99
+    # Does it work for TESS?
+    lc = TessLightCurve(time=[], targetid=20)
+    assert lc.targetid == 20
