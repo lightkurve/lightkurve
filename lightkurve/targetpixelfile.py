@@ -99,7 +99,17 @@ class TargetPixelFile(object):
     def header(self):
         """Returns the header of the primary extension."""
         return self.hdu[0].header
-        
+
+
+    def _validate_wcs(self):
+        '''Validates the WCS object. Returns False if WCS is invalid.
+        '''
+        # Find target RA and Dec, use WCS to find the pixel location
+        x, y = self.wcs.wcs_world2pix(np.asarray([[self.ra], [self.dec]]).T, 0).T
+        # Must be included within the TPF
+        validation = (x > 0) & (x <= self.flux.shape[2]) & (y > 0) & (y < self.flux.shape[1])
+        return validation
+
 
     def get_sources(self, catalog=None, magnitude_limit=18):
         """Returns a table of sources known to exist in the TPF file.
