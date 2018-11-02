@@ -15,6 +15,7 @@ from astroquery.exceptions import ResolverError
 from .lightcurvefile import KeplerLightCurveFile
 from .targetpixelfile import KeplerTargetPixelFile
 from .collections import TargetPixelFileCollection, LightCurveFileCollection
+from .utils import suppress_stdout
 from . import PACKAGEDIR
 
 log = logging.getLogger(__name__)
