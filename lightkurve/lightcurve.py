@@ -571,7 +571,7 @@ class LightCurve(object):
             ) / binsize
         else:
             # Make them zeros.
-            binned_lc.flux_err = np.zeros(len(binned_lc.flux_err))
+            binned_lc.flux_err = np.zeros(len(binned_lc.flux))
 
         if hasattr(binned_lc, 'quality'):
             binned_lc.quality = np.array(
