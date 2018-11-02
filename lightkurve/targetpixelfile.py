@@ -214,7 +214,7 @@ class TargetPixelFile(object):
             source_list.rename_column('mag', 'Gmag')
         else:
             source_list.rename_column('mag', 'Kpmag')
-        return source_list
+        return source_list.to_pandas()
 
 
     @property
