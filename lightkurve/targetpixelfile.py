@@ -305,31 +305,6 @@ class TargetPixelFile(object):
 
 
     @property
-    def keplerid(self):
-        return self.header()['KEPLERID']
-
-    @property
-    def obsmode(self):
-        return self.header()['OBSMODE']
-
-    @property
-    def module(self):
-        return self.header()['MODULE']
-
-    @property
-    def channel(self):
-        return self.header()['CHANNEL']
-
-    @property
-    def output(self):
-        return self.header()['OUTPUT']
-
-    def _quality_mask(self, bitmask):
-        if bitmask is None:
-            return np.ones(len(self.hdu[1].data['TIME']), dtype=bool)
-        return (self.hdu[1].data['QUALITY'] & bitmask) == 0
-
-    @property
     def ra(self):
         """Right Ascension of target ('RA_OBJ' header keyword)."""
         try:
