@@ -100,48 +100,6 @@ class TargetPixelFile(object):
         """Returns the header of the primary extension."""
         return self.hdu[0].header
 
-    def get_prf_model(self):
-        """Returns an object of SimpleKeplerPRF initialized using the
-        necessary metadata in the tpf object.
-
-        Returns
-        -------
-        prf : instance of SimpleKeplerPRF
-        """
-
-        return SimpleKeplerPRF(channel=self.channel, shape=self.shape[1:],
-                               column=self.column, row=self.row)
-
-    @property
-    def wcs(self):
-        """Returns an astropy.wcs.WCS object with the World Coordinate System
-        solution for the target pixel file.
-
-        Returns
-        -------
-        w : astropy.wcs.WCS object
-            WCS solution
-        """
-        # Use WCS keywords of the 5th column (FLUX)
-        wcs_keywords = {'1CTYP5': 'CTYPE1',
-                        '2CTYP5': 'CTYPE2',
-                        '1CRPX5': 'CRPIX1',
-                        '2CRPX5': 'CRPIX2',
-                        '1CRVL5': 'CRVAL1',
-                        '2CRVL5': 'CRVAL2',
-                        '1CUNI5': 'CUNIT1',
-                        '2CUNI5': 'CUNIT2',
-                        '1CDLT5': 'CDELT1',
-                        '2CDLT5': 'CDELT2',
-                        '11PC5': 'PC1_1',
-                        '12PC5': 'PC1_2',
-                        '21PC5': 'PC2_1',
-                        '22PC5': 'PC2_2'}
-        mywcs = {}
-        for oldkey, newkey in wcs_keywords.items():
-            mywcs[newkey] = self.hdu[1].header[oldkey]
-        return WCS(mywcs)
-
     def get_coordinates(self, cadence='all'):
         """Returns two 3D arrays of RA and Dec values in decimal degrees.
 
