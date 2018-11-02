@@ -559,19 +559,19 @@ class LightCurve(object):
 
         n_bins = self.flux.size // binsize
         binned_lc = self.copy()
-        binned_lc.time = np.array([methodf(a) for a in np.array_split(self.time, n_bins)])
-        binned_lc.flux = np.array([methodf(a) for a in np.array_split(self.flux, n_bins)])
+        indexes = np.array_split(np.arange(len(self.time)), n_bins)
+        binned_lc.time = np.array([methodf(a) for a in indexes])
+        binned_lc.flux = np.array([methodf(a) for a in indexes])
 
         if np.any(np.isfinite(self.flux_err)):
             # root-mean-square error
             binned_lc.flux_err = np.array(
                 [np.sqrt(np.nansum(a**2))
-                 for a in np.array_split(self.flux_err, n_bins)]
+                 for a in indexes]
             ) / binsize
         else:
-            # compute the standard deviation from the data
-            binned_lc.flux_err = np.array([np.nanstd(a)
-                                           for a in np.array_split(self.flux, n_bins)])
+            # Make them zeros.
+            binned_lc.flux_err = np.zeros(len(binned_lc.flux_err))
 
         if hasattr(binned_lc, 'quality'):
             binned_lc.quality = np.array(
