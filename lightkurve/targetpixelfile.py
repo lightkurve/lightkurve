@@ -915,7 +915,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                 **keys)
 
     @staticmethod
-    def from_fits_images(images, position=None, size=(11, 11), extension=1,
+    def from_fits_images(images, position, size=(11, 11), extension=1,
                          target_id="unnamed-target", hdu0_keywords={}, **kwargs):
         """Creates a new Target Pixel File from a set of images.
 
@@ -946,12 +946,14 @@ class KeplerTargetPixelFile(TargetPixelFile):
         tpf : KeplerTargetPixelFile
             A new Target Pixel File assembled from the images.
         """
+        if len(images) == 0:
+            raise ValueError('One or more images must be passed.')
+        if not isinstance(position, SkyCoord):
+            raise ValueError('Position must be an astropy.coordinates.SkyCoord.')
+
         basic_keywords = ['MISSION', 'TELESCOP', 'INSTRUME', 'QUARTER',
                           'CAMPAIGN', 'CHANNEL', 'MODULE', 'OUTPUT']
         carry_keywords = {}
-
-        if not isinstance(position, SkyCoord):
-            raise FactoryError('Position must be an astropy.coordinates.SkyCoord.')
 
         # Define a helper function to accept images in a flexible way
         def _open_image(img, extension):
@@ -981,7 +983,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
                             np.asarray([[position.ra.deg], [position.dec.deg]]).T,
                             0)[0]
             column, row = int(column), int(row)
-        except Exception:
+        except Exception as e:
+            raise e
             raise FactoryError("Images must have a valid WCS astrometric solution.")
             return None
 
@@ -1095,11 +1098,14 @@ class KeplerTargetPixelFileFactory(object):
         ''' Check the data before writing to a TPF for any obvious errors
         '''
         if len(self.time) != len(np.unique(self.time)):
-            raise FactoryError('Duplicate time stamps in the TPF')
+            warnings.warn('The factory-created TPF contains cadences with '
+                          'identical TIME values.', LightkurveWarning)
         if ~np.all(self.time == np.sort(self.time)):
-            raise FactoryError('Starting time values are not sorted')
+            warnings.warn('Cadences in the factory-created TPF do not appear '
+                          'to be sorted in chronological order.', LightkurveWarning)
         if np.nansum(self.flux) == 0:
-            raise FactoryError('No flux has been set.')
+            warnings.warn('The factory-created TPF does not appear to contain '
+                          'non-zero flux values.', LightkurveWarning)
 
     def get_tpf(self, hdu0_keywords={}, ext_info={}, **kwargs):
         """Returns a KeplerTargetPixelFile object."""
