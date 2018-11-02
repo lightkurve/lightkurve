@@ -4,15 +4,18 @@ from __future__ import division, print_function
 
 import os
 import logging
+import warnings
+
 import numpy as np
 import matplotlib as mpl
 from matplotlib import pyplot as plt
-
 from astropy.io import fits as pyfits
 
-from .utils import (bkjd_to_astropy_time, KeplerQualityFlags, TessQualityFlags)
+from .utils import (bkjd_to_astropy_time, KeplerQualityFlags, TessQualityFlags,
+                    LightkurveWarning)
 from .mast import download_kepler_products
 
+from . import MPLSTYLE
 
 __all__ = ['KeplerLightCurveFile', 'TessLightCurveFile']
 
@@ -24,14 +27,19 @@ class LightCurveFile(object):
 
     Parameters
     ----------
-    path : str
+    path : str or `astropy.io.fits.HDUList` object
         Local path or remote url of a lightcurve FITS file.
+        Also accepts a FITS file object already opened using AstroPy.
     kwargs : dict
         Keyword arguments to be passed to astropy.io.fits.open.
     """
     def __init__(self, path, **kwargs):
-        self.path = path
-        self.hdu = pyfits.open(self.path, **kwargs)
+        if isinstance(path, pyfits.HDUList):
+            self.path = None
+            self.hdu = path
+        else:
+            self.path = path
+            self.hdu = pyfits.open(self.path, **kwargs)
 
     def header(self, ext=0):
         """Header of the object at extension `ext`"""
@@ -95,7 +103,7 @@ class LightCurveFile(object):
         types = [n for n in types if not ('ERR' in n)]
         return types
 
-    def plot(self, flux_types=None, style='fast', **kwargs):
+    def plot(self, flux_types=None, style='lightkurve', **kwargs):
         """Plot all the light curves contained in this light curve file.
 
         Parameters
@@ -109,8 +117,8 @@ class LightCurveFile(object):
             Dictionary of keyword arguments to be passed to
             `KeplerLightCurve.plot()`.
         """
-        if (style == "fast") and ("fast" not in mpl.style.available):
-            style = "default"
+        if style is None or style == 'lightkurve':
+            style = MPLSTYLE
         with plt.style.context(style):
             if not ('ax' in kwargs):
                 fig, ax = plt.subplots(1)
@@ -163,20 +171,9 @@ class KeplerLightCurveFile(LightCurveFile):
 
     @staticmethod
     def from_archive(target, cadence='long', quarter=None, month=None,
-                     campaign=None, radius=1., targetlimit=1,
-                     quality_bitmask="default", **kwargs):
-        """Fetches a LightCurveFile (or list thereof) from the data archive at MAST.
-
-        If a target was observed across multiple quarters or campaigns, a
-        list of `LightCurveFile` objects will only be returned if the string
-        'all' is passed to `quarter` or `campaign`.  Alternatively, a list of
-        numbers can be pased to these arguments.
-
-        An `ArchiveError` will be raised if no (unique) LightCurveFile
-        can be found.
-
-        If `targetlimit` is set to more than one (or None) then will return a list
-        of `KeplerLightCurveFile`. Will only return hits within the specified radius.
+                     campaign=None, quality_bitmask="default", **kwargs):
+        """WARNING: THIS FUNCTION IS DEPRECATED AND WILL BE REMOVED VERY SOON.
+        Use `lightkurve.search_lightcurvefile()` instead.
 
         Parameters
         ----------
@@ -190,12 +187,6 @@ class KeplerLightCurveFile(LightCurveFile):
             For Kepler's prime mission, there are three short-cadence
             LightCurveFile objects for each quarter, each covering one month.
             Hence, if cadence='short' you need to specify month=1, 2, or 3.
-        radius : float
-            Search radius in arcseconds. Default is 1 arcsecond.
-        targetlimit : None or int
-            If multiple targets are present within `radius`, limit the number
-            of returned LightCurveFile objects to `targetlimit`.
-            If `None`, no limit is applied.
         quality_bitmask : str or int
             Bitmask (integer) which identifies the quality flag bitmask that should
             be used to mask out bad cadences. If a string is passed, it has the
@@ -217,6 +208,10 @@ class KeplerLightCurveFile(LightCurveFile):
         -------
         lcf : KeplerLightCurveFile object or list of KeplerLightCurveFile objects
         """
+        warnings.warn("`LightCurveFile.from_archive()` is deprecated and will be removed soon, "
+                      "please use `lightkurve.search_lightcurvefile()` instead.",
+                      LightkurveWarning)
+
         # Be tolerant if a direct path or url is passed to this function by accident
         if os.path.exists(str(target)) or str(target).startswith('http'):
             log.warning('Warning: from_archive() is not intended to accept a '
@@ -226,7 +221,7 @@ class KeplerLightCurveFile(LightCurveFile):
             path = download_kepler_products(
                 target=target, filetype='Lightcurve', cadence=cadence,
                 quarter=quarter, campaign=campaign, month=month,
-                radius=radius, targetlimit=targetlimit)
+                searchtype='single', radius=1., targetlimit=1)
         if len(path) == 1:
             return KeplerLightCurveFile(path[0],
                                         quality_bitmask=quality_bitmask,

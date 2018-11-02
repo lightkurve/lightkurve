@@ -2,6 +2,8 @@
 from __future__ import division, print_function
 import logging
 import sys
+import os
+import warnings
 
 from astropy.visualization import (PercentileInterval, ImageNormalize,
                                    SqrtStretch, LinearStretch)
@@ -12,9 +14,7 @@ import astropy.units as u
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 import numpy as np
-import logging
-
-log = logging.getLogger(__name__)
+from functools import wraps
 
 log = logging.getLogger(__name__)
 
@@ -405,7 +405,13 @@ def plot_image(image, ax=None, scale='linear', origin='lower',
     """
     if ax is None:
         _, ax = plt.subplots()
-    vmin, vmax = PercentileInterval(95.).get_limits(image[image > 0])
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", RuntimeWarning)  # ignore image NaN values
+        mask = np.nan_to_num(image) > 0
+        if mask.any() > 0:
+            vmin, vmax = PercentileInterval(95.).get_limits(image[mask])
+        else:
+            vmin, vmax = 0, 0
 
     norm = None
     if scale is not None:
@@ -506,3 +512,25 @@ def kpmag_to_flux(kpmag):
     f12 = 1.74 * 10**5  # pre-flight zero point
     exponent = -0.4*(kpmag - 12)
     return 10**(exponent) * f12
+
+
+class LightkurveWarning(Warning):
+    """Class for all Lightkurve warnings."""
+    pass
+
+
+def suppress_stdout(f, *args):
+    """A simple decorator to suppress function print outputs."""
+    @wraps(f)
+    def wrapper(*args):
+        # redirect output to `null`
+        with open(os.devnull, 'w') as devnull:
+            old_out = sys.stdout
+            sys.stdout = devnull
+            try:
+                return f(*args)
+            # restore to default
+            finally:
+                sys.stdout = old_out
+    return wrapper
+>>>>>>> de8381424805b9eebe9cf830b9e1d16478977812

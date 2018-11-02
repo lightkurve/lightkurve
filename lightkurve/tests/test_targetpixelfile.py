@@ -14,11 +14,12 @@ import tempfile
 from ..targetpixelfile import KeplerTargetPixelFile, KeplerTargetPixelFileFactory
 from ..targetpixelfile import TessTargetPixelFile
 from ..utils import KeplerQualityFlags, query_catalog
+from ..lightcurve import TessLightCurve
 
 
 filename_tpf_all_zeros = get_pkg_data_filename("data/test-tpf-all-zeros.fits")
 filename_tpf_one_center = get_pkg_data_filename("data/test-tpf-non-zero-center.fits")
-filename_tess = get_pkg_data_filename("data/test-tess-tpf.fits")
+filename_tess = get_pkg_data_filename("data/tess25155310-s01-first-cadences.fits.gz")
 
 TABBY_Q8 = ("https://archive.stsci.edu/missions/kepler/lightcurves"
             "/0084/008462852/kplr008462852-2011073133259_llc.fits")
@@ -26,7 +27,6 @@ TABBY_TPF = ("https://archive.stsci.edu/missions/kepler/target_pixel_files"
              "/0084/008462852/kplr008462852-2011073133259_lpd-targ.fits.gz")
 TESS_SIM = ("https://archive.stsci.edu/missions/tess/ete-6/tid/00/000"
             "/004/176/tess2019128220341-0000000417699452-0016-s_tp.fits")
-
 
 
 @pytest.mark.remote_data
@@ -139,7 +139,7 @@ def test_wcs_tabby():
     tpf = KeplerTargetPixelFile(TABBY_TPF)
     w = tpf.wcs
     ra, dec = tpf.get_coordinates(0)
-    col, row = tpf.centroids()
+    col, row = tpf.estimate_centroids()
     col -= tpf.column
     row -= tpf.row
     y, x = int(np.round(col[0])), int(np.round(row[1]))
@@ -207,10 +207,10 @@ def test_bkg_lightcurve():
 def test_aperture_photometry():
     for tpf in [KeplerTargetPixelFile(filename_tpf_all_zeros),
                 TessTargetPixelFile(filename_tpf_all_zeros)]:
-        tpf.aperture_photometry()
-        tpf.aperture_photometry(aperture_mask=None)
-        tpf.aperture_photometry(aperture_mask='all')
-        tpf.aperture_photometry(aperture_mask='pipeline')
+        tpf.extract_aperture_photometry()
+        tpf.extract_aperture_photometry(aperture_mask=None)
+        tpf.extract_aperture_photometry(aperture_mask='all')
+        tpf.extract_aperture_photometry(aperture_mask='pipeline')
 
 def test_tpf_to_fits():
     """Can we write a TPF back to a fits file?"""
@@ -275,7 +275,7 @@ def test_tpf_factory():
 
     # Can we add our own keywords?
     tpf = factory.get_tpf(hdu0_keywords = {'creator': 'Christina'})
-    assert tpf.header()['CREATOR'] == 'Christina'
+    assert tpf.header['CREATOR'] == 'Christina'
 
 
 def test_tpf_from_images():
@@ -389,15 +389,42 @@ def test_tess_simulation():
     assert tpf.astropy_time.scale == 'tdb'
     assert tpf.flux.shape == tpf.flux_err.shape
     tpf.wcs
-    col, row = tpf.centroids()
+    col, row = tpf.estimate_centroids()
     # Regression test for https://github.com/KeplerGO/lightkurve/pull/236
     assert np.isnan(tpf.time).sum() == 0
 
 
-def test_tess_aperture():
-    '''Can we parse the tess aperture?
-    '''
-    tpf = TessTargetPixelFile.from_fits(filename_tess)
+def test_threshold_aperture_mask():
+    """Does the threshold mask work?"""
+    tpf = KeplerTargetPixelFile.from_fits(filename_tpf_one_center)
+    tpf.plot(aperture_mask='threshold')
+    lc = tpf.to_lightcurve(aperture_mask=tpf.create_threshold_mask(threshold=1))
+    assert (lc.flux == 1).all()
+
+
+def test_tpf_tess():
+    """Does a TESS Sector 1 TPF work?"""
+    tpf = TessTargetPixelFile(filename_tess, quality_bitmask=None)
     assert tpf.mission == 'TESS'
-    assert tpf.pipeline_mask.sum() == 8
-    assert tpf.background_mask.sum() == 0
+    assert tpf.targetid == 25155310
+    assert tpf.sector == 1
+    assert tpf.camera == 4
+    assert tpf.ccd == 1
+    assert tpf.pipeline_mask.sum() == 9
+    assert tpf.background_mask.sum() == 30
+    lc = tpf.to_lightcurve()
+    assert isinstance(lc, TessLightCurve)
+    assert_array_equal(lc.time, tpf.time)
+    assert tpf.astropy_time.scale == 'tdb'
+    assert tpf.flux.shape == tpf.flux_err.shape
+    tpf.wcs
+    col, row = tpf.estimate_centroids()
+
+
+def test_tpf_slicing():
+    tpf = KeplerTargetPixelFile(filename_tpf_one_center)
+    assert tpf[0].time == tpf.time[0]
+    assert tpf[-1].time == tpf.time[-1]
+    assert tpf[5:10].shape == tpf.flux[5:10].shape
+    assert tpf[0].targetid == tpf.targetid
+    assert_array_equal(tpf[tpf.time < tpf.time[5]].time, tpf.time[0:5])

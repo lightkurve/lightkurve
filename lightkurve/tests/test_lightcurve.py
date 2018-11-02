@@ -12,6 +12,7 @@ import pytest
 
 from ..lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
 from ..lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
+from ..utils import LightkurveWarning
 
 # 8th Quarter of Tabby's star
 TABBY_Q8 = ("https://archive.stsci.edu/missions/kepler/lightcurves"
@@ -43,6 +44,13 @@ def test_empty_lightcurve():
     with pytest.raises(ValueError) as err:
         LightCurve()
     assert err_string == err.value.args[0]
+
+
+def test_lc_nan_time():
+    time = np.array([1, 2, 3, np.nan])
+    flux = np.array([1, 2, 3, 4])
+    with pytest.warns(LightkurveWarning, match='contains NaN times'):
+        lc = LightCurve(time=time, flux=flux)
 
 
 def test_math_operators():
@@ -174,6 +182,69 @@ def test_lightcurve_append_multiple():
     assert_array_equal(lc.time, 4*[1, 2, 3])
 
 
+def test_lightcurve_copy():
+    """Test ``LightCurve.copy()``."""
+    time = np.array([1, 2, 3, 4])
+    flux = np.array([1, 2, 3, 4])
+    error = np.array([0.1, 0.2, 0.3, 0.4])
+    lc = LightCurve(time=time, flux=flux, flux_err=error)
+
+    nlc = lc.copy()
+    assert_array_equal(lc.time, nlc.time)
+    assert_array_equal(lc.flux, nlc.flux)
+    assert_array_equal(lc.flux_err, nlc.flux_err)
+
+    nlc.time[1] = 5
+    nlc.flux[1] = 6
+    nlc.flux_err[1] = 7
+
+    # By changing 1 of the 4 data points in the new lightcurve's array-like
+    # attributes, we expect assert_array_equal to raise an AssertionError
+    # indicating a mismatch of 1/4 (or 25%).
+    with pytest.raises(AssertionError, match='(mismatch 25.0%)'):
+        assert_array_equal(lc.time, nlc.time)
+    with pytest.raises(AssertionError, match='(mismatch 25.0%)'):
+        assert_array_equal(lc.flux, nlc.flux)
+    with pytest.raises(AssertionError, match='(mismatch 25.0%)'):
+        assert_array_equal(lc.flux_err, nlc.flux_err)
+
+    # KeplerLightCurve has extra data
+    lc = KeplerLightCurve(time=[1, 2, 3], flux=[1, .5, 1],
+                          centroid_col=[4, 5, 6], centroid_row=[7, 8, 9],
+                          cadenceno=[10, 11, 12], quality=[10, 20, 30])
+    nlc = lc.copy()
+    assert_array_equal(lc.time, nlc.time)
+    assert_array_equal(lc.flux, nlc.flux)
+    assert_array_equal(lc.centroid_col, nlc.centroid_col)
+    assert_array_equal(lc.centroid_row, nlc.centroid_row)
+    assert_array_equal(lc.cadenceno, nlc.cadenceno)
+    assert_array_equal(lc.quality, nlc.quality)
+
+    nlc.time[1] = 6
+    nlc.flux[1] = 7
+    nlc.centroid_col[1] = 8
+    nlc.centroid_row[1] = 9
+    nlc.cadenceno[1] = 10
+    nlc.quality[1] = 11
+
+    # As before, by changing 1/3 data points, we expect a mismatch of 33.3%
+    # with a repeating decimal. However, float precision for python 2.7 is 10
+    # decimal digits, while python 3.6's is 13 decimal digits. Therefore,
+    # a regular expression is needed for both versions.
+    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
+        assert_array_equal(lc.time, nlc.time)
+    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
+        assert_array_equal(lc.flux, nlc.flux)
+    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
+        assert_array_equal(lc.centroid_col, nlc.centroid_col)
+    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
+        assert_array_equal(lc.centroid_row, nlc.centroid_row)
+    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
+        assert_array_equal(lc.cadenceno, nlc.cadenceno)
+    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
+        assert_array_equal(lc.quality, nlc.quality)
+
+
 @pytest.mark.remote_data
 def test_lightcurve_plots():
     """Sanity check to verify that lightcurve plotting works"""
@@ -209,16 +280,17 @@ def test_lightcurve_scatter():
     lc.fold(**foldkw).scatter(ax=ax[1,1], c=foldedtimeinorder, **scatterkw)
     plt.ylim(0.999, 1.001)
 
+
 def test_cdpp():
     """Test the basics of the CDPP noise metric."""
     # A flat lightcurve should have a CDPP close to zero
-    assert_almost_equal(LightCurve(np.arange(200), np.ones(200)).cdpp(), 0)
+    assert_almost_equal(LightCurve(np.arange(200), np.ones(200)).estimate_cdpp(), 0)
     # An artificial lightcurve with sigma=100ppm should have cdpp=100ppm
     lc = LightCurve(np.arange(10000), np.random.normal(loc=1, scale=100e-6, size=10000))
-    assert_almost_equal(lc.cdpp(transit_duration=1), 100, decimal=-0.5)
+    assert_almost_equal(lc.estimate_cdpp(transit_duration=1), 100, decimal=-0.5)
     # Transit_duration must be an integer (cadences)
     with pytest.raises(ValueError):
-        lc.cdpp(transit_duration=6.5)
+        lc.estimate_cdpp(transit_duration=6.5)
 
 
 @pytest.mark.remote_data
@@ -227,7 +299,7 @@ def test_cdpp_tabby():
     lcf = KeplerLightCurveFile(TABBY_Q8)
     # Tabby's star shows dips after cadence 1000 which increase the cdpp
     lc = LightCurve(lcf.PDCSAP_FLUX.time[:1000], lcf.PDCSAP_FLUX.flux[:1000])
-    assert(np.abs(lc.cdpp() - lcf.header(ext=1)['CDPP6_0']) < 30)
+    assert(np.abs(lc.estimate_cdpp() - lcf.header(ext=1)['CDPP6_0']) < 30)
 
 
 def test_bin():
@@ -320,6 +392,7 @@ def test_to_fits():
     """Test the KeplerLightCurve.to_fits() method"""
     lcf = KeplerLightCurveFile(TABBY_Q8)
     hdu = lcf.PDCSAP_FLUX.to_fits()
+    lcf_new = KeplerLightCurveFile(hdu)  # Regression test for #233
     assert type(hdu).__name__ is 'HDUList'
     assert len(hdu) == 2
     assert hdu[0].header['EXTNAME'] == 'PRIMARY'
@@ -329,6 +402,7 @@ def test_to_fits():
     assert hdu[1].header['TTYPE3'] == 'FLUX_ERR'
     assert hdu[1].header['TTYPE4'] == 'CADENCENO'
     hdu = LightCurve([0, 1, 2, 3, 4], [1, 1, 1, 1, 1]).to_fits()
+    lcf_new = KeplerLightCurveFile(hdu)  # Regression test for #233
     assert hdu[0].header['EXTNAME'] == 'PRIMARY'
     assert hdu[1].header['EXTNAME'] == 'LIGHTCURVE'
     assert hdu[1].header['TTYPE1'] == 'TIME'
@@ -452,7 +526,7 @@ def test_properties():
     lcf = KeplerLightCurveFile(TABBY_Q8)
     kplc = lcf.get_lightcurve('SAP_FLUX')
     k = kplc.properties()
-    assert isinstance(p, pd.core.frame.DataFrame)
+    assert isinstance(k, pd.core.frame.DataFrame)
     assert (len(p) > 3)
 
 
