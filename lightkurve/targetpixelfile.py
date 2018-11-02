@@ -5,6 +5,7 @@ import warnings
 import logging
 
 from astropy.io import fits
+from astropy.io.fits import Undefined
 from astropy.nddata import Cutout2D
 from astropy.table import Table
 from astropy.wcs import WCS
@@ -13,13 +14,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
 from astropy.coordinates import SkyCoord
-from astropy.io.fits.card import Undefined
+from astropy.stats.funcs import median_absolute_deviation as MAD
 
 from . import PACKAGEDIR, MPLSTYLE
 from .lightcurve import KeplerLightCurve, TessLightCurve
 from .prf import KeplerPRF
 from .utils import KeplerQualityFlags, TessQualityFlags, \
-                   plot_image, bkjd_to_astropy_time, btjd_to_astropy_time
+                   plot_image, bkjd_to_astropy_time, btjd_to_astropy_time, \
+                   LightkurveWarning
 from .mast import download_kepler_products
 
 __all__ = ['KeplerTargetPixelFile', 'TessTargetPixelFile']
@@ -41,6 +43,37 @@ class TargetPixelFile(object):
             self.hdu = fits.open(self.path, **kwargs)
         self.quality_bitmask = quality_bitmask
         self.targetid = targetid
+
+    def __getitem__(self, key):
+        """Implements indexing and slicing.
+
+        Note: the implementation below cannot be be simplified using
+            `copy[1].data = copy[1].data[self.quality_mask][key]`
+        due to the complicated behavior of AstroPy's `FITS_rec`.
+        """
+        # Step 1: determine the indexes of the data to return.
+        # We start by determining the indexes of the good-quality cadences.
+        quality_idx = np.where(self.quality_mask)[0]
+        # Then we apply the index or slice to the good-quality indexes.
+        if isinstance(key, int):
+            # Ensure we always have a range; this is necessary to ensure
+            # that we always ge a  `FITS_rec` instead of a `FITS_record` below.
+            if key == -1:
+                selected_idx = quality_idx[key:]
+            else:
+                selected_idx = quality_idx[key:key+1]
+        else:
+            selected_idx = quality_idx[key]
+
+        # Step 2: use the indexes to create a new copy of the data.
+        with warnings.catch_warnings():
+            # Ignore warnings about empty fields
+            warnings.simplefilter('ignore', UserWarning)
+            # AstroPy added `HDUList.copy()` in v3.1, but we don't want to make
+            # v3.1 a minimum requirement yet, so we copy in a funny way.
+            copy = fits.HDUList([myhdu.copy() for myhdu in self.hdu])
+            copy[1].data = copy[1].data[selected_idx]
+        return self.__class__(copy, quality_bitmask=self.quality_bitmask, targetid=self.targetid)
 
     @property
     def hdu(self):
@@ -345,13 +378,14 @@ class TargetPixelFile(object):
 
         Parameters
         ----------
-        aperture_mask : array-like, 'pipeline', 'all', or None
-            A boolean array describing the aperture such that `False` means
-            that the pixel will be masked out.
-            If None or 'all' are passed, a mask that is `True` everywhere will
-            be returned.
-            If 'pipeline' is passed, the mask suggested by the pipeline
+        aperture_mask : array-like, 'pipeline', 'all', 'threshold', or None
+            A boolean array describing the aperture such that `True` means
+            that the pixel will be used.
+            If None or 'all' are passed, all pixels will be used.
+            If 'pipeline' is passed, the mask suggested by the official pipeline
             will be returned.
+            If 'threshold' is passed, all pixels brighter than 3-sigma above
+            the median flux will be used.
 
         Returns
         -------
@@ -366,13 +400,48 @@ class TargetPixelFile(object):
                 aperture_mask = np.ones((self.shape[1], self.shape[2]), dtype=bool)
             elif aperture_mask == 'pipeline':
                 aperture_mask = self.pipeline_mask
+            elif aperture_mask == 'threshold':
+                aperture_mask = self.create_threshold_mask()
         self._last_aperture_mask = aperture_mask
         return aperture_mask
 
+    def create_threshold_mask(self, threshold=3):
+        """Returns an aperture mask creating using the thresholding method.
+
+        This method will identify the pixels in the TargetPixelFile which show
+        a median flux that is brighter than `threshold` times the standard
+        deviation above the overall median. The standard deviation is estimated
+        in a robust way by multiplying the Median Absolute Deviation (MAD)
+        with 1.4826.
+
+        Parameters
+        ----------
+        threshold : float
+            A value for the number of sigma by which a pixel needs to be
+            brighter than the median flux to be included in the aperture mask.
+
+        Returns
+        -------
+        aperture_mask : ndarray
+            2D boolean numpy array containing `True` for pixels above the
+            threshold.
+        """
+        # Calculate the median image
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            median_image = np.nanmedian(self.flux, axis=0)
+        vals = median_image[np.isfinite(median_image)].flatten()
+        # Calculate the theshold value in flux units
+        mad_cut = (1.4826 * MAD(vals) * threshold) + np.nanmedian(median_image)
+        # Create a mask containing the pixels above the threshold flux
+        return np.nan_to_num(median_image) > mad_cut
+
     def centroids(self, **kwargs):
         """DEPRECATED: use `estimate_cdpp()` instead."""
-        log.warning("WARNING: centroids() is deprecated and will be removed in v1.0.0; "
-                    "please use estimate_centroids() instead.")
+        warnings.warn('`TargetPixelFile.centroids()` is deprecated and will be '
+                      'removed in Lightkurve v1.0.0, '
+                      'please use `TargetPixelFile.estimate_centroids()` instead.',
+                      LightkurveWarning)
         return self.estimate_centroids(**kwargs)
 
     def estimate_centroids(self, aperture_mask='pipeline'):
@@ -381,10 +450,13 @@ class TargetPixelFile(object):
         Parameters
         ----------
         aperture_mask : array-like, 'pipeline', or 'all'
-            A boolean array describing the aperture such that `False` means
-            that the pixel will be masked out.
-            If the string 'all' is passed, all pixels will be used.
-            The default behaviour is to use the Kepler pipeline mask.
+            A boolean array describing the aperture such that `True` means
+            that the pixel will be used.
+            If None or 'all' are passed, all pixels will be used.
+            If 'pipeline' is passed, the mask suggested by the official pipeline
+            will be returned.
+            If 'threshold' is passed, all pixels brighter than 3-sigma above
+            the median flux will be used.
 
         Returns
         -------
@@ -420,7 +492,7 @@ class TargetPixelFile(object):
             This argument has priority over frame number.
         bkg : bool
             If True, background will be added to the pixel values.
-        aperture_mask : ndarray
+        aperture_mask : ndarray or str
             Highlight pixels selected by aperture_mask.
         show_colorbar : bool
             Whether or not to show the colorbar
@@ -559,15 +631,9 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
     @staticmethod
     def from_archive(target, cadence='long', quarter=None, month=None,
-                     campaign=None, radius=1., targetlimit=1,
-                     quality_bitmask='default', **kwargs):
-        """Fetch a Target Pixel File from the Kepler/K2 data archive at MAST.
-
-        See the :class:`KeplerQualityFlags` class for details on the bitmasks.
-
-        Raises an `ArchiveError` if a unique TPF cannot be found.  For example,
-        this is the case if a target was observed in multiple Quarters and the
-        quarter parameter is unspecified.
+                     campaign=None, quality_bitmask='default', **kwargs):
+        """WARNING: THIS FUNCTION IS DEPRECATED AND WILL BE REMOVED VERY SOON.
+        Use `lightkurve.search_targetpixelfile()` instead.
 
         Parameters
         ----------
@@ -581,12 +647,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
             For Kepler's prime mission, there are three short-cadence
             Target Pixel Files for each quarter, each covering one month.
             Hence, if cadence='short' you need to specify month=1, 2, or 3.
-        radius : float
-            Search radius in arcseconds. Default is 1 arcsecond.
-        targetlimit : None or int
-            If multiple targets are present within `radius`, limit the number
-            of returned TargetPixelFile objects to `targetlimit`.
-            If `None`, no limit is applied.
         quality_bitmask : str or int
             Bitmask (integer) which identifies the quality flag bitmask that should
             be used to mask out bad cadences. If a string is passed, it has the
@@ -609,6 +669,9 @@ class KeplerTargetPixelFile(TargetPixelFile):
         -------
         tpf : :class:`KeplerTargetPixelFile` object.
         """
+        warnings.warn('`TargetPixelFile.from_archive` is deprecated and will be removed soon, '
+                      'please use `lightkurve.search_targetpixelfile()` instead.',
+                      LightkurveWarning)
         if os.path.exists(str(target)) or str(target).startswith('http'):
             log.warning('Warning: from_archive() is not intended to accept a '
                         'direct path, use KeplerTargetPixelFile(path) instead.')
@@ -617,7 +680,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
             path = download_kepler_products(
                 target=target, filetype='Target Pixel', cadence=cadence,
                 quarter=quarter, campaign=campaign, month=month,
-                radius=radius, targetlimit=targetlimit)
+                searchtype='single', radius=1., targetlimit=1)
         if len(path) == 1:
             return KeplerTargetPixelFile(path[0],
                                          quality_bitmask=quality_bitmask,
@@ -694,11 +757,14 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
         Parameters
         ----------
-        aperture_mask : array-like, 'pipeline', or 'all'
-            A boolean array describing the aperture such that `False` means
-            that the pixel will be masked out.
-            If the string 'all' is passed, all pixels will be used.
-            The default behaviour is to use the Kepler pipeline mask.
+        aperture_mask : array-like, 'pipeline', 'threshold' or 'all'
+            A boolean array describing the aperture such that `True` means
+            that the pixel will be used.
+            If None or 'all' are passed, all pixels will be used.
+            If 'pipeline' is passed, the mask suggested by the official pipeline
+            will be returned.
+            If 'threshold' is passed, all pixels brighter than 3-sigma above
+            the median flux will be used.
 
         Returns
         -------
