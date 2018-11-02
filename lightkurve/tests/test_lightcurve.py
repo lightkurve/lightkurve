@@ -2,7 +2,6 @@ from __future__ import division, print_function
 
 from astropy.io import fits as pyfits
 import matplotlib.pyplot as plt
-import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
 
@@ -520,15 +519,14 @@ def test_remove_outliers():
 
 
 @pytest.mark.remote_data
-def test_properties():
+def test_properties(capfd):
     '''Test if the describe function produces an output.
     The output is 624 characters at the moment, but we might add more properties.'''
     lcf = KeplerLightCurveFile(TABBY_Q8)
     kplc = lcf.get_lightcurve('SAP_FLUX')
-    k = kplc.show_properties()
-    assert isinstance(k, pd.core.frame.DataFrame)
-    assert (len(k) > 3)
-
+    kplc.show_properties()
+    out, err = capfd.readouterr()
+    assert len(out) > 500
 
 
 def test_flatten_with_nans():

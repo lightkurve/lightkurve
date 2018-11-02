@@ -342,13 +342,14 @@ def test_tpf_from_images():
                                                         position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
 
 
-def test_properties2():
-    '''Test if the describe function produces an output.
+def test_properties2(capfd):
+    '''Test if the describe function produces an output
     The output is 1870 characters at the moment, but we might add more properties.'''
     tpf = KeplerTargetPixelFile(filename_tpf_all_zeros)
-    p = tpf.show_properties()
-    assert isinstance(p, pd.core.frame.DataFrame)
-    assert (len(p) > 3)
+    tpf.show_properties()
+    out, err = capfd.readouterr()
+    assert len(out) > 1000
+
 
 def test_interact():
     """Test the Jupyter notebook interact() widget."""
