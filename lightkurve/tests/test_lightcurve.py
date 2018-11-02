@@ -525,9 +525,9 @@ def test_properties():
     The output is 624 characters at the moment, but we might add more properties.'''
     lcf = KeplerLightCurveFile(TABBY_Q8)
     kplc = lcf.get_lightcurve('SAP_FLUX')
-    k = kplc.properties()
+    k = kplc.show_properties()
     assert isinstance(k, pd.core.frame.DataFrame)
-    assert (len(p) > 3)
+    assert (len(k) > 3)
 
 
 
