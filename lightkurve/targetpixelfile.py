@@ -99,62 +99,7 @@ class TargetPixelFile(object):
     def header(self):
         """Returns the header of the primary extension."""
         return self.hdu[0].header
-
-    def get_coordinates(self, cadence='all'):
-        """Returns two 3D arrays of RA and Dec values in decimal degrees.
-
-        If cadence number is given, returns 2D arrays for that cadence. If
-        cadence is 'all' returns one RA, Dec value for each pixel in every cadence.
-        Uses the WCS solution and the POS_CORR data from TPF header.
-
-        Parameters
-        ----------
-        cadence : 'all' or int
-            Which cadences to return the RA Dec coordinates for.
-
-        Returns
-        -------
-        ra : numpy array, same shape as tpf.flux[cadence]
-            Array containing RA values for every pixel, for every cadence.
-        dec : numpy array, same shape as tpf.flux[cadence]
-            Array containing Dec values for every pixel, for every cadence.
-        """
-        w = self.wcs
-        X, Y = np.meshgrid(np.arange(self.shape[2]), np.arange(self.shape[1]))
-        pos_corr1_pix, pos_corr2_pix = np.copy(self.hdu[1].data['POS_CORR1']), np.copy(self.hdu[1].data['POS_CORR2'])
-
-        # We zero POS_CORR* when the values are NaN or make no sense (>50px)
-        with warnings.catch_warnings():  # Comparing NaNs to numbers is OK here
-            warnings.simplefilter("ignore", RuntimeWarning)
-            bad = np.any([~np.isfinite(pos_corr1_pix),
-                          ~np.isfinite(pos_corr2_pix),
-                          np.abs(pos_corr1_pix - np.nanmedian(pos_corr1_pix)) > 50,
-                          np.abs(pos_corr2_pix - np.nanmedian(pos_corr2_pix)) > 50], axis=0)
-        pos_corr1_pix[bad], pos_corr2_pix[bad] = 0, 0
-        # Add in POSCORRs
-        X = (np.atleast_3d(X).transpose([2, 0, 1]) +
-             np.atleast_3d(pos_corr1_pix).transpose([1, 2, 0]))
-        Y = (np.atleast_3d(Y).transpose([2, 0, 1]) +
-             np.atleast_3d(pos_corr2_pix).transpose([1, 2, 0]))
-
-        # Pass through WCS
-        ra, dec = w.wcs_pix2world(X.ravel(), Y.ravel(), 1)
-        ra = ra.reshape((pos_corr1_pix.shape[0], self.shape[1], self.shape[2]))
-        dec = dec.reshape((pos_corr2_pix.shape[0], self.shape[1], self.shape[2]))
-        ra, dec = ra[self.quality_mask], dec[self.quality_mask]
-        if cadence is not 'all':
-            return ra[cadence], dec[cadence]
-        return ra, dec
-
-    def _validate_wcs(self):
-        '''Validates the WCS object. Returns False if WCS is invalid.
-        '''
-        # Find target RA and Dec, use WCS to find the pixel location
-        x, y = self.wcs.wcs_world2pix(np.asarray([[self.ra], [self.dec]]).T, 0).T
-        # Must be included within the TPF
-        validation = (x > 0) & (x <= self.flux.shape[2]) & (y > 0) & (y < self.flux.shape[1])
-        return validation
-
+        
 
     def get_sources(self, catalog=None, magnitude_limit=18):
         """Returns a table of sources known to exist in the TPF file.
