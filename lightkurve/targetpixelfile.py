@@ -951,19 +951,22 @@ class KeplerTargetPixelFile(TargetPixelFile):
             factory.add_cadence(frameno=idx, flux=cutout.data, header=hdu.header)
         return factory.get_tpf(hdu0_keywords=allkeys, ext_info=ext_info, **kwargs)
 
-    def correct(self, method='pld'):
+    def correct(self, method='pld', aperture_mask=None):
         """
 
         """
 
         from .correctors import PLDCorrector
 
+        if aperture_mask is None:
+            aperture_mask = self.pipeline_mask
+            
         self.corrector = PLDCorrector()
         corrected_lc = self.corrector.correct(fpix=np.nan_to_num(self.flux),
                                               ferr=np.nan_to_num(self.flux_err),
                                               trninds=[],
                                               time=self.time,
-                                              aperture=self.pipeline_mask)
+                                              aperture=aperture_mask)
         new_lc = self.to_lightcurve()
         new_lc.time = corrected_lc.time
         new_lc.flux = corrected_lc.flux
