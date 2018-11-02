@@ -64,7 +64,7 @@ class SearchResult(object):
     def unique_targets(self):
         """Returns a table of targets and their RA & dec values produced by search"""
         mask = ['target_name', 's_ra', 's_dec']
-        return unique(self.table[mask], keys='target_name')
+        return Table.from_pandas(self.table[mask].to_pandas().drop_duplicates('target_name').reset_index(drop=True))
 
     @property
     def obsid(self):
