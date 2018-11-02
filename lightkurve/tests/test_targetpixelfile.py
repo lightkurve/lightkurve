@@ -11,6 +11,7 @@ import tempfile
 from ..targetpixelfile import KeplerTargetPixelFile, KeplerTargetPixelFileFactory
 from ..targetpixelfile import TessTargetPixelFile
 from ..lightcurve import TessLightCurve
+from ..utils import LightkurveWarning
 
 
 filename_tpf_all_zeros = get_pkg_data_filename("data/test-tpf-all-zeros.fits")
@@ -224,17 +225,17 @@ def test_tpf_factory():
     # You shouldn't be able to build a TPF like this...because TPFs shouldn't
     # have extensions where time stamps are duplicated (here frames 1-8 will have)
     # time stamp zero
-    with pytest.raises(FactoryError) as exc:
+    with pytest.warns(LightkurveWarning, match='identical TIME values'):
         tpf = factory.get_tpf()
     [factory.add_cadence(frameno=i, flux=flux_0,
                         header={'TSTART': i*10, 'TSTOP': (i*10)+10})  for i in np.arange(2, 9)]
 
     # This should fail because the time stamps of the images are not in order...
-    with pytest.raises(FactoryError) as exc:
+    with pytest.warns(LightkurveWarning, match='chronological order'):
         tpf = factory.get_tpf()
 
     [factory.add_cadence(frameno=i, flux=flux_0,
-                        header={'TSTART': i*10, 'TSTOP': (i*10)+10})  for i in np.arange(1, 9)]
+                         header={'TSTART': i*10, 'TSTOP': (i*10)+10})  for i in np.arange(1, 9)]
 
     # This should pass
     tpf = factory.get_tpf()
@@ -257,7 +258,7 @@ def test_tpf_factory():
                             header={'TSTART': 90, 'TSTOP': 100})
 
     # Can we add our own keywords?
-    tpf = factory.get_tpf(hdu0_keywords = {'creator': 'Christina'})
+    tpf = factory.get_tpf(hdu0_keywords={'creator': 'Christina'})
     assert tpf.header['CREATOR'] == 'Christina'
 
 
@@ -280,8 +281,9 @@ def test_tpf_from_images():
         images.append(fits.ImageHDU(data=np.ones((5, 5)), header=header))
 
     # Not without a wcs...
-    with pytest.raises(FactoryError) as exc:
-        tpf_list = KeplerTargetPixelFile.from_fits_images(images, size=(3, 3))
+    with pytest.raises(Exception):
+        KeplerTargetPixelFile.from_fits_images(images, size=(3, 3),
+                                               position=SkyCoord(-234.75, 8.3393, unit='deg'))
 
     # Make a fake WCS based on astropy.docs...
     w = wcs.WCS(naxis=2)
@@ -302,8 +304,19 @@ def test_tpf_from_images():
         images.append(fits.ImageHDU(data=np.ones((5, 5)), header=header))
 
     # Now this should work.
-    tpf_list = KeplerTargetPixelFile.from_fits_images(images, size=(3, 3), position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
-    assert isinstance(tpf_list, KeplerTargetPixelFile)
+    tpf = KeplerTargetPixelFile.from_fits_images(images, size=(3, 3),
+                                                 position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
+    assert isinstance(tpf, KeplerTargetPixelFile)
+
+    # Can we write the output to disk?
+    # `delete=False` is necessary below to enable writing to the file on Windows
+    # but it means we have to clean up the tmp file ourselves
+    tmp = tempfile.NamedTemporaryFile(delete=False)
+    try:
+        tpf.to_fits(tmp.name)
+    finally:
+        tmp.close()
+        os.remove(tmp.name)
 
     # Can we read in a list of file names or a list of HDUlists?
     hdus = []
