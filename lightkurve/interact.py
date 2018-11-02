@@ -148,7 +148,7 @@ def make_lightcurve_figure_elements(lc, lc_source):
 
     fig = figure(title=title, plot_height=340, plot_width=600,
                  tools="pan,wheel_zoom,box_zoom,tap,reset",
-                 toolbar_location="below", logo=None,
+                 toolbar_location="below",
                  border_fill_color="whitesmoke")
     fig.title.offset = -10
     fig.yaxis.axis_label = 'Flux (e/s)'
@@ -211,7 +211,7 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=0):
                  x_range=(tpf.column, tpf.column+tpf.shape[2]),
                  y_range=(tpf.row, tpf.row+tpf.shape[1]),
                  title=title, tools='tap,box_select,wheel_zoom,reset',
-                 toolbar_location="below", logo=None,
+                 toolbar_location="below",
                  border_fill_color="whitesmoke")
 
     fig.yaxis.axis_label = 'Pixel Row Number'

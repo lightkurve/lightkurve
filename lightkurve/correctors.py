@@ -274,7 +274,7 @@ class SFFCorrector(object):
         pass
 
     def correct(self, time, flux, centroid_col, centroid_row,
-                polyorder=5, niters=3, bins=15, windows=1, sigma_1=3.,
+                polyorder=5, niters=3, bins=15, windows=10, sigma_1=3.,
                 sigma_2=5., restore_trend=False):
         """Returns a systematics-corrected LightCurve.
 

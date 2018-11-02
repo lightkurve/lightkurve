@@ -312,13 +312,18 @@ class LightCurve(object):
             # Reduce `window_length` and `polyorder` for short segments;
             # this prevents `savgol_filter` from raising an exception
             # If the segment is too short, just take the median
+
             if np.any([window_length > (h - l), (h - l) < break_tolerance]):
                 trend_signal[l:h] = np.nanmedian(lc_clean.flux[l:h])
             else:
-                trend_signal[l:h] = signal.savgol_filter(x=lc_clean.flux[l:h],
-                                                         window_length=window_length,
-                                                         polyorder=polyorder,
-                                                         **kwargs)
+                # Scipy outputs a warning here that is not useful, will be fixed in version 1.2
+                with warnings.catch_warnings():
+                    warnings.simplefilter('ignore', FutureWarning)
+                    trend_signal[l:h] = signal.savgol_filter(x=lc_clean.flux[l:h],
+                                                             window_length=window_length,
+                                                             polyorder=polyorder,
+                                                             **kwargs)
+
         trend_signal = np.interp(self.time, lc_clean.time, trend_signal)
         flatten_lc = self.copy()
         with warnings.catch_warnings():
@@ -1049,7 +1054,6 @@ class LightCurve(object):
         if path is not None:
             hdu.writeto(path, overwrite=overwrite, checksum=True)
         return hdu
-
 
 class FoldedLightCurve(LightCurve):
     """Defines a folded lightcurve with different plotting defaults."""

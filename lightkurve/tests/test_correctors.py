@@ -44,7 +44,7 @@ def test_sff_corrector():
     corrected_lc = sff.correct(time=time, flux=raw_flux,
                                centroid_col=centroid_col,
                                centroid_row=centroid_row,
-                               niters=1)
+                               niters=1, windows=1)
     # do hidden plots execute smoothly?
     ax = sff._plot_rotated_centroids()
     ax = sff._plot_normflux_arclength()
@@ -63,7 +63,7 @@ def test_sff_corrector():
     # test using KeplerLightCurve interface
     klc = KeplerLightCurve(time=time, flux=raw_flux, centroid_col=centroid_col,
                            centroid_row=centroid_row)
-    klc = klc.correct(niters=1)
+    klc = klc.correct(niters=1, windows=1)
     sff = klc.corrector
 
     assert_almost_equal(klc.flux*sff.bspline(time),
