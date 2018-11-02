@@ -560,13 +560,13 @@ class LightCurve(object):
         n_bins = self.flux.size // binsize
         binned_lc = self.copy()
         indexes = np.array_split(np.arange(len(self.time)), n_bins)
-        binned_lc.time = np.array([methodf(a) for a in indexes])
-        binned_lc.flux = np.array([methodf(a) for a in indexes])
+        binned_lc.time = np.array([methodf(self.time[a]) for a in indexes])
+        binned_lc.flux = np.array([methodf(self.flux[a]) for a in indexes])
 
         if np.any(np.isfinite(self.flux_err)):
             # root-mean-square error
             binned_lc.flux_err = np.array(
-                [np.sqrt(np.nansum(a**2))
+                [np.sqrt(np.nansum(self.flux_err[a]**2))
                  for a in indexes]
             ) / binsize
         else:
