@@ -85,6 +85,7 @@ class SearchResult(object):
         """Returns an array of dec values for targets in search"""
         return self.table['s_dec'].data.data
 
+    @suppress_stdout
     def download(self, quality_bitmask='default', download_dir=None):
         """Returns a single `KeplerTargetPixelFile` or `KeplerLightCurveFile` object.
 
@@ -139,6 +140,7 @@ class SearchResult(object):
         elif any(file in self.table['productFilename'][0] for file in lcf_files):
             return KeplerLightCurveFile(path[0], quality_bitmask=quality_bitmask)
 
+    @suppress_stdout
     def download_all(self, quality_bitmask='default', download_dir=None):
         """Returns a `TargetPixelFileCollection or `LightCurveFileCollection`.
 
