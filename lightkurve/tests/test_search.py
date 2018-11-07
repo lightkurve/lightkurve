@@ -16,7 +16,7 @@ import astropy.units as u
 from astropy.table import Table
 
 from ..utils import LightkurveWarning
-from ..search import search_lightcurvefile, search_targetpixelfile, SearchResult
+from ..search import search_lightcurvefile, search_targetpixelfile, SearchResult, open
 from .. import KeplerLightCurveFile, KeplerTargetPixelFile, TargetPixelFileCollection
 
 
@@ -195,3 +195,19 @@ def test_source_confusion_DEPRECATED():
     desired_target = 6507433
     tpf = KeplerTargetPixelFile.from_archive(desired_target, quarter=8)
     assert tpf.targetid == desired_target
+
+
+def test_open():
+    k2_path = os.path.dirname(os.path.abspath(__file__)) + '/data/test-tpf-star.fits'
+    tess_path = os.path.dirname(os.path.abspath(__file__)) + '/data/tess25155310-s01-first-cadences.fits.gz'
+    k2tpf = open(k2_path)
+    assert isinstance(k2tpf, KeplerTargetPixelFile)
+    tesstpf = open(tess_path)
+    assert isinstance(tesstpf, TessTargetPixelFile)
+    try:
+        open(os.path.dirname(os.path.abspath(__file__)) +
+                  '/data/test_factory0.fits')
+    except ValueError:
+        pass
+    assert isinstance(KeplerTargetPixelFile(tess_path), KeplerTargetPixelFile)
+    assert isinstance(TessTargetPixelFile(k2_path), TessTargetPixelFile)
