@@ -1418,19 +1418,3 @@ class TessTargetPixelFile(TargetPixelFile):
                               flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
                               flux_err=flux_bkg_err,
                               **keys)
-
-def open(path):
-    """
-    Opens a fits file, detects its type, and returns the appopriate
-    `KeplerTargetPixelFile` or `TessTargetPixelFile`.
-    """
-    hdulist = fits.open(path)
-    try:
-        mission = hdulist[0].header['telescop']
-        if mission == 'Kepler':
-            return KeplerTargetPixelFile(path)
-        elif mission == 'TESS':
-            return TessTargetPixelFile(path)
-    except KeyError:
-        pass
-    raise ValueError('Given fits file not recognized as Kepler or TESS observation.')

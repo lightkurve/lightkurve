@@ -7,21 +7,21 @@ import warnings
 
 from astropy.table import unique, join, Table, Row
 from astropy.coordinates import SkyCoord
-from astropy.io import ascii
+from astropy.io import ascii, fits
 from astropy import units as u
 
 from astroquery.mast import Observations
 from astroquery.exceptions import ResolverError
 
-from .lightcurvefile import KeplerLightCurveFile
-from .targetpixelfile import KeplerTargetPixelFile
+from .lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
+from .targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
 from .collections import TargetPixelFileCollection, LightCurveFileCollection
 from .utils import suppress_stdout, LightkurveWarning
 from . import PACKAGEDIR
 
 log = logging.getLogger(__name__)
 
-__all__ = ['search_targetpixelfile', 'search_lightcurvefile']
+__all__ = ['search_targetpixelfile', 'search_lightcurvefile', 'open']
 
 
 class SearchError(Exception):
@@ -642,3 +642,26 @@ def _filter_products(products, campaign=None, quarter=None, month=None,
     if limit is not None:
         return products[0:limit]
     return products
+
+def open(path):
+    """
+    Opens a fits file, detects its type, and returns the appopriate
+    `KeplerTargetPixelFile` or `TessTargetPixelFile`.
+    """
+    hdulist = fits.open(path)
+    try:
+        mission = hdulist[0].header['telescop']
+        creator = hdulist[0].header['creator']
+        if mission == 'Kepler':
+            if 'TargetPixel' in creator:
+                return KeplerTargetPixelFile(path)
+            elif 'Flux' in creator:
+                return KeplerLightCurveFile(path)
+        elif mission == 'TESS':
+            if 'TargetPixel' in creator:
+                return TessTargetPixelFile(path)
+            elif 'Flux' in creator:
+                return TessLightCurveFile(path)
+    except KeyError:
+        pass
+    raise ValueError('Given fits file not recognized as Kepler or TESS observation.')
