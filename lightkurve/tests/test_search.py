@@ -7,6 +7,7 @@ if no internet connection is available.
 """
 from __future__ import division, print_function
 
+import os
 import pytest
 import numpy as np
 from numpy.testing import assert_almost_equal, assert_array_equal
@@ -17,7 +18,8 @@ from astropy.table import Table
 
 from ..utils import LightkurveWarning
 from ..search import search_lightcurvefile, search_targetpixelfile, SearchResult, open
-from .. import KeplerLightCurveFile, KeplerTargetPixelFile, TargetPixelFileCollection
+from .. import KeplerLightCurveFile
+from .. import KeplerTargetPixelFile, TessTargetPixelFile, TargetPixelFileCollection
 
 
 @pytest.mark.remote_data
@@ -205,8 +207,7 @@ def test_open():
     tesstpf = open(tess_path)
     assert isinstance(tesstpf, TessTargetPixelFile)
     try:
-        open(os.path.dirname(os.path.abspath(__file__)) +
-                  '/data/test_factory0.fits')
+        open(os.path.dirname(os.path.abspath(__file__)) + '/data/test_factory0.fits')
     except ValueError:
         pass
     assert isinstance(KeplerTargetPixelFile(tess_path), KeplerTargetPixelFile)
