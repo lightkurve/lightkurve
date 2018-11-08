@@ -77,13 +77,15 @@ def prepare_lightcurve_datasource(lc):
     return lc_source
 
 
-def prepare_tpf_datasource(tpf, startup_aperture):
+def prepare_tpf_datasource(tpf, aperture_mask):
     """Prepare a bokeh DataSource object for selection glyphs
 
     Parameters
     ----------
     tpf : TargetPixelFile
         TPF to be shown.
+    aperture_mask : boolean numpy array
+        The Aperture mask applied at the startup of interact
 
     Returns
     -------
@@ -96,7 +98,7 @@ def prepare_tpf_datasource(tpf, startup_aperture):
     yy = tpf.row + np.arange(tpf.shape[1])
     xa, ya = np.meshgrid(xx, yy)
     preselection = Selection()
-    preselection.indices = pixel_index_array[startup_aperture].reshape(-1).tolist()
+    preselection.indices = pixel_index_array[aperture_mask].reshape(-1).tolist()
     tpf_source = ColumnDataSource(data=dict(xx=xa+0.5, yy=ya+0.5), selected=preselection)
     return tpf_source
 
@@ -275,7 +277,7 @@ def make_default_export_name(tpf, suffix='custom-aperture-mask'):
 
 def show_interact_widget(tpf, notebook_url='localhost:8888',
                          max_cadences=30000,
-                         startup_aperture=None,
+                         aperture_mask=None,
                          exported_filename=None):
     """Display an interactive Jupyter Notebook widget to inspect the pixel data.
 
@@ -313,13 +315,13 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
                   "you can install bokeh using e.g. `conda install bokeh`.")
         return None
 
-    if startup_aperture is None:
-        startup_aperture=tpf.pipeline_mask
+    if aperture_mask is None:
+        aperture_mask=tpf.pipeline_mask
 
     if exported_filename is None:
         exported_filename = make_default_export_name(tpf)
 
-    lc = tpf.to_lightcurve(aperture_mask=startup_aperture)
+    lc = tpf.to_lightcurve(aperture_mask=aperture_mask)
 
     n_pixels = tpf.flux[0, :, :].size
     pixel_index_array = np.arange(0, n_pixels, 1, dtype=int).reshape(tpf.flux[0, :, :].shape)
@@ -332,7 +334,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
     def create_interact_ui(doc):
         # The data source includes metadata for hover-over tooltips
         lc_source = prepare_lightcurve_datasource(lc)
-        tpf_source = prepare_tpf_datasource(tpf, startup_aperture)
+        tpf_source = prepare_tpf_datasource(tpf, aperture_mask)
 
         # Create the lightcurve figure and its vertical marker
         fig_lc, vertical_line = make_lightcurve_figure_elements(lc, lc_source)
