@@ -21,6 +21,8 @@ from ..search import search_lightcurvefile, search_targetpixelfile, SearchResult
 from .. import KeplerLightCurveFile
 from .. import KeplerTargetPixelFile, TessTargetPixelFile, TargetPixelFileCollection
 
+from .. import PACKAGEDIR
+
 
 @pytest.mark.remote_data
 def test_search_targetpixelfile():
@@ -200,14 +202,14 @@ def test_source_confusion_DEPRECATED():
 
 
 def test_open():
-    k2_path = os.path.dirname(os.path.abspath(__file__)) + '/data/test-tpf-star.fits'
-    tess_path = os.path.dirname(os.path.abspath(__file__)) + '/data/tess25155310-s01-first-cadences.fits.gz'
+    k2_path = PACKAGEDIR + '/tests/data/test-tpf-star.fits'
+    tess_path = PACKAGEDIR + '/tests/data/tess25155310-s01-first-cadences.fits.gz'
     k2tpf = open(k2_path)
     assert isinstance(k2tpf, KeplerTargetPixelFile)
     tesstpf = open(tess_path)
     assert isinstance(tesstpf, TessTargetPixelFile)
     try:
-        open(os.path.dirname(os.path.abspath(__file__)) + '/data/test_factory0.fits')
+        open(PACKAGEDIR + '/tests/data/test_factory0.fits')
     except ValueError:
         pass
     assert isinstance(KeplerTargetPixelFile(tess_path), KeplerTargetPixelFile)
