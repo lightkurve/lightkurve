@@ -18,6 +18,7 @@ import warnings
 import numpy as np
 from astropy.stats import sigma_clip
 from .utils import KeplerQualityFlags, LightkurveWarning
+import os
 
 log = logging.getLogger(__name__)
 
@@ -264,6 +265,13 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=0):
 
     return fig, stretch_slider
 
+def make_default_export_name(tpf, suffix='custom_mask'):
+    '''makes the default name to save a custom intetract mask'''
+    fn = tpf.hdu.filename()
+    base = os.path.basename(fn)
+    outname = base.rsplit('_')[0] + '_{}.fits'.format(suffix)
+    return outname
+
 
 def show_interact_widget(tpf, lc=None, notebook_url='localhost:8888', max_cadences=30000):
     """Display an interactive Jupyter Notebook widget to inspect the pixel data.
@@ -343,6 +351,7 @@ def show_interact_widget(tpf, lc=None, notebook_url='localhost:8888', max_cadenc
                                 width=490)
         r_button = Button(label=">", button_type="default", width=30)
         l_button = Button(label="<", button_type="default", width=30)
+        export_button = Button(label="Export Mask", button_type="success", width=120)
 
         # Callbacks
         def update_upon_pixel_selection(attr, old, new):
@@ -385,6 +394,21 @@ def show_interact_widget(tpf, lc=None, notebook_url='localhost:8888', max_cadenc
             if existing_value > np.min(tpf.cadenceno):
                 cadence_slider.value = existing_value - 1
 
+        def export_mask():
+            outname = make_default_export_name(tpf)
+            if tpf_source.selected.indices != []:
+                selected_indices = np.array(tpf_source.selected.indices)
+                selected_mask = np.isin(pixel_index_array, selected_indices)
+                lc_new = tpf.to_lightcurve(aperture_mask=selected_mask)
+                lc_new.to_fits(outname, overwrite=True,
+                               SOURCE='lightkurve interact',
+                               NOTE='custom mask',
+                               MASKNPIX = np.nansum(selected_mask),
+                               MASK=selected_mask)
+            else:
+                log.info("No pixels selected, no mask saved.")
+
+
         def jump_to_lightcurve_position(attr, old, new):
             if new != []:
                 cadence_slider.value = lc.cadenceno[new[0]]
@@ -394,13 +418,15 @@ def show_interact_widget(tpf, lc=None, notebook_url='localhost:8888', max_cadenc
         l_button.on_click(go_left_by_one)
         tpf_source.selected.on_change('indices', update_upon_pixel_selection)
         lc_source.selected.on_change('indices', jump_to_lightcurve_position)
+        export_button.on_click(export_mask)
         cadence_slider.on_change('value', update_upon_cadence_change)
 
         # Layout all of the plots
         space1, space2, space3 = Spacer(width=15), Spacer(width=30), Spacer(width=80)
         widgets_and_figures = layout([fig_lc, fig_tpf],
                                      [l_button, space1, r_button, space2,
-                                      cadence_slider, space3, stretch_slider])
+                                      cadence_slider, space3, stretch_slider],
+                                      [export_button])
         doc.add_root(widgets_and_figures)
 
     output_notebook(verbose=False, hide_banner=True)
