@@ -645,8 +645,19 @@ def _filter_products(products, campaign=None, quarter=None, month=None,
 
 def open(path):
     """
-    Opens a fits file, detects its type, and returns the appopriate
-    `KeplerTargetPixelFile` or `TessTargetPixelFile`.
+    Opens a fits file, detects its type, and returns the appopriate object.
+
+    Parameters
+    ----------
+    path : str
+        Path or URL of a FITS file.
+
+    Returns
+    -------
+    data : :class:`TargetPixelFile` or :class:`LightCurveFile` object
+        `KeplerTargetPixelFile`, `TessTargetPixelFile`, `KeplerLightCurveFile` or
+        `TessLightCurveFile` object corresponding to datatype of given fits file.
+
     """
     hdulist = fits.open(path)
     try:
