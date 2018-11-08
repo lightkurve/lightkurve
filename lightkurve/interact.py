@@ -77,7 +77,7 @@ def prepare_lightcurve_datasource(lc):
     return lc_source
 
 
-def prepare_tpf_datasource(tpf):
+def prepare_tpf_datasource(tpf, startup_aperture):
     """Prepare a bokeh DataSource object for selection glyphs
 
     Parameters
@@ -96,7 +96,7 @@ def prepare_tpf_datasource(tpf):
     yy = tpf.row + np.arange(tpf.shape[1])
     xa, ya = np.meshgrid(xx, yy)
     preselection = Selection()
-    preselection.indices = pixel_index_array[tpf.pipeline_mask].reshape(-1).tolist()
+    preselection.indices = pixel_index_array[startup_aperture].reshape(-1).tolist()
     tpf_source = ColumnDataSource(data=dict(xx=xa+0.5, yy=ya+0.5), selected=preselection)
     return tpf_source
 
@@ -273,7 +273,10 @@ def make_default_export_name(tpf, suffix='custom-aperture-mask'):
     return outname
 
 
-def show_interact_widget(tpf, lc=None, notebook_url='localhost:8888', max_cadences=30000):
+def show_interact_widget(tpf, notebook_url='localhost:8888',
+                         max_cadences=30000,
+                         startup_aperture=None,
+                         exported_filename=None):
     """Display an interactive Jupyter Notebook widget to inspect the pixel data.
 
     The widget will show both the lightcurve and pixel data.  The pixel data
@@ -310,14 +313,13 @@ def show_interact_widget(tpf, lc=None, notebook_url='localhost:8888', max_cadenc
                   "you can install bokeh using e.g. `conda install bokeh`.")
         return None
 
-    if lc is None:
-        lc = tpf.to_lightcurve(aperture_mask=tpf.pipeline_mask)
-    else:
-        if len(lc.time) != len(tpf.time):
-            log.error("The custom lightcurve provided to interact() does not contain "
-                      "the same number of cadences ({}) as the target pixel file ({})."
-                      "".format(len(lc.time), len(tpf.time)))
-            return None
+    if startup_aperture is None:
+        startup_aperture=tpf.pipeline_mask
+
+    if exported_filename is None:
+        exported_filename = make_default_export_name(tpf)
+
+    lc = tpf.to_lightcurve(aperture_mask=startup_aperture)
 
     n_pixels = tpf.flux[0, :, :].size
     pixel_index_array = np.arange(0, n_pixels, 1, dtype=int).reshape(tpf.flux[0, :, :].shape)
@@ -330,7 +332,7 @@ def show_interact_widget(tpf, lc=None, notebook_url='localhost:8888', max_cadenc
     def create_interact_ui(doc):
         # The data source includes metadata for hover-over tooltips
         lc_source = prepare_lightcurve_datasource(lc)
-        tpf_source = prepare_tpf_datasource(tpf)
+        tpf_source = prepare_tpf_datasource(tpf, startup_aperture)
 
         # Create the lightcurve figure and its vertical marker
         fig_lc, vertical_line = make_lightcurve_figure_elements(lc, lc_source)
@@ -395,12 +397,12 @@ def show_interact_widget(tpf, lc=None, notebook_url='localhost:8888', max_cadenc
                 cadence_slider.value = existing_value - 1
 
         def export_mask():
-            outname = make_default_export_name(tpf)
+
             if tpf_source.selected.indices != []:
                 selected_indices = np.array(tpf_source.selected.indices)
                 selected_mask = np.isin(pixel_index_array, selected_indices)
                 lc_new = tpf.to_lightcurve(aperture_mask=selected_mask)
-                lc_new.to_fits(outname, overwrite=True,
+                lc_new.to_fits(exported_filename, overwrite=True,
                                aperture_mask=selected_mask.astype(np.int),
                                SOURCE='lightkurve interact',
                                NOTE='custom mask',
