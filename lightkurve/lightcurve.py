@@ -997,7 +997,7 @@ class LightCurve(object):
                                            freq_unit=freq_unit,
                                            **kwargs)
 
-    def to_fits(self, path=None, overwrite=False, **extra_data):
+    def to_fits(self, path=None, overwrite=False, aperture_mask=None, **extra_data):
         """Writes the LightCurve to a FITS file.
 
         Parameters
@@ -1093,15 +1093,28 @@ class LightCurve(object):
             hdu.header['EXTNAME'] = 'LIGHTCURVE'
             return hdu
 
+        def _make_aperture_extension(aperture_mask):
+            """Create the 'APERTURE' extension (i.e. extension #2)."""
+            # Simple binary mask for now
+            hdu = fits.ImageHDU(aperture_mask)
+            hdu.header['EXTNAME'] = 'APERTURE'
+            return hdu
+
         def _hdulist(**extra_data):
             """Returns an astropy.io.fits.HDUList object."""
-            return fits.HDUList([_make_primary_hdu(extra_data=extra_data),
-                                 _make_lightcurve_extension(extra_data=extra_data)])
+            list_out = fits.HDUList([_make_primary_hdu(extra_data=extra_data),
+                             _make_lightcurve_extension(extra_data=extra_data)])
+            if aperture_mask is None:
+                return list_out
+            else:
+                list_out.append(_make_aperture_extension(aperture_mask))
+                return list_out
 
         hdu = _hdulist(**extra_data)
         if path is not None:
             hdu.writeto(path, overwrite=overwrite, checksum=True)
-        return hdu
+        else:
+            return hdu
 
 
 class FoldedLightCurve(LightCurve):
@@ -1299,7 +1312,7 @@ class KeplerLightCurve(LightCurve):
         """
         return super(KeplerLightCurve, self).to_pandas(columns=columns)
 
-    def to_fits(self, path=None, overwrite=False, **extra_data):
+    def to_fits(self, path=None, overwrite=False, aperture_mask=None, **extra_data):
         """Writes the KeplerLightCurve to a FITS file.
 
         Parameters
@@ -1337,6 +1350,7 @@ class KeplerLightCurve(LightCurve):
                 extra_data[kw] = kepler_specific_data[kw]
         return super(KeplerLightCurve, self).to_fits(path=path,
                                                      overwrite=overwrite,
+                                                     aperture_mask=aperture_mask,
                                                      **extra_data)
 
 
