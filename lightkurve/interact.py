@@ -265,11 +265,11 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=0):
 
     return fig, stretch_slider
 
-def make_default_export_name(tpf, suffix='custom_mask'):
+def make_default_export_name(tpf, suffix='custom-aperture-mask'):
     '''makes the default name to save a custom intetract mask'''
     fn = tpf.hdu.filename()
     base = os.path.basename(fn)
-    outname = base.rsplit('_')[0] + '_{}.fits'.format(suffix)
+    outname = base.rsplit('-targ.fits')[0] + '-{}.fits'.format(suffix)
     return outname
 
 
@@ -401,10 +401,10 @@ def show_interact_widget(tpf, lc=None, notebook_url='localhost:8888', max_cadenc
                 selected_mask = np.isin(pixel_index_array, selected_indices)
                 lc_new = tpf.to_lightcurve(aperture_mask=selected_mask)
                 lc_new.to_fits(outname, overwrite=True,
+                               aperture_mask=selected_mask.astype(np.int),
                                SOURCE='lightkurve interact',
                                NOTE='custom mask',
-                               MASKNPIX = np.nansum(selected_mask),
-                               MASK=selected_mask)
+                               MASKNPIX = np.nansum(selected_mask))
             else:
                 log.info("No pixels selected, no mask saved.")
 
