@@ -661,6 +661,7 @@ def open(path):
     """
     hdulist = fits.open(path)
     try:
+        # use `telescop` keyword to determine mission and `creator` to determine tpf or lc
         mission = hdulist[0].header['telescop']
         creator = hdulist[0].header['creator']
         if mission == 'Kepler':
@@ -673,6 +674,7 @@ def open(path):
                 return TessTargetPixelFile(path)
             elif 'Flux' in creator:
                 return TessLightCurveFile(path)
+    # if these keywords don't exist, raise `ValueError`
     except KeyError:
         pass
     raise ValueError('Given fits file not recognized as Kepler or TESS observation.')
