@@ -6,8 +6,10 @@ from numpy.testing import assert_almost_equal, assert_array_equal
 
 from astropy.coordinates import SkyCoord
 import astropy.units as u
+from astropy.table import Table
 
-from ..search import search_lightcurvefile, search_targetpixelfile, SearchError
+from ..utils import LightkurveWarning
+from ..search import search_lightcurvefile, search_targetpixelfile, SearchResult, SearchError
 from ..targetpixelfile import KeplerTargetPixelFile
 
 
@@ -125,3 +127,14 @@ def test_source_confusion():
     desired_target = 6507433
     tpf = search_targetpixelfile(desired_target, quarter=8).download()
     assert tpf.targetid == desired_target
+
+
+def test_empty_searchresult():
+    """Does an empty SearchResult behave gracefully?"""
+    sr = SearchResult(Table())
+    assert len(sr) == 0
+    str(sr)
+    with pytest.warns(LightkurveWarning, match='empty search'):
+        sr.download()
+    with pytest.warns(LightkurveWarning, match='empty search'):
+        sr.download_all()

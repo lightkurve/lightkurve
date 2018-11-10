@@ -3,6 +3,7 @@ from __future__ import division
 import os
 import logging
 import numpy as np
+import warnings
 
 from astropy.table import unique, join, Table, Row
 from astropy.coordinates import SkyCoord
@@ -15,7 +16,7 @@ from astroquery.exceptions import ResolverError
 from .lightcurvefile import KeplerLightCurveFile
 from .targetpixelfile import KeplerTargetPixelFile
 from .collections import TargetPixelFileCollection, LightCurveFileCollection
-from .utils import suppress_stdout
+from .utils import suppress_stdout, LightkurveWarning
 from . import PACKAGEDIR
 
 log = logging.getLogger(__name__)
@@ -41,12 +42,18 @@ class SearchResult(object):
         Astropy table returned by a join of the astroquery `Observations.query_criteria()`
         and `Observations.get_product_list()` methods.
     """
-    def __init__(self, table):
-        self.table = table
+    def __init__(self, table=None):
+        if table is None:
+            self.table = Table()
+        else:
+            self.table = table
 
     def __repr__(self):
+        out = 'SearchResult containing {} data products.'.format(len(self.table))
+        if len(self.table) == 0:
+            return out
         columns = ['obsID', 'target_name', 'productFilename', 'description', 'distance']
-        return '\n'.join(self.table[columns].pformat(max_width=300))
+        return out + '\n\n' + '\n'.join(self.table[columns].pformat(max_width=300))
 
     def __getitem__(self, key):
         """Implements indexing and slicing, e.g. SearchResult[2:5]."""
@@ -118,6 +125,16 @@ class SearchResult(object):
         data : `TargetPixelFile` or `LightCurveFile` object
             The first entry in the products table.
         """
+        if len(self.table) == 0:
+            warnings.warn("Cannot download from an empty search result.",
+                          LightkurveWarning)
+            return None
+        if len(self.table) != 1:
+            log.warning('Warning: {} files available to download. '
+                        'Only the first file has been downloaded. '
+                        'Please use `download_all()` or specify a campaign, quarter, or '
+                        'cadence to limit your search.'.format(len(self.table)))
+
         # Make sure astroquery uses the same level of verbosity
         logging.getLogger('astropy').setLevel(log.getEffectiveLevel())
 
@@ -127,12 +144,6 @@ class SearchResult(object):
 
         path = Observations.download_products(self.table[:1], mrp_only=False,
                                               download_dir=download_dir)['Local Path']
-
-        if len(self.table) != 1:
-            log.warning('Warning: {} files available to download. '
-                        'Only the first file has been downloaded. '
-                        'Please use `download_all()` or specify a campaign, quarter, or '
-                        'cadence to limit your search.'.format(len(self.table)))
 
         # return single tpf or lcf
         tpf_files = ['lpd-targ.fits', 'spd-targ.fits']
@@ -172,6 +183,11 @@ class SearchResult(object):
             Returns a `LightCurveFileCollection`  or `TargetPixelFileCollection`,
             containing all entries in the products table
         """
+        if len(self.table) == 0:
+            warnings.warn("Cannot download from an empty search result.",
+                          LightkurveWarning)
+            return None
+
         # Make sure astroquery uses the same level of verbosity
         logging.getLogger('astropy').setLevel(log.getEffectiveLevel())
 
@@ -304,7 +320,7 @@ def search_targetpixelfile(target, radius=None, cadence='long', quarter=None,
                                 campaign=campaign, limit=limit)
     except SearchError as exc:
         log.error(exc)
-        return None
+        return SearchResult(None)
 
 
 def search_lightcurvefile(target, radius=None, cadence='long', quarter=None,
@@ -389,7 +405,7 @@ def search_lightcurvefile(target, radius=None, cadence='long', quarter=None,
                                 campaign=campaign, limit=limit)
     except SearchError as exc:
         log.error(exc)
-        return None
+        return SearchResult(None)
 
 
 def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
