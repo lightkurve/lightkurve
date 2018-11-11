@@ -22,7 +22,6 @@ from .prf import KeplerPRF
 from .utils import KeplerQualityFlags, TessQualityFlags, \
                    plot_image, bkjd_to_astropy_time, btjd_to_astropy_time, \
                    LightkurveWarning
-from .mast import download_kepler_products
 
 __all__ = ['KeplerTargetPixelFile', 'TessTargetPixelFile']
 log = logging.getLogger(__name__)
@@ -667,7 +666,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
         Returns
         -------
-        tpf : :class:`KeplerTargetPixelFile` object.
+        tpf : :class:`KeplerTargetPixelFile` or :class:`TargetPixelFileCollection` object.
         """
         warnings.warn('`TargetPixelFile.from_archive` is deprecated and will be removed soon, '
                       'please use `lightkurve.search_targetpixelfile()` instead.',
@@ -675,18 +674,18 @@ class KeplerTargetPixelFile(TargetPixelFile):
         if os.path.exists(str(target)) or str(target).startswith('http'):
             log.warning('Warning: from_archive() is not intended to accept a '
                         'direct path, use KeplerTargetPixelFile(path) instead.')
-            path = [target]
+            return KeplerTargetPixelFile(target)
         else:
-            path = download_kepler_products(
-                target=target, filetype='Target Pixel', cadence=cadence,
-                quarter=quarter, campaign=campaign, month=month,
-                searchtype='single', radius=1., targetlimit=1)
-        if len(path) == 1:
-            return KeplerTargetPixelFile(path[0],
-                                         quality_bitmask=quality_bitmask,
-                                         **kwargs)
-        return [KeplerTargetPixelFile(p, quality_bitmask=quality_bitmask, **kwargs)
-                for p in path]
+            from .search import search_targetpixelfile
+            sr = search_targetpixelfile(target, cadence=cadence,
+                                        quarter=quarter, month=month,
+                                        campaign=campaign)
+            if len(sr) == 1:
+                return sr.download(quality_bitmask=quality_bitmask, **kwargs)
+            elif len(sr) > 1:
+                return sr.download_all(quality_bitmask=quality_bitmask, **kwargs)
+            else:
+                raise ValueError("No target pixel files found that match the search criteria.")
 
     def __repr__(self):
         return('KeplerTargetPixelFile Object (ID: {})'.format(self.targetid))

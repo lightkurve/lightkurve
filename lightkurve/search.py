@@ -130,10 +130,11 @@ class SearchResult(object):
                           LightkurveWarning)
             return None
         if len(self.table) != 1:
-            log.warning('Warning: {} files available to download. '
-                        'Only the first file has been downloaded. '
-                        'Please use `download_all()` or specify a campaign, quarter, or '
-                        'cadence to limit your search.'.format(len(self.table)))
+            warnings.warn('Warning: {} files available to download. '
+                          'Only the first file has been downloaded. '
+                          'Please use `download_all()` or specify a campaign, quarter, or '
+                          'cadence to limit your search.'.format(len(self.table)),
+                          LightkurveWarning)
 
         # Make sure astroquery uses the same level of verbosity
         logging.getLogger('astropy').setLevel(log.getEffectiveLevel())
