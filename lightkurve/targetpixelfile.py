@@ -627,13 +627,15 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 mission = fits.open(path)[0].header['telescop']
                 if mission == 'TESS':
                     warnings.warn('The provided file path appears to be a TESS observation. '
-                                  'Please instantiate as a `TessTargetPixelFile`.')
+                                  'Please instantiate as a `TessTargetPixelFile`.',
+                                  LightkurveWarning)
                 elif mission == 'Kepler':
                     pass
                 else:
                     raise KeyError
             except KeyError:
-                warnings.warn('The provided file path not recognized as Kepler observation.')
+                warnings.warn('The provided file path not recognized as Kepler observation.',
+                              LightkurveWarning)
         if self.targetid is None:
             try:
                 self.targetid = self.header['KEPLERID']
@@ -1296,13 +1298,15 @@ class TessTargetPixelFile(TargetPixelFile):
                 mission = fits.open(path)[0].header['telescop']
                 if mission == 'Kepler':
                     warnings.warn('The provided file path appears to be a Kepler observation. '
-                                  'Please instantiate as a `KeplerTargetPixelFile`.')
+                                  'Please instantiate as a `KeplerTargetPixelFile`.',
+                                  LightkurveWarning)
                 elif mission == 'TESS':
                     pass
                 else:
                     raise KeyError
             except KeyError:
-                warnings.warn('The provided file path not recognized as TESS observation.')
+                warnings.warn('The provided file path not recognized as TESS observation.',
+                              LightkurveWarning)
         try:
             self.targetid = self.header['TICID']
         except KeyError:
