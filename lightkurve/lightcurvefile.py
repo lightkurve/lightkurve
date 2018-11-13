@@ -13,7 +13,6 @@ from astropy.io import fits as pyfits
 
 from .utils import (bkjd_to_astropy_time, KeplerQualityFlags, TessQualityFlags,
                     LightkurveWarning)
-from .mast import download_kepler_products
 
 from . import MPLSTYLE
 
@@ -206,7 +205,7 @@ class KeplerLightCurveFile(LightCurveFile):
 
         Returns
         -------
-        lcf : KeplerLightCurveFile object or list of KeplerLightCurveFile objects
+        lcf : KeplerLightCurveFile or LightCurveFileCollection
         """
         warnings.warn("`LightCurveFile.from_archive()` is deprecated and will be removed soon, "
                       "please use `lightkurve.search_lightcurvefile()` instead.",
@@ -216,18 +215,18 @@ class KeplerLightCurveFile(LightCurveFile):
         if os.path.exists(str(target)) or str(target).startswith('http'):
             log.warning('Warning: from_archive() is not intended to accept a '
                         'direct path, use KeplerLightCurveFile(path) instead.')
-            path = [target]
+            KeplerLightCurveFile(target)
         else:
-            path = download_kepler_products(
-                target=target, filetype='Lightcurve', cadence=cadence,
-                quarter=quarter, campaign=campaign, month=month,
-                searchtype='single', radius=1., targetlimit=1)
-        if len(path) == 1:
-            return KeplerLightCurveFile(path[0],
-                                        quality_bitmask=quality_bitmask,
-                                        **kwargs)
-        return [KeplerLightCurveFile(p, quality_bitmask=quality_bitmask, **kwargs)
-                for p in path]
+            from .search import search_lightcurvefile
+            sr = search_lightcurvefile(target, cadence=cadence,
+                                       quarter=quarter, month=month,
+                                       campaign=campaign)
+            if len(sr) == 1:
+                return sr.download(quality_bitmask=quality_bitmask, **kwargs)
+            elif len(sr) > 1:
+                return sr.download_all(quality_bitmask=quality_bitmask, **kwargs)
+            else:
+                raise ValueError("No light curve files found that match the search criteria.")
 
     def __repr__(self):
         return('KeplerLightCurveFile(ID: {})'.format(self.targetid))
