@@ -117,7 +117,11 @@ class TargetPixelFile(object):
             out = self.hdu[1].header['1CRV5P']
         except KeyError:
             out = 0
-        return out
+        # ensure output has a value
+        if isinstance(out, fits.card.Undefined):
+            return 0
+        else:
+            return out
 
     @property
     def row(self):
@@ -125,7 +129,11 @@ class TargetPixelFile(object):
             out = self.hdu[1].header['2CRV5P']
         except KeyError:
             out = 0
-        return out
+        # ensure output has a value
+        if isinstance(out, fits.card.Undefined):
+            return 0
+        else:
+            return out
 
     @property
     def pos_corr1(self):
