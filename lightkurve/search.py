@@ -648,11 +648,12 @@ def open(path_or_url):
     """Opens a Kepler or TESS data product.
 
     This function will automatically detect the type of the data product,
-    and return the appropriate object. File types currently supported are:
-    * `KeplerTargetPixelFile` (typical suffix "-targ.fits.gz");
-    * `KeplerLightCurveFile` (typical suffix "llc.fits");
-    * `TessTargetPixelFile` (typical suffix "_tp.fits");
-    * `TessLightCurveFile` (typical suffix "_lc.fits").
+    and return the appropriate object. File types currently supported are::
+
+        * `KeplerTargetPixelFile` (typical suffix "-targ.fits.gz");
+        * `KeplerLightCurveFile` (typical suffix "llc.fits");
+        * `TessTargetPixelFile` (typical suffix "_tp.fits");
+        * `TessLightCurveFile` (typical suffix "_lc.fits").
 
     The function will detect the file type by looking at both the TELESCOP and
     CREATOR keywords in the first extension of the FITS file.
@@ -676,10 +677,9 @@ def open(path_or_url):
 
     Examples
     --------
-    To open a target pixel file using its URL, simply use:
+    To open a target pixel file using its path or URL, simply use:
 
-        >>> tpf = open("https://archive.stsci.edu/missions/kepler/target_pixel_files/" \
-                       + "0119/011904151/kplr011904151-2010009091648_lpd-targ.fits.gz")
+        >>> tpf = open("mytpf.fits")  # doctest: +SKIP
     """
     hdulist = fits.open(path_or_url)
     try:
