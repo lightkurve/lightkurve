@@ -678,8 +678,8 @@ def open(path_or_url):
     --------
     To open a target pixel file using its URL, simply use:
 
-        >>> tpf = open("https://archive.stsci.edu/missions/kepler/target_pixel_files/"
-                       "0119/011904151/kplr011904151-2010009091648_lpd-targ.fits.gz")
+        >>> tpf = open("https://archive.stsci.edu/missions/kepler/target_pixel_files/" \
+                       + "0119/011904151/kplr011904151-2010009091648_lpd-targ.fits.gz")
     """
     hdulist = fits.open(path_or_url)
     try:
