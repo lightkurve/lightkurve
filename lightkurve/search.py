@@ -5,7 +5,7 @@ import logging
 import numpy as np
 import warnings
 
-from astropy.table import unique, join, Table, Row
+from astropy.table import join, Table, Row
 from astropy.coordinates import SkyCoord
 from astropy.io import ascii, fits
 from astropy import units as u
@@ -643,37 +643,60 @@ def _filter_products(products, campaign=None, quarter=None, month=None,
         return products[0:limit]
     return products
 
-def open(path):
-    """
-    Opens a fits file, detects its type, and returns the appopriate object.
+
+def open(path_or_url):
+    """Opens a Kepler or TESS data product.
+
+    This function will automatically detect the type of the data product,
+    and return the appropriate object. File types currently supported are:
+    * `KeplerTargetPixelFile` (typical suffix "-targ.fits.gz");
+    * `KeplerLightCurveFile` (typical suffix "llc.fits");
+    * `TessTargetPixelFile` (typical suffix "_tp.fits");
+    * `TessLightCurveFile` (typical suffix "_lc.fits").
+
+    The function will detect the file type by looking at both the TELESCOP and
+    CREATOR keywords in the first extension of the FITS file.
+    If the file is not recognized as a Kepler or TESS data product,
+    a `ValueError` is raised.
 
     Parameters
     ----------
-    path : str
+    path_or_url : str
         Path or URL of a FITS file.
 
     Returns
     -------
-    data : :class:`TargetPixelFile` or :class:`LightCurveFile` object
-        `KeplerTargetPixelFile`, `TessTargetPixelFile`, `KeplerLightCurveFile` or
-        `TessLightCurveFile` object corresponding to datatype of given fits file.
+    data : a subclass of :class:`TargetPixelFile` or :class:`LightCurveFile`,
+        depending on the detected file type.
 
+    Raises
+    ------
+    ValueError : raised if the data product is not recognized as a Kepler or
+        TESS product.
+
+    Examples
+    --------
+    To open a target pixel file using its URL, simply use:
+
+        >>> tpf = open("https://archive.stsci.edu/missions/kepler/target_pixel_files/"
+                       "0119/011904151/kplr011904151-2010009091648_lpd-targ.fits.gz")
     """
-    hdulist = fits.open(path)
+    hdulist = fits.open(path_or_url)
     try:
-        # use `telescop` keyword to determine mission and `creator` to determine tpf or lc
-        mission = hdulist[0].header['telescop']
+        # use `telescop` keyword to determine mission
+        # and `creator` to determine tpf or lc
+        telescop = hdulist[0].header['telescop']
         creator = hdulist[0].header['creator']
-        if mission == 'Kepler':
+        if telescop == 'Kepler':
             if 'TargetPixel' in creator:
-                return KeplerTargetPixelFile(path)
+                return KeplerTargetPixelFile(path_or_url)
             elif 'Flux' in creator:
-                return KeplerLightCurveFile(path)
-        elif mission == 'TESS':
+                return KeplerLightCurveFile(path_or_url)
+        elif telescop == 'TESS':
             if 'TargetPixel' in creator:
-                return TessTargetPixelFile(path)
+                return TessTargetPixelFile(path_or_url)
             elif 'Flux' in creator:
-                return TessLightCurveFile(path)
+                return TessLightCurveFile(path_or_url)
     # if these keywords don't exist, raise `ValueError`
     except KeyError:
         pass
