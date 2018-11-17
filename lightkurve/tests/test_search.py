@@ -7,6 +7,7 @@ if no internet connection is available.
 """
 from __future__ import division, print_function
 
+import os
 import pytest
 import numpy as np
 from numpy.testing import assert_almost_equal, assert_array_equal
@@ -16,8 +17,11 @@ import astropy.units as u
 from astropy.table import Table
 
 from ..utils import LightkurveWarning
-from ..search import search_lightcurvefile, search_targetpixelfile, SearchResult
-from .. import KeplerLightCurveFile, KeplerTargetPixelFile, TargetPixelFileCollection
+from ..search import search_lightcurvefile, search_targetpixelfile, SearchResult, open
+from .. import KeplerLightCurveFile
+from .. import KeplerTargetPixelFile, TessTargetPixelFile, TargetPixelFileCollection
+
+from .. import PACKAGEDIR
 
 
 @pytest.mark.remote_data
@@ -195,3 +199,18 @@ def test_source_confusion_DEPRECATED():
     desired_target = 6507433
     tpf = KeplerTargetPixelFile.from_archive(desired_target, quarter=8)
     assert tpf.targetid == desired_target
+
+
+def test_open():
+    k2_path = os.path.join(PACKAGEDIR, "tests", "data", "test-tpf-star.fits")
+    tess_path = os.path.join(PACKAGEDIR, "tests", "data", "tess25155310-s01-first-cadences.fits.gz")
+    k2tpf = open(k2_path)
+    assert isinstance(k2tpf, KeplerTargetPixelFile)
+    tesstpf = open(tess_path)
+    assert isinstance(tesstpf, TessTargetPixelFile)
+    try:
+        open(os.path.join(PACKAGEDIR, "tests", "data", "test_factory0.fits"))
+    except ValueError:
+        pass
+    assert isinstance(KeplerTargetPixelFile(tess_path), KeplerTargetPixelFile)
+    assert isinstance(TessTargetPixelFile(k2_path), TessTargetPixelFile)

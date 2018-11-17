@@ -630,6 +630,23 @@ class KeplerTargetPixelFile(TargetPixelFile):
         self.quality_mask = KeplerQualityFlags.create_quality_mask(
                                 quality_array=self.hdu[1].data['QUALITY'],
                                 bitmask=quality_bitmask)
+
+        # Check the TELESCOP keyword and warn the user if it's not 'Kepler'
+        try:
+            telescop = self.header['telescop']
+            if telescop == 'TESS':
+                warnings.warn("A TESS data product is being opened using the "
+                              "`KeplerTargetPixelFile` class. "
+                              "Please use `TessTargetPixelFile` instead.",
+                              LightkurveWarning)
+            elif telescop != 'Kepler':
+                warnings.warn("KeplerTargetPixelFile encountered 'TELESCOP' "
+                              "keyword '{}' instead of 'Kepler'".format(telescop),
+                              LightkurveWarning)
+        except KeyError:
+            log.debug("KeplerTargetPixelFile encountered a file without 'TELESCOP' keyword.")
+
+        # Use the KEPLERID keyword as the default targetid
         if self.targetid is None:
             try:
                 self.targetid = self.header['KEPLERID']
@@ -1287,6 +1304,23 @@ class TessTargetPixelFile(TargetPixelFile):
         # which were not flagged by a QUALITY flag yet; the line below prevents
         # these cadences from being used. They would break most methods!
         self.quality_mask &= np.isfinite(self.hdu[1].data['TIME'])
+
+        # Check the TELESCOP keyword and warn the user if it's not 'TESS'
+        try:
+            telescop = self.header['telescop']
+            if telescop == 'Kepler':
+                warnings.warn("A Kepler data product is being opened using the "
+                              "`TessTargetPixelFile` class. "
+                              "Please use `KeplerTargetPixelFile` instead.",
+                              LightkurveWarning)
+            elif telescop != 'TESS':
+                warnings.warn("TessTargetPixelFile encountered 'TELESCOP' "
+                              "keyword '{}' instead of 'TESS'".format(telescop),
+                              LightkurveWarning)
+        except KeyError:
+            log.debug("TessTargetPixelFile encountered a file without 'TELESCOP' keyword.")
+
+        # Use the TICID keyword as the default targetid
         try:
             self.targetid = self.header['TICID']
         except KeyError:

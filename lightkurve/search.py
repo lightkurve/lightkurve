@@ -5,23 +5,23 @@ import logging
 import numpy as np
 import warnings
 
-from astropy.table import unique, join, Table, Row
+from astropy.table import join, Table, Row
 from astropy.coordinates import SkyCoord
-from astropy.io import ascii
+from astropy.io import ascii, fits
 from astropy import units as u
 
 from astroquery.mast import Observations
 from astroquery.exceptions import ResolverError
 
-from .lightcurvefile import KeplerLightCurveFile
-from .targetpixelfile import KeplerTargetPixelFile
+from .lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
+from .targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
 from .collections import TargetPixelFileCollection, LightCurveFileCollection
 from .utils import suppress_stdout, LightkurveWarning
 from . import PACKAGEDIR
 
 log = logging.getLogger(__name__)
 
-__all__ = ['search_targetpixelfile', 'search_lightcurvefile']
+__all__ = ['search_targetpixelfile', 'search_lightcurvefile', 'open']
 
 
 class SearchError(Exception):
@@ -642,3 +642,62 @@ def _filter_products(products, campaign=None, quarter=None, month=None,
     if limit is not None:
         return products[0:limit]
     return products
+
+
+def open(path_or_url):
+    """Opens a Kepler or TESS data product.
+
+    This function will automatically detect the type of the data product,
+    and return the appropriate object. File types currently supported are::
+
+        * `KeplerTargetPixelFile` (typical suffix "-targ.fits.gz");
+        * `KeplerLightCurveFile` (typical suffix "llc.fits");
+        * `TessTargetPixelFile` (typical suffix "_tp.fits");
+        * `TessLightCurveFile` (typical suffix "_lc.fits").
+
+    The function will detect the file type by looking at both the TELESCOP and
+    CREATOR keywords in the first extension of the FITS file.
+    If the file is not recognized as a Kepler or TESS data product,
+    a `ValueError` is raised.
+
+    Parameters
+    ----------
+    path_or_url : str
+        Path or URL of a FITS file.
+
+    Returns
+    -------
+    data : a subclass of :class:`TargetPixelFile` or :class:`LightCurveFile`,
+        depending on the detected file type.
+
+    Raises
+    ------
+    ValueError : raised if the data product is not recognized as a Kepler or
+        TESS product.
+
+    Examples
+    --------
+    To open a target pixel file using its path or URL, simply use:
+
+        >>> tpf = open("mytpf.fits")  # doctest: +SKIP
+    """
+    hdulist = fits.open(path_or_url)
+    try:
+        # use `telescop` keyword to determine mission
+        # and `creator` to determine tpf or lc
+        telescop = hdulist[0].header['telescop']
+        creator = hdulist[0].header['creator']
+        if telescop == 'Kepler':
+            if 'TargetPixel' in creator:
+                return KeplerTargetPixelFile(path_or_url)
+            elif 'Flux' in creator:
+                return KeplerLightCurveFile(path_or_url)
+        elif telescop == 'TESS':
+            if 'TargetPixel' in creator:
+                return TessTargetPixelFile(path_or_url)
+            elif 'Flux' in creator:
+                return TessLightCurveFile(path_or_url)
+    # if these keywords don't exist, raise `ValueError`
+    except KeyError:
+        pass
+    raise ValueError('Given fits file not recognized as Kepler or TESS observation.')

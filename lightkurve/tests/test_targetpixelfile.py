@@ -398,7 +398,7 @@ def test_threshold_aperture_mask():
     lc = tpf.to_lightcurve(aperture_mask=tpf.create_threshold_mask(threshold=1))
     assert (lc.flux == 1).all()
 
-    
+
 def test_tpf_tess():
     """Does a TESS Sector 1 TPF work?"""
     tpf = TessTargetPixelFile(filename_tess, quality_bitmask=None)
@@ -417,7 +417,7 @@ def test_tpf_tess():
     tpf.wcs
     col, row = tpf.estimate_centroids()
 
-    
+
 def test_tpf_slicing():
     tpf = KeplerTargetPixelFile(filename_tpf_one_center)
     assert tpf[0].time == tpf.time[0]
