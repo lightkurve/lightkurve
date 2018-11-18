@@ -228,24 +228,13 @@ class TargetPixelFile(object):
 
     @classmethod
     def from_fits(cls, path_or_url, **kwargs):
-        """Open a Target Pixel File using the path or url of a FITS file.
+        """WARNING: THIS FUNCTION IS DEPRECATED AND WILL BE REMOVED VERY SOON.
 
-        This is identical to opening a Target Pixel File via the constructor.
-        This method was added because many tutorials use the `from_archive`
-        method, therefore users may expect a `from_fits` equivalent.
-
-        Parameters
-        ----------
-        path_or_url : str
-            Path or URL of a FITS file.
-        **kwargs : dict
-            Keyword arguments that will be passed to the constructor.
-
-        Returns
-        -------
-        tpf : TargetPixelFile object
-            The loaded target pixel file.
+        Please use `lightkurve.open()` instead.
         """
+        warnings.warn('`TargetPixelFile.from_fits()` is deprecated and will be '
+                      'removed soon, please use `lightkurve.open()` instead.',
+                      LightkurveWarning)
         return cls(path_or_url, **kwargs)
 
     def get_coordinates(self, cadence='all'):
