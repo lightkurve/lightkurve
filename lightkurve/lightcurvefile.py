@@ -161,8 +161,8 @@ class KeplerLightCurveFile(LightCurveFile):
                           "observation.", LightkurveWarning)
         elif "TargetPixelFile" in filetype:
             warnings.warn("A `TargetPixelFile` object is being opened as a "
-                          "`KeplerLightCurveFile`. To avoid errors in the "
-                          "future, please use `KeplerTargetPixelFile` instead.",
+                          "`KeplerLightCurveFile`. "
+                          "Please use `KeplerTargetPixelFile` instead.",
                           LightkurveWarning)
 
         self.quality_bitmask = quality_bitmask
@@ -375,8 +375,8 @@ class TessLightCurveFile(LightCurveFile):
                           "observation.", LightkurveWarning)
         elif "TargetPixelFile" in filetype:
             warnings.warn("A `TargetPixelFile` object is being opened as a "
-                          "`TessLightCurveFile`. To avoid errors in the "
-                          "future, please use `TessTargetPixelFile` instead.",
+                          "`TessLightCurveFile`. "
+                          "Please use `TessTargetPixelFile` instead.",
                           LightkurveWarning)
 
         self.quality_bitmask = quality_bitmask

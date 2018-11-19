@@ -462,7 +462,15 @@ def detect_filetype(header):
     Detects filetype of a given header.
 
     This function will detect the file type by looking at both the TELESCOP and
-    CREATOR keywords in the first extension of the FITS header.
+    CREATOR keywords in the first extension of the FITS header. If the file is
+    recognized as a Kepler or TESS data product, one of the following strings
+    will be returned:
+
+        * `'KeplerTargetPixelFile'`
+        * `'TessTargetPixelFile'`
+        * `'KeplerLightCurveFile'`
+        * `'TessLightCurveFile'`
+
     If the file is not recognized as a Kepler or TESS data product,
     `None` will be returned.
 
