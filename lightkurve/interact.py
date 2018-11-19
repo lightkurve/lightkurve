@@ -267,7 +267,7 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=0):
 
     return fig, stretch_slider
 
-def make_default_export_name(tpf, suffix='custom-aperture-mask'):
+def make_default_export_name(tpf, suffix='custom-lc'):
     '''makes the default name to save a custom intetract mask'''
     fn = tpf.hdu.filename()
     base = os.path.basename(fn)
