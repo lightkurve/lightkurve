@@ -156,14 +156,14 @@ class KeplerLightCurveFile(LightCurveFile):
                           "`KeplerLightCurveFile` class. "
                           "Please use `TessLightCurveFile` instead.",
                           LightkurveWarning)
+        elif filetype is None:
+            warnings.warn("Given fits file not recognized as Kepler or TESS "
+                          "observation.", LightkurveWarning)
         elif "TargetPixelFile" in filetype:
             warnings.warn("A `TargetPixelFile` object is being opened as a "
                           "`KeplerLightCurveFile`. To avoid errors in the "
                           "future, please use `KeplerTargetPixelFile` instead.",
                           LightkurveWarning)
-        elif filetype is None:
-            warnings.warn("Given fits file not recognized as Kepler or TESS "
-                          "observation.", LightkurveWarning)
 
         self.quality_bitmask = quality_bitmask
         self.quality_mask = KeplerQualityFlags.create_quality_mask(
@@ -370,14 +370,14 @@ class TessLightCurveFile(LightCurveFile):
                           "`TessLightCurveFile` class. "
                           "Please use `KeplerLightCurveFile` instead.",
                           LightkurveWarning)
+        elif filetype is None:
+            warnings.warn("Given fits file not recognized as Kepler or TESS "
+                          "observation.", LightkurveWarning)
         elif "TargetPixelFile" in filetype:
             warnings.warn("A `TargetPixelFile` object is being opened as a "
                           "`TessLightCurveFile`. To avoid errors in the "
                           "future, please use `TessTargetPixelFile` instead.",
                           LightkurveWarning)
-        elif filetype is None:
-            warnings.warn("Given fits file not recognized as Kepler or TESS "
-                          "observation.", LightkurveWarning)
 
         self.quality_bitmask = quality_bitmask
         self.quality_mask = TessQualityFlags.create_quality_mask(
