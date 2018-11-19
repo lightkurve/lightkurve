@@ -5,6 +5,7 @@ import sys
 import os
 import warnings
 
+from astropy.io import fits
 from astropy.visualization import (PercentileInterval, ImageNormalize,
                                    SqrtStretch, LinearStretch)
 from astropy.time import Time
@@ -455,3 +456,43 @@ def suppress_stdout(f, *args, **kwargs):
             finally:
                 sys.stdout = old_out
     return wrapper
+
+def detect_filetype(header):
+    """
+    Detects filetype of a given header.
+
+    This function will detect the file type by looking at both the TELESCOP and
+    CREATOR keywords in the first extension of the FITS header.
+    If the file is not recognized as a Kepler or TESS data product,
+    `None` will be returned.
+
+    Parameters
+    ----------
+    header :
+        The `header` for the first index of a fits file's hdulist.
+
+    Returns
+    -------
+    filetype : str or None
+        A string describing the detected filetype. If the filetype is not
+        recognized, `None` will be returned.
+    """
+
+    try:
+        # use `telescop` keyword to determine mission
+        # and `creator` to determine tpf or lc
+        telescop = header['telescop']
+        creator = header['creator']
+        if telescop == 'Kepler':
+            if 'TargetPixel' in creator:
+                return 'KeplerTargetPixelFile'
+            elif 'Flux' in creator:
+                return 'KeplerLightCurveFile'
+        elif telescop == 'TESS':
+            if 'TargetPixel' in creator:
+                return 'TessTargetPixelFile'
+            elif 'Flux' in creator:
+                return 'TessLightCurveFile'
+    # if these keywords don't exist, raise `ValueError`
+    except KeyError:
+        return None
