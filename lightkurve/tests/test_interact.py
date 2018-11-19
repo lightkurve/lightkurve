@@ -48,7 +48,7 @@ def test_graceful_exit_outside_notebook():
         pass
 
 
-def test_custom_lc():
+def test_custom_aperture_mask():
     """Can we provide a custom lightcurve to show?"""
     with warnings.catch_warnings():
         # Ignore the "TELESCOP is not equal to TESS" warning
@@ -57,8 +57,47 @@ def test_custom_lc():
                 TessTargetPixelFile(example_tpf)]
     try:
         import bokeh
+        with warnings.catch_warnings():
+            # Ignore the "TELESCOP is not equal to TESS" warning
+            warnings.simplefilter("ignore", LightkurveWarning)
+            tpfs = [KeplerTargetPixelFile(example_tpf),
+                    TessTargetPixelFile(example_tpf)]
         for tpf in tpfs:
-            tpf.interact(lc=tpf.to_lightcurve().flatten())
+            mask = tpf.flux[0, :, :] == tpf.flux[0, :, :]
+            tpf.interact(aperture_mask=mask)
+    except ImportError:
+        # bokeh is an optional dependency
+        pass
+
+
+def test_custom_exported_filename():
+    """Can we provide a custom lightcurve to show?"""
+    try:
+        import bokeh
+        with warnings.catch_warnings():
+            # Ignore the "TELESCOP is not equal to TESS" warning
+            warnings.simplefilter("ignore", LightkurveWarning)
+            tpfs = [KeplerTargetPixelFile(example_tpf),
+                    TessTargetPixelFile(example_tpf)]
+        for tpf in tpfs:
+            tpf.interact(exported_filename='demo.fits')
+    except ImportError:
+        # bokeh is an optional dependency
+        pass
+
+def test_max_cadences():
+    """Can we provide a custom lightcurve to show?"""
+    try:
+        import bokeh
+        with warnings.catch_warnings():
+            # Ignore the "TELESCOP is not equal to TESS" warning
+            warnings.simplefilter("ignore", LightkurveWarning)
+            tpfs = [KeplerTargetPixelFile(example_tpf),
+                    TessTargetPixelFile(example_tpf)]
+        for tpf in tpfs:
+            with pytest.raises(RuntimeError) as exc:
+                tpf.interact(max_cadences=5)
+                assert('Interact cannot display more than' in exc.value.args[0])
     except ImportError:
         # bokeh is an optional dependency
         pass
@@ -72,8 +111,9 @@ def test_interact_functions():
                                 get_lightcurve_y_limits, make_lightcurve_figure_elements,
                                 make_tpf_figure_elements, show_interact_widget)
         tpf = TessTargetPixelFile(example_tpf)
-        lc = tpf.to_lightcurve()
-        tpf_source = prepare_tpf_datasource(tpf)
+        mask = tpf.flux[0, :, :] == tpf.flux[0, :, :]
+        tpf_source = prepare_tpf_datasource(tpf, aperture_mask=mask)
+        lc = tpf.to_lightcurve(aperture_mask=mask)
         lc_source = prepare_lightcurve_datasource(lc)
         get_lightcurve_y_limits(lc_source)
         make_lightcurve_figure_elements(lc, lc_source)
