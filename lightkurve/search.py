@@ -4,7 +4,6 @@ import os
 import logging
 import numpy as np
 import warnings
-import importlib
 
 from astropy.table import join, Table, Row
 from astropy.coordinates import SkyCoord
@@ -683,8 +682,7 @@ def open(path_or_url):
 
     # if the filetype is recognized, instantiate a class of that name
     if filetype is not None:
-        lk_module = importlib.import_module("lightkurve")
-        return getattr(lk_module, filetype)(path_or_url)
+        return getattr(__import__('lightkurve'), filetype)(path_or_url)
     else:
         # if these keywords don't exist, raise `ValueError`
         raise ValueError('Given fits file not recognized as Kepler or TESS '
