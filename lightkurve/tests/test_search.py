@@ -11,6 +11,7 @@ import os
 import pytest
 import numpy as np
 from numpy.testing import assert_almost_equal, assert_array_equal
+import warnings
 
 from astropy.coordinates import SkyCoord
 import astropy.units as u
@@ -117,7 +118,9 @@ def test_collections():
     # if fewer targets are found than targetlimit, should still download all available
     assert(len(search_targetpixelfile(205998445, radius=900, limit=6).table) == 4)
     # if download() is used when multiple files are available, should only download 1
-    assert(isinstance(search_targetpixelfile(205998445, radius=900).download(), KeplerTargetPixelFile))
+    with pytest.warns(LightkurveWarning, match='4 files available to download'):
+        assert(isinstance(search_targetpixelfile(205998445, radius=900).download(),
+                          KeplerTargetPixelFile))
 
 
 @pytest.mark.remote_data
@@ -160,34 +163,40 @@ def test_empty_searchresult():
 @pytest.mark.remote_data
 @pytest.mark.filterwarnings('ignore:Query returned no results')
 def test_kepler_tpf_from_archive_DEPRECATED():
-    # Request an object name that does not exist
-    with pytest.raises(ValueError):
-        KeplerTargetPixelFile.from_archive("LightKurve_Unit_Test_Invalid_Target")
-    # Request an EPIC ID that was not observed
-    with pytest.raises(ValueError):
-        KeplerTargetPixelFile.from_archive(246000000)
-    KeplerTargetPixelFile.from_archive('Kepler-10', quarter=11)
-    KeplerTargetPixelFile.from_archive('Kepler-10', quarter=11, cadence='short')
-    KeplerTargetPixelFile.from_archive('Kepler-10', quarter=11, month=1, cadence='short')
-    # If we request 2 quarters it should give a list of two TPFs, ordered by quarter
-    tpfs = KeplerTargetPixelFile.from_archive(5728079, cadence='long', quarter=[1, 2])
-    assert(isinstance(tpfs, TargetPixelFileCollection))
-    assert(isinstance(tpfs[0], KeplerTargetPixelFile))
-    assert(tpfs[0].quarter == 1)
+    # Ignore all deprecation warnings
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", LightkurveWarning)
+        # Request an object name that does not exist
+        with pytest.raises(ValueError):
+            KeplerTargetPixelFile.from_archive("LightKurve_Unit_Test_Invalid_Target")
+        # Request an EPIC ID that was not observed
+        with pytest.raises(ValueError):
+            KeplerTargetPixelFile.from_archive(246000000)
+        KeplerTargetPixelFile.from_archive('Kepler-10', quarter=11)
+        KeplerTargetPixelFile.from_archive('Kepler-10', quarter=11, cadence='short')
+        KeplerTargetPixelFile.from_archive('Kepler-10', quarter=11, month=1, cadence='short')
+        # If we request 2 quarters it should give a list of two TPFs, ordered by quarter
+        tpfs = KeplerTargetPixelFile.from_archive(5728079, cadence='long', quarter=[1, 2])
+        assert(isinstance(tpfs, TargetPixelFileCollection))
+        assert(isinstance(tpfs[0], KeplerTargetPixelFile))
+        assert(tpfs[0].quarter == 1)
 
 
 @pytest.mark.remote_data
 @pytest.mark.filterwarnings('ignore:Query returned no results')
 def test_kepler_lightcurve_from_archive_DEPRECATED():
-    # Request an object name that does not exist
-    with pytest.raises(ValueError):
-        KeplerLightCurveFile.from_archive("LightKurve_Unit_Test_Invalid_Target")
-    # Request an EPIC ID that was not observed
-    with pytest.raises(ValueError):
-        KeplerLightCurveFile.from_archive(246000000)
-    KeplerLightCurveFile.from_archive('Kepler-10', quarter=11)
-    KeplerLightCurveFile.from_archive('Kepler-10', quarter=11, cadence='short')
-    KeplerLightCurveFile.from_archive('Kepler-10', quarter=11, month=1, cadence='short')
+    # Ignore all deprecation warnings
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", LightkurveWarning)
+        # Request an object name that does not exist
+        with pytest.raises(ValueError):
+            KeplerLightCurveFile.from_archive("LightKurve_Unit_Test_Invalid_Target")
+        # Request an EPIC ID that was not observed
+        with pytest.raises(ValueError):
+            KeplerLightCurveFile.from_archive(246000000)
+        KeplerLightCurveFile.from_archive('Kepler-10', quarter=11)
+        KeplerLightCurveFile.from_archive('Kepler-10', quarter=11, cadence='short')
+        KeplerLightCurveFile.from_archive('Kepler-10', quarter=11, month=1, cadence='short')
 
 
 @pytest.mark.remote_data
@@ -196,9 +205,12 @@ def test_source_confusion_DEPRECATED():
     # When obtaining the TPF for target 6507433, @benmontet noticed that
     # a target 4 arcsec away was returned instead.
     # See https://github.com/KeplerGO/lightkurve/issues/148
-    desired_target = 6507433
-    tpf = KeplerTargetPixelFile.from_archive(desired_target, quarter=8)
-    assert tpf.targetid == desired_target
+    # Ignore all deprecation warnings
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", LightkurveWarning)
+        desired_target = 6507433
+        tpf = KeplerTargetPixelFile.from_archive(desired_target, quarter=8)
+        assert tpf.targetid == desired_target
 
 
 def test_open():
@@ -212,5 +224,5 @@ def test_open():
         open(os.path.join(PACKAGEDIR, "tests", "data", "test_factory0.fits"))
     except ValueError:
         pass
-    assert isinstance(KeplerTargetPixelFile(tess_path), KeplerTargetPixelFile)
-    assert isinstance(TessTargetPixelFile(k2_path), TessTargetPixelFile)
+    assert isinstance(KeplerTargetPixelFile(k2_path), KeplerTargetPixelFile)
+    assert isinstance(TessTargetPixelFile(tess_path), TessTargetPixelFile)
