@@ -271,7 +271,7 @@ def make_default_export_name(tpf, suffix='custom-aperture-mask'):
     '''makes the default name to save a custom intetract mask'''
     fn = tpf.hdu.filename()
     base = os.path.basename(fn)
-    outname = base.rsplit('-targ.fits')[0] + '-{}.fits'.format(suffix)
+    outname = base.rsplit('.fits')[0] + '-{}.fits'.format(suffix)
     return outname
 
 
@@ -355,7 +355,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
                                 width=490)
         r_button = Button(label=">", button_type="default", width=30)
         l_button = Button(label="<", button_type="default", width=30)
-        export_button = Button(label="Export Mask", button_type="success", width=120)
+        export_button = Button(label="Save Lightcurve", button_type="success", width=120)
 
         # Callbacks
         def update_upon_pixel_selection(attr, old, new):
