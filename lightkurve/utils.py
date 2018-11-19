@@ -366,7 +366,7 @@ def btjd_to_astropy_time(btjd, bjdref=2457000.):
 
 def plot_image(image, ax=None, scale='linear', origin='lower',
                xlabel='Pixel Column Number', ylabel='Pixel Row Number',
-               clabel='Flux ($e^{-}s^{-1}$)', title=None, show_colorbar=True,
+               clabel='Flux ($e^{-}s^{-1}$)', title='', show_colorbar=True,
                **kwargs):
     """Utility function to plot a 2D image
 
