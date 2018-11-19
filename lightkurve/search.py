@@ -685,5 +685,5 @@ def open(path_or_url):
         return getattr(__import__('lightkurve'), filetype)(path_or_url)
     else:
         # if these keywords don't exist, raise `ValueError`
-        raise ValueError('Given fits file not recognized as Kepler or TESS '
-                         'observation.')
+        raise ValueError("Given fits file not recognized as Kepler or TESS "
+                         "observation.")

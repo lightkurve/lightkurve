@@ -21,7 +21,7 @@ from .lightcurve import KeplerLightCurve, TessLightCurve
 from .prf import KeplerPRF
 from .utils import KeplerQualityFlags, TessQualityFlags, \
                    plot_image, bkjd_to_astropy_time, btjd_to_astropy_time, \
-                   LightkurveWarning
+                   LightkurveWarning, detect_filetype
 
 __all__ = ['KeplerTargetPixelFile', 'TessTargetPixelFile']
 log = logging.getLogger(__name__)
@@ -614,22 +614,16 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                 quality_array=self.hdu[1].data['QUALITY'],
                                 bitmask=quality_bitmask)
 
-        # Check the TELESCOP keyword and warn the user if it's not 'Kepler'
-        try:
-            telescop = self.header['telescop']
-            if isinstance(telescop, Undefined):
-                raise KeyError
-            elif telescop == 'TESS':
-                warnings.warn("A TESS data product is being opened using the "
-                              "`KeplerTargetPixelFile` class. "
-                              "Please use `TessTargetPixelFile` instead.",
-                              LightkurveWarning)
-            elif telescop != 'Kepler':
-                warnings.warn("KeplerTargetPixelFile encountered 'TELESCOP' "
-                              "keyword '{}' instead of 'Kepler'".format(telescop),
-                              LightkurveWarning)
-        except KeyError:
-            log.debug("KeplerTargetPixelFile encountered a file without 'TELESCOP' keyword.")
+        # check to make sure the correct filetype has been provided
+        filetype = detect_filetype(self.header)
+        if filetype == 'TessTargetPixelFile':
+            warnings.warn("A TESS data product is being opened using the "
+                          "`KeplerTargetPixelFile` class. "
+                          "Please use `TessTargetPixelFile` instead.",
+                          LightkurveWarning)
+        elif filetype is None:
+            warnings.warn("File header not recognized as Kepler or TESS "
+                          "observation.", LightkurveWarning)
 
         # Use the KEPLERID keyword as the default targetid
         if self.targetid is None:
@@ -1281,22 +1275,16 @@ class TessTargetPixelFile(TargetPixelFile):
         # these cadences from being used. They would break most methods!
         self.quality_mask &= np.isfinite(self.hdu[1].data['TIME'])
 
-        # Check the TELESCOP keyword and warn the user if it's not 'TESS'
-        try:
-            telescop = self.header['telescop']
-            if isinstance(telescop, Undefined):
-                raise KeyError
-            elif telescop == 'Kepler':
-                warnings.warn("A Kepler data product is being opened using the "
-                              "`TessTargetPixelFile` class. "
-                              "Please use `KeplerTargetPixelFile` instead.",
-                              LightkurveWarning)
-            elif telescop != 'TESS':
-                warnings.warn("TessTargetPixelFile encountered 'TELESCOP' "
-                              "keyword '{}' instead of 'TESS'".format(telescop),
-                              LightkurveWarning)
-        except KeyError:
-            log.debug("TessTargetPixelFile encountered a file without 'TELESCOP' keyword.")
+        # check to make sure the correct filetype has been provided
+        filetype = detect_filetype(self.header)
+        if filetype == 'KeplerTargetPixelFile':
+            warnings.warn("A Kepler data product is being opened using the "
+                          "`TessTargetPixelFile` class. "
+                          "Please use `KeplerTargetPixelFile` instead.",
+                          LightkurveWarning)
+        elif filetype is None:
+            warnings.warn("File header not recognized as Kepler or TESS "
+                          "observation.", LightkurveWarning)
 
         # Use the TICID keyword as the default targetid
         try:
