@@ -15,7 +15,8 @@ from functools import wraps
 
 log = logging.getLogger(__name__)
 
-__all__ = ['KeplerQualityFlags', 'TessQualityFlags',
+__all__ = ['LightkurveWarning',
+           'KeplerQualityFlags', 'TessQualityFlags',
            'bkjd_to_astropy_time', 'btjd_to_astropy_time',
            'channel_to_module_output', 'module_output_to_channel',
            'running_mean']

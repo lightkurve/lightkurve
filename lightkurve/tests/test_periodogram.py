@@ -61,22 +61,22 @@ def test_periodogram_slicing():
 
 
 def test_assign_periods():
-    """ Test if you can assign periods and frequencies
-    """
-    lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000), flux_err=np.zeros(1000)+0.1)
-    periods = np.arange(0, 100) * u.day
+    """Test if you can assign periods and frequencies."""
+    lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000),
+                    flux_err=np.zeros(1000) + 0.1)
+    periods = np.arange(1, 100) * u.day
     p = lc.to_periodogram(period=periods)
     # Get around the floating point error
     assert np.isclose(np.sum(periods - p.period).value, 0, rtol=1e-14)
-    frequency = np.arange(0, 100) * u.Hz
+    frequency = np.arange(1, 100) * u.Hz
     p = lc.to_periodogram(frequency=frequency)
     assert np.isclose(np.sum(frequency - p.frequency).value, 0, rtol=1e-14)
 
 
 def test_bin():
-    """ Test if you can bin the periodogram
-    """
-    lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000), flux_err=np.zeros(1000)+0.1)
+    """Test if you can bin the periodogram."""
+    lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000),
+                    flux_err=np.zeros(1000) + 0.1)
     p = lc.to_periodogram()
     assert len(p.bin(binsize=10).frequency) == len(p.frequency)//10
 
@@ -102,9 +102,9 @@ def test_smooth():
         p.smooth(method='boxkernel', filter_width=5.*u.day)
     assert err.value.args[0] == 'the `filter_width` parameter must have frequency units.'
 
-    # Can't (yet) use a periodogram with a non-evenly spaced frqeuencies
+    # Can't (yet) use a periodogram with a non-evenly spaced frequencies
     with pytest.raises(ValueError) as err:
-        p = np.arange(100)
+        p = np.arange(1, 100)
         p = lc.to_periodogram(period=p)
         p.smooth()
 

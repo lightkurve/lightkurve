@@ -90,6 +90,20 @@ class TargetPixelFile(object):
         else:
             self._hdu = value
 
+    def get_keyword(self, keyword, hdu=0, default=None):
+        """Returns a header keyword value.
+
+        If the keyword is Undefined or does not exist,
+        then return ``default`` instead.
+        """
+        try:
+            kw = self.hdu[hdu].header[keyword]
+        except KeyError:
+            return default
+        if isinstance(kw, Undefined):
+            return default
+        return kw
+
     @property
     def header(self):
         """Returns the header of the primary extension."""
@@ -98,42 +112,22 @@ class TargetPixelFile(object):
     @property
     def ra(self):
         """Right Ascension of target ('RA_OBJ' header keyword)."""
-        try:
-            return self.header['RA_OBJ']
-        except KeyError:
-            return None
+        return self.get_keyword('RA_OBJ')
 
     @property
     def dec(self):
         """Declination of target ('DEC_OBJ' header keyword)."""
-        try:
-            return self.header['DEC_OBJ']
-        except KeyError:
-            return None
+        return self.get_keyword('DEC_OBJ')
 
     @property
     def column(self):
-        try:
-            out = self.hdu[1].header['1CRV5P']
-        except KeyError:
-            out = 0
-        # ensure output has a value
-        if isinstance(out, fits.card.Undefined):
-            return 0
-        else:
-            return out
+        """CCD pixel column number ('1CRV5P' header keyword)."""
+        return self.get_keyword('1CRV5P', hdu=1, default=0)
 
     @property
     def row(self):
-        try:
-            out = self.hdu[1].header['2CRV5P']
-        except KeyError:
-            out = 0
-        # ensure output has a value
-        if isinstance(out, fits.card.Undefined):
-            return 0
-        else:
-            return out
+        """CCD pixel row number ('2CRV5P' header keyword)."""
+        return self.get_keyword('2CRV5P', hdu=1, default=0)
 
     @property
     def pos_corr1(self):
@@ -623,7 +617,9 @@ class KeplerTargetPixelFile(TargetPixelFile):
         # Check the TELESCOP keyword and warn the user if it's not 'Kepler'
         try:
             telescop = self.header['telescop']
-            if telescop == 'TESS':
+            if isinstance(telescop, Undefined):
+                raise KeyError
+            elif telescop == 'TESS':
                 warnings.warn("A TESS data product is being opened using the "
                               "`KeplerTargetPixelFile` class. "
                               "Please use `TessTargetPixelFile` instead.",
@@ -719,22 +715,22 @@ class KeplerTargetPixelFile(TargetPixelFile):
     @property
     def obsmode(self):
         """'short cadence' or 'long cadence'. ('OBSMODE' header keyword)"""
-        return self.header['OBSMODE']
+        return self.get_keyword('OBSMODE')
 
     @property
     def module(self):
         """Kepler CCD module number. ('MODULE' header keyword)"""
-        return self.header['MODULE']
+        return self.get_keyword('MODULE')
 
     @property
     def output(self):
         """Kepler CCD module output number. ('OUTPUT' header keyword)"""
-        return self.header['OUTPUT']
+        return self.get_keyword('OUTPUT')
 
     @property
     def channel(self):
         """Kepler CCD channel number. ('CHANNEL' header keyword)"""
-        return self.header['CHANNEL']
+        return self.get_keyword('CHANNEL')
 
     @property
     def astropy_time(self):
@@ -744,26 +740,17 @@ class KeplerTargetPixelFile(TargetPixelFile):
     @property
     def quarter(self):
         """Kepler quarter number. ('QUARTER' header keyword)"""
-        try:
-            return self.header['QUARTER']
-        except KeyError:
-            return None
+        return self.get_keyword('QUARTER')
 
     @property
     def campaign(self):
         """K2 Campaign number. ('CAMPAIGN' header keyword)"""
-        try:
-            return self.header['CAMPAIGN']
-        except KeyError:
-            return None
+        return self.get_keyword('CAMPAIGN')
 
     @property
     def mission(self):
         """'Kepler' or 'K2'. ('MISSION' header keyword)"""
-        try:
-            return self.header['MISSION']
-        except KeyError:
-            return None
+        return self.get_keyword('MISSION')
 
     def extract_aperture_photometry(self, aperture_mask='pipeline'):
         """Returns a LightCurve obtained using aperture photometry.
@@ -1297,7 +1284,9 @@ class TessTargetPixelFile(TargetPixelFile):
         # Check the TELESCOP keyword and warn the user if it's not 'TESS'
         try:
             telescop = self.header['telescop']
-            if telescop == 'Kepler':
+            if isinstance(telescop, Undefined):
+                raise KeyError
+            elif telescop == 'Kepler':
                 warnings.warn("A Kepler data product is being opened using the "
                               "`TessTargetPixelFile` class. "
                               "Please use `KeplerTargetPixelFile` instead.",
@@ -1334,24 +1323,18 @@ class TessTargetPixelFile(TargetPixelFile):
 
     @property
     def sector(self):
-        try:
-            return self.header['SECTOR']
-        except KeyError:
-            return None
+        """TESS Sector number ('SECTOR' header keyword)."""
+        return self.get_keyword('SECTOR')
 
     @property
     def camera(self):
-        try:
-            return self.header['CAMERA']
-        except KeyError:
-            return None
+        """TESS Camera number ('CAMERA' header keyword)."""
+        return self.get_keyword('CAMERA')
 
     @property
     def ccd(self):
-        try:
-            return self.header['CCD']
-        except KeyError:
-            return None
+        """TESS CCD number ('CCD' header keyword)."""
+        return self.get_keyword('CCD')
 
     @property
     def mission(self):
@@ -1395,7 +1378,7 @@ class TessTargetPixelFile(TargetPixelFile):
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
-                'label': self.header['OBJECT'],
+                'label': self.get_keyword('OBJECT'),
                 'targetid': self.targetid}
         return TessLightCurve(time=self.time,
                               time_format='btjd',
