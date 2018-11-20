@@ -96,7 +96,7 @@ def test_max_cadences():
                     TessTargetPixelFile(example_tpf)]
         for tpf in tpfs:
             with pytest.raises(RuntimeError) as exc:
-                tpf.interact(max_cadences=5)
+                tpf.interact(max_cadences=2)
                 assert('Interact cannot display more than' in exc.value.args[0])
     except ImportError:
         # bokeh is an optional dependency
