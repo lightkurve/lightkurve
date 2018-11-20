@@ -580,6 +580,15 @@ def test_fill_gaps():
     assert(np.all(nlc.flux == 1))
     assert(np.all(np.isfinite(nlc.flux)))
 
+    # Because fill_gaps() uses pandas, check that it works regardless of endianness
+    # For details see https://github.com/KeplerGO/lightkurve/issues/188
+    lc = LightCurve(np.array([1, 2, 3, 4, 6, 7, 8], dtype='>f8'),
+                    np.array([1, 1, 1, np.nan, np.nan, 1, 1], dtype='>f8'))
+    lc.fill_gaps()
+    lc = LightCurve(np.array([1, 2, 3, 4, 6, 7, 8], dtype='<f8'),
+                    np.array([1, 1, 1, np.nan, np.nan, 1, 1], dtype='<f8'))
+    lc.fill_gaps()
+
 
 def test_targetid():
     """Is a generic targetid available on each type of LighCurve object?"""
