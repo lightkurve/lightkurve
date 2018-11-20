@@ -496,10 +496,12 @@ class PLDCorrector(object):
     Target Pixel Files.
     """
 
-    def __init__(self):
-        pass
+    def __init__(self, tpf, ferr, time):
+        self.tpf = tpf
+        self.ferr = ferr
+        self.time = time
 
-    def correct(self, fpix, ferr, trninds, time, aperture):
+    def correct(self, trninds, aperture):
         """Returns a systematics-corrected LightCurve.
 
         Note that it is assumed that time and flux do not contain NaNs.
@@ -521,25 +523,25 @@ class PLDCorrector(object):
         aperture_mask[np.where(aperture)] = 1.
         aperture = aperture_mask
 
-        aperture = [aperture for i in range(len(fpix))]
+        aperture = [aperture for i in range(len(self.tpf))]
 
         M = lambda x: np.delete(x, trninds, axis=0)
 
         #  generate flux light curve
-        fpix = M(fpix)
+        self.tpf = M(self.tpf)
         aperture = M(aperture)
-        fpix_rs = (fpix*aperture).reshape(len(fpix),-1)
-        fpix_ap = np.zeros((len(fpix),len(np.delete(fpix_rs[0],np.where(np.isnan(fpix_rs[0]))))))
+        self.tpf_rs = (self.tpf*aperture).reshape(len(self.tpf),-1)
+        self.tpf_ap = np.zeros((len(self.tpf),len(np.delete(self.tpf_rs[0],np.where(np.isnan(self.tpf_rs[0]))))))
 
-        for c in range(len(fpix_rs)):
-            naninds = np.where(np.isnan(fpix_rs[c]))
-            fpix_ap[c] = np.delete(fpix_rs[c],naninds)
+        for c in range(len(self.tpf_rs)):
+            naninds = np.where(np.isnan(self.tpf_rs[c]))
+            self.tpf_ap[c] = np.delete(self.tpf_rs[c],naninds)
 
-        fpix = fpix_ap
-        rawflux = np.sum(fpix.reshape(len(fpix),-1), axis=1)
+        self.tpf = self.tpf_ap
+        rawflux = np.sum(self.tpf.reshape(len(self.tpf),-1), axis=1)
 
         # First order PLD
-        f1 = fpix / rawflux.reshape(-1, 1)
+        f1 = self.tpf / rawflux.reshape(-1, 1)
         pca = PCA(n_components=10)
         X1 = pca.fit_transform(f1)
 
@@ -561,7 +563,7 @@ class PLDCorrector(object):
 
         # Set up gaussian process
         gp = george.GP(amp ** 2 * george.kernels.Matern32Kernel(tau ** 2))
-        sigma = gp.get_matrix(M(time)) + np.diag(M(np.sum(ferr.reshape(len(ferr),-1), axis = 1))**2)
+        sigma = gp.get_matrix(M(self.time)) + np.diag(M(np.sum(self.ferr.reshape(len(self.ferr),-1), axis = 1))**2)
 
         # Compute
         A = np.dot(MX.T, np.linalg.solve(sigma, MX))
@@ -570,6 +572,6 @@ class PLDCorrector(object):
 
         # Compute detrended light curve
         model = np.dot(X, C)
-        flux = rawflux - model + np.nanmean(rawflux)
+        detrended_flux = rawflux - model + np.nanmean(rawflux)
 
-        return LightCurve(time=time, flux=flux)
+        return LightCurve(time=self.time, flux=detrended_flux)
