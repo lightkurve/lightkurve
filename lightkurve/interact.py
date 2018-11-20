@@ -360,6 +360,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
         # Callbacks
         def update_upon_pixel_selection(attr, old, new):
             """Callback to take action when pixels are selected."""
+            # Check if a selection was "re-clicked", then de-select
             if ((sorted(old) == sorted(new)) & (new != [])):
                 # Trigger recursion
                 tpf_source.selected.indices = new[1:]
