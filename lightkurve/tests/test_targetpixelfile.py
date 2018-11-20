@@ -426,3 +426,9 @@ def test_tpf_slicing():
     assert tpf[5:10].shape == tpf.flux[5:10].shape
     assert tpf[0].targetid == tpf.targetid
     assert_array_equal(tpf[tpf.time < tpf.time[5]].time, tpf.time[0:5])
+
+
+def test_endianness():
+    """Regression test for https://github.com/KeplerGO/lightkurve/issues/188"""
+    tpf = KeplerTargetPixelFile(filename_tpf_one_center)
+    tpf.to_lightcurve().to_pandas().describe()
