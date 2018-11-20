@@ -559,19 +559,19 @@ class LightCurve(object):
 
         n_bins = self.flux.size // binsize
         binned_lc = self.copy()
-        binned_lc.time = np.array([methodf(a) for a in np.array_split(self.time, n_bins)])
-        binned_lc.flux = np.array([methodf(a) for a in np.array_split(self.flux, n_bins)])
+        indexes = np.array_split(np.arange(len(self.time)), n_bins)
+        binned_lc.time = np.array([methodf(self.time[a]) for a in indexes])
+        binned_lc.flux = np.array([methodf(self.flux[a]) for a in indexes])
 
         if np.any(np.isfinite(self.flux_err)):
             # root-mean-square error
             binned_lc.flux_err = np.array(
-                [np.sqrt(np.nansum(a**2))
-                 for a in np.array_split(self.flux_err, n_bins)]
+                [np.sqrt(np.nansum(self.flux_err[a]**2))
+                 for a in indexes]
             ) / binsize
         else:
-            # compute the standard deviation from the data
-            binned_lc.flux_err = np.array([np.nanstd(a)
-                                           for a in np.array_split(self.flux, n_bins)])
+            # Make them zeros.
+            binned_lc.flux_err = np.zeros(len(binned_lc.flux))
 
         if hasattr(binned_lc, 'quality'):
             binned_lc.quality = np.array(
@@ -862,6 +862,12 @@ class LightCurve(object):
         for col in columns:
             if hasattr(self, col):
                 data[col] = vars(self)[col]
+                # We need to ensure pandas gets the native byteorder.
+                # x86 uses little endian, so it is reasonable to assume that
+                # we always want little endian, even though FITS uses big endian!
+                # See https://github.com/KeplerGO/lightkurve/issues/188
+                if data[col].dtype.byteorder == '>':  # is big endian?
+                    data[col] = data[col].byteswap().newbyteorder()
         df = pd.DataFrame(data=data, index=self.time, columns=columns)
         df.index.name = 'time'
         return df

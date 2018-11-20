@@ -9,6 +9,7 @@ API documentation
     lightcurvefile
     targetpixelfile
     search
+    periodogram
     correctors
     prf
     utils

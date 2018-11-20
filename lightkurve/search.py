@@ -3,24 +3,25 @@ from __future__ import division
 import os
 import logging
 import numpy as np
+import warnings
 
-from astropy.table import unique, join, Table, Row
+from astropy.table import join, Table, Row
 from astropy.coordinates import SkyCoord
-from astropy.io import ascii
+from astropy.io import ascii, fits
 from astropy import units as u
 
 from astroquery.mast import Observations
 from astroquery.exceptions import ResolverError
 
-from .lightcurvefile import KeplerLightCurveFile
-from .targetpixelfile import KeplerTargetPixelFile
+from .lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
+from .targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
 from .collections import TargetPixelFileCollection, LightCurveFileCollection
-from .utils import suppress_stdout
+from .utils import suppress_stdout, LightkurveWarning
 from . import PACKAGEDIR
 
 log = logging.getLogger(__name__)
 
-__all__ = ['search_targetpixelfile', 'search_lightcurvefile']
+__all__ = ['search_targetpixelfile', 'search_lightcurvefile', 'open']
 
 
 class SearchError(Exception):
@@ -41,12 +42,18 @@ class SearchResult(object):
         Astropy table returned by a join of the astroquery `Observations.query_criteria()`
         and `Observations.get_product_list()` methods.
     """
-    def __init__(self, table):
-        self.table = table
+    def __init__(self, table=None):
+        if table is None:
+            self.table = Table()
+        else:
+            self.table = table
 
     def __repr__(self):
+        out = 'SearchResult containing {} data products.'.format(len(self.table))
+        if len(self.table) == 0:
+            return out
         columns = ['obsID', 'target_name', 'productFilename', 'description', 'distance']
-        return '\n'.join(self.table[columns].pformat(max_width=300))
+        return out + '\n\n' + '\n'.join(self.table[columns].pformat(max_width=300))
 
     def __getitem__(self, key):
         """Implements indexing and slicing, e.g. SearchResult[2:5]."""
@@ -64,7 +71,7 @@ class SearchResult(object):
     def unique_targets(self):
         """Returns a table of targets and their RA & dec values produced by search"""
         mask = ['target_name', 's_ra', 's_dec']
-        return unique(self.table[mask], keys='target_name')
+        return Table.from_pandas(self.table[mask].to_pandas().drop_duplicates('target_name').reset_index(drop=True))
 
     @property
     def obsid(self):
@@ -118,6 +125,17 @@ class SearchResult(object):
         data : `TargetPixelFile` or `LightCurveFile` object
             The first entry in the products table.
         """
+        if len(self.table) == 0:
+            warnings.warn("Cannot download from an empty search result.",
+                          LightkurveWarning)
+            return None
+        if len(self.table) != 1:
+            warnings.warn('Warning: {} files available to download. '
+                          'Only the first file has been downloaded. '
+                          'Please use `download_all()` or specify a campaign, quarter, or '
+                          'cadence to limit your search.'.format(len(self.table)),
+                          LightkurveWarning)
+
         # Make sure astroquery uses the same level of verbosity
         logging.getLogger('astropy').setLevel(log.getEffectiveLevel())
 
@@ -127,12 +145,6 @@ class SearchResult(object):
 
         path = Observations.download_products(self.table[:1], mrp_only=False,
                                               download_dir=download_dir)['Local Path']
-
-        if len(self.table) != 1:
-            log.warning('Warning: {} files available to download. '
-                        'Only the first file has been downloaded. '
-                        'Please use `download_all()` or specify a campaign, quarter, or '
-                        'cadence to limit your search.'.format(len(self.table)))
 
         # return single tpf or lcf
         tpf_files = ['lpd-targ.fits', 'spd-targ.fits']
@@ -172,6 +184,11 @@ class SearchResult(object):
             Returns a `LightCurveFileCollection`  or `TargetPixelFileCollection`,
             containing all entries in the products table
         """
+        if len(self.table) == 0:
+            warnings.warn("Cannot download from an empty search result.",
+                          LightkurveWarning)
+            return None
+
         # Make sure astroquery uses the same level of verbosity
         logging.getLogger('astropy').setLevel(log.getEffectiveLevel())
 
@@ -304,7 +321,7 @@ def search_targetpixelfile(target, radius=None, cadence='long', quarter=None,
                                 campaign=campaign, limit=limit)
     except SearchError as exc:
         log.error(exc)
-        return None
+        return SearchResult(None)
 
 
 def search_lightcurvefile(target, radius=None, cadence='long', quarter=None,
@@ -389,7 +406,7 @@ def search_lightcurvefile(target, radius=None, cadence='long', quarter=None,
                                 campaign=campaign, limit=limit)
     except SearchError as exc:
         log.error(exc)
-        return None
+        return SearchResult(None)
 
 
 def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
@@ -625,3 +642,62 @@ def _filter_products(products, campaign=None, quarter=None, month=None,
     if limit is not None:
         return products[0:limit]
     return products
+
+
+def open(path_or_url):
+    """Opens a Kepler or TESS data product.
+
+    This function will automatically detect the type of the data product,
+    and return the appropriate object. File types currently supported are::
+
+        * `KeplerTargetPixelFile` (typical suffix "-targ.fits.gz");
+        * `KeplerLightCurveFile` (typical suffix "llc.fits");
+        * `TessTargetPixelFile` (typical suffix "_tp.fits");
+        * `TessLightCurveFile` (typical suffix "_lc.fits").
+
+    The function will detect the file type by looking at both the TELESCOP and
+    CREATOR keywords in the first extension of the FITS file.
+    If the file is not recognized as a Kepler or TESS data product,
+    a `ValueError` is raised.
+
+    Parameters
+    ----------
+    path_or_url : str
+        Path or URL of a FITS file.
+
+    Returns
+    -------
+    data : a subclass of :class:`TargetPixelFile` or :class:`LightCurveFile`,
+        depending on the detected file type.
+
+    Raises
+    ------
+    ValueError : raised if the data product is not recognized as a Kepler or
+        TESS product.
+
+    Examples
+    --------
+    To open a target pixel file using its path or URL, simply use:
+
+        >>> tpf = open("mytpf.fits")  # doctest: +SKIP
+    """
+    hdulist = fits.open(path_or_url)
+    try:
+        # use `telescop` keyword to determine mission
+        # and `creator` to determine tpf or lc
+        telescop = hdulist[0].header['telescop']
+        creator = hdulist[0].header['creator']
+        if telescop == 'Kepler':
+            if 'TargetPixel' in creator:
+                return KeplerTargetPixelFile(path_or_url)
+            elif 'Flux' in creator:
+                return KeplerLightCurveFile(path_or_url)
+        elif telescop == 'TESS':
+            if 'TargetPixel' in creator:
+                return TessTargetPixelFile(path_or_url)
+            elif 'Flux' in creator:
+                return TessLightCurveFile(path_or_url)
+    # if these keywords don't exist, raise `ValueError`
+    except KeyError:
+        pass
+    raise ValueError('Given fits file not recognized as Kepler or TESS observation.')

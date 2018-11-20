@@ -47,3 +47,5 @@ of manual steps:
     $ make clean
     $ make html
     $ make upload
+
+7. Edit `lightkurve/version.py` to contain the next version number with suffix `.dev`.

@@ -15,7 +15,8 @@ from functools import wraps
 
 log = logging.getLogger(__name__)
 
-__all__ = ['KeplerQualityFlags', 'TessQualityFlags',
+__all__ = ['LightkurveWarning',
+           'KeplerQualityFlags', 'TessQualityFlags',
            'bkjd_to_astropy_time', 'btjd_to_astropy_time',
            'channel_to_module_output', 'module_output_to_channel',
            'running_mean']
@@ -440,16 +441,16 @@ class LightkurveWarning(Warning):
     pass
 
 
-def suppress_stdout(f, *args):
+def suppress_stdout(f, *args, **kwargs):
     """A simple decorator to suppress function print outputs."""
     @wraps(f)
-    def wrapper(*args):
+    def wrapper(*args, **kwargs):
         # redirect output to `null`
         with open(os.devnull, 'w') as devnull:
             old_out = sys.stdout
             sys.stdout = devnull
             try:
-                return f(*args)
+                return f(*args, **kwargs)
             # restore to default
             finally:
                 sys.stdout = old_out

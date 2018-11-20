@@ -3,11 +3,11 @@ from __future__ import division, print_function
 from astropy.io import fits as pyfits
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib import pyplot as plt
 
 from numpy.testing import (assert_almost_equal, assert_array_equal,
                            assert_allclose)
 import pytest
+import warnings
 
 from ..lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
 from ..lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
@@ -80,8 +80,9 @@ def test_rmath_operators():
 @pytest.mark.parametrize("path, mission", [(TABBY_Q8, "Kepler"), (K2_C08, "K2")])
 def test_KeplerLightCurveFile(path, mission):
     lcf = KeplerLightCurveFile(path, quality_bitmask=None)
-    hdu = pyfits.open(path)
-    lc = lcf.get_lightcurve('SAP_FLUX')
+    # The liberal bitmask will cause the lightcurve to contain NaN times
+    with pytest.warns(LightkurveWarning, match='NaN times'):
+        lc = lcf.get_lightcurve('SAP_FLUX')
 
     assert lc.channel == lcf.channel
     assert lc.mission.lower() == mission.lower()
@@ -91,11 +92,13 @@ def test_KeplerLightCurveFile(path, mission):
     elif lc.mission.lower() == 'k2':
         assert lc.campaign == 8
         assert lc.quarter is None
-    assert lc.label == hdu[0].header['OBJECT']
     assert lc.time_format == 'bkjd'
     assert lc.time_scale == 'tdb'
     assert lc.astropy_time.scale == 'tdb'
 
+    # Does the data match what one would obtain using pyfits.open?
+    hdu = pyfits.open(path)
+    assert lc.label == hdu[0].header['OBJECT']
     assert_array_equal(lc.time, hdu[1].data['TIME'])
     assert_array_equal(lc.flux, hdu[1].data['SAP_FLUX'])
 
@@ -134,7 +137,10 @@ def test_TessLightCurveFile(quality_bitmask):
 def test_bitmasking(quality_bitmask, answer):
     """Test whether the bitmasking behaves like it should"""
     lcf = KeplerLightCurveFile(TABBY_Q8, quality_bitmask=quality_bitmask)
-    flux = lcf.get_lightcurve('SAP_FLUX').flux
+    with warnings.catch_warnings():
+        # Ignore "LightCurve contains NaN times" warnings triggered by liberal masks
+        warnings.simplefilter("ignore", LightkurveWarning)
+        flux = lcf.get_lightcurve('SAP_FLUX').flux
     assert len(flux) == answer
 
 
@@ -560,12 +566,6 @@ def test_flatten_robustness():
     assert_allclose(flat_lc.flux, expected_result)
 
 
-@pytest.mark.remote_data
-def test_from_archive_should_accept_path():
-    """If a url is passed to `from_archive` it should still just work."""
-    KeplerLightCurveFile.from_archive(TABBY_Q8)
-
-
 def test_fill_gaps():
     lc = LightCurve([1,2,3,4,6,7,8], [1,1,1,1,1,1,1])
     nlc = lc.fill_gaps()
@@ -580,16 +580,14 @@ def test_fill_gaps():
     assert(np.all(nlc.flux == 1))
     assert(np.all(np.isfinite(nlc.flux)))
 
-@pytest.mark.remote_data
-def test_from_fits():
-    """Does the lcf.from_fits() method work like the constructor?"""
-    lcf = KeplerLightCurveFile.from_fits(TABBY_Q8)
-    assert isinstance(lcf, KeplerLightCurveFile)
-    assert lcf.targetid == KeplerLightCurveFile(TABBY_Q8).targetid
-    # Execute the same test for TESS
-    lcf = TessLightCurveFile.from_fits(TESS_SIM)
-    assert isinstance(lcf, TessLightCurveFile)
-    assert lcf.targetid == TessLightCurveFile(TESS_SIM).targetid
+    # Because fill_gaps() uses pandas, check that it works regardless of endianness
+    # For details see https://github.com/KeplerGO/lightkurve/issues/188
+    lc = LightCurve(np.array([1, 2, 3, 4, 6, 7, 8], dtype='>f8'),
+                    np.array([1, 1, 1, np.nan, np.nan, 1, 1], dtype='>f8'))
+    lc.fill_gaps()
+    lc = LightCurve(np.array([1, 2, 3, 4, 6, 7, 8], dtype='<f8'),
+                    np.array([1, 1, 1, np.nan, np.nan, 1, 1], dtype='<f8'))
+    lc.fill_gaps()
 
 
 def test_targetid():
