@@ -404,6 +404,9 @@ class TargetPixelFile(object):
         in a robust way by multiplying the Median Absolute Deviation (MAD)
         with 1.4826.
 
+        If the thresholding method yields multiple contiguous regions, then
+        only the region closest to the central pixel is returned.
+
         Parameters
         ----------
         threshold : float
@@ -424,7 +427,19 @@ class TargetPixelFile(object):
         # Calculate the theshold value in flux units
         mad_cut = (1.4826 * MAD(vals) * threshold) + np.nanmedian(median_image)
         # Create a mask containing the pixels above the threshold flux
-        return np.nan_to_num(median_image) > mad_cut
+        threshold_mask = np.nan_to_num(median_image) > mad_cut
+
+        # label all contiguous regions
+        from scipy.ndimage import label
+        labeled_values = label(threshold_mask)[0]
+        # which region is closest to the mask center?
+        label_args = np.argwhere(labeled_values > 0)
+        central_arg = np.array([self.shape[0] / 2, self.shape[1] / 2])
+        winning_arg = np.argmin([np.hypot(crd[0], crd[1])
+                                 for crd in label_args - central_arg])
+        winning_px = label_args[winning_arg]
+        winning_label = labeled_values[winning_px[0], winning_px[1]]
+        return labeled_values == winning_label
 
     def centroids(self, **kwargs):
         """DEPRECATED: use `estimate_cdpp()` instead."""
