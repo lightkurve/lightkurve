@@ -395,7 +395,7 @@ class TargetPixelFile(object):
         self._last_aperture_mask = aperture_mask
         return aperture_mask
 
-    def create_threshold_mask(self, threshold=3):
+    def create_threshold_mask(self, threshold=3, reference_pixel=None):
         """Returns an aperture mask creating using the thresholding method.
 
         This method will identify the pixels in the TargetPixelFile which show
@@ -405,13 +405,19 @@ class TargetPixelFile(object):
         with 1.4826.
 
         If the thresholding method yields multiple contiguous regions, then
-        only the region closest to the central pixel is returned.
+        only the region closest to the ``reference_pixel`` is returned.
+        If ``reference_pixel`` is None, then the region closest to the center
+        of the mask will be returned.
 
         Parameters
         ----------
         threshold : float
             A value for the number of sigma by which a pixel needs to be
             brighter than the median flux to be included in the aperture mask.
+        reference_pixel: (int, int) tuple
+            If multiple contiguous regions of pixels fall above the threshold,
+            the region closest to this pixel coordinate will be returned.
+            If `None` (default), the center pixel of the mask will be used.
 
         Returns
         -------
@@ -419,6 +425,8 @@ class TargetPixelFile(object):
             2D boolean numpy array containing `True` for pixels above the
             threshold.
         """
+        if reference_pixel is None:
+            reference_pixel = (self.shape[0] / 2, self.shape[1] / 2)
         # Calculate the median image
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
@@ -429,17 +437,16 @@ class TargetPixelFile(object):
         # Create a mask containing the pixels above the threshold flux
         threshold_mask = np.nan_to_num(median_image) > mad_cut
 
-        # label all contiguous regions
+        # Label all contiguous regions
         from scipy.ndimage import label
         labeled_values = label(threshold_mask)[0]
-        # which region is closest to the mask center?
+        # Which region is closest to the reference pixel?
         label_args = np.argwhere(labeled_values > 0)
-        central_arg = np.array([self.shape[0] / 2, self.shape[1] / 2])
-        winning_arg = np.argmin([np.hypot(crd[0], crd[1])
-                                 for crd in label_args - central_arg])
-        winning_px = label_args[winning_arg]
-        winning_label = labeled_values[winning_px[0], winning_px[1]]
-        return labeled_values == winning_label
+        pixel_distances = [np.hypot(crd[0], crd[1])
+                           for crd in label_args - np.array(reference_pixel)]
+        closest_px = label_args[np.argmin(pixel_distances)]
+        closest_label = labeled_values[closest_px[0], closest_px[1]]
+        return labeled_values == closest_label
 
     def centroids(self, **kwargs):
         """DEPRECATED: use `estimate_cdpp()` instead."""
