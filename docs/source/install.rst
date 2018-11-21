@@ -50,6 +50,21 @@ simply run the following command on a terminal window::
     <http://www.pip-installer.org/en/1.2.1/other-tools.html#using-pip-with-the-user-scheme>`_.
 
 
+With optional dependencies
+--------------------------
+
+Some features in ``lightkurve`` require optional dependencies that are not
+installed automatically with pip.  For example ``.interact()`` relies on
+the interactive javascript visualization package `bokeh
+<https://bokeh.pydata.org/>`_.  The language agnostic package and dependency
+manager `conda <https://conda.io/docs/>`_ can seamlessly install lightkurve and
+its optional dependencies.  Once you have ``conda``, you can run the following
+command on a terminal window::
+
+    $ conda install --channel conda-forge lightkurve
+
+
+
 Development version
 -------------------
 
