@@ -50,11 +50,11 @@ of manual steps:
 
 7. Edit `lightkurve/version.py` to contain the next version number with suffix `.dev`.
 
-8. Increment the version number on the `lightkurve conda feedstock <https://github.com/conda-forge/lightkurve-feedstock>`_.  Specifically you will need to navigate to the meta.yaml file in the recipes directory:
+8. Increment the version number on the `lightkurve conda feedstock <https://github.com/conda-forge/lightkurve-feedstock>`_.  Specifically you will need to navigate to the :code:`meta.yaml` file in the :code:`recipe` directory:
 
 .. code-block:: yaml
 
   {% set version = "1.0b20" %}
   {% set sha256 = "b65f556362b64d9fcc8aa4b0e89991c2b8f7fc059dfa22269b0877a8b758b255" %}
 
-You need to replace the version and sha256.  You can retrieve the sha256 value from the "Download files" section of `the lightkurve PyPI <https://pypi.org/project/lightkurve/>`_.
+You need to replace the version and sha256 values.  You can retrieve the sha256 value from the "Download files" section of `the lightkurve PyPI <https://pypi.org/project/lightkurve/>`_.  Submit your update as a Pull Request, which offers a checklist to guide programmatic spot-checking of your code.
