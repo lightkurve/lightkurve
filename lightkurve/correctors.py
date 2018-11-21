@@ -502,7 +502,7 @@ class PLDCorrector(object):
         self.flux_err = np.nan_to_num(tpf.flux_err)
         self.time = tpf.time
 
-    def correct(self, trninds=[], aperture=None):
+    def correct(self, transit_mask=[], aperture_mask=None):
         """Returns a systematics-corrected LightCurve.
 
         Note that it is assumed that time and flux do not contain NaNs.
@@ -520,21 +520,20 @@ class PLDCorrector(object):
             Returns a corrected lightcurve object.
         """
 
-        if aperture is None:
-            aperture = self.tpf.pipeline_mask
+        if aperture_mask is None:
+            aperture_mask = self.tpf.pipeline_mask
 
-        aperture_mask = np.zeros(aperture.shape)
-        aperture_mask[np.where(aperture)] = 1.
-        aperture = aperture_mask
+        aperture = np.zeros(aperture_mask.shape)
+        aperture[np.where(aperture_mask)] = 1.
 
-        aperture = [aperture for i in range(len(self.fpix))]
+        aperture_mask = [aperture for i in range(len(self.fpix))]
 
-        M = lambda x: np.delete(x, trninds, axis=0)
+        M = lambda x: np.delete(x, transit_mask, axis=0)
 
         #  generate flux light curve
         self.fpix = M(self.fpix)
-        aperture = M(aperture)
-        self.tpf_rs = (self.fpix*aperture).reshape(len(self.fpix),-1)
+        aperture_mask = M(aperture_mask)
+        self.tpf_rs = (self.fpix*aperture_mask).reshape(len(self.fpix),-1)
         self.tpf_ap = np.zeros((len(self.fpix),len(np.delete(self.tpf_rs[0],np.where(np.isnan(self.tpf_rs[0]))))))
 
         for c in range(len(self.tpf_rs)):
