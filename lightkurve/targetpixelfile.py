@@ -405,19 +405,21 @@ class TargetPixelFile(object):
         with 1.4826.
 
         If the thresholding method yields multiple contiguous regions, then
-        only the region closest to the ``reference_pixel`` is returned.
-        If ``reference_pixel`` is None, then the region closest to the center
-        of the mask will be returned.
+        only the region closest to the `reference_pixel` is returned.
+        By default (`reference_pixel=None`) the region closest to the
+        center of the mask will be returned.
+        If `reference_pixel='all'` then all regions will be returned.
 
         Parameters
         ----------
         threshold : float
             A value for the number of sigma by which a pixel needs to be
             brighter than the median flux to be included in the aperture mask.
-        reference_pixel: (int, int) tuple
+        reference_pixel: (int, int) tuple, None, or 'all'
             If multiple contiguous regions of pixels fall above the threshold,
             the region closest to this pixel coordinate will be returned.
             If `None` (default), the center pixel of the mask will be used.
+            If `'all'` then all regions will be returned.
 
         Returns
         -------
@@ -436,17 +438,22 @@ class TargetPixelFile(object):
         mad_cut = (1.4826 * MAD(vals) * threshold) + np.nanmedian(median_image)
         # Create a mask containing the pixels above the threshold flux
         threshold_mask = np.nan_to_num(median_image) > mad_cut
-
-        # Label all contiguous regions
-        from scipy.ndimage import label
-        labeled_values = label(threshold_mask)[0]
-        # Which region is closest to the reference pixel?
-        label_args = np.argwhere(labeled_values > 0)
-        pixel_distances = [np.hypot(crd[0], crd[1])
-                           for crd in label_args - np.array(reference_pixel)]
-        closest_px = label_args[np.argmin(pixel_distances)]
-        closest_label = labeled_values[closest_px[0], closest_px[1]]
-        return labeled_values == closest_label
+        if reference_pixel == 'all':
+            # return all regions above threshold
+            return threshold_mask
+        else:
+            # Return only the contiguous region closest to `reference_pixel`.
+            # First, label contiguous regions:
+            from scipy.ndimage import label
+            labels = label(threshold_mask)[0]
+            # For all pixels above threshold, compute distance to reference pixel:
+            label_args = np.argwhere(labels > 0)
+            distances = [np.hypot(crd[1], crd[0])
+                         for crd in label_args - np.array(reference_pixel)]
+            # Which label corresponds to the closest pixel?
+            closest_arg = label_args[np.argmin(distances)]
+            closest_label = labels[closest_arg[0], closest_arg[1]]
+            return labels == closest_label
 
     def centroids(self, **kwargs):
         """DEPRECATED: use `estimate_cdpp()` instead."""
