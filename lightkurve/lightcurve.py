@@ -1069,9 +1069,9 @@ class LightCurve(object):
 class FoldedLightCurve(LightCurve):
     """Defines a folded lightcurve with different plotting defaults."""
 
-    def __init__(self, *args, time_original=None, **kwargs):
+    def __init__(self, *args, **kwargs):
+        self.time_original = kwargs.pop("time_original", None)
         super(FoldedLightCurve, self).__init__(*args, **kwargs)
-        self.time_original = time_original
 
     @property
     def phase(self):
