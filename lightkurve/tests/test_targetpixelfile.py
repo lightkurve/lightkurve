@@ -278,8 +278,8 @@ def test_tpf_factory():
                             header={'TSTART': 90, 'TSTOP': 100})
 
     # Can we add our own keywords?
-    tpf = factory.get_tpf(hdu0_keywords={'creator': 'Christina'})
-    assert tpf.header['CREATOR'] == 'Christina'
+    tpf = factory.get_tpf(hdu0_keywords={'creator': 'Christina TargetPixelFileWriter'})
+    assert tpf.header['CREATOR'] == 'Christina TargetPixelFileWriter'
 
 
 def test_tpf_from_images():

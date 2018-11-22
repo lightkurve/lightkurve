@@ -5,7 +5,6 @@ import sys
 import os
 import warnings
 
-from astropy.io import fits
 from astropy.visualization import (PercentileInterval, ImageNormalize,
                                    SqrtStretch, LinearStretch)
 from astropy.time import Time
@@ -471,13 +470,13 @@ def detect_filetype(header):
         * `'KeplerLightCurveFile'`
         * `'TessLightCurveFile'`
 
-    If the file is not recognized as a Kepler or TESS data product,
+    If the file is not recognized as a Kepler or TESS data product, then
     `None` will be returned.
 
     Parameters
     ----------
-    header :
-        The `header` for the first index of a fits file's hdulist.
+    header : astropy.io.fits.Header object
+        The primary header of a FITS file.
 
     Returns
     -------
@@ -504,6 +503,7 @@ def detect_filetype(header):
             # TESS LCFs will contain "LightCurveExporterPipelineModule"
             elif 'lightcurve' in creator:
                 return 'TessLightCurveFile'
-    # if these keywords don't exist, return None
-    except KeyError:
+    # If the TELESCOP or CREATOR keywords don't exist we expect a KeyError;
+    # if one of them is Undefined we expect `.lower()` to yield an AttributeError.
+    except (KeyError, AttributeError):
         return None
