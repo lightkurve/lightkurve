@@ -73,3 +73,6 @@ pyraf
 sandbox
 mastDownload
 .pytest_cache
+
+# Large Files
+lightkurve/data/planets.csv

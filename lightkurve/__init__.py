@@ -21,4 +21,3 @@ from .convenience import *
 from .periodogram import *
 from .collections import *
 from .search import *
-#from .nexsci import *
