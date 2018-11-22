@@ -606,3 +606,9 @@ def test_targetid():
     # Does it work for TESS?
     lc = TessLightCurve(time=[], targetid=20)
     assert lc.targetid == 20
+
+
+def test_regression_346():
+    """Regression test for https://github.com/KeplerGO/lightkurve/issues/346"""
+    # This previously triggered an IndexError:
+    KeplerLightCurveFile(K2_C08).PDCSAP_FLUX.correct().estimate_cdpp()
