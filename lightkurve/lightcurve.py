@@ -1209,7 +1209,7 @@ class KeplerLightCurve(LightCurve):
                                                   **kwargs)
         else:
             raise ValueError("method {} is not available.".format(method))
-        new_lc = self.copy()
+        new_lc = self[not_nan].copy()
         new_lc.time = corrected_lc.time
         new_lc.flux = corrected_lc.flux
         new_lc.flux_err = self.normalize().flux_err[not_nan]
