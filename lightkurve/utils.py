@@ -491,16 +491,17 @@ def detect_filetype(header):
         telescop = header['telescop'].lower()
         creator = header['creator'].lower()
         if telescop == 'kepler':
-            # Kepler TPFs will show "TargetPixelExporterPipelineModule"
+            # Kepler TPFs will contain "TargetPixelExporterPipelineModule"
             if 'targetpixel' in creator:
                 return 'KeplerTargetPixelFile'
-            # Kepler LCFs will show "FluxExporter2PipelineModule"
+            # Kepler LCFs will contain "FluxExporter2PipelineModule"
             elif 'fluxexporter' in creator or 'lightcurve' in creator:
                 return 'KeplerLightCurveFile'
-        elif telescop == 'tESS':
+        elif telescop == 'tess':
+            # TESS TPFs will contain "TargetPixelExporterPipelineModule"
             if 'targetpixel' in creator:
                 return 'TessTargetPixelFile'
-            # TESS LCFs will show "LightCurveExporterPipelineModule"
+            # TESS LCFs will contain "LightCurveExporterPipelineModule"
             elif 'lightcurve' in creator:
                 return 'TessLightCurveFile'
     # if these keywords don't exist, return None
