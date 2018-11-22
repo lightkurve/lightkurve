@@ -457,9 +457,9 @@ def suppress_stdout(f, *args, **kwargs):
                 sys.stdout = old_out
     return wrapper
 
+
 def detect_filetype(header):
-    """
-    Detects filetype of a given header.
+    """Returns Kepler and TESS file types given their primary header.
 
     This function will detect the file type by looking at both the TELESCOP and
     CREATOR keywords in the first extension of the FITS header. If the file is
@@ -485,22 +485,24 @@ def detect_filetype(header):
         A string describing the detected filetype. If the filetype is not
         recognized, `None` will be returned.
     """
-
     try:
         # use `telescop` keyword to determine mission
         # and `creator` to determine tpf or lc
-        telescop = header['telescop']
-        creator = header['creator']
-        if telescop == 'Kepler':
-            if 'TargetPixel' in creator:
+        telescop = header['telescop'].lower()
+        creator = header['creator'].lower()
+        if telescop == 'kepler':
+            # Kepler TPFs will show "TargetPixelExporterPipelineModule"
+            if 'targetpixel' in creator:
                 return 'KeplerTargetPixelFile'
-            elif 'Flux' in creator:
+            # Kepler LCFs will show "FluxExporter2PipelineModule"
+            elif 'fluxexporter' in creator or 'lightcurve' in creator:
                 return 'KeplerLightCurveFile'
-        elif telescop == 'TESS':
-            if 'TargetPixel' in creator:
+        elif telescop == 'tESS':
+            if 'targetpixel' in creator:
                 return 'TessTargetPixelFile'
-            elif 'Flux' in creator:
+            # TESS LCFs will show "LightCurveExporterPipelineModule"
+            elif 'lightcurve' in creator:
                 return 'TessLightCurveFile'
-    # if these keywords don't exist, raise `ValueError`
+    # if these keywords don't exist, return None
     except KeyError:
         return None
