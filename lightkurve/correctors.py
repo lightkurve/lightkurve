@@ -531,20 +531,21 @@ class PLDCorrector(object):
         M = lambda x: np.delete(x, transit_mask, axis=0)
 
         #  generate flux light curve
-        self.fpix = M(self.fpix)
         aperture_mask = M(aperture_mask)
-        self.tpf_rs = (self.fpix*aperture_mask).reshape(len(self.fpix),-1)
-        self.tpf_ap = np.zeros((len(self.fpix),len(np.delete(self.tpf_rs[0],np.where(np.isnan(self.tpf_rs[0]))))))
+        self.tpf_rs = (M(self.fpix)*aperture_mask).reshape(len(M(self.fpix)),-1)
+        self.tpf_ap = np.zeros((len(M(self.fpix)),
+                               len(np.delete(self.tpf_rs[0],
+                               np.where(np.isnan(self.tpf_rs[0]))))))
 
         for c in range(len(self.tpf_rs)):
             naninds = np.where(np.isnan(self.tpf_rs[c]))
             self.tpf_ap[c] = np.delete(self.tpf_rs[c],naninds)
 
-        self.fpix = self.tpf_ap
-        rawflux = np.sum(self.fpix.reshape(len(self.fpix),-1), axis=1)
+        self.ap_fpix = self.tpf_ap
+        rawflux = np.sum(self.ap_fpix.reshape(len(self.ap_fpix),-1), axis=1)
 
         # First order PLD
-        f1 = self.fpix / rawflux.reshape(-1, 1)
+        f1 = self.ap_fpix / rawflux.reshape(-1, 1)
         pca = PCA(n_components=10)
         X1 = pca.fit_transform(f1)
 
@@ -560,13 +561,16 @@ class PLDCorrector(object):
         MX = M(X)
 
         # Define gaussian process parameters
-        y = M(rawflux) - np.dot(MX, np.linalg.solve(np.dot(MX.T, MX), np.dot(MX.T, M(rawflux))))
+        y = M(rawflux) - np.dot(MX, np.linalg.solve(np.dot(MX.T, MX),
+                                np.dot(MX.T, M(rawflux))))
         amp = np.nanstd(y)
         tau = 30.
 
         # Set up gaussian process
         gp = george.GP(amp ** 2 * george.kernels.Matern32Kernel(tau ** 2))
-        sigma = gp.get_matrix(M(self.time)) + np.diag(M(np.sum(self.flux_err.reshape(len(self.flux_err),-1), axis = 1))**2)
+        sigma = gp.get_matrix(M(self.time)) + \
+                np.diag(M(np.sum(self.flux_err.reshape(len(self.flux_err),-1),
+                        axis = 1))**2)
 
         # Compute
         A = np.dot(MX.T, np.linalg.solve(sigma, MX))
