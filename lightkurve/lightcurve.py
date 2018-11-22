@@ -862,6 +862,12 @@ class LightCurve(object):
         for col in columns:
             if hasattr(self, col):
                 data[col] = vars(self)[col]
+                # We need to ensure pandas gets the native byteorder.
+                # x86 uses little endian, so it is reasonable to assume that
+                # we always want little endian, even though FITS uses big endian!
+                # See https://github.com/KeplerGO/lightkurve/issues/188
+                if data[col].dtype.byteorder == '>':  # is big endian?
+                    data[col] = data[col].byteswap().newbyteorder()
         df = pd.DataFrame(data=data, index=self.time, columns=columns)
         df.index.name = 'time'
         return df
@@ -1203,7 +1209,7 @@ class KeplerLightCurve(LightCurve):
                                                   **kwargs)
         else:
             raise ValueError("method {} is not available.".format(method))
-        new_lc = self.copy()
+        new_lc = self[not_nan].copy()
         new_lc.time = corrected_lc.time
         new_lc.flux = corrected_lc.flux
         new_lc.flux_err = self.normalize().flux_err[not_nan]

@@ -7,7 +7,7 @@ Installation
 Requirements
 ============
 
-**lightkurve** has the following requirements, all of which tend to be
+*Lightkurve* has the following requirements, all of which tend to be
 available by default in a modern installation of Python:
 
 - Python: 2.7, 3.5, 3.6 or later.
@@ -17,28 +17,31 @@ available by default in a modern installation of Python:
 - Matplotlib: 1.5.3 or later.
 - Astroquery 0.3.7 or later.
 
+Optional dependencies:
+
+- Pandas: 0.20 or later.
+- Bokeh: 1.0 or later.
+
 We recommend using the `Anaconda Python <https://www.continuum.io/downloads>`_
 distribution, which will install Python alongside its most common scientific
 packages, including all those listed above.
-
+If you install *lightkurve* using ``pip`` or ``conda`` as explained below, any missing dependencies will be installed automatically.
 
 
 Installing lightkurve
 =====================
 
-Stable version
---------------
+Using pip
+---------
 
 The easiest way to install or upgrade lightkurve is with ``pip``,
-simply run the following command on a terminal window::
+which is standard part of most Python distributions.
+To install *lightkurve*, simply run the following command on a terminal window::
 
     $ pip install lightkurve --upgrade
 
-
-.. note::
-
-    The ``--upgrade`` flag is optional, but recommended if you already
-    have lightkurve installed and want to upgrade to the latest version.
+The ``--upgrade`` flag is optional, but recommended if you already
+have *lightkurve* installed and want to upgrade to the latest version.
 
 .. note::
 
@@ -50,16 +53,29 @@ simply run the following command on a terminal window::
     <http://www.pip-installer.org/en/1.2.1/other-tools.html#using-pip-with-the-user-scheme>`_.
 
 
-Development version
--------------------
+Using conda
+-----------
 
-Alternatively, if you want to experiment with the latest development version of
-lightkurve, you can install it straight from GitHub::
+Alternatively, you can use the ``conda`` package manager, which is part of the
+`Anaconda Python <https://www.continuum.io/downloads>`_ distribution.
+With ``conda`` installed, you can run the following command on a terminal window::
+
+    $ conda install --channel conda-forge lightkurve
+
+
+Installing the development version
+==================================
+
+If you want to experiment with the latest development version of
+*lightkurve*, you can install it straight from the master branch on GitHub::
 
     $ git clone https://github.com/KeplerGO/lightkurve.git
     $ cd lightkurve
     $ pip install -e .
 
+This is recommended for anyone who wants to edit the source code.
+Please see our guide on :ref:`contributing to lightkurve<contributing>`
+for additional instructions.
 
 Building documentation
 ======================
@@ -68,10 +84,10 @@ Building documentation
 
     Building the documentation is not necessary unless you are
     writing new documentation or do not have internet access, because the
-    latest version of lightkurve's documentation is available online at
-    `docs.lightkurve.org <http://docs.lightkurve.org/>`_ .
+    latest version of the documentation is available online at
+    `docs.lightkurve.org <https://docs.lightkurve.org/>`_ .
 
-Building the **lightkurve** documentation requires a few extra packages:
+Building the *lightkurve* documentation requires a few extra packages:
 
 - sphinx
 - sphinx-automodapi
@@ -80,18 +96,18 @@ Building the **lightkurve** documentation requires a few extra packages:
 
 These packages can be installed using `conda` or `pip`.
 
-To build the documentation in HTML format, you can do::
+To build the documentation in HTML format, execute::
 
-    cd docs
-    make html
+    $ cd docs
+    $ make html
 
-This will save the documentation website in the `../../lightkurve-docs` directory
+This will save the documentation website in the ``../../lightkurve-docs`` directory
 on your system.  The notebook-based tutorials will not be recompiled by default
 because they take some time to build.  To recompile the notebooks, type::
 
     make notebooks
 
-Finally, if you have write permission to lightkurve's GitHub repository,
-you can upload the documentation using::
+Finally, if you have write permission to *lightkurve*'s GitHub repository,
+you can upload the documentation to the web server using::
 
     make upload
