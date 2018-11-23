@@ -2,6 +2,7 @@ from __future__ import division, print_function
 
 import os
 from astropy.utils.data import get_pkg_data_filename
+from astropy.io.fits.verify import VerifyWarning
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy.testing import assert_array_equal
@@ -325,34 +326,37 @@ def test_tpf_from_images():
                                                  position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
     assert isinstance(tpf, KeplerTargetPixelFile)
 
-    # Can we write the output to disk?
-    # `delete=False` is necessary below to enable writing to the file on Windows
-    # but it means we have to clean up the tmp file ourselves
-    tmp = tempfile.NamedTemporaryFile(delete=False)
-    try:
-        tpf.to_fits(tmp.name)
-    finally:
-        tmp.close()
-        os.remove(tmp.name)
+    with warnings.catch_warnings():
+        # Some cards are too long -- to be investigated.
+        warnings.simplefilter("ignore", VerifyWarning)
+        # Can we write the output to disk?
+        # `delete=False` is necessary below to enable writing to the file on Windows
+        # but it means we have to clean up the tmp file ourselves
+        tmp = tempfile.NamedTemporaryFile(delete=False)
+        try:
+            tpf.to_fits(tmp.name)
+        finally:
+            tmp.close()
+            os.remove(tmp.name)
 
-    # Can we read in a list of file names or a list of HDUlists?
-    hdus = []
-    for idx, im in enumerate(images):
-        hdu = fits.HDUList([fits.PrimaryHDU(), im])
-        hdu.writeto(get_pkg_data_filename('data/test_factory{}.fits'.format(idx)), overwrite=True)
-        hdus.append(hdu)
+        # Can we read in a list of file names or a list of HDUlists?
+        hdus = []
+        for idx, im in enumerate(images):
+            hdu = fits.HDUList([fits.PrimaryHDU(), im])
+            hdu.writeto(get_pkg_data_filename('data/test_factory{}.fits'.format(idx)), overwrite=True)
+            hdus.append(hdu)
 
-    fnames = [get_pkg_data_filename('data/test_factory{}.fits'.format(i)) for i in range(5)]
+        fnames = [get_pkg_data_filename('data/test_factory{}.fits'.format(i)) for i in range(5)]
 
-    # Should be able to run with a list of file names
-    tpf_fnames = KeplerTargetPixelFile.from_fits_images(fnames,
-                                                        size=(3, 3),
-                                                        position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
+        # Should be able to run with a list of file names
+        tpf_fnames = KeplerTargetPixelFile.from_fits_images(fnames,
+                                                            size=(3, 3),
+                                                            position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
 
-    # Should be able to run with a list of HDUlists
-    tpf_hdus = KeplerTargetPixelFile.from_fits_images(hdus,
-                                                      size=(3, 3),
-                                                      position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
+        # Should be able to run with a list of HDUlists
+        tpf_hdus = KeplerTargetPixelFile.from_fits_images(hdus,
+                                                          size=(3, 3),
+                                                          position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
 
 
 def test_properties2(capfd):
