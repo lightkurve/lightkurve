@@ -76,7 +76,7 @@ class SearchResult(object):
     @property
     def obsid(self):
         """Returns an array of MAST observation IDs"""
-        return np.asarray(np.unique(self.table['obsid']), dtype='int')
+        return np.asarray(np.unique(self.table['obsid']), dtype='int64')
 
     @property
     def target_name(self):
@@ -624,6 +624,10 @@ def _filter_products(products, campaign=None, quarter=None, month=None,
         month = np.atleast_1d(month)
         # Get the short cadence date lookup table.
         table = ascii.read(os.path.join(PACKAGEDIR, 'data', 'short_cadence_month_lookup.csv'))
+        # The following line is needed for systems where the default integer type
+        # is int32 (e.g. Windows/Appveyor), the column will then be interpreted
+        # as string which makes the test fail.
+        table['StartTime'] = table['StartTime'].astype(np.int64)
         # Grab the dates of each of the short cadence files. Make sure every entry
         # has the correct month
         finalmask = np.ones(len(products), dtype=bool)
