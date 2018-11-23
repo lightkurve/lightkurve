@@ -1,3 +1,5 @@
+"""Defines TargetPixelFile, KeplerTargetPixelFile, and TessTargetPixelFile."""
+
 from __future__ import division
 import datetime
 import os
@@ -80,8 +82,10 @@ class TargetPixelFile(object):
 
     @hdu.setter
     def hdu(self, value, keys=['FLUX', 'QUALITY']):
-        '''Raises a ValueError exception if value does not appear to be a Target Pixel File.
-        '''
+        """Verify the file format when setting the value of `self.hdu`.
+
+        Raises a ValueError if `value` does not appear to be a Target Pixel File.
+        """
         for key in keys:
             if ~(np.any([value[1].header[ttype] == key
                          for ttype in value[1].header['TTYPE*']])):
@@ -280,11 +284,10 @@ class TargetPixelFile(object):
         return ra, dec
 
     def show_properties(self):
-        '''Print out a description of each of the non-callable attributes of a
-        TargetPixelFile object.
+        """Prints a description of all non-callable attributes.
 
-        Prints in order of type (ints, strings, lists, arrays and others)
-        Prints in alphabetical order.'''
+        Prints in order of type (ints, strings, lists, arrays, others).
+        """
         attrs = {}
         for attr in dir(self):
             if not attr.startswith('_'):
@@ -334,7 +337,7 @@ class TargetPixelFile(object):
         output.pprint(max_lines=-1, max_width=-1)
 
     def to_lightcurve(self, method='aperture', **kwargs):
-        """Performs photometry.
+        """Performs photometry on the pixel data and returns a LightCurve object.
 
         See the docstring of `aperture_photometry()` for valid
         arguments if the method is 'aperture'.  Otherwise, see the docstring
@@ -467,8 +470,10 @@ class TargetPixelFile(object):
 
     def plot(self, ax=None, frame=0, cadenceno=None, bkg=False, aperture_mask=None,
              show_colorbar=True, mask_color='pink', style='lightkurve', **kwargs):
-        """
-        Plot a target pixel file at a given frame (index) or cadence number.
+        """Plot the pixel data for a single frame (i.e. at a single time).
+
+        The time can be specified by frame index number (`frame=0` will show the
+        first frame) or absolute cadence number (`cadenceno`).
 
         Parameters
         ----------
@@ -1089,8 +1094,7 @@ class KeplerTargetPixelFileFactory(object):
             self.pos_corr1[frameno], self.pos_corr2[frameno] = None, None
 
     def _check_data(self):
-        ''' Check the data before writing to a TPF for any obvious errors
-        '''
+        """Check the data before writing to a TPF for any obvious errors."""
         if len(self.time) != len(np.unique(self.time)):
             warnings.warn('The factory-created TPF contains cadences with '
                           'identical TIME values.', LightkurveWarning)

@@ -1,4 +1,4 @@
-"""Defines LightCurve, KeplerLightCurve, TessLightCurve, etc."""
+"""Defines LightCurve, KeplerLightCurve, and TessLightCurve."""
 
 from __future__ import division, print_function
 
@@ -160,11 +160,10 @@ class LightCurve(object):
         return Time(self.time, format=self.time_format, scale=self.time_scale)
 
     def show_properties(self):
-        '''Print out a description of each of the non-callable attributes of a
-        LightCurve object.
+        """Prints a description of all non-callable attributes.
 
-        Prints in order of type (ints, strings, lists, arrays and others)
-        Prints in alphabetical order.'''
+        Prints in order of type (ints, strings, lists, arrays, others).
+        """
         attrs = {}
         for attr in dir(self):
             if not attr.startswith('_'):
@@ -259,8 +258,7 @@ class LightCurve(object):
 
     def flatten(self, window_length=101, polyorder=2, return_trend=False,
                 break_tolerance=5, **kwargs):
-        """
-        Removes low frequency trend using scipy's Savitzky-Golay filter.
+        """Removes the low frequency trend using scipy's Savitzky-Golay filter.
 
         This method wraps `scipy.signal.savgol_filter`.
 
@@ -525,8 +523,10 @@ class LightCurve(object):
         return self[~outlier_mask]
 
     def bin(self, binsize=13, method='mean'):
-        """Bins a lightcurve using a function defined by `method`
-        on blocks of samples of size `binsize`.
+        """Bins a lightcurve in blocks of size `binsize`.
+
+        The value of the bins will contain the mean (`method='mean'`) or the
+        median (`method='median'`) of the original data.  The default is mean.
 
         Parameters
         ----------
@@ -708,7 +708,7 @@ class LightCurve(object):
                 # Colorbars should only be plotted if the user specifies, and there is
                 # a color specified that is not a string (e.g. 'C1') and is iterable.
                 if show_colorbar and ('c' in kwargs) and \
-                  (not isinstance(kwargs['c'], str)) and hasattr(kwargs['c'], '__iter__'):
+                   (not isinstance(kwargs['c'], str)) and hasattr(kwargs['c'], '__iter__'):
                     cbar = plt.colorbar(sc, ax=ax)
                     cbar.set_label(colorbar_label)
                     cbar.ax.yaxis.set_tick_params(tick1On=False, tick2On=False)
@@ -1061,9 +1061,13 @@ class LightCurve(object):
             hdu.writeto(path, overwrite=overwrite, checksum=True)
         return hdu
 
-class FoldedLightCurve(LightCurve):
-    """Defines a folded lightcurve with different plotting defaults."""
 
+class FoldedLightCurve(LightCurve):
+    """Class to hold a phase-folded lightcurve, i.e. the output of `LightCurve.fold()`.
+
+    Compared to the standard `LightCurve` class, this class offers an extra
+    `phase` property and implements different plotting defaults.
+    """
     def __init__(self, *args, **kwargs):
         super(FoldedLightCurve, self).__init__(*args, **kwargs)
 
