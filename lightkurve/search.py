@@ -76,7 +76,7 @@ class SearchResult(object):
     @property
     def obsid(self):
         """Returns an array of MAST observation IDs"""
-        return np.asarray(np.unique(self.table['obsid']), dtype='int')
+        return np.asarray(np.unique(self.table['obsid']), dtype='int64')
 
     @property
     def target_name(self):
