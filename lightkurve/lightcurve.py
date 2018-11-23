@@ -997,7 +997,7 @@ class LightCurve(object):
             from . import __version__
             default = default = {'ORIGIN': "Unofficial data product",
                                  'DATE': datetime.datetime.now().strftime("%Y-%m-%d"),
-                                 'CREATOR': "lightkurve",
+                                 'CREATOR': "lightkurve.LightCurve.to_fits()",
                                  'PROCVER': str(__version__)}
 
             for kw in default:

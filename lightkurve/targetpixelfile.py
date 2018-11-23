@@ -1130,7 +1130,8 @@ class KeplerTargetPixelFileFactory(object):
         # Override the defaults where necessary
         hdu.header['ORIGIN'] = "Unofficial data product"
         hdu.header['DATE'] = datetime.datetime.now().strftime("%Y-%m-%d")
-        hdu.header['CREATOR'] = "lightkurve"
+        hdu.header['TELESCOP'] = "Kepler"
+        hdu.header['CREATOR'] = "lightkurve.KeplerTargetPixelFileFactory"
         hdu.header['OBJECT'] = self.target_id
         hdu.header['KEPLERID'] = self.target_id
         # Empty a bunch of keywords rather than having incorrect info
