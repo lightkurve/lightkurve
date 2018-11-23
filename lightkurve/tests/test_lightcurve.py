@@ -80,6 +80,9 @@ def test_rmath_operators():
 @pytest.mark.parametrize("path, mission", [(TABBY_Q8, "Kepler"), (K2_C08, "K2")])
 def test_KeplerLightCurveFile(path, mission):
     lcf = KeplerLightCurveFile(path, quality_bitmask=None)
+    assert lcf.obsmode == 'long cadence'
+    assert len(lcf.pos_corr1) == len(lcf.pos_corr2)
+
     # The liberal bitmask will cause the lightcurve to contain NaN times
     with pytest.warns(LightkurveWarning, match='NaN times'):
         lc = lcf.get_lightcurve('SAP_FLUX')
