@@ -1,7 +1,7 @@
 Lightkurve
 ==========
 
-**A beautiful package for astronomical time series analysis in Python.**
+**A beautiful package for Kepler and TESS time series analysis in Python.**
 
 |pypi-badge| |ci-badge| |appveyor-badge| |cov-badge| |doi-badge|
 
