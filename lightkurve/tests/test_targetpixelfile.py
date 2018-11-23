@@ -436,3 +436,10 @@ def test_endianness():
     """Regression test for https://github.com/KeplerGO/lightkurve/issues/188"""
     tpf = KeplerTargetPixelFile(filename_tpf_one_center)
     tpf.to_lightcurve().to_pandas().describe()
+
+
+def test_get_keyword():
+    tpf = KeplerTargetPixelFile(filename_tpf_one_center)
+    assert tpf.get_keyword("TELESCOP") == "Kepler"
+    assert tpf.get_keyword("TTYPE1", hdu=1) == "TIME"
+    assert tpf.get_keyword("DOESNOTEXIST", default=5) == 5

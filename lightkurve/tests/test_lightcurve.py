@@ -80,6 +80,9 @@ def test_rmath_operators():
 @pytest.mark.parametrize("path, mission", [(TABBY_Q8, "Kepler"), (K2_C08, "K2")])
 def test_KeplerLightCurveFile(path, mission):
     lcf = KeplerLightCurveFile(path, quality_bitmask=None)
+    assert lcf.obsmode == 'long cadence'
+    assert len(lcf.pos_corr1) == len(lcf.pos_corr2)
+
     # The liberal bitmask will cause the lightcurve to contain NaN times
     with pytest.warns(LightkurveWarning, match='NaN times'):
         lc = lcf.get_lightcurve('SAP_FLUX')
@@ -567,6 +570,9 @@ def test_flatten_robustness():
     # flatten should work even if `break_tolerance = None`
     flat_lc = lc.flatten(window_length=3, break_tolerance=None)
     assert_allclose(flat_lc.flux, expected_result)
+    flat_lc, trend_lc = lc.flatten(return_trend=True)
+    assert_allclose(flat_lc.time, trend_lc.time)
+    assert_allclose(lc.flux, flat_lc.flux * trend_lc.flux)
 
 
 def test_fill_gaps():
