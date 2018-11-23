@@ -1,21 +1,27 @@
 import pytest
 from astropy import units as u
 import numpy as np
-from numpy.testing import assert_array_equal
-from ..lightcurvefile import KeplerLightCurveFile
 from ..lightcurve import LightCurve
-from ..targetpixelfile import KeplerTargetPixelFile
 from ..periodogram import Periodogram
 
-def test_lightcurve_seismology_plot():
+
+def test_periodogram_basics():
     """Sanity check to verify that periodogram plotting works"""
-    lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000), flux_err=np.zeros(1000)+0.1)
-    lc.to_periodogram().plot()
+    lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000),
+                    flux_err=np.zeros(1000)+0.1)
+    pg = lc.to_periodogram()
+    pg.plot()
+    pg.plot(format='period')
+    pg.show_properties()
+    pg.to_table()
+    str(pg)
+
 
 def test_periodogram_units():
     """Tests whether periodogram has correct units"""
     # Fake, noisy data
-    lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000), flux_err=np.zeros(1000)+0.1)
+    lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000),
+                    flux_err=np.zeros(1000)+0.1)
     p = lc.to_periodogram()
     # Has units
     assert hasattr(p.frequency, 'unit')
@@ -25,20 +31,25 @@ def test_periodogram_units():
     assert p.power.unit == u.cds.ppm**2*u.day
     assert p.period.unit == u.day
     assert p.frequency_at_max_power.unit == 1./u.day
+    assert p.max_power.unit == u.cds.ppm**2*u.day
+
 
 def test_periodogram_can_find_periods():
     """Periodogram should recover the correct period"""
     # Light curve that is noisy
-    lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000), flux_err=np.zeros(1000)+0.1)
+    lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000),
+                    flux_err=np.zeros(1000)+0.1)
     # Add a 100 day period signal
     lc.flux *= np.sin((lc.time/float(lc.time.max())) * 20 * np.pi)
     p = lc.to_periodogram()
     assert np.isclose(p.period_at_max_power.value, 100, rtol=1e-3)
 
+
 def test_periodogram_slicing():
     """Tests whether periodograms can be sliced"""
     # Fake, noisy data
-    lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000), flux_err=np.zeros(1000)+0.1)
+    lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000),
+                    flux_err=np.zeros(1000)+0.1)
     p = lc.to_periodogram()
     assert len(p[0:200].frequency) == 200
 
@@ -78,7 +89,8 @@ def test_bin():
     lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000),
                     flux_err=np.zeros(1000) + 0.1)
     p = lc.to_periodogram()
-    assert len(p.bin(binsize=10).frequency) == len(p.frequency)//10
+    assert len(p.bin(binsize=10, method='mean').frequency) == len(p.frequency)//10
+    assert len(p.bin(binsize=10, method='median').frequency) == len(p.frequency)//10
 
 
 def test_smooth():
@@ -127,21 +139,26 @@ def test_flatten():
     s, b = p.flatten(return_trend=True)
     assert all(b.power == p.smooth(method='logmedian', filter_width=0.01).power)
     assert all(s.power == p.flatten().power)
+    str(s)
+    s.plot()
 
 
 def test_index():
     """Test if you can mask out periodogram
     """
-    lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000), flux_err=np.zeros(1000)+0.1)
+    lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000),
+                    flux_err=np.zeros(1000)+0.1)
     p = lc.to_periodogram()
     mask = (p.frequency > 0.1*(1/u.day)) & (p.frequency < 0.2*(1/u.day))
     assert len(p[mask].frequency) == mask.sum()
+
 
 def test_error_messages():
     """Test periodogram raises reasonable errors
     """
     # Fake, noisy data
-    lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000), flux_err=np.zeros(1000)+0.1)
+    lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000),
+                    flux_err=np.zeros(1000)+0.1)
 
     # Can't specify period range and frequency range
     with pytest.raises(ValueError) as err:
@@ -158,19 +175,29 @@ def test_error_messages():
     # No unitless periodograms
     with pytest.raises(ValueError) as err:
         Periodogram([0], [1])
-    assert err.value.args[0] == 'frequency must be an `astropy.units.Quantity` object.'
+        assert err.value.args[0] == 'frequency must be an `astropy.units.Quantity` object.'
+
+    # No unitless periodograms
+    with pytest.raises(ValueError) as err:
+        Periodogram([0]*u.Hz, [1])
+        assert err.value.args[0] == 'power must be an `astropy.units.Quantity` object.'
 
     # No single value periodograms
     with pytest.raises(ValueError) as err:
         Periodogram([0]*u.Hz, [1]*u.K)
-    assert err.value.args[0] == 'frequency and power must have a length greater than 1.'
+        assert err.value.args[0] == 'frequency and power must have a length greater than 1.'
 
     # No uneven arrays
     with pytest.raises(ValueError) as err:
         Periodogram([0, 1, 2, 3]*u.Hz, [1, 1]*u.K)
-    assert err.value.args[0] == 'frequency and power must have the same length.'
+        assert err.value.args[0] == 'frequency and power must have the same length.'
 
     # Bad frequency units
     with pytest.raises(ValueError) as err:
         Periodogram([0, 1, 2]*u.K, [1, 1, 1]*u.K)
-    assert err.value.args[0] == 'Frequency must be in units of 1/time.'
+        assert err.value.args[0] == 'Frequency must be in units of 1/time.'
+
+    # Bad binning
+    with pytest.raises(ValueError) as err:
+        Periodogram([0, 1, 2]*u.Hz, [1, 1, 1]*u.K).bin(binsize=-2)
+        assert err.value.args[0] == 'binsize must be larger than or equal to 1'

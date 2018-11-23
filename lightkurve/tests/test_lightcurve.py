@@ -567,6 +567,9 @@ def test_flatten_robustness():
     # flatten should work even if `break_tolerance = None`
     flat_lc = lc.flatten(window_length=3, break_tolerance=None)
     assert_allclose(flat_lc.flux, expected_result)
+    flat_lc, trend_lc = lc.flatten(return_trend=True)
+    assert_allclose(flat_lc.time, trend_lc.time)
+    assert_allclose(lc.flux, flat_lc.flux * trend_lc.flux)
 
 
 def test_fill_gaps():

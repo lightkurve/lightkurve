@@ -589,7 +589,7 @@ class Periodogram(object):
     def __rdiv__(self, other):
         return self.__rtruediv__(other)
 
-    def properties(self):
+    def show_properties(self):
         """Prints a summary of the non-callable attributes of the Periodogram object.
 
         Prints in order of type (ints, strings, lists, arrays and others).
