@@ -24,12 +24,14 @@ def test_trappist():
     ''' Test the planet mask works '''
     t = np.arange(0, 100, 0.001)
     m = find_planet_mask('TRAPPIST-1', t)
+    v = (1. - (m.sum()/float(len(t))))
     # Trappist 1 should have a planet transiting 7.9% of the time
-    assert np.isclose((1 - (m.sum()/len(t))), 0.079, atol=0.001)
+    assert np.isclose(v, 0.079, atol=0.001)
 
 def test_unknown():
     ''' Test the unknown planet mask works '''
     t = np.arange(0, 100, 0.001)
     m = create_planet_mask(t, 10, 0, 5)
     # This should have a planet transiting 75% of the time
-    assert np.isclose((1 - (m.sum()/len(t))), 0.75, atol=0.01)
+    v = (1. - (m.sum()/float(len(t))))
+    assert np.isclose(v, 0.75, atol=0.01)
