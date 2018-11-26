@@ -360,9 +360,13 @@ class LightCurve(object):
         # fold time domain from -.5 to .5
         fold_time[fold_time > 0.5] -= 1
         sorted_args = np.argsort(fold_time)
-        return FoldedLightCurve(fold_time[sorted_args],
-                                self.flux[sorted_args],
-                                flux_err=self.flux_err[sorted_args])
+        return FoldedLightCurve(time=fold_time[sorted_args],
+                                flux=self.flux[sorted_args],
+                                flux_err=self.flux_err[sorted_args],
+                                time_original=self.time,
+                                targetid=self.targetid,
+                                label=self.label,
+                                meta=self.meta)
 
     def normalize(self):
         """Returns a normalized version of the lightcurve.
@@ -1069,6 +1073,7 @@ class FoldedLightCurve(LightCurve):
     `phase` property and implements different plotting defaults.
     """
     def __init__(self, *args, **kwargs):
+        self.time_original = kwargs.pop("time_original", None)
         super(FoldedLightCurve, self).__init__(*args, **kwargs)
 
     @property
