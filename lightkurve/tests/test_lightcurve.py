@@ -10,7 +10,7 @@ import pytest
 import warnings
 
 from ..lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
-from ..lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
+from ..lightcurvefile import LightCurveFile, KeplerLightCurveFile, TessLightCurveFile
 from ..utils import LightkurveWarning
 
 # 8th Quarter of Tabby's star
@@ -80,6 +80,9 @@ def test_rmath_operators():
 @pytest.mark.parametrize("path, mission", [(TABBY_Q8, "Kepler"), (K2_C08, "K2")])
 def test_KeplerLightCurveFile(path, mission):
     lcf = KeplerLightCurveFile(path, quality_bitmask=None)
+    assert lcf.obsmode == 'long cadence'
+    assert len(lcf.pos_corr1) == len(lcf.pos_corr2)
+
     # The liberal bitmask will cause the lightcurve to contain NaN times
     with pytest.warns(LightkurveWarning, match='NaN times'):
         lc = lcf.get_lightcurve('SAP_FLUX')
@@ -393,6 +396,7 @@ def test_to_csv():
         pass
 
 
+@pytest.mark.remote_data
 def test_to_fits():
     """Test the KeplerLightCurve.to_fits() method"""
     lcf = KeplerLightCurveFile(TABBY_Q8)
@@ -407,13 +411,14 @@ def test_to_fits():
     assert hdu[1].header['TTYPE3'] == 'FLUX_ERR'
     assert hdu[1].header['TTYPE4'] == 'CADENCENO'
     hdu = LightCurve([0, 1, 2, 3, 4], [1, 1, 1, 1, 1]).to_fits()
-    lcf_new = KeplerLightCurveFile(hdu)  # Regression test for #233
+    lcf_new = LightCurveFile(hdu)  # Regression test for #233
     assert hdu[0].header['EXTNAME'] == 'PRIMARY'
     assert hdu[1].header['EXTNAME'] == 'LIGHTCURVE'
     assert hdu[1].header['TTYPE1'] == 'TIME'
     assert hdu[1].header['TTYPE2'] == 'FLUX'
 
 
+@pytest.mark.remote_data
 def test_astropy_time():
     '''Test the `astropy_time` property'''
     lcf = KeplerLightCurveFile(TABBY_Q8)
@@ -443,6 +448,7 @@ def test_lightcurve_repr():
     repr(TessLightCurve(time, flux))
 
 
+@pytest.mark.remote_data
 def test_lightcurvefile_repr():
     """Do __str__ and __repr__ work?"""
     lcf = KeplerLightCurveFile(TABBY_Q8)
@@ -564,6 +570,9 @@ def test_flatten_robustness():
     # flatten should work even if `break_tolerance = None`
     flat_lc = lc.flatten(window_length=3, break_tolerance=None)
     assert_allclose(flat_lc.flux, expected_result)
+    flat_lc, trend_lc = lc.flatten(return_trend=True)
+    assert_allclose(flat_lc.time, trend_lc.time)
+    assert_allclose(lc.flux, flat_lc.flux * trend_lc.flux)
 
 
 def test_fill_gaps():
