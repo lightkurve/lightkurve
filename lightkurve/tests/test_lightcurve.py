@@ -158,7 +158,12 @@ def test_lightcurve_fold():
     assert_almost_equal(fold.time[0], -0.5, 2)
     assert_almost_equal(np.min(fold.phase), -0.5, 2)
     assert_almost_equal(np.max(fold.phase), 0.5, 2)
-    fold.plot()
+    ax = fold.plot()
+    assert (ax.get_xlabel() == 'Phase')
+    ax = fold.scatter()
+    assert (ax.get_xlabel() == 'Phase')
+    ax = fold.errorbar()
+    assert (ax.get_xlabel() == 'Phase')
     plt.close('all')
 
 

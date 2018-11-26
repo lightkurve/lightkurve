@@ -1115,6 +1115,25 @@ class FoldedLightCurve(LightCurve):
             ax.set_xlabel("Phase")
         return ax
 
+    def errorbar(self, **kwargs):
+        """Plot the folded light curve usng matplotlib's `errorbar` method.
+
+        See `LightCurve.scatter` for details on the accepted arguments.
+
+        Parameters
+        ----------
+        kwargs : dict
+            Dictionary of arguments to be passed to `LightCurve.scatter`.
+
+        Returns
+        -------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            The matplotlib axes object.
+        """
+        ax = super(FoldedLightCurve, self).errorbar(**kwargs)
+        if 'xlabel' not in kwargs:
+            ax.set_xlabel("Phase")
+        return ax
 
 class KeplerLightCurve(LightCurve):
     """Defines a light curve class for NASA's Kepler and K2 missions.
