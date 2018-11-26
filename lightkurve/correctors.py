@@ -492,8 +492,9 @@ class SFFCorrector(object):
         raise NotImplementedError()
 
 class PLDCorrector(object):
-    """Implements the Pixel Level Decorrelation (PLD) method to de-trend
-    Target Pixel Files.
+    """
+    Implements the Pixel Level Decorrelation (PLD) method to de-trend
+    Target Pixel Files. 
     """
 
     def __init__(self, tpf):
@@ -516,7 +517,7 @@ class PLDCorrector(object):
 
         Returns
         -------
-        corrected_lightcurve : LightCurve object
+        corrected_lightcurve : :class:`LightCurve` object
             Returns a corrected lightcurve object.
         """
 
@@ -524,7 +525,7 @@ class PLDCorrector(object):
             aperture_mask = self.tpf.pipeline_mask
 
         aperture = np.zeros(aperture_mask.shape)
-        aperture[np.where(aperture_mask)] = 1.
+        aperture[aperture_mask] = 1.
 
         aperture_mask = [aperture for i in range(len(self.fpix))]
 
@@ -579,6 +580,22 @@ class PLDCorrector(object):
 
         # Compute detrended light curve
         model = np.dot(X, C)
-        detrended_flux = rawflux - model + np.nanmean(rawflux)
+        self.detrended_flux = rawflux - model + np.nanmean(rawflux)
 
-        return LightCurve(time=self.time, flux=detrended_flux)
+        return LightCurve(time=self.time, flux=self.detrended_flux)
+
+    def diagnose(self, ax=None):
+        """Plot a figure to diagnose performance of PLD correction."""
+
+        if ax is None:
+            import matplotlib.pyplot as plt
+            _, ax = plt.subplots()
+
+        ax.plot(self.tpf.to_lightcurve().flux, 'r.', alpha=0.3,
+                label='Raw Flux')
+        ax.plot(self.detrended_flux, 'k.', alpha=0.5, label='De-trended Flux')
+
+        ax.set_xlabel('Time')
+        ax.set_ylabel('Flux')
+        ax.legend(loc='best')
+        return ax
