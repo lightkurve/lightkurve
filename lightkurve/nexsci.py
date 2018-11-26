@@ -80,7 +80,7 @@ def _check_data_is_fresh():
         except OnlineRetrievalFailure:
             log.warning("Couldn't obtain data from NExScI. Do you have an internet connection?")
         fname = "{}/data/planets.csv".format(PACKAGEDIR)
-    st = os.stat(fname[0])
+    st = os.stat(fname)
     mtime = st.st_mtime
     # If database is out of date, get it again.
     if (datetime.datetime.now() - datetime.datetime.fromtimestamp(mtime) > datetime.timedelta(days=7)):
