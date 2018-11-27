@@ -648,7 +648,7 @@ def _filter_products(products, campaign=None, quarter=None, month=None,
     return products
 
 
-def open(path_or_url, quality_bitmask='default'):
+def open(path_or_url, **kwargs):
     """Opens a Kepler or TESS data product.
 
     This function will use the `detect_filetype()` function to
@@ -686,8 +686,7 @@ def open(path_or_url, quality_bitmask='default'):
 
     # if the filetype is recognized, instantiate a class of that name
     if filetype is not None:
-        return getattr(__import__('lightkurve'),
-                       filetype)(path_or_url, quality_bitmask=quality_bitmask)
+        return getattr(__import__('lightkurve'), filetype)(path_or_url, **kwargs)
     else:
         # if these keywords don't exist, raise `ValueError`
         raise ValueError("Not recognized as a Kepler or TESS data product: "
