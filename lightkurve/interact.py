@@ -31,6 +31,8 @@ try:
     from bokeh.models.tools import HoverTool
     from bokeh.models.widgets import Button
     from bokeh.models.formatters import PrintfTickFormatter
+    if bokeh.__version__[0] == '0':
+        warnings.warn("interact() requires Bokeh version 1.0 or later", LightkurveWarning)
 except ImportError:
     pass  # We will print a nice error message in the `show_interact_widget` function
 
