@@ -363,7 +363,7 @@ class LightCurve(object):
         return FoldedLightCurve(time=fold_time[sorted_args],
                                 flux=self.flux[sorted_args],
                                 flux_err=self.flux_err[sorted_args],
-                                time_original=self.time,
+                                time_original=self.time[sorted_args],
                                 targetid=self.targetid,
                                 label=self.label,
                                 meta=self.meta)
