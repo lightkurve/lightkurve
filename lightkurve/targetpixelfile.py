@@ -396,7 +396,7 @@ class TargetPixelFile(object):
         self._last_aperture_mask = aperture_mask
         return aperture_mask
 
-    def create_threshold_mask(self, threshold=3, reference_pixel=None):
+    def create_threshold_mask(self, threshold=3, reference_pixel='center'):
         """Returns an aperture mask creating using the thresholding method.
 
         This method will identify the pixels in the TargetPixelFile which show
@@ -407,22 +407,22 @@ class TargetPixelFile(object):
 
         If the thresholding method yields multiple contiguous regions, then
         only the region closest to the (col, row) coordinate specified by
-        `reference_pixel` is returned, e.g. `reference_pixel=(0, 0)` will pick
-        the region closest to the bottom left corner.
+        `reference_pixel` is returned.  For exmaple, `reference_pixel=(0, 0)`
+        will pick the region closest to the bottom left corner.
         By default, the region closest to the center of the mask will be
-        returned. If `reference_pixel='all'` then all regions will be returned.
+        returned. If `reference_pixel=None` then all regions will be returned.
 
         Parameters
         ----------
         threshold : float
             A value for the number of sigma by which a pixel needs to be
             brighter than the median flux to be included in the aperture mask.
-        reference_pixel: (int, int) tuple, None, or 'all'
+        reference_pixel: (int, int) tuple, 'center', or None
             (col, row) pixel coordinate closest to the desired region.
             For example, use `reference_pixel=(0,0)` to select the region
             closest to the bottom left corner of the target pixel file.
-            If `None` (default) then the region closest to the center pixel
-            will be selected. If `'all'` then all regions will be selected.
+            If 'center' (default) then the region closest to the center pixel
+            will be selected. If `None` then all regions will be selected.
 
         Returns
         -------
@@ -430,7 +430,7 @@ class TargetPixelFile(object):
             2D boolean numpy array containing `True` for pixels above the
             threshold.
         """
-        if reference_pixel is None:
+        if reference_pixel == 'center':
             reference_pixel = (self.shape[1] / 2, self.shape[2] / 2)
         # Calculate the median image
         with warnings.catch_warnings():
@@ -441,7 +441,7 @@ class TargetPixelFile(object):
         mad_cut = (1.4826 * MAD(vals) * threshold) + np.nanmedian(median_image)
         # Create a mask containing the pixels above the threshold flux
         threshold_mask = np.nan_to_num(median_image) > mad_cut
-        if reference_pixel == 'all':
+        if reference_pixel is None:
             # return all regions above threshold
             return threshold_mask
         else:
