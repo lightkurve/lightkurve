@@ -344,8 +344,12 @@ def show_interact_widget(tpf, lc=None, notebook_url='localhost:8888', max_cadenc
         # Callbacks
         def update_upon_pixel_selection(attr, old, new):
             """Callback to take action when pixels are selected."""
-            if tpf_source.selected.indices != []:
-                selected_indices = np.array(tpf_source.selected.indices)
+            if ((sorted(old) == sorted(new)) & (new != [])):
+                # Trigger recursion
+                tpf_source.selected.indices = new[1:]
+
+            if new != []:
+                selected_indices = np.array(new)
                 selected_mask = np.isin(pixel_index_array, selected_indices)
                 lc_new = tpf.to_lightcurve(aperture_mask=selected_mask)
                 lc_source.data['flux'] = lc_new.flux
@@ -379,8 +383,8 @@ def show_interact_widget(tpf, lc=None, notebook_url='localhost:8888', max_cadenc
                 cadence_slider.value = existing_value - 1
 
         def jump_to_lightcurve_position(attr, old, new):
-            if new.indices != []:
-                cadence_slider.value = lc.cadenceno[new.indices[0]]
+            if new != []:
+                cadence_slider.value = lc.cadenceno[new[0]]
 
         # Map changes to callbacks
         r_button.on_click(go_right_by_one)
