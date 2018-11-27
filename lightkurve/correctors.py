@@ -494,7 +494,7 @@ class SFFCorrector(object):
 class PLDCorrector(object):
     """
     Implements the Pixel Level Decorrelation (PLD) method to de-trend
-    Target Pixel Files. 
+    Target Pixel Files.
     """
 
     def __init__(self, tpf):
@@ -532,9 +532,8 @@ class PLDCorrector(object):
         M = lambda x: np.delete(x, transit_mask, axis=0)
 
         #  generate flux light curve
-        aperture_mask = M(aperture_mask)
-        self.tpf_rs = (M(self.fpix)*aperture_mask).reshape(len(M(self.fpix)),-1)
-        self.tpf_ap = np.zeros((len(M(self.fpix)),
+        self.tpf_rs = (self.fpix*aperture_mask).reshape(len(self.fpix),-1)
+        self.tpf_ap = np.zeros((len(self.fpix),
                                len(np.delete(self.tpf_rs[0],
                                np.where(np.isnan(self.tpf_rs[0]))))))
 
@@ -561,17 +560,19 @@ class PLDCorrector(object):
         # Mask transits in design matrix
         MX = M(X)
 
+
         # Define gaussian process parameters
         y = M(rawflux) - np.dot(MX, np.linalg.solve(np.dot(MX.T, MX),
                                 np.dot(MX.T, M(rawflux))))
+
         amp = np.nanstd(y)
         tau = 30.
 
         # Set up gaussian process
         gp = george.GP(amp ** 2 * george.kernels.Matern32Kernel(tau ** 2))
         sigma = gp.get_matrix(M(self.time)) + \
-                np.diag(M(np.sum(self.flux_err.reshape(len(self.flux_err),-1),
-                        axis = 1))**2)
+                np.diag(np.sum(M(self.flux_err).reshape(len(M(self.flux_err)),
+                        -1), axis=1)**2)
 
         # Compute
         A = np.dot(MX.T, np.linalg.solve(sigma, MX))
