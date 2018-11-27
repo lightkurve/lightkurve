@@ -341,19 +341,9 @@ def show_interact_widget(tpf, lc=None, notebook_url='localhost:8888', max_cadenc
         r_button = Button(label=">", button_type="default", width=30)
         l_button = Button(label="<", button_type="default", width=30)
 
-        existing_selection = tpf_source.selected.to_json(True).copy()
-
         # Callbacks
         def update_upon_pixel_selection(attr, old, new):
             """Callback to take action when pixels are selected."""
-            # check if a selection was "re-clicked".
-            if ((sorted(existing_selection['indices']) == sorted(new.indices)) &
-                    (new.indices != [])):
-                tpf_source.selected = Selection(indices=new.indices[1:])
-                existing_selection['indices'] = new.indices[1:]
-            else:
-                existing_selection['indices'] = new.indices
-
             if tpf_source.selected.indices != []:
                 selected_indices = np.array(tpf_source.selected.indices)
                 selected_mask = np.isin(pixel_index_array, selected_indices)
@@ -395,8 +385,8 @@ def show_interact_widget(tpf, lc=None, notebook_url='localhost:8888', max_cadenc
         # Map changes to callbacks
         r_button.on_click(go_right_by_one)
         l_button.on_click(go_left_by_one)
-        tpf_source.on_change('selected', update_upon_pixel_selection)
-        lc_source.on_change('selected', jump_to_lightcurve_position)
+        tpf_source.selected.on_change('indices', update_upon_pixel_selection)
+        lc_source.selected.on_change('indices', jump_to_lightcurve_position)
         cadence_slider.on_change('value', update_upon_cadence_change)
 
         # Layout all of the plots
