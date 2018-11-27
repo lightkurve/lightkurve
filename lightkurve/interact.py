@@ -14,9 +14,10 @@ Note that this will only work inside a Jupyter notebook at this time.
 """
 from __future__ import division, print_function
 import logging
+import warnings
 import numpy as np
 from astropy.stats import sigma_clip
-from .utils import KeplerQualityFlags
+from .utils import KeplerQualityFlags, LightkurveWarning
 
 log = logging.getLogger(__name__)
 
@@ -31,8 +32,6 @@ try:
     from bokeh.models.tools import HoverTool
     from bokeh.models.widgets import Button
     from bokeh.models.formatters import PrintfTickFormatter
-    if bokeh.__version__[0] == '0':
-        warnings.warn("interact() requires Bokeh version 1.0 or later", LightkurveWarning)
 except ImportError:
     pass  # We will print a nice error message in the `show_interact_widget` function
 
@@ -296,6 +295,8 @@ def show_interact_widget(tpf, lc=None, notebook_url='localhost:8888', max_cadenc
     """
     try:
         import bokeh
+        if bokeh.__version__[0] == '0':
+            warnings.warn("interact() requires Bokeh version 1.0 or later", LightkurveWarning)
     except ImportError:
         log.error("The interact() tool requires the `bokeh` package; "
                   "you can install bokeh using e.g. `conda install bokeh`.")
