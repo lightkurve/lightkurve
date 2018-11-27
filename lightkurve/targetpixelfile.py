@@ -421,7 +421,7 @@ class TargetPixelFile(object):
             (col, row) pixel coordinate closest to the desired region.
             For example, use `reference_pixel=(0,0)` to select the region
             closest to the bottom left corner of the target pixel file.
-            If `None` (default) then the region closest ot the center pixel
+            If `None` (default) then the region closest to the center pixel
             will be selected. If `'all'` then all regions will be selected.
 
         Returns
