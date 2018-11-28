@@ -62,7 +62,7 @@ Planet Search/Characterization
 - `robin <https://robin.readthedocs.io/en/latest/>`_ : Robust exoplanet radii from ingress/egress durations
 - `ktransit <http://github.com/mrtommyb/ktransit>`_ : A simple exoplanet transit modeling tool in python
 - `planetplanet <http://github.com/rodluger/planetplanet>`_ : A general photodynamical code for exoplanet light curves
-- `ketu <http://github.com/dfm/ketu>`_ : I can haz planetz?
+- `ketu <http://github.com/dfm/ketu>`_ : Search for transiting planets in K2 data
 - `ttvfast-python <http://github.com/mindriot101/ttvfast-python>`_ : Python interface to the TTVFast library
 - `TTV2Fast2Furious <https://github.com/shadden/TTV2Fast2Furious>`_ : Construct and fit linear transit timing variation models
 - `terra <http://github.com/petigura/terra>`_ : Transit Detection Code
