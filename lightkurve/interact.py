@@ -316,7 +316,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
         return None
 
     if aperture_mask is None:
-        aperture_mask=tpf.pipeline_mask
+        aperture_mask = tpf.pipeline_mask
 
     if exported_filename is None:
         exported_filename = make_default_export_name(tpf)
