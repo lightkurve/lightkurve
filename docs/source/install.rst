@@ -92,6 +92,8 @@ Building the *lightkurve* documentation requires a few extra packages:
 - sphinx
 - sphinx-automodapi
 - nbsphinx
+- ghp-import
+- graphviz
 - `numpydoc <https://github.com/numpy/numpydoc>`_
 
 These packages can be installed using `conda` or `pip`.
