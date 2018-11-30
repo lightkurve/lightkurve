@@ -598,7 +598,7 @@ class LightCurve(object):
         return self.estimate_cdpp(**kwargs)
 
     def estimate_cdpp(self, transit_duration=13, savgol_window=101,
-                      savgol_polyorder=2, sigma_clip=5.):
+                      savgol_polyorder=2, sigma=5.):
         """Estimate the CDPP noise metric using the Savitzky-Golay (SG) method.
 
         A common estimate of the noise in a lightcurve is the scatter that
@@ -614,7 +614,7 @@ class LightCurve(object):
             1. Remove low frequency signals using a Savitzky-Golay filter with
                window length `savgol_window` and polynomial order `savgol_polyorder`.
             2. Remove outliers by rejecting data points which are separated from
-               the mean by `sigma_clip` times the standard deviation.
+               the mean by `sigma` times the standard deviation.
             3. Compute the standard deviation of a running mean with
                a configurable window length equal to `transit_duration`.
 
@@ -636,7 +636,7 @@ class LightCurve(object):
         savgol_polyorder : int, optional
             Polynomial order of the Savitsky-Golay filter.
             The recommended value is 2.
-        sigma_clip : float, optional
+        sigma : float, optional
             The number of standard deviations to use for clipping outliers.
             The default is 5.
 
@@ -657,7 +657,7 @@ class LightCurve(object):
 
         detrended_lc = self.flatten(window_length=savgol_window,
                                     polyorder=savgol_polyorder)
-        cleaned_lc = detrended_lc.remove_outliers(sigma=sigma_clip)
+        cleaned_lc = detrended_lc.remove_outliers(sigma=sigma)
         mean = running_mean(data=cleaned_lc.flux, window_size=transit_duration)
         cdpp_ppm = np.std(mean) * 1e6
         return cdpp_ppm
