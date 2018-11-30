@@ -335,7 +335,7 @@ class LightCurve(object):
             return flatten_lc, trend_lc
         return flatten_lc
 
-    def fold(self, period, phase=0.):
+    def fold(self, period, transit_midpoint=0.):
         """Folds the lightcurve at a specified ``period`` and ``phase``.
 
         This method returns a new ``LightCurve`` object in which the time
@@ -347,8 +347,8 @@ class LightCurve(object):
         ----------
         period : float
             The period upon which to fold.
-        phase : float, optional
-            Time reference point.
+        transit_midpoint : float, optional
+            Time reference point/epoch.
 
         Returns
         -------
@@ -356,6 +356,11 @@ class LightCurve(object):
             A new ``LightCurve`` in which the data are folded and sorted by
             phase.
         """
+
+        if (transit_midpoint > 2450000) & ((self.time[0] < 2450000) | (self.time_format == 'bkjd')):
+            warnings.warn('Transit mid point appears to be in JD, however light curve time appears'
+                        ' to be in BKJD (i.e. JD - 2454833).', LightkurveWarning)
+        phase = (transit_midpoint % period) / period
         fold_time = (((self.time - phase * period) / period) % 1)
         # fold time domain from -.5 to .5
         fold_time[fold_time > 0.5] -= 1
@@ -363,7 +368,7 @@ class LightCurve(object):
         return FoldedLightCurve(time=fold_time[sorted_args],
                                 flux=self.flux[sorted_args],
                                 flux_err=self.flux_err[sorted_args],
-                                time_original=self.time,
+                                time_original=self.time[sorted_args],
                                 targetid=self.targetid,
                                 label=self.label,
                                 meta=self.meta)
