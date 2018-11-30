@@ -62,7 +62,7 @@ of manual steps:
 
 1. Add any new contributors to `AUTHORS.rst`.
 
-2. Remove the suffix `.dev` from the version number in `lightkurve/version.py`. Note that Lightkurve follows a `semantic versioning scheme <https://semver.org>`_.
+2. Remove the suffix `.dev` from the version number in `lightkurve/version.py` and commit to master. Note that Lightkurve follows a `semantic versioning scheme <https://semver.org>`_.
 
 3. Verify that all unit tests pass:
 
