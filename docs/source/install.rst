@@ -76,38 +76,3 @@ If you want to experiment with the latest development version of
 This is recommended for anyone who wants to edit the source code.
 Please see our guide on :ref:`contributing to lightkurve<contributing>`
 for additional instructions.
-
-Building documentation
-======================
-
-.. note::
-
-    Building the documentation is not necessary unless you are
-    writing new documentation or do not have internet access, because the
-    latest version of the documentation is available online at
-    `docs.lightkurve.org <https://docs.lightkurve.org/>`_ .
-
-Building the *lightkurve* documentation requires a few extra packages:
-
-- sphinx
-- sphinx-automodapi
-- nbsphinx
-- `numpydoc <https://github.com/numpy/numpydoc>`_
-
-These packages can be installed using `conda` or `pip`.
-
-To build the documentation in HTML format, execute::
-
-    $ cd docs
-    $ make html
-
-This will save the documentation website in the ``../../lightkurve-docs`` directory
-on your system.  The notebook-based tutorials will not be recompiled by default
-because they take some time to build.  To recompile the notebooks, type::
-
-    make notebooks
-
-Finally, if you have write permission to *lightkurve*'s GitHub repository,
-you can upload the documentation to the web server using::
-
-    make upload

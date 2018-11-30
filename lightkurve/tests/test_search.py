@@ -217,12 +217,13 @@ def test_open():
     k2_path = os.path.join(PACKAGEDIR, "tests", "data", "test-tpf-star.fits")
     tess_path = os.path.join(PACKAGEDIR, "tests", "data", "tess25155310-s01-first-cadences.fits.gz")
     k2tpf = open(k2_path)
-    assert isinstance(k2tpf, KeplerTargetPixelFile)
+    assert(isinstance(k2tpf, KeplerTargetPixelFile))
     tesstpf = open(tess_path)
-    assert isinstance(tesstpf, TessTargetPixelFile)
+    assert(isinstance(tesstpf, TessTargetPixelFile))
     try:
         open(os.path.join(PACKAGEDIR, "tests", "data", "test_factory0.fits"))
     except ValueError:
         pass
-    assert isinstance(KeplerTargetPixelFile(k2_path), KeplerTargetPixelFile)
-    assert isinstance(TessTargetPixelFile(tess_path), TessTargetPixelFile)
+    assert(isinstance(KeplerTargetPixelFile(k2_path), KeplerTargetPixelFile))
+    assert(isinstance(TessTargetPixelFile(tess_path), TessTargetPixelFile))
+    assert(open(k2_path, quality_bitmask='hard').quality_bitmask == 'hard')

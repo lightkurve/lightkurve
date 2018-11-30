@@ -14,6 +14,7 @@ from astropy.wcs import WCS
 from matplotlib import patches
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.ndimage import label
 from tqdm import tqdm
 from astropy.coordinates import SkyCoord
 from astropy.stats.funcs import median_absolute_deviation as MAD
@@ -398,7 +399,7 @@ class TargetPixelFile(object):
         self._last_aperture_mask = aperture_mask
         return aperture_mask
 
-    def create_threshold_mask(self, threshold=3):
+    def create_threshold_mask(self, threshold=3, reference_pixel='center'):
         """Returns an aperture mask creating using the thresholding method.
 
         This method will identify the pixels in the TargetPixelFile which show
@@ -407,11 +408,24 @@ class TargetPixelFile(object):
         in a robust way by multiplying the Median Absolute Deviation (MAD)
         with 1.4826.
 
+        If the thresholding method yields multiple contiguous regions, then
+        only the region closest to the (col, row) coordinate specified by
+        `reference_pixel` is returned.  For exmaple, `reference_pixel=(0, 0)`
+        will pick the region closest to the bottom left corner.
+        By default, the region closest to the center of the mask will be
+        returned. If `reference_pixel=None` then all regions will be returned.
+
         Parameters
         ----------
         threshold : float
             A value for the number of sigma by which a pixel needs to be
             brighter than the median flux to be included in the aperture mask.
+        reference_pixel: (int, int) tuple, 'center', or None
+            (col, row) pixel coordinate closest to the desired region.
+            For example, use `reference_pixel=(0,0)` to select the region
+            closest to the bottom left corner of the target pixel file.
+            If 'center' (default) then the region closest to the center pixel
+            will be selected. If `None` then all regions will be selected.
 
         Returns
         -------
@@ -419,6 +433,8 @@ class TargetPixelFile(object):
             2D boolean numpy array containing `True` for pixels above the
             threshold.
         """
+        if reference_pixel == 'center':
+            reference_pixel = (self.shape[1] / 2, self.shape[2] / 2)
         # Calculate the median image
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
@@ -427,7 +443,22 @@ class TargetPixelFile(object):
         # Calculate the theshold value in flux units
         mad_cut = (1.4826 * MAD(vals) * threshold) + np.nanmedian(median_image)
         # Create a mask containing the pixels above the threshold flux
-        return np.nan_to_num(median_image) > mad_cut
+        threshold_mask = np.nan_to_num(median_image) > mad_cut
+        if reference_pixel is None:
+            # return all regions above threshold
+            return threshold_mask
+        else:
+            # Return only the contiguous region closest to `region`.
+            # First, label all the regions:
+            labels = label(threshold_mask)[0]
+            # For all pixels above threshold, compute distance to reference pixel:
+            label_args = np.argwhere(labels > 0)
+            distances = [np.hypot(crd[0], crd[1])
+                         for crd in label_args - np.array([reference_pixel[1], reference_pixel[0]])]
+            # Which label corresponds to the closest pixel?
+            closest_arg = label_args[np.argmin(distances)]
+            closest_label = labels[closest_arg[0], closest_arg[1]]
+            return labels == closest_label
 
     def centroids(self, **kwargs):
         """DEPRECATED: use `estimate_cdpp()` instead."""

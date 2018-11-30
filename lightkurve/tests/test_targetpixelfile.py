@@ -402,6 +402,13 @@ def test_threshold_aperture_mask():
     tpf.plot(aperture_mask='threshold')
     lc = tpf.to_lightcurve(aperture_mask=tpf.create_threshold_mask(threshold=1))
     assert (lc.flux == 1).all()
+    # The TESS file shows three pixel regions above a 2-sigma threshold;
+    # let's make sure the `reference_pixel` argument allows them to be selected.
+    tpf = TessTargetPixelFile(filename_tess)
+    assert tpf.create_threshold_mask(threshold=2.).sum() == 25
+    assert tpf.create_threshold_mask(threshold=2., reference_pixel='center').sum() == 25
+    assert tpf.create_threshold_mask(threshold=2., reference_pixel=None).sum() == 28
+    assert tpf.create_threshold_mask(threshold=2., reference_pixel=(5, 0)).sum() == 2
 
 
 def test_tpf_tess():
