@@ -13,6 +13,7 @@ If your software is not listed, please `open a Pull Request <https://github.com/
 
 Detrending & Analysis
 ~~~~~~~~~~~~~~~~~~~~~~
+
 - `PyKE <http://github.com/KeplerGO/PyKE>`_ : Kepler, K2 & TESS Data Analysis Tools
 - `everest <http://github.com/rodluger/everest>`_ : De-trending of K2 Light curves
 - `k2sc <http://github.com/OxES/k2sc>`_ : K2 systematics correction using Gaussian processes
@@ -30,12 +31,14 @@ Detrending & Analysis
 - `PySysRem <http://github.com/stephtdouglas/PySysRem>`_ : A Python implementation of the SysRem algorithm from Tamuz, Mazeh, and Zucker (2004)
 - `CBVshrink <https://github.com/saigrain/CBVshrink>`_ : Kepler systematics correction using co-trending basis vectors (CBV), Variational Bayes and shrinkage priors
 
+
 Full Frame Images
 ~~~~~~~~~~~~~~~~~~
 
 - `f3 <http://github.com/benmontet/f3>`_ : Full Frame Fotometry from the Kepler Full Frame Images
 - `FFIorBUST <http://github.com/jradavenport/FFIorBUST>`_ : Make really bad light curves from the Kepler Full Frame Images
 - `kepcal <http://github.com/dfm/kepcal>`_ : Self calibration using the Kepler FFIs
+
 
 Data access
 ~~~~~~~~~~~~
@@ -52,6 +55,7 @@ Metadata
 - `k2-quality-control <http://github.com/KeplerGO/k2-quality-control>`_ : Automated quality control of Kepler/K2 data products.
 - `SuperstampFITS <http://github.com/amcody/SuperstampFITS>`_ : Create individual FITS files of K2 superstamp regions.
 - `keputils <http://github.com/timothydmorton/keputils>`_ : Basic module for interaction with KOI and Kepler-stellar tables.
+
 
 Planet Search/Characterization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -113,6 +117,7 @@ Science / Astrophysics
 Astronomical Spectroscopy / Radial Velocities
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+- `exoplanet <https://github.com/dfm/exoplanet>`_ : Fast and scalable MCMC for all your exoplanet needs
 - `exonailer <https://github.com/nespinoza/exonailer>`_ : Tools for fitting transiting exoplanet lightcurves and radial velocities
 - `pyaneti <https://github.com/oscaribv/pyaneti>`_ : A multi-planet Radial Velocity and Transit fit software
 - `radvel <http://github.com/California-Planet-Search/radvel>`_ : General Toolkit for Modeling Radial Velocity Data
@@ -122,6 +127,7 @@ Astronomical Spectroscopy / Radial Velocities
 - `PSOAP <https://github.com/iancze/PSOAP>`_ : Tools for data-driven spectra models with Gaussian processes
 - `specmatch-emp <https://github.com/samuelyeewl/specmatch-emp>`_ : Spectral matching with empirical templates
 - `specmatch-syn <https://github.com/petigura/specmatch-syn>`_ : Spectral matching with synthetic templates
+
 
 Other
 ~~~~~~
