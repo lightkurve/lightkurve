@@ -1,6 +1,7 @@
 import numpy as np
 import pytest
 import warnings
+import os
 
 from ..nexsci import *
 from .. import nexsci
