@@ -336,7 +336,7 @@ class LightCurve(object):
         return flatten_lc
 
     def fold(self, period, transit_midpoint=0.):
-        """Folds the lightcurve at a specified ``period`` and ``phase``.
+        """Folds the lightcurve at a specified ``period`` and ``transit_midpoint``.
 
         This method returns a new ``LightCurve`` object in which the time
         values range between -0.5 to +0.5.  Data points which occur exactly
