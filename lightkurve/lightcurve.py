@@ -357,7 +357,7 @@ class LightCurve(object):
             phase.
         """
 
-        if (transit_midpoint > 2450000) & ((self.time[0] < 2450000) | (self.time_format == 'bkjd')):
+        if (transit_midpoint > 2450000) & ((self.time[0] < 2450000) | (self.time_format == 'bkjd') | (self.time_format == 'bkjd')):
             warnings.warn('Transit mid point appears to be in JD, however light curve time appears'
                         ' to be in BKJD (i.e. JD - 2454833).', LightkurveWarning)
         phase = (transit_midpoint % period) / period
