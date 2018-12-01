@@ -5,6 +5,8 @@ import logging
 import os
 import datetime
 from . import PACKAGEDIR
+from .utils import LightkurveWarning
+import warnings
 
 log = logging.getLogger(__name__)
 
@@ -73,23 +75,23 @@ def _check_data_is_fresh():
     If not, will attempt to redownload.
     '''
     fname = "{}/data/planets.csv".format(PACKAGEDIR)
-    if len(fname) == 0:
+    if not os.path.isfile(fname):
         try:
             log.info('Retrieving data from NExScI')
             _retrieve_online_data()
         except OnlineRetrievalFailure:
-            log.warning("Couldn't obtain data from NExScI. Do you have an internet connection?")
+            warnings.warn("Couldn't obtain data from NExScI. Do you have an internet connection?", LightkurveWarning)
         fname = "{}/data/planets.csv".format(PACKAGEDIR)
     st = os.stat(fname)
     mtime = st.st_mtime
     # If database is out of date, get it again.
     if (datetime.datetime.now() - datetime.datetime.fromtimestamp(mtime) > datetime.timedelta(days=7)):
-        log.warning('NExScI Database out of date. Redownloading...')
+        warnings.warn('NExScI Database out of date. Redownloading...', LightkurveWarning)
         try:
             log.info('Retrieving data from NExScI')
             _retrieve_online_data()
         except OnlineRetrievalFailure:
-            log.warning("Couldn't obtain data from NExScI. Do you have an internet connection?")
+            warnings.warn("Couldn't obtain data from NExScI. Do you have an internet connection?", LightkurveWarning)
 
 
 def get_nexsci_data():
@@ -149,16 +151,18 @@ def find_planet_mask(name, time_array, planets='all'):
     df = df[['pl_orbper', 'pl_tranmid', 'pl_trandur']]
     if len(df) == 0:
         raise ValueError('No such planet as {}'.format(name))
+    if not isinstance(time_array, np.ndarray):
+        raise ValueError('Time must be a numpy array.')
     if isinstance(planets, str):
         if planets == 'all':
             planets = np.arange(0, len(df))
     if not isinstance(planets, (list, np.ndarray)):
-        raise ValueError('Planets must be an iterable (list or numpy array)')
+        raise ValueError('Planets must be an iterable (list or numpy array).')
     else:
         if planets[-1] > len(df):
             raise ValueError('Only {} planet(s) in the {} system.'.format(len(df), name))
     if (~np.isfinite(np.asarray(df))).any():
-        raise ValueError('Some ephemeris values are NaNs. Cannot compute mas')
+        raise ValueError('Some NExScI ephemeris values are NaNs. Cannot compute mask.')
 
     mask = np.ones(len(time_array), dtype=bool)
     for idx in planets:
