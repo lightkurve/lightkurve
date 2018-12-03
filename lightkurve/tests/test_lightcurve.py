@@ -174,8 +174,9 @@ def test_lightcurve_fold():
 
     # bad transit midpoint should give a warning
     # if user tries a t0 in JD but time is in BKJD
-    with pytest.warns(LightkurveWarning, match='appears to be in JD, however '):
-        f = lc.fold(10, 2456600)
+    with pytest.warns(LightkurveWarning, match='appears to be given in JD'):
+        lc.fold(10, 2456600)
+
 
 def test_lightcurve_append():
     """Test ``LightCurve.append()``."""

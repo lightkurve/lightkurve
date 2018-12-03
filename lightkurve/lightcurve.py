@@ -339,16 +339,17 @@ class LightCurve(object):
         """Folds the lightcurve at a specified ``period`` and ``transit_midpoint``.
 
         This method returns a new ``LightCurve`` object in which the time
-        values range between -0.5 to +0.5.  Data points which occur exactly
-        at ``phase`` or an integer multiple of `phase + n*period` have time
-        value 0.0.
+        values range between -0.5 to +0.5 (i.e. the phase).
+        Data points which occur exactly at ``transit_midpoint`` or an integer
+        multiple of `transit_midpoint + n*period` will have time value 0.0.
 
         Parameters
         ----------
         period : float
             The period upon which to fold.
         transit_midpoint : float, optional
-            Time reference point/epoch.
+            Time reference point in the same units as the LightCurve's `time`
+            attribute.
 
         Returns
         -------
@@ -357,9 +358,15 @@ class LightCurve(object):
             phase.
         """
 
-        if (transit_midpoint > 2450000) & ((self.time[0] < 2450000) | (self.time_format == 'bkjd') | (self.time_format == 'bkjd')):
-            warnings.warn('Transit mid point appears to be in JD, however light curve time appears'
-                        ' to be in BKJD (i.e. JD - 2454833).', LightkurveWarning)
+        if (transit_midpoint > 2450000):
+            if self.time_format == 'bkjd':
+                warnings.warn('`transit_midpoint` appears to be given in JD, '
+                              'however the light curve time uses BKJD '
+                              '(i.e. JD - 2454833).', LightkurveWarning)
+            elif self.time_format == 'btjd':
+                warnings.warn('`transit_midpoint` appears to be given in JD, '
+                              'however the light curve time uses BTJD '
+                              '(i.e. JD - 2457000).', LightkurveWarning)
         phase = (transit_midpoint % period) / period
         fold_time = (((self.time - phase * period) / period) % 1)
         # fold time domain from -.5 to .5
