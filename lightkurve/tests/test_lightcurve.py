@@ -150,7 +150,7 @@ def test_bitmasking(quality_bitmask, answer):
 def test_lightcurve_fold():
     """Test the ``LightCurve.fold()`` method."""
     lc = LightCurve(time=np.linspace(0, 10, 100), flux=np.zeros(100)+1,
-                    targetid=999, label='mystar', meta={'ccd': 2})
+                    targetid=999, label='mystar', meta={'ccd': 2}, time_format='bkjd')
     fold = lc.fold(period=1)
     assert_almost_equal(fold.phase[0], -0.5, 2)
     assert_almost_equal(np.min(fold.phase), -0.5, 2)
@@ -158,8 +158,9 @@ def test_lightcurve_fold():
     assert fold.targetid == lc.targetid
     assert fold.label == lc.label
     assert fold.meta == lc.meta
+    assert_array_equal(np.sort(fold.time_original), lc.time)
     assert len(fold.time_original) == len(lc.time)
-    fold = lc.fold(period=1, phase=-0.1)
+    fold = lc.fold(period=1, transit_midpoint=-0.1)
     assert_almost_equal(fold.time[0], -0.5, 2)
     assert_almost_equal(np.min(fold.phase), -0.5, 2)
     assert_almost_equal(np.max(fold.phase), 0.5, 2)
@@ -170,6 +171,11 @@ def test_lightcurve_fold():
     ax = fold.errorbar()
     assert (ax.get_xlabel() == 'Phase')
     plt.close('all')
+
+    # bad transit midpoint should give a warning
+    # if user tries a t0 in JD but time is in BKJD
+    with pytest.warns(LightkurveWarning, match='appears to be given in JD'):
+        lc.fold(10, 2456600)
 
 
 def test_lightcurve_append():
