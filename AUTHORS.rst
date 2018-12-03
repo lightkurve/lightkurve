@@ -17,6 +17,10 @@ Direct contributions to the code base:
 - `Anand Sundaram <https://github.com/anand-sundaram-zocdoc>`_
 - `Oliver Hall <https://github.com/ojhall94>`_
 - `Nicholas Saunders <https://github.com/nksaunders>`_
+- `Jose A. Lerma III <https://github.com/JoseALermaIII>`_
+- `Dag Evensberget <https://github.com/svaberg>`_
+- `Natalie Gosnell <https://github.com/nattieg>`_
+- `Peter Williams <https://github.com/pkgw>`_
 
 
 Comments, corrections & suggestions:
@@ -34,3 +38,5 @@ Comments, corrections & suggestions:
 - `Benjamin Pope <https://github.com/benjaminpope>`_
 - `J. K. Carlberg <https://github.com/jkcarlberg>`_
 - `Brian Jackson <https://github.com/decaelus>`_
+- `Rishi Paudel <https://github.com/rrpastro>`_
+- `Marusa Zerjal <https://github.com/marusazerjal>`_

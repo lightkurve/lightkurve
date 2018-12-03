@@ -15,13 +15,16 @@ install:
   - "ECHO %PATH%"
   - where conda
   - conda config --set always_yes yes --set changeps1 no
-  - "conda create -q -n test-environment python=%PYTHON_VERSION% numpy scipy astropy pytest matplotlib tqdm requests"
+  - "conda create -q -n test-environment python=%PYTHON_VERSION% numpy scipy astropy pytest pytest-cov pytest-remotedata matplotlib tqdm requests"
   - activate test-environment
   - pip install oktopus
   - pip install sphinx_rtd_theme
   - pip install bs4
   - pip install celerite
   - pip install astroquery
+  - pip install codecov
+  - pip install numpydoc
+  - python setup.py develop
 
 test_script:
-  - "python setup.py test"
+  - pytest --remote-data

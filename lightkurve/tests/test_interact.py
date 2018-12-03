@@ -1,11 +1,12 @@
 """Tests the features of the lightkurve.interact module."""
 from astropy.utils.data import get_pkg_data_filename
 import pytest
+import warnings
 
+from .. import LightkurveWarning
 from ..targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
-from .. import log
 
-filename_tpf_one_center = get_pkg_data_filename("data/test-tpf-non-zero-center.fits")
+example_tpf = get_pkg_data_filename("data/tess25155310-s01-first-cadences.fits.gz")
 
 
 def test_bokeh_import_error(caplog):
@@ -14,7 +15,7 @@ def test_bokeh_import_error(caplog):
     try:
         import bokeh
     except ImportError:
-        tpf = KeplerTargetPixelFile(filename_tpf_one_center)
+        tpf = TessTargetPixelFile(example_tpf)
         tpf.interact()
         assert "requires the `bokeh` package" in caplog.text
 
@@ -23,7 +24,7 @@ def test_malformed_notebook_url():
     """Test if malformed notebook_urls raise proper exceptions."""
     try:
         import bokeh
-        tpf = KeplerTargetPixelFile(filename_tpf_one_center)
+        tpf = TessTargetPixelFile(example_tpf)
         with pytest.raises(ValueError) as exc:
             tpf.interact(notebook_url='')
         assert('Empty host value' in exc.value.args[0])
@@ -39,7 +40,7 @@ def test_graceful_exit_outside_notebook():
     """Test if running interact outside of a notebook does fails gracefully."""
     try:
         import bokeh
-        tpf = KeplerTargetPixelFile(filename_tpf_one_center)
+        tpf = TessTargetPixelFile(example_tpf)
         result = tpf.interact()
         assert(result is None)
     except ImportError:
@@ -49,10 +50,14 @@ def test_graceful_exit_outside_notebook():
 
 def test_custom_lc():
     """Can we provide a custom lightcurve to show?"""
+    with warnings.catch_warnings():
+        # Ignore the "TELESCOP is not equal to TESS" warning
+        warnings.simplefilter("ignore", LightkurveWarning)
+        tpfs = [KeplerTargetPixelFile(example_tpf),
+                TessTargetPixelFile(example_tpf)]
     try:
         import bokeh
-        for tpf in [KeplerTargetPixelFile(filename_tpf_one_center),
-                    TessTargetPixelFile(filename_tpf_one_center)]:
+        for tpf in tpfs:
             tpf.interact(lc=tpf.to_lightcurve().flatten())
     except ImportError:
         # bokeh is an optional dependency
@@ -66,7 +71,7 @@ def test_interact_functions():
         from ..interact import (prepare_tpf_datasource, prepare_lightcurve_datasource,
                                 get_lightcurve_y_limits, make_lightcurve_figure_elements,
                                 make_tpf_figure_elements, show_interact_widget)
-        tpf = KeplerTargetPixelFile(filename_tpf_one_center)
+        tpf = TessTargetPixelFile(example_tpf)
         lc = tpf.to_lightcurve()
         tpf_source = prepare_tpf_datasource(tpf)
         lc_source = prepare_lightcurve_datasource(lc)

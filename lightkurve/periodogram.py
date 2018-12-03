@@ -317,7 +317,7 @@ class Periodogram(object):
             binned_freq = np.nanmedian(self.frequency[:m*binsize].reshape((m, binsize)), axis=1)
             binned_power = np.nanmedian(self.power[:m*binsize].reshape((m, binsize)), axis=1)
 
-        binned_pg = copy.deepcopy(self)
+        binned_pg = self.copy()
         binned_pg.frequency = binned_freq
         binned_pg.power = binned_power
         return binned_pg
@@ -380,7 +380,7 @@ class Periodogram(object):
 
             box_kernel = Box1DKernel(np.ceil(filter_width/fs))
             smooth_power = convolve(self.power.value, box_kernel)
-            smooth_pg = copy.deepcopy(self)
+            smooth_pg = self.copy()
             smooth_pg.power = u.Quantity(smooth_power, self.power.unit)
             return smooth_pg
 
@@ -398,7 +398,7 @@ class Periodogram(object):
                     count[m] += 1
                 x0 += 0.5 * filter_width
             bkg /= count
-            smooth_pg = copy.deepcopy(self)
+            smooth_pg = self.copy()
             smooth_pg.power = u.Quantity(bkg, self.power.unit)
             return smooth_pg
 
@@ -529,17 +529,30 @@ class Periodogram(object):
                      names=('frequency', 'period', 'power'),
                      meta=self.meta)
 
+    def copy(self):
+        """Returns a copy of the Periodogram object.
+
+        This method uses the `copy.deepcopy` function to ensure that all
+        objects stored within the Periodogram are copied.
+
+        Returns
+        -------
+        pg_copy : Periodogram
+            A new `Periodogram` object which is a copy of the original.
+        """
+        return copy.deepcopy(self)
+
     def __repr__(self):
         return('Periodogram(ID: {})'.format(self.targetid))
 
     def __getitem__(self, key):
-        copy_self = copy.copy(self)
+        copy_self = self.copy()
         copy_self.frequency = self.frequency[key]
         copy_self.power = self.power[key]
         return copy_self
 
     def __add__(self, other):
-        copy_self = copy.copy(self)
+        copy_self = self.copy()
         copy_self.power = copy_self.power + u.Quantity(other, self.power.unit)
         return copy_self
 
@@ -550,12 +563,12 @@ class Periodogram(object):
         return self.__add__(-other)
 
     def __rsub__(self, other):
-        copy_self = copy.copy(self)
+        copy_self = self.copy()
         copy_self.power = other - copy_self.power
         return copy_self
 
     def __mul__(self, other):
-        copy_self = copy.copy(self)
+        copy_self = self.copy()
         copy_self.power = other * copy_self.power
         return copy_self
 
@@ -566,7 +579,7 @@ class Periodogram(object):
         return self.__mul__(1./other)
 
     def __rtruediv__(self, other):
-        copy_self = copy.copy(self)
+        copy_self = self.copy()
         copy_self.power = other / copy_self.power
         return copy_self
 
@@ -576,7 +589,7 @@ class Periodogram(object):
     def __rdiv__(self, other):
         return self.__rtruediv__(other)
 
-    def properties(self):
+    def show_properties(self):
         """Prints a summary of the non-callable attributes of the Periodogram object.
 
         Prints in order of type (ints, strings, lists, arrays and others).

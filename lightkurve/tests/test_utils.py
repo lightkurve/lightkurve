@@ -2,12 +2,19 @@ from __future__ import division, print_function
 
 import numpy as np
 from numpy.testing import assert_almost_equal
+from astropy.io import fits
 import pytest
+import warnings
+import os
 
 from ..utils import KeplerQualityFlags, TessQualityFlags
 from ..utils import module_output_to_channel, channel_to_module_output
 from ..utils import running_mean
+from ..utils import LightkurveWarning
+from ..utils import detect_filetype
+from ..lightcurve import LightCurve
 
+from .. import PACKAGEDIR
 
 def test_channel_to_module_output():
     assert channel_to_module_output(1) == (2, 1)
@@ -69,3 +76,20 @@ def test_quality_mask():
     with pytest.raises(ValueError) as err:
         KeplerQualityFlags.create_quality_mask(quality, bitmask='invalidoption')
     assert "not supported" in err.value.args[0]
+
+
+def test_lightkurve_warning():
+    """Can we ignore Lightkurve warnings?"""
+    with warnings.catch_warnings(record=True) as warns:
+        warnings.simplefilter('ignore', LightkurveWarning)
+        time = np.array([1, 2, 3, np.nan])
+        flux = np.array([1, 2, 3, 4])
+        lc = LightCurve(time=time, flux=flux)
+        assert len(warns) == 0
+
+def test_detect_filetype():
+    """Can we detect the correct filetype?"""
+    k2_path = os.path.join(PACKAGEDIR, "tests", "data", "test-tpf-star.fits")
+    tess_path = os.path.join(PACKAGEDIR, "tests", "data", "tess25155310-s01-first-cadences.fits.gz")
+    assert detect_filetype(fits.open(k2_path)[0].header) == 'KeplerTargetPixelFile'
+    assert detect_filetype(fits.open(tess_path)[0].header) == 'TessTargetPixelFile'
