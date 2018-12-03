@@ -150,7 +150,7 @@ def test_bitmasking(quality_bitmask, answer):
 def test_lightcurve_fold():
     """Test the ``LightCurve.fold()`` method."""
     lc = LightCurve(time=np.linspace(0, 10, 100), flux=np.zeros(100)+1,
-                    targetid=999, label='mystar', meta={'ccd': 2})
+                    targetid=999, label='mystar', meta={'ccd': 2}, time_format='bkjd')
     fold = lc.fold(period=1)
     assert_almost_equal(fold.phase[0], -0.5, 2)
     assert_almost_equal(np.min(fold.phase), -0.5, 2)
