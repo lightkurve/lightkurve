@@ -285,7 +285,7 @@ def make_default_export_name(tpf, suffix='custom-lc'):
 
 def show_interact_widget(tpf, notebook_url='localhost:8888',
                          max_cadences=30000,
-                         aperture_mask=None,
+                         aperture_mask='pipeline',
                          exported_filename=None):
     """Display an interactive Jupyter Notebook widget to inspect the pixel data.
 
@@ -323,8 +323,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
                   "you can install bokeh using e.g. `conda install bokeh`.")
         return None
 
-    if aperture_mask is None:
-        aperture_mask = tpf.pipeline_mask
+    aperture_mask = tpf._parse_aperture_mask(aperture_mask)
 
     if exported_filename is None:
         exported_filename = make_default_export_name(tpf)
