@@ -11,6 +11,7 @@ import warnings
 
 import numpy as np
 from scipy import signal
+from scipy.interpolate import interp1d
 from matplotlib import pyplot as plt
 
 from astropy.stats import sigma_clip
@@ -257,7 +258,7 @@ class LightCurve(object):
         return copy.deepcopy(self)
 
     def flatten(self, window_length=101, polyorder=2, return_trend=False,
-                break_tolerance=5, **kwargs):
+                break_tolerance=5, niters=2, sigma=3, **kwargs):
         """Removes the low frequency trend using scipy's Savitzky-Golay filter.
 
         This method wraps `scipy.signal.savgol_filter`.
@@ -279,6 +280,11 @@ class LightCurve(object):
             individually. A gap is defined as a period in time larger than
             `break_tolerance` times the median gap.  To disable this feature,
             set `break_tolerance` to None.
+        niters : int
+            Number of iterations to iteratively sigma clip and flatten. If more than one, will
+            perform the flatten several times, removing outliers each time.
+        sigma : int
+            Number of sigma above which to remove outliers from the flatten
         **kwargs : dict
             Dictionary of arguments to be passed to `scipy.signal.savgol_filter`.
 
@@ -290,39 +296,52 @@ class LightCurve(object):
         trend_lc : LightCurve object
             Trend in the lightcurve data
         """
-        if break_tolerance is None:
-            break_tolerance = np.nan
-        if polyorder >= window_length:
-            polyorder = window_length - 1
-            log.warning("polyorder must be smaller than window_length, "
-                        "using polyorder={}.".format(polyorder))
-        lc_clean = self.remove_nans()
-        # Split the lightcurve into segments by finding large gaps in time
-        dt = lc_clean.time[1:] - lc_clean.time[0:-1]
-        with warnings.catch_warnings():  # Ignore warnings due to NaNs
-            warnings.simplefilter("ignore", RuntimeWarning)
-            cut = np.where(dt > break_tolerance * np.nanmedian(dt))[0] + 1
-        low = np.append([0], cut)
-        high = np.append(cut, len(lc_clean.time))
-        # Then, apply the savgol_filter to each segment separately
-        trend_signal = np.zeros(len(lc_clean.time))
-        for l, h in zip(low, high):
-            # Reduce `window_length` and `polyorder` for short segments;
-            # this prevents `savgol_filter` from raising an exception
-            # If the segment is too short, just take the median
 
-            if np.any([window_length > (h - l), (h - l) < break_tolerance]):
-                trend_signal[l:h] = np.nanmedian(lc_clean.flux[l:h])
-            else:
-                # Scipy outputs a warning here that is not useful, will be fixed in version 1.2
-                with warnings.catch_warnings():
-                    warnings.simplefilter('ignore', FutureWarning)
-                    trend_signal[l:h] = signal.savgol_filter(x=lc_clean.flux[l:h],
-                                                             window_length=window_length,
-                                                             polyorder=polyorder,
-                                                             **kwargs)
+        # No NaNs
+        mask = np.isfinite(self.flux)
+        # No outliers
+        mask &= np.nan_to_num(np.abs(self.flux - np.nanmedian(self.flux))) <= (np.nanstd(self.flux) * sigma)
+#        ax = self.plot(normalize=False)
+        for iter in np.arange(0, niters):
+#            ax.scatter(self.time[mask], self.flux[mask])
 
-        trend_signal = np.interp(self.time, lc_clean.time, trend_signal)
+            if break_tolerance is None:
+                break_tolerance = np.nan
+            if polyorder >= window_length:
+                polyorder = window_length - 1
+                log.warning("polyorder must be smaller than window_length, "
+                            "using polyorder={}.".format(polyorder))
+            # Split the lightcurve into segments by finding large gaps in time
+            dt = self.time[mask][1:] - self.time[mask][0:-1]
+            with warnings.catch_warnings():  # Ignore warnings due to NaNs
+                warnings.simplefilter("ignore", RuntimeWarning)
+                cut = np.where(dt > break_tolerance * np.nanmedian(dt))[0] + 1
+            low = np.append([0], cut)
+            high = np.append(cut, len(self.time[mask]))
+            # Then, apply the savgol_filter to each segment separately
+            trend_signal = np.zeros(len(self.time[mask]))
+            for l, h in zip(low, high):
+                # Reduce `window_length` and `polyorder` for short segments;
+                # this prevents `savgol_filter` from raising an exception
+                # If the segment is too short, just take the median
+                if np.any([window_length > (h - l), (h - l) < break_tolerance]):
+                    trend_signal[l:h] = np.nanmedian(self.flux[mask][l:h])
+                else:
+                    # Scipy outputs a warning here that is not useful, will be fixed in version 1.2
+                    with warnings.catch_warnings():
+                        warnings.simplefilter('ignore', FutureWarning)
+                        trend_signal[l:h] = signal.savgol_filter(x=self.flux[mask][l:h],
+                                                                 window_length=window_length,
+                                                                 polyorder=polyorder,
+                                                                 **kwargs)
+
+            # No outliers
+            mask1 = np.nan_to_num(np.abs(self.flux[mask] - trend_signal)) <\
+                    (np.nanstd(self.flux[mask] - trend_signal) * sigma)
+            f = interp1d(self.time[mask][mask1], trend_signal[mask1], fill_value='extrapolate')
+            trend_signal = f(self.time)
+            mask[mask] &= mask1
+
         flatten_lc = self.copy()
         with warnings.catch_warnings():
             # ignore invalid division warnings
