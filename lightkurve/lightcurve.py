@@ -258,7 +258,7 @@ class LightCurve(object):
         return copy.deepcopy(self)
 
     def flatten(self, window_length=101, polyorder=2, return_trend=False,
-                break_tolerance=5, niters=3, sigma=3, **kwargs):
+                break_tolerance=5, niters=3, sigma=3, mask=None, **kwargs):
         """Removes the low frequency trend using scipy's Savitzky-Golay filter.
 
         This method wraps `scipy.signal.savgol_filter`.
@@ -285,6 +285,11 @@ class LightCurve(object):
             perform the flatten several times, removing outliers each time.
         sigma : int
             Number of sigma above which to remove outliers from the flatten
+        mask : boolean array with length of self.time
+            Boolean array to mask data with before flattening. Flux values where
+            mask is False will not be used to flatten the data. An interpolated
+            result will be provided for these points. Use this mask to remove
+            data you want to preserve, e.g. transits.
         **kwargs : dict
             Dictionary of arguments to be passed to `scipy.signal.savgol_filter`.
 
@@ -297,8 +302,10 @@ class LightCurve(object):
             Trend in the lightcurve data
         """
 
+        if mask is None:
+            mask = np.ones(len(self.time), dtype=bool)
         # No NaNs
-        mask = np.isfinite(self.flux)
+        mask &= np.isfinite(self.flux)
         # No outliers
         mask &= np.nan_to_num(np.abs(self.flux - np.nanmedian(self.flux))) <= (np.nanstd(self.flux) * sigma)
 #        ax = self.plot(normalize=False)
