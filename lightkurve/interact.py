@@ -6,8 +6,9 @@ The functions in this module are used to create Bokeh-based visualization
 widgets.  For example, the following code will create an interactive
 visualization widget showing the pixel data and a lightcurve::
 
+    # SN 2018 oh Supernova example
     from lightkurve import KeplerTargetPixelFile
-    tpf = KeplerTargetPixelFile.from_archive(228682548) # SN 2018 oh for example
+    tpf = KeplerTargetPixelFile.from_archive(228682548)
     tpf.interact()
 
 Note that this will only work inside a Jupyter notebook at this time.
@@ -34,7 +35,8 @@ try:
     from bokeh.models.widgets import Button
     from bokeh.models.formatters import PrintfTickFormatter
 except ImportError:
-    pass  # We will print a nice error message in the `show_interact_widget` function
+    # We will print a nice error message in the `show_interact_widget` function
+    pass
 
 
 def prepare_lightcurve_datasource(lc):
@@ -92,14 +94,15 @@ def prepare_tpf_datasource(tpf, aperture_mask):
     tpf_source : bokeh.plotting.ColumnDataSource
         Bokeh object to be shown.
     """
-    n_pixels = tpf.flux[0, :, :].size
-    pixel_index_array = np.arange(0, n_pixels, 1, dtype=int).reshape(tpf.flux[0, :, :].shape)
+    npix = tpf.flux[0, :, :].size
+    pixel_index_array = np.arange(0, npix, 1).reshape(tpf.flux[0].shape)
     xx = tpf.column + np.arange(tpf.shape[2])
     yy = tpf.row + np.arange(tpf.shape[1])
     xa, ya = np.meshgrid(xx, yy)
-    preselection = Selection()
-    preselection.indices = pixel_index_array[aperture_mask].reshape(-1).tolist()
-    tpf_source = ColumnDataSource(data=dict(xx=xa+0.5, yy=ya+0.5), selected=preselection)
+    preselected = Selection()
+    preselected.indices = pixel_index_array[aperture_mask].reshape(-1).tolist()
+    tpf_source = ColumnDataSource(data=dict(xx=xa+0.5, yy=ya+0.5),
+                                  selected=preselected)
     return tpf_source
 
 
@@ -167,20 +170,21 @@ def make_lightcurve_figure_elements(lc, lc_source):
              nonselection_line_alpha=1.0)
     circ = fig.circle('time', 'flux', source=lc_source, fill_alpha=0.3, size=8,
                       line_color=None, selection_color="firebrick",
-                      nonselection_fill_alpha=0.0, nonselection_fill_color="grey",
-                      nonselection_line_color=None, nonselection_line_alpha=0.0,
+                      nonselection_fill_alpha=0.0,
+                      nonselection_fill_color="grey",
+                      nonselection_line_color=None,
+                      nonselection_line_alpha=0.0,
                       fill_color=None, hover_fill_color="firebrick",
                       hover_alpha=0.9, hover_line_color="white")
-    fig.add_tools(HoverTool(tooltips=[("Cadence", "@cadence"),
-                                      ("Time ({})".format(lc.time_format.upper()),
-                                       "@time{0,0.000}"),
-                                      ("Time (ISO)", "@time_iso"),
-                                      ("Flux", "@flux"),
-                                      ("Quality Code", "@quality_code"),
-                                      ("Quality Flag", "@quality")],
-                            renderers=[circ],
-                            mode='mouse',
-                            point_policy="snap_to_data"))
+    tooltips = [("Cadence", "@cadence"),
+                ("Time ({})".format(lc.time_format.upper()),
+                 "@time{0,0.000}"),
+                ("Time (ISO)", "@time_iso"),
+                ("Flux", "@flux"),
+                ("Quality Code", "@quality_code"),
+                ("Quality Flag", "@quality")]
+    fig.add_tools(HoverTool(tooltips=tooltips, renderers=[circ],
+                            mode='mouse', point_policy="snap_to_data"))
 
     # Vertical line to indicate the cadence
     vertical_line = Span(location=lc.time[0], dimension='height',
@@ -234,10 +238,13 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=0):
     # This colorbar share of the plot window grows, shrinking plot area.
     # This effect is known, some workarounds might work to fix the plot area:
     # https://github.com/bokeh/bokeh/issues/5186
-    color_bar = ColorBar(color_mapper=color_mapper, ticker=LogTicker(desired_num_ticks=8),
-                         label_standoff=-10, border_line_color=None, location=(0, 0),
-                         background_fill_color='whitesmoke', major_label_text_align='left',
-                         major_label_text_baseline='middle', title='e/s', margin=0)
+    color_bar = ColorBar(color_mapper=color_mapper,
+                         ticker=LogTicker(desired_num_ticks=8),
+                         label_standoff=-10, border_line_color=None,
+                         location=(0, 0), background_fill_color='whitesmoke',
+                         major_label_text_align='left',
+                         major_label_text_baseline='middle',
+                         title='e/s', margin=0)
     fig.add_layout(color_bar, 'right')
 
     color_bar.formatter = PrintfTickFormatter(format="%14u")
@@ -266,6 +273,7 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=0):
     stretch_slider.on_change('value', stretch_change_callback)
 
     return fig, stretch_slider
+
 
 def make_default_export_name(tpf, suffix='custom-lc'):
     '''makes the default name to save a custom intetract mask'''
@@ -323,13 +331,14 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
 
     lc = tpf.to_lightcurve(aperture_mask=aperture_mask)
 
-    n_pixels = tpf.flux[0, :, :].size
-    pixel_index_array = np.arange(0, n_pixels, 1, dtype=int).reshape(tpf.flux[0, :, :].shape)
+    npix = tpf.flux[0, :, :].size
+    pixel_index_array = np.arange(0, npix, 1).reshape(tpf.flux[0].shape)
 
     # Bokeh cannot handle many data points
     # https://github.com/bokeh/bokeh/issues/7490
     if len(lc.cadenceno) > max_cadences:
-        raise RuntimeError('Interact cannot display more than {} cadences.'.format(max_cadences))
+        msg = 'Interact cannot display more than {} cadences.'
+        raise RuntimeError(msg.format(max_cadences))
 
     def create_interact_ui(doc):
         # The data source includes metadata for hover-over tooltips
@@ -341,7 +350,8 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
 
         # Create the TPF figure and its stretch slider
         pedestal = np.nanmin(tpf.flux)
-        fig_tpf, stretch_slider = make_tpf_figure_elements(tpf, tpf_source, pedestal=pedestal)
+        fig_tpf, stretch_slider = make_tpf_figure_elements(tpf, tpf_source,
+                                                           pedestal=pedestal)
 
         # Helper lookup table which maps cadence number onto flux array index.
         tpf_index_lookup = {cad: idx for idx, cad in enumerate(tpf.cadenceno)}
@@ -355,7 +365,8 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
                                 width=490)
         r_button = Button(label=">", button_type="default", width=30)
         l_button = Button(label="<", button_type="default", width=30)
-        export_button = Button(label="Save Lightcurve", button_type="success", width=120)
+        export_button = Button(label="Save Lightcurve",
+                               button_type="success", width=120)
 
         # Callbacks
         def update_upon_pixel_selection(attr, old, new):
@@ -382,11 +393,12 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
             '''Callback to take action when cadence slider changes'''
             if new in tpf.cadenceno:
                 frameno = tpf_index_lookup[new]
-                fig_tpf.select('tpfimg')[0].data_source.data['image'] = [tpf.flux[frameno, :, :]
-                                                                         - pedestal]
+                fig_tpf.select('tpfimg')[0].data_source.data['image'] = \
+                    [tpf.flux[frameno, :, :] - pedestal]
                 vertical_line.update(location=tpf.time[frameno])
             else:
-                fig_tpf.select('tpfimg')[0].data_source.data['image'] = [tpf.flux[0, :, :] * np.NaN]
+                fig_tpf.select('tpfimg')[0].data_source.data['image'] = \
+                    [tpf.flux[0, :, :] * np.NaN]
             lc_source.selected.indices = []
 
         def go_right_by_one():
@@ -409,10 +421,9 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
                                aperture_mask=selected_mask.astype(np.int),
                                SOURCE='lightkurve interact',
                                NOTE='custom mask',
-                               MASKNPIX = np.nansum(selected_mask))
+                               MASKNPIX=np.nansum(selected_mask))
             else:
                 log.info("No pixels selected, no mask saved.")
-
 
         def jump_to_lightcurve_position(attr, old, new):
             if new != []:
@@ -427,11 +438,11 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
         cadence_slider.on_change('value', update_upon_cadence_change)
 
         # Layout all of the plots
-        space1, space2, space3 = Spacer(width=15), Spacer(width=30), Spacer(width=80)
+        sp1, sp2, sp3 = Spacer(width=15), Spacer(width=30), Spacer(width=80)
         widgets_and_figures = layout([fig_lc, fig_tpf],
-                                     [l_button, space1, r_button, space2,
-                                      cadence_slider, space3, stretch_slider],
-                                      [export_button])
+                                     [l_button, sp1, r_button, sp2,
+                                     cadence_slider, sp3, stretch_slider],
+                                     [export_button])
         doc.add_root(widgets_and_figures)
 
     output_notebook(verbose=False, hide_banner=True)
