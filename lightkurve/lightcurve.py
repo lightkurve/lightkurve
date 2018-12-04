@@ -1314,7 +1314,7 @@ class KeplerLightCurve(LightCurve):
             Optional 2D aperture mask to save with this lightcurve object, if
             defined.  The mask can be either a boolean mask or an integer mask
             mimicking the Kepler/TESS convention; boolean masks are
-            automatically converted to the Kepler/TESS 
+            automatically converted to the Kepler/TESS conventions
         extra_data : dict
             Extra keywords or columns to include in the FITS file.
             Arguments of type str, int, float, or bool will be stored as
@@ -1439,7 +1439,7 @@ class TessLightCurve(LightCurve):
             Optional 2D aperture mask to save with this lightcurve object, if
             defined.  The mask can be either a boolean mask or an integer mask
             mimicking the Kepler/TESS convention; boolean masks are
-            automatically converted to the Kepler/TESS 
+            automatically converted to the Kepler/TESS conventions
         extra_data : dict
             Extra keywords or columns to include in the FITS file.
             Arguments of type str, int, float, or bool will be stored as
