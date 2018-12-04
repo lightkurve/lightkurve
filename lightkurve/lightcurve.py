@@ -258,7 +258,7 @@ class LightCurve(object):
         return copy.deepcopy(self)
 
     def flatten(self, window_length=101, polyorder=2, return_trend=False,
-                break_tolerance=5, niters=2, sigma=3, **kwargs):
+                break_tolerance=5, niters=3, sigma=3, **kwargs):
         """Removes the low frequency trend using scipy's Savitzky-Golay filter.
 
         This method wraps `scipy.signal.savgol_filter`.
