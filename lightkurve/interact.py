@@ -276,7 +276,7 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=0):
 
 
 def make_default_export_name(tpf, suffix='custom-lc'):
-    '''makes the default name to save a custom intetract mask'''
+    """makes the default name to save a custom intetract mask"""
     fn = tpf.hdu.filename()
     base = os.path.basename(fn)
     outname = base.rsplit('.fits')[0] + '-{}.fits'.format(suffix)
@@ -390,7 +390,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
                 fig_lc.y_range.end = 1
 
         def update_upon_cadence_change(attr, old, new):
-            '''Callback to take action when cadence slider changes'''
+            """Callback to take action when cadence slider changes"""
             if new in tpf.cadenceno:
                 frameno = tpf_index_lookup[new]
                 fig_tpf.select('tpfimg')[0].data_source.data['image'] = \

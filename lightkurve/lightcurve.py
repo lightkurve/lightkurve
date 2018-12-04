@@ -997,7 +997,7 @@ class LightCurve(object):
                                            freq_unit=freq_unit,
                                            **kwargs)
 
-    def to_fits(self, path=None, overwrite=False, aperture_mask=None, **extra_data):
+    def to_fits(self, path=None, overwrite=False, **extra_data):
         """Writes the LightCurve to a FITS file.
 
         Parameters
@@ -1093,22 +1093,11 @@ class LightCurve(object):
             hdu.header['EXTNAME'] = 'LIGHTCURVE'
             return hdu
 
-        def _make_aperture_extension(aperture_mask):
-            """Create the 'APERTURE' extension (i.e. extension #2)."""
-            # Simple binary mask for now
-            hdu = fits.ImageHDU(aperture_mask)
-            hdu.header['EXTNAME'] = 'APERTURE'
-            return hdu
-
         def _hdulist(**extra_data):
             """Returns an astropy.io.fits.HDUList object."""
             list_out = fits.HDUList([_make_primary_hdu(extra_data=extra_data),
                              _make_lightcurve_extension(extra_data=extra_data)])
-            if aperture_mask is None:
-                return list_out
-            else:
-                list_out.append(_make_aperture_extension(aperture_mask))
-                return list_out
+            return list_out
 
         hdu = _hdulist(**extra_data)
         if path is not None:
@@ -1321,6 +1310,11 @@ class KeplerLightCurve(LightCurve):
             File path, if `None` returns an astropy.io.fits.HDUList object.
         overwrite : bool
             Whether or not to overwrite the file
+        aperture_mask : array-like
+            Optional 2D aperture mask to save with this lightcurve object, if
+            defined.  The mask can be either a boolean mask or an integer mask
+            mimicking the Kepler/TESS convention; boolean masks are
+            automatically converted to the Kepler/TESS 
         extra_data : dict
             Extra keywords or columns to include in the FITS file.
             Arguments of type str, int, float, or bool will be stored as
@@ -1345,14 +1339,32 @@ class KeplerLightCurve(LightCurve):
             'EQUINOX': 2000,
             'DATE-OBS': Time(self.time[0]+2454833., format=('jd')).isot,
             'SAP_QUALITY': self.quality}
+
+        def _make_aperture_extension(hdu_list, aperture_mask):
+            """Create the 'APERTURE' extension (e.g. extension #2)."""
+            # Simple binary mask for now
+
+            # TODO: convert boolean aperture mask to Kepler bitmask
+
+            if aperture_mask is not None:
+                hdu = fits.ImageHDU(aperture_mask)
+                hdu.header['EXTNAME'] = 'APERTURE'
+                hdu_list.append(hdu)
+            return hdu_list
+
         for kw in kepler_specific_data:
             if ~np.asarray([kw.lower == k.lower() for k in extra_data]).any():
                 extra_data[kw] = kepler_specific_data[kw]
-        return super(KeplerLightCurve, self).to_fits(path=path,
-                                                     overwrite=overwrite,
-                                                     aperture_mask=aperture_mask,
-                                                     **extra_data)
+        hdu = super(KeplerLightCurve, self).to_fits(path=None,
+                                                    overwrite=overwrite,
+                                                    **extra_data)
 
+        hdu = _make_aperture_extension(hdu, aperture_mask)
+
+        if path is not None:
+            hdu.writeto(path, overwrite=overwrite, checksum=True)
+        else:
+            return hdu
 
 class TessLightCurve(LightCurve):
     """Defines a light curve class for NASA's TESS mission.
@@ -1412,3 +1424,64 @@ class TessLightCurve(LightCurve):
 
     def __repr__(self):
         return('TessLightCurve(TICID: {})'.format(self.targetid))
+
+
+    def to_fits(self, path=None, overwrite=False, aperture_mask=None, **extra_data):
+        """Writes the KeplerLightCurve to a FITS file.
+
+        Parameters
+        ----------
+        path : string, default None
+            File path, if `None` returns an astropy.io.fits.HDUList object.
+        overwrite : bool
+            Whether or not to overwrite the file
+        aperture_mask : array-like
+            Optional 2D aperture mask to save with this lightcurve object, if
+            defined.  The mask can be either a boolean mask or an integer mask
+            mimicking the Kepler/TESS convention; boolean masks are
+            automatically converted to the Kepler/TESS 
+        extra_data : dict
+            Extra keywords or columns to include in the FITS file.
+            Arguments of type str, int, float, or bool will be stored as
+            keywords in the primary header.
+            Arguments of type np.array or list will be stored as columns
+            in the first extension.
+
+        Returns
+        -------
+        hdu : astropy.io.fits
+            Returns an astropy.io.fits object if path is None
+        """
+        # TODO: populate more TESS specific metadata
+
+        tess_specific_data = {
+            'OBJECT': '{}'.format(self.targetid),
+            'MISSION': self.mission,
+            'RA_OBJ': self.ra,
+            'DEC_OBJ': self.dec} # ... insert more here!
+
+        def _make_aperture_extension(hdu_list, aperture_mask):
+            """Create the 'APERTURE' extension (e.g. extension #2)."""
+            # Simple binary mask for now
+
+            # TODO: convert boolean aperture mask to *TESS* bitmask
+
+            if aperture_mask is not None:
+                hdu = fits.ImageHDU(aperture_mask)
+                hdu.header['EXTNAME'] = 'APERTURE'
+                hdu_list.append(hdu)
+            return hdu_list
+
+        for kw in tess_specific_data:
+            if ~np.asarray([kw.lower == k.lower() for k in extra_data]).any():
+                extra_data[kw] = tess_specific_data[kw]
+        hdu = super(KeplerLightCurve, self).to_fits(path=None,
+                                                    overwrite=overwrite,
+                                                    **extra_data)
+
+        hdu = _make_aperture_extension(hdu, aperture_mask)
+
+        if path is not None:
+            hdu.writeto(path, overwrite=overwrite, checksum=True)
+        else:
+            return hdu
