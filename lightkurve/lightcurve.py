@@ -1046,12 +1046,6 @@ class LightCurve(object):
                 hdu.header['{}'.format(kw).upper()] = default[kw]
                 if default[kw] is None:
                     log.warning('Value for {} is None.'.format(kw))
-            if ('quarter' in dir(self)) and (self.quarter is not None):
-                hdu.header['QUARTER'] = self.quarter
-            elif ('campaign' in dir(self)) and self.campaign is not None:
-                hdu.header['CAMPAIGN'] = self.campaign
-            else:
-                log.warning('Cannot find Campaign or Quarter number.')
 
             for kw in extra_data:
                 if isinstance(extra_data[kw], (str, float, int, bool, type(None))):
@@ -1358,6 +1352,13 @@ class KeplerLightCurve(LightCurve):
         hdu = super(KeplerLightCurve, self).to_fits(path=None,
                                                     overwrite=overwrite,
                                                     **extra_data)
+
+        if ('quarter' in dir(self)) and (self.quarter is not None):
+            hdu[0].header['QUARTER'] = self.quarter
+        elif ('campaign' in dir(self)) and self.campaign is not None:
+            hdu[0].header['CAMPAIGN'] = self.campaign
+        else:
+            log.warning('Cannot find Campaign or Quarter number.')
 
         hdu = _make_aperture_extension(hdu, aperture_mask)
 
