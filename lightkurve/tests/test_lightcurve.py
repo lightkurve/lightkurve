@@ -11,6 +11,7 @@ import warnings
 
 from ..lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
 from ..lightcurvefile import LightCurveFile, KeplerLightCurveFile, TessLightCurveFile
+from ..targetpixelfile import KeplerTargetPixelFile
 from ..utils import LightkurveWarning
 
 # 8th Quarter of Tabby's star
@@ -373,6 +374,7 @@ def test_to_pandas():
         assert_allclose(df.index, time)
         assert_allclose(df.flux, flux)
         assert_allclose(df.flux_err, flux_err)
+        df.describe() # Will fail if for Endianness bugs
     except ImportError:
         # pandas is an optional dependency
         pass
@@ -427,11 +429,32 @@ def test_to_fits():
     assert hdu[1].header['TTYPE3'] == 'FLUX_ERR'
     assert hdu[1].header['TTYPE4'] == 'CADENCENO'
     hdu = LightCurve([0, 1, 2, 3, 4], [1, 1, 1, 1, 1]).to_fits()
+
+    # Test "round-tripping": can we read-in what we write
     lcf_new = LightCurveFile(hdu)  # Regression test for #233
     assert hdu[0].header['EXTNAME'] == 'PRIMARY'
     assert hdu[1].header['EXTNAME'] == 'LIGHTCURVE'
     assert hdu[1].header['TTYPE1'] == 'TIME'
     assert hdu[1].header['TTYPE2'] == 'FLUX'
+
+    # Test aperture mask support in to_fits
+    tpf = KeplerTargetPixelFile(TABBY_Q8)
+    random_mask = np.random.randint(0, 2,size=tpf.flux[0].shape, dtype=bool)
+    thresh_mask = tpf.create_threshold_mask(threshold=3)
+
+    lc = tpf.to_lightcurve(aperture_mask='random_mask')
+    lc.to_fits(path='out.fits', aperture_mask=random_mask)
+
+    lc = tpf[17:400].to_lightcurve(aperture_mask=thresh_mask)
+    lc.to_fits(aperture_mask=thresh_mask, path='out2.fits')
+
+    # Test the extra data kwargs
+    bkg_mask = ~tpf.create_threshold_mask(threshold=0.1)
+    bkg_lc = tpf.to_lightcurve(aperture_mask=bkg_mask)
+    lc = tpf.to_lightcurve(aperture_mask=thresh_mask)
+    lc_out = lc - bkg_lc.flux * (thresh_mask.sum()/bkg_mask.sum())
+    lc_out.to_fits(aperture_mask=thresh_mask, path='out2.fits', 
+               overwrite=True, extra_data={'BKG':bkg_lc.flux})
 
 
 @pytest.mark.remote_data
