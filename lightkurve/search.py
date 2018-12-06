@@ -548,8 +548,8 @@ def _query_mast(target, spacecraft='Kepler', radius=None, cadence='long'):
     elif spacecraft == "Tess":
         obs = Observations.query_criteria(objectname=target,
                                           radius=str(radius.to(u.deg)),
-                                          project=["Kepler", "K2", "TESS"],
-                                          obs_collection=["Kepler", "K2", "TEsS"])
+                                          project=["TESS"],
+                                          obs_collection=["TESS"])
 
     obs.sort('distance')  # ensure table returned is sorted by distance
     return obs
