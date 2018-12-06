@@ -342,6 +342,8 @@ def search_lightcurvefile(target, radius=None, cadence='long',
         units of arcseconds.  If `None` then we default to 0.0001 arcsec.
     cadence : str
         'long' or 'short'.
+    project : str or list
+        Keyword to specify which telescope observed the target.
     quarter, campaign : int, list of ints
         Kepler Quarter or K2 Campaign number.
         By default all quarters and campaigns will be returned.
@@ -438,7 +440,7 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
     if len(observations) == 0:
         raise SearchError('No data found for target "{}."'.format(target))
 
-    # mask out FFIs from observations    
+    # mask out FFIs from observations
     mask = np.array(['FFI' not in obs['target_name'] and
                      'FFI' not in obs['obs_collection'] for obs in observations])
 
@@ -500,8 +502,13 @@ def _query_mast(target, project=['Kepler', 'K2', 'TESS'], radius=None, cadence='
             target_obs = Observations.query_criteria(target_name=target_name,
                                                      radius=str(radius.to(u.deg)),
                                                      project=project)
-            if len(target_obs) == 0:
-                raise ValueError("No observations found for {}".format(target_name))
+
+            if len(target_obs) == 0 and 'TESS' in [p.upper() for p in project]:
+                raise ValueError("No observations found for {}. If this is a TESS "
+                                 "target, please pass `project='TESS'` into the "
+                                 "search function.".format(target_name))
+            elif len(target_obs) == 0:
+                raise ValueError("No observations found for {}.".format(target_name))
 
             # check if a cone search is being performed
             # if yes, perform a cone search around coordinates of desired target
@@ -533,6 +540,7 @@ def _query_mast(target, project=['Kepler', 'K2', 'TESS'], radius=None, cadence='
                                           project=project)
 
     obs.sort('distance')  # ensure table returned is sorted by distance
+
     return obs
 
 
@@ -570,6 +578,7 @@ def _filter_products(products, campaign=None, quarter=None, month=None,
         qoc = np.atleast_1d(np.asarray(qoc, dtype=int))
 
     project = np.atleast_1d(project)
+
     if 'KEPLER' in  [p.upper() for p in project]:
         # Because MAST doesn't let us query based on Kepler-specific meta data
         # fields, we need to identify short/long-cadence TPFs by their filename.

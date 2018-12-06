@@ -49,6 +49,11 @@ def test_search_targetpixelfile():
         cc = search_targetpixelfile(idx, quarter=c[2]).table
         assert(len(cc) == 2)
     search_targetpixelfile(11904151, quarter=11).download()
+    # with project='TESS', it should return TESS observations
+    tic = 273985862
+    assert(len(search_targetpixelfile(tic, project='TESS').table) == 1)
+    assert(len(search_targetpixelfile(tic, project='TESS', radius=100).table) == 2)
+    search_targetpixelfile(tic, project='TESS').download()
 
 
 @pytest.mark.remote_data
@@ -70,6 +75,11 @@ def test_search_lightcurvefile(caplog):
     c = SkyCoord('297.5835 40.98339', unit=(u.deg, u.deg))
     assert(len(search_lightcurvefile(c, quarter=6).table) == 1)
     search_lightcurvefile(c, quarter=6).download()
+    # with project='TESS', it should return TESS observations
+    tic = 273985862
+    assert(len(search_lightcurvefile(tic, project='TESS').table) == 1)
+    assert(len(search_lightcurvefile(tic, project='TESS', radius=100).table) == 2)
+    search_lightcurvefile(tic, project='TESS').download()
 
 
 @pytest.mark.remote_data
