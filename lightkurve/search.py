@@ -434,10 +434,16 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
     SearchResult : :class:`SearchResult` object.
     """
     observations = _query_mast(target, project=project, cadence='long', radius=radius)
+
     if len(observations) == 0:
         raise SearchError('No data found for target "{}."'.format(target))
-    products = Observations.get_product_list(observations)
-    result = join(products, observations, join_type='left')  # will join on obs_id
+
+    # mask out FFIs from observations    
+    mask = np.array(['FFI' not in obs['target_name'] and
+                     'FFI' not in obs['obs_collection'] for obs in observations])
+
+    products = Observations.get_product_list(observations[mask])
+    result = join(products, observations[mask], join_type='left')  # will join on obs_id
     result.sort(['distance', 'obs_id'])
 
     masked_result = _filter_products(result, filetype=filetype, campaign=campaign,
