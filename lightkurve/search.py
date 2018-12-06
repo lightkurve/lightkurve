@@ -93,7 +93,7 @@ class SearchResult(object):
         """Returns an array of dec values for targets in search"""
         return self.table['s_dec'].data.data
 
-    # @suppress_stdout
+    @suppress_stdout
     def download(self, quality_bitmask='default', download_dir=None):
         """Returns a single `KeplerTargetPixelFile` or `KeplerLightCurveFile` object.
 
@@ -232,7 +232,8 @@ class SearchResult(object):
         return download_dir
 
 
-def search_targetpixelfile(target, radius=None, cadence='long', project='Kepler', quarter=None,
+def search_targetpixelfile(target, radius=None, cadence='long',
+                           project=['Kepler', 'K2', 'TESS'], quarter=None,
                            month=None, campaign=None, limit=None):
     """Searches MAST for Target Pixel Files.
 
@@ -316,7 +317,8 @@ def search_targetpixelfile(target, radius=None, cadence='long', project='Kepler'
         return SearchResult(None)
 
 
-def search_lightcurvefile(target, radius=None, cadence='long', project='Kepler', quarter=None,
+def search_lightcurvefile(target, radius=None, cadence='long',
+                          project=['Kepler', 'K2', 'TESS'], quarter=None,
                           month=None, campaign=None, limit=None):
     """Returns a SearchResult with MAST LightCurveFiles which match the criteria.
 
@@ -394,16 +396,15 @@ def search_lightcurvefile(target, radius=None, cadence='long', project='Kepler',
     """
     try:
         return _search_products(target, radius=radius, filetype="Lightcurve",
-                                cadence=cadence, project=project,
-                                quarter=quarter, month=month, campaign=campaign,
-                                limit=limit)
+                                cadence=cadence, project=project, quarter=quarter,
+                                month=month, campaign=campaign, limit=limit)
     except SearchError as exc:
         log.error(exc)
         return SearchResult(None)
 
 
 def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
-                     project='Kepler', quarter=None, month=None,
+                     project=['Kepler', 'K2', 'TESS'], quarter=None, month=None,
                      campaign=None, limit=None):
     """Helper function which returns a SearchResult object containing MAST
     products that match several criteria.
@@ -440,8 +441,8 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
     result.sort(['distance', 'obs_id'])
 
     masked_result = _filter_products(result, filetype=filetype, campaign=campaign,
-                                     quarter=quarter, cadence=cadence, project=project, month=month,
-                                     limit=limit)
+                                     quarter=quarter, cadence=cadence,
+                                     project=project, month=month, limit=limit)
     return SearchResult(masked_result)
 
 
@@ -530,7 +531,8 @@ def _query_mast(target, project=['Kepler', 'K2', 'TESS'], radius=None, cadence='
 
 
 def _filter_products(products, campaign=None, quarter=None, month=None,
-                     cadence='long', project='Kepler', filetype='Target Pixel', limit=None):
+                     cadence='long', project=['Kepler', 'K2', 'TESS'],
+                     filetype='Target Pixel', limit=None):
     """Helper function which filters a SearchResult's products table by one or
     more criteria.
 
@@ -597,7 +599,7 @@ def _filter_products(products, campaign=None, quarter=None, month=None,
     mask &= np.array([suffix in desc for desc in products['description']])
     products = products[mask]
 
-    if project == 'Kepler':
+    if 'KEPLER' in  [p.upper() for p in project]:
         # Add the quarter or campaign numbers
         qoc = np.asarray([p.split(' - ')[-1][1:].replace('-', '')
                           for p in products['description']], dtype=int)
