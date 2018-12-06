@@ -1,4 +1,4 @@
-"""Defines LightCurve, KeplerLightCurve, TessLightCurve, etc."""
+"""Defines LightCurve, KeplerLightCurve, and TessLightCurve."""
 
 from __future__ import division, print_function
 
@@ -160,11 +160,10 @@ class LightCurve(object):
         return Time(self.time, format=self.time_format, scale=self.time_scale)
 
     def show_properties(self):
-        '''Print out a description of each of the non-callable attributes of a
-        LightCurve object.
+        """Prints a description of all non-callable attributes.
 
-        Prints in order of type (ints, strings, lists, arrays and others)
-        Prints in alphabetical order.'''
+        Prints in order of type (ints, strings, lists, arrays, others).
+        """
         attrs = {}
         for attr in dir(self):
             if not attr.startswith('_'):
@@ -259,8 +258,7 @@ class LightCurve(object):
 
     def flatten(self, window_length=101, polyorder=2, return_trend=False,
                 break_tolerance=5, **kwargs):
-        """
-        Removes low frequency trend using scipy's Savitzky-Golay filter.
+        """Removes the low frequency trend using scipy's Savitzky-Golay filter.
 
         This method wraps `scipy.signal.savgol_filter`.
 
@@ -337,20 +335,21 @@ class LightCurve(object):
             return flatten_lc, trend_lc
         return flatten_lc
 
-    def fold(self, period, phase=0.):
-        """Folds the lightcurve at a specified ``period`` and ``phase``.
+    def fold(self, period, transit_midpoint=0.):
+        """Folds the lightcurve at a specified ``period`` and ``transit_midpoint``.
 
         This method returns a new ``LightCurve`` object in which the time
-        values range between -0.5 to +0.5.  Data points which occur exactly
-        at ``phase`` or an integer multiple of `phase + n*period` have time
-        value 0.0.
+        values range between -0.5 to +0.5 (i.e. the phase).
+        Data points which occur exactly at ``transit_midpoint`` or an integer
+        multiple of `transit_midpoint + n*period` will have time value 0.0.
 
         Parameters
         ----------
         period : float
             The period upon which to fold.
-        phase : float, optional
-            Time reference point.
+        transit_midpoint : float, optional
+            Time reference point in the same units as the LightCurve's `time`
+            attribute.
 
         Returns
         -------
@@ -358,13 +357,28 @@ class LightCurve(object):
             A new ``LightCurve`` in which the data are folded and sorted by
             phase.
         """
+
+        if (transit_midpoint > 2450000):
+            if self.time_format == 'bkjd':
+                warnings.warn('`transit_midpoint` appears to be given in JD, '
+                              'however the light curve time uses BKJD '
+                              '(i.e. JD - 2454833).', LightkurveWarning)
+            elif self.time_format == 'btjd':
+                warnings.warn('`transit_midpoint` appears to be given in JD, '
+                              'however the light curve time uses BTJD '
+                              '(i.e. JD - 2457000).', LightkurveWarning)
+        phase = (transit_midpoint % period) / period
         fold_time = (((self.time - phase * period) / period) % 1)
         # fold time domain from -.5 to .5
         fold_time[fold_time > 0.5] -= 1
         sorted_args = np.argsort(fold_time)
-        return FoldedLightCurve(fold_time[sorted_args],
-                                self.flux[sorted_args],
-                                flux_err=self.flux_err[sorted_args])
+        return FoldedLightCurve(time=fold_time[sorted_args],
+                                flux=self.flux[sorted_args],
+                                flux_err=self.flux_err[sorted_args],
+                                time_original=self.time[sorted_args],
+                                targetid=self.targetid,
+                                label=self.label,
+                                meta=self.meta)
 
     def normalize(self):
         """Returns a normalized version of the lightcurve.
@@ -525,8 +539,10 @@ class LightCurve(object):
         return self[~outlier_mask]
 
     def bin(self, binsize=13, method='mean'):
-        """Bins a lightcurve using a function defined by `method`
-        on blocks of samples of size `binsize`.
+        """Bins a lightcurve in blocks of size `binsize`.
+
+        The value of the bins will contain the mean (`method='mean'`) or the
+        median (`method='median'`) of the original data.  The default is mean.
 
         Parameters
         ----------
@@ -594,7 +610,7 @@ class LightCurve(object):
         return self.estimate_cdpp(**kwargs)
 
     def estimate_cdpp(self, transit_duration=13, savgol_window=101,
-                      savgol_polyorder=2, sigma_clip=5.):
+                      savgol_polyorder=2, sigma=5.):
         """Estimate the CDPP noise metric using the Savitzky-Golay (SG) method.
 
         A common estimate of the noise in a lightcurve is the scatter that
@@ -610,7 +626,7 @@ class LightCurve(object):
             1. Remove low frequency signals using a Savitzky-Golay filter with
                window length `savgol_window` and polynomial order `savgol_polyorder`.
             2. Remove outliers by rejecting data points which are separated from
-               the mean by `sigma_clip` times the standard deviation.
+               the mean by `sigma` times the standard deviation.
             3. Compute the standard deviation of a running mean with
                a configurable window length equal to `transit_duration`.
 
@@ -632,7 +648,7 @@ class LightCurve(object):
         savgol_polyorder : int, optional
             Polynomial order of the Savitsky-Golay filter.
             The recommended value is 2.
-        sigma_clip : float, optional
+        sigma : float, optional
             The number of standard deviations to use for clipping outliers.
             The default is 5.
 
@@ -653,7 +669,7 @@ class LightCurve(object):
 
         detrended_lc = self.flatten(window_length=savgol_window,
                                     polyorder=savgol_polyorder)
-        cleaned_lc = detrended_lc.remove_outliers(sigma=sigma_clip)
+        cleaned_lc = detrended_lc.remove_outliers(sigma=sigma)
         mean = running_mean(data=cleaned_lc.flux, window_size=transit_duration)
         cdpp_ppm = np.std(mean) * 1e6
         return cdpp_ppm
@@ -708,7 +724,7 @@ class LightCurve(object):
                 # Colorbars should only be plotted if the user specifies, and there is
                 # a color specified that is not a string (e.g. 'C1') and is iterable.
                 if show_colorbar and ('c' in kwargs) and \
-                  (not isinstance(kwargs['c'], str)) and hasattr(kwargs['c'], '__iter__'):
+                   (not isinstance(kwargs['c'], str)) and hasattr(kwargs['c'], '__iter__'):
                     cbar = plt.colorbar(sc, ax=ax)
                     cbar.set_label(colorbar_label)
                     cbar.ax.yaxis.set_tick_params(tick1On=False, tick2On=False)
@@ -997,7 +1013,7 @@ class LightCurve(object):
             from . import __version__
             default = default = {'ORIGIN': "Unofficial data product",
                                  'DATE': datetime.datetime.now().strftime("%Y-%m-%d"),
-                                 'CREATOR': "lightkurve",
+                                 'CREATOR': "lightkurve.LightCurve.to_fits()",
                                  'PROCVER': str(__version__)}
 
             for kw in default:
@@ -1061,10 +1077,15 @@ class LightCurve(object):
             hdu.writeto(path, overwrite=overwrite, checksum=True)
         return hdu
 
-class FoldedLightCurve(LightCurve):
-    """Defines a folded lightcurve with different plotting defaults."""
 
+class FoldedLightCurve(LightCurve):
+    """Class to hold a phase-folded lightcurve, i.e. the output of `LightCurve.fold()`.
+
+    Compared to the standard `LightCurve` class, this class offers an extra
+    `phase` property and implements different plotting defaults.
+    """
     def __init__(self, *args, **kwargs):
+        self.time_original = kwargs.pop("time_original", None)
         super(FoldedLightCurve, self).__init__(*args, **kwargs)
 
     @property
@@ -1111,6 +1132,25 @@ class FoldedLightCurve(LightCurve):
             ax.set_xlabel("Phase")
         return ax
 
+    def errorbar(self, **kwargs):
+        """Plot the folded light curve usng matplotlib's `errorbar` method.
+
+        See `LightCurve.scatter` for details on the accepted arguments.
+
+        Parameters
+        ----------
+        kwargs : dict
+            Dictionary of arguments to be passed to `LightCurve.scatter`.
+
+        Returns
+        -------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            The matplotlib axes object.
+        """
+        ax = super(FoldedLightCurve, self).errorbar(**kwargs)
+        if 'xlabel' not in kwargs:
+            ax.set_xlabel("Phase")
+        return ax
 
 class KeplerLightCurve(LightCurve):
     """Defines a light curve class for NASA's Kepler and K2 missions.
@@ -1209,7 +1249,7 @@ class KeplerLightCurve(LightCurve):
                                                   **kwargs)
         else:
             raise ValueError("method {} is not available.".format(method))
-        new_lc = self.copy()
+        new_lc = self[not_nan].copy()
         new_lc.time = corrected_lc.time
         new_lc.flux = corrected_lc.flux
         new_lc.flux_err = self.normalize().flux_err[not_nan]

@@ -16,7 +16,7 @@ from astroquery.exceptions import ResolverError
 from .lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
 from .targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
 from .collections import TargetPixelFileCollection, LightCurveFileCollection
-from .utils import suppress_stdout, LightkurveWarning
+from .utils import suppress_stdout, LightkurveWarning, detect_filetype
 from . import PACKAGEDIR
 
 log = logging.getLogger(__name__)
@@ -76,7 +76,7 @@ class SearchResult(object):
     @property
     def obsid(self):
         """Returns an array of MAST observation IDs"""
-        return np.asarray(np.unique(self.table['obsid']), dtype='int')
+        return np.asarray(np.unique(self.table['obsid']), dtype='int64')
 
     @property
     def target_name(self):
@@ -624,6 +624,10 @@ def _filter_products(products, campaign=None, quarter=None, month=None,
         month = np.atleast_1d(month)
         # Get the short cadence date lookup table.
         table = ascii.read(os.path.join(PACKAGEDIR, 'data', 'short_cadence_month_lookup.csv'))
+        # The following line is needed for systems where the default integer type
+        # is int32 (e.g. Windows/Appveyor), the column will then be interpreted
+        # as string which makes the test fail.
+        table['StartTime'] = table['StartTime'].astype(np.int64)
         # Grab the dates of each of the short cadence files. Make sure every entry
         # has the correct month
         finalmask = np.ones(len(products), dtype=bool)
@@ -644,21 +648,17 @@ def _filter_products(products, campaign=None, quarter=None, month=None,
     return products
 
 
-def open(path_or_url):
+def open(path_or_url, **kwargs):
     """Opens a Kepler or TESS data product.
 
-    This function will automatically detect the type of the data product,
-    and return the appropriate object. File types currently supported are::
+    This function will use the `detect_filetype()` function to
+    automatically detect the type of the data product, and return the
+    appropriate object. File types currently supported are::
 
         * `KeplerTargetPixelFile` (typical suffix "-targ.fits.gz");
         * `KeplerLightCurveFile` (typical suffix "llc.fits");
         * `TessTargetPixelFile` (typical suffix "_tp.fits");
         * `TessLightCurveFile` (typical suffix "_lc.fits").
-
-    The function will detect the file type by looking at both the TELESCOP and
-    CREATOR keywords in the first extension of the FITS file.
-    If the file is not recognized as a Kepler or TESS data product,
-    a `ValueError` is raised.
 
     Parameters
     ----------
@@ -681,23 +681,13 @@ def open(path_or_url):
 
         >>> tpf = open("mytpf.fits")  # doctest: +SKIP
     """
-    hdulist = fits.open(path_or_url)
-    try:
-        # use `telescop` keyword to determine mission
-        # and `creator` to determine tpf or lc
-        telescop = hdulist[0].header['telescop']
-        creator = hdulist[0].header['creator']
-        if telescop == 'Kepler':
-            if 'TargetPixel' in creator:
-                return KeplerTargetPixelFile(path_or_url)
-            elif 'Flux' in creator:
-                return KeplerLightCurveFile(path_or_url)
-        elif telescop == 'TESS':
-            if 'TargetPixel' in creator:
-                return TessTargetPixelFile(path_or_url)
-            elif 'Flux' in creator:
-                return TessLightCurveFile(path_or_url)
-    # if these keywords don't exist, raise `ValueError`
-    except KeyError:
-        pass
-    raise ValueError('Given fits file not recognized as Kepler or TESS observation.')
+    # pass header into `detect_filetype()`
+    filetype = detect_filetype(fits.open(path_or_url)[0].header)
+
+    # if the filetype is recognized, instantiate a class of that name
+    if filetype is not None:
+        return getattr(__import__('lightkurve'), filetype)(path_or_url, **kwargs)
+    else:
+        # if these keywords don't exist, raise `ValueError`
+        raise ValueError("Not recognized as a Kepler or TESS data product: "
+                         "{}".format(path_or_url))

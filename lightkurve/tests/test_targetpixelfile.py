@@ -2,6 +2,7 @@ from __future__ import division, print_function
 
 import os
 from astropy.utils.data import get_pkg_data_filename
+from astropy.io.fits.verify import VerifyWarning
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy.testing import assert_array_equal
@@ -278,8 +279,8 @@ def test_tpf_factory():
                             header={'TSTART': 90, 'TSTOP': 100})
 
     # Can we add our own keywords?
-    tpf = factory.get_tpf(hdu0_keywords={'creator': 'Christina'})
-    assert tpf.header['CREATOR'] == 'Christina'
+    tpf = factory.get_tpf(hdu0_keywords={'creator': 'Christina TargetPixelFileWriter'})
+    assert tpf.header['CREATOR'] == 'Christina TargetPixelFileWriter'
 
 
 def test_tpf_from_images():
@@ -325,34 +326,37 @@ def test_tpf_from_images():
                                                  position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
     assert isinstance(tpf, KeplerTargetPixelFile)
 
-    # Can we write the output to disk?
-    # `delete=False` is necessary below to enable writing to the file on Windows
-    # but it means we have to clean up the tmp file ourselves
-    tmp = tempfile.NamedTemporaryFile(delete=False)
-    try:
-        tpf.to_fits(tmp.name)
-    finally:
-        tmp.close()
-        os.remove(tmp.name)
+    with warnings.catch_warnings():
+        # Some cards are too long -- to be investigated.
+        warnings.simplefilter("ignore", VerifyWarning)
+        # Can we write the output to disk?
+        # `delete=False` is necessary below to enable writing to the file on Windows
+        # but it means we have to clean up the tmp file ourselves
+        tmp = tempfile.NamedTemporaryFile(delete=False)
+        try:
+            tpf.to_fits(tmp.name)
+        finally:
+            tmp.close()
+            os.remove(tmp.name)
 
-    # Can we read in a list of file names or a list of HDUlists?
-    hdus = []
-    for idx, im in enumerate(images):
-        hdu = fits.HDUList([fits.PrimaryHDU(), im])
-        hdu.writeto(get_pkg_data_filename('data/test_factory{}.fits'.format(idx)), overwrite=True)
-        hdus.append(hdu)
+        # Can we read in a list of file names or a list of HDUlists?
+        hdus = []
+        for idx, im in enumerate(images):
+            hdu = fits.HDUList([fits.PrimaryHDU(), im])
+            hdu.writeto(get_pkg_data_filename('data/test_factory{}.fits'.format(idx)), overwrite=True)
+            hdus.append(hdu)
 
-    fnames = [get_pkg_data_filename('data/test_factory{}.fits'.format(i)) for i in range(5)]
+        fnames = [get_pkg_data_filename('data/test_factory{}.fits'.format(i)) for i in range(5)]
 
-    # Should be able to run with a list of file names
-    tpf_fnames = KeplerTargetPixelFile.from_fits_images(fnames,
-                                                        size=(3, 3),
-                                                        position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
+        # Should be able to run with a list of file names
+        tpf_fnames = KeplerTargetPixelFile.from_fits_images(fnames,
+                                                            size=(3, 3),
+                                                            position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
 
-    # Should be able to run with a list of HDUlists
-    tpf_hdus = KeplerTargetPixelFile.from_fits_images(hdus,
-                                                      size=(3, 3),
-                                                      position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
+        # Should be able to run with a list of HDUlists
+        tpf_hdus = KeplerTargetPixelFile.from_fits_images(hdus,
+                                                          size=(3, 3),
+                                                          position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
 
 
 def test_properties2(capfd):
@@ -398,6 +402,13 @@ def test_threshold_aperture_mask():
     tpf.plot(aperture_mask='threshold')
     lc = tpf.to_lightcurve(aperture_mask=tpf.create_threshold_mask(threshold=1))
     assert (lc.flux == 1).all()
+    # The TESS file shows three pixel regions above a 2-sigma threshold;
+    # let's make sure the `reference_pixel` argument allows them to be selected.
+    tpf = TessTargetPixelFile(filename_tess)
+    assert tpf.create_threshold_mask(threshold=2.).sum() == 25
+    assert tpf.create_threshold_mask(threshold=2., reference_pixel='center').sum() == 25
+    assert tpf.create_threshold_mask(threshold=2., reference_pixel=None).sum() == 28
+    assert tpf.create_threshold_mask(threshold=2., reference_pixel=(5, 0)).sum() == 2
 
 
 def test_tpf_tess():
@@ -432,3 +443,10 @@ def test_endianness():
     """Regression test for https://github.com/KeplerGO/lightkurve/issues/188"""
     tpf = KeplerTargetPixelFile(filename_tpf_one_center)
     tpf.to_lightcurve().to_pandas().describe()
+
+
+def test_get_keyword():
+    tpf = KeplerTargetPixelFile(filename_tpf_one_center)
+    assert tpf.get_keyword("TELESCOP") == "Kepler"
+    assert tpf.get_keyword("TTYPE1", hdu=1) == "TIME"
+    assert tpf.get_keyword("DOESNOTEXIST", default=5) == 5

@@ -1,3 +1,5 @@
+"""Defines TargetPixelFile, KeplerTargetPixelFile, and TessTargetPixelFile."""
+
 from __future__ import division
 import datetime
 import os
@@ -12,6 +14,7 @@ from astropy.wcs import WCS
 from matplotlib import patches
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.ndimage import label
 from tqdm import tqdm
 from astropy.coordinates import SkyCoord
 from astropy.stats.funcs import median_absolute_deviation as MAD
@@ -21,7 +24,7 @@ from .lightcurve import KeplerLightCurve, TessLightCurve
 from .prf import KeplerPRF
 from .utils import KeplerQualityFlags, TessQualityFlags, \
                    plot_image, bkjd_to_astropy_time, btjd_to_astropy_time, \
-                   LightkurveWarning
+                   LightkurveWarning, detect_filetype
 
 __all__ = ['KeplerTargetPixelFile', 'TessTargetPixelFile']
 log = logging.getLogger(__name__)
@@ -80,8 +83,10 @@ class TargetPixelFile(object):
 
     @hdu.setter
     def hdu(self, value, keys=['FLUX', 'QUALITY']):
-        '''Raises a ValueError exception if value does not appear to be a Target Pixel File.
-        '''
+        """Verify the file format when setting the value of `self.hdu`.
+
+        Raises a ValueError if `value` does not appear to be a Target Pixel File.
+        """
         for key in keys:
             if ~(np.any([value[1].header[ttype] == key
                          for ttype in value[1].header['TTYPE*']])):
@@ -280,11 +285,10 @@ class TargetPixelFile(object):
         return ra, dec
 
     def show_properties(self):
-        '''Print out a description of each of the non-callable attributes of a
-        TargetPixelFile object.
+        """Prints a description of all non-callable attributes.
 
-        Prints in order of type (ints, strings, lists, arrays and others)
-        Prints in alphabetical order.'''
+        Prints in order of type (ints, strings, lists, arrays, others).
+        """
         attrs = {}
         for attr in dir(self):
             if not attr.startswith('_'):
@@ -334,7 +338,7 @@ class TargetPixelFile(object):
         output.pprint(max_lines=-1, max_width=-1)
 
     def to_lightcurve(self, method='aperture', **kwargs):
-        """Performs photometry.
+        """Performs photometry on the pixel data and returns a LightCurve object.
 
         See the docstring of `aperture_photometry()` for valid
         arguments if the method is 'aperture'.  Otherwise, see the docstring
@@ -395,7 +399,7 @@ class TargetPixelFile(object):
         self._last_aperture_mask = aperture_mask
         return aperture_mask
 
-    def create_threshold_mask(self, threshold=3):
+    def create_threshold_mask(self, threshold=3, reference_pixel='center'):
         """Returns an aperture mask creating using the thresholding method.
 
         This method will identify the pixels in the TargetPixelFile which show
@@ -404,11 +408,24 @@ class TargetPixelFile(object):
         in a robust way by multiplying the Median Absolute Deviation (MAD)
         with 1.4826.
 
+        If the thresholding method yields multiple contiguous regions, then
+        only the region closest to the (col, row) coordinate specified by
+        `reference_pixel` is returned.  For exmaple, `reference_pixel=(0, 0)`
+        will pick the region closest to the bottom left corner.
+        By default, the region closest to the center of the mask will be
+        returned. If `reference_pixel=None` then all regions will be returned.
+
         Parameters
         ----------
         threshold : float
             A value for the number of sigma by which a pixel needs to be
             brighter than the median flux to be included in the aperture mask.
+        reference_pixel: (int, int) tuple, 'center', or None
+            (col, row) pixel coordinate closest to the desired region.
+            For example, use `reference_pixel=(0,0)` to select the region
+            closest to the bottom left corner of the target pixel file.
+            If 'center' (default) then the region closest to the center pixel
+            will be selected. If `None` then all regions will be selected.
 
         Returns
         -------
@@ -416,6 +433,8 @@ class TargetPixelFile(object):
             2D boolean numpy array containing `True` for pixels above the
             threshold.
         """
+        if reference_pixel == 'center':
+            reference_pixel = (self.shape[1] / 2, self.shape[2] / 2)
         # Calculate the median image
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
@@ -424,7 +443,22 @@ class TargetPixelFile(object):
         # Calculate the theshold value in flux units
         mad_cut = (1.4826 * MAD(vals) * threshold) + np.nanmedian(median_image)
         # Create a mask containing the pixels above the threshold flux
-        return np.nan_to_num(median_image) > mad_cut
+        threshold_mask = np.nan_to_num(median_image) > mad_cut
+        if reference_pixel is None:
+            # return all regions above threshold
+            return threshold_mask
+        else:
+            # Return only the contiguous region closest to `region`.
+            # First, label all the regions:
+            labels = label(threshold_mask)[0]
+            # For all pixels above threshold, compute distance to reference pixel:
+            label_args = np.argwhere(labels > 0)
+            distances = [np.hypot(crd[0], crd[1])
+                         for crd in label_args - np.array([reference_pixel[1], reference_pixel[0]])]
+            # Which label corresponds to the closest pixel?
+            closest_arg = label_args[np.argmin(distances)]
+            closest_label = labels[closest_arg[0], closest_arg[1]]
+            return labels == closest_label
 
     def centroids(self, **kwargs):
         """DEPRECATED: use `estimate_cdpp()` instead."""
@@ -467,8 +501,10 @@ class TargetPixelFile(object):
 
     def plot(self, ax=None, frame=0, cadenceno=None, bkg=False, aperture_mask=None,
              show_colorbar=True, mask_color='pink', style='lightkurve', **kwargs):
-        """
-        Plot a target pixel file at a given frame (index) or cadence number.
+        """Plot the pixel data for a single frame (i.e. at a single time).
+
+        The time can be specified by frame index number (`frame=0` will show the
+        first frame) or absolute cadence number (`cadenceno`).
 
         Parameters
         ----------
@@ -614,22 +650,16 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                 quality_array=self.hdu[1].data['QUALITY'],
                                 bitmask=quality_bitmask)
 
-        # Check the TELESCOP keyword and warn the user if it's not 'Kepler'
-        try:
-            telescop = self.header['telescop']
-            if isinstance(telescop, Undefined):
-                raise KeyError
-            elif telescop == 'TESS':
-                warnings.warn("A TESS data product is being opened using the "
-                              "`KeplerTargetPixelFile` class. "
-                              "Please use `TessTargetPixelFile` instead.",
-                              LightkurveWarning)
-            elif telescop != 'Kepler':
-                warnings.warn("KeplerTargetPixelFile encountered 'TELESCOP' "
-                              "keyword '{}' instead of 'Kepler'".format(telescop),
-                              LightkurveWarning)
-        except KeyError:
-            log.debug("KeplerTargetPixelFile encountered a file without 'TELESCOP' keyword.")
+        # check to make sure the correct filetype has been provided
+        filetype = detect_filetype(self.header)
+        if filetype == 'TessTargetPixelFile':
+            warnings.warn("A TESS data product is being opened using the "
+                          "`KeplerTargetPixelFile` class. "
+                          "Please use `TessTargetPixelFile` instead.",
+                          LightkurveWarning)
+        elif filetype is None:
+            warnings.warn("File header not recognized as Kepler or TESS "
+                          "observation.", LightkurveWarning)
 
         # Use the KEPLERID keyword as the default targetid
         if self.targetid is None:
@@ -1117,8 +1147,7 @@ class KeplerTargetPixelFileFactory(object):
             self.pos_corr1[frameno], self.pos_corr2[frameno] = None, None
 
     def _check_data(self):
-        ''' Check the data before writing to a TPF for any obvious errors
-        '''
+        """Check the data before writing to a TPF for any obvious errors."""
         if len(self.time) != len(np.unique(self.time)):
             warnings.warn('The factory-created TPF contains cadences with '
                           'identical TIME values.', LightkurveWarning)
@@ -1158,7 +1187,8 @@ class KeplerTargetPixelFileFactory(object):
         # Override the defaults where necessary
         hdu.header['ORIGIN'] = "Unofficial data product"
         hdu.header['DATE'] = datetime.datetime.now().strftime("%Y-%m-%d")
-        hdu.header['CREATOR'] = "lightkurve"
+        hdu.header['TELESCOP'] = "Kepler"
+        hdu.header['CREATOR'] = "lightkurve.KeplerTargetPixelFileFactory"
         hdu.header['OBJECT'] = self.target_id
         hdu.header['KEPLERID'] = self.target_id
         # Empty a bunch of keywords rather than having incorrect info
@@ -1303,22 +1333,16 @@ class TessTargetPixelFile(TargetPixelFile):
         # these cadences from being used. They would break most methods!
         self.quality_mask &= np.isfinite(self.hdu[1].data['TIME'])
 
-        # Check the TELESCOP keyword and warn the user if it's not 'TESS'
-        try:
-            telescop = self.header['telescop']
-            if isinstance(telescop, Undefined):
-                raise KeyError
-            elif telescop == 'Kepler':
-                warnings.warn("A Kepler data product is being opened using the "
-                              "`TessTargetPixelFile` class. "
-                              "Please use `KeplerTargetPixelFile` instead.",
-                              LightkurveWarning)
-            elif telescop != 'TESS':
-                warnings.warn("TessTargetPixelFile encountered 'TELESCOP' "
-                              "keyword '{}' instead of 'TESS'".format(telescop),
-                              LightkurveWarning)
-        except KeyError:
-            log.debug("TessTargetPixelFile encountered a file without 'TELESCOP' keyword.")
+        # check to make sure the correct filetype has been provided
+        filetype = detect_filetype(self.header)
+        if filetype == 'KeplerTargetPixelFile':
+            warnings.warn("A Kepler data product is being opened using the "
+                          "`TessTargetPixelFile` class. "
+                          "Please use `KeplerTargetPixelFile` instead.",
+                          LightkurveWarning)
+        elif filetype is None:
+            warnings.warn("File header not recognized as Kepler or TESS "
+                          "observation.", LightkurveWarning)
 
         # Use the TICID keyword as the default targetid
         try:

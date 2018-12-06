@@ -455,3 +455,55 @@ def suppress_stdout(f, *args, **kwargs):
             finally:
                 sys.stdout = old_out
     return wrapper
+
+
+def detect_filetype(header):
+    """Returns Kepler and TESS file types given their primary header.
+
+    This function will detect the file type by looking at both the TELESCOP and
+    CREATOR keywords in the first extension of the FITS header. If the file is
+    recognized as a Kepler or TESS data product, one of the following strings
+    will be returned:
+
+        * `'KeplerTargetPixelFile'`
+        * `'TessTargetPixelFile'`
+        * `'KeplerLightCurveFile'`
+        * `'TessLightCurveFile'`
+
+    If the file is not recognized as a Kepler or TESS data product, then
+    `None` will be returned.
+
+    Parameters
+    ----------
+    header : astropy.io.fits.Header object
+        The primary header of a FITS file.
+
+    Returns
+    -------
+    filetype : str or None
+        A string describing the detected filetype. If the filetype is not
+        recognized, `None` will be returned.
+    """
+    try:
+        # use `telescop` keyword to determine mission
+        # and `creator` to determine tpf or lc
+        telescop = header['telescop'].lower()
+        creator = header['creator'].lower()
+        if telescop == 'kepler':
+            # Kepler TPFs will contain "TargetPixelExporterPipelineModule"
+            if 'targetpixel' in creator:
+                return 'KeplerTargetPixelFile'
+            # Kepler LCFs will contain "FluxExporter2PipelineModule"
+            elif 'fluxexporter' in creator or 'lightcurve' in creator:
+                return 'KeplerLightCurveFile'
+        elif telescop == 'tess':
+            # TESS TPFs will contain "TargetPixelExporterPipelineModule"
+            if 'targetpixel' in creator:
+                return 'TessTargetPixelFile'
+            # TESS LCFs will contain "LightCurveExporterPipelineModule"
+            elif 'lightcurve' in creator:
+                return 'TessLightCurveFile'
+    # If the TELESCOP or CREATOR keywords don't exist we expect a KeyError;
+    # if one of them is Undefined we expect `.lower()` to yield an AttributeError.
+    except (KeyError, AttributeError):
+        return None

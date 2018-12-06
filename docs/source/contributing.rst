@@ -80,7 +80,7 @@ You should see something like this:
 .. code-block:: bash
 
     $ git commit -m "description of changes"
-    $ git push origin name-of-my-branch
+    $ git push origin name-of-your-branch
 
 9. Head to https://github.com/KeplerGO/lightkurve and you should now see a button
    "Compare and open a pull request".  Click the button and submit your pull request.

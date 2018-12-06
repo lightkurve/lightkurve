@@ -12,7 +12,7 @@ from matplotlib import pyplot as plt
 from astropy.io import fits as pyfits
 
 from .utils import (bkjd_to_astropy_time, KeplerQualityFlags, TessQualityFlags,
-                    LightkurveWarning)
+                    LightkurveWarning, detect_filetype)
 
 from . import MPLSTYLE
 
@@ -148,6 +148,23 @@ class KeplerLightCurveFile(LightCurveFile):
     """
     def __init__(self, path, quality_bitmask='default', **kwargs):
         super(KeplerLightCurveFile, self).__init__(path, **kwargs)
+
+        # check to make sure the correct filetype has been provided
+        filetype = detect_filetype(self.header())
+        if filetype == 'TessLightCurveFile':
+            warnings.warn("A TESS data product is being opened using the "
+                          "`KeplerLightCurveFile` class. "
+                          "Please use `TessLightCurveFile` instead.",
+                          LightkurveWarning)
+        elif filetype is None:
+            warnings.warn("Given fits file not recognized as Kepler or TESS "
+                          "observation.", LightkurveWarning)
+        elif "TargetPixelFile" in filetype:
+            warnings.warn("A `TargetPixelFile` object is being opened as a "
+                          "`KeplerLightCurveFile`. "
+                          "Please use `KeplerTargetPixelFile` instead.",
+                          LightkurveWarning)
+
         self.quality_bitmask = quality_bitmask
         self.quality_mask = KeplerQualityFlags.create_quality_mask(
                                 quality_array=self.hdu[1].data['SAP_QUALITY'],
@@ -345,6 +362,23 @@ class TessLightCurveFile(LightCurveFile):
     """
     def __init__(self, path, quality_bitmask='default', **kwargs):
         super(TessLightCurveFile, self).__init__(path, **kwargs)
+
+        # check to make sure the correct filetype has been provided
+        filetype = detect_filetype(self.header())
+        if filetype == 'KeplerLightCurveFile':
+            warnings.warn("A Kepler data product is being opened using the "
+                          "`TessLightCurveFile` class. "
+                          "Please use `KeplerLightCurveFile` instead.",
+                          LightkurveWarning)
+        elif filetype is None:
+            warnings.warn("Given fits file not recognized as Kepler or TESS "
+                          "observation.", LightkurveWarning)
+        elif "TargetPixelFile" in filetype:
+            warnings.warn("A `TargetPixelFile` object is being opened as a "
+                          "`TessLightCurveFile`. "
+                          "Please use `TessTargetPixelFile` instead.",
+                          LightkurveWarning)
+
         self.quality_bitmask = quality_bitmask
         self.quality_mask = TessQualityFlags.create_quality_mask(
                                 quality_array=self.hdu[1].data['QUALITY'],
@@ -353,6 +387,7 @@ class TessLightCurveFile(LightCurveFile):
         # which were not flagged by a QUALITY flag yet; the line below prevents
         # these cadences from being used. They would break most methods!
         self.quality_mask &= np.isfinite(self.hdu[1].data['TIME'])
+
         try:
             self.targetid = self.header()['TICID']
         except KeyError:
