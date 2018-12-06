@@ -256,7 +256,7 @@ class SearchResult(object):
         return download_dir
 
 
-def search_targetpixelfile(target, radius=None, cadence='long', spacecraft='Kepler', quarter=None,
+def search_targetpixelfile(target, radius=None, cadence='long', project='Kepler', quarter=None,
                            month=None, campaign=None, limit=None):
     """Searches MAST for Target Pixel Files.
 
@@ -333,14 +333,14 @@ def search_targetpixelfile(target, radius=None, cadence='long', spacecraft='Kepl
     """
     try:
         return _search_products(target, radius=radius, filetype="Target Pixel",
-                                cadence=cadence, spacecraft=spacecraft, quarter=quarter,
+                                cadence=cadence, project=project, quarter=quarter,
                                 month=month, campaign=campaign, limit=limit)
     except SearchError as exc:
         log.error(exc)
         return SearchResult(None)
 
 
-def search_lightcurvefile(target, radius=None, cadence='long', spacecraft='Kepler', quarter=None,
+def search_lightcurvefile(target, radius=None, cadence='long', project='Kepler', quarter=None,
                           month=None, campaign=None, limit=None):
     """Returns a SearchResult with MAST LightCurveFiles which match the criteria.
 
@@ -418,7 +418,7 @@ def search_lightcurvefile(target, radius=None, cadence='long', spacecraft='Keple
     """
     try:
         return _search_products(target, radius=radius, filetype="Lightcurve",
-                                cadence=cadence, spacecraft=spacecraft,
+                                cadence=cadence, project=project,
                                 quarter=quarter, month=month, campaign=campaign,
                                 limit=limit)
     except SearchError as exc:
@@ -427,7 +427,7 @@ def search_lightcurvefile(target, radius=None, cadence='long', spacecraft='Keple
 
 
 def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
-                     spacecraft='Kepler', quarter=None, month=None,
+                     project='Kepler', quarter=None, month=None,
                      campaign=None, limit=None):
     """Helper function which returns a SearchResult object containing MAST
     products that match several criteria.
@@ -456,7 +456,7 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
     -------
     SearchResult : :class:`SearchResult` object.
     """
-    observations = _query_mast(target, spacecraft=spacecraft, cadence='long', radius=radius)
+    observations = _query_mast(target, project=project, cadence='long', radius=radius)
     if len(observations) == 0:
         raise SearchError('No data found for target "{}."'.format(target))
     products = Observations.get_product_list(observations)
@@ -464,12 +464,12 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
     result.sort(['distance', 'obs_id'])
 
     masked_result = _filter_products(result, filetype=filetype, campaign=campaign,
-                                     quarter=quarter, cadence=cadence, spacecraft=spacecraft, month=month,
+                                     quarter=quarter, cadence=cadence, project=project, month=month,
                                      limit=limit)
     return SearchResult(masked_result)
 
 
-def _query_mast(target, spacecraft='Kepler', radius=None, cadence='long'):
+def _query_mast(target, project='Kepler', radius=None, cadence='long'):
     """Helper function which wraps `astroquery.mast.Observations.query_criteria()`
     to returns a table of all Kepler or K2 observations of a given target.
 
@@ -497,7 +497,7 @@ def _query_mast(target, spacecraft='Kepler', radius=None, cadence='long'):
     elif not isinstance(radius, u.quantity.Quantity):
         radius = radius * u.arcsec
 
-    if spacecraft == 'Kepler':
+    if project == 'Kepler':
         try:
             # If `target` looks like a KIC or EPIC ID, we will pass the exact
             # `target_name` under which MAST will know the object to prevent
@@ -545,7 +545,7 @@ def _query_mast(target, spacecraft='Kepler', radius=None, cadence='long'):
             except ResolverError as exc:
                 raise SearchError(exc)
 
-    elif spacecraft == "Tess":
+    elif project == "Tess":
         obs = Observations.query_criteria(objectname=target,
                                           radius=str(radius.to(u.deg)),
                                           project=["TESS"],
@@ -556,7 +556,7 @@ def _query_mast(target, spacecraft='Kepler', radius=None, cadence='long'):
 
 
 def _filter_products(products, campaign=None, quarter=None, month=None,
-                     cadence='long', spacecraft='Kepler', filetype='Target Pixel', limit=None):
+                     cadence='long', project='Kepler', filetype='Target Pixel', limit=None):
     """Helper function which filters a SearchResult's products table by one or
     more criteria.
 
@@ -587,7 +587,7 @@ def _filter_products(products, campaign=None, quarter=None, month=None,
     if (campaign is not None) | (quarter is not None):
         qoc = np.atleast_1d(np.asarray(qoc, dtype=int))
 
-    if spacecraft == 'Kepler':
+    if project == 'Kepler':
         # Because MAST doesn't let us query based on Kepler-specific meta data
         # fields, we need to identify short/long-cadence TPFs by their filename.
         if cadence in ['short', 'sc']:
@@ -596,7 +596,7 @@ def _filter_products(products, campaign=None, quarter=None, month=None,
             suffix = "{}".format(filetype)
         else:
             suffix = "{} Long".format(filetype)
-    elif spacecraft == 'Tess':
+    elif project == 'Tess':
         if filetype == 'Lightcurve':
             suffix = 'Light curves'
         elif filetype == 'Target Pixel':
@@ -622,7 +622,7 @@ def _filter_products(products, campaign=None, quarter=None, month=None,
     mask &= np.array([suffix in desc for desc in products['description']])
     products = products[mask]
 
-    if spacecraft == 'Kepler':
+    if project == 'Kepler':
         # Add the quarter or campaign numbers
         qoc = np.asarray([p.split(' - ')[-1][1:].replace('-', '')
                           for p in products['description']], dtype=int)
