@@ -149,16 +149,15 @@ class SearchResult(object):
         # return single tpf or lcf
         kepler_tpf_files = ['lpd-targ.fits', 'spd-targ.fits']
         kepler_lcf_files = ['llc.fits', 'slc.fits']
-        tess_tpf_files = ['_tp.fits']
-        tess_lcf_files = ['_lc.fits']
-
+        tess_tpf_file = '_tp.fits'
+        tess_lcf_file = '_lc.fits'
         if any(file in self.table['productFilename'][0] for file in kepler_tpf_files):
             return KeplerTargetPixelFile(path[0], quality_bitmask=quality_bitmask)
-        elif any(file in self.table['productFilename'][0] for file in tess_tpf_files):
-            return TessTargetPixelFile(path[0], quality_bitmask)
-        elif any(file in self.table['productFilename'][0] for file in kepler_lcf_files):
+        elif tess_tpf_file in self.table['productFilename'][0] for file in kepler_lcf_files):
             return KeplerLightCurveFile(path[0], quality_bitmask=quality_bitmask)
-        elif any(file in self.table['productFilename'][0] for file in tess_lcf_files):
+        elif tess_tpf_file in self.table['productFilename'][0]:
+            return TessTargetPixelFile(path[0], quality_bitmask)
+        elif tess_lcf_file in self.table['productFilename'][0]:
             return TessLightCurveFile(path[0], quality_bitmask=quality_bitmask)
 
     @suppress_stdout
@@ -209,9 +208,8 @@ class SearchResult(object):
         # return collection of tpf or lcf
         kepler_tpf_files = ['lpd-targ.fits', 'spd-targ.fits']
         kepler_lcf_files = ['llc.fits', 'slc.fits']
-        tess_tpf_files = ['_tp.fits']
-        tess_lcf_files = ['_lc.fits']
-
+        tess_tpf_file = '_tp.fits'
+        tess_lcf_file = '_lc.fits'
         if any(file in self.table['productFilename'][0] for file in kepler_tpf_files):
             tpfs = [KeplerTargetPixelFile(p, quality_bitmask=quality_bitmask)
                     for p in path]
@@ -220,11 +218,11 @@ class SearchResult(object):
             lcs = [KeplerLightCurveFile(p, quality_bitmask=quality_bitmask)
                    for p in path]
             return LightCurveFileCollection(lcs)
-        elif any(file in self.table['productFilename'][0] for file in tess_tpf_files):
+        elif tess_tpf_file in self.table['productFilename'][0]:
             tpfs = [TessTargetPixelFile(p, quality_bitmask=quality_bitmask)
                     for p in path]
             return TargetPixelFileCollection(tpfs)
-        elif any(file in self.table['productFilename'][0] for file in tess_lcf_files):
+        elif tess_lcf_file in self.table['productFilename'][0]:
             lcs = [TessLightCurveFile(p, quality_bitmask=quality_bitmask)
                    for p in path]
             return LightCurveFileCollection(lcs)
