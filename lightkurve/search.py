@@ -93,7 +93,7 @@ class SearchResult(object):
         """Returns an array of dec values for targets in search"""
         return self.table['s_dec'].data.data
 
-    @suppress_stdout
+    # @suppress_stdout
     def download(self, quality_bitmask='default', download_dir=None):
         """Returns a single `KeplerTargetPixelFile` or `KeplerLightCurveFile` object.
 
@@ -146,19 +146,8 @@ class SearchResult(object):
         path = Observations.download_products(self.table[:1], mrp_only=False,
                                               download_dir=download_dir)['Local Path']
 
-        # return single tpf or lcf
-        kepler_tpf_files = ['lpd-targ.fits', 'spd-targ.fits']
-        kepler_lcf_files = ['llc.fits', 'slc.fits']
-        tess_tpf_file = '_tp.fits'
-        tess_lcf_file = '_lc.fits'
-        if any(file in self.table['productFilename'][0] for file in kepler_tpf_files):
-            return KeplerTargetPixelFile(path[0], quality_bitmask=quality_bitmask)
-        elif any(file in self.table['productFilename'][0] for file in kepler_lcf_files):
-            return KeplerLightCurveFile(path[0], quality_bitmask=quality_bitmask)
-        elif tess_tpf_file in self.table['productFilename'][0]:
-            return TessTargetPixelFile(path[0], quality_bitmask)
-        elif tess_lcf_file in self.table['productFilename'][0]:
-            return TessLightCurveFile(path[0], quality_bitmask=quality_bitmask)
+        # open() will determine filetype and return
+        return open(path[0])
 
     @suppress_stdout
     def download_all(self, quality_bitmask='default', download_dir=None):
@@ -205,27 +194,14 @@ class SearchResult(object):
         path = Observations.download_products(self.table, mrp_only=False,
                                               download_dir=download_dir)['Local Path']
 
-        # return collection of tpf or lcf
-        kepler_tpf_files = ['lpd-targ.fits', 'spd-targ.fits']
-        kepler_lcf_files = ['llc.fits', 'slc.fits']
-        tess_tpf_file = '_tp.fits'
-        tess_lcf_file = '_lc.fits'
-        if any(file in self.table['productFilename'][0] for file in kepler_tpf_files):
-            tpfs = [KeplerTargetPixelFile(p, quality_bitmask=quality_bitmask)
-                    for p in path]
-            return TargetPixelFileCollection(tpfs)
-        elif any(file in self.table['productFilename'][0] for file in kepler_lcf_files):
-            lcs = [KeplerLightCurveFile(p, quality_bitmask=quality_bitmask)
-                   for p in path]
-            return LightCurveFileCollection(lcs)
-        elif tess_tpf_file in self.table['productFilename'][0]:
-            tpfs = [TessTargetPixelFile(p, quality_bitmask=quality_bitmask)
-                    for p in path]
-            return TargetPixelFileCollection(tpfs)
-        elif tess_lcf_file in self.table['productFilename'][0]:
-            lcs = [TessLightCurveFile(p, quality_bitmask=quality_bitmask)
-                   for p in path]
-            return LightCurveFileCollection(lcs)
+        # open() will determine filetype and return
+        # return a collection containing opened files
+        tpf_extensions = ['lpd-targ.fits', 'spd-targ.fits', '_tp.fits']
+        lcf_extensions = ['llc.fits', 'slc.fits', '_lc.fits']
+        if any(e in self.table['productFilename'][0] for e in tpf_extensions):
+            return TargetPixelFileCollection([open(p) for p in path])
+        elif any(e in self.table['productFilename'][0] for e in lcf_extensions):
+            return LightCurveFileCollection([open(p) for p in path])
 
     def _default_download_dir(self):
         """Returns the default path to the directory where files will be downloaded.
@@ -469,7 +445,7 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
     return SearchResult(masked_result)
 
 
-def _query_mast(target, project='Kepler', radius=None, cadence='long'):
+def _query_mast(target, project=['Kepler', 'K2', 'TESS'], radius=None, cadence='long'):
     """Helper function which wraps `astroquery.mast.Observations.query_criteria()`
     to returns a table of all Kepler or K2 observations of a given target.
 
@@ -492,12 +468,14 @@ def _query_mast(target, project='Kepler', radius=None, cadence='long'):
     if isinstance(target, SkyCoord):
         target = '{}, {}'.format(target.ra.deg, target.dec.deg)
 
+    project = np.atleast_1d(project)
+
     if radius is None:
         radius = .0001 * u.arcsec
     elif not isinstance(radius, u.quantity.Quantity):
         radius = radius * u.arcsec
 
-    if project == 'Kepler':
+    if 'KEPLER' in  [p.upper() for p in project]:
         try:
             # If `target` looks like a KIC or EPIC ID, we will pass the exact
             # `target_name` under which MAST will know the object to prevent
@@ -514,8 +492,7 @@ def _query_mast(target, project='Kepler', radius=None, cadence='long'):
             # so first grab desired target with ~0 arcsecond radius
             target_obs = Observations.query_criteria(target_name=target_name,
                                                      radius=str(radius.to(u.deg)),
-                                                     project=["Kepler", "K2"],
-                                                     obs_collection=["Kepler", "K2"])
+                                                     project=project)
             if len(target_obs) == 0:
                 raise ValueError("No observations found for {}".format(target_name))
 
@@ -531,8 +508,7 @@ def _query_mast(target, project='Kepler', radius=None, cadence='long'):
                 dec = target_obs['s_dec'][0]
                 obs = Observations.query_criteria(coordinates='{} {}'.format(ra, dec),
                                                   radius=str(radius.to(u.deg)),
-                                                  project=["Kepler", "K2"],
-                                                  obs_collection=["Kepler", "K2"])
+                                                  project=project)
         except ValueError:
             # If `target` did not look like a KIC or EPIC ID, then we let MAST
             # resolve the target name to a sky position. Convert radius from arcsec
@@ -540,16 +516,14 @@ def _query_mast(target, project='Kepler', radius=None, cadence='long'):
             try:
                 obs = Observations.query_criteria(objectname=target,
                                                   radius=str(radius.to(u.deg)),
-                                                  project=["Kepler", "K2", "TESS"],
-                                                  obs_collection=["Kepler", "K2", "TESS"])
+                                                  project=project)
             except ResolverError as exc:
                 raise SearchError(exc)
 
-    elif project == "Tess":
+    elif 'TESS' in [p.upper() for p in project]:
         obs = Observations.query_criteria(objectname=target,
                                           radius=str(radius.to(u.deg)),
-                                          project=["TESS"],
-                                          obs_collection=["TESS"])
+                                          project=project)
 
     obs.sort('distance')  # ensure table returned is sorted by distance
     return obs
@@ -587,7 +561,8 @@ def _filter_products(products, campaign=None, quarter=None, month=None,
     if (campaign is not None) | (quarter is not None):
         qoc = np.atleast_1d(np.asarray(qoc, dtype=int))
 
-    if project == 'Kepler':
+    project = np.atleast_1d(project)
+    if 'KEPLER' in  [p.upper() for p in project]:
         # Because MAST doesn't let us query based on Kepler-specific meta data
         # fields, we need to identify short/long-cadence TPFs by their filename.
         if cadence in ['short', 'sc']:
@@ -596,7 +571,7 @@ def _filter_products(products, campaign=None, quarter=None, month=None,
             suffix = "{}".format(filetype)
         else:
             suffix = "{} Long".format(filetype)
-    elif project == 'Tess':
+    elif 'TESS' in  [p.upper() for p in project]:
         if filetype == 'Lightcurve':
             suffix = 'Light curves'
         elif filetype == 'Target Pixel':
