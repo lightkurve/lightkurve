@@ -240,7 +240,7 @@ class SearchResult(object):
         return download_dir
 
 
-def search_targetpixelfile(target, radius=None, cadence='long', quarter=None,
+def search_targetpixelfile(target, radius=None, cadence='long', spacecraft='Kepler', quarter=None,
                            month=None, campaign=None, limit=None):
     """Searches MAST for Target Pixel Files.
 
@@ -317,14 +317,14 @@ def search_targetpixelfile(target, radius=None, cadence='long', quarter=None,
     """
     try:
         return _search_products(target, radius=radius, filetype="Target Pixel",
-                                cadence=cadence, quarter=quarter, month=month,
-                                campaign=campaign, limit=limit)
+                                cadence=cadence, spacecraft=spacecraft, quarter=quarter,
+                                month=month, campaign=campaign, limit=limit)
     except SearchError as exc:
         log.error(exc)
         return SearchResult(None)
 
 
-def search_lightcurvefile(target, radius=None, cadence='long', quarter=None,
+def search_lightcurvefile(target, radius=None, cadence='long', spacecraft='Kepler', quarter=None,
                           month=None, campaign=None, limit=None):
     """Returns a SearchResult with MAST LightCurveFiles which match the criteria.
 
@@ -402,15 +402,17 @@ def search_lightcurvefile(target, radius=None, cadence='long', quarter=None,
     """
     try:
         return _search_products(target, radius=radius, filetype="Lightcurve",
-                                cadence=cadence, quarter=quarter, month=month,
-                                campaign=campaign, limit=limit)
+                                cadence=cadence, spacecraft=spacecraft,
+                                quarter=quarter, month=month, campaign=campaign,
+                                limit=limit)
     except SearchError as exc:
         log.error(exc)
         return SearchResult(None)
 
 
 def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
-                     quarter=None, month=None, campaign=None, limit=None):
+                     spacecraft='Kepler', quarter=None, month=None,
+                     campaign=None, limit=None):
     """Helper function which returns a SearchResult object containing MAST
     products that match several criteria.
 
@@ -438,7 +440,7 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
     -------
     SearchResult : :class:`SearchResult` object.
     """
-    observations = _query_mast(target, cadence='long', radius=radius)
+    observations = _query_mast(target, spacecraft=spacecraft, cadence='long', radius=radius)
     if len(observations) == 0:
         raise SearchError('No data found for target "{}."'.format(target))
     products = Observations.get_product_list(observations)
@@ -446,12 +448,12 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
     result.sort(['distance', 'obs_id'])
 
     masked_result = _filter_products(result, filetype=filetype, campaign=campaign,
-                                     quarter=quarter, cadence=cadence, month=month,
+                                     quarter=quarter, cadence=cadence, spacecraft=spacecraft, month=month,
                                      limit=limit)
     return SearchResult(masked_result)
 
 
-def _query_mast(target, radius=None, cadence='long'):
+def _query_mast(target, spacecraft='Kepler', radius=None, cadence='long'):
     """Helper function which wraps `astroquery.mast.Observations.query_criteria()`
     to returns a table of all Kepler or K2 observations of a given target.
 
@@ -479,59 +481,66 @@ def _query_mast(target, radius=None, cadence='long'):
     elif not isinstance(radius, u.quantity.Quantity):
         radius = radius * u.arcsec
 
-    try:
-        # If `target` looks like a KIC or EPIC ID, we will pass the exact
-        # `target_name` under which MAST will know the object to prevent
-        # source confusion (see GitHub issue #148).
-        target = int(target)
-        if (target > 0) and (target < 200000000):
-            target_name = 'kplr{:09d}'.format(target)
-        elif (target > 200000000) and (target < 300000000):
-            target_name = 'ktwo{:09d}'.format(target)
-        else:
-            raise ValueError("{:09d}: not in the KIC or EPIC ID range".format(target))
-
-        # query_criteria does not allow a cone search when target_name is passed in
-        # so first grab desired target with ~0 arcsecond radius
-        target_obs = Observations.query_criteria(target_name=target_name,
-                                                 radius=str(radius.to(u.deg)),
-                                                 project=["Kepler", "K2"],
-                                                 obs_collection=["Kepler", "K2"])
-        if len(target_obs) == 0:
-            raise ValueError("No observations found for {}".format(target_name))
-
-        # check if a cone search is being performed
-        # if yes, perform a cone search around coordinates of desired target
-        if radius < (0.1 * u.arcsec):
-            obs = target_obs
-            # astroquery does not return distance if target_name is given;
-            # we add it here so that the table returned always has this column.
-            obs['distance'] = 0.
-        else:
-            ra = target_obs['s_ra'][0]
-            dec = target_obs['s_dec'][0]
-            obs = Observations.query_criteria(coordinates='{} {}'.format(ra, dec),
-                                              radius=str(radius.to(u.deg)),
-                                              project=["Kepler", "K2"],
-                                              obs_collection=["Kepler", "K2"])
-    except ValueError:
-        # If `target` did not look like a KIC or EPIC ID, then we let MAST
-        # resolve the target name to a sky position. Convert radius from arcsec
-        # to degrees for query_criteria().
+    if spacecraft == 'Kepler':
         try:
-            obs = Observations.query_criteria(objectname=target,
-                                              radius=str(radius.to(u.deg)),
-                                              project=["Kepler", "K2"],
-                                              obs_collection=["Kepler", "K2"])
-        except ResolverError as exc:
-            raise SearchError(exc)
+            # If `target` looks like a KIC or EPIC ID, we will pass the exact
+            # `target_name` under which MAST will know the object to prevent
+            # source confusion (see GitHub issue #148).
+            target = int(target)
+            if (target > 0) and (target < 200000000):
+                target_name = 'kplr{:09d}'.format(target)
+            elif (target > 200000000) and (target < 300000000):
+                target_name = 'ktwo{:09d}'.format(target)
+            else:
+                raise ValueError("{:09d}: not in the KIC or EPIC ID range".format(target))
+
+            # query_criteria does not allow a cone search when target_name is passed in
+            # so first grab desired target with ~0 arcsecond radius
+            target_obs = Observations.query_criteria(target_name=target_name,
+                                                     radius=str(radius.to(u.deg)),
+                                                     project=["Kepler", "K2"],
+                                                     obs_collection=["Kepler", "K2"])
+            if len(target_obs) == 0:
+                raise ValueError("No observations found for {}".format(target_name))
+
+            # check if a cone search is being performed
+            # if yes, perform a cone search around coordinates of desired target
+            if radius < (0.1 * u.arcsec):
+                obs = target_obs
+                # astroquery does not return distance if target_name is given;
+                # we add it here so that the table returned always has this column.
+                obs['distance'] = 0.
+            else:
+                ra = target_obs['s_ra'][0]
+                dec = target_obs['s_dec'][0]
+                obs = Observations.query_criteria(coordinates='{} {}'.format(ra, dec),
+                                                  radius=str(radius.to(u.deg)),
+                                                  project=["Kepler", "K2"],
+                                                  obs_collection=["Kepler", "K2"])
+        except ValueError:
+            # If `target` did not look like a KIC or EPIC ID, then we let MAST
+            # resolve the target name to a sky position. Convert radius from arcsec
+            # to degrees for query_criteria().
+            try:
+                obs = Observations.query_criteria(objectname=target,
+                                                  radius=str(radius.to(u.deg)),
+                                                  project=["Kepler", "K2", "TESS"],
+                                                  obs_collection=["Kepler", "K2", "TESS"])
+            except ResolverError as exc:
+                raise SearchError(exc)
+
+    elif spacecraft == "Tess":
+        obs = Observations.query_criteria(objectname=target,
+                                          radius=str(radius.to(u.deg)),
+                                          project=["Kepler", "K2", "TESS"],
+                                          obs_collection=["Kepler", "K2", "TESS"])
 
     obs.sort('distance')  # ensure table returned is sorted by distance
     return obs
 
 
 def _filter_products(products, campaign=None, quarter=None, month=None,
-                     cadence='long', filetype='Target Pixel', limit=None):
+                     cadence='long', spacecraft='Kepler', filetype='Target Pixel', limit=None):
     """Helper function which filters a SearchResult's products table by one or
     more criteria.
 
@@ -562,14 +571,20 @@ def _filter_products(products, campaign=None, quarter=None, month=None,
     if (campaign is not None) | (quarter is not None):
         qoc = np.atleast_1d(np.asarray(qoc, dtype=int))
 
-    # Because MAST doesn't let us query based on Kepler-specific meta data
-    # fields, we need to identify short/long-cadence TPFs by their filename.
-    if cadence in ['short', 'sc']:
-        suffix = "{} Short".format(filetype)
-    elif cadence in ['any', 'both']:
-        suffix = "{}".format(filetype)
-    else:
-        suffix = "{} Long".format(filetype)
+    if spacecraft == 'Kepler':
+        # Because MAST doesn't let us query based on Kepler-specific meta data
+        # fields, we need to identify short/long-cadence TPFs by their filename.
+        if cadence in ['short', 'sc']:
+            suffix = "{} Short".format(filetype)
+        elif cadence in ['any', 'both']:
+            suffix = "{}".format(filetype)
+        else:
+            suffix = "{} Long".format(filetype)
+    elif spacecraft == 'Tess':
+        if filetype == 'Lightcurve':
+            suffix = 'Light curves'
+        elif filetype == 'Target Pixel':
+            suffix = 'Target pixel files'
 
     # Identify the campaign or quarter by the description.
     if qoc is not None:
@@ -591,25 +606,26 @@ def _filter_products(products, campaign=None, quarter=None, month=None,
     mask &= np.array([suffix in desc for desc in products['description']])
     products = products[mask]
 
-    # Add the quarter or campaign numbers
-    qoc = np.asarray([p.split(' - ')[-1][1:].replace('-', '')
-                      for p in products['description']], dtype=int)
-    products['qoc'] = qoc
-    # Add the dates of each short cadence observation to the product table.
-    # Note this will not produce a date for ktwo observations, but will not break.
-    dates = [p.split('/')[-1].split('-')[1].split('_')[0]
-             for p in products['dataURI']]
-    for idx, d in enumerate(dates):
-        try:
-            dates[idx] = float(d)
-        except:
-            dates[idx] = 0
-    products['dates'] = np.asarray(dates)
+    if spacecraft == 'Kepler':
+        # Add the quarter or campaign numbers
+        qoc = np.asarray([p.split(' - ')[-1][1:].replace('-', '')
+                          for p in products['description']], dtype=int)
+        products['qoc'] = qoc
+        # Add the dates of each short cadence observation to the product table.
+        # Note this will not produce a date for ktwo observations, but will not break.
+        dates = [p.split('/')[-1].split('-')[1].split('_')[0]
+                 for p in products['dataURI']]
+        for idx, d in enumerate(dates):
+            try:
+                dates[idx] = float(d)
+            except:
+                dates[idx] = 0
+        products['dates'] = np.asarray(dates)
 
     # If there is nothing in the table, quit now.
     if len(products) == 0:
         return products
-    products.sort(['distance', 'dates', 'qoc'])
+    products.sort('distance')
 
     # For Kepler short cadence data there are additional rules, so find anywhere
     # where there is short cadence data...
