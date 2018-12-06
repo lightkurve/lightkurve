@@ -153,7 +153,7 @@ class SearchResult(object):
         tess_lcf_file = '_lc.fits'
         if any(file in self.table['productFilename'][0] for file in kepler_tpf_files):
             return KeplerTargetPixelFile(path[0], quality_bitmask=quality_bitmask)
-        elif tess_tpf_file in self.table['productFilename'][0] for file in kepler_lcf_files):
+        elif any(file in self.table['productFilename'][0] for file in kepler_lcf_files):
             return KeplerLightCurveFile(path[0], quality_bitmask=quality_bitmask)
         elif tess_tpf_file in self.table['productFilename'][0]:
             return TessTargetPixelFile(path[0], quality_bitmask)
@@ -549,7 +549,7 @@ def _query_mast(target, spacecraft='Kepler', radius=None, cadence='long'):
         obs = Observations.query_criteria(objectname=target,
                                           radius=str(radius.to(u.deg)),
                                           project=["Kepler", "K2", "TESS"],
-                                          obs_collection=["Kepler", "K2", "TESS"])
+                                          obs_collection=["Kepler", "K2", "TEsS"])
 
     obs.sort('distance')  # ensure table returned is sorted by distance
     return obs
