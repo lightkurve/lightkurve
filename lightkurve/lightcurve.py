@@ -13,6 +13,7 @@ import numpy as np
 from scipy import signal
 from scipy.interpolate import interp1d
 from matplotlib import pyplot as plt
+from copy import deepcopy
 
 from astropy.stats import sigma_clip
 from astropy.table import Table
@@ -287,7 +288,7 @@ class LightCurve(object):
             Number of sigma above which to remove outliers from the flatten
         mask : boolean array with length of self.time
             Boolean array to mask data with before flattening. Flux values where
-            mask is False will not be used to flatten the data. An interpolated
+            mask is True will not be used to flatten the data. An interpolated
             result will be provided for these points. Use this mask to remove
             data you want to preserve, e.g. transits.
         **kwargs : dict
@@ -304,14 +305,15 @@ class LightCurve(object):
 
         if mask is None:
             mask = np.ones(len(self.time), dtype=bool)
+        else:
+            # Deep copy ensures we don't change the original.
+            mask = deepcopy(~mask)
+
         # No NaNs
         mask &= np.isfinite(self.flux)
         # No outliers
         mask &= np.nan_to_num(np.abs(self.flux - np.nanmedian(self.flux))) <= (np.nanstd(self.flux) * sigma)
-#        ax = self.plot(normalize=False)
         for iter in np.arange(0, niters):
-#            ax.scatter(self.time[mask], self.flux[mask])
-
             if break_tolerance is None:
                 break_tolerance = np.nan
             if polyorder >= window_length:
