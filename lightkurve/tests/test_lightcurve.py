@@ -590,6 +590,7 @@ def test_flatten_robustness():
     assert_allclose(flat_lc.time, trend_lc.time)
     assert_allclose(lc.flux, flat_lc.flux * trend_lc.flux)
 
+
 def test_iterative_flatten():
     '''Test the iterative sigma clipping in flatten '''
     # Test a light curve with a single, buried outlier.
@@ -597,23 +598,17 @@ def test_iterative_flatten():
     y = np.sin(x/200)/100 + 1
     y[250] -= 0.01
     lc = LightCurve(x, y)
-
     # Flatten it
     c, f = lc.flatten(window_length=25, niters=2, sigma=3, return_trend=True)
-
     # Only one outlier should remain.
     assert np.isclose(c.flux, 1, rtol=0.00001).sum() == 1999
-
     mask = np.zeros(2000, dtype=bool)
     mask[250] = True
     # Flatten it using a mask to remove the bad data point.
     c, f = lc.flatten(window_length=25, niters=1, sigma=3, mask=mask,
                       return_trend=True)
-
     # Only one outlier should remain.
     assert np.isclose(c.flux, 1, rtol=0.00001).sum() == 1999
-
-
 
 
 def test_fill_gaps():

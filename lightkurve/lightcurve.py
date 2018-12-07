@@ -308,7 +308,6 @@ class LightCurve(object):
         else:
             # Deep copy ensures we don't change the original.
             mask = deepcopy(~mask)
-
         # No NaNs
         mask &= np.isfinite(self.flux)
         # No outliers
@@ -343,7 +342,6 @@ class LightCurve(object):
                                                                  window_length=window_length,
                                                                  polyorder=polyorder,
                                                                  **kwargs)
-
             # No outliers
             mask1 = np.nan_to_num(np.abs(self.flux[mask] - trend_signal)) <\
                     (np.nanstd(self.flux[mask] - trend_signal) * sigma)
