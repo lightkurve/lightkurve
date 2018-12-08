@@ -189,7 +189,7 @@ class TessQualityFlags(QualityFlags):
 
     #: DEFAULT bitmask identifies all cadences which are definitely useless.
     DEFAULT_BITMASK = (AttitudeTweak | SafeMode | CoarsePoint | EarthPoint |
-                       Desat | ManualExclude | ImpulsiveOutlier)
+                       Desat | ManualExclude)
     #: HARD bitmask is conservative and may identify cadences which are useful.
     HARD_BITMASK = (DEFAULT_BITMASK | ApertureCosmic |
                     CollateralCosmic | Straylight)
