@@ -505,7 +505,8 @@ def _query_mast(target, radius=None, project=['Kepler', 'K2', 'TESS']):
         # so first grab desired target with ~0 arcsecond radius
         target_obs = Observations.query_criteria(target_name=target_name,
                                                  radius=str(radius.to(u.deg)),
-                                                 project=project)
+                                                 project=project,
+                                                 obs_collection=project)
 
         if len(target_obs) == 0:
             raise ValueError("No observations found for {}.".format(target_name))
@@ -522,7 +523,8 @@ def _query_mast(target, radius=None, project=['Kepler', 'K2', 'TESS']):
             dec = target_obs['s_dec'][0]
             obs = Observations.query_criteria(coordinates='{} {}'.format(ra, dec),
                                               radius=str(radius.to(u.deg)),
-                                              project=project)
+                                              project=project,
+                                              obs_collection=project)
             obs.sort('distance')
         return obs
     except ValueError:
@@ -534,7 +536,8 @@ def _query_mast(target, radius=None, project=['Kepler', 'K2', 'TESS']):
     try:
         obs = Observations.query_criteria(objectname=target,
                                           radius=str(radius.to(u.deg)),
-                                          project=project)
+                                          project=project,
+                                          obs_collection=project)
         obs.sort('distance')
         return obs
     except ResolverError as exc:
