@@ -40,15 +40,22 @@ def test_search_targetpixelfile():
     campaigns = [[91, 92, 9], [101, 102, 10], [111, 112, 11]]
     ids = [200068780, 200071712, 202975993]
     for c, idx in zip(campaigns, ids):
-        ca = search_targetpixelfile(idx, quarter=c[0]).table
-        cb = search_targetpixelfile(idx, quarter=c[1]).table
+        ca = search_targetpixelfile(idx, campaign=c[0]).table
+        cb = search_targetpixelfile(idx, campaign=c[1]).table
         assert(len(ca) == 1)
         assert(len(ca) == len(cb))
         assert(~np.any(ca['description'] == cb['description']))
         # If you specify the whole campaign, both split parts must be returned.
-        cc = search_targetpixelfile(idx, quarter=c[2]).table
+        cc = search_targetpixelfile(idx, campaign=c[2]).table
         assert(len(cc) == 2)
     search_targetpixelfile(11904151, quarter=11).download()
+
+    # with mission='TESS', it should return TESS observations
+    tic = 273985862
+    assert(len(search_targetpixelfile(tic, mission='TESS').table) == 1)
+    assert(len(search_targetpixelfile(tic, mission='TESS', radius=100).table) == 2)
+    search_targetpixelfile(tic, mission='TESS').download()
+    assert(len(search_targetpixelfile("pi Mensae", sector=1).table) == 1)
 
 
 @pytest.mark.remote_data
@@ -70,6 +77,12 @@ def test_search_lightcurvefile(caplog):
     c = SkyCoord('297.5835 40.98339', unit=(u.deg, u.deg))
     assert(len(search_lightcurvefile(c, quarter=6).table) == 1)
     search_lightcurvefile(c, quarter=6).download()
+    # with mission='TESS', it should return TESS observations
+    tic = 273985862
+    assert(len(search_lightcurvefile(tic, mission='TESS').table) == 1)
+    assert(len(search_lightcurvefile(tic, mission='TESS', radius=100).table) == 2)
+    search_lightcurvefile(tic, mission='TESS').download()
+    assert(len(search_lightcurvefile("pi Mensae", sector=1).table) == 1)
 
 
 @pytest.mark.remote_data
@@ -214,16 +227,21 @@ def test_source_confusion_DEPRECATED():
 
 
 def test_open():
+    # define paths to k2 and  tess data
     k2_path = os.path.join(PACKAGEDIR, "tests", "data", "test-tpf-star.fits")
     tess_path = os.path.join(PACKAGEDIR, "tests", "data", "tess25155310-s01-first-cadences.fits.gz")
+    # Ensure files are read in as the correct object
     k2tpf = open(k2_path)
     assert(isinstance(k2tpf, KeplerTargetPixelFile))
     tesstpf = open(tess_path)
     assert(isinstance(tesstpf, TessTargetPixelFile))
+    # Open should fail if the filetype is not recognized
     try:
         open(os.path.join(PACKAGEDIR, "tests", "data", "test_factory0.fits"))
     except ValueError:
         pass
+    # Can you instantiate with a path?
     assert(isinstance(KeplerTargetPixelFile(k2_path), KeplerTargetPixelFile))
     assert(isinstance(TessTargetPixelFile(tess_path), TessTargetPixelFile))
+    # Can open take a quality_bitmask argument?
     assert(open(k2_path, quality_bitmask='hard').quality_bitmask == 'hard')
