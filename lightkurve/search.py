@@ -541,10 +541,12 @@ def _query_mast(target, radius=None, project=['Kepler', 'K2', 'TESS']):
     # resolve the target name to a sky position. Convert radius from arcsec
     # to degrees for query_criteria().
     try:
-        obs = Observations.query_criteria(objectname=target,
-                                          radius=str(radius.to(u.deg)),
-                                          project=project,
-                                          obs_collection=project)
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', AstropyWarning)
+            obs = Observations.query_criteria(objectname=target,
+                                              radius=str(radius.to(u.deg)),
+                                              project=project,
+                                              obs_collection=project)
         obs.sort('distance')
         return obs
     except ResolverError as exc:
