@@ -1,0 +1,299 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Systematics correction classes &mdash; lightkurve 1.0b24.dev documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="KeplerCBVCorrector" href="lightkurve.correctors.KeplerCBVCorrector.html" />
+    <link rel="prev" title="Periodogram" href="lightkurve.periodogram.Periodogram.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> lightkurve
+          
+
+          
+            
+            <img src="../_static/lightkurve.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0b24.dev
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="lightcurve.html">LightCurve classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lightcurvefile.html">LightCurveFile classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="targetpixelfile.html">TargetPixelFile classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="search.html">Data search functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="periodogram.html">Periodogram classes</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Systematics correction classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#classes">Classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.correctors.KeplerCBVCorrector.html">KeplerCBVCorrector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.correctors.SFFCorrector.html">SFFCorrector</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#class-inheritance-diagram">Class Inheritance Diagram</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="prf.html">PRF photometry classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">Utility functions</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section1.html">Introduction to lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section2.html">Science with lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section3.html">Extracting lightcurves</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section4.html">Systematics correction</a></li>
+</ul>
+<p class="caption"><span class="caption-text">About lightkurve</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing and reporting issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developer.html">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../citing.html">Citing and acknowledging lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../other_software.html">Other software</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">lightkurve</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">API documentation</a> &raquo;</li>
+        
+      <li>Systematics correction classes</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/api/correctors.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+</style>
+<div class="section" id="module-lightkurve.correctors">
+<span id="systematics-correction-classes"></span><h1>Systematics correction classes<a class="headerlink" href="#module-lightkurve.correctors" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-lightkurve.correctors"></span><p>Defines KeplerCBVCorrector and SFFCorrector.</p>
+<div class="section" id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="lightkurve.correctors.KeplerCBVCorrector.html#lightkurve.correctors.KeplerCBVCorrector" title="lightkurve.correctors.KeplerCBVCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerCBVCorrector</span></code></a>(lc_file[,&nbsp;likelihood,&nbsp;prior])</td>
+<td>Remove systematic trends from Kepler light curves by fitting cotrending basis vectors.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="lightkurve.correctors.SFFCorrector.html#lightkurve.correctors.SFFCorrector" title="lightkurve.correctors.SFFCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SFFCorrector</span></code></a>()</td>
+<td>Implements the Self-Flat-Fielding (SFF) systematics removal method.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="class-inheritance-diagram">
+<h2>Class Inheritance Diagram<a class="headerlink" href="#class-inheritance-diagram" title="Permalink to this headline">¶</a></h2>
+<div class="graphviz"><img src="../_images/inheritance-1f8ea850fadaaa82abfbb155a1227eb7631eee34.png" alt="Inheritance diagram of lightkurve.correctors.KeplerCBVCorrector, lightkurve.correctors.SFFCorrector" usemap="#inheritancea288947b7e" class="inheritance graphviz" /></div>
+<map id="inheritancea288947b7e" name="inheritancea288947b7e">
+<area shape="rect" id="node1" href="lightkurve.correctors.KeplerCBVCorrector.html#lightkurve.correctors.KeplerCBVCorrector" target="_top" title="Remove systematic trends from Kepler light curves by fitting" alt="" coords="5,55,149,80"/>
+<area shape="rect" id="node2" href="lightkurve.correctors.SFFCorrector.html#lightkurve.correctors.SFFCorrector" target="_top" title="Implements the Self&#45;Flat&#45;Fielding (SFF) systematics removal method." alt="" coords="26,5,129,31"/>
+</map></div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="lightkurve.correctors.KeplerCBVCorrector.html" class="btn btn-neutral float-right" title="KeplerCBVCorrector" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="lightkurve.periodogram.Periodogram.html" class="btn btn-neutral" title="Periodogram" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright lightkurve developers and contributors
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

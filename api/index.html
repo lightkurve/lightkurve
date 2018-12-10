@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>API documentation &mdash; lightkurve 1.0.0dev documentation</title>
+  <title>API documentation &mdash; lightkurve 1.0b24.dev documentation</title>
   
 
   
@@ -24,13 +24,13 @@
 
   
 
-  
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Target Pixel File" href="targetpixelfile.html" />
-    <link rel="prev" title="lightkurve Documentation" href="../index.html" /> 
+    <link rel="next" title="LightCurve classes" href="lightcurve.html" />
+    <link rel="prev" title="Installation" href="../install.html" /> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -54,7 +54,7 @@
 
           
             
-            <img src="../_static/lightkurve.gif" class="logo" alt="Logo"/>
+            <img src="../_static/lightkurve.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                1.0.0dev
+                1.0b24.dev
               </div>
             
           
@@ -86,60 +86,35 @@
               
             
             
-              <ul class="current">
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">API documentation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="targetpixelfile.html">Target Pixel File</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="lightcurve.html">Lightcurve</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="prf.html">Point Spread Function Photometry</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html">Utilities</a><ul class="simple">
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../install.html#requirements">Requirements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../install.html#installing-lightkurve">Installing lightkurve</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../install.html#stable-version">Stable version</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../install.html#development-version">Development version</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../install.html#building-documentation">Building documentation</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../contributing.html#proposing-changes-to-lightkurve-using-github-pull-requests">Proposing changes to lightkurve using GitHub pull requests</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../contributing.html#coding-and-documentation-guidelines">Coding and documentation guidelines</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../community_software.html">Community Software</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../community_software.html#detrending-analysis">Detrending &amp; Analysis</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../community_software.html#full-frame-images">Full Frame Images</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../community_software.html#data-access">Data access</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../community_software.html#metadata">Metadata</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../community_software.html#planet-search">Planet Search</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../community_software.html#population-statistics">Population Statistics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../community_software.html#positional">Positional</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../community_software.html#science-astrophysics">Science / Astrophysics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../community_software.html#other">Other</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lightcurve.html">LightCurve classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lightcurvefile.html">LightCurveFile classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="targetpixelfile.html">TargetPixelFile classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="search.html">Data search functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="periodogram.html">Periodogram classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="correctors.html">Systematics correction classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prf.html">PRF photometry classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">Utility functions</a></li>
 </ul>
 </li>
 </ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">lightkurve tutorials</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/target-pixel-files.html">What are Target Pixel Files?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../tutorials/lightcurve-files.html">What are Light Curve Files?</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/lightcurve-files.html#Lightcurves-from-Target-Pixel-Files">Lightcurves from Target Pixel Files</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/lightcurve-files.html#PDCSAP-from-lightcurves-from-MAST">PDCSAP from lightcurves from MAST</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section1.html">Introduction to lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section2.html">Science with lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section3.html">Extracting lightcurves</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section4.html">Systematics correction</a></li>
 </ul>
-</li>
-</ul>
-</li>
+<p class="caption"><span class="caption-text">About lightkurve</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing and reporting issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developer.html">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../citing.html">Citing and acknowledging lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../other_software.html">Other software</a></li>
 </ul>
 
             
@@ -159,7 +134,6 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
         
         <div class="rst-content">
@@ -220,21 +194,6 @@
     margin-top: -19px;
 }
 
-/* nice headers on first paragraph of info/warning boxes */
-.admonition .first {
-    margin: -12px;
-    padding: 6px 12px;
-    margin-bottom: 12px;
-    color: #fff;
-    line-height: 1;
-    display: block;
-}
-.admonition.warning .first {
-    background: #f0b37e;
-}
-.admonition.note .first {
-    background: #6ab0de;
-}
 .admonition > p:before {
     margin-right: 4px;  /* make room for the exclamation icon */
 }
@@ -243,10 +202,14 @@
 <h1>API documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="targetpixelfile.html">Target Pixel File</a></li>
-<li class="toctree-l1"><a class="reference internal" href="lightcurve.html">Lightcurve</a></li>
-<li class="toctree-l1"><a class="reference internal" href="prf.html">Point Spread Function Photometry</a></li>
-<li class="toctree-l1"><a class="reference internal" href="utils.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lightcurve.html">LightCurve classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lightcurvefile.html">LightCurveFile classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="targetpixelfile.html">TargetPixelFile classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="search.html">Data search functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="periodogram.html">Periodogram classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="correctors.html">Systematics correction classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prf.html">PRF photometry classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utility functions</a></li>
 </ul>
 </div>
 </div>
@@ -259,10 +222,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="targetpixelfile.html" class="btn btn-neutral float-right" title="Target Pixel File" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="lightcurve.html" class="btn btn-neutral float-right" title="LightCurve classes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="../index.html" class="btn btn-neutral" title="lightkurve Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="../install.html" class="btn btn-neutral" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -271,7 +234,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright lightkurve Developers and Contributors.
+        &copy; Copyright lightkurve developers and contributors
 
     </p>
   </div>
@@ -290,34 +253,22 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'1.0.0dev',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
 
   <script type="text/javascript">
       jQuery(function () {
-          
-          SphinxRtdTheme.Navigation.enableSticky();
-          
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script> 
 

@@ -1,0 +1,1204 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>How to recover the first TESS planet candidate with Lightkurve? &mdash; lightkurve 1.0b24.dev documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="How to use lightkurve for asteroseismology" href="2.09-how-to-use-lightkurve-for-asteroseismology.html" />
+    <link rel="prev" title="How to recover a known planet in Kepler data?" href="2.02-recover-a-planet.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> lightkurve
+          
+
+          
+            
+            <img src="../_static/lightkurve.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0b24.dev
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">API documentation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="section1.html">Introduction to lightkurve</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="section2.html">Science with lightkurve</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="2.02-recover-a-planet.html">How to recover a known planet in Kepler data?</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">How to recover the first TESS planet candidate with <em>Lightkurve</em>?</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Building-Light-Curves-from-TPFs">Building Light Curves from TPFs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Comparing-two-apertures">Comparing two apertures</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="2.09-how-to-use-lightkurve-for-asteroseismology.html">How to use lightkurve for asteroseismology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2.10-how-to-make-a-supernova-lightcurve.html">How to make a supernova lightcurve?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="section3.html">Extracting lightcurves</a></li>
+<li class="toctree-l1"><a class="reference internal" href="section4.html">Systematics correction</a></li>
+</ul>
+<p class="caption"><span class="caption-text">About lightkurve</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing and reporting issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developer.html">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../citing.html">Citing and acknowledging lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../other_software.html">Other software</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">lightkurve</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="section2.html">Science with lightkurve</a> &raquo;</li>
+        
+      <li>How to recover the first TESS planet candidate with <em>Lightkurve</em>?</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/tutorials/how-to-recover-the-first-tess-candidate.ipynb.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput div.prompt,
+div.nbinput div.input_area,
+div.nbinput div[class*=highlight],
+div.nbinput div[class*=highlight] pre,
+div.nboutput,
+div.nbinput div.prompt,
+div.nbinput div.output_area,
+div.nboutput div[class*=highlight],
+div.nboutput div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput,
+    div.nboutput {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput div.prompt pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput div.prompt pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput div.prompt,
+div.nboutput div.prompt {
+    min-width: 8ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+@media (max-width: 540px) {
+    div.nbinput div.prompt,
+    div.nboutput div.prompt {
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput div.prompt.empty {
+        padding: 0;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput div.prompt pre,
+div.nboutput div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput div.input_area,
+div.nboutput div.output_area {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput div.input_area,
+    div.nboutput div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput div.input_area {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+</style>
+<div class="section" id="How-to-recover-the-first-TESS-planet-candidate-with-Lightkurve?">
+<h1>How to recover the first TESS planet candidate with <em>Lightkurve</em>?<a class="headerlink" href="#How-to-recover-the-first-TESS-planet-candidate-with-Lightkurve?" title="Permalink to this headline">¶</a></h1>
+<p>Recently, the first public pixel data from the TESS mission have become
+<a class="reference external" href="https://archive.stsci.edu/prepds/tess-data-alerts/">available from the data archive at
+MAST</a>. This
+tutorial demonstrates how the <a class="reference external" href="http://lightkurve.keplerscience.org">Lightkurve Python
+package</a> can be used to read in
+these data and create your own TESS light curves with different aperture
+masks.</p>
+<p>Below is a quick tutorial on how to get started using <em>Lightkurve</em> and
+TESS data. We’ll use the nearby, bright target Pi Mensae (ID 261136679),
+around which the mission team recently discovered a short period planet
+candidate on a 6.27 day orbit. See the <a class="reference external" href="https://arxiv.org/abs/1809.05967">pre-print paper by Huang et al
+(2018)</a> for more details.</p>
+<p>TESS data is stored in a binary file format which is documented in the
+<a class="reference external" href="https://archive.stsci.edu/missions/tess/doc/EXP-TESS-ARC-ICD-TM-0014.pdf">TESS Science Data Products Description
+Document</a>.
+<em>Lightkurve</em> provides a <code class="docutils literal notranslate"><span class="pre">TessTargetPixelFile</span></code> class which allows you
+to interact with the data easily.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">lightkurve</span> <span class="k">import</span> <span class="n">TessTargetPixelFile</span>
+<span class="n">tpf</span> <span class="o">=</span> <span class="n">TessTargetPixelFile</span><span class="p">(</span><span class="s1">&#39;https://archive.stsci.edu/hlsps/tess-data-alerts/hlsp_tess-data-alerts_tess_phot_00261136679-s01_tess_v1_tp.fits&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">TessTargetPixelFile</span></code>’s have many helpful methods and attributes.
+For example, you can access basic meta data on the target easily:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">mission</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[2]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>&#39;TESS&#39;
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">targetid</span>  <span class="c1"># TESS Input Catalog (TIC) Identifier</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[3]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>261136679
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">sector</span>  <span class="c1"># TESS Observation Sector</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[4]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>1
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">camera</span>  <span class="c1"># TESS Camera Number</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[5]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>4
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">ccd</span>  <span class="c1"># TESS CCD Number</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[6]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>2
+</pre></div>
+</div>
+</div>
+<p>We might want to plot the data, we can do this with the <code class="docutils literal notranslate"><span class="pre">plot()</span></code>
+method. You can add the keyword <code class="docutils literal notranslate"><span class="pre">aperture_mask</span></code> to plot an aperture on
+top of the image. In this case we’ve used the <code class="docutils literal notranslate"><span class="pre">pipeline_mask</span></code> which is
+stored in the original .fits file, but you can use any aperture you
+like.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="n">tpf</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">tpf</span><span class="o">.</span><span class="n">pipeline_mask</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_how-to-recover-the-first-tess-candidate_11_0.png" src="../_images/tutorials_how-to-recover-the-first-tess-candidate_11_0.png" />
+</div>
+</div>
+<p>If you want to access the original fits file that generated the data you
+can use the <code class="docutils literal notranslate"><span class="pre">hdu</span></code> attribute of the tpf. This will return an
+<code class="docutils literal notranslate"><span class="pre">astropy.io.fits</span></code> object, for example</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">hdu</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[8]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>[&lt;astropy.io.fits.hdu.image.PrimaryHDU object at 0x7ff460fdcd68&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x7ff4610004a8&gt;, &lt;astropy.io.fits.hdu.image.ImageHDU object at 0x7ff45b683fd0&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x7ff45b4a84e0&gt;]
+</pre></div>
+</div>
+</div>
+<p>You can access each extension and the data inside it in the same way
+you’d use <code class="docutils literal notranslate"><span class="pre">astropy.io.fits</span></code>. If you want to access data held in the
+TPF, such as the time of the observations, you can do that easily by
+using</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">time</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[9]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>array([1325.29698328, 1325.29837215, 1325.29976102, ..., 1353.17292214,
+       1353.17431099, 1353.17569985])
+</pre></div>
+</div>
+</div>
+<p>This returns the time in units of days counted since <a class="reference external" href="https://en.wikipedia.org/wiki/Julian_day">Julian
+Day</a> 2457000.</p>
+<p>You can access the corresponding flux values using</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">flux</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[10]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>array([[[  -1.3825388,  -37.66533  ,  -91.830536 , ..., -108.04645  ,
+         -103.54175  , -134.1816   ],
+        [-135.68407  , -125.30367  , -112.52773  , ..., -113.03839  ,
+         -122.92997  , -131.28302  ],
+        [-147.63722  , -142.73625  , -134.99854  , ..., -101.330734 ,
+         -114.31767  , -121.03055  ],
+        ...,
+        [-138.13503  , -137.8448   , -146.29425  , ...,  -77.273094 ,
+         -105.22347  , -135.82652  ],
+        [-142.20255  , -139.6766   , -147.65201  , ..., -118.81814  ,
+         -129.52805  , -130.46175  ],
+        [-133.71326  , -134.32669  , -148.82013  , ..., -127.16725  ,
+          -90.90953  , -112.974434 ]],
+
+       [[  -3.390986 ,  -47.140965 ,  -90.53796  , ..., -106.87563  ,
+         -108.55464  , -136.6413   ],
+        [-133.7175   , -125.38933  , -114.30842  , ..., -115.82087  ,
+         -125.8608   , -132.87209  ],
+        [-147.48918  , -142.87836  , -138.43767  , ..., -103.16773  ,
+         -116.372955 , -119.86726  ],
+        ...,
+        [-138.81976  , -138.86803  , -146.27737  , ...,  -78.0859   ,
+         -107.27506  , -136.54706  ],
+        [-139.40416  , -141.568    , -148.46045  , ..., -122.45605  ,
+         -127.82529  , -132.05716  ],
+        [-131.66135  , -135.35051  , -150.45163  , ..., -128.91386  ,
+          -88.85448  , -111.716286 ]],
+
+       [[  -3.5488758,  -47.50886  ,  -95.015564 , ..., -110.717064 ,
+         -108.882744 , -137.5612   ],
+        [-137.84918  , -126.03129  , -115.643364 , ..., -114.72093  ,
+         -126.24343  , -133.79109  ],
+        [-147.31683  , -145.31314  , -137.13574  , ..., -105.026146 ,
+         -116.6999   , -122.60661  ],
+        ...,
+        [-141.17563  , -140.43784  , -149.25896  , ...,  -78.849335 ,
+         -108.58714  , -138.34416  ],
+        [-140.01288  , -142.26175  , -148.14075  , ..., -126.20568  ,
+         -129.13695  , -132.04318  ],
+        [-132.21141  , -138.6819   , -146.84227  , ..., -131.71007  ,
+          -93.29626  , -116.47916  ]],
+
+       ...,
+
+       [[  15.500299 ,  -32.484245 ,  -88.58714  , ...,  -99.75848  ,
+          -93.617775 , -129.5383   ],
+        [-122.93883  , -117.40679  , -105.49079  , ..., -108.75932  ,
+         -120.350716 , -129.25839  ],
+        [-143.43176  , -138.72139  , -131.21268  , ...,  -97.953094 ,
+         -113.65763  , -118.00191  ],
+        ...,
+        [-130.2462   , -133.78702  , -140.91888  , ...,  -68.20146  ,
+          -99.546646 , -132.0319   ],
+        [-137.01523  , -137.3937   , -141.48993  , ..., -112.68788  ,
+         -125.11879  , -128.38521  ],
+        [-125.543655 , -129.38873  , -144.37961  , ..., -122.12083  ,
+          -89.26432  , -107.87084  ]],
+
+       [[  18.095486 ,  -34.98728  ,  -91.17793  , ...,  -99.494095 ,
+          -93.221954 , -128.76079  ],
+        [-124.04631  , -116.41686  , -102.980415 , ..., -107.50661  ,
+         -119.95467  , -127.54848  ],
+        [-142.71834  , -138.71126  , -129.78357  , ...,  -98.722206 ,
+         -112.27363  , -119.09576  ],
+        ...,
+        [-131.34     , -131.13364  , -141.24506  , ...,  -71.29033  ,
+          -98.11233  , -129.48041  ],
+        [-134.56529  , -136.50882  , -140.93579  , ..., -114.41215  ,
+         -122.87399  , -129.40953  ],
+        [-126.638466 , -132.9018   , -142.17902  , ..., -123.72011  ,
+          -89.90764  , -108.07525  ]],
+
+       [[  14.83668  ,  -38.491974 ,  -89.118706 , ..., -104.50926  ,
+          -98.43293  , -133.46823  ],
+        [-129.66971  , -120.571465 , -107.0652   , ..., -110.490425 ,
+         -121.109955 , -126.844826 ],
+        [-146.30688  , -139.21913  , -132.79062  , ...,  -99.678925 ,
+         -112.38672  , -118.37381  ],
+        ...,
+        [-133.21715  , -132.51721  , -141.62198  , ...,  -73.295105 ,
+         -100.20323  , -132.46454  ],
+        [-138.18147  , -138.7651   , -144.7824   , ..., -116.421265 ,
+         -125.88614  , -129.6993   ],
+        [-126.65554  , -130.70747  , -144.31444  , ..., -124.7908   ,
+          -86.73392  , -112.15379  ]]], dtype=float32)
+</pre></div>
+</div>
+</div>
+<p>Flux is a <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> with a shape of (TIME x PIXELS x PIXELS). If
+you want to access just the first frame you can use</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[11]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>array([[-1.38253880e+00, -3.76653290e+01, -9.18305359e+01,
+        -1.29922272e+02, -1.45692978e+02, -1.35893311e+02,
+        -9.54683685e+01, -8.85729370e+01, -1.08046448e+02,
+        -1.03541748e+02, -1.34181595e+02],
+       [-1.35684067e+02, -1.25303673e+02, -1.12527733e+02,
+        -1.35690414e+02, -1.45928650e+02, -1.27757614e+02,
+        -6.09818077e+01, -7.37526398e+01, -1.13038391e+02,
+        -1.22929970e+02, -1.31283020e+02],
+       [-1.47637222e+02, -1.42736252e+02, -1.34998535e+02,
+        -1.41663147e+02, -1.40064377e+02, -1.18161720e+02,
+        -5.37216644e+01, -6.23722382e+01, -1.01330734e+02,
+        -1.14317673e+02, -1.21030548e+02],
+       [-1.49992447e+02, -1.43351776e+02, -1.39589264e+02,
+        -1.37442719e+02, -1.31207718e+02, -9.68078690e+01,
+        -1.37817793e+01, -3.41951828e+01, -7.66406403e+01,
+        -8.33256989e+01, -8.85187225e+01],
+       [-1.37578445e+02, -1.28364151e+02, -1.26376915e+02,
+        -1.21656555e+02, -1.14596848e+02, -5.06528702e+01,
+         7.68901138e+01,  4.60617752e+01,  2.71646519e+01,
+         3.94530640e+01, -2.65274410e+01],
+       [-1.36808558e+01,  3.27203102e+01,  5.92592163e+01,
+         3.10102577e+01,  1.12594862e+01,  1.24587753e+02,
+         3.30445312e+02,  3.36818207e+02,  4.67378265e+02,
+         2.58437531e+02,  5.39367867e+00],
+       [ 3.06964386e+02,  5.08380646e+02,  6.83612305e+02,
+         6.75774414e+02,  6.43811035e+02,  8.33415833e+02,
+         1.27430811e+03,  1.84799011e+03,  1.48316943e+03,
+         3.57677521e+02, -2.22004585e+01],
+       [ 7.54239929e+02,  1.21837598e+03,  1.75272681e+03,
+         2.08298779e+03,  2.50489863e+04,  6.54504688e+04,
+         6.99400781e+03,  7.02737646e+03,  1.77507739e+03,
+         2.59077271e+02, -1.98949337e+01],
+       [ 1.11253564e+03,  2.07831738e+03,  3.65158667e+03,
+         5.48250391e+03,  1.00965391e+05,  1.02543531e+05,
+         4.09393594e+04,  9.44738086e+03,  1.42760950e+03,
+         3.31844025e+02,  5.17090683e+01],
+       [ 1.02698645e+03,  2.25617969e+03,  5.54376465e+03,
+         2.46261230e+04,  1.03035734e+05,  1.04624336e+05,
+         6.53138633e+04,  7.71915039e+03,  1.35093494e+03,
+         3.36992310e+02, -3.54690289e+00],
+       [ 7.21791382e+02,  1.66756409e+03,  3.87029858e+03,
+         2.42247129e+04,  1.03909016e+05,  1.06053984e+05,
+         4.83635586e+04,  4.23504346e+03,  1.32237488e+03,
+         3.16208466e+02, -6.57367096e+01],
+       [ 4.29120178e+02,  1.26064551e+03,  3.15358057e+03,
+         1.05985273e+04,  1.02944805e+05,  1.05321906e+05,
+         1.19889746e+04,  3.39063574e+03,  1.40142529e+03,
+         4.15249512e+02, -3.48390923e+01],
+       [ 1.72348724e+02,  7.88590881e+02,  2.23820068e+03,
+         4.44562012e+03,  5.58241680e+04,  1.03319727e+05,
+         5.61203809e+03,  2.66727393e+03,  1.30703625e+03,
+         4.99335266e+02,  4.71602020e+01],
+       [ 2.69907742e+01,  3.23401794e+02,  9.99374329e+02,
+         1.78104407e+03,  2.04844604e+03,  3.67428320e+04,
+         2.80467065e+03,  1.85512500e+03,  1.18081396e+03,
+         6.49496826e+02,  1.00554329e+02],
+       [-7.98464050e+01,  9.25059509e+01,  3.26399536e+02,
+         6.55647888e+02,  9.57525818e+02,  1.18310132e+03,
+         1.39609094e+03,  1.17153650e+03,  1.15672314e+03,
+         7.71616577e+02,  5.45056877e+01],
+       [-1.13249367e+02, -6.13406181e+01,  5.93428993e+01,
+         1.54688034e+02,  3.48396606e+02,  5.27463257e+02,
+         6.76866699e+02,  6.34336426e+02,  5.01662018e+02,
+         3.01781311e+02, -2.48897457e+01],
+       [-8.82987518e+01, -1.17512108e+02, -9.47615585e+01,
+        -3.40316010e+01,  4.28901634e+01,  1.52270020e+02,
+         2.72233185e+02,  2.77604492e+02,  1.88234268e+02,
+         4.79093513e+01, -6.75118103e+01],
+       [-8.60586777e+01, -1.14533005e+02, -1.38196228e+02,
+        -1.20548019e+02, -7.74374313e+01, -3.44268494e+01,
+         3.27217293e+01,  4.88377647e+01,  1.26917982e+01,
+        -5.03569221e+01, -1.11872086e+02],
+       [-1.38135025e+02, -1.37844803e+02, -1.46294250e+02,
+        -1.46713867e+02, -1.37058548e+02, -1.05716675e+02,
+        -6.76952667e+01, -5.82716599e+01, -7.72730942e+01,
+        -1.05223473e+02, -1.35826523e+02],
+       [-1.42202545e+02, -1.39676605e+02, -1.47652008e+02,
+        -1.50885605e+02, -1.49152878e+02, -1.39763824e+02,
+        -1.17666542e+02, -1.09747162e+02, -1.18818138e+02,
+        -1.29528046e+02, -1.30461746e+02],
+       [-1.33713257e+02, -1.34326691e+02, -1.48820129e+02,
+        -1.51972229e+02, -1.49277893e+02, -1.45098679e+02,
+        -1.30031540e+02, -1.21871094e+02, -1.27167252e+02,
+        -9.09095306e+01, -1.12974434e+02]], dtype=float32)
+</pre></div>
+</div>
+</div>
+<p>These values are in units electrons per second.</p>
+<div class="section" id="Building-Light-Curves-from-TPFs">
+<h2>Building Light Curves from TPFs<a class="headerlink" href="#Building-Light-Curves-from-TPFs" title="Permalink to this headline">¶</a></h2>
+<p>We can use the <code class="docutils literal notranslate"><span class="pre">to_lightcurve()</span></code> method to turn this TPF into a light
+curve using <em>Simple Aperture Photometry</em>. This will put an aperture on
+the target, and sum up the flux in all the pixels inside the aperture.</p>
+<p>The default for <code class="docutils literal notranslate"><span class="pre">to_lightcurve()</span></code> is to use the mask generated by the
+TESS pipeline.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">lc</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p>Now we can use the plot function to take a look at the data.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">lc</span><span class="o">.</span><span class="n">errorbar</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_how-to-recover-the-first-tess-candidate_24_0.png" src="../_images/tutorials_how-to-recover-the-first-tess-candidate_24_0.png" />
+</div>
+</div>
+<p>This looks pretty good, but maybe we can improve things by creating a
+new aperture.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># Create a median image of the source over time</span>
+<span class="n">median_image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">tpf</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Select pixels which are brighter than the 85th percentile of the median image</span>
+<span class="n">aperture_mask</span> <span class="o">=</span> <span class="n">median_image</span> <span class="o">&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">nanpercentile</span><span class="p">(</span><span class="n">median_image</span><span class="p">,</span> <span class="mi">85</span><span class="p">)</span>
+
+<span class="c1"># Plot that aperture</span>
+<span class="n">tpf</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">aperture_mask</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_how-to-recover-the-first-tess-candidate_26_0.png" src="../_images/tutorials_how-to-recover-the-first-tess-candidate_26_0.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">lc</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">aperture_mask</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">lc</span><span class="o">.</span><span class="n">errorbar</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_how-to-recover-the-first-tess-candidate_28_0.png" src="../_images/tutorials_how-to-recover-the-first-tess-candidate_28_0.png" />
+</div>
+</div>
+<p>There’s a long term trend in this dataset, which we can remove with a
+simple smoothing filter. You can use the <code class="docutils literal notranslate"><span class="pre">lc.flatten()</span></code> method to
+apply and divide the <a class="reference external" href="https://en.wikipedia.org/wiki/Savitzky%E2%80%93Golay_filter">Savitzky-Golay smoothing
+filter</a>.
+Here we’ll use a <code class="docutils literal notranslate"><span class="pre">window_length</span></code> of 1001 cadences, which is roughly a
+5% of the full length of the light curve.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Number of cadences in the full light curve</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+(18067,)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">flat_lc</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">window_length</span><span class="o">=</span><span class="mi">1001</span><span class="p">)</span>
+<span class="n">flat_lc</span><span class="o">.</span><span class="n">errorbar</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_how-to-recover-the-first-tess-candidate_31_0.png" src="../_images/tutorials_how-to-recover-the-first-tess-candidate_31_0.png" />
+</div>
+</div>
+<p>The light curve looks much flatter. Unfortunately there is a portion of
+the light curve that is very noisy, due to a jitter in the TESS
+spacecraft. We can remove this simply by masking the light curve. First
+we’ll select the times that had the jitter.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Flag the times that are good quality</span>
+<span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">flat_lc</span><span class="o">.</span><span class="n">time</span> <span class="o">&lt;</span> <span class="mi">1346</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">flat_lc</span><span class="o">.</span><span class="n">time</span> <span class="o">&gt;</span> <span class="mi">1350</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Then we can just clip those times out.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">masked_lc</span> <span class="o">=</span> <span class="n">flat_lc</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+<span class="n">masked_lc</span><span class="o">.</span><span class="n">errorbar</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_how-to-recover-the-first-tess-candidate_35_0.png" src="../_images/tutorials_how-to-recover-the-first-tess-candidate_35_0.png" />
+</div>
+</div>
+<p>We can use <em>lightkurve</em> to plot these two light curves over each other
+to see the difference.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># First define the `matplotlib.pyplot.axes`</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">flat_lc</span><span class="o">.</span><span class="n">errorbar</span><span class="p">()</span>
+
+<span class="c1"># Pass that axis to the next plot</span>
+<span class="n">masked_lc</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_how-to-recover-the-first-tess-candidate_37_0.png" src="../_images/tutorials_how-to-recover-the-first-tess-candidate_37_0.png" />
+</div>
+</div>
+<p>This looks much better. Now we might want to clip out some outliers from
+the light curve. We can do that with a simple lightkurve function
+<code class="docutils literal notranslate"><span class="pre">remove_outliers()</span></code></p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">clipped_lc</span> <span class="o">=</span> <span class="n">masked_lc</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">(</span><span class="n">sigma</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">clipped_lc</span><span class="o">.</span><span class="n">errorbar</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_how-to-recover-the-first-tess-candidate_39_0.png" src="../_images/tutorials_how-to-recover-the-first-tess-candidate_39_0.png" />
+</div>
+</div>
+<p>It’s a little hard to see these data because of the plotting style.
+Let’s use a scatter plot instead. We can do this with the
+<code class="docutils literal notranslate"><span class="pre">lc.scatter()</span></code> method. This method works in the same way that
+<code class="docutils literal notranslate"><span class="pre">matplotlib.pyplot.scatter</span></code> works, and takes in the same keyword
+arguments.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">clipped_lc</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="mf">0.1</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_how-to-recover-the-first-tess-candidate_41_0.png" src="../_images/tutorials_how-to-recover-the-first-tess-candidate_41_0.png" />
+</div>
+</div>
+<p>We can also add errorbars using the <code class="docutils literal notranslate"><span class="pre">lc.errorbar()</span></code> method.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">clipped_lc</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">clipped_lc</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">);</span>  <span class="c1"># alpha determines the transparency</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_how-to-recover-the-first-tess-candidate_43_0.png" src="../_images/tutorials_how-to-recover-the-first-tess-candidate_43_0.png" />
+</div>
+</div>
+<p>Finally let’s use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> to fold the data at the exoplanet
+orbital period and see if we can see the transit.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Note I have added the phase argument to center the transit</span>
+<span class="n">folded_lc</span> <span class="o">=</span> <span class="n">clipped_lc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mf">6.27</span><span class="p">,</span> <span class="n">phase</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
+<span class="n">folded_lc</span><span class="o">.</span><span class="n">errorbar</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_how-to-recover-the-first-tess-candidate_45_0.png" src="../_images/tutorials_how-to-recover-the-first-tess-candidate_45_0.png" />
+</div>
+</div>
+<p>It looks like there’s something there, but it’s hard to see. Let’s bin
+the light curve to reduce the number of points, but also reduce the
+uncertainty of those points.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">binned_lc</span> <span class="o">=</span> <span class="n">folded_lc</span><span class="o">.</span><span class="n">bin</span><span class="p">(</span><span class="n">binsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>  <span class="c1"># Average 10 points per bin</span>
+<span class="n">binned_lc</span><span class="o">.</span><span class="n">errorbar</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_how-to-recover-the-first-tess-candidate_47_0.png" src="../_images/tutorials_how-to-recover-the-first-tess-candidate_47_0.png" />
+</div>
+</div>
+<p>And now we can see the transit of Pi Men c!</p>
+<p>Note that you can actually do all these steps in just a few lines:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">lc</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">aperture_mask</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">window_length</span><span class="o">=</span><span class="mi">1001</span><span class="p">)</span>
+<span class="n">lc</span> <span class="o">=</span> <span class="n">lc</span><span class="p">[(</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span> <span class="o">&lt;</span> <span class="mi">1346</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span> <span class="o">&gt;</span> <span class="mi">1350</span><span class="p">)]</span>
+<span class="n">lc</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">(</span><span class="n">sigma</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mf">6.27</span><span class="p">,</span> <span class="n">phase</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span><span class="o">.</span><span class="n">bin</span><span class="p">(</span><span class="n">binsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">errorbar</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_how-to-recover-the-first-tess-candidate_49_0.png" src="../_images/tutorials_how-to-recover-the-first-tess-candidate_49_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="Comparing-two-apertures">
+<h2>Comparing two apertures<a class="headerlink" href="#Comparing-two-apertures" title="Permalink to this headline">¶</a></h2>
+<p>In the above tutorial we used our own aperture instead of the pipeline
+aperture. Let’s compare the results from using these two different
+apertures.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [29]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Use the default</span>
+<span class="n">lc</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">tpf</span><span class="o">.</span><span class="n">pipeline_mask</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">window_length</span><span class="o">=</span><span class="mi">1001</span><span class="p">)</span>
+<span class="n">lc</span> <span class="o">=</span> <span class="n">lc</span><span class="p">[(</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span> <span class="o">&lt;</span> <span class="mi">1346</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span> <span class="o">&gt;</span> <span class="mi">1350</span><span class="p">)]</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mf">6.27</span><span class="p">,</span> <span class="n">phase</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span><span class="o">.</span><span class="n">bin</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="c1"># Use a custom aperture</span>
+<span class="n">custom_lc</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">aperture_mask</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">window_length</span><span class="o">=</span><span class="mi">1001</span><span class="p">)</span>
+<span class="n">custom_lc</span> <span class="o">=</span> <span class="n">custom_lc</span><span class="p">[(</span><span class="n">custom_lc</span><span class="o">.</span><span class="n">time</span> <span class="o">&lt;</span> <span class="mi">1346</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">custom_lc</span><span class="o">.</span><span class="n">time</span> <span class="o">&gt;</span> <span class="mi">1350</span><span class="p">)]</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mf">6.27</span><span class="p">,</span> <span class="n">phase</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span><span class="o">.</span><span class="n">bin</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [30]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Default aperture&#39;</span><span class="p">)</span>
+<span class="n">custom_lc</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Custom aperture&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_how-to-recover-the-first-tess-candidate_52_0.png" src="../_images/tutorials_how-to-recover-the-first-tess-candidate_52_0.png" />
+</div>
+</div>
+<p>The importance of using different aperture masks is clearly visible in
+the figure above. Note however that the data archive at MAST also
+contains lightcurve products which have more advanced systematics
+removal methods applied. We will explore those in a future tutorial!</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="2.09-how-to-use-lightkurve-for-asteroseismology.html" class="btn btn-neutral float-right" title="How to use lightkurve for asteroseismology" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="2.02-recover-a-planet.html" class="btn btn-neutral" title="How to recover a known planet in Kepler data?" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright lightkurve developers and contributors
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

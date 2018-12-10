@@ -1,0 +1,6 @@
+get_initial_guesses
+===================
+
+.. currentmodule:: lightkurve.prf
+
+.. autofunction:: get_initial_guesses

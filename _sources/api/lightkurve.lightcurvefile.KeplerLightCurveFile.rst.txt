@@ -1,0 +1,63 @@
+KeplerLightCurveFile
+====================
+
+.. currentmodule:: lightkurve.lightcurvefile
+
+.. autoclass:: KeplerLightCurveFile
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~KeplerLightCurveFile.PDCSAP_FLUX
+      ~KeplerLightCurveFile.SAP_FLUX
+      ~KeplerLightCurveFile.astropy_time
+      ~KeplerLightCurveFile.cadenceno
+      ~KeplerLightCurveFile.campaign
+      ~KeplerLightCurveFile.channel
+      ~KeplerLightCurveFile.dec
+      ~KeplerLightCurveFile.mission
+      ~KeplerLightCurveFile.obsmode
+      ~KeplerLightCurveFile.pos_corr1
+      ~KeplerLightCurveFile.pos_corr2
+      ~KeplerLightCurveFile.quarter
+      ~KeplerLightCurveFile.ra
+      ~KeplerLightCurveFile.time
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~KeplerLightCurveFile.compute_cotrended_lightcurve
+      ~KeplerLightCurveFile.from_archive
+      ~KeplerLightCurveFile.from_fits
+      ~KeplerLightCurveFile.get_lightcurve
+      ~KeplerLightCurveFile.header
+      ~KeplerLightCurveFile.plot
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: PDCSAP_FLUX
+   .. autoattribute:: SAP_FLUX
+   .. autoattribute:: astropy_time
+   .. autoattribute:: cadenceno
+   .. autoattribute:: campaign
+   .. autoattribute:: channel
+   .. autoattribute:: dec
+   .. autoattribute:: mission
+   .. autoattribute:: obsmode
+   .. autoattribute:: pos_corr1
+   .. autoattribute:: pos_corr2
+   .. autoattribute:: quarter
+   .. autoattribute:: ra
+   .. autoattribute:: time
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: compute_cotrended_lightcurve
+   .. automethod:: from_archive
+   .. automethod:: from_fits
+   .. automethod:: get_lightcurve
+   .. automethod:: header
+   .. automethod:: plot

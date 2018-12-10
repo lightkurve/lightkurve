@@ -1,0 +1,877 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Interactively inspecting Target Pixel Files and Lightcurves &mdash; lightkurve 1.0b24.dev documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="How to remove common systematics using basis vectors (CBVs)" href="2.04-removing-cbvs.html" />
+    <link rel="prev" title="Systematics correction" href="section4.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> lightkurve
+          
+
+          
+            
+            <img src="../_static/lightkurve.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0b24.dev
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">API documentation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="section1.html">Introduction to lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="section2.html">Science with lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="section3.html">Extracting lightcurves</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="section4.html">Systematics correction</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Interactively inspecting Target Pixel Files and Lightcurves</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Pixel-selection">Pixel selection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#The-.interact()-method-applies-to-target-pixel-files.">The <code class="docutils literal notranslate"><span class="pre">.interact()</span></code> method applies to target pixel files.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Troubleshooting-.interact()">Troubleshooting <code class="docutils literal notranslate"><span class="pre">.interact()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="2.04-removing-cbvs.html">How to remove common systematics using basis vectors (CBVs)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2.01-how-to-detrend.html">How to remove K2 motion systematics with SFF?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="motion-correction/replicate-vanderburg-2014-k2sff.html">How does the SFF method work?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="motion-correction/replicate-vanderburg-2014-lightkurve.html">Replicating Vanderburg &amp; Johnson 2014 using lightkurve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="2.06-identify-rolling-band.html">How to identify time-variable background noise (“rolling bands”)?</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">About lightkurve</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing and reporting issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developer.html">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../citing.html">Citing and acknowledging lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../other_software.html">Other software</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">lightkurve</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="section4.html">Systematics correction</a> &raquo;</li>
+        
+      <li>Interactively inspecting Target Pixel Files and Lightcurves</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/tutorials/1.05-interact-with-lightcurves-and-tpf.ipynb.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput div.prompt,
+div.nbinput div.input_area,
+div.nbinput div[class*=highlight],
+div.nbinput div[class*=highlight] pre,
+div.nboutput,
+div.nbinput div.prompt,
+div.nbinput div.output_area,
+div.nboutput div[class*=highlight],
+div.nboutput div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput,
+    div.nboutput {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput div.prompt pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput div.prompt pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput div.prompt,
+div.nboutput div.prompt {
+    min-width: 8ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+@media (max-width: 540px) {
+    div.nbinput div.prompt,
+    div.nboutput div.prompt {
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput div.prompt.empty {
+        padding: 0;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput div.prompt pre,
+div.nboutput div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput div.input_area,
+div.nboutput div.output_area {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput div.input_area,
+    div.nboutput div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput div.input_area {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+</style>
+<div class="section" id="Interactively-inspecting-Target-Pixel-Files-and-Lightcurves">
+<h1>Interactively inspecting Target Pixel Files and Lightcurves<a class="headerlink" href="#Interactively-inspecting-Target-Pixel-Files-and-Lightcurves" title="Permalink to this headline">¶</a></h1>
+<p>One of the most common questions we get at the Kepler/K2 Guest Observer
+Office is “I see a noise blip in my K2 lightcurve. Is it real or
+instrumental?” Answering the question usually entails ticking through
+our (long, incomplete) mental list of conceivable, sometimes exotic
+instrumental artifacts. Space-craft induced periodic motion. Rolling
+band. Cosmic Rays. Collateral cosmic rays. Smear. Sudden pixel
+sensitivity dropouts. Fine-guidance-sensor cross talk. Regular cross
+talk. <a class="reference external" href="https://twitter.com/gully_/status/941707161058586624">Sweater
+fuzzy</a>.</p>
+<p>In this tutorial we introduce and explain the <code class="docutils literal notranslate"><span class="pre">tpf.interact()</span></code> tool
+that accomplishes the goal of interactively inspecting the TPFs and
+lightcurve simultaneously.</p>
+<div class="section" id="Pixel-selection">
+<h2>Pixel selection<a class="headerlink" href="#Pixel-selection" title="Permalink to this headline">¶</a></h2>
+<p>We have recently extended <code class="docutils literal notranslate"><span class="pre">.interact()</span></code> to offer instantaneous
+interactive selection of the pixel mask. You can now click on individual
+pixels and the aperture photometry updates. The mask can be defined with
+either individual clicking of pixels, or clicking and dragging a box
+over a rectangular set of pixels. <em>De</em>selection of individual pixels
+also works– simply re-click a pixel that you wish to take away from your
+mask.</p>
+<p>The default mask is the Kepler “pipeline” mask, and can be modified as
+described above.</p>
+</div>
+<div class="section" id="The-.interact()-method-applies-to-target-pixel-files.">
+<h2>The <code class="docutils literal notranslate"><span class="pre">.interact()</span></code> method applies to target pixel files.<a class="headerlink" href="#The-.interact()-method-applies-to-target-pixel-files." title="Permalink to this headline">¶</a></h2>
+<p>Using interact should be as simple as downloading a Kepler Target Pixel
+File (TPF) and running the method <code class="docutils literal notranslate"><span class="pre">.interact()</span></code>. This method can only
+be run in a Jupyter Notebook at the moment, and is limited to
+lightcurves with fewer than 30000 cadences.</p>
+<p>Let’s first look at the target HL Tau, a young star that possesses a
+gapped circumstellar disk <a class="reference external" href="http://www.almaobservatory.org/en/press-release/revolutionary-alma-image-reveals-planetary-genesis/">imaged by the Atacama Large Millimeter
+Array</a>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">lightkurve</span> <span class="k">import</span> <span class="n">search_targetpixelfile</span>
+<span class="n">tpf</span> <span class="o">=</span> <span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s2">&quot;HL Tau&quot;</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="mi">13</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p>The K2 postage stamp of HL Tau contains a portion of a nearby source of
+comparable brightness. The weakly overlapping point spread functions
+(PSFs) of these sources motivate some caution in aperture choice. Let’s
+interactively assign a custom aperture photometry pixel mask:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span><span class="o">.</span><span class="n">interact</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="figure" id="id1">
+<img alt="Lightkurve interact() demo" src="../_images/20180924_interact_HLTau.gif" />
+<p class="caption"><span class="caption-text">Lightkurve interact() demo</span></p>
+</div>
+<p>You can move the large bottom left slider to change the location of the
+verical red bar, which indicates which cadence is being shown in the TPF
+postage stamp image. The slider beneath the TPF postage stamp image
+controls the screen stretch, which defaults to logarithmic scaling
+initialized to 1% and 95% lower and upper limits respectively.</p>
+<p>You can move your cursor over individual data points to show hover-over
+tool-tips indicating additional information about that datum. Currently
+the tool tips list the cadence, time, flux, and quality flags. The tools
+on the right hand side of the plots enable zooming, and pixel selection.</p>
+<p>We see that the starting mask (the Kepler pipeline mask, by default),
+shows huge jumps in flux between times 3000 and 3020. These jagged
+artifacts disappear upon the selection of a larger aperture– large
+enough to encompass most of the point spread function of the star. The
+end result shows a time-series lightcurve of a young disk-bearing star.</p>
+<p>Interaction modes:</p>
+<ul class="simple">
+<li>Clicking on a single pixel shows the time-series lightcurve of that
+pixel alone.</li>
+<li><code class="docutils literal notranslate"><span class="pre">shift</span></code>-clicking on multiple pixels shows the lightcurve using that
+pixel mask.</li>
+<li><code class="docutils literal notranslate"><span class="pre">shift</span></code>-clicking on an already-selected pixel will <em>de</em>-select that
+pixel.</li>
+<li>Clicking and dragging a box will make a rectangular aperture mask–
+individual pixels can be deselected from this mask by shift-clicking
+(box de-selecting does not work).</li>
+<li>The screen stretch high and low limits can be changed independently
+by clicking and dragging each end, or simultaneously by clicking and
+dragging in the middle.</li>
+<li>The cadence slider updates the postage stamp image at the position of
+the vertical red bar in the lightcurve.</li>
+<li>Clicking on a position in the lightcurve automatically seeks to that
+Cadence Number.</li>
+<li>The left and right arrows can be clicked to increment the cadence
+number by one.</li>
+</ul>
+<p>The <code class="docutils literal notranslate"><span class="pre">interact()</span></code> tool works for both Kepler or K2 data. KOI 6.01 (KIC
+3248033) sits 4 pixels away from eclipsing binary KOI 1759.01 (KIC
+3248019). An unwise choice of pixels can give rise to a spurious
+exoplanet signal.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">tpf</span> <span class="o">=</span> <span class="n">search_targetpixelfile</span><span class="p">(</span><span class="mi">3248033</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span><span class="o">.</span><span class="n">interact</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="figure" id="id2">
+<img alt="Lightkurve interact() demo" src="../_images/20180925_interact_EB_contam.gif" />
+<p class="caption"><span class="caption-text">Lightkurve interact() demo</span></p>
+</div>
+<p>You can see that the Kepler pointing is remarkably stable over this
+Kepler quarter of 89 days. The value of interact arises from its ability
+to discern the spatial origin of signals. In this case, an eclipsing
+binary occupies the pixels towards the top of the postage stamp image.
+The target of interest occupies the pixels in the middle. The optimal
+aperture mask should avoid pixels near the top in order to mitigate an
+artificial planet signal.</p>
+</div>
+<div class="section" id="Troubleshooting-.interact()">
+<h2>Troubleshooting <code class="docutils literal notranslate"><span class="pre">.interact()</span></code><a class="headerlink" href="#Troubleshooting-.interact()" title="Permalink to this headline">¶</a></h2>
+<p>There are a few known limitations of <code class="docutils literal notranslate"><span class="pre">interact()</span></code>. First, interact
+only works in a Jupyter Notebook. We are experimenting with solutions to
+allow interact to work from additional settings. Second, you must either
+run interact from the default Jupyter notebook address “localhost:8888”,
+<strong>or tell interact the name of the notebook server</strong>, for example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span><span class="o">.</span><span class="n">interact</span><span class="p">(</span><span class="n">notebook_url</span><span class="o">=</span><span class="s1">&#39;localhost:8893&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>otherwise, you will likely see an error message like this:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">interact</span><span class="p">(</span><span class="n">notebook_url</span><span class="o">=</span><span class="s1">&#39;localhost:4321&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div></div>
+<script type="text/javascript">
+var element = document.currentScript.previousSibling.previousSibling;
+
+(function(root) {
+  function now() {
+    return new Date();
+  }
+
+  var force = true;
+
+  if (typeof (root._bokeh_onload_callbacks) === "undefined" || force === true) {
+    root._bokeh_onload_callbacks = [];
+    root._bokeh_is_loading = undefined;
+  }
+
+  var JS_MIME_TYPE = 'application/javascript';
+  var HTML_MIME_TYPE = 'text/html';
+  var EXEC_MIME_TYPE = 'application/vnd.bokehjs_exec.v0+json';
+  var CLASS_NAME = 'output_bokeh rendered_html';
+
+  /**
+   * Render data to the DOM node
+   */
+  function render(props, node) {
+    var script = document.createElement("script");
+    node.appendChild(script);
+  }
+
+  /**
+   * Handle when an output is cleared or removed
+   */
+  function handleClearOutput(event, handle) {
+    var cell = handle.cell;
+
+    var id = cell.output_area._bokeh_element_id;
+    var server_id = cell.output_area._bokeh_server_id;
+    // Clean up Bokeh references
+    if (id != null && id in Bokeh.index) {
+      Bokeh.index[id].model.document.clear();
+      delete Bokeh.index[id];
+    }
+
+    if (server_id !== undefined) {
+      // Clean up Bokeh references
+      var cmd = "from bokeh.io.state import curstate; print(curstate().uuid_to_server['" + server_id + "'].get_sessions()[0].document.roots[0]._id)";
+      cell.notebook.kernel.execute(cmd, {
+        iopub: {
+          output: function(msg) {
+            var id = msg.content.text.trim();
+            if (id in Bokeh.index) {
+              Bokeh.index[id].model.document.clear();
+              delete Bokeh.index[id];
+            }
+          }
+        }
+      });
+      // Destroy server and session
+      var cmd = "import bokeh.io.notebook as ion; ion.destroy_server('" + server_id + "')";
+      cell.notebook.kernel.execute(cmd);
+    }
+  }
+
+  /**
+   * Handle when a new output is added
+   */
+  function handleAddOutput(event, handle) {
+    var output_area = handle.output_area;
+    var output = handle.output;
+
+    // limit handleAddOutput to display_data with EXEC_MIME_TYPE content only
+    if ((output.output_type != "display_data") || (!output.data.hasOwnProperty(EXEC_MIME_TYPE))) {
+      return
+    }
+
+    var toinsert = output_area.element.find("." + CLASS_NAME.split(' ')[0]);
+
+    if (output.metadata[EXEC_MIME_TYPE]["id"] !== undefined) {
+      toinsert[toinsert.length - 1].firstChild.textContent = output.data[JS_MIME_TYPE];
+      // store reference to embed id on output_area
+      output_area._bokeh_element_id = output.metadata[EXEC_MIME_TYPE]["id"];
+    }
+    if (output.metadata[EXEC_MIME_TYPE]["server_id"] !== undefined) {
+      var bk_div = document.createElement("div");
+      bk_div.innerHTML = output.data[HTML_MIME_TYPE];
+      var script_attrs = bk_div.children[0].attributes;
+      for (var i = 0; i < script_attrs.length; i++) {
+        toinsert[toinsert.length - 1].firstChild.setAttribute(script_attrs[i].name, script_attrs[i].value);
+      }
+      // store reference to server id on output_area
+      output_area._bokeh_server_id = output.metadata[EXEC_MIME_TYPE]["server_id"];
+    }
+  }
+
+  function register_renderer(events, OutputArea) {
+
+    function append_mime(data, metadata, element) {
+      // create a DOM node to render to
+      var toinsert = this.create_output_subarea(
+        metadata,
+        CLASS_NAME,
+        EXEC_MIME_TYPE
+      );
+      this.keyboard_manager.register_events(toinsert);
+      // Render to node
+      var props = {data: data, metadata: metadata[EXEC_MIME_TYPE]};
+      render(props, toinsert[toinsert.length - 1]);
+      element.append(toinsert);
+      return toinsert
+    }
+
+    /* Handle when an output is cleared or removed */
+    events.on('clear_output.CodeCell', handleClearOutput);
+    events.on('delete.Cell', handleClearOutput);
+
+    /* Handle when a new output is added */
+    events.on('output_added.OutputArea', handleAddOutput);
+
+    /**
+     * Register the mime type and append_mime function with output_area
+     */
+    OutputArea.prototype.register_mime_type(EXEC_MIME_TYPE, append_mime, {
+      /* Is output safe? */
+      safe: true,
+      /* Index of renderer in `output_area.display_order` */
+      index: 0
+    });
+  }
+
+  // register the mime type if in Jupyter Notebook environment and previously unregistered
+  if (root.Jupyter !== undefined) {
+    var events = require('base/js/events');
+    var OutputArea = require('notebook/js/outputarea').OutputArea;
+
+    if (OutputArea.prototype.mime_types().indexOf(EXEC_MIME_TYPE) == -1) {
+      register_renderer(events, OutputArea);
+    }
+  }
+
+
+  if (typeof (root._bokeh_timeout) === "undefined" || force === true) {
+    root._bokeh_timeout = Date.now() + 5000;
+    root._bokeh_failed_load = false;
+  }
+
+  var NB_LOAD_WARNING = {'data': {'text/html':
+     "<div style='background-color: #fdd'>\n"+
+     "<p>\n"+
+     "BokehJS does not appear to have successfully loaded. If loading BokehJS from CDN, this \n"+
+     "may be due to a slow or bad network connection. Possible fixes:\n"+
+     "</p>\n"+
+     "<ul>\n"+
+     "<li>re-rerun `output_notebook()` to attempt to load from CDN again, or</li>\n"+
+     "<li>use INLINE resources instead, as so:</li>\n"+
+     "</ul>\n"+
+     "<code>\n"+
+     "from bokeh.resources import INLINE\n"+
+     "output_notebook(resources=INLINE)\n"+
+     "</code>\n"+
+     "</div>"}};
+
+  function display_loaded() {
+    var el = document.getElementById(null);
+    if (el != null) {
+      el.textContent = "BokehJS is loading...";
+    }
+    if (root.Bokeh !== undefined) {
+      if (el != null) {
+        el.textContent = "BokehJS " + root.Bokeh.version + " successfully loaded.";
+      }
+    } else if (Date.now() < root._bokeh_timeout) {
+      setTimeout(display_loaded, 100)
+    }
+  }
+
+
+  function run_callbacks() {
+    try {
+      root._bokeh_onload_callbacks.forEach(function(callback) { callback() });
+    }
+    finally {
+      delete root._bokeh_onload_callbacks
+    }
+    console.info("Bokeh: all callbacks have finished");
+  }
+
+  function load_libs(js_urls, callback) {
+    root._bokeh_onload_callbacks.push(callback);
+    if (root._bokeh_is_loading > 0) {
+      console.log("Bokeh: BokehJS is being loaded, scheduling callback at", now());
+      return null;
+    }
+    if (js_urls == null || js_urls.length === 0) {
+      run_callbacks();
+      return null;
+    }
+    console.log("Bokeh: BokehJS not loaded, scheduling load and callback at", now());
+    root._bokeh_is_loading = js_urls.length;
+    for (var i = 0; i < js_urls.length; i++) {
+      var url = js_urls[i];
+      var s = document.createElement('script');
+      s.src = url;
+      s.async = false;
+      s.onreadystatechange = s.onload = function() {
+        root._bokeh_is_loading--;
+        if (root._bokeh_is_loading === 0) {
+          console.log("Bokeh: all BokehJS libraries loaded");
+          run_callbacks()
+        }
+      };
+      s.onerror = function() {
+        console.warn("failed to load library " + url);
+      };
+      console.log("Bokeh: injecting script tag for BokehJS library: ", url);
+      document.getElementsByTagName("head")[0].appendChild(s);
+    }
+  };
+
+  var js_urls = ["https://cdn.pydata.org/bokeh/release/bokeh-0.13.0.min.js", "https://cdn.pydata.org/bokeh/release/bokeh-widgets-0.13.0.min.js", "https://cdn.pydata.org/bokeh/release/bokeh-tables-0.13.0.min.js", "https://cdn.pydata.org/bokeh/release/bokeh-gl-0.13.0.min.js"];
+
+  var inline_js = [
+    function(Bokeh) {
+      Bokeh.set_log_level("info");
+    },
+
+    function(Bokeh) {
+
+    },
+    function(Bokeh) {
+      console.log("Bokeh: injecting CSS: https://cdn.pydata.org/bokeh/release/bokeh-0.13.0.min.css");
+      Bokeh.embed.inject_css("https://cdn.pydata.org/bokeh/release/bokeh-0.13.0.min.css");
+      console.log("Bokeh: injecting CSS: https://cdn.pydata.org/bokeh/release/bokeh-widgets-0.13.0.min.css");
+      Bokeh.embed.inject_css("https://cdn.pydata.org/bokeh/release/bokeh-widgets-0.13.0.min.css");
+      console.log("Bokeh: injecting CSS: https://cdn.pydata.org/bokeh/release/bokeh-tables-0.13.0.min.css");
+      Bokeh.embed.inject_css("https://cdn.pydata.org/bokeh/release/bokeh-tables-0.13.0.min.css");
+    }
+  ];
+
+  function run_inline_js() {
+
+    if ((root.Bokeh !== undefined) || (force === true)) {
+      for (var i = 0; i < inline_js.length; i++) {
+        inline_js[i].call(root, root.Bokeh);
+      }} else if (Date.now() < root._bokeh_timeout) {
+      setTimeout(run_inline_js, 100);
+    } else if (!root._bokeh_failed_load) {
+      console.log("Bokeh: BokehJS failed to load within specified timeout.");
+      root._bokeh_failed_load = true;
+    } else if (force !== true) {
+      var cell = $(document.getElementById(null)).parents('.cell').data().cell;
+      cell.output_area.append_execute_result(NB_LOAD_WARNING)
+    }
+
+  }
+
+  if (root._bokeh_is_loading === 0) {
+    console.log("Bokeh: BokehJS loaded, going straight to plotting");
+    run_inline_js();
+  } else {
+    load_libs(js_urls, function() {
+      console.log("Bokeh: BokehJS plotting callback run at", now());
+      run_inline_js();
+    });
+  }
+}(window));
+</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script src="http://localhost:45291/autoload.js?bokeh-autoload-element=22cf3020-2f5b-4c95-b8c1-552262fdf135&bokeh-absolute-url=http://localhost:45291&resources=none" id="22cf3020-2f5b-4c95-b8c1-552262fdf135"></script></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="stderr output_area docutils container">
+<div class="highlight"><pre>
+ERROR:bokeh.server.views.ws:Refusing websocket connection from Origin &#39;http://localhost:8889&#39;;                       use --allow-websocket-origin=localhost:8889 to permit this; currently we allow origins {&#39;localhost:4321&#39;}
+WARNING:tornado.access:403 GET /ws?bokeh-protocol-version=1.0&amp;bokeh-session-id=HrQP3fE8lKQUTvhGwpsFMFCObfdgWpS2BsIUXEmibxBm (::1) 1.44ms
+</pre></div></div>
+</div>
+<p>Other unexpected behaviors can occur in interact. For example, when
+resetting the image views the revised plot scaling may not display the
+data. Attempting to de-select with a box will cause unexpected toggling
+of pixels. De-selection only works with the tap tool, so box-selections
+should use caution not to overlap with existing pixels. Short cadence
+lightcurves do not work with interact at the moment. There is no way to
+save the generated mask at the moment. If you would like to see a way to
+export masks, please upvote our <a class="reference external" href="https://github.com/KeplerGO/lightkurve/issues/265">GitHub Issue about mask generation with
+interact</a>.</p>
+<p>We are continuing to improve interact. We welcome any feedback about the
+tool or feature requests. You can <a class="reference external" href="https://keplerscience.arc.nasa.gov/helpdesk.html">email
+us</a> or <a class="reference external" href="https://github.com/KeplerGO/lightkurve/issues">open an
+Issue on our lightkurve GitHub
+repository</a>.</p>
+<p>Finally, we’d like to thank the developers of
+<a class="reference external" href="https://bokeh.pydata.org/en/latest/">Bokeh</a>, upon which interact
+relies.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="2.04-removing-cbvs.html" class="btn btn-neutral float-right" title="How to remove common systematics using basis vectors (CBVs)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="section4.html" class="btn btn-neutral" title="Systematics correction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright lightkurve developers and contributors
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

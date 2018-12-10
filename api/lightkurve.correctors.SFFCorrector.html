@@ -1,0 +1,442 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>SFFCorrector &mdash; lightkurve 1.0b24.dev documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="PRF photometry classes" href="prf.html" />
+    <link rel="prev" title="KeplerCBVCorrector" href="lightkurve.correctors.KeplerCBVCorrector.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> lightkurve
+          
+
+          
+            
+            <img src="../_static/lightkurve.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0b24.dev
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="lightcurve.html">LightCurve classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lightcurvefile.html">LightCurveFile classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="targetpixelfile.html">TargetPixelFile classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="search.html">Data search functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="periodogram.html">Periodogram classes</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="correctors.html">Systematics correction classes</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="correctors.html#classes">Classes</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="lightkurve.correctors.KeplerCBVCorrector.html">KeplerCBVCorrector</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">SFFCorrector</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="correctors.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="prf.html">PRF photometry classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">Utility functions</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section1.html">Introduction to lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section2.html">Science with lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section3.html">Extracting lightcurves</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/section4.html">Systematics correction</a></li>
+</ul>
+<p class="caption"><span class="caption-text">About lightkurve</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing and reporting issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developer.html">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../citing.html">Citing and acknowledging lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../other_software.html">Other software</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">lightkurve</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">API documentation</a> &raquo;</li>
+        
+          <li><a href="correctors.html">Systematics correction classes</a> &raquo;</li>
+        
+      <li>SFFCorrector</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/api/lightkurve.correctors.SFFCorrector.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+</style>
+<div class="section" id="sffcorrector">
+<h1>SFFCorrector<a class="headerlink" href="#sffcorrector" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="lightkurve.correctors.SFFCorrector">
+<em class="property">class </em><code class="descclassname">lightkurve.correctors.</code><code class="descname">SFFCorrector</code><a class="reference internal" href="../_modules/lightkurve/correctors.html#SFFCorrector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.correctors.SFFCorrector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Implements the Self-Flat-Fielding (SFF) systematics removal method.</p>
+<p>This method is described in detail by Vanderburg and Johnson (2014).
+Briefly, the algorithm implemented in this class can be described
+as follows</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Rotate the centroid measurements onto the subspace spanned by the
+eigenvectors of the centroid covariance matrix</li>
+<li>Fit a polynomial to the rotated centroids</li>
+<li>Compute the arclength of such polynomial</li>
+<li>Fit a BSpline of the raw flux as a function of time</li>
+<li>Normalize the raw flux by the fitted BSpline computed in step (4)</li>
+<li>Bin and interpolate the normalized flux as a function of the arclength</li>
+<li>Divide the raw flux by the piecewise linear interpolation done in step (6)</li>
+<li>Set raw flux as the flux computed in step (7) and repeat</li>
+<li>Multiply back the fitted BSpline</li>
+</ol>
+</div></blockquote>
+<p class="rubric">Methods Summary</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.correctors.SFFCorrector.arclength" title="lightkurve.correctors.SFFCorrector.arclength"><code class="xref py py-obj docutils literal notranslate"><span class="pre">arclength</span></code></a>(x1,&nbsp;x)</td>
+<td>Compute the arclength of the polynomial used to fit the centroid measurements.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#lightkurve.correctors.SFFCorrector.bin_and_interpolate" title="lightkurve.correctors.SFFCorrector.bin_and_interpolate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bin_and_interpolate</span></code></a>(s,&nbsp;normflux,&nbsp;bins,&nbsp;sigma)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.correctors.SFFCorrector.breakpoints" title="lightkurve.correctors.SFFCorrector.breakpoints"><code class="xref py py-obj docutils literal notranslate"><span class="pre">breakpoints</span></code></a>(campaign)</td>
+<td>Return a break point as a function of the campaign number.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#lightkurve.correctors.SFFCorrector.correct" title="lightkurve.correctors.SFFCorrector.correct"><code class="xref py py-obj docutils literal notranslate"><span class="pre">correct</span></code></a>(time,&nbsp;flux,&nbsp;centroid_col,&nbsp;centroid_row)</td>
+<td>Returns a systematics-corrected LightCurve.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.correctors.SFFCorrector.fit_bspline" title="lightkurve.correctors.SFFCorrector.fit_bspline"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit_bspline</span></code></a>(time,&nbsp;flux[,&nbsp;knotspacing])</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#lightkurve.correctors.SFFCorrector.rotate_centroids" title="lightkurve.correctors.SFFCorrector.rotate_centroids"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rotate_centroids</span></code></a>(centroid_col,&nbsp;centroid_row)</td>
+<td>Rotate the coordinate frame of the (col, row) centroids to a new (x,y) frame in which the dominant motion of the spacecraft is aligned with the x axis.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods Documentation</p>
+<dl class="method">
+<dt id="lightkurve.correctors.SFFCorrector.arclength">
+<code class="descname">arclength</code><span class="sig-paren">(</span><em>x1</em>, <em>x</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/correctors.html#SFFCorrector.arclength"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.arclength" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the arclength of the polynomial used to fit the centroid
+measurements.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>x1</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd><p class="first last">Upper limit of the integration domain.</p>
+</dd>
+<dt><strong>x</strong> <span class="classifier-delimiter">:</span> <span class="classifier">ndarray</span></dt>
+<dd><p class="first last">Domain at which the arclength integrand is defined.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>arclength</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd><p class="first last">Result of the arclength integral from x[0] to x1.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="lightkurve.correctors.SFFCorrector.bin_and_interpolate">
+<code class="descname">bin_and_interpolate</code><span class="sig-paren">(</span><em>s</em>, <em>normflux</em>, <em>bins</em>, <em>sigma</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/correctors.html#SFFCorrector.bin_and_interpolate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.bin_and_interpolate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lightkurve.correctors.SFFCorrector.breakpoints">
+<code class="descname">breakpoints</code><span class="sig-paren">(</span><em>campaign</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/correctors.html#SFFCorrector.breakpoints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.breakpoints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a break point as a function of the campaign number.</p>
+<p>The intention of this function is to implement a smart way to determine
+the boundaries of the windows on which the SFF algorithm is applied
+independently. However, this is not implemented yet in this version.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="lightkurve.correctors.SFFCorrector.correct">
+<code class="descname">correct</code><span class="sig-paren">(</span><em>time</em>, <em>flux</em>, <em>centroid_col</em>, <em>centroid_row</em>, <em>polyorder=5</em>, <em>niters=3</em>, <em>bins=15</em>, <em>windows=10</em>, <em>sigma_1=3.0</em>, <em>sigma_2=5.0</em>, <em>restore_trend=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/correctors.html#SFFCorrector.correct"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.correct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a systematics-corrected LightCurve.</p>
+<p>Note that it is assumed that time and flux do not contain NaNs.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>time</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array-like</span></dt>
+<dd><p class="first last">Time measurements</p>
+</dd>
+<dt><strong>flux</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array-like</span></dt>
+<dd><p class="first last">Data flux for every time point</p>
+</dd>
+<dt><strong>centroid_col, centroid_row</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array-like, array-like</span></dt>
+<dd><p class="first last">Centroid column and row coordinates as a function of time</p>
+</dd>
+<dt><strong>polyorder</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">Degree of the polynomial which will be used to fit one
+centroid as a function of the other.</p>
+</dd>
+<dt><strong>niters</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">Number of iterations of the aforementioned algorithm.</p>
+</dd>
+<dt><strong>bins</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">Number of bins to be used in step (6) to create the
+piece-wise interpolation of arclength vs flux correction.</p>
+</dd>
+<dt><strong>windows</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">Number of windows to subdivide the data.  The SFF algorithm
+is ran independently in each window.</p>
+</dd>
+<dt><strong>sigma_1, sigma_2</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float, float</span></dt>
+<dd><p class="first last">Sigma values which will be used to reject outliers
+in steps (6) and (2), respectivelly.</p>
+</dd>
+<dt><strong>restore_trend</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd><p class="first last">If <cite>True</cite>, the long-term trend will be added back into the
+lightcurve.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>corrected_lightcurve</strong> <span class="classifier-delimiter">:</span> <span class="classifier">LightCurve object</span></dt>
+<dd><p class="first last">Returns a corrected lightcurve object.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="lightkurve.correctors.SFFCorrector.fit_bspline">
+<code class="descname">fit_bspline</code><span class="sig-paren">(</span><em>time</em>, <em>flux</em>, <em>knotspacing=1.5</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/correctors.html#SFFCorrector.fit_bspline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.fit_bspline" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lightkurve.correctors.SFFCorrector.rotate_centroids">
+<code class="descname">rotate_centroids</code><span class="sig-paren">(</span><em>centroid_col</em>, <em>centroid_row</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/correctors.html#SFFCorrector.rotate_centroids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.rotate_centroids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rotate the coordinate frame of the (col, row) centroids to a new (x,y)
+frame in which the dominant motion of the spacecraft is aligned with
+the x axis.  This makes it easier to fit a characteristic polynomial
+that describes the motion.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="prf.html" class="btn btn-neutral float-right" title="PRF photometry classes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="lightkurve.correctors.KeplerCBVCorrector.html" class="btn btn-neutral" title="KeplerCBVCorrector" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright lightkurve developers and contributors
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

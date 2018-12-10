@@ -1,0 +1,1130 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>How does the SFF method work? &mdash; lightkurve 1.0b24.dev documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Replicating Vanderburg &amp; Johnson 2014 using lightkurve" href="replicate-vanderburg-2014-lightkurve.html" />
+    <link rel="prev" title="How to remove K2 motion systematics with SFF?" href="../2.01-how-to-detrend.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> lightkurve
+          
+
+          
+            
+            <img src="../../_static/lightkurve.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0b24.dev
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/index.html">API documentation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../section1.html">Introduction to lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../section2.html">Science with lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../section3.html">Extracting lightcurves</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../section4.html">Systematics correction</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../1.05-interact-with-lightcurves-and-tpf.html">Interactively inspecting Target Pixel Files and Lightcurves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../2.04-removing-cbvs.html">How to remove common systematics using basis vectors (CBVs)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../2.01-how-to-detrend.html">How to remove K2 motion systematics with SFF?</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">How does the SFF method work?</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Retrieve-the-K2SFF-data-for-ENG-test-source-60021426">Retrieve the K2SFF data for ENG test source <code class="docutils literal notranslate"><span class="pre">60021426</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Manually-reproduce-with-the-Vanderburg-provided-diagnostic-data">Manually reproduce with the Vanderburg-provided diagnostic data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="replicate-vanderburg-2014-lightkurve.html">Replicating Vanderburg &amp; Johnson 2014 using lightkurve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../2.06-identify-rolling-band.html">How to identify time-variable background noise (“rolling bands”)?</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">About lightkurve</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing and reporting issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer.html">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../citing.html">Citing and acknowledging lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../other_software.html">Other software</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">lightkurve</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../section4.html">Systematics correction</a> &raquo;</li>
+        
+      <li>How does the SFF method work?</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/tutorials/motion-correction/replicate-vanderburg-2014-k2sff.ipynb.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput div.prompt,
+div.nbinput div.input_area,
+div.nbinput div[class*=highlight],
+div.nbinput div[class*=highlight] pre,
+div.nboutput,
+div.nbinput div.prompt,
+div.nbinput div.output_area,
+div.nboutput div[class*=highlight],
+div.nboutput div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput,
+    div.nboutput {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput div.prompt pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput div.prompt pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput div.prompt,
+div.nboutput div.prompt {
+    min-width: 8ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+@media (max-width: 540px) {
+    div.nbinput div.prompt,
+    div.nboutput div.prompt {
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput div.prompt.empty {
+        padding: 0;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput div.prompt pre,
+div.nboutput div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput div.input_area,
+div.nboutput div.output_area {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput div.input_area,
+    div.nboutput div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput div.input_area {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+</style>
+<div class="section" id="How-does-the-SFF-method-work?">
+<h1>How does the SFF method work?<a class="headerlink" href="#How-does-the-SFF-method-work?" title="Permalink to this headline">¶</a></h1>
+<p>Vanderburg and Johnson (2014) introduced a method for “Self Flat
+Fielding” by tracking how the lightcurve changes with motion of the
+spacecraft:</p>
+<p><a class="reference external" href="http://adsabs.harvard.edu/abs/2014PASP..126..948V">A Technique for Extracting Highly Precise Photometry for the
+Two-Wheeled Kepler
+Mission</a></p>
+<p>In this notebook we replicate the K2SFF method following the same
+example source, #60021426, as that in the publication. We aim to
+demystify the technique, which is extremely popular within the K2
+community. We have focused on reproducibility, so that we achieve the
+same result at the publication.</p>
+<p>The Vanderburg &amp; Johnson 2014 paper uses data from the Kepler two-wheel
+“Concept Engineering Test”, predating campaign 0, and sometimes called
+campaign <em>“eng”</em> or abbreviated CET. This vestigal “campaign” lacks some
+of the standardization of later K2 campaigns— it was much shorter, only
+about 9 days long, it lacks some of the standard quality flags, targets
+have non-traditional EPIC IDs, and other quirks.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">astropy.io</span> <span class="k">import</span> <span class="n">fits</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="Retrieve-the-K2SFF-data-for-ENG-test-source-60021426">
+<h2>Retrieve the K2SFF data for ENG test source <code class="docutils literal notranslate"><span class="pre">60021426</span></code><a class="headerlink" href="#Retrieve-the-K2SFF-data-for-ENG-test-source-60021426" title="Permalink to this headline">¶</a></h2>
+<p>First we will retrieve data and inspect the mask used in the paper.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="ch">#! wget -q http://archive.stsci.edu/hlsps/k2sff/cet/060000000/21426/hlsp_k2sff_k2_lightcurve_060021426-cet_kepler_v1_llc.fits</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">vdb_fits</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;hlsp_k2sff_k2_lightcurve_060021426-cet_kepler_v1_llc.fits&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">BESTAPER</span></code> keyword explains which aperture was chosen as the
+“best” by Vanderburg &amp; Johnson 2014. The FITS header for that slice
+contains the metadata needed to reproduce the mask.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;MASKTYPE&#39;</span><span class="p">,</span> <span class="s1">&#39;MASKINDE&#39;</span><span class="p">,</span> <span class="s1">&#39;NPIXSAP&#39;</span><span class="p">]</span>
+<span class="n">_</span> <span class="o">=</span> <span class="p">[</span><span class="nb">print</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s1">&#39; : &#39;</span><span class="p">,</span> <span class="n">vdb_fits</span><span class="p">[</span><span class="s1">&#39;BESTAPER&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="n">key</span><span class="p">])</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+MASKTYPE  :  PRF FIT
+MASKINDE  :  4
+NPIXSAP  :  29.0
+</pre></div></div>
+</div>
+<p>We want the <em>exact same</em> mask as Vanderburg &amp; Johnson 2014, but the
+publication version and MAST version differ!</p>
+<p>Publication version: <img alt="img" src="https://www.cfa.harvard.edu/~avanderb/k2/ep60021426image.png" /></p>
+<p>MAST Version: <img alt="MAST Version" src="http://archive.stsci.edu/hlsps/k2sff/cet/060000000/21426/hlsp_k2sff_k2_lightcurve_060021426-cet_kepler_v1_image.png" /></p>
+<p>Aperture 7 should yield a bigger mask, more similar to what was used in
+the paper.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">VDB_J_mask</span> <span class="o">=</span> <span class="n">vdb_fits</span><span class="p">[</span><span class="s1">&#39;PRF_APER_TBL&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">7</span><span class="p">,:,</span> <span class="p">:]</span> <span class="o">==</span> <span class="kc">True</span>
+<span class="n">VDB_J_mask</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[5]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>53
+</pre></div>
+</div>
+</div>
+<p>Save the mask for easy use in our next notebook.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;VDB_J_2014_mask.npy&#39;</span><span class="p">,</span> <span class="n">VDB_J_mask</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Manually-reproduce-with-the-Vanderburg-provided-diagnostic-data">
+<h2>Manually reproduce with the Vanderburg-provided diagnostic data<a class="headerlink" href="#Manually-reproduce-with-the-Vanderburg-provided-diagnostic-data" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line">Retrieve the Vanderburg-provided diagnostic data for the Kepler ENG
+testing.</div>
+<div class="line">Uncomment the line below to retrieve the data programmatically, or
+manually get the linked file in a browser and save it to this
+directory.</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="ch">#! wget https://www.cfa.harvard.edu/~avanderb/k2/ep60021426alldiagnostics.csv</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+--2018-05-22 14:24:12--  https://www.cfa.harvard.edu/~avanderb/k2/ep60021426alldiagnostics.csv
+Resolving www.cfa.harvard.edu (www.cfa.harvard.edu)... 131.142.21.11
+Connecting to www.cfa.harvard.edu (www.cfa.harvard.edu)|131.142.21.11|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 33564 (33K) [text/plain]
+Saving to: ‘ep60021426alldiagnostics.csv.1’
+
+ep60021426alldiagno 100%[===================&gt;]  32.78K   153KB/s    in 0.2s
+
+2018-05-22 14:24:13 (153 KB/s) - ‘ep60021426alldiagnostics.csv.1’ saved [33564/33564]
+
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;ep60021426alldiagnostics.csv&#39;</span><span class="p">,</span><span class="n">index_col</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[8]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>BJD - 2454833</th>
+      <th>Raw Flux</th>
+      <th>Corrected Flux</th>
+      <th>X-centroid</th>
+      <th>Y-centroid</th>
+      <th>arclength</th>
+      <th>Correction</th>
+      <th>Thrusters On</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1862.502368</td>
+      <td>0.995119</td>
+      <td>0.995985</td>
+      <td>25.135097</td>
+      <td>24.661074</td>
+      <td>2.327480</td>
+      <td>0.999130</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1862.522801</td>
+      <td>0.997313</td>
+      <td>0.996767</td>
+      <td>25.289752</td>
+      <td>24.418689</td>
+      <td>1.175322</td>
+      <td>1.000548</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1862.543235</td>
+      <td>0.996713</td>
+      <td>0.996136</td>
+      <td>25.288052</td>
+      <td>24.429406</td>
+      <td>1.214627</td>
+      <td>1.000580</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1862.563668</td>
+      <td>0.996930</td>
+      <td>0.996277</td>
+      <td>25.275216</td>
+      <td>24.448405</td>
+      <td>1.306617</td>
+      <td>1.000656</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1862.584102</td>
+      <td>0.996862</td>
+      <td>0.996228</td>
+      <td>25.253864</td>
+      <td>24.480184</td>
+      <td>1.460259</td>
+      <td>1.000636</td>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>We can mean-subtract the provided <span class="math notranslate nohighlight">\(x-y\)</span> centroids, assigning them
+column and row identifiers, then rotate the coordinates into their major
+and minor axes.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">col</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39; X-centroid&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+<span class="n">col</span> <span class="o">=</span> <span class="n">col</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+<span class="n">row</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39; Y-centroid&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+<span class="n">row</span> <span class="o">=</span> <span class="n">row</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">def</span> <span class="nf">_get_eigen_vectors</span><span class="p">(</span><span class="n">centroid_col</span><span class="p">,</span> <span class="n">centroid_row</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;get the eigenvalues and eigenvectors given centroid x, y positions&#39;&#39;&#39;</span>
+    <span class="n">centroids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">centroid_col</span><span class="p">,</span> <span class="n">centroid_row</span><span class="p">])</span>
+    <span class="n">eig_val</span><span class="p">,</span> <span class="n">eig_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">centroids</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">eig_val</span><span class="p">,</span> <span class="n">eig_vec</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">def</span> <span class="nf">_rotate</span><span class="p">(</span><span class="n">eig_vec</span><span class="p">,</span> <span class="n">centroid_col</span><span class="p">,</span> <span class="n">centroid_row</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;rotate the centroids into their predominant linear axis&#39;&#39;&#39;</span>
+    <span class="n">centroids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">centroid_col</span><span class="p">,</span> <span class="n">centroid_row</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">eig_vec</span><span class="p">,</span> <span class="n">centroids</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">eig_val</span><span class="p">,</span> <span class="n">eig_vec</span> <span class="o">=</span> <span class="n">_get_eigen_vectors</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span>
+<span class="n">v1</span><span class="p">,</span> <span class="n">v2</span> <span class="o">=</span> <span class="n">eig_vec</span>
+</pre></div>
+</div>
+</div>
+<p>The major axis is the latter.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">platescale</span> <span class="o">=</span> <span class="mf">4.0</span> <span class="c1"># The Kepler plate scale; has units of arcseconds / pixel</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">col</span> <span class="o">*</span> <span class="n">platescale</span><span class="p">,</span> <span class="n">row</span> <span class="o">*</span> <span class="n">platescale</span><span class="p">,</span> <span class="s1">&#39;ko&#39;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">col</span> <span class="o">*</span> <span class="n">platescale</span><span class="p">,</span> <span class="n">row</span> <span class="o">*</span> <span class="n">platescale</span><span class="p">,</span> <span class="s1">&#39;ro&#39;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">([</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">([</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;X position [arcseconds]&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Y position [arcseconds]&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">v1</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">v1</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">v2</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">v2</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_motion-correction_replicate-vanderburg-2014-k2sff_25_0.png" src="../../_images/tutorials_motion-correction_replicate-vanderburg-2014-k2sff_25_0.png" />
+</div>
+</div>
+<p>Following the form of <strong>Figure 2</strong> of Vanderburg &amp; Johsnon 2014.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">rot_colp</span><span class="p">,</span> <span class="n">rot_rowp</span> <span class="o">=</span> <span class="n">_rotate</span><span class="p">(</span><span class="n">eig_vec</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span> <span class="c1">#units in pixels</span>
+</pre></div>
+</div>
+</div>
+<p>You can rotate into the new reference frame.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">rot_rowp</span> <span class="o">*</span> <span class="n">platescale</span><span class="p">,</span> <span class="n">rot_colp</span> <span class="o">*</span> <span class="n">platescale</span><span class="p">,</span> <span class="s1">&#39;ko&#39;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">rot_rowp</span> <span class="o">*</span> <span class="n">platescale</span><span class="p">,</span> <span class="n">rot_colp</span> <span class="o">*</span> <span class="n">platescale</span><span class="p">,</span> <span class="s1">&#39;ro&#39;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">([</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">([</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;X&#39; position [arcseconds]&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Y&#39; position [arcseconds]&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_motion-correction_replicate-vanderburg-2014-k2sff_29_0.png" src="../../_images/tutorials_motion-correction_replicate-vanderburg-2014-k2sff_29_0.png" />
+</div>
+</div>
+<p>We need to calculate the arclength using:</p>
+<div class="math notranslate nohighlight">
+\begin{equation}s= \int_{x'_0}^{x'_1}\sqrt{1+\left( \frac{dy'_p}{dx'}\right)^2} dx'\end{equation}</div><p>where <span class="math notranslate nohighlight">\(x^\prime_0\)</span> is the transformed <span class="math notranslate nohighlight">\(x\)</span> coordinate of the
+point with the smallest <span class="math notranslate nohighlight">\(x^\prime\)</span> position, and
+<span class="math notranslate nohighlight">\(y^\prime_p\)</span> is the best–fit polynomial function.</p>
+<p>Fit a <span class="math notranslate nohighlight">\(5^{th}\)</span> order polynomial to the rotated coordinates.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">rot_rowp</span><span class="p">,</span> <span class="n">rot_colp</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">p5</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+<span class="n">p5_deriv</span> <span class="o">=</span> <span class="n">p5</span><span class="o">.</span><span class="n">deriv</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">x0_prime</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">rot_rowp</span><span class="p">)</span>
+<span class="n">xmax_prime</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">rot_rowp</span><span class="p">)</span>
+<span class="n">x_dense</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">x0_prime</span><span class="p">,</span> <span class="n">xmax_prime</span><span class="p">,</span> <span class="mi">2000</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">rot_rowp</span><span class="p">,</span> <span class="n">rot_colp</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_dense</span><span class="p">,</span> <span class="n">p5</span><span class="p">(</span><span class="n">x_dense</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Position along minor axis (pixels)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Position along major axis (pixels)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Performance of polynomial regression&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_motion-correction_replicate-vanderburg-2014-k2sff_34_0.png" src="../../_images/tutorials_motion-correction_replicate-vanderburg-2014-k2sff_34_0.png" />
+</div>
+</div>
+<p>We see evidence for a <a class="reference external" href="https://en.wikipedia.org/wiki/Bias%E2%80%93variance_tradeoff">bias-variance
+tradeoff</a>,
+suggesting some modest opportunity for improvement.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="nd">@np</span><span class="o">.</span><span class="n">vectorize</span>
+<span class="k">def</span> <span class="nf">arclength</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Input x1_prime, get out arclength&#39;&#39;&#39;</span>
+    <span class="n">gi</span> <span class="o">=</span> <span class="n">x_dense</span> <span class="o">&lt;</span><span class="n">x</span>
+    <span class="n">s_integrand</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">p5_deriv</span><span class="p">(</span><span class="n">x_dense</span><span class="p">[</span><span class="n">gi</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">trapz</span><span class="p">(</span><span class="n">s_integrand</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x_dense</span><span class="p">[</span><span class="n">gi</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">s</span>
+</pre></div>
+</div>
+</div>
+<p>Let’s double check that we compute the same arclength as the published
+paper.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">aspect_ratio</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figaspect</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">aspect_ratio</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39; arclength&#39;</span><span class="p">],</span> <span class="n">arclength</span><span class="p">(</span><span class="n">rot_rowp</span><span class="p">)</span><span class="o">*</span><span class="mf">4.0</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;$s$  (Vanderburg &amp; Johnson 2014)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;$s$  (This work)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="s1">&#39;k--&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_motion-correction_replicate-vanderburg-2014-k2sff_38_0.png" src="../../_images/tutorials_motion-correction_replicate-vanderburg-2014-k2sff_38_0.png" />
+</div>
+</div>
+<p>Yes, we compute arclength correctly.</p>
+<p>Now we apply a <strong>high-pass filter</strong> to the raw lightcurve data. We
+follow the original paper by using <em>BSplines</em> with 1.5 day breakpoints.
+You can also apply data exclusion at this stage.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="k">import</span> <span class="n">BSpline</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="k">import</span> <span class="n">interpolate</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">times</span><span class="p">,</span> <span class="n">raw_fluxes</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;BJD - 2454833&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39; Raw Flux&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+</pre></div>
+</div>
+</div>
+<p>We find the weighted least square spline for a given set of knots,
+<span class="math notranslate nohighlight">\(t\)</span>. We supply interior knots as knots on the ends are added
+automatically, as stated in the <code class="docutils literal notranslate"><span class="pre">interpolate.splrep()</span></code> docstring.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">interior_knots</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">times</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">times</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">6</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">)</span>
+<span class="n">t</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">k</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">splrep</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">raw_fluxes</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">task</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="n">interior_knots</span><span class="p">)</span>
+<span class="n">bspl</span> <span class="o">=</span> <span class="n">BSpline</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">raw_fluxes</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">bspl</span><span class="p">(</span><span class="n">times</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;$t$ (days)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Raw Flux&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_motion-correction_replicate-vanderburg-2014-k2sff_45_0.png" src="../../_images/tutorials_motion-correction_replicate-vanderburg-2014-k2sff_45_0.png" />
+</div>
+</div>
+<div class="line-block">
+<div class="line">The Spline fit looks good, so we can normalize the flux by the
+long-term trend.</div>
+<div class="line">Plot the normalized flux versus arclength to see the
+position-dependent flux.</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">fluxes</span> <span class="o">=</span> <span class="n">raw_fluxes</span><span class="o">/</span><span class="n">bspl</span><span class="p">(</span><span class="n">times</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Mask the data by keeping only the good samples.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">bi</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39; Thrusters On&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> <span class="o">==</span> <span class="mf">1.0</span>
+<span class="n">gi</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39; Thrusters On&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> <span class="o">==</span> <span class="mf">0.0</span>
+<span class="n">clean_fluxes</span> <span class="o">=</span> <span class="n">fluxes</span><span class="p">[</span><span class="n">gi</span><span class="p">]</span>
+<span class="n">al</span> <span class="o">=</span> <span class="n">arclength</span><span class="p">(</span><span class="n">rot_rowp</span><span class="p">[</span><span class="n">gi</span><span class="p">])</span> <span class="o">*</span> <span class="n">platescale</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">sorted_inds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">al</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>We will follow the paper by interpolating <strong>flux versus arclength
+position</strong> in 15 bins of means, which is a <em>piecewise linear fit</em>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [29]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">knots</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">al</span><span class="p">)]</span><span class="o">+</span>
+                 <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">splt</span><span class="p">)</span> <span class="k">for</span> <span class="n">splt</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="n">al</span><span class="p">[</span><span class="n">sorted_inds</span><span class="p">],</span> <span class="mi">15</span><span class="p">)]</span><span class="o">+</span>
+                 <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">al</span><span class="p">)])</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [30]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">bin_means</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">clean_fluxes</span><span class="p">[</span><span class="n">sorted_inds</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span><span class="o">+</span>
+                     <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">splt</span><span class="p">)</span> <span class="k">for</span> <span class="n">splt</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="n">clean_fluxes</span><span class="p">[</span><span class="n">sorted_inds</span><span class="p">],</span> <span class="mi">15</span><span class="p">)]</span><span class="o">+</span>
+                     <span class="p">[</span><span class="n">clean_fluxes</span><span class="p">[</span><span class="n">sorted_inds</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [31]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">zz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">al</span><span class="p">,</span> <span class="n">clean_fluxes</span><span class="p">,</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">sff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">(</span><span class="n">zz</span><span class="p">)</span>
+<span class="n">al_dense</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="n">interp_func</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="n">knots</span><span class="p">,</span> <span class="n">bin_means</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [32]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">arclength</span><span class="p">(</span><span class="n">rot_rowp</span><span class="p">)</span><span class="o">*</span><span class="mf">4.0</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="s1">&#39;ko&#39;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">arclength</span><span class="p">(</span><span class="n">rot_rowp</span><span class="p">)</span><span class="o">*</span><span class="mf">4.0</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#3498db&#39;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">arclength</span><span class="p">(</span><span class="n">rot_rowp</span><span class="p">[</span><span class="n">bi</span><span class="p">])</span><span class="o">*</span><span class="mf">4.0</span><span class="p">,</span> <span class="n">fluxes</span><span class="p">[</span><span class="n">bi</span><span class="p">],</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">al</span><span class="p">),</span> <span class="n">interp_func</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">al</span><span class="p">)),</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#e67e22&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">minorticks_on</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Arclength [arcseconds]&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Relative Brightness&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;EPIC 60021426, Kp =10.3&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="mf">0.997</span><span class="p">,</span> <span class="mf">1.002</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_motion-correction_replicate-vanderburg-2014-k2sff_55_0.png" src="../../_images/tutorials_motion-correction_replicate-vanderburg-2014-k2sff_55_0.png" />
+</div>
+</div>
+<p>Following <strong>Figure 4</strong> of Vanderburg &amp; Johnson 2014.</p>
+<p>Apply the Self Flat Field (SFF) correction:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [33]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">corr_fluxes</span> <span class="o">=</span> <span class="n">clean_fluxes</span> <span class="o">/</span> <span class="n">interp_func</span><span class="p">(</span><span class="n">al</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [34]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+
+<span class="n">dy</span> <span class="o">=</span> <span class="mf">0.004</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;BJD - 2454833&#39;</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39; Raw Flux&#39;</span><span class="p">]</span><span class="o">+</span><span class="n">dy</span><span class="p">,</span> <span class="s1">&#39;ko&#39;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;BJD - 2454833&#39;</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39; Raw Flux&#39;</span><span class="p">]</span><span class="o">+</span><span class="n">dy</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#3498db&#39;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;BJD - 2454833&#39;</span><span class="p">][</span><span class="n">bi</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39; Raw Flux&#39;</span><span class="p">][</span><span class="n">bi</span><span class="p">]</span><span class="o">+</span><span class="n">dy</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;BJD - 2454833&#39;</span><span class="p">][</span><span class="n">gi</span><span class="p">],</span> <span class="n">corr_fluxes</span><span class="o">*</span><span class="n">bspl</span><span class="p">(</span><span class="n">times</span><span class="p">[</span><span class="n">gi</span><span class="p">]),</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">ms</span> <span class="o">=</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;BJD - 2454833&#39;</span><span class="p">][</span><span class="n">gi</span><span class="p">],</span> <span class="n">corr_fluxes</span><span class="o">*</span><span class="n">bspl</span><span class="p">(</span><span class="n">times</span><span class="p">[</span><span class="n">gi</span><span class="p">]),</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#e67e22&#39;</span><span class="p">,</span> <span class="n">ms</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;BJD - 2454833&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Relative Brightness&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">1862</span><span class="p">,</span> <span class="mi">1870</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="mf">0.994</span><span class="p">,</span> <span class="mf">1.008</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_motion-correction_replicate-vanderburg-2014-k2sff_59_0.png" src="../../_images/tutorials_motion-correction_replicate-vanderburg-2014-k2sff_59_0.png" />
+</div>
+</div>
+<p>Following <strong>Figure 5</strong> of Vanderburg &amp; Johnson 2015.</p>
+<p><em>The end.</em></p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="replicate-vanderburg-2014-lightkurve.html" class="btn btn-neutral float-right" title="Replicating Vanderburg &amp; Johnson 2014 using lightkurve" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../2.01-how-to-detrend.html" class="btn btn-neutral" title="How to remove K2 motion systematics with SFF?" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright lightkurve developers and contributors
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

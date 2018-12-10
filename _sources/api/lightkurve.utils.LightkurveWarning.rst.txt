@@ -1,0 +1,6 @@
+LightkurveWarning
+=================
+
+.. currentmodule:: lightkurve.utils
+
+.. autoexception:: LightkurveWarning
