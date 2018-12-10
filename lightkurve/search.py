@@ -13,8 +13,6 @@ from astropy import units as u
 from astroquery.mast import Observations
 from astroquery.exceptions import ResolverError
 
-from .lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
-from .targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
 from .collections import TargetPixelFileCollection, LightCurveFileCollection
 from .utils import suppress_stdout, LightkurveWarning, detect_filetype
 from . import PACKAGEDIR
@@ -233,8 +231,8 @@ class SearchResult(object):
 
 
 def search_targetpixelfile(target, radius=None, cadence='long',
-                           project=['Kepler', 'K2', 'TESS'], quarter=None,
-                           month=None, campaign=None, limit=None):
+                           mission=['Kepler', 'K2', 'TESS'], quarter=None,
+                           month=None, campaign=None, sector=None, limit=None):
     """Searches MAST for Target Pixel Files.
 
     This function fetches a data table that lists the Target Pixel Files (TPFs)
@@ -257,13 +255,15 @@ def search_targetpixelfile(target, radius=None, cadence='long',
         units of arcseconds.  If `None` then we default to 0.0001 arcsec.
     cadence : str
         'long' or 'short'.
-    quarter, campaign : int, list of ints
-        Kepler Quarter or K2 Campaign number.
-        By default all quarters and campaigns will be returned.
-    month : 1, 2, 3, or list of int
+    mission : str, list of str
+        'Kepler', 'K2', or 'TESS'. By default, all will be returned.
+    quarter, campaign, sector : int, list of ints
+        Kepler Quarter, K2 Campaign, or TESS Sector number.
+        By default all quarters/campaigns/sectors will be returned.
+    month : 1, 2, 3, 4 or list of int
         For Kepler's prime mission, there are three short-cadence
         TargetPixelFiles for each quarter, each covering one month.
-        Hence, if cadence='short' you need to specify month=1, 2, or 3.
+        Hence, if cadence='short' you can specify month=1, 2, 3, or 4.
         By default all months will be returned.
     limit : int
         Maximum number of products to return.
@@ -310,16 +310,16 @@ def search_targetpixelfile(target, radius=None, cadence='long',
     """
     try:
         return _search_products(target, radius=radius, filetype="Target Pixel",
-                                cadence=cadence, project=project, quarter=quarter,
-                                month=month, campaign=campaign, limit=limit)
+                                cadence=cadence, mission=mission, quarter=quarter,
+                                month=month, campaign=campaign, sector=sector, limit=limit)
     except SearchError as exc:
         log.error(exc)
         return SearchResult(None)
 
 
 def search_lightcurvefile(target, radius=None, cadence='long',
-                          project=['Kepler', 'K2', 'TESS'], quarter=None,
-                          month=None, campaign=None, limit=None):
+                          mission=['Kepler', 'K2', 'TESS'], quarter=None,
+                          month=None, campaign=None, sector=None, limit=None):
     """Returns a SearchResult with MAST LightCurveFiles which match the criteria.
 
     This function fetches a data table that lists the Light Curve Files
@@ -342,15 +342,15 @@ def search_lightcurvefile(target, radius=None, cadence='long',
         units of arcseconds.  If `None` then we default to 0.0001 arcsec.
     cadence : str
         'long' or 'short'.
-    project : str or list
-        Keyword to specify which telescope observed the target.
-    quarter, campaign : int, list of ints
-        Kepler Quarter or K2 Campaign number.
-        By default all quarters and campaigns will be returned.
-    month : 1, 2, 3, or list of int
+    mission : str, list of str
+        'Kepler', 'K2', or 'TESS'. By default, all will be returned.
+    quarter, campaign, sector : int, list of ints
+        Kepler Quarter, K2 Campaign, or TESS Sector number.
+        By default all quarters/campaigns/sectors will be returned.
+    month : 1, 2, 3, 4 or list of int
         For Kepler's prime mission, there are three short-cadence
-        LightCurveFiles for each quarter, each covering one month.
-        Hence, if cadence='short' you need to specify month=1, 2, or 3.
+        TargetPixelFiles for each quarter, each covering one month.
+        Hence, if cadence='short' you can specify month=1, 2, 3, or 4.
         By default all months will be returned.
     limit : int
         Maximum number of products to return.
@@ -398,16 +398,16 @@ def search_lightcurvefile(target, radius=None, cadence='long',
     """
     try:
         return _search_products(target, radius=radius, filetype="Lightcurve",
-                                cadence=cadence, project=project, quarter=quarter,
-                                month=month, campaign=campaign, limit=limit)
+                                cadence=cadence, mission=mission, quarter=quarter,
+                                month=month, campaign=campaign, sector=sector, limit=limit)
     except SearchError as exc:
         log.error(exc)
         return SearchResult(None)
 
 
 def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
-                     project=['Kepler', 'K2', 'TESS'], quarter=None, month=None,
-                     campaign=None, limit=None):
+                     mission=['Kepler', 'K2', 'TESS'], quarter=None, month=None,
+                     campaign=None, sector=None, limit=None):
     """Helper function which returns a SearchResult object containing MAST
     products that match several criteria.
 
@@ -422,12 +422,16 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
         Type of files queried at MAST (`Target Pixel` or `Lightcurve`)
     cadence : str
         Desired cadence (`long`, `short`, `any`)
-    quarter : int or list
-        Desired quarter of observation for data products
-    month : int or list
-        Desired month of observation for data products
-    campaign : int or list
-        Desired campaign of observation for data products
+    mission : str, list of str
+        'Kepler', 'K2', or 'TESS'. By default, all will be returned.
+    quarter, campaign, sector : int, list of ints
+        Kepler Quarter, K2 Campaign, or TESS Sector number.
+        By default all quarters/campaigns/sectors will be returned.
+    month : 1, 2, 3, 4 or list of int
+        For Kepler's prime mission, there are three short-cadence
+        TargetPixelFiles for each quarter, each covering one month.
+        Hence, if cadence='short' you can specify month=1, 2, 3, or 4.
+        By default all months will be returned.
     limit : int
         Maximum number of products to return
 
@@ -435,14 +439,14 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
     -------
     SearchResult : :class:`SearchResult` object.
     """
-    observations = _query_mast(target, project=project, cadence='long', radius=radius)
-
-    if len(observations) == 0:
-        raise SearchError('No data found for target "{}."'.format(target))
+    observations = _query_mast(target, project=mission, radius=radius)
 
     # mask out FFIs from observations
     mask = np.array(['FFI' not in obs['target_name'] and
                      'FFI' not in obs['obs_collection'] for obs in observations])
+
+    if len(observations[mask]) == 0:
+        raise SearchError('No data found for target "{}".'.format(target))
 
     products = Observations.get_product_list(observations[mask])
     result = join(products, observations[mask], join_type='left')  # will join on obs_id
@@ -450,11 +454,12 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
 
     masked_result = _filter_products(result, filetype=filetype, campaign=campaign,
                                      quarter=quarter, cadence=cadence,
-                                     project=project, month=month, limit=limit)
+                                     project=mission, month=month, sector=sector,
+                                     limit=limit)
     return SearchResult(masked_result)
 
 
-def _query_mast(target, project=['Kepler', 'K2', 'TESS'], radius=None, cadence='long'):
+def _query_mast(target, radius=None, project=['Kepler', 'K2', 'TESS']):
     """Helper function which wraps `astroquery.mast.Observations.query_criteria()`
     to returns a table of all Kepler or K2 observations of a given target.
 
@@ -465,8 +470,8 @@ def _query_mast(target, project=['Kepler', 'K2', 'TESS'], radius=None, cadence='
     radius : float or `astropy.units.Quantity` object
         Conesearch radius.  If a float is given it will be assumed to be in
         units of arcseconds.  If `None` then we default to 0.0001 arcsec.
-    cadence: 'short' or 'long'
-        Specify short (1-min) or long (30-min) cadence data.
+    project : str, list of str
+        'Kepler', 'K2', and/or 'TESS'.
 
     Returns
     -------
@@ -484,67 +489,59 @@ def _query_mast(target, project=['Kepler', 'K2', 'TESS'], radius=None, cadence='
     elif not isinstance(radius, u.quantity.Quantity):
         radius = radius * u.arcsec
 
-    if 'KEPLER' in  [p.upper() for p in project]:
-        try:
-            # If `target` looks like a KIC or EPIC ID, we will pass the exact
-            # `target_name` under which MAST will know the object to prevent
-            # source confusion (see GitHub issue #148).
-            target = int(target)
-            if (target > 0) and (target < 200000000):
-                target_name = 'kplr{:09d}'.format(target)
-            elif (target > 200000000) and (target < 300000000):
-                target_name = 'ktwo{:09d}'.format(target)
-            else:
-                raise ValueError("{:09d}: not in the KIC or EPIC ID range".format(target))
+    try:
+        # If `target` looks like a KIC or EPIC ID, we will pass the exact
+        # `target_name` under which MAST will know the object to prevent
+        # source confusion (see GitHub issue #148).
+        target = int(target)
+        if (target > 0) and (target < 200000000):
+            target_name = 'kplr{:09d}'.format(target)
+        elif (target > 200000000) and (target < 300000000):
+            target_name = 'ktwo{:09d}'.format(target)
+        else:
+            raise ValueError("{:09d}: not in the KIC or EPIC ID range".format(target))
 
-            # query_criteria does not allow a cone search when target_name is passed in
-            # so first grab desired target with ~0 arcsecond radius
-            target_obs = Observations.query_criteria(target_name=target_name,
-                                                     radius=str(radius.to(u.deg)),
-                                                     project=project)
+        # query_criteria does not allow a cone search when target_name is passed in
+        # so first grab desired target with ~0 arcsecond radius
+        target_obs = Observations.query_criteria(target_name=target_name,
+                                                 radius=str(radius.to(u.deg)),
+                                                 project=project)
 
-            if len(target_obs) == 0 and 'TESS' in [p.upper() for p in project]:
-                raise ValueError("No observations found for {}. If this is a TESS "
-                                 "target, please pass `project='TESS'` into the "
-                                 "search function.".format(target_name))
-            elif len(target_obs) == 0:
-                raise ValueError("No observations found for {}.".format(target_name))
+        if len(target_obs) == 0:
+            raise ValueError("No observations found for {}.".format(target_name))
 
-            # check if a cone search is being performed
-            # if yes, perform a cone search around coordinates of desired target
-            if radius < (0.1 * u.arcsec):
-                obs = target_obs
-                # astroquery does not return distance if target_name is given;
-                # we add it here so that the table returned always has this column.
-                obs['distance'] = 0.
-            else:
-                ra = target_obs['s_ra'][0]
-                dec = target_obs['s_dec'][0]
-                obs = Observations.query_criteria(coordinates='{} {}'.format(ra, dec),
-                                                  radius=str(radius.to(u.deg)),
-                                                  project=project)
-        except ValueError:
-            # If `target` did not look like a KIC or EPIC ID, then we let MAST
-            # resolve the target name to a sky position. Convert radius from arcsec
-            # to degrees for query_criteria().
-            try:
-                obs = Observations.query_criteria(objectname=target,
-                                                  radius=str(radius.to(u.deg)),
-                                                  project=project)
-            except ResolverError as exc:
-                raise SearchError(exc)
+        # check if a cone search is being performed
+        # if yes, perform a cone search around coordinates of desired target
+        if radius < (0.1 * u.arcsec):
+            obs = target_obs
+            # astroquery does not return distance if target_name is given;
+            # we add it here so that the table returned always has this column.
+            obs['distance'] = 0.
+        else:
+            ra = target_obs['s_ra'][0]
+            dec = target_obs['s_dec'][0]
+            obs = Observations.query_criteria(coordinates='{} {}'.format(ra, dec),
+                                              radius=str(radius.to(u.deg)),
+                                              project=project)
+            obs.sort('distance')
+        return obs
+    except ValueError:
+        pass
 
-    elif 'TESS' in [p.upper() for p in project]:
+    # If `target` did not look like a KIC or EPIC ID, then we let MAST
+    # resolve the target name to a sky position. Convert radius from arcsec
+    # to degrees for query_criteria().
+    try:
         obs = Observations.query_criteria(objectname=target,
                                           radius=str(radius.to(u.deg)),
                                           project=project)
+        obs.sort('distance')
+        return obs
+    except ResolverError as exc:
+        raise SearchError(exc)
 
-    obs.sort('distance')  # ensure table returned is sorted by distance
 
-    return obs
-
-
-def _filter_products(products, campaign=None, quarter=None, month=None,
+def _filter_products(products, campaign=None, quarter=None, month=None, sector=None,
                      cadence='long', project=['Kepler', 'K2', 'TESS'],
                      filetype='Target Pixel', limit=None):
     """Helper function which filters a SearchResult's products table by one or
@@ -570,106 +567,144 @@ def _filter_products(products, campaign=None, quarter=None, month=None,
     products : `astropy.table.Table` object
         Masked astropy table containing desired data products
     """
-    # Value for the quarter or campaign
-    qoc = campaign if campaign is not None else quarter
-
-    # Ensure quarter or campaign is iterable.
-    if (campaign is not None) | (quarter is not None):
-        qoc = np.atleast_1d(np.asarray(qoc, dtype=int))
-
     project = np.atleast_1d(project)
+    project_lower = [p.lower() for p in project]
 
-    if 'KEPLER' in  [p.upper() for p in project]:
-        # Because MAST doesn't let us query based on Kepler-specific meta data
-        # fields, we need to identify short/long-cadence TPFs by their filename.
-        if cadence in ['short', 'sc']:
-            suffix = "{} Short".format(filetype)
-        elif cadence in ['any', 'both']:
-            suffix = "{}".format(filetype)
-        else:
-            suffix = "{} Long".format(filetype)
-    elif 'TESS' in  [p.upper() for p in project]:
-        if filetype == 'Lightcurve':
-            suffix = 'Light curves'
-        elif filetype == 'Target Pixel':
-            suffix = 'Target pixel files'
+    mask = np.zeros(len(products), dtype=bool)
 
-    # Identify the campaign or quarter by the description.
-    if qoc is not None:
-        mask = np.zeros(np.shape(products)[0], dtype=bool)
-        for q in qoc:
-            mask |= np.array([desc.lower().replace('-', '').endswith('q{}'.format(q)) or
-                              'c{:02d}'.format(q) in desc.lower().replace('-', '') or
-                              'c{:03d}'.format(q) in desc.lower().replace('-', '')
-                              for desc in products['description']])
-    else:
-        mask = np.ones(np.shape(products)[0], dtype=bool)
+    if 'kepler' in project_lower and campaign is None and sector is None:
+        mask |= _mask_kepler_products(products, quarter=quarter, month=month,
+                                      cadence=cadence, filetype=filetype)
+    if 'k2' in project_lower and quarter is None and sector is None:
+        mask |= _mask_k2_products(products, campaign=campaign,
+                                  cadence=cadence, filetype=filetype)
+    if 'tess' in project_lower and quarter is None and campaign is None:
+        mask |= _mask_tess_products(products, sector=sector, filetype=filetype)
 
-    # Allow only the correct fits or fits.gz type
-    mask &= np.array([desc.lower().endswith('fits') or
-                      desc.lower().endswith('fits.gz')
-                      for desc in products['dataURI']])
-
-    # Allow only the correct cadence type
-    mask &= np.array([suffix in desc for desc in products['description']])
     products = products[mask]
+    products.sort(['distance', 'productFilename'])
+    if limit is not None:
+        return products[0:limit]
+    return products
 
-    if 'KEPLER' in  [p.upper() for p in project]:
-        # Add the quarter or campaign numbers
-        qoc = np.asarray([p.split(' - ')[-1][1:].replace('-', '')
-                          for p in products['description']], dtype=int)
-        products['qoc'] = qoc
-        # Add the dates of each short cadence observation to the product table.
-        # Note this will not produce a date for ktwo observations, but will not break.
-        dates = [p.split('/')[-1].split('-')[1].split('_')[0]
-                 for p in products['dataURI']]
-        for idx, d in enumerate(dates):
-            try:
-                dates[idx] = float(d)
-            except:
-                dates[idx] = 0
-        products['dates'] = np.asarray(dates)
 
-    # If there is nothing in the table, quit now.
-    if len(products) == 0:
-        return products
-    products.sort('distance')
+def _mask_kepler_products(products, quarter=None, month=None, cadence='long',
+                          filetype='Target Pixel'):
+    """Returns a mask flagging the Kepler products that match the criteria."""
+    mask = np.array([proj.lower() == 'kepler' for proj in products['project']])
+    if mask.sum() == 0:
+        return mask
 
-    # For Kepler short cadence data there are additional rules, so find anywhere
-    # where there is short cadence data...
-    scmask = np.asarray(['Short' in d for d in products['description']]) &\
-             np.asarray(['kplr' in d for d in products['dataURI']])
+    # Allow only fits files
+    mask &= np.array([uri.lower().endswith('fits') or
+                      uri.lower().endswith('fits.gz')
+                      for uri in products['productFilename']])
 
-    if np.any(scmask):
-        # If no month is specified, return all
-        if month is None:
-            return products
+    # Filters on cadence and product type
+    if cadence in ['short', 'sc']:
+        description_string = "{} Short".format(filetype)
+    elif cadence in ['any', 'both']:
+        description_string = "{}".format(filetype)
+    else:
+        description_string = "{} Long".format(filetype)
+    mask &= np.array([description_string in desc for desc in products['description']])
 
+    # Identify quarter by the description.
+    if quarter is not None:
+        quarter_mask = np.zeros(len(products), dtype=bool)
+        for q in np.atleast_1d(quarter):
+            quarter_mask |= np.array([desc.lower().replace('-', '').endswith('q{}'.format(q))
+                                      for desc in products['description']])
+        mask &= quarter_mask
+
+    # For Kepler short cadence data the month can be specified
+    if month is not None:
         month = np.atleast_1d(month)
         # Get the short cadence date lookup table.
         table = ascii.read(os.path.join(PACKAGEDIR, 'data', 'short_cadence_month_lookup.csv'))
         # The following line is needed for systems where the default integer type
         # is int32 (e.g. Windows/Appveyor), the column will then be interpreted
         # as string which makes the test fail.
-        table['StartTime'] = table['StartTime'].astype(np.int64)
-        # Grab the dates of each of the short cadence files. Make sure every entry
-        # has the correct month
-        finalmask = np.ones(len(products), dtype=bool)
-        for c in np.unique(products[scmask]['qoc']):
-            ok = (products['qoc'] == c) & (scmask)
-            mask = np.zeros(np.shape(products[ok])[0], dtype=bool)
+        table['StartTime'] = table['StartTime'].astype(str)
+        # Grab the dates of each of the short cadence files.
+        # Make sure every entry has the correct month
+        is_shortcadence = mask & np.asarray(['Short' in desc for desc in products['description']])
+        for idx in np.where(is_shortcadence)[0]:
+            quarter = int(products['description'][idx].split(' - ')[-1][1:].replace('-', ''))
+            date = products['dataURI'][idx].split('/')[-1].split('-')[1].split('_')[0]
+            permitted_dates = []
             for m in month:
-                udate = (table['StartTime'][np.where(
-                    (table['Month'] == m) & (table['Quarter'] == c))[0][0]])
-                mask |= np.asarray(products['dates'][ok]) == udate
-            finalmask[ok] = mask
-        products = products[finalmask]
-        # Sort by id, then date and quarter
-        products.sort(['distance', 'dates', 'qoc'])
+                try:
+                    permitted_dates.append(table['StartTime'][
+                        np.where((table['Month'] == m) & (table['Quarter'] == quarter))[0][0]
+                                    ])
+                except IndexError:
+                    pass
+            if not (date in permitted_dates):
+                mask[idx] = False
 
-    if limit is not None:
-        return products[0:limit]
-    return products
+    return mask
+
+
+def _mask_k2_products(products, campaign=None, cadence='long', filetype='Target Pixel'):
+    """Returns a mask flagging the K2 products that match the criteria."""
+    mask = np.array([proj.lower() == 'k2' for proj in products['project']])
+    if mask.sum() == 0:
+        return mask
+
+    # Allow only fits files
+    mask &= np.array([uri.lower().endswith('fits') or
+                      uri.lower().endswith('fits.gz')
+                      for uri in products['productFilename']])
+
+    # Filters on cadence and product type
+    if cadence in ['short', 'sc']:
+        description_string = "{} Short".format(filetype)
+    elif cadence in ['any', 'both']:
+        description_string = "{}".format(filetype)
+    else:
+        description_string = "{} Long".format(filetype)
+    mask &= np.array([description_string in desc for desc in products['description']])
+
+    # Identify campaign by the description.
+    if campaign is not None:
+        campaign_mask = np.zeros(len(products), dtype=bool)
+        for c in np.atleast_1d(campaign):
+            campaign_mask |= np.array(['c{:02d}'.format(c) in desc.lower().replace('-', '') or
+                                       'c{:03d}'.format(c) in desc.lower().replace('-', '')
+                                       for desc in products['description']])
+        mask &= campaign_mask
+
+    return mask
+
+
+def _mask_tess_products(products, sector=None, filetype='Target Pixel'):
+    """Returns a mask flagging the TESS products that match the criteria."""
+    mask = np.array([p.lower() == 'spoc' for p in products['project']])
+    if mask.sum() == 0:
+        return mask
+
+    # Allow only fits files
+    mask &= np.array([uri.lower().endswith('fits') or
+                      uri.lower().endswith('fits.gz')
+                      for uri in products['productFilename']])
+
+    # Filter on product type
+    if filetype == 'Lightcurve':
+            description_string = 'Light curves'
+    elif filetype == 'Target Pixel':
+            description_string = 'Target pixel files'
+    mask &= np.array([description_string in desc for desc in products['description']])
+
+    # Identify sector by the description.
+    if sector is not None:
+        sector_mask = np.zeros(len(products), dtype=bool)
+        for s in np.atleast_1d(sector):
+            sector_mask |= np.array([fn.split('-')[1] == 's{:04d}'.format(s)
+                                     for fn in products['productFilename']])
+        mask &= sector_mask
+
+    return mask
 
 
 def open(path_or_url, **kwargs):
