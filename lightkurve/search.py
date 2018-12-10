@@ -9,6 +9,7 @@ from astropy.table import join, Table, Row
 from astropy.coordinates import SkyCoord
 from astropy.io import ascii, fits
 from astropy import units as u
+from astropy.utils.exceptions import AstropyWarning
 
 from astroquery.mast import Observations
 from astroquery.exceptions import ResolverError
@@ -505,10 +506,12 @@ def _query_mast(target, radius=None, project=['Kepler', 'K2', 'TESS']):
 
         # query_criteria does not allow a cone search when target_name is passed in
         # so first grab desired target with ~0 arcsecond radius
-        target_obs = Observations.query_criteria(target_name=target_name,
-                                                 radius=str(radius.to(u.deg)),
-                                                 project=project,
-                                                 obs_collection=project)
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', AstropyWarning)
+            target_obs = Observations.query_criteria(target_name=target_name,
+                                                     radius=str(radius.to(u.deg)),
+                                                     project=project,
+                                                     obs_collection=project)
 
         if len(target_obs) == 0:
             raise ValueError("No observations found for {}.".format(target_name))
@@ -523,10 +526,12 @@ def _query_mast(target, radius=None, project=['Kepler', 'K2', 'TESS']):
         else:
             ra = target_obs['s_ra'][0]
             dec = target_obs['s_dec'][0]
-            obs = Observations.query_criteria(coordinates='{} {}'.format(ra, dec),
-                                              radius=str(radius.to(u.deg)),
-                                              project=project,
-                                              obs_collection=project)
+            with warnings.catch_warnings():
+                warnings.simplefilter('ignore', AstropyWarning)
+                obs = Observations.query_criteria(coordinates='{} {}'.format(ra, dec),
+                                                  radius=str(radius.to(u.deg)),
+                                                  project=project,
+                                                  obs_collection=project)
             obs.sort('distance')
         return obs
     except ValueError:
