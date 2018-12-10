@@ -507,6 +507,7 @@ def _query_mast(target, radius=None, project=['Kepler', 'K2', 'TESS']):
         # query_criteria does not allow a cone search when target_name is passed in
         # so first grab desired target with ~0 arcsecond radius
         with warnings.catch_warnings():
+            # suppress misleading AstropyWarning
             warnings.simplefilter('ignore', AstropyWarning)
             target_obs = Observations.query_criteria(target_name=target_name,
                                                      radius=str(radius.to(u.deg)),
@@ -527,6 +528,7 @@ def _query_mast(target, radius=None, project=['Kepler', 'K2', 'TESS']):
             ra = target_obs['s_ra'][0]
             dec = target_obs['s_dec'][0]
             with warnings.catch_warnings():
+                # suppress misleading AstropyWarning
                 warnings.simplefilter('ignore', AstropyWarning)
                 obs = Observations.query_criteria(coordinates='{} {}'.format(ra, dec),
                                                   radius=str(radius.to(u.deg)),
@@ -542,6 +544,7 @@ def _query_mast(target, radius=None, project=['Kepler', 'K2', 'TESS']):
     # to degrees for query_criteria().
     try:
         with warnings.catch_warnings():
+            # suppress misleading AstropyWarning
             warnings.simplefilter('ignore', AstropyWarning)
             obs = Observations.query_criteria(objectname=target,
                                               radius=str(radius.to(u.deg)),
