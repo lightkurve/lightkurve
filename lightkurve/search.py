@@ -449,7 +449,8 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
         raise SearchError('No data found for target "{}".'.format(target))
 
     products = Observations.get_product_list(observations[mask])
-    result = join(products, observations[mask], join_type='left')  # will join on obs_id
+    result = join(products, observations[mask], keys="obs_id", join_type='left',
+                  uniq_col_name='{col_name}{table_name}', table_names=['', '_2'])
     result.sort(['distance', 'obs_id'])
 
     masked_result = _filter_products(result, filetype=filetype, campaign=campaign,
