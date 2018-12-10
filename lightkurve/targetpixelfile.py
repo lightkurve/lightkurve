@@ -168,7 +168,12 @@ class TargetPixelFile(object):
     @property
     def cadenceno(self):
         """Return the cadence number for all good-quality cadences."""
-        return self.hdu[1].data['CADENCENO'][self.quality_mask]
+        cadenceno = self.hdu[1].data['CADENCENO'][self.quality_mask]
+        # The TESScut service returns an array of zeros as CADENCENO.
+        # If this is the case, return frame numbers from 0 instead.
+        if cadenceno[0] == 0:
+            return np.arange(0, len(cadenceno), 1, dtype=int)
+        return cadenceno
 
     @property
     def nan_time_mask(self):
