@@ -130,8 +130,9 @@ class SearchResult(object):
         if len(self.table) != 1:
             warnings.warn('Warning: {} files available to download. '
                           'Only the first file has been downloaded. '
-                          'Please use `download_all()` or specify a campaign, quarter, or '
-                          'cadence to limit your search.'.format(len(self.table)),
+                          'Please use `download_all()` or specify additional '
+                          'criteria (e.g. quarter, campaign, or sector) '
+                          'to limit your search.'.format(len(self.table)),
                           LightkurveWarning)
 
         # Make sure astroquery uses the same level of verbosity
