@@ -3,7 +3,7 @@
   <div class="container text-center" style="padding-top:5em; padding-bottom: 2em;">
     <h1 style="font-size: 4rem;">Lightkurve</h1>
     <p class="lead" style="font-size: 1.5rem;">
-        A friendly package for Kepler and TESS time series analysis in Python.
+        A friendly package for Kepler & TESS time series analysis in Python.
     </p>
     <p>
         <a href="quickstart.html" class="btn btn-primary my-2" style="font-size: 1.25rem;">Quickstart →</a>

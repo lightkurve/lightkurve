@@ -22,7 +22,61 @@
     .headerlink {
         font-size: 0.5em;
         vertical-align: super;
-        color: rgba(0,0,0,.5);
+        color: rgba(0, 0, 0, .5);
+    }
+
+
+    /* automodapi function signatures */
+    dt:target, span.highlighted {
+        background-color: #f6e58d;
+    }
+
+    table.field-list {
+        border-spacing: 0px;
+        margin-left: 1px;
+        border-left: 5px solid rgba(0, 0, 0, .1) !important;
+    }
+
+    table.field-list th.field-name {
+        display: inline-block;
+        padding: 1px 8px 1px 5px;
+        white-space: nowrap;
+        background-color: rgba(0, 0, 0, .1);
+    }
+
+    table.longtable {
+        border: 0;
+        border-spacing: 5px;
+        border-collapse: separate;
+    }
+
+    table.docutils td {
+        padding: 1px 8px 1px 5px;
+        border-top: 0;
+        border-left: 0;
+        border-right: 0;
+        border-bottom: 0;
+    }
+
+    /* Add lines below each entry in the Attributes and Methods Summary tables. */
+    table.longtable td {
+        border-bottom: 1px solid rgba(0, 0, 0, .1);
+    }
+
+    table.docutils td:first-child {
+        white-space: nowrap;
+    }
+
+    /* Titles: "Attributes summary", "Methods summary" */
+    p.rubric {
+        margin-top: 30px;
+        font-weight: bold;
+    }
+
+    code.descname {
+        background-color: transparent;
+        font-weight: bold;
+        font-size: 1.2em;
     }
     </style>
   </head>
