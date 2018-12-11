@@ -22,7 +22,10 @@ from astropy.time import Time
 from astropy import units as u
 from . import PACKAGEDIR, MPLSTYLE
 
-from .utils import running_mean, bkjd_to_astropy_time, btjd_to_astropy_time, LightkurveWarning
+from .utils import (
+    running_mean, bkjd_to_astropy_time, btjd_to_astropy_time,
+    LightkurveWarning, boolean_mask_to_bitmask
+)
 
 __all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve',
            'FoldedLightCurve']
@@ -1336,12 +1339,10 @@ class KeplerLightCurve(LightCurve):
 
         def _make_aperture_extension(hdu_list, aperture_mask):
             """Create the 'APERTURE' extension (e.g. extension #2)."""
-            # Simple binary mask for now
-
-            # TODO: convert boolean aperture mask to Kepler bitmask
 
             if aperture_mask is not None:
-                hdu = fits.ImageHDU(aperture_mask)
+                bitmask = boolean_mask_to_bitmask(aperture_mask)
+                hdu = fits.ImageHDU(bitmask)
                 hdu.header['EXTNAME'] = 'APERTURE'
                 hdu_list.append(hdu)
             return hdu_list
@@ -1463,12 +1464,10 @@ class TessLightCurve(LightCurve):
 
         def _make_aperture_extension(hdu_list, aperture_mask):
             """Create the 'APERTURE' extension (e.g. extension #2)."""
-            # Simple binary mask for now
-
-            # TODO: convert boolean aperture mask to *TESS* bitmask
 
             if aperture_mask is not None:
-                hdu = fits.ImageHDU(aperture_mask)
+                bitmask = boolean_mask_to_bitmask(aperture_mask)
+                hdu = fits.ImageHDU(bitmask)
                 hdu.header['EXTNAME'] = 'APERTURE'
                 hdu_list.append(hdu)
             return hdu_list

@@ -438,11 +438,11 @@ def test_to_fits():
     assert hdu[1].header['TTYPE2'] == 'FLUX'
 
     # Test aperture mask support in to_fits
-    tpf = KeplerTargetPixelFile(TABBY_Q8)
+    tpf = KeplerTargetPixelFile(TABBY_TPF)
     random_mask = np.random.randint(0, 2,size=tpf.flux[0].shape, dtype=bool)
     thresh_mask = tpf.create_threshold_mask(threshold=3)
 
-    lc = tpf.to_lightcurve(aperture_mask='random_mask')
+    lc = tpf.to_lightcurve(aperture_mask=random_mask)
     lc.to_fits(path='out.fits', aperture_mask=random_mask)
 
     lc = tpf[17:400].to_lightcurve(aperture_mask=thresh_mask)
@@ -453,7 +453,7 @@ def test_to_fits():
     bkg_lc = tpf.to_lightcurve(aperture_mask=bkg_mask)
     lc = tpf.to_lightcurve(aperture_mask=thresh_mask)
     lc_out = lc - bkg_lc.flux * (thresh_mask.sum()/bkg_mask.sum())
-    lc_out.to_fits(aperture_mask=thresh_mask, path='out2.fits', 
+    lc_out.to_fits(aperture_mask=thresh_mask, path='out2.fits',
                overwrite=True, extra_data={'BKG':bkg_lc.flux})
 
 

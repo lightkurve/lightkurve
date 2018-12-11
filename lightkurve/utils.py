@@ -511,3 +511,10 @@ def detect_filetype(header):
     # if one of them is Undefined we expect `.lower()` to yield an AttributeError.
     except (KeyError, AttributeError):
         return None
+
+
+def boolean_mask_to_bitmask(aperture_mask):
+    '''Takes in an aperture_mask and returns a Kepler-style bitmask'''
+    out_mask = np.ones(aperture_mask.shape, dtype=np.uint8)
+    out_mask[aperture_mask] = 3
+    return out_mask
