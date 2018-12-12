@@ -514,7 +514,37 @@ def detect_filetype(header):
 
 
 def boolean_mask_to_bitmask(aperture_mask):
-    '''Takes in an aperture_mask and returns a Kepler-style bitmask'''
-    out_mask = np.ones(aperture_mask.shape, dtype=np.uint8)
-    out_mask[aperture_mask] = 3
+    """Takes in an aperture_mask and returns a Kepler-style bitmask
+
+    Parameters
+    ----------
+    aperture_mask : array-like
+        2D aperture mask. The mask can be either a boolean mask or an integer
+        mask mimicking the Kepler/TESS convention; boolean or boolean-like masks
+        are converted to the Kepler/TESS conventions.
+
+    Returns
+    -------
+    bitmask : numpy uint8 array
+        A bitmask mimicking the Kepler/TESS convention
+    """
+    # Masks can either be boolean input or Kepler pipeline style
+    clean_mask = np.nan_to_num(aperture_mask)
+
+    contains_bit2 = (clean_mask.astype(np.int) & 2).any()
+    all_zeros_or_ones = ( (clean_mask.dtype in ['float', 'int']) &
+                          ((set(np.unique(clean_mask)) - {0,1}) == set()) )
+    is_bool_mask = ( (aperture_mask.dtype == 'bool') | all_zeros_or_ones )
+
+
+    if is_bool_mask:
+        out_mask = np.ones(aperture_mask.shape, dtype=np.uint8)
+        out_mask[aperture_mask == 1] = 3
+        out_mask = out_mask.astype(np.uint8)
+    elif contains_bit2:
+        out_mask = aperture_mask.astype(np.uint8)
+    else:
+        log.warn("The input aperture mask must be boolean or follow the \
+                Kepler-pipeline standard; returning None.")
+        out_mask = None
     return out_mask
