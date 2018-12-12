@@ -146,8 +146,14 @@ class TargetPixelFile(object):
 
     @property
     def pipeline_mask(self):
-        """Returns the aperture mask used by the pipeline"""
-        return self.hdu[2].data > 2
+        """Returns the optimal aperture mask used by the pipeline."""
+        # Both Kepler and TESS flag the pixels in the optimal aperture using
+        # bit number 2 in the aperture mask extension, e.g. see Section 6 of
+        # the TESS Data Products documentation (EXP-TESS-ARC-ICD-TM-0014.pdf).
+        try:
+            return self.hdu[2].data & 2 > 0
+        except TypeError:  # Early versions of TESScut returned floats in HDU 2
+            return np.ones(self.hdu[2].data.shape, dtype=bool)
 
     @property
     def shape(self):
@@ -162,7 +168,12 @@ class TargetPixelFile(object):
     @property
     def cadenceno(self):
         """Return the cadence number for all good-quality cadences."""
-        return self.hdu[1].data['CADENCENO'][self.quality_mask]
+        cadenceno = self.hdu[1].data['CADENCENO'][self.quality_mask]
+        # The TESScut service returns an array of zeros as CADENCENO.
+        # If this is the case, return frame numbers from 0 instead.
+        if cadenceno[0] == 0:
+            return np.arange(0, len(cadenceno), 1, dtype=int)
+        return cadenceno
 
     @property
     def nan_time_mask(self):
@@ -1330,15 +1341,6 @@ class TessTargetPixelFile(TargetPixelFile):
 
     def __repr__(self):
         return('TessTargetPixelFile(TICID: {})'.format(self.targetid))
-
-    @property
-    def pipeline_mask(self):
-        """Returns the optimal aperture mask used by the TESS pipeline.
-
-        For details on how the mask is stored in a TPF, see Section 6 of the
-        Data Products documentation (EXP-TESS-ARC-ICD-TM-0014.pdf).
-        """
-        return self.hdu[2].data & 2 > 0
 
     @property
     def background_mask(self):

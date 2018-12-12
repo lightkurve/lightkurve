@@ -189,7 +189,7 @@ class TessQualityFlags(QualityFlags):
 
     #: DEFAULT bitmask identifies all cadences which are definitely useless.
     DEFAULT_BITMASK = (AttitudeTweak | SafeMode | CoarsePoint | EarthPoint |
-                       Desat | ManualExclude | ImpulsiveOutlier)
+                       Desat | ManualExclude)
     #: HARD bitmask is conservative and may identify cadences which are useful.
     HARD_BITMASK = (DEFAULT_BITMASK | ApertureCosmic |
                     CollateralCosmic | Straylight)
@@ -489,6 +489,7 @@ def detect_filetype(header):
         # and `creator` to determine tpf or lc
         telescop = header['telescop'].lower()
         creator = header['creator'].lower()
+        origin = header['origin'].lower()
         if telescop == 'kepler':
             # Kepler TPFs will contain "TargetPixelExporterPipelineModule"
             if 'targetpixel' in creator:
@@ -503,6 +504,9 @@ def detect_filetype(header):
             # TESS LCFs will contain "LightCurveExporterPipelineModule"
             elif 'lightcurve' in creator:
                 return 'TessLightCurveFile'
+            # Early versions of TESScut did not set a good CREATOR keyword
+            elif 'stsci' in origin:
+                return 'TessTargetPixelFile'
     # If the TELESCOP or CREATOR keywords don't exist we expect a KeyError;
     # if one of them is Undefined we expect `.lower()` to yield an AttributeError.
     except (KeyError, AttributeError):

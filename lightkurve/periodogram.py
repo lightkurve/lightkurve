@@ -3,6 +3,7 @@ from __future__ import division, print_function
 
 import copy
 import logging
+import math
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -378,7 +379,7 @@ class Periodogram(object):
                 raise ValueError("the 'boxkernel' method requires the periodogram "
                                  "to have a grid of evenly spaced frequencies.")
 
-            box_kernel = Box1DKernel(np.ceil(filter_width/fs))
+            box_kernel = Box1DKernel(math.ceil((filter_width/fs).value))
             smooth_power = convolve(self.power.value, box_kernel)
             smooth_pg = self.copy()
             smooth_pg.power = u.Quantity(smooth_power, self.power.unit)
