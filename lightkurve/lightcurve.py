@@ -623,6 +623,7 @@ class LightCurve(object):
         if hasattr(binned_lc, 'cadenceno'):
             binned_lc.cadenceno = np.array([np.nan] * n_bins)
         if hasattr(binned_lc, 'centroid_col'):
+            # Note: nanmean/nanmedian yield a RuntimeWarning if a slice is all NaNs
             binned_lc.centroid_col = np.array(
                 [methodf(a) if np.any(np.isfinite(a)) else np.nan
                  for a in np.array_split(self.centroid_col, n_bins)])

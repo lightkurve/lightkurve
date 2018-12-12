@@ -346,6 +346,7 @@ def test_bin():
     lc = KeplerLightCurve(time=np.arange(10),
                           flux=2*np.ones(10))
     lc.bin(5).remove_outliers()
+    # Second regression test for #377
     lc = KeplerLightCurve(time=np.arange(1000) * 0.02,
                           flux=1*np.ones(1000) + np.random.normal(0, 1e-6, 1000),
                           cadenceno=np.arange(1000))
