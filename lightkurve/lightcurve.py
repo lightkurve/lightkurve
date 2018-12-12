@@ -616,18 +616,20 @@ class LightCurve(object):
             binned_lc.flux_err = np.zeros(len(binned_lc.flux))
 
         if hasattr(binned_lc, 'quality'):
+            # Note: np.bitwise_or only works if there are no NaNs
             binned_lc.quality = np.array(
-                [np.bitwise_or.reduce(a) if np.all(np.isfinite(a))
-                 else np.nan
+                [np.bitwise_or.reduce(a) if np.all(np.isfinite(a)) else np.nan
                  for a in np.array_split(self.quality, n_bins)])
         if hasattr(binned_lc, 'cadenceno'):
             binned_lc.cadenceno = np.array([np.nan] * n_bins)
         if hasattr(binned_lc, 'centroid_col'):
             binned_lc.centroid_col = np.array(
-                [methodf(a) for a in np.array_split(self.centroid_col, n_bins)])
+                [methodf(a) if np.any(np.isfinite(a)) else np.nan
+                 for a in np.array_split(self.centroid_col, n_bins)])
         if hasattr(binned_lc, 'centroid_row'):
             binned_lc.centroid_row = np.array(
-                [methodf(a) for a in np.array_split(self.centroid_row, n_bins)])
+                [methodf(a) if np.any(np.isfinite(a)) else np.nan
+                 for a in np.array_split(self.centroid_row, n_bins)])
 
         return binned_lc
 

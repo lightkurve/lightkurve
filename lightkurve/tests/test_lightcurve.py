@@ -346,10 +346,12 @@ def test_bin():
     lc = KeplerLightCurve(time=np.arange(10),
                           flux=2*np.ones(10))
     lc.bin(5).remove_outliers()
+    lc = KeplerLightCurve(time=np.arange(1000) * 0.02,
+                          flux=1*np.ones(1000) + np.random.normal(0, 1e-6, 1000),
+                          cadenceno=np.arange(1000))
+    assert np.isclose(lc.bin(2).estimate_cdpp(), 1, rtol=1)
 
-lc = lk.KeplerLightCurve(time=np.arange(1000) * 0.02,
-                          flux=1*np.ones(1000) + np.random.normal(0, 0.00002, 1000), cadenceno=np.arange(1000)+3000)
-np.isclose(lc.estimate_cdpp(), 5, rtol=2)
+
 def test_bin_quality():
     """Binning must also revise the quality and centroid columns."""
     lc = KeplerLightCurve(time=[1, 2, 3, 4],
