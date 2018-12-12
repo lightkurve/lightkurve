@@ -124,8 +124,8 @@ html_theme_options = {
     "navbar_title": "Lightkurve v" + version,
     "navbar_links": [
         ("Quickstart", "quickstart"),
-        ("API", "api"),
         ("Tutorials", "tutorials/index"),
+        ("API", "api"),
         ("About", "about"),
     ],
 }
