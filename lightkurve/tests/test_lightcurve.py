@@ -342,6 +342,10 @@ def test_bin():
                     flux=2*np.ones(10))
     binned_lc = lc.bin(binsize=2)
     assert_allclose(binned_lc.flux_err, np.zeros(5))
+    # Regression test for #377
+    lc = KeplerLightCurve(time=np.arange(10),
+                          flux=2*np.ones(10))
+    lc.bin(5).remove_outliers()
 
 
 def test_bin_quality():

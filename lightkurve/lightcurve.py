@@ -617,7 +617,11 @@ class LightCurve(object):
 
         if hasattr(binned_lc, 'quality'):
             binned_lc.quality = np.array(
-                [np.bitwise_or.reduce(a) for a in np.array_split(self.quality, n_bins)])
+                [np.bitwise_or.reduce(a) if np.all(np.isfinite(a))
+                 else np.nan
+                 for a in np.array_split(self.quality, n_bins)])
+        if hasattr(binned_lc, 'cadenceno'):
+            binned_lc.cadenceno = np.array([np.nan] * n_bins)
         if hasattr(binned_lc, 'centroid_col'):
             binned_lc.centroid_col = np.array(
                 [methodf(a) for a in np.array_split(self.centroid_col, n_bins)])
