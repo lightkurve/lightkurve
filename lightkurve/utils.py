@@ -521,12 +521,15 @@ def boolean_mask_to_bitmask(aperture_mask):
     aperture_mask : array-like
         2D aperture mask. The mask can be either a boolean mask or an integer
         mask mimicking the Kepler/TESS convention; boolean or boolean-like masks
-        are converted to the Kepler/TESS conventions.
+        are converted to the Kepler/TESS conventions.  Kepler bitmasks are
+        returned unchanged except for possible datatype conversion.
 
     Returns
     -------
     bitmask : numpy uint8 array
-        A bitmask mimicking the Kepler/TESS convention
+        A bitmask incompletely mimicking the Kepler/TESS convention: Bit 2,
+        value = 3, means "pixel was part of the custom aperture".  The other
+        bits have no meaning and are currently assigned a value of 1.
     """
     # Masks can either be boolean input or Kepler pipeline style
     clean_mask = np.nan_to_num(aperture_mask)
