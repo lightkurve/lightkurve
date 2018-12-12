@@ -1475,7 +1475,7 @@ class TessLightCurve(LightCurve):
         for kw in tess_specific_data:
             if ~np.asarray([kw.lower == k.lower() for k in extra_data]).any():
                 extra_data[kw] = tess_specific_data[kw]
-        hdu = super(KeplerLightCurve, self).to_fits(path=None,
+        hdu = super(TessLightCurve, self).to_fits(path=None,
                                                     overwrite=overwrite,
                                                     **extra_data)
 
