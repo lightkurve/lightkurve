@@ -20,7 +20,6 @@
 import os
 import sys
 sys.path.append(os.path.join(os.path.dirname(__name__), '..'))
-import sphinx_rtd_theme
 
 import lightkurve
 
@@ -68,7 +67,7 @@ author = 'Kepler/K2 Guest Observer Office'
 # built documents.
 #
 # The short X.Y version.
-version = lightkurve.__version__.split('-', 1)[0]
+version = lightkurve.__version__.split('.dev')[0]
 # The full version, including alpha/beta/rc tags.
 release = lightkurve.__version__
 
@@ -122,6 +121,7 @@ html_theme = 'kurvian'
 html_theme_path = ['../']
 
 html_theme_options = {
+    "navbar_title": "Lightkurve v" + version,
     "navbar_links": [
         ("Quickstart", "quickstart"),
         ("API", "api"),
@@ -130,75 +130,11 @@ html_theme_options = {
     ],
 }
 
+html_title = "Test 1 2 3"
+
 html_static_path = ['_static']
 
 html_logo = '_static/images/lightkurve.png'
-
-
-# -- Options for HTMLHelp output ------------------------------------------
-
-# Output file base name for HTML help builder.
-htmlhelp_basename = 'lightkurvedoc'
-
-
-# -- Options for LaTeX output ---------------------------------------------
-
-latex_elements = {
-    # The paper size ('letterpaper' or 'a4paper').
-    #
-    # 'papersize': 'letterpaper',
-
-    # The font size ('10pt', '11pt' or '12pt').
-    #
-    # 'pointsize': '10pt',
-
-    # Additional stuff for the LaTeX preamble.
-    #
-    # 'preamble': '',
-
-    # Latex figure (float) alignment
-    #
-    # 'figure_align': 'htbp',
-}
-
-# Grouping the document tree into LaTeX files. List of tuples
-# (source start file, target name, title,
-#  author, documentclass [howto, manual, or own class]).
-latex_documents = [
-    (master_doc, 'lightkurve.tex', 'lightkurve documentation',
-     'Kepler/K2 Guest Observer Office', 'manual'),
-]
-
-
-# -- Options for manual page output ---------------------------------------
-
-# One entry per manual page. List of tuples
-# (source start file, name, description, authors, manual section).
-man_pages = [
-    (master_doc, 'lightkurve', 'lightkurve documentation',
-     [author], 1)
-]
-
-
-# -- Options for Texinfo output -------------------------------------------
-
-# Grouping the document tree into Texinfo files. List of tuples
-# (source start file, target name, title, author,
-#  dir menu entry, description, category)
-texinfo_documents = [
-    (master_doc, 'lightkurve', 'lightkurve documentation',
-     author, 'Kepler/K2 Guest Observer Office',
-     'A beautiful package for astronomical flux time series analysis in Python',
-     'Miscellaneous'),
-]
-
-
-# Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'python': ('https://docs.python.org/', None),
-                       'numpy': ('http://docs.scipy.org/doc/numpy/', None),
-                       'scipy': ('http://docs.scipy.org/doc/scipy/reference', None),
-                       'oktopus': ('http://keplergo.github.io/oktopus')}
-
 
 sys.path += ['exts']
 extensions += ['sphinxcontrib_rawfiles']

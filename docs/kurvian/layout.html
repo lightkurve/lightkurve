@@ -1,22 +1,24 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+{% extends "basic/layout.html" %}
 
-    <!-- Bootstrap CSS -->
+{%- block extrahead %}
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-
-    <title>Lightkurve docs</title>
 
     <style>
     body {
         font-family: Lato;
     }
 
+    h1, h2, h3, h4, h5, h6 {
+        margin-top: 0.8em;
+    }
+
     .nav-item {
         margin-left: 0.4em;
+    }
+
+    .btn-primary {
+        background-color: #3498db;
+        border-color: #3498db;
     }
 
     .headerlink {
@@ -79,62 +81,58 @@
         font-size: 1.2em;
     }
     </style>
-  </head>
-  <body>
+{% endblock %}
 
-  <header>
-   <nav class="navbar navbar-expand-lg navbar-light">
-      <div class="container">
-        <a class="navbar-brand" href="{{ pathto('index') }}">Lightkurve v1.0</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
 
-        <div class="collapse navbar-collapse" id="navbarsExample07">
-          <ul class="navbar-nav mr-auto">
-            {% if theme_navbar_links %}
-              {%- for link in theme_navbar_links %}
-                {% if pagename == link[1] %}
-                <li class="nav-item active">
-                {% else %}
-                <li class="nav-item">
-                {% endif %}
-                  <a class="nav-link" href="{{ pathto(*link[1:]) }}">{{ link[0] }}</a>
-                </li>
-              {%- endfor %}
-            {% endif %}
-          </ul>
-          <form class="form-inline my-2 my-md-0">
-            <input class="form-control" type="text" placeholder="Search" aria-label="Search">
-          </form>
-        </div>
-      </div>
-    </nav>
-    <div class="container">
-      <hr style="margin-top: 0px;">
-    </div>
-   </header>
-
-  {%- block content %}
-
+{%- block header %}
+<header>
+<nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-  {% block body %}{% endblock %}
+    <a class="navbar-brand" href="{{ pathto('index') }}">{{ theme_navbar_title }}</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarsExample07">
+      <ul class="navbar-nav mr-auto">
+        {% if theme_navbar_links %}
+          {%- for link in theme_navbar_links %}
+            {% if pagename == link[1] %}
+            <li class="nav-item active">
+            {% else %}
+            <li class="nav-item">
+            {% endif %}
+              <a class="nav-link" href="{{ pathto(*link[1:]) }}">{{ link[0] }}</a>
+            </li>
+          {%- endfor %}
+        {% endif %}
+      </ul>
+        <form class="form-inline my-2 my-md-0" action="{{ pathto('search') }}" method="get">
+            <input class="form-control" type="text" placeholder="Search" aria-label="Search" name="q" />
+            <i class="search link icon"></i>
+        </form>
+      <a class="item" href="https://github.com/pymc-devs/pymc3"><i class="github blue icon large"></i></a>
+
+    </div>
   </div>
+</nav>
+</header>
+{% endblock %}
 
-  {%- endblock %}
+
+{%- block content %}
+<div class="container">
+    {% block body %}{% endblock %}
+</div>
+{%- endblock %}
 
 
-  {%- block footer %}
-  <div class="container" style="padding-top: 2em;">
+{%- block footer %}
+<div class="container" style="padding-top: 2em;">
     <hr>
     <p class="text-center">Lightkurve developers.</p>
-  </div>
-  {%- endblock %}
+</div>
+{%- endblock %}
 
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-  </body>
-</html>
+{%- block relbar1 %}{% endblock %}
+{%- block relbar2 %}{% endblock %}
