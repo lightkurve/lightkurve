@@ -81,6 +81,14 @@ def test_custom_exported_filename():
                     TessTargetPixelFile(example_tpf)]
         for tpf in tpfs:
             tpf.interact(exported_filename='demo.fits')
+            tpf[0:2].interact()
+            tpf[0:2].interact(exported_filename='string_only')
+            tpf[0:2].interact(exported_filename='demo2.FITS')
+            tpf[0:2].interact(exported_filename='demo3.png')
+            tpf[0:2].interact(exported_filename='')
+            tpf.interact(exported_filename=210690913)
+            mask = tpf.time == tpf.time
+            tpf[mask].interact()
     except ImportError:
         # bokeh is an optional dependency
         pass

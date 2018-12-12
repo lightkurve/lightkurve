@@ -278,8 +278,11 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=0):
 def make_default_export_name(tpf, suffix='custom-lc'):
     """makes the default name to save a custom intetract mask"""
     fn = tpf.hdu.filename()
-    base = os.path.basename(fn)
-    outname = base.rsplit('.fits')[0] + '-{}.fits'.format(suffix)
+    if fn is None:
+        outname = "{}_{}_{}.fits".format(tpf.mission, tpf.targetid, suffix)
+    else:
+        base = os.path.basename(fn)
+        outname = base.rsplit('.fits')[0] + '-{}.fits'.format(suffix)
     return outname
 
 
@@ -327,6 +330,13 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
 
     if exported_filename is None:
         exported_filename = make_default_export_name(tpf)
+    try:
+        exported_filename = str(exported_filename)
+    except:
+        log.error('Invalid input filename type for interact()')
+        raise
+    if ('.fits' not in exported_filename.lower()):
+        exported_filename += '.fits'
 
     lc = tpf.to_lightcurve(aperture_mask=aperture_mask)
 
