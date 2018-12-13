@@ -1,6 +1,7 @@
 from __future__ import division, print_function
 
 from astropy.io import fits as pyfits
+from astropy.utils.data import get_pkg_data_filename
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -11,7 +12,7 @@ import warnings
 
 from ..lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
 from ..lightcurvefile import LightCurveFile, KeplerLightCurveFile, TessLightCurveFile
-from ..targetpixelfile import KeplerTargetPixelFile
+from ..targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
 from ..utils import LightkurveWarning
 
 # 8th Quarter of Tabby's star
@@ -25,6 +26,7 @@ KEPLER10 = ("https://archive.stsci.edu/missions/kepler/lightcurves/"
             "0119/011904151/kplr011904151-2010009091648_llc.fits")
 TESS_SIM = ("https://archive.stsci.edu/missions/tess/ete-6/tid/00/000/"
             "004/104/tess2019128220341-0000000410458113-0016-s_lc.fits")
+filename_tess = get_pkg_data_filename("data/tess25155310-s01-first-cadences.fits.gz")
 
 
 def test_invalid_lightcurve():
@@ -438,23 +440,25 @@ def test_to_fits():
     assert hdu[1].header['TTYPE2'] == 'FLUX'
 
     # Test aperture mask support in to_fits
-    tpf = KeplerTargetPixelFile(TABBY_TPF)
-    random_mask = np.random.randint(0, 2,size=tpf.flux[0].shape, dtype=bool)
-    thresh_mask = tpf.create_threshold_mask(threshold=3)
+    for tpf in [KeplerTargetPixelFile(TABBY_TPF),TessTargetPixelFile(filename_tess)]:
+        random_mask = np.random.randint(0, 2,size=tpf.flux[0].shape, dtype=bool)
+        thresh_mask = tpf.create_threshold_mask(threshold=3)
 
-    lc = tpf.to_lightcurve(aperture_mask=random_mask)
-    lc.to_fits(path='out1.fits', aperture_mask=random_mask)
+        lc = tpf.to_lightcurve(aperture_mask=random_mask)
+        lc.to_fits(path='out1.fits', aperture_mask=random_mask, overwrite=True)
 
-    lc = tpf[17:400].to_lightcurve(aperture_mask=thresh_mask)
-    lc.to_fits(aperture_mask=thresh_mask, path='out2.fits')
+        lc = tpf[0:2].to_lightcurve(aperture_mask=thresh_mask)
+        lc.to_fits(aperture_mask=thresh_mask, path='out2.fits', overwrite=True)
 
-    # Test the extra data kwargs
-    bkg_mask = ~tpf.create_threshold_mask(threshold=0.1)
-    bkg_lc = tpf.to_lightcurve(aperture_mask=bkg_mask)
-    lc = tpf.to_lightcurve(aperture_mask=thresh_mask)
-    lc_out = lc - bkg_lc.flux * (thresh_mask.sum()/bkg_mask.sum())
-    lc_out.to_fits(aperture_mask=thresh_mask, path='out2.fits',
-               overwrite=True, extra_data={'BKG':bkg_lc.flux})
+        # Test the extra data kwargs
+        bkg_mask = ~tpf.create_threshold_mask(threshold=0.1)
+        bkg_lc = tpf.to_lightcurve(aperture_mask=bkg_mask)
+        lc = tpf.to_lightcurve(aperture_mask=tpf.hdu['APERTURE'].data)
+        #lc = tpf.to_lightcurve(aperture_mask=None) ## will error
+        lc = tpf.to_lightcurve(aperture_mask=thresh_mask)
+        lc_out = lc - bkg_lc.flux * (thresh_mask.sum()/bkg_mask.sum())
+        lc_out.to_fits(aperture_mask=thresh_mask, path='out2.fits',
+                   overwrite=True, extra_data={'BKG':bkg_lc.flux})
 
 
 @pytest.mark.remote_data

@@ -7,6 +7,8 @@ from .. import LightkurveWarning
 from ..targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
 
 example_tpf = get_pkg_data_filename("data/tess25155310-s01-first-cadences.fits.gz")
+TABBY_TPF = ("https://archive.stsci.edu/missions/kepler/target_pixel_files"
+             "/0084/008462852/kplr008462852-2011073133259_lpd-targ.fits.gz")
 
 
 def test_bokeh_import_error(caplog):
@@ -53,17 +55,16 @@ def test_custom_aperture_mask():
     with warnings.catch_warnings():
         # Ignore the "TELESCOP is not equal to TESS" warning
         warnings.simplefilter("ignore", LightkurveWarning)
-        tpfs = [KeplerTargetPixelFile(example_tpf),
+        tpfs = [KeplerTargetPixelFile(TABBY_TPF),
                 TessTargetPixelFile(example_tpf)]
     try:
         import bokeh
-        with warnings.catch_warnings():
-            # Ignore the "TELESCOP is not equal to TESS" warning
-            warnings.simplefilter("ignore", LightkurveWarning)
-            tpfs = [KeplerTargetPixelFile(example_tpf),
-                    TessTargetPixelFile(example_tpf)]
         for tpf in tpfs:
             mask = tpf.flux[0, :, :] == tpf.flux[0, :, :]
+            tpf.interact(aperture_mask=mask)
+            mask = None
+            tpf.interact(aperture_mask=mask)
+            mask = 'threshold'
             tpf.interact(aperture_mask=mask)
     except ImportError:
         # bokeh is an optional dependency
@@ -77,7 +78,7 @@ def test_custom_exported_filename():
         with warnings.catch_warnings():
             # Ignore the "TELESCOP is not equal to TESS" warning
             warnings.simplefilter("ignore", LightkurveWarning)
-            tpfs = [KeplerTargetPixelFile(example_tpf),
+            tpfs = [KeplerTargetPixelFile(TABBY_TPF),
                     TessTargetPixelFile(example_tpf)]
         for tpf in tpfs:
             tpf.interact(exported_filename='demo.fits')
@@ -100,7 +101,7 @@ def test_max_cadences():
         with warnings.catch_warnings():
             # Ignore the "TELESCOP is not equal to TESS" warning
             warnings.simplefilter("ignore", LightkurveWarning)
-            tpfs = [KeplerTargetPixelFile(example_tpf),
+            tpfs = [KeplerTargetPixelFile(TABBY_TPF),
                     TessTargetPixelFile(example_tpf)]
         for tpf in tpfs:
             with pytest.raises(RuntimeError) as exc:

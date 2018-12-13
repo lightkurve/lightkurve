@@ -376,7 +376,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
         l_button = Button(label="<", button_type="default", width=30)
         export_button = Button(label="Save Lightcurve",
                                button_type="success", width=120)
-        message_on_save = Div(text=' ',width=600, height=60)
+        message_on_save = Div(text=' ',width=600, height=15)
 
         # Callbacks
         def update_upon_pixel_selection(attr, old, new):
