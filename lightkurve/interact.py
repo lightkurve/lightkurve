@@ -200,7 +200,54 @@ def make_lightcurve_figure_elements(lc, lc_source):
     return fig, vertical_line
 
 
-def make_tpf_figure_elements(tpf, tpf_source, pedestal=0):
+def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
+    """Make the Gaia Figure Elements"""
+    #Get the positions of the Gaia sources
+    ## TODO: turn this part into a method: `tpf.query_nearby_gaia()`
+    c1 = SkyCoord(tpf.ra, tpf.dec, frame='icrs', unit='deg')
+    result = Vizier.query_region(c1, catalog=["I/345/gaia2"], radius=Angle(np.max(tpf.shape[1:]) * 3, "arcsec"))
+    if result is None:
+        raise ValueError('No targets found in region.')
+    result = result["I/345/gaia2"].to_pandas()
+    result = result[result.Gmag < magnitude_limit]
+    radecs = np.vstack([result['RA_ICRS'], result['DE_ICRS']]).T
+    coords = tpf.wcs.all_world2pix(radecs, 0) ## TODO, is this supposed to be zero or one?????
+    ok = (coords[:, 0] > 0) & (coords[:, 0] < tpf.shape[2]) & (coords[:, 1] > 0) & (coords[:, 1] < tpf.shape[1])
+    result = result[ok]
+    coords = coords[ok]
+    year = ((tpf.astropy_time[0].jd - 2457206.375) * u.day).to(u.year)
+    pmra = ((np.asarray(result.pmRA) * u.milliarcsecond/u.year) * year).to(u.arcsec).value
+    pmdec = ((np.asarray(result.pmDE) * u.milliarcsecond/u.year) * year).to(u.arcsec).value
+    ## todo: filter NaNs in pmra/pmdec
+    result.RA_ICRS += pmra
+    result.DE_ICRS += pmdec
+
+    ## TODO: Gently size the points by their Gaia magnitude
+    source = ColumnDataSource(data=dict(ra=result['RA_ICRS'],
+                                        dec=result['DE_ICRS'],
+                                        source=result['Source'],
+                                        Gmag=result['Gmag'],
+                                        plx=result['Plx'],
+                                        x=coords[:, 0]+tpf.column,
+                                        y=coords[:, 1]+tpf.row))
+
+    r = fig.circle('x', 'y', source=source,fill_alpha=0.3, size=8, line_color=None,
+                    selection_color="firebrick",nonselection_fill_alpha=0.0, nonselection_line_color=None,
+                    nonselection_line_alpha=0.0, fill_color="firebrick",
+                    hover_fill_color="firebrick", hover_alpha=0.9, hover_line_color="white")
+
+    fig.add_tools(HoverTool(tooltips=[("Source", "@source"),("G", "@Gmag"),("Parallax", "@plx"),
+                                    ("RA", "@ra{0,0.00000000}"),
+                                     ("DEC", "@dec{0,0.00000000}"),
+                                      ("x", "@x"),
+                                     ("y", "@y")],
+                                     renderers=[r],
+                                     mode='mouse',
+                                     point_policy="snap_to_data"))
+    return fig, r
+
+
+def make_tpf_figure_elements(tpf, tpf_source, pedestal=0, fiducial_frame=None):
     """Returns the lightcurve figure elements.
 
     Parameters
@@ -235,7 +282,7 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=0):
     vstep = (np.log10(vhi) - np.log10(vlo)) / 300.0  # assumes counts >> 1.0!
     color_mapper = LogColorMapper(palette="Viridis256", low=lo, high=hi)
 
-    fig.image([pedestal + tpf.flux[0, :, :]], x=tpf.column, y=tpf.row,
+    fig.image([pedestal + tpf.flux[fiducial_frame, :, :]], x=tpf.column, y=tpf.row,
               dw=tpf.shape[2], dh=tpf.shape[1], dilate=True,
               color_mapper=color_mapper, name="tpfimg")
 
@@ -255,8 +302,9 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=0):
 
     color_bar.formatter = PrintfTickFormatter(format="%14u")
 
-    fig.rect('xx', 'yy', 1, 1, source=tpf_source, fill_color='gray',
-             fill_alpha=0.4, line_color='white')
+    if tpf_source is not None:
+        fig.rect('xx', 'yy', 1, 1, source=tpf_source, fill_color='gray',
+                fill_alpha=0.4, line_color='white')
 
     # Configure the stretch slider and its callback function
     stretch_slider = RangeSlider(start=np.log10(vlo),
@@ -478,6 +526,66 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
 
     output_notebook(verbose=False, hide_banner=True)
     return show(create_interact_ui, notebook_url=notebook_url)
+
+
+def show_skyview_widget(tpf, notebook_url='localhost:8888', magnitude_limit=18):
+    """skyview
+
+    Parameters
+    ----------
+    tpf : lightkurve.TargetPixelFile
+        Target Pixel File to interact with
+    notebook_url: str
+        Location of the Jupyter notebook page (default: "localhost:8888")
+        When showing Bokeh applications, the Bokeh server must be
+        explicitly configured to allow connections originating from
+        different URLs. This parameter defaults to the standard notebook
+        host and port. If you are running on a different location, you
+        will need to supply this value for the application to display
+        properly. If no protocol is supplied in the URL, e.g. if it is
+        of the form "localhost:8888", then "http" will be used.
+    max_cadences : int
+        Raise a RuntimeError if the number of cadences shown is larger than
+        this value. This limit helps keep browsers from becoming unresponsive.
+    """
+    try:
+        import bokeh
+        if bokeh.__version__[0] == '0':
+            warnings.warn("interact() requires Bokeh version 1.0 or later", LightkurveWarning)
+    except ImportError:
+        log.error("The skyview() tool requires the `bokeh` package; "
+                  "you can install bokeh using e.g. `conda install bokeh`.")
+        return None
+
+    # Try to identify the "fiducial frame"
+    zp = (tpf.pos_corr1 == 0) & (tpf.pos_corr2 == 0)
+    zp_loc, = np.where(zp)
+
+    if len(zp_loc) == 1:
+        fiducial_frame = zp_loc[0]
+    else:
+        fiducial_frame = 0
+
+    def create_interact_ui(doc):
+        # The data source includes metadata for hover-over tooltips
+        tpf_source = None
+
+        # Create the TPF figure and its stretch slider
+        pedestal = np.nanmin(tpf.flux)
+        fig_tpf, stretch_slider = make_tpf_figure_elements(tpf, tpf_source,
+                                                pedestal=pedestal,
+                                                fiducial_frame=fiducial_frame)
+        fig_tpf, r = add_gaia_figure_elements(tpf, fig_tpf,
+                                            magnitude_limit = magnitude_limit)
+
+        # Layout all of the plots
+
+        widgets_and_figures = layout([fig_tpf, stretch_slider])
+        doc.add_root(widgets_and_figures)
+
+    output_notebook(verbose=False, hide_banner=True)
+    return show(create_interact_ui, notebook_url=notebook_url)
+
 
 
 def show_skymap_widget(tpf, magnitude_limit=18):
