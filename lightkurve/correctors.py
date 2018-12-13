@@ -527,12 +527,16 @@ class PLDCorrector(object):
         aperture = np.zeros(aperture_mask.shape)
         aperture[aperture_mask] = 1.
 
-        aperture_mask = [aperture for i in range(len(self.fpix))]
+        # crop data cube to include only desired pixels
+        xmin, xmax = min(np.where(aperture)[0]),  max(np.where(aperture)[0])
+        ymin, ymax = min(np.where(aperture)[1]),  max(np.where(aperture)[1])
+
+        aperture_mask = [aperture[xmin:xmax+1, ymin:ymax+1] for i in range(len(self.fpix))]
 
         M = lambda x: np.delete(x, transit_mask, axis=0)
 
         #  generate flux light curve
-        self.tpf_rs = (self.fpix*aperture_mask).reshape(len(self.fpix),-1)
+        self.tpf_rs = (self.fpix[:, xmin:xmax+1, ymin:ymax+1]*aperture_mask).reshape(len(self.fpix),-1)
         self.tpf_ap = np.zeros((len(self.fpix),
                                len(np.delete(self.tpf_rs[0],
                                np.where(np.isnan(self.tpf_rs[0]))))))
