@@ -376,7 +376,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
         l_button = Button(label="<", button_type="default", width=30)
         export_button = Button(label="Save Lightcurve",
                                button_type="success", width=120)
-        message_on_save = Div(text=' ',width=300, height=30)
+        message_on_save = Div(text=' ',width=600, height=60)
 
         # Callbacks
         def update_upon_pixel_selection(attr, old, new):
@@ -399,6 +399,9 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
                 fig_lc.y_range.start = -1
                 fig_lc.y_range.end = 1
 
+            message_on_save.text = " "
+            export_button.button_type = "success"
+
         def update_upon_cadence_change(attr, old, new):
             """Callback to take action when cadence slider changes"""
             if new in tpf.cadenceno:
@@ -412,23 +415,19 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
             lc_source.selected.indices = []
 
         def go_right_by_one():
+            """Step forward in time by a single cadence"""
             existing_value = cadence_slider.value
             if existing_value < np.max(tpf.cadenceno):
                 cadence_slider.value = existing_value + 1
 
         def go_left_by_one():
+            """Step back in time by a single cadence"""
             existing_value = cadence_slider.value
             if existing_value > np.min(tpf.cadenceno):
                 cadence_slider.value = existing_value - 1
 
-        def print_successful_save(filename):
-            div = Div(text='Saved file {}'.format(filename),
-                      width=300, height=50)
-            return div
-
-
         def save_lightcurve():
-
+            """Save the lightcurve as a fits file with mask as HDU extension"""
             if tpf_source.selected.indices != []:
                 selected_indices = np.array(tpf_source.selected.indices)
                 selected_mask = np.isin(pixel_index_array, selected_indices)
@@ -438,9 +437,17 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
                                SOURCE='lightkurve interact',
                                NOTE='custom mask',
                                MASKNPIX=np.nansum(selected_mask))
-                message_on_save.text = "Saved file {}".format(exported_filename)
+                if message_on_save.text == " ":
+                    text = '<font color="black"><i>Saved file {} </i></font>'
+                    message_on_save.text = text.format(exported_filename)
+                    export_button.button_type = "success"
+                else:
+                    text = '<font color="gray"><i>Saved file {} </i></font>'
+                    message_on_save.text = text.format(exported_filename)
             else:
-                message_on_save.text = "No pixels selected, no mask saved"
+                text = '<font color="gray"><i>No pixels selected, no mask saved</i></font>'
+                export_button.button_type = "warning"
+                message_on_save.text = text
 
         def jump_to_lightcurve_position(attr, old, new):
             if new != []:
@@ -455,11 +462,12 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
         cadence_slider.on_change('value', update_upon_cadence_change)
 
         # Layout all of the plots
-        sp1, sp2, sp3 = Spacer(width=15), Spacer(width=30), Spacer(width=80)
+        sp1, sp2, sp3, sp4 = (Spacer(width=15), Spacer(width=30),
+                              Spacer(width=80), Spacer(width=60) )
         widgets_and_figures = layout([fig_lc, fig_tpf],
                                      [l_button, sp1, r_button, sp2,
                                      cadence_slider, sp3, stretch_slider],
-                                     [export_button])
+                                     [export_button, sp4, message_on_save])
         doc.add_root(widgets_and_figures)
 
     output_notebook(verbose=False, hide_banner=True)
