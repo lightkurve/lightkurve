@@ -20,13 +20,18 @@ import numpy as np
 from astropy.stats import sigma_clip
 from .utils import KeplerQualityFlags, LightkurveWarning
 import os
+from astropy.coordinates import SkyCoord, Angle
+from astroquery.vizier import Vizier
+import astropy.units as u
+
+Vizier.ROW_LIMIT= -1
 
 log = logging.getLogger(__name__)
 
 # Import the optional Bokeh dependency, or print a friendly error otherwise.
 try:
     import bokeh  # Import bokeh first so we get an ImportError we can catch
-    from bokeh.io import show, output_notebook
+    from bokeh.io import show, output_notebook, push_notebook
     from bokeh.plotting import figure, ColumnDataSource
     from bokeh.models import LogColorMapper, Selection, Slider, RangeSlider, \
         Span, ColorBar, LogTicker, Range1d
@@ -34,6 +39,7 @@ try:
     from bokeh.models.tools import HoverTool
     from bokeh.models.widgets import Button, Div
     from bokeh.models.formatters import PrintfTickFormatter
+    import ipywidgets as widgets
 except ImportError:
     # We will print a nice error message in the `show_interact_widget` function
     pass
@@ -472,3 +478,122 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
 
     output_notebook(verbose=False, hide_banner=True)
     return show(create_interact_ui, notebook_url=notebook_url)
+
+
+def show_skymap_widget(tpf, magnitude_limit=18):
+    """Display an interactive Target Pixel File with positions of Gaia DR2 sources.
+
+    Parameters
+    ----------
+
+    tpf : lightkurve.TargetPixelFile
+        tpf to plot
+    magnitude_limit : float
+        A value to limit the results in based on Gaia Gmag. Default, 18.
+    """
+
+    output_notebook()
+
+    if tpf.mission == 'K2':
+        title = "Skyview for EPIC {}, K2 Campaign {}, CCD {}.{}".format(
+                            tpf.targetid, tpf.campaign, tpf.module, tpf.output)
+    elif tpf.mission == 'Kepler':
+        title = "Skyview for KIC {}, Kepler Quarter {}, CCD {}.{}".format(
+                        tpf.targetid, tpf.quarter, tpf.module, tpf.output)
+    fig2 = figure(plot_width=600, plot_height=600,
+                  tools="pan,wheel_zoom,box_zoom,save,reset",
+                  title=title)
+    fig2.yaxis.axis_label = 'Pixel Row Number'
+    fig2.xaxis.axis_label = 'Pixel Column Number'
+    fig2.x_range = Range1d(start=tpf.column, end=tpf.column + tpf.flux.shape[2])
+    fig2.y_range = Range1d(start=tpf.row, end=tpf.row + tpf.flux.shape[1])
+
+    pedestal = np.nanmin(tpf.flux)
+    stretch_dims = np.prod(tpf.flux.shape)
+    screen_stretch = tpf.flux.reshape(stretch_dims) - pedestal
+    screen_stretch = screen_stretch[np.isfinite(screen_stretch)]  # ignore NaNs
+    screen_stretch = screen_stretch[screen_stretch > 0.0]
+    vlo = np.min(screen_stretch)
+    vhi = np.max(screen_stretch)
+    vstep = (np.log10(vhi) - np.log10(vlo)) / 300.0  # assumes counts >> 1.0!
+    lo, med, hi = np.nanpercentile(screen_stretch, [1, 50, 95])
+    color_mapper = LogColorMapper(palette="Viridis256", low=lo, high=hi)
+
+    # Try to identify the "fiducial frame"
+    zp = (tpf.pos_corr1 == 0) & (tpf.pos_corr2 == 0)
+    zp_loc, = np.where(zp)
+
+    if len(zp_loc) == 1:
+        fiducial_frame = zp_loc[0]
+    else:
+        fiducial_frame = 0
+    thumb = np.nanmedian(tpf.flux, axis=0)
+    fig2_dat = fig2.image([thumb], x=tpf.column,
+                          y=tpf.row, dw=tpf.shape[2], dh=tpf.shape[1],
+                          dilate=False, color_mapper=color_mapper)
+
+    #Get the positions of the Gaia sources
+    ## TODO: turn this part into a method: `tpf.query_nearby_gaia()`
+    c1 = SkyCoord(tpf.ra, tpf.dec, frame='icrs', unit='deg')
+    result = Vizier.query_region(c1, catalog=["I/345/gaia2"], radius=Angle(np.max(tpf.shape[1:]) * 3, "arcsec"))
+    if result is None:
+        raise ValueError('No targets found in region.')
+    result = result["I/345/gaia2"].to_pandas()
+    result = result[result.Gmag < magnitude_limit]
+    radecs = np.vstack([result['RA_ICRS'], result['DE_ICRS']]).T
+    coords = tpf.wcs.all_world2pix(radecs, 0) ## TODO, is this supposed to be zero or one?????
+    ok = (coords[:, 0] > 0) & (coords[:, 0] < tpf.shape[2]) & (coords[:, 1] > 0) & (coords[:, 1] < tpf.shape[1])
+    result = result[ok]
+    coords = coords[ok]
+    year = ((tpf.astropy_time[0].jd - 2457206.375) * u.day).to(u.year)
+    pmra = ((np.asarray(result.pmRA) * u.milliarcsecond/u.year) * year).to(u.arcsec).value
+    pmdec = ((np.asarray(result.pmDE) * u.milliarcsecond/u.year) * year).to(u.arcsec).value
+    result.RA_ICRS += pmra
+    result.DE_ICRS += pmdec
+
+    ## TODO: Gently size the points by their Gaia magnitude
+    source = ColumnDataSource(data=dict(ra=result['RA_ICRS'],
+                                        dec=result['DE_ICRS'],
+                                        source=result['Source'],
+                                        Gmag=result['Gmag'],
+                                        plx=result['Plx'],
+                                        x=coords[:, 0]+tpf.column,
+                                        y=coords[:, 1]+tpf.row))
+
+    r = fig2.circle('x', 'y', source=source,fill_alpha=0.3, size=8, line_color=None,
+                    selection_color="firebrick",nonselection_fill_alpha=0.0, nonselection_line_color=None,
+                    nonselection_line_alpha=0.0, fill_color="firebrick",
+                    hover_fill_color="firebrick", hover_alpha=0.9, hover_line_color="white")
+
+    fig2.add_tools(HoverTool(tooltips=[("Source", "@source"),("G", "@Gmag"),("Parallax", "@plx"),
+                                    ("RA", "@ra{0,0.00000000}"),
+                                     ("DEC", "@dec{0,0.00000000}"),
+                                      ("x", "@x"),
+                                     ("y", "@y")],
+                                     renderers=[r],
+                                     mode='mouse',
+                                     point_policy="snap_to_data"))
+
+    # The figures appear before the interactive widget sliders
+    show(fig2, notebook_handle=True)
+
+    # The widget sliders call the update function each time
+    def update(log_stretch):
+        """Function that connects to the interact widget slider values"""
+        fig2_dat.glyph.color_mapper.high = 10**log_stretch[1]
+        fig2_dat.glyph.color_mapper.low = 10**log_stretch[0]
+        push_notebook()
+
+    # Define the widgets that enable the interactivity
+    screen_slider = widgets.FloatRangeSlider(
+                        value=[np.log10(lo), np.log10(hi)],
+                        min=np.log10(vlo),
+                        max=np.log10(vhi),
+                        step=vstep,
+                        description='Pixel Stretch (log)',
+                        style={'description_width': 'initial'},
+                        continuous_update=False,
+                        layout=widgets.Layout(width='30%', height='20px'))
+    ui = widgets.HBox([screen_slider])
+    out = widgets.interactive_output(update, {'log_stretch': screen_slider})
+    display(ui, out)
