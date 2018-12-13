@@ -109,10 +109,7 @@
       </ul>
         <form class="form-inline my-2 my-md-0" action="{{ pathto('search') }}" method="get">
             <input class="form-control" type="text" placeholder="Search" aria-label="Search" name="q" />
-            <i class="search link icon"></i>
         </form>
-      <a class="item" href="https://github.com/pymc-devs/pymc3"><i class="github blue icon large"></i></a>
-
     </div>
   </div>
 </nav>
@@ -130,7 +127,10 @@
 {%- block footer %}
 <div class="container" style="padding-top: 2em;">
     <hr>
-    <p class="text-center">Lightkurve developers.</p>
+    <p class="text-center">
+        Created with ♥ by the Lightkurve developers.
+        <a href="https://github.com/KeplerGO/lightkurve">Join us on GitHub.</a>
+    </p>
 </div>
 {%- endblock %}
 

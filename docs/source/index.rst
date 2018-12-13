@@ -13,7 +13,7 @@
   <div class="container">
     <hr>
     <div class="row">
-      <div class="col-md-5">
+      <div class="col-md-6">
         <p style="font-size: 1.2em; font-weight: 700;">
           Make discoveries in NASA's open data
         </p>
@@ -28,8 +28,15 @@
           by providing high-quality data analysis tools and tutorials.
         </p>
       </div>
-      <div class="col-md-7">
-        <img src="https://docs.lightkurve.org/_images/lightkurve-teaser.gif" class="img-fluid">
+      <div class="col-md-6">
+        <pre><code class="python">
+    import lightkurve as lk
+    search = lk.search_targetpixelfile("Kepler-10", quarter=6)
+    pixelfile = search.download()
+
+    lightcurve = pixelfile.to_lightcurve(method="aperture")
+    lightcurve.plot()
+        </code></pre>
       </div>
     </div>
   </div>
