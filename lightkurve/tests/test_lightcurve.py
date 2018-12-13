@@ -443,7 +443,7 @@ def test_to_fits():
     thresh_mask = tpf.create_threshold_mask(threshold=3)
 
     lc = tpf.to_lightcurve(aperture_mask=random_mask)
-    lc.to_fits(path='out.fits', aperture_mask=random_mask)
+    lc.to_fits(path='out1.fits', aperture_mask=random_mask)
 
     lc = tpf[17:400].to_lightcurve(aperture_mask=thresh_mask)
     lc.to_fits(aperture_mask=thresh_mask, path='out2.fits')

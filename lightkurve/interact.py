@@ -32,7 +32,7 @@ try:
         Span, ColorBar, LogTicker, Range1d
     from bokeh.layouts import layout, Spacer
     from bokeh.models.tools import HoverTool
-    from bokeh.models.widgets import Button
+    from bokeh.models.widgets import Button, Div
     from bokeh.models.formatters import PrintfTickFormatter
 except ImportError:
     # We will print a nice error message in the `show_interact_widget` function
@@ -376,6 +376,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
         l_button = Button(label="<", button_type="default", width=30)
         export_button = Button(label="Save Lightcurve",
                                button_type="success", width=120)
+        message_on_save = Div(text=' ',width=300, height=30)
 
         # Callbacks
         def update_upon_pixel_selection(attr, old, new):
@@ -420,7 +421,13 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
             if existing_value > np.min(tpf.cadenceno):
                 cadence_slider.value = existing_value - 1
 
-        def export_mask():
+        def print_successful_save(filename):
+            div = Div(text='Saved file {}'.format(filename),
+                      width=300, height=50)
+            return div
+
+
+        def save_lightcurve():
 
             if tpf_source.selected.indices != []:
                 selected_indices = np.array(tpf_source.selected.indices)
@@ -431,8 +438,9 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
                                SOURCE='lightkurve interact',
                                NOTE='custom mask',
                                MASKNPIX=np.nansum(selected_mask))
+                message_on_save.text = "Saved file {}".format(exported_filename)
             else:
-                log.info("No pixels selected, no mask saved.")
+                message_on_save.text = "No pixels selected, no mask saved"
 
         def jump_to_lightcurve_position(attr, old, new):
             if new != []:
@@ -443,7 +451,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
         l_button.on_click(go_left_by_one)
         tpf_source.selected.on_change('indices', update_upon_pixel_selection)
         lc_source.selected.on_change('indices', jump_to_lightcurve_position)
-        export_button.on_click(export_mask)
+        export_button.on_click(save_lightcurve)
         cadence_slider.on_change('value', update_upon_cadence_change)
 
         # Layout all of the plots

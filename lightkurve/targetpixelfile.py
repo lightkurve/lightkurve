@@ -407,6 +407,8 @@ class TargetPixelFile(object):
                 aperture_mask = self.pipeline_mask
             elif aperture_mask == 'threshold':
                 aperture_mask = self.create_threshold_mask()
+            elif ((aperture_mask & 2) == 2).any(): # Kepler-pipeline style
+                aperture_mask = (aperture_mask & 2) == 2
         self._last_aperture_mask = aperture_mask
         return aperture_mask
 
