@@ -373,7 +373,6 @@ def test_interact():
     for tpf in [KeplerTargetPixelFile(filename_tpf_one_center),
                 TessTargetPixelFile(filename_tess)]:
         tpf.interact()
-        tpf.interact(lc=tpf.to_lightcurve(aperture_mask='all'))
 
 
 def test_get_models():
