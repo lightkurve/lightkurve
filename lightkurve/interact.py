@@ -247,7 +247,8 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
     return fig, r
 
 
-def make_tpf_figure_elements(tpf, tpf_source, pedestal=0, fiducial_frame=None):
+def make_tpf_figure_elements(tpf, tpf_source, pedestal=0,
+        fiducial_frame=None, plot_width=370, plot_height=340):
     """Returns the lightcurve figure elements.
 
     Parameters
@@ -268,7 +269,7 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=0, fiducial_frame=None):
     else:
         title = "Pixel data"
 
-    fig = figure(plot_width=370, plot_height=340,
+    fig = figure(plot_width=plot_width, plot_height=plot_height,
                  x_range=(tpf.column, tpf.column+tpf.shape[2]),
                  y_range=(tpf.row, tpf.row+tpf.shape[1]),
                  title=title, tools='tap,box_select,wheel_zoom,reset',
@@ -574,7 +575,8 @@ def show_skyview_widget(tpf, notebook_url='localhost:8888', magnitude_limit=18):
         pedestal = np.nanmin(tpf.flux)
         fig_tpf, stretch_slider = make_tpf_figure_elements(tpf, tpf_source,
                                                 pedestal=pedestal,
-                                                fiducial_frame=fiducial_frame)
+                                                fiducial_frame=fiducial_frame,
+                                                plot_width=640, plot_height=600)
         fig_tpf, r = add_gaia_figure_elements(tpf, fig_tpf,
                                             magnitude_limit = magnitude_limit)
 
