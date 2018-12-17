@@ -9,7 +9,8 @@ Jupyter Notebook Tutorials
 - [What are TargetPixelFile objects?](01-target-pixel-files.ipynb)  
 - [What are LightCurve objects?](01-what-are-lightcurves.ipynb)  
 - [What are LightCurveFile objects?](01-lightcurve-files.ipynb)  
-- [What is the Periodogram class?](01-using-the-periodogram-class.ipynb)  
+- [What is the Periodogram class?](01-using-the-periodogram-class.ipynb)
+- *How to mask data using slicing*
 
 ### Science with lightkurve
 
@@ -35,10 +36,10 @@ Jupyter Notebook Tutorials
 - [How does the SFF method work?](04-replicate-vanderburg-2014-k2sff.ipynb)
 - [Replicating Vanderburg & Johnson 2014 using lightkurve](04-replicate-vanderburg-2014-lightkurve.ipynb)
 - [How to identify time-variable background noise (“rolling bands”)?](04-identify-rolling-band.ipynb)
-- Pixel level decorrelation (PLD) tutorial
+- *Pixel level decorrelation (PLD) tutorial*
 
 
 ### Advanced Patterns
 
-- Gaussian processes regression
-- The K2 legacy field
+- *Gaussian processes regression*
+- *The K2 legacy field*
