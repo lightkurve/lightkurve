@@ -52,6 +52,9 @@ numpydoc_show_class_members = False
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
+# Exclude build directory and Jupyter backup files:
+exclude_patterns = ['_build', '**.ipynb_checkpoints']
+
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
