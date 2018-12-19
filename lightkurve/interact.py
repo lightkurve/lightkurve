@@ -158,7 +158,7 @@ def make_lightcurve_figure_elements(lc, lc_source, tools="pan,wheel_zoom,box_zoo
 
     fig = figure(title=title, plot_height=figsize[0], plot_width=figsize[1],
                  tools=tools,
-                 toolbar_location="below", logo=None,
+                 toolbar_location="below",
                  border_fill_color="whitesmoke")
     fig.title.offset = -10
     fig.yaxis.axis_label = 'Flux (e/s)'
@@ -480,7 +480,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
     return show(create_interact_ui, notebook_url=notebook_url)
 
 
-def show_SFF_interact_widget(orig_lc, notebook_url='localhost:8888', postprocessing=None):
+def show_SFF_interact_widget(corr, notebook_url='localhost:8888', postprocessing=None):
     '''Show an interactive SFF widget...
 
     Parameters
@@ -492,7 +492,7 @@ def show_SFF_interact_widget(orig_lc, notebook_url='localhost:8888', postprocess
 
     '''
 
-    lc_source = prepare_lightcurve_datasource(orig_lc)
+    lc_source = prepare_lightcurve_datasource(corr.data)
     def create_interact_ui(doc):
         SFF = SFFCorrector()
 
@@ -523,14 +523,13 @@ def show_SFF_interact_widget(orig_lc, notebook_url='localhost:8888', postprocess
                                 width=600)
 
 
-        niters_button = RadioButtonGroup(labels=["1 Iter", "2 Iter", "3 Iter"], active=2)
-        restore_trend = CheckboxGroup(labels=["Restore Trend"], active=[])
+        niters_button = RadioButtonGroup(labels=["1 Iter", "2 Iter", "3 Iter", "4 Iter", "5 Iter", "6 Iter", "7 Iter", "8 Iter"], active=4)
+        remove_trend = CheckboxGroup(labels=["Remove Trend"], active=[])
         show_windows = CheckboxGroup(labels=["Show Window Edges"], active=[])
-        correct_thrusters = CheckboxGroup(labels=["Correct Thrusters"], active=[])
         #-----------------------------
 
         # Make plot
-        fig_lc = make_lightcurve_figure_elements(orig_lc, lc_source, line=False, tools="pan,wheel_zoom,box_zoom,reset", tooltips=False)
+        fig_lc = make_lightcurve_figure_elements(corr.data, lc_source, line=False, tools="pan,wheel_zoom,box_zoom,reset", tooltips=False)
 
         #Make INVISIBLE lines.
         line_dict = {}
@@ -543,25 +542,26 @@ def show_SFF_interact_widget(orig_lc, notebook_url='localhost:8888', postprocess
         def compute(attr, old, new):
             '''When sliders change, compute the new correction'''
             if (window_slider.value != 0) & (bin_slider.value!=0):
-                lc = SFF.correct(orig_lc.time, orig_lc.flux, orig_lc.centroid_col, orig_lc.centroid_row,
-                                                       windows=window_slider.value, bins=bin_slider.value,
-                                                       niters=niters_button.active + 1,
-                                                       window_shift=window_shift_slider.value,
-                                                       restore_trend = bool(len(restore_trend.active)),
-                                                       correct_thrusters=bool(len(correct_thrusters.active)))
+                lc = corr.correct(windows=window_slider.value, bins=bin_slider.value,
+                                    niters=niters_button.active + 1,
+                                    window_shift=window_shift_slider.value,
+                                    remove_trend = bool(len(remove_trend.active)))
+
                 if postprocessing is not None:
                     if not callable(postprocessing):
                         raise ValueError('Post Processing must be a function.')
                     lc = postprocessing(lc)
                     show_windows.active=[]
-                    restore_trend.active=[]
-                    restore_trend.disabled=True
+                    remove_trend.active=[]
+                    remove_trend.disabled=True
                     show_windows.disabled=True
 
-                lc_source.data['flux'] = lc.flux
-                lc_source.data['time'] = lc.time
+                new_source = prepare_lightcurve_datasource(lc)
+                for k in new_source.data.keys():
+                    lc_source.data[k] = new_source.data[k]
+                lc_source.data['quality'] = lc.quality
             else:
-                lc_source.data['flux'] = orig_lc.flux
+                lc_source.data['flux'] = corr.data.flux
 
 
         def do_lines(attr, old, new):
@@ -571,7 +571,7 @@ def show_SFF_interact_widget(orig_lc, notebook_url='localhost:8888', postprocess
             window_shift = window_shift_slider.value
             idx = 0
             if bool(len(show_windows.active)):
-                time = SFF.build_window_positions(orig_lc.time, windows=windows, window_shift=window_shift)
+                time = SFF.build_window_positions(corr.data.time, windows=windows, window_shift=window_shift)
                 for idx, t in enumerate(time):
                     line_dict[idx].update(location=t[0])
                     line_dict[idx].update(line_width=1.5)
@@ -584,14 +584,13 @@ def show_SFF_interact_widget(orig_lc, notebook_url='localhost:8888', postprocess
         window_shift_slider.on_change('value', compute)
         bin_slider.on_change('value', compute)
         niters_button.on_change('active', compute)
-        restore_trend.on_change('active', compute)
-        correct_thrusters.on_change('active', compute)
+        remove_trend.on_change('active', compute)
 
         show_windows.on_change('active', do_lines)
         window_slider.on_change('value', do_lines)
         window_shift_slider.on_change('value', do_lines)
 
-        doc.add_root(layout([fig_lc, Spacer(width=30), [niters_button, restore_trend, show_windows, correct_thrusters]], [window_slider], [bin_slider], [window_shift_slider]))
+        doc.add_root(layout([fig_lc, Spacer(width=30), [niters_button, remove_trend, show_windows]], [window_slider], [bin_slider], [window_shift_slider]))
 
     output_notebook(verbose=False, hide_banner=True)
     return show(create_interact_ui, notebook_url=notebook_url)
