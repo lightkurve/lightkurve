@@ -514,12 +514,20 @@ def show_SFF_interact_widget(corr, notebook_url='localhost:8888', postprocessing
                                 title="Bin Number",
                                 width=600)
 
-                # Window Slider
+        # Window Slider
         window_shift_slider = Slider(start=0,
                                 end=1000,
                                 value=0,
                                 step=1,
                                 title="Window Shift",
+                                width=600)
+
+        # Knot slider
+        knot_slider = Slider(start=0.5,
+                                end=10,
+                                value=1.5,
+                                step=0.25,
+                                title="Knot Spacing",
                                 width=600)
 
 
@@ -545,7 +553,8 @@ def show_SFF_interact_widget(corr, notebook_url='localhost:8888', postprocessing
                 lc = corr.correct(windows=window_slider.value, bins=bin_slider.value,
                                     niters=niters_button.active + 1,
                                     window_shift=window_shift_slider.value,
-                                    remove_trend = bool(len(remove_trend.active)))
+                                    remove_trend = bool(len(remove_trend.active)),
+                                    knotspacing=knot_slider.value)
 
                 if postprocessing is not None:
                     if not callable(postprocessing):
@@ -583,6 +592,7 @@ def show_SFF_interact_widget(corr, notebook_url='localhost:8888', postprocessing
         window_slider.on_change('value', compute)
         window_shift_slider.on_change('value', compute)
         bin_slider.on_change('value', compute)
+        knot_slider.on_change('value', compute)
         niters_button.on_change('active', compute)
         remove_trend.on_change('active', compute)
 
@@ -590,7 +600,7 @@ def show_SFF_interact_widget(corr, notebook_url='localhost:8888', postprocessing
         window_slider.on_change('value', do_lines)
         window_shift_slider.on_change('value', do_lines)
 
-        doc.add_root(layout([fig_lc, Spacer(width=30), [niters_button, remove_trend, show_windows]], [window_slider], [bin_slider], [window_shift_slider]))
+        doc.add_root(layout([fig_lc, Spacer(width=30), [niters_button, remove_trend, show_windows]], [window_slider], [bin_slider], [window_shift_slider], [knot_slider]))
 
     output_notebook(verbose=False, hide_banner=True)
     return show(create_interact_ui, notebook_url=notebook_url)

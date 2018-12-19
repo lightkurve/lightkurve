@@ -1,3 +1,5 @@
+'''Module for implementing Self Flat Fielding correction on light curves
+'''
 from __future__ import division, print_function
 
 import logging
@@ -5,35 +7,47 @@ import warnings
 import numpy as np
 import matplotlib.pyplot as plt
 
-
-
 from astropy.stats import sigma_clip, sigma_clipped_stats
 from astropy.convolution import convolve, Gaussian1DKernel, Box1DKernel
+from .lightcurve import LightCurve
+from .lightcurvefile import LightCurveFile
+from .targetpixelfile import TargetPixelFile
+from .utils import LightkurveWarning
 
 from scipy import interpolate, linalg
+from . import PACKAGEDIR, MPLSTYLE
 
 log = logging.getLogger(__name__)
 
 
-def fit_bspline(time, flux, knotspacing=1.5):
+def fit_bspline(time, flux, knotspacing=1.5, return_knots=False):
+    ''' Fit a Bivariate Spline to time/flux data
+
+    Parameters
+    ----------
+    time : np.ndarray
+        Time data to fit
+    flux : np.ndaarray
+        Flux data to fit
+    knot_spacing : float
+        The spacing in time at which to set knots for the spline.
+        Knots that fall in gaps in time will be removed. Default 1.5
+    return_knots : bool
+        Whether to return the spline function, or the spline function AND knots (as list).
+        Default False.
+
+    Returns
+    -------
+    func : function
+        An interpolated bspline.
+    '''
     # By default, knots are placed 1.5 days apart
-    knots = np.arange(time[0], time[-1], knotspacing)
-
-    # If the light curve has breaks larger than the spacing between knots,
-    # we must remove the knots that fall in the breaks.
-    # This is necessary for e.g. K2 Campaigns 0 and 10.
-    bad_knots = []
-    a = time[0:-1][np.diff(time) > knotspacing]
-    b = time[1:][np.diff(time) > knotspacing]
-    for a1, b1 in zip(a, b):
-        bad = np.where((knots > a1) & (knots < b1))[0][1:-1]
-        if len(bad_knots) > 0:
-            [bad_knots.append(b) for b in bad]
-    good_knots = list(set(list(np.arange(len(knots)))) - set(bad_knots))
-    knots = knots[good_knots]
-
+    knots = np.arange(time[0] + 0.55*knotspacing, time[-1] - 0.55*knotspacing, knotspacing)
+    knots = knots[np.asarray([np.min(np.abs(time - k)) < 0.55*knotspacing for k in knots])]
     # Now fit and return the spline
-    t, c, k = interpolate.splrep(time, flux, t=knots[1:])
+    t, c, k = interpolate.splrep(time, flux, t=knots)
+    if return_knots:
+        return interpolate.BSpline(t, c, k), knots
     return interpolate.BSpline(t, c, k)
 
 
@@ -43,46 +57,59 @@ class SFFCorrectorException(Exception):
 
 
 class SFFCorrector(object):
-    ''' A generic class for a corrector object. Correctors take the following form
-
-            corrector = lk.CorrectorClass(data)
-
-        The correctors must have at least two functions
-
-            lk.CorrectorClass(data).correct(**options)
-            lk.CorrectorClass(data).plot_diagnostic()
-
-        ...And they always return a lightkurve.LightCurve class object.
-
-        lc = lk.CorrectorClass(data).correct(**options)
+    '''SFF Corrector class.
     '''
 
-    def __init__(self, data, knotspacing=1.5, xmotion=None, ymotion=None):
-        self.data = data.copy()#.remove_nans()
-        self.knotspacing = knotspacing
+    def __init__(self, data, xmotion=None, ymotion=None):
+        ''' SFF Corrector Class
+
+        Parameters
+        ----------
+        data : lightkurve.LightCurve object.
+            Light curve object to correct
+        xmotion : Optional, np.ndarray of same length as data.flux
+            Motion in the x direction. Optional. Will use data.centroid_row by default
+        ymotion : Optional, np.ndarray of same length as data.flux
+            Motion in the x direction. Optional. Will use data.centroid_col by default
+        '''
+        # Accepted corrector data types
+        acceptable_types = (LightCurveFile,
+                            LightCurve,
+                            TargetPixelFile)
+
+        if not isinstance(data, acceptable_types):
+            raise CorrectorException("`data` is an invalid type.\nData must be one of {}".format(acceptable_types))
+        if isinstance(data, LightCurveFile):
+            warnings.warn('Passed a LightCurveFile, not a LightCurve. Using SAP_FLUX.', LightkurveWarning)
+            self.data = data.SAP_FLUX.remove_nans().normalize().copy()
+        elif isinstance(data, TargetPixelFile):
+            warnings.warn('Passed a TargetPixelFile, not a LightCurve. Using default aperture.', LightkurveWarning)
+            self.data = data.to_lightcurve().remove_nans().normalize().copy()
+        else:
+            self.data = data.remove_nans().normalize().copy()
+
+        self._is_corrected = False
 
         if xmotion is None:
-            self.xmotion =self.data.centroid_row
+            self.xmotion =self.data.centroid_col
         else:
             self.xmotion = xmotion
 
         if ymotion is None:
-            self.ymotion =self.data.centroid_col
+            self.ymotion =self.data.centroid_row
         else:
             self.ymotion = ymotion
 
-        if (~np.isfinite(self.ymotion)).any() | (~np.isfinite(self.xmotion)).any():
-            raise SFFCorrectorException('There are nan values in xmotion and ymotion. Please remove these before proceeding.')
+        if np.any([(len(self.xmotion) != len(self.data.flux)), (len(self.ymotion) != len(self.data.flux))]):
+            raise SFFCorrectorException('Motion vectors are not the same shape as the input light curve.')
+
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", category=np.RankWarning)
-            poly = np.polyfit(self.xmotion, self.ymotion, 5)
+            poly = np.polyfit(self.xmotion[~self.nans()], self.ymotion[~self.nans()], 5)
         polyprime = np.poly1d(poly).deriv()
-        x = np.linspace(self.xmotion.min(), self.xmotion.max(), 10000)
-        # THIS IS HECKIN' SLOW
+        x = np.linspace(self.xmotion[~self.nans()].min(), self.xmotion[~self.nans()].max(), 10000)
         self.arclength = np.array([self._compute_arclength(x1=np.asarray(xp), x=x, polyprime=polyprime) for xp in self.xmotion])
-
-        self.knotspacing = knotspacing
-
+        self.mask = ~self.motion_outliers() & ~self.burnin() & ~self.nans()
 
     def __repr__(self):
         return 'lightkurve.SFFCorrector Class'
@@ -91,7 +118,11 @@ class SFFCorrector(object):
     #-----------------
     # Data Quality
 
-    def thrusters(self, sigma=3):
+    def motion_outliers(self, sigma=3):
+        ''' Returns a boolean mask, True where there are outliers in motion.
+
+        Note: splits light curve into two halves, as there are two different motion properties
+        '''
         #rad = (self.data.centroid_col**2 + self.data.centroid_row**2)**0.5
         mask = np.zeros(len(self.data.time), dtype=bool)
         bp = np.where(np.append(10, np.diff(self.data.time)) > 30 * np.median(np.diff(self.data.time)))[0]
@@ -101,23 +132,15 @@ class SFFCorrector(object):
 
         for b1, b2 in zip(bp[0:-1], bp[1:]):
             _, med, std = sigma_clipped_stats(np.diff(self.arclength[b1:b2]), sigma=sigma, iters=3)
-            thrusters = np.zeros(len(self.arclength[b1:b2]), dtype=bool)
-            thrusters[1:] |= np.abs(np.diff(self.arclength[b1:b2]) - med) > sigma * std
-            thrusters[0:-1] |= np.abs(np.diff(self.arclength[b1:b2]) - med) > sigma * std
-
+            motion_outliers = np.zeros(len(self.arclength[b1:b2]), dtype=bool)
             _, med, std = sigma_clipped_stats(self.arclength[b1:b2], sigma=sigma, iters=3)
-            thrusters |= np.abs(self.arclength[b1:b2] - med) > sigma * std
-
-#            plt.scatter(self.data.time[b1:b2], self.arclength[b1:b2], s=1)
-#            plt.scatter(self.data.time[b1:b2][thrusters], self.arclength[b1:b2][thrusters], s=10, c='b')
-            mask[b1:b2] |= thrusters
-
-#        plt.scatter(self.data.time, self.arclength, c='k', s=1)
-#        plt.scatter(self.data.time[mask], self.arclength[mask], c='r', s=10)
-
+            motion_outliers |= np.abs(self.arclength[b1:b2] - med) > sigma * std
+            mask[b1:b2] |= motion_outliers
         return mask
 
     def outliers(self, sigma=3, niters=5):
+        ''' Returns a boolean mask, True where there are outliers in flux.
+        '''
         mask = np.zeros(len(self.data.time), dtype=bool)
         for iter in range(niters):
             f = np.copy(self.data.flux)/self.correction
@@ -127,13 +150,21 @@ class SFFCorrector(object):
         return mask
 
     def burnin(self, width=20):
+        ''' Returns a boolean mask, True where there is data after a long break.
+        This masks where there may be "burn in" at the beginning of campaigns.
+        '''
         mask = np.append(10, np.diff(self.data.time)) > np.median(np.diff(self.data.time)) * 30
         mask = convolve(mask, Box1DKernel(width), fill_value=0, boundary='fill') > 0.01
         return mask
 
     def nans(self):
+        ''' Returns a boolean mask, True where there are nan values in the data.
+        '''
         mask = ~np.isfinite(self.data.flux)
         mask |= ~np.isfinite(self.data.time)
+        mask |= ~np.isfinite(self.xmotion)
+        mask |= ~np.isfinite(self.ymotion)
+
         return mask
 
     #-----------------
@@ -146,14 +177,14 @@ class SFFCorrector(object):
 
         Parameters
         ----------
-
-        min_size : int
-            Minimum size of any given window. Windows will be merged when they drop below this size.
+        break_tolerance : int
+            Breaks in data longer than this number of points will be considered to be new sections
+        min_size: int
+            Segments shorter than this length will not be allowed, and will be merged with the preceeding segment.
         Returns
         -------
-
         break_points : list
-            Where the data should be broken.
+            Points where the data should be broken.
         """
 
         # Number of points in a window
@@ -188,20 +219,37 @@ class SFFCorrector(object):
     #-----------------
 
 
-    def _bin_and_interpolate(self, s, normflux, bins=10):
-        if len(s) == 0:
+    def _bin_and_interpolate(self, arclength, flux, bins=10):
+        ''' Bins the arclength vs. flux data and fits an interpolated curve
+
+        Parameters
+        ----------
+        s : np.ndarray
+            Arclength
+        flux : np.ndarray
+            Flux
+        bins : int
+            How agressively to bin the data before fitting the curve. Fewer bins will give a less
+            flexible curve.
+
+        Returns
+        -------
+        func : function
+            Interpolated relationship between arclength and flux.
+        '''
+        if len(arclength) == 0:
             return lambda x: []
-        normflux_srtd = normflux[np.argsort(s)]
-        s_srtd = s[np.argsort(s)]
+        flux_srtd = flux[np.argsort(arclength)]
+        arclength_srtd = arclength[np.argsort(arclength)]
 
         # where are we going to spine?
-        knots = np.array([np.min(s_srtd)]
-                         + [np.median(split) for split in np.array_split(s_srtd, bins)]
-                         + [np.max(s_srtd)])
+        knots = np.array([np.min(arclength_srtd)]
+                         + [np.median(split) for split in np.array_split(arclength_srtd, bins)]
+                         + [np.max(arclength_srtd)])
 
-        bin_means = np.array([normflux_srtd[0]]
-                             + [np.mean(split) for split in np.array_split(normflux_srtd, bins)]
-                             + [normflux_srtd[-1]])
+        bin_means = np.array([flux_srtd[0]]
+                             + [np.mean(split) for split in np.array_split(flux_srtd, bins)]
+                             + [flux_srtd[-1]])
         return interpolate.interp1d(knots, bin_means, bounds_error=False,
                                     fill_value='extrapolate')
 
@@ -227,37 +275,61 @@ class SFFCorrector(object):
         return np.trapz(y=y, x=x[mask])
 
 
-    def correct(self, sigma=3, niters=5, windows=20, window_shift=0, bins=10, user_break_points=None, remove_trend=False):
+    def correct(self, windows=20, window_shift=0, bins=10, user_break_points=None, knotspacing=1.5, sigma=3, niters=5, remove_trend=False):
+        '''Corrects the input data using SFF method.
 
+        Parameters
+        ----------
+        windows : int
+            Number of windows to split the data into. Some windows may be removed or merged.
+        window_shift : int
+            Number of points to shift the data in time
+        bins : int
+            Number of bins to use when fitting arclength. A smaller number of bins is less flexible,
+            but more robust.
+        user_break_points : list
+            A list of input break points that the user specifies. Data will be broken at these points,
+            in addition to the computed windows. Default is None.
+        knotspacing : float
+            How far apart in time to space knots when using a bspline. A larger knot spacing will fit
+            longer trends, a smaller spacing will fit shorter trends.
+        sigma : int
+            How many sigma outliers should be removed from fitting the arclength trend.
+        niters : int
+            How many iterations to perform the correction. Default 5
+        remove_trend : bool
+            Whether to return a corrected light curve with the long term trends removed.
+
+        Returns
+        -------
+        corrected_lc : lightkurve.LightCurve
+            Light curve with the correction divded out, and outliers in motion and burnin removed.
+        '''
         self.bins = bins
         self.windows = windows
         self.window_shift = window_shift
         self.user_break_points = user_break_points
+        self.knotspacing = knotspacing
         self.breakpoints = self._find_breaks()
-
-
 
         # Make a simple first pass.
         l = self._bin_and_interpolate(self.arclength, self.data.flux, bins=self.bins)
         self.correction = l(self.arclength)
-
-        self.data = self.data.remove_nans()
-        self.mask = ~self.thrusters() & ~self.outliers() & ~self.burnin() & ~self.nans()
-        #self._validate()
+        self.mask &= ~self.outliers(sigma=sigma)
 
 
         flux = np.copy(self.data.flux)
-
         for count in np.arange(niters):
             longtermtrends = fit_bspline(self.data.time[self.mask], self.data.flux[self.mask]/self.correction[self.mask], knotspacing=self.knotspacing)(self.data.time)
             for b1, b2 in zip(self.breakpoints[0:-1], self.breakpoints[1:]):
+
                 y = np.copy(flux[b1:b2])
                 y /= self.correction[b1:b2]
                 y /= longtermtrends[b1:b2]
                 x = self.arclength[b1:b2]
 
                 # Mask out bad parts of the window...
-                mask = self.mask[b1:b2]
+                mask = np.copy(self.mask[b1:b2])
                 k = (~sigma_clip(x[mask], sigma=sigma).mask & ~sigma_clip(y[mask], sigma=sigma).mask)
                 mask[mask] &= k
                 if mask.sum() == 0:
@@ -267,34 +339,75 @@ class SFFCorrector(object):
                     c1 = self._bin_and_interpolate(x[mask][np.argsort(x[mask])], y[mask][np.argsort(x[mask])])(x)
                 c1[~np.isfinite(c1)] = 1
                 self.correction[b1:b2] *= c1/np.median(c1[mask])
-            self.mask &= ~self.outliers()
-        if remove_trend:
-            self.correction *= longtermtrends
-        return (self.data/self.correction)[~self.burnin() & ~self.thrusters()]
+            self.mask &= ~self.outliers(sigma=sigma)
 
-    def _create_plot(self):
-        ''' Plotting style for creating a diagnostic...?
+
+
+        self._is_corrected = True
+        self.corrected = (self.data/self.correction)
+        if remove_trend:
+            return (self.corrected/longtermtrends)[~self.burnin() & ~self.motion_outliers()]
+        return (self.corrected)[~self.burnin() & ~self.motion_outliers()]
+
+    def plot_diagnostic(self):
+        '''Plot a diagnostic of the performance of the correct method.
+
+        Returns
+        -------
+        fig : mpl.pyplot.figure
+            Diagnostic figure for SFF correct method.
         '''
-        pass
+
+        if not self._is_corrected:
+            raise SFFCorrectorException('Please run correction with the correct method before trying to diagnose.')
+        with plt.style.context(MPLSTYLE):
+            fig = plt.figure(figsize=(15, 7))
+            ax = plt.subplot2grid((2,4), (0, 0), colspan=3)
+            self.data.scatter(ax=ax, label='Original', c='k', normalize=False)
+            self.data[self.motion_outliers()].scatter(ax=ax, label='Motion Outliers', c='r', normalize=False, s=10)
+            self.data[self.burnin()].scatter(ax=ax, label='Burn In', c='b', normalize=False, s=10)
+
+
+            longtermtrends, knots = fit_bspline(self.data.time[self.mask], self.data.flux[self.mask]/self.correction[self.mask], knotspacing=self.knotspacing, return_knots=True)
+            ax.plot(self.data.time, longtermtrends(self.data.time), lw=4, alpha=0.4, c='lime', label='B-Spline')
+            ax.scatter(knots, longtermtrends(knots), c='lime', s=20, edgecolor='k', lw=0.5)
+
+            ax.set_xlabel('')
+            ax.legend()
+            xlims, ylims = ax.get_xlim(), ax.get_ylim()
+            ax = plt.subplot2grid((2,4), (1, 0), colspan=3)
+            self.corrected.plot(ax=ax, label='Corrected', normalize=False)
+            self.corrected[self.outliers()].scatter(ax=ax, label='Outliers (Not used for corection)', c='r', normalize=False)
+            ax.set_xlim(xlims)
+            ax.set_ylim(ylims)
+
+            ax = plt.subplot2grid((2,4), (0,3))
+            ax.scatter(self.arclength[~self.mask], (self.data.flux/longtermtrends(self.data.time))[~self.mask], c='r', label='Masked')
+            ax.scatter(self.arclength[self.mask], (self.data.flux/longtermtrends(self.data.time))[self.mask], c='k', s=1, label='True Arclength')
+
+            for b1, b2 in zip(self.breakpoints[0:-1], self.breakpoints[1:]):
+                x, y = self.arclength[b1:b2], self.correction[b1:b2]
+                ax.plot(x[np.argsort(x)], y[np.argsort(x)], c='orange')
+            ax.plot(self.arclength[b1:b2], self.correction[b1:b2], c='orange', label='Correction')
+
+
+            ax.set_ylabel('Flux')
+            ax.set_xlabel('Arclength')
+            ax.set_ylim(ylims)
+            ax.set_ylabel('')
+            ax.set_yticks([])
+            ax.set_xlabel('')
+            ax.set_xticks([])
+            ax.legend()
+
+        return fig
 
 
     def interactive(self, notebook_url='localhost:8888', postprocessing=None):
-        """Display an interactive Jupyter Notebook widget to inspect the pixel data.
-
-        The widget will show both the lightcurve and pixel data.  By default,
-        the lightcurve shown is obtained by calling the `to_lightcurve()` method,
-        unless the user supplies a custom `LightCurve` object.
-        This feature requires an optional dependency, bokeh (v0.12.15 or later).
-        This dependency can be installed using e.g. `conda install bokeh`.
-
-        At this time, this feature only works inside an active Jupyter
-        Notebook, and tends to be too slow when more than ~30,000 cadences
-        are contained in the TPF (e.g. short cadence data).
+        """Display an interactive Jupyter Notebook widget to interactively correct with SFF.
 
         Parameters
         ----------
-        lc : LightCurve object
-            An optional pre-processed lightcurve object to show.
         notebook_url: str
             Location of the Jupyter notebook page (default: "localhost:8888")
             When showing Bokeh applications, the Bokeh server must be
@@ -304,9 +417,8 @@ class SFFCorrector(object):
             will need to supply this value for the application to display
             properly. If no protocol is supplied in the URL, e.g. if it is
             of the form "localhost:8888", then "http" will be used.
-        max_cadences : int
-            Raise a RuntimeError if the number of cadences shown is larger than
-            this value. This limit helps keep browsers from becoming unresponsive.
+        post_processing : function
+            A function that will be applied to the corrected light curve before displaying.
         """
         from .interact import show_SFF_interact_widget
         return show_SFF_interact_widget(self, notebook_url=notebook_url,
