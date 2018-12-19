@@ -518,49 +518,43 @@ class PLDCorrector(object):
             Returns a corrected lightcurve object.
         """
 
-        # fetch aperture
-        if aperture_mask in [None, 'pipeline']:
-            aperture_mask = self.tpf.pipeline_mask
-        elif aperture_mask == 'threshold':
-            aperture_mask = self.tpf.create_threshold_mask()
-
-        # set aperture to 1 for desired pixels, 0 elsewhere
-        aperture = np.zeros(aperture_mask.shape)
-        aperture[aperture_mask] = 1.
+        # parse aperture
+        aperture = self.tpf._parse_aperture_mask(aperture_mask)
 
         # find pixel bounds of aperture on tpf
         xmin, xmax = min(np.where(aperture)[0]),  max(np.where(aperture)[0])
         ymin, ymax = min(np.where(aperture)[1]),  max(np.where(aperture)[1])
 
-        # crop aperture to inlude only desired pixels
-        aperture_mask = [aperture[xmin:xmax+1, ymin:ymax+1] for i in range(len(self.flux))]
+        # crop data cube to include only desired pixels
+        # this is required for superstamps to ensure matrix is invertable
+        self.flux = self.flux[:, xmin-1:xmax+2, ymin-1:ymax+2]
+        self.flux_err = self.flux_err[:, xmin-1:xmax+2, ymin-1:ymax+2]
+        aperture = aperture[xmin-1:xmax+2, ymin-1:ymax+2]
 
         # set transit mask
-        M = lambda x: np.delete(x, transit_mask, axis=0)
+        if len(transit_mask) == 0:
+            transit_mask = np.where(self.time)
+        M = lambda x: x[transit_mask]
 
         #  generate flux light curve from desired pixels
-        self.tpf_rs = (self.flux[:, xmin:xmax+1, ymin:ymax+1]*aperture_mask).reshape(len(self.flux),-1)
-        self.tpf_ap = np.zeros((len(self.flux),
-                               len(np.delete(self.tpf_rs[0],
-                               np.where(np.isnan(self.tpf_rs[0]))))))
+        lc = M(self.tpf).to_lightcurve(aperture_mask=aperture_mask)
 
-        # remove indices containing nans
-        for c in range(len(self.tpf_rs)):
-            naninds = np.where(np.isnan(self.tpf_rs[c]))
-            self.tpf_ap[c] = np.delete(self.tpf_rs[c], naninds)
+        # set aperture values
+        aperture_vals = np.zeros(aperture.shape)
+        aperture_vals[np.where(aperture)] = 1
 
         # compute raw flux light curve
-        self.ap_fpix = self.tpf_ap
-        rawflux = np.sum(self.ap_fpix.reshape(len(self.ap_fpix),-1), axis=1)
+        self.aperture_flux = np.array([f*aperture_vals for f in self.flux]).reshape(len(self.flux), -1)
+        rawflux = np.sum(self.aperture_flux.reshape(len(self.aperture_flux), -1), axis=1)
 
         # first order PLD
-        f1 = self.ap_fpix / rawflux.reshape(-1, 1)
-        pca = PCA(n_components=10)
+        f1 = self.aperture_flux / rawflux.reshape(-1, 1)
+        pca = PCA(n_components=28)
         X1 = pca.fit_transform(f1)
 
         # second order PLD
         f2 = np.product(list(multichoose(f1.T, 2)), axis = 1).T
-        pca = PCA(n_components=10)
+        pca = PCA(n_components=30)
         X2 = pca.fit_transform(f2)
 
         # combine them and add a column vector of 1s for stability
@@ -569,7 +563,7 @@ class PLDCorrector(object):
         # mask transits in design matrix
         MX = M(X)
 
-        # define gaussian process parameters {y, amp, tau}
+        # define gaussian process parameters amp, tau
         y = M(rawflux) - np.dot(MX, np.linalg.solve(np.dot(MX.T, MX),
                                 np.dot(MX.T, M(rawflux))))
         amp = np.nanstd(y)
@@ -578,7 +572,6 @@ class PLDCorrector(object):
         # set up gaussian process
         kernel = celerite.terms.Matern32Term(np.log(amp), np.log(tau))
         gp = celerite.GP(kernel)
-        # gp = celerite.GP(amp ** 2 * george.kernels.Matern32Kernel(tau ** 2))
         sigma = gp.get_matrix(M(self.time)) + \
                 np.diag(np.sum(M(self.flux_err).reshape(len(M(self.flux_err)),
                         -1), axis=1)**2)
