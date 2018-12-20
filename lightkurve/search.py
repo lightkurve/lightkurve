@@ -147,7 +147,7 @@ class SearchResult(object):
                                               download_dir=download_dir)['Local Path']
 
         # open() will determine filetype and return
-        return open(path[0])
+        return open(path[0], quality_bitmask=quality_bitmask)
 
     @suppress_stdout
     def download_all(self, quality_bitmask='default', download_dir=None):
