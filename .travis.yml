@@ -13,6 +13,8 @@ before_install:  # optional dependencies
   - pip install pandas
   - pip install ipython  # required by bokeh
   - pip install bokeh
+  - pip install scikit-learn # required by PLD corrector
+  - pip install celerite
 install:
   - pip install -r requirements.txt
 # command to run tests

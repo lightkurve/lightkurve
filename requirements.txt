@@ -8,3 +8,5 @@ bs4
 requests
 tqdm
 pandas
+scikit-learn
+celerite
