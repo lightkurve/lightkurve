@@ -501,7 +501,7 @@ class PLDCorrector(object):
         self.tpf = tpf
         self.flux = np.nan_to_num(tpf.flux)
         self.flux_err = np.nan_to_num(tpf.flux_err)
-        self.time = tpf.time
+        self.time = np.nan_to_num(tpf.time)
 
     def correct(self, transit_mask=[], aperture_mask=None):
         """Returns a systematics-corrected LightCurve.
@@ -527,9 +527,9 @@ class PLDCorrector(object):
 
         # crop data cube to include only desired pixels
         # this is required for superstamps to ensure matrix is invertable
-        self.flux = self.flux[:, xmin-1:xmax+2, ymin-1:ymax+2]
-        self.flux_err = self.flux_err[:, xmin-1:xmax+2, ymin-1:ymax+2]
-        aperture = aperture[xmin-1:xmax+2, ymin-1:ymax+2]
+        self.flux = self.flux[:, xmin:xmax+2, ymin:ymax+2]
+        self.flux_err = self.flux_err[:, xmin:xmax+2, ymin:ymax+2]
+        aperture = aperture[xmin:xmax+2, ymin:ymax+2]
 
         # set transit mask
         if len(transit_mask) == 0:
