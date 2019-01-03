@@ -1,4 +1,4 @@
-Direct contributions to the code base:
+Direct contributions:
 
 - `José Vinícius de Miranda Cardoso <https://github.com/mirca>`_
 - `Geert Barentsen <https://github.com/barentsen>`_
@@ -21,6 +21,7 @@ Direct contributions to the code base:
 - `Dag Evensberget <https://github.com/svaberg>`_
 - `Natalie Gosnell <https://github.com/nattieg>`_
 - `Peter Williams <https://github.com/pkgw>`_
+- `Richard Elkins <https://github.com/texadactyl>`_
 
 
 Comments, corrections & suggestions:
