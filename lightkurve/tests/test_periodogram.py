@@ -167,10 +167,23 @@ def test_error_messages():
     # Can't have a minimum frequency > maximum frequency
     with pytest.raises(ValueError) as err:
         lc.to_periodogram(max_frequency=0.1, min_frequency=10)
+        assert err.value.args[0] == 'min_frequency cannot be larger than max_frequency'
+
+    # Can't have a minimum period > maximum period
+    with pytest.raises(ValueError) as err:
+        lc.to_periodogram(max_period=0.1, min_period=10)
+        assert err.value.args[0] == 'min_period cannot be larger than max_period'
 
     # Can't specify periods and frequencies
     with pytest.raises(ValueError) as err:
         lc.to_periodogram(frequency=np.arange(10), period=np.arange(10))
+
+    # Don't accept NaNs
+    with pytest.raises(ValueError) as err:
+        lc_with_nans = lc.copy()
+        lc_with_nans.flux[0] = np.nan
+        lc_with_nans.to_periodogram()
+        assert('Lightcurve contains NaN values.' in err.value.args[0])
 
     # No unitless periodograms
     with pytest.raises(ValueError) as err:
@@ -201,3 +214,13 @@ def test_error_messages():
     with pytest.raises(ValueError) as err:
         Periodogram([0, 1, 2]*u.Hz, [1, 1, 1]*u.K).bin(binsize=-2)
         assert err.value.args[0] == 'binsize must be larger than or equal to 1'
+
+    # Bad binning method
+    with pytest.raises(ValueError) as err:
+        Periodogram([0, 1, 2]*u.Hz, [1, 1, 1]*u.K).bin(method='not-implemented')
+        assert("is not a valid method, must be 'mean' or 'median'" in err.value.args[0])
+
+    # Bad smooth method
+    with pytest.raises(ValueError) as err:
+        Periodogram([0, 1, 2]*u.Hz, [1, 1, 1]*u.K).smooth(method="not-implemented")
+        assert("parameter must be one 'boxkernel' or 'logmedian'" in err.value.args[0])
