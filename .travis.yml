@@ -3,6 +3,7 @@ python:
   - 2.7
   - 3.6
   - 3.7
+dist: xenial
 before_install:  # optional dependencies
   - pip install codecov
   - pip install pytest-cov
