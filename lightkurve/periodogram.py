@@ -41,10 +41,10 @@ class Periodogram(object):
     nyquist : float, optional
         The Nyquist frequency of the lightcurve. In units of freq_unit, where
         freq_unit is the unit of the frequency attribute.
-    targetid : str, optional
-        Identifier of the target.
     label : str, optional
         Human-friendly object label, e.g. "KIC 123456789".
+    targetid : str, optional
+        Identifier of the target.
     meta : dict, optional
         Free-form metadata associated with the Periodogram.
     """
@@ -501,6 +501,9 @@ class Periodogram(object):
             in units of frequency.
             If method = `logmedian`, this is the width of the smoothing filter
             in log10(frequency) space.
+        return_trend : bool
+            If True, then the background estimate, alongside the SNR spectrum,
+            will be returned.
 
         Returns
         -------
@@ -508,6 +511,9 @@ class Periodogram(object):
             Returns a periodogram object where the power is an estimate of the
             signal-to-noise of the spectrum, creating by dividing the powers
             with a simple estimate of the noise background using a smoothing filter.
+        bkg : `Periodogram` object
+            The estimated power spectrum of the background noise. This is only
+            returned if `return_trend = True`.
         """
         bkg = self.smooth(method=method, filter_width=filter_width)
         snr_pg = self / bkg.power
