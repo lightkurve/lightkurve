@@ -1,3 +1,5 @@
+.. title:: Lightkurve docs
+
 .. raw:: html
 
   <div class="container text-center" style="padding-top:1em; padding-bottom: 2em;">

@@ -11,24 +11,18 @@ LightCurve objects contain time-series data on the brightness of a star. They pr
 .. automodsumm:: lightkurve.lightcurve
 
 
-Opening and searching data files
---------------------------------
+Opening data files
+------------------
 
 The lightkurve.search modules makes it easy to open data products from Kepler and TESS, and search for them at the data archive.
 
 .. automodsumm:: lightkurve.search
 
 
-LightCurveFile objects
-----------------------
-
 LightCurveFile objects represent files that are used to store LightCurves and their metadata. Files of this type are found at NASA’s data archives.
 
 .. automodsumm:: lightkurve.lightcurvefile
 
-
-TargetPixelFile objects
------------------------
 
 TargetPixelFile objects hold the sequence of images (pixels) which can be converted into LightCurve objects using different techniques.
 
