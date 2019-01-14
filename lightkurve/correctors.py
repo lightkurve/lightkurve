@@ -24,7 +24,7 @@ from sklearn.decomposition import PCA
 from itertools import combinations_with_replacement as multichoose
 import celerite
 
-__all__ = ['KeplerCBVCorrector', 'SFFCorrector']
+__all__ = ['KeplerCBVCorrector', 'SFFCorrector', 'PLDCorrector']
 
 
 class KeplerCBVCorrector(object):
@@ -585,7 +585,8 @@ class PLDCorrector(object):
         model = np.dot(X, C)
         self.detrended_flux = rawflux - model + np.nanmean(rawflux)
 
-        return LightCurve(time=self.time, flux=self.detrended_flux)
+        return LightCurve(time=self.time, flux=self.detrended_flux,
+                          flux_err=self.tpf.to_lightcurve().flux_err)
 
     def diagnose(self, ax=None):
         """Plot a figure to diagnose performance of PLD correction."""
