@@ -7,7 +7,8 @@ from astropy.utils.data import get_pkg_data_filename
 
 from ..lightcurve import KeplerLightCurve
 from ..lightcurvefile import KeplerLightCurveFile
-from ..correctors import KeplerCBVCorrector, SFFCorrector
+from ..correctors import KeplerCBVCorrector, SFFCorrector, PLDCorrector
+from ..search import search_targetpixelfile
 
 from .test_lightcurve import TABBY_Q8
 
@@ -26,7 +27,7 @@ def test_kepler_cbv_fit():
 def test_sff_corrector():
     """Does our code agree with the example presented in Vanderburg
     and Jhonson (2014)?"""
-    # The following csv file, provided by Vanderburg and Jhonson
+    # The following csv file, provided by Vanderburg and Johnson
     # at https://www.cfa.harvard.edu/~avanderb/k2/ep60021426.html,
     # contains the results of applying SFF to EPIC 60021426.
     fn = get_pkg_data_filename('./data/ep60021426alldiagnostics.csv')
@@ -71,3 +72,15 @@ def test_sff_corrector():
     assert_almost_equal(4*sff.s, arclength, decimal=2)
     assert_almost_equal(sff.interp(sff.s), correction, decimal=3)
     assert_array_equal(time, klc.time)
+
+@pytest.mark.remote_data
+def test_pld_corrector():
+    # download tpf data for a target
+    target = 247887989
+    tpf = search_targetpixelfile(target).download()
+
+    # instantiate PLD corrector object
+    pld = PLDCorrector(tpf)
+
+    # produce a PLD-corrected light curve
+    corrected_lc = pld.correct()
