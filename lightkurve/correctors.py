@@ -1,4 +1,4 @@
-"""Defines KeplerCBVCorrector and SFFCorrector."""
+"""Defines KeplerCBVCorrector, SFFCorrector, and PLDCorrector."""
 
 from __future__ import division, print_function
 
@@ -17,8 +17,9 @@ from astropy.io import fits as pyfits
 from astropy.stats import sigma_clip
 
 from .utils import channel_to_module_output
-from .lightcurve import LightCurve
-from .lightcurvefile import KeplerLightCurveFile
+from .lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
+from .lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
+from .targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
 
 from sklearn.decomposition import PCA
 from itertools import combinations_with_replacement as multichoose
@@ -527,9 +528,9 @@ class PLDCorrector(object):
 
         # crop data cube to include only desired pixels
         # this is required for superstamps to ensure matrix is invertable
-        self.flux = self.flux[:, xmin:xmax+2, ymin:ymax+2]
-        self.flux_err = self.flux_err[:, xmin:xmax+2, ymin:ymax+2]
-        aperture = aperture[xmin:xmax+2, ymin:ymax+2]
+        flux_crop = self.flux[:, xmin:xmax+2, ymin:ymax+2]
+        flux_err_crop = self.flux_err[:, xmin:xmax+2, ymin:ymax+2]
+        aperture_mask = aperture[xmin:xmax+2, ymin:ymax+2]
 
         # set transit mask
         if len(transit_mask) == 0:
@@ -540,11 +541,11 @@ class PLDCorrector(object):
         lc = M(self.tpf).to_lightcurve(aperture_mask=aperture_mask)
 
         # set aperture values
-        aperture_vals = np.zeros(aperture.shape)
-        aperture_vals[np.where(aperture)] = 1
+        aperture_vals = np.zeros(aperture_mask.shape)
+        aperture_vals[np.where(aperture_mask)] = 1
 
         # compute raw flux light curve
-        self.aperture_flux = np.array([f*aperture_vals for f in self.flux]).reshape(len(self.flux), -1)
+        self.aperture_flux = np.array([f*aperture_vals for f in flux_crop]).reshape(len(flux_crop), -1)
         rawflux = np.sum(self.aperture_flux.reshape(len(self.aperture_flux), -1), axis=1)
 
         # first order PLD
@@ -573,7 +574,7 @@ class PLDCorrector(object):
         kernel = celerite.terms.Matern32Term(np.log(amp), np.log(tau))
         gp = celerite.GP(kernel)
         sigma = gp.get_matrix(M(self.time)) + \
-                np.diag(np.sum(M(self.flux_err).reshape(len(M(self.flux_err)),
+                np.diag(np.sum(M(flux_err_crop).reshape(len(M(flux_err_crop)),
                         -1), axis=1)**2)
 
         # compute
@@ -585,8 +586,51 @@ class PLDCorrector(object):
         model = np.dot(X, C)
         self.detrended_flux = rawflux - model + np.nanmean(rawflux)
 
-        return LightCurve(time=self.time, flux=self.detrended_flux,
-                          flux_err=self.tpf.to_lightcurve().flux_err)
+        # calculate errors (ignore warnings related to zero or negative errors)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RuntimeWarning)
+            flux_err = np.nansum(self.flux_err[:, aperture_mask]**2, axis=1)**0.5
+
+        # estimate centroids
+        centroid_col, centroid_row = self.tpf.estimate_centroids(aperture)
+
+        # check type of input TPF and return corresponding LightCurve object
+        if isinstance(self.tpf, KeplerTargetPixelFile):
+            keys = {'centroid_col': centroid_col,
+                    'centroid_row': centroid_row,
+                    'quality': self.tpf.quality,
+                    'channel': self.tpf.channel,
+                    'campaign': self.tpf.campaign,
+                    'quarter': self.tpf.quarter,
+                    'mission': self.tpf.mission,
+                    'cadenceno': self.tpf.cadenceno,
+                    'ra': self.tpf.ra,
+                    'dec': self.tpf.dec,
+                    'label': self.tpf.header['OBJECT'],
+                    'targetid': self.tpf.targetid}
+            return KeplerLightCurve(time=self.time, flux=self.detrended_flux,
+                                    flux_err=flux_err, **keys)
+
+        elif isinstance(self.tpf, TessTargetPixelFile):
+            keys = {'centroid_col': centroid_col,
+                    'centroid_row': centroid_row,
+                    'quality': self.quality,
+                    'sector': self.sector,
+                    'camera': self.camera,
+                    'ccd': self.ccd,
+                    'cadenceno': self.cadenceno,
+                    'ra': self.ra,
+                    'dec': self.dec,
+                    'label': self.get_keyword('OBJECT'),
+                    'targetid': self.targetid}
+            return TessLightCurve(time=self.time, flux=self.detrended_flux,
+                                  flux_err=flux_err, **keys)
+
+        else:
+            warnings.warn("Input TargetPixelFile not recognized as a Kepler "
+                          "or TESS observation.", LightkurveWarning)
+            return LightCurve(time=self.time, flux=self.detrended_flux,
+                              flux_err=flux_err)
 
     def diagnose(self, ax=None):
         """Plot a figure to diagnose performance of PLD correction."""
