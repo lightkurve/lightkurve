@@ -560,9 +560,9 @@ class PLDCorrector(object):
             An array of indices to be included in de-trending model. This should
             exclude cadences which occur during transit.
         n_components_first : int
-            Number of primary first-order PLD components to reduce to with PCA.
+            Number of first-order PLD components to reduce to with PCA.
         n_components_second : int
-            Number of primary second-order PLD components to reduce to with PCA.
+            Number of second-order PLD components to reduce to with PCA.
 
         Returns
         -------
