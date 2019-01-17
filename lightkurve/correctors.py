@@ -504,19 +504,72 @@ class PLDCorrector(object):
         self.flux_err = np.nan_to_num(tpf.flux_err)
         self.time = np.nan_to_num(tpf.time)
 
-    def correct(self, transit_mask=[], aperture_mask=None):
-        """Returns a systematics-corrected LightCurve.
+    def correct(self, aperture_mask=None, transit_mask=[],
+                n_components_first=25, n_components_second=20):
+        """Returns a PLD systematics-corrected LightCurve.
 
-        Note that it is assumed that time and flux do not contain NaNs.
+        Pixel Level De-Correlation (PLD) was developed by Deming et. al (2015)
+        to remove systematic noise caused by spacecraft jitter for the Spitzer
+        space telescope. It was adapted to K2 data by Luger et. al (2016, 2018)
+        for the Everest pipeline. For a detailed description of PLD, please see
+        the papers by Deming and Luger.
+
+        Our simple implimentation of PLD is performed by first calculating the
+        PLD model for each cadence in time. This function goes up to second order,
+        and is represented by
+
+        .. math::
+
+            m_i = \sum_l a_l \frac{f_{il}}{\sum_k f_{ik}} + \sum_l \sum_m b_{lm} \frac{f_{il}f_{im}}{\left( \sum_k f_{ik} \right)^2} + \alpha + \beta t_i + \gamma t_i^2
+
+        where $m_i$ is the noise model at time $t_i$, $f_{il}$ is the flux in
+        the $l^\text{th}$ pixel at time $t_i$, $a_l$ is the first-order PLD
+        coefficient on the linear term, and $b_{lm}$ is the second-order PLD
+        coefficient on the $l^\text{th}$, $m^\text{th}$ pixel pair. $\alpha$,
+        $\beta$, and $\gamma$ are the Gaussian Process terms applied to capture
+        long-period variability.
+
+        We perform Principle Component Analysis (PCA) to reduce the number of
+        vectors in our final model to limit the set to best capture instrumental
+        noise. With a PCA-reduced set of vectors, we can construct a design matrix
+        containing first and second order fractional pixel fluxes.
+
+        To solve for the PLD model, we need to minimize the difference squared
+
+        .. math::
+
+            \chi^2 = \sum_i \frac{(y_i - m_i)^2}{\sigma_i^2},
+
+        where $y_i$ is the observed flux value at time $t_i$, by solving
+
+        .. math::
+
+            \frac{\partial \chi^2}{\partial a_l} = 0.
 
         Parameters
         ----------
-
+        aperture_mask : array-like, 'pipeline', 'all', 'threshold', or None
+            A boolean array describing the aperture such that `True` means
+            that the pixel will be used.
+            If None or 'all' are passed, all pixels will be used.
+            If 'pipeline' is passed, the mask suggested by the official pipeline
+            will be returned.
+            If 'threshold' is passed, all pixels brighter than 3-sigma above
+            the median flux will be used.
+        transit_mask : array-like
+            An array of indices to be included in de-trending model. This should
+            exclude cadences which occur during transit.
+        n_components_first : int
+            Number of primary first-order PLD components to reduce to with PCA.
+        n_components_second : int
+            Number of primary second-order PLD components to reduce to with PCA.
 
         Returns
         -------
         corrected_lightcurve : :class:`LightCurve` object
-            Returns a corrected lightcurve object.
+            Returns a corrected lightcurve object. Depending on the input, the
+            returned object will be a `KeplerLightCurve`, `TessLightCurve`, or
+            general `LightCurve` object.
         """
 
         # parse aperture
@@ -550,12 +603,12 @@ class PLDCorrector(object):
 
         # first order PLD
         f1 = self.aperture_flux / rawflux.reshape(-1, 1)
-        pca = PCA(n_components=28)
+        pca = PCA(n_components=n_components_first)
         X1 = pca.fit_transform(f1)
 
         # second order PLD
         f2 = np.product(list(multichoose(f1.T, 2)), axis = 1).T
-        pca = PCA(n_components=30)
+        pca = PCA(n_components=n_components_second)
         X2 = pca.fit_transform(f2)
 
         # combine them and add a column vector of 1s for stability
