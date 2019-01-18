@@ -585,6 +585,11 @@ class PLDCorrector(object):
         flux_err_crop = self.flux_err[:, xmin:xmax+2, ymin:ymax+2]
         aperture_mask = aperture[xmin:xmax+2, ymin:ymax+2]
 
+        # calculate errors (ignore warnings related to zero or negative errors)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RuntimeWarning)
+            flux_err = np.nansum(self.flux_err[:, aperture_mask]**2, axis=1)**0.5
+
         # set transit mask
         if len(transit_mask) == 0:
             transit_mask = np.where(self.time)
@@ -630,6 +635,10 @@ class PLDCorrector(object):
                 np.diag(np.sum(M(flux_err_crop).reshape(len(M(flux_err_crop)),
                         -1), axis=1)**2)
 
+        # store gp trend
+        gp.compute(self.time, flux_err)
+        self.gp_trend, self.gp_var = gp.predict(rawflux, self.time)
+
         # compute
         A = np.dot(MX.T, np.linalg.solve(sigma, MX))
         B = np.dot(MX.T, np.linalg.solve(sigma, M(rawflux)))
@@ -638,11 +647,6 @@ class PLDCorrector(object):
         # compute detrended light curve
         model = np.dot(X, C)
         self.detrended_flux = rawflux - model + np.nanmean(rawflux)
-
-        # calculate errors (ignore warnings related to zero or negative errors)
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", RuntimeWarning)
-            flux_err = np.nansum(self.flux_err[:, aperture_mask]**2, axis=1)**0.5
 
         # estimate centroids
         centroid_col, centroid_row = self.tpf.estimate_centroids(aperture)
