@@ -9,4 +9,5 @@ requests
 tqdm
 pandas
 scikit-learn
+pybind11
 celerite
