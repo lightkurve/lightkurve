@@ -1336,7 +1336,9 @@ class TessTargetPixelFile(TargetPixelFile):
         # Early TESS releases had cadences with time=NaN (i.e. missing data)
         # which were not flagged by a QUALITY flag yet; the line below prevents
         # these cadences from being used. They would break most methods!
-        self.quality_mask &= np.isfinite(self.hdu[1].data['TIME'])
+        #self.quality_mask &= np.isfinite(self.hdu[1].data['TIME'])  # kjm2019JAN21: original
+        if (quality_bitmask > 0):  # kjm2019: new
+            self.quality_mask &= np.isfinite(self.hdu[1].data['TIME'])  # kjm2019JAN21: indented
 
         # check to make sure the correct filetype has been provided
         filetype = detect_filetype(self.header)
