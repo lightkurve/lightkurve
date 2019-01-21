@@ -2,6 +2,8 @@
 from __future__ import division, print_function
 import logging
 import sys
+import os
+import warnings
 
 from astropy.visualization import (PercentileInterval, ImageNormalize,
                                    SqrtStretch, LinearStretch)
@@ -9,10 +11,12 @@ from astropy.time import Time
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 import numpy as np
+from functools import wraps
 
 log = logging.getLogger(__name__)
 
-__all__ = ['KeplerQualityFlags', 'TessQualityFlags',
+__all__ = ['LightkurveWarning',
+           'KeplerQualityFlags', 'TessQualityFlags',
            'bkjd_to_astropy_time', 'btjd_to_astropy_time',
            'channel_to_module_output', 'module_output_to_channel',
            'running_mean']
@@ -399,7 +403,13 @@ def plot_image(image, ax=None, scale='linear', origin='lower',
     """
     if ax is None:
         _, ax = plt.subplots()
-    vmin, vmax = PercentileInterval(95.).get_limits(image)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", RuntimeWarning)  # ignore image NaN values
+        mask = np.nan_to_num(image) > 0
+        if mask.any() > 0:
+            vmin, vmax = PercentileInterval(95.).get_limits(image[mask])
+        else:
+            vmin, vmax = 0, 0
 
     norm = None
     if scale is not None:
@@ -420,5 +430,84 @@ def plot_image(image, ax=None, scale='linear', origin='lower',
     ax.set_ylabel(ylabel)
     ax.set_title(title)
     if show_colorbar:
-        plt.colorbar(cax, ax=ax, norm=norm, label=clabel)
+        cbar = plt.colorbar(cax, ax=ax, norm=norm, label=clabel)
+        cbar.ax.yaxis.set_tick_params(tick1On=False, tick2On=False)
+        cbar.ax.minorticks_off()
     return ax
+
+
+class LightkurveWarning(Warning):
+    """Class for all Lightkurve warnings."""
+    pass
+
+
+def suppress_stdout(f, *args, **kwargs):
+    """A simple decorator to suppress function print outputs."""
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        # redirect output to `null`
+        with open(os.devnull, 'w') as devnull:
+            old_out = sys.stdout
+            sys.stdout = devnull
+            try:
+                return f(*args, **kwargs)
+            # restore to default
+            finally:
+                sys.stdout = old_out
+    return wrapper
+
+
+def detect_filetype(header):
+    """Returns Kepler and TESS file types given their primary header.
+
+    This function will detect the file type by looking at both the TELESCOP and
+    CREATOR keywords in the first extension of the FITS header. If the file is
+    recognized as a Kepler or TESS data product, one of the following strings
+    will be returned:
+
+        * `'KeplerTargetPixelFile'`
+        * `'TessTargetPixelFile'`
+        * `'KeplerLightCurveFile'`
+        * `'TessLightCurveFile'`
+
+    If the file is not recognized as a Kepler or TESS data product, then
+    `None` will be returned.
+
+    Parameters
+    ----------
+    header : astropy.io.fits.Header object
+        The primary header of a FITS file.
+
+    Returns
+    -------
+    filetype : str or None
+        A string describing the detected filetype. If the filetype is not
+        recognized, `None` will be returned.
+    """
+    try:
+        # use `telescop` keyword to determine mission
+        # and `creator` to determine tpf or lc
+        telescop = header['telescop'].lower()
+        creator = header['creator'].lower()
+        origin = header['origin'].lower()
+        if telescop == 'kepler':
+            # Kepler TPFs will contain "TargetPixelExporterPipelineModule"
+            if 'targetpixel' in creator:
+                return 'KeplerTargetPixelFile'
+            # Kepler LCFs will contain "FluxExporter2PipelineModule"
+            elif 'fluxexporter' in creator or 'lightcurve' in creator:
+                return 'KeplerLightCurveFile'
+        elif telescop == 'tess':
+            # TESS TPFs will contain "TargetPixelExporterPipelineModule"
+            if 'targetpixel' in creator:
+                return 'TessTargetPixelFile'
+            # TESS LCFs will contain "LightCurveExporterPipelineModule"
+            elif 'lightcurve' in creator:
+                return 'TessLightCurveFile'
+            # Early versions of TESScut did not set a good CREATOR keyword
+            elif 'stsci' in origin:
+                return 'TessTargetPixelFile'
+    # If the TELESCOP or CREATOR keywords don't exist we expect a KeyError;
+    # if one of them is Undefined we expect `.lower()` to yield an AttributeError.
+    except (KeyError, AttributeError):
+        return None

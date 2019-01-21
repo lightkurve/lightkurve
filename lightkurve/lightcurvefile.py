@@ -4,15 +4,17 @@ from __future__ import division, print_function
 
 import os
 import logging
+import warnings
+
 import numpy as np
 import matplotlib as mpl
 from matplotlib import pyplot as plt
-
 from astropy.io import fits as pyfits
 
-from .utils import (bkjd_to_astropy_time, KeplerQualityFlags, TessQualityFlags)
-from .mast import download_kepler_products
+from .utils import (bkjd_to_astropy_time, KeplerQualityFlags, TessQualityFlags,
+                    LightkurveWarning, detect_filetype)
 
+from . import MPLSTYLE
 
 __all__ = ['KeplerLightCurveFile', 'TessLightCurveFile']
 
@@ -24,14 +26,19 @@ class LightCurveFile(object):
 
     Parameters
     ----------
-    path : str
+    path : str or `astropy.io.fits.HDUList` object
         Local path or remote url of a lightcurve FITS file.
+        Also accepts a FITS file object already opened using AstroPy.
     kwargs : dict
         Keyword arguments to be passed to astropy.io.fits.open.
     """
     def __init__(self, path, **kwargs):
-        self.path = path
-        self.hdu = pyfits.open(self.path, **kwargs)
+        if isinstance(path, pyfits.HDUList):
+            self.path = None
+            self.hdu = path
+        else:
+            self.path = path
+            self.hdu = pyfits.open(self.path, **kwargs)
 
     def header(self, ext=0):
         """Header of the object at extension `ext`"""
@@ -69,24 +76,13 @@ class LightCurveFile(object):
 
     @classmethod
     def from_fits(cls, path_or_url, **kwargs):
-        """Open a Light Curve File using the path or url of a FITS file.
+        """WARNING: THIS FUNCTION IS DEPRECATED AND WILL BE REMOVED VERY SOON.
 
-        This is identical to opening a Light Curve File via the constructor.
-        This method was added because many tutorials use the `from_archive`
-        method, therefore users may expect a `from_fits` equivalent.
-
-        Parameters
-        ----------
-        path_or_url : str
-            Path or URL of a FITS file.
-        **kwargs : dict
-            Keyword arguments that will be passed to the constructor.
-
-        Returns
-        -------
-        tpf : LightCurveFile object
-            The loaded light curve file.
+        Please use `lightkurve.open()` instead.
         """
+        warnings.warn('`LightCurveFile.from_fits()` is deprecated and will be '
+                      'removed soon, please use `lightkurve.open()` instead.',
+                      LightkurveWarning)
         return cls(path_or_url, **kwargs)
 
     def _flux_types(self):
@@ -95,7 +91,7 @@ class LightCurveFile(object):
         types = [n for n in types if not ('ERR' in n)]
         return types
 
-    def plot(self, flux_types=None, style='fast', **kwargs):
+    def plot(self, flux_types=None, style='lightkurve', **kwargs):
         """Plot all the light curves contained in this light curve file.
 
         Parameters
@@ -109,8 +105,8 @@ class LightCurveFile(object):
             Dictionary of keyword arguments to be passed to
             `KeplerLightCurve.plot()`.
         """
-        if (style == "fast") and ("fast" not in mpl.style.available):
-            style = "default"
+        if style is None or style == 'lightkurve':
+            style = MPLSTYLE
         with plt.style.context(style):
             if not ('ax' in kwargs):
                 fig, ax = plt.subplots(1)
@@ -152,27 +148,37 @@ class KeplerLightCurveFile(LightCurveFile):
     """
     def __init__(self, path, quality_bitmask='default', **kwargs):
         super(KeplerLightCurveFile, self).__init__(path, **kwargs)
+
+        # check to make sure the correct filetype has been provided
+        filetype = detect_filetype(self.header())
+        if filetype == 'TessLightCurveFile':
+            warnings.warn("A TESS data product is being opened using the "
+                          "`KeplerLightCurveFile` class. "
+                          "Please use `TessLightCurveFile` instead.",
+                          LightkurveWarning)
+        elif filetype is None:
+            warnings.warn("Given fits file not recognized as Kepler or TESS "
+                          "observation.", LightkurveWarning)
+        elif "TargetPixelFile" in filetype:
+            warnings.warn("A `TargetPixelFile` object is being opened as a "
+                          "`KeplerLightCurveFile`. "
+                          "Please use `KeplerTargetPixelFile` instead.",
+                          LightkurveWarning)
+
         self.quality_bitmask = quality_bitmask
         self.quality_mask = KeplerQualityFlags.create_quality_mask(
                                 quality_array=self.hdu[1].data['SAP_QUALITY'],
                                 bitmask=quality_bitmask)
+        try:
+            self.targetid = self.header()['KEPLERID']
+        except KeyError:
+            self.targetid = None
 
     @staticmethod
     def from_archive(target, cadence='long', quarter=None, month=None,
-                     campaign=None, radius=1., targetlimit=1,
-                     quality_bitmask="default", **kwargs):
-        """Fetches a LightCurveFile (or list thereof) from the data archive at MAST.
-
-        If a target was observed across multiple quarters or campaigns, a
-        list of `LightCurveFile` objects will only be returned if the string
-        'all' is passed to `quarter` or `campaign`.  Alternatively, a list of
-        numbers can be pased to these arguments.
-
-        An `ArchiveError` will be raised if no (unique) LightCurveFile
-        can be found.
-
-        If `targetlimit` is set to more than one (or None) then will return a list
-        of `KeplerLightCurveFile`. Will only return hits within the specified radius.
+                     campaign=None, quality_bitmask="default", **kwargs):
+        """WARNING: THIS FUNCTION IS DEPRECATED AND WILL BE REMOVED VERY SOON.
+        Use `lightkurve.search_lightcurvefile()` instead.
 
         Parameters
         ----------
@@ -186,12 +192,6 @@ class KeplerLightCurveFile(LightCurveFile):
             For Kepler's prime mission, there are three short-cadence
             LightCurveFile objects for each quarter, each covering one month.
             Hence, if cadence='short' you need to specify month=1, 2, or 3.
-        radius : float
-            Search radius in arcseconds. Default is 1 arcsecond.
-        targetlimit : None or int
-            If multiple targets are present within `radius`, limit the number
-            of returned LightCurveFile objects to `targetlimit`.
-            If `None`, no limit is applied.
         quality_bitmask : str or int
             Bitmask (integer) which identifies the quality flag bitmask that should
             be used to mask out bad cadences. If a string is passed, it has the
@@ -211,32 +211,31 @@ class KeplerLightCurveFile(LightCurveFile):
 
         Returns
         -------
-        lcf : KeplerLightCurveFile object or list of KeplerLightCurveFile objects
+        lcf : KeplerLightCurveFile or LightCurveFileCollection
         """
+        warnings.warn("`LightCurveFile.from_archive()` is deprecated and will be removed soon, "
+                      "please use `lightkurve.search_lightcurvefile()` instead.",
+                      LightkurveWarning)
+
         # Be tolerant if a direct path or url is passed to this function by accident
         if os.path.exists(str(target)) or str(target).startswith('http'):
             log.warning('Warning: from_archive() is not intended to accept a '
                         'direct path, use KeplerLightCurveFile(path) instead.')
-            path = [target]
+            KeplerLightCurveFile(target)
         else:
-            path = download_kepler_products(
-                target=target, filetype='Lightcurve', cadence=cadence,
-                quarter=quarter, campaign=campaign, month=month,
-                radius=radius, targetlimit=targetlimit)
-        if len(path) == 1:
-            return KeplerLightCurveFile(path[0],
-                                        quality_bitmask=quality_bitmask,
-                                        **kwargs)
-        return [KeplerLightCurveFile(p, quality_bitmask=quality_bitmask, **kwargs)
-                for p in path]
+            from .search import search_lightcurvefile
+            sr = search_lightcurvefile(target, cadence=cadence,
+                                       quarter=quarter, month=month,
+                                       campaign=campaign)
+            if len(sr) == 1:
+                return sr.download(quality_bitmask=quality_bitmask, **kwargs)
+            elif len(sr) > 1:
+                return sr.download_all(quality_bitmask=quality_bitmask, **kwargs)
+            else:
+                raise ValueError("No light curve files found that match the search criteria.")
 
     def __repr__(self):
-        if self.mission is None:
-            return('KeplerLightCurveFile(ID: {})'.format(self.keplerid))
-        elif self.mission.lower() == 'kepler':
-            return('KeplerLightCurveFile(KIC: {})'.format(self.keplerid))
-        elif self.mission.lower() == 'k2':
-            return('KeplerLightCurveFile(EPIC: {})'.format(self.keplerid))
+        return('KeplerLightCurveFile(ID: {})'.format(self.targetid))
 
     @property
     def astropy_time(self):
@@ -262,7 +261,8 @@ class KeplerLightCurveFile(LightCurveFile):
                 quarter=self.quarter,
                 mission=self.mission,
                 cadenceno=self.cadenceno,
-                keplerid=self.keplerid,
+                targetid=self.targetid,
+                label=self.hdu[0].header['OBJECT'],
                 ra=self.ra,
                 dec=self.dec)
         else:
@@ -275,14 +275,6 @@ class KeplerLightCurveFile(LightCurveFile):
         return self.header(ext=0)['CHANNEL']
 
     @property
-    def keplerid(self):
-        return self.header(ext=0)['KEPLERID']
-
-    @property
-    def targetid(self):
-        return self.keplerid
-
-    @property
     def obsmode(self):
         """'short cadence' or 'long cadence'. ('OBSMODE' header keyword)"""
         return self.header()['OBSMODE']
@@ -293,7 +285,7 @@ class KeplerLightCurveFile(LightCurveFile):
         return self.hdu[1].data['POS_CORR1'][self.quality_mask]
 
     @property
-    def poss_corr2(self):
+    def pos_corr2(self):
         """Returns the row position correction."""
         return self.hdu[1].data['POS_CORR2'][self.quality_mask]
 
@@ -370,6 +362,23 @@ class TessLightCurveFile(LightCurveFile):
     """
     def __init__(self, path, quality_bitmask='default', **kwargs):
         super(TessLightCurveFile, self).__init__(path, **kwargs)
+
+        # check to make sure the correct filetype has been provided
+        filetype = detect_filetype(self.header())
+        if filetype == 'KeplerLightCurveFile':
+            warnings.warn("A Kepler data product is being opened using the "
+                          "`TessLightCurveFile` class. "
+                          "Please use `KeplerLightCurveFile` instead.",
+                          LightkurveWarning)
+        elif filetype is None:
+            warnings.warn("Given fits file not recognized as Kepler or TESS "
+                          "observation.", LightkurveWarning)
+        elif "TargetPixelFile" in filetype:
+            warnings.warn("A `TargetPixelFile` object is being opened as a "
+                          "`TessLightCurveFile`. "
+                          "Please use `TessTargetPixelFile` instead.",
+                          LightkurveWarning)
+
         self.quality_bitmask = quality_bitmask
         self.quality_mask = TessQualityFlags.create_quality_mask(
                                 quality_array=self.hdu[1].data['QUALITY'],
@@ -379,28 +388,31 @@ class TessLightCurveFile(LightCurveFile):
         # these cadences from being used. They would break most methods!
         self.quality_mask &= np.isfinite(self.hdu[1].data['TIME'])
 
+        try:
+            self.targetid = self.header()['TICID']
+        except KeyError:
+            self.targetid = None
+
     def __repr__(self):
-        return('TessLightCurveFile(TICID: {})'.format(self.ticid))
-
-    @property
-    def ticid(self):
-        return self.header(ext=0)['TICID']
-
-    @property
-    def targetid(self):
-        return self.ticid
+        return('TessLightCurveFile(TICID: {})'.format(self.targetid))
 
     def get_lightcurve(self, flux_type, centroid_type='MOM_CENTR'):
         if flux_type in self._flux_types():
-            # We did not import lightcurve at the top to prevent circular imports
+            # We did not import TessLightCurve at the top to prevent circular imports
             from .lightcurve import TessLightCurve
             return TessLightCurve(
-                self.hdu[1].data['TIME'][self.quality_mask],
-                self.hdu[1].data[flux_type][self.quality_mask],
+                time=self.hdu[1].data['TIME'][self.quality_mask],
+                time_format='btjd',
+                time_scale='tdb',
+                flux=self.hdu[1].data[flux_type][self.quality_mask],
                 flux_err=self.hdu[1].data[flux_type + "_ERR"][self.quality_mask],
                 centroid_col=self.hdu[1].data[centroid_type + "1"][self.quality_mask],
                 centroid_row=self.hdu[1].data[centroid_type + "2"][self.quality_mask],
                 quality=self.hdu[1].data['QUALITY'][self.quality_mask],
                 quality_bitmask=self.quality_bitmask,
                 cadenceno=self.cadenceno,
-                ticid=self.ticid)
+                targetid=self.targetid,
+                label=self.hdu[0].header['OBJECT'])
+        else:
+            raise KeyError("{} is not a valid flux type. Available types are: {}".
+                           format(flux_type, self._flux_types))

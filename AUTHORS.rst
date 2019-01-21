@@ -1,4 +1,4 @@
-Direct contributions to the code base:
+Direct contributions:
 
 - `José Vinícius de Miranda Cardoso <https://github.com/mirca>`_
 - `Geert Barentsen <https://github.com/barentsen>`_
@@ -13,6 +13,16 @@ Direct contributions to the code base:
 - `Sheila Sagear <https://github.com/ssagear>`_
 - `Emma Turtelboom <https://github.com/Emmavt>`_
 - `Jeff Coughlin <https://github.com/JeffLCoughlin>`_
+- `Zachory K. Berta-Thompson <https://github.com/zkbt>`_
+- `Anand Sundaram <https://github.com/anand-sundaram-zocdoc>`_
+- `Oliver Hall <https://github.com/ojhall94>`_
+- `Nicholas Saunders <https://github.com/nksaunders>`_
+- `Jose A. Lerma III <https://github.com/JoseALermaIII>`_
+- `Dag Evensberget <https://github.com/svaberg>`_
+- `Natalie Gosnell <https://github.com/nattieg>`_
+- `Peter Williams <https://github.com/pkgw>`_
+- `Richard Elkins <https://github.com/texadactyl>`_
+
 
 Comments, corrections & suggestions:
 
@@ -28,3 +38,6 @@ Comments, corrections & suggestions:
 - Ashley Villar
 - `Benjamin Pope <https://github.com/benjaminpope>`_
 - `J. K. Carlberg <https://github.com/jkcarlberg>`_
+- `Brian Jackson <https://github.com/decaelus>`_
+- `Rishi Paudel <https://github.com/rrpastro>`_
+- `Marusa Zerjal <https://github.com/marusazerjal>`_

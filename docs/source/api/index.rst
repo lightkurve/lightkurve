@@ -5,9 +5,11 @@ API documentation
 .. toctree::
     :maxdepth: 1
 
-    targetpixelfile
     lightcurve
     lightcurvefile
+    targetpixelfile
+    search
+    periodogram
     correctors
     prf
     utils

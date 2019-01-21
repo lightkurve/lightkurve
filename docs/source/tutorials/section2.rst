@@ -8,5 +8,6 @@ In this section we will look at some common data analysis tasks, and show how th
     :maxdepth: 1
 
     2.02-recover-a-planet.ipynb
+    how-to-recover-the-first-tess-candidate.ipynb
     2.09-how-to-use-lightkurve-for-asteroseismology.ipynb
     2.10-how-to-make-a-supernova-lightcurve.ipynb
