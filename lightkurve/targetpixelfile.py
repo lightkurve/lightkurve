@@ -302,6 +302,79 @@ class TargetPixelFile(object):
             return ra[cadence], dec[cadence]
         return ra, dec
 
+    def get_model(self, star_priors=None, **kwargs):
+        """Returns a default `TPFModel` object for PRF fitting.
+
+        The default model only includes one star and only allows its flux
+        and position to change.  A different set of stars can be added using
+        the `star_priors` parameter.
+
+        Parameters
+        ----------
+        **kwargs : dict
+            Arguments to be passed to the `TPFModel` constructor, e.g.
+            `star_priors`.
+
+        Returns
+        -------
+        model : TPFModel object
+            Model with appropriate defaults for this Target Pixel File.
+        """
+        from .prf import TPFModel, StarPrior, BackgroundPrior
+        from .prf import UniformPrior, GaussianPrior
+        # Set up the model
+        if 'star_priors' not in kwargs:
+            centr_col, centr_row = self.estimate_centroids()
+            star_priors = [StarPrior(col=GaussianPrior(mean=np.nanmedian(centr_col),
+                                                       var=np.nanstd(centr_col)**2),
+                                     row=GaussianPrior(mean=np.nanmedian(centr_row),
+                                                       var=np.nanstd(centr_row)**2),
+                                     flux=UniformPrior(lb=0.5*np.nanmax(self.flux[0]),
+                                                       ub=2*np.nansum(self.flux[0]) + 1e-10),
+                                     targetid=self.targetid)]
+            kwargs['star_priors'] = star_priors
+        if 'prfmodel' not in kwargs:
+            kwargs['prfmodel'] = self.get_prf_model()
+        if 'background_prior' not in kwargs:
+            if np.all(np.isnan(self.flux_bkg)):  # If TargetPixelFile has no background flux data
+                # Use the median of the lower half of flux as an estimate for flux_bkg
+                clipped_flux = np.ma.masked_where(self.flux > np.percentile(self.flux, 50),
+                                                  self.flux)
+                flux_prior = GaussianPrior(mean=np.ma.median(clipped_flux),
+                                           var=np.ma.std(clipped_flux)**2)
+            else:
+                flux_prior = GaussianPrior(mean=np.nanmedian(self.flux_bkg),
+                                           var=np.nanstd(self.flux_bkg)**2)
+            kwargs['background_prior'] = BackgroundPrior(flux=flux_prior)
+        return TPFModel(**kwargs)
+
+    def extract_prf_photometry(self, cadences=None, parallel=True, **kwargs):
+        """Returns the results of PRF photometry applied to the pixel file.
+
+        Parameters
+        ----------
+        cadences : list of int
+            Cadences to fit.  If `None` (default) then all cadences will be fit.
+        parallel : bool
+            If `True`, fitting cadences will be distributed across multiple
+            cores using Python's `multiprocessing` module.
+        **kwargs : dict
+            Keywords to be passed to `tpf.get_model()` to create the
+            `TPFModel` object that will be fit.
+
+        Returns
+        -------
+        results : PRFPhotometry object
+            Object that provides access to PRF-fitting photometry results and
+            various diagnostics.
+        """
+        from .prf import PRFPhotometry
+        log.warning('Warning: PRF-fitting photometry is dope '
+                    'in this version of lightkurve.')
+        prfphot = PRFPhotometry(model=self.get_model(**kwargs))
+        prfphot.run(self.flux + self.flux_bkg, cadences=cadences, parallel=parallel)
+        return prfphot
+
     def show_properties(self):
         """Prints a description of all non-callable attributes.
 
@@ -937,80 +1010,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                 flux_err=flux_bkg_err,
                                 **keys)
 
-    def get_model(self, star_priors=None, **kwargs):
-        """Returns a default `TPFModel` object for PRF fitting.
-
-        The default model only includes one star and only allows its flux
-        and position to change.  A different set of stars can be added using
-        the `star_priors` parameter.
-
-        Parameters
-        ----------
-        **kwargs : dict
-            Arguments to be passed to the `TPFModel` constructor, e.g.
-            `star_priors`.
-
-        Returns
-        -------
-        model : TPFModel object
-            Model with appropriate defaults for this Target Pixel File.
-        """
-        from .prf import TPFModel, StarPrior, BackgroundPrior
-        from .prf import UniformPrior, GaussianPrior
-        # Set up the model
-        if 'star_priors' not in kwargs:
-            centr_col, centr_row = self.estimate_centroids()
-            star_priors = [StarPrior(col=GaussianPrior(mean=np.nanmedian(centr_col),
-                                                       var=np.nanstd(centr_col)**2),
-                                     row=GaussianPrior(mean=np.nanmedian(centr_row),
-                                                       var=np.nanstd(centr_row)**2),
-                                     flux=UniformPrior(lb=0.5*np.nanmax(self.flux[0]),
-                                                       ub=2*np.nansum(self.flux[0]) + 1e-10),
-                                     targetid=self.targetid)]
-            kwargs['star_priors'] = star_priors
-        if 'prfmodel' not in kwargs:
-            kwargs['prfmodel'] = self.get_prf_model()
-        if 'background_prior' not in kwargs:
-            if np.all(np.isnan(self.flux_bkg)):  # If TargetPixelFile has no background flux data
-                # Use the median of the lower half of flux as an estimate for flux_bkg
-                clipped_flux = np.ma.masked_where(self.flux > np.percentile(self.flux, 50),
-                                                  self.flux)
-                flux_prior = GaussianPrior(mean=np.ma.median(clipped_flux),
-                                           var=np.ma.std(clipped_flux)**2)
-            else:
-                flux_prior = GaussianPrior(mean=np.nanmedian(self.flux_bkg),
-                                           var=np.nanstd(self.flux_bkg)**2)
-            kwargs['background_prior'] = BackgroundPrior(flux=flux_prior)
-        return TPFModel(**kwargs)
-
-    def extract_prf_photometry(self, cadences=None, parallel=True, **kwargs):
-        """Returns the results of PRF photometry applied to the pixel file.
-
-        Parameters
-        ----------
-        cadences : list of int
-            Cadences to fit.  If `None` (default) then all cadences will be fit.
-        parallel : bool
-            If `True`, fitting cadences will be distributed across multiple
-            cores using Python's `multiprocessing` module.
-        **kwargs : dict
-            Keywords to be passed to `tpf.get_model()` to create the
-            `TPFModel` object that will be fit.
-
-        Returns
-        -------
-        results : PRFPhotometry object
-            Object that provides access to PRF-fitting photometry results and
-            various diagnostics.
-        """
-        from .prf import PRFPhotometry
-        log.warning('Warning: PRF-fitting photometry is experimental '
-                    'in this version of lightkurve.')
-        prfphot = PRFPhotometry(model=self.get_model(**kwargs))
-        prfphot.run(self.flux + self.flux_bkg, cadences=cadences, parallel=parallel,
-                    pos_corr1=self.pos_corr1, pos_corr2=self.pos_corr2)
-        return prfphot
-
     def prf_lightcurve(self, **kwargs):
         lc = self.extract_prf_photometry(**kwargs).lightcurves[0]
         keys = {'quality': self.quality,
@@ -1508,3 +1507,16 @@ class TessTargetPixelFile(TargetPixelFile):
                               flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
                               flux_err=flux_bkg_err,
                               **keys)
+
+    def get_prf_model(self):
+        """Returns an object of TessPRF initialized using the
+        necessary metadata in the tpf object.
+
+        Returns
+        -------
+        prf : instance of SimpleKeplerPRF
+        """
+
+        return TessPRF(camera=self.camera, ccd=self.ccd, shape=self.shape[1:],
+                       column=self.column, row=self.row)
+
