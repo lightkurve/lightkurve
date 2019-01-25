@@ -2,19 +2,135 @@
 from __future__ import division, print_function
 
 import math
+from os.path import join, curdir
+import urllib3
+import certifi
 
 from astropy.io import fits as pyfits
 import numpy as np
-import scipy
-import scipy.interpolate
+import scipy.interpolate as scinterp
+import scipy.io as scio
 
 from ..utils import channel_to_module_output, plot_image
+from ..search import default_download_dir
 
 
-__all__ = ['KeplerPRF', 'SimpleKeplerPRF']
+__all__ = ['KeplerPRF', 'TessPRF']
 
 
-class KeplerPRF(object):
+class PRFModel:
+    def __call__(self, center_col, center_row, flux, scale_col, scale_row,
+                 rotation_angle):
+        return self.evaluate(center_col, center_row, flux,
+                             scale_col, scale_row, rotation_angle)
+
+    def evaluate(self, center_col, center_row, flux=1., scale_col=1., scale_row=1.,
+                 rotation_angle=0.):
+        """
+        Interpolates the PRF model onto detector coordinates.
+
+        Parameters
+        ----------
+        center_col, center_row : float
+            Column and row coordinates of the center
+        flux : float
+            Total integrated flux of the PRF
+        scale_col, scale_row : float
+            Pixel scale stretch parameter, i.e. the numbers by which the PRF
+            model needs to be multiplied in the column and row directions to
+            account for focus changes
+        rotation_angle : float
+            Rotation angle in radians
+
+        Returns
+        -------
+        prf_model : 2D array
+            Two dimensional array representing the PRF values parametrized
+            by flux, centroids, widths, and rotation.
+        """
+        cosa = math.cos(rotation_angle)
+        sina = math.sin(rotation_angle)
+
+        delta_col = self.col_coord - center_col
+        delta_row = self.row_coord - center_row
+        delta_col, delta_row = np.meshgrid(delta_col, delta_row)
+
+        rot_row = delta_row * cosa - delta_col * sina
+        rot_col = delta_row * sina + delta_col * cosa
+
+        self.prf_model = (flux * scale_row * scale_col *
+                          self.model(rot_row.flatten() * scale_row,
+                                     rot_col.flatten() * scale_col,
+                                     grid=False).reshape(self.shape))
+        return self.prf_model
+
+    def gradient(self, center_col, center_row, flux=1., scale_col=1., scale_row=1.,
+                 rotation_angle=0.):
+        """
+        This function returns the gradient of the KeplerPRF model with
+        respect to center_col, center_row, flux, scale_col, scale_row,
+        and rotation_angle.
+
+        Parameters
+        ----------
+        center_col, center_row : float
+            Column and row coordinates of the center
+        flux : float
+            Total integrated flux of the PRF
+        scale_col, scale_row : float
+            Pixel scale stretch parameter, i.e. the numbers by which the PRF
+            model needs to be multiplied in the column and row directions to
+            account for focus changes
+        rotation_angle : float
+            Rotation angle in radians
+
+        Returns
+        -------
+        grad_prf : list
+            Returns a list of arrays where the elements are the partial derivatives
+            of the KeplerPRF model with respect to center_col, center_row, flux, scale_col,
+            scale_row, and rotation_angle, respectively.
+        """
+        cosa = math.cos(rotation_angle)
+        sina = math.sin(rotation_angle)
+
+        delta_col = self.col_coord - center_col
+        delta_row = self.row_coord - center_row
+        delta_col, delta_row = np.meshgrid(delta_col, delta_row)
+
+        rot_row = delta_row * cosa - delta_col * sina
+        rot_col = delta_row * sina + delta_col * cosa
+
+        # for a proof of the maths that follow, see the pdf attached
+        # on pull request #198 in lightkurve GitHub repo.
+        interp = self.model(rot_row.flatten() * scale_row,
+                            rot_col.flatten() * scale_col,
+                            grid=False).reshape(self.shape)
+
+        deriv_flux = scale_row * scale_col * interp
+
+        interp_dy = self.model(rot_row.flatten() * scale_row,
+                               rot_col.flatten() * scale_col,
+                               grid=False, dy=1).reshape(self.shape)
+
+        interp_dx = self.model(rot_row.flatten() * scale_row,
+                               rot_col.flatten() * scale_col,
+                               grid=False, dx=1).reshape(self.shape)
+
+        scale_row_times_interp_dx = scale_row * interp_dx
+        scale_col_times_interp_dy = scale_col * interp_dy
+
+        deriv_center_col = - scale_row * scale_col * flux * (cosa * scale_col_times_interp_dy - sina * scale_row_times_interp_dx)
+        deriv_center_row = - scale_row * scale_col * flux * (sina * scale_col_times_interp_dy + cosa * scale_row_times_interp_dx)
+        deriv_scale_row = flux * scale_col * (scale_row * interp_dx * rot_row + interp)
+        deriv_scale_col = flux * scale_row * (scale_col * interp_dy * rot_col + interp)
+        deriv_rotation_angle = scale_row * scale_col * flux * (interp_dy * scale_col * (delta_row * cosa - delta_col * sina)
+                                       - interp_dx * scale_row * (delta_row * sina + delta_col * cosa))
+        return [deriv_center_col, deriv_center_row, deriv_flux,
+                deriv_scale_col, deriv_scale_row, deriv_rotation_angle]
+
+
+class KeplerPRF(PRFModel):
     """
     Kepler's Pixel Response Function as designed by [1]_.
 
@@ -64,115 +180,7 @@ class KeplerPRF(object):
         self.shape = shape
         self.column = column
         self.row = row
-        self.col_coord, self.row_coord, self.interpolate, self.supersampled_prf = self._prepare_prf()
-
-    def __call__(self, center_col, center_row, flux, scale_col, scale_row,
-                 rotation_angle):
-        return self.evaluate(center_col, center_row, flux,
-                             scale_col, scale_row, rotation_angle)
-
-    def evaluate(self, center_col, center_row, flux=1., scale_col=1., scale_row=1.,
-                 rotation_angle=0.):
-        """
-        Interpolates the PRF model onto detector coordinates.
-
-        Parameters
-        ----------
-        center_col, center_row : float
-            Column and row coordinates of the center
-        flux : float
-            Total integrated flux of the PRF
-        scale_col, scale_row : float
-            Pixel scale stretch parameter, i.e. the numbers by which the PRF
-            model needs to be multiplied in the column and row directions to
-            account for focus changes
-        rotation_angle : float
-            Rotation angle in radians
-
-        Returns
-        -------
-        prf_model : 2D array
-            Two dimensional array representing the PRF values parametrized
-            by flux, centroids, widths, and rotation.
-        """
-        cosa = math.cos(rotation_angle)
-        sina = math.sin(rotation_angle)
-
-        delta_col = self.col_coord - center_col
-        delta_row = self.row_coord - center_row
-        delta_col, delta_row = np.meshgrid(delta_col, delta_row)
-
-        rot_row = delta_row * cosa - delta_col * sina
-        rot_col = delta_row * sina + delta_col * cosa
-
-        self.prf_model = flux * self.interpolate(rot_row.flatten() * scale_row,
-                                                 rot_col.flatten() * scale_col,
-                                                 grid=False).reshape(self.shape)
-        return self.prf_model
-
-    def gradient(self, center_col, center_row, flux=1., scale_col=1., scale_row=1.,
-                 rotation_angle=0.):
-        """
-        This function returns the gradient of the KeplerPRF model with
-        respect to center_col, center_row, flux, scale_col, scale_row,
-        and rotation_angle.
-
-        Parameters
-        ----------
-        center_col, center_row : float
-            Column and row coordinates of the center
-        flux : float
-            Total integrated flux of the PRF
-        scale_col, scale_row : float
-            Pixel scale stretch parameter, i.e. the numbers by which the PRF
-            model needs to be multiplied in the column and row directions to
-            account for focus changes
-        rotation_angle : float
-            Rotation angle in radians
-
-        Returns
-        -------
-        grad_prf : list
-            Returns a list of arrays where the elements are the partial derivatives
-            of the KeplerPRF model with respect to center_col, center_row, flux, scale_col,
-            scale_row, and rotation_angle, respectively.
-        """
-        cosa = math.cos(rotation_angle)
-        sina = math.sin(rotation_angle)
-
-        delta_col = self.col_coord - center_col
-        delta_row = self.row_coord - center_row
-        delta_col, delta_row = np.meshgrid(delta_col, delta_row)
-
-        rot_row = delta_row * cosa - delta_col * sina
-        rot_col = delta_row * sina + delta_col * cosa
-
-        # for a proof of the maths that follow, see the pdf attached
-        # on pull request #198 in lightkurve GitHub repo.
-        deriv_flux = self.interpolate(rot_row.flatten() * scale_row,
-                                      rot_col.flatten() * scale_col,
-                                      grid=False).reshape(self.shape)
-
-        interp_dy = self.interpolate(rot_row.flatten() * scale_row,
-                                     rot_col.flatten() * scale_col,
-                                     grid=False, dy=1).reshape(self.shape)
-
-        interp_dx = self.interpolate(rot_row.flatten() * scale_row,
-                                     rot_col.flatten() * scale_col,
-                                     grid=False, dx=1).reshape(self.shape)
-
-        scale_row_times_interp_dx = scale_row * interp_dx
-        scale_col_times_interp_dy = scale_col * interp_dy
-
-        deriv_center_col = - flux * (cosa * scale_col_times_interp_dy - sina * scale_row_times_interp_dx)
-        deriv_center_row = - flux * (sina * scale_col_times_interp_dy + cosa * scale_row_times_interp_dx)
-        deriv_scale_row = flux * interp_dx * rot_row
-        deriv_scale_col = flux * interp_dy * rot_col
-        deriv_rotation_angle = flux * (interp_dy * scale_col * (delta_row * cosa - delta_col * sina)
-                                       - interp_dx * scale_row * (delta_row * sina + delta_col * cosa))
-
-        return [deriv_center_col, deriv_center_row, deriv_flux,
-                deriv_scale_col, deriv_scale_row, deriv_rotation_angle]
+        self.col_coord, self.row_coord, self.model, self.supersampled_prf = self._prepare_prf()
 
     def _read_prf_calibration_file(self, path, ext):
         prf_cal_file = pyfits.open(path)
@@ -236,9 +244,9 @@ class KeplerPRF(object):
         # x-axis correspond to row-axis in scipy.RectBivariate
         # not to be confused with our convention, in which the
         # x-axis correspond to the column-axis
-        interpolate = scipy.interpolate.RectBivariateSpline(PRFrow, PRFcol, prf)
+        model = scinterp.RectBivariateSpline(PRFrow, PRFcol, prf)
 
-        return col_coord, row_coord, interpolate, prf
+        return col_coord, row_coord, model, prf
 
     def plot(self, *params, **kwargs):
         pflux = self.evaluate(*params)
@@ -247,65 +255,68 @@ class KeplerPRF(object):
                            self.row, self.row + self.shape[0]), **kwargs)
 
 
-class SimpleKeplerPRF(KeplerPRF):
+class TessPRF(PRFModel):
+    """Builds a parametric PRF model on the basis of the calibrated PRF files
+    made available by the TESS science team at https://archive.stsci.edu/missions/tess/models/.
+
+    Parameters
+    ----------
+    camera : int
+        The camera number.
+    ccd : int
+        The ccd number.
+    shape : array-like of ints
+        The size (number_of_rows, number_of_columns) of the tpf to be modelled.
+    column, row: ints
+        Column and row numbers of the bottom-left corner of the tpf.
     """
-    Simple model of KeplerPRF.
+    def __init__(self, camera, ccd, shape, column, row):
+        self.camera = camera
+        self.ccd = ccd
+        self.shape = shape
+        self.column = column
+        self.row = row
+        self.col_coord, self.row_coord, self.model = self.build_model()
 
-    This class provides identical functionality as in KeplerPRF, except that
-    it is parametrized only by flux and center positions. The width scales
-    and angle are fixed to 1.0 and 0, respectivelly.
-    """
+    def build_model(self):
+        prf_struct = self.read_prf_file()
+        prf_values, prf_row, prf_col = (prf_struct[0][0][0], prf_struct[0][0][5],
+                                        prf_struct[0][0][6])
+        prf_row = prf_row.flatten()
+        prf_col = prf_col.flatten()
+        row_diff = abs(prf_row[0] - prf_row[1])
+        col_diff = abs(prf_col[0] - prf_col[1])
+        prf_values /= (np.sum(prf_values) * row_diff * col_diff)
+        rowdim, coldim = self.shape[0], self.shape[1]
+        col_coord = np.arange(self.column + .5, self.column + coldim + .5)
+        row_coord = np.arange(self.row + .5, self.row + rowdim + .5)
+        model = scinterp.RectBivariateSpline(prf_row, prf_col, prf_values)
+        return col_coord, row_coord, model
 
-    def __call__(self, center_col, center_row, flux=1.):
-        return self.evaluate(center_col, center_row, flux)
+    def read_prf_file(self):
+        if (self.camera <= 2 and self.ccd <= 3):
+            prefix = 'tess2018243163600-00072_035-'
+        else:
+            prefix = 'tess2018243163601-00072_035-'
+        filename = (prefix + str(self.camera) + '-' + str(self.ccd) +
+                    '-characterized-prf.mat')
+        url = 'https://archive.stsci.edu/missions/tess/models/' + filename
+        # download .mat prf file and save it in wherever lightkurve was installed
+        tess_prf_dir = default_download_dir()
+        file_path = join(tess_prf_dir, filename)
+        try:
+            prf_contents = scio.loadmat(file_path)
+        except (FileNotFoundError, TypeError):
+            http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED',
+                                       ca_certs=certifi.where())
+            response = http.request('GET', url)
+            with open(file_path, 'wb') as f:
+                f.write(response.data)
+                prf_contents = scio.loadmat(file_path)
+        return prf_contents['prfStruct']
 
-    def evaluate(self, center_col, center_row, flux=1.):
-        """
-        Interpolates the PRF model onto detector coordinates.
-
-        Parameters
-        ----------
-        flux : float
-            Total integrated flux of the PRF
-        center_col, center_row : float
-            Column and row coordinates of the center
-
-        Returns
-        -------
-        prf_model : 2D array
-            Two dimensional array representing the PRF values parametrized
-            by flux and centroids.
-        """
-        delta_col = self.col_coord - center_col
-        delta_row = self.row_coord - center_row
-        self.prf_model = flux * self.interpolate(delta_row, delta_col)
-
-        return self.prf_model
-
-    def gradient(self, center_col, center_row, flux):
-        """
-        This function returns the gradient of the SimpleKeplerPRF model with
-        respect to flux, center_col, and center_row.
-
-        Parameters
-        ----------
-        center_col, center_row : float
-            Column and row coordinates of the center
-        flux : float
-            Total integrated flux of the PRF
-
-        Returns
-        -------
-        grad_prf : list
-            Returns a list of arrays where the elements are the derivative
-            of the KeplerPRF model with respect to center_col, center_row,
-            and flux, respectively.
-        """
-        delta_col = self.col_coord - center_col
-        delta_row = self.row_coord - center_row
-
-        deriv_flux = self.interpolate(delta_row, delta_col)
-        deriv_center_col = - flux * self.interpolate(delta_row, delta_col, dy=1)
-        deriv_center_row = - flux * self.interpolate(delta_row, delta_col, dx=1)
-
-        return [deriv_center_col, deriv_center_row, deriv_flux]
+    def plot(self, *params, **kwargs):
+        pflux = self.evaluate(*params)
+        plot_image(pflux, title='TESS PRF Model, Camera: {}, CCD: {}'.format(self.camera, self.ccd),
+                   extent=(self.column, self.column + self.shape[1],
+                           self.row, self.row + self.shape[0]), **kwargs)
