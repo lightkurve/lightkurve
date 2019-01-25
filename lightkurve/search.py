@@ -204,32 +204,36 @@ class SearchResult(object):
             return LightCurveFileCollection([open(p) for p in path])
 
     def _default_download_dir(self):
-        """Returns the default path to the directory where files will be downloaded.
+        return(default_download_dir())
 
-        By default, this method will return "~/.lightkurve-cache" and create
-        this directory if it does not exist.  If the directory cannot be
-        access or created, then it returns the local directory (".").
 
-        Returns
-        -------
-        download_dir : str
-            Path to location of `mastDownload` folder where data downloaded from MAST are stored
-        """
-        download_dir = os.path.join(os.path.expanduser('~'), '.lightkurve-cache')
-        if os.path.isdir(download_dir):
-            return download_dir
-        else:
-            # if it doesn't exist, make a new cache directory
-            try:
-                os.mkdir(download_dir)
-            # downloads locally if OS error occurs
-            except OSError:
-                log.warning('Warning: unable to create {}. '
-                            'Downloading MAST files to the current '
-                            'working directory instead.'.format(download_dir))
-                download_dir = '.'
+def default_download_dir():
+    """Returns the default path to the directory where files will be downloaded.
 
+    By default, this method will return "~/.lightkurve-cache" and create
+    this directory if it does not exist.  If the directory cannot be
+    access or created, then it returns the local directory (".").
+
+    Returns
+    -------
+    download_dir : str
+        Path to location of `mastDownload` folder where data downloaded from MAST are stored
+    """
+    download_dir = os.path.join(os.path.expanduser('~'), '.lightkurve-cache')
+    if os.path.isdir(download_dir):
         return download_dir
+    else:
+        # if it doesn't exist, make a new cache directory
+        try:
+            os.mkdir(download_dir)
+        # downloads locally if OS error occurs
+        except OSError:
+            log.warning('Warning: unable to create {}. '
+                        'Downloading MAST files to the current '
+                        'working directory instead.'.format(download_dir))
+            download_dir = '.'
+
+    return download_dir
 
 
 def search_targetpixelfile(target, radius=None, cadence='long',
