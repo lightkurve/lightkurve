@@ -659,7 +659,7 @@ class PRFPhotometry(object):
             args = zip([self.model]*len(cadences),
                       tpf_flux[cadences],
                        pos_corr1[cadences],
-                       pos_corr2[cadences])            
+                       pos_corr2[cadences])
         # Set up a mapping function
         if parallel:
             import multiprocessing
