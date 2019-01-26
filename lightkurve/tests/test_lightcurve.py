@@ -258,17 +258,17 @@ def test_lightcurve_copy():
     # with a repeating decimal. However, float precision for python 2.7 is 10
     # decimal digits, while python 3.6's is 13 decimal digits. Therefore,
     # a regular expression is needed for both versions.
-    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
+    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+'):
         assert_array_equal(lc.time, nlc.time)
-    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
+    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+'):
         assert_array_equal(lc.flux, nlc.flux)
-    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
+    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+'):
         assert_array_equal(lc.centroid_col, nlc.centroid_col)
-    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
+    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+'):
         assert_array_equal(lc.centroid_row, nlc.centroid_row)
-    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
+    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+'):
         assert_array_equal(lc.cadenceno, nlc.cadenceno)
-    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
+    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+'):
         assert_array_equal(lc.quality, nlc.quality)
 
 
@@ -419,7 +419,7 @@ def test_to_csv():
     time, flux, flux_err = range(3), np.ones(3), np.zeros(3)
     try:
         lc = LightCurve(time, flux, flux_err)
-        assert(lc.to_csv(index=False) == 'time,flux,flux_err\n0,1.0,0.0\n1,1.0,0.0\n2,1.0,0.0\n')
+        assert(lc.to_csv(index=False, line_terminator='\n') == 'time,flux,flux_err\n0,1.0,0.0\n1,1.0,0.0\n2,1.0,0.0\n')
     except ImportError:
         # pandas is an optional dependency
         pass
