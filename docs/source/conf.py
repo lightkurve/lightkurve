@@ -109,10 +109,11 @@ nbsphinx_prolog = r"""
         :format: html
 
     .. nbinfo::
+        **This tutorial is a static-text version of an interactive Jupyter notebook**
 
-        This page was generated from `{{ docname }}`__.
-        Interactive online version:
-        :raw-html:`<a href="https://mybinder.org/v2/gh/KeplerGO/lightkurve/master?filepath=docs/source/{{ docname }}"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg" style="vertical-align:text-bottom"></a>`
+        - Try the interactive version: :raw-html:`<a href="https://mybinder.org/v2/gh/KeplerGO/lightkurve/master?filepath=docs/source/{{ docname }}"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg" style="vertical-align:text-bottom"></a>`
+
+        - Download the source file: `{{ docname }}`__
 
     __ https://github.com/KeplerGO/lightkurve/blob/master/docs/source/
         {{ docname }}
