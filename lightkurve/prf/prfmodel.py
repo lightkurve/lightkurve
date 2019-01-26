@@ -15,7 +15,7 @@ from ..utils import channel_to_module_output, plot_image
 from ..search import default_download_dir
 
 
-__all__ = ['KeplerPRF', 'TessPRF']
+__all__ = ['KeplerPRF', 'TessPRF', 'GaussianPRF']
 
 
 class PRFModel:
@@ -338,3 +338,27 @@ class TessPRF(PRFModel):
         plot_image(pflux, title='TESS PRF Model, Camera: {}, CCD: {}'.format(self.camera, self.ccd),
                    extent=(self.column, self.column + self.shape[1],
                            self.row, self.row + self.shape[0]), **kwargs)
+
+
+class GaussianPRF(PRFModel):
+    def __init__(self, shape, column, row):
+        self.shape = shape
+        self.column = column
+        self.row = row
+        rowdim, coldim = self.shape[0], self.shape[1]
+        self.x, self.y = np.meshgrid(np.arange(self.column + .5, self.column + coldim + .5),
+                                     np.arange(self.row + .5, self.row + rowdim + .5))
+
+    def evaluate(self, center_col, center_row, flux=1, scale_col=1, scale_row=1, rotation_angle=0):
+        psi = rotation_angle
+        a = .5 * ((scale_col * math.cos(psi)) ** 2 + (scale_row * math.sin(psi) ** 2))
+        b = .25 * math.sin(2 * psi) * (scale_row ** 2 - scale_col ** 2)
+        c = .5 * ((scale_col * math.sin(psi)) ** 2 + (scale_row * math.cos(psi) ** 2))
+        xo, yo = center_col, center_row
+        density = np.exp(-(a * (self.x - xo) ** 2 +
+                           2 * b * (self.x - xo) * (self.y - yo) +
+                           c * (self.y - yo) ** 2))
+        return flux * density / np.sum(density)
+
+    def gradient(self):
+        pass
