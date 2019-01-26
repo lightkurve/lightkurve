@@ -19,6 +19,22 @@ __all__ = ['KeplerPRF', 'TessPRF']
 
 
 class PRFModel:
+    """A base class for a parametric model of a Pixel Response Function (PRF).
+
+    Mathematically, the model is expressed as
+
+    PRF(x, y) = flux * sig_x * sig_y * rot(phi(sig_x * (x - xc), sig_y * (y - yc)), alpha),
+    where rot(., alpha) is the rotation operator, and alpha is angle of rotation.
+
+    The parameters of the model are:
+        - flux: the total flux of the source
+        - sig_x, sig_y: PRF width factors in the x and y direction
+        - xc, yc: coordinates of the center of the PRF
+        - alpha: rotation angle
+
+    The function phi represents an interpolation operation which is done on the basis
+    of some calibrated/reference data.
+    """
     def __call__(self, center_col, center_row, flux, scale_col, scale_row,
                  rotation_angle):
         return self.evaluate(center_col, center_row, flux,
