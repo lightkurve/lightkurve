@@ -312,6 +312,8 @@ class TessPRF(PRFModel):
     def read_prf_file(self):
         if (self.camera <= 2 and self.ccd <= 3):
             prefix = 'tess2018243163600-00072_035-'
+        elif (self.camera == 1 and self.ccd == 4):
+            prefix = 'tess2018243163600-00072_035-'
         else:
             prefix = 'tess2018243163601-00072_035-'
         filename = (prefix + str(self.camera) + '-' + str(self.ccd) +
