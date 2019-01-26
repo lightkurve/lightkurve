@@ -28,13 +28,11 @@ def test_tess_prf_normalization():
     """Does the PRF model integrate to the requested flux across the focal plane?"""
     for camera in [1, 2, 3, 4]:
         for ccd in [1, 2, 3, 4]:
-            for col in [123, 678]:
-                for row in [234, 789]:
-                    shape = (11, 7)
-                    flux = 100
-                    prf = TessPRF(camera=camera, ccd=ccd, column=col, row=row, shape=shape)
-                    prf_sum = prf.evaluate(col + shape[0]/2, row + shape[1]/2, flux, 1, 1, 0).sum()
-                    assert np.isclose(prf_sum, flux, rtol=0.1)
+            shape = (11, 11)
+            flux = 100
+            prf = TessPRF(camera=camera, ccd=ccd, column=0, row=0, shape=shape)
+            prf_sum = prf.evaluate(shape[0]/2, shape[1]/2, flux, 1, 1, 0).sum()
+            assert np.isclose(prf_sum, flux, rtol=0.1)
 
 
 def test_kepler_prf():
@@ -43,8 +41,8 @@ def test_kepler_prf():
     prf_2 = KeplerPRF(channel=16, shape=[10, 10], column=5, row=5)
     for c in [10, 8, 10, 7]:
         for r in [10, 10, 7, 7]:
-            assert_allclose(prf_2(center_col=c, center_row=r, flux=1),
-                            prf_1(center_col=c, center_row=r, flux=1)[5:15, 5:15],
+            assert_allclose(prf_2(c, r, 1, 1, 1, 0),
+                            prf_1(c, r, 1, 1, 1, 0)[5:15, 5:15],
                             rtol=1e-5)
 
 
@@ -54,8 +52,8 @@ def test_tess_prf():
     prf_2 = TessPRF(camera=2, ccd=3, shape=[10, 10], column=5, row=5)
     for c in [10, 8, 10, 7]:
         for r in [10, 10, 7, 7]:
-            assert_allclose(prf_2(center_col=c, center_row=r, flux=1),
-                            prf_1(center_col=c, center_row=r, flux=1)[5:15, 5:15],
+            assert_allclose(prf_2(c, r, 1, 1, 1, 0),
+                            prf_1(c, r, 1, 1, 1, 0)[5:15, 5:15],
                             rtol=1e-5)
 
 
