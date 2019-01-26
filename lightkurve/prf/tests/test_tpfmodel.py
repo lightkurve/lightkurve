@@ -13,7 +13,7 @@ from ... import PACKAGEDIR
 from ...prf import FixedValuePrior, GaussianPrior, UniformPrior
 from ...prf import StarPrior, BackgroundPrior, FocusPrior, MotionPrior
 from ...prf import TPFModel, PRFPhotometry
-from ...prf import SimpleKeplerPRF, KeplerPRF
+from ...prf import KeplerPRF
 
 
 def test_fixedvalueprior():
@@ -50,7 +50,7 @@ def test_backgroundprior():
 
 
 def test_tpf_model_simple():
-    prf = SimpleKeplerPRF(channel=16, shape=[10, 10], column=15, row=15)
+    prf = KeplerPRF(channel=16, shape=[10, 10], column=15, row=15)
     model = TPFModel(prfmodel=prf)
     assert model.prfmodel.channel == 16
 
