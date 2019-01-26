@@ -179,9 +179,9 @@ class FocusPrior(PriorContainer):
         Rotation angle in radians. Typically zero.
     """
     def __init__(self,
-                 scale_col=GaussianPrior(mean=1, var=0.0001),
-                 scale_row=GaussianPrior(mean=1, var=0.0001),
-                 rotation_angle=UniformPrior(lb=-3.1415, ub=3.1415)):
+                 scale_col=GaussianPrior(mean=1, var=0.1),
+                 scale_row=GaussianPrior(mean=1, var=0.1),
+                 rotation_angle=UniformPrior(lb=-np.pi, ub=np.pi)):
         self.scale_col = self._parse_prior(scale_col)
         self.scale_row = self._parse_prior(scale_row)
         self.rotation_angle = self._parse_prior(rotation_angle)
@@ -381,7 +381,7 @@ class TPFModelParameters(object):
 
 
 class TPFModel(object):
-    """A model which describes a single-cadence Kepler image.
+    """A model which describes a single-cadence Kepler/TESS image.
 
     Attributes
     ----------
@@ -389,7 +389,7 @@ class TPFModel(object):
         List of stars believed to be in the image.
     background_prior : ``BackgroundPrior`` object.
         Beliefs about the background flux.
-    prfmodel : ``KeplerPRF`` object.
+    prfmodel : ``KeplerPRF`` or ``TessPRF`` object.
         The callable Pixel Reponse Function (PRF) model to use.
     focus_prior : ``FocusPrior`` object.
         Beliefs about the telescope focus.

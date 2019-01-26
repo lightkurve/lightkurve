@@ -21,7 +21,7 @@ from astropy.stats.funcs import median_absolute_deviation as MAD
 
 from . import PACKAGEDIR, MPLSTYLE
 from .lightcurve import KeplerLightCurve, TessLightCurve
-from .prf import KeplerPRF
+from .prf import KeplerPRF, TessPRF
 from .utils import KeplerQualityFlags, TessQualityFlags, \
                    plot_image, bkjd_to_astropy_time, btjd_to_astropy_time, \
                    LightkurveWarning, detect_filetype
@@ -336,8 +336,11 @@ class TargetPixelFile(object):
                 flux_prior = GaussianPrior(mean=np.ma.median(clipped_flux),
                                            var=np.ma.std(clipped_flux)**2)
             else:
-                flux_prior = GaussianPrior(mean=np.nanmedian(self.flux_bkg),
-                                           var=np.nanstd(self.flux_bkg)**2)
+                median_bkg_flux = np.nanmedian(self.flux_bkg)
+                std_bkg_flux = np.nanstd(self.flux_bkg)
+                lb = median_bkg_flux - 5 * std_bkg_flux
+                ub = median_bkg_flux + 5 * std_bkg_flux
+                flux_prior = UniformPrior(lb=lb*(lb > 0), ub=ub)
             kwargs['background_prior'] = BackgroundPrior(flux=flux_prior)
         return TPFModel(**kwargs)
 
@@ -362,11 +365,37 @@ class TargetPixelFile(object):
             various diagnostics.
         """
         from .prf import PRFPhotometry
-        log.warning('Warning: PRF-fitting photometry is dope '
+        log.warning('Warning: PRF-fitting photometry is experimental '
                     'in this version of lightkurve.')
         prfphot = PRFPhotometry(model=self.get_model(**kwargs))
         prfphot.run(self.flux + self.flux_bkg, cadences=cadences, parallel=parallel)
         return prfphot
+
+    def prf_lightcurve(self, **kwargs):
+        lc = self.extract_prf_photometry(**kwargs).lightcurves[0]
+        keys = {'quality': self.quality,
+                'mission': self.mission,
+                'cadenceno': self.cadenceno,
+                'ra': self.ra,
+                'dec': self.dec,
+                'targetid': self.targetid}
+        if self.mission == 'Kepler' or self.mission == 'K2':
+            keys['channel'] = self.channel
+            keys['campaign'] = self.campaign
+            keys['quarter'] = self.quarter
+            return KeplerLightCurve(time=self.time,
+                                    flux=lc.flux,
+                                    time_format='bkjd',
+                                    time_scale='tdb',
+                                    **keys)
+        elif self.mission == 'TESS':
+            keys['camera'] = self.camera
+            keys['ccd'] = self.ccd
+            return TessLightCurve(time=self.time,
+                                  flux=lc.flux,
+                                  time_format='btjd',
+                                  time_scale='tdb',
+                                  **keys)
 
     def show_properties(self):
         """Prints a description of all non-callable attributes.
@@ -547,7 +576,7 @@ class TargetPixelFile(object):
             return labels == closest_label
 
     def centroids(self, **kwargs):
-        """DEPRECATED: use `estimate_cdpp()` instead."""
+        """DEPRECATED: use `estimate_centroids()` instead."""
         warnings.warn('`TargetPixelFile.centroids()` is deprecated and will be '
                       'removed in Lightkurve v1.0.0, '
                       'please use `TargetPixelFile.estimate_centroids()` instead.',
@@ -836,7 +865,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
         Returns
         -------
-        prf : instance of SimpleKeplerPRF
+        prf : instance of KeplerPRF
         """
 
         return KeplerPRF(channel=self.channel, shape=self.shape[1:],
@@ -952,24 +981,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                 flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
                                 flux_err=flux_bkg_err,
                                 **keys)
-
-    def prf_lightcurve(self, **kwargs):
-        lc = self.extract_prf_photometry(**kwargs).lightcurves[0]
-        keys = {'quality': self.quality,
-                'channel': self.channel,
-                'campaign': self.campaign,
-                'quarter': self.quarter,
-                'mission': self.mission,
-                'cadenceno': self.cadenceno,
-                'ra': self.ra,
-                'dec': self.dec,
-                'targetid': self.targetid}
-        return KeplerLightCurve(time=self.time,
-                                flux=lc.flux,
-                                time_format='bkjd',
-                                time_scale='tdb',
-                                **keys)
-
     @staticmethod
     def from_fits_images(images, position, size=(11, 11), extension=1,
                          target_id="unnamed-target", hdu0_keywords={}, **kwargs):
@@ -1456,7 +1467,7 @@ class TessTargetPixelFile(TargetPixelFile):
 
         Returns
         -------
-        prf : instance of SimpleKeplerPRF
+        prf : instance of TessPRF
         """
 
         return TessPRF(camera=self.camera, ccd=self.ccd, shape=self.shape[1:],
