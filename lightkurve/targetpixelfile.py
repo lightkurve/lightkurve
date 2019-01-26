@@ -381,7 +381,6 @@ class TargetPixelFile(object):
     def prf_lightcurve(self, **kwargs):
         lc = self.extract_prf_photometry(**kwargs).lightcurves[0]
         keys = {'quality': self.quality,
-                'mission': self.mission,
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
