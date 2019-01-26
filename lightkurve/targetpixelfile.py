@@ -338,8 +338,8 @@ class TargetPixelFile(object):
             else:
                 median_bkg_flux = np.nanmedian(self.flux_bkg)
                 std_bkg_flux = np.nanstd(self.flux_bkg)
-                lb = median_bkg_flux - 5 * std_bkg_flux
-                ub = median_bkg_flux + 5 * std_bkg_flux
+                lb = median_bkg_flux - 10 * std_bkg_flux
+                ub = median_bkg_flux + 10 * std_bkg_flux
                 flux_prior = UniformPrior(lb=lb*(lb > 0), ub=ub)
             kwargs['background_prior'] = BackgroundPrior(flux=flux_prior)
         return TPFModel(**kwargs)
