@@ -17,7 +17,7 @@
     <div class="row">
       <div class="col-md-6">
         <p style="font-size: 1.2em; font-weight: 700;">
-          Make discoveries in NASA's open data
+          Make discoveries in NASA's exoplanet data
         </p>
         <p>
           Lightkurve offers a beautiful and friendly way
@@ -31,14 +31,23 @@
         </p>
       </div>
       <div class="col-md-6">
-        <pre><code class="python">
+    
+
+.. code-block:: python
+
     import lightkurve as lk
+
+    # Download Kepler pixel data
     search = lk.search_targetpixelfile("Kepler-10", quarter=6)
     pixelfile = search.download()
 
+    # Plot exoplanet Kepler-10b
     lightcurve = pixelfile.to_lightcurve(method="aperture")
-    lightcurve.plot()
-        </code></pre>
+    lightcurve.flatten().fold(period=0.837).plot()
+
+
+.. raw:: html
+
       </div>
     </div>
   </div>

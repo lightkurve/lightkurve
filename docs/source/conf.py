@@ -105,7 +105,7 @@ html_theme_options = {
         ("Quickstart", "quickstart"),
         ("Tutorials", "tutorials/index"),
         ("API", "api"),
-        ("About", "about"),
+        ("About", "about/index"),
     ],
 }
 
