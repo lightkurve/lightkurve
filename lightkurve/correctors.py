@@ -505,7 +505,7 @@ class PLDCorrector(object):
         self.time = np.nan_to_num(tpf.time)
 
     def correct(self, aperture_mask=None, transit_mask=[], gp_timescale=30,
-                n_components_first=25, n_components_second=20):
+                n_components_first=25, n_components_second=20, use_gp=True):
         """Returns a PLD systematics-corrected LightCurve.
 
         Pixel Level De-Correlation (PLD) was developed by Deming et. al (2015)
@@ -567,6 +567,8 @@ class PLDCorrector(object):
             Number of first-order PLD components to reduce to with PCA.
         n_components_second : int
             Number of second-order PLD components to reduce to with PCA.
+        use_gp : boolean
+            Option to turn GP fitting on or off. 
 
         Returns
         -------
@@ -631,15 +633,19 @@ class PLDCorrector(object):
         amp = np.nanstd(y)
         tau = gp_timescale
 
-        # set up gaussian process using celerite
-        # we use a Matern-3/2 kernel for  its flexibility and non-periodicity
-        kernel = celerite.terms.Matern32Term(np.log(amp), np.log(tau))
-        gp = celerite.GP(kernel)
+        if use_gp:
+            # set up gaussian process using celerite
+            # we use a Matern-3/2 kernel for  its flexibility and non-periodicity
+            kernel = celerite.terms.Matern32Term(np.log(amp), np.log(tau))
+            gp = celerite.GP(kernel)
 
-        # recover GP matrix from celerite model
-        sigma = gp.get_matrix(M(self.time)) + \
-                np.diag(np.sum(M(flux_err_crop).reshape(len(M(flux_err_crop)),
-                        -1), axis=1)**2)
+            # recover GP matrix from celerite model
+            sigma = gp.get_matrix(M(self.time)) + \
+                    np.diag(np.sum(M(flux_err_crop).reshape(len(M(flux_err_crop)),
+                            -1), axis=1)**2)
+        else:
+            sigma = np.diag(np.sum(M(flux_err_crop).reshape(len(M(flux_err_crop)),
+                            -1), axis=1)**2)
 
         # compute
         A = np.dot(MX.T, np.linalg.solve(sigma, MX))

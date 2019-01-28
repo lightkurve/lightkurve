@@ -105,7 +105,8 @@ def test_pld_corrector():
     pld = PLDCorrector(tess_tpf)
     # produce a PLD-corrected light curve with a pipeline aperture mask
     raw_lc = tess_tpf.to_lightcurve(aperture_mask='pipeline')
-    corrected_lc = pld.correct(aperture_mask='pipeline', n_components_first=15, n_components_second=15)
+    corrected_lc = pld.correct(aperture_mask='pipeline', n_components_first=15,
+                               n_components_second=15, use_gp=False)
     # the corrected light curve should have higher precision
     assert(corrected_lc.estimate_cdpp() < raw_lc.estimate_cdpp())
     # make sure the returned object is the correct type (`TessLightCurve`)
