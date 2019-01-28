@@ -97,7 +97,6 @@ def test_pld_corrector():
     corrected_lc = pld.correct(n_components_first=10, n_components_second=10)
     # this should produce a lower-precision light curve
     bad_cdpp = corrected_lc.estimate_cdpp()
-    print(3)
     assert(bad_cdpp > pld_cdpp)
     # try PLD on a TESS observation
     tess_target = 273985862
