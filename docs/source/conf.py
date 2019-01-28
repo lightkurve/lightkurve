@@ -115,4 +115,4 @@ html_static_path = ['_static']
 
 sys.path += ['exts']
 extensions += ['sphinxcontrib_rawfiles']
-rawfiles = ['CNAME']  # Files we want to copy
+rawfiles = ['CNAME', '.nojekyll']  # Files we want to copy
