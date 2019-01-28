@@ -504,7 +504,7 @@ class PLDCorrector(object):
         self.flux_err = np.nan_to_num(tpf.flux_err)
         self.time = np.nan_to_num(tpf.time)
 
-    def correct(self, aperture_mask=None, transit_mask=[],
+    def correct(self, aperture_mask=None, transit_mask=[], gp_timescale=30,
                 n_components_first=25, n_components_second=20):
         """Returns a PLD systematics-corrected LightCurve.
 
@@ -558,7 +558,11 @@ class PLDCorrector(object):
             the median flux will be used.
         transit_mask : array-like
             An array of indices to be included in de-trending model. This should
-            exclude cadences which occur during transit.
+            exclude cadences which occur during transit. `True` means that the
+            cadence will be included in the analysis.
+        gp_timescale : float
+            Gaussian Process time scale length term (`tau`) used to define
+            length of fit variability in days.
         n_components_first : int
             Number of first-order PLD components to reduce to with PCA.
         n_components_second : int
@@ -581,9 +585,10 @@ class PLDCorrector(object):
 
         # crop data cube to include only desired pixels
         # this is required for superstamps to ensure matrix is invertable
-        flux_crop = self.flux[:, xmin:xmax+2, ymin:ymax+2]
-        flux_err_crop = self.flux_err[:, xmin:xmax+2, ymin:ymax+2]
-        aperture_mask = aperture[xmin:xmax+2, ymin:ymax+2]
+        flux_crop = self.flux[:, xmin:xmax+1, ymin:ymax+1]
+        flux_err_crop = self.flux_err[:, xmin:xmax+1, ymin:ymax+1]
+
+        aperture_mask = aperture[xmin:xmax+1, ymin:ymax+1]
 
         # calculate errors (ignore warnings related to zero or negative errors)
         with warnings.catch_warnings():
@@ -596,13 +601,12 @@ class PLDCorrector(object):
         M = lambda x: x[transit_mask]
 
         #  generate flux light curve from desired pixels
-        lc = M(self.tpf).to_lightcurve(aperture_mask=aperture_mask)
+        lc = self.tpf.to_lightcurve(aperture_mask=aperture_mask)
 
         # set aperture values
-        aperture_vals = np.zeros(aperture_mask.shape)
-        aperture_vals[np.where(aperture_mask)] = 1
+        aperture_vals = np.copy(aperture_mask).astype(int)
 
-        # compute raw flux light curve
+        # create rawflux light curve from pixels in aperture
         self.aperture_flux = np.array([f*aperture_vals for f in flux_crop]).reshape(len(flux_crop), -1)
         rawflux = np.sum(self.aperture_flux.reshape(len(self.aperture_flux), -1), axis=1)
 
@@ -626,18 +630,17 @@ class PLDCorrector(object):
         y = M(rawflux) - np.dot(MX, np.linalg.solve(np.dot(MX.T, MX),
                                 np.dot(MX.T, M(rawflux))))
         amp = np.nanstd(y)
-        tau = 30.
+        tau = gp_timescale
 
-        # set up gaussian process
+        # set up gaussian process using celerite
+        # we use a Matern-3/2 kernel for  its flexibility and non-periodicity
         kernel = celerite.terms.Matern32Term(np.log(amp), np.log(tau))
         gp = celerite.GP(kernel)
+
+        # recover GP matrix from celerite model
         sigma = gp.get_matrix(M(self.time)) + \
                 np.diag(np.sum(M(flux_err_crop).reshape(len(M(flux_err_crop)),
                         -1), axis=1)**2)
-
-        # store gp trend
-        gp.compute(self.time, flux_err)
-        self.gp_trend, self.gp_var = gp.predict(rawflux, self.time)
 
         # compute
         A = np.dot(MX.T, np.linalg.solve(sigma, MX))
@@ -648,8 +651,12 @@ class PLDCorrector(object):
         model = np.dot(X, C)
         self.detrended_flux = rawflux - model + np.nanmean(rawflux)
 
+        # store gp trend
+        gp.compute(self.time, flux_err)
+        self.gp_trend, self.gp_var = gp.predict(self.detrended_flux, self.time)
+
         # estimate centroids
-        centroid_col, centroid_row = self.tpf.estimate_centroids(aperture)
+        centroid_col, centroid_row = self.tpf.estimate_centroids(aperture_mask)
 
         # check type of input TPF and return corresponding LightCurve object
         if isinstance(self.tpf, KeplerTargetPixelFile):
@@ -665,8 +672,8 @@ class PLDCorrector(object):
                     'dec': self.tpf.dec,
                     'label': self.tpf.header['OBJECT'],
                     'targetid': self.tpf.targetid}
-            return KeplerLightCurve(time=self.time, flux=self.detrended_flux,
-                                    flux_err=flux_err, **keys)
+            self.corrected_lc = KeplerLightCurve(time=self.time, flux=self.detrended_flux,
+                                                 flux_err=flux_err, **keys)
 
         elif isinstance(self.tpf, TessTargetPixelFile):
             keys = {'centroid_col': centroid_col,
@@ -680,27 +687,13 @@ class PLDCorrector(object):
                     'dec': self.dec,
                     'label': self.get_keyword('OBJECT'),
                     'targetid': self.targetid}
-            return TessLightCurve(time=self.time, flux=self.detrended_flux,
-                                  flux_err=flux_err, **keys)
+            self.corrected_lc = TessLightCurve(time=self.time, flux=self.detrended_flux,
+                                               flux_err=flux_err, **keys)
 
         else:
             warnings.warn("Input TargetPixelFile not recognized as a Kepler "
                           "or TESS observation.", LightkurveWarning)
-            return LightCurve(time=self.time, flux=self.detrended_flux,
-                              flux_err=flux_err)
+            self.corrected_lc = LightCurve(time=self.time, flux=self.detrended_flux,
+                                           flux_err=flux_err)
 
-    def diagnose(self, ax=None):
-        """Plot a figure to diagnose performance of PLD correction."""
-
-        if ax is None:
-            import matplotlib.pyplot as plt
-            _, ax = plt.subplots()
-
-        ax.plot(self.tpf.to_lightcurve().flux, 'r.', alpha=0.3,
-                label='Raw Flux')
-        ax.plot(self.detrended_flux, 'k.', alpha=0.5, label='De-trended Flux')
-
-        ax.set_xlabel('Time')
-        ax.set_ylabel('Flux')
-        ax.legend(loc='best')
-        return ax
+        return self.corrected_lc
