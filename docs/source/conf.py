@@ -104,7 +104,7 @@ html_theme_options = {
     "navbar_links": [
         ("Quickstart", "quickstart"),
         ("Tutorials", "tutorials/index"),
-        ("API", "api"),
+        ("API", "api/index"),
         ("About", "about/index"),
     ],
 }

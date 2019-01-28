@@ -17,33 +17,35 @@
     <div class="row">
       <div class="col-md-6">
         <p style="font-size: 1.2em; font-weight: 700;">
-          Make discoveries in NASA's exoplanet data
+          Building blocks for analyzing NASA telescope data
         </p>
         <p>
-          Lightkurve offers a beautiful and friendly way
+          Lightkurve offers a user-friendly way
           to analyze the pixels and light curves obtained by
-          NASA’s Kepler, K2, and TESS missions.
+          NASA’s Kepler and TESS space telescopes.
         </p>
         <p>
-          This package aims to lower the barrier for students, astronomers,
-          and citizen scientists 
-          by providing high-quality data analysis tools and tutorials.
+          Lightkurve lowers the barrier for students, astronomers,
+          and citizens to extract science
+          by providing a well-tested <a href="api/index.html">API</a> and <a href="tutorials/index.html">tutorials</a>.
         </p>
-      </div>
+      </div> 
+
       <div class="col-md-6">
-    
+
 
 .. code-block:: python
 
     import lightkurve as lk
 
-    # Download Kepler pixel data
-    search = lk.search_targetpixelfile("Kepler-10", quarter=6)
-    pixelfile = search.download()
+    pixels = lk.search_targetpixelfile("Kepler-10").download()
+    pixels.plot()
 
-    # Plot exoplanet Kepler-10b
-    lightcurve = pixelfile.to_lightcurve(method="aperture")
-    lightcurve.flatten().fold(period=0.837).plot()
+    lightcurve = pixels.to_lightcurve()
+    lightcurve.plot()
+
+    exoplanet = lightcurve.flatten().fold(period=8.567)
+    exoplanet.plot()
 
 
 .. raw:: html
