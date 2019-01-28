@@ -44,7 +44,7 @@
     lightcurve = pixels.to_lightcurve()
     lightcurve.plot()
 
-    exoplanet = lightcurve.flatten().fold(period=8.567)
+    exoplanet = lightcurve.flatten().fold(period=0.838)
     exoplanet.plot()
 
 
