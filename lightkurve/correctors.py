@@ -587,13 +587,12 @@ class PLDCorrector(object):
         # this is required for superstamps to ensure matrix is invertable
         flux_crop = self.flux[:, xmin:xmax+1, ymin:ymax+1]
         flux_err_crop = self.flux_err[:, xmin:xmax+1, ymin:ymax+1]
-
-        aperture_mask = aperture[xmin:xmax+1, ymin:ymax+1]
+        aperture_crop = aperture[xmin:xmax+1, ymin:ymax+1]
 
         # calculate errors (ignore warnings related to zero or negative errors)
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", RuntimeWarning)
-            flux_err = np.nansum(self.flux_err[:, aperture_mask]**2, axis=1)**0.5
+            flux_err = np.nansum(flux_err_crop[:, aperture_crop]**2, axis=1)**0.5
 
         # set transit mask
         if len(transit_mask) == 0:
@@ -601,10 +600,10 @@ class PLDCorrector(object):
         M = lambda x: x[transit_mask]
 
         #  generate flux light curve from desired pixels
-        lc = self.tpf.to_lightcurve(aperture_mask=aperture_mask)
+        lc = self.tpf.to_lightcurve(aperture_mask=aperture)
 
         # set aperture values
-        aperture_vals = np.copy(aperture_mask).astype(int)
+        aperture_vals = np.copy(aperture_crop).astype(int)
 
         # create rawflux light curve from pixels in aperture
         self.aperture_flux = np.array([f*aperture_vals for f in flux_crop]).reshape(len(flux_crop), -1)
@@ -649,14 +648,10 @@ class PLDCorrector(object):
 
         # compute detrended light curve
         model = np.dot(X, C)
-        self.detrended_flux = rawflux - model + np.nanmean(rawflux)
-
-        # store gp trend
-        gp.compute(self.time, flux_err)
-        self.gp_trend, self.gp_var = gp.predict(self.detrended_flux, self.time)
+        self.detrended_flux = rawflux - (model - np.nanmean(model))
 
         # estimate centroids
-        centroid_col, centroid_row = self.tpf.estimate_centroids(aperture_mask)
+        centroid_col, centroid_row = self.tpf.estimate_centroids(aperture)
 
         # check type of input TPF and return corresponding LightCurve object
         if isinstance(self.tpf, KeplerTargetPixelFile):
@@ -678,15 +673,15 @@ class PLDCorrector(object):
         elif isinstance(self.tpf, TessTargetPixelFile):
             keys = {'centroid_col': centroid_col,
                     'centroid_row': centroid_row,
-                    'quality': self.quality,
-                    'sector': self.sector,
-                    'camera': self.camera,
-                    'ccd': self.ccd,
-                    'cadenceno': self.cadenceno,
-                    'ra': self.ra,
-                    'dec': self.dec,
-                    'label': self.get_keyword('OBJECT'),
-                    'targetid': self.targetid}
+                    'quality': self.tpf.quality,
+                    'sector': self.tpf.sector,
+                    'camera': self.tpf.camera,
+                    'ccd': self.tpf.ccd,
+                    'cadenceno': self.tpf.cadenceno,
+                    'ra': self.tpf.ra,
+                    'dec': self.tpf.dec,
+                    'label': self.tpf.get_keyword('OBJECT'),
+                    'targetid': self.tpf.targetid}
             self.corrected_lc = TessLightCurve(time=self.time, flux=self.detrended_flux,
                                                flux_err=flux_err, **keys)
 
