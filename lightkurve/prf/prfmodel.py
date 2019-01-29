@@ -14,6 +14,14 @@ import scipy.io as scio
 from ..utils import channel_to_module_output, plot_image
 from ..search import default_download_dir
 
+# Python2.7 doesnt define a FileNotFoundError
+# so let's use the following hack:
+# credit: https://stackoverflow.com/questions/21367320/searching-for-equivalent-of-filenotfounderror-in-python-2
+try:
+    FileNotFoundError
+except NameError:
+    FileNotFoundError = IOError
+
 
 __all__ = ['KeplerPRF', 'TessPRF', 'GaussianPRF']
 
