@@ -319,7 +319,8 @@ class TessPRF(PRFModel):
         filename = (prefix + str(self.camera) + '-' + str(self.ccd) +
                     '-characterized-prf.mat')
         url = 'https://archive.stsci.edu/missions/tess/models/' + filename
-        # download .mat prf file and save it in wherever lightkurve was installed
+        # download .mat prf files and save them in the default
+        # .lightkurve-cache directory
         tess_prf_dir = default_download_dir()
         file_path = join(tess_prf_dir, filename)
         try:
