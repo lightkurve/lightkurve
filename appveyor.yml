@@ -25,6 +25,9 @@ install:
   - pip install astroquery
   - pip install codecov
   - pip install numpydoc
+  - pip install scikit-learn
+  - pip install pybind11
+  - pip install celerite
   - python setup.py develop
 
 test_script:
