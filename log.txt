@@ -1,0 +1,606 @@
+d340292,Zé Vinícius,Sun Jan 6 12:57:28 2019 -0300
+0472f02,Zé Vinícius,Sat Jan 5 13:10:26 2019 -0300
+3b4bb66,Geert Barentsen,Wed Jan 2 19:00:55 2019 -0800
+617e69b,gully,Thu Dec 20 14:56:35 2018 -0800
+cd976f5,Geert Barentsen,Fri Dec 14 16:08:54 2018 -0800
+6d41cf7,Geert Barentsen,Fri Dec 14 16:04:01 2018 -0800
+6a47024,gully,Thu Dec 13 19:08:52 2018 -0800
+60ebda1,Geert Barentsen,Tue Dec 11 19:57:24 2018 -0800
+7ddf7d5,Geert Barentsen,Mon Dec 10 12:07:37 2018 -0800
+512a727,Geert Barentsen,Mon Dec 10 11:59:45 2018 -0800
+bb7173d,Nicholas Saunders,Mon Dec 10 11:56:11 2018 -0800
+abbef8a,gully,Mon Dec 10 11:22:19 2018 -0800
+2fa93f7,Geert Barentsen,Mon Dec 10 10:10:23 2018 -0800
+760238f,Tom Barclay,Fri Dec 7 19:37:39 2018 -0800
+b70f046,Christina Hedges,Fri Dec 7 14:24:18 2018 -0800
+4327373,Zé Vinícius,Fri Dec 7 17:38:53 2018 -0300
+087f256,Zé Vinícius,Fri Dec 7 16:47:14 2018 -0300
+7f72516,Geert Barentsen,Fri Dec 7 11:26:47 2018 -0800
+9d8bcfd,Brennan Vincello,Thu Dec 6 20:35:46 2018 -0800
+21833db,Christina Hedges,Mon Dec 3 14:10:41 2018 -0800
+8307c79,Geert Barentsen,Fri Nov 30 15:24:45 2018 -0800
+ab3e5f7,Geert Barentsen,Fri Nov 30 15:12:01 2018 -0800
+e1e673c,Zé Vinícius,Fri Nov 30 19:03:52 2018 -0300
+fa90577,gully,Fri Nov 30 12:20:41 2018 -0800
+02ab03d,Geert Barentsen,Fri Nov 30 11:57:52 2018 -0800
+5bc4b27,Nicholas Saunders,Tue Nov 27 15:01:58 2018 -0800
+7574e1d,Nicholas Saunders,Tue Nov 27 14:42:02 2018 -0800
+9b5534a,Nicholas Saunders,Tue Nov 27 13:59:20 2018 -0800
+ad2714a,Nicholas Saunders,Tue Nov 27 13:55:49 2018 -0800
+d0ac1fa,Geert Barentsen,Mon Nov 26 20:35:02 2018 -0800
+4aa7920,Geert Barentsen,Mon Nov 26 18:58:53 2018 -0800
+31c29d6,Christina Hedges,Mon Nov 26 14:45:32 2018 -0800
+d2628bc,Geert Barentsen,Mon Nov 26 14:43:20 2018 -0800
+97870bd,Geert Barentsen,Fri Nov 23 11:52:52 2018 -0800
+59cde01,Geert Barentsen,Fri Nov 23 11:27:10 2018 -0800
+e8d7d8f,Geert Barentsen,Fri Nov 23 11:17:49 2018 -0800
+e18e1cc,Geert Barentsen,Thu Nov 22 18:27:58 2018 -0800
+f0923ef,Geert Barentsen,Thu Nov 22 17:43:12 2018 -0800
+4a3736b,Geert Barentsen,Thu Nov 22 16:52:57 2018 -0800
+7215e9c,Geert Barentsen,Thu Nov 22 16:44:43 2018 -0800
+aec5e12,Geert Barentsen,Thu Nov 22 15:28:04 2018 -0800
+9254815,Nicholas Saunders,Wed Nov 21 18:17:26 2018 -0800
+4142162,Geert Barentsen,Wed Nov 21 18:05:34 2018 -0800
+cf1c9a2,Geert Barentsen,Wed Nov 21 12:01:16 2018 -0800
+095cf33,gully,Tue Nov 20 18:58:58 2018 -0800
+1e8a7f5,Nicholas Saunders,Tue Nov 20 18:07:10 2018 -0800
+3237197,Geert Barentsen,Tue Nov 20 10:49:48 2018 -0800
+61e96e9,Geert Barentsen,Mon Nov 19 17:50:31 2018 -0800
+ee2f16b,Geert Barentsen,Sat Nov 17 18:15:13 2018 -0800
+08a05f1,Geert Barentsen,Sat Nov 17 18:05:15 2018 -0800
+1d694cb,Geert Barentsen,Sat Nov 17 18:05:10 2018 -0800
+6876cbf,Geert Barentsen,Sat Nov 17 18:04:39 2018 -0800
+fccb631,Nicholas Saunders,Fri Nov 16 16:11:37 2018 -0800
+a1363f3,Nicholas Saunders,Fri Nov 16 14:41:51 2018 -0800
+53bba97,Nicholas Saunders,Fri Nov 16 14:11:41 2018 -0800
+b0c26f4,Nicholas Saunders,Thu Nov 15 13:55:02 2018 -0800
+c286278,Nicholas Saunders,Tue Nov 13 14:49:08 2018 -0800
+3ee696b,Geert Barentsen,Mon Nov 12 08:48:52 2018 -0800
+b5537db,Geert Barentsen,Sun Nov 11 12:01:45 2018 -0800
+7504509,Geert Barentsen,Sat Nov 10 14:04:47 2018 -0800
+8460ee2,Nicholas Saunders,Mon Nov 5 16:32:35 2018 -0800
+8acee36,Nicholas Saunders,Mon Nov 5 14:55:40 2018 -0800
+b817b9b,Nicholas Saunders,Mon Nov 5 14:54:24 2018 -0800
+c9cec8e,Nicholas Saunders,Mon Nov 5 14:39:19 2018 -0800
+552e15b,Nicholas Saunders,Mon Nov 5 14:31:28 2018 -0800
+a9dc2dd,Christina Hedges,Mon Nov 5 12:12:18 2018 -0800
+35bc958,Nicholas Saunders,Mon Nov 5 10:49:21 2018 -0800
+4122e84,Geert Barentsen,Fri Nov 2 16:29:49 2018 -0700
+de90b7a,Nicholas Saunders,Fri Nov 2 16:19:25 2018 -0700
+825bf82,Geert Barentsen,Fri Nov 2 14:06:28 2018 -0700
+09a4616,Geert Barentsen,Fri Nov 2 14:06:22 2018 -0700
+9fa5e70,Nicholas Saunders,Fri Nov 2 13:44:50 2018 -0700
+56fdbef,Christina Hedges,Fri Nov 2 12:34:15 2018 -0700
+9c2b0d3,Nicholas Saunders,Thu Nov 1 14:27:17 2018 -0700
+de83814,Nicholas Saunders,Wed Oct 31 11:25:41 2018 -0700
+40d88e7,Christina Hedges,Wed Oct 31 10:24:33 2018 -0700
+34d04fc,Geert Barentsen,Wed Oct 31 10:24:01 2018 -0700
+9e514cf,Christina Hedges,Tue Oct 30 14:41:36 2018 -0700
+c383e50,Christina Hedges,Tue Oct 30 11:56:40 2018 -0700
+ca7ac50,Geert Barentsen,Mon Oct 29 20:21:50 2018 -0700
+1d01179,Christina Hedges,Mon Oct 29 18:58:42 2018 -0700
+c142cd7,Christina Hedges,Mon Oct 29 18:56:39 2018 -0700
+88d48fc,Christina Hedges,Mon Oct 29 17:23:46 2018 -0700
+6deabf7,Christina Hedges,Mon Oct 29 17:23:26 2018 -0700
+c6daef7,Geert Barentsen,Mon Oct 29 17:16:29 2018 -0700
+ef3b3f5,Geert Barentsen,Mon Oct 29 17:16:21 2018 -0700
+d69ab69,Christina Hedges,Mon Oct 29 16:41:49 2018 -0700
+2b7b04c,Geert Barentsen,Tue Oct 23 23:36:42 2018 -0700
+12a7684,Geert Barentsen,Tue Oct 23 23:32:16 2018 -0700
+bf1a343,Geert Barentsen,Tue Oct 23 22:12:48 2018 -0700
+47fd01b,Geert Barentsen,Tue Oct 23 21:13:52 2018 -0700
+d6cbdde,Geert Barentsen,Tue Oct 23 21:12:29 2018 -0700
+be85423,Geert Barentsen,Tue Oct 23 17:26:23 2018 -0700
+c68d720,Geert Barentsen,Tue Oct 23 15:08:21 2018 -0700
+87b8a96,Geert Barentsen,Tue Oct 23 11:58:23 2018 -0700
+3c13b06,Nicholas Saunders,Tue Oct 23 11:35:58 2018 -0700
+255b5ce,Tom Barclay,Sun Oct 21 17:25:46 2018 -0400
+16c1384,Jose A Lerma III,Sun Oct 21 15:58:30 2018 -0500
+8ab980b,Geert Barentsen,Fri Oct 19 14:27:33 2018 -0700
+df56e90,Jose A Lerma III,Thu Oct 18 00:21:19 2018 -0500
+174eae6,Geert Barentsen,Tue Oct 16 10:34:50 2018 -0700
+710d839,Geert Barentsen,Tue Oct 16 10:19:37 2018 -0700
+2fb006f,Geert Barentsen,Tue Oct 16 09:57:23 2018 -0700
+ec36234,Jose A Lerma III,Mon Oct 15 22:51:38 2018 -0500
+e26f84e,Oliver Hall,Mon Oct 15 20:09:49 2018 -0700
+1731434,Christina Hedges,Mon Oct 15 17:47:16 2018 -0700
+3eb445a,Geert Barentsen,Mon Oct 15 17:27:54 2018 -0700
+9b33ba0,Christina Hedges,Thu Oct 11 15:36:59 2018 -0700
+e643805,Oliver Hall,Thu Oct 11 10:50:46 2018 -0700
+94a724d,Oliver Hall,Thu Oct 11 10:30:22 2018 -0700
+da03db2,Oliver Hall,Thu Oct 11 10:29:04 2018 -0700
+536ed1b,Oliver Hall,Wed Oct 10 23:26:26 2018 -0400
+a267902,Oliver Hall,Wed Oct 10 23:17:15 2018 -0400
+b88228f,Geert Barentsen,Thu Oct 11 07:45:00 2018 -0700
+4f216ea,Geert Barentsen,Thu Oct 11 07:38:27 2018 -0700
+a3e1879,Geert Barentsen,Thu Oct 11 07:36:26 2018 -0700
+05f9f73,Oliver Hall,Wed Oct 10 23:26:26 2018 -0400
+029d009,Oliver Hall,Wed Oct 10 23:17:15 2018 -0400
+f6c8e6b,Geert Barentsen,Wed Oct 10 17:34:04 2018 -0700
+9939185,Nicholas Saunders,Wed Oct 10 17:32:22 2018 -0700
+5c62fd5,Geert Barentsen,Wed Oct 10 14:48:05 2018 -0700
+ee891be,Geert Barentsen,Wed Oct 10 14:47:58 2018 -0700
+a9eec76,Geert Barentsen,Wed Oct 10 10:26:06 2018 -0700
+365a567,Geert Barentsen,Wed Oct 10 09:19:50 2018 -0700
+a3b2e41,Nicholas Saunders,Tue Oct 9 17:26:38 2018 -0700
+cde9831,Christina Hedges,Tue Oct 9 16:14:34 2018 -0700
+511e010,Geert Barentsen,Tue Oct 9 11:58:26 2018 -0700
+d0c371a,Christina Hedges,Tue Oct 9 11:53:26 2018 -0700
+732d197,Christina Hedges,Tue Oct 9 11:26:14 2018 -0700
+8bb1835,Christina Hedges,Tue Oct 9 10:29:33 2018 -0700
+2b3ad75,Anand Sundaram,Mon Oct 8 17:17:15 2018 -0400
+cb5fd4c,Keaton Bell,Mon Oct 8 20:21:12 2018 +0200
+90bf552,Christina Hedges,Fri Oct 5 11:33:33 2018 -0700
+5df7a68,Geert Barentsen,Thu Oct 4 15:16:08 2018 -0700
+838cf7b,Geert Barentsen,Thu Oct 4 14:47:46 2018 -0700
+66405e8,Geert Barentsen,Thu Oct 4 14:47:10 2018 -0700
+23a8b72,Christina Hedges,Thu Oct 4 09:58:15 2018 -0700
+ae504ea,Christina Hedges,Wed Oct 3 16:50:40 2018 -0700
+c6dc006,Christina Hedges,Wed Oct 3 16:33:54 2018 -0700
+39b8781,Christina Hedges,Mon Oct 1 16:33:04 2018 -0700
+8e55c21,Zé Vinícius,Mon Oct 1 17:49:13 2018 -0300
+a3a25a9,Christina Hedges,Mon Oct 1 13:11:06 2018 -0700
+8db2d9a,Geert Barentsen,Sat Sep 29 17:29:23 2018 -0700
+3cd7c31,Geert Barentsen,Sat Sep 29 17:28:58 2018 -0700
+9e792ed,Geert Barentsen,Sat Sep 29 17:23:18 2018 -0700
+5777983,Christina Hedges,Sat Sep 29 15:50:51 2018 -0700
+fe88a46,Geert Barentsen,Sat Sep 29 15:40:47 2018 -0700
+ef0b5ae,gully,Sat Sep 29 15:25:49 2018 -0700
+9019032,Geert Barentsen,Mon Sep 24 16:16:38 2018 -0700
+7c21173,gully,Sun Sep 23 21:07:24 2018 -0700
+523fe5b,Christina Hedges,Sun Sep 23 14:50:14 2018 -0400
+16e0a9e,Christina Hedges,Sun Sep 23 13:48:52 2018 -0400
+c1be96a,Geert Barentsen,Wed Sep 19 15:21:51 2018 -0700
+be8ccd3,Christina Hedges,Tue Sep 18 21:03:21 2018 -0400
+291707b,Christina Hedges,Mon Sep 17 13:59:20 2018 -0700
+2472f72,Geert Barentsen,Fri Sep 14 11:51:38 2018 -0700
+7ee3f01,Geert Barentsen,Thu Sep 13 20:54:48 2018 -0700
+8fe31bb,Christina Hedges,Wed Sep 12 18:18:27 2018 -0700
+91883c3,Christina Hedges,Wed Sep 12 16:52:05 2018 -0700
+d1c99cc,Christina Hedges,Wed Sep 12 16:51:58 2018 -0700
+fab7054,Christina Hedges,Wed Sep 12 16:51:25 2018 -0700
+38b9dbb,Christina Hedges,Wed Sep 12 16:51:01 2018 -0700
+2a0c0c9,Christina Hedges,Wed Sep 12 16:47:54 2018 -0700
+2d53d3f,Geert Barentsen,Tue Sep 11 20:13:58 2018 -0700
+ae88663,Christina Hedges,Tue Sep 11 16:44:53 2018 -0700
+b8a9d73,Nicholas Saunders,Tue Sep 11 10:10:04 2018 -0700
+931b17e,Christina Hedges,Mon Sep 10 16:36:49 2018 -0700
+e2ec7c4,Geert Barentsen,Mon Sep 10 16:28:40 2018 -0700
+e7f8737,Christina Hedges,Mon Sep 10 16:10:56 2018 -0700
+36d0254,Christina Hedges,Mon Sep 10 14:19:00 2018 -0700
+d53757d,Geert Barentsen,Mon Sep 10 10:19:56 2018 -0700
+c407f0b,Geert Barentsen,Mon Sep 10 10:19:33 2018 -0700
+ed7ee7e,Zach Berta-Thompson,Sun Sep 9 20:25:58 2018 -0600
+96709eb,Geert Barentsen,Fri Sep 7 08:14:59 2018 -0700
+17add9f,Christina Hedges,Thu Sep 6 11:45:05 2018 -0700
+cd637e9,Geert Barentsen,Wed Sep 5 20:33:14 2018 -0700
+e92dc9f,Christina Hedges,Wed Sep 5 16:51:07 2018 -0700
+ba018ef,Christina Hedges,Wed Sep 5 16:07:48 2018 -0700
+987ab5f,Geert Barentsen,Wed Sep 5 14:59:12 2018 -0700
+4a6d78b,Geert Barentsen,Wed Sep 5 14:57:08 2018 -0700
+89df6d1,Geert Barentsen,Mon Aug 13 18:20:22 2018 -0700
+ff809cb,Geert Barentsen,Mon Aug 13 14:48:03 2018 -0700
+fcc778d,Geert Barentsen,Sun Aug 12 13:25:30 2018 -0700
+7752a45,Geert Barentsen,Sat Aug 11 17:55:24 2018 -0700
+7dc76ac,Geert Barentsen,Sat Aug 11 17:53:40 2018 -0700
+e3a5c80,Peter Williams,Sat Aug 4 11:24:12 2018 -0700
+ff008eb,Geert Barentsen,Thu Aug 2 13:58:26 2018 -0700
+02d31e5,Geert Barentsen,Thu Aug 2 13:53:59 2018 -0700
+b8648ff,Geert Barentsen,Thu Aug 2 13:52:33 2018 -0700
+023693c,Emma Turtelboom,Tue Jul 31 16:12:33 2018 -0700
+1bb6c93,Johnny Zhang,Fri Jul 27 14:49:52 2018 -0700
+0795ced,Geert Barentsen,Thu Jul 26 08:34:50 2018 -0700
+cbe6879,Zé Vinícius,Thu Jul 26 06:40:07 2018 -0300
+3a2add1,Emma Turtelboom,Wed Jul 25 17:21:47 2018 -0700
+88d54b2,Zé Vinícius,Wed Jul 25 21:11:22 2018 -0300
+dc016fb,Geert Barentsen,Wed Jul 25 14:34:05 2018 -0700
+34abd1f,Geert Barentsen,Wed Jul 25 14:00:00 2018 -0700
+3522084,Geert Barentsen,Tue Jul 24 10:17:04 2018 -0700
+eae09a0,Geert Barentsen,Mon Jul 16 11:01:14 2018 -0700
+1430fb6,Geert Barentsen,Mon Jul 16 10:45:18 2018 -0700
+be9dffd,Geert Barentsen,Mon Jul 16 05:20:10 2018 -0700
+e521f76,Geert Barentsen,Mon Jul 16 05:02:33 2018 -0700
+2f7068a,Geert Barentsen,Mon Jul 16 04:56:40 2018 -0700
+e3f086f,Geert Barentsen,Mon Jul 16 04:55:48 2018 -0700
+921ffa2,Geert Barentsen,Mon Jul 16 04:47:33 2018 -0700
+522a927,gully,Mon Jul 16 03:49:55 2018 -0700
+f9b4641,Geert Barentsen,Sat Jul 14 11:59:22 2018 -0700
+343dfb1,Zé Vinícius,Sat Jul 14 13:00:56 2018 -0300
+0b6e0fd,Geert Barentsen,Fri Jul 13 13:34:45 2018 +0200
+dd47fae,Zé Vinícius,Mon Jul 9 13:45:27 2018 -0300
+2f70b3b,Christina Hedges,Sat Jul 7 12:05:32 2018 -0700
+2a659db,Johnny Zhang,Fri Jul 6 19:34:32 2018 -0700
+c5c22cb,Geert Barentsen,Fri Jul 6 16:38:14 2018 -0700
+98f0e02,Geert Barentsen,Fri Jul 6 15:25:37 2018 -0700
+04bd7f8,Geert Barentsen,Fri Jul 6 15:25:28 2018 -0700
+1f0fb99,Geert Barentsen,Fri Jul 6 14:35:50 2018 -0700
+94bfa45,Christina Hedges,Fri Jul 6 14:32:27 2018 -0700
+00c1d0c,Geert Barentsen,Thu Jul 5 09:19:53 2018 -0700
+a1d5bb1,Geert Barentsen,Thu Jul 5 09:18:58 2018 -0700
+ec1b261,Geert Barentsen,Wed Jul 4 09:33:29 2018 -0700
+ebde666,Keaton Bell,Wed Jul 4 18:31:36 2018 +0200
+ea77c07,Sheila Sagear,Fri Jun 29 14:49:46 2018 -0700
+bad8344,Geert Barentsen,Wed Jun 27 15:50:22 2018 -0700
+0d98b91,Sheila Sagear,Wed Jun 27 15:20:35 2018 -0700
+d2d7d3d,Christina Hedges,Wed Jun 20 17:26:46 2018 -0700
+20b73d4,Christina Hedges,Wed Jun 20 17:26:05 2018 -0700
+2955138,Christina Hedges,Wed Jun 20 17:23:41 2018 -0700
+fca2257,Christina Hedges,Wed Jun 20 17:13:28 2018 -0700
+000b63e,Geert Barentsen,Wed Jun 13 21:09:48 2018 -0700
+4b7c1cd,Zé Vinícius,Thu Jun 14 01:07:13 2018 -0300
+c0d0667,Geert Barentsen,Tue Jun 12 21:12:04 2018 -0700
+3c80d63,Geert Barentsen,Tue Jun 12 20:34:29 2018 -0700
+12117b3,Geert Barentsen,Tue Jun 12 16:58:59 2018 -0700
+cdc6df8,Geert Barentsen,Tue Jun 12 16:58:51 2018 -0700
+ad62c70,Christina Hedges,Tue Jun 12 16:44:11 2018 -0700
+8673a46,Geert Barentsen,Tue Jun 12 16:33:23 2018 -0700
+2a64f9e,Sheila Sagear,Tue Jun 12 10:56:11 2018 -0700
+26e8351,Sheila Sagear,Tue Jun 12 10:55:40 2018 -0700
+12a9673,Sheila Sagear,Mon Jun 11 11:36:28 2018 -0700
+62265b6,Geert Barentsen,Mon Jun 11 13:35:00 2018 -0700
+8a91b77,Christina Hedges,Mon Jun 11 10:57:54 2018 -0700
+6719112,Geert Barentsen,Sun Jun 10 15:42:32 2018 -0700
+339ce8a,Geert Barentsen,Sun Jun 10 15:34:18 2018 -0700
+f411c58,Geert Barentsen,Sun Jun 10 15:32:21 2018 -0700
+dcdaaca,Geert Barentsen,Sun Jun 10 15:26:38 2018 -0700
+61cfd6b,Geert Barentsen,Sun Jun 10 15:22:43 2018 -0700
+f0534ff,Geert Barentsen,Sun Jun 10 15:19:28 2018 -0700
+bbadf8b,Geert Barentsen,Sun Jun 10 10:16:07 2018 -0700
+d3cc27e,Geert Barentsen,Sat Jun 9 16:53:06 2018 -0700
+6639e0f,mirca,Sat Jun 9 19:12:03 2018 -0300
+bcbe598,Geert Barentsen,Sat Jun 9 14:25:01 2018 -0700
+70b7be5,Geert Barentsen,Sat Jun 9 14:06:56 2018 -0700
+e3e629f,Geert Barentsen,Sat Jun 9 11:24:43 2018 -0700
+1cf716e,Christina Hedges,Thu Jun 7 15:31:22 2018 -0700
+7087003,Christina Hedges,Thu Jun 7 14:37:20 2018 -0700
+fa47415,Christina Hedges,Thu Jun 7 14:32:45 2018 -0700
+93ac5f2,Geert Barentsen,Thu Jun 7 11:26:31 2018 -0600
+3382dde,Geert Barentsen,Thu Jun 7 11:26:16 2018 -0600
+fb2e625,Christina Hedges,Mon May 7 16:36:00 2018 -0700
+aa6a1a2,Christina Hedges,Tue Apr 24 16:52:25 2018 -0700
+f3334bb,Christina Hedges,Wed Jun 6 16:32:23 2018 -0700
+1a7f397,Geert Barentsen,Thu May 31 14:45:04 2018 -0700
+a0cc85f,Geert Barentsen,Thu May 31 14:43:41 2018 -0700
+61e4cae,KenMighell,Wed May 30 07:48:55 2018 -0700
+96f0437,KenMighell,Tue May 29 14:38:24 2018 -0700
+7ea99d5,mirca,Tue May 22 15:14:27 2018 -0300
+36d7700,mirca,Mon May 21 10:03:23 2018 -0300
+fce4ac2,Geert Barentsen,Mon May 14 13:53:49 2018 -0700
+6b506a9,mirca,Mon May 21 10:00:32 2018 -0300
+0cfe057,mirca,Mon May 21 09:59:54 2018 -0300
+e3a3180,Geert Barentsen,Mon May 14 13:53:49 2018 -0700
+a795e2e,mirca,Mon May 14 08:31:49 2018 -0300
+0e6b665,Geert Barentsen,Fri May 11 12:07:26 2018 -0700
+60331fe,Geert Barentsen,Sun May 6 11:49:09 2018 -0700
+7f3910e,Geert Barentsen,Sun May 6 11:15:51 2018 -0700
+fa599ba,Zé Vinícius,Sun May 6 15:10:49 2018 -0300
+74a9a2b,Geert Barentsen,Sat May 5 11:37:33 2018 -0700
+7271778,Christina Hedges,Fri May 4 18:06:20 2018 -0700
+5cb65cc,gully,Fri May 4 17:33:25 2018 -0700
+0fbed3a,Christina Hedges,Thu Apr 12 12:46:20 2018 -0700
+94d6f50,Christina Hedges,Thu Apr 12 12:30:34 2018 -0700
+0f76e63,Christina Hedges,Thu Apr 12 12:25:11 2018 -0700
+1bd8036,Christina Hedges,Thu Apr 12 12:22:12 2018 -0700
+dbf6975,Christina Hedges,Thu Apr 12 11:39:46 2018 -0700
+2b3e3a7,mirca,Sun Apr 15 09:10:02 2018 -0300
+1286742,Christina Hedges,Fri Apr 6 12:37:27 2018 -0700
+d561af0,Christina Hedges,Thu Apr 5 14:03:19 2018 -0700
+c8cf7d5,Christina Hedges,Thu Apr 5 14:00:06 2018 -0700
+f6be167,mirca,Thu Apr 5 09:48:35 2018 +0800
+0bcee70,Geert Barentsen,Wed Mar 21 16:12:20 2018 -0700
+dbf23cb,Geert Barentsen,Tue Mar 20 10:25:25 2018 -0700
+e5143dc,Geert Barentsen,Tue Mar 20 10:24:38 2018 -0700
+ced62d0,Geert Barentsen,Mon Mar 19 14:38:03 2018 -0700
+92059ed,Geert Barentsen,Mon Mar 19 12:19:28 2018 -0700
+25eca29,Geert Barentsen,Sat Mar 17 21:59:25 2018 -0700
+83b421c,Geert Barentsen,Sat Mar 17 21:49:30 2018 -0700
+2617684,Geert Barentsen,Sat Mar 17 14:30:14 2018 -0700
+67cae36,Geert Barentsen,Sat Mar 17 14:30:11 2018 -0700
+1fbf7fa,Geert Barentsen,Sat Mar 17 14:29:17 2018 -0700
+792d5d1,Geert Barentsen,Sat Mar 17 14:28:18 2018 -0700
+7e61980,Geert Barentsen,Sat Mar 17 10:36:25 2018 -0700
+49195f3,Geert Barentsen,Fri Mar 16 19:50:50 2018 -0700
+d53ff09,Geert Barentsen,Fri Mar 16 16:45:24 2018 -0700
+4b2eca6,Geert Barentsen,Fri Mar 16 14:28:28 2018 -0700
+b1b70ea,Geert Barentsen,Fri Mar 16 10:20:31 2018 -0700
+a92ed8d,Geert Barentsen,Fri Mar 16 10:35:19 2018 -0700
+19224b6,Geert Barentsen,Fri Mar 9 14:18:04 2018 -0500
+92c93fa,Geert Barentsen,Fri Mar 9 14:17:56 2018 -0500
+0fc7f6a,Geert Barentsen,Fri Mar 9 11:33:59 2018 -0500
+37b1b47,Geert Barentsen,Fri Mar 9 11:32:08 2018 -0500
+910c939,Geert Barentsen,Fri Mar 9 14:16:34 2018 -0500
+e9cda9e,Geert Barentsen,Fri Mar 9 14:09:01 2018 -0500
+5eff472,Geert Barentsen,Fri Mar 9 14:08:38 2018 -0500
+fd8779a,Geert Barentsen,Fri Mar 9 14:06:11 2018 -0500
+f3dae20,Geert Barentsen,Fri Mar 9 14:06:09 2018 -0500
+dafc893,Geert Barentsen,Fri Mar 9 13:53:48 2018 -0500
+88d337e,Geert Barentsen,Fri Mar 9 13:53:27 2018 -0500
+6d14f09,Geert Barentsen,Thu Mar 8 11:54:30 2018 -0500
+add22ed,Geert Barentsen,Thu Mar 8 11:51:51 2018 -0500
+eda95dc,Geert Barentsen,Fri Mar 9 10:44:51 2018 -0500
+2f008c3,Geert Barentsen,Fri Mar 9 10:44:48 2018 -0500
+c68c835,mirca,Fri Mar 9 10:24:04 2018 -0500
+afe44eb,mirca,Fri Mar 9 10:15:28 2018 -0500
+7ce45d8,Geert Barentsen,Fri Mar 9 09:37:49 2018 -0500
+0e4c7c5,Geert Barentsen,Wed Mar 7 12:38:29 2018 -0500
+13f0fe1,Geert Barentsen,Tue Mar 6 14:18:47 2018 -0500
+c1f3264,Geert Barentsen,Tue Mar 6 13:49:11 2018 -0500
+f339ed7,Geert Barentsen,Tue Mar 6 13:49:06 2018 -0500
+4da7caa,Zé Vinícius,Tue Mar 6 12:20:07 2018 -0500
+3fe39e9,Zé Vinícius,Tue Mar 6 12:19:40 2018 -0500
+0f06e65,Geert Barentsen,Mon Mar 5 13:43:35 2018 -0500
+049ebef,Geert Barentsen,Sat Mar 3 16:28:27 2018 -0800
+957ce07,Geert Barentsen,Fri Mar 2 17:25:12 2018 -0800
+47818a0,Geert Barentsen,Mon Mar 5 11:52:00 2018 -0500
+7b57598,Geert Barentsen,Sun Mar 4 16:27:28 2018 -0800
+0d84c7a,Geert Barentsen,Sun Mar 4 16:05:29 2018 -0800
+9c76a97,Geert Barentsen,Sat Mar 3 17:13:45 2018 -0800
+0f5c969,Geert Barentsen,Sat Mar 3 17:01:28 2018 -0800
+44cc73c,Geert Barentsen,Sat Mar 3 16:56:26 2018 -0800
+e9ea200,Christina Hedges,Fri Mar 2 12:10:27 2018 -0800
+9f4c825,Christina Hedges,Fri Mar 2 12:09:18 2018 -0800
+860fc37,Geert Barentsen,Fri Mar 2 10:02:28 2018 -0800
+49abd32,Geert Barentsen,Thu Mar 1 21:35:54 2018 -0800
+a54d644,gully,Tue Feb 27 18:31:51 2018 -0800
+5138588,gully,Fri Feb 23 15:31:17 2018 -0800
+5006578,mirca,Thu Feb 1 17:21:13 2018 -0800
+0e81052,mirca,Thu Feb 1 17:17:05 2018 -0800
+4c7df1d,Geert Barentsen,Thu Mar 1 20:56:39 2018 -0800
+f96dbd5,Christina Hedges,Thu Mar 1 17:38:04 2018 -0800
+bebc84b,Christina Hedges,Thu Mar 1 16:07:08 2018 -0800
+9d93115,Christina Hedges,Thu Mar 1 16:03:08 2018 -0800
+ad55514,Christina Hedges,Thu Mar 1 15:42:07 2018 -0800
+f531168,Christina Hedges,Thu Mar 1 17:17:30 2018 -0800
+de564c8,Christina Hedges,Thu Mar 1 15:57:20 2018 -0800
+612dc29,Christina Hedges,Thu Mar 1 15:56:44 2018 -0800
+6469578,Christina Hedges,Thu Mar 1 12:41:33 2018 -0800
+21c326b,Christina Hedges,Thu Mar 1 12:39:20 2018 -0800
+0b33486,Christina Hedges,Thu Mar 1 11:43:50 2018 -0800
+e726c42,Christina Hedges,Thu Mar 1 11:43:41 2018 -0800
+7ad7de3,Christina Hedges,Thu Mar 1 11:43:12 2018 -0800
+6c9f89e,Christina Hedges,Thu Mar 1 11:42:49 2018 -0800
+ca07206,Christina Hedges,Thu Mar 1 11:09:14 2018 -0800
+f897664,Christina Hedges,Thu Mar 1 10:41:36 2018 -0800
+b0d4974,mirca,Thu Mar 1 20:43:47 2018 +0800
+4f65b54,Zé Vinícius,Thu Mar 1 16:08:01 2018 +0800
+eac6896,Geert Barentsen,Wed Feb 28 21:39:22 2018 -0800
+7238cf3,Geert Barentsen,Wed Feb 28 21:10:24 2018 -0800
+be951fa,Geert Barentsen,Wed Feb 28 21:02:24 2018 -0800
+adeb0a9,Geert Barentsen,Wed Feb 28 21:02:13 2018 -0800
+6e82d46,Geert Barentsen,Wed Feb 28 20:45:26 2018 -0800
+a1b34f5,Geert Barentsen,Wed Feb 28 20:45:10 2018 -0800
+3d691ee,Geert Barentsen,Wed Feb 28 20:38:30 2018 -0800
+89bf611,gully,Wed Feb 28 20:19:12 2018 -0800
+3be585e,Geert Barentsen,Tue Feb 27 21:44:09 2018 -0800
+2a91ef2,Geert Barentsen,Tue Feb 27 18:30:26 2018 -0800
+ba353b9,Geert Barentsen,Sun Feb 25 20:49:39 2018 -0800
+92341b3,Geert Barentsen,Sun Feb 25 20:31:06 2018 -0800
+edcc083,Geert Barentsen,Sun Feb 25 20:22:40 2018 -0800
+56c5aeb,Geert Barentsen,Wed Feb 28 17:27:32 2018 -0800
+32a9711,mirca,Wed Feb 28 18:06:40 2018 +0800
+8e7b864,Geert Barentsen,Tue Feb 27 18:31:12 2018 -0800
+7b344f2,Geert Barentsen,Tue Feb 27 17:19:49 2018 -0800
+fc9a4d4,Geert Barentsen,Tue Feb 27 17:19:49 2018 -0800
+6bdf6b1,Geert Barentsen,Tue Feb 27 17:07:25 2018 -0800
+5bb040e,Christina Hedges,Tue Feb 27 16:03:41 2018 -0800
+c7c3bb5,Christina Hedges,Tue Feb 27 15:46:21 2018 -0800
+ca749d7,Geert Barentsen,Tue Feb 27 15:44:22 2018 -0800
+85fe6f0,Christina Hedges,Tue Feb 27 15:39:23 2018 -0800
+07fa30a,Christina Hedges,Tue Feb 27 15:35:28 2018 -0800
+86aaeee,Christina Hedges,Tue Feb 27 12:20:21 2018 -0800
+b440686,Christina Hedges,Tue Feb 27 10:34:12 2018 -0800
+23bce5a,Christina Hedges,Mon Feb 26 18:11:07 2018 -0800
+1084a93,Christina Hedges,Mon Feb 26 16:13:51 2018 -0800
+75d106a,Christina Hedges,Mon Feb 26 15:44:55 2018 -0800
+b5f75b0,Christina Hedges,Mon Feb 26 15:41:32 2018 -0800
+df7c69e,mirca,Mon Feb 26 09:15:27 2018 +0800
+ba8da4c,mirca,Mon Feb 26 09:01:55 2018 +0800
+7213335,mirca,Mon Feb 26 09:00:55 2018 +0800
+53e2ca6,mirca,Mon Feb 26 08:47:21 2018 +0800
+9a678b6,mirca,Mon Feb 26 08:46:14 2018 +0800
+3304fd3,Geert Barentsen,Sun Feb 25 11:07:19 2018 -0800
+3277e6e,Geert Barentsen,Sun Feb 25 10:51:03 2018 -0800
+d599da5,Zé Vinícius,Mon Feb 26 08:23:43 2018 +0800
+68687e3,Geert Barentsen,Sun Feb 25 12:09:27 2018 -0800
+db26f34,Geert Barentsen,Sun Feb 25 11:57:01 2018 -0800
+695301d,Geert Barentsen,Sun Feb 25 09:39:19 2018 -0800
+d28ce41,Geert Barentsen,Sat Feb 24 22:01:42 2018 -0800
+ff132f5,Geert Barentsen,Sat Feb 24 21:55:11 2018 -0800
+64d5686,Geert Barentsen,Sat Feb 24 22:22:45 2018 -0800
+eb431bb,Geert Barentsen,Sat Feb 24 21:16:17 2018 -0800
+dbc02a2,Geert Barentsen,Sat Feb 24 20:20:15 2018 -0800
+b153dc5,Geert Barentsen,Sat Feb 24 21:21:55 2018 -0800
+2adbdb3,Geert Barentsen,Sat Feb 24 10:58:42 2018 -0800
+3392efe,Geert Barentsen,Sat Feb 24 10:58:36 2018 -0800
+1eff8e3,Geert Barentsen,Sat Feb 24 10:57:48 2018 -0800
+81dc2e5,Geert Barentsen,Sat Feb 24 10:32:59 2018 -0800
+7f6c3dc,Geert Barentsen,Sat Feb 24 10:13:00 2018 -0800
+4cd99da,Geert Barentsen,Sat Feb 24 10:11:05 2018 -0800
+805259f,Geert Barentsen,Sat Feb 24 10:10:59 2018 -0800
+c08f16e,Geert Barentsen,Sat Feb 24 10:08:40 2018 -0800
+939dd35,Geert Barentsen,Sat Feb 24 10:03:43 2018 -0800
+f1233df,Geert Barentsen,Sat Feb 24 10:02:07 2018 -0800
+39f5d43,Geert Barentsen,Sat Feb 24 10:00:00 2018 -0800
+a63e0de,gully,Fri Feb 23 17:45:32 2018 -0800
+536a526,gully,Fri Feb 23 17:42:38 2018 -0800
+28e519d,gully,Fri Feb 23 17:39:53 2018 -0800
+8ae623d,Geert Barentsen,Fri Feb 23 17:23:56 2018 -0800
+7379666,Geert Barentsen,Fri Feb 23 16:57:02 2018 -0800
+b55bd3a,Geert Barentsen,Fri Feb 23 16:33:23 2018 -0800
+ffc4c60,Geert Barentsen,Fri Feb 23 16:12:47 2018 -0800
+a615e68,Geert Barentsen,Fri Feb 23 16:12:17 2018 -0800
+213fa18,Geert Barentsen,Fri Feb 23 14:01:32 2018 -0800
+9c48f15,Geert Barentsen,Fri Feb 23 12:22:45 2018 -0800
+580f79a,Geert Barentsen,Fri Feb 23 12:15:13 2018 -0800
+819491c,Geert Barentsen,Fri Feb 23 12:14:56 2018 -0800
+6f3372a,Geert Barentsen,Fri Feb 23 11:59:47 2018 -0800
+9e7d8b1,Geert Barentsen,Fri Feb 23 11:57:37 2018 -0800
+666d0ae,Geert Barentsen,Thu Feb 22 15:56:31 2018 -0800
+de6131e,Geert Barentsen,Thu Feb 22 15:54:22 2018 -0800
+769b552,Christina Hedges,Thu Feb 22 15:43:18 2018 -0800
+53ed5f5,Christina Hedges,Thu Feb 22 15:41:29 2018 -0800
+2cd2e21,Christina Hedges,Thu Feb 22 15:31:26 2018 -0800
+e517ff2,Geert Barentsen,Thu Feb 22 15:23:29 2018 -0800
+6f0456b,Christina Hedges,Thu Feb 22 14:48:55 2018 -0800
+8da4815,Christina Hedges,Thu Feb 22 14:45:46 2018 -0800
+60a0ab4,Geert Barentsen,Thu Feb 22 14:44:02 2018 -0800
+490047d,Christina Hedges,Thu Feb 22 14:23:56 2018 -0800
+e1023b8,Christina Hedges,Thu Feb 22 14:22:48 2018 -0800
+fd22b6e,Christina Hedges,Thu Feb 22 14:11:43 2018 -0800
+11f4b0d,Christina Hedges,Thu Feb 22 14:09:18 2018 -0800
+5b9cc8f,Christina Hedges,Thu Feb 22 14:09:18 2018 -0800
+a338b5f,Christina Hedges,Thu Feb 22 14:07:26 2018 -0800
+ce80927,Christina Hedges,Thu Feb 22 12:20:18 2018 -0800
+d995ae6,Christina Hedges,Thu Feb 22 11:50:12 2018 -0800
+7d7cabb,Christina Hedges,Thu Feb 22 11:49:07 2018 -0800
+918014e,Geert Barentsen,Tue Feb 20 17:57:43 2018 -0800
+8810a41,Geert Barentsen,Tue Feb 20 17:56:57 2018 -0800
+4c4c50f,Geert Barentsen,Tue Feb 20 17:48:44 2018 -0800
+2951a31,Zé Vinícius,Tue Feb 20 17:44:16 2018 -0800
+13efb99,mirca,Tue Feb 20 16:20:28 2018 -0800
+a455553,mirca,Tue Feb 20 16:04:23 2018 -0800
+7346ddf,mirca,Tue Feb 20 14:48:53 2018 -0800
+90905ec,mirca,Tue Feb 20 14:23:22 2018 -0800
+1055dae,mirca,Tue Feb 20 14:10:39 2018 -0800
+23a79e9,mirca,Tue Feb 20 14:10:21 2018 -0800
+64dfa52,mirca,Tue Feb 20 14:07:03 2018 -0800
+5b7311b,Geert Barentsen,Tue Feb 20 12:33:13 2018 -0800
+3be353d,mirca,Tue Feb 20 12:32:39 2018 -0800
+74ad13a,mirca,Tue Feb 20 12:20:19 2018 -0800
+32847e1,mirca,Tue Feb 20 11:42:02 2018 -0800
+cb605c3,mirca,Tue Feb 20 11:41:04 2018 -0800
+22d6d73,Zé Vinícius,Tue Feb 20 10:53:58 2018 -0800
+e7377fe,Geert Barentsen,Tue Feb 20 10:36:27 2018 -0800
+cb498f5,Zé Vinícius,Fri Feb 16 15:25:57 2018 -0800
+c93de22,Geert Barentsen,Fri Feb 16 14:05:43 2018 -0800
+2513b93,Geert Barentsen,Fri Feb 16 13:44:21 2018 -0800
+9e4fdb5,Geert Barentsen,Fri Feb 16 13:40:47 2018 -0800
+bd9ae1d,mirca,Fri Feb 16 12:50:28 2018 -0800
+1b5a396,mirca,Fri Feb 16 12:41:43 2018 -0800
+97acb71,Geert Barentsen,Fri Feb 16 12:19:05 2018 -0800
+318f049,mirca,Wed Feb 14 07:14:54 2018 -0800
+9b151a1,mirca,Wed Feb 14 06:55:54 2018 -0800
+c2f7600,mirca,Wed Feb 14 06:48:33 2018 -0800
+f2c54b7,Geert Barentsen,Tue Feb 13 12:30:07 2018 -0800
+46a7de4,mirca,Mon Feb 12 21:38:45 2018 -0800
+49e712f,mirca,Mon Feb 12 21:18:24 2018 -0800
+09ba6cb,mirca,Fri Feb 9 16:07:53 2018 -0800
+5c35b98,gully,Fri Feb 9 11:15:06 2018 -0800
+4919fce,Zé Vinícius,Thu Feb 8 17:43:15 2018 -0800
+aa1495c,Zé Vinícius,Thu Feb 8 16:35:20 2018 -0800
+c174c0e,Zé Vinícius,Thu Feb 8 16:34:19 2018 -0800
+da5fc36,mirca,Thu Feb 8 15:08:06 2018 -0800
+a9bebd4,mirca,Thu Feb 8 14:59:29 2018 -0800
+5d0b28b,mirca,Thu Feb 8 14:34:07 2018 -0800
+4a951db,mirca,Thu Feb 8 14:23:03 2018 -0800
+88739ec,mirca,Thu Feb 8 12:59:00 2018 -0800
+5904752,mirca,Thu Feb 8 11:39:34 2018 -0800
+025fe74,mirca,Thu Feb 8 11:14:38 2018 -0800
+73160b4,mirca,Thu Feb 8 11:04:34 2018 -0800
+cda59a8,gully,Wed Feb 7 16:28:03 2018 -0800
+ec38b3d,gully,Wed Feb 7 16:19:38 2018 -0800
+19a7bb7,Zé Vinícius,Wed Feb 7 16:09:52 2018 -0800
+fc8f4bb,gully,Wed Feb 7 15:27:42 2018 -0800
+b3c8837,gully,Wed Feb 7 14:28:07 2018 -0800
+9763d3a,Christina Hedges,Tue Feb 6 17:24:07 2018 -0800
+3753932,Christina Hedges,Tue Feb 6 17:18:08 2018 -0800
+fb3559e,Christina Hedges,Tue Feb 6 16:39:38 2018 -0800
+adb7633,Christina Hedges,Tue Feb 6 16:34:05 2018 -0800
+77d1698,Christina Hedges,Tue Feb 6 16:06:21 2018 -0800
+6775a0f,Zé Vinícius,Tue Feb 6 15:37:49 2018 -0800
+7310322,mirca,Tue Feb 6 12:17:55 2018 -0800
+ad5b57b,mirca,Tue Feb 6 11:50:36 2018 -0800
+14dbd63,mirca,Tue Feb 6 11:45:29 2018 -0800
+3800016,mirca,Tue Feb 6 11:27:25 2018 -0800
+423c850,mirca,Tue Feb 6 11:25:43 2018 -0800
+80f1735,Zé Vinícius,Sat Feb 3 20:36:42 2018 -0800
+84360cc,mirca,Sat Feb 3 20:16:42 2018 -0800
+c5178bf,mirca,Sat Feb 3 20:09:17 2018 -0800
+cc32dae,Geert Barentsen,Sat Feb 3 19:48:50 2018 -0800
+fbb5d81,mirca,Sat Feb 3 19:44:49 2018 -0800
+fb6de53,mirca,Sat Feb 3 19:41:30 2018 -0800
+0bfb0a8,mirca,Sat Feb 3 19:41:17 2018 -0800
+512f71e,Zé Vinícius,Sat Feb 3 19:37:54 2018 -0800
+32e6957,mirca,Sat Feb 3 19:33:13 2018 -0800
+95af7cf,mirca,Sat Feb 3 19:29:49 2018 -0800
+450a0a4,Geert Barentsen,Sat Feb 3 19:28:41 2018 -0800
+4125bc9,mirca,Fri Feb 2 17:29:36 2018 -0800
+a8dcec1,mirca,Fri Feb 2 11:43:16 2018 -0800
+8ca769f,mirca,Fri Feb 2 10:29:02 2018 -0800
+9359220,Zé Vinícius,Wed Jan 31 14:45:32 2018 -0800
+53d1d2d,Christina Hedges,Wed Jan 31 14:42:11 2018 -0800
+b1d9788,Christina Hedges,Wed Jan 31 14:24:26 2018 -0800
+5794b2e,mirca,Mon Jan 29 12:45:46 2018 -0800
+7973719,Christina Hedges,Mon Jan 29 11:29:41 2018 -0800
+51429c9,Christina Hedges,Mon Jan 29 11:27:29 2018 -0800
+b4a9d24,Christina Hedges,Mon Jan 29 11:18:43 2018 -0800
+f8f5d59,mirca,Fri Jan 26 19:14:08 2018 -0800
+9647f3e,mirca,Fri Jan 26 17:57:17 2018 -0800
+9deb71b,mirca,Fri Jan 26 17:57:05 2018 -0800
+c5e1ed9,Geert Barentsen,Fri Jan 26 17:49:13 2018 -0800
+2ca3523,Geert Barentsen,Fri Jan 26 17:48:00 2018 -0800
+ef446b6,Christina Hedges,Fri Jan 26 17:20:44 2018 -0800
+5130b14,Christina Hedges,Fri Jan 26 17:17:20 2018 -0800
+526051a,Christina Hedges,Fri Jan 26 17:10:38 2018 -0800
+18c3e13,Christina Hedges,Fri Jan 26 16:56:47 2018 -0800
+2c89845,Christina Hedges,Fri Jan 26 16:39:08 2018 -0800
+d4f4657,Christina Hedges,Fri Jan 26 16:31:38 2018 -0800
+128490d,Christina Hedges,Fri Jan 26 16:30:28 2018 -0800
+bb04e88,mirca,Fri Jan 26 16:02:46 2018 -0800
+acf4784,Christina Hedges,Fri Jan 26 15:50:50 2018 -0800
+3031242,mirca,Fri Jan 26 15:45:42 2018 -0800
+7c249a1,Christina Hedges,Fri Jan 26 14:41:28 2018 -0800
+38e7f68,Christina Hedges,Fri Jan 26 14:09:40 2018 -0800
+228517b,Christina Hedges,Fri Jan 26 14:09:34 2018 -0800
+e8db0de,mirca,Fri Jan 26 12:53:24 2018 -0800
+9a3fa76,Zé Vinícius,Fri Jan 26 12:50:46 2018 -0800
+59ee0b3,mirca,Fri Jan 26 12:48:01 2018 -0800
+9b1f6fb,Christina Hedges,Fri Jan 26 12:37:03 2018 -0800
+e85c699,Christina Hedges,Fri Jan 26 12:27:53 2018 -0800
+6f0d75d,Christina Hedges,Fri Jan 26 12:19:54 2018 -0800
+638f86d,mirca,Fri Jan 26 11:54:16 2018 -0800
+133a84e,Christina Hedges,Fri Jan 26 11:49:50 2018 -0800
+07a13c4,Christina Hedges,Fri Jan 26 11:44:36 2018 -0800
+6bfa1fd,Christina Hedges,Thu Jan 25 17:02:10 2018 -0800
+8a42bea,Christina Hedges,Thu Jan 25 17:00:44 2018 -0800
+2f924d0,Christina Hedges,Thu Jan 25 16:43:29 2018 -0800
+d5ea628,mirca,Thu Jan 25 16:35:52 2018 -0800
+66c4440,mirca,Wed Jan 24 14:38:19 2018 -0800
+561a6eb,mirca,Wed Jan 24 14:33:48 2018 -0800
+61ff66f,mirca,Tue Jan 23 19:28:58 2018 -0800
+3bb1c65,mirca,Tue Jan 23 14:02:01 2018 -0800
+66cc5ed,mirca,Tue Jan 23 13:58:46 2018 -0800
+e5e9fdc,mirca,Tue Jan 23 13:47:35 2018 -0800
+7b29368,mirca,Tue Jan 23 10:50:45 2018 -0800
+7694412,mirca,Mon Jan 22 11:32:56 2018 -0800
+a384a3b,mirca,Mon Jan 22 11:10:36 2018 -0800
+4645d14,mirca,Mon Jan 22 09:28:23 2018 -0800
+01a88ca,mirca,Sun Jan 21 19:51:48 2018 -0800
+684eecf,mirca,Sun Jan 21 19:51:32 2018 -0800
+1fdde5c,Geert Barentsen,Sun Jan 21 19:43:43 2018 -0800
+672a727,mirca,Sun Jan 21 19:38:45 2018 -0800
+33cd592,mirca,Sun Jan 21 19:31:30 2018 -0800
+18d4bfd,mirca,Sun Jan 21 19:28:00 2018 -0800
+ad73d33,mirca,Sun Jan 21 19:26:14 2018 -0800
+2405a2f,mirca,Sun Jan 21 19:19:20 2018 -0800
+b0ee196,mirca,Sun Jan 21 19:15:57 2018 -0800
+af86081,Geert Barentsen,Sun Jan 21 18:36:15 2018 -0800
+d9e6677,Geert Barentsen,Sun Jan 21 18:11:31 2018 -0800
+fee1013,Geert Barentsen,Sun Jan 21 18:07:11 2018 -0800
+fa00e75,Geert Barentsen,Sun Jan 21 18:06:17 2018 -0800
+0abe9db,Geert Barentsen,Sun Jan 21 18:05:05 2018 -0800
+7567b89,mirca,Sun Jan 21 19:00:24 2018 -0800
+e55d88e,mirca,Sun Jan 21 17:50:06 2018 -0800
+c4181b6,Geert Barentsen,Sun Jan 21 17:33:09 2018 -0800
+0da021e,Geert Barentsen,Sun Jan 21 17:29:14 2018 -0800
+b20a566,Geert Barentsen,Sun Jan 21 18:36:15 2018 -0800
+d1d53ca,Geert Barentsen,Sun Jan 21 18:11:31 2018 -0800
+35cebe5,Geert Barentsen,Sun Jan 21 18:07:11 2018 -0800
+2eb6fc0,Geert Barentsen,Sun Jan 21 18:06:17 2018 -0800
+97f3679,Geert Barentsen,Sun Jan 21 18:05:05 2018 -0800
+7d54d22,mirca,Sun Jan 21 17:50:06 2018 -0800
+1f0fc14,mirca,Sun Jan 21 17:48:53 2018 -0800
+70f9aa6,mirca,Sun Jan 21 17:48:36 2018 -0800
+bb08c69,Geert Barentsen,Sun Jan 21 17:33:09 2018 -0800
+9011794,Geert Barentsen,Sun Jan 21 17:29:14 2018 -0800
+a416ee2,Zé Vinícius,Sun Jan 21 16:50:00 2018 -0800

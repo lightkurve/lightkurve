@@ -877,6 +877,26 @@ class LightCurve(object):
             kwargs['linestyle'] = linestyle
         return self._create_plot(method='errorbar', **kwargs)
 
+
+    def interact_bls(self, notebook_url='localhost:8888'):
+        """Display an interactive Jupyter Notebook widget to run a BLS and find planets.
+
+        Parameters
+        ----------
+        notebook_url: str
+            Location of the Jupyter notebook page (default: "localhost:8888")
+            When showing Bokeh applications, the Bokeh server must be
+            explicitly configured to allow connections originating from
+            different URLs. This parameter defaults to the standard notebook
+            host and port. If you are running on a different location, you
+            will need to supply this value for the application to display
+            properly. If no protocol is supplied in the URL, e.g. if it is
+            of the form "localhost:8888", then "http" will be used.
+        """
+        from .interact_bls import show_interact_widget
+        return show_interact_widget(self, notebook_url=notebook_url)
+
+
     def to_table(self):
         """Export the LightCurve as an AstroPy Table.
 
