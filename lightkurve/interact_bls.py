@@ -9,12 +9,6 @@ import numpy as np
 from astropy.stats import sigma_clip
 from .utils import KeplerQualityFlags, LightkurveWarning
 import os
-# Import the optional Bokeh dependency, or print a friendly error otherwise.
-try:
-    from astropy.stats.bls import BoxLeastSquares
-except ImportError:
-    log.critical('astropy.stats.bls is not installed. Interactive tools will not work.')
-
 import matplotlib.pyplot as plt
 import numpy as np
 from datetime import datetime
@@ -22,6 +16,11 @@ from time import time
 
 
 log = logging.getLogger(__name__)
+# Import the optional Bokeh dependency, or print a friendly error otherwise.
+try:
+    from astropy.stats.bls import BoxLeastSquares
+except ImportError:
+    log.critical('astropy.stats.bls is not installed. Interactive tools will not work.')
 
 # Import the optional Bokeh dependency, or print a friendly error otherwise.
 try:
