@@ -904,6 +904,22 @@ class LightCurve(object):
             but less accurate compute time. You can also vary this value using the
             Resolution Slider.
         """
+        try:
+            import bokeh
+            if bokeh.__version__[0] == '0':
+                warnings.warn("interact() requires Bokeh version 1.0 or later", LightkurveWarning)
+        except ImportError:
+            log.error("The interact_bls() tool requires the `bokeh` package; "
+                      "you can install bokeh using e.g. `conda install bokeh`.")
+            return None
+        try:
+            from astropy.stats.bls import BoxLeastSquares
+        except ImportError:
+            log.error("The interact_bls() tool requires the `astropy.stats.bls` package; "
+                      "this requires python 3.0. If you do not have the package installed, ",
+                      "please install with pip.")
+            return None
+
         from .interact_bls import show_interact_widget
         clean = self.remove_nans()
         return show_interact_widget(clean, notebook_url=notebook_url, minimum_period=minimum_period,

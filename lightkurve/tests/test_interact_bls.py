@@ -1,13 +1,17 @@
 """Tests the features of the lightkurve.interact_bls module."""
 import pytest
 import sys
-from astropy.stats.bls import BoxLeastSquares
+import numpy as np
 from ..lightcurvefile import LightCurveFile, KeplerLightCurveFile, TessLightCurveFile
 
 try:
     import bokeh
 except:
     print('no bokeh, tests will be skipped')
+try:
+    from astropy.stats.bls import BoxLeastSquares
+except:
+    print('no bls, tests will be skipped')
 
 
 KEPLER10 = ("https://archive.stsci.edu/missions/kepler/lightcurves/"
@@ -15,10 +19,11 @@ KEPLER10 = ("https://archive.stsci.edu/missions/kepler/lightcurves/"
 TESS_SIM = ("https://archive.stsci.edu/missions/tess/ete-6/tid/00/000/"
             "004/104/tess2019128220341-0000000410458113-0016-s_lc.fits")
 
+bad_optional_imports = np.any([('bokeh' not in sys.modules), ('astropy.stats.bls' not in sys.modules)])
 
 @pytest.mark.remote_data
-@pytest.mark.skipif('bokeh' not in sys.modules,
-                    reason="requires bokeh")
+@pytest.mark.skipif(bad_optional_imports,
+                    reason="requires bokeh and astropy.stats.bls")
 def test_malformed_notebook_url():
     """Test if malformed notebook_urls raise proper exceptions."""
     lcf = KeplerLightCurveFile(KEPLER10)
@@ -31,8 +36,8 @@ def test_malformed_notebook_url():
     assert('object has no attribute' in exc.value.args[0])
 
 @pytest.mark.remote_data
-@pytest.mark.skipif('bokeh' not in sys.modules,
-                    reason="requires bokeh")
+@pytest.mark.skipif(bad_optional_imports,
+                    reason="requires bokeh and astropy.stats.bls")
 def test_graceful_exit_outside_notebook():
     """Test if running interact outside of a notebook does fails gracefully."""
     lcf = KeplerLightCurveFile(KEPLER10)
@@ -41,8 +46,8 @@ def test_graceful_exit_outside_notebook():
     assert(result is None)
 
 @pytest.mark.remote_data
-@pytest.mark.skipif('bokeh' not in sys.modules,
-                    reason="requires bokeh")
+@pytest.mark.skipif(bad_optional_imports,
+                    reason="requires bokeh and astropy.stats.bls")
 def test_helper_functions():
     """Can we use all the functions in interact_bls?"""
     from ..interact_bls import (prepare_bls_datasource,
@@ -70,8 +75,8 @@ def test_helper_functions():
     fig_bls = make_bls_figure_elements(result, bls_source, bls_help)
 
 @pytest.mark.remote_data
-@pytest.mark.skipif('bokeh' not in sys.modules,
-                    reason="requires bokeh")
+@pytest.mark.skipif(bad_optional_imports,
+                    reason="requires bokeh and astropy.stats.bls")
 def test_full_widget():
     '''Test if we can run the widget with the keywords'''
     lcf = KeplerLightCurveFile(KEPLER10)
@@ -82,8 +87,8 @@ def test_full_widget():
     result = lc.interact_bls(resolution=1000)
 
 @pytest.mark.remote_data
-@pytest.mark.skipif('bokeh' not in sys.modules,
-                    reason="requires bokeh")
+@pytest.mark.skipif(bad_optional_imports,
+                    reason="requires bokeh and astropy.stats.bls")
 def test_tess_widget():
     '''Test if we can run the widget with the keywords'''
     lcf = TessLightCurveFile(TESS_SIM)
