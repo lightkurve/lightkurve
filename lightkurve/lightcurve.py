@@ -878,7 +878,8 @@ class LightCurve(object):
         return self._create_plot(method='errorbar', **kwargs)
 
 
-    def interact_bls(self, notebook_url='localhost:8888'):
+    def interact_bls(self, notebook_url='localhost:8888', minimum_period=None,
+                    maximum_period=None, resolution=2000):
         """Display an interactive Jupyter Notebook widget to run a BLS and find planets.
 
         Parameters
@@ -892,10 +893,21 @@ class LightCurve(object):
             will need to supply this value for the application to display
             properly. If no protocol is supplied in the URL, e.g. if it is
             of the form "localhost:8888", then "http" will be used.
+        minimum_period : float or None
+            Minimum period to assess the BLS to. If None, default value of 0.3 days
+            will be used.
+        maximum_period : float or None
+            Maximum period to evaluate the BLS to. If None, the time coverage of the
+            lightcurve / 4 will be used.
+        resolution : int
+            Number of points to use in the BLS panel. Lower this value to have a faster
+            but less accurate compute time. You can also vary this value using the
+            Resolution Slider.
         """
         from .interact_bls import show_interact_widget
         clean = self.remove_nans()
-        return show_interact_widget(clean, notebook_url=notebook_url)
+        return show_interact_widget(clean, notebook_url=notebook_url, minimum_period=minimum_period,
+                                    maximum_period=maximum_period, resolution=resolution)
 
 
     def to_table(self):

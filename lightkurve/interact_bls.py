@@ -10,7 +10,6 @@ from astropy.stats import sigma_clip
 from .utils import KeplerQualityFlags, LightkurveWarning
 import os
 
-
 from astropy.stats.bls import BoxLeastSquares
 import matplotlib.pyplot as plt
 import numpy as np
@@ -47,6 +46,7 @@ from . import PACKAGEDIR
 
 
 __all__ = ['show_interact_widget']
+
 
 def prepare_bls_datasource(result, loc):
     '''Prepare a bls result for bokeh plotting
@@ -94,6 +94,122 @@ def prepare_folded_datasource(f):
     return folded_source
 
 
+# Helper functions for help text...
+
+def prepare_lc_help_source(lc):
+    data = dict(time=[(np.max(lc.time) - np.min(lc.time)) * 0.98 + np.min(lc.time)],
+                 flux=[(np.max(lc.flux) - np.min(lc.flux)) * 0.9 + np.min(lc.flux)],
+                 boxicon=['https://bokeh.pydata.org/en/latest/_images/BoxZoom.png'],
+                 panicon=['https://bokeh.pydata.org/en/latest/_images/Pan.png'],
+                 reseticon=['https://bokeh.pydata.org/en/latest/_images/Reset.png'],
+                 tapicon=['https://bokeh.pydata.org/en/latest/_images/Tap.png'],
+                 hovericon=['https://bokeh.pydata.org/en/latest/_images/Hover.png'],
+                 helpme=['?'],
+                 help=["""
+                             <div style="width: 550px;">
+                                 <div>
+                                     <span style="font-size: 12px; font-weight: bold;">Light Curve</span>
+                                 </div>
+                                 <div>
+                                     <span style="font-size: 11px;"">This panel shows the full light curve, with the BLS model overlayed in red. The period of the model is the period
+                                     currently selected in the BLS panel [top, left], indicated by the vertical red line. The duration of the transit model is given by the duration slider below..</span>
+                                     <br></br>
+                                 </div>
+                                 <div>
+                                     <span style="font-size: 12px; font-weight: bold;">Bokeh Tools</span>
+                                 </div>
+                                 <div>
+                                     <span style="font-size: 11px;"">Each of the three panels have Bokeh tools to navigate them.
+                                     You can turn off/on each tool by clicking the icon in the tray below each panel.
+                                     You can zoom in using the Box Zoom Tool, move about the panel using the Pan Tool,
+                                     or reset the panel back to the original view using the Reset Tool. </span>
+                                     <br></br>
+                                     <center>
+                                         <table>
+                                             <tr>
+                                                 <td><img src="@boxicon" height="20" width="20"></td><td><span style="font-size: 11px;"">Box Zoom Tool</span></td>
+                                             </tr>
+                                             <tr>
+                                                 <td><img src="@panicon" height="20" width="20"></td><td><span style="font-size: 11px;"">Pan Tool</span></td>
+                                             </tr>
+                                             <tr>
+                                                 <td><img src="@reseticon" height="20" width="20"></td><td><span style="font-size: 11px;"">Reset Tool</span></td>
+                                             </tr>
+                                             <tr>
+                                                 <td><img src="@tapicon" height="20" width="20"></td><td><span style="font-size: 11px;"">Tap Tool (select periods in BLS Panel only)</span></td>
+                                             </tr>
+                                             <tr>
+                                                 <td><img src="@hovericon" height="20" width="20"></td><td><span style="font-size: 11px;"">Help Messages (click to disable/enable help)</span></td>
+                                             </tr>
+                                         </table>
+                                     </center>
+                                 </div>
+                             </div>
+                         """])
+    return ColumnDataSource(data=data)
+
+def prepare_bls_help_source(bls_source, slider_value):
+    data = dict(period=[bls_source.data['period'][int(slider_value*0.95)]],
+                 power=[(np.max(bls_source.data['power']) - np.min(bls_source.data['power'])) * 0.98 + np.min(bls_source.data['power'])],
+                 helpme=['?'],
+                 help=["""
+                             <div style="width: 375px;">
+                                 <div style="height: 190px;">
+                                 </div>
+                                 <div>
+                                     <span style="font-size: 12px; font-weight: bold;">Box Least Squares Periodogram</span>
+                                 </div>
+                                 <div>
+                                     <span style="font-size: 11px;"">This panel shows the BLS periodogram for
+                                      the light curve shown in the lower panel.
+                                     The current selected period is highlighted by the red line.
+                                     The selected period is the peak period within the range.
+                                     The Folded Light Curve panel [right] will update when a new period
+                                     is selected in the BLS Panel. You can select a new period either by
+                                     using the Box Zoom tool to select a smaller range, or by clicking on the peak you want to select. </span>
+                                     <br></br>
+                                     <span style="font-size: 11px;"">The panel is set at the resolution
+                                     given by the Resolution Slider [bottom]. This value is the number
+                                     of points in the BLS Periodogram panel.
+                                     Incresing the resolution will make the BLS Periodogram more accurate,
+                                     but slower to render. To increase the resolution for a given peak,
+                                     simply zoom in with the Box Zoom Tool.</span>
+
+                                 </div>
+                             </div>
+                         """])
+    return ColumnDataSource(data=data)
+
+
+def prepare_f_help_source(f):
+    data = dict(phase=[(np.max(f.time) - np.min(f.time)) * 0.98 + np.min(f.time)],
+                flux=[(np.max(f.flux) - np.min(f.flux)) * 0.98 + np.min(f.flux)],
+                helpme=['?'],
+                help=["""
+                        <div style="width: 375px;">
+                            <div style="height: 190px;">
+                            </div>
+                            <div>
+                                <span style="font-size: 12px; font-weight: bold;">Folded Light Curve</span>
+                            </div>
+                            <div>
+                                <span style="font-size: 11px;"">This panel shows the folded light curve,
+                                using the period currently selected in the BLS panel [left], indicated by the red line.
+                                The transit model is show in red, and duration of the transit model
+                                is given by the duration slider below. Update the slider to change the duration.
+                                The period and transit midpoint values of the model are given above this panel.</span>
+                                <br></br>
+                                <span style="font-size: 11px;"">If the folded transit looks like a near miss of
+                                the true period, try zooming in on the peak in the BLS Periodogram panel [right]
+                                with the Box Zoom tool. This will increase the resolution of the peak, and provide
+                                a better period solution. You can also vary the transit duration, for a better fit.
+                                If the transit model is too shallow, it may be that you have selected a harmonic.
+                                Look in the BLS Periodogram for a peak at (e.g. 0.25x, 0.5x, 2x, 4x the current period etc).</span>
+                            </div>
+                        </div>
+                """])
+    return ColumnDataSource(data=data)
+
 
 def make_lightcurve_figure_elements(lc, model_lc, lc_source, model_lc_source, help_source):
     '''Make a figure with a simple light curve scatter and model light curve line
@@ -140,54 +256,13 @@ def make_lightcurve_figure_elements(lc, model_lc, lc_source, model_lc_source, he
     question_mark = Text(x="time", y="flux", text="helpme", text_color="grey", text_align='center', text_baseline="middle", text_font_size='12px', text_font_style='bold', text_alpha=0.6)
     fig.add_glyph(help_source, question_mark)
     help = fig.circle('time', 'flux', alpha=0.0, size=15, source=help_source, line_width=2, line_color='grey', line_alpha=0.6)
-    tooltips = [("", "@help")]
-    tooltips = """
-                <div style="width: 550px;">
-                    <div>
-                        <span style="font-size: 12px; font-weight: bold;">Light Curve</span>
-                    </div>
-                    <div>
-                        <span style="font-size: 11px;"">This panel shows the full light curve, with the BLS model overlayed in red. The period of the model is the period
-                        currently selected in the BLS panel [top, left], indicated by the vertical red line. The duration of the transit model is given by the duration slider below..</span>
-                        <br></br>
-                    </div>
-                    <div>
-                        <span style="font-size: 12px; font-weight: bold;">Bokeh Tools</span>
-                    </div>
-                    <div>
-                        <span style="font-size: 11px;"">Each of the three panels have Bokeh tools to navigate them.
-                        You can turn off/on each tool by clicking the icon in the tray below each panel.
-                        You can zoom in using the Box Zoom Tool, move about the panel using the Pan Tool,
-                        or reset the panel back to the original view using the Reset Tool. </span>
-                        <br></br>
-                        <center>
-                            <table>
-                                <tr>
-                                    <td><img src="@boxicon" height="20" width="20"></td><td><span style="font-size: 11px;"">Box Zoom Tool</span></td>
-                                </tr>
-                                <tr>
-                                    <td><img src="@panicon" height="20" width="20"></td><td><span style="font-size: 11px;"">Pan Tool</span></td>
-                                </tr>
-                                <tr>
-                                    <td><img src="@reseticon" height="20" width="20"></td><td><span style="font-size: 11px;"">Reset Tool</span></td>
-                                </tr>
-                                <tr>
-                                    <td><img src="@tapicon" height="20" width="20"></td><td><span style="font-size: 11px;"">Tap Tool (select periods in BLS Panel only)</span></td>
-                                </tr>
-                                <tr>
-                                    <td><img src="@hovericon" height="20" width="20"></td><td><span style="font-size: 11px;"">Help Messages (click to disable/enable help)</span></td>
-                                </tr>
-                            </table>
-                        </center>
-                    </div>
-                </div>
-            """
+    tooltips = help_source.data['help'][0]
     fig.add_tools(HoverTool(tooltips=tooltips, renderers=[help],
                             mode='mouse', point_policy="snap_to_data"))
     return fig
 
 
-def make_folded_figure_elements(f, f_source, f_model_lc, f_model_lc_source, help_source):
+def make_folded_figure_elements(f, f_model_lc, f_source, f_model_lc_source, help_source):
     '''Make a scatter plot of a folded lightkurve.lightcurve
     Parameters
     ----------
@@ -232,30 +307,7 @@ def make_folded_figure_elements(f, f_source, f_model_lc, f_model_lc_source, help
     fig.add_glyph(help_source, question_mark)
     help = fig.circle('phase', 'flux', alpha=0.0, size=15, source=help_source, line_width=2, line_color='grey', line_alpha=0.6)
 
-    tooltips = [("", "@help")]
-    tooltips = """
-                <div style="width: 375px;">
-                    <div style="height: 190px;">
-                    </div>
-                    <div>
-                        <span style="font-size: 12px; font-weight: bold;">Folded Light Curve</span>
-                    </div>
-                    <div>
-                        <span style="font-size: 11px;"">This panel shows the folded light curve,
-                        using the period currently selected in the BLS panel [left], indicated by the red line.
-                        The transit model is show in red, and duration of the transit model
-                        is given by the duration slider below. Update the slider to change the duration.
-                        The period and transit midpoint values of the model are given above this panel.</span>
-                        <br></br>
-                        <span style="font-size: 11px;"">If the folded transit looks like a near miss of
-                        the true period, try zooming in on the peak in the BLS Periodogram panel [right]
-                        with the Box Zoom tool. This will increase the resolution of the peak, and provide
-                        a better period solution. You can also vary the transit duration, for a better fit.
-                        If the transit model is too shallow, it may be that you have selected a harmonic.
-                        Look in the BLS Periodogram for a peak at (e.g. 0.25x, 0.5x, 2x, 4x the current period etc).</span>
-                    </div>
-                </div>
-            """
+    tooltips = help_source.data['help'][0]
     fig.add_tools(HoverTool(tooltips=tooltips, renderers=[help],
                             mode='mouse', point_policy="snap_to_data"))
     return fig
@@ -316,41 +368,15 @@ def make_bls_figure_elements(result, bls_source, help_source):
     question_mark = Text(x="period", y="power", text="helpme", text_color="grey", text_align='center', text_baseline="middle", text_font_size='12px', text_font_style='bold', text_alpha=0.6)
     fig.add_glyph(help_source, question_mark)
     help = fig.circle('period', 'power', alpha=0.0, size=15, source=help_source, line_width=2, line_color='grey', line_alpha=0.6)
-
-    tooltips = [("", "@help")]
-    tooltips = """
-                <div style="width: 375px;">
-                    <div style="height: 190px;">
-                    </div>
-                    <div>
-                        <span style="font-size: 12px; font-weight: bold;">Box Least Squares Periodogram</span>
-                    </div>
-                    <div>
-                        <span style="font-size: 11px;"">This panel shows the BLS periodogram for
-                         the light curve shown in the lower panel.
-                        The current selected period is highlighted by the red line.
-                        The selected period is the peak period within the range.
-                        The Folded Light Curve panel [right] will update when a new period
-                        is selected in the BLS Panel. You can select a new period either by
-                        using the Box Zoom tool to select a smaller range, or by clicking on the peak you want to select. </span>
-                        <br></br>
-                        <span style="font-size: 11px;"">The panel is set at the resolution
-                        given by the Resolution Slider [bottom]. This value is the number
-                        of points in the BLS Periodogram panel.
-                        Incresing the resolution will make the BLS Periodogram more accurate,
-                        but slower to render. To increase the resolution for a given peak,
-                        simply zoom in with the Box Zoom Tool.</span>
-
-                    </div>
-                </div>
-            """
+    tooltips = help_source.data['help'][0]
     fig.add_tools(HoverTool(tooltips=tooltips, renderers=[help],
                             mode='mouse', point_policy="snap_to_data"))
 
     return fig, vertical_line
 
 
-def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None, maximum_period=None):
+def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None, maximum_period=None,
+                        resolution=2000):
     ''' Show the BLS interact widget
 
     Parameters
@@ -370,9 +396,13 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
     maximum_period : float or None
         Maximum period to evaluate the BLS to. If None, the time coverage of the
         lightcurve / 4 will be used.
+    resolution : int
+        Number of points to use in the BLS panel. Lower this value to have a faster
+        but less accurate compute time. You can also vary this value using the
+        Resolution Slider.
     '''
 
-    def create_interact_ui(doc, minp=minimum_period, maxp=maximum_period):
+    def create_interact_ui(doc, minp=minimum_period, maxp=maximum_period, resolution=resolution):
         '''Create BLS interact user interface
         '''
 
@@ -386,7 +416,7 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
 
         npoints_slider = Slider(start=500,
                             end=10000,
-                            value=2000,
+                            value=resolution,
                             step=100,
                             title="BLS Resolution",
                             width=400)
@@ -406,11 +436,7 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
 
         # Set up BLS source
         bls_source = prepare_bls_datasource(result, loc)
-        bls_help_source = ColumnDataSource(data=dict(
-                                                 period=[result.period[int(npoints_slider.value*0.95)]],
-                                                 power=[(np.max(bls_source.data['power']) - np.min(bls_source.data['power'])) * 0.98 + np.min(bls_source.data['power'])],
-                                                 helpme=['?']
-                                                 ))
+        bls_help_source = prepare_bls_help_source(bls_source, npoints_slider.value)
 
         # Set up the model LC
         model_lc = LightCurve(lc.time, model.model(lc.time, best_period, duration_slider.value, best_t0))
@@ -420,16 +446,8 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
 
         # Set up the LC
         lc_source = prepare_lightcurve_datasource(lc)
-        lc_help_source = ColumnDataSource(data=dict(
-                                                 time=[(np.max(lc.time) - np.min(lc.time)) * 0.98 + np.min(lc.time)],
-                                                 flux=[(np.max(lc.flux) - np.min(lc.flux)) * 0.9 + np.min(lc.flux)],
-                                                 boxicon=['https://bokeh.pydata.org/en/latest/_images/BoxZoom.png'],
-                                                 panicon=['https://bokeh.pydata.org/en/latest/_images/Pan.png'],
-                                                 reseticon=['https://bokeh.pydata.org/en/latest/_images/Reset.png'],
-                                                 tapicon=['https://bokeh.pydata.org/en/latest/_images/Tap.png'],
-                                                 hovericon=['https://bokeh.pydata.org/en/latest/_images/Hover.png'],
-                                                 helpme=['?']
-                                                 ))
+        lc_help_source = prepare_lc_help_source(lc)
+
         # Set up folded LC
         f = lc.fold(best_period, best_t0)
         f_model_lc = model_lc.fold(best_period, best_t0)
@@ -437,11 +455,7 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
                                  phase=f_model_lc.time,
                                  flux=f_model_lc.flux))
         f_source = prepare_folded_datasource(f)
-        f_help_source = ColumnDataSource(data=dict(
-                                                 phase=[(np.max(f.time) - np.min(f.time)) * 0.98 + np.min(f.time)],
-                                                 flux=[(np.max(f.flux) - np.min(f.flux)) * 0.98 + np.min(f.flux)],
-                                                 helpme=['?']
-                                                 ))
+        f_help_source = prepare_f_help_source(f)
 
         # Function to update the widget
         def update_params(all=False, best_period=None, best_t0=None):
@@ -529,7 +543,7 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
 
 
         # Create all the figures.
-        fig_folded = make_folded_figure_elements(f, f_source, f_model_lc, f_model_lc_source, f_help_source)
+        fig_folded = make_folded_figure_elements(f, f_model_lc, f_source, f_model_lc_source, f_help_source)
         fig_folded.title.text = 'Period: {} days \t T0: {}'.format(np.round(best_period, 7), np.round(best_t0, 5))
         fig_bls, vertical_line = make_bls_figure_elements(result, bls_source, bls_help_source)
         fig_lc = make_lightcurve_figure_elements(lc, model_lc, lc_source, model_lc_source, lc_help_source)
