@@ -52,6 +52,9 @@ numpydoc_show_class_members = False
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
+# Exclude build directory and Jupyter backup files:
+exclude_patterns = ['_build', '**.ipynb_checkpoints']
+
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
@@ -93,6 +96,32 @@ pygments_style = 'sphinx'
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
 
+# Some notebook cells take longer than 60 seconds to execute
+nbsphinx_timeout = 300
+
+# PUT PROLOG HERE
+nbsphinx_prolog = r"""
+{% set docname = env.doc2path(env.docname, base=None) %}
+
+.. only:: html
+
+    .. role:: raw-html(raw)
+        :format: html
+
+    .. nbinfo::
+        **This tutorial is a static-text version of an interactive Jupyter notebook**
+
+        - Try the interactive version: :raw-html:`<a href="https://mybinder.org/v2/gh/KeplerGO/lightkurve/master?filepath=docs/source/{{ docname }}"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg" style="vertical-align:text-bottom"></a>`
+
+        - Download the source file: `{{ docname }}`__
+
+    __ https://github.com/KeplerGO/lightkurve/blob/master/docs/source/
+        {{ docname }}
+
+"""
+
+# This is processed by Jinja2 and inserted after each notebook
+#nbsphinx_epilog = r""" text here """
 
 # -- Options for HTML output ----------------------------------------------
 
