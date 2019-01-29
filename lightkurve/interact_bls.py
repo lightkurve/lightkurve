@@ -109,7 +109,7 @@ def make_folded_figure_elements(f, f_source, f_model_lc, f_model_lc_source, help
     '''Make a scatter plot of a folded lightkurve.lightcurve
     '''
     fig = figure(title='Folded Light Curve', plot_height=340, plot_width=450,
-                 tools="pan,wheel_zoom,box_zoom,reset",
+                 tools="pan,box_zoom,reset",
                  toolbar_location="below",
                  border_fill_color="#FFFFFF")
     fig.title.offset = -10
@@ -122,7 +122,11 @@ def make_folded_figure_elements(f, f_source, f_model_lc, f_model_lc_source, help
              source=f_model_lc_source, nonselection_line_color='firebrick',
              nonselection_line_alpha=1.0)
 
-    help = fig.asterisk('phase', 'flux', alpha=0.5, size=10, source=help_source)
+
+    question_mark = Text(x="phase", y="flux", text="helpme", text_color="grey", text_align='center', text_baseline="middle", text_font_size='12px', text_font_style='bold', text_alpha=0.6)
+    fig.add_glyph(help_source, question_mark)
+    help = fig.circle('phase', 'flux', alpha=0.0, size=15, source=help_source, line_width=2, line_color='grey', line_alpha=0.6)
+
     tooltips = [("", "@help")]
     tooltips = """
                 <div style="width: 350px;">
@@ -143,9 +147,6 @@ def make_folded_figure_elements(f, f_source, f_model_lc, f_model_lc_source, help
                                 </tr>
                                 <tr>
                                     <td><img src="@panicon" height="20" width="20"></td><td><span style="font-size: 11px;"">Pan Tool</span></td>
-                                </tr>
-                                <tr>
-                                    <td><img src="@wheelicon" height="20" width="20"></td><td><span style="font-size: 11px;"">Wheel Zoom Tool</span></td>
                                 </tr>
                                 <tr>
                                     <td><img src="@reseticon" height="20" width="20"></td><td><span style="font-size: 11px;"">Reset Tool</span></td>
@@ -263,7 +264,8 @@ def show_interact_widget(lc, notebook_url='localhost:8888'):
                                                  boxicon=['https://bokeh.pydata.org/en/latest/_images/BoxZoom.png'],
                                                  panicon=['https://bokeh.pydata.org/en/latest/_images/Pan.png'],
                                                  wheelicon=['https://bokeh.pydata.org/en/latest/_images/WheelZoom.png'],
-                                                 reseticon=['https://bokeh.pydata.org/en/latest/_images/Reset.png']
+                                                 reseticon=['https://bokeh.pydata.org/en/latest/_images/Reset.png'],
+                                                 helpme=['?']
                                                  ))
 
         def update_params(all=False):
