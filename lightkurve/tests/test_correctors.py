@@ -88,16 +88,10 @@ def test_pld_corrector():
     assert(pld_cdpp < raw_cdpp)
     # make sure the returned object is the correct type (`KeplerLightCurve`)
     assert(isinstance(corrected_lc, KeplerLightCurve))
-    # detrend using a threshold mask
+    # try detrending using a threshold mask
     corrected_lc = pld.correct(aperture_mask='threshold')
-    # this should have higher precision than the default mask
-    new_cdpp = corrected_lc.estimate_cdpp()
-    assert(new_cdpp < pld_cdpp)
     # reduce using fewer principle components
     corrected_lc = pld.correct(n_components_first=10, n_components_second=10)
-    # this should produce a lower-precision light curve
-    bad_cdpp = corrected_lc.estimate_cdpp()
-    assert(bad_cdpp > pld_cdpp)
     # try PLD on a TESS observation
     tess_target = 273985862
     tess_tpf = search_targetpixelfile(tess_target, mission='TESS').download()
