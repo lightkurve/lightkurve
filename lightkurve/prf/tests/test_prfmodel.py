@@ -61,13 +61,13 @@ def test_tess_prf():
 def test_kepler_prf_interpolation_consistency():
     """Ensures that the interpolated prf is consistent with calibration files.
     """
-    sprf = KeplerPRF(channel=56, shape=[15, 15], column=0, row=0)
+    prf = KeplerPRF(channel=56, shape=[15, 15], column=0, row=0)
     cal_prf = fits.open("http://archive.stsci.edu/missions/kepler/fpc/prf/"
                         "extracted/kplr16.4_2011265_prf.fits")
     cal_prf_subsampled = cal_prf[-1].data[25::50, 25::50]
     cal_prf_subsampled_normalized = cal_prf_subsampled / (cal_prf[-1].data.sum() * 0.02 ** 2)
-    sprf_data = sprf(center_col=7.5, center_row=7.5, flux=1)
-    np.isclose(np.sum(np.abs(sprf_data - cal_prf_subsampled_normalized)), 0)
+    prf_data = prf(center_col=7.5, center_row=7.5, flux=1, scale_col=1, scale_row=1, rotation_angle=0)
+    np.isclose(np.sum(np.abs(prf_data - cal_prf_subsampled_normalized)), 0)
 
 
 def test_get_model_prf():
