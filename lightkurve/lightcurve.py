@@ -943,17 +943,12 @@ class LightCurve(object):
         """
         return self.to_pandas().to_csv(path_or_buf=path_or_buf, **kwargs)
 
-    def to_bls(self):
-        """Returns an `astropy.stats.BoxLeastSquares` object."""
-        from astropy.stats import BoxLeastSquares
-        return BoxLeastSquares(self.time, self.flux, self.flux_err)
-
     def to_periodogram(self, method="lombscargle", **kwargs):
         """Returns a `Periodogram` power spectrum object.
 
         Parameters
         ----------
-        method : 'lombscargle' or 'bls'
+        method : "lombscargle" or "bls"
             Which method to use?
         kwargs : dict
             Keyword arguments passed to either `LombScargle(...)` or
@@ -964,19 +959,17 @@ class LightCurve(object):
         Periodogram : `Periodogram` object
             Returns a Periodogram object extracted from the lightcurve.
         """
-        from . import Periodogram
+        allowed_methods = ["lombscargle", "bls"]
+        if method not in allowed_methods:
+            raise ValueError(("Unrecognized method '{0}'\n"
+                              "allowed methods are: {1}")
+                             .format(method, allowed_methods))
         if method == "bls":
-            bls = self.to_bls()
-            duration = kwargs.pop("duration", 0.25)
-            period = kwargs.pop("period", bls.autoperiod(duration))
-            result = self.to_bls().power(period, duration, **kwargs)
-            if not isinstance(result.period, u.quantity.Quantity):
-                result.period = result.period * u.day
-            if not isinstance(result.power, u.quantity.Quantity):
-                result.power = result.power * u.dimensionless_unscaled
-            return Periodogram(frequency=1. / result.period, power=result.power)
+            from . import BoxLeastSquaresPeriodogram
+            return BoxLeastSquaresPeriodogram.from_lightcurve(lc=self, **kwargs)
         else:
-            return Periodogram.from_lightcurve(lc=self, **kwargs)
+            from . import LombScarglePeriodogram
+            return LombScarglePeriodogram.from_lightcurve(lc=self, **kwargs)
 
     def _boolean_mask_to_bitmask(self, aperture_mask):
         """Takes in an aperture_mask and returns a Kepler-style bitmask
@@ -1193,6 +1186,7 @@ class FoldedLightCurve(LightCurve):
         if 'xlabel' not in kwargs:
             ax.set_xlabel("Phase")
         return ax
+
 
 class KeplerLightCurve(LightCurve):
     """Defines a light curve class for NASA's Kepler and K2 missions.

@@ -20,7 +20,7 @@ from . import MPLSTYLE
 
 log = logging.getLogger(__name__)
 
-__all__ = ['Periodogram']
+__all__ = ['Periodogram', 'LombScarglePeriodogram', 'BoxLeastSquaresPeriodogram']
 
 
 class Periodogram(object):
@@ -92,199 +92,6 @@ class Periodogram(object):
     def period_at_max_power(self):
         """Returns the period corresponding to the highest peak in the periodogram."""
         return 1. / self.frequency_at_max_power
-
-    @staticmethod
-    def from_lightcurve(lc, min_frequency=None, max_frequency=None,
-                        min_period=None, max_period=None,
-                        frequency=None, period=None,
-                        nterms=1, nyquist_factor=1, oversample_factor=1,
-                        freq_unit=1/u.day, **kwargs):
-        """Creates a Periodogram from a LightCurve using the Lomb-Scargle method.
-
-        By default, the periodogram will be created for a regular grid of
-        frequencies from one frequency separation to the Nyquist frequency,
-        where the frequency separation is determined as 1 / the time baseline.
-
-        The min frequency and/or max frequency (or max period and/or min period)
-        can be passed to set custom limits for the frequency grid. Alternatively,
-        the user can provide a custom regular grid using the `frequency`
-        parameter or a custom regular grid of periods using the `period`
-        parameter.
-
-        The spectrum can be oversampled by increasing the oversample_factor
-        parameter. The parameter nterms controls how many Fourier terms are used
-        in the model. Note that many terms could lead to spurious peaks. Setting
-        the Nyquist_factor to be greater than 1 will sample the space beyond the
-        Nyquist frequency, which may introduce aliasing.
-
-        The unit parameter allows a request for alternative units in frequency
-        space. By default frequency is in (1/day) and power in (ppm^2 * day).
-        Asteroseismologists for example may want frequency in (microHz) and
-        power in (ppm^2 / microHz), in which case they would pass
-        `unit = u.microhertz` where `u` is `astropy.units`
-
-        By default this method uses the LombScargle 'fast' method, which assumes
-        a regular grid. If a regular grid of periods (i.e. an irregular grid of
-        frequencies) it will use the 'slow' method. If nterms > 1 is passed, it
-        will use the 'fastchi2' method for regular grids, and 'chi2' for
-        irregular grids. The normalizatin of the Lomb Scargle periodogram is
-        fixed to `psd`, and cannot be overridden.
-
-        Caution: this method assumes that the LightCurve's time (lc.time)
-        is given in units of days.
-
-        Parameters
-        ----------
-        lc : LightCurve object
-            The LightCurve from which to compute the Periodogram.
-        min_frequency : float
-            If specified, use this minimum frequency rather than one over the
-            time baseline.
-        max_frequency : float
-            If specified, use this maximum frequency rather than nyquist_factor
-            times the nyquist frequency.
-        min_period : float
-            If specified, use 1./minium_period as the maximum frequency rather
-            than nyquist_factor times the nyquist frequency.
-        max_period : float
-            If specified, use 1./maximum_period as the minimum frequency rather
-            than one over the time baseline.
-        frequency :  array-like
-            The regular grid of frequencies to use. If given a unit, it is
-            converted to units of freq_unit. If not, it is assumed to be in
-            units of freq_unit. This over rides any set frequency limits.
-        period : array-like
-            The regular grid of periods to use (as 1/period). If given a unit,
-            it is converted to units of freq_unit. If not, it is assumed to be
-            in units of 1/freq_unit. This overrides any set period limits.
-        nterms : int
-            Default 1. Number of terms to use in the Fourier fit.
-        nyquist_factor : int
-            Default 1. The multiple of the average Nyquist frequency. Is
-            overriden by maximum_frequency (or minimum period).
-        oversample_factor : int
-            The frequency spacing, determined by the time baseline of the
-            lightcurve, is divided by this factor, oversampling the frequency
-            space. This parameter is identical to the samples_per_peak parameter
-            in astropy.LombScargle()
-        freq_unit : `astropy.units.core.CompositeUnit`
-            Default: 1/u.day. The desired frequency units for the Lomb Scargle
-            periodogram. This implies that 1/freq_unit is the units for period.
-        kwargs : dict
-            Keyword arguments passed to `astropy.stats.LombScargle()`
-
-        Returns
-        -------
-        Periodogram : `Periodogram` object
-            Returns a Periodogram object extracted from the lightcurve.
-        """
-        # Make sure the lightcurve object is normalized
-        lc = lc.normalize()
-
-        # Check if any values of period have been passed and set format accordingly
-        if not all(b is None for b in [period, min_period, max_period]):
-            format = 'period'
-        else:
-            format = 'frequency'
-
-        # If period and frequency keywords have both been set, throw an error
-        if (not all(b is None for b in [period, min_period, max_period])) & \
-           (not all(b is None for b in [frequency, min_frequency, max_frequency])):
-            raise ValueError('You have input keyword arguments for both frequency and period. '
-                             'Please only use one.')
-
-        if (~np.isfinite(lc.flux)).any():
-            raise ValueError('Lightcurve contains NaN values. Use lc.remove_nans()'
-                             ' to remove NaN values from a LightCurve.')
-
-        # Hard coding that time is in days.
-        time = lc.time.copy() * u.day
-
-        # Calculate Nyquist Frequency and frequency bin width in terms of days
-        nyquist = 0.5 * (1./(np.median(np.diff(time))))
-        fs = (1./(time[-1] - time[0])) / oversample_factor
-
-        # Convert these values to requested frequency unit
-        nyquist = nyquist.to(freq_unit)
-        fs = fs.to(freq_unit)
-
-        # Warn if there is confusing input
-        if (frequency is not None) & (any([a is not None for a in [min_frequency, max_frequency]])):
-            log.warning("You have passed both a grid of frequencies "
-                        "and min_frequency/max_frequency arguments; "
-                        "the latter will be ignored.")
-        if (period is not None) & (any([a is not None for a in [min_period, max_period]])):
-            log.warning("You have passed a grid of periods "
-                        "and min_period/max_period arguments; "
-                        "the latter will be ignored.")
-
-        # Tidy up the period stuff...
-        if max_period is not None:
-            # min_frequency MUST be none by this point.
-            min_frequency = 1. / max_period
-        if min_period is not None:
-            # max_frequency MUST be none by this point.
-            max_frequency = 1. / min_period
-        # If the user specified a period, copy it into the frequency.
-        if (period is not None):
-            frequency = 1. / period
-
-        # Do unit conversions if user input min/max frequency or period
-        if frequency is None:
-            if min_frequency is not None:
-                min_frequency = u.Quantity(min_frequency, freq_unit)
-            if max_frequency is not None:
-                max_frequency = u.Quantity(max_frequency, freq_unit)
-            if (min_frequency is not None) & (max_frequency is not None):
-                if (min_frequency > max_frequency):
-                    if format == 'frequency':
-                        raise ValueError('min_frequency cannot be larger than max_frequency')
-                    if format == 'period':
-                        raise ValueError('min_period cannot be larger than max_period')
-            # If nothing has been passed in, set them to the defaults
-            if min_frequency is None:
-                min_frequency = fs
-            if max_frequency is None:
-                max_frequency = nyquist * nyquist_factor
-
-            # Create frequency grid evenly spaced in frequency
-            frequency = np.arange(min_frequency.value, max_frequency.value, fs.to(freq_unit).value)
-
-        # Convert to desired units
-        frequency = u.Quantity(frequency, freq_unit)
-
-        if nterms > 1:
-            raise NotImplementedError('Increasing the number of terms is not implemented yet.')
-        else:
-            method = 'fast'
-
-        if period is not None:
-            method = 'slow'
-            log.warning("You have passed an evenly-spaced grid of periods. "
-                        "These are not evenly spaced in frequency space.\n"
-                        "Method has been set to 'slow' to allow for this.")
-
-        if float(__version__[0]) >= 3:
-            LS = LombScargle(time, lc.flux * 1e6,
-                             nterms=nterms, normalization='psd', **kwargs)
-            power = LS.power(frequency, method=method)
-        else:
-            LS = LombScargle(time, lc.flux * 1e6,
-                             nterms=nterms, **kwargs)
-            power = LS.power(frequency, method=method, normalization='psd')
-
-        # Normalise the according to Parseval's theorem
-        norm = np.std(lc.flux * 1e6)**2 / np.sum(power)
-        power *= norm
-
-        power = power * (cds.ppm**2)
-
-        # Rescale power to units of ppm^2 / [frequency unit]
-        power = power / fs
-
-        # Periodogram needs properties
-        return Periodogram(frequency=frequency, power=power, nyquist=nyquist,
-                           targetid=lc.targetid, label=lc.label)
 
     def bin(self, binsize=10, method='mean'):
         """Bins the power spectrum.
@@ -695,3 +502,225 @@ class SNRPeriodogram(Periodogram):
         if 'ylabel' not in kwargs:
             ax.set_ylabel("Signal to Noise Ratio (SNR)")
         return ax
+
+
+class LombScarglePeriodogram(Periodogram):
+
+    def __init__(self, *args, **kwargs):
+        super(LombScarglePeriodogram, self).__init__(*args, **kwargs)
+
+    @staticmethod
+    def from_lightcurve(lc, min_frequency=None, max_frequency=None,
+                        min_period=None, max_period=None,
+                        frequency=None, period=None,
+                        nterms=1, nyquist_factor=1, oversample_factor=1,
+                        freq_unit=1/u.day, **kwargs):
+        """Creates a Periodogram from a LightCurve using the Lomb-Scargle method.
+
+        By default, the periodogram will be created for a regular grid of
+        frequencies from one frequency separation to the Nyquist frequency,
+        where the frequency separation is determined as 1 / the time baseline.
+
+        The min frequency and/or max frequency (or max period and/or min period)
+        can be passed to set custom limits for the frequency grid. Alternatively,
+        the user can provide a custom regular grid using the `frequency`
+        parameter or a custom regular grid of periods using the `period`
+        parameter.
+
+        The spectrum can be oversampled by increasing the oversample_factor
+        parameter. The parameter nterms controls how many Fourier terms are used
+        in the model. Note that many terms could lead to spurious peaks. Setting
+        the Nyquist_factor to be greater than 1 will sample the space beyond the
+        Nyquist frequency, which may introduce aliasing.
+
+        The unit parameter allows a request for alternative units in frequency
+        space. By default frequency is in (1/day) and power in (ppm^2 * day).
+        Asteroseismologists for example may want frequency in (microHz) and
+        power in (ppm^2 / microHz), in which case they would pass
+        `unit = u.microhertz` where `u` is `astropy.units`
+
+        By default this method uses the LombScargle 'fast' method, which assumes
+        a regular grid. If a regular grid of periods (i.e. an irregular grid of
+        frequencies) it will use the 'slow' method. If nterms > 1 is passed, it
+        will use the 'fastchi2' method for regular grids, and 'chi2' for
+        irregular grids. The normalizatin of the Lomb Scargle periodogram is
+        fixed to `psd`, and cannot be overridden.
+
+        Caution: this method assumes that the LightCurve's time (lc.time)
+        is given in units of days.
+
+        Parameters
+        ----------
+        lc : LightCurve object
+            The LightCurve from which to compute the Periodogram.
+        min_frequency : float
+            If specified, use this minimum frequency rather than one over the
+            time baseline.
+        max_frequency : float
+            If specified, use this maximum frequency rather than nyquist_factor
+            times the nyquist frequency.
+        min_period : float
+            If specified, use 1./minium_period as the maximum frequency rather
+            than nyquist_factor times the nyquist frequency.
+        max_period : float
+            If specified, use 1./maximum_period as the minimum frequency rather
+            than one over the time baseline.
+        frequency :  array-like
+            The regular grid of frequencies to use. If given a unit, it is
+            converted to units of freq_unit. If not, it is assumed to be in
+            units of freq_unit. This over rides any set frequency limits.
+        period : array-like
+            The regular grid of periods to use (as 1/period). If given a unit,
+            it is converted to units of freq_unit. If not, it is assumed to be
+            in units of 1/freq_unit. This overrides any set period limits.
+        nterms : int
+            Default 1. Number of terms to use in the Fourier fit.
+        nyquist_factor : int
+            Default 1. The multiple of the average Nyquist frequency. Is
+            overriden by maximum_frequency (or minimum period).
+        oversample_factor : int
+            The frequency spacing, determined by the time baseline of the
+            lightcurve, is divided by this factor, oversampling the frequency
+            space. This parameter is identical to the samples_per_peak parameter
+            in astropy.LombScargle()
+        freq_unit : `astropy.units.core.CompositeUnit`
+            Default: 1/u.day. The desired frequency units for the Lomb Scargle
+            periodogram. This implies that 1/freq_unit is the units for period.
+        kwargs : dict
+            Keyword arguments passed to `astropy.stats.LombScargle()`
+
+        Returns
+        -------
+        Periodogram : `Periodogram` object
+            Returns a Periodogram object extracted from the lightcurve.
+        """
+        # Make sure the lightcurve object is normalized
+        lc = lc.normalize()
+
+        # Check if any values of period have been passed and set format accordingly
+        if not all(b is None for b in [period, min_period, max_period]):
+            format = 'period'
+        else:
+            format = 'frequency'
+
+        # If period and frequency keywords have both been set, throw an error
+        if (not all(b is None for b in [period, min_period, max_period])) & \
+           (not all(b is None for b in [frequency, min_frequency, max_frequency])):
+            raise ValueError('You have input keyword arguments for both frequency and period. '
+                             'Please only use one.')
+
+        if (~np.isfinite(lc.flux)).any():
+            raise ValueError('Lightcurve contains NaN values. Use lc.remove_nans()'
+                             ' to remove NaN values from a LightCurve.')
+
+        # Hard coding that time is in days.
+        time = lc.time.copy() * u.day
+
+        # Calculate Nyquist Frequency and frequency bin width in terms of days
+        nyquist = 0.5 * (1./(np.median(np.diff(time))))
+        fs = (1./(time[-1] - time[0])) / oversample_factor
+
+        # Convert these values to requested frequency unit
+        nyquist = nyquist.to(freq_unit)
+        fs = fs.to(freq_unit)
+
+        # Warn if there is confusing input
+        if (frequency is not None) & (any([a is not None for a in [min_frequency, max_frequency]])):
+            log.warning("You have passed both a grid of frequencies "
+                        "and min_frequency/max_frequency arguments; "
+                        "the latter will be ignored.")
+        if (period is not None) & (any([a is not None for a in [min_period, max_period]])):
+            log.warning("You have passed a grid of periods "
+                        "and min_period/max_period arguments; "
+                        "the latter will be ignored.")
+
+        # Tidy up the period stuff...
+        if max_period is not None:
+            # min_frequency MUST be none by this point.
+            min_frequency = 1. / max_period
+        if min_period is not None:
+            # max_frequency MUST be none by this point.
+            max_frequency = 1. / min_period
+        # If the user specified a period, copy it into the frequency.
+        if (period is not None):
+            frequency = 1. / period
+
+        # Do unit conversions if user input min/max frequency or period
+        if frequency is None:
+            if min_frequency is not None:
+                min_frequency = u.Quantity(min_frequency, freq_unit)
+            if max_frequency is not None:
+                max_frequency = u.Quantity(max_frequency, freq_unit)
+            if (min_frequency is not None) & (max_frequency is not None):
+                if (min_frequency > max_frequency):
+                    if format == 'frequency':
+                        raise ValueError('min_frequency cannot be larger than max_frequency')
+                    if format == 'period':
+                        raise ValueError('min_period cannot be larger than max_period')
+            # If nothing has been passed in, set them to the defaults
+            if min_frequency is None:
+                min_frequency = fs
+            if max_frequency is None:
+                max_frequency = nyquist * nyquist_factor
+
+            # Create frequency grid evenly spaced in frequency
+            frequency = np.arange(min_frequency.value, max_frequency.value, fs.to(freq_unit).value)
+
+        # Convert to desired units
+        frequency = u.Quantity(frequency, freq_unit)
+
+        if nterms > 1:
+            raise NotImplementedError('Increasing the number of terms is not implemented yet.')
+        else:
+            method = 'fast'
+
+        if period is not None:
+            method = 'slow'
+            log.warning("You have passed an evenly-spaced grid of periods. "
+                        "These are not evenly spaced in frequency space.\n"
+                        "Method has been set to 'slow' to allow for this.")
+
+        if float(__version__[0]) >= 3:
+            LS = LombScargle(time, lc.flux * 1e6,
+                             nterms=nterms, normalization='psd', **kwargs)
+            power = LS.power(frequency, method=method)
+        else:
+            LS = LombScargle(time, lc.flux * 1e6,
+                             nterms=nterms, **kwargs)
+            power = LS.power(frequency, method=method, normalization='psd')
+
+        # Normalise the according to Parseval's theorem
+        norm = np.std(lc.flux * 1e6)**2 / np.sum(power)
+        power *= norm
+
+        power = power * (cds.ppm**2)
+
+        # Rescale power to units of ppm^2 / [frequency unit]
+        power = power / fs
+
+        # Periodogram needs properties
+        return LombScarglePeriodogram(frequency=frequency, power=power, nyquist=nyquist,
+                                      targetid=lc.targetid, label=lc.label)
+
+
+class BoxLeastSquaresPeriodogram(Periodogram):
+
+    def __init__(self, *args, **kwargs):
+        super(BoxLeastSquaresPeriodogram, self).__init__(*args, **kwargs)
+
+    @staticmethod
+    def from_lightcurve(lc, **kwargs):
+        """Creates a Periodogram from a LightCurve using the Box Least Squares (BLS) method."""
+        try:
+            from astropy.stats import BoxLeastSquares
+        except ImportError:
+            raise Exception("BLS requires AstroPy v3.1 or later")
+        bls = BoxLeastSquares(lc.time, lc.flux, lc.flux_err)
+        duration = kwargs.pop("duration", 0.25)
+        period = kwargs.pop("period", bls.autoperiod(duration))
+        result = bls.power(period, duration, **kwargs)
+        if not isinstance(result.period, u.quantity.Quantity):
+            result.period = result.period * u.day
+        if not isinstance(result.power, u.quantity.Quantity):
+            result.power = result.power * u.dimensionless_unscaled
+        return BoxLeastSquaresPeriodogram(frequency=1. / result.period, power=result.power)
