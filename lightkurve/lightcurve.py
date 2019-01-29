@@ -894,7 +894,8 @@ class LightCurve(object):
             of the form "localhost:8888", then "http" will be used.
         """
         from .interact_bls import show_interact_widget
-        return show_interact_widget(self, notebook_url=notebook_url)
+        clean = self.remove_nans()
+        return show_interact_widget(clean, notebook_url=notebook_url)
 
 
     def to_table(self):
