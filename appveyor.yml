@@ -1,3 +1,5 @@
+image: Visual Studio 2017 # required to install pybind11 (celerite dependency)
+
 build: false
 
 environment:
