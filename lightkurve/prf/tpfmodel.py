@@ -496,18 +496,17 @@ class TPFModel(object):
         return self._predict(*params_array)
 
     def gradient(self, *params_array):
-        """UNFINISHED WORK!"""
         params = self._params.from_array(params_array)
         grad = []
         for star in params.stars:
             grad.append(self.prfmodel.gradient(center_col=star.col,
                                                center_row=star.row,
-                                               flux=star.flux))
-        # We assume the background gradient is proportional to one
+                                               flux=star.flux,
+                                               scale_col=star.scale_col,
+                                               scale_row=star.scale_row,
+                                               rotation_angle=star.rotation_angle))
+        # Our background per pixel model is hard-coded as a constant
         grad.append([np.ones(self.prfmodel.shape)])
-        # We assume the gradient of other parameters is one
-        for i in range(len([params_array]) - 3 * len(params.stars) - 1):
-            grad.append([np.ones(self.prfmodel.shape)])
         grad = sum(grad, [])
         return grad
 
