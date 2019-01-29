@@ -79,7 +79,7 @@ def test_pld_corrector():
     k2_target = 247887989
     k2_tpf = search_targetpixelfile(k2_target).download()
     # instantiate PLD corrector object
-    pld = PLDCorrector(k2_tpf)
+    pld = PLDCorrector(k2_tpf[:1000])
     # produce a PLD-corrected light curve with a default aperture mask
     corrected_lc = pld.correct()
     # ensure the CDPP was reduced by the corrector
@@ -102,7 +102,7 @@ def test_pld_corrector():
     tess_target = 273985862
     tess_tpf = search_targetpixelfile(tess_target, mission='TESS').download()
     # instantiate PLD corrector object
-    pld = PLDCorrector(tess_tpf)
+    pld = PLDCorrector(tess_tpf[:1000])
     # produce a PLD-corrected light curve with a pipeline aperture mask
     raw_lc = tess_tpf.to_lightcurve(aperture_mask='pipeline')
     corrected_lc = pld.correct(aperture_mask='pipeline', n_components_first=15,
