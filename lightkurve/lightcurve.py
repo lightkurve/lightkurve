@@ -992,69 +992,33 @@ class LightCurve(object):
         """
         return self.to_pandas().to_csv(path_or_buf=path_or_buf, **kwargs)
 
-    def to_periodogram(self, nterms=1, nyquist_factor=1, oversample_factor=1,
-                       min_frequency=None, max_frequency=None,
-                       min_period=None, max_period=None,
-                       frequency=None, period=None,
-                       freq_unit=1/u.day, **kwargs):
+    def to_periodogram(self, method="lombscargle", **kwargs):
         """Returns a `Periodogram` power spectrum object.
 
         Parameters
         ----------
-        min_frequency : float
-            If specified, use this minimum frequency rather than one over the
-            time baseline.
-        max_frequency : float
-            If specified, use this maximum frequency rather than nyquist_factor
-            times the nyquist frequency.
-        min_period : float
-            If specified, use 1./minium_period as the maximum frequency rather
-            than nyquist_factor times the nyquist frequency.
-        max_period : float
-            If specified, use 1./maximum_period as the minimum frequency rather
-            than one over the time baseline.
-        frequency :  array-like
-            The regular grid of frequencies to use. If given a unit, it is
-            converted to units of freq_unit. If not, it is assumed to be in
-            units of freq_unit. This over rides any set frequency limits.
-        period : array-like
-            The regular grid of periods to use (as 1/period). If given a unit,
-            it is converted to units of freq_unit. If not, it is assumed to be
-            in units of 1/freq_unit. This overrides any set period limits.
-        nterms : int
-            Default 1. Number of terms to use in the Fourier fit.
-        nyquist_factor : int
-            Default 1. The multiple of the average Nyquist frequency. Is
-            overriden by maximum_frequency (or minimum period).
-        oversample_factor : int
-            The frequency spacing, determined by the time baseline of the
-            lightcurve, is divided by this factor, oversampling frequency space.
-            This parameter is identical to the samples_per_peak parameter in
-            astropy.LombScargle()
-        freq_unit : `astropy.units.core.CompositeUnit`
-            Default: 1/u.day. The desired frequency units for the Lomb Scargle
-            periodogram. This implies that 1/freq_unit is the units for period.
+        method : "lombscargle" or "bls"
+            Which method to use?
         kwargs : dict
-            Keyword arguments passed to `astropy.stats.LombScargle()`
+            Keyword arguments passed to either `LombScargle(...)` or
+            `BoxLeastSquares.power(...)`
 
         Returns
         -------
         Periodogram : `Periodogram` object
             Returns a Periodogram object extracted from the lightcurve.
         """
-        from . import Periodogram
-        return Periodogram.from_lightcurve(lc=self,
-                                           min_frequency=min_frequency,
-                                           max_frequency=max_frequency,
-                                           min_period=min_period,
-                                           max_period=max_period,
-                                           frequency=frequency,
-                                           period=period,
-                                           nterms=nterms,
-                                           nyquist_factor=nyquist_factor,
-                                           oversample_factor=oversample_factor,
-                                           freq_unit=freq_unit,
-                                           **kwargs)
+        allowed_methods = ["lombscargle", "bls"]
+        if method not in allowed_methods:
+            raise ValueError(("Unrecognized method '{0}'\n"
+                              "allowed methods are: {1}")
+                             .format(method, allowed_methods))
+        if method == "bls":
+            from . import BoxLeastSquaresPeriodogram
+            return BoxLeastSquaresPeriodogram.from_lightcurve(lc=self, **kwargs)
+        else:
+            from . import LombScarglePeriodogram
+            return LombScarglePeriodogram.from_lightcurve(lc=self, **kwargs)
 
     def _boolean_mask_to_bitmask(self, aperture_mask):
         """Takes in an aperture_mask and returns a Kepler-style bitmask
@@ -1271,6 +1235,7 @@ class FoldedLightCurve(LightCurve):
         if 'xlabel' not in kwargs:
             ax.set_xlabel("Phase")
         return ax
+
 
 class KeplerLightCurve(LightCurve):
     """Defines a light curve class for NASA's Kepler and K2 missions.
