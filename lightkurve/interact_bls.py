@@ -13,7 +13,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from datetime import datetime
 from time import time
-
+from astropy.convolution import convolve, Box1DKernel
+import warnings
 
 log = logging.getLogger(__name__)
 # Import the optional Bokeh dependency, or print a friendly error otherwise.
@@ -92,8 +93,8 @@ def prepare_folded_datasource(f):
     '''
 
     folded_source = ColumnDataSource(data=dict(
-                                 phase=f.time,
-                                 flux=f.flux))
+                                 phase=np.sort(f.time),
+                                 flux=f.flux[np.argsort(f.time)]))
     return folded_source
 
 
@@ -301,9 +302,10 @@ def make_folded_figure_elements(f, f_model_lc, f_source, f_model_lc_source, help
          nonselection_line_alpha=1.0, size=2)
 
     # Line plot for model
-    fig.line('phase', 'flux', line_width=3, color='firebrick',
+    fig.step('phase', 'flux', line_width=3, color='firebrick',
              source=f_model_lc_source, nonselection_line_color='firebrick',
              nonselection_line_alpha=1.0)
+
 
     # Help button
     question_mark = Text(x="phase", y="flux", text="helpme", text_color="grey", text_align='center', text_baseline="middle", text_font_size='12px', text_font_style='bold', text_alpha=0.6)
@@ -442,7 +444,13 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
         bls_help_source = prepare_bls_help_source(bls_source, npoints_slider.value)
 
         # Set up the model LC
-        model_lc = LightCurve(lc.time, model.model(lc.time, best_period, duration_slider.value, best_t0))
+        mf = model.model(lc.time, best_period, duration_slider.value, best_t0)
+        mf /= np.median(mf)
+        mask = ~(convolve(np.asarray(mf == np.median(mf)), Box1DKernel(2)) > 0.9)
+        model_lc = LightCurve(lc.time[mask], mf[mask])
+        model_lc = model_lc.append(LightCurve([(lc.time[0] - best_t0) + best_period/2], [1]))
+        model_lc = model_lc.append(LightCurve([(lc.time[0] - best_t0) + 3*best_period/2], [1]))
+
         model_lc_source = ColumnDataSource(data=dict(
                                      time=model_lc.time,
                                      flux=model_lc.flux))
@@ -454,6 +462,9 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
         # Set up folded LC
         f = lc.fold(best_period, best_t0)
         f_model_lc = model_lc.fold(best_period, best_t0)
+        f_model_lc = LightCurve([-0.5], [1]).append(f_model_lc)
+        f_model_lc = f_model_lc.append(LightCurve([0.5], [1]))
+
         f_model_lc_source = ColumnDataSource(data=dict(
                                  phase=f_model_lc.time,
                                  flux=f_model_lc.flux))
@@ -486,12 +497,18 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
             f_source.data['flux'] = f.flux
             f_source.data['phase'] = f.time
 
-            model_lc = LightCurve(lc.time, model.model(lc.time, best_period, duration_slider.value, best_t0))
-            model_lc_source.data['flux'] = model_lc.flux
-            model_lc_source.data['time'] = model_lc.time
+            mf = model.model(lc.time, best_period, duration_slider.value, best_t0)
+            mf /= np.median(mf)
+            mask = ~(convolve(np.asarray(mf == np.median(mf)), Box1DKernel(2)) > 0.9)
+            model_lc = LightCurve(lc.time[mask], mf[mask])
+
+            model_lc_source.data = {'time':model_lc.time, 'flux':model_lc.flux}
+
             f_model_lc = model_lc.fold(best_period, best_t0)
-            f_model_lc_source.data['flux'] = f_model_lc.flux
-            f_model_lc_source.data['phase'] = f_model_lc.time
+            f_model_lc = LightCurve([-0.5], [1]).append(f_model_lc)
+            f_model_lc = f_model_lc.append(LightCurve([0.5], [1]))
+
+            f_model_lc_source.data = {'phase':f_model_lc.time, 'flux':f_model_lc.flux}
 
             vertical_line.update(location=best_period)
             fig_folded.title.text = 'Period: {} days \t T0: {}'.format(np.round(best_period, 7), np.round(best_t0, 5))
