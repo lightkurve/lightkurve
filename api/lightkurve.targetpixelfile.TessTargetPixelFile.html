@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>TessTargetPixelFile &mdash; lightkurve 1.0b24.dev documentation</title>
+  <title>TessTargetPixelFile &mdash; lightkurve 1.0b26.dev documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                1.0b24.dev
+                1.0b26.dev
               </div>
             
           
@@ -209,6 +209,11 @@
 .admonition > p:before {
     margin-right: 4px;  /* make room for the exclamation icon */
 }
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
 </style>
 <div class="section" id="tesstargetpixelfile">
 <h1>TessTargetPixelFile<a class="headerlink" href="#tesstargetpixelfile" title="Permalink to this headline">¶</a></h1>
@@ -290,7 +295,7 @@ Enables extraction of raw lightcurves and centroid positions.</p>
 <td>Returns a boolean mask flagging cadences whose time is <cite>nan</cite>.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.pipeline_mask" title="lightkurve.targetpixelfile.TessTargetPixelFile.pipeline_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pipeline_mask</span></code></a></td>
-<td>Returns the optimal aperture mask used by the TESS pipeline.</td>
+<td>Returns the optimal aperture mask used by the pipeline.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.pos_corr1" title="lightkurve.targetpixelfile.TessTargetPixelFile.pos_corr1"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pos_corr1</span></code></a></td>
 <td>Returns the column position correction.</td>
@@ -352,7 +357,7 @@ Enables extraction of raw lightcurves and centroid positions.</p>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.get_keyword" title="lightkurve.targetpixelfile.TessTargetPixelFile.get_keyword"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_keyword</span></code></a>(keyword[,&nbsp;hdu,&nbsp;default])</td>
 <td>Returns a header keyword value.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.interact" title="lightkurve.targetpixelfile.TessTargetPixelFile.interact"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interact</span></code></a>([lc,&nbsp;notebook_url,&nbsp;max_cadences])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.interact" title="lightkurve.targetpixelfile.TessTargetPixelFile.interact"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interact</span></code></a>([notebook_url,&nbsp;max_cadences,&nbsp;…])</td>
 <td>Display an interactive Jupyter Notebook widget to inspect the pixel data.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.plot" title="lightkurve.targetpixelfile.TessTargetPixelFile.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>([ax,&nbsp;frame,&nbsp;cadenceno,&nbsp;bkg,&nbsp;…])</td>
@@ -460,9 +465,7 @@ Enables extraction of raw lightcurves and centroid positions.</p>
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.pipeline_mask">
 <code class="descname">pipeline_mask</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.pipeline_mask" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the optimal aperture mask used by the TESS pipeline.</p>
-<p>For details on how the mask is stored in a TPF, see Section 6 of the
-Data Products documentation (EXP-TESS-ARC-ICD-TM-0014.pdf).</p>
+<dd><p>Returns the optimal aperture mask used by the pipeline.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -701,7 +704,7 @@ then return <code class="docutils literal notranslate"><span class="pre">default
 
 <dl class="method">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.interact">
-<code class="descname">interact</code><span class="sig-paren">(</span><em>lc=None</em>, <em>notebook_url='localhost:8888'</em>, <em>max_cadences=30000</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.interact" title="Permalink to this definition">¶</a></dt>
+<code class="descname">interact</code><span class="sig-paren">(</span><em>notebook_url='localhost:8888'</em>, <em>max_cadences=30000</em>, <em>aperture_mask='pipeline'</em>, <em>exported_filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.interact" title="Permalink to this definition">¶</a></dt>
 <dd><p>Display an interactive Jupyter Notebook widget to inspect the pixel data.</p>
 <p>The widget will show both the lightcurve and pixel data.  By default,
 the lightcurve shown is obtained by calling the <cite>to_lightcurve()</cite> method,
@@ -716,9 +719,6 @@ are contained in the TPF (e.g. short cadence data).</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>lc</strong> <span class="classifier-delimiter">:</span> <span class="classifier">LightCurve object</span></dt>
-<dd><p class="first last">An optional pre-processed lightcurve object to show.</p>
-</dd>
 <dt><strong>notebook_url: str</strong></dt>
 <dd><p class="first last">Location of the Jupyter notebook page (default: “localhost:8888”)
 When showing Bokeh applications, the Bokeh server must be
@@ -732,6 +732,21 @@ of the form “localhost:8888”, then “http” will be used.</p>
 <dt><strong>max_cadences</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
 <dd><p class="first last">Raise a RuntimeError if the number of cadences shown is larger than
 this value. This limit helps keep browsers from becoming unresponsive.</p>
+</dd>
+<dt><strong>aperture_mask</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array-like, ‘pipeline’, ‘threshold’ or ‘all’</span></dt>
+<dd><p class="first last">A boolean array describing the aperture such that <cite>True</cite> means
+that the pixel will be used.
+If None or ‘all’ are passed, all pixels will be used.
+If ‘pipeline’ is passed, the mask suggested by the official pipeline
+will be returned.
+If ‘threshold’ is passed, all pixels brighter than 3-sigma above
+the median flux will be used.</p>
+</dd>
+<dt><strong>exported_filename: str</strong></dt>
+<dd><p class="first last">An optional filename to assign to exported fits files containing
+the custom aperture mask generated by clicking on pixels in interact.
+The default adds a suffix ‘-custom-aperture-mask.fits’ to the
+TargetPixelFile basename.</p>
 </dd>
 </dl>
 </td>
@@ -892,6 +907,7 @@ of <cite>prf_photometry()</cite> for valid arguments if the method is ‘prf’.
         <script type="text/javascript" src="../_static/underscore.js"></script>
         <script type="text/javascript" src="../_static/doctools.js"></script>
         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     
 
   

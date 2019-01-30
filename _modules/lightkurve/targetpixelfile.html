@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>lightkurve.targetpixelfile &mdash; lightkurve 1.0b24.dev documentation</title>
+  <title>lightkurve.targetpixelfile &mdash; lightkurve 1.0b26.dev documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                1.0b24.dev
+                1.0b26.dev
               </div>
             
           
@@ -314,8 +314,14 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">pipeline_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the aperture mask used by the pipeline&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">data</span> <span class="o">&gt;</span> <span class="mi">2</span>
+        <span class="sd">&quot;&quot;&quot;Returns the optimal aperture mask used by the pipeline.&quot;&quot;&quot;</span>
+        <span class="c1"># Both Kepler and TESS flag the pixels in the optimal aperture using</span>
+        <span class="c1"># bit number 2 in the aperture mask extension, e.g. see Section 6 of</span>
+        <span class="c1"># the TESS Data Products documentation (EXP-TESS-ARC-ICD-TM-0014.pdf).</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">data</span> <span class="o">&amp;</span> <span class="mi">2</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>  <span class="c1"># Early versions of TESScut returned floats in HDU 2</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">shape</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -330,7 +336,12 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">cadenceno</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return the cadence number for all good-quality cadences.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;CADENCENO&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">]</span>
+        <span class="n">cadenceno</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;CADENCENO&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">quality_mask</span><span class="p">]</span>
+        <span class="c1"># The TESScut service returns an array of zeros as CADENCENO.</span>
+        <span class="c1"># If this is the case, return frame numbers from 0 instead.</span>
+        <span class="k">if</span> <span class="n">cadenceno</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">cadenceno</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cadenceno</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">nan_time_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -564,6 +575,8 @@
                 <span class="n">aperture_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_mask</span>
             <span class="k">elif</span> <span class="n">aperture_mask</span> <span class="o">==</span> <span class="s1">&#39;threshold&#39;</span><span class="p">:</span>
                 <span class="n">aperture_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_threshold_mask</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="p">((</span><span class="n">aperture_mask</span> <span class="o">&amp;</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span> <span class="c1"># Kepler-pipeline style</span>
+                <span class="n">aperture_mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">aperture_mask</span> <span class="o">&amp;</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_last_aperture_mask</span> <span class="o">=</span> <span class="n">aperture_mask</span>
         <span class="k">return</span> <span class="n">aperture_mask</span>
 
@@ -744,7 +757,8 @@
             <span class="n">output_fn</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">-targ.fits&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">targetid</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="o">.</span><span class="n">writeto</span><span class="p">(</span><span class="n">output_fn</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">,</span> <span class="n">checksum</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">interact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">notebook_url</span><span class="o">=</span><span class="s1">&#39;localhost:8888&#39;</span><span class="p">,</span> <span class="n">max_cadences</span><span class="o">=</span><span class="mi">30000</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">interact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">notebook_url</span><span class="o">=</span><span class="s1">&#39;localhost:8888&#39;</span><span class="p">,</span> <span class="n">max_cadences</span><span class="o">=</span><span class="mi">30000</span><span class="p">,</span>
+                <span class="n">aperture_mask</span><span class="o">=</span><span class="s1">&#39;pipeline&#39;</span><span class="p">,</span> <span class="n">exported_filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Display an interactive Jupyter Notebook widget to inspect the pixel data.</span>
 
 <span class="sd">        The widget will show both the lightcurve and pixel data.  By default,</span>
@@ -759,8 +773,6 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        lc : LightCurve object</span>
-<span class="sd">            An optional pre-processed lightcurve object to show.</span>
 <span class="sd">        notebook_url: str</span>
 <span class="sd">            Location of the Jupyter notebook page (default: &quot;localhost:8888&quot;)</span>
 <span class="sd">            When showing Bokeh applications, the Bokeh server must be</span>
@@ -773,10 +785,25 @@
 <span class="sd">        max_cadences : int</span>
 <span class="sd">            Raise a RuntimeError if the number of cadences shown is larger than</span>
 <span class="sd">            this value. This limit helps keep browsers from becoming unresponsive.</span>
+<span class="sd">        aperture_mask : array-like, &#39;pipeline&#39;, &#39;threshold&#39; or &#39;all&#39;</span>
+<span class="sd">            A boolean array describing the aperture such that `True` means</span>
+<span class="sd">            that the pixel will be used.</span>
+<span class="sd">            If None or &#39;all&#39; are passed, all pixels will be used.</span>
+<span class="sd">            If &#39;pipeline&#39; is passed, the mask suggested by the official pipeline</span>
+<span class="sd">            will be returned.</span>
+<span class="sd">            If &#39;threshold&#39; is passed, all pixels brighter than 3-sigma above</span>
+<span class="sd">            the median flux will be used.</span>
+<span class="sd">        exported_filename: str</span>
+<span class="sd">            An optional filename to assign to exported fits files containing</span>
+<span class="sd">            the custom aperture mask generated by clicking on pixels in interact.</span>
+<span class="sd">            The default adds a suffix &#39;-custom-aperture-mask.fits&#39; to the</span>
+<span class="sd">            TargetPixelFile basename.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">.interact</span> <span class="k">import</span> <span class="n">show_interact_widget</span>
-        <span class="k">return</span> <span class="n">show_interact_widget</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lc</span><span class="o">=</span><span class="n">lc</span><span class="p">,</span> <span class="n">notebook_url</span><span class="o">=</span><span class="n">notebook_url</span><span class="p">,</span>
-                                    <span class="n">max_cadences</span><span class="o">=</span><span class="n">max_cadences</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">show_interact_widget</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">notebook_url</span><span class="o">=</span><span class="n">notebook_url</span><span class="p">,</span>
+                                    <span class="n">max_cadences</span><span class="o">=</span><span class="n">max_cadences</span><span class="p">,</span>
+                                    <span class="n">aperture_mask</span><span class="o">=</span><span class="n">aperture_mask</span><span class="p">,</span>
+                                    <span class="n">exported_filename</span><span class="o">=</span><span class="n">exported_filename</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="KeplerTargetPixelFile"><a class="viewcode-back" href="../../api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile">[docs]</a><span class="k">class</span> <span class="nc">KeplerTargetPixelFile</span><span class="p">(</span><span class="n">TargetPixelFile</span><span class="p">):</span>
@@ -1500,15 +1527,6 @@
         <span class="k">return</span><span class="p">(</span><span class="s1">&#39;TessTargetPixelFile(TICID: </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">targetid</span><span class="p">))</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">pipeline_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Returns the optimal aperture mask used by the TESS pipeline.</span>
-
-<span class="sd">        For details on how the mask is stored in a TPF, see Section 6 of the</span>
-<span class="sd">        Data Products documentation (EXP-TESS-ARC-ICD-TM-0014.pdf).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">data</span> <span class="o">&amp;</span> <span class="mi">2</span> <span class="o">&gt;</span> <span class="mi">0</span>
-
-    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">background_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns the background mask used by the TESS pipeline.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdu</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">data</span> <span class="o">&amp;</span> <span class="mi">4</span> <span class="o">&gt;</span> <span class="mi">0</span>
@@ -1638,6 +1656,7 @@
         <script type="text/javascript" src="../../_static/underscore.js"></script>
         <script type="text/javascript" src="../../_static/doctools.js"></script>
         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     
 
   

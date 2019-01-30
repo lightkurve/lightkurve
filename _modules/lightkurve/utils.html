@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>lightkurve.utils &mdash; lightkurve 1.0b24.dev documentation</title>
+  <title>lightkurve.utils &mdash; lightkurve 1.0b26.dev documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                1.0b24.dev
+                1.0b26.dev
               </div>
             
           
@@ -357,7 +357,7 @@
 
     <span class="c1">#: DEFAULT bitmask identifies all cadences which are definitely useless.</span>
     <span class="n">DEFAULT_BITMASK</span> <span class="o">=</span> <span class="p">(</span><span class="n">AttitudeTweak</span> <span class="o">|</span> <span class="n">SafeMode</span> <span class="o">|</span> <span class="n">CoarsePoint</span> <span class="o">|</span> <span class="n">EarthPoint</span> <span class="o">|</span>
-                       <span class="n">Desat</span> <span class="o">|</span> <span class="n">ManualExclude</span> <span class="o">|</span> <span class="n">ImpulsiveOutlier</span><span class="p">)</span>
+                       <span class="n">Desat</span> <span class="o">|</span> <span class="n">ManualExclude</span><span class="p">)</span>
     <span class="c1">#: HARD bitmask is conservative and may identify cadences which are useful.</span>
     <span class="n">HARD_BITMASK</span> <span class="o">=</span> <span class="p">(</span><span class="n">DEFAULT_BITMASK</span> <span class="o">|</span> <span class="n">ApertureCosmic</span> <span class="o">|</span>
                     <span class="n">CollateralCosmic</span> <span class="o">|</span> <span class="n">Straylight</span><span class="p">)</span>
@@ -657,6 +657,7 @@
         <span class="c1"># and `creator` to determine tpf or lc</span>
         <span class="n">telescop</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="s1">&#39;telescop&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
         <span class="n">creator</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="s1">&#39;creator&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">origin</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="s1">&#39;origin&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">telescop</span> <span class="o">==</span> <span class="s1">&#39;kepler&#39;</span><span class="p">:</span>
             <span class="c1"># Kepler TPFs will contain &quot;TargetPixelExporterPipelineModule&quot;</span>
             <span class="k">if</span> <span class="s1">&#39;targetpixel&#39;</span> <span class="ow">in</span> <span class="n">creator</span><span class="p">:</span>
@@ -671,6 +672,9 @@
             <span class="c1"># TESS LCFs will contain &quot;LightCurveExporterPipelineModule&quot;</span>
             <span class="k">elif</span> <span class="s1">&#39;lightcurve&#39;</span> <span class="ow">in</span> <span class="n">creator</span><span class="p">:</span>
                 <span class="k">return</span> <span class="s1">&#39;TessLightCurveFile&#39;</span>
+            <span class="c1"># Early versions of TESScut did not set a good CREATOR keyword</span>
+            <span class="k">elif</span> <span class="s1">&#39;stsci&#39;</span> <span class="ow">in</span> <span class="n">origin</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s1">&#39;TessTargetPixelFile&#39;</span>
     <span class="c1"># If the TELESCOP or CREATOR keywords don&#39;t exist we expect a KeyError;</span>
     <span class="c1"># if one of them is Undefined we expect `.lower()` to yield an AttributeError.</span>
     <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">):</span>
@@ -713,6 +717,7 @@
         <script type="text/javascript" src="../../_static/underscore.js"></script>
         <script type="text/javascript" src="../../_static/doctools.js"></script>
         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     
 
   

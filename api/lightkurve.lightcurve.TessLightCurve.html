@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>TessLightCurve &mdash; lightkurve 1.0b24.dev documentation</title>
+  <title>TessLightCurve &mdash; lightkurve 1.0b26.dev documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                1.0b24.dev
+                1.0b26.dev
               </div>
             
           
@@ -211,6 +211,11 @@
 .admonition > p:before {
     margin-right: 4px;  /* make room for the exclamation icon */
 }
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
 </style>
 <div class="section" id="tesslightcurve">
 <h1>TessLightCurve<a class="headerlink" href="#tesslightcurve" title="Permalink to this headline">¶</a></h1>
@@ -328,8 +333,8 @@ e.g. tdb’, ‘tt’, ‘ut1’, or ‘utc’.</p>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.TessLightCurve.to_csv" title="lightkurve.lightcurve.TessLightCurve.to_csv"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_csv</span></code></a>([path_or_buf])</td>
 <td>Writes the LightCurve to a csv file.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.TessLightCurve.to_fits" title="lightkurve.lightcurve.TessLightCurve.to_fits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_fits</span></code></a>([path,&nbsp;overwrite])</td>
-<td>Writes the LightCurve to a FITS file.</td>
+<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.TessLightCurve.to_fits" title="lightkurve.lightcurve.TessLightCurve.to_fits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_fits</span></code></a>([path,&nbsp;overwrite,&nbsp;aperture_mask])</td>
+<td>Writes the KeplerLightCurve to a FITS file.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.TessLightCurve.to_pandas" title="lightkurve.lightcurve.TessLightCurve.to_pandas"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_pandas</span></code></a>([columns])</td>
 <td>Export the LightCurve as a Pandas DataFrame.</td>
@@ -611,7 +616,7 @@ filled.</p>
 
 <dl class="method">
 <dt id="lightkurve.lightcurve.TessLightCurve.flatten">
-<code class="descname">flatten</code><span class="sig-paren">(</span><em>window_length=101</em>, <em>polyorder=2</em>, <em>return_trend=False</em>, <em>break_tolerance=5</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.flatten" title="Permalink to this definition">¶</a></dt>
+<code class="descname">flatten</code><span class="sig-paren">(</span><em>window_length=101</em>, <em>polyorder=2</em>, <em>return_trend=False</em>, <em>break_tolerance=5</em>, <em>niters=3</em>, <em>sigma=3</em>, <em>mask=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.flatten" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes the low frequency trend using scipy’s Savitzky-Golay filter.</p>
 <p>This method wraps <cite>scipy.signal.savgol_filter</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -637,6 +642,19 @@ several sub-lightcurves and apply <cite>savgol_filter</cite> to each
 individually. A gap is defined as a period in time larger than
 <cite>break_tolerance</cite> times the median gap.  To disable this feature,
 set <cite>break_tolerance</cite> to None.</p>
+</dd>
+<dt><strong>niters</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">Number of iterations to iteratively sigma clip and flatten. If more than one, will
+perform the flatten several times, removing outliers each time.</p>
+</dd>
+<dt><strong>sigma</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">Number of sigma above which to remove outliers from the flatten</p>
+</dd>
+<dt><strong>mask</strong> <span class="classifier-delimiter">:</span> <span class="classifier">boolean array with length of self.time</span></dt>
+<dd><p class="first last">Boolean array to mask data with before flattening. Flux values where
+mask is True will not be used to flatten the data. An interpolated
+result will be provided for these points. Use this mask to remove
+data you want to preserve, e.g. transits.</p>
 </dd>
 <dt><strong>**kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
 <dd><p class="first last">Dictionary of arguments to be passed to <cite>scipy.signal.savgol_filter</cite>.</p>
@@ -971,8 +989,8 @@ returns None otherwise.</p>
 
 <dl class="method">
 <dt id="lightkurve.lightcurve.TessLightCurve.to_fits">
-<code class="descname">to_fits</code><span class="sig-paren">(</span><em>path=None</em>, <em>overwrite=False</em>, <em>**extra_data</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.to_fits" title="Permalink to this definition">¶</a></dt>
-<dd><p>Writes the LightCurve to a FITS file.</p>
+<code class="descname">to_fits</code><span class="sig-paren">(</span><em>path=None</em>, <em>overwrite=False</em>, <em>aperture_mask=None</em>, <em>**extra_data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#TessLightCurve.to_fits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.to_fits" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes the KeplerLightCurve to a FITS file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -983,6 +1001,12 @@ returns None otherwise.</p>
 </dd>
 <dt><strong>overwrite</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
 <dd><p class="first last">Whether or not to overwrite the file</p>
+</dd>
+<dt><strong>aperture_mask</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array-like</span></dt>
+<dd><p class="first last">Optional 2D aperture mask to save with this lightcurve object, if
+defined.  The mask can be either a boolean mask or an integer mask
+mimicking the Kepler/TESS convention; boolean masks are
+automatically converted to the Kepler/TESS conventions</p>
 </dd>
 <dt><strong>extra_data</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
 <dd><p class="first last">Extra keywords or columns to include in the FITS file.
@@ -1171,6 +1195,7 @@ periodogram. This implies that 1/freq_unit is the units for period.</p>
         <script type="text/javascript" src="../_static/underscore.js"></script>
         <script type="text/javascript" src="../_static/doctools.js"></script>
         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     
 
   

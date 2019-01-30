@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>lightkurve.periodogram &mdash; lightkurve 1.0b24.dev documentation</title>
+  <title>lightkurve.periodogram &mdash; lightkurve 1.0b26.dev documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                1.0b24.dev
+                1.0b26.dev
               </div>
             
           
@@ -171,6 +171,7 @@
 
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">math</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="k">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
@@ -208,10 +209,10 @@
 <span class="sd">    nyquist : float, optional</span>
 <span class="sd">        The Nyquist frequency of the lightcurve. In units of freq_unit, where</span>
 <span class="sd">        freq_unit is the unit of the frequency attribute.</span>
-<span class="sd">    targetid : str, optional</span>
-<span class="sd">        Identifier of the target.</span>
 <span class="sd">    label : str, optional</span>
 <span class="sd">        Human-friendly object label, e.g. &quot;KIC 123456789&quot;.</span>
+<span class="sd">    targetid : str, optional</span>
+<span class="sd">        Identifier of the target.</span>
 <span class="sd">    meta : dict, optional</span>
 <span class="sd">        Free-form metadata associated with the Periodogram.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -546,7 +547,7 @@
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;the &#39;boxkernel&#39; method requires the periodogram &quot;</span>
                                  <span class="s2">&quot;to have a grid of evenly spaced frequencies.&quot;</span><span class="p">)</span>
 
-            <span class="n">box_kernel</span> <span class="o">=</span> <span class="n">Box1DKernel</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">filter_width</span><span class="o">/</span><span class="n">fs</span><span class="p">))</span>
+            <span class="n">box_kernel</span> <span class="o">=</span> <span class="n">Box1DKernel</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">((</span><span class="n">filter_width</span><span class="o">/</span><span class="n">fs</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
             <span class="n">smooth_power</span> <span class="o">=</span> <span class="n">convolve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">power</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">box_kernel</span><span class="p">)</span>
             <span class="n">smooth_pg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
             <span class="n">smooth_pg</span><span class="o">.</span><span class="n">power</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="n">smooth_power</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">power</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
@@ -668,6 +669,9 @@
 <span class="sd">            in units of frequency.</span>
 <span class="sd">            If method = `logmedian`, this is the width of the smoothing filter</span>
 <span class="sd">            in log10(frequency) space.</span>
+<span class="sd">        return_trend : bool</span>
+<span class="sd">            If True, then the background estimate, alongside the SNR spectrum,</span>
+<span class="sd">            will be returned.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -675,6 +679,9 @@
 <span class="sd">            Returns a periodogram object where the power is an estimate of the</span>
 <span class="sd">            signal-to-noise of the spectrum, creating by dividing the powers</span>
 <span class="sd">            with a simple estimate of the noise background using a smoothing filter.</span>
+<span class="sd">        bkg : `Periodogram` object</span>
+<span class="sd">            The estimated power spectrum of the background noise. This is only</span>
+<span class="sd">            returned if `return_trend = True`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">bkg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">smooth</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="n">filter_width</span><span class="o">=</span><span class="n">filter_width</span><span class="p">)</span>
         <span class="n">snr_pg</span> <span class="o">=</span> <span class="bp">self</span> <span class="o">/</span> <span class="n">bkg</span><span class="o">.</span><span class="n">power</span>
@@ -894,6 +901,7 @@
         <script type="text/javascript" src="../../_static/underscore.js"></script>
         <script type="text/javascript" src="../../_static/doctools.js"></script>
         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     
 
   

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>FoldedLightCurve &mdash; lightkurve 1.0b24.dev documentation</title>
+  <title>FoldedLightCurve &mdash; lightkurve 1.0b26.dev documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                1.0b24.dev
+                1.0b26.dev
               </div>
             
           
@@ -210,6 +210,11 @@
 
 .admonition > p:before {
     margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
 }
 </style>
 <div class="section" id="foldedlightcurve">
@@ -556,7 +561,7 @@ filled.</p>
 
 <dl class="method">
 <dt id="lightkurve.lightcurve.FoldedLightCurve.flatten">
-<code class="descname">flatten</code><span class="sig-paren">(</span><em>window_length=101</em>, <em>polyorder=2</em>, <em>return_trend=False</em>, <em>break_tolerance=5</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.FoldedLightCurve.flatten" title="Permalink to this definition">¶</a></dt>
+<code class="descname">flatten</code><span class="sig-paren">(</span><em>window_length=101</em>, <em>polyorder=2</em>, <em>return_trend=False</em>, <em>break_tolerance=5</em>, <em>niters=3</em>, <em>sigma=3</em>, <em>mask=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.FoldedLightCurve.flatten" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes the low frequency trend using scipy’s Savitzky-Golay filter.</p>
 <p>This method wraps <cite>scipy.signal.savgol_filter</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -582,6 +587,19 @@ several sub-lightcurves and apply <cite>savgol_filter</cite> to each
 individually. A gap is defined as a period in time larger than
 <cite>break_tolerance</cite> times the median gap.  To disable this feature,
 set <cite>break_tolerance</cite> to None.</p>
+</dd>
+<dt><strong>niters</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">Number of iterations to iteratively sigma clip and flatten. If more than one, will
+perform the flatten several times, removing outliers each time.</p>
+</dd>
+<dt><strong>sigma</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">Number of sigma above which to remove outliers from the flatten</p>
+</dd>
+<dt><strong>mask</strong> <span class="classifier-delimiter">:</span> <span class="classifier">boolean array with length of self.time</span></dt>
+<dd><p class="first last">Boolean array to mask data with before flattening. Flux values where
+mask is True will not be used to flatten the data. An interpolated
+result will be provided for these points. Use this mask to remove
+data you want to preserve, e.g. transits.</p>
 </dd>
 <dt><strong>**kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
 <dd><p class="first last">Dictionary of arguments to be passed to <cite>scipy.signal.savgol_filter</cite>.</p>
@@ -1070,6 +1088,7 @@ periodogram. This implies that 1/freq_unit is the units for period.</p>
         <script type="text/javascript" src="../_static/underscore.js"></script>
         <script type="text/javascript" src="../_static/doctools.js"></script>
         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     
 
   

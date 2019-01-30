@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>TessQualityFlags &mdash; lightkurve 1.0b24.dev documentation</title>
+  <title>TessQualityFlags &mdash; lightkurve 1.0b26.dev documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                1.0b24.dev
+                1.0b26.dev
               </div>
             
           
@@ -211,6 +211,11 @@
 .admonition > p:before {
     margin-right: 4px;  /* make room for the exclamation icon */
 }
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
 </style>
 <div class="section" id="tessqualityflags">
 <h1>TessQualityFlags<a class="headerlink" href="#tessqualityflags" title="Permalink to this headline">¶</a></h1>
@@ -331,7 +336,7 @@ as documented in the TESS Data Products Description Document (Ref. [1], Table 26
 
 <dl class="attribute">
 <dt id="lightkurve.utils.TessQualityFlags.DEFAULT_BITMASK">
-<code class="descname">DEFAULT_BITMASK</code><em class="property"> = 687</em><a class="headerlink" href="#lightkurve.utils.TessQualityFlags.DEFAULT_BITMASK" title="Permalink to this definition">¶</a></dt>
+<code class="descname">DEFAULT_BITMASK</code><em class="property"> = 175</em><a class="headerlink" href="#lightkurve.utils.TessQualityFlags.DEFAULT_BITMASK" title="Permalink to this definition">¶</a></dt>
 <dd><p>DEFAULT bitmask identifies all cadences which are definitely useless.</p>
 </dd></dl>
 
@@ -358,7 +363,7 @@ as documented in the TESS Data Products Description Document (Ref. [1], Table 26
 
 <dl class="attribute">
 <dt id="lightkurve.utils.TessQualityFlags.HARD_BITMASK">
-<code class="descname">HARD_BITMASK</code><em class="property"> = 3823</em><a class="headerlink" href="#lightkurve.utils.TessQualityFlags.HARD_BITMASK" title="Permalink to this definition">¶</a></dt>
+<code class="descname">HARD_BITMASK</code><em class="property"> = 3311</em><a class="headerlink" href="#lightkurve.utils.TessQualityFlags.HARD_BITMASK" title="Permalink to this definition">¶</a></dt>
 <dd><p>HARD bitmask is conservative and may identify cadences which are useful.</p>
 </dd></dl>
 
@@ -374,7 +379,7 @@ as documented in the TESS Data Products Description Document (Ref. [1], Table 26
 
 <dl class="attribute">
 <dt id="lightkurve.utils.TessQualityFlags.OPTIONS">
-<code class="descname">OPTIONS</code><em class="property"> = {'default': 687, 'hard': 3823, 'hardest': 4095, 'none': 0}</em><a class="headerlink" href="#lightkurve.utils.TessQualityFlags.OPTIONS" title="Permalink to this definition">¶</a></dt>
+<code class="descname">OPTIONS</code><em class="property"> = {'default': 175, 'hard': 3311, 'hardest': 4095, 'none': 0}</em><a class="headerlink" href="#lightkurve.utils.TessQualityFlags.OPTIONS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dictionary which provides friendly names for the various bitmasks.</p>
 </dd></dl>
 
@@ -507,6 +512,7 @@ quality flags raised.  Returns an empty list if no flags raised.</p>
         <script type="text/javascript" src="../_static/underscore.js"></script>
         <script type="text/javascript" src="../_static/doctools.js"></script>
         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     
 
   

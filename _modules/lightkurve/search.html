@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>lightkurve.search &mdash; lightkurve 1.0b24.dev documentation</title>
+  <title>lightkurve.search &mdash; lightkurve 1.0b26.dev documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                1.0b24.dev
+                1.0b26.dev
               </div>
             
           
@@ -177,12 +177,11 @@
 <span class="kn">from</span> <span class="nn">astropy.coordinates</span> <span class="k">import</span> <span class="n">SkyCoord</span>
 <span class="kn">from</span> <span class="nn">astropy.io</span> <span class="k">import</span> <span class="n">ascii</span><span class="p">,</span> <span class="n">fits</span>
 <span class="kn">from</span> <span class="nn">astropy</span> <span class="k">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">u</span>
+<span class="kn">from</span> <span class="nn">astropy.utils.exceptions</span> <span class="k">import</span> <span class="n">AstropyWarning</span>
 
 <span class="kn">from</span> <span class="nn">astroquery.mast</span> <span class="k">import</span> <span class="n">Observations</span>
 <span class="kn">from</span> <span class="nn">astroquery.exceptions</span> <span class="k">import</span> <span class="n">ResolverError</span>
 
-<span class="kn">from</span> <span class="nn">.lightcurvefile</span> <span class="k">import</span> <span class="n">KeplerLightCurveFile</span><span class="p">,</span> <span class="n">TessLightCurveFile</span>
-<span class="kn">from</span> <span class="nn">.targetpixelfile</span> <span class="k">import</span> <span class="n">KeplerTargetPixelFile</span><span class="p">,</span> <span class="n">TessTargetPixelFile</span>
 <span class="kn">from</span> <span class="nn">.collections</span> <span class="k">import</span> <span class="n">TargetPixelFileCollection</span><span class="p">,</span> <span class="n">LightCurveFileCollection</span>
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="k">import</span> <span class="n">suppress_stdout</span><span class="p">,</span> <span class="n">LightkurveWarning</span><span class="p">,</span> <span class="n">detect_filetype</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">PACKAGEDIR</span>
@@ -300,8 +299,9 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Warning: </span><span class="si">{}</span><span class="s1"> files available to download. &#39;</span>
                           <span class="s1">&#39;Only the first file has been downloaded. &#39;</span>
-                          <span class="s1">&#39;Please use `download_all()` or specify a campaign, quarter, or &#39;</span>
-                          <span class="s1">&#39;cadence to limit your search.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">)),</span>
+                          <span class="s1">&#39;Please use `download_all()` or specify additional &#39;</span>
+                          <span class="s1">&#39;criteria (e.g. quarter, campaign, or sector) &#39;</span>
+                          <span class="s1">&#39;to limit your search.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">)),</span>
                           <span class="n">LightkurveWarning</span><span class="p">)</span>
 
         <span class="c1"># Make sure astroquery uses the same level of verbosity</span>
@@ -314,13 +314,8 @@
         <span class="n">path</span> <span class="o">=</span> <span class="n">Observations</span><span class="o">.</span><span class="n">download_products</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[:</span><span class="mi">1</span><span class="p">],</span> <span class="n">mrp_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                                               <span class="n">download_dir</span><span class="o">=</span><span class="n">download_dir</span><span class="p">)[</span><span class="s1">&#39;Local Path&#39;</span><span class="p">]</span>
 
-        <span class="c1"># return single tpf or lcf</span>
-        <span class="n">tpf_files</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;lpd-targ.fits&#39;</span><span class="p">,</span> <span class="s1">&#39;spd-targ.fits&#39;</span><span class="p">]</span>
-        <span class="n">lcf_files</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;llc.fits&#39;</span><span class="p">,</span> <span class="s1">&#39;slc.fits&#39;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s1">&#39;productFilename&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">tpf_files</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">KeplerTargetPixelFile</span><span class="p">(</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">quality_bitmask</span><span class="o">=</span><span class="n">quality_bitmask</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">any</span><span class="p">(</span><span class="n">file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s1">&#39;productFilename&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">lcf_files</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">KeplerLightCurveFile</span><span class="p">(</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">quality_bitmask</span><span class="o">=</span><span class="n">quality_bitmask</span><span class="p">)</span>
+        <span class="c1"># open() will determine filetype and return</span>
+        <span class="k">return</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">quality_bitmask</span><span class="o">=</span><span class="n">quality_bitmask</span><span class="p">)</span>
 
     <span class="nd">@suppress_stdout</span>
     <span class="k">def</span> <span class="nf">download_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quality_bitmask</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="n">download_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -367,17 +362,14 @@
         <span class="n">path</span> <span class="o">=</span> <span class="n">Observations</span><span class="o">.</span><span class="n">download_products</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">,</span> <span class="n">mrp_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                                               <span class="n">download_dir</span><span class="o">=</span><span class="n">download_dir</span><span class="p">)[</span><span class="s1">&#39;Local Path&#39;</span><span class="p">]</span>
 
-        <span class="c1"># return collection of tpf or lcf</span>
-        <span class="n">tpf_files</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;lpd-targ.fits&#39;</span><span class="p">,</span> <span class="s1">&#39;spd-targ.fits&#39;</span><span class="p">]</span>
-        <span class="n">lcf_files</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;llc.fits&#39;</span><span class="p">,</span> <span class="s1">&#39;slc.fits&#39;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s1">&#39;productFilename&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">tpf_files</span><span class="p">):</span>
-            <span class="n">tpfs</span> <span class="o">=</span> <span class="p">[</span><span class="n">KeplerTargetPixelFile</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">quality_bitmask</span><span class="o">=</span><span class="n">quality_bitmask</span><span class="p">)</span>
-                    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">path</span><span class="p">]</span>
-            <span class="k">return</span> <span class="n">TargetPixelFileCollection</span><span class="p">(</span><span class="n">tpfs</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">any</span><span class="p">(</span><span class="n">file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s1">&#39;productFilename&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">lcf_files</span><span class="p">):</span>
-            <span class="n">lcs</span> <span class="o">=</span> <span class="p">[</span><span class="n">KeplerLightCurveFile</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">quality_bitmask</span><span class="o">=</span><span class="n">quality_bitmask</span><span class="p">)</span>
-                   <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">path</span><span class="p">]</span>
-            <span class="k">return</span> <span class="n">LightCurveFileCollection</span><span class="p">(</span><span class="n">lcs</span><span class="p">)</span>
+        <span class="c1"># open() will determine filetype and return</span>
+        <span class="c1"># return a collection containing opened files</span>
+        <span class="n">tpf_extensions</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;lpd-targ.fits&#39;</span><span class="p">,</span> <span class="s1">&#39;spd-targ.fits&#39;</span><span class="p">,</span> <span class="s1">&#39;_tp.fits&#39;</span><span class="p">]</span>
+        <span class="n">lcf_extensions</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;llc.fits&#39;</span><span class="p">,</span> <span class="s1">&#39;slc.fits&#39;</span><span class="p">,</span> <span class="s1">&#39;_lc.fits&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s1">&#39;productFilename&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">tpf_extensions</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">TargetPixelFileCollection</span><span class="p">([</span><span class="nb">open</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">path</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="nb">any</span><span class="p">(</span><span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">[</span><span class="s1">&#39;productFilename&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">lcf_extensions</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">LightCurveFileCollection</span><span class="p">([</span><span class="nb">open</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">path</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">_default_download_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns the default path to the directory where files will be downloaded.</span>
@@ -408,8 +400,9 @@
         <span class="k">return</span> <span class="n">download_dir</span>
 
 
-<div class="viewcode-block" id="search_targetpixelfile"><a class="viewcode-back" href="../../api/lightkurve.search.search_targetpixelfile.html#lightkurve.search.search_targetpixelfile">[docs]</a><span class="k">def</span> <span class="nf">search_targetpixelfile</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s1">&#39;long&#39;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                           <span class="n">month</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="search_targetpixelfile"><a class="viewcode-back" href="../../api/lightkurve.search.search_targetpixelfile.html#lightkurve.search.search_targetpixelfile">[docs]</a><span class="k">def</span> <span class="nf">search_targetpixelfile</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s1">&#39;long&#39;</span><span class="p">,</span>
+                           <span class="n">mission</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Kepler&#39;</span><span class="p">,</span> <span class="s1">&#39;K2&#39;</span><span class="p">,</span> <span class="s1">&#39;TESS&#39;</span><span class="p">],</span> <span class="n">quarter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                           <span class="n">month</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sector</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Searches MAST for Target Pixel Files.</span>
 
 <span class="sd">    This function fetches a data table that lists the Target Pixel Files (TPFs)</span>
@@ -432,13 +425,15 @@
 <span class="sd">        units of arcseconds.  If `None` then we default to 0.0001 arcsec.</span>
 <span class="sd">    cadence : str</span>
 <span class="sd">        &#39;long&#39; or &#39;short&#39;.</span>
-<span class="sd">    quarter, campaign : int, list of ints</span>
-<span class="sd">        Kepler Quarter or K2 Campaign number.</span>
-<span class="sd">        By default all quarters and campaigns will be returned.</span>
-<span class="sd">    month : 1, 2, 3, or list of int</span>
+<span class="sd">    mission : str, list of str</span>
+<span class="sd">        &#39;Kepler&#39;, &#39;K2&#39;, or &#39;TESS&#39;. By default, all will be returned.</span>
+<span class="sd">    quarter, campaign, sector : int, list of ints</span>
+<span class="sd">        Kepler Quarter, K2 Campaign, or TESS Sector number.</span>
+<span class="sd">        By default all quarters/campaigns/sectors will be returned.</span>
+<span class="sd">    month : 1, 2, 3, 4 or list of int</span>
 <span class="sd">        For Kepler&#39;s prime mission, there are three short-cadence</span>
 <span class="sd">        TargetPixelFiles for each quarter, each covering one month.</span>
-<span class="sd">        Hence, if cadence=&#39;short&#39; you need to specify month=1, 2, or 3.</span>
+<span class="sd">        Hence, if cadence=&#39;short&#39; you can specify month=1, 2, 3, or 4.</span>
 <span class="sd">        By default all months will be returned.</span>
 <span class="sd">    limit : int</span>
 <span class="sd">        Maximum number of products to return.</span>
@@ -485,15 +480,16 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">_search_products</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">radius</span><span class="p">,</span> <span class="n">filetype</span><span class="o">=</span><span class="s2">&quot;Target Pixel&quot;</span><span class="p">,</span>
-                                <span class="n">cadence</span><span class="o">=</span><span class="n">cadence</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="n">quarter</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="n">month</span><span class="p">,</span>
-                                <span class="n">campaign</span><span class="o">=</span><span class="n">campaign</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">)</span>
+                                <span class="n">cadence</span><span class="o">=</span><span class="n">cadence</span><span class="p">,</span> <span class="n">mission</span><span class="o">=</span><span class="n">mission</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="n">quarter</span><span class="p">,</span>
+                                <span class="n">month</span><span class="o">=</span><span class="n">month</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="n">campaign</span><span class="p">,</span> <span class="n">sector</span><span class="o">=</span><span class="n">sector</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">)</span>
     <span class="k">except</span> <span class="n">SearchError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
         <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">SearchResult</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="search_lightcurvefile"><a class="viewcode-back" href="../../api/lightkurve.search.search_lightcurvefile.html#lightkurve.search.search_lightcurvefile">[docs]</a><span class="k">def</span> <span class="nf">search_lightcurvefile</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s1">&#39;long&#39;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                          <span class="n">month</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="search_lightcurvefile"><a class="viewcode-back" href="../../api/lightkurve.search.search_lightcurvefile.html#lightkurve.search.search_lightcurvefile">[docs]</a><span class="k">def</span> <span class="nf">search_lightcurvefile</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s1">&#39;long&#39;</span><span class="p">,</span>
+                          <span class="n">mission</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Kepler&#39;</span><span class="p">,</span> <span class="s1">&#39;K2&#39;</span><span class="p">,</span> <span class="s1">&#39;TESS&#39;</span><span class="p">],</span> <span class="n">quarter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                          <span class="n">month</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sector</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Returns a SearchResult with MAST LightCurveFiles which match the criteria.</span>
 
 <span class="sd">    This function fetches a data table that lists the Light Curve Files</span>
@@ -516,13 +512,15 @@
 <span class="sd">        units of arcseconds.  If `None` then we default to 0.0001 arcsec.</span>
 <span class="sd">    cadence : str</span>
 <span class="sd">        &#39;long&#39; or &#39;short&#39;.</span>
-<span class="sd">    quarter, campaign : int, list of ints</span>
-<span class="sd">        Kepler Quarter or K2 Campaign number.</span>
-<span class="sd">        By default all quarters and campaigns will be returned.</span>
-<span class="sd">    month : 1, 2, 3, or list of int</span>
+<span class="sd">    mission : str, list of str</span>
+<span class="sd">        &#39;Kepler&#39;, &#39;K2&#39;, or &#39;TESS&#39;. By default, all will be returned.</span>
+<span class="sd">    quarter, campaign, sector : int, list of ints</span>
+<span class="sd">        Kepler Quarter, K2 Campaign, or TESS Sector number.</span>
+<span class="sd">        By default all quarters/campaigns/sectors will be returned.</span>
+<span class="sd">    month : 1, 2, 3, 4 or list of int</span>
 <span class="sd">        For Kepler&#39;s prime mission, there are three short-cadence</span>
-<span class="sd">        LightCurveFiles for each quarter, each covering one month.</span>
-<span class="sd">        Hence, if cadence=&#39;short&#39; you need to specify month=1, 2, or 3.</span>
+<span class="sd">        TargetPixelFiles for each quarter, each covering one month.</span>
+<span class="sd">        Hence, if cadence=&#39;short&#39; you can specify month=1, 2, 3, or 4.</span>
 <span class="sd">        By default all months will be returned.</span>
 <span class="sd">    limit : int</span>
 <span class="sd">        Maximum number of products to return.</span>
@@ -570,15 +568,16 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">_search_products</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">radius</span><span class="p">,</span> <span class="n">filetype</span><span class="o">=</span><span class="s2">&quot;Lightcurve&quot;</span><span class="p">,</span>
-                                <span class="n">cadence</span><span class="o">=</span><span class="n">cadence</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="n">quarter</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="n">month</span><span class="p">,</span>
-                                <span class="n">campaign</span><span class="o">=</span><span class="n">campaign</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">)</span>
+                                <span class="n">cadence</span><span class="o">=</span><span class="n">cadence</span><span class="p">,</span> <span class="n">mission</span><span class="o">=</span><span class="n">mission</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="n">quarter</span><span class="p">,</span>
+                                <span class="n">month</span><span class="o">=</span><span class="n">month</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="n">campaign</span><span class="p">,</span> <span class="n">sector</span><span class="o">=</span><span class="n">sector</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">)</span>
     <span class="k">except</span> <span class="n">SearchError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
         <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">SearchResult</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span></div>
 
 
 <span class="k">def</span> <span class="nf">_search_products</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">filetype</span><span class="o">=</span><span class="s2">&quot;Lightcurve&quot;</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s1">&#39;long&#39;</span><span class="p">,</span>
-                     <span class="n">quarter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                     <span class="n">mission</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Kepler&#39;</span><span class="p">,</span> <span class="s1">&#39;K2&#39;</span><span class="p">,</span> <span class="s1">&#39;TESS&#39;</span><span class="p">],</span> <span class="n">quarter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">campaign</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sector</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Helper function which returns a SearchResult object containing MAST</span>
 <span class="sd">    products that match several criteria.</span>
 
@@ -593,12 +592,16 @@
 <span class="sd">        Type of files queried at MAST (`Target Pixel` or `Lightcurve`)</span>
 <span class="sd">    cadence : str</span>
 <span class="sd">        Desired cadence (`long`, `short`, `any`)</span>
-<span class="sd">    quarter : int or list</span>
-<span class="sd">        Desired quarter of observation for data products</span>
-<span class="sd">    month : int or list</span>
-<span class="sd">        Desired month of observation for data products</span>
-<span class="sd">    campaign : int or list</span>
-<span class="sd">        Desired campaign of observation for data products</span>
+<span class="sd">    mission : str, list of str</span>
+<span class="sd">        &#39;Kepler&#39;, &#39;K2&#39;, or &#39;TESS&#39;. By default, all will be returned.</span>
+<span class="sd">    quarter, campaign, sector : int, list of ints</span>
+<span class="sd">        Kepler Quarter, K2 Campaign, or TESS Sector number.</span>
+<span class="sd">        By default all quarters/campaigns/sectors will be returned.</span>
+<span class="sd">    month : 1, 2, 3, 4 or list of int</span>
+<span class="sd">        For Kepler&#39;s prime mission, there are three short-cadence</span>
+<span class="sd">        TargetPixelFiles for each quarter, each covering one month.</span>
+<span class="sd">        Hence, if cadence=&#39;short&#39; you can specify month=1, 2, 3, or 4.</span>
+<span class="sd">        By default all months will be returned.</span>
 <span class="sd">    limit : int</span>
 <span class="sd">        Maximum number of products to return</span>
 
@@ -606,20 +609,28 @@
 <span class="sd">    -------</span>
 <span class="sd">    SearchResult : :class:`SearchResult` object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">observations</span> <span class="o">=</span> <span class="n">_query_mast</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s1">&#39;long&#39;</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">radius</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">observations</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">SearchError</span><span class="p">(</span><span class="s1">&#39;No data found for target &quot;</span><span class="si">{}</span><span class="s1">.&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
-    <span class="n">products</span> <span class="o">=</span> <span class="n">Observations</span><span class="o">.</span><span class="n">get_product_list</span><span class="p">(</span><span class="n">observations</span><span class="p">)</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">products</span><span class="p">,</span> <span class="n">observations</span><span class="p">,</span> <span class="n">join_type</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>  <span class="c1"># will join on obs_id</span>
+    <span class="n">observations</span> <span class="o">=</span> <span class="n">_query_mast</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="n">mission</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">radius</span><span class="p">)</span>
+
+    <span class="c1"># mask out FFIs from observations</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s1">&#39;FFI&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obs</span><span class="p">[</span><span class="s1">&#39;target_name&#39;</span><span class="p">]</span> <span class="ow">and</span>
+                     <span class="s1">&#39;FFI&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obs</span><span class="p">[</span><span class="s1">&#39;obs_collection&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">obs</span> <span class="ow">in</span> <span class="n">observations</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">observations</span><span class="p">[</span><span class="n">mask</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">SearchError</span><span class="p">(</span><span class="s1">&#39;No data found for target &quot;</span><span class="si">{}</span><span class="s1">&quot;.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
+
+    <span class="n">products</span> <span class="o">=</span> <span class="n">Observations</span><span class="o">.</span><span class="n">get_product_list</span><span class="p">(</span><span class="n">observations</span><span class="p">[</span><span class="n">mask</span><span class="p">])</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">products</span><span class="p">,</span> <span class="n">observations</span><span class="p">[</span><span class="n">mask</span><span class="p">],</span> <span class="n">keys</span><span class="o">=</span><span class="s2">&quot;obs_id&quot;</span><span class="p">,</span> <span class="n">join_type</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>
+                  <span class="n">uniq_col_name</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{col_name}{table_name}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">table_names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;_2&#39;</span><span class="p">])</span>
     <span class="n">result</span><span class="o">.</span><span class="n">sort</span><span class="p">([</span><span class="s1">&#39;distance&#39;</span><span class="p">,</span> <span class="s1">&#39;obs_id&#39;</span><span class="p">])</span>
 
     <span class="n">masked_result</span> <span class="o">=</span> <span class="n">_filter_products</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">filetype</span><span class="o">=</span><span class="n">filetype</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="n">campaign</span><span class="p">,</span>
-                                     <span class="n">quarter</span><span class="o">=</span><span class="n">quarter</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="n">cadence</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="n">month</span><span class="p">,</span>
+                                     <span class="n">quarter</span><span class="o">=</span><span class="n">quarter</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="n">cadence</span><span class="p">,</span>
+                                     <span class="n">project</span><span class="o">=</span><span class="n">mission</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="n">month</span><span class="p">,</span> <span class="n">sector</span><span class="o">=</span><span class="n">sector</span><span class="p">,</span>
                                      <span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">SearchResult</span><span class="p">(</span><span class="n">masked_result</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_query_mast</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s1">&#39;long&#39;</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_query_mast</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Kepler&#39;</span><span class="p">,</span> <span class="s1">&#39;K2&#39;</span><span class="p">,</span> <span class="s1">&#39;TESS&#39;</span><span class="p">]):</span>
     <span class="sd">&quot;&quot;&quot;Helper function which wraps `astroquery.mast.Observations.query_criteria()`</span>
 <span class="sd">    to returns a table of all Kepler or K2 observations of a given target.</span>
 
@@ -630,8 +641,8 @@
 <span class="sd">    radius : float or `astropy.units.Quantity` object</span>
 <span class="sd">        Conesearch radius.  If a float is given it will be assumed to be in</span>
 <span class="sd">        units of arcseconds.  If `None` then we default to 0.0001 arcsec.</span>
-<span class="sd">    cadence: &#39;short&#39; or &#39;long&#39;</span>
-<span class="sd">        Specify short (1-min) or long (30-min) cadence data.</span>
+<span class="sd">    project : str, list of str</span>
+<span class="sd">        &#39;Kepler&#39;, &#39;K2&#39;, and/or &#39;TESS&#39;.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -641,6 +652,8 @@
     <span class="c1"># If passed a SkyCoord, convert it to an RA and Dec</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">SkyCoord</span><span class="p">):</span>
         <span class="n">target</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">ra</span><span class="o">.</span><span class="n">deg</span><span class="p">,</span> <span class="n">target</span><span class="o">.</span><span class="n">dec</span><span class="o">.</span><span class="n">deg</span><span class="p">)</span>
+
+    <span class="n">project</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">project</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">radius</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">radius</span> <span class="o">=</span> <span class="o">.</span><span class="mi">0001</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">arcsec</span>
@@ -661,12 +674,16 @@
 
         <span class="c1"># query_criteria does not allow a cone search when target_name is passed in</span>
         <span class="c1"># so first grab desired target with ~0 arcsecond radius</span>
-        <span class="n">target_obs</span> <span class="o">=</span> <span class="n">Observations</span><span class="o">.</span><span class="n">query_criteria</span><span class="p">(</span><span class="n">target_name</span><span class="o">=</span><span class="n">target_name</span><span class="p">,</span>
-                                                 <span class="n">radius</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">radius</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">deg</span><span class="p">)),</span>
-                                                 <span class="n">project</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Kepler&quot;</span><span class="p">,</span> <span class="s2">&quot;K2&quot;</span><span class="p">],</span>
-                                                 <span class="n">obs_collection</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Kepler&quot;</span><span class="p">,</span> <span class="s2">&quot;K2&quot;</span><span class="p">])</span>
+        <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+            <span class="c1"># suppress misleading AstropyWarning</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">AstropyWarning</span><span class="p">)</span>
+            <span class="n">target_obs</span> <span class="o">=</span> <span class="n">Observations</span><span class="o">.</span><span class="n">query_criteria</span><span class="p">(</span><span class="n">target_name</span><span class="o">=</span><span class="n">target_name</span><span class="p">,</span>
+                                                     <span class="n">radius</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">radius</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">deg</span><span class="p">)),</span>
+                                                     <span class="n">project</span><span class="o">=</span><span class="n">project</span><span class="p">,</span>
+                                                     <span class="n">obs_collection</span><span class="o">=</span><span class="n">project</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">target_obs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No observations found for </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">target_name</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No observations found for </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">target_name</span><span class="p">))</span>
 
         <span class="c1"># check if a cone search is being performed</span>
         <span class="c1"># if yes, perform a cone search around coordinates of desired target</span>
@@ -678,28 +695,38 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">ra</span> <span class="o">=</span> <span class="n">target_obs</span><span class="p">[</span><span class="s1">&#39;s_ra&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">dec</span> <span class="o">=</span> <span class="n">target_obs</span><span class="p">[</span><span class="s1">&#39;s_dec&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">obs</span> <span class="o">=</span> <span class="n">Observations</span><span class="o">.</span><span class="n">query_criteria</span><span class="p">(</span><span class="n">coordinates</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ra</span><span class="p">,</span> <span class="n">dec</span><span class="p">),</span>
-                                              <span class="n">radius</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">radius</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">deg</span><span class="p">)),</span>
-                                              <span class="n">project</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Kepler&quot;</span><span class="p">,</span> <span class="s2">&quot;K2&quot;</span><span class="p">],</span>
-                                              <span class="n">obs_collection</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Kepler&quot;</span><span class="p">,</span> <span class="s2">&quot;K2&quot;</span><span class="p">])</span>
+            <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+                <span class="c1"># suppress misleading AstropyWarning</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">AstropyWarning</span><span class="p">)</span>
+                <span class="n">obs</span> <span class="o">=</span> <span class="n">Observations</span><span class="o">.</span><span class="n">query_criteria</span><span class="p">(</span><span class="n">coordinates</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ra</span><span class="p">,</span> <span class="n">dec</span><span class="p">),</span>
+                                                  <span class="n">radius</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">radius</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">deg</span><span class="p">)),</span>
+                                                  <span class="n">project</span><span class="o">=</span><span class="n">project</span><span class="p">,</span>
+                                                  <span class="n">obs_collection</span><span class="o">=</span><span class="n">project</span><span class="p">)</span>
+            <span class="n">obs</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="s1">&#39;distance&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">obs</span>
     <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-        <span class="c1"># If `target` did not look like a KIC or EPIC ID, then we let MAST</span>
-        <span class="c1"># resolve the target name to a sky position. Convert radius from arcsec</span>
-        <span class="c1"># to degrees for query_criteria().</span>
-        <span class="k">try</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="c1"># If `target` did not look like a KIC or EPIC ID, then we let MAST</span>
+    <span class="c1"># resolve the target name to a sky position. Convert radius from arcsec</span>
+    <span class="c1"># to degrees for query_criteria().</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+            <span class="c1"># suppress misleading AstropyWarning</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">AstropyWarning</span><span class="p">)</span>
             <span class="n">obs</span> <span class="o">=</span> <span class="n">Observations</span><span class="o">.</span><span class="n">query_criteria</span><span class="p">(</span><span class="n">objectname</span><span class="o">=</span><span class="n">target</span><span class="p">,</span>
                                               <span class="n">radius</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">radius</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">deg</span><span class="p">)),</span>
-                                              <span class="n">project</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Kepler&quot;</span><span class="p">,</span> <span class="s2">&quot;K2&quot;</span><span class="p">],</span>
-                                              <span class="n">obs_collection</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Kepler&quot;</span><span class="p">,</span> <span class="s2">&quot;K2&quot;</span><span class="p">])</span>
-        <span class="k">except</span> <span class="n">ResolverError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">SearchError</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
+                                              <span class="n">project</span><span class="o">=</span><span class="n">project</span><span class="p">,</span>
+                                              <span class="n">obs_collection</span><span class="o">=</span><span class="n">project</span><span class="p">)</span>
+        <span class="n">obs</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="s1">&#39;distance&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">obs</span>
+    <span class="k">except</span> <span class="n">ResolverError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">SearchError</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
 
-    <span class="n">obs</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="s1">&#39;distance&#39;</span><span class="p">)</span>  <span class="c1"># ensure table returned is sorted by distance</span>
-    <span class="k">return</span> <span class="n">obs</span>
 
-
-<span class="k">def</span> <span class="nf">_filter_products</span><span class="p">(</span><span class="n">products</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                     <span class="n">cadence</span><span class="o">=</span><span class="s1">&#39;long&#39;</span><span class="p">,</span> <span class="n">filetype</span><span class="o">=</span><span class="s1">&#39;Target Pixel&#39;</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_filter_products</span><span class="p">(</span><span class="n">products</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sector</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">cadence</span><span class="o">=</span><span class="s1">&#39;long&#39;</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Kepler&#39;</span><span class="p">,</span> <span class="s1">&#39;K2&#39;</span><span class="p">,</span> <span class="s1">&#39;TESS&#39;</span><span class="p">],</span>
+                     <span class="n">filetype</span><span class="o">=</span><span class="s1">&#39;Target Pixel&#39;</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Helper function which filters a SearchResult&#39;s products table by one or</span>
 <span class="sd">    more criteria.</span>
 
@@ -723,97 +750,144 @@
 <span class="sd">    products : `astropy.table.Table` object</span>
 <span class="sd">        Masked astropy table containing desired data products</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Value for the quarter or campaign</span>
-    <span class="n">qoc</span> <span class="o">=</span> <span class="n">campaign</span> <span class="k">if</span> <span class="n">campaign</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">quarter</span>
+    <span class="n">project</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">project</span><span class="p">)</span>
+    <span class="n">project_lower</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">project</span><span class="p">]</span>
 
-    <span class="c1"># Ensure quarter or campaign is iterable.</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">campaign</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">quarter</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
-        <span class="n">qoc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">qoc</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">))</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">products</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
 
-    <span class="c1"># Because MAST doesn&#39;t let us query based on Kepler-specific meta data</span>
-    <span class="c1"># fields, we need to identify short/long-cadence TPFs by their filename.</span>
-    <span class="k">if</span> <span class="n">cadence</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;short&#39;</span><span class="p">,</span> <span class="s1">&#39;sc&#39;</span><span class="p">]:</span>
-        <span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> Short&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filetype</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">cadence</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;any&#39;</span><span class="p">,</span> <span class="s1">&#39;both&#39;</span><span class="p">]:</span>
-        <span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filetype</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> Long&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filetype</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;kepler&#39;</span> <span class="ow">in</span> <span class="n">project_lower</span> <span class="ow">and</span> <span class="n">campaign</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">sector</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">mask</span> <span class="o">|=</span> <span class="n">_mask_kepler_products</span><span class="p">(</span><span class="n">products</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="n">quarter</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="n">month</span><span class="p">,</span>
+                                      <span class="n">cadence</span><span class="o">=</span><span class="n">cadence</span><span class="p">,</span> <span class="n">filetype</span><span class="o">=</span><span class="n">filetype</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;k2&#39;</span> <span class="ow">in</span> <span class="n">project_lower</span> <span class="ow">and</span> <span class="n">quarter</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">sector</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">mask</span> <span class="o">|=</span> <span class="n">_mask_k2_products</span><span class="p">(</span><span class="n">products</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="n">campaign</span><span class="p">,</span>
+                                  <span class="n">cadence</span><span class="o">=</span><span class="n">cadence</span><span class="p">,</span> <span class="n">filetype</span><span class="o">=</span><span class="n">filetype</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;tess&#39;</span> <span class="ow">in</span> <span class="n">project_lower</span> <span class="ow">and</span> <span class="n">quarter</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">campaign</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">mask</span> <span class="o">|=</span> <span class="n">_mask_tess_products</span><span class="p">(</span><span class="n">products</span><span class="p">,</span> <span class="n">sector</span><span class="o">=</span><span class="n">sector</span><span class="p">,</span> <span class="n">filetype</span><span class="o">=</span><span class="n">filetype</span><span class="p">)</span>
 
-    <span class="c1"># Identify the campaign or quarter by the description.</span>
-    <span class="k">if</span> <span class="n">qoc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">products</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">qoc</span><span class="p">:</span>
-            <span class="n">mask</span> <span class="o">|=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">desc</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;q</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">q</span><span class="p">))</span> <span class="ow">or</span>
-                              <span class="s1">&#39;c</span><span class="si">{:02d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">q</span><span class="p">)</span> <span class="ow">in</span> <span class="n">desc</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="ow">or</span>
-                              <span class="s1">&#39;c</span><span class="si">{:03d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">q</span><span class="p">)</span> <span class="ow">in</span> <span class="n">desc</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
-                              <span class="k">for</span> <span class="n">desc</span> <span class="ow">in</span> <span class="n">products</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]])</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">products</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
-
-    <span class="c1"># Allow only the correct fits or fits.gz type</span>
-    <span class="n">mask</span> <span class="o">&amp;=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">desc</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;fits&#39;</span><span class="p">)</span> <span class="ow">or</span>
-                      <span class="n">desc</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;fits.gz&#39;</span><span class="p">)</span>
-                      <span class="k">for</span> <span class="n">desc</span> <span class="ow">in</span> <span class="n">products</span><span class="p">[</span><span class="s1">&#39;dataURI&#39;</span><span class="p">]])</span>
-
-    <span class="c1"># Allow only the correct cadence type</span>
-    <span class="n">mask</span> <span class="o">&amp;=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">suffix</span> <span class="ow">in</span> <span class="n">desc</span> <span class="k">for</span> <span class="n">desc</span> <span class="ow">in</span> <span class="n">products</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]])</span>
     <span class="n">products</span> <span class="o">=</span> <span class="n">products</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+    <span class="n">products</span><span class="o">.</span><span class="n">sort</span><span class="p">([</span><span class="s1">&#39;distance&#39;</span><span class="p">,</span> <span class="s1">&#39;productFilename&#39;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">limit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">products</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">limit</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">products</span>
 
-    <span class="c1"># Add the quarter or campaign numbers</span>
-    <span class="n">qoc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">p</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; - &#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
-                      <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">products</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
-    <span class="n">products</span><span class="p">[</span><span class="s1">&#39;qoc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">qoc</span>
-    <span class="c1"># Add the dates of each short cadence observation to the product table.</span>
-    <span class="c1"># Note this will not produce a date for ktwo observations, but will not break.</span>
-    <span class="n">dates</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-             <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">products</span><span class="p">[</span><span class="s1">&#39;dataURI&#39;</span><span class="p">]]</span>
-    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dates</span><span class="p">):</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">dates</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
-        <span class="k">except</span><span class="p">:</span>
-            <span class="n">dates</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">products</span><span class="p">[</span><span class="s1">&#39;dates&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">dates</span><span class="p">)</span>
 
-    <span class="c1"># If there is nothing in the table, quit now.</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">products</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">products</span>
-    <span class="n">products</span><span class="o">.</span><span class="n">sort</span><span class="p">([</span><span class="s1">&#39;distance&#39;</span><span class="p">,</span> <span class="s1">&#39;dates&#39;</span><span class="p">,</span> <span class="s1">&#39;qoc&#39;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">_mask_kepler_products</span><span class="p">(</span><span class="n">products</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s1">&#39;long&#39;</span><span class="p">,</span>
+                          <span class="n">filetype</span><span class="o">=</span><span class="s1">&#39;Target Pixel&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a mask flagging the Kepler products that match the criteria.&quot;&quot;&quot;</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">proj</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;kepler&#39;</span> <span class="k">for</span> <span class="n">proj</span> <span class="ow">in</span> <span class="n">products</span><span class="p">[</span><span class="s1">&#39;project&#39;</span><span class="p">]])</span>
+    <span class="k">if</span> <span class="n">mask</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">mask</span>
 
-    <span class="c1"># For Kepler short cadence data there are additional rules, so find anywhere</span>
-    <span class="c1"># where there is short cadence data...</span>
-    <span class="n">scmask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="s1">&#39;Short&#39;</span> <span class="ow">in</span> <span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">products</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]])</span> <span class="o">&amp;</span>\
-             <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="s1">&#39;kplr&#39;</span> <span class="ow">in</span> <span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">products</span><span class="p">[</span><span class="s1">&#39;dataURI&#39;</span><span class="p">]])</span>
+    <span class="c1"># Allow only fits files</span>
+    <span class="n">mask</span> <span class="o">&amp;=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">uri</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;fits&#39;</span><span class="p">)</span> <span class="ow">or</span>
+                      <span class="n">uri</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;fits.gz&#39;</span><span class="p">)</span>
+                      <span class="k">for</span> <span class="n">uri</span> <span class="ow">in</span> <span class="n">products</span><span class="p">[</span><span class="s1">&#39;productFilename&#39;</span><span class="p">]])</span>
 
-    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">scmask</span><span class="p">):</span>
-        <span class="c1"># If no month is specified, return all</span>
-        <span class="k">if</span> <span class="n">month</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">products</span>
+    <span class="c1"># Filters on cadence and product type</span>
+    <span class="k">if</span> <span class="n">cadence</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;short&#39;</span><span class="p">,</span> <span class="s1">&#39;sc&#39;</span><span class="p">]:</span>
+        <span class="n">description_string</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> Short&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filetype</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">cadence</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;any&#39;</span><span class="p">,</span> <span class="s1">&#39;both&#39;</span><span class="p">]:</span>
+        <span class="n">description_string</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filetype</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">description_string</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> Long&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filetype</span><span class="p">)</span>
+    <span class="n">mask</span> <span class="o">&amp;=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">description_string</span> <span class="ow">in</span> <span class="n">desc</span> <span class="k">for</span> <span class="n">desc</span> <span class="ow">in</span> <span class="n">products</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]])</span>
 
+    <span class="c1"># Identify quarter by the description.</span>
+    <span class="k">if</span> <span class="n">quarter</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">quarter_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">products</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">quarter</span><span class="p">):</span>
+            <span class="n">quarter_mask</span> <span class="o">|=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">desc</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;q</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">q</span><span class="p">))</span>
+                                      <span class="k">for</span> <span class="n">desc</span> <span class="ow">in</span> <span class="n">products</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]])</span>
+        <span class="n">mask</span> <span class="o">&amp;=</span> <span class="n">quarter_mask</span>
+
+    <span class="c1"># For Kepler short cadence data the month can be specified</span>
+    <span class="k">if</span> <span class="n">month</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">month</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">month</span><span class="p">)</span>
         <span class="c1"># Get the short cadence date lookup table.</span>
         <span class="n">table</span> <span class="o">=</span> <span class="n">ascii</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PACKAGEDIR</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;short_cadence_month_lookup.csv&#39;</span><span class="p">))</span>
         <span class="c1"># The following line is needed for systems where the default integer type</span>
         <span class="c1"># is int32 (e.g. Windows/Appveyor), the column will then be interpreted</span>
         <span class="c1"># as string which makes the test fail.</span>
-        <span class="n">table</span><span class="p">[</span><span class="s1">&#39;StartTime&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="s1">&#39;StartTime&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
-        <span class="c1"># Grab the dates of each of the short cadence files. Make sure every entry</span>
-        <span class="c1"># has the correct month</span>
-        <span class="n">finalmask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">products</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">products</span><span class="p">[</span><span class="n">scmask</span><span class="p">][</span><span class="s1">&#39;qoc&#39;</span><span class="p">]):</span>
-            <span class="n">ok</span> <span class="o">=</span> <span class="p">(</span><span class="n">products</span><span class="p">[</span><span class="s1">&#39;qoc&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">c</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">scmask</span><span class="p">)</span>
-            <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">products</span><span class="p">[</span><span class="n">ok</span><span class="p">])[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="n">table</span><span class="p">[</span><span class="s1">&#39;StartTime&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="s1">&#39;StartTime&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+        <span class="c1"># Grab the dates of each of the short cadence files.</span>
+        <span class="c1"># Make sure every entry has the correct month</span>
+        <span class="n">is_shortcadence</span> <span class="o">=</span> <span class="n">mask</span> <span class="o">&amp;</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="s1">&#39;Short&#39;</span> <span class="ow">in</span> <span class="n">desc</span> <span class="k">for</span> <span class="n">desc</span> <span class="ow">in</span> <span class="n">products</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]])</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">is_shortcadence</span><span class="p">)[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">quarter</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">products</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; - &#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+            <span class="n">date</span> <span class="o">=</span> <span class="n">products</span><span class="p">[</span><span class="s1">&#39;dataURI&#39;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">permitted_dates</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">month</span><span class="p">:</span>
-                <span class="n">udate</span> <span class="o">=</span> <span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="s1">&#39;StartTime&#39;</span><span class="p">][</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
-                    <span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="s1">&#39;Month&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">m</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="s1">&#39;Quarter&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">c</span><span class="p">))[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]])</span>
-                <span class="n">mask</span> <span class="o">|=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">products</span><span class="p">[</span><span class="s1">&#39;dates&#39;</span><span class="p">][</span><span class="n">ok</span><span class="p">])</span> <span class="o">==</span> <span class="n">udate</span>
-            <span class="n">finalmask</span><span class="p">[</span><span class="n">ok</span><span class="p">]</span> <span class="o">=</span> <span class="n">mask</span>
-        <span class="n">products</span> <span class="o">=</span> <span class="n">products</span><span class="p">[</span><span class="n">finalmask</span><span class="p">]</span>
-        <span class="c1"># Sort by id, then date and quarter</span>
-        <span class="n">products</span><span class="o">.</span><span class="n">sort</span><span class="p">([</span><span class="s1">&#39;distance&#39;</span><span class="p">,</span> <span class="s1">&#39;dates&#39;</span><span class="p">,</span> <span class="s1">&#39;qoc&#39;</span><span class="p">])</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">permitted_dates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="s1">&#39;StartTime&#39;</span><span class="p">][</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">table</span><span class="p">[</span><span class="s1">&#39;Month&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">m</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="s1">&#39;Quarter&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">quarter</span><span class="p">))[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                                    <span class="p">])</span>
+                <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                    <span class="k">pass</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">date</span> <span class="ow">in</span> <span class="n">permitted_dates</span><span class="p">):</span>
+                <span class="n">mask</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
 
-    <span class="k">if</span> <span class="n">limit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">products</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">limit</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">products</span>
+    <span class="k">return</span> <span class="n">mask</span>
+
+
+<span class="k">def</span> <span class="nf">_mask_k2_products</span><span class="p">(</span><span class="n">products</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s1">&#39;long&#39;</span><span class="p">,</span> <span class="n">filetype</span><span class="o">=</span><span class="s1">&#39;Target Pixel&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a mask flagging the K2 products that match the criteria.&quot;&quot;&quot;</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">proj</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;k2&#39;</span> <span class="k">for</span> <span class="n">proj</span> <span class="ow">in</span> <span class="n">products</span><span class="p">[</span><span class="s1">&#39;project&#39;</span><span class="p">]])</span>
+    <span class="k">if</span> <span class="n">mask</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">mask</span>
+
+    <span class="c1"># Allow only fits files</span>
+    <span class="n">mask</span> <span class="o">&amp;=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">uri</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;fits&#39;</span><span class="p">)</span> <span class="ow">or</span>
+                      <span class="n">uri</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;fits.gz&#39;</span><span class="p">)</span>
+                      <span class="k">for</span> <span class="n">uri</span> <span class="ow">in</span> <span class="n">products</span><span class="p">[</span><span class="s1">&#39;productFilename&#39;</span><span class="p">]])</span>
+
+    <span class="c1"># Filters on cadence and product type</span>
+    <span class="k">if</span> <span class="n">cadence</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;short&#39;</span><span class="p">,</span> <span class="s1">&#39;sc&#39;</span><span class="p">]:</span>
+        <span class="n">description_string</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> Short&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filetype</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">cadence</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;any&#39;</span><span class="p">,</span> <span class="s1">&#39;both&#39;</span><span class="p">]:</span>
+        <span class="n">description_string</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filetype</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">description_string</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> Long&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filetype</span><span class="p">)</span>
+    <span class="n">mask</span> <span class="o">&amp;=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">description_string</span> <span class="ow">in</span> <span class="n">desc</span> <span class="k">for</span> <span class="n">desc</span> <span class="ow">in</span> <span class="n">products</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]])</span>
+
+    <span class="c1"># Identify campaign by the description.</span>
+    <span class="k">if</span> <span class="n">campaign</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">campaign_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">products</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">campaign</span><span class="p">):</span>
+            <span class="n">campaign_mask</span> <span class="o">|=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s1">&#39;c</span><span class="si">{:02d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="ow">in</span> <span class="n">desc</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="ow">or</span>
+                                       <span class="s1">&#39;c</span><span class="si">{:03d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="ow">in</span> <span class="n">desc</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                                       <span class="k">for</span> <span class="n">desc</span> <span class="ow">in</span> <span class="n">products</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]])</span>
+        <span class="n">mask</span> <span class="o">&amp;=</span> <span class="n">campaign_mask</span>
+
+    <span class="k">return</span> <span class="n">mask</span>
+
+
+<span class="k">def</span> <span class="nf">_mask_tess_products</span><span class="p">(</span><span class="n">products</span><span class="p">,</span> <span class="n">sector</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">filetype</span><span class="o">=</span><span class="s1">&#39;Target Pixel&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a mask flagging the TESS products that match the criteria.&quot;&quot;&quot;</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">p</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;spoc&#39;</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">products</span><span class="p">[</span><span class="s1">&#39;project&#39;</span><span class="p">]])</span>
+    <span class="k">if</span> <span class="n">mask</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">mask</span>
+
+    <span class="c1"># Allow only fits files</span>
+    <span class="n">mask</span> <span class="o">&amp;=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">uri</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;fits&#39;</span><span class="p">)</span> <span class="ow">or</span>
+                      <span class="n">uri</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;fits.gz&#39;</span><span class="p">)</span>
+                      <span class="k">for</span> <span class="n">uri</span> <span class="ow">in</span> <span class="n">products</span><span class="p">[</span><span class="s1">&#39;productFilename&#39;</span><span class="p">]])</span>
+
+    <span class="c1"># Filter on product type</span>
+    <span class="k">if</span> <span class="n">filetype</span> <span class="o">==</span> <span class="s1">&#39;Lightcurve&#39;</span><span class="p">:</span>
+            <span class="n">description_string</span> <span class="o">=</span> <span class="s1">&#39;Light curves&#39;</span>
+    <span class="k">elif</span> <span class="n">filetype</span> <span class="o">==</span> <span class="s1">&#39;Target Pixel&#39;</span><span class="p">:</span>
+            <span class="n">description_string</span> <span class="o">=</span> <span class="s1">&#39;Target pixel files&#39;</span>
+    <span class="n">mask</span> <span class="o">&amp;=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">description_string</span> <span class="ow">in</span> <span class="n">desc</span> <span class="k">for</span> <span class="n">desc</span> <span class="ow">in</span> <span class="n">products</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]])</span>
+
+    <span class="c1"># Identify sector by the description.</span>
+    <span class="k">if</span> <span class="n">sector</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">sector_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">products</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">sector</span><span class="p">):</span>
+            <span class="n">sector_mask</span> <span class="o">|=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">fn</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;s</span><span class="si">{:04d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+                                     <span class="k">for</span> <span class="n">fn</span> <span class="ow">in</span> <span class="n">products</span><span class="p">[</span><span class="s1">&#39;productFilename&#39;</span><span class="p">]])</span>
+        <span class="n">mask</span> <span class="o">&amp;=</span> <span class="n">sector_mask</span>
+
+    <span class="k">return</span> <span class="n">mask</span>
 
 
 <div class="viewcode-block" id="open"><a class="viewcode-back" href="../../api/lightkurve.search.open.html#lightkurve.search.open">[docs]</a><span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="n">path_or_url</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -897,6 +971,7 @@
         <script type="text/javascript" src="../../_static/underscore.js"></script>
         <script type="text/javascript" src="../../_static/doctools.js"></script>
         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     
 
   

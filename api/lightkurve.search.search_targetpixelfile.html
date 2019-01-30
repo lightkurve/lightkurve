@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>search_targetpixelfile &mdash; lightkurve 1.0b24.dev documentation</title>
+  <title>search_targetpixelfile &mdash; lightkurve 1.0b26.dev documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                1.0b24.dev
+                1.0b26.dev
               </div>
             
           
@@ -209,12 +209,17 @@
 .admonition > p:before {
     margin-right: 4px;  /* make room for the exclamation icon */
 }
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
 </style>
 <div class="section" id="search-targetpixelfile">
 <h1>search_targetpixelfile<a class="headerlink" href="#search-targetpixelfile" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="lightkurve.search.search_targetpixelfile">
-<code class="descclassname">lightkurve.search.</code><code class="descname">search_targetpixelfile</code><span class="sig-paren">(</span><em>target</em>, <em>radius=None</em>, <em>cadence='long'</em>, <em>quarter=None</em>, <em>month=None</em>, <em>campaign=None</em>, <em>limit=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/search.html#search_targetpixelfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.search.search_targetpixelfile" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">lightkurve.search.</code><code class="descname">search_targetpixelfile</code><span class="sig-paren">(</span><em>target, radius=None, cadence='long', mission=['Kepler', 'K2', 'TESS'], quarter=None, month=None, campaign=None, sector=None, limit=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/search.html#search_targetpixelfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.search.search_targetpixelfile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Searches MAST for Target Pixel Files.</p>
 <p>This function fetches a data table that lists the Target Pixel Files (TPFs)
 that fall within a region of sky centered around the position of <cite>target</cite>
@@ -244,14 +249,17 @@ units of arcseconds.  If <cite>None</cite> then we default to 0.0001 arcsec.</p>
 <dt><strong>cadence</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
 <dd><p class="first last">‘long’ or ‘short’.</p>
 </dd>
-<dt><strong>quarter, campaign</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int, list of ints</span></dt>
-<dd><p class="first last">Kepler Quarter or K2 Campaign number.
-By default all quarters and campaigns will be returned.</p>
+<dt><strong>mission</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, list of str</span></dt>
+<dd><p class="first last">‘Kepler’, ‘K2’, or ‘TESS’. By default, all will be returned.</p>
 </dd>
-<dt><strong>month</strong> <span class="classifier-delimiter">:</span> <span class="classifier">1, 2, 3, or list of int</span></dt>
+<dt><strong>quarter, campaign, sector</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int, list of ints</span></dt>
+<dd><p class="first last">Kepler Quarter, K2 Campaign, or TESS Sector number.
+By default all quarters/campaigns/sectors will be returned.</p>
+</dd>
+<dt><strong>month</strong> <span class="classifier-delimiter">:</span> <span class="classifier">1, 2, 3, 4 or list of int</span></dt>
 <dd><p class="first last">For Kepler’s prime mission, there are three short-cadence
 TargetPixelFiles for each quarter, each covering one month.
-Hence, if cadence=’short’ you need to specify month=1, 2, or 3.
+Hence, if cadence=’short’ you can specify month=1, 2, 3, or 4.
 By default all months will be returned.</p>
 </dd>
 <dt><strong>limit</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
@@ -352,6 +360,7 @@ for these targets in Quarter 4 with:</p>
         <script type="text/javascript" src="../_static/underscore.js"></script>
         <script type="text/javascript" src="../_static/doctools.js"></script>
         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     
 
   

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Introduction to lightkurve &mdash; lightkurve 1.0b24.dev documentation</title>
+  <title>Introduction to lightkurve &mdash; lightkurve 1.0b26.dev documentation</title>
   
 
   
@@ -29,7 +29,7 @@
   <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="What are TargetPixelFile objects?" href="1.02-target-pixel-files.html" />
+    <link rel="next" title="What are TargetPixelFile objects?" href="01-target-pixel-files.html" />
     <link rel="prev" title="TessQualityFlags" href="../api/lightkurve.utils.TessQualityFlags.html" /> 
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                1.0b24.dev
+                1.0b26.dev
               </div>
             
           
@@ -95,10 +95,10 @@
 <p class="caption"><span class="caption-text">Tutorials</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction to lightkurve</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="1.02-target-pixel-files.html">What are TargetPixelFile objects?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="1.03-what-are-lightcurves.html">What are LightCurve objects?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="1.04-lightcurve-files.html">What are LightCurveFile objects?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="1.06-using-the-periodogram-class.html">What is the Periodogram class?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="01-target-pixel-files.html">What are TargetPixelFile objects?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="01-what-are-lightcurves.html">What are LightCurve objects?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="01-lightcurve-files.html">What are LightCurveFile objects?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="01-using-the-periodogram-class.html">What is the Periodogram class?</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="section2.html">Science with lightkurve</a></li>
@@ -193,16 +193,21 @@
 .admonition > p:before {
     margin-right: 4px;  /* make room for the exclamation icon */
 }
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
 </style>
 <div class="section" id="introduction-to-lightkurve">
 <h1>Introduction to lightkurve<a class="headerlink" href="#introduction-to-lightkurve" title="Permalink to this headline">¶</a></h1>
 <p>In the first section of these tutorials we’ll cover the basics of using <em>lightkurve</em>. This will include getting to grips with the file types and how to load and work with data from both the Kepler and K2 missions. In the second section we will cover some data analysis tasks that astronomers might commonly want to do with time series data.</p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="1.02-target-pixel-files.html">What are TargetPixelFile objects?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="1.03-what-are-lightcurves.html">What are LightCurve objects?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="1.04-lightcurve-files.html">What are LightCurveFile objects?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="1.06-using-the-periodogram-class.html">What is the Periodogram class?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01-target-pixel-files.html">What are TargetPixelFile objects?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01-what-are-lightcurves.html">What are LightCurve objects?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01-lightcurve-files.html">What are LightCurveFile objects?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01-using-the-periodogram-class.html">What is the Periodogram class?</a></li>
 </ul>
 </div>
 </div>
@@ -215,7 +220,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="1.02-target-pixel-files.html" class="btn btn-neutral float-right" title="What are TargetPixelFile objects?" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="01-target-pixel-files.html" class="btn btn-neutral float-right" title="What are TargetPixelFile objects?" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="../api/lightkurve.utils.TessQualityFlags.html" class="btn btn-neutral" title="TessQualityFlags" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
@@ -253,6 +258,7 @@
         <script type="text/javascript" src="../_static/underscore.js"></script>
         <script type="text/javascript" src="../_static/doctools.js"></script>
         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     
 
   

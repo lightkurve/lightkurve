@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>lightkurve.lightcurve &mdash; lightkurve 1.0b24.dev documentation</title>
+  <title>lightkurve.lightcurve &mdash; lightkurve 1.0b26.dev documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                1.0b24.dev
+                1.0b26.dev
               </div>
             
           
@@ -179,7 +179,9 @@
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="k">import</span> <span class="n">signal</span>
+<span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="k">import</span> <span class="n">interp1d</span>
 <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="k">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
 
 <span class="kn">from</span> <span class="nn">astropy.stats</span> <span class="k">import</span> <span class="n">sigma_clip</span>
 <span class="kn">from</span> <span class="nn">astropy.table</span> <span class="k">import</span> <span class="n">Table</span>
@@ -188,7 +190,10 @@
 <span class="kn">from</span> <span class="nn">astropy</span> <span class="k">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">u</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">PACKAGEDIR</span><span class="p">,</span> <span class="n">MPLSTYLE</span>
 
-<span class="kn">from</span> <span class="nn">.utils</span> <span class="k">import</span> <span class="n">running_mean</span><span class="p">,</span> <span class="n">bkjd_to_astropy_time</span><span class="p">,</span> <span class="n">btjd_to_astropy_time</span><span class="p">,</span> <span class="n">LightkurveWarning</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">running_mean</span><span class="p">,</span> <span class="n">bkjd_to_astropy_time</span><span class="p">,</span> <span class="n">btjd_to_astropy_time</span><span class="p">,</span>
+    <span class="n">LightkurveWarning</span>
+<span class="p">)</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;LightCurve&#39;</span><span class="p">,</span> <span class="s1">&#39;KeplerLightCurve&#39;</span><span class="p">,</span> <span class="s1">&#39;TessLightCurve&#39;</span><span class="p">,</span>
            <span class="s1">&#39;FoldedLightCurve&#39;</span><span class="p">]</span>
@@ -425,7 +430,7 @@
         <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="LightCurve.flatten"><a class="viewcode-back" href="../../api/lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve.flatten">[docs]</a>    <span class="k">def</span> <span class="nf">flatten</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">window_length</span><span class="o">=</span><span class="mi">101</span><span class="p">,</span> <span class="n">polyorder</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">return_trend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                <span class="n">break_tolerance</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                <span class="n">break_tolerance</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">niters</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Removes the low frequency trend using scipy&#39;s Savitzky-Golay filter.</span>
 
 <span class="sd">        This method wraps `scipy.signal.savgol_filter`.</span>
@@ -447,6 +452,16 @@
 <span class="sd">            individually. A gap is defined as a period in time larger than</span>
 <span class="sd">            `break_tolerance` times the median gap.  To disable this feature,</span>
 <span class="sd">            set `break_tolerance` to None.</span>
+<span class="sd">        niters : int</span>
+<span class="sd">            Number of iterations to iteratively sigma clip and flatten. If more than one, will</span>
+<span class="sd">            perform the flatten several times, removing outliers each time.</span>
+<span class="sd">        sigma : int</span>
+<span class="sd">            Number of sigma above which to remove outliers from the flatten</span>
+<span class="sd">        mask : boolean array with length of self.time</span>
+<span class="sd">            Boolean array to mask data with before flattening. Flux values where</span>
+<span class="sd">            mask is True will not be used to flatten the data. An interpolated</span>
+<span class="sd">            result will be provided for these points. Use this mask to remove</span>
+<span class="sd">            data you want to preserve, e.g. transits.</span>
 <span class="sd">        **kwargs : dict</span>
 <span class="sd">            Dictionary of arguments to be passed to `scipy.signal.savgol_filter`.</span>
 
@@ -458,39 +473,53 @@
 <span class="sd">        trend_lc : LightCurve object</span>
 <span class="sd">            Trend in the lightcurve data</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">break_tolerance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">break_tolerance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-        <span class="k">if</span> <span class="n">polyorder</span> <span class="o">&gt;=</span> <span class="n">window_length</span><span class="p">:</span>
-            <span class="n">polyorder</span> <span class="o">=</span> <span class="n">window_length</span> <span class="o">-</span> <span class="mi">1</span>
-            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;polyorder must be smaller than window_length, &quot;</span>
-                        <span class="s2">&quot;using polyorder=</span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">polyorder</span><span class="p">))</span>
-        <span class="n">lc_clean</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_nans</span><span class="p">()</span>
-        <span class="c1"># Split the lightcurve into segments by finding large gaps in time</span>
-        <span class="n">dt</span> <span class="o">=</span> <span class="n">lc_clean</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="n">lc_clean</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>  <span class="c1"># Ignore warnings due to NaNs</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="ne">RuntimeWarning</span><span class="p">)</span>
-            <span class="n">cut</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">dt</span> <span class="o">&gt;</span> <span class="n">break_tolerance</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">dt</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
-        <span class="n">low</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">],</span> <span class="n">cut</span><span class="p">)</span>
-        <span class="n">high</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cut</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">lc_clean</span><span class="o">.</span><span class="n">time</span><span class="p">))</span>
-        <span class="c1"># Then, apply the savgol_filter to each segment separately</span>
-        <span class="n">trend_signal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lc_clean</span><span class="o">.</span><span class="n">time</span><span class="p">))</span>
-        <span class="k">for</span> <span class="n">l</span><span class="p">,</span> <span class="n">h</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">):</span>
-            <span class="c1"># Reduce `window_length` and `polyorder` for short segments;</span>
-            <span class="c1"># this prevents `savgol_filter` from raising an exception</span>
-            <span class="c1"># If the segment is too short, just take the median</span>
 
-            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">([</span><span class="n">window_length</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">h</span> <span class="o">-</span> <span class="n">l</span><span class="p">),</span> <span class="p">(</span><span class="n">h</span> <span class="o">-</span> <span class="n">l</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">break_tolerance</span><span class="p">]):</span>
-                <span class="n">trend_signal</span><span class="p">[</span><span class="n">l</span><span class="p">:</span><span class="n">h</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">lc_clean</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="n">l</span><span class="p">:</span><span class="n">h</span><span class="p">])</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="c1"># Scipy outputs a warning here that is not useful, will be fixed in version 1.2</span>
-                <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
-                    <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="ne">FutureWarning</span><span class="p">)</span>
-                    <span class="n">trend_signal</span><span class="p">[</span><span class="n">l</span><span class="p">:</span><span class="n">h</span><span class="p">]</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">savgol_filter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">lc_clean</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="n">l</span><span class="p">:</span><span class="n">h</span><span class="p">],</span>
-                                                             <span class="n">window_length</span><span class="o">=</span><span class="n">window_length</span><span class="p">,</span>
-                                                             <span class="n">polyorder</span><span class="o">=</span><span class="n">polyorder</span><span class="p">,</span>
-                                                             <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Deep copy ensures we don&#39;t change the original.</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="o">~</span><span class="n">mask</span><span class="p">)</span>
+        <span class="c1"># No NaNs</span>
+        <span class="n">mask</span> <span class="o">&amp;=</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">)</span>
+        <span class="c1"># No outliers</span>
+        <span class="n">mask</span> <span class="o">&amp;=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">)))</span> <span class="o">&lt;=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanstd</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">)</span> <span class="o">*</span> <span class="n">sigma</span><span class="p">)</span>
+        <span class="k">for</span> <span class="nb">iter</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">niters</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">break_tolerance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">break_tolerance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="k">if</span> <span class="n">polyorder</span> <span class="o">&gt;=</span> <span class="n">window_length</span><span class="p">:</span>
+                <span class="n">polyorder</span> <span class="o">=</span> <span class="n">window_length</span> <span class="o">-</span> <span class="mi">1</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;polyorder must be smaller than window_length, &quot;</span>
+                            <span class="s2">&quot;using polyorder=</span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">polyorder</span><span class="p">))</span>
+            <span class="c1"># Split the lightcurve into segments by finding large gaps in time</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="n">mask</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="n">mask</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>  <span class="c1"># Ignore warnings due to NaNs</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="ne">RuntimeWarning</span><span class="p">)</span>
+                <span class="n">cut</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">dt</span> <span class="o">&gt;</span> <span class="n">break_tolerance</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">dt</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">low</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">],</span> <span class="n">cut</span><span class="p">)</span>
+            <span class="n">high</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cut</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="n">mask</span><span class="p">]))</span>
+            <span class="c1"># Then, apply the savgol_filter to each segment separately</span>
+            <span class="n">trend_signal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="n">mask</span><span class="p">]))</span>
+            <span class="k">for</span> <span class="n">l</span><span class="p">,</span> <span class="n">h</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">):</span>
+                <span class="c1"># Reduce `window_length` and `polyorder` for short segments;</span>
+                <span class="c1"># this prevents `savgol_filter` from raising an exception</span>
+                <span class="c1"># If the segment is too short, just take the median</span>
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">([</span><span class="n">window_length</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">h</span> <span class="o">-</span> <span class="n">l</span><span class="p">),</span> <span class="p">(</span><span class="n">h</span> <span class="o">-</span> <span class="n">l</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">break_tolerance</span><span class="p">]):</span>
+                    <span class="n">trend_signal</span><span class="p">[</span><span class="n">l</span><span class="p">:</span><span class="n">h</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="n">mask</span><span class="p">][</span><span class="n">l</span><span class="p">:</span><span class="n">h</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Scipy outputs a warning here that is not useful, will be fixed in version 1.2</span>
+                    <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+                        <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="ne">FutureWarning</span><span class="p">)</span>
+                        <span class="n">trend_signal</span><span class="p">[</span><span class="n">l</span><span class="p">:</span><span class="n">h</span><span class="p">]</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">savgol_filter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="n">mask</span><span class="p">][</span><span class="n">l</span><span class="p">:</span><span class="n">h</span><span class="p">],</span>
+                                                                 <span class="n">window_length</span><span class="o">=</span><span class="n">window_length</span><span class="p">,</span>
+                                                                 <span class="n">polyorder</span><span class="o">=</span><span class="n">polyorder</span><span class="p">,</span>
+                                                                 <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="c1"># No outliers</span>
+            <span class="n">mask1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">-</span> <span class="n">trend_signal</span><span class="p">))</span> <span class="o">&lt;</span>\
+                    <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanstd</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flux</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">-</span> <span class="n">trend_signal</span><span class="p">)</span> <span class="o">*</span> <span class="n">sigma</span><span class="p">)</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="n">mask</span><span class="p">][</span><span class="n">mask1</span><span class="p">],</span> <span class="n">trend_signal</span><span class="p">[</span><span class="n">mask1</span><span class="p">],</span> <span class="n">fill_value</span><span class="o">=</span><span class="s1">&#39;extrapolate&#39;</span><span class="p">)</span>
+            <span class="n">trend_signal</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
+            <span class="n">mask</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">&amp;=</span> <span class="n">mask1</span>
 
-        <span class="n">trend_signal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">lc_clean</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">trend_signal</span><span class="p">)</span>
         <span class="n">flatten_lc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
             <span class="c1"># ignore invalid division warnings</span>
@@ -758,14 +787,21 @@
             <span class="n">binned_lc</span><span class="o">.</span><span class="n">flux_err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">binned_lc</span><span class="o">.</span><span class="n">flux</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">binned_lc</span><span class="p">,</span> <span class="s1">&#39;quality&#39;</span><span class="p">):</span>
+            <span class="c1"># Note: np.bitwise_or only works if there are no NaNs</span>
             <span class="n">binned_lc</span><span class="o">.</span><span class="n">quality</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-                <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">bitwise_or</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">quality</span><span class="p">,</span> <span class="n">n_bins</span><span class="p">)])</span>
+                <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">bitwise_or</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">a</span><span class="p">))</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                 <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">quality</span><span class="p">,</span> <span class="n">n_bins</span><span class="p">)])</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">binned_lc</span><span class="p">,</span> <span class="s1">&#39;cadenceno&#39;</span><span class="p">):</span>
+            <span class="n">binned_lc</span><span class="o">.</span><span class="n">cadenceno</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_bins</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">binned_lc</span><span class="p">,</span> <span class="s1">&#39;centroid_col&#39;</span><span class="p">):</span>
+            <span class="c1"># Note: nanmean/nanmedian yield a RuntimeWarning if a slice is all NaNs</span>
             <span class="n">binned_lc</span><span class="o">.</span><span class="n">centroid_col</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-                <span class="p">[</span><span class="n">methodf</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">centroid_col</span><span class="p">,</span> <span class="n">n_bins</span><span class="p">)])</span>
+                <span class="p">[</span><span class="n">methodf</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">a</span><span class="p">))</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                 <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">centroid_col</span><span class="p">,</span> <span class="n">n_bins</span><span class="p">)])</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">binned_lc</span><span class="p">,</span> <span class="s1">&#39;centroid_row&#39;</span><span class="p">):</span>
             <span class="n">binned_lc</span><span class="o">.</span><span class="n">centroid_row</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-                <span class="p">[</span><span class="n">methodf</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">centroid_row</span><span class="p">,</span> <span class="n">n_bins</span><span class="p">)])</span>
+                <span class="p">[</span><span class="n">methodf</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">a</span><span class="p">))</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                 <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">centroid_row</span><span class="p">,</span> <span class="n">n_bins</span><span class="p">)])</span>
 
         <span class="k">return</span> <span class="n">binned_lc</span></div>
 
@@ -1139,6 +1175,45 @@
                                            <span class="n">freq_unit</span><span class="o">=</span><span class="n">freq_unit</span><span class="p">,</span>
                                            <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
+    <span class="k">def</span> <span class="nf">_boolean_mask_to_bitmask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Takes in an aperture_mask and returns a Kepler-style bitmask</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        aperture_mask : array-like</span>
+<span class="sd">            2D aperture mask. The mask can be either a boolean mask or an integer</span>
+<span class="sd">            mask mimicking the Kepler/TESS convention; boolean or boolean-like masks</span>
+<span class="sd">            are converted to the Kepler/TESS conventions.  Kepler bitmasks are</span>
+<span class="sd">            returned unchanged except for possible datatype conversion.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bitmask : numpy uint8 array</span>
+<span class="sd">            A bitmask incompletely mimicking the Kepler/TESS convention: Bit 2,</span>
+<span class="sd">            value = 3, means &quot;pixel was part of the custom aperture&quot;.  The other</span>
+<span class="sd">            bits have no meaning and are currently assigned a value of 1.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Masks can either be boolean input or Kepler pipeline style</span>
+        <span class="n">clean_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">aperture_mask</span><span class="p">)</span>
+
+        <span class="n">contains_bit2</span> <span class="o">=</span> <span class="p">(</span><span class="n">clean_mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span>
+        <span class="n">all_zeros_or_ones</span> <span class="o">=</span> <span class="p">(</span> <span class="p">(</span><span class="n">clean_mask</span><span class="o">.</span><span class="n">dtype</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;float&#39;</span><span class="p">,</span> <span class="s1">&#39;int&#39;</span><span class="p">])</span> <span class="o">&amp;</span>
+                              <span class="p">((</span><span class="nb">set</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">clean_mask</span><span class="p">))</span> <span class="o">-</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">})</span> <span class="o">==</span> <span class="nb">set</span><span class="p">())</span> <span class="p">)</span>
+        <span class="n">is_bool_mask</span> <span class="o">=</span> <span class="p">(</span> <span class="p">(</span><span class="n">aperture_mask</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="s1">&#39;bool&#39;</span><span class="p">)</span> <span class="o">|</span> <span class="n">all_zeros_or_ones</span> <span class="p">)</span>
+
+
+        <span class="k">if</span> <span class="n">is_bool_mask</span><span class="p">:</span>
+            <span class="n">out_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+            <span class="n">out_mask</span><span class="p">[</span><span class="n">aperture_mask</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
+            <span class="n">out_mask</span> <span class="o">=</span> <span class="n">out_mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">contains_bit2</span><span class="p">:</span>
+            <span class="n">out_mask</span> <span class="o">=</span> <span class="n">aperture_mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;The input aperture mask must be boolean or follow the </span><span class="se">\</span>
+<span class="s2">                    Kepler-pipeline standard; returning None.&quot;</span><span class="p">)</span>
+            <span class="n">out_mask</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">out_mask</span>
+
 <div class="viewcode-block" id="LightCurve.to_fits"><a class="viewcode-back" href="../../api/lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve.to_fits">[docs]</a>    <span class="k">def</span> <span class="nf">to_fits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">extra_data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Writes the LightCurve to a FITS file.</span>
 
@@ -1188,12 +1263,6 @@
                 <span class="n">hdu</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">kw</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span> <span class="o">=</span> <span class="n">default</span><span class="p">[</span><span class="n">kw</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">default</span><span class="p">[</span><span class="n">kw</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Value for </span><span class="si">{}</span><span class="s1"> is None.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">kw</span><span class="p">))</span>
-            <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;quarter&#39;</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">quarter</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
-                <span class="n">hdu</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;QUARTER&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">quarter</span>
-            <span class="k">elif</span> <span class="p">(</span><span class="s1">&#39;campaign&#39;</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">campaign</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">hdu</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;CAMPAIGN&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">campaign</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Cannot find Campaign or Quarter number.&#39;</span><span class="p">)</span>
 
             <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">extra_data</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">extra_data</span><span class="p">[</span><span class="n">kw</span><span class="p">],</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">))):</span>
@@ -1237,13 +1306,15 @@
 
         <span class="k">def</span> <span class="nf">_hdulist</span><span class="p">(</span><span class="o">**</span><span class="n">extra_data</span><span class="p">):</span>
             <span class="sd">&quot;&quot;&quot;Returns an astropy.io.fits.HDUList object.&quot;&quot;&quot;</span>
-            <span class="k">return</span> <span class="n">fits</span><span class="o">.</span><span class="n">HDUList</span><span class="p">([</span><span class="n">_make_primary_hdu</span><span class="p">(</span><span class="n">extra_data</span><span class="o">=</span><span class="n">extra_data</span><span class="p">),</span>
-                                 <span class="n">_make_lightcurve_extension</span><span class="p">(</span><span class="n">extra_data</span><span class="o">=</span><span class="n">extra_data</span><span class="p">)])</span>
+            <span class="n">list_out</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">HDUList</span><span class="p">([</span><span class="n">_make_primary_hdu</span><span class="p">(</span><span class="n">extra_data</span><span class="o">=</span><span class="n">extra_data</span><span class="p">),</span>
+                             <span class="n">_make_lightcurve_extension</span><span class="p">(</span><span class="n">extra_data</span><span class="o">=</span><span class="n">extra_data</span><span class="p">)])</span>
+            <span class="k">return</span> <span class="n">list_out</span>
 
         <span class="n">hdu</span> <span class="o">=</span> <span class="n">_hdulist</span><span class="p">(</span><span class="o">**</span><span class="n">extra_data</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">hdu</span><span class="o">.</span><span class="n">writeto</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">,</span> <span class="n">checksum</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">hdu</span></div></div>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">hdu</span></div></div>
 
 
 <div class="viewcode-block" id="FoldedLightCurve"><a class="viewcode-back" href="../../api/lightkurve.lightcurve.FoldedLightCurve.html#lightkurve.lightcurve.FoldedLightCurve">[docs]</a><span class="k">class</span> <span class="nc">FoldedLightCurve</span><span class="p">(</span><span class="n">LightCurve</span><span class="p">):</span>
@@ -1441,7 +1512,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">KeplerLightCurve</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="KeplerLightCurve.to_fits"><a class="viewcode-back" href="../../api/lightkurve.lightcurve.KeplerLightCurve.html#lightkurve.lightcurve.KeplerLightCurve.to_fits">[docs]</a>    <span class="k">def</span> <span class="nf">to_fits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">extra_data</span><span class="p">):</span>
+<div class="viewcode-block" id="KeplerLightCurve.to_fits"><a class="viewcode-back" href="../../api/lightkurve.lightcurve.KeplerLightCurve.html#lightkurve.lightcurve.KeplerLightCurve.to_fits">[docs]</a>    <span class="k">def</span> <span class="nf">to_fits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">extra_data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Writes the KeplerLightCurve to a FITS file.</span>
 
 <span class="sd">        Parameters</span>
@@ -1450,6 +1521,11 @@
 <span class="sd">            File path, if `None` returns an astropy.io.fits.HDUList object.</span>
 <span class="sd">        overwrite : bool</span>
 <span class="sd">            Whether or not to overwrite the file</span>
+<span class="sd">        aperture_mask : array-like</span>
+<span class="sd">            Optional 2D aperture mask to save with this lightcurve object, if</span>
+<span class="sd">            defined.  The mask can be either a boolean mask or an integer mask</span>
+<span class="sd">            mimicking the Kepler/TESS convention; boolean masks are</span>
+<span class="sd">            automatically converted to the Kepler/TESS conventions</span>
 <span class="sd">        extra_data : dict</span>
 <span class="sd">            Extra keywords or columns to include in the FITS file.</span>
 <span class="sd">            Arguments of type str, int, float, or bool will be stored as</span>
@@ -1474,13 +1550,37 @@
             <span class="s1">&#39;EQUINOX&#39;</span><span class="p">:</span> <span class="mi">2000</span><span class="p">,</span>
             <span class="s1">&#39;DATE-OBS&#39;</span><span class="p">:</span> <span class="n">Time</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mf">2454833.</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;jd&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">isot</span><span class="p">,</span>
             <span class="s1">&#39;SAP_QUALITY&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">quality</span><span class="p">}</span>
+
+        <span class="k">def</span> <span class="nf">_make_aperture_extension</span><span class="p">(</span><span class="n">hdu_list</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;Create the &#39;APERTURE&#39; extension (e.g. extension #2).&quot;&quot;&quot;</span>
+
+            <span class="k">if</span> <span class="n">aperture_mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">bitmask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_boolean_mask_to_bitmask</span><span class="p">(</span><span class="n">aperture_mask</span><span class="p">)</span>
+                <span class="n">hdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">ImageHDU</span><span class="p">(</span><span class="n">bitmask</span><span class="p">)</span>
+                <span class="n">hdu</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;EXTNAME&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;APERTURE&#39;</span>
+                <span class="n">hdu_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hdu</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">hdu_list</span>
+
         <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">kepler_specific_data</span><span class="p">:</span>
             <span class="k">if</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">kw</span><span class="o">.</span><span class="n">lower</span> <span class="o">==</span> <span class="n">k</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">extra_data</span><span class="p">])</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
                 <span class="n">extra_data</span><span class="p">[</span><span class="n">kw</span><span class="p">]</span> <span class="o">=</span> <span class="n">kepler_specific_data</span><span class="p">[</span><span class="n">kw</span><span class="p">]</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">KeplerLightCurve</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">to_fits</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
-                                                     <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">,</span>
-                                                     <span class="o">**</span><span class="n">extra_data</span><span class="p">)</span></div></div>
+        <span class="n">hdu</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">KeplerLightCurve</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">to_fits</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                                    <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">,</span>
+                                                    <span class="o">**</span><span class="n">extra_data</span><span class="p">)</span>
 
+        <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;quarter&#39;</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">quarter</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">hdu</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;QUARTER&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">quarter</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="s1">&#39;campaign&#39;</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">campaign</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">hdu</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;CAMPAIGN&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">campaign</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Cannot find Campaign or Quarter number.&#39;</span><span class="p">)</span>
+
+        <span class="n">hdu</span> <span class="o">=</span> <span class="n">_make_aperture_extension</span><span class="p">(</span><span class="n">hdu</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">hdu</span><span class="o">.</span><span class="n">writeto</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">,</span> <span class="n">checksum</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">hdu</span></div></div>
 
 <div class="viewcode-block" id="TessLightCurve"><a class="viewcode-back" href="../../api/lightkurve.lightcurve.TessLightCurve.html#lightkurve.lightcurve.TessLightCurve">[docs]</a><span class="k">class</span> <span class="nc">TessLightCurve</span><span class="p">(</span><span class="n">LightCurve</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Defines a light curve class for NASA&#39;s TESS mission.</span>
@@ -1539,7 +1639,66 @@
         <span class="k">return</span> <span class="n">lc</span>
 
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span><span class="p">(</span><span class="s1">&#39;TessLightCurve(TICID: </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">targetid</span><span class="p">))</span></div>
+        <span class="k">return</span><span class="p">(</span><span class="s1">&#39;TessLightCurve(TICID: </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">targetid</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="TessLightCurve.to_fits"><a class="viewcode-back" href="../../api/lightkurve.lightcurve.TessLightCurve.html#lightkurve.lightcurve.TessLightCurve.to_fits">[docs]</a>    <span class="k">def</span> <span class="nf">to_fits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">extra_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Writes the KeplerLightCurve to a FITS file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        path : string, default None</span>
+<span class="sd">            File path, if `None` returns an astropy.io.fits.HDUList object.</span>
+<span class="sd">        overwrite : bool</span>
+<span class="sd">            Whether or not to overwrite the file</span>
+<span class="sd">        aperture_mask : array-like</span>
+<span class="sd">            Optional 2D aperture mask to save with this lightcurve object, if</span>
+<span class="sd">            defined.  The mask can be either a boolean mask or an integer mask</span>
+<span class="sd">            mimicking the Kepler/TESS convention; boolean masks are</span>
+<span class="sd">            automatically converted to the Kepler/TESS conventions</span>
+<span class="sd">        extra_data : dict</span>
+<span class="sd">            Extra keywords or columns to include in the FITS file.</span>
+<span class="sd">            Arguments of type str, int, float, or bool will be stored as</span>
+<span class="sd">            keywords in the primary header.</span>
+<span class="sd">            Arguments of type np.array or list will be stored as columns</span>
+<span class="sd">            in the first extension.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        hdu : astropy.io.fits</span>
+<span class="sd">            Returns an astropy.io.fits object if path is None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># TODO: populate more TESS specific metadata</span>
+
+        <span class="n">tess_specific_data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;OBJECT&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">targetid</span><span class="p">),</span>
+            <span class="s1">&#39;MISSION&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mission</span><span class="p">,</span>
+            <span class="s1">&#39;RA_OBJ&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ra</span><span class="p">,</span>
+            <span class="s1">&#39;DEC_OBJ&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dec</span><span class="p">}</span> <span class="c1"># ... insert more here!</span>
+
+        <span class="k">def</span> <span class="nf">_make_aperture_extension</span><span class="p">(</span><span class="n">hdu_list</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;Create the &#39;APERTURE&#39; extension (e.g. extension #2).&quot;&quot;&quot;</span>
+
+            <span class="k">if</span> <span class="n">aperture_mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">bitmask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_boolean_mask_to_bitmask</span><span class="p">(</span><span class="n">aperture_mask</span><span class="p">)</span>
+                <span class="n">hdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">ImageHDU</span><span class="p">(</span><span class="n">bitmask</span><span class="p">)</span>
+                <span class="n">hdu</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;EXTNAME&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;APERTURE&#39;</span>
+                <span class="n">hdu_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hdu</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">hdu_list</span>
+
+        <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">tess_specific_data</span><span class="p">:</span>
+            <span class="k">if</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">kw</span><span class="o">.</span><span class="n">lower</span> <span class="o">==</span> <span class="n">k</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">extra_data</span><span class="p">])</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+                <span class="n">extra_data</span><span class="p">[</span><span class="n">kw</span><span class="p">]</span> <span class="o">=</span> <span class="n">tess_specific_data</span><span class="p">[</span><span class="n">kw</span><span class="p">]</span>
+        <span class="n">hdu</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TessLightCurve</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">to_fits</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                                    <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">,</span>
+                                                    <span class="o">**</span><span class="n">extra_data</span><span class="p">)</span>
+
+        <span class="n">hdu</span> <span class="o">=</span> <span class="n">_make_aperture_extension</span><span class="p">(</span><span class="n">hdu</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">hdu</span><span class="o">.</span><span class="n">writeto</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">,</span> <span class="n">checksum</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">hdu</span></div></div>
 </pre></div>
 
            </div>
@@ -1578,6 +1737,7 @@
         <script type="text/javascript" src="../../_static/underscore.js"></script>
         <script type="text/javascript" src="../../_static/doctools.js"></script>
         <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     
 
   
