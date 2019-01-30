@@ -33,7 +33,7 @@ try:
     from bokeh.models import Text
     from bokeh.layouts import layout, Spacer
     from bokeh.models.tools import HoverTool
-    from bokeh.models.widgets import Button, Div
+    from bokeh.models.widgets import Button, Div, Paragraph
     from bokeh.models.formatters import PrintfTickFormatter
     from bokeh.events import PanEnd, Reset
 
@@ -249,7 +249,7 @@ def make_lightcurve_figure_elements(lc, model_lc, lc_source, model_lc_source, he
 
     # Add light curve
     fig.circle('time', 'flux', line_width=1, color='#191919',
-             source=lc_source, nonselection_line_color='#191919', size=2,
+             source=lc_source, nonselection_line_color='#191919', size=0.5,
              nonselection_line_alpha=1.0)
     # Add model
     fig.step('time', 'flux', line_width=1, color='firebrick',
@@ -299,7 +299,7 @@ def make_folded_figure_elements(f, f_model_lc, f_source, f_model_lc_source, help
     # Scatter point for data
     fig.circle('phase', 'flux', line_width=1, color='#191919',
          source=f_source, nonselection_line_color='#191919',
-         nonselection_line_alpha=1.0, size=2)
+         nonselection_line_alpha=1.0, size=0.1)
 
     # Line plot for model
     fig.step('phase', 'flux', line_width=3, color='firebrick',
@@ -410,6 +410,12 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
     def _create_interact_ui(doc, minp=minimum_period, maxp=maximum_period, resolution=resolution):
         '''Create BLS interact user interface
         '''
+        if minp is None:
+            #minp = np.mean(np.diff(lc.time)) * 20
+            minp = 0.3
+        if maxp is None:
+            maxp = (lc.time[-1] - lc.time[0])/4
+
 
         # Some sliders
         duration_slider = Slider(start=0.01,
@@ -425,11 +431,6 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
                             step=100,
                             title="BLS Resolution",
                             width=400)
-        if minp is None:
-            #minp = np.mean(np.diff(lc.time)) * 20
-            minp = 0.3
-        if maxp is None:
-            maxp = (lc.time[-1] - lc.time[0])/4
 
         # Set up the period values, BLS model and best period
         period_values = np.logspace(np.log10(minp), np.log10(maxp), npoints_slider.value)
@@ -438,6 +439,16 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
         loc = np.argmax(result.power)
         best_period = result.period[loc]
         best_t0 = result.transit_time[loc]
+
+
+        # Some Buttons
+        double_button = Button(label="Double Period",
+                               button_type="danger", width=100)
+
+        half_button = Button(label="Half Period",
+                              button_type="danger", width=100)
+        text_output = Paragraph(text="Period: {} days, \t T0: {}".format(np.round(best_period, 7), np.round(best_t0, 7)),
+                                width=300, height=40)
 
         # Set up BLS source
         bls_source = prepare_bls_datasource(result, loc)
@@ -537,7 +548,9 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
             f_model_lc_source.data = {'phase':f_model_lc.time, 'flux':f_model_lc.flux}
 
             vertical_line.update(location=best_period)
-            fig_folded.title.text = 'Period: {} days \t T0: {}'.format(np.round(best_period, 7), np.round(best_t0, 5))
+            fig_folded.title.text = 'Period: {} days \t T0: {}'.format(np.round(best_period, 7), np.round(best_t0, 7))
+            text_output.text = "Period: {} days, \t T0: {}".format(np.round(best_period, 7), np.round(best_t0, 7))
+
 
         # Callbacks
         def _update_upon_period_selection(attr, old, new):
@@ -561,6 +574,15 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
             '''
             _update_params(all=True)
 
+        def _double_period_event():
+            fig_bls.x_range.start *= 2
+            fig_bls.x_range.end *= 2
+            _update_params(all=True)
+
+        def _half_period_event():
+            fig_bls.x_range.start /= 2
+            fig_bls.x_range.end /= 2
+            _update_params(all=True)
 
         # Help Hover Call Backs
         def _update_folded_plot_help_reset(event):
@@ -631,8 +653,18 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
         fig_lc.on_event(PanEnd, _update_lc_plot_help)
         fig_lc.on_event(Reset, _update_lc_plot_help_reset)
 
+
+        # Buttons
+        double_button.on_click(_double_period_event)
+        half_button.on_click(_half_period_event)
+
         # Layout the widget
-        doc.add_root(layout([[fig_bls, fig_folded], fig_lc, [Spacer(width=70), duration_slider, Spacer(width=50), npoints_slider]]))
+        doc.add_root(layout([
+                            [fig_bls, fig_folded],
+                            fig_lc,
+                            [Spacer(width=70), duration_slider, Spacer(width=50), npoints_slider],
+                            [Spacer(width=70), double_button, Spacer(width=70), half_button, Spacer(width=300), text_output]
+                                ]))
 
     output_notebook(verbose=False, hide_banner=True)
     return show(_create_interact_ui, notebook_url=notebook_url)
