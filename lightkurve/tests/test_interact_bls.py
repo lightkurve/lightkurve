@@ -2,7 +2,7 @@
 import pytest
 import sys
 import numpy as np
-from ..lightcurvefile import LightCurveFile, KeplerLightCurveFile, TessLightCurveFile
+from ..lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
 
 try:
     import bokeh

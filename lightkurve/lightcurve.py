@@ -919,6 +919,7 @@ class LightCurve(object):
         Load the light curve for Kepler-10, remove long-term trends, and
         display the BLS tool as follows:
 
+        >>> import lightkurve as lk
         >>> lc = lk.search_lightcurvefile('kepler-10', quarter=3).download()
         >>> lc = lc.PDCSAP_FLUX.normalize().flatten()
         >>> lc.interact_bls()
@@ -927,13 +928,7 @@ class LightCurve(object):
         ----------
         .. [1] http://docs.astropy.org/en/latest/stats/bls.html
         """
-        try:
-            from .interact_bls import show_interact_widget
-        except ImportError as e:
-            # Raised if AstroPy>=3.1 or Bokeh are not available
-            log.error(e)
-            return None
-
+        from .interact_bls import show_interact_widget
         clean = self.remove_nans()
         return show_interact_widget(clean, notebook_url=notebook_url, minimum_period=minimum_period,
                                     maximum_period=maximum_period, resolution=resolution)
