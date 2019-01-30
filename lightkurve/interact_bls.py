@@ -32,7 +32,7 @@ __all__ = ['show_interact_widget']
 
 
 def prepare_bls_datasource(result, loc):
-    '''Prepare a bls result for bokeh plotting
+    """Prepare a bls result for bokeh plotting
 
     Parameters
     ----------
@@ -45,50 +45,50 @@ def prepare_bls_datasource(result, loc):
     -------
     bls_source : Bokeh.plotting.ColumnDataSource
         Bokeh style source for plotting
-    '''
+    """
     preselected = Selection()
     preselected.indices = [loc]
     bls_source = ColumnDataSource(data=dict(
-                                 period=result['period'],
-                                 power=result['power'],
-                                 depth=result['depth'],
-                                 duration=result['duration'],
-                                 transit_time=result['transit_time']), selected=preselected)
+                                        period=result['period'],
+                                        power=result['power'],
+                                        depth=result['depth'],
+                                        duration=result['duration'],
+                                        transit_time=result['transit_time']),
+                                  selected=preselected)
     return bls_source
 
 
-def prepare_folded_datasource(f):
-    '''Prepare a folded lightkurve.lightcurve for bokeh plotting
+def prepare_folded_datasource(folded_lc):
+    """Prepare a FoldedLightCurve object for bokeh plotting.
 
     Parameters
     ----------
-    f : lightkurve.FoldedLightCurve
+    folded_lc : lightkurve.FoldedLightCurve
         The folded lightcurve
 
     Returns
     -------
     folded_source : Bokeh.plotting.ColumnDataSource
         Bokeh style source for plotting
-    '''
-
-    folded_source = ColumnDataSource(data=dict(
-                                 phase=np.sort(f.time),
-                                 flux=f.flux[np.argsort(f.time)]))
-    return folded_source
+    """
+    folded_src = ColumnDataSource(data=dict(
+                                  phase=np.sort(folded_lc.time),
+                                  flux=folded_lc.flux[np.argsort(folded_lc.time)]))
+    return folded_src
 
 
 # Helper functions for help text...
 
 def prepare_lc_help_source(lc):
     data = dict(time=[(np.max(lc.time) - np.min(lc.time)) * 0.98 + np.min(lc.time)],
-                 flux=[(np.max(lc.flux) - np.min(lc.flux)) * 0.9 + np.min(lc.flux)],
-                 boxicon=['https://bokeh.pydata.org/en/latest/_images/BoxZoom.png'],
-                 panicon=['https://bokeh.pydata.org/en/latest/_images/Pan.png'],
-                 reseticon=['https://bokeh.pydata.org/en/latest/_images/Reset.png'],
-                 tapicon=['https://bokeh.pydata.org/en/latest/_images/Tap.png'],
-                 hovericon=['https://bokeh.pydata.org/en/latest/_images/Hover.png'],
-                 helpme=['?'],
-                 help=["""
+                flux=[(np.max(lc.flux) - np.min(lc.flux)) * 0.9 + np.min(lc.flux)],
+                boxicon=['https://bokeh.pydata.org/en/latest/_images/BoxZoom.png'],
+                panicon=['https://bokeh.pydata.org/en/latest/_images/Pan.png'],
+                reseticon=['https://bokeh.pydata.org/en/latest/_images/Reset.png'],
+                tapicon=['https://bokeh.pydata.org/en/latest/_images/Tap.png'],
+                hovericon=['https://bokeh.pydata.org/en/latest/_images/Hover.png'],
+                helpme=['?'],
+                help=["""
                              <div style="width: 550px;">
                                  <div>
                                      <span style="font-size: 12px; font-weight: bold;">Light Curve</span>
@@ -131,11 +131,12 @@ def prepare_lc_help_source(lc):
                          """])
     return ColumnDataSource(data=data)
 
+
 def prepare_bls_help_source(bls_source, slider_value):
     data = dict(period=[bls_source.data['period'][int(slider_value*0.95)]],
-                 power=[(np.max(bls_source.data['power']) - np.min(bls_source.data['power'])) * 0.98 + np.min(bls_source.data['power'])],
-                 helpme=['?'],
-                 help=["""
+                power=[(np.max(bls_source.data['power']) - np.min(bls_source.data['power'])) * 0.98 + np.min(bls_source.data['power'])],
+                helpme=['?'],
+                help=["""
                              <div style="width: 375px;">
                                  <div style="height: 190px;">
                                  </div>
@@ -195,7 +196,7 @@ def prepare_f_help_source(f):
 
 
 def make_lightcurve_figure_elements(lc, model_lc, lc_source, model_lc_source, help_source):
-    '''Make a figure with a simple light curve scatter and model light curve line
+    """Make a figure with a simple light curve scatter and model light curve line.
 
     Parameters
     ----------
@@ -214,7 +215,7 @@ def make_lightcurve_figure_elements(lc, model_lc, lc_source, model_lc_source, he
     -------
     fig : bokeh.plotting.figure
         Bokeh figure object
-    '''
+    """
     # Make figure
     fig = figure(title='Light Curve', plot_height=300, plot_width=900,
                  tools="pan,box_zoom,reset",
@@ -228,17 +229,21 @@ def make_lightcurve_figure_elements(lc, model_lc, lc_source, model_lc_source, he
 
     # Add light curve
     fig.circle('time', 'flux', line_width=1, color='#191919',
-             source=lc_source, nonselection_line_color='#191919', size=0.5,
-             nonselection_line_alpha=1.0)
+               source=lc_source, nonselection_line_color='#191919', size=0.5,
+               nonselection_line_alpha=1.0)
     # Add model
     fig.step('time', 'flux', line_width=1, color='firebrick',
              source=model_lc_source, nonselection_line_color='firebrick',
              nonselection_line_alpha=1.0)
 
     # Help button
-    question_mark = Text(x="time", y="flux", text="helpme", text_color="grey", text_align='center', text_baseline="middle", text_font_size='12px', text_font_style='bold', text_alpha=0.6)
+    question_mark = Text(x="time", y="flux", text="helpme", text_color="grey",
+                         text_align='center', text_baseline="middle",
+                         text_font_size='12px', text_font_style='bold',
+                         text_alpha=0.6)
     fig.add_glyph(help_source, question_mark)
-    help = fig.circle('time', 'flux', alpha=0.0, size=15, source=help_source, line_width=2, line_color='grey', line_alpha=0.6)
+    help = fig.circle('time', 'flux', alpha=0.0, size=15, source=help_source,
+                      line_width=2, line_color='grey', line_alpha=0.6)
     tooltips = help_source.data['help'][0]
     fig.add_tools(HoverTool(tooltips=tooltips, renderers=[help],
                             mode='mouse', point_policy="snap_to_data"))
@@ -246,7 +251,8 @@ def make_lightcurve_figure_elements(lc, model_lc, lc_source, model_lc_source, he
 
 
 def make_folded_figure_elements(f, f_model_lc, f_source, f_model_lc_source, help_source):
-    '''Make a scatter plot of a folded lightkurve.lightcurve
+    """Make a scatter plot of a FoldedLightCurve.
+
     Parameters
     ----------
     f : lightkurve.LightCurve
@@ -264,7 +270,7 @@ def make_folded_figure_elements(f, f_model_lc, f_source, f_model_lc_source, help
     -------
     fig : bokeh.plotting.figure
         Bokeh figure object
-    '''
+    """
 
     # Build Figure
     fig = figure(title='Folded Light Curve', plot_height=340, plot_width=450,
@@ -277,19 +283,22 @@ def make_folded_figure_elements(f, f_model_lc, f_source, f_model_lc_source, help
 
     # Scatter point for data
     fig.circle('phase', 'flux', line_width=1, color='#191919',
-         source=f_source, nonselection_line_color='#191919',
-         nonselection_line_alpha=1.0, size=0.1)
+               source=f_source, nonselection_line_color='#191919',
+               nonselection_line_alpha=1.0, size=0.1)
 
     # Line plot for model
     fig.step('phase', 'flux', line_width=3, color='firebrick',
              source=f_model_lc_source, nonselection_line_color='firebrick',
              nonselection_line_alpha=1.0)
 
-
     # Help button
-    question_mark = Text(x="phase", y="flux", text="helpme", text_color="grey", text_align='center', text_baseline="middle", text_font_size='12px', text_font_style='bold', text_alpha=0.6)
+    question_mark = Text(x="phase", y="flux", text="helpme", text_color="grey",
+                         text_align='center', text_baseline="middle",
+                         text_font_size='12px', text_font_style='bold',
+                         text_alpha=0.6)
     fig.add_glyph(help_source, question_mark)
-    help = fig.circle('phase', 'flux', alpha=0.0, size=15, source=help_source, line_width=2, line_color='grey', line_alpha=0.6)
+    help = fig.circle('phase', 'flux', alpha=0.0, size=15, source=help_source,
+                      line_width=2, line_color='grey', line_alpha=0.6)
 
     tooltips = help_source.data['help'][0]
     fig.add_tools(HoverTool(tooltips=tooltips, renderers=[help],
@@ -298,7 +307,7 @@ def make_folded_figure_elements(f, f_model_lc, f_source, f_model_lc_source, help
 
 
 def make_bls_figure_elements(result, bls_source, help_source):
-    ''' Make a line plot of a BLS result
+    """Make a line plot of a BLS result.
 
     Parameters
     ----------
@@ -315,7 +324,7 @@ def make_bls_figure_elements(result, bls_source, help_source):
         Bokeh figure object
     vertical_line : bokeh.models.Span
         Vertical line to highlight current selected period
-    '''
+    """
 
     # Build Figure
     fig = figure(title='BLS Periodogram', plot_height=340, plot_width=450,
@@ -330,13 +339,13 @@ def make_bls_figure_elements(result, bls_source, help_source):
 
     # Add circles for the selection of new period. These are always hidden
     circ = fig.circle('period', 'power', source=bls_source, fill_alpha=0., size=6,
-                  line_color=None, selection_color="white",
-                  nonselection_fill_alpha=0.0,
-                  nonselection_fill_color='white',
-                  nonselection_line_color=None,
-                  nonselection_line_alpha=0.0,
-                  fill_color=None, hover_fill_color="white",
-                  hover_alpha=0., hover_line_color="white")
+                      line_color=None, selection_color="white",
+                      nonselection_fill_alpha=0.0,
+                      nonselection_fill_color='white',
+                      nonselection_line_color=None,
+                      nonselection_line_alpha=0.0,
+                      fill_color=None, hover_fill_color="white",
+                      hover_alpha=0., hover_line_color="white")
 
     # Add line for the BLS power
     fig.line('period', 'power', line_width=1, color='#191919',
@@ -349,9 +358,13 @@ def make_bls_figure_elements(result, bls_source, help_source):
     fig.add_layout(vertical_line)
 
     # Help button
-    question_mark = Text(x="period", y="power", text="helpme", text_color="grey", text_align='center', text_baseline="middle", text_font_size='12px', text_font_style='bold', text_alpha=0.6)
+    question_mark = Text(x="period", y="power", text="helpme", text_color="grey",
+                         text_align='center', text_baseline="middle",
+                         text_font_size='12px', text_font_style='bold',
+                         text_alpha=0.6)
     fig.add_glyph(help_source, question_mark)
-    help = fig.circle('period', 'power', alpha=0.0, size=15, source=help_source, line_width=2, line_color='grey', line_alpha=0.6)
+    help = fig.circle('period', 'power', alpha=0.0, size=15, source=help_source,
+                      line_width=2, line_color='grey', line_alpha=0.6)
     tooltips = help_source.data['help'][0]
     fig.add_tools(HoverTool(tooltips=tooltips, renderers=[help],
                             mode='mouse', point_policy="snap_to_data"))
@@ -359,9 +372,9 @@ def make_bls_figure_elements(result, bls_source, help_source):
     return fig, vertical_line
 
 
-def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None, maximum_period=None,
-                        resolution=2000):
-    ''' Show the BLS interact widget
+def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
+                         maximum_period=None, resolution=2000):
+    """Show the BLS interact widget.
 
     Parameters
     ----------
@@ -384,32 +397,29 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
         Number of points to use in the BLS panel. Lower this value to have a faster
         but less accurate compute time. You can also vary this value using the
         Resolution Slider.
-    '''
+    """
 
     def _create_interact_ui(doc, minp=minimum_period, maxp=maximum_period, resolution=resolution):
-        '''Create BLS interact user interface
-        '''
+        """Create BLS interact user interface."""
         if minp is None:
-            #minp = np.mean(np.diff(lc.time)) * 20
             minp = 0.3
         if maxp is None:
             maxp = (lc.time[-1] - lc.time[0])/4
 
-
         # Some sliders
         duration_slider = Slider(start=0.01,
-                            end=0.3,
-                            value=0.05,
-                            step=0.01,
-                            title="Duration [Days]",
-                            width=400)
+                                 end=0.3,
+                                 value=0.05,
+                                 step=0.01,
+                                 title="Duration [Days]",
+                                 width=400)
 
         npoints_slider = Slider(start=500,
-                            end=10000,
-                            value=resolution,
-                            step=100,
-                            title="BLS Resolution",
-                            width=400)
+                                end=10000,
+                                value=resolution,
+                                step=100,
+                                title="BLS Resolution",
+                                width=400)
 
         # Set up the period values, BLS model and best period
         period_values = np.logspace(np.log10(minp), np.log10(maxp), npoints_slider.value)
@@ -419,14 +429,12 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
         best_period = result.period[loc]
         best_t0 = result.transit_time[loc]
 
-
         # Some Buttons
-        double_button = Button(label="Double Period",
-                               button_type="danger", width=100)
-
-        half_button = Button(label="Half Period",
-                              button_type="danger", width=100)
-        text_output = Paragraph(text="Period: {} days, \t T0: {}".format(np.round(best_period, 7), np.round(best_t0, 7)),
+        double_button = Button(label="Double Period", button_type="danger", width=100)
+        half_button = Button(label="Half Period", button_type="danger", width=100)
+        text_output = Paragraph(text="Period: {} days, \t T0: {}".format(
+                                                    np.round(best_period, 7),
+                                                    np.round(best_t0, 7)),
                                 width=300, height=40)
 
         # Set up BLS source
@@ -464,15 +472,14 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
                                  phase=f_model_lc.time,
                                  flux=f_model_lc.flux))
 
-
         def _update_light_curve_plot(event):
-            ''' If we zoom in on LC plot, update the binning
-            '''
+            """If we zoom in on LC plot, update the binning."""
             mint, maxt = fig_lc.x_range.start, fig_lc.x_range.end
             inwindow = (lc.time > mint) & (lc.time < maxt)
             nb = int(np.ceil(inwindow.sum()/5000))
             temp_lc = lc[inwindow]
-            lc_source.data = {'time':temp_lc.time[::nb], 'flux':temp_lc.flux[::nb]}
+            lc_source.data = {'time': temp_lc.time[::nb],
+                              'flux': temp_lc.flux[::nb]}
 
         def _update_folded_plot(event):
             loc = np.argmax(bls_source.data['power'])
@@ -483,7 +490,8 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
             f = lc.fold(best_period, best_t0)
             inwindow = (f.time > minphase) & (f.time < maxphase)
             nb = int(np.ceil(inwindow.sum()/10000))
-            f_source.data = {'phase':f[inwindow].time[::nb], 'flux':f[inwindow].flux[::nb]}
+            f_source.data = {'phase': f[inwindow].time[::nb],
+                             'flux': f[inwindow].flux[::nb]}
 
         # Function to update the widget
         def _update_params(all=False, best_period=None, best_t0=None):
@@ -511,46 +519,50 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
             f = lc.fold(best_period, best_t0)
             inwindow = (f.time > minphase) & (f.time < maxphase)
             nb = int(np.ceil(inwindow.sum()/10000))
-            f_source.data = {'phase':f[inwindow].time[::nb], 'flux':f[inwindow].flux[::nb]}
+            f_source.data = {'phase': f[inwindow].time[::nb],
+                             'flux': f[inwindow].flux[::nb]}
 
             mf = model.model(lc.time, best_period, duration_slider.value, best_t0)
             mf /= np.median(mf)
             mask = ~(convolve(np.asarray(mf == np.median(mf)), Box1DKernel(2)) > 0.9)
             model_lc = LightCurve(lc.time[mask], mf[mask])
 
-            model_lc_source.data = {'time':np.sort(model_lc.time), 'flux':model_lc.flux[np.argsort(model_lc.time)]}
+            model_lc_source.data = {'time': np.sort(model_lc.time),
+                                    'flux': model_lc.flux[np.argsort(model_lc.time)]}
 
             f_model_lc = model_lc.fold(best_period, best_t0)
             f_model_lc = LightCurve([-0.5], [1]).append(f_model_lc)
             f_model_lc = f_model_lc.append(LightCurve([0.5], [1]))
 
-            f_model_lc_source.data = {'phase':f_model_lc.time, 'flux':f_model_lc.flux}
+            f_model_lc_source.data = {'phase': f_model_lc.time,
+                                      'flux': f_model_lc.flux}
 
             vertical_line.update(location=best_period)
-            fig_folded.title.text = 'Period: {} days \t T0: {}'.format(np.round(best_period, 7), np.round(best_t0, 7))
-            text_output.text = "Period: {} days, \t T0: {}".format(np.round(best_period, 7), np.round(best_t0, 7))
-
+            fig_folded.title.text = 'Period: {} days \t T0: {}'.format(
+                                        np.round(best_period, 7),
+                                        np.round(best_t0, 7))
+            text_output.text = "Period: {} days, \t T0: {}".format(
+                                        np.round(best_period, 7),
+                                        np.round(best_t0, 7))
 
         # Callbacks
         def _update_upon_period_selection(attr, old, new):
-            ''' When we select a period we should just update a few things, but we should not recalculate model
-            '''
+            """When we select a period we should just update a few things, but we should not recalculate model
+            """
             if len(new) > 0:
                 new = new[0]
                 best_period = bls_source.data['period'][new]
                 best_t0 = bls_source.data['transit_time'][new]
                 _update_params(best_period=best_period, best_t0=best_t0)
 
-
         def _update_model_slider(attr, old, new):
-            ''' If we update the duration slider, we should update the whole model set.
-            '''
+            """If the duration slider is updated, then update the whole model set."""
             _update_params(all=True)
 
         def _update_model_slider_EVENT(event):
-            ''' If we update the duration slider, we should update the whole model set.
+            """If we update the duration slider, we should update the whole model set.
             This is the same as the _update_model_slider but it has a different call signature...
-            '''
+            """
             _update_params(all=True)
 
         def _double_period_event():
@@ -582,19 +594,19 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
 
         def _update_bls_plot_help_event(event):
             bls_help_source.data['period'] = [bls_source.data['period'][int(npoints_slider.value*0.95)]]
-            bls_help_source.data['power'] = [(np.max(bls_source.data['power']) - np.min(bls_source.data['power'])) * 0.98 + np.min(bls_source.data['power'])]
+            bls_help_source.data['power'] = [(np.max(bls_source.data['power']) - np.min(bls_source.data['power'])) * 0.98
+                                             + np.min(bls_source.data['power'])]
 
         def _update_bls_plot_help(attr, old, new):
             bls_help_source.data['period'] = [bls_source.data['period'][int(npoints_slider.value*0.95)]]
-            bls_help_source.data['power'] = [(np.max(bls_source.data['power']) - np.min(bls_source.data['power'])) * 0.98 + np.min(bls_source.data['power'])]
-
+            bls_help_source.data['power'] = [(np.max(bls_source.data['power']) - np.min(bls_source.data['power'])) * 0.98
+                                             + np.min(bls_source.data['power'])]
 
         # Create all the figures.
         fig_folded = make_folded_figure_elements(f, f_model_lc, f_source, f_model_lc_source, f_help_source)
         fig_folded.title.text = 'Period: {} days \t T0: {}'.format(np.round(best_period, 7), np.round(best_t0, 5))
         fig_bls, vertical_line = make_bls_figure_elements(result, bls_source, bls_help_source)
         fig_lc = make_lightcurve_figure_elements(lc, model_lc, lc_source, model_lc_source, lc_help_source)
-
 
         # Map changes
 
@@ -623,7 +635,6 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
         fig_folded.on_event(PanEnd, _update_folded_plot)
         fig_folded.on_event(Reset, _update_folded_plot)
 
-
         # Deal with help button
         fig_bls.on_event(PanEnd, _update_bls_plot_help_event)
         fig_bls.on_event(Reset, _update_bls_plot_help_event)
@@ -631,7 +642,6 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
         fig_folded.on_event(Reset, _update_folded_plot_help_reset)
         fig_lc.on_event(PanEnd, _update_lc_plot_help)
         fig_lc.on_event(Reset, _update_lc_plot_help_reset)
-
 
         # Buttons
         double_button.on_click(_double_period_event)
