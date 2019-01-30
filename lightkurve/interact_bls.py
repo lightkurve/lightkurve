@@ -407,7 +407,7 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
         Resolution Slider.
     '''
 
-    def create_interact_ui(doc, minp=minimum_period, maxp=maximum_period, resolution=resolution):
+    def _create_interact_ui(doc, minp=minimum_period, maxp=maximum_period, resolution=resolution):
         '''Create BLS interact user interface
         '''
 
@@ -452,8 +452,8 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
         model_lc = model_lc.append(LightCurve([(lc.time[0] - best_t0) + 3*best_period/2], [1]))
 
         model_lc_source = ColumnDataSource(data=dict(
-                                     time=model_lc.time,
-                                     flux=model_lc.flux))
+                                     time=np.sort(model_lc.time),
+                                     flux=model_lc.flux[np.argsort(model_lc.time)]))
 
         # Set up the LC
         nb = int(np.ceil(len(lc.flux)/5000))
@@ -475,9 +475,7 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
                                  flux=f_model_lc.flux))
 
 
-
-
-        def update_light_curve_plot(event):
+        def _update_light_curve_plot(event):
             ''' If we zoom in on LC plot, update the binning
             '''
             mint, maxt = fig_lc.x_range.start, fig_lc.x_range.end
@@ -486,7 +484,7 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
             temp_lc = lc[inwindow]
             lc_source.data = {'time':temp_lc.time[::nb], 'flux':temp_lc.flux[::nb]}
 
-        def update_folded_plot(event):
+        def _update_folded_plot(event):
             loc = np.argmax(bls_source.data['power'])
             best_period = bls_source.data['period'][loc]
             best_t0 = bls_source.data['transit_time'][loc]
@@ -498,7 +496,7 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
             f_source.data = {'phase':f[inwindow].time[::nb], 'flux':f[inwindow].flux[::nb]}
 
         # Function to update the widget
-        def update_params(all=False, best_period=None, best_t0=None):
+        def _update_params(all=False, best_period=None, best_t0=None):
             if all:
                 # If we're updating everything, recalculate the BLS model
                 minp, maxp = fig_bls.x_range.start, fig_bls.x_range.end
@@ -530,7 +528,7 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
             mask = ~(convolve(np.asarray(mf == np.median(mf)), Box1DKernel(2)) > 0.9)
             model_lc = LightCurve(lc.time[mask], mf[mask])
 
-            model_lc_source.data = {'time':model_lc.time, 'flux':model_lc.flux}
+            model_lc_source.data = {'time':np.sort(model_lc.time), 'flux':model_lc.flux[np.argsort(model_lc.time)]}
 
             f_model_lc = model_lc.fold(best_period, best_t0)
             f_model_lc = LightCurve([-0.5], [1]).append(f_model_lc)
@@ -542,50 +540,50 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
             fig_folded.title.text = 'Period: {} days \t T0: {}'.format(np.round(best_period, 7), np.round(best_t0, 5))
 
         # Callbacks
-        def update_upon_period_selection(attr, old, new):
+        def _update_upon_period_selection(attr, old, new):
             ''' When we select a period we should just update a few things, but we should not recalculate model
             '''
             if len(new) > 0:
                 new = new[0]
                 best_period = bls_source.data['period'][new]
                 best_t0 = bls_source.data['transit_time'][new]
-                update_params(best_period=best_period, best_t0=best_t0)
+                _update_params(best_period=best_period, best_t0=best_t0)
 
 
-        def update_model_slider(attr, old, new):
+        def _update_model_slider(attr, old, new):
             ''' If we update the duration slider, we should update the whole model set.
             '''
-            update_params(all=True)
+            _update_params(all=True)
 
-        def update_model_slider_EVENT(event):
+        def _update_model_slider_EVENT(event):
             ''' If we update the duration slider, we should update the whole model set.
-            This is the same as the update_model_slider but it has a different call signature...
+            This is the same as the _update_model_slider but it has a different call signature...
             '''
-            update_params(all=True)
+            _update_params(all=True)
 
 
         # Help Hover Call Backs
-        def update_folded_plot_help_reset(event):
+        def _update_folded_plot_help_reset(event):
             f_help_source.data['phase'] = [(np.max(f.time) - np.min(f.time)) * 0.98 + np.min(f.time)]
             f_help_source.data['flux'] = [(np.max(f.flux) - np.min(f.flux)) * 0.98 + np.min(f.flux)]
 
-        def update_folded_plot_help(event):
+        def _update_folded_plot_help(event):
             f_help_source.data['phase'] = [(fig_folded.x_range.end - fig_folded.x_range.start) * 0.95 + fig_folded.x_range.start]
             f_help_source.data['flux'] = [(fig_folded.y_range.end - fig_folded.y_range.start) * 0.95 + fig_folded.y_range.start]
 
-        def update_lc_plot_help_reset(event):
+        def _update_lc_plot_help_reset(event):
             lc_help_source.data['time'] = [(np.max(lc.time) - np.min(lc.time)) * 0.98 + np.min(lc.time)]
             lc_help_source.data['flux'] = [(np.max(lc.flux) - np.min(lc.flux)) * 0.9 + np.min(lc.flux)]
 
-        def update_lc_plot_help(event):
+        def _update_lc_plot_help(event):
             lc_help_source.data['time'] = [(fig_lc.x_range.end - fig_lc.x_range.start) * 0.95 + fig_lc.x_range.start]
             lc_help_source.data['flux'] = [(fig_lc.y_range.end - fig_lc.y_range.start) * 0.9 + fig_lc.y_range.start]
 
-        def update_bls_plot_help_event(event):
+        def _update_bls_plot_help_event(event):
             bls_help_source.data['period'] = [bls_source.data['period'][int(npoints_slider.value*0.95)]]
             bls_help_source.data['power'] = [(np.max(bls_source.data['power']) - np.min(bls_source.data['power'])) * 0.98 + np.min(bls_source.data['power'])]
 
-        def update_bls_plot_help(attr, old, new):
+        def _update_bls_plot_help(attr, old, new):
             bls_help_source.data['period'] = [bls_source.data['period'][int(npoints_slider.value*0.95)]]
             bls_help_source.data['power'] = [(np.max(bls_source.data['power']) - np.min(bls_source.data['power'])) * 0.98 + np.min(bls_source.data['power'])]
 
@@ -600,41 +598,41 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
         # Map changes
 
         # If we click a new period, update
-        bls_source.selected.on_change('indices', update_upon_period_selection)
+        bls_source.selected.on_change('indices', _update_upon_period_selection)
 
         # If we change the duration, update everything, including help button for BLS
-        duration_slider.on_change('value', update_model_slider)
-        duration_slider.on_change('value', update_bls_plot_help)
+        duration_slider.on_change('value', _update_model_slider)
+        duration_slider.on_change('value', _update_bls_plot_help)
 
         # If we increase resolution, update everything
-        npoints_slider.on_change('value', update_model_slider)
+        npoints_slider.on_change('value', _update_model_slider)
 
         # Make sure the vertical line always goes to the best period.
         vertical_line.update(location=best_period)
 
         # If we pan in the BLS panel, update everything
-        fig_bls.on_event(PanEnd, update_model_slider_EVENT)
-        fig_bls.on_event(Reset, update_model_slider_EVENT)
+        fig_bls.on_event(PanEnd, _update_model_slider_EVENT)
+        fig_bls.on_event(Reset, _update_model_slider_EVENT)
 
         # If we pan in the LC panel, rebin the points
-        fig_lc.on_event(PanEnd, update_light_curve_plot)
-        fig_lc.on_event(Reset, update_light_curve_plot)
+        fig_lc.on_event(PanEnd, _update_light_curve_plot)
+        fig_lc.on_event(Reset, _update_light_curve_plot)
 
         # If we pan in the Folded panel, rebin the points
-        fig_folded.on_event(PanEnd, update_folded_plot)
-        fig_folded.on_event(Reset, update_folded_plot)
+        fig_folded.on_event(PanEnd, _update_folded_plot)
+        fig_folded.on_event(Reset, _update_folded_plot)
 
 
         # Deal with help button
-        fig_bls.on_event(PanEnd, update_bls_plot_help_event)
-        fig_bls.on_event(Reset, update_bls_plot_help_event)
-        fig_folded.on_event(PanEnd, update_folded_plot_help)
-        fig_folded.on_event(Reset, update_folded_plot_help_reset)
-        fig_lc.on_event(PanEnd, update_lc_plot_help)
-        fig_lc.on_event(Reset, update_lc_plot_help_reset)
+        fig_bls.on_event(PanEnd, _update_bls_plot_help_event)
+        fig_bls.on_event(Reset, _update_bls_plot_help_event)
+        fig_folded.on_event(PanEnd, _update_folded_plot_help)
+        fig_folded.on_event(Reset, _update_folded_plot_help_reset)
+        fig_lc.on_event(PanEnd, _update_lc_plot_help)
+        fig_lc.on_event(Reset, _update_lc_plot_help_reset)
 
         # Layout the widget
         doc.add_root(layout([[fig_bls, fig_folded], fig_lc, [Spacer(width=70), duration_slider, Spacer(width=50), npoints_slider]]))
 
     output_notebook(verbose=False, hide_banner=True)
-    return show(create_interact_ui, notebook_url=notebook_url)
+    return show(_create_interact_ui, notebook_url=notebook_url)
