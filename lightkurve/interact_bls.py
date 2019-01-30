@@ -23,7 +23,7 @@ try:
     from bokeh.models.tools import HoverTool
     from bokeh.models.widgets import Button, Paragraph
     from bokeh.events import PanEnd, Reset
-except (ImportError, ModuleNotFoundError):
+except ImportError:
     pass  # we will print an error message in `show_interact_widget` instead
 
 from .interact import prepare_lightcurve_datasource
