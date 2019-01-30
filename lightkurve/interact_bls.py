@@ -1,52 +1,32 @@
-"""Provides tools for bls interact
-
-Example use
------------
-"""
+"""This module provides helper functions for the `LightCurve.interact_bls()` feature."""
 import logging
-import warnings
 import numpy as np
-from astropy.stats import sigma_clip
-from .utils import KeplerQualityFlags, LightkurveWarning
-import os
-import matplotlib.pyplot as plt
-import numpy as np
-from datetime import datetime
-from time import time
 from astropy.convolution import convolve, Box1DKernel
-import warnings
 
 log = logging.getLogger(__name__)
-# Import the optional Bokeh dependency, or print a friendly error otherwise.
+
+# Import the optional AstroPy dependency, or print a friendly error otherwise.
 try:
     from astropy.stats.bls import BoxLeastSquares
 except ImportError:
-    log.critical('astropy.stats.bls is not installed. Interactive tools will not work.')
+    log.error('astropy.stats.bls is not installed. Interactive tools will not work.')
 
 # Import the optional Bokeh dependency, or print a friendly error otherwise.
 try:
     import bokeh  # Import bokeh first so we get an ImportError we can catch
     from bokeh.io import show, output_notebook
     from bokeh.plotting import figure, ColumnDataSource
-    from bokeh.models import LogColorMapper, Selection, Slider, RangeSlider, \
-        Span, ColorBar, LogTicker, Range1d
+    from bokeh.models import Selection, Slider, Span, Range1d
     from bokeh.models import Text
     from bokeh.layouts import layout, Spacer
     from bokeh.models.tools import HoverTool
-    from bokeh.models.widgets import Button, Div, Paragraph
-    from bokeh.models.formatters import PrintfTickFormatter
+    from bokeh.models.widgets import Button, Paragraph
     from bokeh.events import PanEnd, Reset
-
-    from bokeh.layouts import widgetbox
-    from bokeh.models.widgets import Dropdown
 except ImportError:
-    log.critical('Bokeh is not installed. Interactive tools will not work.')
-
+    log.error('Bokeh is not installed. Interactive tools will not work.')
 
 from .interact import prepare_lightcurve_datasource
 from .lightcurve import LightCurve
-
-from . import PACKAGEDIR
 
 
 __all__ = ['show_interact_widget']
