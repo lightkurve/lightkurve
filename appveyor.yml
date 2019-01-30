@@ -19,9 +19,9 @@ install:
   - "ECHO %PATH%"
   - where conda
   - conda config --set always_yes yes --set changeps1 no
-  - "conda create -q -n test-environment python=%PYTHON_VERSION% numpy scipy astropy pytest pytest-cov pytest-remotedata matplotlib tqdm requests"
+  - "conda create -q -n test-environment python=%PYTHON_VERSION% numpy scipy astropy pytest pytest-cov pytest-remotedata matplotlib tqdm requests pybind11"
   - activate test-environment
-  - pip install --upgrade setuptools
+  - conda install -c conda-forge celerite
   - pip install oktopus
   - pip install sphinx_rtd_theme
   - pip install bs4
@@ -29,8 +29,6 @@ install:
   - pip install codecov
   - pip install numpydoc
   - pip install scikit-learn
-  - pip install pybind11
-  - pip install celerite
   - python setup.py develop
 
 test_script:
