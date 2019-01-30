@@ -456,11 +456,16 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
                                      flux=model_lc.flux))
 
         # Set up the LC
-        lc_source = prepare_lightcurve_datasource(lc)
+        nb = int(np.ceil(len(lc.flux)/5000))
+        lc_source = prepare_lightcurve_datasource(lc[::nb])
         lc_help_source = prepare_lc_help_source(lc)
 
         # Set up folded LC
+        nb = int(np.ceil(len(lc.flux)/10000))
         f = lc.fold(best_period, best_t0)
+        f_source = prepare_folded_datasource(f[::nb])
+        f_help_source = prepare_f_help_source(f)
+
         f_model_lc = model_lc.fold(best_period, best_t0)
         f_model_lc = LightCurve([-0.5], [1]).append(f_model_lc)
         f_model_lc = f_model_lc.append(LightCurve([0.5], [1]))
@@ -468,8 +473,29 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
         f_model_lc_source = ColumnDataSource(data=dict(
                                  phase=f_model_lc.time,
                                  flux=f_model_lc.flux))
-        f_source = prepare_folded_datasource(f)
-        f_help_source = prepare_f_help_source(f)
+
+
+
+
+        def update_light_curve_plot(event):
+            ''' If we zoom in on LC plot, update the binning
+            '''
+            mint, maxt = fig_lc.x_range.start, fig_lc.x_range.end
+            inwindow = (lc.time > mint) & (lc.time < maxt)
+            nb = int(np.ceil(inwindow.sum()/5000))
+            temp_lc = lc[inwindow]
+            lc_source.data = {'time':temp_lc.time[::nb], 'flux':temp_lc.flux[::nb]}
+
+        def update_folded_plot(event):
+            loc = np.argmax(bls_source.data['power'])
+            best_period = bls_source.data['period'][loc]
+            best_t0 = bls_source.data['transit_time'][loc]
+            # Otherwise, we can just update the best_period index
+            minphase, maxphase = fig_folded.x_range.start, fig_folded.x_range.end
+            f = lc.fold(best_period, best_t0)
+            inwindow = (f.time > minphase) & (f.time < maxphase)
+            nb = int(np.ceil(inwindow.sum()/10000))
+            f_source.data = {'phase':f[inwindow].time[::nb], 'flux':f[inwindow].flux[::nb]}
 
         # Function to update the widget
         def update_params(all=False, best_period=None, best_t0=None):
@@ -493,9 +519,11 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
                 fig_bls.y_range.end = maxpow
 
             # Otherwise, we can just update the best_period index
+            minphase, maxphase = fig_folded.x_range.start, fig_folded.x_range.end
             f = lc.fold(best_period, best_t0)
-            f_source.data['flux'] = f.flux
-            f_source.data['phase'] = f.time
+            inwindow = (f.time > minphase) & (f.time < maxphase)
+            nb = int(np.ceil(inwindow.sum()/10000))
+            f_source.data = {'phase':f[inwindow].time[::nb], 'flux':f[inwindow].flux[::nb]}
 
             mf = model.model(lc.time, best_period, duration_slider.value, best_t0)
             mf /= np.median(mf)
@@ -587,6 +615,15 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
         # If we pan in the BLS panel, update everything
         fig_bls.on_event(PanEnd, update_model_slider_EVENT)
         fig_bls.on_event(Reset, update_model_slider_EVENT)
+
+        # If we pan in the LC panel, rebin the points
+        fig_lc.on_event(PanEnd, update_light_curve_plot)
+        fig_lc.on_event(Reset, update_light_curve_plot)
+
+        # If we pan in the Folded panel, rebin the points
+        fig_folded.on_event(PanEnd, update_folded_plot)
+        fig_folded.on_event(Reset, update_folded_plot)
+
 
         # Deal with help button
         fig_bls.on_event(PanEnd, update_bls_plot_help_event)
