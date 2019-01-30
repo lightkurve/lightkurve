@@ -6,7 +6,7 @@ In the first section of these tutorials we'll cover the basics of using *lightku
 .. toctree::
     :maxdepth: 1
 
-    1.02-target-pixel-files.ipynb
-    1.03-what-are-lightcurves.ipynb
-    1.04-lightcurve-files.ipynb
-    1.06-using-the-periodogram-class.ipynb
+    01-target-pixel-files.ipynb
+    01-what-are-lightcurves.ipynb
+    01-lightcurve-files.ipynb
+    01-using-the-periodogram-class.ipynb
