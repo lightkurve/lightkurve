@@ -514,7 +514,7 @@ class PLDCorrector(object):
         for the Everest pipeline. For a detailed description of PLD, please see
         the papers by Deming and Luger.
 
-        Our simple implimentation of PLD is performed by first calculating the
+        Our simple implementation of PLD is performed by first calculating the
         PLD model for each cadence in time. This function goes up to second order,
         and is represented by
 
@@ -529,7 +529,7 @@ class PLDCorrector(object):
         $\beta$, and $\gamma$ are the Gaussian Process terms applied to capture
         long-period variability.
 
-        We perform Principle Component Analysis (PCA) to reduce the number of
+        We perform Principal Component Analysis (PCA) to reduce the number of
         vectors in our final model to limit the set to best capture instrumental
         noise. With a PCA-reduced set of vectors, we can construct a design matrix
         containing first and second order fractional pixel fluxes.
@@ -568,7 +568,7 @@ class PLDCorrector(object):
         n_components_second : int
             Number of second-order PLD components to reduce to with PCA.
         use_gp : boolean
-            Option to turn GP fitting on or off. 
+            Option to turn GP fitting on or off.
 
         Returns
         -------
