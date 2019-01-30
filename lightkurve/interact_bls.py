@@ -1,15 +1,13 @@
 """This module provides helper functions for the `LightCurve.interact_bls()` feature."""
-import logging
 import numpy as np
 from astropy.convolution import convolve, Box1DKernel
-
-log = logging.getLogger(__name__)
 
 # Import the optional AstroPy dependency, or print a friendly error otherwise.
 try:
     from astropy.stats.bls import BoxLeastSquares
 except ImportError:
-    log.error('astropy.stats.bls is not installed. Interactive tools will not work.')
+    raise ImportError("The `interact_bls()` tool requires the `astropy.stats.bls` module; "
+                      "this requires AstroPy v3.1 or later.")
 
 # Import the optional Bokeh dependency, or print a friendly error otherwise.
 try:
@@ -23,7 +21,8 @@ try:
     from bokeh.models.widgets import Button, Paragraph
     from bokeh.events import PanEnd, Reset
 except ImportError:
-    log.error('Bokeh is not installed. Interactive tools will not work.')
+    raise ImportError("The interact_bls() tool requires the bokeh package; "
+                      "you can install bokeh using e.g. `conda install bokeh`.")
 
 from .interact import prepare_lightcurve_datasource
 from .lightcurve import LightCurve

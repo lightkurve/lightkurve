@@ -877,10 +877,20 @@ class LightCurve(object):
             kwargs['linestyle'] = linestyle
         return self._create_plot(method='errorbar', **kwargs)
 
-
     def interact_bls(self, notebook_url='localhost:8888', minimum_period=None,
-                    maximum_period=None, resolution=2000):
-        """Display an interactive Jupyter Notebook widget to run a BLS and find planets.
+                     maximum_period=None, resolution=2000):
+        """Display an interactive Jupyter Notebook widget to find planets.
+
+        The Box Least Squares (BLS) periodogram is a statistical tool used
+        for detecting transiting exoplanets and eclipsing binaries in
+        light curves.  This method will display a Jupyter Notebook Widget
+        which enables the BLS algorithm to be used interactively.
+        Behind the scenes, the widget uses the AstroPy implementation of BLS [1]_.
+
+        This feature only works inside an active Jupyter Notebook.
+        It requires Bokeh v1.0 (or later) and AstroPy v3.1 (or later),
+        which are optional dependencies. An error message will be shown
+        if these dependencies are not available.
 
         Parameters
         ----------
@@ -900,31 +910,33 @@ class LightCurve(object):
             Maximum period to evaluate the BLS to. If None, the time coverage of the
             lightcurve / 4 will be used.
         resolution : int
-            Number of points to use in the BLS panel. Lower this value to have a faster
-            but less accurate compute time. You can also vary this value using the
-            Resolution Slider.
+            Number of points to use in the BLS panel. Lower this value for faster
+            but less accurate performance. You can also vary this value using the
+            widget's Resolution Slider.
+
+        Examples
+        --------
+        Load the light curve for Kepler-10, remove long-term trends, and
+        display the BLS tool as follows:
+
+        >>> lc = lk.search_lightcurvefile('kepler-10', quarter=3).download()
+        >>> lc = lc.PDCSAP_FLUX.normalize().flatten()
+        >>> lc.interact_bls()
+
+        References
+        ----------
+        .. [1] http://docs.astropy.org/en/latest/stats/bls.html
         """
         try:
-            import bokeh
-            if bokeh.__version__[0] == '0':
-                warnings.warn("interact() requires Bokeh version 1.0 or later", LightkurveWarning)
-        except ImportError:
-            log.error("The interact_bls() tool requires the `bokeh` package; "
-                      "you can install bokeh using e.g. `conda install bokeh`.")
-            return None
-        try:
-            from astropy.stats.bls import BoxLeastSquares
-        except ImportError:
-            log.error("The interact_bls() tool requires the `astropy.stats.bls` package; "
-                      "this requires python 3.0. If you do not have the package installed, ",
-                      "please install with pip.")
+            from .interact_bls import show_interact_widget
+        except ImportError as e:
+            # Raised if AstroPy>=3.1 or Bokeh are not available
+            log.error(e)
             return None
 
-        from .interact_bls import show_interact_widget
         clean = self.remove_nans()
         return show_interact_widget(clean, notebook_url=notebook_url, minimum_period=minimum_period,
                                     maximum_period=maximum_period, resolution=resolution)
-
 
     def to_table(self):
         """Export the LightCurve as an AstroPy Table.
