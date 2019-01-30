@@ -157,7 +157,7 @@ def prepare_bls_help_source(bls_source, slider_value):
                                      <span style="font-size: 11px;"">The panel is set at the resolution
                                      given by the Resolution Slider [bottom]. This value is the number
                                      of points in the BLS Periodogram panel.
-                                     Incresing the resolution will make the BLS Periodogram more accurate,
+                                     Increasing the resolution will make the BLS Periodogram more accurate,
                                      but slower to render. To increase the resolution for a given peak,
                                      simply zoom in with the Box Zoom Tool.</span>
 
