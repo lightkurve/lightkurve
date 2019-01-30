@@ -1,4 +1,4 @@
-image: Visual Studio 2015 # required to install pybind11 (celerite dependency)
+image: Visual Studio 2017 # required to install pybind11 (celerite dependency)
 
 build: false
 
@@ -21,6 +21,7 @@ install:
   - conda config --set always_yes yes --set changeps1 no
   - "conda create -q -n test-environment python=%PYTHON_VERSION% numpy scipy astropy pytest pytest-cov pytest-remotedata matplotlib tqdm requests"
   - activate test-environment
+  - pip install --upgrade setuptools
   - pip install oktopus
   - pip install sphinx_rtd_theme
   - pip install bs4
