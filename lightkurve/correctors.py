@@ -493,9 +493,7 @@ class SFFCorrector(object):
         raise NotImplementedError()
 
 class PLDCorrector(object):
-    """
-    Implements the Pixel Level Decorrelation (PLD) method to de-trend
-    Target Pixel Files.
+    """Implements Pixel Level Decorrelation (PLD) to de-trend Target Pixel Files.
     """
 
     def __init__(self, tpf):
@@ -506,28 +504,33 @@ class PLDCorrector(object):
 
     def correct(self, aperture_mask=None, transit_mask=[], gp_timescale=30,
                 n_components_first=25, n_components_second=20, use_gp=True):
-        """Returns a PLD systematics-corrected LightCurve.
+        r"""Returns a PLD systematics-corrected LightCurve.
 
-        Pixel Level De-Correlation (PLD) was developed by Deming et. al (2015)
-        to remove systematic noise caused by spacecraft jitter for the Spitzer
-        space telescope. It was adapted to K2 data by Luger et. al (2016, 2018)
-        for the Everest pipeline. For a detailed description of PLD, please see
-        the papers by Deming and Luger.
+        Pixel Level Decorrelation (PLD) was developed by [1]_ to remove
+        systematic noise caused by spacecraft jitter for the Spitzer
+        Space Telescope. It was adapted to K2 data by [2]_ and [3]_
+        for the Everest pipeline. For a detailed description of PLD,
+        please refer to these references.
 
         Our simple implementation of PLD is performed by first calculating the
-        PLD model for each cadence in time. This function goes up to second order,
+        noise model for each cadence in time. This function goes up to second order,
         and is represented by
 
         .. math::
 
             m_i = \sum_l a_l \frac{f_{il}}{\sum_k f_{ik}} + \sum_l \sum_m b_{lm} \frac{f_{il}f_{im}}{\left( \sum_k f_{ik} \right)^2} + \alpha + \beta t_i + \gamma t_i^2
 
-        where $m_i$ is the noise model at time $t_i$, $f_{il}$ is the flux in
-        the $l^\text{th}$ pixel at time $t_i$, $a_l$ is the first-order PLD
-        coefficient on the linear term, and $b_{lm}$ is the second-order PLD
-        coefficient on the $l^\text{th}$, $m^\text{th}$ pixel pair. $\alpha$,
-        $\beta$, and $\gamma$ are the Gaussian Process terms applied to capture
-        long-period variability.
+
+        where
+
+
+          - :math:`m_i` is the noise model at time :math:`t_i`
+          - :math:`f_{il}` is the flux in the :math:`l^\text{th}` pixel at time :math:`t_i`
+          - :math:`a_l` is the first-order PLD coefficient on the linear term
+          - :math:`b_{lm}` is the second-order PLD coefficient on the :math:`l^\text{th}`,
+            :math:`m^\text{th}` pixel pair
+          - :math:`\alpha`, :math:`\beta`, and :math:`\gamma` are the
+            Gaussian Process terms applied to capture long-period variability.
 
         We perform Principal Component Analysis (PCA) to reduce the number of
         vectors in our final model to limit the set to best capture instrumental
@@ -540,7 +543,7 @@ class PLDCorrector(object):
 
             \chi^2 = \sum_i \frac{(y_i - m_i)^2}{\sigma_i^2},
 
-        where $y_i$ is the observed flux value at time $t_i$, by solving
+        where :math:`y_i` is the observed flux value at time :math:`t_i`, by solving
 
         .. math::
 
@@ -576,6 +579,15 @@ class PLDCorrector(object):
             Returns a corrected lightcurve object. Depending on the input, the
             returned object will be a `KeplerLightCurve`, `TessLightCurve`, or
             general `LightCurve` object.
+
+        References
+        ----------
+        .. [1] Deming et al. (2015), ads:2015ApJ...805..132D.
+            (arXiv:1411.7404)
+        .. [2] Luger et al. (2016), ads:2016AJ....152..100L
+            (arXiv:1607.00524)
+        .. [3] Luger et al. (2018), ads:2018AJ....156...99L
+            (arXiv:1702.05488)
         """
 
         # parse aperture
