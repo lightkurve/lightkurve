@@ -213,10 +213,6 @@ def test_bls(caplog):
     assert isinstance(p.depth_at_max_power, float)
 
 
-
-
-
-
 def test_error_messages():
     """Test periodogram raises reasonable errors
     """
