@@ -170,7 +170,7 @@ def test_bls(caplog):
 
     # should be able to make a periodogram
     p = lc.to_periodogram(method='bls')
-    keys = ['period', 'power', 'duration', 'transit_time', 'depth', 'SNR']
+    keys = ['period', 'power', 'duration', 'transit_time', 'depth', 'snr']
     assert np.all([key in  dir(p) for key in keys])
 
     p.plot()
