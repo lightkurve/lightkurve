@@ -19,7 +19,7 @@ def test_periodogram_basics():
                     flux_err=np.zeros(1000)+0.1)
     pg = lc.to_periodogram()
     pg.plot()
-    pg.plot(format='period')
+    pg.plot(view='period')
     pg.show_properties()
     pg.to_table()
     str(pg)

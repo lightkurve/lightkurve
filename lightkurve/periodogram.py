@@ -45,6 +45,8 @@ class Periodogram(object):
         Human-friendly object label, e.g. "KIC 123456789".
     targetid : str, optional
         Identifier of the target.
+    default_view : "frequency" or "period"
+        Should plots be shown in frequency space or period space by default?
     meta : dict, optional
         Free-form metadata associated with the Periodogram.
     """
@@ -65,6 +67,12 @@ class Periodogram(object):
             raise ValueError('frequency and power must have a length greater than 1.')
         if frequency.shape != power.shape:
             raise ValueError('frequency and power must have the same length.')
+        # Default view must be "frequency" or "period"
+        allowed_views = ["frequency", "period"]
+        if default_view not in allowed_views:
+            raise ValueError(("Unrecognized default_view '{0}'\n"
+                              "allowed values are: {1}")
+                             .format(default_view, allowed_views))
 
         self.frequency = frequency
         self.power = power
@@ -212,7 +220,7 @@ class Periodogram(object):
             return smooth_pg
 
     def plot(self, scale='linear', ax=None, xlabel=None, ylabel=None, title='',
-             style='lightkurve', format=None, unit=None, **kwargs):
+             style='lightkurve', view=None, unit=None, **kwargs):
         """Plots the Periodogram.
 
         Parameters
@@ -232,7 +240,7 @@ class Periodogram(object):
             Path or URL to a matplotlib style file, or name of one of
             matplotlib's built-in stylesheets (e.g. 'ggplot').
             Lightkurve's custom stylesheet is used by default.
-        format : str
+        view : str
             {'frequency', 'period'}. Default 'frequency'. If 'frequency', x-axis
             units will be frequency. If 'period', the x-axis units will be
             period and 'log' scale.
@@ -247,12 +255,12 @@ class Periodogram(object):
         if isinstance(unit, u.quantity.Quantity):
             unit = unit.unit
 
-        if format is None:
-            format = self.default_view
+        if view is None:
+            view = self.default_view
 
         if unit is None:
             unit = self.frequency.unit
-            if format == 'period':
+            if view == 'period':
                 unit = self.period.unit
 
         if style is None or style == 'lightkurve':
@@ -269,16 +277,16 @@ class Periodogram(object):
                 fig, ax = plt.subplots()
 
             # Plot frequency and power
-            if format.lower() == 'frequency':
+            if view.lower() == 'frequency':
                 ax.plot(self.frequency.to(unit), self.power, **kwargs)
                 if xlabel is None:
                     xlabel = "Frequency [{}]".format(unit.to_string('latex'))
-            elif format.lower() == 'period':
+            elif view.lower() == 'period':
                 ax.plot(self.period.to(unit), self.power, **kwargs)
                 if xlabel is None:
                     xlabel = "Period [{}]".format(unit.to_string('latex'))
             else:
-                raise ValueError('{} is not a valid plotting format'.format(format))
+                raise ValueError('{} is not a valid plotting view'.format(view))
             ax.set_xlabel(xlabel)
             ax.set_ylabel(ylabel)
             # Show the legend if labels were set
@@ -514,7 +522,6 @@ class LombScarglePeriodogram(Periodogram):
     def __init__(self, *args, **kwargs):
         super(LombScarglePeriodogram, self).__init__(*args, **kwargs)
 
-
     def __repr__(self):
         return('LombScarglePeriodogram(ID: {})'.format(self.targetid))
 
@@ -608,9 +615,9 @@ class LombScarglePeriodogram(Periodogram):
 
         # Check if any values of period have been passed and set format accordingly
         if not all(b is None for b in [period, min_period, max_period]):
-            format = 'period'
+            view = 'period'
         else:
-            format = 'frequency'
+            view = 'frequency'
 
         # If period and frequency keywords have both been set, throw an error
         if (not all(b is None for b in [period, min_period, max_period])) & \
@@ -662,9 +669,9 @@ class LombScarglePeriodogram(Periodogram):
                 max_frequency = u.Quantity(max_frequency, freq_unit)
             if (min_frequency is not None) & (max_frequency is not None):
                 if (min_frequency > max_frequency):
-                    if format == 'frequency':
+                    if view == 'frequency':
                         raise ValueError('min_frequency cannot be larger than max_frequency')
-                    if format == 'period':
+                    if view == 'period':
                         raise ValueError('min_period cannot be larger than max_period')
             # If nothing has been passed in, set them to the defaults
             if min_frequency is None:
@@ -712,14 +719,13 @@ class LombScarglePeriodogram(Periodogram):
                                       targetid=lc.targetid, label=lc.label)
 
 
-
 class BoxLeastSquaresPeriodogram(Periodogram):
     '''Super class of `Periodogram` for working with Box Least Squares Periodograms.
     '''
     def __init__(self, *args, **kwargs):
         self.duration = kwargs.pop("duration", None)
         self.depth = kwargs.pop("depth", None)
-        self.SNR = kwargs.pop("SNR", None)
+        self.snr = kwargs.pop("snr", None)
         self._BLS_result = kwargs.pop("bls_result", None)
         self._BLS_object = kwargs.pop("bls_obj", None)
 
@@ -750,6 +756,7 @@ class BoxLeastSquaresPeriodogram(Periodogram):
             raise ValueError('`duration` must be a single value.')
         minimum_period = kwargs.pop("minimum_period", None)
         maximum_period = kwargs.pop("maximum_period", None)
+        period = kwargs.pop("period", None)
         if minimum_period is None:
             if 'period' in kwargs:
                 minimum_period = period.min()
@@ -768,18 +775,22 @@ class BoxLeastSquaresPeriodogram(Periodogram):
         # Too many points
         if npoints > 1e5:
             log.warning('`period` contains {} points.'
-            'Periodogram is likely to be large, and slow to evaluate. '
-            'Consider setting `frequency_factor` to a higher value.'.format(np.round(npoints, 4)))
+                        'Periodogram is likely to be large, and slow to evaluate. '
+                        'Consider setting `frequency_factor` to a higher value.'
+                        ''.format(np.round(npoints, 4)))
 
         # Way too many points
         if npoints > 1e7:
             raise ValueError('`period` contains {} points.'
-            'Periodogram is too large to evaluate. '
-            'Consider setting `frequency_factor` to a higher value.'.format(np.round(npoints, 4)))
+                             'Periodogram is too large to evaluate. '
+                             'Consider setting `frequency_factor` to a higher value.'
+                             ''.format(np.round(npoints, 4)))
 
         period = kwargs.pop("period",
-                            bls.autoperiod(duration, minimum_period=minimum_period,
-                                            maximum_period=maximum_period, frequency_factor=frequency_factor))
+                            bls.autoperiod(duration,
+                                           minimum_period=minimum_period,
+                                           maximum_period=maximum_period,
+                                           frequency_factor=frequency_factor))
 
         result = bls.power(period, duration, **kwargs)
         if not isinstance(result.period, u.quantity.Quantity):
@@ -787,16 +798,23 @@ class BoxLeastSquaresPeriodogram(Periodogram):
         if not isinstance(result.power, u.quantity.Quantity):
             result.power = result.power * u.dimensionless_unscaled
 
-
-        return BoxLeastSquaresPeriodogram(frequency=1. / result.period, power=result.power,
-                                            default_view='period', label=lc.label,
-                                            targetid=lc.targetid, transit_time=result.transit_time,
-                                            duration=result.duration, depth=result.depth, bls_result=result,
-                                            SNR=result.depth_snr, bls_obj=bls, time=lc.time, flux=lc.flux, time_unit=time_unit)
-
+        return BoxLeastSquaresPeriodogram(frequency=1. / result.period,
+                                          power=result.power,
+                                          default_view='period',
+                                          label=lc.label,
+                                          targetid=lc.targetid,
+                                          transit_time=result.transit_time,
+                                          duration=result.duration,
+                                          depth=result.depth,
+                                          bls_result=result,
+                                          snr=result.depth_snr,
+                                          bls_obj=bls,
+                                          time=lc.time,
+                                          flux=lc.flux,
+                                          time_unit=time_unit)
 
     def compute_stats(self, period=None, duration=None, transit_time=None):
-        '''Computes commonly used vetting statistics for a transit model.
+        """Computes commonly used vetting statistics for a transit model.
 
         See astropy.stats.bls docs for further details.
 
@@ -813,7 +831,7 @@ class BoxLeastSquaresPeriodogram(Periodogram):
         -------
         stats : dict
             Dictionary of vetting statistics
-        '''
+        """
         if period is None:
             period = self.period_at_max_power
             log.warning('No period specified. Using period at max power')
@@ -824,11 +842,11 @@ class BoxLeastSquaresPeriodogram(Periodogram):
             transit_time = self.transit_time_at_max_power
             log.warning('No transit time specified. Using transit time at max power')
         return self._BLS_object.compute_stats(u.Quantity(period, 'd').value,
-                                                u.Quantity(duration, 'd').value,
-                                                u.Quantity(transit_time, 'd').value)
+                                              u.Quantity(duration, 'd').value,
+                                              u.Quantity(transit_time, 'd').value)
 
     def get_transit_model(self, period=None, duration=None, transit_time=None):
-        '''Computes the transit model using the BLS, returns a lightkurve.LightCurve
+        """Computes the transit model using the BLS, returns a lightkurve.LightCurve
 
         See astropy.stats.bls docs for further details.
 
@@ -845,7 +863,7 @@ class BoxLeastSquaresPeriodogram(Periodogram):
         -------
         model : lightkurve.LightCurve
             Model of transit
-        '''
+        """
         from .lightcurve import LightCurve
 
         if period is None:
@@ -865,7 +883,7 @@ class BoxLeastSquaresPeriodogram(Periodogram):
         return model
 
     def get_transit_mask(self, period=None, duration=None, transit_time=None):
-        '''Computes the transit mask using the BLS, returns a lightkurve.LightCurve
+        """Computes the transit mask using the BLS, returns a lightkurve.LightCurve
 
         True where there are no transits.
 
@@ -882,7 +900,7 @@ class BoxLeastSquaresPeriodogram(Periodogram):
         -------
         mask : np.array of Bool
             Mask that removes transits. Mask is True where there are no transits.
-        '''
+        """
         model = self.get_transit_model(period=period, duration=duration, transit_time=transit_time)
         return model.flux == np.median(model.flux)
 
@@ -918,13 +936,10 @@ class BoxLeastSquaresPeriodogram(Periodogram):
         ax = super(BoxLeastSquaresPeriodogram, self).plot(**kwargs)
         if 'ylabel' not in kwargs:
             ax.set_ylabel("BLS Power")
-
         return ax
 
     def flatten(self, **kwargs):
-        raise NotImplementedError('`flatten` is not currently implemented for `BoxLeastSquaresPeriodogram`. '
-                                  'Please check back soon. ')
+        raise NotImplementedError('`flatten` is not implemented for `BoxLeastSquaresPeriodogram`.')
 
     def smooth(self, **kwargs):
-        raise NotImplementedError('`smooth` is not currently implemented for `BoxLeastSquaresPeriodogram`. '
-                                  'Please check back soon. ')
+        raise NotImplementedError('`smooth` is not implemented for `BoxLeastSquaresPeriodogram`. ')
