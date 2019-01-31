@@ -3,6 +3,7 @@ from astropy import units as u
 import numpy as np
 from ..lightcurve import LightCurve
 from ..periodogram import Periodogram
+import sys
 
 try:
     from astropy.stats.bls import BoxLeastSquares
