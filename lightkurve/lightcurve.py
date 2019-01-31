@@ -877,6 +877,62 @@ class LightCurve(object):
             kwargs['linestyle'] = linestyle
         return self._create_plot(method='errorbar', **kwargs)
 
+    def interact_bls(self, notebook_url='localhost:8888', minimum_period=None,
+                     maximum_period=None, resolution=2000):
+        """Display an interactive Jupyter Notebook widget to find planets.
+
+        The Box Least Squares (BLS) periodogram is a statistical tool used
+        for detecting transiting exoplanets and eclipsing binaries in
+        light curves.  This method will display a Jupyter Notebook Widget
+        which enables the BLS algorithm to be used interactively.
+        Behind the scenes, the widget uses the AstroPy implementation of BLS [1]_.
+
+        This feature only works inside an active Jupyter Notebook.
+        It requires Bokeh v1.0 (or later) and AstroPy v3.1 (or later),
+        which are optional dependencies. An error message will be shown
+        if these dependencies are not available.
+
+        Parameters
+        ----------
+        notebook_url: str
+            Location of the Jupyter notebook page (default: "localhost:8888")
+            When showing Bokeh applications, the Bokeh server must be
+            explicitly configured to allow connections originating from
+            different URLs. This parameter defaults to the standard notebook
+            host and port. If you are running on a different location, you
+            will need to supply this value for the application to display
+            properly. If no protocol is supplied in the URL, e.g. if it is
+            of the form "localhost:8888", then "http" will be used.
+        minimum_period : float or None
+            Minimum period to assess the BLS to. If None, default value of 0.3 days
+            will be used.
+        maximum_period : float or None
+            Maximum period to evaluate the BLS to. If None, the time coverage of the
+            lightcurve / 4 will be used.
+        resolution : int
+            Number of points to use in the BLS panel. Lower this value for faster
+            but less accurate performance. You can also vary this value using the
+            widget's Resolution Slider.
+
+        Examples
+        --------
+        Load the light curve for Kepler-10, remove long-term trends, and
+        display the BLS tool as follows:
+
+        >>> import lightkurve as lk
+        >>> lc = lk.search_lightcurvefile('kepler-10', quarter=3).download()
+        >>> lc = lc.PDCSAP_FLUX.normalize().flatten()
+        >>> lc.interact_bls()
+
+        References
+        ----------
+        .. [1] http://docs.astropy.org/en/latest/stats/bls.html
+        """
+        from .interact_bls import show_interact_widget
+        clean = self.remove_nans()
+        return show_interact_widget(clean, notebook_url=notebook_url, minimum_period=minimum_period,
+                                    maximum_period=maximum_period, resolution=resolution)
+
     def to_table(self):
         """Export the LightCurve as an AstroPy Table.
 
