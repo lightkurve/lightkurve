@@ -420,7 +420,7 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
         if minp is None:
             minp = 0.3
         if maxp is None:
-            maxp = (lc.time[-1] - lc.time[0])/4
+            maxp = (lc.time[-1] - lc.time[0])/2
 
         # Some sliders
         duration_slider = Slider(start=0.01,
@@ -440,7 +440,7 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
         # Set up the period values, BLS model and best period
         period_values = np.logspace(np.log10(minp), np.log10(maxp), npoints_slider.value)
         period_values = period_values[(period_values > duration_slider.value) &
-                                        (period_values < (lc.time[-1] - lc.time[0])/2)]
+                                        (period_values < maxp)]
         model = BoxLeastSquares(lc.time, lc.flux)
         result = model.power(period_values, duration_slider.value)
         loc = np.argmax(result.power)
@@ -517,23 +517,23 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
                 # If we're updating everything, recalculate the BLS model
                 minp, maxp = fig_bls.x_range.start, fig_bls.x_range.end
                 period_values = np.logspace(np.log10(minp), np.log10(maxp), npoints_slider.value)
-                ok = (period_values > duration_slider.value) & (period_values < (lc.time[-1] - lc.time[0])/2)
+                ok = (period_values > duration_slider.value) & (period_values < maxp)
                 if ok.sum() == 0:
                     return
                 period_values = period_values[ok]
-
                 result = model.power(period_values, duration_slider.value)
-
+                ok = np.isfinite(result['power']) & np.isfinite(result['duration']) &\
+                         np.isfinite(result['transit_time']) & np.isfinite(result['period'])
                 bls_source.data = dict(
-                                     period=result['period'],
-                                     power=result['power'],
-                                     duration=result['duration'],
-                                     transit_time=result['transit_time'])
-                loc = np.argmax(bls_source.data['power'])
+                                     period=result['period'][ok],
+                                     power=result['power'][ok],
+                                     duration=result['duration'][ok],
+                                     transit_time=result['transit_time'][ok])
+                loc = np.nanargmax(bls_source.data['power'])
                 best_period = bls_source.data['period'][loc]
                 best_t0 = bls_source.data['transit_time'][loc]
 
-                minpow, maxpow = result.power.min()*0.95, result.power.max()*1.05
+                minpow, maxpow = bls_source.data['power'].min()*0.95,  bls_source.data['power'].max()*1.05
                 fig_bls.y_range.start = minpow
                 fig_bls.y_range.end = maxpow
 
