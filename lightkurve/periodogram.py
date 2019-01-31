@@ -18,8 +18,6 @@ from astropy.convolution import convolve, Box1DKernel
 
 from . import MPLSTYLE
 
-from .lightcurve import LightCurve
-
 log = logging.getLogger(__name__)
 
 __all__ = ['Periodogram', 'LombScarglePeriodogram', 'BoxLeastSquaresPeriodogram']
@@ -834,6 +832,8 @@ class BoxLeastSquaresPeriodogram(Periodogram):
         model : lightkurve.LightCurve
             Model of transit
         '''
+        from .lightcurve import LightCurve
+
         if period is None:
             period = self.period_at_max_power
             log.warning('No period specified. Using period at max power')
@@ -845,8 +845,8 @@ class BoxLeastSquaresPeriodogram(Periodogram):
             log.warning('No transit time specified. Using transit time at max power')
 
         model_flux = self._BLS_object.model(self.time, u.Quantity(period, 'd').value,
-                                                u.Quantity(duration, 'd').value,
-                                                u.Quantity(transit_time, 'd').value)
+                                            u.Quantity(duration, 'd').value,
+                                            u.Quantity(transit_time, 'd').value)
         model = LightCurve(self.time, model_flux, label='Transit Model Flux')
         return model
 

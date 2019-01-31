@@ -964,13 +964,13 @@ class LightCurve(object):
         Periodogram : `Periodogram` object
             Returns a Periodogram object extracted from the lightcurve.
         """
-
+        method_clean = method.replace(' ', '').lower()
         allowed_methods = ["lombscargle", "bls"]
-        if method.replace(' ','').lower() not in allowed_methods:
+        if method_clean not in allowed_methods:
             raise ValueError(("Unrecognized method '{0}'\n"
                               "allowed methods are: {1}")
                              .format(method, allowed_methods))
-        if method.replace(' ','').lower() == "bls":
+        if method_clean == "bls":
             from . import BoxLeastSquaresPeriodogram
             return BoxLeastSquaresPeriodogram.from_lightcurve(lc=self, **kwargs)
         else:
