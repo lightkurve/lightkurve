@@ -49,7 +49,7 @@ class Periodogram(object):
         Free-form metadata associated with the Periodogram.
     """
     def __init__(self, frequency, power, nyquist=None, label=None,
-                 targetid=None, _default_view='frequency', meta={}):
+                 targetid=None, default_view='frequency', meta={}):
         # Input validation
         if not isinstance(frequency, u.quantity.Quantity):
             raise ValueError('frequency must be an `astropy.units.Quantity` object.')
@@ -71,7 +71,7 @@ class Periodogram(object):
         self.nyquist = nyquist
         self.label = label
         self.targetid = targetid
-        self._default_view = _default_view
+        self.default_view = default_view
         self.meta = meta
 
     @property
@@ -248,7 +248,7 @@ class Periodogram(object):
             unit = unit.unit
 
         if format is None:
-            format = self._default_view
+            format = self.default_view
 
         if unit is None:
             unit = self.frequency.unit
@@ -746,26 +746,40 @@ class BoxLeastSquaresPeriodogram(Periodogram):
 
         bls = BoxLeastSquares(lc.time, lc.flux, lc.flux_err)
         duration = kwargs.pop("duration", 0.25)
+        if hasattr(duration, '__iter__'):
+            raise ValueError('`duration` must be a single value.')
         minimum_period = kwargs.pop("minimum_period", None)
         maximum_period = kwargs.pop("maximum_period", None)
-        frequency_factor = kwargs.pop("frequency_factor", 1)
+        if minimum_period is None:
+            if 'period' in kwargs:
+                minimum_period = period.min()
+            else:
+                minimum_period = np.max([np.median(np.diff(lc.time)) * 4, duration + np.median(np.diff(lc.time))])
+        if maximum_period is None:
+            if 'period' in kwargs:
+                maximum_period = period.max()
+            else:
+                maximum_period = (np.max(lc.time) - np.min(lc.time)) / 3.
+
+        frequency_factor = kwargs.pop("frequency_factor", 10)
+        df = frequency_factor * duration / (np.max(lc.time) - np.min(lc.time))**2
+        npoints = int(((1/minimum_period) - (1/maximum_period))/df)
+
+        # Too many points
+        if npoints > 1e5:
+            log.warning('`period` contains {} points.'
+            'Periodogram is likely to be large, and slow to evaluate. '
+            'Consider setting `frequency_factor` to a higher value.'.format(np.round(npoints, 4)))
+
+        # Way too many points
+        if npoints > 1e7:
+            raise ValueError('`period` contains {} points.'
+            'Periodogram is too large to evaluate. '
+            'Consider setting `frequency_factor` to a higher value.'.format(np.round(npoints, 4)))
+
         period = kwargs.pop("period",
                             bls.autoperiod(duration, minimum_period=minimum_period,
                                             maximum_period=maximum_period, frequency_factor=frequency_factor))
-        if minimum_period is None:
-            minimum_period = period.min()
-        if maximum_period is None:
-            maximum_period = period.max()
-        npoints = len(period)
-        if npoints > 1e5:
-            log.warning('`period` contains over {} points.'
-                            'Periodogram is likely to be large, and slow to evaluate. '
-                            'Consider setting `frequency_factor` to a higher value.'.format(np.round(npoints, 4)))
-
-        if npoints > 1e7:
-            raise ValueError('`period` contains over {} points.'
-                            'Periodogram is too large to evaluate. '
-                            'Consider setting `frequency_factor` to a higher value.'.format(np.round(npoints, 4)))
 
         result = bls.power(period, duration, **kwargs)
         if not isinstance(result.period, u.quantity.Quantity):
@@ -775,7 +789,7 @@ class BoxLeastSquaresPeriodogram(Periodogram):
 
 
         return BoxLeastSquaresPeriodogram(frequency=1. / result.period, power=result.power,
-                                            _default_view='period', label=lc.label,
+                                            default_view='period', label=lc.label,
                                             targetid=lc.targetid, transit_time=result.transit_time,
                                             duration=result.duration, depth=result.depth, bls_result=result,
                                             SNR=result.depth_snr, bls_obj=bls, time=lc.time, flux=lc.flux, time_unit=time_unit)
