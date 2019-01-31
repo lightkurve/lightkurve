@@ -4,6 +4,13 @@ import numpy as np
 from ..lightcurve import LightCurve
 from ..periodogram import Periodogram
 
+try:
+    from astropy.stats.bls import BoxLeastSquares
+except:
+    print('no bls, tests will be skipped')
+
+bad_optional_imports = np.any([('astropy.stats.bls' not in sys.modules)])
+
 
 def test_periodogram_basics():
     """Sanity check to verify that periodogram plotting works"""
@@ -152,7 +159,8 @@ def test_index():
     mask = (p.frequency > 0.1*(1/u.day)) & (p.frequency < 0.2*(1/u.day))
     assert len(p[mask].frequency) == mask.sum()
 
-
+@pytest.mark.skipif(bad_optional_imports,
+                    reason="requires bokeh and astropy.stats.bls")
 def test_bls(caplog):
     ''' Test that BLS periodogram works and gives reasonable errors
     '''
