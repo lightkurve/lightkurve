@@ -415,7 +415,8 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
         # Create the TPF figure and its stretch slider
         pedestal = np.nanmin(tpf.flux)
         fig_tpf, stretch_slider = make_tpf_figure_elements(tpf, tpf_source,
-                                                           pedestal=pedestal)
+                                                           pedestal=pedestal,
+                                                           fiducial_frame=0)
 
         # Helper lookup table which maps cadence number onto flux array index.
         tpf_index_lookup = {cad: idx for idx, cad in enumerate(tpf.cadenceno)}
