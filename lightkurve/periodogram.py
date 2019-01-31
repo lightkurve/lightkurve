@@ -11,7 +11,6 @@ from matplotlib import pyplot as plt
 import astropy
 from astropy.table import Table
 from astropy.stats import LombScargle
-from astropy import __version__
 from astropy import units as u
 from astropy.units import cds
 from astropy.convolution import convolve, Box1DKernel
@@ -472,7 +471,8 @@ class Periodogram(object):
                     attrs[attr]['print'] = '{}'.format(type(res))
                     attrs[attr]['type'] = 'other'
 
-        output = Table(names=['Attribute', 'Description', 'Units'], dtype=[object, object, object])
+        output = Table(names=['Attribute', 'Description', 'Units'],
+                       dtype=[object, object, object])
         idx = 0
         types = ['int', 'str', 'float', 'list', 'array', 'other']
         for typ in types:
@@ -517,8 +517,8 @@ class SNRPeriodogram(Periodogram):
 
 
 class LombScarglePeriodogram(Periodogram):
-    '''Super class of `Periodogram` for working with Lomb Scargle Periodograms.
-    '''
+    """Sub class of `Periodogram` for working with Lomb Scargle Periodograms.
+    """
     def __init__(self, *args, **kwargs):
         super(LombScarglePeriodogram, self).__init__(*args, **kwargs)
 
@@ -696,7 +696,7 @@ class LombScarglePeriodogram(Periodogram):
                         "These are not evenly spaced in frequency space.\n"
                         "Method has been set to 'slow' to allow for this.")
 
-        if float(__version__[0]) >= 3:
+        if float(astropy.__version__[0]) >= 3:
             LS = LombScargle(time, lc.flux * 1e6,
                              nterms=nterms, normalization='psd', **kwargs)
             power = LS.power(frequency, method=method)
@@ -720,8 +720,8 @@ class LombScarglePeriodogram(Periodogram):
 
 
 class BoxLeastSquaresPeriodogram(Periodogram):
-    '''Super class of `Periodogram` for working with Box Least Squares Periodograms.
-    '''
+    """Sub class of `Periodogram` for working with Box Least Squares Periodograms.
+    """
     def __init__(self, *args, **kwargs):
         self.duration = kwargs.pop("duration", None)
         self.depth = kwargs.pop("depth", None)
@@ -761,7 +761,8 @@ class BoxLeastSquaresPeriodogram(Periodogram):
             if 'period' in kwargs:
                 minimum_period = period.min()
             else:
-                minimum_period = np.max([np.median(np.diff(lc.time)) * 4, duration + np.median(np.diff(lc.time))])
+                minimum_period = np.max([np.median(np.diff(lc.time)) * 4,
+                                         duration + np.median(np.diff(lc.time))])
         if maximum_period is None:
             if 'period' in kwargs:
                 maximum_period = period.max()
