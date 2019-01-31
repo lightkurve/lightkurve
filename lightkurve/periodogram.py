@@ -738,7 +738,7 @@ class BoxLeastSquaresPeriodogram(Periodogram):
     def from_lightcurve(lc, **kwargs):
         """Creates a Periodogram from a LightCurve using the Box Least Squares (BLS) method."""
         time_unit = (kwargs.pop("time_unit", "day"))
-        if time_unit not in u.__dir__():
+        if time_unit not in dir(u):
             raise ValueError('{} is not a valid unit for time.'.format(time_unit))
 
         try:
