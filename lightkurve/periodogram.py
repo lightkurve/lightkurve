@@ -51,7 +51,7 @@ class Periodogram(object):
         Free-form metadata associated with the Periodogram.
     """
     def __init__(self, frequency, power, nyquist=None, label=None,
-                 targetid=None, _default_view='frequency', meta={}):
+                 targetid=None, default_view='frequency', meta={}):
         # Input validation
         if not isinstance(frequency, u.quantity.Quantity):
             raise ValueError('frequency must be an `astropy.units.Quantity` object.')
@@ -73,7 +73,7 @@ class Periodogram(object):
         self.nyquist = nyquist
         self.label = label
         self.targetid = targetid
-        self._default_view = _default_view
+        self.default_view = default_view
         self.meta = meta
 
     @property
@@ -250,7 +250,7 @@ class Periodogram(object):
             unit = unit.unit
 
         if format is None:
-            format = self._default_view
+            format = self.default_view
 
         if unit is None:
             unit = self.frequency.unit
@@ -777,7 +777,7 @@ class BoxLeastSquaresPeriodogram(Periodogram):
 
 
         return BoxLeastSquaresPeriodogram(frequency=1. / result.period, power=result.power,
-                                            _default_view='period', label=lc.label,
+                                            default_view='period', label=lc.label,
                                             targetid=lc.targetid, transit_time=result.transit_time,
                                             duration=result.duration, depth=result.depth, bls_result=result,
                                             SNR=result.depth_snr, bls_obj=bls, time=lc.time, flux=lc.flux, time_unit=time_unit)
