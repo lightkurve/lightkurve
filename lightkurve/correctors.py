@@ -545,7 +545,7 @@ class PLDCorrector(object):
     >>> tpf = lk.search_targetpixelfile("GJ9827").download()
     >>> corrector = lk.PLDCorrector(tpf)
     >>> lc = corrector.correct()
-    >>> lc.plot()
+    >>> lc.plot() # doctest: +SKIP
 
     However, the above example will over-fit the small transits!
     It is necessary to mask the transits using `corrector.correct(transit_mask=...)`.
