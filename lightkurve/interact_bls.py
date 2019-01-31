@@ -424,7 +424,7 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
 
         # Some sliders
         duration_slider = Slider(start=0.01,
-                                 end=0.3,
+                                 end=0.5,
                                  value=0.05,
                                  step=0.01,
                                  title="Duration [Days]",
@@ -439,6 +439,8 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
 
         # Set up the period values, BLS model and best period
         period_values = np.logspace(np.log10(minp), np.log10(maxp), npoints_slider.value)
+        period_values = period_values[(period_values > duration_slider.value) &
+                                        (period_values < (lc.time[-1] - lc.time[0])/2)]
         model = BoxLeastSquares(lc.time, lc.flux)
         result = model.power(period_values, duration_slider.value)
         loc = np.argmax(result.power)
@@ -515,6 +517,11 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
                 # If we're updating everything, recalculate the BLS model
                 minp, maxp = fig_bls.x_range.start, fig_bls.x_range.end
                 period_values = np.logspace(np.log10(minp), np.log10(maxp), npoints_slider.value)
+                ok = (period_values > duration_slider.value) & (period_values < (lc.time[-1] - lc.time[0])/2)
+                if ok.sum() == 0:
+                    return
+                period_values = period_values[ok]
+
                 result = model.power(period_values, duration_slider.value)
 
                 bls_source.data = dict(
