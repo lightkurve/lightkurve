@@ -1,231 +1,74 @@
 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-<!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>PRF photometry classes &mdash; lightkurve 1.0b26.dev documentation</title>
-  
-
-  
-  
-  
-  
-
-  
-
-  
-  
-    
-
-  
-
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>PRF photometry classes &#8212; Lightkurve</title>
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="BackgroundParameters" href="lightkurve.prf.BackgroundParameters.html" />
-    <link rel="prev" title="SFFCorrector" href="lightkurve.correctors.SFFCorrector.html" /> 
+    <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
-  
-  <script src="../_static/js/modernizr.min.js"></script>
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
 
-</head>
+  </head><body>
+<header>
+<nav class="navbar navbar-expand-lg navbar-light border-bottom">
+  <div class="container">
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b26</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-<body class="wy-body-for-nav">
+    <div class="collapse navbar-collapse" id="navbarsExample07">
+      <ul class="navbar-nav mr-auto">
+        
+            
+            <li class="nav-item">
+            
+              <a class="nav-link" href="../quickstart.html">Quickstart</a>
+            </li>
+            
+            <li class="nav-item">
+            
+              <a class="nav-link" href="../tutorials/index.html">Tutorials</a>
+            </li>
+            
+            <li class="nav-item">
+            
+              <a class="nav-link" href="index.html">API</a>
+            </li>
+            
+            <li class="nav-item">
+            
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+        
+      </ul>
+        <form class="form-inline my-2 my-md-0" action="../search.html" method="get">
+            <input class="form-control" type="text" placeholder="Search" aria-label="Search" name="q" />
+        </form>
+    </div>
+  </div>
+</nav>
+</header>
 
-   
-  <div class="wy-grid-for-nav">
-
+<div class="container">
     
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
-          
-
-          
-            <a href="../index.html" class="icon icon-home"> lightkurve
-          
-
-          
-            
-            <img src="../_static/lightkurve.png" class="logo" alt="Logo"/>
-          
-          </a>
-
-          
-            
-            
-              <div class="version">
-                1.0b26.dev
-              </div>
-            
-          
-
-          
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Getting started</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/quickstart.html">Quickstart</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">API documentation</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="lightcurve.html">LightCurve classes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightcurvefile.html">LightCurveFile classes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="targetpixelfile.html">TargetPixelFile classes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="search.html">Data search functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="periodogram.html">Periodogram classes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="correctors.html">Systematics correction classes</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">PRF photometry classes</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#classes">Classes</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.BackgroundParameters.html">BackgroundParameters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.BackgroundPrior.html">BackgroundPrior</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.FixedValuePrior.html">FixedValuePrior</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.FocusParameters.html">FocusParameters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.FocusPrior.html">FocusPrior</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.KeplerPRF.html">KeplerPRF</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.MotionParameters.html">MotionParameters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.MotionPrior.html">MotionPrior</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.PRFPhotometry.html">PRFPhotometry</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.SimpleKeplerPRF.html">SimpleKeplerPRF</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.StarParameters.html">StarParameters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.StarPrior.html">StarPrior</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.TPFModel.html">TPFModel</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.prf.TPFModelParameters.html">TPFModelParameters</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#class-inheritance-diagram">Class Inheritance Diagram</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html">Utility functions</a></li>
-</ul>
-</li>
-</ul>
-<p class="caption"><span class="caption-text">Tutorials</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/section1.html">Introduction to lightkurve</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/section2.html">Science with lightkurve</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/section3.html">Extracting lightcurves</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/section4.html">Systematics correction</a></li>
-</ul>
-<p class="caption"><span class="caption-text">About lightkurve</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing and reporting issues</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../developer.html">Developer documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../citing.html">Citing and acknowledging lightkurve</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../other_software.html">Other software</a></li>
-</ul>
-
-            
-          
-        </div>
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">lightkurve</a>
-        
-      </nav>
-
-
-      <div class="wy-nav-content">
-        
-        <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
-  <ul class="wy-breadcrumbs">
-    
-      <li><a href="../index.html">Docs</a> &raquo;</li>
-        
-          <li><a href="index.html">API documentation</a> &raquo;</li>
-        
-      <li>PRF photometry classes</li>
-    
-    
-      <li class="wy-breadcrumbs-aside">
-        
-            
-            <a href="../_sources/api/prf.rst.txt" rel="nofollow"> View page source</a>
-          
-        
-      </li>
-    
-  </ul>
-
-  
-  <hr/>
-</div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-            
-  
-<style>
-/* CSS overrides for sphinx_rtd_theme */
-
-/* 24px margin */
-.nbinput.nblast,
-.nboutput.nblast {
-    margin-bottom: 19px;  /* padding has already 5px */
-}
-
-/* ... except between code cells! */
-.nblast + .nbinput {
-    margin-top: -19px;
-}
-
-.admonition > p:before {
-    margin-right: 4px;  /* make room for the exclamation icon */
-}
-
-/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
-.math {
-    text-align: unset;
-}
-</style>
-<div class="section" id="module-lightkurve.prf">
+  <div class="section" id="module-lightkurve.prf">
 <span id="prf-photometry-classes"></span><h1>PRF photometry classes<a class="headerlink" href="#module-lightkurve.prf" title="Permalink to this headline">¶</a></h1>
 <span class="target" id="module-lightkurve.prf"></span><div class="section" id="classes">
 <h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
@@ -288,83 +131,18 @@
 </div>
 <div class="section" id="class-inheritance-diagram">
 <h2>Class Inheritance Diagram<a class="headerlink" href="#class-inheritance-diagram" title="Permalink to this headline">¶</a></h2>
-<div class="graphviz"><img src="../_images/inheritance-06f02cfa7d6f1992268c5c389617ca8e3f08b42f.png" alt="Inheritance diagram of lightkurve.prf.tpfmodel.BackgroundParameters, lightkurve.prf.tpfmodel.BackgroundPrior, lightkurve.prf.tpfmodel.FixedValuePrior, lightkurve.prf.tpfmodel.FocusParameters, lightkurve.prf.tpfmodel.FocusPrior, lightkurve.prf.prfmodel.KeplerPRF, lightkurve.prf.tpfmodel.MotionParameters, lightkurve.prf.tpfmodel.MotionPrior, lightkurve.prf.tpfmodel.PRFPhotometry, lightkurve.prf.prfmodel.SimpleKeplerPRF, lightkurve.prf.tpfmodel.StarParameters, lightkurve.prf.tpfmodel.StarPrior, lightkurve.prf.tpfmodel.TPFModel, lightkurve.prf.tpfmodel.TPFModelParameters" usemap="#inheritance2633681e36" class="inheritance graphviz" /></div>
-<map id="inheritance2633681e36" name="inheritance2633681e36">
-<area shape="rect" id="node1" href="lightkurve.prf.BackgroundParameters.html#lightkurve.prf.BackgroundParameters" target="_top" title="Container class to hold the parameters of the background in a ``TPFModel``." alt="" coords="5,524,168,549"/>
-<area shape="rect" id="node2" href="lightkurve.prf.BackgroundPrior.html#lightkurve.prf.BackgroundPrior" target="_top" title="Container class to capture a user&#39;s beliefs about the background flux." alt="" coords="219,400,341,425"/>
-<area shape="rect" id="node7" href="lightkurve.prf.FocusPrior.html#lightkurve.prf.FocusPrior" target="_top" title="Container class to capture a user&#39;s beliefs about the telescope focus." alt="" coords="237,449,323,475"/>
-<area shape="rect" id="node11" href="lightkurve.prf.MotionPrior.html#lightkurve.prf.MotionPrior" target="_top" title="Container class to capture a user&#39;s beliefs about the telescope motion." alt="" coords="235,499,325,524"/>
-<area shape="rect" id="node15" href="lightkurve.prf.StarPrior.html#lightkurve.prf.StarPrior" target="_top" title="Container class to capture a user&#39;s beliefs about a star&#39;s position and flux." alt="" coords="243,548,317,573"/>
-<area shape="rect" id="node4" href="lightkurve.prf.FixedValuePrior.html#lightkurve.prf.FixedValuePrior" target="_top" title="An improper prior with a negative log probability of 0 at a single fixed" alt="" coords="392,351,509,376"/>
-<area shape="rect" id="node6" href="lightkurve.prf.FocusParameters.html#lightkurve.prf.FocusParameters" target="_top" title="Container class to hold the parameters of the telescope focus in a ``TPFModel``." alt="" coords="23,301,150,327"/>
-<area shape="rect" id="node8" href="lightkurve.prf.KeplerPRF.html#lightkurve.prf.KeplerPRF" target="_top" title="Kepler&#39;s Pixel Response Function as designed by [1]_." alt="" coords="43,252,130,277"/>
-<area shape="rect" id="node13" href="lightkurve.prf.SimpleKeplerPRF.html#lightkurve.prf.SimpleKeplerPRF" target="_top" title="Simple model of KeplerPRF." alt="" coords="216,252,344,277"/>
-<area shape="rect" id="node10" href="lightkurve.prf.MotionParameters.html#lightkurve.prf.MotionParameters" target="_top" title="Container class to hold the parameters of the telescope motion in a ``TPFModel``." alt="" coords="21,203,152,228"/>
-<area shape="rect" id="node12" href="lightkurve.prf.PRFPhotometry.html#lightkurve.prf.PRFPhotometry" target="_top" title="This class performs PRF Photometry on TPF&#45;like data given a ``TPFModel``." alt="" coords="28,153,145,179"/>
-<area shape="rect" id="node14" href="lightkurve.prf.StarParameters.html#lightkurve.prf.StarParameters" target="_top" title="Container class to hold the parameters of a star in a ``TPFModel``." alt="" coords="29,104,145,129"/>
-<area shape="rect" id="node16" href="lightkurve.prf.TPFModel.html#lightkurve.prf.TPFModel" target="_top" title="A model which describes a single&#45;cadence Kepler image." alt="" coords="45,55,129,80"/>
-<area shape="rect" id="node17" href="lightkurve.prf.TPFModelParameters.html#lightkurve.prf.TPFModelParameters" target="_top" title="Container class to combine all parameters that parameterize a ``TPFModel``." alt="" coords="11,5,163,31"/>
-</map></div>
+<div class="graphviz"><img src="../_images/inheritance-9b00423e1e8710c6f50bc03b4afee2da735fe186.png" alt="Inheritance diagram of lightkurve.prf.tpfmodel.BackgroundParameters, lightkurve.prf.tpfmodel.BackgroundPrior, lightkurve.prf.tpfmodel.FixedValuePrior, lightkurve.prf.tpfmodel.FocusParameters, lightkurve.prf.tpfmodel.FocusPrior, lightkurve.prf.prfmodel.KeplerPRF, lightkurve.prf.tpfmodel.MotionParameters, lightkurve.prf.tpfmodel.MotionPrior, lightkurve.prf.tpfmodel.PRFPhotometry, lightkurve.prf.prfmodel.SimpleKeplerPRF, lightkurve.prf.tpfmodel.StarParameters, lightkurve.prf.tpfmodel.StarPrior, lightkurve.prf.tpfmodel.TPFModel, lightkurve.prf.tpfmodel.TPFModelParameters" class="inheritance graphviz" /></div>
+</div>
 </div>
 
 
-           </div>
-           
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="lightkurve.prf.BackgroundParameters.html" class="btn btn-neutral float-right" title="BackgroundParameters" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="lightkurve.correctors.SFFCorrector.html" class="btn btn-neutral" title="SFFCorrector" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
-  
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>
-        &copy; Copyright lightkurve developers and contributors
-
+</div>
+<div class="container" style="padding-top: 2em;">
+    <hr>
+    <p class="text-center">
+        Created with ♥ by the Lightkurve developers.
+        <a href="https://github.com/KeplerGO/lightkurve">Join us on GitHub.</a>
     </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
-
-</footer>
-
-        </div>
-      </div>
-
-    </section>
-
-  </div>
-  
-
-
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
-    
-
-  
-
-  <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-  <script type="text/javascript">
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script> 
-
-</body>
+</div>
+  </body>
 </html>

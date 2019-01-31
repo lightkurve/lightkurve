@@ -1,228 +1,79 @@
 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-<!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>LightCurve &mdash; lightkurve 1.0b26.dev documentation</title>
-  
-
-  
-  
-  
-  
-
-  
-
-  
-  
-    
-
-  
-
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>LightCurve &#8212; Lightkurve</title>
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="KeplerLightCurve" href="lightkurve.lightcurve.KeplerLightCurve.html" />
-    <link rel="prev" title="LightCurve classes" href="lightcurve.html" /> 
+    <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
-  
-  <script src="../_static/js/modernizr.min.js"></script>
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
 
-</head>
+  </head><body>
+<header>
+<nav class="navbar navbar-expand-lg navbar-light border-bottom">
+  <div class="container">
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b26</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-<body class="wy-body-for-nav">
+    <div class="collapse navbar-collapse" id="navbarsExample07">
+      <ul class="navbar-nav mr-auto">
+        
+            
+            <li class="nav-item">
+            
+              <a class="nav-link" href="../quickstart.html">Quickstart</a>
+            </li>
+            
+            <li class="nav-item">
+            
+              <a class="nav-link" href="../tutorials/index.html">Tutorials</a>
+            </li>
+            
+            <li class="nav-item">
+            
+              <a class="nav-link" href="index.html">API</a>
+            </li>
+            
+            <li class="nav-item">
+            
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+        
+      </ul>
+        <form class="form-inline my-2 my-md-0" action="../search.html" method="get">
+            <input class="form-control" type="text" placeholder="Search" aria-label="Search" name="q" />
+        </form>
+    </div>
+  </div>
+</nav>
+</header>
 
-   
-  <div class="wy-grid-for-nav">
-
+<div class="container">
     
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
-          
-
-          
-            <a href="../index.html" class="icon icon-home"> lightkurve
-          
-
-          
-            
-            <img src="../_static/lightkurve.png" class="logo" alt="Logo"/>
-          
-          </a>
-
-          
-            
-            
-              <div class="version">
-                1.0b26.dev
-              </div>
-            
-          
-
-          
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Getting started</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/quickstart.html">Quickstart</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">API documentation</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="lightcurve.html">LightCurve classes</a><ul class="current">
-<li class="toctree-l3 current"><a class="reference internal" href="lightcurve.html#classes">Classes</a><ul class="current">
-<li class="toctree-l4 current"><a class="current reference internal" href="#">LightCurve</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurve.KeplerLightCurve.html">KeplerLightCurve</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurve.TessLightCurve.html">TessLightCurve</a></li>
-<li class="toctree-l4"><a class="reference internal" href="lightkurve.lightcurve.FoldedLightCurve.html">FoldedLightCurve</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="lightcurve.html#class-inheritance-diagram">Class Inheritance Diagram</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="lightcurvefile.html">LightCurveFile classes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="targetpixelfile.html">TargetPixelFile classes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="search.html">Data search functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="periodogram.html">Periodogram classes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="correctors.html">Systematics correction classes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="prf.html">PRF photometry classes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html">Utility functions</a></li>
-</ul>
-</li>
-</ul>
-<p class="caption"><span class="caption-text">Tutorials</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/section1.html">Introduction to lightkurve</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/section2.html">Science with lightkurve</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/section3.html">Extracting lightcurves</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/section4.html">Systematics correction</a></li>
-</ul>
-<p class="caption"><span class="caption-text">About lightkurve</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing and reporting issues</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../developer.html">Developer documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../citing.html">Citing and acknowledging lightkurve</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../other_software.html">Other software</a></li>
-</ul>
-
-            
-          
-        </div>
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">lightkurve</a>
-        
-      </nav>
-
-
-      <div class="wy-nav-content">
-        
-        <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
-  <ul class="wy-breadcrumbs">
-    
-      <li><a href="../index.html">Docs</a> &raquo;</li>
-        
-          <li><a href="index.html">API documentation</a> &raquo;</li>
-        
-          <li><a href="lightcurve.html">LightCurve classes</a> &raquo;</li>
-        
-      <li>LightCurve</li>
-    
-    
-      <li class="wy-breadcrumbs-aside">
-        
-            
-            <a href="../_sources/api/lightkurve.lightcurve.LightCurve.rst.txt" rel="nofollow"> View page source</a>
-          
-        
-      </li>
-    
-  </ul>
-
-  
-  <hr/>
-</div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-            
-  
-<style>
-/* CSS overrides for sphinx_rtd_theme */
-
-/* 24px margin */
-.nbinput.nblast,
-.nboutput.nblast {
-    margin-bottom: 19px;  /* padding has already 5px */
-}
-
-/* ... except between code cells! */
-.nblast + .nbinput {
-    margin-top: -19px;
-}
-
-.admonition > p:before {
-    margin-right: 4px;  /* make room for the exclamation icon */
-}
-
-/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
-.math {
-    text-align: unset;
-}
-</style>
-<div class="section" id="lightcurve">
+  <div class="section" id="lightcurve">
 <h1>LightCurve<a class="headerlink" href="#lightcurve" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="lightkurve.lightcurve.LightCurve">
-<em class="property">class </em><code class="descclassname">lightkurve.lightcurve.</code><code class="descname">LightCurve</code><span class="sig-paren">(</span><em>time=None</em>, <em>flux=None</em>, <em>flux_err=None</em>, <em>time_format=None</em>, <em>time_scale=None</em>, <em>targetid=None</em>, <em>label=None</em>, <em>meta={}</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<em class="property">class </em><code class="descclassname">lightkurve.lightcurve.</code><code class="descname">LightCurve</code><span class="sig-paren">(</span><em>time=None</em>, <em>flux=None</em>, <em>flux_err=None</em>, <em>time_format=None</em>, <em>time_scale=None</em>, <em>targetid=None</em>, <em>label=None</em>, <em>meta={}</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.LightCurve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Implements a simple class for a generic light curve.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -368,7 +219,7 @@ allowed by AstroPy.</p>
 <p class="rubric">Methods Documentation</p>
 <dl class="method">
 <dt id="lightkurve.lightcurve.LightCurve.append">
-<code class="descname">append</code><span class="sig-paren">(</span><em>others</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.append" title="Permalink to this definition">¶</a></dt>
+<code class="descname">append</code><span class="sig-paren">(</span><em>others</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.append" title="Permalink to this definition">¶</a></dt>
 <dd><p>Append LightCurve objects.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -394,7 +245,7 @@ allowed by AstroPy.</p>
 
 <dl class="method">
 <dt id="lightkurve.lightcurve.LightCurve.bin">
-<code class="descname">bin</code><span class="sig-paren">(</span><em>binsize=13</em>, <em>method='mean'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve.bin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.bin" title="Permalink to this definition">¶</a></dt>
+<code class="descname">bin</code><span class="sig-paren">(</span><em>binsize=13</em>, <em>method='mean'</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.bin" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bins a lightcurve in blocks of size <cite>binsize</cite>.</p>
 <p>The value of the bins will contain the mean (<cite>method=’mean’</cite>) or the
 median (<cite>method=’median’</cite>) of the original data.  The default is mean.</p>
@@ -437,13 +288,13 @@ bitwise OR of the quality flags will be returned per bin.</li>
 
 <dl class="method">
 <dt id="lightkurve.lightcurve.LightCurve.cdpp">
-<code class="descname">cdpp</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve.cdpp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.cdpp" title="Permalink to this definition">¶</a></dt>
+<code class="descname">cdpp</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.cdpp" title="Permalink to this definition">¶</a></dt>
 <dd><p>DEPRECATED: use <cite>estimate_cdpp()</cite> instead.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="lightkurve.lightcurve.LightCurve.copy">
-<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.copy" title="Permalink to this definition">¶</a></dt>
+<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.copy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a copy of the LightCurve object.</p>
 <p>This method uses the <cite>copy.deepcopy</cite> function to ensure that all
 objects stored within the LightCurve are copied (e.g. time and flux).</p>
@@ -464,7 +315,7 @@ objects stored within the LightCurve are copied (e.g. time and flux).</p>
 
 <dl class="method">
 <dt id="lightkurve.lightcurve.LightCurve.errorbar">
-<code class="descname">errorbar</code><span class="sig-paren">(</span><em>linestyle=''</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve.errorbar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.errorbar" title="Permalink to this definition">¶</a></dt>
+<code class="descname">errorbar</code><span class="sig-paren">(</span><em>linestyle=''</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.errorbar" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots the light curve using matplotlib’s <cite>errorbar</cite> method.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -514,7 +365,7 @@ Lightkurve’s custom stylesheet is used by default.</p>
 
 <dl class="method">
 <dt id="lightkurve.lightcurve.LightCurve.estimate_cdpp">
-<code class="descname">estimate_cdpp</code><span class="sig-paren">(</span><em>transit_duration=13</em>, <em>savgol_window=101</em>, <em>savgol_polyorder=2</em>, <em>sigma=5.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve.estimate_cdpp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.estimate_cdpp" title="Permalink to this definition">¶</a></dt>
+<code class="descname">estimate_cdpp</code><span class="sig-paren">(</span><em>transit_duration=13</em>, <em>savgol_window=101</em>, <em>savgol_polyorder=2</em>, <em>sigma=5.0</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.estimate_cdpp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimate the CDPP noise metric using the Savitzky-Golay (SG) method.</p>
 <p>A common estimate of the noise in a lightcurve is the scatter that
 remains after all long term trends have been removed. This is the idea
@@ -583,7 +434,7 @@ svn+ssh://murzim/repo/so/trunk/Develop/jvc/common/compute_SG_noise.m</p>
 
 <dl class="method">
 <dt id="lightkurve.lightcurve.LightCurve.fill_gaps">
-<code class="descname">fill_gaps</code><span class="sig-paren">(</span><em>method='nearest'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve.fill_gaps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.fill_gaps" title="Permalink to this definition">¶</a></dt>
+<code class="descname">fill_gaps</code><span class="sig-paren">(</span><em>method='nearest'</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.fill_gaps" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fill in gaps in time with linear interpolation.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -610,7 +461,7 @@ filled.</p>
 
 <dl class="method">
 <dt id="lightkurve.lightcurve.LightCurve.flatten">
-<code class="descname">flatten</code><span class="sig-paren">(</span><em>window_length=101</em>, <em>polyorder=2</em>, <em>return_trend=False</em>, <em>break_tolerance=5</em>, <em>niters=3</em>, <em>sigma=3</em>, <em>mask=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve.flatten"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.flatten" title="Permalink to this definition">¶</a></dt>
+<code class="descname">flatten</code><span class="sig-paren">(</span><em>window_length=101</em>, <em>polyorder=2</em>, <em>return_trend=False</em>, <em>break_tolerance=5</em>, <em>niters=3</em>, <em>sigma=3</em>, <em>mask=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.flatten" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes the low frequency trend using scipy’s Savitzky-Golay filter.</p>
 <p>This method wraps <cite>scipy.signal.savgol_filter</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -674,7 +525,7 @@ data you want to preserve, e.g. transits.</p>
 
 <dl class="method">
 <dt id="lightkurve.lightcurve.LightCurve.fold">
-<code class="descname">fold</code><span class="sig-paren">(</span><em>period</em>, <em>transit_midpoint=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve.fold"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.fold" title="Permalink to this definition">¶</a></dt>
+<code class="descname">fold</code><span class="sig-paren">(</span><em>period</em>, <em>transit_midpoint=0.0</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.fold" title="Permalink to this definition">¶</a></dt>
 <dd><p>Folds the lightcurve at a specified <code class="docutils literal notranslate"><span class="pre">period</span></code> and <code class="docutils literal notranslate"><span class="pre">transit_midpoint</span></code>.</p>
 <p>This method returns a new <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> object in which the time
 values range between -0.5 to +0.5 (i.e. the phase).
@@ -709,7 +560,7 @@ phase.</p>
 
 <dl class="method">
 <dt id="lightkurve.lightcurve.LightCurve.normalize">
-<code class="descname">normalize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve.normalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.normalize" title="Permalink to this definition">¶</a></dt>
+<code class="descname">normalize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.normalize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a normalized version of the lightcurve.</p>
 <p>The normalized lightcurve is obtained by dividing <cite>flux</cite> and <cite>flux_err</cite>
 by the median flux.</p>
@@ -731,7 +582,7 @@ by the median.</p>
 
 <dl class="method">
 <dt id="lightkurve.lightcurve.LightCurve.plot">
-<code class="descname">plot</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.plot" title="Permalink to this definition">¶</a></dt>
+<code class="descname">plot</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the light curve using matplotlib’s <cite>plot</cite> method.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -778,7 +629,7 @@ Lightkurve’s custom stylesheet is used by default.</p>
 
 <dl class="method">
 <dt id="lightkurve.lightcurve.LightCurve.remove_nans">
-<code class="descname">remove_nans</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve.remove_nans"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.remove_nans" title="Permalink to this definition">¶</a></dt>
+<code class="descname">remove_nans</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.remove_nans" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes cadences where the flux is NaN.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -797,7 +648,7 @@ Lightkurve’s custom stylesheet is used by default.</p>
 
 <dl class="method">
 <dt id="lightkurve.lightcurve.LightCurve.remove_outliers">
-<code class="descname">remove_outliers</code><span class="sig-paren">(</span><em>sigma=5.0</em>, <em>return_mask=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve.remove_outliers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.remove_outliers" title="Permalink to this definition">¶</a></dt>
+<code class="descname">remove_outliers</code><span class="sig-paren">(</span><em>sigma=5.0</em>, <em>return_mask=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.remove_outliers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes outlier data points using sigma-clipping.</p>
 <p>This method returns a new <a class="reference internal" href="#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightCurve</span></code></a> object from which data
 points are removed if their flux values are greater or smaller than
@@ -892,7 +743,7 @@ in place:</p>
 
 <dl class="method">
 <dt id="lightkurve.lightcurve.LightCurve.scatter">
-<code class="descname">scatter</code><span class="sig-paren">(</span><em>colorbar_label=''</em>, <em>show_colorbar=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve.scatter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.scatter" title="Permalink to this definition">¶</a></dt>
+<code class="descname">scatter</code><span class="sig-paren">(</span><em>colorbar_label=''</em>, <em>show_colorbar=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.scatter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots the light curve using matplotlib’s <cite>scatter</cite> method.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -945,14 +796,14 @@ Lightkurve’s custom stylesheet is used by default.</p>
 
 <dl class="method">
 <dt id="lightkurve.lightcurve.LightCurve.show_properties">
-<code class="descname">show_properties</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve.show_properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.show_properties" title="Permalink to this definition">¶</a></dt>
+<code class="descname">show_properties</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.show_properties" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prints a description of all non-callable attributes.</p>
 <p>Prints in order of type (ints, strings, lists, arrays, others).</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="lightkurve.lightcurve.LightCurve.to_csv">
-<code class="descname">to_csv</code><span class="sig-paren">(</span><em>path_or_buf=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve.to_csv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.to_csv" title="Permalink to this definition">¶</a></dt>
+<code class="descname">to_csv</code><span class="sig-paren">(</span><em>path_or_buf=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.to_csv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes the LightCurve to a csv file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -983,7 +834,7 @@ returns None otherwise.</p>
 
 <dl class="method">
 <dt id="lightkurve.lightcurve.LightCurve.to_fits">
-<code class="descname">to_fits</code><span class="sig-paren">(</span><em>path=None</em>, <em>overwrite=False</em>, <em>**extra_data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve.to_fits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.to_fits" title="Permalink to this definition">¶</a></dt>
+<code class="descname">to_fits</code><span class="sig-paren">(</span><em>path=None</em>, <em>overwrite=False</em>, <em>**extra_data</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.to_fits" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes the LightCurve to a FITS file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1019,7 +870,7 @@ in the first extension.</p>
 
 <dl class="method">
 <dt id="lightkurve.lightcurve.LightCurve.to_pandas">
-<code class="descname">to_pandas</code><span class="sig-paren">(</span><em>columns=['time', 'flux', 'flux_err']</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve.to_pandas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.to_pandas" title="Permalink to this definition">¶</a></dt>
+<code class="descname">to_pandas</code><span class="sig-paren">(</span><em>columns=['time', 'flux', 'flux_err']</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.to_pandas" title="Permalink to this definition">¶</a></dt>
 <dd><p>Export the LightCurve as a Pandas DataFrame.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1047,7 +898,7 @@ and <cite>flux_err</cite>.</p>
 
 <dl class="method">
 <dt id="lightkurve.lightcurve.LightCurve.to_periodogram">
-<code class="descname">to_periodogram</code><span class="sig-paren">(</span><em>nterms=1</em>, <em>nyquist_factor=1</em>, <em>oversample_factor=1</em>, <em>min_frequency=None</em>, <em>max_frequency=None</em>, <em>min_period=None</em>, <em>max_period=None</em>, <em>frequency=None</em>, <em>period=None</em>, <em>freq_unit=&lt;Quantity 1. 1 / d&gt;</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve.to_periodogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.to_periodogram" title="Permalink to this definition">¶</a></dt>
+<code class="descname">to_periodogram</code><span class="sig-paren">(</span><em>nterms=1</em>, <em>nyquist_factor=1</em>, <em>oversample_factor=1</em>, <em>min_frequency=None</em>, <em>max_frequency=None</em>, <em>min_period=None</em>, <em>max_period=None</em>, <em>frequency=None</em>, <em>period=None</em>, <em>freq_unit=&lt;Quantity 1. 1 / d&gt;</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.to_periodogram" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a <cite>Periodogram</cite> power spectrum object.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1116,7 +967,7 @@ periodogram. This implies that 1/freq_unit is the units for period.</p>
 
 <dl class="method">
 <dt id="lightkurve.lightcurve.LightCurve.to_table">
-<code class="descname">to_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/lightkurve/lightcurve.html#LightCurve.to_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.to_table" title="Permalink to this definition">¶</a></dt>
+<code class="descname">to_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.LightCurve.to_table" title="Permalink to this definition">¶</a></dt>
 <dd><p>Export the LightCurve as an AstroPy Table.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1138,63 +989,13 @@ periodogram. This implies that 1/freq_unit is the units for period.</p>
 </div>
 
 
-           </div>
-           
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="lightkurve.lightcurve.KeplerLightCurve.html" class="btn btn-neutral float-right" title="KeplerLightCurve" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="lightcurve.html" class="btn btn-neutral" title="LightCurve classes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
-  
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>
-        &copy; Copyright lightkurve developers and contributors
-
+</div>
+<div class="container" style="padding-top: 2em;">
+    <hr>
+    <p class="text-center">
+        Created with ♥ by the Lightkurve developers.
+        <a href="https://github.com/KeplerGO/lightkurve">Join us on GitHub.</a>
     </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
-
-</footer>
-
-        </div>
-      </div>
-
-    </section>
-
-  </div>
-  
-
-
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
-    
-
-  
-
-  <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-  <script type="text/javascript">
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script> 
-
-</body>
+</div>
+  </body>
 </html>

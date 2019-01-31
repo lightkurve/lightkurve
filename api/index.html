@@ -1,282 +1,214 @@
 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-<!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>API documentation &mdash; lightkurve 1.0b26.dev documentation</title>
-  
-
-  
-  
-  
-  
-
-  
-
-  
-  
-    
-
-  
-
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>API &#8212; Lightkurve</title>
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="LightCurve classes" href="lightcurve.html" />
-    <link rel="prev" title="Installation" href="../install.html" /> 
+    <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
-  
-  <script src="../_static/js/modernizr.min.js"></script>
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
 
-</head>
+  </head><body>
+<header>
+<nav class="navbar navbar-expand-lg navbar-light border-bottom">
+  <div class="container">
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b26</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-<body class="wy-body-for-nav">
-
-   
-  <div class="wy-grid-for-nav">
-
-    
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
-          
-
-          
-            <a href="../index.html" class="icon icon-home"> lightkurve
-          
-
-          
-            
-            <img src="../_static/lightkurve.png" class="logo" alt="Logo"/>
-          
-          </a>
-
-          
-            
-            
-              <div class="version">
-                1.0b26.dev
-              </div>
-            
-          
-
-          
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Getting started</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/quickstart.html">Quickstart</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">API documentation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="lightcurve.html">LightCurve classes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lightcurvefile.html">LightCurveFile classes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="targetpixelfile.html">TargetPixelFile classes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="search.html">Data search functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="periodogram.html">Periodogram classes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="correctors.html">Systematics correction classes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="prf.html">PRF photometry classes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils.html">Utility functions</a></li>
-</ul>
-</li>
-</ul>
-<p class="caption"><span class="caption-text">Tutorials</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/section1.html">Introduction to lightkurve</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/section2.html">Science with lightkurve</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/section3.html">Extracting lightcurves</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/section4.html">Systematics correction</a></li>
-</ul>
-<p class="caption"><span class="caption-text">About lightkurve</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing and reporting issues</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../developer.html">Developer documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../citing.html">Citing and acknowledging lightkurve</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../other_software.html">Other software</a></li>
-</ul>
-
-            
-          
-        </div>
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">lightkurve</a>
-        
-      </nav>
-
-
-      <div class="wy-nav-content">
-        
-        <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
-  <ul class="wy-breadcrumbs">
-    
-      <li><a href="../index.html">Docs</a> &raquo;</li>
-        
-      <li>API documentation</li>
-    
-    
-      <li class="wy-breadcrumbs-aside">
+    <div class="collapse navbar-collapse" id="navbarsExample07">
+      <ul class="navbar-nav mr-auto">
         
             
-            <a href="../_sources/api/index.rst.txt" rel="nofollow"> View page source</a>
-          
-        
-      </li>
-    
-  </ul>
-
-  
-  <hr/>
-</div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
+            <li class="nav-item">
             
-  
-<style>
-/* CSS overrides for sphinx_rtd_theme */
-
-/* 24px margin */
-.nbinput.nblast,
-.nboutput.nblast {
-    margin-bottom: 19px;  /* padding has already 5px */
-}
-
-/* ... except between code cells! */
-.nblast + .nbinput {
-    margin-top: -19px;
-}
-
-.admonition > p:before {
-    margin-right: 4px;  /* make room for the exclamation icon */
-}
-
-/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
-.math {
-    text-align: unset;
-}
-</style>
-<div class="section" id="api-documentation">
-<h1>API documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h1>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="lightcurve.html">LightCurve classes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="lightcurvefile.html">LightCurveFile classes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="targetpixelfile.html">TargetPixelFile classes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="search.html">Data search functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="periodogram.html">Periodogram classes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="correctors.html">Systematics correction classes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="prf.html">PRF photometry classes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="utils.html">Utility functions</a></li>
-</ul>
-</div>
-</div>
-
-
-           </div>
-           
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="lightcurve.html" class="btn btn-neutral float-right" title="LightCurve classes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="../install.html" class="btn btn-neutral" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+              <a class="nav-link" href="../quickstart.html">Quickstart</a>
+            </li>
+            
+            <li class="nav-item">
+            
+              <a class="nav-link" href="../tutorials/index.html">Tutorials</a>
+            </li>
+            
+            <li class="nav-item active">
+            
+              <a class="nav-link" href="#">API</a>
+            </li>
+            
+            <li class="nav-item">
+            
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+        
+      </ul>
+        <form class="form-inline my-2 my-md-0" action="../search.html" method="get">
+            <input class="form-control" type="text" placeholder="Search" aria-label="Search" name="q" />
+        </form>
     </div>
-  
+  </div>
+</nav>
+</header>
 
-  <hr/>
+<div class="container">
+    
+  <div class="section" id="api">
+<span id="id1"></span><h1>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="lightcurve-objects">
+<h2>LightCurve objects<a class="headerlink" href="#lightcurve-objects" title="Permalink to this headline">¶</a></h2>
+<p>LightCurve objects contain time-series data on the brightness of a star. They provide easy access to a range of operations, e.g. folding, binning, plotting, and a variety of signal processing. Light curves observed by Kepler or TESS have a specific sub-class which provide extra metadata, but the generic LightCurve object can be used for any data set.</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a>([time,&nbsp;flux,&nbsp;flux_err,&nbsp;…])</td>
+<td>Implements a simple class for a generic light curve.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="lightkurve.lightcurve.KeplerLightCurve.html#lightkurve.lightcurve.KeplerLightCurve" title="lightkurve.lightcurve.KeplerLightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code></a>([time,&nbsp;flux,&nbsp;flux_err,&nbsp;…])</td>
+<td>Defines a light curve class for NASA’s Kepler and K2 missions.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="lightkurve.lightcurve.TessLightCurve.html#lightkurve.lightcurve.TessLightCurve" title="lightkurve.lightcurve.TessLightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TessLightCurve</span></code></a>([time,&nbsp;flux,&nbsp;flux_err,&nbsp;…])</td>
+<td>Defines a light curve class for NASA’s TESS mission.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="lightkurve.lightcurve.FoldedLightCurve.html#lightkurve.lightcurve.FoldedLightCurve" title="lightkurve.lightcurve.FoldedLightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve</span></code></a>(*args,&nbsp;**kwargs)</td>
+<td>Class to hold a phase-folded lightcurve, i.e.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="opening-data-files">
+<h2>Opening data files<a class="headerlink" href="#opening-data-files" title="Permalink to this headline">¶</a></h2>
+<p>The lightkurve.search modules makes it easy to open data products from Kepler and TESS, and search for them at the data archive.</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="lightkurve.search.search_targetpixelfile.html#lightkurve.search.search_targetpixelfile" title="lightkurve.search.search_targetpixelfile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_targetpixelfile</span></code></a>(target[,&nbsp;radius,&nbsp;…])</td>
+<td>Searches MAST for Target Pixel Files.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="lightkurve.search.search_lightcurvefile.html#lightkurve.search.search_lightcurvefile" title="lightkurve.search.search_lightcurvefile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_lightcurvefile</span></code></a>(target[,&nbsp;radius,&nbsp;…])</td>
+<td>Returns a SearchResult with MAST LightCurveFiles which match the criteria.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="lightkurve.search.open.html#lightkurve.search.open" title="lightkurve.search.open"><code class="xref py py-obj docutils literal notranslate"><span class="pre">open</span></code></a>(path_or_url,&nbsp;**kwargs)</td>
+<td>Opens a Kepler or TESS data product.</td>
+</tr>
+</tbody>
+</table>
+<p>LightCurveFile objects represent files that are used to store LightCurves and their metadata. Files of this type are found at NASA’s data archives.</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="lightkurve.lightcurvefile.KeplerLightCurveFile.html#lightkurve.lightcurvefile.KeplerLightCurveFile" title="lightkurve.lightcurvefile.KeplerLightCurveFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerLightCurveFile</span></code></a>(path[,&nbsp;quality_bitmask])</td>
+<td>Defines a class for a given light curve FITS file from NASA’s Kepler and K2 missions.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="lightkurve.lightcurvefile.TessLightCurveFile.html#lightkurve.lightcurvefile.TessLightCurveFile" title="lightkurve.lightcurvefile.TessLightCurveFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TessLightCurveFile</span></code></a>(path[,&nbsp;quality_bitmask])</td>
+<td>Defines a class for a given light curve FITS file from NASA’s TESS mission.</td>
+</tr>
+</tbody>
+</table>
+<p>TargetPixelFile objects hold the sequence of images (pixels) which can be converted into LightCurve objects using different techniques.</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile" title="lightkurve.targetpixelfile.KeplerTargetPixelFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code></a>(path[,&nbsp;quality_bitmask])</td>
+<td>Defines a TargetPixelFile class for the Kepler/K2 Mission.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile" title="lightkurve.targetpixelfile.TessTargetPixelFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TessTargetPixelFile</span></code></a>(path[,&nbsp;quality_bitmask])</td>
+<td>Defines a TargetPixelFile class for the TESS Mission.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="utility-objects-and-functions">
+<h2>Utility objects and functions<a class="headerlink" href="#utility-objects-and-functions" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="lightkurve.utils.LightkurveWarning.html#lightkurve.utils.LightkurveWarning" title="lightkurve.utils.LightkurveWarning"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightkurveWarning</span></code></a></td>
+<td>Class for all Lightkurve warnings.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="lightkurve.utils.KeplerQualityFlags.html#lightkurve.utils.KeplerQualityFlags" title="lightkurve.utils.KeplerQualityFlags"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerQualityFlags</span></code></a></td>
+<td>This class encodes the meaning of the various Kepler QUALITY bitmask flags, as documented in the Kepler Archive Manual (Ref.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="lightkurve.utils.TessQualityFlags.html#lightkurve.utils.TessQualityFlags" title="lightkurve.utils.TessQualityFlags"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TessQualityFlags</span></code></a></td>
+<td>This class encodes the meaning of the various TESS QUALITY bitmask flags, as documented in the TESS Data Products Description Document (Ref.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="lightkurve.utils.bkjd_to_astropy_time.html#lightkurve.utils.bkjd_to_astropy_time" title="lightkurve.utils.bkjd_to_astropy_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bkjd_to_astropy_time</span></code></a>(bkjd[,&nbsp;bjdref])</td>
+<td>Converts BKJD time values to an <cite>astropy.time.Time</cite> object.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="lightkurve.utils.btjd_to_astropy_time.html#lightkurve.utils.btjd_to_astropy_time" title="lightkurve.utils.btjd_to_astropy_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">btjd_to_astropy_time</span></code></a>(btjd[,&nbsp;bjdref])</td>
+<td>Converts BTJD time values to an <cite>astropy.time.Time</cite> object.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="lightkurve.utils.channel_to_module_output.html#lightkurve.utils.channel_to_module_output" title="lightkurve.utils.channel_to_module_output"><code class="xref py py-obj docutils literal notranslate"><span class="pre">channel_to_module_output</span></code></a>(channel)</td>
+<td>Returns a (module, output) pair given a CCD channel number.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="lightkurve.utils.module_output_to_channel.html#lightkurve.utils.module_output_to_channel" title="lightkurve.utils.module_output_to_channel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">module_output_to_channel</span></code></a>(module,&nbsp;output)</td>
+<td>Returns the CCD channel number for a given module and output pair.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="lightkurve.utils.running_mean.html#lightkurve.utils.running_mean" title="lightkurve.utils.running_mean"><code class="xref py py-obj docutils literal notranslate"><span class="pre">running_mean</span></code></a>(data,&nbsp;window_size)</td>
+<td>Returns the moving average of an array <cite>data</cite>.</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a>(frequency,&nbsp;power[,&nbsp;nyquist,&nbsp;…])</td>
+<td>Class to represents a power spectrum, i.e.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="indices-and-tables">
+<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference internal" href="../genindex.html"><span class="std std-ref">Index</span></a></li>
+<li><a class="reference internal" href="../py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
+<li><a class="reference internal" href="../search.html"><span class="std std-ref">Search Page</span></a></li>
+</ul>
+</div>
+</div>
 
-  <div role="contentinfo">
-    <p>
-        &copy; Copyright lightkurve developers and contributors
 
+</div>
+<div class="container" style="padding-top: 2em;">
+    <hr>
+    <p class="text-center">
+        Created with ♥ by the Lightkurve developers.
+        <a href="https://github.com/KeplerGO/lightkurve">Join us on GitHub.</a>
     </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
-
-</footer>
-
-        </div>
-      </div>
-
-    </section>
-
-  </div>
-  
-
-
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
-    
-
-  
-
-  <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-  <script type="text/javascript">
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script> 
-
-</body>
+</div>
+  </body>
 </html>

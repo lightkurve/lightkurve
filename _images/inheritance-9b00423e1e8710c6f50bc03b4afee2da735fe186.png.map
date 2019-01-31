@@ -1,0 +1,19 @@
+<map id="inheritance2633681e36" name="inheritance2633681e36">
+<area shape="rect" id="node1" title="Container class to hold the parameters of the background in a ``TPFModel``." alt="" coords="5,524,168,549"/>
+<area shape="rect" id="node2" title="Container class to capture a user&#39;s beliefs about the background flux." alt="" coords="219,400,341,425"/>
+<area shape="rect" id="node3" title="Container object to hold parameter priors for PRF photometry." alt="" coords="33,475,141,500"/>
+<area shape="rect" id="node7" title="Container class to capture a user&#39;s beliefs about the telescope focus." alt="" coords="237,449,323,475"/>
+<area shape="rect" id="node11" title="Container class to capture a user&#39;s beliefs about the telescope motion." alt="" coords="235,499,325,524"/>
+<area shape="rect" id="node15" title="Container class to capture a user&#39;s beliefs about a star&#39;s position and flux." alt="" coords="243,548,317,573"/>
+<area shape="rect" id="node4" title="An improper prior with a negative log probability of 0 at a single fixed" alt="" coords="392,351,509,376"/>
+<area shape="rect" id="node5" title="A base class for a prior distribution. Differently from Likelihood, a prior" alt="" coords="244,351,316,376"/>
+<area shape="rect" id="node6" title="Container class to hold the parameters of the telescope focus in a ``TPFModel``." alt="" coords="23,301,150,327"/>
+<area shape="rect" id="node8" title="Kepler&#39;s Pixel Response Function as designed by [1]_." alt="" coords="43,252,130,277"/>
+<area shape="rect" id="node13" title="Simple model of KeplerPRF." alt="" coords="216,252,344,277"/>
+<area shape="rect" id="node9" title="An abstract class for an arbitrary loss (cost) function." alt="" coords="36,351,137,376"/>
+<area shape="rect" id="node10" title="Container class to hold the parameters of the telescope motion in a ``TPFModel``." alt="" coords="21,203,152,228"/>
+<area shape="rect" id="node12" title="This class performs PRF Photometry on TPF&#45;like data given a ``TPFModel``." alt="" coords="28,153,145,179"/>
+<area shape="rect" id="node14" title="Container class to hold the parameters of a star in a ``TPFModel``." alt="" coords="29,104,145,129"/>
+<area shape="rect" id="node16" title="A model which describes a single&#45;cadence Kepler image." alt="" coords="45,55,129,80"/>
+<area shape="rect" id="node17" title="Container class to combine all parameters that parameterize a ``TPFModel``." alt="" coords="11,5,163,31"/>
+</map>
