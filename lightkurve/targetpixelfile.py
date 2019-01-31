@@ -1077,28 +1077,16 @@ class KeplerTargetPixelFile(TargetPixelFile):
             factory.add_cadence(frameno=idx, flux=cutout.data, header=hdu.header)
         return factory.get_tpf(hdu0_keywords=allkeys, ext_info=ext_info, **kwargs)
 
-    def correct(self, method='pld', aperture_mask=None):
-        """
+    def pld(self, **kwargs):
+        """Returns a LightCurve detrended using Pixel Level Decorrelation (PLD).
 
+        For the list of parameters that can be passed, see the docstring of
+        the `lightkurve.PLDCorrector.correct()` method.
         """
-
         from .correctors import PLDCorrector
+        corrector = PLDCorrector(self)
+        return corrector.correct(**kwargs)
 
-        if aperture_mask is None:
-            aperture_mask = self.pipeline_mask
-            
-        self.corrector = PLDCorrector()
-        corrected_lc = self.corrector.correct(fpix=np.nan_to_num(self.flux),
-                                              ferr=np.nan_to_num(self.flux_err),
-                                              trninds=[],
-                                              time=self.time,
-                                              aperture=aperture_mask)
-        new_lc = self.to_lightcurve()
-        new_lc.time = corrected_lc.time
-        new_lc.flux = corrected_lc.flux
-        new_lc.flux_err = new_lc.normalize().flux_err
-
-        return new_lc
 
 class FactoryError(Exception):
     """Raised if there is a problem creating a TPF."""

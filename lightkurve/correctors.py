@@ -548,7 +548,7 @@ class PLDCorrector(object):
     >>> lc.plot() # doctest: +SKIP
 
     However, the above example will over-fit the small transits!
-    It is necessary to mask the transits using `corrector.correct(transit_mask=...)`.
+    It is necessary to mask the transits using `corrector.correct(cadence_mask=...)`.
 
     References
     ----------
@@ -565,8 +565,8 @@ class PLDCorrector(object):
         self.flux_err = np.nan_to_num(tpf.flux_err)
         self.time = np.nan_to_num(tpf.time)
 
-    def correct(self, aperture_mask=None, transit_mask=None, gp_timescale=30,
-                n_components_first=25, n_components_second=20, use_gp=True):
+    def correct(self, aperture_mask=None, cadence_mask=None, gp_timescale=30,
+                n_components_first=None, n_components_second=20, use_gp=True):
         r"""Returns a PLD systematics-corrected LightCurve.
 
         Parameters
@@ -574,23 +574,27 @@ class PLDCorrector(object):
         aperture_mask : array-like, 'pipeline', 'all', 'threshold', or None
             A boolean array describing the aperture such that `True` means
             that the pixel will be used.
-            If None or 'all' are passed, all pixels will be used.
+            If `None` or 'all' are passed, all pixels will be used.
             If 'pipeline' is passed, the mask suggested by the official pipeline
             will be returned.
             If 'threshold' is passed, all pixels brighter than 3-sigma above
             the median flux will be used.
-        transit_mask : array-like
+        cadence_mask : array-like
             A mask that will be applied to the cadences prior to constructing
             the detrending model. For example, you can pass a boolean array
             of length `n_cadences` where `True` means that the cadence will be
-            included in the noise model. You may also pass an array of indices
-            to be included in the noise model.
+            included in the noise model. You may also pass an array of indices.
+            This option enables signals of interest (e.g. planet transits)
+            to be excluded from the noise model, which will prevent over-fitting.
+            By default, no cadences will be masked.
         gp_timescale : float
             Gaussian Process time scale length term (`tau`) used to define
             length of fit variability in days.
         n_components_first : int
             Number of first-order PLD components to reduce to with PCA.
             Must be smaller than the number of pixels in the aperture mask.
+            If `None`, then 25 or the number of pixels in the mask will be used,
+            whichever is smaller.
         n_components_second : int
             Number of second-order PLD components to reduce to with PCA.
         use_gp : boolean
@@ -603,9 +607,12 @@ class PLDCorrector(object):
             returned object will be a `KeplerLightCurve`, `TessLightCurve`, or
             general `LightCurve` object.
         """
-
-        # parse aperture
+        # Parse the aperture mask to accept strings etc.
         aperture = self.tpf._parse_aperture_mask(aperture_mask)
+
+        # n_components_first cannot be larger than the number of pixels in the mask
+        if n_components_first is None:
+            n_components_first = min(25, (aperture > 0).sum())
 
         # find pixel bounds of aperture on tpf
         xmin, xmax = min(np.where(aperture)[0]),  max(np.where(aperture)[0])
@@ -622,12 +629,12 @@ class PLDCorrector(object):
             warnings.simplefilter("ignore", RuntimeWarning)
             flux_err = np.nansum(flux_err_crop[:, aperture_crop]**2, axis=1)**0.5
 
-        # set transit mask
-        if transit_mask is None:
-            transit_mask = np.where(self.time)
-        M = lambda x: x[transit_mask]
+        # set default transit mask
+        if cadence_mask is None:
+            cadence_mask = np.where(self.time)
+        M = lambda x: x[cadence_mask]
 
-        #  generate flux light curve from desired pixels
+        # generate flux light curve from desired pixels
         lc = self.tpf.to_lightcurve(aperture_mask=aperture)
 
         # set aperture values
@@ -692,48 +699,8 @@ class PLDCorrector(object):
         model = np.dot(X, C)
         self.detrended_flux = rawflux - (model - np.nanmean(model))
 
-        # TODO: we could replace the code below with something like this:
-        # corrected_lc = lc.copy()
-        # corrected_lc.flux = self.detrended_flux
-        # corrected_lc.flux_err = flux_err
-
-        # estimate centroids
-        centroid_col, centroid_row = self.tpf.estimate_centroids(aperture)
-
-        # check type of input TPF and return corresponding LightCurve object
-        if isinstance(self.tpf, KeplerTargetPixelFile):
-            keys = {'centroid_col': centroid_col,
-                    'centroid_row': centroid_row,
-                    'quality': self.tpf.quality,
-                    'channel': self.tpf.channel,
-                    'campaign': self.tpf.campaign,
-                    'quarter': self.tpf.quarter,
-                    'mission': self.tpf.mission,
-                    'cadenceno': self.tpf.cadenceno,
-                    'ra': self.tpf.ra,
-                    'dec': self.tpf.dec,
-                    'label': self.tpf.header['OBJECT'],
-                    'targetid': self.tpf.targetid}
-            self.corrected_lc = KeplerLightCurve(time=self.time, flux=self.detrended_flux,
-                                                 flux_err=flux_err, **keys)
-
-        elif isinstance(self.tpf, TessTargetPixelFile):
-            keys = {'centroid_col': centroid_col,
-                    'centroid_row': centroid_row,
-                    'quality': self.tpf.quality,
-                    'sector': self.tpf.sector,
-                    'camera': self.tpf.camera,
-                    'ccd': self.tpf.ccd,
-                    'cadenceno': self.tpf.cadenceno,
-                    'ra': self.tpf.ra,
-                    'dec': self.tpf.dec,
-                    'label': self.tpf.get_keyword('OBJECT'),
-                    'targetid': self.tpf.targetid}
-            self.corrected_lc = TessLightCurve(time=self.time, flux=self.detrended_flux,
-                                               flux_err=flux_err, **keys)
-
-        else:
-            self.corrected_lc = LightCurve(time=self.time, flux=self.detrended_flux,
-                                           flux_err=flux_err)
-
-        return self.corrected_lc
+        # Create and return a new LightCurve object with the corrected flux
+        corrected_lc = lc.copy()
+        corrected_lc.flux = self.detrended_flux
+        corrected_lc.flux_err = flux_err
+        return corrected_lc
