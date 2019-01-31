@@ -1,5 +1,8 @@
-"""Defines KeplerCBVCorrector, SFFCorrector, and PLDCorrector."""
+"""Defines KeplerCBVCorrector, SFFCorrector, and PLDCorrector.
 
+These classes are intended to help remove instrument systematics from
+time series photometry data.
+"""
 from __future__ import division, print_function
 
 import requests
@@ -17,9 +20,8 @@ from astropy.io import fits as pyfits
 from astropy.stats import sigma_clip
 
 from .utils import channel_to_module_output
-from .lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
-from .lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
-from .targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
+from .lightcurve import LightCurve
+from .lightcurvefile import KeplerLightCurveFile
 
 from sklearn.decomposition import PCA
 from itertools import combinations_with_replacement as multichoose
@@ -499,12 +501,16 @@ class PLDCorrector(object):
         Pixel Level Decorrelation (PLD) was developed by [1]_ to remove
         systematic noise caused by spacecraft jitter for the Spitzer
         Space Telescope. It was adapted to K2 data by [2]_ and [3]_
-        for the Everest pipeline. For a detailed description of PLD,
-        please refer to these references.
+        for the EVEREST pipeline [4]_.
+
+        For a detailed description and implementation of PLD, please refer to
+        these references. Lightkurve provides a reference implementation
+        of PLD that is less sophisticated than EVEREST, but is suitable
+        for quick-look analyses and detrending experiments.
 
         Our simple implementation of PLD is performed by first calculating the
-        noise model for each cadence in time. This function goes up to second order,
-        and is represented by
+        noise model for each cadence in time. This function goes up to second
+        order, and is represented by
 
         .. math::
 
@@ -558,6 +564,7 @@ class PLDCorrector(object):
         (arXiv:1607.00524)
     .. [3] Luger et al. (2018), ads:2018AJ....156...99L
         (arXiv:1702.05488)
+    .. [4] EVEREST pipeline webpage, https://rodluger.github.io/everest
     """
     def __init__(self, tpf):
         self.tpf = tpf
@@ -640,8 +647,10 @@ class PLDCorrector(object):
         # set aperture values
         aperture_vals = np.copy(aperture_crop).astype(int)
 
-        # aperture_flux contains the per-pixel lightcurve in a (n_cadences, n_pixels) matrix;
-        # we will run PCA on this to create our design matrix further below.
+        # `aperture_flux` contains the per-pixel lightcurve in a matrix
+        # with shape (n_cadences, n_pixels).
+        # We will run PCA on this matrix further below to arrive at the design
+        # matrix for the noise model.
         self.aperture_flux = np.array([f*aperture_vals for f in flux_crop]).reshape(len(flux_crop), -1)
         rawflux = np.sum(self.aperture_flux.reshape(len(self.aperture_flux), -1), axis=1)
 
@@ -683,8 +692,9 @@ class PLDCorrector(object):
             # recover GP covariance matrix from celerite model
             # sigma is expected to have shape (n_unmasked_cadences, n_unmasked_cadences)
             sigma = gp.get_matrix(M(self.time)) + \
-                    np.diag(np.sum(M(flux_err_crop).reshape(len(M(flux_err_crop)),
-                            -1), axis=1)**2)
+                np.diag(
+                    np.sum(M(flux_err_crop).reshape(len(M(flux_err_crop)), -1), axis=1)**2
+                       )
         else:
             sigma = np.diag(np.sum(M(flux_err_crop).reshape(len(M(flux_err_crop)),
                             -1), axis=1)**2)

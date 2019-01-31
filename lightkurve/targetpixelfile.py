@@ -1077,15 +1077,29 @@ class KeplerTargetPixelFile(TargetPixelFile):
             factory.add_cadence(frameno=idx, flux=cutout.data, header=hdu.header)
         return factory.get_tpf(hdu0_keywords=allkeys, ext_info=ext_info, **kwargs)
 
-    def pld(self, **kwargs):
-        """Returns a LightCurve detrended using Pixel Level Decorrelation (PLD).
+    def to_corrector(self, method="pld"):
+        """Returns a `Corrector` instance to remove systematics.
 
-        For the list of parameters that can be passed, see the docstring of
-        the `lightkurve.PLDCorrector.correct()` method.
+        Parameters
+        ----------
+        methods : string
+            Currently, only "pld" is supported.  This will return a
+            `PLDCorrector` class instance.
+
+        Returns
+        -------
+        correcter : `lightkurve.Correcter`
+            Instance of a Corrector class, which typically provides `correct()`
+            and `diagnose()` methods.
         """
-        from .correctors import PLDCorrector
-        corrector = PLDCorrector(self)
-        return corrector.correct(**kwargs)
+        allowed_methods = ["pld"]
+        if method not in allowed_methods:
+            raise ValueError(("Unrecognized method '{0}'\n"
+                              "allowed methods are: {1}")
+                             .format(method, allowed_methods))
+        if method == "pld":
+            from .correctors import PLDCorrector
+            return PLDCorrector(self)
 
 
 class FactoryError(Exception):

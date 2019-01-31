@@ -452,8 +452,8 @@ def test_get_keyword():
     assert tpf.get_keyword("DOESNOTEXIST", default=5) == 5
 
 
-def test_pld():
+def test_to_corrector():
     """Does the tpf.pld() convenience method work?"""
     tpf = KeplerTargetPixelFile(TABBY_TPF)
-    lc = tpf.pld()
+    lc = tpf.to_corrector("pld").correct()
     assert len(lc.flux) == len(tpf.time)
