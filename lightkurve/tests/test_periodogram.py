@@ -153,6 +153,70 @@ def test_index():
     assert len(p[mask].frequency) == mask.sum()
 
 
+def test_bls(caplog):
+    ''' Test that BLS periodogram works and gives reasonable errors
+    '''
+    lc = LightCurve(time=np.linspace(0, 10, 1000), flux=np.random.normal(1, 0.1, 1000),
+                    flux_err=np.zeros(1000)+0.1)
+
+    # should be able to make a periodogram
+    p = lc.to_periodogram(method='bls')
+    keys = ['period', 'power', 'duration', 'transit_time', 'depth', 'SNR']
+    assert np.all([key in  p.__dir__() for key in keys])
+
+    p.plot()
+
+    # we should be able to specify some keywords
+    lc.to_periodogram(method='bls', minimum_period=0.2, duration=0.1, maximum_period=0.5)
+
+    # Ridiculous BLS spectra should break.
+    with pytest.raises(ValueError) as err:
+        lc.to_periodogram(method='bls', frequency_factor=0.00001)
+        assert err.value.args[0] == ('`period` contains over 72000001 points.Periodogram is too large to evaluate. Consider setting `frequency_factor` to a higher value.')
+
+    # Some errors should occur
+    p.compute_stats()
+    for record in caplog.records:
+        assert record.levelname == 'WARNING'
+    assert len(caplog.records) == 4
+    assert 'No period specified.' in caplog.text
+
+    # No more errors
+    stats = p.compute_stats(1, 0.1, 0)
+    assert len(caplog.records) == 4
+    assert isinstance(stats, dict)
+
+    # Some errors should occur
+    p.get_transit_model()
+    for record in caplog.records:
+        assert record.levelname == 'WARNING'
+    assert len(caplog.records) == 7
+    assert 'No period specified.' in caplog.text
+
+    model = p.get_transit_model(1, 0.1, 0)
+    # No more errors
+    assert len(caplog.records) == 7
+    # Model is LC
+    assert isinstance(model, LightCurve)
+    # Model is otherwise identical to LC
+    assert np.in1d(model.time, lc.time).all()
+    assert np.in1d(lc.time, model.time).all()
+
+    mask = p.get_transit_mask(1, 0.1, 0)
+    assert isinstance(mask, np.ndarray)
+    assert isinstance(mask[0], np.bool_)
+    assert mask.sum() > (~mask).sum()
+
+    assert isinstance(p.period_at_max_power, u.Quantity)
+    assert isinstance(p.duration_at_max_power, float)
+    assert isinstance(p.transit_time_at_max_power, float)
+    assert isinstance(p.depth_at_max_power, float)
+
+
+
+
+
+
 def test_error_messages():
     """Test periodogram raises reasonable errors
     """

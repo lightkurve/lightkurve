@@ -18,6 +18,8 @@ from astropy.convolution import convolve, Box1DKernel
 
 from . import MPLSTYLE
 
+from .lightcurve import LightCurve
+
 log = logging.getLogger(__name__)
 
 __all__ = ['Periodogram', 'LombScarglePeriodogram', 'BoxLeastSquaresPeriodogram']
@@ -49,7 +51,7 @@ class Periodogram(object):
         Free-form metadata associated with the Periodogram.
     """
     def __init__(self, frequency, power, nyquist=None, label=None,
-                 targetid=None, meta={}):
+                 targetid=None, _default_view='frequency', meta={}):
         # Input validation
         if not isinstance(frequency, u.quantity.Quantity):
             raise ValueError('frequency must be an `astropy.units.Quantity` object.')
@@ -71,6 +73,7 @@ class Periodogram(object):
         self.nyquist = nyquist
         self.label = label
         self.targetid = targetid
+        self._default_view = _default_view
         self.meta = meta
 
     @property
@@ -211,7 +214,7 @@ class Periodogram(object):
             return smooth_pg
 
     def plot(self, scale='linear', ax=None, xlabel=None, ylabel=None, title='',
-             style='lightkurve', format='frequency', unit=None, **kwargs):
+             style='lightkurve', format=None, unit=None, **kwargs):
         """Plots the Periodogram.
 
         Parameters
@@ -245,6 +248,9 @@ class Periodogram(object):
         """
         if isinstance(unit, u.quantity.Quantity):
             unit = unit.unit
+
+        if format is None:
+            format = self._default_view
 
         if unit is None:
             unit = self.frequency.unit
@@ -505,9 +511,14 @@ class SNRPeriodogram(Periodogram):
 
 
 class LombScarglePeriodogram(Periodogram):
-
+    '''Super class of `Periodogram` for working with Lomb Scargle Periodograms.
+    '''
     def __init__(self, *args, **kwargs):
         super(LombScarglePeriodogram, self).__init__(*args, **kwargs)
+
+
+    def __repr__(self):
+        return('LombScarglePeriodogram(ID: {})'.format(self.targetid))
 
     @staticmethod
     def from_lightcurve(lc, min_frequency=None, max_frequency=None,
@@ -703,24 +714,203 @@ class LombScarglePeriodogram(Periodogram):
                                       targetid=lc.targetid, label=lc.label)
 
 
-class BoxLeastSquaresPeriodogram(Periodogram):
 
+class BoxLeastSquaresPeriodogram(Periodogram):
+    '''Super class of `Periodogram` for working with Box Least Squares Periodograms.
+    '''
     def __init__(self, *args, **kwargs):
+        self.duration = kwargs.pop("duration", None)
+        self.depth = kwargs.pop("depth", None)
+        self.SNR = kwargs.pop("SNR", None)
+        self._BLS_result = kwargs.pop("bls_result", None)
+        self._BLS_object = kwargs.pop("bls_obj", None)
+
+        self.transit_time = kwargs.pop("transit_time", None)
+        self.time = kwargs.pop("time", None)
+        self.flux = kwargs.pop("flux", None)
+        self.time_unit = kwargs.pop("time_unit", None)
         super(BoxLeastSquaresPeriodogram, self).__init__(*args, **kwargs)
+
+    def __repr__(self):
+        return('BoxLeastSquaresPeriodogram(ID: {})'.format(self.targetid))
 
     @staticmethod
     def from_lightcurve(lc, **kwargs):
         """Creates a Periodogram from a LightCurve using the Box Least Squares (BLS) method."""
+        time_unit = (kwargs.pop("time_unit", "day"))
+        if time_unit not in u.__dir__():
+            raise ValueError('{} is not a valid unit for time.'.format(time_unit))
+
         try:
             from astropy.stats import BoxLeastSquares
         except ImportError:
             raise Exception("BLS requires AstroPy v3.1 or later")
+
         bls = BoxLeastSquares(lc.time, lc.flux, lc.flux_err)
         duration = kwargs.pop("duration", 0.25)
-        period = kwargs.pop("period", bls.autoperiod(duration))
+        minimum_period = kwargs.pop("minimum_period", None)
+        maximum_period = kwargs.pop("maximum_period", None)
+        frequency_factor = kwargs.pop("frequency_factor", 1)
+        period = kwargs.pop("period",
+                            bls.autoperiod(duration, minimum_period=minimum_period,
+                                            maximum_period=maximum_period, frequency_factor=frequency_factor))
+        if minimum_period is None:
+            minimum_period = period.min()
+        if maximum_period is None:
+            maximum_period = period.max()
+        npoints = len(period)
+        if npoints > 1e5:
+            log.warning('`period` contains over {} points.'
+                            'Periodogram is likely to be large, and slow to evaluate. '
+                            'Consider setting `frequency_factor` to a higher value.'.format(np.round(npoints, 4)))
+
+        if npoints > 1e7:
+            raise ValueError('`period` contains over {} points.'
+                            'Periodogram is too large to evaluate. '
+                            'Consider setting `frequency_factor` to a higher value.'.format(np.round(npoints, 4)))
+
         result = bls.power(period, duration, **kwargs)
         if not isinstance(result.period, u.quantity.Quantity):
-            result.period = result.period * u.day
+            result.period = u.Quantity(result.period, time_unit)
         if not isinstance(result.power, u.quantity.Quantity):
             result.power = result.power * u.dimensionless_unscaled
-        return BoxLeastSquaresPeriodogram(frequency=1. / result.period, power=result.power)
+
+
+        return BoxLeastSquaresPeriodogram(frequency=1. / result.period, power=result.power,
+                                            _default_view='period', label=lc.label,
+                                            targetid=lc.targetid, transit_time=result.transit_time,
+                                            duration=result.duration, depth=result.depth, bls_result=result,
+                                            SNR=result.depth_snr, bls_obj=bls, time=lc.time, flux=lc.flux, time_unit=time_unit)
+
+
+    def compute_stats(self, period=None, duration=None, transit_time=None):
+        '''Computes commonly used vetting statistics for a transit model.
+
+        See astropy.stats.bls docs for further details.
+
+        Parameters
+        ----------
+        period : float or Quantity
+            Period of the transits. Default is `period_at_max_power`
+        duration : float or Quantity
+            Duration of the transits. Default is `duration_at_max_power`
+        transit_time : float or Quantity
+            Transit midpoint of the transits. Default is `transit_time_at_max_power`
+
+        Returns
+        -------
+        stats : dict
+            Dictionary of vetting statistics
+        '''
+        if period is None:
+            period = self.period_at_max_power
+            log.warning('No period specified. Using period at max power')
+        if duration is None:
+            duration = self.duration_at_max_power
+            log.warning('No duration specified. Using duration at max power')
+        if transit_time is None:
+            transit_time = self.transit_time_at_max_power
+            log.warning('No transit time specified. Using transit time at max power')
+        return self._BLS_object.compute_stats(u.Quantity(period, 'd').value,
+                                                u.Quantity(duration, 'd').value,
+                                                u.Quantity(transit_time, 'd').value)
+
+    def get_transit_model(self, period=None, duration=None, transit_time=None):
+        '''Computes the transit model using the BLS, returns a lightkurve.LightCurve
+
+        See astropy.stats.bls docs for further details.
+
+        Parameters
+        ----------
+        period : float or Quantity
+            Period of the transits. Default is `period_at_max_power`
+        duration : float or Quantity
+            Duration of the transits. Default is `duration_at_max_power`
+        transit_time : float or Quantity
+            Transit midpoint of the transits. Default is `transit_time_at_max_power`
+
+        Returns
+        -------
+        model : lightkurve.LightCurve
+            Model of transit
+        '''
+        if period is None:
+            period = self.period_at_max_power
+            log.warning('No period specified. Using period at max power')
+        if duration is None:
+            duration = self.duration_at_max_power
+            log.warning('No duration specified. Using duration at max power')
+        if transit_time is None:
+            transit_time = self.transit_time_at_max_power
+            log.warning('No transit time specified. Using transit time at max power')
+
+        model_flux = self._BLS_object.model(self.time, u.Quantity(period, 'd').value,
+                                                u.Quantity(duration, 'd').value,
+                                                u.Quantity(transit_time, 'd').value)
+        model = LightCurve(self.time, model_flux, label='Transit Model Flux')
+        return model
+
+    def get_transit_mask(self, period=None, duration=None, transit_time=None):
+        '''Computes the transit mask using the BLS, returns a lightkurve.LightCurve
+
+        True where there are no transits.
+
+        Parameters
+        ----------
+        period : float or Quantity
+            Period of the transits. Default is `period_at_max_power`
+        duration : float or Quantity
+            Duration of the transits. Default is `duration_at_max_power`
+        transit_time : float or Quantity
+            Transit midpoint of the transits. Default is `transit_time_at_max_power`
+
+        Returns
+        -------
+        mask : np.array of Bool
+            Mask that removes transits. Mask is True where there are no transits.
+        '''
+        model = self.get_transit_model(period=period, duration=duration, transit_time=transit_time)
+        return model.flux == np.median(model.flux)
+
+    @property
+    def transit_time_at_max_power(self):
+        """Returns the transit time corresponding to the highest peak in the periodogram."""
+        return self.transit_time[np.nanargmax(self.power)]
+
+    @property
+    def duration_at_max_power(self):
+        """Returns the duration corresponding to the highest peak in the periodogram."""
+        return self.duration[np.nanargmax(self.power)]
+
+    @property
+    def depth_at_max_power(self):
+        """Returns the depth corresponding to the highest peak in the periodogram."""
+        return self.depth[np.nanargmax(self.power)]
+
+    def plot(self, **kwargs):
+        """Plot the BoxLeastSquaresPeriodogram spectrum using matplotlib's `plot` method.
+        See `Periodogram.plot` for details on the accepted arguments.
+
+        Parameters
+        ----------
+        kwargs : dict
+            Dictionary of arguments ot be passed to `Periodogram.plot`.
+
+        Returns
+        -------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            The matplotlib axes object.
+        """
+        ax = super(BoxLeastSquaresPeriodogram, self).plot(**kwargs)
+        if 'ylabel' not in kwargs:
+            ax.set_ylabel("BLS Power")
+
+        return ax
+
+    def flatten(self, **kwargs):
+        raise NotImplementedError('`flatten` is not currently implemented for `BoxLeastSquaresPeriodogram`. '
+                                  'Please check back soon. ')
+
+    def smooth(self, **kwargs):
+        raise NotImplementedError('`smooth` is not currently implemented for `BoxLeastSquaresPeriodogram`. '
+                                  'Please check back soon. ')

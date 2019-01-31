@@ -998,22 +998,28 @@ class LightCurve(object):
         Parameters
         ----------
         method : "lombscargle" or "bls"
-            Which method to use?
+            Select a method to create a periodogram. Default "lombscargle".
         kwargs : dict
-            Keyword arguments passed to either `LombScargle(...)` or
-            `BoxLeastSquares.power(...)`
+            Keyword arguments passed to either `LombScarglePeriodogram` or
+            `BoxLeastSquaresPeriodogram`.
+            Keywords accepted by `LombScarglePeriodogram`:
+            min_frequency, max_frequency, min_period, max_period, frequency,
+            period, nterms, nyquist_factor, oversample_factor, freq_unit
+            Keywords accepted by `BoxLeastSquaresPeriodogram`:
+            min_period, max_period, period, frequency_factor
 
         Returns
         -------
         Periodogram : `Periodogram` object
             Returns a Periodogram object extracted from the lightcurve.
         """
+
         allowed_methods = ["lombscargle", "bls"]
-        if method not in allowed_methods:
+        if method.replace(' ','').lower() not in allowed_methods:
             raise ValueError(("Unrecognized method '{0}'\n"
                               "allowed methods are: {1}")
                              .format(method, allowed_methods))
-        if method == "bls":
+        if method.replace(' ','').lower() == "bls":
             from . import BoxLeastSquaresPeriodogram
             return BoxLeastSquaresPeriodogram.from_lightcurve(lc=self, **kwargs)
         else:
