@@ -3,7 +3,7 @@
 API
 ===
 
-This page provides an overview of the Python functions and classes provided by Lightkurve, also known as the API (*Application Programming Interface*).
+This page provides an overview of the Python functions and classes provided by the Lightkurve package. Programmers tend to refer to a list like this as the API (*Application Programming Interface*).
 
 
 Light curves
@@ -67,7 +67,7 @@ The :class:`lightkurve.utils` module provides a range of common helper functions
 More info?
 ----------
 
-If you did not find what you want, try consulting the API index or search pages:
+If you are looking for a specific class or function not listed here, try consulting the API index or search pages:
 
 * :ref:`Index of all classes and methods <genindex>`
 * :ref:`Index of all modules <modindex>`
