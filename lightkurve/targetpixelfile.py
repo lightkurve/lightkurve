@@ -1077,6 +1077,30 @@ class KeplerTargetPixelFile(TargetPixelFile):
             factory.add_cadence(frameno=idx, flux=cutout.data, header=hdu.header)
         return factory.get_tpf(hdu0_keywords=allkeys, ext_info=ext_info, **kwargs)
 
+    def to_corrector(self, method="pld"):
+        """Returns a `Corrector` instance to remove systematics.
+
+        Parameters
+        ----------
+        methods : string
+            Currently, only "pld" is supported.  This will return a
+            `PLDCorrector` class instance.
+
+        Returns
+        -------
+        correcter : `lightkurve.Correcter`
+            Instance of a Corrector class, which typically provides `correct()`
+            and `diagnose()` methods.
+        """
+        allowed_methods = ["pld"]
+        if method not in allowed_methods:
+            raise ValueError(("Unrecognized method '{0}'\n"
+                              "allowed methods are: {1}")
+                             .format(method, allowed_methods))
+        if method == "pld":
+            from .correctors import PLDCorrector
+            return PLDCorrector(self)
+
 
 class FactoryError(Exception):
     """Raised if there is a problem creating a TPF."""
