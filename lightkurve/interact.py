@@ -222,16 +222,18 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
     result.RA_ICRS += pmra
     result.DE_ICRS += pmdec
 
-    ## TODO: Gently size the points by their Gaia magnitude
+    # Gently size the points by their Gaia magnitude
+    sizes = 64.0 / 2**(result['Gmag']/5.0)
     source = ColumnDataSource(data=dict(ra=result['RA_ICRS'],
                                         dec=result['DE_ICRS'],
                                         source=result['Source'],
                                         Gmag=result['Gmag'],
                                         plx=result['Plx'],
                                         x=coords[:, 0]+tpf.column,
-                                        y=coords[:, 1]+tpf.row))
+                                        y=coords[:, 1]+tpf.row,
+                                        size=sizes))
 
-    r = fig.circle('x', 'y', source=source,fill_alpha=0.3, size=8, line_color=None,
+    r = fig.circle('x', 'y', source=source,fill_alpha=0.3, size='size', line_color=None,
                     selection_color="firebrick",nonselection_fill_alpha=0.0, nonselection_line_color=None,
                     nonselection_line_alpha=0.0, fill_color="firebrick",
                     hover_fill_color="firebrick", hover_alpha=0.9, hover_line_color="white")
