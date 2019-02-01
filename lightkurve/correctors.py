@@ -550,7 +550,7 @@ class PLDCorrector(object):
     >>> import lightkurve as lk
     >>> tpf = lk.search_targetpixelfile("GJ9827").download()
     >>> corrector = lk.PLDCorrector(tpf)
-    >>> lc = corrector.correct()
+    >>> lc = corrector.correct() # doctest: +SKIP
     >>> lc.plot() # doctest: +SKIP
 
     However, the above example will over-fit the small transits!
