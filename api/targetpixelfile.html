@@ -15,7 +15,6 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
@@ -79,21 +78,25 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile" title="lightkurve.targetpixelfile.KeplerTargetPixelFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code></a>(path[,&nbsp;quality_bitmask])</td>
-<td>Defines a TargetPixelFile class for the Kepler/K2 Mission.</td>
+<tr class="row-odd"><td><a class="reference internal" href="lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile" title="lightkurve.targetpixelfile.TargetPixelFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TargetPixelFile</span></code></a>(path[,&nbsp;quality_bitmask,&nbsp;…])</td>
+<td>Generic class representing FITS files which contain time series imaging data.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile" title="lightkurve.targetpixelfile.TessTargetPixelFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TessTargetPixelFile</span></code></a>(path[,&nbsp;quality_bitmask])</td>
-<td>Defines a TargetPixelFile class for the TESS Mission.</td>
+<tr class="row-even"><td><a class="reference internal" href="lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile" title="lightkurve.targetpixelfile.KeplerTargetPixelFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code></a>(path[,&nbsp;quality_bitmask])</td>
+<td>Subclass of <a class="reference internal" href="lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile" title="lightkurve.targetpixelfile.TargetPixelFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">TargetPixelFile</span></code></a> to represent pixel data processed by NASA’s Kepler pipeline.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile" title="lightkurve.targetpixelfile.TessTargetPixelFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TessTargetPixelFile</span></code></a>(path[,&nbsp;quality_bitmask])</td>
+<td>Subclass of <a class="reference internal" href="lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile" title="lightkurve.targetpixelfile.TargetPixelFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">TargetPixelFile</span></code></a> to represent pixel data processed by NASA’s TESS pipeline.</td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="section" id="class-inheritance-diagram">
 <h2>Class Inheritance Diagram<a class="headerlink" href="#class-inheritance-diagram" title="Permalink to this headline">¶</a></h2>
-<div class="graphviz"><img src="../_images/inheritance-497bf7ffd261a1761973c1384444daff05fd5526.png" alt="Inheritance diagram of lightkurve.targetpixelfile.KeplerTargetPixelFile, lightkurve.targetpixelfile.TessTargetPixelFile" usemap="#inheritanced621a4b1ce" class="inheritance graphviz" /></div>
-<map id="inheritanced621a4b1ce" name="inheritanced621a4b1ce">
-<area shape="rect" id="node1" href="lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile" target="_top" title="Defines a TargetPixelFile class for the Kepler/K2 Mission." alt="" coords="164,5,313,31"/>
-<area shape="rect" id="node3" href="lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile" target="_top" title="Defines a TargetPixelFile class for the TESS Mission." alt="" coords="169,55,309,80"/>
+<div class="graphviz"><img src="../_images/inheritance-815e8ad9eb44caed90d4633e4f133df3219de839.png" alt="Inheritance diagram of lightkurve.targetpixelfile.TargetPixelFile, lightkurve.targetpixelfile.KeplerTargetPixelFile, lightkurve.targetpixelfile.TessTargetPixelFile" usemap="#inheritancec0fbea2858" class="inheritance graphviz" /></div>
+<map id="inheritancec0fbea2858" name="inheritancec0fbea2858">
+<area shape="rect" id="node1" href="lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile" target="_top" title="Subclass of :class:`TargetPixelFile &lt;lightkurve.targetpixelfile.TargetPixelFile&gt;`" alt="" coords="169,5,327,31"/>
+<area shape="rect" id="node2" href="lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile" target="_top" title="Generic class representing FITS files which contain time series imaging data." alt="" coords="5,31,121,56"/>
+<area shape="rect" id="node3" href="lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile" target="_top" title="Subclass of :class:`TargetPixelFile &lt;lightkurve.targetpixelfile.TargetPixelFile&gt;`" alt="" coords="176,55,320,80"/>
 </map></div>
 </div>
 

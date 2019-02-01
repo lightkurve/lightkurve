@@ -15,7 +15,6 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
@@ -123,18 +122,18 @@ div.nblast {
 
 /* input prompt */
 div.nbinput div.prompt pre {
-    color: #307FC1;
+    color: #303F9F;
 }
 
 /* output prompt */
 div.nboutput div.prompt pre {
-    color: #BF5B3D;
+    color: #D84315;
 }
 
 /* all prompts */
 div.nbinput div.prompt,
 div.nboutput div.prompt {
-    min-width: 7ex;
+    min-width: 9ex;
     padding-top: 0.4em;
     padding-right: 0.4em;
     text-align: right;
@@ -174,9 +173,9 @@ div.nboutput div.output_area {
 
 /* input area */
 div.nbinput div.input_area {
-    border: 1px solid #e0e0e0;
+    border: 1px solid #cfcfcf;
     border-radius: 2px;
-    background: #f5f5f5;
+    background: #f7f7f7;
 }
 
 /* override MathJax center alignment in output cells */
@@ -184,7 +183,7 @@ div.nboutput div[class*=MathJax] {
     text-align: left !important;
 }
 
-/* override sphinx.ext.imgmath center alignment in output cells */
+/* override sphinx.ext.pngmath center alignment in output cells */
 div.nboutput div.math p {
     text-align: left;
 }
@@ -233,40 +232,6 @@ div.nboutput div.output_area.stderr {
 
 .ansi-bold { font-weight: bold; }
 .ansi-underline { text-decoration: underline; }
-
-/* Some additional styling taken form the Jupyter notebook CSS */
-div.rendered_html table {
-  border: none;
-  border-collapse: collapse;
-  border-spacing: 0;
-  color: black;
-  font-size: 12px;
-  table-layout: fixed;
-}
-div.rendered_html thead {
-  border-bottom: 1px solid black;
-  vertical-align: bottom;
-}
-div.rendered_html tr,
-div.rendered_html th,
-div.rendered_html td {
-  text-align: right;
-  vertical-align: middle;
-  padding: 0.5em 0.5em;
-  line-height: normal;
-  white-space: normal;
-  max-width: none;
-  border: none;
-}
-div.rendered_html th {
-  font-weight: bold;
-}
-div.rendered_html tbody tr:nth-child(odd) {
-  background: #f5f5f5;
-}
-div.rendered_html tbody tr:hover {
-  background: rgba(66, 165, 245, 0.2);
-}
 </style>
 <div class="admonition note">
 <p class="admonition-title"><strong>This page is a static version of an interactive Jupyter notebook</strong></p>
@@ -277,10 +242,16 @@ div.rendered_html tbody tr:hover {
 </div>
 <div class="section" id="What-is-the-Periodogram-class?">
 <h1>What is the Periodogram class?<a class="headerlink" href="#What-is-the-Periodogram-class?" title="Permalink to this headline">¶</a></h1>
-<p><em>lightkurve</em> has a class specifically for dealing with periodograms of time series data. This can be useful for finding the periods of variable stars. Below is a quick example of how to find the period of an eclipsing binary star using <em>lightkurve</em>.</p>
-<p>Firstly lets grab a light curve file from mast. We’ll use KIC 10030943, which is an eclipsing binary observed by the original Kepler mission. We’re just going to use one quarter for this demo.</p>
+<p><em>lightkurve</em> has a class specifically for dealing with periodograms of
+time series data. This can be useful for finding the periods of variable
+stars. Below is a quick example of how to find the period of an
+eclipsing binary star using <em>lightkurve</em>.</p>
+<p>Firstly lets grab a light curve file from mast. We’ll use KIC 10030943,
+which is an eclipsing binary observed by the original Kepler mission.
+We’re just going to use one quarter for this demo.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -289,7 +260,8 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -301,7 +273,8 @@ div.rendered_html tbody tr:hover {
 </div>
 <p>Let’s plot the light curve to see what we’re working with.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -313,12 +286,16 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_01-using-the-periodogram-class_5_0.png"><img alt="../_images/tutorials_01-using-the-periodogram-class_5_0.png" src="../_images/tutorials_01-using-the-periodogram-class_5_0.png" style="width: 745px; height: 368px;" /></a>
+<img alt="../_images/tutorials_01-using-the-periodogram-class_5_0.png" src="../_images/tutorials_01-using-the-periodogram-class_5_0.png" />
 </div>
 </div>
-<p>This light curve looks like it has some structure in it! Let’s use the periodogram class to find the rotation period. You can create a periodogram from the <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> object by using the <code class="docutils literal notranslate"><span class="pre">periodogram</span></code> method.</p>
+<p>This light curve looks like it has some structure in it! Let’s use the
+periodogram class to find the rotation period. You can create a
+periodogram from the <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> object by using the
+<code class="docutils literal notranslate"><span class="pre">periodogram</span></code> method.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -326,9 +303,11 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
-<p>Now we can plot the periodogram in the same way that we plot the original light curve.</p>
+<p>Now we can plot the periodogram in the same way that we plot the
+original light curve.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -340,12 +319,15 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_01-using-the-periodogram-class_9_0.png"><img alt="../_images/tutorials_01-using-the-periodogram-class_9_0.png" src="../_images/tutorials_01-using-the-periodogram-class_9_0.png" style="width: 739px; height: 396px;" /></a>
+<img alt="../_images/tutorials_01-using-the-periodogram-class_9_0.png" src="../_images/tutorials_01-using-the-periodogram-class_9_0.png" />
 </div>
 </div>
-<p>This looks like there is a huge signal at a certain frequency! Let’s plot it in period space, so that we can see what period the oscillation is occurring at.</p>
+<p>This looks like there is a huge signal at a certain frequency! Let’s
+plot it in period space, so that we can see what period the oscillation
+is occurring at.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -357,12 +339,14 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_01-using-the-periodogram-class_11_0.png"><img alt="../_images/tutorials_01-using-the-periodogram-class_11_0.png" src="../_images/tutorials_01-using-the-periodogram-class_11_0.png" style="width: 749px; height: 388px;" /></a>
+<img alt="../_images/tutorials_01-using-the-periodogram-class_11_0.png" src="../_images/tutorials_01-using-the-periodogram-class_11_0.png" />
 </div>
 </div>
-<p>This looks like a very fast period. Let’s find the period with the highest power and fold out light curve.</p>
+<p>This looks like a very fast period. Let’s find the period with the
+highest power and fold out light curve.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -384,12 +368,15 @@ Best period: 0.2587311606278735 d
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_01-using-the-periodogram-class_13_1.png"><img alt="../_images/tutorials_01-using-the-periodogram-class_13_1.png" src="../_images/tutorials_01-using-the-periodogram-class_13_1.png" style="width: 745px; height: 368px;" /></a>
+<img alt="../_images/tutorials_01-using-the-periodogram-class_13_1.png" src="../_images/tutorials_01-using-the-periodogram-class_13_1.png" />
 </div>
 </div>
-<p>As is quite common for eclipsing binaries with deep secondary eclipses, we have found a harmonic of the period of the eclipsing binary. Let’s plot it again with quadruple the period.</p>
+<p>As is quite common for eclipsing binaries with deep secondary eclipses,
+we have found a harmonic of the period of the eclipsing binary. Let’s
+plot it again with quadruple the period.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -411,12 +398,14 @@ Best period: 1.034924642511494 d
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_01-using-the-periodogram-class_15_1.png"><img alt="../_images/tutorials_01-using-the-periodogram-class_15_1.png" src="../_images/tutorials_01-using-the-periodogram-class_15_1.png" style="width: 745px; height: 368px;" /></a>
+<img alt="../_images/tutorials_01-using-the-periodogram-class_15_1.png" src="../_images/tutorials_01-using-the-periodogram-class_15_1.png" />
 </div>
 </div>
-<p>It looks like we could probably get a better fit than this. Let’s try increasing the number of points in our periodogram.</p>
+<p>It looks like we could probably get a better fit than this. Let’s try
+increasing the number of points in our periodogram.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -426,7 +415,8 @@ Best period: 1.034924642511494 d
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -448,10 +438,11 @@ Best period: 1.0350971683913832 d
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_01-using-the-periodogram-class_18_1.png"><img alt="../_images/tutorials_01-using-the-periodogram-class_18_1.png" src="../_images/tutorials_01-using-the-periodogram-class_18_1.png" style="width: 745px; height: 368px;" /></a>
+<img alt="../_images/tutorials_01-using-the-periodogram-class_18_1.png" src="../_images/tutorials_01-using-the-periodogram-class_18_1.png" />
 </div>
 </div>
-<p>That’s improved our fit! It looks like this eclipsing binary has a period of approximately 1 day.</p>
+<p>That’s improved our fit! It looks like this eclipsing binary has a
+period of approximately 1 day.</p>
 </div>
 
 

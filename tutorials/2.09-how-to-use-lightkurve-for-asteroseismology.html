@@ -1,0 +1,978 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>How to use lightkurve for asteroseismology &mdash; lightkurve 1.0b26.dev documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="How to make a supernova lightcurve?" href="2.10-how-to-make-a-supernova-lightcurve.html" />
+    <link rel="prev" title="How to recover the first TESS planet candidate with Lightkurve?" href="how-to-recover-the-first-tess-candidate.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> lightkurve
+          
+
+          
+            
+            <img src="../_static/lightkurve.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0b26.dev
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">API documentation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="section1.html">Introduction to lightkurve</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="section2.html">Science with lightkurve</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="2.02-recover-a-planet.html">How to recover a known planet in Kepler data?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how-to-recover-the-first-tess-candidate.html">How to recover the first TESS planet candidate with <em>Lightkurve</em>?</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">How to use lightkurve for asteroseismology</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#1.-Varying-the-SFF-Motion-Correction">1. Varying the SFF Motion Correction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#2.-Varying-the-Aperture-Size">2. Varying the Aperture Size</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#3.-Using-data-from-multiple-campaigns">3. Using data from multiple campaigns</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="2.10-how-to-make-a-supernova-lightcurve.html">How to make a supernova lightcurve?</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="section3.html">Extracting lightcurves</a></li>
+<li class="toctree-l1"><a class="reference internal" href="section4.html">Systematics correction</a></li>
+</ul>
+<p class="caption"><span class="caption-text">About lightkurve</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing and reporting issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developer.html">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../citing.html">Citing and acknowledging lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../other_software.html">Other software</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">lightkurve</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="section2.html">Science with lightkurve</a> &raquo;</li>
+        
+      <li>How to use lightkurve for asteroseismology</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/tutorials/2.09-how-to-use-lightkurve-for-asteroseismology.ipynb.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput div.prompt,
+div.nbinput div.input_area,
+div.nbinput div[class*=highlight],
+div.nbinput div[class*=highlight] pre,
+div.nboutput,
+div.nbinput div.prompt,
+div.nbinput div.output_area,
+div.nboutput div[class*=highlight],
+div.nboutput div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput,
+    div.nboutput {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput div.prompt pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput div.prompt pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput div.prompt,
+div.nboutput div.prompt {
+    min-width: 8ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+@media (max-width: 540px) {
+    div.nbinput div.prompt,
+    div.nboutput div.prompt {
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput div.prompt.empty {
+        padding: 0;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput div.prompt pre,
+div.nboutput div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput div.input_area,
+div.nboutput div.output_area {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput div.input_area,
+    div.nboutput div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput div.input_area {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+</style>
+<div class="section" id="How-to-use-lightkurve-for-asteroseismology">
+<h1>How to use lightkurve for asteroseismology<a class="headerlink" href="#How-to-use-lightkurve-for-asteroseismology" title="Permalink to this headline">¶</a></h1>
+<p>Asteroseismology is the study of stellar oscillations. To see them, we
+usually want to transfer from the <em>time domain</em> that light curves are in
+to the <em>frequency domain</em>. We can do that with methods such as Fourier
+Transforms or Lomb-Scargle Periodograms. <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> has built in
+methods for working with data in the <em>frequency domain</em>, in the
+<code class="docutils literal notranslate"><span class="pre">Periodogram</span></code> class.</p>
+<p>Below we demonstrate some of the new functionalities in <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code>
+and how to use them for asteroseismology.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">lightkurve</span> <span class="k">import</span> <span class="n">log</span><span class="p">,</span> <span class="n">search_targetpixelfile</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="k">import</span> <span class="n">tqdm</span>
+<span class="kn">import</span> <span class="nn">astropy.units</span> <span class="k">as</span> <span class="nn">u</span>
+<span class="n">log</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="s1">&#39;WARNING&#39;</span><span class="p">)</span>  <span class="c1"># Ignore download messages</span>
+</pre></div>
+</div>
+</div>
+<p>As an example, we can use a red giant star from Campaign 5. You can read
+more about asteroseismology with giants in K2 in Stello et al 2015
+<a class="reference external" href="https://arxiv.org/pdf/1610.03060.pdf">here</a>.</p>
+<p>First we’ll use <code class="docutils literal notranslate"><span class="pre">from_archive</span></code> to download the Target Pixel File for
+the target.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">ID</span> <span class="o">=</span> <span class="mi">211416749</span>
+<span class="n">tpf</span> <span class="o">=</span> <span class="n">search_targetpixelfile</span><span class="p">(</span><span class="n">ID</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s1">&#39;short&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Downloading URL https://mast.stsci.edu/api/v0/download/file?uri=mast:K2/url/missions/k2/target_pixel_files/c5/211400000/16000/ktwo211416749-c05_spd-targ.fits.gz to /home/gb/.lightkurve-cache/mastDownload/K2/ktwo211416749-c05_sc/ktwo211416749-c05_spd-targ.fits.gz ... [Done]
+</pre></div></div>
+</div>
+<p>Be aware that this is a <strong>short cadence</strong> light curve, which means that
+this dataset is much larger than others we’ve used in previous
+tutorials. If you’re rerunning this tutorial locally, it might take a
+few minutes to rerun the later steps.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[5]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>(109343, 11, 11)
+</pre></div>
+</div>
+</div>
+<p>Let’s plot the target below to see if the aperture is centered. We’re
+plotting in ‘log’ scale here so that we can see the wings of the PSF.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="o">=</span><span class="n">tpf</span><span class="o">.</span><span class="n">pipeline_mask</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_2.09-how-to-use-lightkurve-for-asteroseismology_7_0.png" src="../_images/tutorials_2.09-how-to-use-lightkurve-for-asteroseismology_7_0.png" />
+</div>
+</div>
+<p>We can now create a <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> using Simple Aperture
+Photometry with the <code class="docutils literal notranslate"><span class="pre">to_lightcurve</span></code> method. We can then normalize,
+remove NaN values and remove outliers in one easy line. We can also use
+the new <code class="docutils literal notranslate"><span class="pre">fill_gaps</span></code> method to fill in any gaps there are in our data
+using linear interpolation of the nearest neighbours. This creates an
+almost perfectly sampled time array with no gaps.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">lc</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">()</span>
+<span class="n">lc</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span><span class="o">.</span><span class="n">remove_nans</span><span class="p">()</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">()</span><span class="o">.</span><span class="n">fill_gaps</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p>We can plot our light curve easily with the <code class="docutils literal notranslate"><span class="pre">plot</span></code> method.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">lc</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_2.09-how-to-use-lightkurve-for-asteroseismology_11_0.png" src="../_images/tutorials_2.09-how-to-use-lightkurve-for-asteroseismology_11_0.png" />
+</div>
+</div>
+<p>Let’s take a look at the periodogram for this light curve. You can
+create a <code class="docutils literal notranslate"><span class="pre">periodogram</span></code> object using <code class="docutils literal notranslate"><span class="pre">lc.periodogram()</span></code>. This can be
+passed any array of frequencies that the user wants, but by default will
+create an array of frequency for you. You can also change the frequency
+units, depending on the range of frequencies you’re looking for. In
+asteroseismology we usually use <span class="math notranslate nohighlight">\(\mu Hz\)</span>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">p</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">to_periodogram</span><span class="p">(</span><span class="n">freq_unit</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">microHertz</span><span class="p">,</span> <span class="n">max_frequency</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">min_frequency</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>With this new periodogram object we can now plot the power spectrum of
+the data. Let’s do that now!</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_2.09-how-to-use-lightkurve-for-asteroseismology_15_0.png" src="../_images/tutorials_2.09-how-to-use-lightkurve-for-asteroseismology_15_0.png" />
+</div>
+</div>
+<div class="section" id="1.-Varying-the-SFF-Motion-Correction">
+<h2>1. Varying the SFF Motion Correction<a class="headerlink" href="#1.-Varying-the-SFF-Motion-Correction" title="Permalink to this headline">¶</a></h2>
+<p>Unfortunately there is some ringing going on…there is a periodicity in
+the data due to the K2 motion. We can see below when we plot the data in
+“Period” space instead of “Frequency” space there is a significant
+periodicity at ~ 6 hours.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">hour</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;Period&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mf">3e7</span><span class="p">,</span> <span class="s1">&#39;6 Hour Roll Motion&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_2.09-how-to-use-lightkurve-for-asteroseismology_18_0.png" src="../_images/tutorials_2.09-how-to-use-lightkurve-for-asteroseismology_18_0.png" />
+</div>
+</div>
+<p>We can apply our own Self Flat Fielding (SFF) correction to the light
+curve to remove the K2 roll motion. Below we correct with SFF using the
+default <code class="docutils literal notranslate"><span class="pre">correct</span></code> function, with <code class="docutils literal notranslate"><span class="pre">windows=10</span></code>. (You can read more
+about SFF in our other tutorials.)</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">lc</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">()</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span><span class="o">.</span><span class="n">remove_nans</span><span class="p">()</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">()</span>
+<span class="n">clc</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">correct</span><span class="p">(</span><span class="n">windows</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">()</span><span class="o">.</span><span class="n">fill_gaps</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">clc</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[13]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f115009c208&gt;
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_2.09-how-to-use-lightkurve-for-asteroseismology_21_1.png" src="../_images/tutorials_2.09-how-to-use-lightkurve-for-asteroseismology_21_1.png" />
+</div>
+</div>
+<p>Our new, corrected lightcurve looks much flatter and has a much smaller
+CDPP. Let’s try plotting the periodogram again.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">p_clean</span> <span class="o">=</span> <span class="n">clc</span><span class="o">.</span><span class="n">to_periodogram</span><span class="p">(</span><span class="n">freq_unit</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">microHertz</span><span class="p">,</span> <span class="n">max_frequency</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">min_frequency</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">p_clean</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_2.09-how-to-use-lightkurve-for-asteroseismology_23_0.png" src="../_images/tutorials_2.09-how-to-use-lightkurve-for-asteroseismology_23_0.png" />
+</div>
+</div>
+<p>This is much better, although there is clearly some periodicity still
+left in the data. However, now we can see the oscillation modes of the
+target! Let’s zoom in to the region of interest.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">p_clean</span> <span class="o">=</span> <span class="n">clc</span><span class="o">.</span><span class="n">to_periodogram</span><span class="p">(</span><span class="n">freq_unit</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">microHertz</span><span class="p">,</span> <span class="n">max_frequency</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">min_frequency</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">p_clean</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_2.09-how-to-use-lightkurve-for-asteroseismology_25_0.png" src="../_images/tutorials_2.09-how-to-use-lightkurve-for-asteroseismology_25_0.png" />
+</div>
+</div>
+<p>We can even find out what effect our detrending parameters have on our
+target. Below we change the detrending windows from
+<span class="math notranslate nohighlight">\(w=2\; ... \; 10\)</span> and plot the periodogram in each case. We can
+see different detrending parameters has an effect on each of the modes.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Loop over several windows</span>
+<span class="k">for</span> <span class="n">windows</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">2</span><span class="p">)):</span>
+    <span class="c1"># Create the light curve</span>
+    <span class="n">lc</span> <span class="o">=</span>  <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">()</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span><span class="o">.</span><span class="n">remove_nans</span><span class="p">()</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">()</span>
+    <span class="n">clc</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">correct</span><span class="p">(</span><span class="n">windows</span><span class="o">=</span><span class="n">windows</span><span class="p">)</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">()</span><span class="o">.</span><span class="n">fill_gaps</span><span class="p">()</span>
+    <span class="c1"># Create the periodogram</span>
+    <span class="n">p_clean</span> <span class="o">=</span> <span class="n">clc</span><span class="o">.</span><span class="n">to_periodogram</span><span class="p">(</span><span class="n">freq_unit</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">microHertz</span><span class="p">,</span> <span class="n">max_frequency</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">min_frequency</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="c1"># Plot the periodogram</span>
+    <span class="k">if</span> <span class="n">windows</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">p_clean</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Windows: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">windows</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">p_clean</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Windows: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">windows</span><span class="p">))</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="stderr output_area docutils container">
+<div class="highlight"><pre>
+100%|██████████| 5/5 [03:08&lt;00:00, 37.79s/it]
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[17]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>&lt;matplotlib.legend.Legend at 0x7f1151dd01d0&gt;
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_2.09-how-to-use-lightkurve-for-asteroseismology_27_2.png" src="../_images/tutorials_2.09-how-to-use-lightkurve-for-asteroseismology_27_2.png" />
+</div>
+</div>
+<p>It looks like there is a significant effect on the oscillation modes as
+we vary the window size. When using K2 data for detecting these
+oscillations it is important to understand and mitigate the effects of
+detrending to ensure the modes have the highest possible signal to noise
+ratio.</p>
+</div>
+<div class="section" id="2.-Varying-the-Aperture-Size">
+<h2>2. Varying the Aperture Size<a class="headerlink" href="#2.-Varying-the-Aperture-Size" title="Permalink to this headline">¶</a></h2>
+<p>We can also easily change the aperture size. If the aperture is too
+small, increasing the aperture size should allow us to include more of
+the target flux. If there is a contaminant nearby, decreasing the
+aperture may increase our singal to noise.</p>
+<p>Below we create a new aperture for the target. In this case we’ve used
+an aperture where pixels have a value greater than the 70th percentile.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">aper</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">tpf</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">nanpercentile</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">tpf</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="mi">70</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="stderr output_area docutils container">
+<div class="highlight"><pre>
+/home/gb/bin/anaconda/lib/python3.6/site-packages/numpy/lib/nanfunctions.py:907: RuntimeWarning: All-NaN slice encountered
+  result = np.apply_along_axis(_nanmedian1d, axis, a, overwrite_input)
+/home/gb/bin/anaconda/lib/python3.6/site-packages/ipykernel_launcher.py:1: RuntimeWarning: invalid value encountered in greater
+  &#34;&#34;&#34;Entry point for launching an IPython kernel.
+</pre></div></div>
+</div>
+<p>We can plot up our new aperture against the pipeline aperture for
+comparison.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Two subplots</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+
+<span class="c1"># Plot pipeline aperture mask</span>
+<span class="n">tpf</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">scale</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="o">=</span><span class="n">tpf</span><span class="o">.</span><span class="n">pipeline_mask</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Pipeline Aperture&#39;</span><span class="p">)</span>
+
+<span class="c1"># Plot larger aperture mask</span>
+<span class="n">tpf</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">scale</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">,</span> <span class="n">aperture_mask</span><span class="o">=</span><span class="n">aper</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Larger Aperture&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_2.09-how-to-use-lightkurve-for-asteroseismology_32_0.png" src="../_images/tutorials_2.09-how-to-use-lightkurve-for-asteroseismology_32_0.png" />
+</div>
+</div>
+<p>Now let’s create our two light curves, one with the pipeline aperture
+and one with the new aperture.</p>
+<p><code class="docutils literal notranslate"><span class="pre">tpf.to_lightcurve()</span></code> creates our SAP flux with the pipeline aperture
+as a default. To use a new aperture we simple use
+<code class="docutils literal notranslate"><span class="pre">tpf.to_lightcurve(aperture_mask=NEW_APERTURE)</span></code>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Create the light curve with the pipelien aperture.</span>
+<span class="n">lc_pipeline</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">()</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span><span class="o">.</span><span class="n">remove_nans</span><span class="p">()</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">()</span>
+<span class="n">lc_pipeline</span> <span class="o">=</span> <span class="n">lc_pipeline</span><span class="o">.</span><span class="n">correct</span><span class="p">(</span><span class="n">windows</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">()</span><span class="o">.</span><span class="n">fill_gaps</span><span class="p">()</span>
+
+<span class="c1"># Create a light curve with a slightly larger aperture</span>
+<span class="n">lc_larger_aperture</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">aper</span><span class="p">)</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span><span class="o">.</span><span class="n">remove_nans</span><span class="p">()</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">()</span>
+<span class="n">lc_larger_aperture</span> <span class="o">=</span> <span class="n">lc_larger_aperture</span><span class="o">.</span><span class="n">correct</span><span class="p">(</span><span class="n">windows</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">()</span><span class="o">.</span><span class="n">fill_gaps</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p>When we plot these two light curves we can see that the larger aperture
+is much less noisy.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1">#Plot the pipeline and large aperture light curves</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">lc_pipeline</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Pipeline Aperture&#39;</span><span class="p">)</span>
+<span class="n">lc_larger_aperture</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Larger Aperture&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_2.09-how-to-use-lightkurve-for-asteroseismology_36_0.png" src="../_images/tutorials_2.09-how-to-use-lightkurve-for-asteroseismology_36_0.png" />
+</div>
+</div>
+<p>Finally, when we plot the periodogram we can see we’ve increased the
+signal to noise ratio of our stellar oscillations.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Create the periodograms</span>
+<span class="n">p_pipeline</span> <span class="o">=</span> <span class="n">lc_pipeline</span><span class="o">.</span><span class="n">to_periodogram</span><span class="p">(</span><span class="n">freq_unit</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">microHertz</span><span class="p">,</span> <span class="n">max_frequency</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">min_frequency</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">p_larger_aperture</span> <span class="o">=</span> <span class="n">lc_larger_aperture</span><span class="o">.</span><span class="n">to_periodogram</span><span class="p">(</span><span class="n">freq_unit</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">microHertz</span><span class="p">,</span> <span class="n">max_frequency</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">min_frequency</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+
+
+<span class="c1"># Plot the periodograms</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">p_pipeline</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Pipeline&#39;</span><span class="p">)</span>
+<span class="n">p_larger_aperture</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;C3&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Larger Aperture&#39;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_2.09-how-to-use-lightkurve-for-asteroseismology_38_0.png" src="../_images/tutorials_2.09-how-to-use-lightkurve-for-asteroseismology_38_0.png" />
+</div>
+</div>
+<p>By increasing our aperture size and including more pixels here we have
+increased the signal to noise of the oscillation modes of this red
+giant.</p>
+</div>
+<div class="section" id="3.-Using-data-from-multiple-campaigns">
+<h2>3. Using data from multiple campaigns<a class="headerlink" href="#3.-Using-data-from-multiple-campaigns" title="Permalink to this headline">¶</a></h2>
+<p>Finally, this target was actually observed twice by K2, once in April
+2015 in Campaign 5 and once in December 2017 in Campaign 16. We can get
+both of these data sets and compare the results.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Download the C16 TPF</span>
+<span class="n">tpf_c16</span> <span class="o">=</span> <span class="n">search_targetpixelfile</span><span class="p">(</span><span class="n">ID</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">cadence</span><span class="o">=</span><span class="s1">&#39;short&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+
+<span class="c1"># Create a new &quot;large&quot; aperture where flux is greater than the 70th percentile.</span>
+<span class="n">aper</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">tpf_c16</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">nanpercentile</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">tpf_c16</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="mi">70</span><span class="p">)</span>
+
+<span class="c1"># Create a new light curve for C16</span>
+<span class="n">lc_c16</span> <span class="o">=</span> <span class="n">tpf_c16</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span><span class="o">.</span><span class="n">remove_nans</span><span class="p">()</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">()</span>
+<span class="n">lc_c16</span> <span class="o">=</span> <span class="n">lc_c16</span><span class="o">.</span><span class="n">correct</span><span class="p">(</span><span class="n">windows</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">()</span><span class="o">.</span><span class="n">fill_gaps</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Downloading URL https://mast.stsci.edu/api/v0/download/file?uri=mast:K2/url/missions/k2/target_pixel_files/c16/211400000/16000/ktwo211416749-c16_spd-targ.fits.gz to /home/gb/.lightkurve-cache/mastDownload/K2/ktwo211416749-c16_sc/ktwo211416749-c16_spd-targ.fits.gz ... [Done]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="stderr output_area docutils container">
+<div class="highlight"><pre>
+/home/gb/bin/anaconda/lib/python3.6/site-packages/numpy/lib/nanfunctions.py:907: RuntimeWarning: All-NaN slice encountered
+  result = np.apply_along_axis(_nanmedian1d, axis, a, overwrite_input)
+/home/gb/bin/anaconda/lib/python3.6/site-packages/ipykernel_launcher.py:5: RuntimeWarning: invalid value encountered in greater
+  &#34;&#34;&#34;
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Create a periodogram for c16 data</span>
+<span class="n">p_c16</span> <span class="o">=</span> <span class="n">lc_c16</span><span class="o">.</span><span class="n">to_periodogram</span><span class="p">(</span><span class="n">freq_unit</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">microHertz</span><span class="p">,</span> <span class="n">max_frequency</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">min_frequency</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Create subplots to plot into</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">p_pipeline</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;C5&#39;</span><span class="p">)</span>
+<span class="n">p_c16</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;C3&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;C16&#39;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">400</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">50000</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[26]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>&lt;matplotlib.legend.Legend at 0x7f114feae860&gt;
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_2.09-how-to-use-lightkurve-for-asteroseismology_43_1.png" src="../_images/tutorials_2.09-how-to-use-lightkurve-for-asteroseismology_43_1.png" />
+</div>
+</div>
+<p>It looks like the two data sets provide similar modes, however the two
+campaigns have very different instrument systematics. To find the true
+answer, users should iterate over many different detrending parameters
+and aperture sizes, and combine datasets to increase signal to noise.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="2.10-how-to-make-a-supernova-lightcurve.html" class="btn btn-neutral float-right" title="How to make a supernova lightcurve?" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="how-to-recover-the-first-tess-candidate.html" class="btn btn-neutral" title="How to recover the first TESS planet candidate with Lightkurve?" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright lightkurve developers and contributors
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

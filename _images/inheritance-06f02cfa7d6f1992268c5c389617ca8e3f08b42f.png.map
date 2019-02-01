@@ -1,0 +1,19 @@
+<map id="inheritance2633681e36" name="inheritance2633681e36">
+<area shape="rect" id="node1" href="lightkurve.prf.BackgroundParameters.html#lightkurve.prf.BackgroundParameters" target="_top" title="Container class to hold the parameters of the background in a ``TPFModel``." alt="" coords="5,524,179,549"/>
+<area shape="rect" id="node2" href="lightkurve.prf.BackgroundPrior.html#lightkurve.prf.BackgroundPrior" target="_top" title="Container class to capture a user&#39;s beliefs about the background flux." alt="" coords="228,400,357,425"/>
+<area shape="rect" id="node3" title="Container object to hold parameter priors for PRF photometry." alt="" coords="35,475,149,500"/>
+<area shape="rect" id="node7" href="lightkurve.prf.FocusPrior.html#lightkurve.prf.FocusPrior" target="_top" title="Container class to capture a user&#39;s beliefs about the telescope focus." alt="" coords="248,449,337,475"/>
+<area shape="rect" id="node11" href="lightkurve.prf.MotionPrior.html#lightkurve.prf.MotionPrior" target="_top" title="Container class to capture a user&#39;s beliefs about the telescope motion." alt="" coords="245,499,341,524"/>
+<area shape="rect" id="node15" href="lightkurve.prf.StarPrior.html#lightkurve.prf.StarPrior" target="_top" title="Container class to capture a user&#39;s beliefs about a star&#39;s position and flux." alt="" coords="253,548,332,573"/>
+<area shape="rect" id="node4" href="lightkurve.prf.FixedValuePrior.html#lightkurve.prf.FixedValuePrior" target="_top" title="An improper prior with a negative log probability of 0 at a single fixed" alt="" coords="407,351,529,376"/>
+<area shape="rect" id="node5" title="A base class for a prior distribution. Differently from Likelihood, a prior" alt="" coords="257,351,329,376"/>
+<area shape="rect" id="node6" href="lightkurve.prf.FocusParameters.html#lightkurve.prf.FocusParameters" target="_top" title="Container class to hold the parameters of the telescope focus in a ``TPFModel``." alt="" coords="25,301,159,327"/>
+<area shape="rect" id="node8" href="lightkurve.prf.KeplerPRF.html#lightkurve.prf.KeplerPRF" target="_top" title="Kepler&#39;s Pixel Response Function as designed by [1]_." alt="" coords="49,252,135,277"/>
+<area shape="rect" id="node13" href="lightkurve.prf.SimpleKeplerPRF.html#lightkurve.prf.SimpleKeplerPRF" target="_top" title="Simple model of KeplerPRF." alt="" coords="227,252,359,277"/>
+<area shape="rect" id="node9" title="An abstract class for an arbitrary loss (cost) function." alt="" coords="39,351,145,376"/>
+<area shape="rect" id="node10" href="lightkurve.prf.MotionParameters.html#lightkurve.prf.MotionParameters" target="_top" title="Container class to hold the parameters of the telescope motion in a ``TPFModel``." alt="" coords="22,203,162,228"/>
+<area shape="rect" id="node12" href="lightkurve.prf.PRFPhotometry.html#lightkurve.prf.PRFPhotometry" target="_top" title="This class performs PRF Photometry on TPF&#45;like data given a ``TPFModel``." alt="" coords="31,153,153,179"/>
+<area shape="rect" id="node14" href="lightkurve.prf.StarParameters.html#lightkurve.prf.StarParameters" target="_top" title="Container class to hold the parameters of a star in a ``TPFModel``." alt="" coords="31,104,153,129"/>
+<area shape="rect" id="node16" href="lightkurve.prf.TPFModel.html#lightkurve.prf.TPFModel" target="_top" title="A model which describes a single&#45;cadence Kepler image." alt="" coords="50,55,134,80"/>
+<area shape="rect" id="node17" href="lightkurve.prf.TPFModelParameters.html#lightkurve.prf.TPFModelParameters" target="_top" title="Container class to combine all parameters that parameterize a ``TPFModel``." alt="" coords="13,5,171,31"/>
+</map>

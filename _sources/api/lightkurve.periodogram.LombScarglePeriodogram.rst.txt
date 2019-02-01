@@ -1,0 +1,47 @@
+LombScarglePeriodogram
+======================
+
+.. currentmodule:: lightkurve.periodogram
+
+.. autoclass:: LombScarglePeriodogram
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~LombScarglePeriodogram.frequency_at_max_power
+      ~LombScarglePeriodogram.max_power
+      ~LombScarglePeriodogram.period
+      ~LombScarglePeriodogram.period_at_max_power
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~LombScarglePeriodogram.bin
+      ~LombScarglePeriodogram.copy
+      ~LombScarglePeriodogram.flatten
+      ~LombScarglePeriodogram.from_lightcurve
+      ~LombScarglePeriodogram.plot
+      ~LombScarglePeriodogram.show_properties
+      ~LombScarglePeriodogram.smooth
+      ~LombScarglePeriodogram.to_table
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: frequency_at_max_power
+   .. autoattribute:: max_power
+   .. autoattribute:: period
+   .. autoattribute:: period_at_max_power
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: bin
+   .. automethod:: copy
+   .. automethod:: flatten
+   .. automethod:: from_lightcurve
+   .. automethod:: plot
+   .. automethod:: show_properties
+   .. automethod:: smooth
+   .. automethod:: to_table

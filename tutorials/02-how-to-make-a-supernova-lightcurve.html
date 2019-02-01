@@ -15,7 +15,6 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
@@ -123,18 +122,18 @@ div.nblast {
 
 /* input prompt */
 div.nbinput div.prompt pre {
-    color: #307FC1;
+    color: #303F9F;
 }
 
 /* output prompt */
 div.nboutput div.prompt pre {
-    color: #BF5B3D;
+    color: #D84315;
 }
 
 /* all prompts */
 div.nbinput div.prompt,
 div.nboutput div.prompt {
-    min-width: 7ex;
+    min-width: 9ex;
     padding-top: 0.4em;
     padding-right: 0.4em;
     text-align: right;
@@ -174,9 +173,9 @@ div.nboutput div.output_area {
 
 /* input area */
 div.nbinput div.input_area {
-    border: 1px solid #e0e0e0;
+    border: 1px solid #cfcfcf;
     border-radius: 2px;
-    background: #f5f5f5;
+    background: #f7f7f7;
 }
 
 /* override MathJax center alignment in output cells */
@@ -184,7 +183,7 @@ div.nboutput div[class*=MathJax] {
     text-align: left !important;
 }
 
-/* override sphinx.ext.imgmath center alignment in output cells */
+/* override sphinx.ext.pngmath center alignment in output cells */
 div.nboutput div.math p {
     text-align: left;
 }
@@ -233,40 +232,6 @@ div.nboutput div.output_area.stderr {
 
 .ansi-bold { font-weight: bold; }
 .ansi-underline { text-decoration: underline; }
-
-/* Some additional styling taken form the Jupyter notebook CSS */
-div.rendered_html table {
-  border: none;
-  border-collapse: collapse;
-  border-spacing: 0;
-  color: black;
-  font-size: 12px;
-  table-layout: fixed;
-}
-div.rendered_html thead {
-  border-bottom: 1px solid black;
-  vertical-align: bottom;
-}
-div.rendered_html tr,
-div.rendered_html th,
-div.rendered_html td {
-  text-align: right;
-  vertical-align: middle;
-  padding: 0.5em 0.5em;
-  line-height: normal;
-  white-space: normal;
-  max-width: none;
-  border: none;
-}
-div.rendered_html th {
-  font-weight: bold;
-}
-div.rendered_html tbody tr:nth-child(odd) {
-  background: #f5f5f5;
-}
-div.rendered_html tbody tr:hover {
-  background: rgba(66, 165, 245, 0.2);
-}
 </style>
 <div class="admonition note">
 <p class="admonition-title"><strong>This page is a static version of an interactive Jupyter notebook</strong></p>
@@ -277,20 +242,42 @@ div.rendered_html tbody tr:hover {
 </div>
 <div class="section" id="How-to-make-a-supernova-lightcurve?">
 <h1>How to make a supernova lightcurve?<a class="headerlink" href="#How-to-make-a-supernova-lightcurve?" title="Permalink to this headline">¶</a></h1>
-<p>You can use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> to extract a lightcurve of transient phenomena, including supernovae. Supernovae data analysis presents a few unique challenges compared to data analysis of isolated point sources. We can anticipate some of the common limitations of the Kepler pipeline-processed lightcurves, which make no attempt to hone-in on supernovae. For example, the supernova resides in a host galaxy which may itself be time variable due to, <em>e.g.</em>, active galactic nuclei (AGN). Common detrending
-methods, such as “Self Flat Fielding” (<a class="reference external" href="https://archive.stsci.edu/prepds/k2sff/">SFF</a>) assume that centroid shifts are due entirely to undesired motion of the spacecraft, while transients induce bona-fide astrophysical centroid motion as the postage-stamp photocenter gets weighted towards the increasingly luminous transient’s photocenter.</p>
-<p>In this tutorial we will custom-make a custom supernova lightcurve with these simple steps:</p>
+<p>You can use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> to extract a lightcurve of transient
+phenomena, including supernovae. Supernovae data analysis presents a few
+unique challenges compared to data analysis of isolated point sources.
+We can anticipate some of the common limitations of the Kepler
+pipeline-processed lightcurves, which make no attempt to hone-in on
+supernovae. For example, the supernova resides in a host galaxy which
+may itself be time variable due to, <em>e.g.</em>, active galactic nuclei
+(AGN). Common detrending methods, such as “Self Flat Fielding”
+(<a class="reference external" href="https://archive.stsci.edu/prepds/k2sff/">SFF</a>) assume that centroid
+shifts are due entirely to undesired motion of the spacecraft, while
+transients induce bona-fide astrophysical centroid motion as the
+postage-stamp photocenter gets weighted towards the increasingly
+luminous transient’s photocenter.</p>
+<p>In this tutorial we will custom-make a custom supernova lightcurve with
+these simple steps:</p>
 <ol class="arabic simple">
-<li>Create an appropriate aperture mask to isolate the transient from its host galaxy</li>
-<li>Extract aperture photometry of both the supernova and the background attributable to the host galaxy</li>
+<li>Create an appropriate aperture mask to isolate the transient from its
+host galaxy</li>
+<li>Extract aperture photometry of both the supernova and the background
+attributable to the host galaxy</li>
 <li>Apply “Self Flat Fielding” (SFF) detrending techniques</li>
 <li>Plot the lightcurve</li>
 </ol>
-<p>We will focus on an unusual class of transient recently observed in K2, the so-called <em>Fast-Evolving Luminous Transients</em> or <strong>FELT</strong>s. These transients rise and fall within a mere few days, much shorter than conventional supernovae, which can last hundreds of days. The discovery of <strong>KSN2015k</strong> was recently reported by <a class="reference external" href="https://www.nature.com/articles/s41550-018-0423-2">Rest et al.&nbsp;2018</a> and summarized in at least two press releases from
-<a class="reference external" href="http://hubblesite.org/news_release/news/2018-18">STSci</a> and <a class="reference external" href="https://www.jpl.nasa.gov/news/news.php?feature=7086">JPL</a>.</p>
+<p>We will focus on an unusual class of transient recently observed in K2,
+the so-called <em>Fast-Evolving Luminous Transients</em> or <strong>FELT</strong>s. These
+transients rise and fall within a mere few days, much shorter than
+conventional supernovae, which can last hundreds of days. The discovery
+of <strong>KSN2015k</strong> was recently reported by <a class="reference external" href="https://www.nature.com/articles/s41550-018-0423-2">Rest et
+al.&nbsp;2018</a> and
+summarized in at least two press releases from
+<a class="reference external" href="http://hubblesite.org/news_release/news/2018-18">STSci</a> and
+<a class="reference external" href="https://www.jpl.nasa.gov/news/news.php?feature=7086">JPL</a>.</p>
 <p>The EPIC ID for <code class="docutils literal notranslate"><span class="pre">KSN2015k</span></code>’s host galaxy is <strong>212593538</strong>.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -303,7 +290,8 @@ methods, such as “Self Flat Fielding” (<a class="reference external" href="h
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[1]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -311,9 +299,11 @@ methods, such as “Self Flat Fielding” (<a class="reference external" href="h
 </pre></div>
 </div>
 </div>
-<p>The TPF has 3561 useable cadences, with an <span class="math notranslate nohighlight">\(8 \times 8\)</span> postage stamp image.</p>
+<p>The TPF has 3561 useable cadences, with an <span class="math notranslate nohighlight">\(8 \times 8\)</span> postage
+stamp image.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -325,13 +315,22 @@ methods, such as “Self Flat Fielding” (<a class="reference external" href="h
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-make-a-supernova-lightcurve_4_0.png"><img alt="../_images/tutorials_02-how-to-make-a-supernova-lightcurve_4_0.png" src="../_images/tutorials_02-how-to-make-a-supernova-lightcurve_4_0.png" style="width: 497px; height: 401px;" /></a>
+<img alt="../_images/tutorials_02-how-to-make-a-supernova-lightcurve_4_0.png" src="../_images/tutorials_02-how-to-make-a-supernova-lightcurve_4_0.png" />
 </div>
 </div>
-<p>The coarse angular resolution of Kepler means that this host galaxy resembles a pixelated blob. We’re showing frame 100 out of 3561 frames– we do not presently know when the supernova went off so it’s hard to say whether there is a supernova in the image or not.</p>
-<p>One of the pixels is white, which represents <code class="docutils literal notranslate"><span class="pre">NaN</span></code> values in the color image. In fact, this pixel within the <span class="math notranslate nohighlight">\(8 \times 8\)</span> square postage stamp image boundary is <code class="docutils literal notranslate"><span class="pre">NaN</span></code> in all 3561 cadences, indicating that this TPF has an irregular boundary with <span class="math notranslate nohighlight">\(N_{\rm pix} = 63\)</span>. Irregular boundaries are a common space-saving strategy for the distant Kepler telescope.</p>
+<p>The coarse angular resolution of Kepler means that this host galaxy
+resembles a pixelated blob. We’re showing frame 100 out of 3561 frames–
+we do not presently know when the supernova went off so it’s hard to say
+whether there is a supernova in the image or not.</p>
+<p>One of the pixels is white, which represents <code class="docutils literal notranslate"><span class="pre">NaN</span></code> values in the color
+image. In fact, this pixel within the <span class="math notranslate nohighlight">\(8 \times 8\)</span> square postage
+stamp image boundary is <code class="docutils literal notranslate"><span class="pre">NaN</span></code> in all 3561 cadences, indicating that
+this TPF has an irregular boundary with <span class="math notranslate nohighlight">\(N_{\rm pix} = 63\)</span>.
+Irregular boundaries are a common space-saving strategy for the distant
+Kepler telescope.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -341,7 +340,8 @@ methods, such as “Self Flat Fielding” (<a class="reference external" href="h
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[3]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -349,9 +349,13 @@ methods, such as “Self Flat Fielding” (<a class="reference external" href="h
 </pre></div>
 </div>
 </div>
-<p>Let’s make a lightcurve summing <em>all of the pixels</em> to see if we can pick out the FELT <em>by-eye</em>. We will pre-process the lightcurve to remove sharp discontinuities in the time series that arise from spurious cosmic rays, not our astrophysical transient of interest.</p>
+<p>Let’s make a lightcurve summing <em>all of the pixels</em> to see if we can
+pick out the FELT <em>by-eye</em>. We will pre-process the lightcurve to remove
+sharp discontinuities in the time series that arise from spurious cosmic
+rays, not our astrophysical transient of interest.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -362,7 +366,8 @@ methods, such as “Self Flat Fielding” (<a class="reference external" href="h
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -374,14 +379,24 @@ methods, such as “Self Flat Fielding” (<a class="reference external" href="h
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-make-a-supernova-lightcurve_9_0.png"><img alt="../_images/tutorials_02-how-to-make-a-supernova-lightcurve_9_0.png" src="../_images/tutorials_02-how-to-make-a-supernova-lightcurve_9_0.png" style="width: 753px; height: 368px;" /></a>
+<img alt="../_images/tutorials_02-how-to-make-a-supernova-lightcurve_9_0.png" src="../_images/tutorials_02-how-to-make-a-supernova-lightcurve_9_0.png" />
 </div>
 </div>
-<p><strong>Voilà</strong>! We indeed see what looks like a sharply-rising phenomenon at <span class="math notranslate nohighlight">\(t = 2400-2415\)</span> days, distinct from the smoothly-varying background, which could arise from either instrumental artifacts or host-galaxy.</p>
-<p>Let’s identify where the FELT was located within the host galaxy and its K2 postage stamp. We can either visually inspect the lightcurve with <a class="reference external" href="http://lightkurve.keplerscience.org/tutorials/1.05-interact-with-lightcurves-and-tpf.html">interact</a> to look for the position of the explosion, or we can programmatically select cadences to estimate a difference image. I used <code class="docutils literal notranslate"><span class="pre">interact</span></code> with a fine-tuned screen-stretch to see that the FELT appears near pixel column 830, row 231. Furthermore, it looks
-like the flux drops off significantly in the first and last columns.</p>
+<p><strong>Voilà</strong>! We indeed see what looks like a sharply-rising phenomenon at
+<span class="math notranslate nohighlight">\(t = 2400-2415\)</span> days, distinct from the smoothly-varying
+background, which could arise from either instrumental artifacts or
+host-galaxy.</p>
+<p>Let’s identify where the FELT was located within the host galaxy and its
+K2 postage stamp. We can either visually inspect the lightcurve with
+<a class="reference external" href="http://lightkurve.keplerscience.org/tutorials/1.05-interact-with-lightcurves-and-tpf.html">interact</a>
+to look for the position of the explosion, or we can programmatically
+select cadences to estimate a difference image. I used <code class="docutils literal notranslate"><span class="pre">interact</span></code> with
+a fine-tuned screen-stretch to see that the FELT appears near pixel
+column 830, row 231. Furthermore, it looks like the flux drops off
+significantly in the first and last columns.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -389,11 +404,15 @@ like the flux drops off significantly in the first and last columns.</p>
 </pre></div>
 </div>
 </div>
-<p>Once we have our aperture and background masks, we can estimate the net flux <span class="math notranslate nohighlight">\(f_{\rm net}\)</span> as:</p>
+<p>Once we have our aperture and background masks, we can estimate the net
+flux <span class="math notranslate nohighlight">\(f_{\rm net}\)</span> as:</p>
 <p><span class="math notranslate nohighlight">\(f_{\rm net}(t) = f_{\rm aper}(t) - f_{\rm b}(t) \cdot N_{\rm aper}\)</span></p>
-<p>where <span class="math notranslate nohighlight">\(f_{\rm aper}\)</span> is the total summed flux in an aperture of size <span class="math notranslate nohighlight">\(N_{\rm aper}\)</span> pixels, and <span class="math notranslate nohighlight">\(f_{b}\)</span> is our estimate for the (spatially-flat) background level per pixel, in each cadence.</p>
+<p>where <span class="math notranslate nohighlight">\(f_{\rm aper}\)</span> is the total summed flux in an aperture of
+size <span class="math notranslate nohighlight">\(N_{\rm aper}\)</span> pixels, and <span class="math notranslate nohighlight">\(f_{b}\)</span> is our estimate for
+the (spatially-flat) background level per pixel, in each cadence.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -405,7 +424,8 @@ like the flux drops off significantly in the first and last columns.</p>
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -415,7 +435,8 @@ like the flux drops off significantly in the first and last columns.</p>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[8]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -424,7 +445,8 @@ like the flux drops off significantly in the first and last columns.</p>
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -437,19 +459,20 @@ like the flux drops off significantly in the first and last columns.</p>
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-make-a-supernova-lightcurve_16_0.png"><img alt="../_images/tutorials_02-how-to-make-a-supernova-lightcurve_16_0.png" src="../_images/tutorials_02-how-to-make-a-supernova-lightcurve_16_0.png" style="width: 497px; height: 401px;" /></a>
+<img alt="../_images/tutorials_02-how-to-make-a-supernova-lightcurve_16_0.png" src="../_images/tutorials_02-how-to-make-a-supernova-lightcurve_16_0.png" />
 </div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-make-a-supernova-lightcurve_16_1.png"><img alt="../_images/tutorials_02-how-to-make-a-supernova-lightcurve_16_1.png" src="../_images/tutorials_02-how-to-make-a-supernova-lightcurve_16_1.png" style="width: 497px; height: 401px;" /></a>
+<img alt="../_images/tutorials_02-how-to-make-a-supernova-lightcurve_16_1.png" src="../_images/tutorials_02-how-to-make-a-supernova-lightcurve_16_1.png" />
 </div>
 </div>
 <p>Checks out. Let’s apply the equation above:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -459,7 +482,8 @@ like the flux drops off significantly in the first and last columns.</p>
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [11]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -469,7 +493,8 @@ like the flux drops off significantly in the first and last columns.</p>
 </div>
 <p>Drop the previously-identified spurious cadences.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [12]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -478,7 +503,8 @@ like the flux drops off significantly in the first and last columns.</p>
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [13]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -490,13 +516,18 @@ like the flux drops off significantly in the first and last columns.</p>
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-make-a-supernova-lightcurve_22_0.png"><img alt="../_images/tutorials_02-how-to-make-a-supernova-lightcurve_22_0.png" src="../_images/tutorials_02-how-to-make-a-supernova-lightcurve_22_0.png" style="width: 745px; height: 371px;" /></a>
+<img alt="../_images/tutorials_02-how-to-make-a-supernova-lightcurve_22_0.png" src="../_images/tutorials_02-how-to-make-a-supernova-lightcurve_22_0.png" />
 </div>
 </div>
-<p>Much better! We no longer see the instrumentally-induced background wiggles.</p>
-<p>I can see lots of spacecraft motion jittering the postage stamp image back-and-forth, a common instrumental artifact in K2 data. Let’s attempt to mitigate the spacecraft motion with the SFF algorithm, knowing that it might delete some of the astrophysical signal of interest.</p>
+<p>Much better! We no longer see the instrumentally-induced background
+wiggles.</p>
+<p>I can see lots of spacecraft motion jittering the postage stamp image
+back-and-forth, a common instrumental artifact in K2 data. Let’s attempt
+to mitigate the spacecraft motion with the SFF algorithm, knowing that
+it might delete some of the astrophysical signal of interest.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [14]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -505,7 +536,8 @@ like the flux drops off significantly in the first and last columns.</p>
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [15]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -514,9 +546,18 @@ like the flux drops off significantly in the first and last columns.</p>
 </pre></div>
 </div>
 </div>
-<p>The SFF method appears to do virtually nothing at all! There are probably two primary reasons– Our large aperture has captured all of the FELT + host galaxy flux, so the jitter motion has been subdued to the point where SFF has little or no constraining power. A second effect is that large extended objects compensate for flux loss with equal parts of flux gain: flux from the right of the boundary enters when flux from the left exits. This effect subdues the common jig-saw pattern attributable to
-flux overflowing the pixel mask.</p>
-<p>It’s conceivable—and likely— that fine tuning the SFF parameters and pixel mask size would result in a higher signal-to-noise ratio lightcurve. We are presently accepting lots of <em>variance</em> for the purpose of limiting <em>bias</em>.</p>
+<p>The SFF method appears to do virtually nothing at all! There are
+probably two primary reasons– Our large aperture has captured all of the
+FELT + host galaxy flux, so the jitter motion has been subdued to the
+point where SFF has little or no constraining power. A second effect is
+that large extended objects compensate for flux loss with equal parts of
+flux gain: flux from the right of the boundary enters when flux from the
+left exits. This effect subdues the common jig-saw pattern attributable
+to flux overflowing the pixel mask.</p>
+<p>It’s conceivable—and likely— that fine tuning the SFF parameters and
+pixel mask size would result in a higher signal-to-noise ratio
+lightcurve. We are presently accepting lots of <em>variance</em> for the
+purpose of limiting <em>bias</em>.</p>
 </div>
 
 

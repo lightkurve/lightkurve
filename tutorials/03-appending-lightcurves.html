@@ -15,7 +15,6 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
@@ -123,18 +122,18 @@ div.nblast {
 
 /* input prompt */
 div.nbinput div.prompt pre {
-    color: #307FC1;
+    color: #303F9F;
 }
 
 /* output prompt */
 div.nboutput div.prompt pre {
-    color: #BF5B3D;
+    color: #D84315;
 }
 
 /* all prompts */
 div.nbinput div.prompt,
 div.nboutput div.prompt {
-    min-width: 7ex;
+    min-width: 9ex;
     padding-top: 0.4em;
     padding-right: 0.4em;
     text-align: right;
@@ -174,9 +173,9 @@ div.nboutput div.output_area {
 
 /* input area */
 div.nbinput div.input_area {
-    border: 1px solid #e0e0e0;
+    border: 1px solid #cfcfcf;
     border-radius: 2px;
-    background: #f5f5f5;
+    background: #f7f7f7;
 }
 
 /* override MathJax center alignment in output cells */
@@ -184,7 +183,7 @@ div.nboutput div[class*=MathJax] {
     text-align: left !important;
 }
 
-/* override sphinx.ext.imgmath center alignment in output cells */
+/* override sphinx.ext.pngmath center alignment in output cells */
 div.nboutput div.math p {
     text-align: left;
 }
@@ -233,40 +232,6 @@ div.nboutput div.output_area.stderr {
 
 .ansi-bold { font-weight: bold; }
 .ansi-underline { text-decoration: underline; }
-
-/* Some additional styling taken form the Jupyter notebook CSS */
-div.rendered_html table {
-  border: none;
-  border-collapse: collapse;
-  border-spacing: 0;
-  color: black;
-  font-size: 12px;
-  table-layout: fixed;
-}
-div.rendered_html thead {
-  border-bottom: 1px solid black;
-  vertical-align: bottom;
-}
-div.rendered_html tr,
-div.rendered_html th,
-div.rendered_html td {
-  text-align: right;
-  vertical-align: middle;
-  padding: 0.5em 0.5em;
-  line-height: normal;
-  white-space: normal;
-  max-width: none;
-  border: none;
-}
-div.rendered_html th {
-  font-weight: bold;
-}
-div.rendered_html tbody tr:nth-child(odd) {
-  background: #f5f5f5;
-}
-div.rendered_html tbody tr:hover {
-  background: rgba(66, 165, 245, 0.2);
-}
 </style>
 <div class="admonition note">
 <p class="admonition-title"><strong>This page is a static version of an interactive Jupyter notebook</strong></p>
@@ -277,14 +242,22 @@ div.rendered_html tbody tr:hover {
 </div>
 <div class="section" id="How-to-combine-lightcurves-from-different-Kepler-quarters">
 <h1>How to combine lightcurves from different Kepler quarters<a class="headerlink" href="#How-to-combine-lightcurves-from-different-Kepler-quarters" title="Permalink to this headline">¶</a></h1>
-<p>The Kepler mission took 17 quarters of continuous observations on the same targets. For applications such as finding long period planets or asteroseismology it is useful to be able to turn these quarters into one long light curve. We can do this using lightkurve’s <code class="docutils literal notranslate"><span class="pre">append</span></code> function. The append function is called by doing</p>
+<p>The Kepler mission took 17 quarters of continuous observations on the
+same targets. For applications such as finding long period planets or
+asteroseismology it is useful to be able to turn these quarters into one
+long light curve. We can do this using lightkurve’s <code class="docutils literal notranslate"><span class="pre">append</span></code> function.
+The append function is called by doing</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">stitched_lc</span> <span class="o">=</span> <span class="n">lc1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lc2</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>It works in the same way as appending a list in python.</p>
-<p>Below is an example of how to stitch together all the quarters for the exoplanet target Kepler-8b. (<em>Note: We’ll use the jupyter notebook magic command ``%%capture`` to supress the output for the cell so that it doesn’t print a long download message</em>)</p>
+<p>Below is an example of how to stitch together all the quarters for the
+exoplanet target Kepler-8b. (<em>Note: We’ll use the jupyter notebook magic
+command ``%%capture`` to supress the output for the cell so that it
+doesn’t print a long download message</em>)</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -294,7 +267,8 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -305,9 +279,15 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
-<p>Above we have created a <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> object from the first quarter of the data, choosing to use the PDCSAP_FLUX. Then we have looped through all the quarters, appending each new light curve to the fist one. We can plot this new <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> using the <code class="docutils literal notranslate"><span class="pre">plot</span></code> function (and all the other functions from previous tutorials will work too!)</p>
+<p>Above we have created a <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> object from the first
+quarter of the data, choosing to use the PDCSAP_FLUX. Then we have
+looped through all the quarters, appending each new light curve to the
+fist one. We can plot this new <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> using the <code class="docutils literal notranslate"><span class="pre">plot</span></code>
+function (and all the other functions from previous tutorials will work
+too!)</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -319,12 +299,17 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_03-appending-lightcurves_5_0.png"><img alt="../_images/tutorials_03-appending-lightcurves_5_0.png" src="../_images/tutorials_03-appending-lightcurves_5_0.png" style="width: 754px; height: 368px;" /></a>
+<img alt="../_images/tutorials_03-appending-lightcurves_5_0.png" src="../_images/tutorials_03-appending-lightcurves_5_0.png" />
 </div>
 </div>
-<p>Unfortunately, as the light fell on difference pixels in each quarter and the spacecraft changed temperature during observation, these light curves all have difference offsets. We can remove them by normalizing each light curve before we append it. We can do this with the lightkurve function <code class="docutils literal notranslate"><span class="pre">normalize</span></code>.</p>
+<p>Unfortunately, as the light fell on difference pixels in each quarter
+and the spacecraft changed temperature during observation, these light
+curves all have difference offsets. We can remove them by normalizing
+each light curve before we append it. We can do this with the lightkurve
+function <code class="docutils literal notranslate"><span class="pre">normalize</span></code>.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -335,7 +320,8 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -347,12 +333,16 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_03-appending-lightcurves_8_0.png"><img alt="../_images/tutorials_03-appending-lightcurves_8_0.png" src="../_images/tutorials_03-appending-lightcurves_8_0.png" style="width: 755px; height: 368px;" /></a>
+<img alt="../_images/tutorials_03-appending-lightcurves_8_0.png" src="../_images/tutorials_03-appending-lightcurves_8_0.png" />
 </div>
 </div>
-<p>Now that the light curves are normalized they don’t have significant offsets. However, there are clear long term trends in some of the early quarters of the data. We can remove this using lightkurve’s <code class="docutils literal notranslate"><span class="pre">flatten</span></code> method before appending each object.</p>
+<p>Now that the light curves are normalized they don’t have significant
+offsets. However, there are clear long term trends in some of the early
+quarters of the data. We can remove this using lightkurve’s <code class="docutils literal notranslate"><span class="pre">flatten</span></code>
+method before appending each object.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -363,7 +353,8 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -375,12 +366,15 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_03-appending-lightcurves_11_0.png"><img alt="../_images/tutorials_03-appending-lightcurves_11_0.png" src="../_images/tutorials_03-appending-lightcurves_11_0.png" style="width: 755px; height: 368px;" /></a>
+<img alt="../_images/tutorials_03-appending-lightcurves_11_0.png" src="../_images/tutorials_03-appending-lightcurves_11_0.png" />
 </div>
 </div>
-<p>Now all of the light curves stitch together with no visible join. We can use the <code class="docutils literal notranslate"><span class="pre">fold</span></code> and <code class="docutils literal notranslate"><span class="pre">bin</span></code> methods to form a planet transit out of all of the data for Kepler-8b.</p>
+<p>Now all of the light curves stitch together with no visible join. We can
+use the <code class="docutils literal notranslate"><span class="pre">fold</span></code> and <code class="docutils literal notranslate"><span class="pre">bin</span></code> methods to form a planet transit out of all
+of the data for Kepler-8b.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>

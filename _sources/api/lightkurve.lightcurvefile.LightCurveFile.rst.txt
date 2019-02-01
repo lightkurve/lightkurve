@@ -1,0 +1,41 @@
+LightCurveFile
+==============
+
+.. currentmodule:: lightkurve.lightcurvefile
+
+.. autoclass:: LightCurveFile
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~LightCurveFile.PDCSAP_FLUX
+      ~LightCurveFile.SAP_FLUX
+      ~LightCurveFile.cadenceno
+      ~LightCurveFile.dec
+      ~LightCurveFile.ra
+      ~LightCurveFile.time
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~LightCurveFile.from_fits
+      ~LightCurveFile.header
+      ~LightCurveFile.plot
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: PDCSAP_FLUX
+   .. autoattribute:: SAP_FLUX
+   .. autoattribute:: cadenceno
+   .. autoattribute:: dec
+   .. autoattribute:: ra
+   .. autoattribute:: time
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: from_fits
+   .. automethod:: header
+   .. automethod:: plot

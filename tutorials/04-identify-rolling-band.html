@@ -15,7 +15,6 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
@@ -123,18 +122,18 @@ div.nblast {
 
 /* input prompt */
 div.nbinput div.prompt pre {
-    color: #307FC1;
+    color: #303F9F;
 }
 
 /* output prompt */
 div.nboutput div.prompt pre {
-    color: #BF5B3D;
+    color: #D84315;
 }
 
 /* all prompts */
 div.nbinput div.prompt,
 div.nboutput div.prompt {
-    min-width: 7ex;
+    min-width: 9ex;
     padding-top: 0.4em;
     padding-right: 0.4em;
     text-align: right;
@@ -174,9 +173,9 @@ div.nboutput div.output_area {
 
 /* input area */
 div.nbinput div.input_area {
-    border: 1px solid #e0e0e0;
+    border: 1px solid #cfcfcf;
     border-radius: 2px;
-    background: #f5f5f5;
+    background: #f7f7f7;
 }
 
 /* override MathJax center alignment in output cells */
@@ -184,7 +183,7 @@ div.nboutput div[class*=MathJax] {
     text-align: left !important;
 }
 
-/* override sphinx.ext.imgmath center alignment in output cells */
+/* override sphinx.ext.pngmath center alignment in output cells */
 div.nboutput div.math p {
     text-align: left;
 }
@@ -233,40 +232,6 @@ div.nboutput div.output_area.stderr {
 
 .ansi-bold { font-weight: bold; }
 .ansi-underline { text-decoration: underline; }
-
-/* Some additional styling taken form the Jupyter notebook CSS */
-div.rendered_html table {
-  border: none;
-  border-collapse: collapse;
-  border-spacing: 0;
-  color: black;
-  font-size: 12px;
-  table-layout: fixed;
-}
-div.rendered_html thead {
-  border-bottom: 1px solid black;
-  vertical-align: bottom;
-}
-div.rendered_html tr,
-div.rendered_html th,
-div.rendered_html td {
-  text-align: right;
-  vertical-align: middle;
-  padding: 0.5em 0.5em;
-  line-height: normal;
-  white-space: normal;
-  max-width: none;
-  border: none;
-}
-div.rendered_html th {
-  font-weight: bold;
-}
-div.rendered_html tbody tr:nth-child(odd) {
-  background: #f5f5f5;
-}
-div.rendered_html tbody tr:hover {
-  background: rgba(66, 165, 245, 0.2);
-}
 </style>
 <div class="admonition note">
 <p class="admonition-title"><strong>This page is a static version of an interactive Jupyter notebook</strong></p>
@@ -277,15 +242,32 @@ div.rendered_html tbody tr:hover {
 </div>
 <div class="section" id="How-to-identify-time-variable-background-noise-(“rolling-bands”)?">
 <h1>How to identify time-variable background noise (“rolling bands”)?<a class="headerlink" href="#How-to-identify-time-variable-background-noise-(“rolling-bands”)?" title="Permalink to this headline">¶</a></h1>
-<p>In the previous tutorial we looked at making custom apertures to check planet signals. In this tutorial we will use the same technique to find variable background (such as rolling band signal) in Kepler data.</p>
-<p>The background flux level of Kepler pixel data is not static. In particular, certain CCD channels occasionally experience the ‘rolling band’ effect, where the background has a strong time varying component of a ‘band’ moving up the detector. You can read more about rolling band in the <a class="reference external" href="https://archive.stsci.edu/kepler/manuals/KSCI-19033-001.pdf">Kepler Instrument Handbook</a>. An example of the rolling band artifact is shown in the video below. You can see the band move through the superstamp at
-the 2 second mark, leaving the bottom of the screen at the 6 second mark.</p>
+<p>In the previous tutorial we looked at making custom apertures to check
+planet signals. In this tutorial we will use the same technique to find
+variable background (such as rolling band signal) in Kepler data.</p>
+<p>The background flux level of Kepler pixel data is not static. In
+particular, certain CCD channels occasionally experience the ‘rolling
+band’ effect, where the background has a strong time varying component
+of a ‘band’ moving up the detector. You can read more about rolling band
+in the <a class="reference external" href="https://archive.stsci.edu/kepler/manuals/KSCI-19033-001.pdf">Kepler Instrument
+Handbook</a>.
+An example of the rolling band artifact is shown in the video below. You
+can see the band move through the superstamp at the 2 second mark,
+leaving the bottom of the screen at the 6 second mark.</p>
 <p><img alt="image0" src="../_images/rollingband.gif" /></p>
-<p>The rolling band artifact is small, up to about 20 counts per pixel. However, this can add up for large apertures containing many pixels or for faint, quiet targets.</p>
-<p>Rolling band can often add spurious signals into your data which look like real astrophysical variability. The best way to spot rolling band is to vary your aperture size. If the signal strength increases as you increase the number of background pixels in the aperture, the effect is likely to be an additive background component.</p>
-<p>Below we will show you how to check for rolling band. First let’s import <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> and download a target.</p>
+<p>The rolling band artifact is small, up to about 20 counts per pixel.
+However, this can add up for large apertures containing many pixels or
+for faint, quiet targets.</p>
+<p>Rolling band can often add spurious signals into your data which look
+like real astrophysical variability. The best way to spot rolling band
+is to vary your aperture size. If the signal strength increases as you
+increase the number of background pixels in the aperture, the effect is
+likely to be an additive background component.</p>
+<p>Below we will show you how to check for rolling band. First let’s import
+<code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> and download a target.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -297,7 +279,8 @@ the 2 second mark, leaving the bottom of the screen at the 6 second mark.</p>
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -306,7 +289,8 @@ the 2 second mark, leaving the bottom of the screen at the 6 second mark.</p>
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -318,12 +302,14 @@ the 2 second mark, leaving the bottom of the screen at the 6 second mark.</p>
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_04-identify-rolling-band_6_0.png"><img alt="../_images/tutorials_04-identify-rolling-band_6_0.png" src="../_images/tutorials_04-identify-rolling-band_6_0.png" style="width: 523px; height: 401px;" /></a>
+<img alt="../_images/tutorials_04-identify-rolling-band_6_0.png" src="../_images/tutorials_04-identify-rolling-band_6_0.png" />
 </div>
 </div>
-<p>This looks like a fairly normal Target Pixel File. Let’s take a look at the light curve.</p>
+<p>This looks like a fairly normal Target Pixel File. Let’s take a look at
+the light curve.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -344,12 +330,16 @@ the 2 second mark, leaving the bottom of the screen at the 6 second mark.</p>
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_04-identify-rolling-band_8_0.png"><img alt="../_images/tutorials_04-identify-rolling-band_8_0.png" src="../_images/tutorials_04-identify-rolling-band_8_0.png" style="width: 758px; height: 390px;" /></a>
+<img alt="../_images/tutorials_04-identify-rolling-band_8_0.png" src="../_images/tutorials_04-identify-rolling-band_8_0.png" />
 </div>
 </div>
-<p>It looks like there are some features at around 1540 days that could be due to rotation in the star. But this could also be due to rolling band. Let’s change the aperture of the target pixel file to <strong>only include background pixels</strong> and see if this signal is still present.</p>
+<p>It looks like there are some features at around 1540 days that could be
+due to rotation in the star. But this could also be due to rolling band.
+Let’s change the aperture of the target pixel file to <strong>only include
+background pixels</strong> and see if this signal is still present.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -360,7 +350,8 @@ the 2 second mark, leaving the bottom of the screen at the 6 second mark.</p>
 </div>
 </div>
 <div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[5]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -372,12 +363,16 @@ the 2 second mark, leaving the bottom of the screen at the 6 second mark.</p>
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_04-identify-rolling-band_10_1.png"><img alt="../_images/tutorials_04-identify-rolling-band_10_1.png" src="../_images/tutorials_04-identify-rolling-band_10_1.png" style="width: 523px; height: 401px;" /></a>
+<img alt="../_images/tutorials_04-identify-rolling-band_10_1.png" src="../_images/tutorials_04-identify-rolling-band_10_1.png" />
 </div>
 </div>
-<p>The mask avoids the center pixels. Let’s create a light curve the same way as above. However, this time we’re going to divide by the number of pixels in the aperture to give the the <strong>average background flux per pixel.</strong></p>
+<p>The mask avoids the center pixels. Let’s create a light curve the same
+way as above. However, this time we’re going to divide by the number of
+pixels in the aperture to give the the <strong>average background flux per
+pixel.</strong></p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -390,7 +385,8 @@ the 2 second mark, leaving the bottom of the screen at the 6 second mark.</p>
 </div>
 </div>
 <div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[6]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -402,13 +398,20 @@ the 2 second mark, leaving the bottom of the screen at the 6 second mark.</p>
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_04-identify-rolling-band_12_1.png"><img alt="../_images/tutorials_04-identify-rolling-band_12_1.png" src="../_images/tutorials_04-identify-rolling-band_12_1.png" style="width: 737px; height: 390px;" /></a>
+<img alt="../_images/tutorials_04-identify-rolling-band_12_1.png" src="../_images/tutorials_04-identify-rolling-band_12_1.png" />
 </div>
 </div>
-<p>It looks like the signal is still there in the background pixels. Unfortunately this means the signal is not astrophysical.</p>
-<p>We can perform another test by looking at the background in a nearby source. Using the <code class="docutils literal notranslate"><span class="pre">search_targetpixelfile</span></code> function we can get the nearest neighbor to our target. We first set a search radius in arcseconds and a limit on the number of targets to return. In this case we only want our target and the nearest neighbour within 60 arcseconds, so we’ll set <code class="docutils literal notranslate"><span class="pre">radius</span></code> to 60 and <code class="docutils literal notranslate"><span class="pre">limit</span></code> to 2 targets.</p>
+<p>It looks like the signal is still there in the background pixels.
+Unfortunately this means the signal is not astrophysical.</p>
+<p>We can perform another test by looking at the background in a nearby
+source. Using the <code class="docutils literal notranslate"><span class="pre">search_targetpixelfile</span></code> function we can get the
+nearest neighbor to our target. We first set a search radius in
+arcseconds and a limit on the number of targets to return. In this case
+we only want our target and the nearest neighbour within 60 arcseconds,
+so we’ll set <code class="docutils literal notranslate"><span class="pre">radius</span></code> to 60 and <code class="docutils literal notranslate"><span class="pre">limit</span></code> to 2 targets.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -419,14 +422,15 @@ the 2 second mark, leaving the bottom of the screen at the 6 second mark.</p>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
-<div class="output_area stderr docutils container">
+<div class="stderr output_area docutils container">
 <div class="highlight"><pre>
 /Users/obsidian/anaconda3/envs/lightkurve_base/lib/python3.6/site-packages/astroquery/utils/commons.py:171: UserWarning: Coordinate string is being interpreted as an ICRS coordinate provided in degrees.
   warnings.warn(&#34;Coordinate string is being interpreted as an &#34;
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -435,7 +439,8 @@ the 2 second mark, leaving the bottom of the screen at the 6 second mark.</p>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[8]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -445,10 +450,13 @@ KeplerTargetPixelFile Object (ID: 7691061)
 </pre></div>
 </div>
 </div>
-<p>Now we can see that <code class="docutils literal notranslate"><span class="pre">tpfs</span></code> is a list of <code class="docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code> objects. There are two different object IDs, our target and the nearest neighbour.</p>
+<p>Now we can see that <code class="docutils literal notranslate"><span class="pre">tpfs</span></code> is a list of <code class="docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code>
+objects. There are two different object IDs, our target and the nearest
+neighbour.</p>
 <p>Let’s double check that these target pixel files are close to each other</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -465,9 +473,15 @@ KeplerTargetPixelFile Object (ID: 7691061)
 TPFs are 9.5 Pixels Apart
 </pre></div></div>
 </div>
-<p>Since these are files are very close on the focal plane, we would expect them to experience similar levels of background. We can now perform the same test as above and look at the background flux averaged over all the background pixels. We’ll do this inside a for loop and follow the same steps: * Build the aperture * Create the light curve (<code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> object) * Plot the light curve</p>
+<p>Since these are files are very close on the focal plane, we would expect
+them to experience similar levels of background. We can now perform the
+same test as above and look at the background flux averaged over all the
+background pixels. We’ll do this inside a for loop and follow the same
+steps: * Build the aperture * Create the light curve
+(<code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> object) * Plot the light curve</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -493,10 +507,13 @@ TPFs are 9.5 Pixels Apart
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_04-identify-rolling-band_21_0.png"><img alt="../_images/tutorials_04-identify-rolling-band_21_0.png" src="../_images/tutorials_04-identify-rolling-band_21_0.png" style="width: 498px; height: 331px;" /></a>
+<img alt="../_images/tutorials_04-identify-rolling-band_21_0.png" src="../_images/tutorials_04-identify-rolling-band_21_0.png" />
 </div>
 </div>
-<p>Looks like a nearby source shows quite similar background variation. This suggests that unfortunately the signal is rolling band. Mitigating rolling band can be difficult, and we’ll discuss corrections in a different tutorial.</p>
+<p>Looks like a nearby source shows quite similar background variation.
+This suggests that unfortunately the signal is rolling band. Mitigating
+rolling band can be difficult, and we’ll discuss corrections in a
+different tutorial.</p>
 </div>
 
 

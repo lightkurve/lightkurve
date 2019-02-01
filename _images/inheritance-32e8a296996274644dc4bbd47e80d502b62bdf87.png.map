@@ -1,0 +1,6 @@
+<map id="inheritancedf8cb9852f" name="inheritancedf8cb9852f">
+<area shape="rect" id="node1" href="lightkurve.periodogram.BoxLeastSquaresPeriodogram.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram" target="_top" title="Subclass of :class:`Periodogram &lt;lightkurve.periodogram.Periodogram&gt;`" alt="" coords="159,5,376,31"/>
+<area shape="rect" id="node2" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram" target="_top" title="Generic class to represent a power spectrum (frequency vs power data)." alt="" coords="5,55,111,80"/>
+<area shape="rect" id="node3" href="lightkurve.periodogram.LombScarglePeriodogram.html#lightkurve.periodogram.LombScarglePeriodogram" target="_top" title="Subclass of :class:`Periodogram &lt;lightkurve.periodogram.Periodogram&gt;`" alt="" coords="173,55,362,80"/>
+<area shape="rect" id="node4" title="Defines a Signal&#45;to&#45;Noise Ratio (SNR) Periodogram class." alt="" coords="201,104,333,129"/>
+</map>

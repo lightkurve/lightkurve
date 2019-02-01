@@ -1,0 +1,17 @@
+PLDCorrector
+============
+
+.. currentmodule:: lightkurve.correctors
+
+.. autoclass:: PLDCorrector
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~PLDCorrector.correct
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: correct

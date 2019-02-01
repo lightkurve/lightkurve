@@ -1,0 +1,5 @@
+<map id="inheritance7c28f86df0" name="inheritance7c28f86df0">
+<area shape="rect" id="node1" href="lightkurve.lightcurve.KeplerLightCurve.html#lightkurve.lightcurve.KeplerLightCurve" target="_top" title="Subclass of `LightCurve` which holds extra data specific to the Kepler mission." alt="" coords="145,5,279,31"/>
+<area shape="rect" id="node2" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" target="_top" title="Generic base class to hold any time series brightness data set." alt="" coords="5,31,97,56"/>
+<area shape="rect" id="node3" href="lightkurve.lightcurve.TessLightCurve.html#lightkurve.lightcurve.TessLightCurve" target="_top" title="Subclass of `LightCurve` which holds extra data specific to the TESS mission." alt="" coords="152,55,272,80"/>
+</map>

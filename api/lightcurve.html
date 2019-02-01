@@ -15,7 +15,6 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
@@ -80,28 +79,24 @@
 </colgroup>
 <tbody valign="top">
 <tr class="row-odd"><td><a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a>([time,&nbsp;flux,&nbsp;flux_err,&nbsp;…])</td>
-<td>Implements a simple class for a generic light curve.</td>
+<td>Generic class to work with any time series photometry data set.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="lightkurve.lightcurve.KeplerLightCurve.html#lightkurve.lightcurve.KeplerLightCurve" title="lightkurve.lightcurve.KeplerLightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code></a>([time,&nbsp;flux,&nbsp;flux_err,&nbsp;…])</td>
-<td>Defines a light curve class for NASA’s Kepler and K2 missions.</td>
+<td>Subclass of <a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightCurve</span></code></a> which holds extra data specific to the Kepler mission.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="lightkurve.lightcurve.TessLightCurve.html#lightkurve.lightcurve.TessLightCurve" title="lightkurve.lightcurve.TessLightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TessLightCurve</span></code></a>([time,&nbsp;flux,&nbsp;flux_err,&nbsp;…])</td>
-<td>Defines a light curve class for NASA’s TESS mission.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="lightkurve.lightcurve.FoldedLightCurve.html#lightkurve.lightcurve.FoldedLightCurve" title="lightkurve.lightcurve.FoldedLightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve</span></code></a>(*args,&nbsp;**kwargs)</td>
-<td>Class to hold a phase-folded lightcurve, i.e.</td>
+<td>Subclass of <a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightCurve</span></code></a> which holds extra data specific to the TESS mission.</td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="section" id="class-inheritance-diagram">
 <h2>Class Inheritance Diagram<a class="headerlink" href="#class-inheritance-diagram" title="Permalink to this headline">¶</a></h2>
-<div class="graphviz"><img src="../_images/inheritance-e2b87def4b73f94f3e94b3531b716dc11f09adc1.png" alt="Inheritance diagram of lightkurve.lightcurve.LightCurve, lightkurve.lightcurve.KeplerLightCurve, lightkurve.lightcurve.TessLightCurve, lightkurve.lightcurve.FoldedLightCurve" usemap="#inheritancec672026571" class="inheritance graphviz" /></div>
-<map id="inheritancec672026571" name="inheritancec672026571">
-<area shape="rect" id="node1" href="lightkurve.lightcurve.FoldedLightCurve.html#lightkurve.lightcurve.FoldedLightCurve" target="_top" title="Class to hold a phase&#45;folded lightcurve, i.e. the output of `LightCurve.fold()`." alt="" coords="140,5,267,31"/>
-<area shape="rect" id="node2" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" target="_top" title="Implements a simple class for a generic light curve." alt="" coords="5,55,92,80"/>
-<area shape="rect" id="node3" href="lightkurve.lightcurve.KeplerLightCurve.html#lightkurve.lightcurve.KeplerLightCurve" target="_top" title="Defines a light curve class for NASA&#39;s Kepler and K2 missions." alt="" coords="141,55,266,80"/>
-<area shape="rect" id="node4" href="lightkurve.lightcurve.TessLightCurve.html#lightkurve.lightcurve.TessLightCurve" target="_top" title="Defines a light curve class for NASA&#39;s TESS mission." alt="" coords="145,104,261,129"/>
+<div class="graphviz"><img src="../_images/inheritance-0297dd0358a9c2882900ca25337403320172bb2a.png" alt="Inheritance diagram of lightkurve.lightcurve.LightCurve, lightkurve.lightcurve.KeplerLightCurve, lightkurve.lightcurve.TessLightCurve" usemap="#inheritance7c28f86df0" class="inheritance graphviz" /></div>
+<map id="inheritance7c28f86df0" name="inheritance7c28f86df0">
+<area shape="rect" id="node1" href="lightkurve.lightcurve.KeplerLightCurve.html#lightkurve.lightcurve.KeplerLightCurve" target="_top" title="Subclass of :class:`LightCurve &lt;lightkurve.lightcurve.LightCurve&gt;`" alt="" coords="145,5,279,31"/>
+<area shape="rect" id="node2" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" target="_top" title="Generic class to work with any time series photometry data set." alt="" coords="5,31,97,56"/>
+<area shape="rect" id="node3" href="lightkurve.lightcurve.TessLightCurve.html#lightkurve.lightcurve.TessLightCurve" target="_top" title="Subclass of :class:`LightCurve &lt;lightkurve.lightcurve.LightCurve&gt;`" alt="" coords="152,55,272,80"/>
 </map></div>
 </div>
 

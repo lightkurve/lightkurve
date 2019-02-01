@@ -15,7 +15,6 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
@@ -123,18 +122,18 @@ div.nblast {
 
 /* input prompt */
 div.nbinput div.prompt pre {
-    color: #307FC1;
+    color: #303F9F;
 }
 
 /* output prompt */
 div.nboutput div.prompt pre {
-    color: #BF5B3D;
+    color: #D84315;
 }
 
 /* all prompts */
 div.nbinput div.prompt,
 div.nboutput div.prompt {
-    min-width: 7ex;
+    min-width: 9ex;
     padding-top: 0.4em;
     padding-right: 0.4em;
     text-align: right;
@@ -174,9 +173,9 @@ div.nboutput div.output_area {
 
 /* input area */
 div.nbinput div.input_area {
-    border: 1px solid #e0e0e0;
+    border: 1px solid #cfcfcf;
     border-radius: 2px;
-    background: #f5f5f5;
+    background: #f7f7f7;
 }
 
 /* override MathJax center alignment in output cells */
@@ -184,7 +183,7 @@ div.nboutput div[class*=MathJax] {
     text-align: left !important;
 }
 
-/* override sphinx.ext.imgmath center alignment in output cells */
+/* override sphinx.ext.pngmath center alignment in output cells */
 div.nboutput div.math p {
     text-align: left;
 }
@@ -233,40 +232,6 @@ div.nboutput div.output_area.stderr {
 
 .ansi-bold { font-weight: bold; }
 .ansi-underline { text-decoration: underline; }
-
-/* Some additional styling taken form the Jupyter notebook CSS */
-div.rendered_html table {
-  border: none;
-  border-collapse: collapse;
-  border-spacing: 0;
-  color: black;
-  font-size: 12px;
-  table-layout: fixed;
-}
-div.rendered_html thead {
-  border-bottom: 1px solid black;
-  vertical-align: bottom;
-}
-div.rendered_html tr,
-div.rendered_html th,
-div.rendered_html td {
-  text-align: right;
-  vertical-align: middle;
-  padding: 0.5em 0.5em;
-  line-height: normal;
-  white-space: normal;
-  max-width: none;
-  border: none;
-}
-div.rendered_html th {
-  font-weight: bold;
-}
-div.rendered_html tbody tr:nth-child(odd) {
-  background: #f5f5f5;
-}
-div.rendered_html tbody tr:hover {
-  background: rgba(66, 165, 245, 0.2);
-}
 </style>
 <div class="admonition note">
 <p class="admonition-title"><strong>This page is a static version of an interactive Jupyter notebook</strong></p>
@@ -277,13 +242,28 @@ div.rendered_html tbody tr:hover {
 </div>
 <div class="section" id="What-are-LightCurve-objects?">
 <h1>What are LightCurve objects?<a class="headerlink" href="#What-are-LightCurve-objects?" title="Permalink to this headline">¶</a></h1>
-<p><code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> objects are data objects which encapsulate the brightness of a star over time. They provide a series of common operations, for example folding, binning, plotting, etc. There are a range of subclasses of <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> objects specific to telescopes, including <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> for Kepler and K2 data and <code class="docutils literal notranslate"><span class="pre">TessLightCurve</span></code> for TESS data.</p>
-<p>Although <em>lightkurve</em> was designed with Kepler, K2 and TESS in mind, these objects can be used for a range of astronomy data.</p>
-<p>You can create a <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> object from a <code class="docutils literal notranslate"><span class="pre">TargetPixelFile</span></code> object using Simple Aperture Photometry (see our tutorial for more information on Target Pixel Files <a class="reference external" href="http://lightkurve.keplerscience.org/tutorials/1.02-target-pixel-files.html">here</a>. Aperture Photometry is the simple act of summing up the values of all the pixels in a pre-defined aperture, as a function of time. By carefully choosing the shape of the aperture mask, you can avoid nearby contaminants or improve the strength of
-the specific signal you are trying to measure relative to the background.</p>
-<p>To demonstrate, lets create a <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> from a <code class="docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> objects are data objects which encapsulate the brightness
+of a star over time. They provide a series of common operations, for
+example folding, binning, plotting, etc. There are a range of subclasses
+of <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> objects specific to telescopes, including
+<code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> for Kepler and K2 data and <code class="docutils literal notranslate"><span class="pre">TessLightCurve</span></code> for
+TESS data.</p>
+<p>Although <em>lightkurve</em> was designed with Kepler, K2 and TESS in mind,
+these objects can be used for a range of astronomy data.</p>
+<p>You can create a <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> object from a <code class="docutils literal notranslate"><span class="pre">TargetPixelFile</span></code> object
+using Simple Aperture Photometry (see our tutorial for more information
+on Target Pixel Files
+<a class="reference external" href="http://lightkurve.keplerscience.org/tutorials/1.02-target-pixel-files.html">here</a>.
+Aperture Photometry is the simple act of summing up the values of all
+the pixels in a pre-defined aperture, as a function of time. By
+carefully choosing the shape of the aperture mask, you can avoid nearby
+contaminants or improve the strength of the specific signal you are
+trying to measure relative to the background.</p>
+<p>To demonstrate, lets create a <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> from a
+<code class="docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code>.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -296,10 +276,17 @@ the specific signal you are trying to measure relative to the background.</p>
 </pre></div>
 </div>
 </div>
-<p>We’ve built a new <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> object called <code class="docutils literal notranslate"><span class="pre">lc</span></code>. Note in this case we’ve passed an <strong>aperture_mask</strong> to the <code class="docutils literal notranslate"><span class="pre">to_lightcurve</span></code> method. The default is to use the <em>Kepler</em> pipeline aperture. (You can pass your own aperture, which is a boolean <code class="docutils literal notranslate"><span class="pre">numpy</span></code> array.) By summing all the pixels in the aperture we have created a Simple Aperture Photometry (SAP) lightcurve.</p>
-<p><code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> has many useful functions that you can use. As with Target Pixel Files you can access the meta data very simply:</p>
+<p>We’ve built a new <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> object called <code class="docutils literal notranslate"><span class="pre">lc</span></code>. Note in
+this case we’ve passed an <strong>aperture_mask</strong> to the <code class="docutils literal notranslate"><span class="pre">to_lightcurve</span></code>
+method. The default is to use the <em>Kepler</em> pipeline aperture. (You can
+pass your own aperture, which is a boolean <code class="docutils literal notranslate"><span class="pre">numpy</span></code> array.) By summing
+all the pixels in the aperture we have created a Simple Aperture
+Photometry (SAP) lightcurve.</p>
+<p><code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> has many useful functions that you can use. As with
+Target Pixel Files you can access the meta data very simply:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -308,7 +295,8 @@ the specific signal you are trying to measure relative to the background.</p>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[2]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -317,7 +305,8 @@ the specific signal you are trying to measure relative to the background.</p>
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -326,7 +315,8 @@ the specific signal you are trying to measure relative to the background.</p>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[3]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -334,9 +324,11 @@ the specific signal you are trying to measure relative to the background.</p>
 </pre></div>
 </div>
 </div>
-<p>And you still have access to time and flux attributes. In a light curve, there is only one flux point for every time stamp:</p>
+<p>And you still have access to time and flux attributes. In a light curve,
+there is only one flux point for every time stamp:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -345,7 +337,8 @@ the specific signal you are trying to measure relative to the background.</p>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[4]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -356,9 +349,11 @@ the specific signal you are trying to measure relative to the background.</p>
 </pre></div>
 </div>
 </div>
-<p>You can also check the “CDPP” noise metric of the lightcurve using the built in method:</p>
+<p>You can also check the “CDPP” noise metric of the lightcurve using the
+built in method:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -367,7 +362,8 @@ the specific signal you are trying to measure relative to the background.</p>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[5]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -375,9 +371,13 @@ the specific signal you are trying to measure relative to the background.</p>
 </pre></div>
 </div>
 </div>
-<p>Now we can use the built in <code class="docutils literal notranslate"><span class="pre">plot</span></code> function on the <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> object to plot the time series. You can pass <code class="docutils literal notranslate"><span class="pre">plot</span></code> any keywords you would normally pass to <code class="docutils literal notranslate"><span class="pre">matplotlib.pyplot.plot</span></code>.</p>
+<p>Now we can use the built in <code class="docutils literal notranslate"><span class="pre">plot</span></code> function on the
+<code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> object to plot the time series. You can pass
+<code class="docutils literal notranslate"><span class="pre">plot</span></code> any keywords you would normally pass to
+<code class="docutils literal notranslate"><span class="pre">matplotlib.pyplot.plot</span></code>.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -390,14 +390,22 @@ the specific signal you are trying to measure relative to the background.</p>
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_01-what-are-lightcurves_11_0.png"><img alt="../_images/tutorials_01-what-are-lightcurves_11_0.png" src="../_images/tutorials_01-what-are-lightcurves_11_0.png" style="width: 755px; height: 368px;" /></a>
+<img alt="../_images/tutorials_01-what-are-lightcurves_11_0.png" src="../_images/tutorials_01-what-are-lightcurves_11_0.png" />
 </div>
 </div>
-<p>There are a set of useful functions in <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> objects which you can use to work with the data. These include: * <code class="docutils literal notranslate"><span class="pre">flatten()</span></code>: Remove long term trends using a <a class="reference external" href="https://en.wikipedia.org/wiki/Savitzky%E2%80%93Golay_filter">Savitzky–Golay filter</a> * <code class="docutils literal notranslate"><span class="pre">remove_outliers()</span></code>: Remove outliers using simple sigma clipping * <code class="docutils literal notranslate"><span class="pre">remove_nans()</span></code>: Remove infinite or NaN values (these can occur during thruster firings) * <code class="docutils literal notranslate"><span class="pre">fold()</span></code>: Fold the data at a particular period * <code class="docutils literal notranslate"><span class="pre">bin()</span></code>: Reduce the
-time resolution of the array, taking the average value in each bin.</p>
+<p>There are a set of useful functions in <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> objects which you
+can use to work with the data. These include: * <code class="docutils literal notranslate"><span class="pre">flatten()</span></code>: Remove
+long term trends using a <a class="reference external" href="https://en.wikipedia.org/wiki/Savitzky%E2%80%93Golay_filter">Savitzky–Golay
+filter</a>
+* <code class="docutils literal notranslate"><span class="pre">remove_outliers()</span></code>: Remove outliers using simple sigma clipping *
+<code class="docutils literal notranslate"><span class="pre">remove_nans()</span></code>: Remove infinite or NaN values (these can occur during
+thruster firings) * <code class="docutils literal notranslate"><span class="pre">fold()</span></code>: Fold the data at a particular period *
+<code class="docutils literal notranslate"><span class="pre">bin()</span></code>: Reduce the time resolution of the array, taking the average
+value in each bin.</p>
 <p>We can use these simply on a light curve object</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -410,11 +418,12 @@ time resolution of the array, taking the average value in each bin.</p>
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_01-what-are-lightcurves_13_0.png"><img alt="../_images/tutorials_01-what-are-lightcurves_13_0.png" src="../_images/tutorials_01-what-are-lightcurves_13_0.png" style="width: 755px; height: 368px;" /></a>
+<img alt="../_images/tutorials_01-what-are-lightcurves_13_0.png" src="../_images/tutorials_01-what-are-lightcurves_13_0.png" />
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -427,11 +436,12 @@ time resolution of the array, taking the average value in each bin.</p>
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_01-what-are-lightcurves_14_0.png"><img alt="../_images/tutorials_01-what-are-lightcurves_14_0.png" src="../_images/tutorials_01-what-are-lightcurves_14_0.png" style="width: 755px; height: 368px;" /></a>
+<img alt="../_images/tutorials_01-what-are-lightcurves_14_0.png" src="../_images/tutorials_01-what-are-lightcurves_14_0.png" />
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -444,12 +454,13 @@ time resolution of the array, taking the average value in each bin.</p>
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_01-what-are-lightcurves_15_0.png"><img alt="../_images/tutorials_01-what-are-lightcurves_15_0.png" src="../_images/tutorials_01-what-are-lightcurves_15_0.png" style="width: 755px; height: 368px;" /></a>
+<img alt="../_images/tutorials_01-what-are-lightcurves_15_0.png" src="../_images/tutorials_01-what-are-lightcurves_15_0.png" />
 </div>
 </div>
 <p>Or we can do these all in a single (long) line!</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -461,7 +472,7 @@ time resolution of the array, taking the average value in each bin.</p>
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_01-what-are-lightcurves_17_0.png"><img alt="../_images/tutorials_01-what-are-lightcurves_17_0.png" src="../_images/tutorials_01-what-are-lightcurves_17_0.png" style="width: 755px; height: 368px;" /></a>
+<img alt="../_images/tutorials_01-what-are-lightcurves_17_0.png" src="../_images/tutorials_01-what-are-lightcurves_17_0.png" />
 </div>
 </div>
 </div>

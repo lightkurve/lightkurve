@@ -15,7 +15,6 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
@@ -73,7 +72,9 @@
 <dl class="function">
 <dt id="lightkurve.search.open">
 <code class="descclassname">lightkurve.search.</code><code class="descname">open</code><span class="sig-paren">(</span><em>path_or_url</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.search.open" title="Permalink to this definition">¶</a></dt>
-<dd><p>Opens a Kepler or TESS data product.</p>
+<dd><p>Opens any valid Kepler or TESS data file and returns an instance of
+<a class="reference internal" href="lightkurve.lightcurvefile.LightCurveFile.html#lightkurve.lightcurvefile.LightCurveFile" title="lightkurve.lightcurvefile.LightCurveFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightCurveFile</span></code></a>
+or <a class="reference internal" href="lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile" title="lightkurve.targetpixelfile.TargetPixelFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">TargetPixelFile</span></code></a>.</p>
 <p>This function will use the <cite>detect_filetype()</cite> function to
 automatically detect the type of the data product, and return the
 appropriate object. File types currently supported are:</p>

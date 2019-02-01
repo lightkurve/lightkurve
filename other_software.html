@@ -1,0 +1,396 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Other software &mdash; lightkurve 1.0b26.dev documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Citing and acknowledging lightkurve" href="citing.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> lightkurve
+          
+
+          
+            
+            <img src="_static/lightkurve.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0b26.dev
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/index.html">API documentation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/section1.html">Introduction to lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/section2.html">Science with lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/section3.html">Extracting lightcurves</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/section4.html">Systematics correction</a></li>
+</ul>
+<p class="caption"><span class="caption-text">About lightkurve</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing and reporting issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developer.html">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="citing.html">Citing and acknowledging lightkurve</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Other software</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#detrending-analysis">Detrending &amp; Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#full-frame-images">Full Frame Images</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#data-access">Data access</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#metadata">Metadata</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#planet-search-characterization">Planet Search/Characterization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#population-statistics">Population Statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#positional">Positional</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#science-astrophysics">Science / Astrophysics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#astronomical-spectroscopy-radial-velocities">Astronomical Spectroscopy / Radial Velocities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#other">Other</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">lightkurve</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Other software</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/other_software.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+</style>
+<div class="section" id="other-software">
+<span id="id1"></span><h1>Other software<a class="headerlink" href="#other-software" title="Permalink to this headline">¶</a></h1>
+<p>Lightkurve provides general purpose tools for interacting with astronomical lightcurve data.
+Many other tools have been developed to solve related scientific and data analysis problems.
+On this page we list community-produced software that may complement lightkurve.</p>
+<p>If your software is not listed, please <a class="reference external" href="https://github.com/KeplerGO/lightkurve/blob/master/docs/source/other_software.rst">open a Pull Request</a> to add it!</p>
+<div class="section" id="detrending-analysis">
+<h2>Detrending &amp; Analysis<a class="headerlink" href="#detrending-analysis" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="http://github.com/KeplerGO/PyKE">PyKE</a> : Kepler, K2 &amp; TESS Data Analysis Tools</li>
+<li><a class="reference external" href="http://github.com/rodluger/everest">everest</a> : De-trending of K2 Light curves</li>
+<li><a class="reference external" href="http://github.com/OxES/k2sc">k2sc</a> : K2 systematics correction using Gaussian processes</li>
+<li><a class="reference external" href="http://github.com/benmontet/nutella">nutella</a> : Great (point) spreads for beautiful Kepler/K2 inference</li>
+<li><a class="reference external" href="http://github.com/nksaunders/skope">skope</a> : Synthetic K2 Objects for PLD Experimentation</li>
+<li><a class="reference external" href="http://github.com/petigura/k2phot">k2phot</a> : public k2phot code from Erik Petigura</li>
+<li><a class="reference external" href="http://github.com/jvc2688/K2-CPM">K2-CPM</a> : K2 Causal Pixel Model</li>
+<li><a class="reference external" href="https://github.com/hvidy/halophot/">halophot</a> : K2 Halo Photometry for very bright stars</li>
+<li><a class="reference external" href="http://github.com/nksaunders/cave">cave</a> : Crowded Aperture Variability Extraction</li>
+<li><a class="reference external" href="http://github.com/skgrunblatt/celerite-asteroseis">celerite-asteroseis</a> : Transit fitting and basic time-domain asteroseismology using celerite and ktransit</li>
+<li><a class="reference external" href="http://github.com/vincentvaneylen/k2photometry">k2photometry</a> : Read, reduce and detrend K2 photometry and search for transiting planets</li>
+<li><a class="reference external" href="http://github.com/benjaminpope/keplersmear">keplersmear</a> : Make light curves from Kepler and K2 collateral data</li>
+<li><a class="reference external" href="http://github.com/OxES/OxKeplerSC">OxKeplerSC</a> : Kepler jump and systematics correction using Variational Bayes and shrinkage priors.</li>
+<li><a class="reference external" href="http://github.com/FGCUStellarResearch/K2Pipeline">K2Pipeline</a> : Data reduction and detrending pipeline for K2 data in Matlab</li>
+<li><a class="reference external" href="http://github.com/stephtdouglas/PySysRem">PySysRem</a> : A Python implementation of the SysRem algorithm from Tamuz, Mazeh, and Zucker (2004)</li>
+<li><a class="reference external" href="https://github.com/saigrain/CBVshrink">CBVshrink</a> : Kepler systematics correction using co-trending basis vectors (CBV), Variational Bayes and shrinkage priors</li>
+</ul>
+</div>
+<div class="section" id="full-frame-images">
+<h2>Full Frame Images<a class="headerlink" href="#full-frame-images" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="http://github.com/benmontet/f3">f3</a> : Full Frame Fotometry from the Kepler Full Frame Images</li>
+<li><a class="reference external" href="http://github.com/jradavenport/FFIorBUST">FFIorBUST</a> : Make really bad light curves from the Kepler Full Frame Images</li>
+<li><a class="reference external" href="http://github.com/dfm/kepcal">kepcal</a> : Self calibration using the Kepler FFIs</li>
+</ul>
+</div>
+<div class="section" id="data-access">
+<h2>Data access<a class="headerlink" href="#data-access" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="http://github.com/dfm/kplr">kplr</a> : Tools for working with Kepler data using Python</li>
+<li><a class="reference external" href="http://github.com/christinahedges/kepFGS">kepFGS</a> : Tools to use the Kepler and K2 Fine Guidance Sensor data.</li>
+<li><a class="reference external" href="http://github.com/rodluger/k2plr">k2plr</a> : Fork of dfm/kplr with added k2 functionality</li>
+</ul>
+</div>
+<div class="section" id="metadata">
+<h2>Metadata<a class="headerlink" href="#metadata" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="http://github.com/KeplerGO/kadenza">kadenza</a> : Converts raw cadence target data from the Kepler space telescope into FITS files.</li>
+<li><a class="reference external" href="http://github.com/KeplerGO/k2-quality-control">k2-quality-control</a> : Automated quality control of Kepler/K2 data products.</li>
+<li><a class="reference external" href="http://github.com/amcody/SuperstampFITS">SuperstampFITS</a> : Create individual FITS files of K2 superstamp regions.</li>
+<li><a class="reference external" href="http://github.com/timothydmorton/keputils">keputils</a> : Basic module for interaction with KOI and Kepler-stellar tables.</li>
+</ul>
+</div>
+<div class="section" id="planet-search-characterization">
+<h2>Planet Search/Characterization<a class="headerlink" href="#planet-search-characterization" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="https://github.com/rodluger/starry">starry</a> : Analytic occultation light curves for astronomy.</li>
+<li><a class="reference external" href="http://github.com/hpparvi/PyTransit">PyTransit</a> : Fast and easy transit light curve modeling using Python and Fortran.</li>
+<li><a class="reference external" href="http://github.com/lkreidberg/batman">batman</a> : Fast transit light curves models in Python.</li>
+<li><a class="reference external" href="https://robin.readthedocs.io/en/latest/">robin</a> : Robust exoplanet radii from ingress/egress durations</li>
+<li><a class="reference external" href="http://github.com/mrtommyb/ktransit">ktransit</a> : A simple exoplanet transit modeling tool in python</li>
+<li><a class="reference external" href="http://github.com/rodluger/planetplanet">planetplanet</a> : A general photodynamical code for exoplanet light curves</li>
+<li><a class="reference external" href="http://github.com/dfm/ketu">ketu</a> : Search for transiting planets in K2 data</li>
+<li><a class="reference external" href="http://github.com/mindriot101/ttvfast-python">ttvfast-python</a> : Python interface to the TTVFast library</li>
+<li><a class="reference external" href="https://github.com/shadden/TTV2Fast2Furious">TTV2Fast2Furious</a> : Construct and fit linear transit timing variation models</li>
+<li><a class="reference external" href="http://github.com/petigura/terra">terra</a> : Transit Detection Code</li>
+<li><a class="reference external" href="http://github.com/rodluger/pysyzygy">pysyzygy</a> : A fast and general planet transit (syzygy) code written in C and in Python</li>
+<li><a class="reference external" href="https://github.com/christinahedges/wellfit">wellfit</a> : Turnkey transit modeling with starry and celerite</li>
+<li><a class="reference external" href="http://github.com/hpparvi/k2ps">k2ps</a> : K2 Planet Search</li>
+<li><a class="reference external" href="http://github.com/matiscke/lcps">lcps</a> : A tool for pre-selecting light curves with possible transit signatures</li>
+</ul>
+</div>
+<div class="section" id="population-statistics">
+<h2>Population Statistics<a class="headerlink" href="#population-statistics" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="http://github.com/timothydmorton/VESPA">VESPA</a> : Calculating false positive probabilities for transit signals</li>
+<li><a class="reference external" href="http://github.com/nasa/kepler-robovetter">kepler-robovetter</a> : The Kepler Prime Robovetter</li>
+<li><a class="reference external" href="http://github.com/timothydmorton/koi-fpp">koi-fpp</a> : False positive probabilities for all KOIs</li>
+<li><a class="reference external" href="http://github.com/nasa/KeplerPORTS">KeplerPORTS</a> : The Kepler Pipeline</li>
+<li><a class="reference external" href="http://github.com/nasa/Kepler-FLTI">Kepler-FLTI</a> : Kepler Prime Flux-Level Transit Injection</li>
+<li><a class="reference external" href="https://github.com/GijsMulders/epos">epos</a> : Exoplanet Population Observation Simulator</li>
+</ul>
+</div>
+<div class="section" id="positional">
+<h2>Positional<a class="headerlink" href="#positional" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="http://github.com/KeplerGO/K2fov">K2fov</a> : Check whether targets are in the field of view of NASA’s K2 space telescope</li>
+<li><a class="reference external" href="http://github.com/KeplerGO/K2ephem">K2ephem</a> : Check whether a Solar System body is (or was) observable by NASA’s K2 mission.</li>
+<li><a class="reference external" href="http://github.com/stephtdouglas/k2-pix">k2-pix</a> : Overlay a sky survey image on a K2 target pixel stamp</li>
+<li><a class="reference external" href="http://github.com/barentsen/k2flix">k2flix</a> : Create quicklook movies from the pixel data observed by Kepler/K2/TESS</li>
+<li><a class="reference external" href="http://github.com/barentsen/k2mosaic">k2mosaic</a> : Mosaic Target Pixel Files (TPFs) obtained by NASA’s Kepler/K2 missions into images and movies.</li>
+<li><a class="reference external" href="https://github.com/megbedell/gaia-kepler.fun">gaia-kepler.fun</a> : Gaia DR2 + Kepler/K2 cross-matches</li>
+<li><a class="reference external" href="http://github.com/tessgi/tvguide">tvguide</a> : A tool for determining whether stars and galaxies are observable by TESS.</li>
+</ul>
+</div>
+<div class="section" id="science-astrophysics">
+<h2>Science / Astrophysics<a class="headerlink" href="#science-astrophysics" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="http://github.com/timothydmorton/isochrones">isochrones</a> : Pythonic stellar model grid access; easy MCMC fitting of stellar properties</li>
+<li><a class="reference external" href="http://github.com/hpparvi/ldtk">ldtk</a> : Python toolkit for calculating stellar limb darkening profiles</li>
+<li><a class="reference external" href="http://github.com/danxhuber/isoclassify">isoclassify</a> : Perform stellar classifications using isochrone grids</li>
+<li><a class="reference external" href="http://github.com/jradavenport/appaloosa">appaloosa</a> : Python-based flare finding code for Kepler light curves.</li>
+<li><a class="reference external" href="http://github.com/timothydmorton/pymacula">pymacula</a> : Python wrapper for Macula analytic starspot code</li>
+<li><a class="reference external" href="http://github.com/rpoleski/MulensModel">MulensModel</a> : Microlensing Modelling package</li>
+<li><a class="reference external" href="http://github.com/stephtdouglas/animate_spots">animate_spots</a> : Make frames for animated gifs/movies showing a rotating spotted star</li>
+<li><a class="reference external" href="https://github.com/christinahedges/asteriks">asteriks</a> : Generate light curves of solar system objects from K2 data</li>
+<li><a class="reference external" href="http://github.com/jadilia/decatur">decatur</a> : Tidal Synchronization of Kepler Eclipsing Binaries</li>
+<li><a class="reference external" href="https://github.com/earlbellinger/asteroseismology">asteroseismology</a> : Forward and inverse problems in asteroseismology</li>
+</ul>
+</div>
+<div class="section" id="astronomical-spectroscopy-radial-velocities">
+<h2>Astronomical Spectroscopy / Radial Velocities<a class="headerlink" href="#astronomical-spectroscopy-radial-velocities" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="https://github.com/dfm/exoplanet">exoplanet</a> : Fast and scalable MCMC for all your exoplanet needs</li>
+<li><a class="reference external" href="https://github.com/nespinoza/exonailer">exonailer</a> : Tools for fitting transiting exoplanet lightcurves and radial velocities</li>
+<li><a class="reference external" href="https://github.com/oscaribv/pyaneti">pyaneti</a> : A multi-planet Radial Velocity and Transit fit software</li>
+<li><a class="reference external" href="http://github.com/California-Planet-Search/radvel">radvel</a> : General Toolkit for Modeling Radial Velocity Data</li>
+<li><a class="reference external" href="https://github.com/LucaMalavolta/PyORBIT">PyORBIT</a> : Simultaneously characterize the orbits of exoplanets and the noise induced by stellar activity.</li>
+<li><a class="reference external" href="https://github.com/megbedell/wobble">wobble</a> : Precise data-driven RV fitting with treatment for telluric contamination</li>
+<li><a class="reference external" href="https://github.com/iancze/Starfish">Starfish</a> : Tools for Flexible Spectroscopic Inference</li>
+<li><a class="reference external" href="https://github.com/iancze/PSOAP">PSOAP</a> : Tools for data-driven spectra models with Gaussian processes</li>
+<li><a class="reference external" href="https://github.com/samuelyeewl/specmatch-emp">specmatch-emp</a> : Spectral matching with empirical templates</li>
+<li><a class="reference external" href="https://github.com/petigura/specmatch-syn">specmatch-syn</a> : Spectral matching with synthetic templates</li>
+</ul>
+</div>
+<div class="section" id="other">
+<h2>Other<a class="headerlink" href="#other" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="http://github.com/natashabatalha/PandExo">PandExo</a> : A Community Tool for Transiting Exoplanet Science with the JWST &amp; HST</li>
+<li><a class="reference external" href="http://github.com/ethankruse/kepler_orrery">kepler_orrery</a> : Make a Kepler orrery gif or movie of all the Kepler multi-planet systems</li>
+<li><a class="reference external" href="https://github.com/sblunt/orbitize">orbitize</a> : Orbit-fitting for directly imaged objects</li>
+<li><a class="reference external" href="https://github.com/oscaribv/tango">tango</a> : Animate exoplanet transit orbits on a stellar disk</li>
+<li><a class="reference external" href="http://github.com/ethankruse/koi3278">koi3278</a> : Analysis files for the KOI-3278 system</li>
+<li><a class="reference external" href="http://github.com/rodluger/trappist1">trappist1</a> : TRAPPIST-1 photometry with K2</li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="citing.html" class="btn btn-neutral" title="Citing and acknowledging lightkurve" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright lightkurve developers and contributors
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

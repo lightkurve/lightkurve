@@ -1,0 +1,6 @@
+<map id="inheritancec672026571" name="inheritancec672026571">
+<area shape="rect" id="node1" href="lightkurve.lightcurve.FoldedLightCurve.html#lightkurve.lightcurve.FoldedLightCurve" target="_top" title="Generic class to store and plot phase&#45;folded light curves." alt="" coords="145,5,280,31"/>
+<area shape="rect" id="node2" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" target="_top" title="Generic base class to hold time series brightness data from any telescope." alt="" coords="5,55,97,80"/>
+<area shape="rect" id="node3" href="lightkurve.lightcurve.KeplerLightCurve.html#lightkurve.lightcurve.KeplerLightCurve" target="_top" title="Subclass of `LightCurve` which holds extra data specific to Kepler." alt="" coords="146,55,279,80"/>
+<area shape="rect" id="node4" href="lightkurve.lightcurve.TessLightCurve.html#lightkurve.lightcurve.TessLightCurve" target="_top" title="Subclass of `LightCurve` which holds extra data specific to TESS." alt="" coords="153,104,273,129"/>
+</map>

@@ -1,0 +1,335 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Developer documentation &mdash; lightkurve 1.0b26.dev documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Citing and acknowledging lightkurve" href="citing.html" />
+    <link rel="prev" title="Contributing and reporting issues" href="contributing.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> lightkurve
+          
+
+          
+            
+            <img src="_static/lightkurve.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0b26.dev
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/index.html">API documentation</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/section1.html">Introduction to lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/section2.html">Science with lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/section3.html">Extracting lightcurves</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/section4.html">Systematics correction</a></li>
+</ul>
+<p class="caption"><span class="caption-text">About lightkurve</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing and reporting issues</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Developer documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#coding-and-documentation-standards">Coding and documentation standards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#building-documentation">Building documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#release-procedure">Release procedure</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="citing.html">Citing and acknowledging lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="other_software.html">Other software</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">lightkurve</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Developer documentation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/developer.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+</style>
+<div class="section" id="developer-documentation">
+<span id="developer"></span><h1>Developer documentation<a class="headerlink" href="#developer-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Lightkurve is actively developed on its <a class="reference external" href="https://github.com/KeplerGO/lightkurve">GitHub repository</a>.
+This page provides guidelines for package developers and maintainers.</p>
+<div class="section" id="coding-and-documentation-standards">
+<h2>Coding and documentation standards<a class="headerlink" href="#coding-and-documentation-standards" title="Permalink to this headline">¶</a></h2>
+<p>Lightkurve adopts AstroPy’s coding guidelines and standards,
+as documented in <a class="reference external" href="http://docs.astropy.org/en/stable/index.html#developer-documentation">AstroPy’s Development Documentation</a>.</p>
+</div>
+<div class="section" id="building-documentation">
+<h2>Building documentation<a class="headerlink" href="#building-documentation" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Building the documentation is not necessary unless you are
+writing new documentation or do not have internet access, because the
+latest version of the documentation is available online at
+<a class="reference external" href="https://docs.lightkurve.org/">docs.lightkurve.org</a> .</p>
+</div>
+<p>Building the <em>lightkurve</em> documentation requires a few extra packages:</p>
+<ul class="simple">
+<li>sphinx</li>
+<li>sphinx-automodapi</li>
+<li>nbsphinx</li>
+<li>ghp-import</li>
+<li>graphviz</li>
+<li><a class="reference external" href="https://github.com/numpy/numpydoc">numpydoc</a></li>
+</ul>
+<p>These packages can be installed using <cite>conda</cite> or <cite>pip</cite>.</p>
+<p>To build the documentation in HTML format, execute:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd docs
+$ make clean
+$ make html
+</pre></div>
+</div>
+<p>This will save the documentation website in the <code class="docutils literal notranslate"><span class="pre">../../lightkurve-docs</span></code> directory
+on your system.  The notebook-based tutorials will not be recompiled by default
+because they take some time to build.  To recompile the notebooks, type:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">notebooks</span>
+</pre></div>
+</div>
+<p>Finally, if you have write permission to <em>lightkurve</em>’s GitHub repository,
+you can upload the documentation to the web server using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">upload</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="release-procedure">
+<h2>Release procedure<a class="headerlink" href="#release-procedure" title="Permalink to this headline">¶</a></h2>
+<p>The procedure to release a new version of Lightkurve requires a number
+of manual steps:</p>
+<ol class="arabic simple">
+<li>Add any new contributors to <cite>AUTHORS.rst</cite>.</li>
+<li>Remove the suffix <cite>.dev</cite> from the version number in <cite>lightkurve/version.py</cite> and commit to master. Note that Lightkurve follows a <a class="reference external" href="https://semver.org">semantic versioning scheme</a>.</li>
+<li>Verify that all unit tests pass:</li>
+</ol>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ pytest --remote-data
+</pre></div>
+</div>
+<ol class="arabic simple" start="4">
+<li>Verify that the docs and all tutorial notebooks can be compiled without failure (see <em>Building documentation</em> above), and upload them to the webserver.</li>
+<li>Make a new release branch in GitHub using the <cite>Draft a new release button</cite> at <a class="reference external" href="https://github.com/KeplerGO/lightkurve/releases">https://github.com/KeplerGO/lightkurve/releases</a>.</li>
+<li>Create and upload the new package to PyPI:</li>
+</ol>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ python setup.py release
+</pre></div>
+</div>
+<ol class="arabic simple" start="7">
+<li>Increment the version number on the <a class="reference external" href="https://github.com/conda-forge/lightkurve-feedstock">lightkurve conda feedstock</a>.  Navigate to the <code class="code docutils literal notranslate"><span class="pre">meta.yaml</span></code> file in the <code class="code docutils literal notranslate"><span class="pre">recipe</span></code> directory and change two lines:</li>
+</ol>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span>{% set version = &quot;1.0b20&quot; %}
+{% set sha256 = &quot;b65f556362b64d9fcc8aa4b0e89991c2b8f7fc059dfa22269b0877a8b758b255&quot; %}
+</pre></div>
+</div>
+<p>Replace the <cite>version</cite> and <cite>sha256</cite> values with the most recent release info in <a class="reference external" href="https://pypi.org/project/lightkurve/">the lightkurve PyPI</a>.  Submit your update as a Pull Request, which offers a checklist to guide programmatic spot-checking of your code.</p>
+<ol class="arabic simple" start="8">
+<li>Edit <cite>lightkurve/version.py</cite> to contain the next version number with suffix <cite>.dev</cite>.</li>
+</ol>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="citing.html" class="btn btn-neutral float-right" title="Citing and acknowledging lightkurve" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="contributing.html" class="btn btn-neutral" title="Contributing and reporting issues" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright lightkurve developers and contributors
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

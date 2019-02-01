@@ -15,7 +15,6 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
@@ -73,7 +72,8 @@
 <dl class="function">
 <dt id="lightkurve.search.search_lightcurvefile">
 <code class="descclassname">lightkurve.search.</code><code class="descname">search_lightcurvefile</code><span class="sig-paren">(</span><em>target, radius=None, cadence='long', mission=['Kepler', 'K2', 'TESS'], quarter=None, month=None, campaign=None, sector=None, limit=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.search.search_lightcurvefile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a SearchResult with MAST LightCurveFiles which match the criteria.</p>
+<dd><p>Searches the public data archive at MAST for a Kepler or TESS
+<a class="reference internal" href="lightkurve.lightcurvefile.LightCurveFile.html#lightkurve.lightcurvefile.LightCurveFile" title="lightkurve.lightcurvefile.LightCurveFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightCurveFile</span></code></a>.</p>
 <p>This function fetches a data table that lists the Light Curve Files
 that fall within a region of sky centered around the position of <cite>target</cite>
 and within a cone of a given <cite>radius</cite>. If no value is provided for <cite>radius</cite>,

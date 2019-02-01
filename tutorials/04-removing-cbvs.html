@@ -15,7 +15,6 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
@@ -123,18 +122,18 @@ div.nblast {
 
 /* input prompt */
 div.nbinput div.prompt pre {
-    color: #307FC1;
+    color: #303F9F;
 }
 
 /* output prompt */
 div.nboutput div.prompt pre {
-    color: #BF5B3D;
+    color: #D84315;
 }
 
 /* all prompts */
 div.nbinput div.prompt,
 div.nboutput div.prompt {
-    min-width: 7ex;
+    min-width: 9ex;
     padding-top: 0.4em;
     padding-right: 0.4em;
     text-align: right;
@@ -174,9 +173,9 @@ div.nboutput div.output_area {
 
 /* input area */
 div.nbinput div.input_area {
-    border: 1px solid #e0e0e0;
+    border: 1px solid #cfcfcf;
     border-radius: 2px;
-    background: #f5f5f5;
+    background: #f7f7f7;
 }
 
 /* override MathJax center alignment in output cells */
@@ -184,7 +183,7 @@ div.nboutput div[class*=MathJax] {
     text-align: left !important;
 }
 
-/* override sphinx.ext.imgmath center alignment in output cells */
+/* override sphinx.ext.pngmath center alignment in output cells */
 div.nboutput div.math p {
     text-align: left;
 }
@@ -233,40 +232,6 @@ div.nboutput div.output_area.stderr {
 
 .ansi-bold { font-weight: bold; }
 .ansi-underline { text-decoration: underline; }
-
-/* Some additional styling taken form the Jupyter notebook CSS */
-div.rendered_html table {
-  border: none;
-  border-collapse: collapse;
-  border-spacing: 0;
-  color: black;
-  font-size: 12px;
-  table-layout: fixed;
-}
-div.rendered_html thead {
-  border-bottom: 1px solid black;
-  vertical-align: bottom;
-}
-div.rendered_html tr,
-div.rendered_html th,
-div.rendered_html td {
-  text-align: right;
-  vertical-align: middle;
-  padding: 0.5em 0.5em;
-  line-height: normal;
-  white-space: normal;
-  max-width: none;
-  border: none;
-}
-div.rendered_html th {
-  font-weight: bold;
-}
-div.rendered_html tbody tr:nth-child(odd) {
-  background: #f5f5f5;
-}
-div.rendered_html tbody tr:hover {
-  background: rgba(66, 165, 245, 0.2);
-}
 </style>
 <div class="admonition note">
 <p class="admonition-title"><strong>This page is a static version of an interactive Jupyter notebook</strong></p>
@@ -277,10 +242,16 @@ div.rendered_html tbody tr:hover {
 </div>
 <div class="section" id="How-to-remove-common-systematics-using-basis-vectors-(CBVs)">
 <h1>How to remove common systematics using basis vectors (CBVs)<a class="headerlink" href="#How-to-remove-common-systematics-using-basis-vectors-(CBVs)" title="Permalink to this headline">¶</a></h1>
-<p>Cotrending Basis Vectors are used to remove long term trends in light curves. They are built from the most common trends observed in each channel. You can read more about CBVs in <a class="reference external" href="https://arxiv.org/pdf/1207.3093.pdf">Demystifying Kepler Data</a>. They can be used to clean lightcurves of common trends experience by all targets.</p>
-<p>Below is an example workflow to remove CBVs from an light curve in Kepler; <a class="reference external" href="https://en.wikipedia.org/wiki/KIC_8462852">Tabby’s star</a>.</p>
+<p>Cotrending Basis Vectors are used to remove long term trends in light
+curves. They are built from the most common trends observed in each
+channel. You can read more about CBVs in <a class="reference external" href="https://arxiv.org/pdf/1207.3093.pdf">Demystifying Kepler
+Data</a>. They can be used to clean
+lightcurves of common trends experience by all targets.</p>
+<p>Below is an example workflow to remove CBVs from an light curve in
+Kepler; <a class="reference external" href="https://en.wikipedia.org/wiki/KIC_8462852">Tabby’s star</a>.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -300,12 +271,17 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_04-removing-cbvs_2_0.png"><img alt="../_images/tutorials_04-removing-cbvs_2_0.png" src="../_images/tutorials_04-removing-cbvs_2_0.png" style="width: 745px; height: 368px;" /></a>
+<img alt="../_images/tutorials_04-removing-cbvs_2_0.png" src="../_images/tutorials_04-removing-cbvs_2_0.png" />
 </div>
 </div>
-<p>The light curve above has a significant dip due to the astrophysical variability from Tabby’s star. However there are other long term trends and small ramps due to heating in the spacecraft, which we would like to remove. We can use CBV’s to do this. Let’s import the CBV corrector from <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code>.</p>
+<p>The light curve above has a significant dip due to the astrophysical
+variability from Tabby’s star. However there are other long term trends
+and small ramps due to heating in the spacecraft, which we would like to
+remove. We can use CBV’s to do this. Let’s import the CBV corrector from
+<code class="docutils literal notranslate"><span class="pre">lightkurve</span></code>.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -313,9 +289,11 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
-<p>We can use the <code class="docutils literal notranslate"><span class="pre">plot_cbvs</span></code> function to take a look at the trends we are going to remove. Let’s look at just the first 8 trends.</p>
+<p>We can use the <code class="docutils literal notranslate"><span class="pre">plot_cbvs</span></code> function to take a look at the trends we
+are going to remove. Let’s look at just the first 8 trends.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -327,12 +305,14 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_04-removing-cbvs_6_0.png"><img alt="../_images/tutorials_04-removing-cbvs_6_0.png" src="../_images/tutorials_04-removing-cbvs_6_0.png" style="width: 352px; height: 277px;" /></a>
+<img alt="../_images/tutorials_04-removing-cbvs_6_0.png" src="../_images/tutorials_04-removing-cbvs_6_0.png" />
 </div>
 </div>
-<p>We probably don’t want to correct all these trends out of Tabby’s star. Let’s pick just the first 5.</p>
+<p>We probably don’t want to correct all these trends out of Tabby’s star.
+Let’s pick just the first 5.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -340,9 +320,11 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
-<p>We can plot the two light curves on the same plot window to see the difference.</p>
+<p>We can plot the two light curves on the same plot window to see the
+difference.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -355,10 +337,11 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_04-removing-cbvs_10_0.png"><img alt="../_images/tutorials_04-removing-cbvs_10_0.png" src="../_images/tutorials_04-removing-cbvs_10_0.png" style="width: 745px; height: 368px;" /></a>
+<img alt="../_images/tutorials_04-removing-cbvs_10_0.png" src="../_images/tutorials_04-removing-cbvs_10_0.png" />
 </div>
 </div>
-<p>Now the CBVs have been corrected only the astrophysical variability is left, the variability from spacecraft heating has been removed.</p>
+<p>Now the CBVs have been corrected only the astrophysical variability is
+left, the variability from spacecraft heating has been removed.</p>
 </div>
 
 

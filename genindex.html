@@ -16,7 +16,6 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="#" />
     <link rel="search" title="Search" href="search.html" />
     <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
@@ -196,6 +195,10 @@
 </li>
         <li><a href="api/lightkurve.lightcurve.TessLightCurve.html#lightkurve.lightcurve.TessLightCurve.bin">(lightkurve.lightcurve.TessLightCurve method)</a>
 </li>
+        <li><a href="api/lightkurve.periodogram.BoxLeastSquaresPeriodogram.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram.bin">(lightkurve.periodogram.BoxLeastSquaresPeriodogram method)</a>
+</li>
+        <li><a href="api/lightkurve.periodogram.LombScarglePeriodogram.html#lightkurve.periodogram.LombScarglePeriodogram.bin">(lightkurve.periodogram.LombScarglePeriodogram method)</a>
+</li>
         <li><a href="api/lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram.bin">(lightkurve.periodogram.Periodogram method)</a>
 </li>
       </ul></li>
@@ -204,6 +207,8 @@
       <li><a href="api/lightkurve.correctors.SFFCorrector.html#lightkurve.correctors.SFFCorrector.bin_and_interpolate">bin_and_interpolate() (lightkurve.correctors.SFFCorrector method)</a>
 </li>
       <li><a href="api/lightkurve.utils.bkjd_to_astropy_time.html#lightkurve.utils.bkjd_to_astropy_time">bkjd_to_astropy_time() (in module lightkurve.utils)</a>
+</li>
+      <li><a href="api/lightkurve.periodogram.BoxLeastSquaresPeriodogram.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram">BoxLeastSquaresPeriodogram (class in lightkurve.periodogram)</a>
 </li>
       <li><a href="api/lightkurve.correctors.SFFCorrector.html#lightkurve.correctors.SFFCorrector.breakpoints">breakpoints() (lightkurve.correctors.SFFCorrector method)</a>
 </li>
@@ -218,9 +223,13 @@
       <li><a href="api/lightkurve.lightcurvefile.KeplerLightCurveFile.html#lightkurve.lightcurvefile.KeplerLightCurveFile.cadenceno">cadenceno (lightkurve.lightcurvefile.KeplerLightCurveFile attribute)</a>
 
       <ul>
+        <li><a href="api/lightkurve.lightcurvefile.LightCurveFile.html#lightkurve.lightcurvefile.LightCurveFile.cadenceno">(lightkurve.lightcurvefile.LightCurveFile attribute)</a>
+</li>
         <li><a href="api/lightkurve.lightcurvefile.TessLightCurveFile.html#lightkurve.lightcurvefile.TessLightCurveFile.cadenceno">(lightkurve.lightcurvefile.TessLightCurveFile attribute)</a>
 </li>
         <li><a href="api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.cadenceno">(lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
+</li>
+        <li><a href="api/lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile.cadenceno">(lightkurve.targetpixelfile.TargetPixelFile attribute)</a>
 </li>
         <li><a href="api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile.cadenceno">(lightkurve.targetpixelfile.TessTargetPixelFile attribute)</a>
 </li>
@@ -248,6 +257,8 @@
       <li><a href="api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.centroids">centroids() (lightkurve.targetpixelfile.KeplerTargetPixelFile method)</a>
 
       <ul>
+        <li><a href="api/lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile.centroids">(lightkurve.targetpixelfile.TargetPixelFile method)</a>
+</li>
         <li><a href="api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile.centroids">(lightkurve.targetpixelfile.TessTargetPixelFile method)</a>
 </li>
       </ul></li>
@@ -265,10 +276,10 @@
         <li><a href="api/lightkurve.utils.TessQualityFlags.html#lightkurve.utils.TessQualityFlags.CoarsePoint">(lightkurve.utils.TessQualityFlags attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/lightkurve.correctors.KeplerCBVCorrector.html#lightkurve.correctors.KeplerCBVCorrector.coeffs">coeffs (lightkurve.correctors.KeplerCBVCorrector attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/lightkurve.utils.KeplerQualityFlags.html#lightkurve.utils.KeplerQualityFlags.CollateralCosmic">CollateralCosmic (lightkurve.utils.KeplerQualityFlags attribute)</a>
 
       <ul>
@@ -278,10 +289,14 @@
       <li><a href="api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.column">column (lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
 
       <ul>
+        <li><a href="api/lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile.column">(lightkurve.targetpixelfile.TargetPixelFile attribute)</a>
+</li>
         <li><a href="api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile.column">(lightkurve.targetpixelfile.TessTargetPixelFile attribute)</a>
 </li>
       </ul></li>
       <li><a href="api/lightkurve.lightcurvefile.KeplerLightCurveFile.html#lightkurve.lightcurvefile.KeplerLightCurveFile.compute_cotrended_lightcurve">compute_cotrended_lightcurve() (lightkurve.lightcurvefile.KeplerLightCurveFile method)</a>
+</li>
+      <li><a href="api/lightkurve.periodogram.BoxLeastSquaresPeriodogram.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram.compute_stats">compute_stats() (lightkurve.periodogram.BoxLeastSquaresPeriodogram method)</a>
 </li>
       <li><a href="api/lightkurve.lightcurve.FoldedLightCurve.html#lightkurve.lightcurve.FoldedLightCurve.copy">copy() (lightkurve.lightcurve.FoldedLightCurve method)</a>
 
@@ -292,12 +307,18 @@
 </li>
         <li><a href="api/lightkurve.lightcurve.TessLightCurve.html#lightkurve.lightcurve.TessLightCurve.copy">(lightkurve.lightcurve.TessLightCurve method)</a>
 </li>
+        <li><a href="api/lightkurve.periodogram.BoxLeastSquaresPeriodogram.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram.copy">(lightkurve.periodogram.BoxLeastSquaresPeriodogram method)</a>
+</li>
+        <li><a href="api/lightkurve.periodogram.LombScarglePeriodogram.html#lightkurve.periodogram.LombScarglePeriodogram.copy">(lightkurve.periodogram.LombScarglePeriodogram method)</a>
+</li>
         <li><a href="api/lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram.copy">(lightkurve.periodogram.Periodogram method)</a>
 </li>
       </ul></li>
       <li><a href="api/lightkurve.correctors.KeplerCBVCorrector.html#lightkurve.correctors.KeplerCBVCorrector.correct">correct() (lightkurve.correctors.KeplerCBVCorrector method)</a>
 
       <ul>
+        <li><a href="api/lightkurve.correctors.PLDCorrector.html#lightkurve.correctors.PLDCorrector.correct">(lightkurve.correctors.PLDCorrector method)</a>
+</li>
         <li><a href="api/lightkurve.correctors.SFFCorrector.html#lightkurve.correctors.SFFCorrector.correct">(lightkurve.correctors.SFFCorrector method)</a>
 </li>
         <li><a href="api/lightkurve.lightcurve.KeplerLightCurve.html#lightkurve.lightcurve.KeplerLightCurve.correct">(lightkurve.lightcurve.KeplerLightCurve method)</a>
@@ -312,6 +333,8 @@
       <li><a href="api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.create_threshold_mask">create_threshold_mask() (lightkurve.targetpixelfile.KeplerTargetPixelFile method)</a>
 
       <ul>
+        <li><a href="api/lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile.create_threshold_mask">(lightkurve.targetpixelfile.TargetPixelFile method)</a>
+</li>
         <li><a href="api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile.create_threshold_mask">(lightkurve.targetpixelfile.TessTargetPixelFile method)</a>
 </li>
       </ul></li>
@@ -324,9 +347,13 @@
       <li><a href="api/lightkurve.lightcurvefile.KeplerLightCurveFile.html#lightkurve.lightcurvefile.KeplerLightCurveFile.dec">dec (lightkurve.lightcurvefile.KeplerLightCurveFile attribute)</a>
 
       <ul>
+        <li><a href="api/lightkurve.lightcurvefile.LightCurveFile.html#lightkurve.lightcurvefile.LightCurveFile.dec">(lightkurve.lightcurvefile.LightCurveFile attribute)</a>
+</li>
         <li><a href="api/lightkurve.lightcurvefile.TessLightCurveFile.html#lightkurve.lightcurvefile.TessLightCurveFile.dec">(lightkurve.lightcurvefile.TessLightCurveFile attribute)</a>
 </li>
         <li><a href="api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.dec">(lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
+</li>
+        <li><a href="api/lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile.dec">(lightkurve.targetpixelfile.TargetPixelFile attribute)</a>
 </li>
         <li><a href="api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile.dec">(lightkurve.targetpixelfile.TessTargetPixelFile attribute)</a>
 </li>
@@ -345,6 +372,8 @@
         <li><a href="api/lightkurve.utils.TessQualityFlags.html#lightkurve.utils.TessQualityFlags.DEFAULT_BITMASK">(lightkurve.utils.TessQualityFlags attribute)</a>
 </li>
       </ul></li>
+      <li><a href="api/lightkurve.periodogram.BoxLeastSquaresPeriodogram.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram.depth_at_max_power">depth_at_max_power (lightkurve.periodogram.BoxLeastSquaresPeriodogram attribute)</a>
+</li>
       <li><a href="api/lightkurve.utils.KeplerQualityFlags.html#lightkurve.utils.KeplerQualityFlags.Desat">Desat (lightkurve.utils.KeplerQualityFlags attribute)</a>
 
       <ul>
@@ -354,6 +383,8 @@
       <li><a href="api/lightkurve.utils.KeplerQualityFlags.html#lightkurve.utils.KeplerQualityFlags.DetectorAnomaly">DetectorAnomaly (lightkurve.utils.KeplerQualityFlags attribute)</a>
 </li>
       <li><a href="api/lightkurve.utils.TessQualityFlags.html#lightkurve.utils.TessQualityFlags.Discontinuity">Discontinuity (lightkurve.utils.TessQualityFlags attribute)</a>
+</li>
+      <li><a href="api/lightkurve.periodogram.BoxLeastSquaresPeriodogram.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram.duration_at_max_power">duration_at_max_power (lightkurve.periodogram.BoxLeastSquaresPeriodogram attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -390,6 +421,8 @@
       <li><a href="api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.estimate_centroids">estimate_centroids() (lightkurve.targetpixelfile.KeplerTargetPixelFile method)</a>
 
       <ul>
+        <li><a href="api/lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile.estimate_centroids">(lightkurve.targetpixelfile.TargetPixelFile method)</a>
+</li>
         <li><a href="api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile.estimate_centroids">(lightkurve.targetpixelfile.TessTargetPixelFile method)</a>
 </li>
       </ul></li>
@@ -454,24 +487,34 @@
 </li>
         <li><a href="api/lightkurve.lightcurve.TessLightCurve.html#lightkurve.lightcurve.TessLightCurve.flatten">(lightkurve.lightcurve.TessLightCurve method)</a>
 </li>
+        <li><a href="api/lightkurve.periodogram.BoxLeastSquaresPeriodogram.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram.flatten">(lightkurve.periodogram.BoxLeastSquaresPeriodogram method)</a>
+</li>
+        <li><a href="api/lightkurve.periodogram.LombScarglePeriodogram.html#lightkurve.periodogram.LombScarglePeriodogram.flatten">(lightkurve.periodogram.LombScarglePeriodogram method)</a>
+</li>
         <li><a href="api/lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram.flatten">(lightkurve.periodogram.Periodogram method)</a>
 </li>
       </ul></li>
       <li><a href="api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.flux">flux (lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
 
       <ul>
+        <li><a href="api/lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile.flux">(lightkurve.targetpixelfile.TargetPixelFile attribute)</a>
+</li>
         <li><a href="api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile.flux">(lightkurve.targetpixelfile.TessTargetPixelFile attribute)</a>
 </li>
       </ul></li>
       <li><a href="api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.flux_bkg">flux_bkg (lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
 
       <ul>
+        <li><a href="api/lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile.flux_bkg">(lightkurve.targetpixelfile.TargetPixelFile attribute)</a>
+</li>
         <li><a href="api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile.flux_bkg">(lightkurve.targetpixelfile.TessTargetPixelFile attribute)</a>
 </li>
       </ul></li>
       <li><a href="api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.flux_bkg_err">flux_bkg_err (lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
 
       <ul>
+        <li><a href="api/lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile.flux_bkg_err">(lightkurve.targetpixelfile.TargetPixelFile attribute)</a>
+</li>
         <li><a href="api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile.flux_bkg_err">(lightkurve.targetpixelfile.TessTargetPixelFile attribute)</a>
 </li>
       </ul></li>
@@ -480,6 +523,8 @@
       <li><a href="api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.flux_err">flux_err (lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
 
       <ul>
+        <li><a href="api/lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile.flux_err">(lightkurve.targetpixelfile.TargetPixelFile attribute)</a>
+</li>
         <li><a href="api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile.flux_err">(lightkurve.targetpixelfile.TessTargetPixelFile attribute)</a>
 </li>
       </ul></li>
@@ -499,8 +544,14 @@
       </ul></li>
       <li><a href="api/lightkurve.lightcurve.FoldedLightCurve.html#lightkurve.lightcurve.FoldedLightCurve">FoldedLightCurve (class in lightkurve.lightcurve)</a>
 </li>
-      <li><a href="api/lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram.frequency_at_max_power">frequency_at_max_power (lightkurve.periodogram.Periodogram attribute)</a>
+      <li><a href="api/lightkurve.periodogram.BoxLeastSquaresPeriodogram.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram.frequency_at_max_power">frequency_at_max_power (lightkurve.periodogram.BoxLeastSquaresPeriodogram attribute)</a>
+
+      <ul>
+        <li><a href="api/lightkurve.periodogram.LombScarglePeriodogram.html#lightkurve.periodogram.LombScarglePeriodogram.frequency_at_max_power">(lightkurve.periodogram.LombScarglePeriodogram attribute)</a>
 </li>
+        <li><a href="api/lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram.frequency_at_max_power">(lightkurve.periodogram.Periodogram attribute)</a>
+</li>
+      </ul></li>
       <li><a href="api/lightkurve.lightcurvefile.KeplerLightCurveFile.html#lightkurve.lightcurvefile.KeplerLightCurveFile.from_archive">from_archive() (lightkurve.lightcurvefile.KeplerLightCurveFile static method)</a>
 
       <ul>
@@ -512,17 +563,25 @@
       <li><a href="api/lightkurve.lightcurvefile.KeplerLightCurveFile.html#lightkurve.lightcurvefile.KeplerLightCurveFile.from_fits">from_fits() (lightkurve.lightcurvefile.KeplerLightCurveFile class method)</a>
 
       <ul>
+        <li><a href="api/lightkurve.lightcurvefile.LightCurveFile.html#lightkurve.lightcurvefile.LightCurveFile.from_fits">(lightkurve.lightcurvefile.LightCurveFile class method)</a>
+</li>
         <li><a href="api/lightkurve.lightcurvefile.TessLightCurveFile.html#lightkurve.lightcurvefile.TessLightCurveFile.from_fits">(lightkurve.lightcurvefile.TessLightCurveFile class method)</a>
 </li>
         <li><a href="api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.from_fits">(lightkurve.targetpixelfile.KeplerTargetPixelFile class method)</a>
+</li>
+        <li><a href="api/lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile.from_fits">(lightkurve.targetpixelfile.TargetPixelFile class method)</a>
 </li>
         <li><a href="api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile.from_fits">(lightkurve.targetpixelfile.TessTargetPixelFile class method)</a>
 </li>
       </ul></li>
       <li><a href="api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.from_fits_images">from_fits_images() (lightkurve.targetpixelfile.KeplerTargetPixelFile static method)</a>
 </li>
-      <li><a href="api/lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram.from_lightcurve">from_lightcurve() (lightkurve.periodogram.Periodogram static method)</a>
+      <li><a href="api/lightkurve.periodogram.BoxLeastSquaresPeriodogram.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve">from_lightcurve() (lightkurve.periodogram.BoxLeastSquaresPeriodogram static method)</a>
+
+      <ul>
+        <li><a href="api/lightkurve.periodogram.LombScarglePeriodogram.html#lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve">(lightkurve.periodogram.LombScarglePeriodogram static method)</a>
 </li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -542,6 +601,8 @@
       <li><a href="api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_coordinates">get_coordinates() (lightkurve.targetpixelfile.KeplerTargetPixelFile method)</a>
 
       <ul>
+        <li><a href="api/lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile.get_coordinates">(lightkurve.targetpixelfile.TargetPixelFile method)</a>
+</li>
         <li><a href="api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile.get_coordinates">(lightkurve.targetpixelfile.TessTargetPixelFile method)</a>
 </li>
       </ul></li>
@@ -550,6 +611,8 @@
       <li><a href="api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_keyword">get_keyword() (lightkurve.targetpixelfile.KeplerTargetPixelFile method)</a>
 
       <ul>
+        <li><a href="api/lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile.get_keyword">(lightkurve.targetpixelfile.TargetPixelFile method)</a>
+</li>
         <li><a href="api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile.get_keyword">(lightkurve.targetpixelfile.TessTargetPixelFile method)</a>
 </li>
       </ul></li>
@@ -564,6 +627,10 @@
       <li><a href="api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_model">get_model() (lightkurve.targetpixelfile.KeplerTargetPixelFile method)</a>
 </li>
       <li><a href="api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_prf_model">get_prf_model() (lightkurve.targetpixelfile.KeplerTargetPixelFile method)</a>
+</li>
+      <li><a href="api/lightkurve.periodogram.BoxLeastSquaresPeriodogram.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram.get_transit_mask">get_transit_mask() (lightkurve.periodogram.BoxLeastSquaresPeriodogram method)</a>
+</li>
+      <li><a href="api/lightkurve.periodogram.BoxLeastSquaresPeriodogram.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram.get_transit_model">get_transit_model() (lightkurve.periodogram.BoxLeastSquaresPeriodogram method)</a>
 </li>
       <li><a href="api/lightkurve.prf.FixedValuePrior.html#lightkurve.prf.FixedValuePrior.gradient">gradient() (lightkurve.prf.FixedValuePrior method)</a>
 
@@ -596,6 +663,8 @@
       <li><a href="api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.hdu">hdu (lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
 
       <ul>
+        <li><a href="api/lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile.hdu">(lightkurve.targetpixelfile.TargetPixelFile attribute)</a>
+</li>
         <li><a href="api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile.hdu">(lightkurve.targetpixelfile.TessTargetPixelFile attribute)</a>
 </li>
       </ul></li>
@@ -604,12 +673,16 @@
       <li><a href="api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.header">header (lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
 
       <ul>
+        <li><a href="api/lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile.header">(lightkurve.targetpixelfile.TargetPixelFile attribute)</a>
+</li>
         <li><a href="api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile.header">(lightkurve.targetpixelfile.TessTargetPixelFile attribute)</a>
 </li>
       </ul></li>
       <li><a href="api/lightkurve.lightcurvefile.KeplerLightCurveFile.html#lightkurve.lightcurvefile.KeplerLightCurveFile.header">header() (lightkurve.lightcurvefile.KeplerLightCurveFile method)</a>
 
       <ul>
+        <li><a href="api/lightkurve.lightcurvefile.LightCurveFile.html#lightkurve.lightcurvefile.LightCurveFile.header">(lightkurve.lightcurvefile.LightCurveFile method)</a>
+</li>
         <li><a href="api/lightkurve.lightcurvefile.TessLightCurveFile.html#lightkurve.lightcurvefile.TessLightCurveFile.header">(lightkurve.lightcurvefile.TessLightCurveFile method)</a>
 </li>
       </ul></li>
@@ -632,6 +705,8 @@
       <li><a href="api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.interact">interact() (lightkurve.targetpixelfile.KeplerTargetPixelFile method)</a>
 
       <ul>
+        <li><a href="api/lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile.interact">(lightkurve.targetpixelfile.TargetPixelFile method)</a>
+</li>
         <li><a href="api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile.interact">(lightkurve.targetpixelfile.TessTargetPixelFile method)</a>
 </li>
       </ul></li>
@@ -665,6 +740,8 @@
 </li>
       <li><a href="api/lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve">LightCurve (class in lightkurve.lightcurve)</a>
 </li>
+      <li><a href="api/lightkurve.lightcurvefile.LightCurveFile.html#lightkurve.lightcurvefile.LightCurveFile">LightCurveFile (class in lightkurve.lightcurvefile)</a>
+</li>
       <li><a href="api/correctors.html#module-lightkurve.correctors">lightkurve.correctors (module)</a>, <a href="api/correctors.html#module-lightkurve.correctors">[1]</a>
 </li>
       <li><a href="api/lightcurve.html#module-lightkurve.lightcurve">lightkurve.lightcurve (module)</a>, <a href="api/lightcurve.html#module-lightkurve.lightcurve">[1]</a>
@@ -687,6 +764,8 @@
 </li>
       <li><a href="api/lightkurve.prf.TPFModel.html#lightkurve.prf.TPFModel.logp_prior">logp_prior() (lightkurve.prf.TPFModel method)</a>
 </li>
+      <li><a href="api/lightkurve.periodogram.LombScarglePeriodogram.html#lightkurve.periodogram.LombScarglePeriodogram">LombScarglePeriodogram (class in lightkurve.periodogram)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -699,10 +778,18 @@
         <li><a href="api/lightkurve.utils.TessQualityFlags.html#lightkurve.utils.TessQualityFlags.ManualExclude">(lightkurve.utils.TessQualityFlags attribute)</a>
 </li>
       </ul></li>
-      <li><a href="api/lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram.max_power">max_power (lightkurve.periodogram.Periodogram attribute)</a>
+      <li><a href="api/lightkurve.periodogram.BoxLeastSquaresPeriodogram.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram.max_power">max_power (lightkurve.periodogram.BoxLeastSquaresPeriodogram attribute)</a>
+
+      <ul>
+        <li><a href="api/lightkurve.periodogram.LombScarglePeriodogram.html#lightkurve.periodogram.LombScarglePeriodogram.max_power">(lightkurve.periodogram.LombScarglePeriodogram attribute)</a>
 </li>
+        <li><a href="api/lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram.max_power">(lightkurve.periodogram.Periodogram attribute)</a>
+</li>
+      </ul></li>
       <li><a href="api/lightkurve.prf.FixedValuePrior.html#lightkurve.prf.FixedValuePrior.mean">mean (lightkurve.prf.FixedValuePrior attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/lightkurve.lightcurvefile.KeplerLightCurveFile.html#lightkurve.lightcurvefile.KeplerLightCurveFile.mission">mission (lightkurve.lightcurvefile.KeplerLightCurveFile attribute)</a>
 
       <ul>
@@ -711,8 +798,6 @@
         <li><a href="api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile.mission">(lightkurve.targetpixelfile.TessTargetPixelFile attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.module">module (lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
 </li>
       <li><a href="api/lightkurve.utils.module_output_to_channel.html#lightkurve.utils.module_output_to_channel">module_output_to_channel() (in module lightkurve.utils)</a>
@@ -732,6 +817,8 @@
       <li><a href="api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.nan_time_mask">nan_time_mask (lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
 
       <ul>
+        <li><a href="api/lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile.nan_time_mask">(lightkurve.targetpixelfile.TargetPixelFile attribute)</a>
+</li>
         <li><a href="api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile.nan_time_mask">(lightkurve.targetpixelfile.TessTargetPixelFile attribute)</a>
 </li>
       </ul></li>
@@ -786,13 +873,27 @@
       <li><a href="api/lightkurve.lightcurvefile.KeplerLightCurveFile.html#lightkurve.lightcurvefile.KeplerLightCurveFile.PDCSAP_FLUX">PDCSAP_FLUX (lightkurve.lightcurvefile.KeplerLightCurveFile attribute)</a>
 
       <ul>
+        <li><a href="api/lightkurve.lightcurvefile.LightCurveFile.html#lightkurve.lightcurvefile.LightCurveFile.PDCSAP_FLUX">(lightkurve.lightcurvefile.LightCurveFile attribute)</a>
+</li>
         <li><a href="api/lightkurve.lightcurvefile.TessLightCurveFile.html#lightkurve.lightcurvefile.TessLightCurveFile.PDCSAP_FLUX">(lightkurve.lightcurvefile.TessLightCurveFile attribute)</a>
 </li>
       </ul></li>
-      <li><a href="api/lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram.period">period (lightkurve.periodogram.Periodogram attribute)</a>
+      <li><a href="api/lightkurve.periodogram.BoxLeastSquaresPeriodogram.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram.period">period (lightkurve.periodogram.BoxLeastSquaresPeriodogram attribute)</a>
+
+      <ul>
+        <li><a href="api/lightkurve.periodogram.LombScarglePeriodogram.html#lightkurve.periodogram.LombScarglePeriodogram.period">(lightkurve.periodogram.LombScarglePeriodogram attribute)</a>
 </li>
-      <li><a href="api/lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram.period_at_max_power">period_at_max_power (lightkurve.periodogram.Periodogram attribute)</a>
+        <li><a href="api/lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram.period">(lightkurve.periodogram.Periodogram attribute)</a>
 </li>
+      </ul></li>
+      <li><a href="api/lightkurve.periodogram.BoxLeastSquaresPeriodogram.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram.period_at_max_power">period_at_max_power (lightkurve.periodogram.BoxLeastSquaresPeriodogram attribute)</a>
+
+      <ul>
+        <li><a href="api/lightkurve.periodogram.LombScarglePeriodogram.html#lightkurve.periodogram.LombScarglePeriodogram.period_at_max_power">(lightkurve.periodogram.LombScarglePeriodogram attribute)</a>
+</li>
+        <li><a href="api/lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram.period_at_max_power">(lightkurve.periodogram.Periodogram attribute)</a>
+</li>
+      </ul></li>
       <li><a href="api/lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram">Periodogram (class in lightkurve.periodogram)</a>
 </li>
       <li><a href="api/lightkurve.lightcurve.FoldedLightCurve.html#lightkurve.lightcurve.FoldedLightCurve.phase">phase (lightkurve.lightcurve.FoldedLightCurve attribute)</a>
@@ -800,9 +901,13 @@
       <li><a href="api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.pipeline_mask">pipeline_mask (lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
 
       <ul>
+        <li><a href="api/lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile.pipeline_mask">(lightkurve.targetpixelfile.TargetPixelFile attribute)</a>
+</li>
         <li><a href="api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile.pipeline_mask">(lightkurve.targetpixelfile.TessTargetPixelFile attribute)</a>
 </li>
       </ul></li>
+      <li><a href="api/lightkurve.correctors.PLDCorrector.html#lightkurve.correctors.PLDCorrector">PLDCorrector (class in lightkurve.correctors)</a>
+</li>
       <li><a href="api/lightkurve.lightcurve.FoldedLightCurve.html#lightkurve.lightcurve.FoldedLightCurve.plot">plot() (lightkurve.lightcurve.FoldedLightCurve method)</a>
 
       <ul>
@@ -814,7 +919,13 @@
 </li>
         <li><a href="api/lightkurve.lightcurvefile.KeplerLightCurveFile.html#lightkurve.lightcurvefile.KeplerLightCurveFile.plot">(lightkurve.lightcurvefile.KeplerLightCurveFile method)</a>
 </li>
+        <li><a href="api/lightkurve.lightcurvefile.LightCurveFile.html#lightkurve.lightcurvefile.LightCurveFile.plot">(lightkurve.lightcurvefile.LightCurveFile method)</a>
+</li>
         <li><a href="api/lightkurve.lightcurvefile.TessLightCurveFile.html#lightkurve.lightcurvefile.TessLightCurveFile.plot">(lightkurve.lightcurvefile.TessLightCurveFile method)</a>
+</li>
+        <li><a href="api/lightkurve.periodogram.BoxLeastSquaresPeriodogram.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram.plot">(lightkurve.periodogram.BoxLeastSquaresPeriodogram method)</a>
+</li>
+        <li><a href="api/lightkurve.periodogram.LombScarglePeriodogram.html#lightkurve.periodogram.LombScarglePeriodogram.plot">(lightkurve.periodogram.LombScarglePeriodogram method)</a>
 </li>
         <li><a href="api/lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram.plot">(lightkurve.periodogram.Periodogram method)</a>
 </li>
@@ -825,6 +936,8 @@
         <li><a href="api/lightkurve.prf.TPFModel.html#lightkurve.prf.TPFModel.plot">(lightkurve.prf.TPFModel method)</a>
 </li>
         <li><a href="api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.plot">(lightkurve.targetpixelfile.KeplerTargetPixelFile method)</a>
+</li>
+        <li><a href="api/lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile.plot">(lightkurve.targetpixelfile.TargetPixelFile method)</a>
 </li>
         <li><a href="api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile.plot">(lightkurve.targetpixelfile.TessTargetPixelFile method)</a>
 </li>
@@ -842,6 +955,8 @@
       <ul>
         <li><a href="api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.pos_corr1">(lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
 </li>
+        <li><a href="api/lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile.pos_corr1">(lightkurve.targetpixelfile.TargetPixelFile attribute)</a>
+</li>
         <li><a href="api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile.pos_corr1">(lightkurve.targetpixelfile.TessTargetPixelFile attribute)</a>
 </li>
       </ul></li>
@@ -849,6 +964,8 @@
 
       <ul>
         <li><a href="api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.pos_corr2">(lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
+</li>
+        <li><a href="api/lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile.pos_corr2">(lightkurve.targetpixelfile.TargetPixelFile attribute)</a>
 </li>
         <li><a href="api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile.pos_corr2">(lightkurve.targetpixelfile.TessTargetPixelFile attribute)</a>
 </li>
@@ -870,6 +987,8 @@
       <li><a href="api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.quality">quality (lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
 
       <ul>
+        <li><a href="api/lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile.quality">(lightkurve.targetpixelfile.TargetPixelFile attribute)</a>
+</li>
         <li><a href="api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile.quality">(lightkurve.targetpixelfile.TessTargetPixelFile attribute)</a>
 </li>
       </ul></li>
@@ -890,9 +1009,13 @@
       <li><a href="api/lightkurve.lightcurvefile.KeplerLightCurveFile.html#lightkurve.lightcurvefile.KeplerLightCurveFile.ra">ra (lightkurve.lightcurvefile.KeplerLightCurveFile attribute)</a>
 
       <ul>
+        <li><a href="api/lightkurve.lightcurvefile.LightCurveFile.html#lightkurve.lightcurvefile.LightCurveFile.ra">(lightkurve.lightcurvefile.LightCurveFile attribute)</a>
+</li>
         <li><a href="api/lightkurve.lightcurvefile.TessLightCurveFile.html#lightkurve.lightcurvefile.TessLightCurveFile.ra">(lightkurve.lightcurvefile.TessLightCurveFile attribute)</a>
 </li>
         <li><a href="api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.ra">(lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
+</li>
+        <li><a href="api/lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile.ra">(lightkurve.targetpixelfile.TargetPixelFile attribute)</a>
 </li>
         <li><a href="api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile.ra">(lightkurve.targetpixelfile.TessTargetPixelFile attribute)</a>
 </li>
@@ -928,6 +1051,8 @@
       <li><a href="api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.row">row (lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
 
       <ul>
+        <li><a href="api/lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile.row">(lightkurve.targetpixelfile.TargetPixelFile attribute)</a>
+</li>
         <li><a href="api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile.row">(lightkurve.targetpixelfile.TessTargetPixelFile attribute)</a>
 </li>
       </ul></li>
@@ -950,6 +1075,8 @@
       <li><a href="api/lightkurve.lightcurvefile.KeplerLightCurveFile.html#lightkurve.lightcurvefile.KeplerLightCurveFile.SAP_FLUX">SAP_FLUX (lightkurve.lightcurvefile.KeplerLightCurveFile attribute)</a>
 
       <ul>
+        <li><a href="api/lightkurve.lightcurvefile.LightCurveFile.html#lightkurve.lightcurvefile.LightCurveFile.SAP_FLUX">(lightkurve.lightcurvefile.LightCurveFile attribute)</a>
+</li>
         <li><a href="api/lightkurve.lightcurvefile.TessLightCurveFile.html#lightkurve.lightcurvefile.TessLightCurveFile.SAP_FLUX">(lightkurve.lightcurvefile.TessLightCurveFile attribute)</a>
 </li>
       </ul></li>
@@ -976,11 +1103,11 @@
       <li><a href="api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.shape">shape (lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
 
       <ul>
+        <li><a href="api/lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile.shape">(lightkurve.targetpixelfile.TargetPixelFile attribute)</a>
+</li>
         <li><a href="api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile.shape">(lightkurve.targetpixelfile.TessTargetPixelFile attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/lightkurve.lightcurve.FoldedLightCurve.html#lightkurve.lightcurve.FoldedLightCurve.show_properties">show_properties() (lightkurve.lightcurve.FoldedLightCurve method)</a>
 
       <ul>
@@ -990,17 +1117,31 @@
 </li>
         <li><a href="api/lightkurve.lightcurve.TessLightCurve.html#lightkurve.lightcurve.TessLightCurve.show_properties">(lightkurve.lightcurve.TessLightCurve method)</a>
 </li>
+        <li><a href="api/lightkurve.periodogram.BoxLeastSquaresPeriodogram.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram.show_properties">(lightkurve.periodogram.BoxLeastSquaresPeriodogram method)</a>
+</li>
+        <li><a href="api/lightkurve.periodogram.LombScarglePeriodogram.html#lightkurve.periodogram.LombScarglePeriodogram.show_properties">(lightkurve.periodogram.LombScarglePeriodogram method)</a>
+</li>
         <li><a href="api/lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram.show_properties">(lightkurve.periodogram.Periodogram method)</a>
 </li>
         <li><a href="api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.show_properties">(lightkurve.targetpixelfile.KeplerTargetPixelFile method)</a>
 </li>
+        <li><a href="api/lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile.show_properties">(lightkurve.targetpixelfile.TargetPixelFile method)</a>
+</li>
         <li><a href="api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile.show_properties">(lightkurve.targetpixelfile.TessTargetPixelFile method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/lightkurve.prf.SimpleKeplerPRF.html#lightkurve.prf.SimpleKeplerPRF">SimpleKeplerPRF (class in lightkurve.prf)</a>
 </li>
-      <li><a href="api/lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram.smooth">smooth() (lightkurve.periodogram.Periodogram method)</a>
+      <li><a href="api/lightkurve.periodogram.BoxLeastSquaresPeriodogram.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram.smooth">smooth() (lightkurve.periodogram.BoxLeastSquaresPeriodogram method)</a>
+
+      <ul>
+        <li><a href="api/lightkurve.periodogram.LombScarglePeriodogram.html#lightkurve.periodogram.LombScarglePeriodogram.smooth">(lightkurve.periodogram.LombScarglePeriodogram method)</a>
 </li>
+        <li><a href="api/lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram.smooth">(lightkurve.periodogram.Periodogram method)</a>
+</li>
+      </ul></li>
       <li><a href="api/lightkurve.prf.StarParameters.html#lightkurve.prf.StarParameters">StarParameters (class in lightkurve.prf)</a>
 </li>
       <li><a href="api/lightkurve.prf.StarPrior.html#lightkurve.prf.StarPrior">StarPrior (class in lightkurve.prf)</a>
@@ -1019,6 +1160,8 @@
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile">TargetPixelFile (class in lightkurve.targetpixelfile)</a>
+</li>
       <li><a href="api/lightkurve.lightcurve.TessLightCurve.html#lightkurve.lightcurve.TessLightCurve">TessLightCurve (class in lightkurve.lightcurve)</a>
 </li>
       <li><a href="api/lightkurve.lightcurvefile.TessLightCurveFile.html#lightkurve.lightcurvefile.TessLightCurveFile">TessLightCurveFile (class in lightkurve.lightcurvefile)</a>
@@ -1032,9 +1175,13 @@
       <li><a href="api/lightkurve.lightcurvefile.KeplerLightCurveFile.html#lightkurve.lightcurvefile.KeplerLightCurveFile.time">time (lightkurve.lightcurvefile.KeplerLightCurveFile attribute)</a>
 
       <ul>
+        <li><a href="api/lightkurve.lightcurvefile.LightCurveFile.html#lightkurve.lightcurvefile.LightCurveFile.time">(lightkurve.lightcurvefile.LightCurveFile attribute)</a>
+</li>
         <li><a href="api/lightkurve.lightcurvefile.TessLightCurveFile.html#lightkurve.lightcurvefile.TessLightCurveFile.time">(lightkurve.lightcurvefile.TessLightCurveFile attribute)</a>
 </li>
         <li><a href="api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.time">(lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
+</li>
+        <li><a href="api/lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile.time">(lightkurve.targetpixelfile.TargetPixelFile attribute)</a>
 </li>
         <li><a href="api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile.time">(lightkurve.targetpixelfile.TessTargetPixelFile attribute)</a>
 </li>
@@ -1062,6 +1209,8 @@
 </li>
         <li><a href="api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.to_fits">(lightkurve.targetpixelfile.KeplerTargetPixelFile method)</a>
 </li>
+        <li><a href="api/lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile.to_fits">(lightkurve.targetpixelfile.TargetPixelFile method)</a>
+</li>
         <li><a href="api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile.to_fits">(lightkurve.targetpixelfile.TessTargetPixelFile method)</a>
 </li>
       </ul></li>
@@ -1070,6 +1219,8 @@
       <li><a href="api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.to_lightcurve">to_lightcurve() (lightkurve.targetpixelfile.KeplerTargetPixelFile method)</a>
 
       <ul>
+        <li><a href="api/lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile.to_lightcurve">(lightkurve.targetpixelfile.TargetPixelFile method)</a>
+</li>
         <li><a href="api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile.to_lightcurve">(lightkurve.targetpixelfile.TessTargetPixelFile method)</a>
 </li>
       </ul></li>
@@ -1102,12 +1253,18 @@
 </li>
         <li><a href="api/lightkurve.lightcurve.TessLightCurve.html#lightkurve.lightcurve.TessLightCurve.to_table">(lightkurve.lightcurve.TessLightCurve method)</a>
 </li>
+        <li><a href="api/lightkurve.periodogram.BoxLeastSquaresPeriodogram.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram.to_table">(lightkurve.periodogram.BoxLeastSquaresPeriodogram method)</a>
+</li>
+        <li><a href="api/lightkurve.periodogram.LombScarglePeriodogram.html#lightkurve.periodogram.LombScarglePeriodogram.to_table">(lightkurve.periodogram.LombScarglePeriodogram method)</a>
+</li>
         <li><a href="api/lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram.to_table">(lightkurve.periodogram.Periodogram method)</a>
 </li>
       </ul></li>
       <li><a href="api/lightkurve.prf.TPFModel.html#lightkurve.prf.TPFModel">TPFModel (class in lightkurve.prf)</a>
 </li>
       <li><a href="api/lightkurve.prf.TPFModelParameters.html#lightkurve.prf.TPFModelParameters">TPFModelParameters (class in lightkurve.prf)</a>
+</li>
+      <li><a href="api/lightkurve.periodogram.BoxLeastSquaresPeriodogram.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram.transit_time_at_max_power">transit_time_at_max_power (lightkurve.periodogram.BoxLeastSquaresPeriodogram attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1126,6 +1283,8 @@
       <li><a href="api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.wcs">wcs (lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
 
       <ul>
+        <li><a href="api/lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile.wcs">(lightkurve.targetpixelfile.TargetPixelFile attribute)</a>
+</li>
         <li><a href="api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile.wcs">(lightkurve.targetpixelfile.TessTargetPixelFile attribute)</a>
 </li>
       </ul></li>

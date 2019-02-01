@@ -15,7 +15,6 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
@@ -123,18 +122,18 @@ div.nblast {
 
 /* input prompt */
 div.nbinput div.prompt pre {
-    color: #307FC1;
+    color: #303F9F;
 }
 
 /* output prompt */
 div.nboutput div.prompt pre {
-    color: #BF5B3D;
+    color: #D84315;
 }
 
 /* all prompts */
 div.nbinput div.prompt,
 div.nboutput div.prompt {
-    min-width: 7ex;
+    min-width: 9ex;
     padding-top: 0.4em;
     padding-right: 0.4em;
     text-align: right;
@@ -174,9 +173,9 @@ div.nboutput div.output_area {
 
 /* input area */
 div.nbinput div.input_area {
-    border: 1px solid #e0e0e0;
+    border: 1px solid #cfcfcf;
     border-radius: 2px;
-    background: #f5f5f5;
+    background: #f7f7f7;
 }
 
 /* override MathJax center alignment in output cells */
@@ -184,7 +183,7 @@ div.nboutput div[class*=MathJax] {
     text-align: left !important;
 }
 
-/* override sphinx.ext.imgmath center alignment in output cells */
+/* override sphinx.ext.pngmath center alignment in output cells */
 div.nboutput div.math p {
     text-align: left;
 }
@@ -233,40 +232,6 @@ div.nboutput div.output_area.stderr {
 
 .ansi-bold { font-weight: bold; }
 .ansi-underline { text-decoration: underline; }
-
-/* Some additional styling taken form the Jupyter notebook CSS */
-div.rendered_html table {
-  border: none;
-  border-collapse: collapse;
-  border-spacing: 0;
-  color: black;
-  font-size: 12px;
-  table-layout: fixed;
-}
-div.rendered_html thead {
-  border-bottom: 1px solid black;
-  vertical-align: bottom;
-}
-div.rendered_html tr,
-div.rendered_html th,
-div.rendered_html td {
-  text-align: right;
-  vertical-align: middle;
-  padding: 0.5em 0.5em;
-  line-height: normal;
-  white-space: normal;
-  max-width: none;
-  border: none;
-}
-div.rendered_html th {
-  font-weight: bold;
-}
-div.rendered_html tbody tr:nth-child(odd) {
-  background: #f5f5f5;
-}
-div.rendered_html tbody tr:hover {
-  background: rgba(66, 165, 245, 0.2);
-}
 </style>
 <div class="admonition note">
 <p class="admonition-title"><strong>This page is a static version of an interactive Jupyter notebook</strong></p>
@@ -277,12 +242,26 @@ div.rendered_html tbody tr:hover {
 </div>
 <div class="section" id="How-does-the-SFF-method-work?">
 <h1>How does the SFF method work?<a class="headerlink" href="#How-does-the-SFF-method-work?" title="Permalink to this headline">¶</a></h1>
-<p>Vanderburg and Johnson (2014) introduced a method for “Self Flat Fielding” by tracking how the lightcurve changes with motion of the spacecraft:</p>
-<p><a class="reference external" href="http://adsabs.harvard.edu/abs/2014PASP..126..948V">A Technique for Extracting Highly Precise Photometry for the Two-Wheeled Kepler Mission</a></p>
-<p>In this notebook we replicate the K2SFF method following the same example source, #60021426, as that in the publication. We aim to demystify the technique, which is extremely popular within the K2 community. We have focused on reproducibility, so that we achieve the same result at the publication.</p>
-<p>The Vanderburg &amp; Johnson 2014 paper uses data from the Kepler two-wheel “Concept Engineering Test”, predating campaign 0, and sometimes called campaign <em>“eng”</em> or abbreviated CET. This vestigal “campaign” lacks some of the standardization of later K2 campaigns— it was much shorter, only about 9 days long, it lacks some of the standard quality flags, targets have non-traditional EPIC IDs, and other quirks.</p>
+<p>Vanderburg and Johnson (2014) introduced a method for “Self Flat
+Fielding” by tracking how the lightcurve changes with motion of the
+spacecraft:</p>
+<p><a class="reference external" href="http://adsabs.harvard.edu/abs/2014PASP..126..948V">A Technique for Extracting Highly Precise Photometry for the
+Two-Wheeled Kepler
+Mission</a></p>
+<p>In this notebook we replicate the K2SFF method following the same
+example source, #60021426, as that in the publication. We aim to
+demystify the technique, which is extremely popular within the K2
+community. We have focused on reproducibility, so that we achieve the
+same result at the publication.</p>
+<p>The Vanderburg &amp; Johnson 2014 paper uses data from the Kepler two-wheel
+“Concept Engineering Test”, predating campaign 0, and sometimes called
+campaign <em>“eng”</em> or abbreviated CET. This vestigal “campaign” lacks some
+of the standardization of later K2 campaigns— it was much shorter, only
+about 9 days long, it lacks some of the standard quality flags, targets
+have non-traditional EPIC IDs, and other quirks.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -298,7 +277,8 @@ div.rendered_html tbody tr:hover {
 <h2>Retrieve the K2SFF data for ENG test source <code class="docutils literal notranslate"><span class="pre">60021426</span></code><a class="headerlink" href="#Retrieve-the-K2SFF-data-for-ENG-test-source-60021426" title="Permalink to this headline">¶</a></h2>
 <p>First we will retrieve data and inspect the mask used in the paper.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -307,9 +287,12 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
-<p>The <code class="docutils literal notranslate"><span class="pre">BESTAPER</span></code> keyword explains which aperture was chosen as the “best” by Vanderburg &amp; Johnson 2014. The FITS header for that slice contains the metadata needed to reproduce the mask.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">BESTAPER</span></code> keyword explains which aperture was chosen as the
+“best” by Vanderburg &amp; Johnson 2014. The FITS header for that slice
+contains the metadata needed to reproduce the mask.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -328,12 +311,15 @@ MASKINDE  :  4
 NPIXSAP  :  29.0
 </pre></div></div>
 </div>
-<p>We want the <em>exact same</em> mask as Vanderburg &amp; Johnson 2014, but the publication version and MAST version differ!</p>
+<p>We want the <em>exact same</em> mask as Vanderburg &amp; Johnson 2014, but the
+publication version and MAST version differ!</p>
 <p>Publication version: <img alt="img" src="https://www.cfa.harvard.edu/~avanderb/k2/ep60021426image.png" /></p>
 <p>MAST Version: <img alt="MAST Version" src="http://archive.stsci.edu/hlsps/k2sff/cet/060000000/21426/hlsp_k2sff_k2_lightcurve_060021426-cet_kepler_v1_image.png" /></p>
-<p>Aperture 7 should yield a bigger mask, more similar to what was used in the paper.</p>
+<p>Aperture 7 should yield a bigger mask, more similar to what was used in
+the paper.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -343,7 +329,8 @@ NPIXSAP  :  29.0
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[6]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -353,7 +340,8 @@ NPIXSAP  :  29.0
 </div>
 <p>Save the mask for easy use in our next notebook.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -365,11 +353,15 @@ NPIXSAP  :  29.0
 <div class="section" id="Manually-reproduce-with-the-Vanderburg-provided-diagnostic-data">
 <h2>Manually reproduce with the Vanderburg-provided diagnostic data<a class="headerlink" href="#Manually-reproduce-with-the-Vanderburg-provided-diagnostic-data" title="Permalink to this headline">¶</a></h2>
 <div class="line-block">
-<div class="line">Retrieve the Vanderburg-provided diagnostic data for the Kepler ENG testing.</div>
-<div class="line">Uncomment the line below to retrieve the data programmatically, or manually get the linked file in a browser and save it to this directory.</div>
+<div class="line">Retrieve the Vanderburg-provided diagnostic data for the Kepler ENG
+testing.</div>
+<div class="line">Uncomment the line below to retrieve the data programmatically, or
+manually get the linked file in a browser and save it to this
+directory.</div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -378,7 +370,8 @@ NPIXSAP  :  29.0
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -388,10 +381,11 @@ NPIXSAP  :  29.0
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[9]:
 </pre></div>
 </div>
-<div class="output_area rendered_html docutils container">
+<div class="output_area docutils container">
 <div>
 <style scoped>
     .dataframe tbody tr th:only-of-type {
@@ -480,9 +474,12 @@ NPIXSAP  :  29.0
 </table>
 </div></div>
 </div>
-<p>We can mean-subtract the provided <span class="math notranslate nohighlight">\(x-y\)</span> centroids, assigning them column and row identifiers, then rotate the coordinates into their major and minor axes.</p>
+<p>We can mean-subtract the provided <span class="math notranslate nohighlight">\(x-y\)</span> centroids, assigning them
+column and row identifiers, then rotate the coordinates into their major
+and minor axes.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -494,7 +491,8 @@ NPIXSAP  :  29.0
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [11]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -507,7 +505,8 @@ NPIXSAP  :  29.0
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [12]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -519,7 +518,8 @@ NPIXSAP  :  29.0
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [13]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -530,7 +530,8 @@ NPIXSAP  :  29.0
 </div>
 <p>The major axis is the latter.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [14]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -539,7 +540,8 @@ NPIXSAP  :  29.0
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [15]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -561,12 +563,13 @@ NPIXSAP  :  29.0
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_04-replicate-vanderburg-2014-k2sff_24_0.png"><img alt="../_images/tutorials_04-replicate-vanderburg-2014-k2sff_24_0.png" src="../_images/tutorials_04-replicate-vanderburg-2014-k2sff_24_0.png" style="width: 331px; height: 374px;" /></a>
+<img alt="../_images/tutorials_04-replicate-vanderburg-2014-k2sff_24_0.png" src="../_images/tutorials_04-replicate-vanderburg-2014-k2sff_24_0.png" />
 </div>
 </div>
 <p>Following the form of <strong>Figure 2</strong> of Vanderburg &amp; Johsnon 2014.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [16]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -576,7 +579,8 @@ NPIXSAP  :  29.0
 </div>
 <p>You can rotate into the new reference frame.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [17]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -598,14 +602,18 @@ NPIXSAP  :  29.0
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_04-replicate-vanderburg-2014-k2sff_28_0.png"><img alt="../_images/tutorials_04-replicate-vanderburg-2014-k2sff_28_0.png" src="../_images/tutorials_04-replicate-vanderburg-2014-k2sff_28_0.png" style="width: 331px; height: 374px;" /></a>
+<img alt="../_images/tutorials_04-replicate-vanderburg-2014-k2sff_28_0.png" src="../_images/tutorials_04-replicate-vanderburg-2014-k2sff_28_0.png" />
 </div>
 </div>
-<p>We need to calculate the arclength using: <span class="math">\begin{equation}s= \int_{x'_0}^{x'_1}\sqrt{1+\left( \frac{dy'_p}{dx'}\right)^2} dx'\end{equation}</span></p>
-<p>where <span class="math notranslate nohighlight">\(x^\prime_0\)</span> is the transformed <span class="math notranslate nohighlight">\(x\)</span> coordinate of the point with the smallest <span class="math notranslate nohighlight">\(x^\prime\)</span> position, and <span class="math notranslate nohighlight">\(y^\prime_p\)</span> is the best–fit polynomial function.</p>
+<p>We need to calculate the arclength using:
+<a href="#id2"><span class="problematic" id="id3">:raw-latex:`\begin{equation}s= \int_{x'_0}^{x'_1}\sqrt{1+\left( \frac{dy'_p}{dx'}\right)^2} dx'\end{equation}`</span></a></p>
+<p>where <span class="math notranslate nohighlight">\(x^\prime_0\)</span> is the transformed <span class="math notranslate nohighlight">\(x\)</span> coordinate of the
+point with the smallest <span class="math notranslate nohighlight">\(x^\prime\)</span> position, and
+<span class="math notranslate nohighlight">\(y^\prime_p\)</span> is the best–fit polynomial function.</p>
 <p>Fit a <span class="math notranslate nohighlight">\(5^{th}\)</span> order polynomial to the rotated coordinates.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [18]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -616,7 +624,8 @@ NPIXSAP  :  29.0
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [19]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -627,7 +636,8 @@ NPIXSAP  :  29.0
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [20]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -644,12 +654,15 @@ NPIXSAP  :  29.0
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_04-replicate-vanderburg-2014-k2sff_33_0.png"><img alt="../_images/tutorials_04-replicate-vanderburg-2014-k2sff_33_0.png" src="../_images/tutorials_04-replicate-vanderburg-2014-k2sff_33_0.png" style="width: 408px; height: 277px;" /></a>
+<img alt="../_images/tutorials_04-replicate-vanderburg-2014-k2sff_33_0.png" src="../_images/tutorials_04-replicate-vanderburg-2014-k2sff_33_0.png" />
 </div>
 </div>
-<p>We see evidence for a <a class="reference external" href="https://en.wikipedia.org/wiki/Bias%E2%80%93variance_tradeoff">bias-variance tradeoff</a>, suggesting some modest opportunity for improvement.</p>
+<p>We see evidence for a <a class="reference external" href="https://en.wikipedia.org/wiki/Bias%E2%80%93variance_tradeoff">bias-variance
+tradeoff</a>,
+suggesting some modest opportunity for improvement.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [21]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -663,9 +676,11 @@ NPIXSAP  :  29.0
 </pre></div>
 </div>
 </div>
-<p>Let’s double check that we compute the same arclength as the published paper.</p>
+<p>Let’s double check that we compute the same arclength as the published
+paper.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [22]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -682,13 +697,16 @@ NPIXSAP  :  29.0
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_04-replicate-vanderburg-2014-k2sff_37_0.png"><img alt="../_images/tutorials_04-replicate-vanderburg-2014-k2sff_37_0.png" src="../_images/tutorials_04-replicate-vanderburg-2014-k2sff_37_0.png" style="width: 276px; height: 265px;" /></a>
+<img alt="../_images/tutorials_04-replicate-vanderburg-2014-k2sff_37_0.png" src="../_images/tutorials_04-replicate-vanderburg-2014-k2sff_37_0.png" />
 </div>
 </div>
 <p>Yes, we compute arclength correctly.</p>
-<p>Now we apply a <strong>high-pass filter</strong> to the raw lightcurve data. We follow the original paper by using <em>BSplines</em> with 1.5 day breakpoints. You can also apply data exclusion at this stage.</p>
+<p>Now we apply a <strong>high-pass filter</strong> to the raw lightcurve data. We
+follow the original paper by using <em>BSplines</em> with 1.5 day breakpoints.
+You can also apply data exclusion at this stage.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [23]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -698,7 +716,8 @@ NPIXSAP  :  29.0
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [24]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -706,9 +725,12 @@ NPIXSAP  :  29.0
 </pre></div>
 </div>
 </div>
-<p>We find the weighted least square spline for a given set of knots, <span class="math notranslate nohighlight">\(t\)</span>. We supply interior knots as knots on the ends are added automatically, as stated in the <code class="docutils literal notranslate"><span class="pre">interpolate.splrep()</span></code> docstring.</p>
+<p>We find the weighted least square spline for a given set of knots,
+<span class="math notranslate nohighlight">\(t\)</span>. We supply interior knots as knots on the ends are added
+automatically, as stated in the <code class="docutils literal notranslate"><span class="pre">interpolate.splrep()</span></code> docstring.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [25]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -719,7 +741,8 @@ NPIXSAP  :  29.0
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [26]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -734,15 +757,18 @@ NPIXSAP  :  29.0
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_04-replicate-vanderburg-2014-k2sff_44_0.png"><img alt="../_images/tutorials_04-replicate-vanderburg-2014-k2sff_44_0.png" src="../_images/tutorials_04-replicate-vanderburg-2014-k2sff_44_0.png" style="width: 400px; height: 265px;" /></a>
+<img alt="../_images/tutorials_04-replicate-vanderburg-2014-k2sff_44_0.png" src="../_images/tutorials_04-replicate-vanderburg-2014-k2sff_44_0.png" />
 </div>
 </div>
 <div class="line-block">
-<div class="line">The Spline fit looks good, so we can normalize the flux by the long-term trend.</div>
-<div class="line">Plot the normalized flux versus arclength to see the position-dependent flux.</div>
+<div class="line">The Spline fit looks good, so we can normalize the flux by the
+long-term trend.</div>
+<div class="line">Plot the normalized flux versus arclength to see the
+position-dependent flux.</div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [27]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -752,7 +778,8 @@ NPIXSAP  :  29.0
 </div>
 <p>Mask the data by keeping only the good samples.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [28]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -764,7 +791,8 @@ NPIXSAP  :  29.0
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [29]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -772,9 +800,11 @@ NPIXSAP  :  29.0
 </pre></div>
 </div>
 </div>
-<p>We will follow the paper by interpolating <strong>flux versus arclength position</strong> in 15 bins of means, which is a <em>piecewise linear fit</em>.</p>
+<p>We will follow the paper by interpolating <strong>flux versus arclength
+position</strong> in 15 bins of means, which is a <em>piecewise linear fit</em>.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [30]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -785,7 +815,8 @@ NPIXSAP  :  29.0
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [31]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -796,7 +827,8 @@ NPIXSAP  :  29.0
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [32]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -808,7 +840,8 @@ NPIXSAP  :  29.0
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [33]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -832,13 +865,14 @@ NPIXSAP  :  29.0
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_04-replicate-vanderburg-2014-k2sff_54_0.png"><img alt="../_images/tutorials_04-replicate-vanderburg-2014-k2sff_54_0.png" src="../_images/tutorials_04-replicate-vanderburg-2014-k2sff_54_0.png" style="width: 345px; height: 386px;" /></a>
+<img alt="../_images/tutorials_04-replicate-vanderburg-2014-k2sff_54_0.png" src="../_images/tutorials_04-replicate-vanderburg-2014-k2sff_54_0.png" />
 </div>
 </div>
 <p>Following <strong>Figure 4</strong> of Vanderburg &amp; Johnson 2014.</p>
 <p>Apply the Self Flat Field (SFF) correction:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [34]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -847,7 +881,8 @@ NPIXSAP  :  29.0
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [35]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -872,7 +907,7 @@ NPIXSAP  :  29.0
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_04-replicate-vanderburg-2014-k2sff_58_0.png"><img alt="../_images/tutorials_04-replicate-vanderburg-2014-k2sff_58_0.png" src="../_images/tutorials_04-replicate-vanderburg-2014-k2sff_58_0.png" style="width: 634px; height: 374px;" /></a>
+<img alt="../_images/tutorials_04-replicate-vanderburg-2014-k2sff_58_0.png" src="../_images/tutorials_04-replicate-vanderburg-2014-k2sff_58_0.png" />
 </div>
 </div>
 <p>Following <strong>Figure 5</strong> of Vanderburg &amp; Johnson 2015.</p>

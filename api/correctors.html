@@ -15,7 +15,6 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
@@ -70,7 +69,9 @@
     
   <div class="section" id="module-lightkurve.correctors">
 <span id="systematics-correction-classes"></span><h1>Systematics correction classes<a class="headerlink" href="#module-lightkurve.correctors" title="Permalink to this headline">¶</a></h1>
-<span class="target" id="module-lightkurve.correctors"></span><p>Defines KeplerCBVCorrector and SFFCorrector.</p>
+<span class="target" id="module-lightkurve.correctors"></span><p>Defines KeplerCBVCorrector, SFFCorrector, and PLDCorrector.</p>
+<p>These classes are intended to help remove instrument systematics from
+time series photometry data.</p>
 <div class="section" id="classes">
 <h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="longtable docutils">
@@ -79,21 +80,25 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="lightkurve.correctors.KeplerCBVCorrector.html#lightkurve.correctors.KeplerCBVCorrector" title="lightkurve.correctors.KeplerCBVCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerCBVCorrector</span></code></a>(lc_file[,&nbsp;likelihood,&nbsp;prior])</td>
-<td>Remove systematic trends from Kepler light curves by fitting cotrending basis vectors.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="lightkurve.correctors.SFFCorrector.html#lightkurve.correctors.SFFCorrector" title="lightkurve.correctors.SFFCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SFFCorrector</span></code></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="lightkurve.correctors.SFFCorrector.html#lightkurve.correctors.SFFCorrector" title="lightkurve.correctors.SFFCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SFFCorrector</span></code></a>()</td>
 <td>Implements the Self-Flat-Fielding (SFF) systematics removal method.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="lightkurve.correctors.PLDCorrector.html#lightkurve.correctors.PLDCorrector" title="lightkurve.correctors.PLDCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PLDCorrector</span></code></a>(tpf)</td>
+<td>Implements the Pixel Level Decorrelation (PLD) systematics removal method.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="lightkurve.correctors.KeplerCBVCorrector.html#lightkurve.correctors.KeplerCBVCorrector" title="lightkurve.correctors.KeplerCBVCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerCBVCorrector</span></code></a>(lc_file[,&nbsp;likelihood,&nbsp;prior])</td>
+<td>Remove systematic trends from Kepler light curves by fitting Cotrending Basis Vectors (CBVs).</td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="section" id="class-inheritance-diagram">
 <h2>Class Inheritance Diagram<a class="headerlink" href="#class-inheritance-diagram" title="Permalink to this headline">¶</a></h2>
-<div class="graphviz"><img src="../_images/inheritance-1f8ea850fadaaa82abfbb155a1227eb7631eee34.png" alt="Inheritance diagram of lightkurve.correctors.KeplerCBVCorrector, lightkurve.correctors.SFFCorrector" usemap="#inheritancea288947b7e" class="inheritance graphviz" /></div>
-<map id="inheritancea288947b7e" name="inheritancea288947b7e">
-<area shape="rect" id="node1" href="lightkurve.correctors.KeplerCBVCorrector.html#lightkurve.correctors.KeplerCBVCorrector" target="_top" title="Remove systematic trends from Kepler light curves by fitting" alt="" coords="5,55,149,80"/>
-<area shape="rect" id="node2" href="lightkurve.correctors.SFFCorrector.html#lightkurve.correctors.SFFCorrector" target="_top" title="Implements the Self&#45;Flat&#45;Fielding (SFF) systematics removal method." alt="" coords="26,5,129,31"/>
+<div class="graphviz"><img src="../_images/inheritance-8504cbf1f73df5c500129733bf3f55ea9df060c2.png" alt="Inheritance diagram of lightkurve.correctors.SFFCorrector, lightkurve.correctors.PLDCorrector, lightkurve.correctors.KeplerCBVCorrector" usemap="#inheritance30f0516e8c" class="inheritance graphviz" /></div>
+<map id="inheritance30f0516e8c" name="inheritance30f0516e8c">
+<area shape="rect" id="node1" href="lightkurve.correctors.KeplerCBVCorrector.html#lightkurve.correctors.KeplerCBVCorrector" target="_top" title="Remove systematic trends from Kepler light curves by fitting" alt="" coords="5,104,156,129"/>
+<area shape="rect" id="node2" href="lightkurve.correctors.PLDCorrector.html#lightkurve.correctors.PLDCorrector" target="_top" title="Implements the Pixel Level Decorrelation (PLD) systematics removal method." alt="" coords="27,55,134,80"/>
+<area shape="rect" id="node3" href="lightkurve.correctors.SFFCorrector.html#lightkurve.correctors.SFFCorrector" target="_top" title="Implements the Self&#45;Flat&#45;Fielding (SFF) systematics removal method." alt="" coords="29,5,133,31"/>
 </map></div>
 </div>
 

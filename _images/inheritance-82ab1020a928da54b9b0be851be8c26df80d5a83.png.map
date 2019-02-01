@@ -1,0 +1,5 @@
+<map id="inheritance207cbcae7a" name="inheritance207cbcae7a">
+<area shape="rect" id="node1" href="lightkurve.lightcurvefile.KeplerLightCurveFile.html#lightkurve.lightcurvefile.KeplerLightCurveFile" target="_top" title="Subclass of :class:`LightCurveFile &lt;lightkurve.lightcurvefile.LightCurveFile&gt;`" alt="" coords="256,5,500,31"/>
+<area shape="rect" id="node2" href="lightkurve.lightcurvefile.LightCurveFile.html#lightkurve.lightcurvefile.LightCurveFile" target="_top" title="Generic class to represent FITS files which contain one or more light curves." alt="" coords="5,31,208,56"/>
+<area shape="rect" id="node3" href="lightkurve.lightcurvefile.TessLightCurveFile.html#lightkurve.lightcurvefile.TessLightCurveFile" target="_top" title="Subclass of :class:`LightCurveFile &lt;lightkurve.lightcurvefile.LightCurveFile&gt;`" alt="" coords="263,55,493,80"/>
+</map>

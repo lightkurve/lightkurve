@@ -15,7 +15,6 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
@@ -75,7 +74,7 @@
 <em class="property">class </em><code class="descclassname">lightkurve.correctors.</code><code class="descname">KeplerCBVCorrector</code><span class="sig-paren">(</span><em>lc_file</em>, <em>likelihood=&lt;class 'oktopus.likelihood.LaplacianLikelihood'&gt;</em>, <em>prior=&lt;class 'oktopus.prior.LaplacianPrior'&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Remove systematic trends from Kepler light curves by fitting
-cotrending basis vectors.</p>
+Cotrending Basis Vectors (CBVs).</p>
 <div class="math notranslate nohighlight">
 \[\arg \min_{\bm{\theta} \in \Theta} \sum_{t}|f_{SAP}(t) - \sum_{j=1}^{n}\theta_j v_{j}(t)|^p, p&gt;0, p \in \mathbb{R}\]</div>
 <p class="rubric">Examples</p>

@@ -1,0 +1,239 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>PLDCorrector &#8212; Lightkurve</title>
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+
+  </head><body>
+<header>
+<nav class="navbar navbar-expand-lg navbar-light border-bottom">
+  <div class="container">
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b26</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarsExample07">
+      <ul class="navbar-nav mr-auto">
+        
+            
+            <li class="nav-item">
+            
+              <a class="nav-link" href="../quickstart.html">Quickstart</a>
+            </li>
+            
+            <li class="nav-item">
+            
+              <a class="nav-link" href="../tutorials/index.html">Tutorials</a>
+            </li>
+            
+            <li class="nav-item">
+            
+              <a class="nav-link" href="index.html">API</a>
+            </li>
+            
+            <li class="nav-item">
+            
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+        
+      </ul>
+        <form class="form-inline my-2 my-md-0" action="../search.html" method="get">
+            <input class="form-control" type="text" placeholder="Search" aria-label="Search" name="q" />
+        </form>
+    </div>
+  </div>
+</nav>
+</header>
+
+<div class="container">
+    
+  <div class="section" id="pldcorrector">
+<h1>PLDCorrector<a class="headerlink" href="#pldcorrector" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="lightkurve.correctors.PLDCorrector">
+<em class="property">class </em><code class="descclassname">lightkurve.correctors.</code><code class="descname">PLDCorrector</code><span class="sig-paren">(</span><em>tpf</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.PLDCorrector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Implements the Pixel Level Decorrelation (PLD) systematics removal method.</p>
+<blockquote>
+<div><p>Pixel Level Decorrelation (PLD) was developed by <a class="reference internal" href="#r333fd99d762c-1" id="id1">[1]</a> to remove
+systematic noise caused by spacecraft jitter for the Spitzer
+Space Telescope. It was adapted to K2 data by <a class="reference internal" href="#r333fd99d762c-2" id="id2">[2]</a> and <a class="reference internal" href="#r333fd99d762c-3" id="id3">[3]</a>
+for the EVEREST pipeline <a class="reference internal" href="#r333fd99d762c-4" id="id4">[4]</a>.</p>
+<p>For a detailed description and implementation of PLD, please refer to
+these references. Lightkurve provides a reference implementation
+of PLD that is less sophisticated than EVEREST, but is suitable
+for quick-look analyses and detrending experiments.</p>
+<p>Our simple implementation of PLD is performed by first calculating the
+noise model for each cadence in time. This function goes up to second
+order, and is represented by</p>
+<div class="math notranslate nohighlight">
+\[m_i = \sum_l a_l \frac{f_{il}}{\sum_k f_{ik}} + \sum_l \sum_m b_{lm} \frac{f_{il}f_{im}}{\left( \sum_k f_{ik} \right)^2} + \alpha + \beta t_i + \gamma t_i^2\]</div>
+<p>where</p>
+<blockquote>
+<div><ul class="simple">
+<li><span class="math notranslate nohighlight">\(m_i\)</span> is the noise model at time <span class="math notranslate nohighlight">\(t_i\)</span></li>
+<li><span class="math notranslate nohighlight">\(f_{il}\)</span> is the flux in the <span class="math notranslate nohighlight">\(l^\text{th}\)</span> pixel at time <span class="math notranslate nohighlight">\(t_i\)</span></li>
+<li><span class="math notranslate nohighlight">\(a_l\)</span> is the first-order PLD coefficient on the linear term</li>
+<li><span class="math notranslate nohighlight">\(b_{lm}\)</span> is the second-order PLD coefficient on the <span class="math notranslate nohighlight">\(l^\text{th}\)</span>,
+<span class="math notranslate nohighlight">\(m^\text{th}\)</span> pixel pair</li>
+<li><span class="math notranslate nohighlight">\(\alpha\)</span>, <span class="math notranslate nohighlight">\(\beta\)</span>, and <span class="math notranslate nohighlight">\(\gamma\)</span> are the
+Gaussian Process terms applied to capture long-period variability.</li>
+</ul>
+</div></blockquote>
+<p>We perform Principal Component Analysis (PCA) to reduce the number of
+vectors in our final model to limit the set to best capture instrumental
+noise. With a PCA-reduced set of vectors, we can construct a design matrix
+containing first and second order fractional pixel fluxes.</p>
+<p>To solve for the PLD model, we need to minimize the difference squared</p>
+<div class="math notranslate nohighlight">
+\[\chi^2 = \sum_i \frac{(y_i - m_i)^2}{\sigma_i^2},\]</div>
+<p>where <span class="math notranslate nohighlight">\(y_i\)</span> is the observed flux value at time <span class="math notranslate nohighlight">\(t_i\)</span>, by solving</p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial \chi^2}{\partial a_l} = 0.\]</div>
+</div></blockquote>
+<p class="rubric">References</p>
+<table class="docutils citation" frame="void" id="r333fd99d762c-1" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[1]</td><td><em>(<a class="fn-backref" href="#id1">1</a>, <a class="fn-backref" href="#id5">2</a>)</em> Deming et al. (2015), ads:2015ApJ…805..132D.
+(arXiv:1411.7404)</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="r333fd99d762c-2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[2]</td><td><em>(<a class="fn-backref" href="#id2">1</a>, <a class="fn-backref" href="#id6">2</a>)</em> Luger et al. (2016), ads:2016AJ….152..100L
+(arXiv:1607.00524)</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="r333fd99d762c-3" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[3]</td><td><em>(<a class="fn-backref" href="#id3">1</a>, <a class="fn-backref" href="#id7">2</a>)</em> Luger et al. (2018), ads:2018AJ….156…99L
+(arXiv:1702.05488)</td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="r333fd99d762c-4" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[4]</td><td><em>(<a class="fn-backref" href="#id4">1</a>, <a class="fn-backref" href="#id8">2</a>)</em> EVEREST pipeline webpage, <a class="reference external" href="https://rodluger.github.io/everest">https://rodluger.github.io/everest</a></td></tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>Download the pixel data for GJ 9827 and obtain a PLD-corrected light curve:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tpf</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s2">&quot;GJ9827&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">corrector</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">PLDCorrector</span><span class="p">(</span><span class="n">tpf</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lc</span> <span class="o">=</span> <span class="n">corrector</span><span class="o">.</span><span class="n">correct</span><span class="p">()</span> <span class="c1"># doctest: +SKIP</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lc</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span> <span class="c1"># doctest: +SKIP</span>
+</pre></div>
+</div>
+<p>However, the above example will over-fit the small transits!
+It is necessary to mask the transits using <cite>corrector.correct(cadence_mask=…)</cite>.</p>
+<p class="rubric">Methods Summary</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.correctors.PLDCorrector.correct" title="lightkurve.correctors.PLDCorrector.correct"><code class="xref py py-obj docutils literal notranslate"><span class="pre">correct</span></code></a>([aperture_mask,&nbsp;cadence_mask,&nbsp;…])</td>
+<td>Returns a PLD systematics-corrected LightCurve.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods Documentation</p>
+<dl class="method">
+<dt id="lightkurve.correctors.PLDCorrector.correct">
+<code class="descname">correct</code><span class="sig-paren">(</span><em>aperture_mask=None</em>, <em>cadence_mask=None</em>, <em>gp_timescale=30</em>, <em>n_components_first=None</em>, <em>n_components_second=20</em>, <em>use_gp=True</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.PLDCorrector.correct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a PLD systematics-corrected LightCurve.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
+<dt><strong>aperture_mask</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array-like, ‘pipeline’, ‘all’, ‘threshold’, or None</span></dt>
+<dd><p class="first last">A boolean array describing the aperture such that <cite>True</cite> means
+that the pixel will be used.
+If <cite>None</cite> or ‘all’ are passed, all pixels will be used.
+If ‘pipeline’ is passed, the mask suggested by the official pipeline
+will be returned.
+If ‘threshold’ is passed, all pixels brighter than 3-sigma above
+the median flux will be used.</p>
+</dd>
+<dt><strong>cadence_mask</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array-like</span></dt>
+<dd><p class="first last">A mask that will be applied to the cadences prior to constructing
+the detrending model. For example, you can pass a boolean array
+of length <cite>n_cadences</cite> where <cite>True</cite> means that the cadence will be
+included in the noise model. You may also pass an array of indices.
+This option enables signals of interest (e.g. planet transits)
+to be excluded from the noise model, which will prevent over-fitting.
+By default, no cadences will be masked.</p>
+</dd>
+<dt><strong>gp_timescale</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd><p class="first last">Gaussian Process time scale length term (<cite>tau</cite>) used to define
+length of fit variability in days.</p>
+</dd>
+<dt><strong>n_components_first</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">Number of first-order PLD components to reduce to with PCA.
+Must be smaller than the number of pixels in the aperture mask.
+If <cite>None</cite>, then 25 or the number of pixels in the mask will be used,
+whichever is smaller.</p>
+</dd>
+<dt><strong>n_components_second</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">Number of second-order PLD components to reduce to with PCA.</p>
+</dd>
+<dt><strong>use_gp</strong> <span class="classifier-delimiter">:</span> <span class="classifier">boolean</span></dt>
+<dd><p class="first last">Option to turn GP fitting on or off.</p>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>corrected_lightcurve</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightCurve</span></code> object</span></dt>
+<dd><p class="first last">Returns a corrected lightcurve object. Depending on the input, the
+returned object will be a <cite>KeplerLightCurve</cite>, <cite>TessLightCurve</cite>, or
+general <cite>LightCurve</cite> object.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+</div>
+<div class="container" style="padding-top: 2em;">
+    <hr>
+    <p class="text-center">
+        Created with ♥ by the Lightkurve developers.
+        <a href="https://github.com/KeplerGO/lightkurve">Join us on GitHub.</a>
+    </p>
+</div>
+  </body>
+</html>

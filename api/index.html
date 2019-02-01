@@ -15,7 +15,6 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
@@ -70,9 +69,11 @@
     
   <div class="section" id="api">
 <span id="id1"></span><h1>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="lightcurve-objects">
-<h2>LightCurve objects<a class="headerlink" href="#lightcurve-objects" title="Permalink to this headline">¶</a></h2>
-<p>LightCurve objects contain time-series data on the brightness of a star. They provide easy access to a range of operations, e.g. folding, binning, plotting, and a variety of signal processing. Light curves observed by Kepler or TESS have a specific sub-class which provide extra metadata, but the generic LightCurve object can be used for any data set.</p>
+<div class="section" id="light-curves">
+<h2>Light curves<a class="headerlink" href="#light-curves" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference internal" href="lightcurve.html#module-lightkurve.lightcurve" title="lightkurve.lightcurve"><code class="xref py py-class docutils literal notranslate"><span class="pre">lightkurve.lightcurve</span></code></a> module provides classes to represent time-series photometry. The classes provide easy access to a range of common operations, e.g. folding, binning, and plotting.
+There are specific sub-classes for light curves observed by the Kepler and TESS missions, which provides easy access to mission-specific metadata.
+The generic <a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightCurve</span></code></a> class can be used for any data set.</p>
 <table border="1" class="longtable docutils">
 <colgroup>
 <col width="10%" />
@@ -80,73 +81,125 @@
 </colgroup>
 <tbody valign="top">
 <tr class="row-odd"><td><a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a>([time,&nbsp;flux,&nbsp;flux_err,&nbsp;…])</td>
-<td>Implements a simple class for a generic light curve.</td>
+<td>Generic class to work with any time series photometry data set.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="lightkurve.lightcurve.KeplerLightCurve.html#lightkurve.lightcurve.KeplerLightCurve" title="lightkurve.lightcurve.KeplerLightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code></a>([time,&nbsp;flux,&nbsp;flux_err,&nbsp;…])</td>
-<td>Defines a light curve class for NASA’s Kepler and K2 missions.</td>
+<td>Subclass of <a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightCurve</span></code></a> which holds extra data specific to the Kepler mission.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="lightkurve.lightcurve.TessLightCurve.html#lightkurve.lightcurve.TessLightCurve" title="lightkurve.lightcurve.TessLightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TessLightCurve</span></code></a>([time,&nbsp;flux,&nbsp;flux_err,&nbsp;…])</td>
-<td>Defines a light curve class for NASA’s TESS mission.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="lightkurve.lightcurve.FoldedLightCurve.html#lightkurve.lightcurve.FoldedLightCurve" title="lightkurve.lightcurve.FoldedLightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve</span></code></a>(*args,&nbsp;**kwargs)</td>
-<td>Class to hold a phase-folded lightcurve, i.e.</td>
+<td>Subclass of <a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightCurve</span></code></a> which holds extra data specific to the TESS mission.</td>
 </tr>
 </tbody>
 </table>
 </div>
-<div class="section" id="opening-data-files">
-<h2>Opening data files<a class="headerlink" href="#opening-data-files" title="Permalink to this headline">¶</a></h2>
-<p>The lightkurve.search modules makes it easy to open data products from Kepler and TESS, and search for them at the data archive.</p>
+<div class="section" id="accessing-data">
+<h2>Accessing data<a class="headerlink" href="#accessing-data" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference internal" href="search.html#module-lightkurve.search" title="lightkurve.search"><code class="xref py py-class docutils literal notranslate"><span class="pre">lightkurve.search</span></code></a> module provides functions which make it easy to search and load data products from the Kepler and TESS missions, or search for them by name or coordinates at the <a class="reference external" href="https://archive.stsci.edu/">public data archive at MAST</a>.</p>
 <table border="1" class="longtable docutils">
 <colgroup>
 <col width="10%" />
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="lightkurve.search.search_targetpixelfile.html#lightkurve.search.search_targetpixelfile" title="lightkurve.search.search_targetpixelfile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_targetpixelfile</span></code></a>(target[,&nbsp;radius,&nbsp;…])</td>
-<td>Searches MAST for Target Pixel Files.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="lightkurve.search.search_lightcurvefile.html#lightkurve.search.search_lightcurvefile" title="lightkurve.search.search_lightcurvefile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_lightcurvefile</span></code></a>(target[,&nbsp;radius,&nbsp;…])</td>
-<td>Returns a SearchResult with MAST LightCurveFiles which match the criteria.</td>
-</tr>
 <tr class="row-odd"><td><a class="reference internal" href="lightkurve.search.open.html#lightkurve.search.open" title="lightkurve.search.open"><code class="xref py py-obj docutils literal notranslate"><span class="pre">open</span></code></a>(path_or_url,&nbsp;**kwargs)</td>
-<td>Opens a Kepler or TESS data product.</td>
+<td>Opens any valid Kepler or TESS data file and returns an instance of <a class="reference internal" href="lightkurve.lightcurvefile.LightCurveFile.html#lightkurve.lightcurvefile.LightCurveFile" title="lightkurve.lightcurvefile.LightCurveFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightCurveFile</span></code></a> or <a class="reference internal" href="lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile" title="lightkurve.targetpixelfile.TargetPixelFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">TargetPixelFile</span></code></a>.</td>
 </tr>
-</tbody>
-</table>
-<p>LightCurveFile objects represent files that are used to store LightCurves and their metadata. Files of this type are found at NASA’s data archives.</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="lightkurve.lightcurvefile.KeplerLightCurveFile.html#lightkurve.lightcurvefile.KeplerLightCurveFile" title="lightkurve.lightcurvefile.KeplerLightCurveFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerLightCurveFile</span></code></a>(path[,&nbsp;quality_bitmask])</td>
-<td>Defines a class for a given light curve FITS file from NASA’s Kepler and K2 missions.</td>
+<tr class="row-even"><td><a class="reference internal" href="lightkurve.search.search_targetpixelfile.html#lightkurve.search.search_targetpixelfile" title="lightkurve.search.search_targetpixelfile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_targetpixelfile</span></code></a>(target[,&nbsp;radius,&nbsp;…])</td>
+<td>Searches the public data archive at MAST for a Kepler or TESS <a class="reference internal" href="lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile" title="lightkurve.targetpixelfile.TargetPixelFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">TargetPixelFile</span></code></a>.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="lightkurve.lightcurvefile.TessLightCurveFile.html#lightkurve.lightcurvefile.TessLightCurveFile" title="lightkurve.lightcurvefile.TessLightCurveFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TessLightCurveFile</span></code></a>(path[,&nbsp;quality_bitmask])</td>
-<td>Defines a class for a given light curve FITS file from NASA’s TESS mission.</td>
-</tr>
-</tbody>
-</table>
-<p>TargetPixelFile objects hold the sequence of images (pixels) which can be converted into LightCurve objects using different techniques.</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile" title="lightkurve.targetpixelfile.KeplerTargetPixelFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code></a>(path[,&nbsp;quality_bitmask])</td>
-<td>Defines a TargetPixelFile class for the Kepler/K2 Mission.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile" title="lightkurve.targetpixelfile.TessTargetPixelFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TessTargetPixelFile</span></code></a>(path[,&nbsp;quality_bitmask])</td>
-<td>Defines a TargetPixelFile class for the TESS Mission.</td>
+<tr class="row-odd"><td><a class="reference internal" href="lightkurve.search.search_lightcurvefile.html#lightkurve.search.search_lightcurvefile" title="lightkurve.search.search_lightcurvefile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_lightcurvefile</span></code></a>(target[,&nbsp;radius,&nbsp;…])</td>
+<td>Searches the public data archive at MAST for a Kepler or TESS <a class="reference internal" href="lightkurve.lightcurvefile.LightCurveFile.html#lightkurve.lightcurvefile.LightCurveFile" title="lightkurve.lightcurvefile.LightCurveFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightCurveFile</span></code></a>.</td>
 </tr>
 </tbody>
 </table>
 </div>
-<div class="section" id="utility-objects-and-functions">
-<h2>Utility objects and functions<a class="headerlink" href="#utility-objects-and-functions" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="data-file-classes">
+<h2>Data file classes<a class="headerlink" href="#data-file-classes" title="Permalink to this headline">¶</a></h2>
+<p>Lightkurve provides classes to interact with the files that are generated by NASA’s Kepler and TESS data processing pipelines and made available at the <a class="reference external" href="https://archive.stsci.edu/">data archive</a>.
+The <a class="reference internal" href="lightcurvefile.html#module-lightkurve.lightcurvefile" title="lightkurve.lightcurvefile"><code class="xref py py-class docutils literal notranslate"><span class="pre">lightkurve.lightcurvefile</span></code></a> module provides classes which represent FITS files that store one or more light curves.
+These classes provide methods to access the metadata or read in a stored light curve into a <a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightCurve</span></code></a> object.</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="lightkurve.lightcurvefile.LightCurveFile.html#lightkurve.lightcurvefile.LightCurveFile" title="lightkurve.lightcurvefile.LightCurveFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurveFile</span></code></a>(path,&nbsp;**kwargs)</td>
+<td>Generic class to represent FITS files which contain one or more light curves.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="lightkurve.lightcurvefile.KeplerLightCurveFile.html#lightkurve.lightcurvefile.KeplerLightCurveFile" title="lightkurve.lightcurvefile.KeplerLightCurveFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerLightCurveFile</span></code></a>(path[,&nbsp;quality_bitmask])</td>
+<td>Subclass of <a class="reference internal" href="lightkurve.lightcurvefile.LightCurveFile.html#lightkurve.lightcurvefile.LightCurveFile" title="lightkurve.lightcurvefile.LightCurveFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightCurveFile</span></code></a> to represent files generated by the NASA’s Kepler pipeline.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="lightkurve.lightcurvefile.TessLightCurveFile.html#lightkurve.lightcurvefile.TessLightCurveFile" title="lightkurve.lightcurvefile.TessLightCurveFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TessLightCurveFile</span></code></a>(path[,&nbsp;quality_bitmask])</td>
+<td>Subclass of <a class="reference internal" href="lightkurve.lightcurvefile.LightCurveFile.html#lightkurve.lightcurvefile.LightCurveFile" title="lightkurve.lightcurvefile.LightCurveFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightCurveFile</span></code></a> to represent files generated by NASA’s TESS pipeline.</td>
+</tr>
+</tbody>
+</table>
+<p>The <a class="reference internal" href="targetpixelfile.html#module-lightkurve.targetpixelfile" title="lightkurve.targetpixelfile"><code class="xref py py-class docutils literal notranslate"><span class="pre">lightkurve.targetpixelfile</span></code></a> module provides classes which represent FITS files that store the original pixel data (images) obtained by the Kepler or TESS telescopes.
+These classes provide methods to extract custom light curves from the pixel data.</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile" title="lightkurve.targetpixelfile.TargetPixelFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TargetPixelFile</span></code></a>(path[,&nbsp;quality_bitmask,&nbsp;…])</td>
+<td>Generic class representing FITS files which contain time series imaging data.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile" title="lightkurve.targetpixelfile.KeplerTargetPixelFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code></a>(path[,&nbsp;quality_bitmask])</td>
+<td>Subclass of <a class="reference internal" href="lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile" title="lightkurve.targetpixelfile.TargetPixelFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">TargetPixelFile</span></code></a> to represent pixel data processed by NASA’s Kepler pipeline.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile" title="lightkurve.targetpixelfile.TessTargetPixelFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TessTargetPixelFile</span></code></a>(path[,&nbsp;quality_bitmask])</td>
+<td>Subclass of <a class="reference internal" href="lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile" title="lightkurve.targetpixelfile.TargetPixelFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">TargetPixelFile</span></code></a> to represent pixel data processed by NASA’s TESS pipeline.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="correcting-systematics">
+<h2>Correcting systematics<a class="headerlink" href="#correcting-systematics" title="Permalink to this headline">¶</a></h2>
+<p>Telescope data is always affected by systematic noise contributed by the instrument. The <a class="reference internal" href="correctors.html#module-lightkurve.correctors" title="lightkurve.correctors"><code class="xref py py-class docutils literal notranslate"><span class="pre">lightkurve.correctors</span></code></a> module provides classes which offer different strategies to remove such noise:</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="lightkurve.correctors.SFFCorrector.html#lightkurve.correctors.SFFCorrector" title="lightkurve.correctors.SFFCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SFFCorrector</span></code></a>()</td>
+<td>Implements the Self-Flat-Fielding (SFF) systematics removal method.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="lightkurve.correctors.PLDCorrector.html#lightkurve.correctors.PLDCorrector" title="lightkurve.correctors.PLDCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PLDCorrector</span></code></a>(tpf)</td>
+<td>Implements the Pixel Level Decorrelation (PLD) systematics removal method.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="lightkurve.correctors.KeplerCBVCorrector.html#lightkurve.correctors.KeplerCBVCorrector" title="lightkurve.correctors.KeplerCBVCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerCBVCorrector</span></code></a>(lc_file[,&nbsp;likelihood,&nbsp;prior])</td>
+<td>Remove systematic trends from Kepler light curves by fitting Cotrending Basis Vectors (CBVs).</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="finding-periodic-signals">
+<h2>Finding periodic signals<a class="headerlink" href="#finding-periodic-signals" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference internal" href="periodogram.html#module-lightkurve.periodogram" title="lightkurve.periodogram"><code class="xref py py-class docutils literal notranslate"><span class="pre">lightkurve.periodogram</span></code></a> module provides classes to help find periodic signals in light curves.</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a>(frequency,&nbsp;power[,&nbsp;nyquist,&nbsp;…])</td>
+<td>Generic class to represent a power spectrum (frequency vs power data).</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="lightkurve.periodogram.LombScarglePeriodogram.html#lightkurve.periodogram.LombScarglePeriodogram" title="lightkurve.periodogram.LombScarglePeriodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LombScarglePeriodogram</span></code></a>(*args,&nbsp;**kwargs)</td>
+<td>Subclass of <a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-class docutils literal notranslate"><span class="pre">Periodogram</span></code></a> representing a power spectrum generated using the Lomb Scargle method.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="lightkurve.periodogram.BoxLeastSquaresPeriodogram.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram" title="lightkurve.periodogram.BoxLeastSquaresPeriodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BoxLeastSquaresPeriodogram</span></code></a>(*args,&nbsp;**kwargs)</td>
+<td>Subclass of <a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-class docutils literal notranslate"><span class="pre">Periodogram</span></code></a> representing a power spectrum generated using the Box Least Squares (BLS) method.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="utilities">
+<h2>Utilities<a class="headerlink" href="#utilities" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference internal" href="utils.html#module-lightkurve.utils" title="lightkurve.utils"><code class="xref py py-class docutils literal notranslate"><span class="pre">lightkurve.utils</span></code></a> module provides a range of common helper functions and classes.</p>
 <table border="1" class="longtable docutils">
 <colgroup>
 <col width="10%" />
@@ -168,34 +221,14 @@
 <tr class="row-odd"><td><a class="reference internal" href="lightkurve.utils.btjd_to_astropy_time.html#lightkurve.utils.btjd_to_astropy_time" title="lightkurve.utils.btjd_to_astropy_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">btjd_to_astropy_time</span></code></a>(btjd[,&nbsp;bjdref])</td>
 <td>Converts BTJD time values to an <cite>astropy.time.Time</cite> object.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="lightkurve.utils.channel_to_module_output.html#lightkurve.utils.channel_to_module_output" title="lightkurve.utils.channel_to_module_output"><code class="xref py py-obj docutils literal notranslate"><span class="pre">channel_to_module_output</span></code></a>(channel)</td>
-<td>Returns a (module, output) pair given a CCD channel number.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="lightkurve.utils.module_output_to_channel.html#lightkurve.utils.module_output_to_channel" title="lightkurve.utils.module_output_to_channel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">module_output_to_channel</span></code></a>(module,&nbsp;output)</td>
-<td>Returns the CCD channel number for a given module and output pair.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="lightkurve.utils.running_mean.html#lightkurve.utils.running_mean" title="lightkurve.utils.running_mean"><code class="xref py py-obj docutils literal notranslate"><span class="pre">running_mean</span></code></a>(data,&nbsp;window_size)</td>
-<td>Returns the moving average of an array <cite>data</cite>.</td>
-</tr>
-</tbody>
-</table>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a>(frequency,&nbsp;power[,&nbsp;nyquist,&nbsp;…])</td>
-<td>Class to represents a power spectrum, i.e.</td>
-</tr>
 </tbody>
 </table>
 </div>
 <div class="section" id="indices-and-tables">
 <h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><a class="reference internal" href="../genindex.html"><span class="std std-ref">Index</span></a></li>
-<li><a class="reference internal" href="../py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
+<li><a class="reference internal" href="../genindex.html"><span class="std std-ref">Index of all classes and methods</span></a></li>
+<li><a class="reference internal" href="../py-modindex.html"><span class="std std-ref">Index of all modules</span></a></li>
 <li><a class="reference internal" href="../search.html"><span class="std std-ref">Search Page</span></a></li>
 </ul>
 </div>

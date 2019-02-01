@@ -15,7 +15,6 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
@@ -123,18 +122,18 @@ div.nblast {
 
 /* input prompt */
 div.nbinput div.prompt pre {
-    color: #307FC1;
+    color: #303F9F;
 }
 
 /* output prompt */
 div.nboutput div.prompt pre {
-    color: #BF5B3D;
+    color: #D84315;
 }
 
 /* all prompts */
 div.nbinput div.prompt,
 div.nboutput div.prompt {
-    min-width: 7ex;
+    min-width: 9ex;
     padding-top: 0.4em;
     padding-right: 0.4em;
     text-align: right;
@@ -174,9 +173,9 @@ div.nboutput div.output_area {
 
 /* input area */
 div.nbinput div.input_area {
-    border: 1px solid #e0e0e0;
+    border: 1px solid #cfcfcf;
     border-radius: 2px;
-    background: #f5f5f5;
+    background: #f7f7f7;
 }
 
 /* override MathJax center alignment in output cells */
@@ -184,7 +183,7 @@ div.nboutput div[class*=MathJax] {
     text-align: left !important;
 }
 
-/* override sphinx.ext.imgmath center alignment in output cells */
+/* override sphinx.ext.pngmath center alignment in output cells */
 div.nboutput div.math p {
     text-align: left;
 }
@@ -233,40 +232,6 @@ div.nboutput div.output_area.stderr {
 
 .ansi-bold { font-weight: bold; }
 .ansi-underline { text-decoration: underline; }
-
-/* Some additional styling taken form the Jupyter notebook CSS */
-div.rendered_html table {
-  border: none;
-  border-collapse: collapse;
-  border-spacing: 0;
-  color: black;
-  font-size: 12px;
-  table-layout: fixed;
-}
-div.rendered_html thead {
-  border-bottom: 1px solid black;
-  vertical-align: bottom;
-}
-div.rendered_html tr,
-div.rendered_html th,
-div.rendered_html td {
-  text-align: right;
-  vertical-align: middle;
-  padding: 0.5em 0.5em;
-  line-height: normal;
-  white-space: normal;
-  max-width: none;
-  border: none;
-}
-div.rendered_html th {
-  font-weight: bold;
-}
-div.rendered_html tbody tr:nth-child(odd) {
-  background: #f5f5f5;
-}
-div.rendered_html tbody tr:hover {
-  background: rgba(66, 165, 245, 0.2);
-}
 </style>
 <div class="admonition note">
 <p class="admonition-title"><strong>This page is a static version of an interactive Jupyter notebook</strong></p>
@@ -277,11 +242,21 @@ div.rendered_html tbody tr:hover {
 </div>
 <div class="section" id="How-to-remove-K2-motion-systematics-with-SFF?">
 <h1>How to remove K2 motion systematics with SFF?<a class="headerlink" href="#How-to-remove-K2-motion-systematics-with-SFF?" title="Permalink to this headline">¶</a></h1>
-<p>You can use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> to remove the motion from K2 data. Targets in K2 data move over multiple pixels during the exposure due to thruster firings. This can be corrected using the self flat fielding method (SFF), which you can read more about <a class="reference external" href="LINK?">here</a>. There is a full tutorial on how SFF works <a class="reference external" href="http://lightkurve.keplerscience.org/tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html">here</a>. Here we will show a quick tutorial on how to use the correct function for light
-curves.</p>
-<p>Let’s download a K2 light curve of an exoplanet host star. Remember that for K2 data, we can use the same Kepler functions <code class="docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code> and <code class="docutils literal notranslate"><span class="pre">KeplerLightCurveFile</span></code> as they are the same instrument.</p>
+<p>You can use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> to remove the motion from K2 data. Targets in
+K2 data move over multiple pixels during the exposure due to thruster
+firings. This can be corrected using the self flat fielding method
+(SFF), which you can read more about <a class="reference external" href="LINK?">here</a>. There is a full
+tutorial on how SFF works
+<a class="reference external" href="http://lightkurve.keplerscience.org/tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html">here</a>.
+Here we will show a quick tutorial on how to use the correct function
+for light curves.</p>
+<p>Let’s download a K2 light curve of an exoplanet host star. Remember that
+for K2 data, we can use the same Kepler functions
+<code class="docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code> and <code class="docutils literal notranslate"><span class="pre">KeplerLightCurveFile</span></code> as they are the
+same instrument.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -298,7 +273,8 @@ curves.</p>
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -310,12 +286,16 @@ curves.</p>
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_04-how-to-detrend_3_0.png"><img alt="../_images/tutorials_04-how-to-detrend_3_0.png" src="../_images/tutorials_04-how-to-detrend_3_0.png" style="width: 760px; height: 374px;" /></a>
+<img alt="../_images/tutorials_04-how-to-detrend_3_0.png" src="../_images/tutorials_04-how-to-detrend_3_0.png" />
 </div>
 </div>
-<p>This light curve is of the object <a class="reference external" href="https://exoplanetarchive.ipac.caltech.edu/cgi-bin/DisplayOverview/nph-DisplayOverview?objname=K2-133+b&amp;type=CONFIRMED_PLANET">K2-133b</a>, which has a period of 3.0712 days. Let’s plot the folded version of it to see what it looks like.</p>
+<p>This light curve is of the object
+<a class="reference external" href="https://exoplanetarchive.ipac.caltech.edu/cgi-bin/DisplayOverview/nph-DisplayOverview?objname=K2-133+b&amp;type=CONFIRMED_PLANET">K2-133b</a>,
+which has a period of 3.0712 days. Let’s plot the folded version of it
+to see what it looks like.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -327,19 +307,30 @@ curves.</p>
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_04-how-to-detrend_5_0.png"><img alt="../_images/tutorials_04-how-to-detrend_5_0.png" src="../_images/tutorials_04-how-to-detrend_5_0.png" style="width: 755px; height: 374px;" /></a>
+<img alt="../_images/tutorials_04-how-to-detrend_5_0.png" src="../_images/tutorials_04-how-to-detrend_5_0.png" />
 </div>
 </div>
-<p>We can see the hint of an exoplanet transit close to the center, but the motion of the spacecraft has made it difficult to make out above the noise. We can use the <code class="docutils literal notranslate"><span class="pre">correct</span></code> function on the lightcurve to remove this motion. An in-depth look into how the algorithm works can be found <a class="reference external" href="http://lightkurve.keplerscience.org/tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html">here</a>. You can pass the following keywords to the <code class="docutils literal notranslate"><span class="pre">correct</span></code> function:</p>
+<p>We can see the hint of an exoplanet transit close to the center, but the
+motion of the spacecraft has made it difficult to make out above the
+noise. We can use the <code class="docutils literal notranslate"><span class="pre">correct</span></code> function on the lightcurve to remove
+this motion. An in-depth look into how the algorithm works can be found
+<a class="reference external" href="http://lightkurve.keplerscience.org/tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html">here</a>.
+You can pass the following keywords to the <code class="docutils literal notranslate"><span class="pre">correct</span></code> function:</p>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">polyorder</span></code> : <em>int</em> Degree of the polynomial which will be used to fit one centroid as a function of the other.</li>
+<li><code class="docutils literal notranslate"><span class="pre">polyorder</span></code> : <em>int</em> Degree of the polynomial which will be used to
+fit one centroid as a function of the other.</li>
 <li><code class="docutils literal notranslate"><span class="pre">niters</span></code> : <em>int</em> Number of iterations</li>
-<li><code class="docutils literal notranslate"><span class="pre">bins</span></code> : <em>int</em> Number of bins to be used to create the piece-wise interpolation of arclength vs flux correction.</li>
-<li><code class="docutils literal notranslate"><span class="pre">windows</span></code> : <em>int</em> Number of windows to subdivide the data. The SFF algorithm is run independently in each window.</li>
+<li><code class="docutils literal notranslate"><span class="pre">bins</span></code> : <em>int</em> Number of bins to be used to create the piece-wise
+interpolation of arclength vs flux correction.</li>
+<li><code class="docutils literal notranslate"><span class="pre">windows</span></code> : <em>int</em> Number of windows to subdivide the data. The SFF
+algorithm is run independently in each window.</li>
 </ul>
-<p>This <a class="reference external" href="gully-tutorial">tutorial</a> will teach you more about how to tune these parameters. For this problem, we will use the defaults, but increase the number of windows to 20.</p>
+<p>This <a class="reference external" href="gully-tutorial">tutorial</a> will teach you more about how to tune
+these parameters. For this problem, we will use the defaults, but
+increase the number of windows to 20.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -347,9 +338,11 @@ curves.</p>
 </pre></div>
 </div>
 </div>
-<p>Now when we compare the two light curves we can see the clear signal from the exoplanet.</p>
+<p>Now when we compare the two light curves we can see the clear signal
+from the exoplanet.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -362,7 +355,7 @@ curves.</p>
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_04-how-to-detrend_9_0.png"><img alt="../_images/tutorials_04-how-to-detrend_9_0.png" src="../_images/tutorials_04-how-to-detrend_9_0.png" style="width: 755px; height: 374px;" /></a>
+<img alt="../_images/tutorials_04-how-to-detrend_9_0.png" src="../_images/tutorials_04-how-to-detrend_9_0.png" />
 </div>
 </div>
 </div>

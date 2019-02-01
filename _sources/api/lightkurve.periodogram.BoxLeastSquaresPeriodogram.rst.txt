@@ -1,0 +1,59 @@
+BoxLeastSquaresPeriodogram
+==========================
+
+.. currentmodule:: lightkurve.periodogram
+
+.. autoclass:: BoxLeastSquaresPeriodogram
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~BoxLeastSquaresPeriodogram.depth_at_max_power
+      ~BoxLeastSquaresPeriodogram.duration_at_max_power
+      ~BoxLeastSquaresPeriodogram.frequency_at_max_power
+      ~BoxLeastSquaresPeriodogram.max_power
+      ~BoxLeastSquaresPeriodogram.period
+      ~BoxLeastSquaresPeriodogram.period_at_max_power
+      ~BoxLeastSquaresPeriodogram.transit_time_at_max_power
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~BoxLeastSquaresPeriodogram.bin
+      ~BoxLeastSquaresPeriodogram.compute_stats
+      ~BoxLeastSquaresPeriodogram.copy
+      ~BoxLeastSquaresPeriodogram.flatten
+      ~BoxLeastSquaresPeriodogram.from_lightcurve
+      ~BoxLeastSquaresPeriodogram.get_transit_mask
+      ~BoxLeastSquaresPeriodogram.get_transit_model
+      ~BoxLeastSquaresPeriodogram.plot
+      ~BoxLeastSquaresPeriodogram.show_properties
+      ~BoxLeastSquaresPeriodogram.smooth
+      ~BoxLeastSquaresPeriodogram.to_table
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: depth_at_max_power
+   .. autoattribute:: duration_at_max_power
+   .. autoattribute:: frequency_at_max_power
+   .. autoattribute:: max_power
+   .. autoattribute:: period
+   .. autoattribute:: period_at_max_power
+   .. autoattribute:: transit_time_at_max_power
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: bin
+   .. automethod:: compute_stats
+   .. automethod:: copy
+   .. automethod:: flatten
+   .. automethod:: from_lightcurve
+   .. automethod:: get_transit_mask
+   .. automethod:: get_transit_model
+   .. automethod:: plot
+   .. automethod:: show_properties
+   .. automethod:: smooth
+   .. automethod:: to_table
