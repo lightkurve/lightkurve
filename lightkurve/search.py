@@ -235,7 +235,8 @@ class SearchResult(object):
 def search_targetpixelfile(target, radius=None, cadence='long',
                            mission=['Kepler', 'K2', 'TESS'], quarter=None,
                            month=None, campaign=None, sector=None, limit=None):
-    """Searches the public data archive (MAST) for Kepler or TESS pixel files.
+    """Searches the public data archive at MAST for a Kepler or TESS
+    :class:`TargetPixelFile <lightkurve.targetpixelfile.TargetPixelFile>`.
 
     This function fetches a data table that lists the Target Pixel Files (TPFs)
     that fall within a region of sky centered around the position of `target`
@@ -322,7 +323,8 @@ def search_targetpixelfile(target, radius=None, cadence='long',
 def search_lightcurvefile(target, radius=None, cadence='long',
                           mission=['Kepler', 'K2', 'TESS'], quarter=None,
                           month=None, campaign=None, sector=None, limit=None):
-    """Searches the public data archive (MAST) for Kepler or TESS light curve files.
+    """Searches the public data archive at MAST for a Kepler or TESS
+    :class:`LightCurveFile <lightkurve.lightcurvefile.LightCurveFile>`.
 
     This function fetches a data table that lists the Light Curve Files
     that fall within a region of sky centered around the position of `target`
@@ -723,7 +725,9 @@ def _mask_tess_products(products, sector=None, filetype='Target Pixel'):
 
 
 def open(path_or_url, **kwargs):
-    """Opens any Kepler or TESS light curve or pixel data file.
+    """Opens any valid Kepler or TESS data file and returns an instance of
+    :class:`LightCurveFile <lightkurve.lightcurvefile.LightCurveFile>`
+    or :class:`TargetPixelFile <lightkurve.targetpixelfile.TargetPixelFile>`.
 
     This function will use the `detect_filetype()` function to
     automatically detect the type of the data product, and return the

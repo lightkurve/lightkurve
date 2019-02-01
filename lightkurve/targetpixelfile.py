@@ -26,13 +26,12 @@ from .utils import KeplerQualityFlags, TessQualityFlags, \
                    plot_image, bkjd_to_astropy_time, btjd_to_astropy_time, \
                    LightkurveWarning, detect_filetype
 
-__all__ = ['KeplerTargetPixelFile', 'TessTargetPixelFile']
+__all__ = ['TargetPixelFile', 'KeplerTargetPixelFile', 'TessTargetPixelFile']
 log = logging.getLogger(__name__)
 
 
 class TargetPixelFile(object):
-    """
-    Generic TargetPixelFile class for Kepler, K2, and TESS data.
+    """Generic class representing FITS files which contain time series imaging data.
 
     See `KeplerTargetPixelFile` and `TessTargetPixelFile` for constructor
     documentation.
@@ -639,9 +638,10 @@ class TargetPixelFile(object):
 
 
 class KeplerTargetPixelFile(TargetPixelFile):
-    """
-    Defines a TargetPixelFile class for the Kepler/K2 Mission.
-    Enables extraction of raw lightcurves and centroid positions.
+    """Subclass of :class:`TargetPixelFile <lightkurve.targetpixelfile.TargetPixelFile>`
+    to represent pixel data processed by NASA's Kepler pipeline.
+
+    This class enables extraction of custom light curves and centroid positions.
 
     Parameters
     ----------
@@ -1337,9 +1337,10 @@ class KeplerTargetPixelFileFactory(object):
 
 
 class TessTargetPixelFile(TargetPixelFile):
-    """
-    Defines a TargetPixelFile class for the TESS Mission.
-    Enables extraction of raw lightcurves and centroid positions.
+    """Subclass of :class:`TargetPixelFile <lightkurve.targetpixelfile.TargetPixelFile>`
+    to represent pixel data processed by NASA's TESS pipeline.
+
+    This class enables extraction of custom light curves and centroid positions.
 
     Parameters
     ----------

@@ -33,7 +33,7 @@ log = logging.getLogger(__name__)
 
 
 class LightCurve(object):
-    """Generic base class to hold any time series brightness data set.
+    """Generic class to work with any time series photometry data set.
 
     Attributes
     ----------
@@ -1249,7 +1249,8 @@ class FoldedLightCurve(LightCurve):
 
 
 class KeplerLightCurve(LightCurve):
-    """Subclass of `LightCurve` which holds extra data specific to the Kepler mission.
+    """Subclass of :class:`LightCurve <lightkurve.lightcurve.LightCurve>`
+    which holds extra data specific to the Kepler mission.
 
     Attributes
     ----------
@@ -1439,8 +1440,10 @@ class KeplerLightCurve(LightCurve):
         else:
             return hdu
 
+
 class TessLightCurve(LightCurve):
-    """Subclass of `LightCurve` which holds extra data specific to the TESS mission.
+    """Subclass of :class:`LightCurve <lightkurve.lightcurve.LightCurve>`
+    which holds extra data specific to the TESS mission.
 
     Attributes
     ----------
