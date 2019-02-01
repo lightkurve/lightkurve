@@ -551,6 +551,10 @@ def _query_mast(target, radius=None, project=['Kepler', 'K2', 'TESS']):
                                               project=project,
                                               obs_collection=project)
         obs.sort('distance')
+        if radius < (0.1 * u.arcsec) and len(obs) > 1:
+            warnings.warn("Multiple targets were returned by astroquery. "
+                          "Please confirm that the desired target is listed in "
+                          "the `SearchResult`.", LightkurveWarning)
         return obs
     except ResolverError as exc:
         raise SearchError(exc)
