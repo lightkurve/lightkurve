@@ -20,7 +20,7 @@ from . import PACKAGEDIR
 
 log = logging.getLogger(__name__)
 
-__all__ = ['search_targetpixelfile', 'search_lightcurvefile', 'open']
+__all__ = ['open', 'search_targetpixelfile', 'search_lightcurvefile']
 
 
 class SearchError(Exception):
@@ -235,7 +235,7 @@ class SearchResult(object):
 def search_targetpixelfile(target, radius=None, cadence='long',
                            mission=['Kepler', 'K2', 'TESS'], quarter=None,
                            month=None, campaign=None, sector=None, limit=None):
-    """Searches MAST for Target Pixel Files.
+    """Searches the public data archive (MAST) for Kepler or TESS pixel files.
 
     This function fetches a data table that lists the Target Pixel Files (TPFs)
     that fall within a region of sky centered around the position of `target`
@@ -322,7 +322,7 @@ def search_targetpixelfile(target, radius=None, cadence='long',
 def search_lightcurvefile(target, radius=None, cadence='long',
                           mission=['Kepler', 'K2', 'TESS'], quarter=None,
                           month=None, campaign=None, sector=None, limit=None):
-    """Returns a SearchResult with MAST LightCurveFiles which match the criteria.
+    """Searches the public data archive (MAST) for Kepler or TESS light curve files.
 
     This function fetches a data table that lists the Light Curve Files
     that fall within a region of sky centered around the position of `target`
@@ -723,7 +723,7 @@ def _mask_tess_products(products, sector=None, filetype='Target Pixel'):
 
 
 def open(path_or_url, **kwargs):
-    """Opens a Kepler or TESS data product.
+    """Opens any Kepler or TESS light curve or pixel data file.
 
     This function will use the `detect_filetype()` function to
     automatically detect the type of the data product, and return the

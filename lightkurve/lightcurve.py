@@ -27,15 +27,13 @@ from .utils import (
     LightkurveWarning
 )
 
-__all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve',
-           'FoldedLightCurve']
+__all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve']
 
 log = logging.getLogger(__name__)
 
 
 class LightCurve(object):
-    """
-    Implements a simple class for a generic light curve.
+    """Generic base class to hold any time series brightness data set.
 
     Attributes
     ----------
@@ -1176,7 +1174,7 @@ class LightCurve(object):
 
 
 class FoldedLightCurve(LightCurve):
-    """Class to hold a phase-folded lightcurve, i.e. the output of `LightCurve.fold()`.
+    """Generic class to store and plot phase-folded light curves.
 
     Compared to the standard `LightCurve` class, this class offers an extra
     `phase` property and implements different plotting defaults.
@@ -1251,7 +1249,7 @@ class FoldedLightCurve(LightCurve):
 
 
 class KeplerLightCurve(LightCurve):
-    """Defines a light curve class for NASA's Kepler and K2 missions.
+    """Subclass of `LightCurve` which holds extra data specific to the Kepler mission.
 
     Attributes
     ----------
@@ -1442,7 +1440,7 @@ class KeplerLightCurve(LightCurve):
             return hdu
 
 class TessLightCurve(LightCurve):
-    """Defines a light curve class for NASA's TESS mission.
+    """Subclass of `LightCurve` which holds extra data specific to the TESS mission.
 
     Attributes
     ----------

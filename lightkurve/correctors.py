@@ -27,12 +27,12 @@ from sklearn.decomposition import PCA
 from itertools import combinations_with_replacement as multichoose
 import celerite
 
-__all__ = ['KeplerCBVCorrector', 'SFFCorrector', 'PLDCorrector']
+__all__ = ['SFFCorrector', 'PLDCorrector', 'KeplerCBVCorrector']
 
 
 class KeplerCBVCorrector(object):
     r"""Remove systematic trends from Kepler light curves by fitting
-    cotrending basis vectors.
+    Cotrending Basis Vectors (CBVs).
 
     .. math::
 
@@ -496,7 +496,7 @@ class SFFCorrector(object):
 
 
 class PLDCorrector(object):
-    r"""Implements Pixel Level Decorrelation (PLD) to de-trend Target Pixel Files.
+    r"""Implements the Pixel Level Decorrelation (PLD) systematics removal method.
 
         Pixel Level Decorrelation (PLD) was developed by [1]_ to remove
         systematic noise caused by spacecraft jitter for the Spitzer
