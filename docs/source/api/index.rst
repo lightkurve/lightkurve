@@ -3,6 +3,9 @@
 API
 ===
 
+This page provides an overview of the Python functions and classes provided by Lightkurve, also known as the API (*Application Programming Interface*).
+
+
 Light curves
 ------------
 
@@ -61,8 +64,11 @@ The :class:`lightkurve.utils` module provides a range of common helper functions
 .. automodsumm:: lightkurve.utils
 
 
-Indices and tables
-------------------
+More info?
+----------
+
+If you did not find what you want, try consulting the API index or search pages:
+
 * :ref:`Index of all classes and methods <genindex>`
 * :ref:`Index of all modules <modindex>`
-* :ref:`search`
+* :ref:`Search page <search>`
