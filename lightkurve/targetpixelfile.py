@@ -674,13 +674,8 @@ class TargetPixelFile(object):
             return PLDCorrector(self)
 
 
-    def skymap(self, magnitude_limit=18):
+    def interact_sky(self, magnitude_limit=18):
         """Display an interactive Target Pixel File with positions of Gaia DR2 sources.
-
-
-        At this time, this feature only works inside an active Jupyter
-        Notebook, and tends to be too slow when more than ~30,000 cadences
-        are contained in the TPF (e.g. short cadence data).
 
         Parameters
         ----------
@@ -688,8 +683,8 @@ class TargetPixelFile(object):
         magnitude_limit : float
             A value to limit the results in based on Gaia Gmag. Default, 18.
         """
-        from .interact import show_skymap_widget
-        return show_skymap_widget(self, magnitude_limit=magnitude_limit)
+        from .interact import show_skyview_widget
+        return show_skyview_widget(self, magnitude_limit=magnitude_limit)
 
 class KeplerTargetPixelFile(TargetPixelFile):
     """Represents pixel data products created by NASA's Kepler pipeline.
