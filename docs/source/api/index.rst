@@ -5,14 +5,18 @@ API
 
 This page provides an overview of the Python functions and classes provided by the Lightkurve package.
 
-Programmers tend to refer to a list of this nature as the API (*Application Programming Interface*).
+Programmers tend to refer to a list like this as the API (*Application Programming Interface*).
 
 
 Light curves
 ------------
 
-The :class:`lightkurve.lightcurve` module provides classes which represent time-series flux (brightness) data.
-The generic :class:`LightCurve <lightkurve.lightcurve.LightCurve>` class can be used to work with any "time vs brightness" data set and provides access to a range of common operations, e.g. folding, filtering, binning, and plotting.
+The :class:`lightkurve.lightcurve` module provides classes which represent time-series brightness (flux) data.
+The generic :class:`LightCurve <lightkurve.lightcurve.LightCurve>` class can be used to work with any "time vs flux" data set and provides access to a range of common operations, e.g.
+:func:`bin() <lightkurve.lightcurve.LightCurve.bin>`,
+:func:`flatten() <lightkurve.lightcurve.LightCurve.flatten>`,
+:func:`fold() <lightkurve.lightcurve.LightCurve.fold>`,
+and :func:`plot() <lightkurve.lightcurve.LightCurve.plot>`.
 There are specific sub-classes for light curves observed by the Kepler and TESS missions, which extend the generic class by adding mission-specific metadata.
 
 .. automodsumm:: lightkurve.lightcurve
