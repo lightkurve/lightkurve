@@ -17,6 +17,7 @@ import lightkurve
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.mathjax',
+    'sphinx.ext.intersphinx',
     'nbsphinx',
     'numpydoc',
     'sphinx_automodapi.automodapi']
@@ -115,4 +116,20 @@ html_static_path = ['_static']
 
 sys.path += ['exts']
 extensions += ['sphinxcontrib_rawfiles']
-rawfiles = ['CNAME', '.nojekyll']  # Files we want to copy
+
+# Files we want to copy
+# CNAME tells GitHub the domain name to use for hosting the docs
+# .nojekyll prevents GitHub from hiding the `_static` dir
+rawfiles = ['CNAME', '.nojekyll']
+
+# Make sure text marked up `like this` will be interpreted as Python objects
+default_role = 'py:obj'
+
+# intersphinx enables links to classes/functions in the packages defined here:
+intersphinx_mapping = {'python': ('https://docs.python.org/', None),
+                       'numpy': ('http://docs.scipy.org/doc/numpy/', None),
+                       'scipy': ('http://docs.scipy.org/doc/scipy/reference', None),
+                       'matplotlib': ('http://matplotlib.sourceforge.net/', None),
+                       'pandas': ('http://pandas.pydata.org/pandas-docs/stable/', None),
+                       'oktopus': ('https://keplergo.github.io/oktopus', None),
+                       'astropy': ('http://docs.astropy.org/en/latest/', None)}

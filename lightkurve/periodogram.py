@@ -23,7 +23,7 @@ __all__ = ['Periodogram', 'LombScarglePeriodogram', 'BoxLeastSquaresPeriodogram'
 
 
 class Periodogram(object):
-    """Class to represents a power spectrum, i.e. frequency vs power.
+    """Generic class to represent a power spectrum (frequency vs power data).
 
     The Periodogram class represents a power spectrum, with values of
     frequency on the x-axis (in any frequency units) and values of power on the
@@ -517,7 +517,8 @@ class SNRPeriodogram(Periodogram):
 
 
 class LombScarglePeriodogram(Periodogram):
-    """Sub class of `Periodogram` for working with Lomb Scargle Periodograms.
+    """Subclass of :class:`Periodogram <lightkurve.periodogram.Periodogram>`
+    representing a power spectrum generated using the Lomb Scargle method.
     """
     def __init__(self, *args, **kwargs):
         super(LombScarglePeriodogram, self).__init__(*args, **kwargs)
@@ -720,7 +721,8 @@ class LombScarglePeriodogram(Periodogram):
 
 
 class BoxLeastSquaresPeriodogram(Periodogram):
-    """Sub class of `Periodogram` for working with Box Least Squares Periodograms.
+    """Subclass of :class:`Periodogram <lightkurve.periodogram.Periodogram>`
+    representing a power spectrum generated using the Box Least Squares (BLS) method.
     """
     def __init__(self, *args, **kwargs):
         self.duration = kwargs.pop("duration", None)
