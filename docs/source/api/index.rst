@@ -13,10 +13,10 @@ Light curves
 
 The :class:`lightkurve.lightcurve` module provides classes which represent time-series brightness (flux) data.
 The generic :class:`LightCurve <lightkurve.lightcurve.LightCurve>` class can be used to work with any "time vs flux" data set and provides access to a range of common operations, e.g.
-:func:`bin() <lightkurve.lightcurve.LightCurve.bin>`,
-:func:`flatten() <lightkurve.lightcurve.LightCurve.flatten>`,
-:func:`fold() <lightkurve.lightcurve.LightCurve.fold>`,
-and :func:`plot() <lightkurve.lightcurve.LightCurve.plot>`.
+`~lightkurve.lightcurve.LightCurve.bin()`,
+`~lightkurve.lightcurve.LightCurve.flatten()`,
+`~lightkurve.lightcurve.LightCurve.fold()`,
+and `~lightkurve.lightcurve.LightCurve.plot()`.
 There are specific sub-classes for light curves observed by the Kepler and TESS missions, which extend the generic class by adding mission-specific metadata.
 
 .. automodsumm:: lightkurve.lightcurve

@@ -19,9 +19,8 @@ from astropy.stats import sigma_clip
 from astropy.table import Table
 from astropy.io import fits
 from astropy.time import Time
-from astropy import units as u
-from . import PACKAGEDIR, MPLSTYLE
 
+from . import PACKAGEDIR, MPLSTYLE
 from .utils import (
     running_mean, bkjd_to_astropy_time, btjd_to_astropy_time,
     LightkurveWarning
@@ -38,9 +37,9 @@ class LightCurve(object):
     Attributes
     ----------
     time : array-like
-        Time measurements
+        Time values
     flux : array-like
-        Data flux for every time point
+        Flux values for every time point
     flux_err : array-like
         Uncertainty on each flux data point
     time_format : str
@@ -48,13 +47,27 @@ class LightCurve(object):
         e.g. 'bkjd' or 'jd'.
     time_scale : str
         String which specifies how the time is measured,
-        e.g. tdb', 'tt', 'ut1', or 'utc'.
+        e.g. 'tdb', 'tt', 'ut1', or 'utc'.
     targetid : str
         Identifier of the target.
     label : str
         Human-friendly object label, e.g. "KIC 123456789"
     meta : dict
         Free-form metadata associated with the LightCurve.
+
+    Examples
+    --------
+    Create a new `LightCurve` object, access the data,
+    and apply binning as follows:
+
+    >>> import lightkurve as lk
+    >>> lc = lk.LightCurve(time=[1, 2, 3, 4], flux=[0.97, 1.01, 1.03, 0.99])
+    >>> lc.time
+    array([1, 2, 3, 4])
+    >>> lc.flux
+    array([0.97, 1.01, 1.03, 0.99])
+    >>> lc.bin(binsize=2).flux
+    array([0.99, 1.01])
     """
     def __init__(self, time=None, flux=None, flux_err=None, time_format=None,
                  time_scale=None, targetid=None, label=None, meta={}):
@@ -136,16 +149,17 @@ class LightCurve(object):
 
     @property
     def astropy_time(self):
-        """Returns an `astropy.time.Time` object.
+        """Returns the time values as an Astropy `~astropy.time.Time` object
+        (if ``time_format`` is set).
 
-        The Time object will be created using the values in `self.time`
-        and the `self.time_format` and `self.time_scale` attributes.
+        The Time object will be created using the values in the ``time``,
+        `time_format`, and ``time_scale`` attributes.
         For Kepler data products, the times are Barycentric.
 
         Raises
         ------
         ValueError
-            If `self.time_format` is not set or not one of the formats
+            If the ``time_format`` attribute is not set or not one of the formats
             allowed by AstroPy.
         """
         from astropy.time import Time
@@ -299,7 +313,7 @@ class LightCurve(object):
         -------
         flatten_lc : LightCurve object
             Flattened lightcurve.
-        If `return_trend` is `True`, the method will also return:
+        If ``return_trend`` is `True`, the method will also return:
         trend_lc : LightCurve object
             Trend in the lightcurve data
         """
@@ -375,14 +389,14 @@ class LightCurve(object):
         period : float
             The period upon which to fold.
         transit_midpoint : float, optional
-            Time reference point in the same units as the LightCurve's `time`
+            Time reference point in the same units as the LightCurve's ``time``
             attribute.
 
         Returns
         -------
-        folded_lightcurve : LightCurve object
-            A new ``LightCurve`` in which the data are folded and sorted by
-            phase.
+        folded_lightcurve : `FoldedLightCurve`
+            A new light curve object in which the data are folded and sorted by
+            phase. The object contains an extra ``phase`` attribute.
         """
 
         if (transit_midpoint > 2450000):
@@ -408,15 +422,15 @@ class LightCurve(object):
                                 meta=self.meta)
 
     def normalize(self):
-        """Returns a normalized version of the lightcurve.
+        """Returns a normalized version of the light curve.
 
-        The normalized lightcurve is obtained by dividing `flux` and `flux_err`
-        by the median flux.
+        The normalized light curve is obtained by dividing the ``flux`` and
+        ``flux_err`` object attributes by the by the median flux.
 
         Returns
         -------
-        normalized_lightcurve : LightCurve object
-            A new ``LightCurve`` in which `flux` and `flux_err` are divided
+        normalized_lightcurve : `LightCurve`
+            A new light curve object in which ``flux`` and ``flux_err`` are divided
             by the median.
         """
         lc = self.copy()
@@ -429,8 +443,8 @@ class LightCurve(object):
 
         Returns
         -------
-        clean_lightcurve : LightCurve object
-            A new ``LightCurve`` from which NaNs fluxes have been removed.
+        clean_lightcurve : `LightCurve`
+            A new light curve object from which NaNs fluxes have been removed.
         """
         return self[~np.isnan(self.flux)]  # This will return a sliced copy
 
@@ -444,9 +458,9 @@ class LightCurve(object):
 
         Returns
         -------
-        nlc : LightCurve object
-            A new ``LightCurve`` in which NaNs values and gaps in time have been
-            filled.
+        filled_lightcurve : `LightCurve`
+            A new light curve object in which NaN values and gaps in time
+            have been filled.
         """
         clc = lc.remove_nans().copy()
         nlc = lc.copy()
@@ -480,7 +494,7 @@ class LightCurve(object):
     def remove_outliers(self, sigma=5., return_mask=False, **kwargs):
         """Removes outlier data points using sigma-clipping.
 
-        This method returns a new :class:`LightCurve` object from which data
+        This method returns a new `LightCurve` object from which data
         points are removed if their flux values are greater or smaller than
         the median flux by at least ``sigma`` times the standard deviation.
 
@@ -492,9 +506,7 @@ class LightCurve(object):
 
         .. note::
             This function is a convenience wrapper around
-            `astropy.stats.sigma_clip
-            <http://docs.astropy.org/en/stable/api/astropy.stats.sigma_clip.html>`_
-            and provides the same functionality.
+            `astropy.stats.sigma_clip()` and provides the same functionality.
 
         Parameters
         ----------
@@ -529,13 +541,13 @@ class LightCurve(object):
 
         Returns
         -------
-        clean_lc : LightCurve object
-            A new :class:`LightCurve` from which outlier data points have been
+        clean_lc : `LightCurve`
+            A new light curve object from which outlier data points have been
             removed.
 
         Examples
         --------
-        This example generates a new LightCurve in which all points
+        This example generates a new light curve in which all points
         that are more than 1 standard deviation from the median are removed::
 
             >>> lc = LightCurve(time=[1, 2, 3, 4, 5], flux=[1, 1000, 1, -1000, 1])
@@ -560,16 +572,16 @@ class LightCurve(object):
         with warnings.catch_warnings():  # Ignore warnings due to NaNs or Infs
             warnings.simplefilter("ignore")
             outlier_mask = sigma_clip(data=self.flux, sigma=sigma, **kwargs).mask
-        # Second, we return the masked lightcurve and optionally the mask itself
+        # Second, we return the masked light curve and optionally the mask itself
         if return_mask:
             return self[~outlier_mask], outlier_mask
         return self[~outlier_mask]
 
     def bin(self, binsize=13, method='mean'):
-        """Bins a lightcurve in blocks of size `binsize`.
+        """Bins a lightcurve in blocks of size ``binsize``.
 
-        The value of the bins will contain the mean (`method='mean'`) or the
-        median (`method='median'`) of the original data.  The default is mean.
+        The value of the bins will contain the mean (``method='mean'``) or the
+        median (``method='median'``) of the original data.  The default is mean.
 
         Parameters
         ----------
@@ -580,15 +592,15 @@ class LightCurve(object):
 
         Returns
         -------
-        binned_lc : LightCurve object
-            Binned lightcurve.
+        binned_lc : `LightCurve`
+            A new light curve which has been binned.
 
         Notes
         -----
         - If the ratio between the lightcurve length and the binsize is not
           a whole number, then the remainder of the data points will be
           ignored.
-        - If the original lightcurve contains flux uncertainties (flux_err),
+        - If the original light curve contains flux uncertainties (``flux_err``),
           the binned lightcurve will report the root-mean-square error.
           If no uncertainties are included, the binned curve will return the
           standard deviation of the data.
@@ -777,7 +789,7 @@ class LightCurve(object):
         return ax
 
     def plot(self, **kwargs):
-        """Plot the light curve using matplotlib's `plot` method.
+        """Plot the light curve using Matplotlib's `~matplotlib.pyplot.plot()` method.
 
         Parameters
         ----------
@@ -807,7 +819,7 @@ class LightCurve(object):
         return self._create_plot(method='plot', **kwargs)
 
     def scatter(self, colorbar_label='', show_colorbar=True, **kwargs):
-        """Plots the light curve using matplotlib's `scatter` method.
+        """Plots the light curve using Matplotlib's `~matplotlib.pyplot.scatter()` method.
 
         Parameters
         ----------
@@ -842,7 +854,7 @@ class LightCurve(object):
                                  show_colorbar=show_colorbar, **kwargs)
 
     def errorbar(self, linestyle='', **kwargs):
-        """Plots the light curve using matplotlib's `errorbar` method.
+        """Plots the light curve using Matplotlib's `~matplotlib.pyplot.errorbar()` method.
 
         Parameters
         ----------
@@ -932,11 +944,11 @@ class LightCurve(object):
                                     maximum_period=maximum_period, resolution=resolution)
 
     def to_table(self):
-        """Export the LightCurve as an AstroPy Table.
+        """Converts the light curve to an Astropy `~astropy.table.Table` object.
 
         Returns
         -------
-        table : `astropy.table.Table` object
+        table : `astropy.table.Table`
             An AstroPy Table with columns 'time', 'flux', and 'flux_err'.
         """
         return Table(data=(self.time, self.flux, self.flux_err),
@@ -944,19 +956,19 @@ class LightCurve(object):
                      meta=self.meta)
 
     def to_pandas(self, columns=['time', 'flux', 'flux_err']):
-        """Export the LightCurve as a Pandas DataFrame.
+        """Converts the light curve to a Pandas `~pandas.DataFrame` object.
 
         Parameters
         ----------
         columns : list of str
             List of columns to include in the DataFrame.  The names must match
-            attributes of the `LightCurve` object (e.g. `time`, `flux`).
+            attributes of the `LightCurve` object (e.g. ``time``, ``flux``).
 
         Returns
         -------
-        dataframe : `pandas.DataFrame` object
-            A dataframe indexed by `time` and containing the columns `flux`
-            and `flux_err`.
+        dataframe : `pandas.DataFrame`
+            A data frame indexed by `time` and containing the columns ``flux``
+            and ``flux_err``.
         """
         try:
             import pandas as pd
@@ -979,7 +991,7 @@ class LightCurve(object):
         return df
 
     def to_csv(self, path_or_buf=None, **kwargs):
-        """Writes the LightCurve to a csv file.
+        """Writes the light curve to a csv file.
 
         Parameters
         ----------
@@ -992,31 +1004,34 @@ class LightCurve(object):
         Returns
         -------
         csv : str or None
-            Returns a csv-formatted string if `path_or_buf=None`,
+            Returns a csv-formatted string if ``path_or_buf=None``,
             returns None otherwise.
         """
         return self.to_pandas().to_csv(path_or_buf=path_or_buf, **kwargs)
 
     def to_periodogram(self, method="lombscargle", **kwargs):
-        """Returns a `Periodogram` power spectrum object.
+        """Converts the light curve to a `~lightkurve.periodogram.Periodogram`
+        power spectrum object.
 
         Parameters
         ----------
-        method : "lombscargle" or "bls"
-            Select a method to create a periodogram. Default "lombscargle".
+        method : {'lombscargle', 'bls'}
+            Use the Lomb Scargle or Box Least Squares (BLS) method to
+            extract the power spectrum. Defaults to ``'lombscargle'``.
         kwargs : dict
-            Keyword arguments passed to either `LombScarglePeriodogram` or
-            `BoxLeastSquaresPeriodogram`.
-            Keywords accepted by `LombScarglePeriodogram`:
-            min_frequency, max_frequency, min_period, max_period, frequency,
-            period, nterms, nyquist_factor, oversample_factor, freq_unit
-            Keywords accepted by `BoxLeastSquaresPeriodogram`:
-            min_period, max_period, period, frequency_factor
+            Keyword arguments passed to the constructor of either
+            `~lightkurve.periodogram.LombScarglePeriodogram` or
+            `~lightkurve.periodogram.BoxLeastSquaresPeriodogram`.
+            Keywords accepted by `~lightkurve.periodogram.LombScarglePeriodogram` are:
+            ``min_frequency``, ``max_frequency``, ``min_period``, ``max_period``, ``frequency``,
+            ``period``, ``nterms``, ``nyquist_factor``, ``oversample_factor``, ``freq_unit``.
+            Keywords accepted by `~lightkurve.periodogram.BoxLeastSquaresPeriodogram` are:
+            ``min_period``, ``max_period``, ``period``, ``frequency_factor``.
 
         Returns
         -------
-        Periodogram : `Periodogram` object
-            Returns a Periodogram object extracted from the lightcurve.
+        Periodogram : `~lightkurve.periodogram.Periodogram` object
+            The power spectrum object extracted from the light curve.
         """
         method_clean = method.replace(' ', '').lower()
         allowed_methods = ["lombscargle", "bls"]
@@ -1071,12 +1086,12 @@ class LightCurve(object):
         return out_mask
 
     def to_fits(self, path=None, overwrite=False, **extra_data):
-        """Writes the LightCurve to a FITS file.
+        """Writes the light curve to a FITS file.
 
         Parameters
         ----------
-        path : string, default None
-            File path, if `None` returns an astropy.io.fits.HDUList object.
+        path : string, default ``None``
+            If set, location where the FITS file will be written.
         overwrite : bool
             Whether or not to overwrite the file
         extra_data : dict
@@ -1088,8 +1103,8 @@ class LightCurve(object):
 
         Returns
         -------
-        hdu : astropy.io.fits
-            Returns an astropy.io.fits object if path is None
+        hdu : `astropy.io.fits.HDUList`
+            Returns an `~astropy.io.fits.HDUList` object.
         """
         typedir = {int: 'J', str: 'A', float: 'D', bool: 'L',
                    np.int32: 'J', np.int32: 'K', np.float32: 'E', np.float64: 'D'}
@@ -1169,8 +1184,7 @@ class LightCurve(object):
         hdu = _hdulist(**extra_data)
         if path is not None:
             hdu.writeto(path, overwrite=overwrite, checksum=True)
-        else:
-            return hdu
+        return hdu
 
 
 class FoldedLightCurve(LightCurve):
@@ -1208,7 +1222,7 @@ class FoldedLightCurve(LightCurve):
         return ax
 
     def scatter(self, **kwargs):
-        """Plot the folded light curve usng matplotlib's `scatter` method.
+        """Plot the folded light curve usng matplotlib's `~matplotlib.pyplot.scatter` method.
 
         See `LightCurve.scatter` for details on the accepted arguments.
 
@@ -1354,7 +1368,7 @@ class KeplerLightCurve(LightCurve):
 
     def to_pandas(self, columns=['time', 'flux', 'flux_err', 'quality',
                                  'centroid_col', 'centroid_row']):
-        """Export the LightCurve as a Pandas DataFrame.
+        """Converts the light curve to a Pandas `~pandas.DataFrame` object.
 
         Parameters
         ----------
