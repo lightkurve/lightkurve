@@ -379,10 +379,10 @@ class LightCurve(object):
     def fold(self, period, transit_midpoint=0.):
         """Folds the lightcurve at a specified ``period`` and ``transit_midpoint``.
 
-        This method returns a new ``LightCurve`` object in which the time
+        This method returns a `FoldedLightCurve` object in which the time
         values range between -0.5 to +0.5 (i.e. the phase).
         Data points which occur exactly at ``transit_midpoint`` or an integer
-        multiple of `transit_midpoint + n*period` will have time value 0.0.
+        multiple of ``transit_midpoint + n*period`` will have time value 0.0.
 
         Parameters
         ----------
