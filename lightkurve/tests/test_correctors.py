@@ -73,6 +73,26 @@ def test_sff_corrector():
     assert_almost_equal(sff.interp(sff.s), correction, decimal=3)
     assert_array_equal(time, klc.time)
 
+
+def test_sff_knots():
+    """Is SFF robust against gaps in time and irregular time sampling?
+
+    This test creates a random light curve with gaps in time between
+    days 20-30 and days 78-80.  In addition, the time sampling rate changes
+    in the interval between day 30 and 78.  SFF should fail without error.
+    """
+    n_points = 300
+    time = np.concatenate((np.linspace(0, 20, int(n_points/3)),
+                           np.linspace(30, 78, int(n_points/3)),
+                           np.linspace(80, 100, int(n_points/3))
+                           ))
+    lc = KeplerLightCurve(time=time,
+                          flux=np.random.normal(1.0, 0.1, n_points),
+                          centroid_col=np.random.normal(1.0, 0.1, n_points),
+                          centroid_row=np.random.normal(1.0, 0.1, n_points))
+    lc.correct()  # should not raise an exception
+
+
 @pytest.mark.remote_data
 def test_pld_corrector():
     # download tpf data for a target
