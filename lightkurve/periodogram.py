@@ -287,7 +287,10 @@ class Periodogram(object):
         if style is None or style == 'lightkurve':
             style = MPLSTYLE
         if ylabel is None:
-            ylabel = "Power Spectral Density [{}]".format(self.power.unit.to_string('latex'))
+            if self.power.unit == cds.ppm:
+                ylabel = "Amplitude [{}]".format(self.power.unit.to_string('latex'))
+            else:
+                ylabel = "Power Spectral Density [{}]".format(self.power.unit.to_string('latex'))
 
         # This will need to be fixed with housekeeping. Self.label currently doesnt exist.
         if ('label' not in kwargs) and ('label' in dir(self)):
@@ -552,8 +555,8 @@ class LombScarglePeriodogram(Periodogram):
     def from_lightcurve(lc, minimum_frequency=None, maximum_frequency=None,
                         minimum_period=None, maximum_period=None,
                         frequency=None, period=None,
-                        nterms=1, nyquist_factor=1, oversample_factor=1,
-                        freq_unit=1/u.day, **kwargs):
+                        nterms=1, nyquist_factor=1, oversample_factor=2,
+                        freq_unit=1/u.day, normalization="psd", **kwargs):
         """Creates a Periodogram from a LightCurve using the Lomb-Scargle method.
 
         By default, the periodogram will be created for a regular grid of
@@ -582,7 +585,7 @@ class LombScarglePeriodogram(Periodogram):
         a regular grid. If a regular grid of periods (i.e. an irregular grid of
         frequencies) it will use the 'slow' method. If nterms > 1 is passed, it
         will use the 'fastchi2' method for regular grids, and 'chi2' for
-        irregular grids. The normalizatin of the Lomb Scargle periodogram is
+        irregular grids. The normalization of the Lomb Scargle periodogram is
         fixed to `psd`, and cannot be overridden.
 
         Caution: this method assumes that the LightCurve's time (lc.time)
@@ -625,6 +628,10 @@ class LombScarglePeriodogram(Periodogram):
         freq_unit : `astropy.units.core.CompositeUnit`
             Default: 1/u.day. The desired frequency units for the Lomb Scargle
             periodogram. This implies that 1/freq_unit is the units for period.
+        normalization : str
+            Default: `psd`. The desired normalization of the power spectrum. 
+            Can be either power spectral density (`psd`) or amplitude 
+            (`amplitude)
         kwargs : dict
             Keyword arguments passed to `astropy.stats.LombScargle()`
 
@@ -633,6 +640,12 @@ class LombScarglePeriodogram(Periodogram):
         Periodogram : `Periodogram` object
             Returns a Periodogram object extracted from the lightcurve.
         """
+
+        # Input validation for spectrum type
+        if normalization not in ('psd', 'amplitude'):
+            raise ValueError("the `normalization` parameter must be one of "
+                             "'psd' or 'amplitude'.")
+
         if "min_period" in kwargs:
             warnings.warn("`min_period` keyword is deprecated, "
                           "please use `minimum_period` instead.",
@@ -740,23 +753,34 @@ class LombScarglePeriodogram(Periodogram):
                         "These are not evenly spaced in frequency space.\n"
                         "Method has been set to 'slow' to allow for this.")
 
+        flux_scaling = 1e6 if normalization == 'psd' else 1.
         if float(astropy.__version__[0]) >= 3:
-            LS = LombScargle(time, lc.flux * 1e6,
+            LS = LombScargle(time, lc.flux * flux_scaling,
                              nterms=nterms, normalization='psd', **kwargs)
             power = LS.power(frequency, method=method)
         else:
-            LS = LombScargle(time, lc.flux * 1e6,
+            LS = LombScargle(time, lc.flux * flux_scaling,
                              nterms=nterms, **kwargs)
             power = LS.power(frequency, method=method, normalization='psd')
 
-        # Normalise the according to Parseval's theorem
-        norm = np.std(lc.flux * 1e6)**2 / np.sum(power)
-        power *= norm
+        # Power spectral density
+        if normalization == 'psd':
+            # Normalise according to Parseval's theorem
+            norm = np.std(lc.flux * 1e6)**2 / np.sum(power)
+            power *= norm
 
-        power = power * (cds.ppm**2)
+            power = power * (cds.ppm**2)
 
-        # Rescale power to units of ppm^2 / [frequency unit]
-        power = power / fs
+            # Rescale power to units of ppm^2 / [frequency unit]
+            power = power / fs
+
+        # Amplitude spectrum
+        elif normalization == 'amplitude':
+            factor = np.sqrt(4./len(lc.time))
+            power = np.sqrt(power) * factor * 1e6
+
+            # Units of ppm
+            power *= cds.ppm
 
         # Periodogram needs properties
         return LombScarglePeriodogram(frequency=frequency, power=power, nyquist=nyquist,
