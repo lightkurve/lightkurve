@@ -11,4 +11,5 @@ About
     developer.rst
     citing.rst
     other_software.rst
+    changelog.rst
     
