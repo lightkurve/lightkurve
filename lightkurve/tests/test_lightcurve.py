@@ -699,4 +699,4 @@ def test_new_corrector_api():
     """This test can be remove after we remove the deprecated `LightCurve.correct()` method"""
     lc1 = KeplerLightCurveFile(K2_C08).PDCSAP_FLUX.correct()
     lc2 = KeplerLightCurveFile(K2_C08).PDCSAP_FLUX.to_corrector().correct()
-    assert_array_equal(lc1.flux, lc2.flux)
+    assert_allclose(lc1.flux, lc2.flux)
