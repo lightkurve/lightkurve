@@ -5,7 +5,7 @@ import numpy as np
 from numpy.testing import assert_almost_equal, assert_array_equal
 from astropy.utils.data import get_pkg_data_filename
 
-from ..lightcurve import KeplerLightCurve, TessLightCurve
+from ..lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
 from ..lightcurvefile import KeplerLightCurveFile
 from ..correctors import KeplerCBVCorrector, SFFCorrector, PLDCorrector
 from ..search import search_targetpixelfile
@@ -41,14 +41,14 @@ def test_sff_corrector():
     arclength = data[:, 5]
     correction = data[:, 6]
 
-    sff = SFFCorrector()
-    corrected_lc = sff.correct(time=time, flux=raw_flux,
-                               centroid_col=centroid_col,
+    lc = LightCurve(time=time, flux=raw_flux)
+    sff = SFFCorrector(lc)
+    corrected_lc = sff.correct(centroid_col=centroid_col,
                                centroid_row=centroid_row,
                                niters=1, windows=1)
     # do hidden plots execute smoothly?
-    ax = sff._plot_rotated_centroids()
-    ax = sff._plot_normflux_arclength()
+    sff._plot_rotated_centroids()
+    sff._plot_normflux_arclength()
 
     # the factor self.bspline(time-time[0]) accounts for
     # the long term trend which is divided out in order to get a "flat"

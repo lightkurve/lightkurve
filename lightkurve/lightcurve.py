@@ -1186,6 +1186,33 @@ class LightCurve(object):
             hdu.writeto(path, overwrite=overwrite, checksum=True)
         return hdu
 
+    def to_corrector(self, method="sff"):
+        """Returns a `Corrector` instance to remove systematics.
+
+        Parameters
+        ----------
+        methods : string
+            Currently, only "sff" is supported.  This will return a
+            `SFFCorrector` class instance.
+
+        Returns
+        -------
+        correcter : `lightkurve.Correcter`
+            Instance of a Corrector class, which typically provides `correct()`
+            and `diagnose()` methods.
+        """
+        allowed_methods = ["sff"]
+        if method == "pld":
+            raise ValueError("The 'pld' method can only be used on "
+                             "`TargetPixelFile` objects, not `LightCurve` objects.")
+        if method not in allowed_methods:
+            raise ValueError(("Unrecognized method '{0}'\n"
+                              "allowed methods are: {1}")
+                             .format(method, allowed_methods))
+        if method == "sff":
+            from .correctors import SFFCorrector
+            return SFFCorrector(self)
+
 
 class FoldedLightCurve(LightCurve):
     """Generic class to store and plot phase-folded light curves.
@@ -1333,7 +1360,7 @@ class KeplerLightCurve(LightCurve):
         return('KeplerLightCurve(ID: {})'.format(self.targetid))
 
     def correct(self, method='sff', **kwargs):
-        """Corrects a lightcurve for motion-dependent systematic errors.
+        """DEPRECATED: use `to_corrector(method).correct()` instead.
 
         Parameters
         ----------
@@ -1349,13 +1376,16 @@ class KeplerLightCurve(LightCurve):
         new_lc : KeplerLightCurve object
             Corrected lightcurve
         """
+        warnings.warn('`KeplerLightCurve.correct()` is deprecated and will be '
+                      'removed in Lightkurve v1.0.0, '
+                      'please use `LightCurve.to_corrector("sff").correct()` instead.',
+                      LightkurveWarning)
+
         not_nan = np.isfinite(self.flux)
         if method == 'sff':
             from .correctors import SFFCorrector
-            self.corrector = SFFCorrector()
-            corrected_lc = self.corrector.correct(time=self.time[not_nan],
-                                                  flux=self.flux[not_nan],
-                                                  centroid_col=self.centroid_col[not_nan],
+            self.corrector = SFFCorrector(self[not_nan])
+            corrected_lc = self.corrector.correct(centroid_col=self.centroid_col[not_nan],
                                                   centroid_row=self.centroid_row[not_nan],
                                                   **kwargs)
         else:
