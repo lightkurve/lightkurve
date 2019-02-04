@@ -537,7 +537,6 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
     -------
     SearchResult : :class:`SearchResult` object.
     """
-
     observations = _query_mast(target, project=mission, radius=radius)
 
     if len(observations) == 0:
@@ -699,6 +698,10 @@ def _filter_products(products, campaign=None, quarter=None, month=None,
     project = np.atleast_1d(project)
     project_lower = [p.lower() for p in project]
 
+    ffi = False
+    if 'Calibrated full frame image' in products['description']:
+        ffi = True
+
     mask = np.zeros(len(products), dtype=bool)
 
     if 'kepler' in project_lower and campaign is None and sector is None:
@@ -711,6 +714,10 @@ def _filter_products(products, campaign=None, quarter=None, month=None,
         mask |= _mask_tess_products(products, sector=sector, filetype=filetype)
 
     products = products[mask]
+
+    if ffi:
+        products.add_row()
+        products[-1]['description'] = 'FFI Cutout (Target Pixel File)'
 
     products.sort(['distance', 'productFilename'])
     if limit is not None:
