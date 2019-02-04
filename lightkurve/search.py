@@ -445,15 +445,11 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
     """
     observations = _query_mast(target, project=mission, radius=radius)
 
-    # mask out FFIs from observations
-    mask = np.array(['FFI' not in obs['target_name'] and
-                     'FFI' not in obs['obs_collection'] for obs in observations])
-
-    if len(observations[mask]) == 0:
+    if len(observations) == 0:
         raise SearchError('No data found for target "{}".'.format(target))
 
-    products = Observations.get_product_list(observations[mask])
-    result = join(products, observations[mask], keys="obs_id", join_type='left',
+    products = Observations.get_product_list(observations)
+    result = join(products, observations, keys="obs_id", join_type='left',
                   uniq_col_name='{col_name}{table_name}', table_names=['', '_2'])
     result.sort(['distance', 'obs_id'])
 
@@ -587,6 +583,10 @@ def _filter_products(products, campaign=None, quarter=None, month=None, sector=N
     project = np.atleast_1d(project)
     project_lower = [p.lower() for p in project]
 
+    ffi = False
+    if 'Calibrated full frame image' in products['description']:
+        ffi = True
+
     mask = np.zeros(len(products), dtype=bool)
 
     if 'kepler' in project_lower and campaign is None and sector is None:
@@ -599,6 +599,9 @@ def _filter_products(products, campaign=None, quarter=None, month=None, sector=N
         mask |= _mask_tess_products(products, sector=sector, filetype=filetype)
 
     products = products[mask]
+    if ffi:
+        products.add_row()
+        products[-1]['description'] = 'FFI Cutout (Target Pixel File)'
     products.sort(['distance', 'productFilename'])
     if limit is not None:
         return products[0:limit]
