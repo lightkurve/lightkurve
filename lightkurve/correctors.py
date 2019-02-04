@@ -447,19 +447,18 @@ class SFFCorrector(object):
         return np.trapz(y=np.sqrt(1 + self.polyprime(x[mask]) ** 2), x=x[mask])
 
     def fit_bspline(self, time, flux, knotspacing=1.5):
-        # By default, knots are placed 1.5 days apart
+        # By default, bspline knots are placed 1.5 days apart
         knots = np.arange(time[0], time[-1], knotspacing)
 
         # If the light curve has breaks larger than the spacing between knots,
         # we must remove the knots that fall in the breaks.
         # This is necessary for e.g. K2 Campaigns 0 and 10.
         bad_knots = []
-        a = time[0:-1][np.diff(time) > knotspacing]
-        b = time[1:][np.diff(time) > knotspacing]
+        a = time[:-1][np.diff(time) > knotspacing]  # times marking the start of a gap
+        b = time[1:][np.diff(time) > knotspacing]  # times marking the end of a gap
         for a1, b1 in zip(a, b):
             bad = np.where((knots > a1) & (knots < b1))[0][1:-1]
-            if len(bad_knots) > 0:
-                [bad_knots.append(b) for b in bad]
+            [bad_knots.append(b) for b in bad]
         good_knots = list(set(list(np.arange(len(knots)))) - set(bad_knots))
         knots = knots[good_knots]
 
