@@ -553,13 +553,20 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
 
     # If Full Frame Images are found, add a table entry for FFI cutouts
     for i in np.where('TESS FFI' in observations['target_name'])[0]:
+        # if target passed in is a SkyCoord object, convert to RA, dec pair
+        if isinstance(target, SkyCoord):
+            target = '{}, {}'.format(target.ra.deg, target.dec.deg)
+        # pull sector numbers
         s = observations['sequence_number'][i]
+        # convert to pandas data frame to add FFI cutout row
         products_df = masked_result.to_pandas()
+        # if the desired sector is available, add a row to the data frame
         if s in np.atleast_1d(sector) or sector is None:
-            products_df = products_df.append({'description': 'Target pixel file (s{})'.format(s),
+            products_df = products_df.append({'description': 'Target pixel file (s{:02})'.format(s),
                                               'target_name': str(target),
                                               'productFilename': 'TESScut Full Frame Image Cutout'},
                                               ignore_index=True)
+        # convert back to an astropy table
         masked_result = Table.from_pandas(products_df)
     return SearchResult(masked_result)
 
