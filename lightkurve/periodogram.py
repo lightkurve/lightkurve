@@ -631,7 +631,7 @@ class LombScarglePeriodogram(Periodogram):
         normalization : 'psd' or 'amplitude'
             Default: `'psd'`. The desired normalization of the power spectrum. 
             Can be either power spectral density (`'psd'`) or amplitude 
-            (`amplitude)
+            (`'amplitude'`)
         kwargs : dict
             Keyword arguments passed to `astropy.stats.LombScargle()`
 
