@@ -126,10 +126,10 @@ rawfiles = ['CNAME', '.nojekyll']
 default_role = 'py:obj'
 
 # intersphinx enables links to classes/functions in the packages defined here:
-intersphinx_mapping = {'python': ('https://docs.python.org/', None),
-                       'numpy': ('http://docs.scipy.org/doc/numpy/', None),
-                       'scipy': ('http://docs.scipy.org/doc/scipy/reference', None),
-                       'matplotlib': ('http://matplotlib.sourceforge.net/', None),
-                       'pandas': ('http://pandas.pydata.org/pandas-docs/stable/', None),
-                       'oktopus': ('https://keplergo.github.io/oktopus', None),
-                       'astropy': ('http://docs.astropy.org/en/latest/', None)}
+intersphinx_mapping = {'python': ('https://docs.python.org/3/objects.inv', None),
+                       'numpy': ('https://docs.scipy.org/doc/numpy/objects.inv', None),
+                       'scipy': ('https://docs.scipy.org/doc/scipy/reference/objects.inv', None),
+                       'matplotlib': ('https://matplotlib.org/objects.inv', None),
+                       'pandas': ('http://pandas.pydata.org/pandas-docs/stable/objects.inv', None),
+                       'oktopus': ('http://oktopus.keplerscience.org/objects.inv', None),
+                       'astropy': ('http://docs.astropy.org/en/latest/objects.inv', None)}
