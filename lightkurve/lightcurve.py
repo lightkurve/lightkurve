@@ -1362,7 +1362,10 @@ class KeplerLightCurve(LightCurve):
     def _repr_html_(self):
         """HTML representation which will display in notebooks by default."""
         html = "<p>{}</p>".format(self.__repr__())
-        html += self.to_pandas().reset_index(drop=True).to_html(max_rows=6, notebook=True)
+        html += self.to_pandas().reset_index(drop=True).to_html(
+                                    max_rows=6,
+                                    notebook=True,
+                                    float_format=lambda x: '{:.3f}'.format(x))
         return html
 
     def correct(self, method='sff', **kwargs):
