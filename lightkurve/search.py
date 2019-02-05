@@ -547,6 +547,7 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
                   uniq_col_name='{col_name}{table_name}', table_names=['', '_2'])
     result.sort(['distance', 'obs_id'])
 
+<<<<<<< HEAD
     masked_result = _filter_products(result, filetype=filetype,
                                      campaign=campaign, quarter=quarter,
                                      cadence=cadence, project=mission,
@@ -572,6 +573,12 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
                                                   ignore_index=True)
             # convert back to an astropy table
             masked_result = Table.from_pandas(products_df)
+=======
+    masked_result = _filter_products(result, target=target, filetype=filetype,
+                                     campaign=campaign, quarter=quarter,
+                                     cadence=cadence, project=mission,
+                                     month=month, sector=sector, limit=limit)
+>>>>>>> use pandas to add FFI entry to SR
     return SearchResult(masked_result)
 
 
@@ -669,8 +676,8 @@ def _query_mast(target, radius=None, project=['Kepler', 'K2', 'TESS']):
         raise SearchError(exc)
 
 
-def _filter_products(products, campaign=None, quarter=None, month=None,
-                     sector=None, cadence='long', limit=None,
+def _filter_products(products, target=None, campaign=None, quarter=None,
+                     month=None, sector=None, cadence='long', limit=None,
                      project=['Kepler', 'K2', 'TESS'], filetype='Target Pixel'):
     """Helper function which filters a SearchResult's products table by one or
     more criteria.
@@ -698,6 +705,7 @@ def _filter_products(products, campaign=None, quarter=None, month=None,
     project = np.atleast_1d(project)
     project_lower = [p.lower() for p in project]
 
+    # Check for existence of Full Frame Images in search result
     ffi = False
     if 'Calibrated full frame image' in products['description']:
         ffi = True
@@ -715,9 +723,12 @@ def _filter_products(products, campaign=None, quarter=None, month=None,
 
     products = products[mask]
 
+    # If Full Frame Images are found, add a table entry for FFI cutouts
     if ffi:
-        products.add_row()
-        products[-1]['description'] = 'FFI Cutout (Target Pixel File)'
+        products_df = products.to_pandas().append({'description': 'Full Frame Image Cutout (TPF)',
+                                                   'target_name': str(target)},
+                                                   ignore_index=True)
+        products = Table.from_pandas(products_df)
 
     products.sort(['distance', 'productFilename'])
     if limit is not None:
