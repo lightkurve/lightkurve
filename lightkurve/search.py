@@ -147,6 +147,7 @@ class SearchResult(object):
 
         # if table contains TESScut search results, download cutout
         if 'TESScut' in self.table[0]['productFilename']:
+<<<<<<< HEAD
             if cutout_size is None:
                 cutout_size = 5
             elif cutout_size < 0:
@@ -156,12 +157,30 @@ class SearchResult(object):
             path = self._fetch_tesscut_path(self.table[0]['target_name'],
                                             self.table[0]['sequence_number'],
                                             download_dir, cutout_size)
+=======
+            from astroquery.mast import TesscutClass
+
+            # Resolve SkyCoord of given target
+            coords = self._resolve_coords(self.table[0]['target_name'])
+            tc = TesscutClass()
+            sector = int(self.table[0]['description'][-2])
+            if cutout_size is None:
+                cutout_size = 5
+            cutout_path = tc.download_cutouts(coords, size=cutout_size,
+                                              sector=sector, path=download_dir)
+
+            path = os.path.join(download_dir, cutout_path[0][0])
+>>>>>>> specify cutout_size
 
         else:
             if cutout_size is not None:
                 warnings.warn('`cutout_size` can only be specified for TESS '
                               'Full Frame Image cutouts.', LightkurveWarning)
+<<<<<<< HEAD
 
+=======
+                              
+>>>>>>> specify cutout_size
             path = Observations.download_products(self.table[:1], mrp_only=False,
                                                   download_dir=download_dir)['Local Path'][0]
 
