@@ -1,7 +1,0 @@
-<map id="inheritance7c8840a80c" name="inheritance7c8840a80c">
-<area shape="rect" id="node1" title="Raised if there is a problem creating a TPF." alt="" coords="57,104,157,129"/>
-<area shape="rect" id="node2" href="lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile" target="_top" title="Subclass of :class:`TargetPixelFile &lt;lightkurve.targetpixelfile.TargetPixelFile&gt;`" alt="" coords="257,31,415,56"/>
-<area shape="rect" id="node3" href="lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile" target="_top" title="Generic class representing FITS files which contain time series imaging data." alt="" coords="49,55,165,80"/>
-<area shape="rect" id="node5" href="lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile" target="_top" title="Subclass of :class:`TargetPixelFile &lt;lightkurve.targetpixelfile.TargetPixelFile&gt;`" alt="" coords="264,80,408,105"/>
-<area shape="rect" id="node4" title="Class to create a KeplerTargetPixelFile." alt="" coords="5,5,209,31"/>
-</map>

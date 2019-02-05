@@ -72,7 +72,7 @@
 <dl class="class">
 <dt id="lightkurve.prf.FixedValuePrior">
 <em class="property">class </em><code class="descclassname">lightkurve.prf.</code><code class="descname">FixedValuePrior</code><span class="sig-paren">(</span><em>value</em>, <em>name=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.FixedValuePrior" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">oktopus.prior.Prior</span></code></p>
+<dd><p>Bases: <a class="reference external" href="http://oktopus.keplerscience.org/api/prior.html#oktopus.prior.Prior" title="(in oktopus)"><code class="xref py py-class docutils literal notranslate"><span class="pre">oktopus.prior.Prior</span></code></a></p>
 <p>An improper prior with a negative log probability of 0 at a single fixed
 value and inf elsewhere. This is similar to a Dirac Delta function,
 except this function does not peak at infinity so that it can be used
@@ -131,7 +131,7 @@ result and is therefore an “improper distribution”.</p>
 <td>Returns the negative log pdf.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.prf.FixedValuePrior.fit" title="lightkurve.prf.FixedValuePrior.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>([optimizer])</td>
-<td>Minimizes the <a class="reference internal" href="#lightkurve.prf.FixedValuePrior.evaluate" title="lightkurve.prf.FixedValuePrior.evaluate"><code class="xref py py-func docutils literal notranslate"><span class="pre">evaluate()</span></code></a> function using <code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.optimize.minimize()</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.optimize.differential_evolution()</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.optimize.basinhopping()</span></code>, or <code class="xref py py-func docutils literal notranslate"><span class="pre">skopt.gp.gp_minimize()</span></code>.</td>
+<td>Minimizes the <a class="reference internal" href="#lightkurve.prf.FixedValuePrior.evaluate" title="lightkurve.prf.FixedValuePrior.evaluate"><code class="xref py py-func docutils literal notranslate"><span class="pre">evaluate()</span></code></a> function using <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html#scipy.optimize.minimize" title="(in SciPy v1.2.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.optimize.minimize()</span></code></a>, <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.differential_evolution.html#scipy.optimize.differential_evolution" title="(in SciPy v1.2.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.optimize.differential_evolution()</span></code></a>, <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.basinhopping.html#scipy.optimize.basinhopping" title="(in SciPy v1.2.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.optimize.basinhopping()</span></code></a>, or <code class="xref py py-func docutils literal notranslate"><span class="pre">skopt.gp.gp_minimize()</span></code>.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.prf.FixedValuePrior.gradient" title="lightkurve.prf.FixedValuePrior.gradient"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gradient</span></code></a>(params)</td>
 <td>Returns the gradient of the loss function evaluated at <code class="docutils literal notranslate"><span class="pre">params</span></code></td>
@@ -176,9 +176,9 @@ result and is therefore an “improper distribution”.</p>
 <dl class="method">
 <dt id="lightkurve.prf.FixedValuePrior.fit">
 <code class="descname">fit</code><span class="sig-paren">(</span><em>optimizer='minimize'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.FixedValuePrior.fit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Minimizes the <a class="reference internal" href="#lightkurve.prf.FixedValuePrior.evaluate" title="lightkurve.prf.FixedValuePrior.evaluate"><code class="xref py py-func docutils literal notranslate"><span class="pre">evaluate()</span></code></a> function using <code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.optimize.minimize()</span></code>,
-<code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.optimize.differential_evolution()</span></code>,
-<code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.optimize.basinhopping()</span></code>, or <code class="xref py py-func docutils literal notranslate"><span class="pre">skopt.gp.gp_minimize()</span></code>.</p>
+<dd><p>Minimizes the <a class="reference internal" href="#lightkurve.prf.FixedValuePrior.evaluate" title="lightkurve.prf.FixedValuePrior.evaluate"><code class="xref py py-func docutils literal notranslate"><span class="pre">evaluate()</span></code></a> function using <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html#scipy.optimize.minimize" title="(in SciPy v1.2.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.optimize.minimize()</span></code></a>,
+<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.differential_evolution.html#scipy.optimize.differential_evolution" title="(in SciPy v1.2.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.optimize.differential_evolution()</span></code></a>,
+<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.basinhopping.html#scipy.optimize.basinhopping" title="(in SciPy v1.2.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">scipy.optimize.basinhopping()</span></code></a>, or <code class="xref py py-func docutils literal notranslate"><span class="pre">skopt.gp.gp_minimize()</span></code>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -195,7 +195,7 @@ result and is therefore an “improper distribution”.</p>
 - ``&#39;gp_minimize&#39;`` uses :func:`skopt.gp.gp_minimize`
 </pre></div>
 </div>
-<p class="last"><cite>‘minimize’</cite> is usually robust enough and therefore recommended
+<p class="last"><code class="xref py py-obj docutils literal notranslate"><span class="pre">'minimize'</span></code> is usually robust enough and therefore recommended
 whenever a good initial guess can be provided. The remaining options
 are global optimizers which might provide better results precisely
 in cases where a close engouh initial guess cannot be obtained
@@ -208,7 +208,7 @@ trivially.</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>opt_result</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">scipy.optimize.OptimizeResult</span></code> object</span></dt>
+<dt><strong>opt_result</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.OptimizeResult.html#scipy.optimize.OptimizeResult" title="(in SciPy v1.2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">scipy.optimize.OptimizeResult</span></code></a> object</span></dt>
 <dd><p class="first last">Object containing the results of the optimization process.
 Note: this is also stored in <strong>self.opt_result</strong>.</p>
 </dd>

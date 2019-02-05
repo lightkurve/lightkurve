@@ -72,9 +72,9 @@
 <dl class="class">
 <dt id="lightkurve.targetpixelfile.TargetPixelFile">
 <em class="property">class </em><code class="descclassname">lightkurve.targetpixelfile.</code><code class="descname">TargetPixelFile</code><span class="sig-paren">(</span><em>path</em>, <em>quality_bitmask='default'</em>, <em>targetid=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TargetPixelFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Generic class representing FITS files which contain time series imaging data.</p>
-<p>See <cite>KeplerTargetPixelFile</cite> and <cite>TessTargetPixelFile</cite> for constructor
+<p>See <a class="reference internal" href="lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile" title="lightkurve.targetpixelfile.KeplerTargetPixelFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code></a> and <a class="reference internal" href="lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile" title="lightkurve.targetpixelfile.TessTargetPixelFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TessTargetPixelFile</span></code></a> for constructor
 documentation.</p>
 <p class="rubric">Attributes Summary</p>
 <table border="1" class="longtable docutils">
@@ -111,7 +111,7 @@ documentation.</p>
 <td>Returns the header of the primary extension.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.targetpixelfile.TargetPixelFile.nan_time_mask" title="lightkurve.targetpixelfile.TargetPixelFile.nan_time_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nan_time_mask</span></code></a></td>
-<td>Returns a boolean mask flagging cadences whose time is <cite>nan</cite>.</td>
+<td>Returns a boolean mask flagging cadences whose time is <code class="xref py py-obj docutils literal notranslate"><span class="pre">nan</span></code>.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.targetpixelfile.TargetPixelFile.pipeline_mask" title="lightkurve.targetpixelfile.TargetPixelFile.pipeline_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pipeline_mask</span></code></a></td>
 <td>Returns the optimal aperture mask used by the pipeline.</td>
@@ -150,7 +150,7 @@ documentation.</p>
 </colgroup>
 <tbody valign="top">
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.targetpixelfile.TargetPixelFile.centroids" title="lightkurve.targetpixelfile.TargetPixelFile.centroids"><code class="xref py py-obj docutils literal notranslate"><span class="pre">centroids</span></code></a>(**kwargs)</td>
-<td>DEPRECATED: use <cite>estimate_cdpp()</cite> instead.</td>
+<td>DEPRECATED: use <code class="xref py py-obj docutils literal notranslate"><span class="pre">estimate_cdpp()</span></code> instead.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.targetpixelfile.TargetPixelFile.create_threshold_mask" title="lightkurve.targetpixelfile.TargetPixelFile.create_threshold_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_threshold_mask</span></code></a>([threshold,&nbsp;…])</td>
 <td>Returns an aperture mask creating using the thresholding method.</td>
@@ -240,7 +240,7 @@ documentation.</p>
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.TargetPixelFile.nan_time_mask">
 <code class="descname">nan_time_mask</code><a class="headerlink" href="#lightkurve.targetpixelfile.TargetPixelFile.nan_time_mask" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a boolean mask flagging cadences whose time is <cite>nan</cite>.</p>
+<dd><p>Returns a boolean mask flagging cadences whose time is <code class="xref py py-obj docutils literal notranslate"><span class="pre">nan</span></code>.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -315,7 +315,7 @@ solution for the target pixel file.</p>
 <dl class="method">
 <dt id="lightkurve.targetpixelfile.TargetPixelFile.centroids">
 <code class="descname">centroids</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TargetPixelFile.centroids" title="Permalink to this definition">¶</a></dt>
-<dd><p>DEPRECATED: use <cite>estimate_cdpp()</cite> instead.</p>
+<dd><p>DEPRECATED: use <code class="xref py py-obj docutils literal notranslate"><span class="pre">estimate_cdpp()</span></code> instead.</p>
 </dd></dl>
 
 <dl class="method">
@@ -323,16 +323,16 @@ solution for the target pixel file.</p>
 <code class="descname">create_threshold_mask</code><span class="sig-paren">(</span><em>threshold=3</em>, <em>reference_pixel='center'</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TargetPixelFile.create_threshold_mask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an aperture mask creating using the thresholding method.</p>
 <p>This method will identify the pixels in the TargetPixelFile which show
-a median flux that is brighter than <cite>threshold</cite> times the standard
+a median flux that is brighter than <code class="xref py py-obj docutils literal notranslate"><span class="pre">threshold</span></code> times the standard
 deviation above the overall median. The standard deviation is estimated
 in a robust way by multiplying the Median Absolute Deviation (MAD)
 with 1.4826.</p>
 <p>If the thresholding method yields multiple contiguous regions, then
 only the region closest to the (col, row) coordinate specified by
-<cite>reference_pixel</cite> is returned.  For exmaple, <cite>reference_pixel=(0, 0)</cite>
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">reference_pixel</span></code> is returned.  For exmaple, <code class="xref py py-obj docutils literal notranslate"><span class="pre">reference_pixel=(0,</span> <span class="pre">0)</span></code>
 will pick the region closest to the bottom left corner.
 By default, the region closest to the center of the mask will be
-returned. If <cite>reference_pixel=None</cite> then all regions will be returned.</p>
+returned. If <code class="xref py py-obj docutils literal notranslate"><span class="pre">reference_pixel=None</span></code> then all regions will be returned.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -344,17 +344,17 @@ brighter than the median flux to be included in the aperture mask.</p>
 </dd>
 <dt><strong>reference_pixel: (int, int) tuple, ‘center’, or None</strong></dt>
 <dd><p class="first last">(col, row) pixel coordinate closest to the desired region.
-For example, use <cite>reference_pixel=(0,0)</cite> to select the region
+For example, use <code class="xref py py-obj docutils literal notranslate"><span class="pre">reference_pixel=(0,0)</span></code> to select the region
 closest to the bottom left corner of the target pixel file.
 If ‘center’ (default) then the region closest to the center pixel
-will be selected. If <cite>None</cite> then all regions will be selected.</p>
+will be selected. If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> then all regions will be selected.</p>
 </dd>
 </dl>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
 <dt><strong>aperture_mask</strong> <span class="classifier-delimiter">:</span> <span class="classifier">ndarray</span></dt>
-<dd><p class="first last">2D boolean numpy array containing <cite>True</cite> for pixels above the
+<dd><p class="first last">2D boolean numpy array containing <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> for pixels above the
 threshold.</p>
 </dd>
 </dl>
@@ -374,7 +374,7 @@ threshold.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
 <dt><strong>aperture_mask</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array-like, ‘pipeline’, or ‘all’</span></dt>
-<dd><p class="first last">A boolean array describing the aperture such that <cite>True</cite> means
+<dd><p class="first last">A boolean array describing the aperture such that <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> means
 that the pixel will be used.
 If None or ‘all’ are passed, all pixels will be used.
 If ‘pipeline’ is passed, the mask suggested by the official pipeline
@@ -400,7 +400,7 @@ the median flux will be used.</p>
 <dt id="lightkurve.targetpixelfile.TargetPixelFile.from_fits">
 <em class="property">classmethod </em><code class="descname">from_fits</code><span class="sig-paren">(</span><em>path_or_url</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TargetPixelFile.from_fits" title="Permalink to this definition">¶</a></dt>
 <dd><p>WARNING: THIS FUNCTION IS DEPRECATED AND WILL BE REMOVED VERY SOON.</p>
-<p>Please use <cite>lightkurve.open()</cite> instead.</p>
+<p>Please use <code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.open()</span></code> instead.</p>
 </dd></dl>
 
 <dl class="method">
@@ -448,10 +448,10 @@ then return <code class="docutils literal notranslate"><span class="pre">default
 <code class="descname">interact</code><span class="sig-paren">(</span><em>notebook_url='localhost:8888'</em>, <em>max_cadences=30000</em>, <em>aperture_mask='pipeline'</em>, <em>exported_filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TargetPixelFile.interact" title="Permalink to this definition">¶</a></dt>
 <dd><p>Display an interactive Jupyter Notebook widget to inspect the pixel data.</p>
 <p>The widget will show both the lightcurve and pixel data.  By default,
-the lightcurve shown is obtained by calling the <cite>to_lightcurve()</cite> method,
-unless the user supplies a custom <cite>LightCurve</cite> object.
+the lightcurve shown is obtained by calling the <a class="reference internal" href="#lightkurve.targetpixelfile.TargetPixelFile.to_lightcurve" title="lightkurve.targetpixelfile.TargetPixelFile.to_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_lightcurve()</span></code></a> method,
+unless the user supplies a custom <code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code> object.
 This feature requires an optional dependency, bokeh (v0.12.15 or later).
-This dependency can be installed using e.g. <cite>conda install bokeh</cite>.</p>
+This dependency can be installed using e.g. <code class="xref py py-obj docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">bokeh</span></code>.</p>
 <p>At this time, this feature only works inside an active Jupyter
 Notebook, and tends to be too slow when more than ~30,000 cadences
 are contained in the TPF (e.g. short cadence data).</p>
@@ -475,7 +475,7 @@ of the form “localhost:8888”, then “http” will be used.</p>
 this value. This limit helps keep browsers from becoming unresponsive.</p>
 </dd>
 <dt><strong>aperture_mask</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array-like, ‘pipeline’, ‘threshold’ or ‘all’</span></dt>
-<dd><p class="first last">A boolean array describing the aperture such that <cite>True</cite> means
+<dd><p class="first last">A boolean array describing the aperture such that <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> means
 that the pixel will be used.
 If None or ‘all’ are passed, all pixels will be used.
 If ‘pipeline’ is passed, the mask suggested by the official pipeline
@@ -500,8 +500,8 @@ TargetPixelFile basename.</p>
 <dt id="lightkurve.targetpixelfile.TargetPixelFile.plot">
 <code class="descname">plot</code><span class="sig-paren">(</span><em>ax=None</em>, <em>frame=0</em>, <em>cadenceno=None</em>, <em>bkg=False</em>, <em>aperture_mask=None</em>, <em>show_colorbar=True</em>, <em>mask_color='pink'</em>, <em>style='lightkurve'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TargetPixelFile.plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the pixel data for a single frame (i.e. at a single time).</p>
-<p>The time can be specified by frame index number (<cite>frame=0</cite> will show the
-first frame) or absolute cadence number (<cite>cadenceno</cite>).</p>
+<p>The time can be specified by frame index number (<code class="xref py py-obj docutils literal notranslate"><span class="pre">frame=0</span></code> will show the
+first frame) or absolute cadence number (<a class="reference internal" href="#lightkurve.targetpixelfile.TargetPixelFile.cadenceno" title="lightkurve.targetpixelfile.TargetPixelFile.cadenceno"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cadenceno</span></code></a>).</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -536,7 +536,7 @@ matplotlib’s built-in stylesheets (e.g. ‘ggplot’).
 Lightkurve’s custom stylesheet is used by default.</p>
 </dd>
 <dt><strong>kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
-<dd><p class="first last">Keywords arguments passed to <cite>lightkurve.utils.plot_image</cite>.</p>
+<dd><p class="first last">Keywords arguments passed to <code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.utils.plot_image</span></code>.</p>
 </dd>
 </dl>
 </td>
@@ -569,9 +569,9 @@ Lightkurve’s custom stylesheet is used by default.</p>
 <dt id="lightkurve.targetpixelfile.TargetPixelFile.to_lightcurve">
 <code class="descname">to_lightcurve</code><span class="sig-paren">(</span><em>method='aperture'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TargetPixelFile.to_lightcurve" title="Permalink to this definition">¶</a></dt>
 <dd><p>Performs photometry on the pixel data and returns a LightCurve object.</p>
-<p>See the docstring of <cite>aperture_photometry()</cite> for valid
+<p>See the docstring of <code class="xref py py-obj docutils literal notranslate"><span class="pre">aperture_photometry()</span></code> for valid
 arguments if the method is ‘aperture’.  Otherwise, see the docstring
-of <cite>prf_photometry()</cite> for valid arguments if the method is ‘prf’.</p>
+of <code class="xref py py-obj docutils literal notranslate"><span class="pre">prf_photometry()</span></code> for valid arguments if the method is ‘prf’.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -581,8 +581,8 @@ of <cite>prf_photometry()</cite> for valid arguments if the method is ‘prf’.
 <dd><p class="first last">Photometry method to use.</p>
 </dd>
 <dt><strong>**kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
-<dd><p class="first last">Extra arguments to be passed to the <cite>aperture_photometry</cite> or the
-<cite>prf_photometry</cite> method of this class.</p>
+<dd><p class="first last">Extra arguments to be passed to the <code class="xref py py-obj docutils literal notranslate"><span class="pre">aperture_photometry</span></code> or the
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">prf_photometry</span></code> method of this class.</p>
 </dd>
 </dl>
 </td>

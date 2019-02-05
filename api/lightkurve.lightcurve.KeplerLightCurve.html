@@ -140,7 +140,7 @@ e.g. tdb’, ‘tt’, ‘ut1’, or ‘utc’.</p>
 </colgroup>
 <tbody valign="top">
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.astropy_time" title="lightkurve.lightcurve.KeplerLightCurve.astropy_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy_time</span></code></a></td>
-<td>Returns an <cite>astropy.time.Time</cite> object.</td>
+<td>Returns the time values as an Astropy <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v3.2.dev2038)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> object (if <code class="docutils literal notranslate"><span class="pre">time_format</span></code> is set).</td>
 </tr>
 </tbody>
 </table>
@@ -155,19 +155,19 @@ e.g. tdb’, ‘tt’, ‘ut1’, or ‘utc’.</p>
 <td>Append LightCurve objects.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.bin" title="lightkurve.lightcurve.KeplerLightCurve.bin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bin</span></code></a>([binsize,&nbsp;method])</td>
-<td>Bins a lightcurve in blocks of size <cite>binsize</cite>.</td>
+<td>Bins a lightcurve in blocks of size <code class="docutils literal notranslate"><span class="pre">binsize</span></code>.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.cdpp" title="lightkurve.lightcurve.KeplerLightCurve.cdpp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cdpp</span></code></a>(**kwargs)</td>
-<td>DEPRECATED: use <cite>estimate_cdpp()</cite> instead.</td>
+<td>DEPRECATED: use <a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.estimate_cdpp" title="lightkurve.lightcurve.KeplerLightCurve.estimate_cdpp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">estimate_cdpp()</span></code></a> instead.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.copy" title="lightkurve.lightcurve.KeplerLightCurve.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a>()</td>
 <td>Returns a copy of the LightCurve object.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.correct" title="lightkurve.lightcurve.KeplerLightCurve.correct"><code class="xref py py-obj docutils literal notranslate"><span class="pre">correct</span></code></a>([method])</td>
-<td>Corrects a lightcurve for motion-dependent systematic errors.</td>
+<td>DEPRECATED: use <code class="xref py py-obj docutils literal notranslate"><span class="pre">to_corrector(method).correct()</span></code> instead.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.errorbar" title="lightkurve.lightcurve.KeplerLightCurve.errorbar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar</span></code></a>([linestyle])</td>
-<td>Plots the light curve using matplotlib’s <cite>errorbar</cite> method.</td>
+<td>Plots the light curve using Matplotlib’s <code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar()</span></code> method.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.estimate_cdpp" title="lightkurve.lightcurve.KeplerLightCurve.estimate_cdpp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">estimate_cdpp</span></code></a>([transit_duration,&nbsp;…])</td>
 <td>Estimate the CDPP noise metric using the Savitzky-Golay (SG) method.</td>
@@ -182,10 +182,10 @@ e.g. tdb’, ‘tt’, ‘ut1’, or ‘utc’.</p>
 <td>Folds the lightcurve at a specified <code class="docutils literal notranslate"><span class="pre">period</span></code> and <code class="docutils literal notranslate"><span class="pre">transit_midpoint</span></code>.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.normalize" title="lightkurve.lightcurve.KeplerLightCurve.normalize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">normalize</span></code></a>()</td>
-<td>Returns a normalized version of the lightcurve.</td>
+<td>Returns a normalized version of the light curve.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.plot" title="lightkurve.lightcurve.KeplerLightCurve.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(**kwargs)</td>
-<td>Plot the light curve using matplotlib’s <cite>plot</cite> method.</td>
+<td>Plot the light curve using Matplotlib’s <code class="xref py py-obj docutils literal notranslate"><span class="pre">plot()</span></code> method.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.remove_nans" title="lightkurve.lightcurve.KeplerLightCurve.remove_nans"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_nans</span></code></a>()</td>
 <td>Removes cadences where the flux is NaN.</td>
@@ -194,25 +194,25 @@ e.g. tdb’, ‘tt’, ‘ut1’, or ‘utc’.</p>
 <td>Removes outlier data points using sigma-clipping.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.scatter" title="lightkurve.lightcurve.KeplerLightCurve.scatter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a>([colorbar_label,&nbsp;show_colorbar])</td>
-<td>Plots the light curve using matplotlib’s <cite>scatter</cite> method.</td>
+<td>Plots the light curve using Matplotlib’s <code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter()</span></code> method.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.show_properties" title="lightkurve.lightcurve.KeplerLightCurve.show_properties"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_properties</span></code></a>()</td>
 <td>Prints a description of all non-callable attributes.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.to_csv" title="lightkurve.lightcurve.KeplerLightCurve.to_csv"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_csv</span></code></a>([path_or_buf])</td>
-<td>Writes the LightCurve to a csv file.</td>
+<td>Writes the light curve to a csv file.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.to_fits" title="lightkurve.lightcurve.KeplerLightCurve.to_fits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_fits</span></code></a>([path,&nbsp;overwrite,&nbsp;aperture_mask])</td>
 <td>Writes the KeplerLightCurve to a FITS file.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.to_pandas" title="lightkurve.lightcurve.KeplerLightCurve.to_pandas"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_pandas</span></code></a>([columns])</td>
-<td>Export the LightCurve as a Pandas DataFrame.</td>
+<td>Converts the light curve to a Pandas <a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.24.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataFrame</span></code></a> object.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.to_periodogram" title="lightkurve.lightcurve.KeplerLightCurve.to_periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_periodogram</span></code></a>([method])</td>
-<td>Returns a <cite>Periodogram</cite> power spectrum object.</td>
+<td>Converts the light curve to a <a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> power spectrum object.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.to_table" title="lightkurve.lightcurve.KeplerLightCurve.to_table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_table</span></code></a>()</td>
-<td>Export the LightCurve as an AstroPy Table.</td>
+<td>Converts the light curve to an Astropy <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v3.2.dev2038)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> object.</td>
 </tr>
 </tbody>
 </table>
@@ -220,9 +220,10 @@ e.g. tdb’, ‘tt’, ‘ut1’, or ‘utc’.</p>
 <dl class="attribute">
 <dt id="lightkurve.lightcurve.KeplerLightCurve.astropy_time">
 <code class="descname">astropy_time</code><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurve.astropy_time" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns an <cite>astropy.time.Time</cite> object.</p>
-<p>The Time object will be created using the values in <cite>self.time</cite>
-and the <cite>self.time_format</cite> and <cite>self.time_scale</cite> attributes.
+<dd><p>Returns the time values as an Astropy <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v3.2.dev2038)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> object
+(if <code class="docutils literal notranslate"><span class="pre">time_format</span></code> is set).</p>
+<p>The Time object will be created using the values in the <code class="docutils literal notranslate"><span class="pre">time</span></code>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">time_format</span></code>, and <code class="docutils literal notranslate"><span class="pre">time_scale</span></code> attributes.
 For Kepler data products, the times are Barycentric.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -230,7 +231,7 @@ For Kepler data products, the times are Barycentric.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><dl class="first last docutils">
 <dt><strong>ValueError</strong></dt>
-<dd><p class="first last">If <cite>self.time_format</cite> is not set or not one of the formats
+<dd><p class="first last">If the <code class="docutils literal notranslate"><span class="pre">time_format</span></code> attribute is not set or not one of the formats
 allowed by AstroPy.</p>
 </dd>
 </dl>
@@ -270,9 +271,9 @@ allowed by AstroPy.</p>
 <dl class="method">
 <dt id="lightkurve.lightcurve.KeplerLightCurve.bin">
 <code class="descname">bin</code><span class="sig-paren">(</span><em>binsize=13</em>, <em>method='mean'</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurve.bin" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bins a lightcurve in blocks of size <cite>binsize</cite>.</p>
-<p>The value of the bins will contain the mean (<cite>method=’mean’</cite>) or the
-median (<cite>method=’median’</cite>) of the original data.  The default is mean.</p>
+<dd><p>Bins a lightcurve in blocks of size <code class="docutils literal notranslate"><span class="pre">binsize</span></code>.</p>
+<p>The value of the bins will contain the mean (<code class="docutils literal notranslate"><span class="pre">method='mean'</span></code>) or the
+median (<code class="docutils literal notranslate"><span class="pre">method='median'</span></code>) of the original data.  The default is mean.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -288,8 +289,8 @@ median (<cite>method=’median’</cite>) of the original data.  The default is 
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>binned_lc</strong> <span class="classifier-delimiter">:</span> <span class="classifier">LightCurve object</span></dt>
-<dd><p class="first last">Binned lightcurve.</p>
+<dt><strong>binned_lc</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a></span></dt>
+<dd><p class="first last">A new light curve which has been binned.</p>
 </dd>
 </dl>
 </td>
@@ -301,7 +302,7 @@ median (<cite>method=’median’</cite>) of the original data.  The default is 
 <li>If the ratio between the lightcurve length and the binsize is not
 a whole number, then the remainder of the data points will be
 ignored.</li>
-<li>If the original lightcurve contains flux uncertainties (flux_err),
+<li>If the original light curve contains flux uncertainties (<code class="docutils literal notranslate"><span class="pre">flux_err</span></code>),
 the binned lightcurve will report the root-mean-square error.
 If no uncertainties are included, the binned curve will return the
 standard deviation of the data.</li>
@@ -313,14 +314,14 @@ bitwise OR of the quality flags will be returned per bin.</li>
 <dl class="method">
 <dt id="lightkurve.lightcurve.KeplerLightCurve.cdpp">
 <code class="descname">cdpp</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurve.cdpp" title="Permalink to this definition">¶</a></dt>
-<dd><p>DEPRECATED: use <cite>estimate_cdpp()</cite> instead.</p>
+<dd><p>DEPRECATED: use <a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.estimate_cdpp" title="lightkurve.lightcurve.KeplerLightCurve.estimate_cdpp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">estimate_cdpp()</span></code></a> instead.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="lightkurve.lightcurve.KeplerLightCurve.copy">
 <code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurve.copy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a copy of the LightCurve object.</p>
-<p>This method uses the <cite>copy.deepcopy</cite> function to ensure that all
+<p>This method uses the <a class="reference external" href="https://docs.python.org/3/library/copy.html#copy.deepcopy" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy.deepcopy</span></code></a> function to ensure that all
 objects stored within the LightCurve are copied (e.g. time and flux).</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -328,7 +329,7 @@ objects stored within the LightCurve are copied (e.g. time and flux).</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
 <dt><strong>lc_copy</strong> <span class="classifier-delimiter">:</span> <span class="classifier">LightCurve</span></dt>
-<dd><p class="first last">A new <cite>LightCurve</cite> object which is a copy of the original.</p>
+<dd><p class="first last">A new <a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> object which is a copy of the original.</p>
 </dd>
 </dl>
 </td>
@@ -340,7 +341,7 @@ objects stored within the LightCurve are copied (e.g. time and flux).</p>
 <dl class="method">
 <dt id="lightkurve.lightcurve.KeplerLightCurve.correct">
 <code class="descname">correct</code><span class="sig-paren">(</span><em>method='sff'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurve.correct" title="Permalink to this definition">¶</a></dt>
-<dd><p>Corrects a lightcurve for motion-dependent systematic errors.</p>
+<dd><p>DEPRECATED: use <code class="xref py py-obj docutils literal notranslate"><span class="pre">to_corrector(method).correct()</span></code> instead.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -352,7 +353,7 @@ Right now only ‘sff’ (Vanderburg’s Self-Flat Fielding) is supported.</p>
 </dd>
 <dt><strong>kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
 <dd><p class="first last">Dictionary of keyword arguments to be passed to the function
-defined by <cite>method</cite>.</p>
+defined by <code class="xref py py-obj docutils literal notranslate"><span class="pre">method</span></code>.</p>
 </dd>
 </dl>
 </td>
@@ -371,7 +372,7 @@ defined by <cite>method</cite>.</p>
 <dl class="method">
 <dt id="lightkurve.lightcurve.KeplerLightCurve.errorbar">
 <code class="descname">errorbar</code><span class="sig-paren">(</span><em>linestyle=''</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurve.errorbar" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plots the light curve using matplotlib’s <cite>errorbar</cite> method.</p>
+<dd><p>Plots the light curve using Matplotlib’s <code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar()</span></code> method.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -402,7 +403,7 @@ Lightkurve’s custom stylesheet is used by default.</p>
 <dd><p class="first last">Connect the error bars using a line?</p>
 </dd>
 <dt><strong>kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
-<dd><p class="first last">Dictionary of arguments to be passed to <cite>matplotlib.pyplot.scatter</cite>.</p>
+<dd><p class="first last">Dictionary of arguments to be passed to <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.scatter.html#matplotlib.pyplot.scatter" title="(in Matplotlib v3.0.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib.pyplot.scatter</span></code></a>.</p>
 </dd>
 </dl>
 </td>
@@ -434,11 +435,11 @@ simpler “sgCDPP proxy algorithm” discussed by Gilliland et al
 <dt>The steps of this algorithm are:</dt>
 <dd><ol class="first last arabic simple">
 <li>Remove low frequency signals using a Savitzky-Golay filter with
-window length <cite>savgol_window</cite> and polynomial order <cite>savgol_polyorder</cite>.</li>
+window length <code class="xref py py-obj docutils literal notranslate"><span class="pre">savgol_window</span></code> and polynomial order <code class="xref py py-obj docutils literal notranslate"><span class="pre">savgol_polyorder</span></code>.</li>
 <li>Remove outliers by rejecting data points which are separated from
-the mean by <cite>sigma</cite> times the standard deviation.</li>
+the mean by <code class="xref py py-obj docutils literal notranslate"><span class="pre">sigma</span></code> times the standard deviation.</li>
 <li>Compute the standard deviation of a running mean with
-a configurable window length equal to <cite>transit_duration</cite>.</li>
+a configurable window length equal to <code class="xref py py-obj docutils literal notranslate"><span class="pre">transit_duration</span></code>.</li>
 </ol>
 </dd>
 </dl>
@@ -503,9 +504,9 @@ svn+ssh://murzim/repo/so/trunk/Develop/jvc/common/compute_SG_noise.m</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>nlc</strong> <span class="classifier-delimiter">:</span> <span class="classifier">LightCurve object</span></dt>
-<dd><p class="first last">A new <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> in which NaNs values and gaps in time have been
-filled.</p>
+<dt><strong>filled_lightcurve</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a></span></dt>
+<dd><p class="first last">A new light curve object in which NaN values and gaps in time
+have been filled.</p>
 </dd>
 </dl>
 </td>
@@ -518,7 +519,7 @@ filled.</p>
 <dt id="lightkurve.lightcurve.KeplerLightCurve.flatten">
 <code class="descname">flatten</code><span class="sig-paren">(</span><em>window_length=101</em>, <em>polyorder=2</em>, <em>return_trend=False</em>, <em>break_tolerance=5</em>, <em>niters=3</em>, <em>sigma=3</em>, <em>mask=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurve.flatten" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes the low frequency trend using scipy’s Savitzky-Golay filter.</p>
-<p>This method wraps <cite>scipy.signal.savgol_filter</cite>.</p>
+<p>This method wraps <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.savgol_filter.html#scipy.signal.savgol_filter" title="(in SciPy v1.2.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scipy.signal.savgol_filter</span></code></a>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -533,15 +534,15 @@ filled.</p>
 must be less than window_length.</p>
 </dd>
 <dt><strong>return_trend</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
-<dd><p class="first last">If <cite>True</cite>, the method will return a tuple of two elements
+<dd><p class="first last">If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a>, the method will return a tuple of two elements
 (flattened_lc, trend_lc) where trend_lc is the removed trend.</p>
 </dd>
 <dt><strong>break_tolerance</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
 <dd><p class="first last">If there are large gaps in time, flatten will split the flux into
-several sub-lightcurves and apply <cite>savgol_filter</cite> to each
+several sub-lightcurves and apply <code class="xref py py-obj docutils literal notranslate"><span class="pre">savgol_filter</span></code> to each
 individually. A gap is defined as a period in time larger than
-<cite>break_tolerance</cite> times the median gap.  To disable this feature,
-set <cite>break_tolerance</cite> to None.</p>
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">break_tolerance</span></code> times the median gap.  To disable this feature,
+set <code class="xref py py-obj docutils literal notranslate"><span class="pre">break_tolerance</span></code> to None.</p>
 </dd>
 <dt><strong>niters</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
 <dd><p class="first last">Number of iterations to iteratively sigma clip and flatten. If more than one, will
@@ -557,7 +558,7 @@ result will be provided for these points. Use this mask to remove
 data you want to preserve, e.g. transits.</p>
 </dd>
 <dt><strong>**kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
-<dd><p class="first last">Dictionary of arguments to be passed to <cite>scipy.signal.savgol_filter</cite>.</p>
+<dd><p class="first last">Dictionary of arguments to be passed to <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.savgol_filter.html#scipy.signal.savgol_filter" title="(in SciPy v1.2.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scipy.signal.savgol_filter</span></code></a>.</p>
 </dd>
 </dl>
 </td>
@@ -566,7 +567,7 @@ data you want to preserve, e.g. transits.</p>
 <dt><strong>flatten_lc</strong> <span class="classifier-delimiter">:</span> <span class="classifier">LightCurve object</span></dt>
 <dd><p class="first last">Flattened lightcurve.</p>
 </dd>
-<dt><strong>If `return_trend` is `True`, the method will also return:</strong></dt>
+<dt><strong>If ``return_trend`` is `True`, the method will also return:</strong></dt>
 <dd></dd>
 <dt><strong>trend_lc</strong> <span class="classifier-delimiter">:</span> <span class="classifier">LightCurve object</span></dt>
 <dd><p class="first last">Trend in the lightcurve data</p>
@@ -582,10 +583,10 @@ data you want to preserve, e.g. transits.</p>
 <dt id="lightkurve.lightcurve.KeplerLightCurve.fold">
 <code class="descname">fold</code><span class="sig-paren">(</span><em>period</em>, <em>transit_midpoint=0.0</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurve.fold" title="Permalink to this definition">¶</a></dt>
 <dd><p>Folds the lightcurve at a specified <code class="docutils literal notranslate"><span class="pre">period</span></code> and <code class="docutils literal notranslate"><span class="pre">transit_midpoint</span></code>.</p>
-<p>This method returns a new <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> object in which the time
+<p>This method returns a <a class="reference internal" href="lightkurve.lightcurve.FoldedLightCurve.html#lightkurve.lightcurve.FoldedLightCurve" title="lightkurve.lightcurve.FoldedLightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve</span></code></a> object in which the time
 values range between -0.5 to +0.5 (i.e. the phase).
 Data points which occur exactly at <code class="docutils literal notranslate"><span class="pre">transit_midpoint</span></code> or an integer
-multiple of <cite>transit_midpoint + n*period</cite> will have time value 0.0.</p>
+multiple of <code class="docutils literal notranslate"><span class="pre">transit_midpoint</span> <span class="pre">+</span> <span class="pre">n*period</span></code> will have time value 0.0.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -595,16 +596,16 @@ multiple of <cite>transit_midpoint + n*period</cite> will have time value 0.0.</
 <dd><p class="first last">The period upon which to fold.</p>
 </dd>
 <dt><strong>transit_midpoint</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float, optional</span></dt>
-<dd><p class="first last">Time reference point in the same units as the LightCurve’s <cite>time</cite>
+<dd><p class="first last">Time reference point in the same units as the LightCurve’s <code class="docutils literal notranslate"><span class="pre">time</span></code>
 attribute.</p>
 </dd>
 </dl>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>folded_lightcurve</strong> <span class="classifier-delimiter">:</span> <span class="classifier">LightCurve object</span></dt>
-<dd><p class="first last">A new <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> in which the data are folded and sorted by
-phase.</p>
+<dt><strong>folded_lightcurve</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference internal" href="lightkurve.lightcurve.FoldedLightCurve.html#lightkurve.lightcurve.FoldedLightCurve" title="lightkurve.lightcurve.FoldedLightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve</span></code></a></span></dt>
+<dd><p class="first last">A new light curve object in which the data are folded and sorted by
+phase. The object contains an extra <code class="docutils literal notranslate"><span class="pre">phase</span></code> attribute.</p>
 </dd>
 </dl>
 </td>
@@ -616,16 +617,16 @@ phase.</p>
 <dl class="method">
 <dt id="lightkurve.lightcurve.KeplerLightCurve.normalize">
 <code class="descname">normalize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurve.normalize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a normalized version of the lightcurve.</p>
-<p>The normalized lightcurve is obtained by dividing <cite>flux</cite> and <cite>flux_err</cite>
-by the median flux.</p>
+<dd><p>Returns a normalized version of the light curve.</p>
+<p>The normalized light curve is obtained by dividing the <code class="docutils literal notranslate"><span class="pre">flux</span></code> and
+<code class="docutils literal notranslate"><span class="pre">flux_err</span></code> object attributes by the by the median flux.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>normalized_lightcurve</strong> <span class="classifier-delimiter">:</span> <span class="classifier">LightCurve object</span></dt>
-<dd><p class="first last">A new <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> in which <cite>flux</cite> and <cite>flux_err</cite> are divided
+<dt><strong>normalized_lightcurve</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a></span></dt>
+<dd><p class="first last">A new light curve object in which <code class="docutils literal notranslate"><span class="pre">flux</span></code> and <code class="docutils literal notranslate"><span class="pre">flux_err</span></code> are divided
 by the median.</p>
 </dd>
 </dl>
@@ -638,7 +639,7 @@ by the median.</p>
 <dl class="method">
 <dt id="lightkurve.lightcurve.KeplerLightCurve.plot">
 <code class="descname">plot</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurve.plot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot the light curve using matplotlib’s <cite>plot</cite> method.</p>
+<dd><p>Plot the light curve using Matplotlib’s <code class="xref py py-obj docutils literal notranslate"><span class="pre">plot()</span></code> method.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -666,7 +667,7 @@ matplotlib’s built-in stylesheets (e.g. ‘ggplot’).
 Lightkurve’s custom stylesheet is used by default.</p>
 </dd>
 <dt><strong>kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
-<dd><p class="first last">Dictionary of arguments to be passed to <cite>matplotlib.pyplot.plot</cite>.</p>
+<dd><p class="first last">Dictionary of arguments to be passed to <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.0.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib.pyplot.plot</span></code></a>.</p>
 </dd>
 </dl>
 </td>
@@ -691,8 +692,8 @@ Lightkurve’s custom stylesheet is used by default.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>clean_lightcurve</strong> <span class="classifier-delimiter">:</span> <span class="classifier">LightCurve object</span></dt>
-<dd><p class="first last">A new <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> from which NaNs fluxes have been removed.</p>
+<dt><strong>clean_lightcurve</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a></span></dt>
+<dd><p class="first last">A new light curve object from which NaNs fluxes have been removed.</p>
 </dd>
 </dl>
 </td>
@@ -705,7 +706,7 @@ Lightkurve’s custom stylesheet is used by default.</p>
 <dt id="lightkurve.lightcurve.KeplerLightCurve.remove_outliers">
 <code class="descname">remove_outliers</code><span class="sig-paren">(</span><em>sigma=5.0</em>, <em>return_mask=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurve.remove_outliers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes outlier data points using sigma-clipping.</p>
-<p>This method returns a new <a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightCurve</span></code></a> object from which data
+<p>This method returns a new <a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> object from which data
 points are removed if their flux values are greater or smaller than
 the median flux by at least <code class="docutils literal notranslate"><span class="pre">sigma</span></code> times the standard deviation.</p>
 <p>Sigma-clipping works by iterating over data points, each time rejecting
@@ -716,8 +717,7 @@ sigma clipping.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">This function is a convenience wrapper around
-<a class="reference external" href="http://docs.astropy.org/en/stable/api/astropy.stats.sigma_clip.html">astropy.stats.sigma_clip</a>
-and provides the same functionality.</p>
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.stats.sigma_clip()</span></code> and provides the same functionality.</p>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -729,42 +729,42 @@ and provides the same functionality.</p>
 upper clipping limit. These limits are overridden by
 <code class="docutils literal notranslate"><span class="pre">sigma_lower</span></code> and <code class="docutils literal notranslate"><span class="pre">sigma_upper</span></code>, if input. Defaults to 5.</p>
 </dd>
-<dt><strong>sigma_lower</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float or <cite>None</cite></span></dt>
+<dt><strong>sigma_lower</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></dt>
 <dd><p class="first last">The number of standard deviations to use as the lower bound for
 the clipping limit. Can be set to float(‘inf’) in order to avoid
-clipping outliers below the median at all. If <cite>None</cite> then the
-value of <code class="docutils literal notranslate"><span class="pre">sigma</span></code> is used. Defaults to <cite>None</cite>.</p>
+clipping outliers below the median at all. If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> then the
+value of <code class="docutils literal notranslate"><span class="pre">sigma</span></code> is used. Defaults to <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>.</p>
 </dd>
-<dt><strong>sigma_upper</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float or <cite>None</cite></span></dt>
+<dt><strong>sigma_upper</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></dt>
 <dd><p class="first last">The number of standard deviations to use as the upper bound for
 the clipping limit. Can be set to float(‘inf’) in order to avoid
-clipping outliers above the median at all. If <cite>None</cite> then the
-value of <code class="docutils literal notranslate"><span class="pre">sigma</span></code> is used. Defaults to <cite>None</cite>.</p>
+clipping outliers above the median at all. If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> then the
+value of <code class="docutils literal notranslate"><span class="pre">sigma</span></code> is used. Defaults to <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>.</p>
 </dd>
 <dt><strong>return_mask</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
 <dd><p class="first last">Whether or not to return a mask (i.e. a boolean array) indicating
-which data points were removed. Entries marked as <cite>True</cite> in the
-mask are considered outliers. Defaults to <cite>True</cite>.</p>
+which data points were removed. Entries marked as <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> in the
+mask are considered outliers. Defaults to <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a>.</p>
 </dd>
-<dt><strong>iters</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int or <cite>None</cite></span></dt>
-<dd><p class="first last">The number of iterations to perform sigma clipping, or <cite>None</cite> to
+<dt><strong>iters</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></dt>
+<dd><p class="first last">The number of iterations to perform sigma clipping, or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> to
 clip until convergence is achieved (i.e., continue until the
 last iteration clips nothing). Defaults to 5.</p>
 </dd>
 <dt><strong>cenfunc</strong> <span class="classifier-delimiter">:</span> <span class="classifier">callable</span></dt>
 <dd><p class="first last">The function used to compute the center for the clipping. Must
 be a callable that takes in a masked array and outputs the
-central value. Defaults to the median (<cite>numpy.ma.median</cite>).</p>
+central value. Defaults to the median (<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ma.median.html#numpy.ma.median" title="(in NumPy v1.16)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.ma.median</span></code></a>).</p>
 </dd>
 <dt><strong>**kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
-<dd><p class="first last">Dictionary of arguments to be passed to <cite>astropy.stats.sigma_clip</cite>.</p>
+<dd><p class="first last">Dictionary of arguments to be passed to <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.stats.sigma_clip.html#astropy.stats.sigma_clip" title="(in Astropy v3.2.dev2038)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.stats.sigma_clip</span></code></a>.</p>
 </dd>
 </dl>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>clean_lc</strong> <span class="classifier-delimiter">:</span> <span class="classifier">LightCurve object</span></dt>
-<dd><p class="first last">A new <a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightCurve</span></code></a> from which outlier data points have been
+<dt><strong>clean_lc</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a></span></dt>
+<dd><p class="first last">A new light curve object from which outlier data points have been
 removed.</p>
 </dd>
 </dl>
@@ -773,7 +773,7 @@ removed.</p>
 </tbody>
 </table>
 <p class="rubric">Examples</p>
-<p>This example generates a new LightCurve in which all points
+<p>This example generates a new light curve in which all points
 that are more than 1 standard deviation from the median are removed:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">lc</span> <span class="o">=</span> <span class="n">LightCurve</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="n">flux</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">lc_clean</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">(</span><span class="n">sigma</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -799,7 +799,7 @@ in place:</p>
 <dl class="method">
 <dt id="lightkurve.lightcurve.KeplerLightCurve.scatter">
 <code class="descname">scatter</code><span class="sig-paren">(</span><em>colorbar_label=''</em>, <em>show_colorbar=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurve.scatter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plots the light curve using matplotlib’s <cite>scatter</cite> method.</p>
+<dd><p>Plots the light curve using Matplotlib’s <code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter()</span></code> method.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -827,13 +827,13 @@ matplotlib’s built-in stylesheets (e.g. ‘ggplot’).
 Lightkurve’s custom stylesheet is used by default.</p>
 </dd>
 <dt><strong>colorbar_label</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
-<dd><p class="first last">Label to show next to the colorbar (if <cite>c</cite> is given).</p>
+<dd><p class="first last">Label to show next to the colorbar (if <code class="xref py py-obj docutils literal notranslate"><span class="pre">c</span></code> is given).</p>
 </dd>
 <dt><strong>show_colorbar</strong> <span class="classifier-delimiter">:</span> <span class="classifier">boolean</span></dt>
-<dd><p class="first last">Show the colorbar if colors are given using the <cite>c</cite> argument?</p>
+<dd><p class="first last">Show the colorbar if colors are given using the <code class="xref py py-obj docutils literal notranslate"><span class="pre">c</span></code> argument?</p>
 </dd>
 <dt><strong>kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
-<dd><p class="first last">Dictionary of arguments to be passed to <cite>matplotlib.pyplot.scatter</cite>.</p>
+<dd><p class="first last">Dictionary of arguments to be passed to <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.scatter.html#matplotlib.pyplot.scatter" title="(in Matplotlib v3.0.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib.pyplot.scatter</span></code></a>.</p>
 </dd>
 </dl>
 </td>
@@ -859,7 +859,7 @@ Lightkurve’s custom stylesheet is used by default.</p>
 <dl class="method">
 <dt id="lightkurve.lightcurve.KeplerLightCurve.to_csv">
 <code class="descname">to_csv</code><span class="sig-paren">(</span><em>path_or_buf=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurve.to_csv" title="Permalink to this definition">¶</a></dt>
-<dd><p>Writes the LightCurve to a csv file.</p>
+<dd><p>Writes the light curve to a csv file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -870,14 +870,14 @@ Lightkurve’s custom stylesheet is used by default.</p>
 a string.</p>
 </dd>
 <dt><strong>**kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
-<dd><p class="first last">Dictionary of arguments to be passed to <cite>pandas.DataFrame.to_csv()</cite>.</p>
+<dd><p class="first last">Dictionary of arguments to be passed to <code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.DataFrame.to_csv()</span></code>.</p>
 </dd>
 </dl>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
 <dt><strong>csv</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str or None</span></dt>
-<dd><p class="first last">Returns a csv-formatted string if <cite>path_or_buf=None</cite>,
+<dd><p class="first last">Returns a csv-formatted string if <code class="docutils literal notranslate"><span class="pre">path_or_buf=None</span></code>,
 returns None otherwise.</p>
 </dd>
 </dl>
@@ -897,7 +897,7 @@ returns None otherwise.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
 <dt><strong>path</strong> <span class="classifier-delimiter">:</span> <span class="classifier">string, default None</span></dt>
-<dd><p class="first last">File path, if <cite>None</cite> returns an astropy.io.fits.HDUList object.</p>
+<dd><p class="first last">File path, if <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> returns an astropy.io.fits.HDUList object.</p>
 </dd>
 <dt><strong>overwrite</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
 <dd><p class="first last">Whether or not to overwrite the file</p>
@@ -932,7 +932,7 @@ in the first extension.</p>
 <dl class="method">
 <dt id="lightkurve.lightcurve.KeplerLightCurve.to_pandas">
 <code class="descname">to_pandas</code><span class="sig-paren">(</span><em>columns=['time', 'flux', 'flux_err', 'quality', 'centroid_col', 'centroid_row']</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurve.to_pandas" title="Permalink to this definition">¶</a></dt>
-<dd><p>Export the LightCurve as a Pandas DataFrame.</p>
+<dd><p>Converts the light curve to a Pandas <a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.24.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataFrame</span></code></a> object.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -940,15 +940,15 @@ in the first extension.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
 <dt><strong>columns</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of str</span></dt>
 <dd><p class="first last">List of columns to include in the DataFrame.  The names must match
-attributes of the <cite>LightCurve</cite> object (e.g. <cite>time</cite>, <cite>flux</cite>).</p>
+attributes of the <a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> object (e.g. <a class="reference external" href="https://docs.python.org/3/library/time.html#module-time" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">time</span></code></a>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">flux</span></code>).</p>
 </dd>
 </dl>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>dataframe</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><cite>pandas.DataFrame</cite> object</span></dt>
-<dd><p class="first last">A dataframe indexed by <cite>time</cite> and containing the columns <cite>flux</cite>
-and <cite>flux_err</cite>.</p>
+<dt><strong>dataframe</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v0.24.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a> object</span></dt>
+<dd><p class="first last">A dataframe indexed by <a class="reference external" href="https://docs.python.org/3/library/time.html#module-time" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">time</span></code></a> and containing the columns <code class="xref py py-obj docutils literal notranslate"><span class="pre">flux</span></code>
+and <code class="xref py py-obj docutils literal notranslate"><span class="pre">flux_err</span></code>.</p>
 </dd>
 </dl>
 </td>
@@ -960,30 +960,33 @@ and <cite>flux_err</cite>.</p>
 <dl class="method">
 <dt id="lightkurve.lightcurve.KeplerLightCurve.to_periodogram">
 <code class="descname">to_periodogram</code><span class="sig-paren">(</span><em>method='lombscargle'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurve.to_periodogram" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a <cite>Periodogram</cite> power spectrum object.</p>
+<dd><p>Converts the light curve to a <a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a>
+power spectrum object.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>method</strong> <span class="classifier-delimiter">:</span> <span class="classifier">“lombscargle” or “bls”</span></dt>
-<dd><p class="first last">Select a method to create a periodogram. Default “lombscargle”.</p>
+<dt><strong>method</strong> <span class="classifier-delimiter">:</span> <span class="classifier">{‘lombscargle’, ‘bls’}</span></dt>
+<dd><p class="first last">Use the Lomb Scargle or Box Least Squares (BLS) method to
+extract the power spectrum. Defaults to <code class="docutils literal notranslate"><span class="pre">'lombscargle'</span></code>.</p>
 </dd>
 <dt><strong>kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
-<dd><p class="first last">Keyword arguments passed to either <cite>LombScarglePeriodogram</cite> or
-<cite>BoxLeastSquaresPeriodogram</cite>.
-Keywords accepted by <cite>LombScarglePeriodogram</cite>:
-min_frequency, max_frequency, min_period, max_period, frequency,
-period, nterms, nyquist_factor, oversample_factor, freq_unit
-Keywords accepted by <cite>BoxLeastSquaresPeriodogram</cite>:
-min_period, max_period, period, frequency_factor</p>
+<dd><p class="first last">Keyword arguments passed to the constructor of either
+<a class="reference internal" href="lightkurve.periodogram.LombScarglePeriodogram.html#lightkurve.periodogram.LombScarglePeriodogram" title="lightkurve.periodogram.LombScarglePeriodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LombScarglePeriodogram</span></code></a> or
+<a class="reference internal" href="lightkurve.periodogram.BoxLeastSquaresPeriodogram.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram" title="lightkurve.periodogram.BoxLeastSquaresPeriodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BoxLeastSquaresPeriodogram</span></code></a>.
+Keywords accepted by <a class="reference internal" href="lightkurve.periodogram.LombScarglePeriodogram.html#lightkurve.periodogram.LombScarglePeriodogram" title="lightkurve.periodogram.LombScarglePeriodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LombScarglePeriodogram</span></code></a> are:
+<code class="docutils literal notranslate"><span class="pre">min_frequency</span></code>, <code class="docutils literal notranslate"><span class="pre">max_frequency</span></code>, <code class="docutils literal notranslate"><span class="pre">min_period</span></code>, <code class="docutils literal notranslate"><span class="pre">max_period</span></code>, <code class="docutils literal notranslate"><span class="pre">frequency</span></code>,
+<code class="docutils literal notranslate"><span class="pre">period</span></code>, <code class="docutils literal notranslate"><span class="pre">nterms</span></code>, <code class="docutils literal notranslate"><span class="pre">nyquist_factor</span></code>, <code class="docutils literal notranslate"><span class="pre">oversample_factor</span></code>, <code class="docutils literal notranslate"><span class="pre">freq_unit</span></code>.
+Keywords accepted by <a class="reference internal" href="lightkurve.periodogram.BoxLeastSquaresPeriodogram.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram" title="lightkurve.periodogram.BoxLeastSquaresPeriodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BoxLeastSquaresPeriodogram</span></code></a> are:
+<code class="docutils literal notranslate"><span class="pre">min_period</span></code>, <code class="docutils literal notranslate"><span class="pre">max_period</span></code>, <code class="docutils literal notranslate"><span class="pre">period</span></code>, <code class="docutils literal notranslate"><span class="pre">frequency_factor</span></code>.</p>
 </dd>
 </dl>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>Periodogram</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><cite>Periodogram</cite> object</span></dt>
-<dd><p class="first last">Returns a Periodogram object extracted from the lightcurve.</p>
+<dt><strong>Periodogram</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> object</span></dt>
+<dd><p class="first last">The power spectrum object extracted from the light curve.</p>
 </dd>
 </dl>
 </td>
@@ -995,13 +998,13 @@ min_period, max_period, period, frequency_factor</p>
 <dl class="method">
 <dt id="lightkurve.lightcurve.KeplerLightCurve.to_table">
 <code class="descname">to_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurve.to_table" title="Permalink to this definition">¶</a></dt>
-<dd><p>Export the LightCurve as an AstroPy Table.</p>
+<dd><p>Converts the light curve to an Astropy <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v3.2.dev2038)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> object.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>table</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><cite>astropy.table.Table</cite> object</span></dt>
+<dt><strong>table</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v3.2.dev2038)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.table.Table</span></code></a></span></dt>
 <dd><p class="first last">An AstroPy Table with columns ‘time’, ‘flux’, and ‘flux_err’.</p>
 </dd>
 </dl>

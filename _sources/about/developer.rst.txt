@@ -72,15 +72,22 @@ of manual steps:
 
 4. Verify that the docs and all tutorial notebooks can be compiled without failure (see *Building documentation* above), and upload them to the webserver.
 
-5. Make a new release branch in GitHub using the `Draft a new release button` at https://github.com/KeplerGO/lightkurve/releases.
+5. Edit the CHANGES.rst file by changing the date for the version you are about to release from “unreleased” to today’s date. Also be sure to make sure the change log is complete and accurate. Then add and commit those changes with:
 
-6. Create and upload the new package to PyPI:
+.. code-block:: bash
+
+    $ git add CHANGES.rst
+    $ git commit -m "Finalizing changelog for v<version>"
+
+6. Make a new release branch in GitHub using the `Draft a new release button` at https://github.com/KeplerGO/lightkurve/releases.
+
+7. Create and upload the new package to PyPI:
 
 .. code-block:: bash
 
     $ python setup.py release
 
-7. Increment the version number on the `lightkurve conda feedstock <https://github.com/conda-forge/lightkurve-feedstock>`_.  Navigate to the :code:`meta.yaml` file in the :code:`recipe` directory and change two lines:
+8. Increment the version number on the `lightkurve conda feedstock <https://github.com/conda-forge/lightkurve-feedstock>`_.  Navigate to the :code:`meta.yaml` file in the :code:`recipe` directory and change two lines:
 
 .. code-block:: yaml
 
@@ -89,4 +96,4 @@ of manual steps:
 
 Replace the `version` and `sha256` values with the most recent release info in `the lightkurve PyPI <https://pypi.org/project/lightkurve/>`_.  Submit your update as a Pull Request, which offers a checklist to guide programmatic spot-checking of your code.
 
-8. Edit `lightkurve/version.py` to contain the next version number with suffix `.dev`.
+9. Edit `lightkurve/version.py` to contain the next version number with suffix `.dev`.

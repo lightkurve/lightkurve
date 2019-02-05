@@ -1,6 +1,0 @@
-<map id="inheritancef3a0442c94" name="inheritancef3a0442c94">
-<area shape="rect" id="node1" href="lightkurve.lightcurve.FoldedLightCurve.html#lightkurve.lightcurve.FoldedLightCurve" target="_top" title="Generic class to store and plot phase&#45;folded light curves." alt="" coords="284,5,559,31"/>
-<area shape="rect" id="node2" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" target="_top" title="Generic class to work with any time series photometry data set." alt="" coords="5,55,236,80"/>
-<area shape="rect" id="node3" href="lightkurve.lightcurve.KeplerLightCurve.html#lightkurve.lightcurve.KeplerLightCurve" target="_top" title="Subclass of :class:`LightCurve &lt;lightkurve.lightcurve.LightCurve&gt;`" alt="" coords="285,55,557,80"/>
-<area shape="rect" id="node4" href="lightkurve.lightcurve.TessLightCurve.html#lightkurve.lightcurve.TessLightCurve" target="_top" title="Subclass of :class:`LightCurve &lt;lightkurve.lightcurve.LightCurve&gt;`" alt="" coords="292,104,551,129"/>
-</map>

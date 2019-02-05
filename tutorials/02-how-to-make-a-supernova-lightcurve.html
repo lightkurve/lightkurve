@@ -531,19 +531,26 @@ it might delete some of the astrophysical signal of interest.</p>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1">#lc_corr = lc_net.correct(restore_trend=True)</span>
+<span></span><span class="n">lc_corr</span> <span class="o">=</span> <span class="n">lc_net</span><span class="o">.</span><span class="n">correct</span><span class="p">(</span><span class="n">restore_trend</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<div class="nbinput nblast docutils container">
+<div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [15]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1">#ax = lc_net.errorbar(color=&#39;red&#39;, alpha=0.5, label=&#39;With Motion&#39;)</span>
-<span class="c1">#ax = lc_corr.errorbar(ax=ax, color=&#39;blue&#39;, alpha=0.5, label=&#39;Motion Corrected&#39;);</span>
+<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">lc_net</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;With Motion&#39;</span><span class="p">)</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">lc_corr</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Motion Corrected&#39;</span><span class="p">);</span>
 </pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_02-how-to-make-a-supernova-lightcurve_26_0.png" src="../_images/tutorials_02-how-to-make-a-supernova-lightcurve_26_0.png" />
 </div>
 </div>
 <p>The SFF method appears to do virtually nothing at all! There are

@@ -1,5 +1,0 @@
-<map id="inheritanceb2eabcdc04" name="inheritanceb2eabcdc04">
-<area shape="rect" id="node1" href="lightkurve.correctors.KeplerCBVCorrector.html#lightkurve.correctors.KeplerCBVCorrector" target="_top" title="Remove systematic trends from Kepler light curves by fitting" alt="" coords="5,104,156,129"/>
-<area shape="rect" id="node2" href="lightkurve.correctors.PLDCorrector.html#lightkurve.correctors.PLDCorrector" target="_top" title="Implements Pixel Level Decorrelation (PLD) to de&#45;trend Target Pixel Files." alt="" coords="27,55,134,80"/>
-<area shape="rect" id="node3" href="lightkurve.correctors.SFFCorrector.html#lightkurve.correctors.SFFCorrector" target="_top" title="Implements the Self&#45;Flat&#45;Fielding (SFF) systematics removal method." alt="" coords="29,5,133,31"/>
-</map>

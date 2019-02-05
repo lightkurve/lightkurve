@@ -71,8 +71,8 @@
 <h1>SFFCorrector<a class="headerlink" href="#sffcorrector" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="lightkurve.correctors.SFFCorrector">
-<em class="property">class </em><code class="descclassname">lightkurve.correctors.</code><code class="descname">SFFCorrector</code><a class="headerlink" href="#lightkurve.correctors.SFFCorrector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<em class="property">class </em><code class="descclassname">lightkurve.correctors.</code><code class="descname">SFFCorrector</code><span class="sig-paren">(</span><em>lightcurve</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Implements the Self-Flat-Fielding (SFF) systematics removal method.</p>
 <p>This method is described in detail by Vanderburg and Johnson (2014).
 Briefly, the algorithm implemented in this class can be described
@@ -91,6 +91,25 @@ eigenvectors of the centroid covariance matrix</li>
 <li>Multiply back the fitted BSpline</li>
 </ol>
 </div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>lightcurve</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a></span></dt>
+<dd><p class="first last">The light curve object on which the SFF algorithm will be applied.</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">lc</span> <span class="o">=</span> <span class="n">LightCurve</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">flux</span><span class="p">)</span>   <span class="c1"># doctest: +SKIP</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">corrector</span> <span class="o">=</span> <span class="n">SFFCorrector</span><span class="p">(</span><span class="n">lc</span><span class="p">)</span>   <span class="c1"># doctest: +SKIP</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_lc</span> <span class="o">=</span> <span class="n">corrector</span><span class="o">.</span><span class="n">correct</span><span class="p">(</span><span class="n">centroid_col</span><span class="p">,</span> <span class="n">centroid_row</span><span class="p">)</span>   <span class="c1"># doctest: +SKIP</span>
+</pre></div>
+</div>
 <p class="rubric">Methods Summary</p>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -107,11 +126,11 @@ eigenvectors of the centroid covariance matrix</li>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.correctors.SFFCorrector.breakpoints" title="lightkurve.correctors.SFFCorrector.breakpoints"><code class="xref py py-obj docutils literal notranslate"><span class="pre">breakpoints</span></code></a>(campaign)</td>
 <td>Return a break point as a function of the campaign number.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.correctors.SFFCorrector.correct" title="lightkurve.correctors.SFFCorrector.correct"><code class="xref py py-obj docutils literal notranslate"><span class="pre">correct</span></code></a>(time,&nbsp;flux,&nbsp;centroid_col,&nbsp;centroid_row)</td>
+<tr class="row-even"><td><a class="reference internal" href="#lightkurve.correctors.SFFCorrector.correct" title="lightkurve.correctors.SFFCorrector.correct"><code class="xref py py-obj docutils literal notranslate"><span class="pre">correct</span></code></a>([centroid_col,&nbsp;centroid_row,&nbsp;…])</td>
 <td>Returns a systematics-corrected LightCurve.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.correctors.SFFCorrector.fit_bspline" title="lightkurve.correctors.SFFCorrector.fit_bspline"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit_bspline</span></code></a>(time,&nbsp;flux[,&nbsp;knotspacing])</td>
-<td></td>
+<td>Returns a <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.BSpline.html#scipy.interpolate.BSpline" title="(in SciPy v1.2.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scipy.interpolate.BSpline</span></code></a> object to interpolate flux as a function of time.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.correctors.SFFCorrector.rotate_centroids" title="lightkurve.correctors.SFFCorrector.rotate_centroids"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rotate_centroids</span></code></a>(centroid_col,&nbsp;centroid_row)</td>
 <td>Rotate the coordinate frame of the (col, row) centroids to a new (x,y) frame in which the dominant motion of the spacecraft is aligned with the x axis.</td>
@@ -165,22 +184,18 @@ independently. However, this is not implemented yet in this version.</p>
 
 <dl class="method">
 <dt id="lightkurve.correctors.SFFCorrector.correct">
-<code class="descname">correct</code><span class="sig-paren">(</span><em>time</em>, <em>flux</em>, <em>centroid_col</em>, <em>centroid_row</em>, <em>polyorder=5</em>, <em>niters=3</em>, <em>bins=15</em>, <em>windows=10</em>, <em>sigma_1=3.0</em>, <em>sigma_2=5.0</em>, <em>restore_trend=False</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.correct" title="Permalink to this definition">¶</a></dt>
+<code class="descname">correct</code><span class="sig-paren">(</span><em>centroid_col=None</em>, <em>centroid_row=None</em>, <em>polyorder=5</em>, <em>niters=3</em>, <em>bins=15</em>, <em>windows=10</em>, <em>sigma_1=3.0</em>, <em>sigma_2=5.0</em>, <em>restore_trend=False</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.correct" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a systematics-corrected LightCurve.</p>
-<p>Note that it is assumed that time and flux do not contain NaNs.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>time</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array-like</span></dt>
-<dd><p class="first last">Time measurements</p>
-</dd>
-<dt><strong>flux</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array-like</span></dt>
-<dd><p class="first last">Data flux for every time point</p>
-</dd>
 <dt><strong>centroid_col, centroid_row</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array-like, array-like</span></dt>
-<dd><p class="first last">Centroid column and row coordinates as a function of time</p>
+<dd><p class="first last">Centroid column and row coordinates as a function of time.
+If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, then the <code class="xref py py-obj docutils literal notranslate"><span class="pre">centroid_col</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">centroid_row</span></code> attributes
+of the <code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code> passed to the constructor of this class
+will be used, if present.</p>
 </dd>
 <dt><strong>polyorder</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
 <dd><p class="first last">Degree of the polynomial which will be used to fit one
@@ -202,15 +217,15 @@ is ran independently in each window.</p>
 in steps (6) and (2), respectivelly.</p>
 </dd>
 <dt><strong>restore_trend</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
-<dd><p class="first last">If <cite>True</cite>, the long-term trend will be added back into the
+<dd><p class="first last">If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a>, the long-term trend will be added back into the
 lightcurve.</p>
 </dd>
 </dl>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>corrected_lightcurve</strong> <span class="classifier-delimiter">:</span> <span class="classifier">LightCurve object</span></dt>
-<dd><p class="first last">Returns a corrected lightcurve object.</p>
+<dt><strong>corrected_lightcurve</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a></span></dt>
+<dd><p class="first last">Returns a corrected light curve.</p>
 </dd>
 </dl>
 </td>
@@ -222,7 +237,8 @@ lightcurve.</p>
 <dl class="method">
 <dt id="lightkurve.correctors.SFFCorrector.fit_bspline">
 <code class="descname">fit_bspline</code><span class="sig-paren">(</span><em>time</em>, <em>flux</em>, <em>knotspacing=1.5</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.fit_bspline" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns a <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.BSpline.html#scipy.interpolate.BSpline" title="(in SciPy v1.2.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scipy.interpolate.BSpline</span></code></a> object to interpolate flux as a function of time.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="lightkurve.correctors.SFFCorrector.rotate_centroids">

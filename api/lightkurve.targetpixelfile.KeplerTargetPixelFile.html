@@ -81,8 +81,8 @@ to represent pixel data processed by NASA’s Kepler pipeline.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>path</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str or <cite>astropy.io.fits.HDUList</cite></span></dt>
-<dd><p class="first last">Path to a Kepler Target Pixel (FITS) File or a <cite>HDUList</cite> object.</p>
+<dt><strong>path</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str or <a class="reference external" href="http://docs.astropy.org/en/latest/io/fits/api/hdulists.html#astropy.io.fits.HDUList" title="(in Astropy v3.2.dev2038)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.io.fits.HDUList</span></code></a></span></dt>
+<dd><p class="first last">Path to a Kepler Target Pixel (FITS) File or a <code class="xref py py-obj docutils literal notranslate"><span class="pre">HDUList</span></code> object.</p>
 </dd>
 <dt><strong>quality_bitmask</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str or int</span></dt>
 <dd><p class="first">Bitmask (integer) which identifies the quality flag bitmask that should
@@ -90,19 +90,19 @@ be used to mask out bad cadences. If a string is passed, it has the
 following meaning:</p>
 <blockquote>
 <div><ul class="simple">
-<li>“none”: no cadences will be ignored (<cite>quality_bitmask=0</cite>).</li>
+<li>“none”: no cadences will be ignored (<code class="xref py py-obj docutils literal notranslate"><span class="pre">quality_bitmask=0</span></code>).</li>
 <li>“default”: cadences with severe quality issues will be ignored
-(<cite>quality_bitmask=1130799</cite>).</li>
+(<code class="xref py py-obj docutils literal notranslate"><span class="pre">quality_bitmask=1130799</span></code>).</li>
 <li>“hard”: more conservative choice of flags to ignore
-(<cite>quality_bitmask=1664431</cite>). This is known to remove good data.</li>
+(<code class="xref py py-obj docutils literal notranslate"><span class="pre">quality_bitmask=1664431</span></code>). This is known to remove good data.</li>
 <li>“hardest”: removes all data that has been flagged
-(<cite>quality_bitmask=2096639</cite>). This mask is not recommended.</li>
+(<code class="xref py py-obj docutils literal notranslate"><span class="pre">quality_bitmask=2096639</span></code>). This mask is not recommended.</li>
 </ul>
 </div></blockquote>
 <p class="last">See the <code class="xref py py-class docutils literal notranslate"><span class="pre">KeplerQualityFlags</span></code> class for details on the bitmasks.</p>
 </dd>
 <dt><strong>kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
-<dd><p class="first last">Keyword arguments passed to <cite>astropy.io.fits.open()</cite>.</p>
+<dd><p class="first last">Keyword arguments passed to <code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.io.fits.open()</span></code>.</p>
 </dd>
 </dl>
 </td>
@@ -167,7 +167,7 @@ following meaning:</p>
 <td>Kepler CCD module number.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.nan_time_mask" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.nan_time_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nan_time_mask</span></code></a></td>
-<td>Returns a boolean mask flagging cadences whose time is <cite>nan</cite>.</td>
+<td>Returns a boolean mask flagging cadences whose time is <code class="xref py py-obj docutils literal notranslate"><span class="pre">nan</span></code>.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.obsmode" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.obsmode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">obsmode</span></code></a></td>
 <td>‘short cadence’ or ‘long cadence’.</td>
@@ -215,7 +215,7 @@ following meaning:</p>
 </colgroup>
 <tbody valign="top">
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.centroids" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.centroids"><code class="xref py py-obj docutils literal notranslate"><span class="pre">centroids</span></code></a>(**kwargs)</td>
-<td>DEPRECATED: use <cite>estimate_cdpp()</cite> instead.</td>
+<td>DEPRECATED: use <code class="xref py py-obj docutils literal notranslate"><span class="pre">estimate_cdpp()</span></code> instead.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.create_threshold_mask" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.create_threshold_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_threshold_mask</span></code></a>([threshold,&nbsp;…])</td>
 <td>Returns an aperture mask creating using the thresholding method.</td>
@@ -248,7 +248,7 @@ following meaning:</p>
 <td>Returns a header keyword value.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_model" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.get_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_model</span></code></a>([star_priors])</td>
-<td>Returns a default <cite>TPFModel</cite> object for PRF fitting.</td>
+<td>Returns a default <code class="xref py py-obj docutils literal notranslate"><span class="pre">TPFModel</span></code> object for PRF fitting.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_prf_model" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.get_prf_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_prf_model</span></code></a>()</td>
 <td>Returns an object of KeplerPRF initialized using the necessary metadata in the tpf object.</td>
@@ -359,7 +359,7 @@ following meaning:</p>
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.nan_time_mask">
 <code class="descname">nan_time_mask</code><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.nan_time_mask" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a boolean mask flagging cadences whose time is <cite>nan</cite>.</p>
+<dd><p>Returns a boolean mask flagging cadences whose time is <code class="xref py py-obj docutils literal notranslate"><span class="pre">nan</span></code>.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -452,7 +452,7 @@ solution for the target pixel file.</p>
 <dl class="method">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.centroids">
 <code class="descname">centroids</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.centroids" title="Permalink to this definition">¶</a></dt>
-<dd><p>DEPRECATED: use <cite>estimate_cdpp()</cite> instead.</p>
+<dd><p>DEPRECATED: use <code class="xref py py-obj docutils literal notranslate"><span class="pre">estimate_cdpp()</span></code> instead.</p>
 </dd></dl>
 
 <dl class="method">
@@ -460,16 +460,16 @@ solution for the target pixel file.</p>
 <code class="descname">create_threshold_mask</code><span class="sig-paren">(</span><em>threshold=3</em>, <em>reference_pixel='center'</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.create_threshold_mask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an aperture mask creating using the thresholding method.</p>
 <p>This method will identify the pixels in the TargetPixelFile which show
-a median flux that is brighter than <cite>threshold</cite> times the standard
+a median flux that is brighter than <code class="xref py py-obj docutils literal notranslate"><span class="pre">threshold</span></code> times the standard
 deviation above the overall median. The standard deviation is estimated
 in a robust way by multiplying the Median Absolute Deviation (MAD)
 with 1.4826.</p>
 <p>If the thresholding method yields multiple contiguous regions, then
 only the region closest to the (col, row) coordinate specified by
-<cite>reference_pixel</cite> is returned.  For exmaple, <cite>reference_pixel=(0, 0)</cite>
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">reference_pixel</span></code> is returned.  For exmaple, <code class="xref py py-obj docutils literal notranslate"><span class="pre">reference_pixel=(0,</span> <span class="pre">0)</span></code>
 will pick the region closest to the bottom left corner.
 By default, the region closest to the center of the mask will be
-returned. If <cite>reference_pixel=None</cite> then all regions will be returned.</p>
+returned. If <code class="xref py py-obj docutils literal notranslate"><span class="pre">reference_pixel=None</span></code> then all regions will be returned.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -481,17 +481,17 @@ brighter than the median flux to be included in the aperture mask.</p>
 </dd>
 <dt><strong>reference_pixel: (int, int) tuple, ‘center’, or None</strong></dt>
 <dd><p class="first last">(col, row) pixel coordinate closest to the desired region.
-For example, use <cite>reference_pixel=(0,0)</cite> to select the region
+For example, use <code class="xref py py-obj docutils literal notranslate"><span class="pre">reference_pixel=(0,0)</span></code> to select the region
 closest to the bottom left corner of the target pixel file.
 If ‘center’ (default) then the region closest to the center pixel
-will be selected. If <cite>None</cite> then all regions will be selected.</p>
+will be selected. If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> then all regions will be selected.</p>
 </dd>
 </dl>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
 <dt><strong>aperture_mask</strong> <span class="classifier-delimiter">:</span> <span class="classifier">ndarray</span></dt>
-<dd><p class="first last">2D boolean numpy array containing <cite>True</cite> for pixels above the
+<dd><p class="first last">2D boolean numpy array containing <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> for pixels above the
 threshold.</p>
 </dd>
 </dl>
@@ -511,7 +511,7 @@ threshold.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
 <dt><strong>aperture_mask</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array-like, ‘pipeline’, or ‘all’</span></dt>
-<dd><p class="first last">A boolean array describing the aperture such that <cite>True</cite> means
+<dd><p class="first last">A boolean array describing the aperture such that <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> means
 that the pixel will be used.
 If None or ‘all’ are passed, all pixels will be used.
 If ‘pipeline’ is passed, the mask suggested by the official pipeline
@@ -543,7 +543,7 @@ the median flux will be used.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
 <dt><strong>aperture_mask</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array-like, ‘pipeline’, ‘threshold’ or ‘all’</span></dt>
-<dd><p class="first last">A boolean array describing the aperture such that <cite>True</cite> means
+<dd><p class="first last">A boolean array describing the aperture such that <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> means
 that the pixel will be used.
 If None or ‘all’ are passed, all pixels will be used.
 If ‘pipeline’ is passed, the mask suggested by the official pipeline
@@ -576,15 +576,15 @@ cadence.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
 <dt><strong>cadences</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of int</span></dt>
-<dd><p class="first last">Cadences to fit.  If <cite>None</cite> (default) then all cadences will be fit.</p>
+<dd><p class="first last">Cadences to fit.  If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> (default) then all cadences will be fit.</p>
 </dd>
 <dt><strong>parallel</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
-<dd><p class="first last">If <cite>True</cite>, fitting cadences will be distributed across multiple
-cores using Python’s <cite>multiprocessing</cite> module.</p>
+<dd><p class="first last">If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a>, fitting cadences will be distributed across multiple
+cores using Python’s <a class="reference external" href="https://docs.python.org/3/library/multiprocessing.html#module-multiprocessing" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">multiprocessing</span></code></a> module.</p>
 </dd>
 <dt><strong>**kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
-<dd><p class="first last">Keywords to be passed to <cite>tpf.get_model()</cite> to create the
-<cite>TPFModel</cite> object that will be fit.</p>
+<dd><p class="first last">Keywords to be passed to <code class="xref py py-obj docutils literal notranslate"><span class="pre">tpf.get_model()</span></code> to create the
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">TPFModel</span></code> object that will be fit.</p>
 </dd>
 </dl>
 </td>
@@ -605,7 +605,7 @@ various diagnostics.</p>
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.from_archive">
 <em class="property">static </em><code class="descname">from_archive</code><span class="sig-paren">(</span><em>target</em>, <em>cadence='long'</em>, <em>quarter=None</em>, <em>month=None</em>, <em>campaign=None</em>, <em>quality_bitmask='default'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.from_archive" title="Permalink to this definition">¶</a></dt>
 <dd><p>WARNING: THIS FUNCTION IS DEPRECATED AND WILL BE REMOVED VERY SOON.
-Use <cite>lightkurve.search_targetpixelfile()</cite> instead.</p>
+Use <code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.search_targetpixelfile()</span></code> instead.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -631,13 +631,13 @@ be used to mask out bad cadences. If a string is passed, it has the
 following meaning:</p>
 <blockquote>
 <div><ul class="simple">
-<li>“none”: no cadences will be ignored (<cite>quality_bitmask=0</cite>).</li>
+<li>“none”: no cadences will be ignored (<code class="xref py py-obj docutils literal notranslate"><span class="pre">quality_bitmask=0</span></code>).</li>
 <li>“default”: cadences with severe quality issues will be ignored
-(<cite>quality_bitmask=1130799</cite>).</li>
+(<code class="xref py py-obj docutils literal notranslate"><span class="pre">quality_bitmask=1130799</span></code>).</li>
 <li>“hard”: more conservative choice of flags to ignore
-(<cite>quality_bitmask=1664431</cite>). This is known to remove good data.</li>
+(<code class="xref py py-obj docutils literal notranslate"><span class="pre">quality_bitmask=1664431</span></code>). This is known to remove good data.</li>
 <li>“hardest”: removes all data that has been flagged
-(<cite>quality_bitmask=2096639</cite>). This mask is not recommended.</li>
+(<code class="xref py py-obj docutils literal notranslate"><span class="pre">quality_bitmask=2096639</span></code>). This mask is not recommended.</li>
 </ul>
 </div></blockquote>
 <p class="last">See the <code class="xref py py-class docutils literal notranslate"><span class="pre">KeplerQualityFlags</span></code> class for details on the bitmasks.</p>
@@ -663,7 +663,7 @@ following meaning:</p>
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.from_fits">
 <em class="property">classmethod </em><code class="descname">from_fits</code><span class="sig-paren">(</span><em>path_or_url</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.from_fits" title="Permalink to this definition">¶</a></dt>
 <dd><p>WARNING: THIS FUNCTION IS DEPRECATED AND WILL BE REMOVED VERY SOON.</p>
-<p>Please use <cite>lightkurve.open()</cite> instead.</p>
+<p>Please use <code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.open()</span></code> instead.</p>
 </dd></dl>
 
 <dl class="staticmethod">
@@ -685,10 +685,10 @@ the data from.</p>
 <dd><p class="first last">Position around which to cut out pixels.</p>
 </dd>
 <dt><strong>size</strong> <span class="classifier-delimiter">:</span> <span class="classifier">(int, int)</span></dt>
-<dd><p class="first last">Dimensions (cols, rows) to cut out around <cite>position</cite>.</p>
+<dd><p class="first last">Dimensions (cols, rows) to cut out around <code class="xref py py-obj docutils literal notranslate"><span class="pre">position</span></code>.</p>
 </dd>
 <dt><strong>extension</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int or str</span></dt>
-<dd><p class="first last">If <cite>images</cite> is a list of filenames, provide the extension number
+<dd><p class="first last">If <code class="xref py py-obj docutils literal notranslate"><span class="pre">images</span></code> is a list of filenames, provide the extension number
 or name to use. Default: 0.</p>
 </dd>
 <dt><strong>target_id</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int or str</span></dt>
@@ -698,7 +698,7 @@ or name to use. Default: 0.</p>
 <dd><p class="first last">Additional keywords to add to the first header file.</p>
 </dd>
 <dt><strong>**kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
-<dd><p class="first last">Extra arguments to be passed to the <cite>KeplerTargetPixelFile</cite> constructor.</p>
+<dd><p class="first last">Extra arguments to be passed to the <a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile" title="lightkurve.targetpixelfile.KeplerTargetPixelFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code></a> constructor.</p>
 </dd>
 </dl>
 </td>
@@ -762,18 +762,18 @@ then return <code class="docutils literal notranslate"><span class="pre">default
 <dl class="method">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.get_model">
 <code class="descname">get_model</code><span class="sig-paren">(</span><em>star_priors=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.get_model" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a default <cite>TPFModel</cite> object for PRF fitting.</p>
+<dd><p>Returns a default <code class="xref py py-obj docutils literal notranslate"><span class="pre">TPFModel</span></code> object for PRF fitting.</p>
 <p>The default model only includes one star and only allows its flux
 and position to change.  A different set of stars can be added using
-the <cite>star_priors</cite> parameter.</p>
+the <code class="xref py py-obj docutils literal notranslate"><span class="pre">star_priors</span></code> parameter.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
 <dt><strong>**kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
-<dd><p class="first last">Arguments to be passed to the <cite>TPFModel</cite> constructor, e.g.
-<cite>star_priors</cite>.</p>
+<dd><p class="first last">Arguments to be passed to the <code class="xref py py-obj docutils literal notranslate"><span class="pre">TPFModel</span></code> constructor, e.g.
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">star_priors</span></code>.</p>
 </dd>
 </dl>
 </td>
@@ -813,10 +813,10 @@ necessary metadata in the tpf object.</p>
 <code class="descname">interact</code><span class="sig-paren">(</span><em>notebook_url='localhost:8888'</em>, <em>max_cadences=30000</em>, <em>aperture_mask='pipeline'</em>, <em>exported_filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.interact" title="Permalink to this definition">¶</a></dt>
 <dd><p>Display an interactive Jupyter Notebook widget to inspect the pixel data.</p>
 <p>The widget will show both the lightcurve and pixel data.  By default,
-the lightcurve shown is obtained by calling the <cite>to_lightcurve()</cite> method,
-unless the user supplies a custom <cite>LightCurve</cite> object.
+the lightcurve shown is obtained by calling the <a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.to_lightcurve" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.to_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_lightcurve()</span></code></a> method,
+unless the user supplies a custom <code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code> object.
 This feature requires an optional dependency, bokeh (v0.12.15 or later).
-This dependency can be installed using e.g. <cite>conda install bokeh</cite>.</p>
+This dependency can be installed using e.g. <code class="xref py py-obj docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">bokeh</span></code>.</p>
 <p>At this time, this feature only works inside an active Jupyter
 Notebook, and tends to be too slow when more than ~30,000 cadences
 are contained in the TPF (e.g. short cadence data).</p>
@@ -840,7 +840,7 @@ of the form “localhost:8888”, then “http” will be used.</p>
 this value. This limit helps keep browsers from becoming unresponsive.</p>
 </dd>
 <dt><strong>aperture_mask</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array-like, ‘pipeline’, ‘threshold’ or ‘all’</span></dt>
-<dd><p class="first last">A boolean array describing the aperture such that <cite>True</cite> means
+<dd><p class="first last">A boolean array describing the aperture such that <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> means
 that the pixel will be used.
 If None or ‘all’ are passed, all pixels will be used.
 If ‘pipeline’ is passed, the mask suggested by the official pipeline
@@ -865,8 +865,8 @@ TargetPixelFile basename.</p>
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.plot">
 <code class="descname">plot</code><span class="sig-paren">(</span><em>ax=None</em>, <em>frame=0</em>, <em>cadenceno=None</em>, <em>bkg=False</em>, <em>aperture_mask=None</em>, <em>show_colorbar=True</em>, <em>mask_color='pink'</em>, <em>style='lightkurve'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the pixel data for a single frame (i.e. at a single time).</p>
-<p>The time can be specified by frame index number (<cite>frame=0</cite> will show the
-first frame) or absolute cadence number (<cite>cadenceno</cite>).</p>
+<p>The time can be specified by frame index number (<code class="xref py py-obj docutils literal notranslate"><span class="pre">frame=0</span></code> will show the
+first frame) or absolute cadence number (<a class="reference internal" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.cadenceno" title="lightkurve.targetpixelfile.KeplerTargetPixelFile.cadenceno"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cadenceno</span></code></a>).</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -901,7 +901,7 @@ matplotlib’s built-in stylesheets (e.g. ‘ggplot’).
 Lightkurve’s custom stylesheet is used by default.</p>
 </dd>
 <dt><strong>kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
-<dd><p class="first last">Keywords arguments passed to <cite>lightkurve.utils.plot_image</cite>.</p>
+<dd><p class="first last">Keywords arguments passed to <code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.utils.plot_image</span></code>.</p>
 </dd>
 </dl>
 </td>
@@ -939,9 +939,9 @@ Lightkurve’s custom stylesheet is used by default.</p>
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.to_lightcurve">
 <code class="descname">to_lightcurve</code><span class="sig-paren">(</span><em>method='aperture'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.to_lightcurve" title="Permalink to this definition">¶</a></dt>
 <dd><p>Performs photometry on the pixel data and returns a LightCurve object.</p>
-<p>See the docstring of <cite>aperture_photometry()</cite> for valid
+<p>See the docstring of <code class="xref py py-obj docutils literal notranslate"><span class="pre">aperture_photometry()</span></code> for valid
 arguments if the method is ‘aperture’.  Otherwise, see the docstring
-of <cite>prf_photometry()</cite> for valid arguments if the method is ‘prf’.</p>
+of <code class="xref py py-obj docutils literal notranslate"><span class="pre">prf_photometry()</span></code> for valid arguments if the method is ‘prf’.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -951,8 +951,8 @@ of <cite>prf_photometry()</cite> for valid arguments if the method is ‘prf’.
 <dd><p class="first last">Photometry method to use.</p>
 </dd>
 <dt><strong>**kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
-<dd><p class="first last">Extra arguments to be passed to the <cite>aperture_photometry</cite> or the
-<cite>prf_photometry</cite> method of this class.</p>
+<dd><p class="first last">Extra arguments to be passed to the <code class="xref py py-obj docutils literal notranslate"><span class="pre">aperture_photometry</span></code> or the
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">prf_photometry</span></code> method of this class.</p>
 </dd>
 </dl>
 </td>

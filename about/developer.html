@@ -94,7 +94,7 @@ latest version of the documentation is available online at
 <li>graphviz</li>
 <li><a class="reference external" href="https://github.com/numpy/numpydoc">numpydoc</a></li>
 </ul>
-<p>These packages can be installed using <cite>conda</cite> or <cite>pip</cite>.</p>
+<p>These packages can be installed using <code class="xref py py-obj docutils literal notranslate"><span class="pre">conda</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">pip</span></code>.</p>
 <p>To build the documentation in HTML format, execute:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd docs
 $ make clean
@@ -118,8 +118,8 @@ you can upload the documentation to the web server using:</p>
 <p>The procedure to release a new version of Lightkurve requires a number
 of manual steps:</p>
 <ol class="arabic simple">
-<li>Add any new contributors to <cite>AUTHORS.rst</cite>.</li>
-<li>Remove the suffix <cite>.dev</cite> from the version number in <cite>lightkurve/version.py</cite> and commit to master. Note that Lightkurve follows a <a class="reference external" href="https://semver.org">semantic versioning scheme</a>.</li>
+<li>Add any new contributors to <code class="xref py py-obj docutils literal notranslate"><span class="pre">AUTHORS.rst</span></code>.</li>
+<li>Remove the suffix <code class="xref py py-obj docutils literal notranslate"><span class="pre">dev</span></code> from the version number in <code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve/version.py</span></code> and commit to master. Note that Lightkurve follows a <a class="reference external" href="https://semver.org">semantic versioning scheme</a>.</li>
 <li>Verify that all unit tests pass:</li>
 </ol>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ pytest --remote-data
@@ -127,22 +127,29 @@ of manual steps:</p>
 </div>
 <ol class="arabic simple" start="4">
 <li>Verify that the docs and all tutorial notebooks can be compiled without failure (see <em>Building documentation</em> above), and upload them to the webserver.</li>
-<li>Make a new release branch in GitHub using the <cite>Draft a new release button</cite> at <a class="reference external" href="https://github.com/KeplerGO/lightkurve/releases">https://github.com/KeplerGO/lightkurve/releases</a>.</li>
+<li>Edit the CHANGES.rst file by changing the date for the version you are about to release from “unreleased” to today’s date. Also be sure to make sure the change log is complete and accurate. Then add and commit those changes with:</li>
+</ol>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git add CHANGES.rst
+$ git commit -m <span class="s2">&quot;Finalizing changelog for v&lt;version&gt;&quot;</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="6">
+<li>Make a new release branch in GitHub using the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Draft</span> <span class="pre">a</span> <span class="pre">new</span> <span class="pre">release</span> <span class="pre">button</span></code> at <a class="reference external" href="https://github.com/KeplerGO/lightkurve/releases">https://github.com/KeplerGO/lightkurve/releases</a>.</li>
 <li>Create and upload the new package to PyPI:</li>
 </ol>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ python setup.py release
 </pre></div>
 </div>
-<ol class="arabic simple" start="7">
+<ol class="arabic simple" start="8">
 <li>Increment the version number on the <a class="reference external" href="https://github.com/conda-forge/lightkurve-feedstock">lightkurve conda feedstock</a>.  Navigate to the <code class="code docutils literal notranslate"><span class="pre">meta.yaml</span></code> file in the <code class="code docutils literal notranslate"><span class="pre">recipe</span></code> directory and change two lines:</li>
 </ol>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span>{% set version = &quot;1.0b20&quot; %}
 {% set sha256 = &quot;b65f556362b64d9fcc8aa4b0e89991c2b8f7fc059dfa22269b0877a8b758b255&quot; %}
 </pre></div>
 </div>
-<p>Replace the <cite>version</cite> and <cite>sha256</cite> values with the most recent release info in <a class="reference external" href="https://pypi.org/project/lightkurve/">the lightkurve PyPI</a>.  Submit your update as a Pull Request, which offers a checklist to guide programmatic spot-checking of your code.</p>
-<ol class="arabic simple" start="8">
-<li>Edit <cite>lightkurve/version.py</cite> to contain the next version number with suffix <cite>.dev</cite>.</li>
+<p>Replace the <code class="xref py py-obj docutils literal notranslate"><span class="pre">version</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">sha256</span></code> values with the most recent release info in <a class="reference external" href="https://pypi.org/project/lightkurve/">the lightkurve PyPI</a>.  Submit your update as a Pull Request, which offers a checklist to guide programmatic spot-checking of your code.</p>
+<ol class="arabic simple" start="9">
+<li>Edit <code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve/version.py</span></code> to contain the next version number with suffix <code class="xref py py-obj docutils literal notranslate"><span class="pre">dev</span></code>.</li>
 </ol>
 </div>
 </div>

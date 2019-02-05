@@ -72,7 +72,7 @@
 <dl class="class">
 <dt id="lightkurve.correctors.PLDCorrector">
 <em class="property">class </em><code class="descclassname">lightkurve.correctors.</code><code class="descname">PLDCorrector</code><span class="sig-paren">(</span><em>tpf</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.PLDCorrector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Implements the Pixel Level Decorrelation (PLD) systematics removal method.</p>
 <blockquote>
 <div><p>Pixel Level Decorrelation (PLD) was developed by <a class="reference internal" href="#r333fd99d762c-1" id="id1">[1]</a> to remove
@@ -149,7 +149,7 @@ containing first and second order fractional pixel fluxes.</p>
 </pre></div>
 </div>
 <p>However, the above example will over-fit the small transits!
-It is necessary to mask the transits using <cite>corrector.correct(cadence_mask=…)</cite>.</p>
+It is necessary to mask the transits using <code class="xref py py-obj docutils literal notranslate"><span class="pre">corrector.correct(cadence_mask=...)</span></code>.</p>
 <p class="rubric">Methods Summary</p>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -173,9 +173,9 @@ It is necessary to mask the transits using <cite>corrector.correct(cadence_mask=
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
 <dt><strong>aperture_mask</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array-like, ‘pipeline’, ‘all’, ‘threshold’, or None</span></dt>
-<dd><p class="first last">A boolean array describing the aperture such that <cite>True</cite> means
+<dd><p class="first last">A boolean array describing the aperture such that <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> means
 that the pixel will be used.
-If <cite>None</cite> or ‘all’ are passed, all pixels will be used.
+If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> or ‘all’ are passed, all pixels will be used.
 If ‘pipeline’ is passed, the mask suggested by the official pipeline
 will be returned.
 If ‘threshold’ is passed, all pixels brighter than 3-sigma above
@@ -184,20 +184,20 @@ the median flux will be used.</p>
 <dt><strong>cadence_mask</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array-like</span></dt>
 <dd><p class="first last">A mask that will be applied to the cadences prior to constructing
 the detrending model. For example, you can pass a boolean array
-of length <cite>n_cadences</cite> where <cite>True</cite> means that the cadence will be
+of length <code class="xref py py-obj docutils literal notranslate"><span class="pre">n_cadences</span></code> where <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> means that the cadence will be
 included in the noise model. You may also pass an array of indices.
 This option enables signals of interest (e.g. planet transits)
 to be excluded from the noise model, which will prevent over-fitting.
 By default, no cadences will be masked.</p>
 </dd>
 <dt><strong>gp_timescale</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
-<dd><p class="first last">Gaussian Process time scale length term (<cite>tau</cite>) used to define
+<dd><p class="first last">Gaussian Process time scale length term (<code class="xref py py-obj docutils literal notranslate"><span class="pre">tau</span></code>) used to define
 length of fit variability in days.</p>
 </dd>
 <dt><strong>n_components_first</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
 <dd><p class="first last">Number of first-order PLD components to reduce to with PCA.
 Must be smaller than the number of pixels in the aperture mask.
-If <cite>None</cite>, then 25 or the number of pixels in the mask will be used,
+If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, then 25 or the number of pixels in the mask will be used,
 whichever is smaller.</p>
 </dd>
 <dt><strong>n_components_second</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
@@ -210,10 +210,10 @@ whichever is smaller.</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>corrected_lightcurve</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightCurve</span></code> object</span></dt>
+<dt><strong>corrected_lightcurve</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a></span></dt>
 <dd><p class="first last">Returns a corrected lightcurve object. Depending on the input, the
-returned object will be a <cite>KeplerLightCurve</cite>, <cite>TessLightCurve</cite>, or
-general <cite>LightCurve</cite> object.</p>
+returned object will be a <code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">TessLightCurve</span></code>, or
+general <code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code> object.</p>
 </dd>
 </dl>
 </td>

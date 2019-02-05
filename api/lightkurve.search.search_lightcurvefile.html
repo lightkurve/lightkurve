@@ -72,18 +72,18 @@
 <dl class="function">
 <dt id="lightkurve.search.search_lightcurvefile">
 <code class="descclassname">lightkurve.search.</code><code class="descname">search_lightcurvefile</code><span class="sig-paren">(</span><em>target, radius=None, cadence='long', mission=['Kepler', 'K2', 'TESS'], quarter=None, month=None, campaign=None, sector=None, limit=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.search.search_lightcurvefile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Searches the public data archive at MAST for a Kepler or TESS
+<dd><p>Searches the <a class="reference external" href="https://archive.stsci.edu">public data archive at MAST</a> for a Kepler or TESS
 <a class="reference internal" href="lightkurve.lightcurvefile.LightCurveFile.html#lightkurve.lightcurvefile.LightCurveFile" title="lightkurve.lightcurvefile.LightCurveFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightCurveFile</span></code></a>.</p>
 <p>This function fetches a data table that lists the Light Curve Files
-that fall within a region of sky centered around the position of <cite>target</cite>
-and within a cone of a given <cite>radius</cite>. If no value is provided for <cite>radius</cite>,
+that fall within a region of sky centered around the position of <code class="xref py py-obj docutils literal notranslate"><span class="pre">target</span></code>
+and within a cone of a given <code class="xref py py-obj docutils literal notranslate"><span class="pre">radius</span></code>. If no value is provided for <code class="xref py py-obj docutils literal notranslate"><span class="pre">radius</span></code>,
 only a single target will be returned.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>target</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, int, or <cite>astropy.coordinates.SkyCoord</cite> object</span></dt>
+<dt><strong>target</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, int, or <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.coordinates.SkyCoord.html#astropy.coordinates.SkyCoord" title="(in Astropy v3.2.dev2038)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.coordinates.SkyCoord</span></code></a> object</span></dt>
 <dd><p class="first">Target around which to search. Valid inputs include:</p>
 <blockquote class="last">
 <div><ul class="simple">
@@ -91,13 +91,13 @@ only a single target will be returned.</p>
 <li>The KIC or EPIC identifier as an integer, e.g. 11904151.</li>
 <li>A coordinate string in decimal format, e.g. “285.67942179 +50.24130576”.</li>
 <li>A coordinate string in sexagesimal format, e.g. “19:02:43.1 +50:14:28.7”.</li>
-<li>An <cite>astropy.coordinates.SkyCoord</cite> object.</li>
+<li>An <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.coordinates.SkyCoord.html#astropy.coordinates.SkyCoord" title="(in Astropy v3.2.dev2038)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.coordinates.SkyCoord</span></code></a> object.</li>
 </ul>
 </div></blockquote>
 </dd>
-<dt><strong>radius</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float or <cite>astropy.units.Quantity</cite> object</span></dt>
+<dt><strong>radius</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float or <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v3.2.dev2038)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.units.Quantity</span></code></a> object</span></dt>
 <dd><p class="first last">Conesearch radius.  If a float is given it will be assumed to be in
-units of arcseconds.  If <cite>None</cite> then we default to 0.0001 arcsec.</p>
+units of arcseconds.  If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> then we default to 0.0001 arcsec.</p>
 </dd>
 <dt><strong>cadence</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
 <dd><p class="first last">‘long’ or ‘short’.</p>
@@ -131,10 +131,10 @@ By default all months will be returned.</p>
 </tbody>
 </table>
 <p class="rubric">Examples</p>
-<p>This example demonstrates how to use the <cite>search_lightcurvefile()</cite> function to
-query and download data. Before instantiating a <cite>KeplerLightCurveFile</cite> object or
+<p>This example demonstrates how to use the <a class="reference internal" href="#lightkurve.search.search_lightcurvefile" title="lightkurve.search.search_lightcurvefile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_lightcurvefile()</span></code></a> function to
+query and download data. Before instantiating a <code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerLightCurveFile</span></code> object or
 downloading any science products, we can identify potential desired targets with
-<cite>search_lightcurvefile</cite>:</p>
+<a class="reference internal" href="#lightkurve.search.search_lightcurvefile" title="lightkurve.search.search_lightcurvefile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_lightcurvefile</span></code></a>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">lightkurve</span> <span class="k">import</span> <span class="n">search_lightcurvefile</span>  
 <span class="gp">&gt;&gt;&gt; </span><span class="n">search_result</span> <span class="o">=</span> <span class="n">search_lightcurvefile</span><span class="p">(</span><span class="s2">&quot;Kepler-10&quot;</span><span class="p">)</span>  
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">search_result</span><span class="p">)</span>  
@@ -144,7 +144,7 @@ downloading any science products, we can identify potential desired targets with
 planet system Kepler-10, and display a table containing the available
 data products. Because Kepler-10 was observed in 15 quarters, the search
 result will list 15 different files. If we want to download a
-<cite>LightCurveFileCollection</cite> object containing all 15 observations, use:</p>
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurveFileCollection</span></code> object containing all 15 observations, use:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">search_result</span><span class="o">.</span><span class="n">download_all</span><span class="p">()</span>  
 </pre></div>
 </div>
@@ -153,13 +153,13 @@ result will list 15 different files. If we want to download a
 </pre></div>
 </div>
 <p>The above line of code will only search and download Quarter 2 data and
-create a <cite>LightCurveFile</cite> object called lcf.</p>
-<p>We can also pass a radius into <cite>search_lightcurvefile</cite> to perform a cone search:</p>
+create a <code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurveFile</span></code> object called lcf.</p>
+<p>We can also pass a radius into <a class="reference internal" href="#lightkurve.search.search_lightcurvefile" title="lightkurve.search.search_lightcurvefile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_lightcurvefile</span></code></a> to perform a cone search:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">search_lightcurvefile</span><span class="p">(</span><span class="s1">&#39;Kepler-10&#39;</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>  
 </pre></div>
 </div>
 <p>This will display a table containing all targets within 100 arcseconds of
-Kepler-10 and in Quarter 4.  We can then download a <cite>LightCurveFileCollection</cite>
+Kepler-10 and in Quarter 4.  We can then download a <code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurveFileCollection</span></code>
 containing all these products using:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">search_lightcurvefile</span><span class="p">(</span><span class="s1">&#39;kepler-10&#39;</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">download_all</span><span class="p">()</span>  
 </pre></div>

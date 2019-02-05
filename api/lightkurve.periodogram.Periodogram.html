@@ -72,7 +72,7 @@
 <dl class="class">
 <dt id="lightkurve.periodogram.Periodogram">
 <em class="property">class </em><code class="descclassname">lightkurve.periodogram.</code><code class="descname">Periodogram</code><span class="sig-paren">(</span><em>frequency</em>, <em>power</em>, <em>nyquist=None</em>, <em>label=None</em>, <em>targetid=None</em>, <em>default_view='frequency'</em>, <em>meta={}</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.Periodogram" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Generic class to represent a power spectrum (frequency vs power data).</p>
 <p>The Periodogram class represents a power spectrum, with values of
 frequency on the x-axis (in any frequency units) and values of power on the
@@ -82,12 +82,12 @@ y-axis (in units of ppm^2 / [frequency units]).</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Attributes:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>frequency</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><cite>astropy.units.Quantity</cite> object</span></dt>
+<dt><strong>frequency</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v3.2.dev2038)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.units.Quantity</span></code></a> object</span></dt>
 <dd><p class="first last">Array of frequencies with associated astropy unit.</p>
 </dd>
-<dt><strong>power</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><cite>astropy.units.Quantity</cite> object</span></dt>
+<dt><strong>power</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v3.2.dev2038)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.units.Quantity</span></code></a> object</span></dt>
 <dd><p class="first last">Array of power-spectral-densities. The Quantity array must have units
-of <cite>ppm^2 / freq_unit</cite>, where freq_unit is the unit of the frequency
+of <code class="xref py py-obj docutils literal notranslate"><span class="pre">ppm^2</span> <span class="pre">/</span> <span class="pre">freq_unit</span></code>, where freq_unit is the unit of the frequency
 attribute.</p>
 </dd>
 <dt><strong>nyquist</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float, optional</span></dt>
@@ -213,8 +213,8 @@ frequency array. Defaults to 10.</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>binned_periodogram</strong> <span class="classifier-delimiter">:</span> <span class="classifier">a <cite>Periodogram</cite> object</span></dt>
-<dd><p class="first last">Returns a new <cite>Periodogram</cite> object which has been binned.</p>
+<dt><strong>binned_periodogram</strong> <span class="classifier-delimiter">:</span> <span class="classifier">a <a class="reference internal" href="#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> object</span></dt>
+<dd><p class="first last">Returns a new <a class="reference internal" href="#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> object which has been binned.</p>
 </dd>
 </dl>
 </td>
@@ -227,7 +227,7 @@ frequency array. Defaults to 10.</p>
 <dt id="lightkurve.periodogram.Periodogram.copy">
 <code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.Periodogram.copy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a copy of the Periodogram object.</p>
-<p>This method uses the <cite>copy.deepcopy</cite> function to ensure that all
+<p>This method uses the <a class="reference external" href="https://docs.python.org/3/library/copy.html#copy.deepcopy" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy.deepcopy</span></code></a> function to ensure that all
 objects stored within the Periodogram are copied.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -235,7 +235,7 @@ objects stored within the Periodogram are copied.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
 <dt><strong>pg_copy</strong> <span class="classifier-delimiter">:</span> <span class="classifier">Periodogram</span></dt>
-<dd><p class="first last">A new <cite>Periodogram</cite> object which is a copy of the original.</p>
+<dd><p class="first last">A new <a class="reference internal" href="#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> object which is a copy of the original.</p>
 </dd>
 </dl>
 </td>
@@ -251,23 +251,23 @@ objects stored within the Periodogram are copied.</p>
 estimate of the noise background.</p>
 <p>This method divides the power spectrum by a background estimated
 using a moving filter in log10 space by default. For details on the
-<cite>method</cite> and <cite>filter_width</cite> parameters, see <cite>Periodogram.smooth()</cite></p>
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">method</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_width</span></code> parameters, see <a class="reference internal" href="#lightkurve.periodogram.Periodogram.smooth" title="lightkurve.periodogram.Periodogram.smooth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram.smooth()</span></code></a></p>
 <p>Dividing the power through by the noise background produces a spectrum
 with no units of power. Since the signal is divided through by a measure
-of the noise, we refer to this as a <cite>Signal-To-Noise</cite> spectrum.</p>
+of the noise, we refer to this as a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Signal-To-Noise</span></code> spectrum.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
 <dt><strong>method</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, one of ‘boxkernel’ or ‘logmedian’</span></dt>
-<dd><p class="first last">Background estimation method passed on to <cite>Periodogram.smooth()</cite>.
+<dd><p class="first last">Background estimation method passed on to <a class="reference internal" href="#lightkurve.periodogram.Periodogram.smooth" title="lightkurve.periodogram.Periodogram.smooth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram.smooth()</span></code></a>.
 Defaults to ‘logmedian’.</p>
 </dd>
 <dt><strong>filter_width</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
-<dd><p class="first last">If <cite>method</cite> = ‘boxkernel’, this is the width of the smoothing filter
+<dd><p class="first last">If <code class="xref py py-obj docutils literal notranslate"><span class="pre">method</span></code> = ‘boxkernel’, this is the width of the smoothing filter
 in units of frequency.
-If method = <cite>logmedian</cite>, this is the width of the smoothing filter
+If method = <code class="xref py py-obj docutils literal notranslate"><span class="pre">logmedian</span></code>, this is the width of the smoothing filter
 in log10(frequency) space.</p>
 </dd>
 <dt><strong>return_trend</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
@@ -278,14 +278,14 @@ will be returned.</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>snr_spectrum</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><cite>Periodogram</cite> object</span></dt>
+<dt><strong>snr_spectrum</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference internal" href="#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> object</span></dt>
 <dd><p class="first last">Returns a periodogram object where the power is an estimate of the
 signal-to-noise of the spectrum, creating by dividing the powers
 with a simple estimate of the noise background using a smoothing filter.</p>
 </dd>
-<dt><strong>bkg</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><cite>Periodogram</cite> object</span></dt>
+<dt><strong>bkg</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference internal" href="#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> object</span></dt>
 <dd><p class="first last">The estimated power spectrum of the background noise. This is only
-returned if <cite>return_trend = True</cite>.</p>
+returned if <code class="xref py py-obj docutils literal notranslate"><span class="pre">return_trend</span> <span class="pre">=</span> <span class="pre">True</span></code>.</p>
 </dd>
 </dl>
 </td>
@@ -330,7 +330,7 @@ units will be frequency. If ‘period’, the x-axis units will be
 period and ‘log’ scale.</p>
 </dd>
 <dt><strong>kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
-<dd><p class="first last">Dictionary of arguments to be passed to <cite>matplotlib.pyplot.plot</cite>.</p>
+<dd><p class="first last">Dictionary of arguments to be passed to <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.0.2)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib.pyplot.plot</span></code></a>.</p>
 </dd>
 </dl>
 </td>
@@ -358,17 +358,17 @@ Prints in alphabetical order.</p>
 <dt id="lightkurve.periodogram.Periodogram.smooth">
 <code class="descname">smooth</code><span class="sig-paren">(</span><em>method='boxkernel'</em>, <em>filter_width=0.1</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.Periodogram.smooth" title="Permalink to this definition">¶</a></dt>
 <dd><p>Smooths the power spectrum using the ‘boxkernel’ or ‘logmedian’ method.</p>
-<p>If <cite>method</cite> is set to ‘boxkernel’, this method will smooth the power
+<p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">method</span></code> is set to ‘boxkernel’, this method will smooth the power
 spectrum by convolving with a numpy Box1DKernel with a width of
-<cite>filter_width</cite>, where <cite>filter width</cite> is in units of frequency.
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_width</span></code>, where <code class="xref py py-obj docutils literal notranslate"><span class="pre">filter</span> <span class="pre">width</span></code> is in units of frequency.
 This is best for filtering out noise while maintaining seismic mode
 peaks. This method requires the Periodogram to have an evenly spaced
-grid of frequencies. A <cite>ValueError</cite> exception will be raised if this is
+grid of frequencies. A <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ValueError</span></code></a> exception will be raised if this is
 not the case.</p>
-<p>If <cite>method</cite> is set to ‘logmedian’, it smooths the power spectrum using
+<p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">method</span></code> is set to ‘logmedian’, it smooths the power spectrum using
 a moving median which moves across the power spectrum in a steps of</p>
 <p>log10(x0) + 0.5 * filter_width</p>
-<p>where <cite>filter width</cite> is in log10(frequency) space. This is best for
+<p>where <code class="xref py py-obj docutils literal notranslate"><span class="pre">filter</span> <span class="pre">width</span></code> is in log10(frequency) space. This is best for
 estimating the noise background, as it filters over the seismic peaks.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -379,17 +379,17 @@ estimating the noise background, as it filters over the seismic peaks.</p>
 <dd><p class="first last">The smoothing method to use. Defaults to ‘boxkernel’.</p>
 </dd>
 <dt><strong>filter_width</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
-<dd><p class="first last">If <cite>method</cite> = ‘boxkernel’, this is the width of the smoothing filter
+<dd><p class="first last">If <code class="xref py py-obj docutils literal notranslate"><span class="pre">method</span></code> = ‘boxkernel’, this is the width of the smoothing filter
 in units of frequency.
-If method = <cite>logmedian</cite>, this is the width of the smoothing filter
+If method = <code class="xref py py-obj docutils literal notranslate"><span class="pre">logmedian</span></code>, this is the width of the smoothing filter
 in log10(frequency) space.</p>
 </dd>
 </dl>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>smoothed_pg</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><cite>Periodogram</cite> object</span></dt>
-<dd><p class="first last">Returns a new <cite>Periodogram</cite> object in which the power spectrum
+<dt><strong>smoothed_pg</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference internal" href="#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> object</span></dt>
+<dd><p class="first last">Returns a new <a class="reference internal" href="#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> object in which the power spectrum
 has been smoothed.</p>
 </dd>
 </dl>
@@ -408,7 +408,7 @@ has been smoothed.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>table</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><cite>astropy.table.Table</cite> object</span></dt>
+<dt><strong>table</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v3.2.dev2038)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.table.Table</span></code></a> object</span></dt>
 <dd><p class="first last">An AstroPy Table with columns ‘frequency’, ‘period’, and ‘power’.</p>
 </dd>
 </dl>

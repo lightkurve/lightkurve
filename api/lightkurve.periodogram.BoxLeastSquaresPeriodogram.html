@@ -134,7 +134,7 @@ representing a power spectrum generated using the Box Least Squares (BLS) method
 <td>Computes the transit model using the BLS, returns a lightkurve.LightCurve</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.plot" title="lightkurve.periodogram.BoxLeastSquaresPeriodogram.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(**kwargs)</td>
-<td>Plot the BoxLeastSquaresPeriodogram spectrum using matplotlib’s <cite>plot</cite> method.</td>
+<td>Plot the BoxLeastSquaresPeriodogram spectrum using matplotlib’s <a class="reference internal" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.plot" title="lightkurve.periodogram.BoxLeastSquaresPeriodogram.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a> method.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.show_properties" title="lightkurve.periodogram.BoxLeastSquaresPeriodogram.show_properties"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_properties</span></code></a>()</td>
 <td>Prints a summary of the non-callable attributes of the Periodogram object.</td>
@@ -213,8 +213,8 @@ frequency array. Defaults to 10.</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>binned_periodogram</strong> <span class="classifier-delimiter">:</span> <span class="classifier">a <cite>Periodogram</cite> object</span></dt>
-<dd><p class="first last">Returns a new <cite>Periodogram</cite> object which has been binned.</p>
+<dt><strong>binned_periodogram</strong> <span class="classifier-delimiter">:</span> <span class="classifier">a <a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> object</span></dt>
+<dd><p class="first last">Returns a new <a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> object which has been binned.</p>
 </dd>
 </dl>
 </td>
@@ -234,13 +234,13 @@ frequency array. Defaults to 10.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
 <dt><strong>period</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float or Quantity</span></dt>
-<dd><p class="first last">Period of the transits. Default is <cite>period_at_max_power</cite></p>
+<dd><p class="first last">Period of the transits. Default is <a class="reference internal" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.period_at_max_power" title="lightkurve.periodogram.BoxLeastSquaresPeriodogram.period_at_max_power"><code class="xref py py-obj docutils literal notranslate"><span class="pre">period_at_max_power</span></code></a></p>
 </dd>
 <dt><strong>duration</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float or Quantity</span></dt>
-<dd><p class="first last">Duration of the transits. Default is <cite>duration_at_max_power</cite></p>
+<dd><p class="first last">Duration of the transits. Default is <a class="reference internal" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.duration_at_max_power" title="lightkurve.periodogram.BoxLeastSquaresPeriodogram.duration_at_max_power"><code class="xref py py-obj docutils literal notranslate"><span class="pre">duration_at_max_power</span></code></a></p>
 </dd>
 <dt><strong>transit_time</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float or Quantity</span></dt>
-<dd><p class="first last">Transit midpoint of the transits. Default is <cite>transit_time_at_max_power</cite></p>
+<dd><p class="first last">Transit midpoint of the transits. Default is <a class="reference internal" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.transit_time_at_max_power" title="lightkurve.periodogram.BoxLeastSquaresPeriodogram.transit_time_at_max_power"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transit_time_at_max_power</span></code></a></p>
 </dd>
 </dl>
 </td>
@@ -260,7 +260,7 @@ frequency array. Defaults to 10.</p>
 <dt id="lightkurve.periodogram.BoxLeastSquaresPeriodogram.copy">
 <code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.copy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a copy of the Periodogram object.</p>
-<p>This method uses the <cite>copy.deepcopy</cite> function to ensure that all
+<p>This method uses the <a class="reference external" href="https://docs.python.org/3/library/copy.html#copy.deepcopy" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy.deepcopy</span></code></a> function to ensure that all
 objects stored within the Periodogram are copied.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -268,7 +268,7 @@ objects stored within the Periodogram are copied.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
 <dt><strong>pg_copy</strong> <span class="classifier-delimiter">:</span> <span class="classifier">Periodogram</span></dt>
-<dd><p class="first last">A new <cite>Periodogram</cite> object which is a copy of the original.</p>
+<dd><p class="first last">A new <a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> object which is a copy of the original.</p>
 </dd>
 </dl>
 </td>
@@ -284,23 +284,23 @@ objects stored within the Periodogram are copied.</p>
 estimate of the noise background.</p>
 <p>This method divides the power spectrum by a background estimated
 using a moving filter in log10 space by default. For details on the
-<cite>method</cite> and <cite>filter_width</cite> parameters, see <cite>Periodogram.smooth()</cite></p>
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">method</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_width</span></code> parameters, see <a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram.smooth" title="lightkurve.periodogram.Periodogram.smooth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram.smooth()</span></code></a></p>
 <p>Dividing the power through by the noise background produces a spectrum
 with no units of power. Since the signal is divided through by a measure
-of the noise, we refer to this as a <cite>Signal-To-Noise</cite> spectrum.</p>
+of the noise, we refer to this as a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Signal-To-Noise</span></code> spectrum.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
 <dt><strong>method</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, one of ‘boxkernel’ or ‘logmedian’</span></dt>
-<dd><p class="first last">Background estimation method passed on to <cite>Periodogram.smooth()</cite>.
+<dd><p class="first last">Background estimation method passed on to <a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram.smooth" title="lightkurve.periodogram.Periodogram.smooth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram.smooth()</span></code></a>.
 Defaults to ‘logmedian’.</p>
 </dd>
 <dt><strong>filter_width</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
-<dd><p class="first last">If <cite>method</cite> = ‘boxkernel’, this is the width of the smoothing filter
+<dd><p class="first last">If <code class="xref py py-obj docutils literal notranslate"><span class="pre">method</span></code> = ‘boxkernel’, this is the width of the smoothing filter
 in units of frequency.
-If method = <cite>logmedian</cite>, this is the width of the smoothing filter
+If method = <code class="xref py py-obj docutils literal notranslate"><span class="pre">logmedian</span></code>, this is the width of the smoothing filter
 in log10(frequency) space.</p>
 </dd>
 <dt><strong>return_trend</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
@@ -311,14 +311,14 @@ will be returned.</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>snr_spectrum</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><cite>Periodogram</cite> object</span></dt>
+<dt><strong>snr_spectrum</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> object</span></dt>
 <dd><p class="first last">Returns a periodogram object where the power is an estimate of the
 signal-to-noise of the spectrum, creating by dividing the powers
 with a simple estimate of the noise background using a smoothing filter.</p>
 </dd>
-<dt><strong>bkg</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><cite>Periodogram</cite> object</span></dt>
+<dt><strong>bkg</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> object</span></dt>
 <dd><p class="first last">The estimated power spectrum of the background noise. This is only
-returned if <cite>return_trend = True</cite>.</p>
+returned if <code class="xref py py-obj docutils literal notranslate"><span class="pre">return_trend</span> <span class="pre">=</span> <span class="pre">True</span></code>.</p>
 </dd>
 </dl>
 </td>
@@ -344,13 +344,13 @@ returned if <cite>return_trend = True</cite>.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
 <dt><strong>period</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float or Quantity</span></dt>
-<dd><p class="first last">Period of the transits. Default is <cite>period_at_max_power</cite></p>
+<dd><p class="first last">Period of the transits. Default is <a class="reference internal" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.period_at_max_power" title="lightkurve.periodogram.BoxLeastSquaresPeriodogram.period_at_max_power"><code class="xref py py-obj docutils literal notranslate"><span class="pre">period_at_max_power</span></code></a></p>
 </dd>
 <dt><strong>duration</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float or Quantity</span></dt>
-<dd><p class="first last">Duration of the transits. Default is <cite>duration_at_max_power</cite></p>
+<dd><p class="first last">Duration of the transits. Default is <a class="reference internal" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.duration_at_max_power" title="lightkurve.periodogram.BoxLeastSquaresPeriodogram.duration_at_max_power"><code class="xref py py-obj docutils literal notranslate"><span class="pre">duration_at_max_power</span></code></a></p>
 </dd>
 <dt><strong>transit_time</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float or Quantity</span></dt>
-<dd><p class="first last">Transit midpoint of the transits. Default is <cite>transit_time_at_max_power</cite></p>
+<dd><p class="first last">Transit midpoint of the transits. Default is <a class="reference internal" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.transit_time_at_max_power" title="lightkurve.periodogram.BoxLeastSquaresPeriodogram.transit_time_at_max_power"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transit_time_at_max_power</span></code></a></p>
 </dd>
 </dl>
 </td>
@@ -377,13 +377,13 @@ returned if <cite>return_trend = True</cite>.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
 <dt><strong>period</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float or Quantity</span></dt>
-<dd><p class="first last">Period of the transits. Default is <cite>period_at_max_power</cite></p>
+<dd><p class="first last">Period of the transits. Default is <a class="reference internal" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.period_at_max_power" title="lightkurve.periodogram.BoxLeastSquaresPeriodogram.period_at_max_power"><code class="xref py py-obj docutils literal notranslate"><span class="pre">period_at_max_power</span></code></a></p>
 </dd>
 <dt><strong>duration</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float or Quantity</span></dt>
-<dd><p class="first last">Duration of the transits. Default is <cite>duration_at_max_power</cite></p>
+<dd><p class="first last">Duration of the transits. Default is <a class="reference internal" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.duration_at_max_power" title="lightkurve.periodogram.BoxLeastSquaresPeriodogram.duration_at_max_power"><code class="xref py py-obj docutils literal notranslate"><span class="pre">duration_at_max_power</span></code></a></p>
 </dd>
 <dt><strong>transit_time</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float or Quantity</span></dt>
-<dd><p class="first last">Transit midpoint of the transits. Default is <cite>transit_time_at_max_power</cite></p>
+<dd><p class="first last">Transit midpoint of the transits. Default is <a class="reference internal" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.transit_time_at_max_power" title="lightkurve.periodogram.BoxLeastSquaresPeriodogram.transit_time_at_max_power"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transit_time_at_max_power</span></code></a></p>
 </dd>
 </dl>
 </td>
@@ -402,15 +402,15 @@ returned if <cite>return_trend = True</cite>.</p>
 <dl class="method">
 <dt id="lightkurve.periodogram.BoxLeastSquaresPeriodogram.plot">
 <code class="descname">plot</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.plot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot the BoxLeastSquaresPeriodogram spectrum using matplotlib’s <cite>plot</cite> method.
-See <cite>Periodogram.plot</cite> for details on the accepted arguments.</p>
+<dd><p>Plot the BoxLeastSquaresPeriodogram spectrum using matplotlib’s <a class="reference internal" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.plot" title="lightkurve.periodogram.BoxLeastSquaresPeriodogram.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a> method.
+See <a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram.plot" title="lightkurve.periodogram.Periodogram.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram.plot</span></code></a> for details on the accepted arguments.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
 <dt><strong>kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
-<dd><p class="first last">Dictionary of arguments ot be passed to <cite>Periodogram.plot</cite>.</p>
+<dd><p class="first last">Dictionary of arguments ot be passed to <a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram.plot" title="lightkurve.periodogram.Periodogram.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram.plot</span></code></a>.</p>
 </dd>
 </dl>
 </td>
@@ -438,17 +438,17 @@ Prints in alphabetical order.</p>
 <dt id="lightkurve.periodogram.BoxLeastSquaresPeriodogram.smooth">
 <code class="descname">smooth</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.smooth" title="Permalink to this definition">¶</a></dt>
 <dd><p>Smooths the power spectrum using the ‘boxkernel’ or ‘logmedian’ method.</p>
-<p>If <cite>method</cite> is set to ‘boxkernel’, this method will smooth the power
+<p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">method</span></code> is set to ‘boxkernel’, this method will smooth the power
 spectrum by convolving with a numpy Box1DKernel with a width of
-<cite>filter_width</cite>, where <cite>filter width</cite> is in units of frequency.
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_width</span></code>, where <code class="xref py py-obj docutils literal notranslate"><span class="pre">filter</span> <span class="pre">width</span></code> is in units of frequency.
 This is best for filtering out noise while maintaining seismic mode
 peaks. This method requires the Periodogram to have an evenly spaced
-grid of frequencies. A <cite>ValueError</cite> exception will be raised if this is
+grid of frequencies. A <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ValueError</span></code></a> exception will be raised if this is
 not the case.</p>
-<p>If <cite>method</cite> is set to ‘logmedian’, it smooths the power spectrum using
+<p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">method</span></code> is set to ‘logmedian’, it smooths the power spectrum using
 a moving median which moves across the power spectrum in a steps of</p>
 <p>log10(x0) + 0.5 * filter_width</p>
-<p>where <cite>filter width</cite> is in log10(frequency) space. This is best for
+<p>where <code class="xref py py-obj docutils literal notranslate"><span class="pre">filter</span> <span class="pre">width</span></code> is in log10(frequency) space. This is best for
 estimating the noise background, as it filters over the seismic peaks.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -459,17 +459,17 @@ estimating the noise background, as it filters over the seismic peaks.</p>
 <dd><p class="first last">The smoothing method to use. Defaults to ‘boxkernel’.</p>
 </dd>
 <dt><strong>filter_width</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
-<dd><p class="first last">If <cite>method</cite> = ‘boxkernel’, this is the width of the smoothing filter
+<dd><p class="first last">If <code class="xref py py-obj docutils literal notranslate"><span class="pre">method</span></code> = ‘boxkernel’, this is the width of the smoothing filter
 in units of frequency.
-If method = <cite>logmedian</cite>, this is the width of the smoothing filter
+If method = <code class="xref py py-obj docutils literal notranslate"><span class="pre">logmedian</span></code>, this is the width of the smoothing filter
 in log10(frequency) space.</p>
 </dd>
 </dl>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>smoothed_pg</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><cite>Periodogram</cite> object</span></dt>
-<dd><p class="first last">Returns a new <cite>Periodogram</cite> object in which the power spectrum
+<dt><strong>smoothed_pg</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> object</span></dt>
+<dd><p class="first last">Returns a new <a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> object in which the power spectrum
 has been smoothed.</p>
 </dd>
 </dl>
@@ -488,7 +488,7 @@ has been smoothed.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>table</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><cite>astropy.table.Table</cite> object</span></dt>
+<dt><strong>table</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v3.2.dev2038)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.table.Table</span></code></a> object</span></dt>
 <dd><p class="first last">An AstroPy Table with columns ‘frequency’, ‘period’, and ‘power’.</p>
 </dd>
 </dl>
