@@ -698,7 +698,8 @@ def test_regression_346():
 
 def test_new_corrector_api():
     """This test can be remove after we remove the deprecated `LightCurve.correct()` method"""
-    with pytest.warns(LightkurveWarning, match='deprecated'):
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", LightkurveWarning)  # Deprecation warning
         lc1 = KeplerLightCurveFile(K2_C08).PDCSAP_FLUX.correct()
     lc2 = KeplerLightCurveFile(K2_C08).PDCSAP_FLUX.to_corrector().correct()
     assert_allclose(lc1.flux, lc2.flux)

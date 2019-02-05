@@ -1094,8 +1094,9 @@ class KeplerTargetPixelFile(TargetPixelFile):
         """
         allowed_methods = ["pld"]
         if method == "sff":
-            raise ValueError("The 'sff' method can only be used on "
-                             "`LightCurve` objects, not `TargetPixelFile` objects.")
+            raise ValueError("The 'sff' method requires a `LightCurve` instead "
+                             "of a `TargetPixelFile` object.  Use `to_lightcurve()` "
+                             "to obtain a `LightCurve` first.")
         if method not in allowed_methods:
             raise ValueError(("Unrecognized method '{0}'\n"
                               "allowed methods are: {1}")
