@@ -376,7 +376,7 @@ class LightCurve(object):
             return flatten_lc, trend_lc
         return flatten_lc
 
-    def fold(self, period, t0=None, transit_midpoint=0.):
+    def fold(self, period, t0=None, transit_midpoint=None):
         """Folds the lightcurve at a specified ``period`` and reference time ``t0``.
 
         This method returns a `FoldedLightCurve` object in which the time
@@ -390,9 +390,9 @@ class LightCurve(object):
             The period upon which to fold.
         t0 : float, optional
             Time corresponding to zero phase. In the same units as the
-            LightCurve's ``time`` attribute.  Defaults to 0.
+            LightCurve's ``time`` attribute.  Defaults to 0 if not set.
         transit_midpoint : float, optional
-            Synonym for `t0`. This parameter will be ignored if ``t0`` is set.
+            Deprecated.  Use `t0` instead.
 
         Returns
         -------
@@ -400,8 +400,16 @@ class LightCurve(object):
             A new light curve object in which the data are folded and sorted by
             phase. The object contains an extra ``phase`` attribute.
         """
+        # `transit_midpoint` is deprecated
+        if transit_midpoint is not None:
+            warnings.warn('`transit_midpoint` is deprecated, please use `t0` instead.',
+                          LightkurveWarning)
+            if t0 is None:
+                t0 = transit_midpoint
+
         if t0 is None:
-            t0 = transit_midpoint
+            t0 = 0.
+
         if (t0 > 2450000):
             if self.time_format == 'bkjd':
                 warnings.warn('`t0` appears to be given in JD, '

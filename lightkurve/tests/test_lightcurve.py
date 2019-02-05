@@ -167,7 +167,10 @@ def test_lightcurve_fold():
     assert_almost_equal(fold.time[0], -0.5, 2)
     assert_almost_equal(np.min(fold.phase), -0.5, 2)
     assert_almost_equal(np.max(fold.phase), 0.5, 2)
-    fold = lc.fold(period=1, transit_midpoint=-0.1)
+    with warnings.catch_warnings():
+        # `transit_midpoint` is deprecated and its use will emit a warning
+        warnings.simplefilter("ignore", LightkurveWarning)
+        fold = lc.fold(period=1, transit_midpoint=-0.1)
     assert_almost_equal(fold.time[0], -0.5, 2)
     ax = fold.plot()
     assert (ax.get_xlabel() == 'Phase')
