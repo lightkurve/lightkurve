@@ -630,7 +630,7 @@ class LombScarglePeriodogram(Periodogram):
             periodogram. This implies that 1/freq_unit is the units for period.
         normalization : 'psd' or 'amplitude'
             Default: `psd`. The desired normalization of the power spectrum. 
-            Can be either power spectral density (`psd`) or amplitude 
+            Can be either power spectral density (`'psd'`) or amplitude 
             (`amplitude)
         kwargs : dict
             Keyword arguments passed to `astropy.stats.LombScargle()`
