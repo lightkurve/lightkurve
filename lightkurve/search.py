@@ -537,9 +537,13 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
     -------
     SearchResult : :class:`SearchResult` object.
     """
+
     observations = _query_mast(target, project=mission, radius=radius)
 
-    if len(observations) == 0:
+    # Check if TESS FFIs exist in observations list
+    TESScut = 'TESS FFI' in observations['target_name']
+
+    if len(observations) == 0 and not TESScut:
         raise SearchError('No data found for target "{}".'.format(target))
 
     products = Observations.get_product_list(observations)
@@ -547,38 +551,11 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
                   uniq_col_name='{col_name}{table_name}', table_names=['', '_2'])
     result.sort(['distance', 'obs_id'])
 
-<<<<<<< HEAD
-    masked_result = _filter_products(result, filetype=filetype,
-                                     campaign=campaign, quarter=quarter,
-                                     cadence=cadence, project=mission,
-                                     month=month, sector=sector, limit=limit)
-
-    # If Full Frame Images are found, add a table entry for FFI cutouts
-    if filetype == 'ffi':
-        for i in np.where('TESS FFI' in observations['target_name'])[0]:
-            # if target passed in is a SkyCoord object, convert to RA, dec pair
-            if isinstance(target, SkyCoord):
-                target = '{}, {}'.format(target.ra.deg, target.dec.deg)
-            # pull sector numbers
-            s = observations['sequence_number'][i]
-            # convert to pandas data frame to add FFI cutout row
-            products_df = masked_result.to_pandas()
-            # if the desired sector is available, add a row to the data frame
-            if s in np.atleast_1d(sector) or sector is None:
-                products_df = products_df.append({'description': 'TESS FFI Cutout (s{:02})'.format(s),
-                                                  'target_name': str(target),
-                                                  'productFilename': 'TESScut Full Frame Image Cutout',
-                                                  'distance': 0.0,
-                                                  'sequence_number': s},
-                                                  ignore_index=True)
-            # convert back to an astropy table
-            masked_result = Table.from_pandas(products_df)
-=======
     masked_result = _filter_products(result, target=target, filetype=filetype,
                                      campaign=campaign, quarter=quarter,
                                      cadence=cadence, project=mission,
-                                     month=month, sector=sector, limit=limit)
->>>>>>> use pandas to add FFI entry to SR
+                                     month=month, sector=sector, limit=limit,
+                                     TESScut=TESScut)
     return SearchResult(masked_result)
 
 
@@ -678,7 +655,8 @@ def _query_mast(target, radius=None, project=['Kepler', 'K2', 'TESS']):
 
 def _filter_products(products, target=None, campaign=None, quarter=None,
                      month=None, sector=None, cadence='long', limit=None,
-                     project=['Kepler', 'K2', 'TESS'], filetype='Target Pixel'):
+                     project=['Kepler', 'K2', 'TESS'], filetype='Target Pixel',
+                     TESScut=False):
     """Helper function which filters a SearchResult's products table by one or
     more criteria.
 
@@ -705,11 +683,6 @@ def _filter_products(products, target=None, campaign=None, quarter=None,
     project = np.atleast_1d(project)
     project_lower = [p.lower() for p in project]
 
-    # Check for existence of Full Frame Images in search result
-    ffi = False
-    if 'Calibrated full frame image' in products['description']:
-        ffi = True
-
     mask = np.zeros(len(products), dtype=bool)
 
     if 'kepler' in project_lower and campaign is None and sector is None:
@@ -724,9 +697,10 @@ def _filter_products(products, target=None, campaign=None, quarter=None,
     products = products[mask]
 
     # If Full Frame Images are found, add a table entry for FFI cutouts
-    if ffi:
+    if TESScut:
         products_df = products.to_pandas().append({'description': 'Full Frame Image Cutout (TPF)',
-                                                   'target_name': str(target)},
+                                                   'target_name': str(target),
+                                                   'productFilename': 'TESScut_FFI_Cutout'},
                                                    ignore_index=True)
         products = Table.from_pandas(products_df)
 
