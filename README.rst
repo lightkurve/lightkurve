@@ -1,7 +1,7 @@
 Lightkurve
 ==========
 
-**A beautiful package for Kepler and TESS time series analysis in Python.**
+**A friendly package for Kepler & TESS time series analysis in Python.**
 
 |pypi-badge| |ci-badge| |appveyor-badge| |cov-badge| |doi-badge|
 
@@ -22,9 +22,9 @@ to analyze astronomical flux time series data,
 in particular the pixels and lightcurves obtained by
 **NASA's Kepler and TESS exoplanet missions**.
 
-.. image:: http://docs.lightkurve.org/_images/lightkurve-teaser.gif
+.. image:: https://raw.githubusercontent.com/KeplerGO/lightkurve/master/docs/source/_static/images/lightkurve-teaser.gif
 
-This package aims to lower the barrier for both students, astronomers,
+This package aims to lower the barrier for students, astronomers,
 and citizen scientists interested in analyzing Kepler and TESS space telescope data.
 It does this by providing **high-quality building blocks and tutorials**
 which enable both hand-tailored data analyses and advanced automated pipelines.
