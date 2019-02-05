@@ -145,6 +145,7 @@ class SearchResult(object):
         if download_dir is None:
             download_dir = self._default_download_dir()
 
+<<<<<<< HEAD
         # if table contains TESScut search results, download cutout
         if 'TESScut' in self.table[0]['productFilename']:
             if cutout_size is None:
@@ -164,6 +165,13 @@ class SearchResult(object):
 
             path = Observations.download_products(self.table[:1], mrp_only=False,
                                                   download_dir=download_dir)['Local Path'][0]
+=======
+        if 'TESScut' in self.table[0]['productFilename']:
+            path = self._ffi_cutout_url()
+        else:
+            path = Observations.download_products(self.table[:1], mrp_only=False,
+                                                  download_dir=download_dir)['Local Path']
+>>>>>>> make sure sector is saved
 
         # open() will determine filetype and return
         return open(path, quality_bitmask=quality_bitmask)
@@ -238,6 +246,10 @@ class SearchResult(object):
             return TargetPixelFileCollection([open(p) for p in path])
         elif any(e in self.table['productFilename'][0] for e in lcf_extensions):
             return LightCurveFileCollection([open(p) for p in path])
+
+    def _ffi_cutout_url(self, target):
+        """ """
+        coords = self._resolve_coords(target)
 
     def _default_download_dir(self):
         """Returns the default path to the directory where files will be downloaded.
@@ -540,10 +552,7 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
 
     observations = _query_mast(target, project=mission, radius=radius)
 
-    # Check if TESS FFIs exist in observations list
-    TESScut = 'TESS FFI' in observations['target_name']
-
-    if len(observations) == 0 and not TESScut:
+    if len(observations) == 0:
         raise SearchError('No data found for target "{}".'.format(target))
 
     products = Observations.get_product_list(observations)
@@ -551,11 +560,19 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
                   uniq_col_name='{col_name}{table_name}', table_names=['', '_2'])
     result.sort(['distance', 'obs_id'])
 
-    masked_result = _filter_products(result, target=target, filetype=filetype,
+    masked_result = _filter_products(result, filetype=filetype,
                                      campaign=campaign, quarter=quarter,
                                      cadence=cadence, project=mission,
-                                     month=month, sector=sector, limit=limit,
-                                     TESScut=TESScut)
+                                     month=month, sector=sector, limit=limit)
+
+    # If Full Frame Images are found, add a table entry for FFI cutouts
+    for i in np.where('TESS FFI' in observations['target_name'])[0]:
+        sector = observations['sequence_number'][i]
+        products_df = masked_result.to_pandas().append({'description': 'Target pixel file (s {})'.format(sector),
+                                                        'target_name': str(target),
+                                                        'productFilename': 'TESScut Full Frame Image Cutout'},
+                                                        ignore_index=True)
+        masked_result = Table.from_pandas(products_df)
     return SearchResult(masked_result)
 
 
@@ -653,10 +670,9 @@ def _query_mast(target, radius=None, project=['Kepler', 'K2', 'TESS']):
         raise SearchError(exc)
 
 
-def _filter_products(products, target=None, campaign=None, quarter=None,
-                     month=None, sector=None, cadence='long', limit=None,
-                     project=['Kepler', 'K2', 'TESS'], filetype='Target Pixel',
-                     TESScut=False):
+def _filter_products(products, campaign=None, quarter=None, month=None,
+                     sector=None, cadence='long', limit=None,
+                     project=['Kepler', 'K2', 'TESS'], filetype='Target Pixel'):
     """Helper function which filters a SearchResult's products table by one or
     more criteria.
 
@@ -819,6 +835,8 @@ def _mask_tess_products(products, sector=None, filetype='Target Pixel'):
     elif filetype == 'ffi':
         description_string = 'TESScut'
     mask &= np.array([description_string in desc for desc in products['description']])
+
+    mask |= np.array(['TESScut' in desc for desc in products['description']])
 
     # Identify sector by the description.
     if sector is not None:
