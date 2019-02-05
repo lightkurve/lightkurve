@@ -148,6 +148,7 @@ class SearchResult(object):
         # if table contains TESScut search results, download cutout
         if 'TESScut' in self.table[0]['productFilename']:
 <<<<<<< HEAD
+<<<<<<< HEAD
             if cutout_size is None:
                 cutout_size = 5
             elif cutout_size < 0:
@@ -171,16 +172,23 @@ class SearchResult(object):
 
             path = os.path.join(download_dir, cutout_path[0][0])
 >>>>>>> specify cutout_size
+=======
+            path = self._fetch_tesscut_path(download_dir, cutout_size)
+>>>>>>> dedicated _fetch_tesscut_path() function
 
         else:
             if cutout_size is not None:
                 warnings.warn('`cutout_size` can only be specified for TESS '
                               'Full Frame Image cutouts.', LightkurveWarning)
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
                               
 >>>>>>> specify cutout_size
+=======
+
+>>>>>>> dedicated _fetch_tesscut_path() function
             path = Observations.download_products(self.table[:1], mrp_only=False,
                                                   download_dir=download_dir)['Local Path'][0]
 
@@ -286,6 +294,7 @@ class SearchResult(object):
 
         return download_dir
 
+<<<<<<< HEAD
     def _fetch_tesscut_path(self, target, sector, download_dir, cutout_size):
         """Downloads TESS FFI cutout and returns path to local file.
 
@@ -303,6 +312,21 @@ class SearchResult(object):
             Path to locally downloaded cutout file
         """
         from astroquery.mast import TesscutClass
+=======
+    def _resolve_coords(self, target):
+        """Returns a SkyCoord object with resolved position of given target.
+
+        Parameters
+        ----------
+        target : str
+            Name of target to resolve coordinates on the sky.
+
+        Returns
+        -------
+        coords : SkyCoord object
+            SkyCoord object corresponding to input target.
+        """
+>>>>>>> dedicated _fetch_tesscut_path() function
         from astroquery.mast.core import MastClass
         coords = MastClass()._resolve_object(target)
 
@@ -311,6 +335,36 @@ class SearchResult(object):
         sector = self.table[0]['sequence_number']
         cutout_path = TesscutClass().download_cutouts(coords, size=cutout_size,
                                                       sector=sector, path=download_dir)
+
+        path = os.path.join(download_dir, cutout_path[0][0])
+        return path
+
+    def _fetch_tesscut_path(self, download_dir, cutout_size):
+        """Downloads TESS FFI cutout and returns path to local file.
+
+        Parameters
+        ----------
+        download_dir : str
+            Path to location of `.lightkurve-cache` directory where downloaded
+            cutouts are stored
+        cutout_size : int or float
+            Side length of cutout in pixels
+
+        Returns
+        -------
+        path : str
+            Path to locally downloaded cutout file
+        """
+        from astroquery.mast import TesscutClass
+        tc = TesscutClass()
+
+        # Resolve SkyCoord of given target
+        coords = self._resolve_coords(self.table[0]['target_name'])
+        sector = int(self.table[0]['description'][-2])
+        if cutout_size is None:
+            cutout_size = 5
+        cutout_path = tc.download_cutouts(coords, size=cutout_size,
+                                          sector=sector, path=download_dir)
 
         path = os.path.join(download_dir, cutout_path[0][0])
         return path
