@@ -8,20 +8,29 @@
 1.0b26 (2019-02-04)
 ===================
 
-- Introduced a brand new layout for the
-  `online documentation <https://docs.lightkurve.org>`_. [#400, #406]
+- Introduced a new layout for the
+  `online documentation <https://docs.lightkurve.org>`_. [#360, #400, #406]
 
 - Added `LightCurve.interact_bls()`: an interactive Bokeh widget to find
   planets using the Box Least Squares (BLS) method. [#401]
 
 - Added `LombScarglePeriodogram` and `BoxLeastSquarePeriodogam` sub-classes
-  to distinguish between `Periodogram` objects generated using different
-  methods. [#403]
+  to distinguish periodograms generated using different methods. [#403]
+
+- Added the `PLDCorrector` class to remove instrument systematics using the
+  Pixel Level Decorrelation (PLD) method. [#305]
+
+- Added the `TargetPixelFile.to_corrector()` convenience method to make
+  systematics correction classes easy to access. [#305]
+
+- Refactored `SFFCorrector` to make its API consistent with `PLDCorrector`,
+  and deprecated the `LightCurve.correct()` method in favor of
+  `LightCurve.to_corrector()`. [#408, #417]
 
 - Made `SFFCorrector` robust against light curves that contain big gaps in
   time. [#414]
 
-- Minor bug fixes. [#392, #397]
+- Minor bug fixes. [#392, #397, #420]
 
 - Increased the unit test coverage. [#387, #388]
 
