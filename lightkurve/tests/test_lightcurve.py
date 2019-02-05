@@ -8,6 +8,7 @@ import numpy as np
 from numpy.testing import (assert_almost_equal, assert_array_equal,
                            assert_allclose)
 import pytest
+import tempfile
 import warnings
 
 from ..lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
@@ -449,25 +450,25 @@ def test_to_fits():
     assert hdu[1].header['TTYPE2'] == 'FLUX'
 
     # Test aperture mask support in to_fits
-    for tpf in [KeplerTargetPixelFile(TABBY_TPF),TessTargetPixelFile(filename_tess)]:
-        random_mask = np.random.randint(0, 2,size=tpf.flux[0].shape, dtype=bool)
+    for tpf in [KeplerTargetPixelFile(TABBY_TPF), TessTargetPixelFile(filename_tess)]:
+        random_mask = np.random.randint(0, 2, size=tpf.flux[0].shape, dtype=bool)
         thresh_mask = tpf.create_threshold_mask(threshold=3)
 
         lc = tpf.to_lightcurve(aperture_mask=random_mask)
-        lc.to_fits(path='out1.fits', aperture_mask=random_mask, overwrite=True)
+        lc.to_fits(path=tempfile.NamedTemporaryFile().name, aperture_mask=random_mask)
 
         lc = tpf[0:2].to_lightcurve(aperture_mask=thresh_mask)
-        lc.to_fits(aperture_mask=thresh_mask, path='out2.fits', overwrite=True)
+        lc.to_fits(aperture_mask=thresh_mask, path=tempfile.NamedTemporaryFile().name)
 
         # Test the extra data kwargs
         bkg_mask = ~tpf.create_threshold_mask(threshold=0.1)
         bkg_lc = tpf.to_lightcurve(aperture_mask=bkg_mask)
         lc = tpf.to_lightcurve(aperture_mask=tpf.hdu['APERTURE'].data)
-        #lc = tpf.to_lightcurve(aperture_mask=None) ## will error
+        lc = tpf.to_lightcurve(aperture_mask=None)
         lc = tpf.to_lightcurve(aperture_mask=thresh_mask)
         lc_out = lc - bkg_lc.flux * (thresh_mask.sum()/bkg_mask.sum())
-        lc_out.to_fits(aperture_mask=thresh_mask, path='out2.fits',
-                   overwrite=True, extra_data={'BKG':bkg_lc.flux})
+        lc_out.to_fits(aperture_mask=thresh_mask, path=tempfile.NamedTemporaryFile().name,
+                       overwrite=True, extra_data={'BKG': bkg_lc.flux})
 
 
 @pytest.mark.remote_data
@@ -692,4 +693,13 @@ def test_targetid():
 def test_regression_346():
     """Regression test for https://github.com/KeplerGO/lightkurve/issues/346"""
     # This previously triggered an IndexError:
-    KeplerLightCurveFile(K2_C08).PDCSAP_FLUX.correct().estimate_cdpp()
+    KeplerLightCurveFile(K2_C08).PDCSAP_FLUX.to_corrector().correct().estimate_cdpp()
+
+
+def test_new_corrector_api():
+    """This test can be remove after we remove the deprecated `LightCurve.correct()` method"""
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", LightkurveWarning)  # Deprecation warning
+        lc1 = KeplerLightCurveFile(K2_C08).PDCSAP_FLUX.correct()
+    lc2 = KeplerLightCurveFile(K2_C08).PDCSAP_FLUX.to_corrector().correct()
+    assert_allclose(lc1.flux, lc2.flux)

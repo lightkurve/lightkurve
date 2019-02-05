@@ -274,26 +274,33 @@ class SFFCorrector(object):
        (7) Divide the raw flux by the piecewise linear interpolation done in step (6)
        (8) Set raw flux as the flux computed in step (7) and repeat
        (9) Multiply back the fitted BSpline
+
+    Parameters
+    ----------
+    lightcurve : `~lightkurve.lightcurve.LightCurve`
+        The light curve object on which the SFF algorithm will be applied.
+
+    Examples
+    --------
+    >>> lc = LightCurve(time, flux)   # doctest: +SKIP
+    >>> corrector = SFFCorrector(lc)   # doctest: +SKIP
+    >>> new_lc = corrector.correct(centroid_col, centroid_row)   # doctest: +SKIP
     """
+    def __init__(self, lightcurve):
+        self.lc = lightcurve
 
-    def __init__(self):
-        pass
-
-    def correct(self, time, flux, centroid_col, centroid_row,
+    def correct(self, centroid_col=None, centroid_row=None,
                 polyorder=5, niters=3, bins=15, windows=10, sigma_1=3.,
                 sigma_2=5., restore_trend=False):
         """Returns a systematics-corrected LightCurve.
 
-        Note that it is assumed that time and flux do not contain NaNs.
-
         Parameters
         ----------
-        time : array-like
-            Time measurements
-        flux : array-like
-            Data flux for every time point
         centroid_col, centroid_row : array-like, array-like
-            Centroid column and row coordinates as a function of time
+            Centroid column and row coordinates as a function of time.
+            If `None`, then the `centroid_col` and `centroid_row` attributes
+            of the `LightCurve` passed to the constructor of this class
+            will be used, if present.
         polyorder : int
             Degree of the polynomial which will be used to fit one
             centroid as a function of the other.
@@ -314,18 +321,33 @@ class SFFCorrector(object):
 
         Returns
         -------
-        corrected_lightcurve : LightCurve object
-            Returns a corrected lightcurve object.
+        corrected_lightcurve : `~lightkurve.lightcurve.LightCurve`
+            Returns a corrected light curve.
         """
-        timecopy = np.copy(time)
+        # `new_lc` is the object we will return at the end of this function;
+        # SFF does not work on cadences with flux=NaN so we remove them here.
+        new_lc = self.lc.remove_nans().copy()
 
-        time = np.array_split(time, windows)
-        flux = np.array_split(flux, windows)
+        # Input validation
+        if centroid_col is None:
+            try:
+                centroid_col = new_lc.centroid_col
+            except AttributeError:
+                raise ValueError('`centroid_col` must be passed to `correct()` '
+                                 'because it is not a property of the LightCurve.')
+        if centroid_row is None:
+            try:
+                centroid_row = new_lc.centroid_row
+            except AttributeError:
+                raise ValueError('`centroid_row` must be passed to `correct()` '
+                                 'because it is not a property of the LightCurve.')
 
+        # Split the data into windows
+        time = np.array_split(new_lc.time, windows)
+        flux = np.array_split(new_lc.flux, windows)
         centroid_col = np.array_split(centroid_col, windows)
         centroid_row = np.array_split(centroid_row, windows)
-
-        self.trend = np.array_split(np.ones(len(timecopy)), windows)
+        self.trend = np.array_split(np.ones(len(new_lc.time)), windows)
 
         # Apply the correction iteratively
         for n in range(niters):
@@ -334,7 +356,7 @@ class SFFCorrector(object):
             # that the K2 motion noise is a high-frequency effect.
             tempflux = np.asarray([item for sublist in flux for item in sublist])
             flux_outliers = sigma_clip(data=tempflux, sigma=sigma_1).mask
-            self.bspline = self.fit_bspline(timecopy[~flux_outliers], tempflux[~flux_outliers])
+            self.bspline = self.fit_bspline(new_lc.time[~flux_outliers], tempflux[~flux_outliers])
 
             # The SFF algorithm is going to be run on each window independently
             for i in range(windows):
@@ -362,7 +384,6 @@ class SFFCorrector(object):
                                 np.max(self.rot_row[~self.outlier_cent]), 10000)
                 self.s = np.array([self.arclength(x1=xp, x=x) for xp in self.rot_row])
 
-
                 # Remove the long-term variation by dividing the flux by the spline
                 iter_trend = self.bspline(time[i])
                 self.normflux = flux[i] / iter_trend
@@ -377,9 +398,8 @@ class SFFCorrector(object):
                 if restore_trend:
                     flux[i] *= self.trend[i]
 
-        flux_hat = np.asarray([item for sublist in flux for item in sublist])
-
-        return LightCurve(time=timecopy, flux=flux_hat)
+        new_lc.flux = np.asarray([item for sublist in flux for item in sublist])
+        return new_lc
 
     def rotate_centroids(self, centroid_col, centroid_row):
         """Rotate the coordinate frame of the (col, row) centroids to a new (x,y)
@@ -447,6 +467,7 @@ class SFFCorrector(object):
         return np.trapz(y=np.sqrt(1 + self.polyprime(x[mask]) ** 2), x=x[mask])
 
     def fit_bspline(self, time, flux, knotspacing=1.5):
+        """Returns a `scipy.interpolate.BSpline` object to interpolate flux as a function of time."""
         # By default, bspline knots are placed 1.5 days apart
         knots = np.arange(time[0], time[-1], knotspacing)
 
@@ -608,7 +629,7 @@ class PLDCorrector(object):
 
         Returns
         -------
-        corrected_lightcurve : :class:`LightCurve` object
+        corrected_lightcurve : `~lightkurve.lightcurve.LightCurve`
             Returns a corrected lightcurve object. Depending on the input, the
             returned object will be a `KeplerLightCurve`, `TessLightCurve`, or
             general `LightCurve` object.
