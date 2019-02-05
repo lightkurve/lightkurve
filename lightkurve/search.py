@@ -93,7 +93,7 @@ class SearchResult(object):
         return self.table['s_dec'].data.data
 
     @suppress_stdout
-    def download(self, quality_bitmask='default', download_dir=None):
+    def download(self, quality_bitmask='default', download_dir=None, cutout_size=None):
         """Returns a single `KeplerTargetPixelFile` or `KeplerLightCurveFile` object.
 
         If multiple files are present in `SearchResult.table`, only the first
@@ -150,10 +150,18 @@ class SearchResult(object):
             coords = self._resolve_coords(self.table[0]['target_name'])
             tc = TesscutClass()
             sector = int(self.table[0]['description'][-2])
-            cutout_path = tc.download_cutouts(coords, size=5, sector=sector, path=download_dir)
+            if cutout_size is None:
+                cutout_size = 5
+            cutout_path = tc.download_cutouts(coords, size=cutout_size,
+                                              sector=sector, path=download_dir)
+
             path = os.path.join(download_dir, cutout_path[0][0])
 
         else:
+            if cutout_size is not None:
+                warnings.warn('`cutout_size` can only be specified for TESS '
+                              'Full Frame Image cutouts.', LightkurveWarning)
+                              
             path = Observations.download_products(self.table[:1], mrp_only=False,
                                                   download_dir=download_dir)['Local Path'][0]
 
