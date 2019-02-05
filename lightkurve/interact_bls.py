@@ -225,7 +225,12 @@ def make_lightcurve_figure_elements(lc, model_lc, lc_source, model_lc_source, he
                  border_fill_color="#FFFFFF", active_drag="box_zoom")
     fig.title.offset = -10
     fig.yaxis.axis_label = 'Flux (e/s)'
-    fig.xaxis.axis_label = 'Time - 2454833 (days)'
+    if lc.time_format == 'bkjd':
+        fig.xaxis.axis_label = 'Time - 2454833 (days)'
+    elif lc.time_format == 'btjd':
+        fig.xaxis.axis_label = 'Time - 2457000 (days)'
+    else:
+        fig.xaxis.axis_label = 'Time (days)'
     ylims = [np.nanmin(lc.flux), np.nanmax(lc.flux)]
     fig.y_range = Range1d(start=ylims[0], end=ylims[1])
 
@@ -422,6 +427,12 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
         if maxp is None:
             maxp = (lc.time[-1] - lc.time[0])/2
 
+        time_format = ''
+        if lc.time_format == 'bkjd':
+            time_format = ' - 2454833 days'
+        if lc.time_format == 'btjd':
+            time_format = ' - 2457000 days'
+
         # Some sliders
         duration_slider = Slider(start=0.01,
                                  end=0.5,
@@ -450,10 +461,10 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
         # Some Buttons
         double_button = Button(label="Double Period", button_type="danger", width=100)
         half_button = Button(label="Half Period", button_type="danger", width=100)
-        text_output = Paragraph(text="Period: {} days, \t T0: {}".format(
+        text_output = Paragraph(text="Period: {} days, T0: {}{}".format(
                                                     np.round(best_period, 7),
-                                                    np.round(best_t0, 7)),
-                                width=300, height=40)
+                                                    np.round(best_t0, 7), time_format),
+                                width=350, height=40)
 
         # Set up BLS source
         bls_source = prepare_bls_datasource(result, loc)
@@ -561,12 +572,12 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
                                       'flux': f_model_lc.flux}
 
             vertical_line.update(location=best_period)
-            fig_folded.title.text = 'Period: {} days \t T0: {}'.format(
+            fig_folded.title.text = 'Period: {} days \t T0: {}{}'.format(
                                         np.round(best_period, 7),
-                                        np.round(best_t0, 7))
-            text_output.text = "Period: {} days, \t T0: {}".format(
+                                        np.round(best_t0, 7), time_format)
+            text_output.text = "Period: {} days, \t T0: {}{}".format(
                                         np.round(best_period, 7),
-                                        np.round(best_t0, 7))
+                                        np.round(best_t0, 7), time_format)
 
         # Callbacks
         def _update_upon_period_selection(attr, old, new):
@@ -627,7 +638,7 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
 
         # Create all the figures.
         fig_folded = make_folded_figure_elements(f, f_model_lc, f_source, f_model_lc_source, f_help_source)
-        fig_folded.title.text = 'Period: {} days \t T0: {}'.format(np.round(best_period, 7), np.round(best_t0, 5))
+        fig_folded.title.text = 'Period: {} days \t T0: {}{}'.format(np.round(best_period, 7), np.round(best_t0, 5), time_format)
         fig_bls, vertical_line = make_bls_figure_elements(result, bls_source, bls_help_source)
         fig_lc = make_lightcurve_figure_elements(lc, model_lc, lc_source, model_lc_source, lc_help_source)
 
