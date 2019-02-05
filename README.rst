@@ -43,21 +43,21 @@ If you have a working version of Python 2 or 3 on your system, you can simply in
 
   pip install lightkurve
 
-Once installed, visit our quickstart guide at `http://docs.lightkurve.org/tutorials/quickstart.html <http://docs.lightkurve.org/tutorials/quickstart.html>`_.
+Once installed, visit our quickstart guide at `http://docs.lightkurve.org/quickstart.html <http://docs.lightkurve.org/quickstart.html>`_.
 
 
 Contributing
 ------------
 
 We welcome community contributions from everyone!
-Please read the contribution guidelines at `http://docs.lightkurve.org/contributing.html <http://docs.lightkurve.org/contributing.html>`_.
+Please read the contribution guidelines at `http://docs.lightkurve.org/about/contributing.html <http://docs.lightkurve.org/about/contributing.html>`_.
 
 
 Citing
 ------
 
-If you find this package useful in your research, please cite it and give us a GitHub star!
-Please read the citation instructions at `http://docs.lightkurve.org/citing.html <http://docs.lightkurve.org/citing.html>`_.
+If you find Lightkurve useful in your research, please cite it and give us a GitHub star!
+Please read the citation instructions at `http://docs.lightkurve.org/about/citing.html <http://docs.lightkurve.org/about/citing.html>`_.
 
 
 Contact
