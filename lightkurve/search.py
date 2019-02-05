@@ -145,7 +145,6 @@ class SearchResult(object):
         if download_dir is None:
             download_dir = self._default_download_dir()
 
-<<<<<<< HEAD
         # if table contains TESScut search results, download cutout
         if 'TESScut' in self.table[0]['productFilename']:
             if cutout_size is None:
@@ -165,13 +164,6 @@ class SearchResult(object):
 
             path = Observations.download_products(self.table[:1], mrp_only=False,
                                                   download_dir=download_dir)['Local Path'][0]
-=======
-        if 'TESScut' in self.table[0]['productFilename']:
-            path = self._ffi_cutout_url()
-        else:
-            path = Observations.download_products(self.table[:1], mrp_only=False,
-                                                  download_dir=download_dir)['Local Path']
->>>>>>> make sure sector is saved
 
         # open() will determine filetype and return
         return open(path, quality_bitmask=quality_bitmask)
@@ -246,10 +238,6 @@ class SearchResult(object):
             return TargetPixelFileCollection([open(p) for p in path])
         elif any(e in self.table['productFilename'][0] for e in lcf_extensions):
             return LightCurveFileCollection([open(p) for p in path])
-
-    def _ffi_cutout_url(self, target):
-        """ """
-        coords = self._resolve_coords(target)
 
     def _default_download_dir(self):
         """Returns the default path to the directory where files will be downloaded.
