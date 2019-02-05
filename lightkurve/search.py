@@ -51,7 +51,7 @@ class SearchResult(object):
         out = 'SearchResult containing {} data products.'.format(len(self.table))
         if len(self.table) == 0:
             return out
-        columns = ['obsID', 'target_name', 'productFilename', 'description', 'distance']
+        columns = ['target_name', 'productFilename', 'description', 'distance']
         return out + '\n\n' + '\n'.join(self.table[columns].pformat(max_width=300))
 
     def __getitem__(self, key):
@@ -443,9 +443,13 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
     -------
     SearchResult : :class:`SearchResult` object.
     """
+
     observations = _query_mast(target, project=mission, radius=radius)
 
-    if len(observations) == 0:
+    # Check if TESS FFIs exist in observations list
+    TESScut = 'TESS FFI' in observations['target_name']
+
+    if len(observations) == 0 and not TESScut:
         raise SearchError('No data found for target "{}".'.format(target))
 
     products = Observations.get_product_list(observations)
@@ -456,7 +460,8 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
     masked_result = _filter_products(result, target=target, filetype=filetype,
                                      campaign=campaign, quarter=quarter,
                                      cadence=cadence, project=mission,
-                                     month=month, sector=sector, limit=limit)
+                                     month=month, sector=sector, limit=limit,
+                                     TESScut=TESScut)
     return SearchResult(masked_result)
 
 
@@ -556,7 +561,8 @@ def _query_mast(target, radius=None, project=['Kepler', 'K2', 'TESS']):
 
 def _filter_products(products, target=None, campaign=None, quarter=None,
                      month=None, sector=None, cadence='long', limit=None,
-                     project=['Kepler', 'K2', 'TESS'], filetype='Target Pixel'):
+                     project=['Kepler', 'K2', 'TESS'], filetype='Target Pixel',
+                     TESScut=False):
     """Helper function which filters a SearchResult's products table by one or
     more criteria.
 
@@ -583,11 +589,6 @@ def _filter_products(products, target=None, campaign=None, quarter=None,
     project = np.atleast_1d(project)
     project_lower = [p.lower() for p in project]
 
-    # Check for existence of Full Frame Images in search result
-    ffi = False
-    if 'Calibrated full frame image' in products['description']:
-        ffi = True
-
     mask = np.zeros(len(products), dtype=bool)
 
     if 'kepler' in project_lower and campaign is None and sector is None:
@@ -602,9 +603,10 @@ def _filter_products(products, target=None, campaign=None, quarter=None,
     products = products[mask]
 
     # If Full Frame Images are found, add a table entry for FFI cutouts
-    if ffi:
+    if TESScut:
         products_df = products.to_pandas().append({'description': 'Full Frame Image Cutout (TPF)',
-                                                   'target_name': str(target)},
+                                                   'target_name': str(target),
+                                                   'productFilename': 'TESScut_FFI_Cutout'},
                                                    ignore_index=True)
         products = Table.from_pandas(products_df)
     products.sort(['distance', 'productFilename'])
