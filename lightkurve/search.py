@@ -476,7 +476,26 @@ def search_lightcurvefile(target, radius=None, cadence='long',
 
 
 def search_TESScutout(target, sector=None):
-    """ """
+    """Searches MAST for TESS Full Frame Images containing a desired target or region.
+
+    Parameters
+    ----------
+    target : str, int, or `astropy.coordinates.SkyCoord` object
+        Target around which to search. Valid inputs include:
+
+            * The name of the object as a string, e.g. "Kepler-10".
+            * The KIC or EPIC identifier as an integer, e.g. 11904151.
+            * A coordinate string in decimal format, e.g. "285.67942179 +50.24130576".
+            * A coordinate string in sexagesimal format, e.g. "19:02:43.1 +50:14:28.7".
+            * An `astropy.coordinates.SkyCoord` object.
+    sector : int
+        TESS Sector number.
+
+    Returns
+    -------
+    result : :class:`SearchResult` object
+        Object detailing the data products found.
+    """
     try:
         return _search_products(target, filetype="ffi", mission='TESS', sector=sector)
     except SearchError as exc:
