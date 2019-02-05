@@ -1,3 +1,5 @@
+image: Visual Studio 2017 # required to install pybind11 (celerite dependency)
+
 build: false
 
 environment:
@@ -17,14 +19,19 @@ install:
   - "ECHO %PATH%"
   - where conda
   - conda config --set always_yes yes --set changeps1 no
-  - "conda create -q -n test-environment python=%PYTHON_VERSION% numpy scipy astropy pytest pytest-cov pytest-remotedata matplotlib tqdm requests"
+  - "conda create -q -n test-environment python=%PYTHON_VERSION% numpy scipy astropy matplotlib tqdm requests pybind11"
   - activate test-environment
+  - conda install -c conda-forge celerite
+  - pip install pytest
+  - pip install pytest-cov
+  - pip install pytest-remotedata
   - pip install oktopus
   - pip install sphinx_rtd_theme
   - pip install bs4
   - pip install astroquery
   - pip install codecov
   - pip install numpydoc
+  - pip install scikit-learn
   - python setup.py develop
 
 test_script:

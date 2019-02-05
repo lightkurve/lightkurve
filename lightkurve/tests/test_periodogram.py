@@ -3,6 +3,14 @@ from astropy import units as u
 import numpy as np
 from ..lightcurve import LightCurve
 from ..periodogram import Periodogram
+import sys
+
+try:
+    from astropy.stats.bls import BoxLeastSquares
+except:
+    print('no bls, tests will be skipped')
+
+bad_optional_imports = np.any([('astropy.stats.bls' not in sys.modules)])
 
 
 def test_periodogram_basics():
@@ -11,7 +19,7 @@ def test_periodogram_basics():
                     flux_err=np.zeros(1000)+0.1)
     pg = lc.to_periodogram()
     pg.plot()
-    pg.plot(format='period')
+    pg.plot(view='period')
     pg.show_properties()
     pg.to_table()
     str(pg)
@@ -151,6 +159,67 @@ def test_index():
     p = lc.to_periodogram()
     mask = (p.frequency > 0.1*(1/u.day)) & (p.frequency < 0.2*(1/u.day))
     assert len(p[mask].frequency) == mask.sum()
+
+@pytest.mark.skipif(bad_optional_imports,
+                    reason="requires bokeh and astropy.stats.bls")
+def test_bls(caplog):
+    ''' Test that BLS periodogram works and gives reasonable errors
+    '''
+    lc = LightCurve(time=np.linspace(0, 10, 1000), flux=np.random.normal(1, 0.1, 1000),
+                    flux_err=np.zeros(1000)+0.1)
+
+    # should be able to make a periodogram
+    p = lc.to_periodogram(method='bls')
+    keys = ['period', 'power', 'duration', 'transit_time', 'depth', 'snr']
+    assert np.all([key in  dir(p) for key in keys])
+
+    p.plot()
+
+    # we should be able to specify some keywords
+    lc.to_periodogram(method='bls', minimum_period=0.2, duration=0.1, maximum_period=0.5)
+
+    # Ridiculous BLS spectra should break.
+    with pytest.raises(ValueError) as err:
+        lc.to_periodogram(method='bls', frequency_factor=0.00001)
+        assert err.value.args[0] == ('`period` contains over 72000001 points.Periodogram is too large to evaluate. Consider setting `frequency_factor` to a higher value.')
+
+    # Some errors should occur
+    p.compute_stats()
+    for record in caplog.records:
+        assert record.levelname == 'WARNING'
+    assert len(caplog.records) == 4
+    assert 'No period specified.' in caplog.text
+
+    # No more errors
+    stats = p.compute_stats(1, 0.1, 0)
+    assert len(caplog.records) == 4
+    assert isinstance(stats, dict)
+
+    # Some errors should occur
+    p.get_transit_model()
+    for record in caplog.records:
+        assert record.levelname == 'WARNING'
+    assert len(caplog.records) == 7
+    assert 'No period specified.' in caplog.text
+
+    model = p.get_transit_model(1, 0.1, 0)
+    # No more errors
+    assert len(caplog.records) == 7
+    # Model is LC
+    assert isinstance(model, LightCurve)
+    # Model is otherwise identical to LC
+    assert np.in1d(model.time, lc.time).all()
+    assert np.in1d(lc.time, model.time).all()
+
+    mask = p.get_transit_mask(1, 0.1, 0)
+    assert isinstance(mask, np.ndarray)
+    assert isinstance(mask[0], np.bool_)
+    assert mask.sum() > (~mask).sum()
+
+    assert isinstance(p.period_at_max_power, u.Quantity)
+    assert isinstance(p.duration_at_max_power, float)
+    assert isinstance(p.transit_time_at_max_power, float)
+    assert isinstance(p.depth_at_max_power, float)
 
 
 def test_error_messages():

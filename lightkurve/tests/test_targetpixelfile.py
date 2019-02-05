@@ -215,6 +215,7 @@ def test_aperture_photometry():
         tpf.extract_aperture_photometry(aperture_mask='all')
         tpf.extract_aperture_photometry(aperture_mask='pipeline')
 
+
 def test_tpf_to_fits():
     """Can we write a TPF back to a fits file?"""
     for tpf in [KeplerTargetPixelFile(filename_tpf_all_zeros),
@@ -449,3 +450,10 @@ def test_get_keyword():
     assert tpf.get_keyword("TELESCOP") == "Kepler"
     assert tpf.get_keyword("TTYPE1", hdu=1) == "TIME"
     assert tpf.get_keyword("DOESNOTEXIST", default=5) == 5
+
+
+def test_to_corrector():
+    """Does the tpf.pld() convenience method work?"""
+    tpf = KeplerTargetPixelFile(TABBY_TPF)
+    lc = tpf.to_corrector("pld").correct()
+    assert len(lc.flux) == len(tpf.time)

@@ -26,13 +26,12 @@ from .utils import KeplerQualityFlags, TessQualityFlags, \
                    plot_image, bkjd_to_astropy_time, btjd_to_astropy_time, \
                    LightkurveWarning, detect_filetype
 
-__all__ = ['KeplerTargetPixelFile', 'TessTargetPixelFile']
+__all__ = ['TargetPixelFile', 'KeplerTargetPixelFile', 'TessTargetPixelFile']
 log = logging.getLogger(__name__)
 
 
 class TargetPixelFile(object):
-    """
-    Generic TargetPixelFile class for Kepler, K2, and TESS data.
+    """Generic class representing FITS files which contain time series imaging data.
 
     See `KeplerTargetPixelFile` and `TessTargetPixelFile` for constructor
     documentation.
@@ -639,9 +638,10 @@ class TargetPixelFile(object):
 
 
 class KeplerTargetPixelFile(TargetPixelFile):
-    """
-    Defines a TargetPixelFile class for the Kepler/K2 Mission.
-    Enables extraction of raw lightcurves and centroid positions.
+    """Subclass of :class:`TargetPixelFile <lightkurve.targetpixelfile.TargetPixelFile>`
+    to represent pixel data processed by NASA's Kepler pipeline.
+
+    This class enables extraction of custom light curves and centroid positions.
 
     Parameters
     ----------
@@ -1077,6 +1077,30 @@ class KeplerTargetPixelFile(TargetPixelFile):
             factory.add_cadence(frameno=idx, flux=cutout.data, header=hdu.header)
         return factory.get_tpf(hdu0_keywords=allkeys, ext_info=ext_info, **kwargs)
 
+    def to_corrector(self, method="pld"):
+        """Returns a `Corrector` instance to remove systematics.
+
+        Parameters
+        ----------
+        methods : string
+            Currently, only "pld" is supported.  This will return a
+            `PLDCorrector` class instance.
+
+        Returns
+        -------
+        correcter : `lightkurve.Correcter`
+            Instance of a Corrector class, which typically provides `correct()`
+            and `diagnose()` methods.
+        """
+        allowed_methods = ["pld"]
+        if method not in allowed_methods:
+            raise ValueError(("Unrecognized method '{0}'\n"
+                              "allowed methods are: {1}")
+                             .format(method, allowed_methods))
+        if method == "pld":
+            from .correctors import PLDCorrector
+            return PLDCorrector(self)
+
 
 class FactoryError(Exception):
     """Raised if there is a problem creating a TPF."""
@@ -1313,9 +1337,10 @@ class KeplerTargetPixelFileFactory(object):
 
 
 class TessTargetPixelFile(TargetPixelFile):
-    """
-    Defines a TargetPixelFile class for the TESS Mission.
-    Enables extraction of raw lightcurves and centroid positions.
+    """Subclass of :class:`TargetPixelFile <lightkurve.targetpixelfile.TargetPixelFile>`
+    to represent pixel data processed by NASA's TESS pipeline.
+
+    This class enables extraction of custom light curves and centroid positions.
 
     Parameters
     ----------
@@ -1336,7 +1361,8 @@ class TessTargetPixelFile(TargetPixelFile):
         # Early TESS releases had cadences with time=NaN (i.e. missing data)
         # which were not flagged by a QUALITY flag yet; the line below prevents
         # these cadences from being used. They would break most methods!
-        self.quality_mask &= np.isfinite(self.hdu[1].data['TIME'])
+        if (quality_bitmask != 0) and (quality_bitmask != 'none'):
+            self.quality_mask &= np.isfinite(self.hdu[1].data['TIME'])
 
         # check to make sure the correct filetype has been provided
         filetype = detect_filetype(self.header)
