@@ -144,13 +144,21 @@ class SearchResult(object):
             download_dir = self._default_download_dir()
 
         if 'TESScut' in self.table[0]['productFilename']:
-            path = self._ffi_cutout_url()
+            from astroquery.mast import TesscutClass
+
+            # Resolve SkyCoord of given target
+            coords = self._resolve_coords(self.table[0]['target_name'])
+            tc = TesscutClass()
+            sector = int(self.table[0]['description'][-2])
+            cutout_path = tc.download_cutouts(coords, size=5, sector=sector, path=download_dir)
+            path = os.path.join(download_dir, cutout_path[0][0])
+
         else:
             path = Observations.download_products(self.table[:1], mrp_only=False,
-                                                  download_dir=download_dir)['Local Path']
+                                                  download_dir=download_dir)['Local Path'][0]
 
         # open() will determine filetype and return
-        return open(path[0], quality_bitmask=quality_bitmask)
+        return open(path, quality_bitmask=quality_bitmask)
 
     @suppress_stdout
     def download_all(self, quality_bitmask='default', download_dir=None):
@@ -206,10 +214,6 @@ class SearchResult(object):
         elif any(e in self.table['productFilename'][0] for e in lcf_extensions):
             return LightCurveFileCollection([open(p) for p in path])
 
-    def _ffi_cutout_url(self, target):
-        """ """
-        coords = self._resolve_coords(target)
-
     def _default_download_dir(self):
         """Returns the default path to the directory where files will be downloaded.
 
@@ -238,11 +242,11 @@ class SearchResult(object):
 
         return download_dir
 
-        def _resolve_coords(self, target):
-            """Returns a SkyCoord object with resolved position of given target."""
-            from astroquery.mast.core import MastClass
-            coords = MastClass()._resolve_object(target)
-            return coords
+    def _resolve_coords(self, target):
+        """Returns a SkyCoord object with resolved position of given target."""
+        from astroquery.mast.core import MastClass
+        coords = MastClass()._resolve_object(target)
+        return coords
 
 
 def search_targetpixelfile(target, radius=None, cadence='long',
