@@ -1,4 +1,32 @@
 
+1.0b27 (unreleased)
+===================
+
+
+
+
+1.0b26 (2019-02-04)
+===================
+
+- Introduced a brand new layout for the
+  `online documentation <https://docs.lightkurve.org>`_. [#400, #406]
+
+- Added `LightCurve.interact_bls()`: an interactive Bokeh widget to find
+  planets using the Box Least Squares (BLS) method. [#401]
+
+- Added `LombScarglePeriodogram` and `BoxLeastSquarePeriodogam` sub-classes
+  to distinguish between `Periodogram` objects generated using different
+  methods. [#403]
+
+- Made `SFFCorrector` robust against light curves that contain big gaps in
+  time. [#414]
+
+- Minor bug fixes. [#392, #397]
+
+- Increased the unit test coverage. [#387, #388]
+
+
+
 1.0b25 (2018-12-14)
 ===================
 
