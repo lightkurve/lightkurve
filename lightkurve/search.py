@@ -478,11 +478,13 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
 
     # If Full Frame Images are found, add a table entry for FFI cutouts
     for i in np.where('TESS FFI' in observations['target_name'])[0]:
-        sector = observations['sequence_number'][i]
-        products_df = masked_result.to_pandas().append({'description': 'Target pixel file (s {})'.format(sector),
-                                                        'target_name': str(target),
-                                                        'productFilename': 'TESScut Full Frame Image Cutout'},
-                                                        ignore_index=True)
+        s = observations['sequence_number'][i]
+        products_df = masked_result.to_pandas()
+        if s in np.atleast_1d(sector) or sector is None:
+            products_df = products_df.append({'description': 'Target pixel file (s{})'.format(s),
+                                              'target_name': str(target),
+                                              'productFilename': 'TESScut Full Frame Image Cutout'},
+                                              ignore_index=True)
         masked_result = Table.from_pandas(products_df)
     return SearchResult(masked_result)
 
