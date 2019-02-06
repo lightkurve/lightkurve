@@ -210,6 +210,12 @@ def test_lightcurve_fold():
     assert (ax.get_xlabel() == 'Phase')
     plt.close('all')
 
+
+    odd = fold.odd
+    even = fold.even
+    assert len(odd) == len(fold.time)
+    assert np.all(odd == ~even)
+    assert np.sum(odd) == np.sum(even)
     # bad transit midpoint should give a warning
     # if user tries a t0 in JD but time is in BKJD
     with pytest.warns(LightkurveWarning, match='appears to be given in JD'):
