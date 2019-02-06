@@ -20,11 +20,7 @@ from . import PACKAGEDIR
 
 log = logging.getLogger(__name__)
 
-<<<<<<< HEAD
-__all__ = ['open', 'search_targetpixelfile', 'search_lightcurvefile', 'search_cutout']
-=======
 __all__ = ['search_targetpixelfile', 'search_lightcurvefile', 'search_cutout', 'open']
->>>>>>> rebase
 
 
 class SearchError(Exception):
@@ -151,53 +147,25 @@ class SearchResult(object):
 
         # if table contains TESScut search results, download cutout
         if 'TESScut' in self.table[0]['productFilename']:
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
             if cutout_size is None:
                 cutout_size = 5
             elif cutout_size < 0:
                 raise ValueError('`cutout_size` must be positive.')
             elif cutout_size > 100:
                 warnings.warn('Cutout size is large and may take a few minutes to download.')
-            path = self._fetch_tesscut_path(self.table[0]['target_name'],
-                                            self.table[0]['sequence_number'],
-                                            download_dir, cutout_size)
-=======
-            from astroquery.mast import TesscutClass
-
-            # Resolve SkyCoord of given target
-            coords = self._resolve_coords(self.table[0]['target_name'])
-            tc = TesscutClass()
-            sector = int(self.table[0]['description'][-2])
-            if cutout_size is None:
-                cutout_size = 5
-            cutout_path = tc.download_cutouts(coords, size=cutout_size,
-                                              sector=sector, path=download_dir)
-
-            path = os.path.join(download_dir, cutout_path[0][0])
->>>>>>> specify cutout_size
-=======
-            path = self._fetch_tesscut_path(download_dir, cutout_size)
->>>>>>> dedicated _fetch_tesscut_path() function
-=======
-            path = self._fetch_tesscut_path(self.table[0]['target_name'],
-                                            download_dir, cutout_size)
->>>>>>> rebase
+            try:
+                path = self._fetch_tesscut_path(self.table[0]['target_name'],
+                                                self.table[0]['sequence_number'],
+                                                download_dir, cutout_size)
+            except:
+                raise SearchError('Unable to download FFI cutout. Desired target '
+                                  'coordinates may be too near the edge of the FFI.')
 
         else:
             if cutout_size is not None:
                 warnings.warn('`cutout_size` can only be specified for TESS '
                               'Full Frame Image cutouts.', LightkurveWarning)
-<<<<<<< HEAD
-<<<<<<< HEAD
 
-=======
-                              
->>>>>>> specify cutout_size
-=======
-
->>>>>>> dedicated _fetch_tesscut_path() function
             path = Observations.download_products(self.table[:1], mrp_only=False,
                                                   download_dir=download_dir)['Local Path'][0]
 
@@ -250,7 +218,6 @@ class SearchResult(object):
 
         # if table contains TESScut search results, download cutouts
         if 'TESScut' in self.table[0]['productFilename']:
-<<<<<<< HEAD
             if cutout_size is None:
                 cutout_size = 5
             elif cutout_size < 0:
@@ -259,10 +226,6 @@ class SearchResult(object):
                 warnings.warn('Cutout size is large and may take a few minutes to download.')
             path = [self._fetch_tesscut_path(t, s, download_dir, cutout_size)
                     for t,s in zip(self.table['target_name'], self.table['sequence_number'])]
-=======
-            path = [self._fetch_tesscut_path(t, download_dir, cutout_size)
-                    for t in self.table['target_name']]
->>>>>>> rebase
         else:
             if cutout_size is not None:
                 warnings.warn('`cutout_size` can only be specified for TESS '
@@ -308,8 +271,6 @@ class SearchResult(object):
 
         return download_dir
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     def _fetch_tesscut_path(self, target, sector, download_dir, cutout_size):
         """Downloads TESS FFI cutout and returns path to local file.
 
@@ -327,21 +288,6 @@ class SearchResult(object):
             Path to locally downloaded cutout file
         """
         from astroquery.mast import TesscutClass
-=======
-    def _resolve_coords(self, target):
-        """Returns a SkyCoord object with resolved position of given target.
-
-        Parameters
-        ----------
-        target : str
-            Name of target to resolve coordinates on the sky.
-
-        Returns
-        -------
-        coords : SkyCoord object
-            SkyCoord object corresponding to input target.
-        """
->>>>>>> dedicated _fetch_tesscut_path() function
         from astroquery.mast.core import MastClass
         coords = MastClass()._resolve_object(target)
 
@@ -353,56 +299,6 @@ class SearchResult(object):
 
         path = os.path.join(download_dir, cutout_path[0][0])
         return path
-
-    def _fetch_tesscut_path(self, download_dir, cutout_size):
-=======
-    def _fetch_tesscut_path(self, target, download_dir, cutout_size):
->>>>>>> rebase
-        """Downloads TESS FFI cutout and returns path to local file.
-
-        Parameters
-        ----------
-        download_dir : str
-            Path to location of `.lightkurve-cache` directory where downloaded
-            cutouts are stored
-        cutout_size : int or float
-            Side length of cutout in pixels
-
-        Returns
-        -------
-        path : str
-            Path to locally downloaded cutout file
-        """
-        from astroquery.mast import TesscutClass
-        tc = TesscutClass()
-
-        # Resolve SkyCoord of given target
-        coords = self._resolve_coords(target)
-        sector = int(self.table[0]['description'][-2])
-        if cutout_size is None:
-            cutout_size = 5
-        cutout_path = tc.download_cutouts(coords, size=cutout_size,
-                                          sector=sector, path=download_dir)
-
-        path = os.path.join(download_dir, cutout_path[0][0])
-        return path
-
-    def _resolve_coords(self, target):
-        """Returns a SkyCoord object with resolved position of given target.
-
-        Parameters
-        ----------
-        target : str
-            Name of target to resolve coordinates on the sky.
-
-        Returns
-        -------
-        coords : SkyCoord object
-            SkyCoord object corresponding to input target.
-        """
-        from astroquery.mast.core import MastClass
-        coords = MastClass()._resolve_object(target)
-        return coords
 
 
 def search_targetpixelfile(target, radius=None, cadence='long',
@@ -582,7 +478,6 @@ def search_lightcurvefile(target, radius=None, cadence='long',
         return SearchResult(None)
 
 
-<<<<<<< HEAD
 def search_cutout(target, sector=None):
     """Searches MAST for TESS Full Frame Images containing a desired target or region.
 
@@ -605,33 +500,6 @@ def search_cutout(target, sector=None):
     result : :class:`SearchResult` object
         Object detailing the data products found.
     """
-=======
-def search_TESScutout(target, sector=None):
-<<<<<<< HEAD
-    """ """
->>>>>>> rebase
-=======
-    """Searches MAST for TESS Full Frame Images containing a desired target or region.
-
-    Parameters
-    ----------
-    target : str, int, or `astropy.coordinates.SkyCoord` object
-        Target around which to search. Valid inputs include:
-
-            * The name of the object as a string, e.g. "Kepler-10".
-            * The KIC or EPIC identifier as an integer, e.g. 11904151.
-            * A coordinate string in decimal format, e.g. "285.67942179 +50.24130576".
-            * A coordinate string in sexagesimal format, e.g. "19:02:43.1 +50:14:28.7".
-            * An `astropy.coordinates.SkyCoord` object.
-    sector : int
-        TESS Sector number.
-
-    Returns
-    -------
-    result : :class:`SearchResult` object
-        Object detailing the data products found.
-    """
->>>>>>> search_TESScutout docstring
     try:
         return _search_products(target, filetype="ffi", mission='TESS', sector=sector)
     except SearchError as exc:
@@ -689,7 +557,7 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
                                      cadence=cadence, project=mission,
                                      month=month, sector=sector, limit=limit)
 
-    # If Full Frame Images are found, add a table entry for FFI cutouts
+    # if Full Frame Images are found, add a table entry for FFI cutouts
     if filetype == 'ffi':
         for i in np.where('TESS FFI' in observations['target_name'])[0]:
             # if target passed in is a SkyCoord object, convert to RA, dec pair
@@ -704,7 +572,8 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
                 products_df = products_df.append({'description': 'TESS FFI Cutout (s{:02})'.format(s),
                                                   'target_name': str(target),
                                                   'productFilename': 'TESScut Full Frame Image Cutout',
-                                                  'distance': 0.0},
+                                                  'distance': 0.0,
+                                                  'sequence_number': s},
                                                   ignore_index=True)
             # convert back to an astropy table
             masked_result = Table.from_pandas(products_df)
@@ -846,14 +715,6 @@ def _filter_products(products, campaign=None, quarter=None, month=None,
         mask |= _mask_tess_products(products, sector=sector, filetype=filetype)
 
     products = products[mask]
-
-    # If Full Frame Images are found, add a table entry for FFI cutouts
-    if TESScut:
-        products_df = products.to_pandas().append({'description': 'Full Frame Image Cutout (TPF)',
-                                                   'target_name': str(target),
-                                                   'productFilename': 'TESScut_FFI_Cutout'},
-                                                   ignore_index=True)
-        products = Table.from_pandas(products_df)
 
     products.sort(['distance', 'productFilename'])
     if limit is not None:
