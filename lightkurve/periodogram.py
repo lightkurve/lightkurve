@@ -752,8 +752,7 @@ class LombScarglePeriodogram(Periodogram):
             log.warning("You have passed an evenly-spaced grid of periods. "
                         "These are not evenly spaced in frequency space.\n"
                         "Method has been set to 'slow' to allow for this.")
-
-        flux_scaling = 1e6 if normalization == 'psd' else 1.
+        flux_scaling = 1e6               
         if float(astropy.__version__[0]) >= 3:
             LS = LombScargle(time, lc.flux * flux_scaling,
                              nterms=nterms, normalization='psd', **kwargs)
@@ -768,17 +767,14 @@ class LombScarglePeriodogram(Periodogram):
             # Normalise according to Parseval's theorem
             norm = np.std(lc.flux * 1e6)**2 / np.sum(power)
             power *= norm
-
             power = power * (cds.ppm**2)
-
             # Rescale power to units of ppm^2 / [frequency unit]
             power = power / fs
 
         # Amplitude spectrum
         elif normalization == 'amplitude':
             factor = np.sqrt(4./len(lc.time))
-            power = np.sqrt(power) * factor * 1e6
-
+            power = np.sqrt(power) * factor
             # Units of ppm
             power *= cds.ppm
 
