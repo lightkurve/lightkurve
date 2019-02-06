@@ -563,7 +563,7 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
             products_df = masked_result.to_pandas()
             # if the desired sector is available, add a row to the data frame
             if s in np.atleast_1d(sector) or sector is None:
-                products_df = products_df.append({'description': 'Target pixel file (s{:02})'.format(s),
+                products_df = products_df.append({'description': 'TESS FFI Cutout (s{:02})'.format(s),
                                                   'target_name': str(target),
                                                   'productFilename': 'TESScut Full Frame Image Cutout',
                                                   'distance': 0.0},
