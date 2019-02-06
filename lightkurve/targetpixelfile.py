@@ -636,6 +636,34 @@ class TargetPixelFile(object):
                                     aperture_mask=aperture_mask,
                                     exported_filename=exported_filename)
 
+    def to_corrector(self, method="pld"):
+        """Returns a `Corrector` instance to remove systematics.
+
+        Parameters
+        ----------
+        methods : string
+            Currently, only "pld" is supported.  This will return a
+            `PLDCorrector` class instance.
+
+        Returns
+        -------
+        correcter : `lightkurve.Correcter`
+            Instance of a Corrector class, which typically provides `correct()`
+            and `diagnose()` methods.
+        """
+        allowed_methods = ["pld"]
+        if method == "sff":
+            raise ValueError("The 'sff' method requires a `LightCurve` instead "
+                             "of a `TargetPixelFile` object.  Use `to_lightcurve()` "
+                             "to obtain a `LightCurve` first.")
+        if method not in allowed_methods:
+            raise ValueError(("Unrecognized method '{0}'\n"
+                              "allowed methods are: {1}")
+                             .format(method, allowed_methods))
+        if method == "pld":
+            from .correctors import PLDCorrector
+            return PLDCorrector(self)
+
 
 class KeplerTargetPixelFile(TargetPixelFile):
     """Represents pixel data products created by NASA's Kepler pipeline.
@@ -1075,34 +1103,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                   size=size, mode='partial')
             factory.add_cadence(frameno=idx, flux=cutout.data, header=hdu.header)
         return factory.get_tpf(hdu0_keywords=allkeys, ext_info=ext_info, **kwargs)
-
-    def to_corrector(self, method="pld"):
-        """Returns a `Corrector` instance to remove systematics.
-
-        Parameters
-        ----------
-        methods : string
-            Currently, only "pld" is supported.  This will return a
-            `PLDCorrector` class instance.
-
-        Returns
-        -------
-        correcter : `lightkurve.Correcter`
-            Instance of a Corrector class, which typically provides `correct()`
-            and `diagnose()` methods.
-        """
-        allowed_methods = ["pld"]
-        if method == "sff":
-            raise ValueError("The 'sff' method requires a `LightCurve` instead "
-                             "of a `TargetPixelFile` object.  Use `to_lightcurve()` "
-                             "to obtain a `LightCurve` first.")
-        if method not in allowed_methods:
-            raise ValueError(("Unrecognized method '{0}'\n"
-                              "allowed methods are: {1}")
-                             .format(method, allowed_methods))
-        if method == "pld":
-            from .correctors import PLDCorrector
-            return PLDCorrector(self)
 
 
 class FactoryError(Exception):
