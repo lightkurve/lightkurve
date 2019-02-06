@@ -118,6 +118,8 @@ class SearchResult(object):
         download_dir : str
             Location where the data files will be stored.
             Defaults to "~/.lightkurve-cache" if `None` is passed.
+        cutout_size : int or float
+            Side length of cutout in pixels. Default value is 5.
 
         Returns
         -------
@@ -145,7 +147,14 @@ class SearchResult(object):
 
         # if table contains TESScut search results, download cutout
         if 'TESScut' in self.table[0]['productFilename']:
+            if cutout_size is None:
+                cutout_size = 5
+            elif cutout_size < 0:
+                raise ValueError('`cutout_size` must be positive.')
+            elif cutout_size > 100:
+                warnings.warn('Cutout size is large and may take a few minutes to download.')
             path = self._fetch_tesscut_path(self.table[0]['target_name'],
+                                            self.table[0]['sequence_number'],
                                             download_dir, cutout_size)
 
         else:
@@ -182,6 +191,8 @@ class SearchResult(object):
         download_dir : str
             Location where the data files will be stored.
             Defaults to "~/.lightkurve-cache" if `None` is passed.
+        cutout_size : int or float
+            Side length of cutout in pixels. Default value is 5.
 
         Returns
         -------
@@ -203,8 +214,14 @@ class SearchResult(object):
 
         # if table contains TESScut search results, download cutouts
         if 'TESScut' in self.table[0]['productFilename']:
-            path = [self._fetch_tesscut_path(t, download_dir, cutout_size)
-                    for t in self.table['target_name']]
+            if cutout_size is None:
+                cutout_size = 5
+            elif cutout_size < 0:
+                raise ValueError('`cutout_size` must be positive.')
+            elif cutout_size > 100:
+                warnings.warn('Cutout size is large and may take a few minutes to download.')
+            path = [self._fetch_tesscut_path(t, s, download_dir, cutout_size)
+                    for t,s in zip(self.table['target_name'], self.table['sequence_number'])]
         else:
             if cutout_size is not None:
                 warnings.warn('`cutout_size` can only be specified for TESS '
@@ -250,7 +267,7 @@ class SearchResult(object):
 
         return download_dir
 
-    def _fetch_tesscut_path(self, target, download_dir, cutout_size):
+    def _fetch_tesscut_path(self, target, sector, download_dir, cutout_size):
         """Downloads TESS FFI cutout and returns path to local file.
 
         Parameters
@@ -267,35 +284,17 @@ class SearchResult(object):
             Path to locally downloaded cutout file
         """
         from astroquery.mast import TesscutClass
-        tc = TesscutClass()
+        from astroquery.mast.core import MastClass
+        coords = MastClass()._resolve_object(target)
 
         # Resolve SkyCoord of given target
-        coords = self._resolve_coords(target)
-        sector = int(self.table[0]['description'][-2])
-        if cutout_size is None:
-            cutout_size = 5
-        cutout_path = tc.download_cutouts(coords, size=cutout_size,
-                                          sector=sector, path=download_dir)
+        coords = MastClass()._resolve_object(target)
+        sector = self.table[0]['sequence_number']
+        cutout_path = TesscutClass().download_cutouts(coords, size=cutout_size,
+                                                      sector=sector, path=download_dir)
 
         path = os.path.join(download_dir, cutout_path[0][0])
         return path
-
-    def _resolve_coords(self, target):
-        """Returns a SkyCoord object with resolved position of given target.
-
-        Parameters
-        ----------
-        target : str
-            Name of target to resolve coordinates on the sky.
-
-        Returns
-        -------
-        coords : SkyCoord object
-            SkyCoord object corresponding to input target.
-        """
-        from astroquery.mast.core import MastClass
-        coords = MastClass()._resolve_object(target)
-        return coords
 
 
 def search_targetpixelfile(target, radius=None, cadence='long',
@@ -475,7 +474,7 @@ def search_lightcurvefile(target, radius=None, cadence='long',
         return SearchResult(None)
 
 
-def search_TESScutout(target, sector=None):
+def search_cutout(target, sector=None):
     """Searches MAST for TESS Full Frame Images containing a desired target or region.
 
     Parameters
@@ -488,8 +487,9 @@ def search_TESScutout(target, sector=None):
             * A coordinate string in decimal format, e.g. "285.67942179 +50.24130576".
             * A coordinate string in sexagesimal format, e.g. "19:02:43.1 +50:14:28.7".
             * An `astropy.coordinates.SkyCoord` object.
-    sector : int
-        TESS Sector number.
+    sector : int or list
+        TESS Sector number. Default (None) will return all available sectors. A
+        list of desired sectors can also be provided.
 
     Returns
     -------
@@ -568,7 +568,8 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
                 products_df = products_df.append({'description': 'TESS FFI Cutout (s{:02})'.format(s),
                                                   'target_name': str(target),
                                                   'productFilename': 'TESScut Full Frame Image Cutout',
-                                                  'distance': 0.0},
+                                                  'distance': 0.0,
+                                                  'sequence_number': s},
                                                   ignore_index=True)
             # convert back to an astropy table
             masked_result = Table.from_pandas(products_df)
