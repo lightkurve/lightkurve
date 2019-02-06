@@ -10,6 +10,7 @@ import warnings
 
 from bs4 import BeautifulSoup
 from tqdm import tqdm
+from itertools import combinations_with_replacement as multichoose
 
 import oktopus
 import numpy as np
@@ -23,9 +24,6 @@ from .utils import channel_to_module_output
 from .lightcurve import LightCurve
 from .lightcurvefile import KeplerLightCurveFile
 
-from sklearn.decomposition import PCA
-from itertools import combinations_with_replacement as multichoose
-import celerite
 
 __all__ = ['SFFCorrector', 'PLDCorrector', 'KeplerCBVCorrector']
 
@@ -634,6 +632,13 @@ class PLDCorrector(object):
             returned object will be a `KeplerLightCurve`, `TessLightCurve`, or
             general `LightCurve` object.
         """
+        # At the time of writing, this is the only method in Lightkurve that
+        # requires celerite and sci-kit learn, so we import them at the
+        # method-level instead of the module-level to prevent `import lightkuve`
+        # from crashing if an issue with these dependencies exist.
+        import celerite
+        from sklearn.decomposition import PCA
+
         # Parse the aperture mask to accept strings etc.
         aperture = self.tpf._parse_aperture_mask(aperture_mask)
 
