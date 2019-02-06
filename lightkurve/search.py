@@ -20,7 +20,11 @@ from . import PACKAGEDIR
 
 log = logging.getLogger(__name__)
 
+<<<<<<< HEAD
 __all__ = ['open', 'search_targetpixelfile', 'search_lightcurvefile', 'search_cutout']
+=======
+__all__ = ['search_targetpixelfile', 'search_lightcurvefile', 'search_cutout', 'open']
+>>>>>>> rebase
 
 
 class SearchError(Exception):
@@ -149,6 +153,7 @@ class SearchResult(object):
         if 'TESScut' in self.table[0]['productFilename']:
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
             if cutout_size is None:
                 cutout_size = 5
             elif cutout_size < 0:
@@ -175,6 +180,10 @@ class SearchResult(object):
 =======
             path = self._fetch_tesscut_path(download_dir, cutout_size)
 >>>>>>> dedicated _fetch_tesscut_path() function
+=======
+            path = self._fetch_tesscut_path(self.table[0]['target_name'],
+                                            download_dir, cutout_size)
+>>>>>>> rebase
 
         else:
             if cutout_size is not None:
@@ -241,6 +250,7 @@ class SearchResult(object):
 
         # if table contains TESScut search results, download cutouts
         if 'TESScut' in self.table[0]['productFilename']:
+<<<<<<< HEAD
             if cutout_size is None:
                 cutout_size = 5
             elif cutout_size < 0:
@@ -249,6 +259,10 @@ class SearchResult(object):
                 warnings.warn('Cutout size is large and may take a few minutes to download.')
             path = [self._fetch_tesscut_path(t, s, download_dir, cutout_size)
                     for t,s in zip(self.table['target_name'], self.table['sequence_number'])]
+=======
+            path = [self._fetch_tesscut_path(t, download_dir, cutout_size)
+                    for t in self.table['target_name']]
+>>>>>>> rebase
         else:
             if cutout_size is not None:
                 warnings.warn('`cutout_size` can only be specified for TESS '
@@ -295,6 +309,7 @@ class SearchResult(object):
         return download_dir
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     def _fetch_tesscut_path(self, target, sector, download_dir, cutout_size):
         """Downloads TESS FFI cutout and returns path to local file.
 
@@ -340,6 +355,9 @@ class SearchResult(object):
         return path
 
     def _fetch_tesscut_path(self, download_dir, cutout_size):
+=======
+    def _fetch_tesscut_path(self, target, download_dir, cutout_size):
+>>>>>>> rebase
         """Downloads TESS FFI cutout and returns path to local file.
 
         Parameters
@@ -359,7 +377,7 @@ class SearchResult(object):
         tc = TesscutClass()
 
         # Resolve SkyCoord of given target
-        coords = self._resolve_coords(self.table[0]['target_name'])
+        coords = self._resolve_coords(target)
         sector = int(self.table[0]['description'][-2])
         if cutout_size is None:
             cutout_size = 5
@@ -368,6 +386,23 @@ class SearchResult(object):
 
         path = os.path.join(download_dir, cutout_path[0][0])
         return path
+
+    def _resolve_coords(self, target):
+        """Returns a SkyCoord object with resolved position of given target.
+
+        Parameters
+        ----------
+        target : str
+            Name of target to resolve coordinates on the sky.
+
+        Returns
+        -------
+        coords : SkyCoord object
+            SkyCoord object corresponding to input target.
+        """
+        from astroquery.mast.core import MastClass
+        coords = MastClass()._resolve_object(target)
+        return coords
 
 
 def search_targetpixelfile(target, radius=None, cadence='long',
@@ -547,6 +582,7 @@ def search_lightcurvefile(target, radius=None, cadence='long',
         return SearchResult(None)
 
 
+<<<<<<< HEAD
 def search_cutout(target, sector=None):
     """Searches MAST for TESS Full Frame Images containing a desired target or region.
 
@@ -569,6 +605,10 @@ def search_cutout(target, sector=None):
     result : :class:`SearchResult` object
         Object detailing the data products found.
     """
+=======
+def search_TESScutout(target, sector=None):
+    """ """
+>>>>>>> rebase
     try:
         return _search_products(target, filetype="ffi", mission='TESS', sector=sector)
     except SearchError as exc:
@@ -898,8 +938,6 @@ def _mask_tess_products(products, sector=None, filetype='Target Pixel'):
     elif filetype == 'ffi':
         description_string = 'TESScut'
     mask &= np.array([description_string in desc for desc in products['description']])
-
-    mask |= np.array(['TESScut' in desc for desc in products['description']])
 
     # Identify sector by the description.
     if sector is not None:
