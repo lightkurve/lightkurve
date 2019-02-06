@@ -203,18 +203,19 @@ def make_lightcurve_figure_elements(lc, lc_source):
 def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
     """Make the Gaia Figure Elements"""
     #Get the positions of the Gaia sources
-    ## TODO: turn this part into a method: `tpf.query_nearby_gaia()`
     c1 = SkyCoord(tpf.ra, tpf.dec, frame='icrs', unit='deg')
-    result = Vizier.query_region(c1, catalog=["I/345/gaia2"], radius=Angle(np.max(tpf.shape[1:]) * 3, "arcsec"))
+    # Use pixel scale for query size
+    pix_scale = 4.0 # arcseconds / pixel for Kepler, default
+    if tpf.mission == 'TESS':
+        pix_scale = 21.0
+    # We are querying with a diameter as the radius, overfilling by 2x.
+    result = Vizier.query_region(c1, catalog=["I/345/gaia2"], radius=Angle(np.max(tpf.shape[1:]) * pix_scale, "arcsec"))
     if result is None:
         raise ValueError('No targets found in region.')
     result = result["I/345/gaia2"].to_pandas()
     result = result[result.Gmag < magnitude_limit]
     radecs = np.vstack([result['RA_ICRS'], result['DE_ICRS']]).T
     coords = tpf.wcs.all_world2pix(radecs, 0) ## TODO, is this supposed to be zero or one?????
-    ok = (coords[:, 0] > 0) & (coords[:, 0] < tpf.shape[2]) & (coords[:, 1] > 0) & (coords[:, 1] < tpf.shape[1])
-    result = result[ok]
-    coords = coords[ok]
     year = ((tpf.astropy_time[0].jd - 2457206.375) * u.day).to(u.year)
     pmra = ((np.asarray(result.pmRA) * u.milliarcsecond/u.year) * year).to(u.arcsec).value
     pmdec = ((np.asarray(result.pmDE) * u.milliarcsecond/u.year) * year).to(u.arcsec).value
@@ -560,7 +561,7 @@ def show_skyview_widget(tpf, notebook_url='localhost:8888', magnitude_limit=18):
                   "you can install bokeh using e.g. `conda install bokeh`.")
         return None
 
-    # Try to identify the "fiducial frame"
+    # Try to identify the "fiducial frame", for which the TPF WCS is exact
     zp = (tpf.pos_corr1 == 0) & (tpf.pos_corr2 == 0)
     zp_loc, = np.where(zp)
 
@@ -582,21 +583,15 @@ def show_skyview_widget(tpf, notebook_url='localhost:8888', magnitude_limit=18):
         fig_tpf, r = add_gaia_figure_elements(tpf, fig_tpf,
                                               magnitude_limit = magnitude_limit)
 
-        # Override the default title
-        title = None
+        # Optionally override the default title
         if tpf.mission == 'K2':
-            title = "Skyview for EPIC {}, K2 Campaign {}, CCD {}.{}".format(
+            fig_tpf.title.text = "Skyview for EPIC {}, K2 Campaign {}, CCD {}.{}".format(
                                 tpf.targetid, tpf.campaign, tpf.module, tpf.output)
         elif tpf.mission == 'Kepler':
-            title = "Skyview for KIC {}, Kepler Quarter {}, CCD {}.{}".format(
+            fig_tpf.title.text = "Skyview for KIC {}, Kepler Quarter {}, CCD {}.{}".format(
                             tpf.targetid, tpf.quarter, tpf.module, tpf.output)
 
-        if title is not None:
-            fig_tpf.title.text = title
-            #fig_tpf.title = title
-
         # Layout all of the plots
-
         widgets_and_figures = layout([fig_tpf, stretch_slider])
         doc.add_root(widgets_and_figures)
 
