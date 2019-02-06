@@ -375,6 +375,12 @@ def test_interact():
                 TessTargetPixelFile(filename_tess)]:
         tpf.interact()
 
+@pytest.mark.remote_data
+def test_interact_sky():
+    """Test the Jupyter notebook interact() widget."""
+    for tpf in [KeplerTargetPixelFile(filename_tpf_one_center),
+                TessTargetPixelFile(filename_tess)]:
+        tpf.interact_sky()
 
 def test_get_models():
     """Can we obtain PRF and TPF models?"""
