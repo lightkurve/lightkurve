@@ -1,6 +1,8 @@
 import pytest
 from astropy import units as u
 import numpy as np
+from numpy.testing import assert_almost_equal
+
 from ..lightcurve import LightCurve
 from ..periodogram import Periodogram
 import sys
@@ -220,6 +222,34 @@ def test_bls(caplog):
     assert isinstance(p.duration_at_max_power, float)
     assert isinstance(p.transit_time_at_max_power, float)
     assert isinstance(p.depth_at_max_power, float)
+
+
+def test_bls_period_recovery():
+    """Create a synthetic light curve and try to recover the simulated period."""
+    # Planet parameters
+    period = 2.0
+    transit_time = 0.5
+    duration = 0.1
+    depth = 0.2
+    flux_err = 0.01
+    # Synthetic light curve
+    time = np.arange(0, 100, 0.1)
+    flux = np.ones_like(time)
+    transit_mask = np.abs((time-transit_time+0.5*period) % period-0.5*period) < 0.5*duration
+    flux[transit_mask] = 1.0 - depth
+    flux += flux_err * np.random.randn(len(time))
+    synthetic_lc = LightCurve(time, flux)
+    # Can we recover the period?
+    bls_period = synthetic_lc.to_periodogram("bls").period_at_max_power
+    assert_almost_equal(bls_period, period)
+    # Does it work if we inject a sneaky NaN?
+    synthetic_lc.flux[10] = np.nan
+    bls_period = synthetic_lc.to_periodogram("bls").period_at_max_power
+    assert_almost_equal(bls_period, period)
+    # Does it work if all errors are NaNs?
+    # This is a regression test for issue #428
+    synthetic_lc.flux_err = np.array([np.nan] * len(time))
+    assert_almost_equal(bls_period, period)
 
 
 def test_error_messages():
