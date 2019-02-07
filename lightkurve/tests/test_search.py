@@ -18,7 +18,7 @@ import astropy.units as u
 from astropy.table import Table
 
 from ..utils import LightkurveWarning
-from ..search import search_lightcurvefile, search_targetpixelfile, SearchResult, open
+from ..search import search_lightcurvefile, search_targetpixelfile, search_cutout, SearchResult, open
 from .. import KeplerLightCurveFile
 from .. import KeplerTargetPixelFile, TessTargetPixelFile, TargetPixelFileCollection
 
@@ -83,6 +83,27 @@ def test_search_lightcurvefile(caplog):
     assert(len(search_lightcurvefile(tic, mission='TESS', radius=100).table) == 2)
     search_lightcurvefile(tic, mission='TESS').download()
     assert(len(search_lightcurvefile("pi Mensae", sector=1).table) == 1)
+
+
+@pytest.mark.remote_data
+def test_search_cutout():
+    # Cutout by target name
+    assert(len(search_cutout("pi Mensae", sector=1).table) == 1)
+    # Cutout by TIC ID
+    assert(len(search_cutout('TIC 206669860', sector=2).table) == 1)
+    # Cutout by RA, dec string
+    search_string = search_cutout('30.578761, -83.210593')
+    # Cutout by SkyCoord
+    c = SkyCoord('30.578761 -83.210593', unit=(u.deg, u.deg))
+    search_coords = search_cutout(c)
+    # These should be identical
+    assert(len(search_string.table) == len(search_coords.table))
+    # Make sure they can be downloaded with a specific size
+    tpf = search_string.download(cutout_size=3)
+    # Ensure the correct object has been read in
+    assert(isinstance(tpf, TessTargetPixelFile))
+    # Ensure correct dimensions have been downloaded
+    assert(tpf.flux[0].shape == (3,3))
 
 
 @pytest.mark.remote_data
