@@ -224,6 +224,7 @@ def test_bls(caplog):
     assert isinstance(p.depth_at_max_power, float)
 
 
+@pytest.mark.skipif(bad_optional_imports, reason="requires astropy.stats.bls")
 def test_bls_period_recovery():
     """Can BLS Periodogram recover the period of a synthetic light curve?"""
     # Planet parameters
