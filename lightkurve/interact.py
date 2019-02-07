@@ -210,12 +210,18 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
         pix_scale = 21.0
     # We are querying with a diameter as the radius, overfilling by 2x.
     result = Vizier.query_region(c1, catalog=["I/345/gaia2"], radius=Angle(np.max(tpf.shape[1:]) * pix_scale, "arcsec"))
+    no_targets_found_message = ValueError('Either no sources were found in the query region or Vizier is unavailable')
+    too_few_found_message = ValueError('No sources found brighter than {:0.1d}'.format(magnitude_limit))
     if result is None:
-        raise ValueError('No targets found in region.')
+        raise no_targets_found_message
+    elif len(result) == 0:
+        raise too_few_found_message
     result = result["I/345/gaia2"].to_pandas()
     result = result[result.Gmag < magnitude_limit]
+    if len(result) == 0:
+        raise no_targets_found_message
     radecs = np.vstack([result['RA_ICRS'], result['DE_ICRS']]).T
-    coords = tpf.wcs.all_world2pix(radecs, 0) ## TODO, is this supposed to be zero or one?????
+    coords = tpf.wcs.all_world2pix(radecs, 1) ## TODO, is origin supposed to be zero or one?
     year = ((tpf.astropy_time[0].jd - 2457206.375) * u.day).to(u.year)
     pmra = ((np.nan_to_num(np.asarray(result.pmRA)) * u.milliarcsecond/u.year) * year).to(u.arcsec).value
     pmdec = ((np.nan_to_num(np.asarray(result.pmDE)) * u.milliarcsecond/u.year) * year).to(u.arcsec).value
@@ -590,6 +596,7 @@ def show_skyview_widget(tpf, notebook_url='localhost:8888', magnitude_limit=18):
         elif tpf.mission == 'Kepler':
             fig_tpf.title.text = "Skyview for KIC {}, Kepler Quarter {}, CCD {}.{}".format(
                             tpf.targetid, tpf.quarter, tpf.module, tpf.output)
+
 
         # Layout all of the plots
         widgets_and_figures = layout([fig_tpf, stretch_slider])
