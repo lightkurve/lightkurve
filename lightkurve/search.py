@@ -153,9 +153,13 @@ class SearchResult(object):
                 raise ValueError('`cutout_size` must be positive.')
             elif cutout_size > 100:
                 warnings.warn('Cutout size is large and may take a few minutes to download.')
-            path = self._fetch_tesscut_path(self.table[0]['target_name'],
-                                            self.table[0]['sequence_number'],
-                                            download_dir, cutout_size)
+            try:
+                path = self._fetch_tesscut_path(self.table[0]['target_name'],
+                                                self.table[0]['sequence_number'],
+                                                download_dir, cutout_size)
+            except:
+                raise SearchError('Unable to download FFI cutout. Desired target '
+                                  'coordinates may be too near the edge of the FFI.')
 
         else:
             if cutout_size is not None:
