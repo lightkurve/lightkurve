@@ -98,12 +98,16 @@ def test_search_cutout():
     search_coords = search_cutout(c)
     # These should be identical
     assert(len(search_string.table) == len(search_coords.table))
-    # Make sure they can be downloaded with a specific size
-    tpf = search_string.download(cutout_size=3)
+    # Make sure they can be downloaded with default size
+    tpf = search_string.download()
     # Ensure the correct object has been read in
     assert(isinstance(tpf, TessTargetPixelFile))
-    # Ensure correct dimensions have been downloaded
-    assert(tpf.flux[0].shape == (3,3))
+    # Ensure default size is 5x5
+    assert(tpf.flux[0].shape == (5,5))
+    # Download with different dimensions
+    tpf = search_coords.download(cutout_size=4)
+    # Ensure correct dimensions
+    assert(tpf.flux[0].shape == (4,4))
 
 
 @pytest.mark.remote_data
