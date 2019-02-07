@@ -553,7 +553,7 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
                                      cadence=cadence, project=mission,
                                      month=month, sector=sector, limit=limit)
 
-    # If Full Frame Images are found, add a table entry for FFI cutouts
+    # if Full Frame Images are found, add a table entry for FFI cutouts
     if filetype == 'ffi':
         for i in np.where('TESS FFI' in observations['target_name'])[0]:
             # if target passed in is a SkyCoord object, convert to RA, dec pair
