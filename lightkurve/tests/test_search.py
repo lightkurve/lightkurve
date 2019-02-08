@@ -20,7 +20,7 @@ from astropy.table import Table
 
 from ..utils import LightkurveWarning
 from ..search import search_lightcurvefile, search_targetpixelfile, \
-                     search_cutout, SearchResult, SearchError, open
+                     search_tesscut, SearchResult, SearchError, open
 from .. import KeplerLightCurveFile
 from .. import KeplerTargetPixelFile, TessTargetPixelFile, TargetPixelFileCollection
 
@@ -88,21 +88,21 @@ def test_search_lightcurvefile(caplog):
 
 
 @pytest.mark.remote_data
-def test_search_cutout():
+def test_search_tesscut():
     # Cutout by target name
-    assert(len(search_cutout("pi Mensae", sector=1).table) == 1)
-    assert(len(search_cutout("pi Mensae").table) > 1)
+    assert(len(search_tesscut("pi Mensae", sector=1).table) == 1)
+    assert(len(search_tesscut("pi Mensae").table) > 1)
     # Cutout by TIC ID
-    assert(len(search_cutout('TIC 206669860', sector=2).table) == 1)
+    assert(len(search_tesscut('TIC 206669860', sector=2).table) == 1)
     # Cutout by RA, dec string
-    search_string = search_cutout('30.578761, -83.210593')
+    search_string = search_tesscut('30.578761, -83.210593')
     # Cutout by SkyCoord
     c = SkyCoord('30.578761 -83.210593', unit=(u.deg, u.deg))
-    search_coords = search_cutout(c)
+    search_coords = search_tesscut(c)
     # These should be identical
     assert(len(search_string.table) == len(search_coords.table))
     # Test cutout at edge of FFI
-    search_edge = search_cutout('30.578761, 6.210593')
+    search_edge = search_tesscut('30.578761, 6.210593')
     assert(len(search_edge.table) == 1)
     try:
         # This is too near the FFI edge and should fail to download
@@ -113,11 +113,10 @@ def test_search_cutout():
 
 # See issue #433 to understand why this test is skipped on Python 3.7 for now
 @pytest.mark.remote_data
-@pytest.mark.skipif(sys.version[4] == '7',
-                    reason="Python 3.7 on Windows")
-def test_search_cutout_download():
+@pytest.mark.skipif(sys.version[2] == '7', reason="GitHub issue #433")
+def test_search_tesscut_download():
     """Can we download TESS cutouts via `search_cutout().download()?"""
-    search_string = search_cutout('30.578761, -83.210593')
+    search_string = search_tesscut('30.578761, -83.210593')
     # Make sure they can be downloaded with default size
     tpf = search_string.download()
     # Ensure the correct object has been read in

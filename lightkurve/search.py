@@ -20,7 +20,7 @@ from . import PACKAGEDIR
 
 log = logging.getLogger(__name__)
 
-__all__ = ['search_targetpixelfile', 'search_lightcurvefile', 'search_cutout', 'open']
+__all__ = ['search_targetpixelfile', 'search_lightcurvefile', 'search_tesscut', 'open']
 
 
 class SearchError(Exception):
@@ -224,7 +224,7 @@ class SearchResult(object):
 
         # open() will determine filetype and return
         # return a collection containing opened files
-        tpf_extensions = ['lpd-targ.fits', 'spd-targ.fits', '_tp.fits', 'TESScut']
+        tpf_extensions = ['lpd-targ.fits', 'spd-targ.fits', '_tp.fits', 'n/a']
         lcf_extensions = ['llc.fits', 'slc.fits', '_lc.fits']
         if any(e in self.table['productFilename'][0] for e in tpf_extensions):
             return TargetPixelFileCollection([open(p) for p in path])
@@ -474,8 +474,8 @@ def search_lightcurvefile(target, radius=None, cadence='long',
         return SearchResult(None)
 
 
-def search_cutout(target, sector=None):
-    """Searches MAST for TESS Full Frame Images containing a desired target or region.
+def search_tesscut(target, sector=None):
+    """Searches MAST for TESS Full Frame Image cutouts containing a desired target or region.
 
     Parameters
     ----------
