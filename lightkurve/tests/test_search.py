@@ -111,9 +111,10 @@ def test_search_cutout():
         pass
 
 
+# See issue #433 to understand why this test is skipped on Python 3.7 for now
 @pytest.mark.remote_data
 @pytest.mark.skipif(sys.version[4] == '7',
-                    reason="Python Windows bug in 3.7")
+                    reason="Python 3.7 on Windows")
 def test_search_cutout_download():
     """Can we download TESS cutouts via `search_cutout().download()?"""
     search_string = search_cutout('30.578761, -83.210593')
