@@ -18,7 +18,8 @@ import astropy.units as u
 from astropy.table import Table
 
 from ..utils import LightkurveWarning
-from ..search import search_lightcurvefile, search_targetpixelfile, search_cutout, SearchResult, open
+from ..search import search_lightcurvefile, search_targetpixelfile, \
+                     search_cutout, SearchResult, SearchError, open
 from .. import KeplerLightCurveFile
 from .. import KeplerTargetPixelFile, TessTargetPixelFile, TargetPixelFileCollection
 
@@ -109,6 +110,14 @@ def test_search_cutout():
     tpf = search_coords.download(cutout_size=4)
     # Ensure correct dimensions
     assert(tpf.flux[0].shape == (4, 4))
+    # Test cutout at edge of FFI
+    search_edge = search_cutout('30.578761, 6.210593')
+    assert(len(search_edge.table) == 1)
+    try:
+        # This is too near the FFI edge and should fail to download
+        search_edge.download()
+    except SearchError:
+        pass
 
 
 @pytest.mark.remote_data

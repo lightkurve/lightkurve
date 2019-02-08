@@ -20,7 +20,7 @@ from . import PACKAGEDIR
 
 log = logging.getLogger(__name__)
 
-__all__ = ['open', 'search_targetpixelfile', 'search_lightcurvefile', 'search_cutout']
+__all__ = ['search_targetpixelfile', 'search_lightcurvefile', 'search_cutout', 'open']
 
 
 class SearchError(Exception):
@@ -147,13 +147,6 @@ class SearchResult(object):
 
         # if table contains TESScut search results, download cutout
         if 'FFI Cutout' in self.table[0]['description']:
-            if cutout_size is None:
-                cutout_size = 5
-            elif cutout_size < 0:
-                raise ValueError('`cutout_size` must be positive.')
-            elif cutout_size > 100:
-                warnings.warn('Cutout size is large and may take a few minutes to download.',
-                              LightkurveWarning)
             try:
                 path = self._fetch_tesscut_path(self.table[0]['target_name'],
                                                 self.table[0]['sequence_number'],
@@ -218,14 +211,7 @@ class SearchResult(object):
             download_dir = self._default_download_dir()
 
         # if table contains TESScut search results, download cutouts
-        if 'TESScut' in self.table[0]['productFilename']:
-            if cutout_size is None:
-                cutout_size = 5
-            elif cutout_size < 0:
-                raise ValueError('`cutout_size` must be positive.')
-            elif cutout_size > 100:
-                warnings.warn('Cutout size is large and may take a few minutes to download.',
-                              LightkurveWarning)
+        if 'FFI Cutout' in self.table[0]['description']:
             path = [self._fetch_tesscut_path(t, s, download_dir, cutout_size)
                     for t,s in zip(self.table['target_name'], self.table['sequence_number'])]
         else:
@@ -292,6 +278,14 @@ class SearchResult(object):
         from astroquery.mast import TesscutClass
         from astroquery.mast.core import MastClass
         coords = MastClass()._resolve_object(target)
+
+        # Enforce bounds on cutout_size
+        if cutout_size is None:
+            cutout_size = 5
+        elif cutout_size <= 0:
+            raise ValueError('`cutout_size` must be positive.')
+        elif cutout_size > 100:
+            warnings.warn('Cutout size is large and may take a few minutes to download.')
 
         # Resolve SkyCoord of given target
         coords = MastClass()._resolve_object(target)
@@ -575,6 +569,7 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
             if s in np.atleast_1d(sector) or sector is None:
                 cutouts.append({'description': 'TESS FFI Cutout (sector {})'.format(s),
                                 'target_name': str(target),
+                                'targetid': str(target),
                                 'productFilename': 'n/a',
                                 'distance': 0.0,
                                 'sequence_number': s}
