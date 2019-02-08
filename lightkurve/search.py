@@ -20,7 +20,7 @@ from . import PACKAGEDIR
 
 log = logging.getLogger(__name__)
 
-__all__ = ['search_targetpixelfile', 'search_lightcurvefile', 'search_cutout', 'open']
+__all__ = ['open', 'search_targetpixelfile', 'search_lightcurvefile', 'search_cutout']
 
 
 class SearchError(Exception):
