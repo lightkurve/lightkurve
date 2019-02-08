@@ -211,7 +211,7 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
     # We are querying with a diameter as the radius, overfilling by 2x.
     result = Vizier.query_region(c1, catalog=["I/345/gaia2"], radius=Angle(np.max(tpf.shape[1:]) * pix_scale, "arcsec"))
     no_targets_found_message = ValueError('Either no sources were found in the query region or Vizier is unavailable')
-    too_few_found_message = ValueError('No sources found brighter than {:0.1d}'.format(magnitude_limit))
+    too_few_found_message = ValueError('No sources found brighter than {:0.1f}'.format(magnitude_limit))
     if result is None:
         raise no_targets_found_message
     elif len(result) == 0:
@@ -230,7 +230,7 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
 
     # Gently size the points by their Gaia magnitude
     sizes = 64.0 / 2**(result['Gmag']/5.0)
-    one_over_parallax = 1.0 / np.nan_to_num(result['Plx']/1000.0)
+    one_over_parallax = 1.0 / (result['Plx']/1000.)
     source = ColumnDataSource(data=dict(ra=result['RA_ICRS'],
                                         dec=result['DE_ICRS'],
                                         source=result['Source'],
@@ -246,10 +246,11 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
                     nonselection_line_alpha=0.0, fill_color="firebrick",
                     hover_fill_color="firebrick", hover_alpha=0.9, hover_line_color="white")
 
-    fig.add_tools(HoverTool(tooltips=[("Source", "@source"),("G", "@Gmag"),("Parallax", "@plx"),
-                                      ("1/parallax (1/arcsec)", "@one_over_plx{0,0.0}"), ("RA", "@ra{0,0.00000000}"),
+    fig.add_tools(HoverTool(tooltips=[("Source", "@source"),("G", "@Gmag"),
+                                     ("Parallax (mas)", "@plx (~@one_over_plx{0,0} pc)"),
+                                     ("RA", "@ra{0,0.00000000}"),
                                      ("DEC", "@dec{0,0.00000000}"),
-                                      ("x", "@x"),
+                                     ("x", "@x"),
                                      ("y", "@y")],
                                      renderers=[r],
                                      mode='mouse',
@@ -300,7 +301,7 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=0,
     vstep = (np.log10(vhi) - np.log10(vlo)) / 300.0  # assumes counts >> 1.0!
     color_mapper = LogColorMapper(palette="Viridis256", low=lo, high=hi)
 
-    fig.image([pedestal + tpf.flux[fiducial_frame, :, :]], x=tpf.column, y=tpf.row,
+    fig.image([tpf.flux[fiducial_frame, :, :] - pedestal], x=tpf.column, y=tpf.row,
               dw=tpf.shape[2], dh=tpf.shape[1], dilate=True,
               color_mapper=color_mapper, name="tpfimg")
 
