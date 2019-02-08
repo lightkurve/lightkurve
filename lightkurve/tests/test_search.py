@@ -89,6 +89,7 @@ def test_search_lightcurvefile(caplog):
 def test_search_cutout():
     # Cutout by target name
     assert(len(search_cutout("pi Mensae", sector=1).table) == 1)
+    assert(len(search_cutout("pi Mensae").table) > 1)
     # Cutout by TIC ID
     assert(len(search_cutout('TIC 206669860', sector=2).table) == 1)
     # Cutout by RA, dec string
@@ -103,11 +104,11 @@ def test_search_cutout():
     # Ensure the correct object has been read in
     assert(isinstance(tpf, TessTargetPixelFile))
     # Ensure default size is 5x5
-    assert(tpf.flux[0].shape == (5,5))
+    assert(tpf.flux[0].shape == (5, 5))
     # Download with different dimensions
     tpf = search_coords.download(cutout_size=4)
     # Ensure correct dimensions
-    assert(tpf.flux[0].shape == (4,4))
+    assert(tpf.flux[0].shape == (4, 4))
 
 
 @pytest.mark.remote_data

@@ -146,13 +146,14 @@ class SearchResult(object):
             download_dir = self._default_download_dir()
 
         # if table contains TESScut search results, download cutout
-        if 'TESScut' in self.table[0]['productFilename']:
+        if 'FFI Cutout' in self.table[0]['description']:
             if cutout_size is None:
                 cutout_size = 5
             elif cutout_size < 0:
                 raise ValueError('`cutout_size` must be positive.')
             elif cutout_size > 100:
-                warnings.warn('Cutout size is large and may take a few minutes to download.')
+                warnings.warn('Cutout size is large and may take a few minutes to download.',
+                              LightkurveWarning)
             try:
                 path = self._fetch_tesscut_path(self.table[0]['target_name'],
                                                 self.table[0]['sequence_number'],
@@ -223,7 +224,8 @@ class SearchResult(object):
             elif cutout_size < 0:
                 raise ValueError('`cutout_size` must be positive.')
             elif cutout_size > 100:
-                warnings.warn('Cutout size is large and may take a few minutes to download.')
+                warnings.warn('Cutout size is large and may take a few minutes to download.',
+                              LightkurveWarning)
             path = [self._fetch_tesscut_path(t, s, download_dir, cutout_size)
                     for t,s in zip(self.table['target_name'], self.table['sequence_number'])]
         else:
@@ -520,8 +522,8 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
     radius : float or `astropy.units.Quantity` object
         Conesearch radius.  If a float is given it will be assumed to be in
         units of arcseconds.  If `None` then we default to 0.0001 arcsec.
-    filetype : str
-        Type of files queried at MAST (`Target Pixel` or `Lightcurve`)
+    filetype : {'Target pixel', 'Lightcurve', 'FFI'}
+        Type of files queried at MAST.
     cadence : str
         Desired cadence (`long`, `short`, `any`)
     mission : str, list of str
@@ -547,37 +549,39 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
     if len(observations) == 0:
         raise SearchError('No data found for target "{}".'.format(target))
 
-    products = Observations.get_product_list(observations)
-    result = join(products, observations, keys="obs_id", join_type='left',
-                  uniq_col_name='{col_name}{table_name}', table_names=['', '_2'])
-    result.sort(['distance', 'obs_id'])
+    # Light curves and target pixel files
+    if filetype.lower() != 'ffi':
+        products = Observations.get_product_list(observations)
+        result = join(products, observations, keys="obs_id", join_type='left',
+                      uniq_col_name='{col_name}{table_name}', table_names=['', '_2'])
+        result.sort(['distance', 'obs_id'])
 
-    masked_result = _filter_products(result, filetype=filetype,
-                                     campaign=campaign, quarter=quarter,
-                                     cadence=cadence, project=mission,
-                                     month=month, sector=sector, limit=limit)
+        masked_result = _filter_products(result, filetype=filetype,
+                                         campaign=campaign, quarter=quarter,
+                                         cadence=cadence, project=mission,
+                                         month=month, sector=sector, limit=limit)
+        return SearchResult(masked_result)
 
-    # if Full Frame Images are found, add a table entry for FFI cutouts
-    if filetype == 'ffi':
-        for i in np.where('TESS FFI' in observations['target_name'])[0]:
+    # Full Frame Images
+    else:
+        cutouts = []
+        for idx in np.where(['TESS FFI' in t for t in observations['target_name']])[0]:
             # if target passed in is a SkyCoord object, convert to RA, dec pair
             if isinstance(target, SkyCoord):
                 target = '{}, {}'.format(target.ra.deg, target.dec.deg)
             # pull sector numbers
-            s = observations['sequence_number'][i]
-            # convert to pandas data frame to add FFI cutout row
-            products_df = masked_result.to_pandas()
-            # if the desired sector is available, add a row to the data frame
+            s = observations['sequence_number'][idx]
+            # if the desired sector is available, add a row
             if s in np.atleast_1d(sector) or sector is None:
-                products_df = products_df.append({'description': 'TESS FFI Cutout (s{:02})'.format(s),
-                                                  'target_name': str(target),
-                                                  'productFilename': 'TESScut Full Frame Image Cutout',
-                                                  'distance': 0.0,
-                                                  'sequence_number': s},
-                                                  ignore_index=True)
-            # convert back to an astropy table
-            masked_result = Table.from_pandas(products_df)
-    return SearchResult(masked_result)
+                cutouts.append({'description': 'TESS FFI Cutout (sector {})'.format(s),
+                                'target_name': str(target),
+                                'productFilename': 'n/a',
+                                'distance': 0.0,
+                                'sequence_number': s}
+                               )
+        masked_result = Table(cutouts)
+        masked_result.sort(['distance', 'sequence_number'])
+        return SearchResult(masked_result)
 
 
 def _query_mast(target, radius=None, project=['Kepler', 'K2', 'TESS']):
@@ -824,11 +828,11 @@ def _mask_tess_products(products, sector=None, filetype='Target Pixel'):
                       for uri in products['productFilename']])
 
     # Filter on product type
-    if filetype == 'Lightcurve':
+    if filetype.lower() == 'lightcurve':
         description_string = 'Light curves'
-    elif filetype == 'Target Pixel':
+    elif filetype.lower() == 'target pixel':
         description_string = 'Target pixel files'
-    elif filetype == 'ffi':
+    elif filetype.lower() == 'ffi':
         description_string = 'TESScut'
     mask &= np.array([description_string in desc for desc in products['description']])
 
