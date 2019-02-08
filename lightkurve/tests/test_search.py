@@ -8,6 +8,7 @@ if no internet connection is available.
 from __future__ import division, print_function
 
 import os
+import sys
 import pytest
 import numpy as np
 from numpy.testing import assert_almost_equal, assert_array_equal
@@ -100,16 +101,6 @@ def test_search_cutout():
     search_coords = search_cutout(c)
     # These should be identical
     assert(len(search_string.table) == len(search_coords.table))
-    # Make sure they can be downloaded with default size
-    tpf = search_string.download()
-    # Ensure the correct object has been read in
-    assert(isinstance(tpf, TessTargetPixelFile))
-    # Ensure default size is 5x5
-    assert(tpf.flux[0].shape == (5, 5))
-    # Download with different dimensions
-    tpf = search_coords.download(cutout_size=4)
-    # Ensure correct dimensions
-    assert(tpf.flux[0].shape == (4, 4))
     # Test cutout at edge of FFI
     search_edge = search_cutout('30.578761, 6.210593')
     assert(len(search_edge.table) == 1)
@@ -118,6 +109,25 @@ def test_search_cutout():
         search_edge.download()
     except SearchError:
         pass
+
+
+@pytest.mark.remote_data
+@pytest.mark.skipif(sys.version[4] == '7',
+                    reason="Python Windows bug in 3.7")
+def test_search_cutout_download():
+    """Can we download TESS cutouts via `search_cutout().download()?"""
+    search_string = search_cutout('30.578761, -83.210593')
+    # Make sure they can be downloaded with default size
+    tpf = search_string.download()
+    # Ensure the correct object has been read in
+    assert(isinstance(tpf, TessTargetPixelFile))
+    # Ensure default size is 5x5
+    assert(tpf.flux[0].shape == (5, 5))
+    # Download with different dimensions
+    tpfc = search_string.download_all(cutout_size=4)
+    assert(isinstance(tpfc, TargetPixelFileCollection))
+    # Ensure correct dimensions
+    assert(tpfc[0].flux[0].shape == (4, 4))
 
 
 @pytest.mark.remote_data
