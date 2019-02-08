@@ -24,7 +24,7 @@ from astropy.coordinates import SkyCoord, Angle
 from astroquery.vizier import Vizier
 import astropy.units as u
 
-Vizier.ROW_LIMIT= -1
+Vizier.ROW_LIMIT = -1
 
 log = logging.getLogger(__name__)
 
@@ -202,15 +202,17 @@ def make_lightcurve_figure_elements(lc, lc_source):
 
 def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
     """Make the Gaia Figure Elements"""
-    #Get the positions of the Gaia sources
+    # Get the positions of the Gaia sources
     c1 = SkyCoord(tpf.ra, tpf.dec, frame='icrs', unit='deg')
     # Use pixel scale for query size
-    pix_scale = 4.0 # arcseconds / pixel for Kepler, default
+    pix_scale = 4.0  # arcseconds / pixel for Kepler, default
     if tpf.mission == 'TESS':
         pix_scale = 21.0
     # We are querying with a diameter as the radius, overfilling by 2x.
-    result = Vizier.query_region(c1, catalog=["I/345/gaia2"], radius=Angle(np.max(tpf.shape[1:]) * pix_scale, "arcsec"))
-    no_targets_found_message = ValueError('Either no sources were found in the query region or Vizier is unavailable')
+    result = Vizier.query_region(c1, catalog=["I/345/gaia2"],
+                                 radius=Angle(np.max(tpf.shape[1:]) * pix_scale, "arcsec"))
+    no_targets_found_message = ValueError('Either no sources were found in the query region '
+                                          'or Vizier is unavailable')
     too_few_found_message = ValueError('No sources found brighter than {:0.1f}'.format(magnitude_limit))
     if result is None:
         raise no_targets_found_message
@@ -241,25 +243,28 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
                                         y=coords[:, 1]+tpf.row,
                                         size=sizes))
 
-    r = fig.circle('x', 'y', source=source,fill_alpha=0.3, size='size', line_color=None,
-                    selection_color="firebrick",nonselection_fill_alpha=0.0, nonselection_line_color=None,
-                    nonselection_line_alpha=0.0, fill_color="firebrick",
-                    hover_fill_color="firebrick", hover_alpha=0.9, hover_line_color="white")
+    r = fig.circle('x', 'y', source=source, fill_alpha=0.3, size='size',
+                   line_color=None, selection_color="firebrick",
+                   nonselection_fill_alpha=0.0, nonselection_line_color=None,
+                   nonselection_line_alpha=0.0, fill_color="firebrick",
+                   hover_fill_color="firebrick", hover_alpha=0.9,
+                   hover_line_color="white")
 
-    fig.add_tools(HoverTool(tooltips=[("Source", "@source"),("G", "@Gmag"),
-                                     ("Parallax (mas)", "@plx (~@one_over_plx{0,0} pc)"),
-                                     ("RA", "@ra{0,0.00000000}"),
-                                     ("DEC", "@dec{0,0.00000000}"),
-                                     ("x", "@x"),
-                                     ("y", "@y")],
-                                     renderers=[r],
-                                     mode='mouse',
-                                     point_policy="snap_to_data"))
+    fig.add_tools(HoverTool(tooltips=[("Gaia source", "@source"),
+                                      ("G", "@Gmag"),
+                                      ("Parallax (mas)", "@plx (~@one_over_plx{0,0} pc)"),
+                                      ("RA", "@ra{0,0.00000000}"),
+                                      ("DEC", "@dec{0,0.00000000}"),
+                                      ("x", "@x"),
+                                      ("y", "@y")],
+                            renderers=[r],
+                            mode='mouse',
+                            point_policy="snap_to_data"))
     return fig, r
 
 
-def make_tpf_figure_elements(tpf, tpf_source, pedestal=0,
-        fiducial_frame=None, plot_width=370, plot_height=340):
+def make_tpf_figure_elements(tpf, tpf_source, pedestal=0, fiducial_frame=None,
+                             plot_width=370, plot_height=340):
     """Returns the lightcurve figure elements.
 
     Parameters

@@ -597,7 +597,7 @@ class TargetPixelFile(object):
         self.hdu.writeto(output_fn, overwrite=overwrite, checksum=True)
 
     def interact(self, notebook_url='localhost:8888', max_cadences=30000,
-                aperture_mask='pipeline', exported_filename=None):
+                 aperture_mask='pipeline', exported_filename=None):
         """Display an interactive Jupyter Notebook widget to inspect the pixel data.
 
         The widget will show both the lightcurve and pixel data.  By default,
@@ -644,6 +644,26 @@ class TargetPixelFile(object):
                                     aperture_mask=aperture_mask,
                                     exported_filename=exported_filename)
 
+    def interact_sky(self, notebook_url='localhost:8888', magnitude_limit=18):
+        """Display a Jupyter Notebook widget showing Gaia DR2 positions on top of the pixels.
+
+        Parameters
+        ----------
+        notebook_url: str
+            Location of the Jupyter notebook page (default: "localhost:8888")
+            When showing Bokeh applications, the Bokeh server must be
+            explicitly configured to allow connections originating from
+            different URLs. This parameter defaults to the standard notebook
+            host and port. If you are running on a different location, you
+            will need to supply this value for the application to display
+            properly. If no protocol is supplied in the URL, e.g. if it is
+            of the form "localhost:8888", then "http" will be used.
+        magnitude_limit : float
+            A value to limit the results in based on Gaia Gmag. Default, 18.
+        """
+        from .interact import show_skyview_widget
+        return show_skyview_widget(self, notebook_url=notebook_url,
+                                   magnitude_limit=magnitude_limit)
 
     def to_corrector(self, method="pld"):
         """Returns a `Corrector` instance to remove systematics.
@@ -673,18 +693,6 @@ class TargetPixelFile(object):
             from .correctors import PLDCorrector
             return PLDCorrector(self)
 
-
-    def interact_sky(self, magnitude_limit=18):
-        """Display an interactive Target Pixel File with positions of Gaia DR2 sources.
-
-        Parameters
-        ----------
-
-        magnitude_limit : float
-            A value to limit the results in based on Gaia Gmag. Default, 18.
-        """
-        from .interact import show_skyview_widget
-        return show_skyview_widget(self, magnitude_limit=magnitude_limit)
 
 class KeplerTargetPixelFile(TargetPixelFile):
     """Represents pixel data products created by NASA's Kepler pipeline.

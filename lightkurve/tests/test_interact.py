@@ -127,5 +127,5 @@ def test_interact_sky_functions():
     mask = tpf.flux[0, :, :] == tpf.flux[0, :, :]
     tpf_source = prepare_tpf_datasource(tpf, aperture_mask=mask)
     fig1, slider1 = make_tpf_figure_elements(tpf, tpf_source)
-    _ = add_gaia_figure_elements(tpf, fig1)
-    _ = add_gaia_figure_elements(tpf, fig1, magnitude_limit=22)
+    add_gaia_figure_elements(tpf, fig1)
+    add_gaia_figure_elements(tpf, fig1, magnitude_limit=22)
