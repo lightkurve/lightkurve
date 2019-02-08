@@ -225,17 +225,18 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
     year = ((tpf.astropy_time[0].jd - 2457206.375) * u.day).to(u.year)
     pmra = ((np.nan_to_num(np.asarray(result.pmRA)) * u.milliarcsecond/u.year) * year).to(u.arcsec).value
     pmdec = ((np.nan_to_num(np.asarray(result.pmDE)) * u.milliarcsecond/u.year) * year).to(u.arcsec).value
-    ## todo: filter NaNs in pmra/pmdec
     result.RA_ICRS += pmra
     result.DE_ICRS += pmdec
 
     # Gently size the points by their Gaia magnitude
     sizes = 64.0 / 2**(result['Gmag']/5.0)
+    one_over_parallax = 1.0 / np.nan_to_num(result['Plx']/1000.0)
     source = ColumnDataSource(data=dict(ra=result['RA_ICRS'],
                                         dec=result['DE_ICRS'],
                                         source=result['Source'],
                                         Gmag=result['Gmag'],
                                         plx=result['Plx'],
+                                        one_over_plx=one_over_parallax,
                                         x=coords[:, 0]+tpf.column,
                                         y=coords[:, 1]+tpf.row,
                                         size=sizes))
@@ -246,7 +247,7 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
                     hover_fill_color="firebrick", hover_alpha=0.9, hover_line_color="white")
 
     fig.add_tools(HoverTool(tooltips=[("Source", "@source"),("G", "@Gmag"),("Parallax", "@plx"),
-                                    ("RA", "@ra{0,0.00000000}"),
+                                      ("1/parallax (1/arcsec)", "@one_over_plx{0,0.0}"), ("RA", "@ra{0,0.00000000}"),
                                      ("DEC", "@dec{0,0.00000000}"),
                                       ("x", "@x"),
                                      ("y", "@y")],
@@ -266,6 +267,13 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=0,
         TPF to show.
     tpf_source : bokeh.plotting.ColumnDataSource
         TPF data source.
+    fiducial_frame: int
+        The tpf slice to start with by default, it is assumed the WCS
+        is exact for this frame.
+    pedestal: float
+        A scalar value to be added to the TPF flux values, often to avoid
+        taking the log of a negative number in colorbars
+
 
     Returns
     -------
@@ -596,7 +604,8 @@ def show_skyview_widget(tpf, notebook_url='localhost:8888', magnitude_limit=18):
         elif tpf.mission == 'Kepler':
             fig_tpf.title.text = "Skyview for KIC {}, Kepler Quarter {}, CCD {}.{}".format(
                             tpf.targetid, tpf.quarter, tpf.module, tpf.output)
-
+        elif tpf.mission == 'TESS':
+            fig_tpf.title.text = 'Skyview for TESS {} Sector {}, Camera {}.{}'.format(tpf.targetid, tpf.sector, tpf.camera, tpf.ccd)
 
         # Layout all of the plots
         widgets_and_figures = layout([fig_tpf, stretch_slider])

@@ -112,39 +112,33 @@ def test_max_cadences():
         pass
 
 
+@pytest.mark.skipif('bokeh' not in sys.modules, reason="requires bokeh")
 def test_interact_functions():
     """Do the helper functions in the interact module run without syntax error?"""
-    try:
-        import bokeh
-        from ..interact import (prepare_tpf_datasource, prepare_lightcurve_datasource,
-                                get_lightcurve_y_limits, make_lightcurve_figure_elements,
-                                make_tpf_figure_elements, show_interact_widget)
-        tpf = TessTargetPixelFile(example_tpf)
-        mask = tpf.flux[0, :, :] == tpf.flux[0, :, :]
-        tpf_source = prepare_tpf_datasource(tpf, aperture_mask=mask)
-        lc = tpf.to_lightcurve(aperture_mask=mask)
-        lc_source = prepare_lightcurve_datasource(lc)
-        get_lightcurve_y_limits(lc_source)
-        make_lightcurve_figure_elements(lc, lc_source)
-        make_tpf_figure_elements(tpf, tpf_source)
-        show_interact_widget(tpf)
-    except ImportError:
-        # bokeh is an optional dependency
-        pass
+    import bokeh
+    from ..interact import (prepare_tpf_datasource, prepare_lightcurve_datasource,
+                            get_lightcurve_y_limits, make_lightcurve_figure_elements,
+                            make_tpf_figure_elements, show_interact_widget)
+    tpf = TessTargetPixelFile(example_tpf)
+    mask = tpf.flux[0, :, :] == tpf.flux[0, :, :]
+    tpf_source = prepare_tpf_datasource(tpf, aperture_mask=mask)
+    lc = tpf.to_lightcurve(aperture_mask=mask)
+    lc_source = prepare_lightcurve_datasource(lc)
+    get_lightcurve_y_limits(lc_source)
+    make_lightcurve_figure_elements(lc, lc_source)
+    make_tpf_figure_elements(tpf, tpf_source)
+    show_interact_widget(tpf)
 
 
+@pytest.mark.skipif('bokeh' not in sys.modules, reason="requires bokeh")
 def test_interact_sky_functions():
     """Do the helper functions in the interact module run without syntax error?"""
-    try:
-        import bokeh
-        from ..interact import (prepare_tpf_datasource, make_tpf_figure_elements,
-                                add_gaia_figure_elements)
-        tpf = TessTargetPixelFile(example_tpf)
-        mask = tpf.flux[0, :, :] == tpf.flux[0, :, :]
-        tpf_source = prepare_tpf_datasource(tpf, aperture_mask=mask)
-        fig1, slider1 = make_tpf_figure_elements(tpf, tpf_source)
-        _ = add_gaia_figure_elements(tpf, fig1)
-        _ = add_gaia_figure_elements(tpf, fig1, magnitude_limit=22)
-    except ImportError:
-        # bokeh is an optional dependency
-        pass
+    import bokeh
+    from ..interact import (prepare_tpf_datasource, make_tpf_figure_elements,
+                            add_gaia_figure_elements)
+    tpf = TessTargetPixelFile(example_tpf)
+    mask = tpf.flux[0, :, :] == tpf.flux[0, :, :]
+    tpf_source = prepare_tpf_datasource(tpf, aperture_mask=mask)
+    fig1, slider1 = make_tpf_figure_elements(tpf, tpf_source)
+    _ = add_gaia_figure_elements(tpf, fig1)
+    _ = add_gaia_figure_elements(tpf, fig1, magnitude_limit=22)
