@@ -124,10 +124,10 @@ def test_search_tesscut_download():
     assert(isinstance(tpf, TessTargetPixelFile))
     # Ensure default size is 5x5
     assert(tpf.flux[0].shape == (5, 5))
-    # Ensure the WCS is valid
-    wcs_ra, wcs_dec = tpf.wcs.pixel_to_world_values([[2, 2]])[0]
-    assert_almost_equal(ra, wcs_ra, decimal=1)
-    assert_almost_equal(dec, wcs_dec, decimal=1)
+    # Ensure the WCS is valid (#434 regression test)
+    center_ra, center_dec = tpf.wcs.all_pix2world([[2.5, 2.5]], 1)[0]
+    assert_almost_equal(ra, center_ra, decimal=1)
+    assert_almost_equal(dec, center_dec, decimal=1)
     # Download with different dimensions
     tpfc = search_string.download_all(cutout_size=4)
     assert(isinstance(tpfc, TargetPixelFileCollection))
