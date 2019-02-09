@@ -213,27 +213,32 @@ class TargetPixelFile(object):
         w : astropy.wcs.WCS object
             WCS solution
         """
-        # Use WCS keywords of the 5th column (FLUX)
-        wcs_keywords = {'1CTYP5': 'CTYPE1',
-                        '2CTYP5': 'CTYPE2',
-                        '1CRPX5': 'CRPIX1',
-                        '2CRPX5': 'CRPIX2',
-                        '1CRVL5': 'CRVAL1',
-                        '2CRVL5': 'CRVAL2',
-                        '1CUNI5': 'CUNIT1',
-                        '2CUNI5': 'CUNIT2',
-                        '1CDLT5': 'CDELT1',
-                        '2CDLT5': 'CDELT2',
-                        '11PC5': 'PC1_1',
-                        '12PC5': 'PC1_2',
-                        '21PC5': 'PC2_1',
-                        '22PC5': 'PC2_2',
-                        'NAXIS1': 'NAXIS1',
-                        'NAXIS2': 'NAXIS2'}
-        mywcs = {}
-        for oldkey, newkey in wcs_keywords.items():
-            mywcs[newkey] = self.hdu[1].header[oldkey]
-        return WCS(mywcs)
+        # TPF's generated using the TESSCut service only seem to have
+        # a valid WCS in the header of the second extension
+        if 'MAST' in self.hdu[0].header['ORIGIN']:
+            return WCS(self.hdu[2])
+        else:
+            # For standard TPF files, we use the WCS keywords for the 5th data column (FLUX)
+            wcs_keywords = {'1CTYP5': 'CTYPE1',
+                            '2CTYP5': 'CTYPE2',
+                            '1CRPX5': 'CRPIX1',
+                            '2CRPX5': 'CRPIX2',
+                            '1CRVL5': 'CRVAL1',
+                            '2CRVL5': 'CRVAL2',
+                            '1CUNI5': 'CUNIT1',
+                            '2CUNI5': 'CUNIT2',
+                            '1CDLT5': 'CDELT1',
+                            '2CDLT5': 'CDELT2',
+                            '11PC5': 'PC1_1',
+                            '12PC5': 'PC1_2',
+                            '21PC5': 'PC2_1',
+                            '22PC5': 'PC2_2',
+                            'NAXIS1': 'NAXIS1',
+                            'NAXIS2': 'NAXIS2'}
+            mywcs = {}
+            for oldkey, newkey in wcs_keywords.items():
+                mywcs[newkey] = self.hdu[1].header[oldkey]
+            return WCS(mywcs)
 
     @classmethod
     def from_fits(cls, path_or_url, **kwargs):
