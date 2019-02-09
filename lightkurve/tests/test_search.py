@@ -113,16 +113,21 @@ def test_search_tesscut():
 
 # See issue #433 to understand why this test is skipped on Python 3.7 for now
 @pytest.mark.remote_data
-@pytest.mark.skipif(sys.version[2] == '7', reason="GitHub issue #433")
+@pytest.mark.skipif(sys.version_info.minor == 7, reason="GitHub issue #433")
 def test_search_tesscut_download():
     """Can we download TESS cutouts via `search_cutout().download()?"""
-    search_string = search_tesscut('30.578761, -83.210593')
+    ra, dec = 30.578761, -83.210593
+    search_string = search_tesscut('{}, {}'.format(ra, dec))
     # Make sure they can be downloaded with default size
     tpf = search_string.download()
     # Ensure the correct object has been read in
     assert(isinstance(tpf, TessTargetPixelFile))
     # Ensure default size is 5x5
     assert(tpf.flux[0].shape == (5, 5))
+    # Ensure the WCS is valid (#434 regression test)
+    center_ra, center_dec = tpf.wcs.all_pix2world([[2.5, 2.5]], 1)[0]
+    assert_almost_equal(ra, center_ra, decimal=1)
+    assert_almost_equal(dec, center_dec, decimal=1)
     # Download with different dimensions
     tpfc = search_string.download_all(cutout_size=4)
     assert(isinstance(tpfc, TargetPixelFileCollection))
