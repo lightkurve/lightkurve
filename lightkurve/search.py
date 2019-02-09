@@ -20,7 +20,7 @@ from . import PACKAGEDIR
 
 log = logging.getLogger(__name__)
 
-__all__ = ['open', 'search_targetpixelfile', 'search_lightcurvefile']
+__all__ = ['search_targetpixelfile', 'search_lightcurvefile', 'search_tesscut', 'open']
 
 
 class SearchError(Exception):
@@ -51,7 +51,7 @@ class SearchResult(object):
         out = 'SearchResult containing {} data products.'.format(len(self.table))
         if len(self.table) == 0:
             return out
-        columns = ['obsID', 'target_name', 'productFilename', 'description', 'distance']
+        columns = ['target_name', 'productFilename', 'description', 'distance']
         return out + '\n\n' + '\n'.join(self.table[columns].pformat(max_width=300))
 
     def __getitem__(self, key):
@@ -93,7 +93,7 @@ class SearchResult(object):
         return self.table['s_dec'].data.data
 
     @suppress_stdout
-    def download(self, quality_bitmask='default', download_dir=None):
+    def download(self, quality_bitmask='default', download_dir=None, cutout_size=None):
         """Returns a single `KeplerTargetPixelFile` or `KeplerLightCurveFile` object.
 
         If multiple files are present in `SearchResult.table`, only the first
@@ -118,6 +118,8 @@ class SearchResult(object):
         download_dir : str
             Location where the data files will be stored.
             Defaults to "~/.lightkurve-cache" if `None` is passed.
+        cutout_size : int or float
+            Side length of cutout in pixels. Default value is 5.
 
         Returns
         -------
@@ -143,14 +145,29 @@ class SearchResult(object):
         if download_dir is None:
             download_dir = self._default_download_dir()
 
-        path = Observations.download_products(self.table[:1], mrp_only=False,
-                                              download_dir=download_dir)['Local Path']
+        # if table contains TESScut search results, download cutout
+        if 'FFI Cutout' in self.table[0]['description']:
+            try:
+                path = self._fetch_tesscut_path(self.table[0]['target_name'],
+                                                self.table[0]['sequence_number'],
+                                                download_dir, cutout_size)
+            except:
+                raise SearchError('Unable to download FFI cutout. Desired target '
+                                  'coordinates may be too near the edge of the FFI.')
+
+        else:
+            if cutout_size is not None:
+                warnings.warn('`cutout_size` can only be specified for TESS '
+                              'Full Frame Image cutouts.', LightkurveWarning)
+
+            path = Observations.download_products(self.table[:1], mrp_only=False,
+                                                  download_dir=download_dir)['Local Path'][0]
 
         # open() will determine filetype and return
-        return open(path[0], quality_bitmask=quality_bitmask)
+        return open(path, quality_bitmask=quality_bitmask)
 
     @suppress_stdout
-    def download_all(self, quality_bitmask='default', download_dir=None):
+    def download_all(self, quality_bitmask='default', download_dir=None, cutout_size=None):
         """Returns a `TargetPixelFileCollection or `LightCurveFileCollection`.
 
          Parameters
@@ -172,6 +189,8 @@ class SearchResult(object):
         download_dir : str
             Location where the data files will be stored.
             Defaults to "~/.lightkurve-cache" if `None` is passed.
+        cutout_size : int or float
+            Side length of cutout in pixels. Default value is 5.
 
         Returns
         -------
@@ -191,12 +210,21 @@ class SearchResult(object):
         if download_dir is None:
             download_dir = self._default_download_dir()
 
-        path = Observations.download_products(self.table, mrp_only=False,
-                                              download_dir=download_dir)['Local Path']
+        # if table contains TESScut search results, download cutouts
+        if 'FFI Cutout' in self.table[0]['description']:
+            path = [self._fetch_tesscut_path(t, s, download_dir, cutout_size)
+                    for t,s in zip(self.table['target_name'], self.table['sequence_number'])]
+        else:
+            if cutout_size is not None:
+                warnings.warn('`cutout_size` can only be specified for TESS '
+                              'Full Frame Image cutouts.', LightkurveWarning)
+
+            path = Observations.download_products(self.table, mrp_only=False,
+                                                  download_dir=download_dir)['Local Path']
 
         # open() will determine filetype and return
         # return a collection containing opened files
-        tpf_extensions = ['lpd-targ.fits', 'spd-targ.fits', '_tp.fits']
+        tpf_extensions = ['lpd-targ.fits', 'spd-targ.fits', '_tp.fits', 'n/a']
         lcf_extensions = ['llc.fits', 'slc.fits', '_lc.fits']
         if any(e in self.table['productFilename'][0] for e in tpf_extensions):
             return TargetPixelFileCollection([open(p) for p in path])
@@ -230,6 +258,43 @@ class SearchResult(object):
                 download_dir = '.'
 
         return download_dir
+
+    def _fetch_tesscut_path(self, target, sector, download_dir, cutout_size):
+        """Downloads TESS FFI cutout and returns path to local file.
+
+        Parameters
+        ----------
+        download_dir : str
+            Path to location of `.lightkurve-cache` directory where downloaded
+            cutouts are stored
+        cutout_size : int or float
+            Side length of cutout in pixels
+
+        Returns
+        -------
+        path : str
+            Path to locally downloaded cutout file
+        """
+        from astroquery.mast import TesscutClass
+        from astroquery.mast.core import MastClass
+        coords = MastClass()._resolve_object(target)
+
+        # Enforce bounds on cutout_size
+        if cutout_size is None:
+            cutout_size = 5
+        elif cutout_size <= 0:
+            raise ValueError('`cutout_size` must be positive.')
+        elif cutout_size > 100:
+            warnings.warn('Cutout size is large and may take a few minutes to download.')
+
+        # Resolve SkyCoord of given target
+        coords = MastClass()._resolve_object(target)
+        sector = self.table[0]['sequence_number']
+        cutout_path = TesscutClass().download_cutouts(coords, size=cutout_size,
+                                                      sector=sector, path=download_dir)
+
+        path = os.path.join(download_dir, cutout_path[0][0])
+        return path
 
 
 def search_targetpixelfile(target, radius=None, cadence='long',
@@ -409,6 +474,35 @@ def search_lightcurvefile(target, radius=None, cadence='long',
         return SearchResult(None)
 
 
+def search_tesscut(target, sector=None):
+    """Searches MAST for TESS Full Frame Image cutouts containing a desired target or region.
+
+    Parameters
+    ----------
+    target : str, int, or `astropy.coordinates.SkyCoord` object
+        Target around which to search. Valid inputs include:
+
+            * The name of the object as a string, e.g. "Kepler-10".
+            * The KIC or EPIC identifier as an integer, e.g. 11904151.
+            * A coordinate string in decimal format, e.g. "285.67942179 +50.24130576".
+            * A coordinate string in sexagesimal format, e.g. "19:02:43.1 +50:14:28.7".
+            * An `astropy.coordinates.SkyCoord` object.
+    sector : int or list
+        TESS Sector number. Default (None) will return all available sectors. A
+        list of desired sectors can also be provided.
+
+    Returns
+    -------
+    result : :class:`SearchResult` object
+        Object detailing the data products found.
+    """
+    try:
+        return _search_products(target, filetype="ffi", mission='TESS', sector=sector)
+    except SearchError as exc:
+        log.error(exc)
+        return SearchResult(None)
+
+
 def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
                      mission=['Kepler', 'K2', 'TESS'], quarter=None, month=None,
                      campaign=None, sector=None, limit=None):
@@ -422,8 +516,8 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
     radius : float or `astropy.units.Quantity` object
         Conesearch radius.  If a float is given it will be assumed to be in
         units of arcseconds.  If `None` then we default to 0.0001 arcsec.
-    filetype : str
-        Type of files queried at MAST (`Target Pixel` or `Lightcurve`)
+    filetype : {'Target pixel', 'Lightcurve', 'FFI'}
+        Type of files queried at MAST.
     cadence : str
         Desired cadence (`long`, `short`, `any`)
     mission : str, list of str
@@ -443,25 +537,46 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
     -------
     SearchResult : :class:`SearchResult` object.
     """
+
     observations = _query_mast(target, project=mission, radius=radius)
 
-    # mask out FFIs from observations
-    mask = np.array(['FFI' not in obs['target_name'] and
-                     'FFI' not in obs['obs_collection'] for obs in observations])
-
-    if len(observations[mask]) == 0:
+    if len(observations) == 0:
         raise SearchError('No data found for target "{}".'.format(target))
 
-    products = Observations.get_product_list(observations[mask])
-    result = join(products, observations[mask], keys="obs_id", join_type='left',
-                  uniq_col_name='{col_name}{table_name}', table_names=['', '_2'])
-    result.sort(['distance', 'obs_id'])
+    # Light curves and target pixel files
+    if filetype.lower() != 'ffi':
+        products = Observations.get_product_list(observations)
+        result = join(products, observations, keys="obs_id", join_type='left',
+                      uniq_col_name='{col_name}{table_name}', table_names=['', '_2'])
+        result.sort(['distance', 'obs_id'])
 
-    masked_result = _filter_products(result, filetype=filetype, campaign=campaign,
-                                     quarter=quarter, cadence=cadence,
-                                     project=mission, month=month, sector=sector,
-                                     limit=limit)
-    return SearchResult(masked_result)
+        masked_result = _filter_products(result, filetype=filetype,
+                                         campaign=campaign, quarter=quarter,
+                                         cadence=cadence, project=mission,
+                                         month=month, sector=sector, limit=limit)
+        return SearchResult(masked_result)
+
+    # Full Frame Images
+    else:
+        cutouts = []
+        for idx in np.where(['TESS FFI' in t for t in observations['target_name']])[0]:
+            # if target passed in is a SkyCoord object, convert to RA, dec pair
+            if isinstance(target, SkyCoord):
+                target = '{}, {}'.format(target.ra.deg, target.dec.deg)
+            # pull sector numbers
+            s = observations['sequence_number'][idx]
+            # if the desired sector is available, add a row
+            if s in np.atleast_1d(sector) or sector is None:
+                cutouts.append({'description': 'TESS FFI Cutout (sector {})'.format(s),
+                                'target_name': str(target),
+                                'targetid': str(target),
+                                'productFilename': 'n/a',
+                                'distance': 0.0,
+                                'sequence_number': s}
+                               )
+        masked_result = Table(cutouts)
+        masked_result.sort(['distance', 'sequence_number'])
+        return SearchResult(masked_result)
 
 
 def _query_mast(target, radius=None, project=['Kepler', 'K2', 'TESS']):
@@ -558,9 +673,9 @@ def _query_mast(target, radius=None, project=['Kepler', 'K2', 'TESS']):
         raise SearchError(exc)
 
 
-def _filter_products(products, campaign=None, quarter=None, month=None, sector=None,
-                     cadence='long', project=['Kepler', 'K2', 'TESS'],
-                     filetype='Target Pixel', limit=None):
+def _filter_products(products, campaign=None, quarter=None, month=None,
+                     sector=None, cadence='long', limit=None,
+                     project=['Kepler', 'K2', 'TESS'], filetype='Target Pixel'):
     """Helper function which filters a SearchResult's products table by one or
     more criteria.
 
@@ -599,6 +714,7 @@ def _filter_products(products, campaign=None, quarter=None, month=None, sector=N
         mask |= _mask_tess_products(products, sector=sector, filetype=filetype)
 
     products = products[mask]
+
     products.sort(['distance', 'productFilename'])
     if limit is not None:
         return products[0:limit]
@@ -707,10 +823,12 @@ def _mask_tess_products(products, sector=None, filetype='Target Pixel'):
                       for uri in products['productFilename']])
 
     # Filter on product type
-    if filetype == 'Lightcurve':
-            description_string = 'Light curves'
-    elif filetype == 'Target Pixel':
-            description_string = 'Target pixel files'
+    if filetype.lower() == 'lightcurve':
+        description_string = 'Light curves'
+    elif filetype.lower() == 'target pixel':
+        description_string = 'Target pixel files'
+    elif filetype.lower() == 'ffi':
+        description_string = 'TESScut'
     mask &= np.array([description_string in desc for desc in products['description']])
 
     # Identify sector by the description.
