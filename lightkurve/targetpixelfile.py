@@ -213,12 +213,15 @@ class TargetPixelFile(object):
         w : astropy.wcs.WCS object
             WCS solution
         """
-        # TPF's generated using the TESSCut service only seem to have
-        # a valid WCS in the header of the second extension
-        if 'MAST' in self.hdu[0].header['ORIGIN']:
+        if 'MAST' in self.hdu[0].header['ORIGIN']:  # Is it a TessCut TPF?
+            # TPF's generated using the TESSCut service in early 2019 only appear
+            # to contain a valid WCS in the second extension (the aperture
+            # extension), so we treat such files as a special case.
             return WCS(self.hdu[2])
         else:
-            # For standard TPF files, we use the WCS keywords for the 5th data column (FLUX)
+            # For standard (Ames-pipeline-produced) TPF files, we use the WCS
+            # keywords provided in the first extension (the data table extension).
+            # Specifically, we use the WCS keywords for the 5th data column (FLUX).
             wcs_keywords = {'1CTYP5': 'CTYPE1',
                             '2CTYP5': 'CTYPE2',
                             '1CRPX5': 'CRPIX1',
