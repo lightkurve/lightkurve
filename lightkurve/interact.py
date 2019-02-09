@@ -542,7 +542,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
 
         # Layout all of the plots
         sp1, sp2, sp3, sp4 = (Spacer(width=15), Spacer(width=30),
-                              Spacer(width=80), Spacer(width=60) )
+                              Spacer(width=80), Spacer(width=60))
         widgets_and_figures = layout([fig_lc, fig_tpf],
                                      [l_button, sp1, r_button, sp2,
                                      cadence_slider, sp3, stretch_slider],
@@ -575,7 +575,8 @@ def show_skyview_widget(tpf, notebook_url='localhost:8888', magnitude_limit=18):
     try:
         import bokeh
         if bokeh.__version__[0] == '0':
-            warnings.warn("interact_sky() requires Bokeh version 1.0 or later", LightkurveWarning)
+            warnings.warn("interact_sky() requires Bokeh version 1.0 or later",
+                          LightkurveWarning)
     except ImportError:
         log.error("The interact_sky() tool requires the `bokeh` package; "
                   "you can install bokeh using e.g. `conda install bokeh`.")
@@ -601,7 +602,7 @@ def show_skyview_widget(tpf, notebook_url='localhost:8888', magnitude_limit=18):
                                                 fiducial_frame=fiducial_frame,
                                                 plot_width=640, plot_height=600)
         fig_tpf, r = add_gaia_figure_elements(tpf, fig_tpf,
-                                              magnitude_limit = magnitude_limit)
+                                              magnitude_limit=magnitude_limit)
 
         # Optionally override the default title
         if tpf.mission == 'K2':
@@ -611,7 +612,8 @@ def show_skyview_widget(tpf, notebook_url='localhost:8888', magnitude_limit=18):
             fig_tpf.title.text = "Skyview for KIC {}, Kepler Quarter {}, CCD {}.{}".format(
                             tpf.targetid, tpf.quarter, tpf.module, tpf.output)
         elif tpf.mission == 'TESS':
-            fig_tpf.title.text = 'Skyview for TESS {} Sector {}, Camera {}.{}'.format(tpf.targetid, tpf.sector, tpf.camera, tpf.ccd)
+            fig_tpf.title.text = 'Skyview for TESS {} Sector {}, Camera {}.{}'.format(
+                            tpf.targetid, tpf.sector, tpf.camera, tpf.ccd)
 
         # Layout all of the plots
         widgets_and_figures = layout([fig_tpf, stretch_slider])
