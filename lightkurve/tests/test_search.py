@@ -113,7 +113,7 @@ def test_search_tesscut():
 
 # See issue #433 to understand why this test is skipped on Python 3.7 for now
 @pytest.mark.remote_data
-@pytest.mark.skipif(sys.version[2] == '7', reason="GitHub issue #433")
+@pytest.mark.skipif(sys.version_info.minor == '7', reason="GitHub issue #433")
 def test_search_tesscut_download():
     """Can we download TESS cutouts via `search_cutout().download()?"""
     ra, dec = 30.578761, -83.210593
