@@ -569,8 +569,8 @@ class PLDCorrector(object):
     Download the pixel data for GJ 9827 and obtain a PLD-corrected light curve:
 
     >>> import lightkurve as lk
-    >>> tpf = lk.search_targetpixelfile("GJ9827").download()
-    >>> corrector = lk.PLDCorrector(tpf)
+    >>> tpf = lk.search_targetpixelfile("GJ9827").download() # doctest: +SKIP
+    >>> corrector = lk.PLDCorrector(tpf) # doctest: +SKIP
     >>> lc = corrector.correct() # doctest: +SKIP
     >>> lc.plot() # doctest: +SKIP
 

@@ -941,9 +941,9 @@ class LightCurve(object):
         display the BLS tool as follows:
 
         >>> import lightkurve as lk
-        >>> lc = lk.search_lightcurvefile('kepler-10', quarter=3).download()
-        >>> lc = lc.PDCSAP_FLUX.normalize().flatten()
-        >>> lc.interact_bls()
+        >>> lc = lk.search_lightcurvefile('kepler-10', quarter=3).download()  # doctest: +SKIP
+        >>> lc = lc.PDCSAP_FLUX.normalize().flatten()  # doctest: +SKIP
+        >>> lc.interact_bls()  # doctest: +SKIP
 
         References
         ----------
@@ -1026,9 +1026,11 @@ class LightCurve(object):
 
         Parameters
         ----------
-        method : {'lombscargle', 'bls'}
+        method : {'lombscargle', 'boxleastsquares', 'ls', 'bls'}
             Use the Lomb Scargle or Box Least Squares (BLS) method to
             extract the power spectrum. Defaults to ``'lombscargle'``.
+            ``'ls'`` and ``'bls'`` are shorthands for ``'lombscargle'``
+            and ``'boxleastsquares'``.
         kwargs : dict
             Keyword arguments passed to the constructor of either
             `~lightkurve.periodogram.LombScarglePeriodogram` or
@@ -1045,12 +1047,12 @@ class LightCurve(object):
             The power spectrum object extracted from the light curve.
         """
         method_clean = method.replace(' ', '').lower()
-        allowed_methods = ["lombscargle", "bls"]
+        allowed_methods = ["ls", "bls", "lombscargle", "boxleastsquares"]
         if method_clean not in allowed_methods:
             raise ValueError(("Unrecognized method '{0}'\n"
                               "allowed methods are: {1}")
                              .format(method, allowed_methods))
-        if method_clean == "bls":
+        if method_clean in ["bls", "boxleastsquares"]:
             from . import BoxLeastSquaresPeriodogram
             return BoxLeastSquaresPeriodogram.from_lightcurve(lc=self, **kwargs)
         else:
