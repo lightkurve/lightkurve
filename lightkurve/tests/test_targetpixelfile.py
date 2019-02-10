@@ -1,6 +1,7 @@
 from __future__ import division, print_function
 
 import os
+import sys
 from astropy.utils.data import get_pkg_data_filename
 from astropy.io.fits.verify import VerifyWarning
 import matplotlib.pyplot as plt
@@ -458,6 +459,8 @@ def test_get_keyword():
     assert tpf.get_keyword("DOESNOTEXIST", default=5) == 5
 
 
+@pytest.mark.skipif(('celerite' not in sys.modules) or ('sklearn' not in sys.modules),
+                    reason="PLD requires celerite and scikit-learn")
 def test_to_corrector():
     """Does the tpf.pld() convenience method work?"""
     tpf = KeplerTargetPixelFile(TABBY_TPF)
