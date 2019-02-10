@@ -27,7 +27,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b26</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b27</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -69,8 +69,35 @@
     
   <div class="section" id="changelog">
 <span id="id1"></span><h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="b27-unreleased">
-<h2>1.0b27 (unreleased)<a class="headerlink" href="#b27-unreleased" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="b28-unreleased">
+<h2>1.0b28 (unreleased)<a class="headerlink" href="#b28-unreleased" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="b27-2019-02-09">
+<h2>1.0b27 (2019-02-09)<a class="headerlink" href="#b27-2019-02-09" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="changes">
+<h3>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Simplified the installation of Lightkurve by turning several packages into
+optional rather than required dependencies (<code class="xref py py-obj docutils literal notranslate"><span class="pre">celerite</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">pybind</span></code>,
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">scikit-learn</span></code>, and <code class="xref py py-obj docutils literal notranslate"><span class="pre">bokeh</span></code>). [#436]</li>
+<li>Added <code class="xref py py-obj docutils literal notranslate"><span class="pre">search_tesscut()</span></code>: an easy interface to access data produced using
+the <a class="reference external" href="https://mast.stsci.edu/tesscut/">MAST TESSCut service</a>. This service
+extracts Target Pixel Files (TPFs) from TESS Full Frame Images (FFIs). [#418]</li>
+<li>Added <code class="xref py py-obj docutils literal notranslate"><span class="pre">TargetPixelFile.interact_sky()</span></code>: an interactive Bokeh widget to
+overlay Gaia DR2 source positions on top of TPFs. [#124]</li>
+<li>Changed <code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.fold()</span></code>: the <code class="xref py py-obj docutils literal notranslate"><span class="pre">transit_midpoint</span></code> parameter has been
+deprecated in favor of the <code class="xref py py-obj docutils literal notranslate"><span class="pre">t0</span></code> parameter. [#419]</li>
+</ul>
+</div>
+<div class="section" id="bugfixes">
+<h3>Bugfixes<a class="headerlink" href="#bugfixes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Made <code class="xref py py-obj docutils literal notranslate"><span class="pre">BoxLeastSquaresPeriodogram</span></code> robust against light curves that contain
+NaNs. [#432]</li>
+<li><code class="xref py py-obj docutils literal notranslate"><span class="pre">TargetPixelFile.wcs</span></code> now works for Target Pixel Files produced using the
+MAST TessCut service. [#434]</li>
+</ul>
+</div>
 </div>
 <div class="section" id="b26-2019-02-04">
 <h2>1.0b26 (2019-02-04)<a class="headerlink" href="#b26-2019-02-04" title="Permalink to this headline">¶</a></h2>

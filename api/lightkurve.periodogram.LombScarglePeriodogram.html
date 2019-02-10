@@ -27,7 +27,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b26</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b27</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -279,7 +279,7 @@ Nyquist frequency, which may introduce aliasing.</p>
 space. By default frequency is in (1/day) and power in (ppm^2 * day).
 Asteroseismologists for example may want frequency in (microHz) and
 power in (ppm^2 / microHz), in which case they would pass
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">unit</span> <span class="pre">=</span> <span class="pre">u.microhertz</span></code> where <code class="xref py py-obj docutils literal notranslate"><span class="pre">u</span></code> is <a class="reference external" href="http://docs.astropy.org/en/latest/units/index.html#module-astropy.units" title="(in Astropy v3.2.dev2038)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.units</span></code></a></p>
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">unit</span> <span class="pre">=</span> <span class="pre">u.microhertz</span></code> where <code class="xref py py-obj docutils literal notranslate"><span class="pre">u</span></code> is <a class="reference external" href="http://docs.astropy.org/en/latest/units/index.html#module-astropy.units" title="(in Astropy v3.2.dev1701)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.units</span></code></a></p>
 <p>By default this method uses the LombScargle ‘fast’ method, which assumes
 a regular grid. If a regular grid of periods (i.e. an irregular grid of
 frequencies) it will use the ‘slow’ method. If nterms &gt; 1 is passed, it
@@ -470,7 +470,7 @@ has been smoothed.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>table</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v3.2.dev2038)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.table.Table</span></code></a> object</span></dt>
+<dt><strong>table</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v3.2.dev1701)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.table.Table</span></code></a> object</span></dt>
 <dd><p class="first last">An AstroPy Table with columns ‘frequency’, ‘period’, and ‘power’.</p>
 </dd>
 </dl>

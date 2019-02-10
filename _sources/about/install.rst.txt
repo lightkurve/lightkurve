@@ -1,47 +1,45 @@
 .. _installation:
 
-************
-Installation
-************
+*********************
+Installing Lightkurve
+*********************
 
-Requirements
-============
+Using conda
+===========
 
-*Lightkurve* has the following requirements, all of which tend to be
-available by default in a modern installation of Python:
+The easiest way to install *Lightkurve* and its dependencies is to use
+the ``conda`` package manager, which is part of the 
+`Anaconda Python <https://www.continuum.io/downloads>`_ distribution.
+With ``conda`` installed, simply run the following command in a terminal window::
 
-- Python: 2.7, 3.5, 3.6 or later.
-- Astropy: 1.3 or later.
-- Numpy: 1.11 or later.
-- Scipy: 0.19 or later.
-- Matplotlib: 1.5.3 or later.
-- Astroquery 0.3.7 or later.
+    $ conda install --channel conda-forge lightkurve
 
-Optional dependencies:
+If you have a previous version of *Lightkurve* installed, you can update it using::
 
-- Pandas: 0.20 or later.
-- Bokeh: 1.0 or later.
+    $ conda update lightkurve
 
-We recommend using the `Anaconda Python <https://www.continuum.io/downloads>`_
-distribution, which will install Python alongside its most common scientific
-packages, including all those listed above.
-If you install *lightkurve* using ``pip`` or ``conda`` as explained below, any missing dependencies will be installed automatically.
+To verify which version of *Lightkurve* you have installed, run::
 
+    $ python -c "import lightkurve; print(lightkurve.__version__)"
 
-Installing lightkurve
-=====================
 
 Using pip
----------
+=========
 
-The easiest way to install or upgrade lightkurve is with ``pip``,
-which is standard part of most Python distributions.
-To install *lightkurve*, simply run the following command on a terminal window::
+An alternative way to install *Lightkurve* is to use the ``pip`` package manager,
+which is a standard part of all Python distributions.
+To install *Lightkurve*, run the following command in a terminal window::
 
     $ pip install lightkurve --upgrade
 
 The ``--upgrade`` flag is optional, but recommended if you already
-have *lightkurve* installed and want to upgrade to the latest version.
+have *Lightkurve* installed and want to upgrade to the latest version.
+
+Note that, by default, ``pip`` will not install any of *Lightkurve*'s optional
+dependencies.  To install these, use::
+
+     $ pip install lightkurve[interact,pld,bls]
+
 
 .. note::
 
@@ -53,21 +51,38 @@ have *lightkurve* installed and want to upgrade to the latest version.
     <http://www.pip-installer.org/en/1.2.1/other-tools.html#using-pip-with-the-user-scheme>`_.
 
 
-Using conda
------------
 
-Alternatively, you can use the ``conda`` package manager, which is part of the
-`Anaconda Python <https://www.continuum.io/downloads>`_ distribution.
-With ``conda`` installed, you can run the following command on a terminal window::
+Requirements
+============
 
-    $ conda install --channel conda-forge lightkurve
+*Lightkurve* has the following minimum requirements:
+
+- Python: 2.7, 3.5, 3.6, 3.7, or later.
+- Astropy: 1.3 or later.
+- Numpy: 1.11 or later.
+- Scipy: 0.19 or later.
+- Matplotlib: 1.5.3 or later.
+- Astroquery 0.3.9 or later.
+- Pandas.
+
+A few extra features (interact widgets, PLD correction, and BLS periodograms) require optional dependencies which are not installed by default using ``pip`` (though they are installed if you use ``conda``):
+
+- Bokeh: 1.0 or later.
+- Scikit-learn.
+- Celerite.
+
+We recommend using the `Anaconda Python <https://www.continuum.io/downloads>`_
+distribution, which will install Python alongside its most common scientific
+packages, including all those listed above.
+If you install *Lightkurve* using ``conda`` or ``pip`` as explained above, any missing dependencies will be installed automatically.
+
 
 
 Installing the development version
 ==================================
 
 If you want to experiment with the latest development version of
-*lightkurve*, you can install it straight from the master branch on GitHub::
+*Lightkurve*, you can install it straight from the master branch on GitHub::
 
     $ git clone https://github.com/KeplerGO/lightkurve.git
     $ cd lightkurve

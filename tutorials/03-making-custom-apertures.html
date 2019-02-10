@@ -27,7 +27,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b26</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b27</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -255,28 +255,27 @@ change the relative contribution of the background. We can do this
 simply with lightkurve.</p>
 <p>First, let’s load a target pixel file. Let’s choose <a class="reference external" href="https://exoplanetarchive.ipac.caltech.edu/cgi-bin/DisplayOverview/nph-DisplayOverview?objname=KOI-2862.01&amp;type=KEPLER_CANDIDATE">KIC
 6679295</a>.
-This is a Kepler planet canidate. We’ll use the <code class="docutils literal notranslate"><span class="pre">from_archive</span></code>
-function to download every target pixel file available for each quarter
-of this data set.</p>
+This is a Kepler planet canidate. We’ll use the
+<code class="docutils literal notranslate"><span class="pre">search_targetpixelfile</span></code> function to download every target pixel file
+available for each quarter of this data set.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="o">%%capture</span>
+<span></span><span class="o">%</span><span class="k">matplotlib</span> inline
 <span class="kn">from</span> <span class="nn">lightkurve</span> <span class="k">import</span> <span class="n">search_targetpixelfile</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
-<span class="n">kic</span> <span class="o">=</span> <span class="s1">&#39;6679295&#39;</span>
 
+<span class="n">kic</span> <span class="o">=</span> <span class="s1">&#39;6679295&#39;</span>
 <span class="n">tpfs</span> <span class="o">=</span> <span class="n">search_targetpixelfile</span><span class="p">(</span><span class="n">kic</span><span class="p">)</span><span class="o">.</span><span class="n">download_all</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
-<p>We’ve now created a list of <code class="docutils literal notranslate"><span class="pre">KeplerTargetPixelFiles</span></code>, where each item
-is a different quarter. We’re going to be able to combine these just
-like in the <a href="#id2"><span class="problematic" id="id4">`stitching tutorial &lt;&gt;`__</span></a>.</p>
+<p>We’ve now created a list of <code class="docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code> objects, where
+each item is a different quarter. We’re going to be able to combine
+these just like in the <a href="#id2"><span class="problematic" id="id4">`stitching tutorial &lt;&gt;`__</span></a>.</p>
 <p>Let’s take a look at just one of those target pixel files.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
@@ -284,12 +283,12 @@ like in the <a href="#id2"><span class="problematic" id="id4">`stitching tutoria
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1">#Build the light curve</span>
+<span></span><span class="c1"># Build the light curve</span>
 <span class="n">pipeline_lc</span> <span class="o">=</span> <span class="n">tpfs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
 <span class="k">for</span> <span class="n">tpf</span> <span class="ow">in</span> <span class="n">tpfs</span><span class="p">:</span>
     <span class="n">pipeline_lc</span> <span class="o">=</span> <span class="n">pipeline_lc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
 
-<span class="c1">#Clean the light curve</span>
+<span class="c1"># Clean the light curve</span>
 <span class="n">pipeline_lc</span> <span class="o">=</span> <span class="n">pipeline_lc</span><span class="o">.</span><span class="n">remove_nans</span><span class="p">()</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -312,9 +311,9 @@ and take a look.</p>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">pipeline_lc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mf">24.57537</span><span class="p">,</span> <span class="n">transit_midpoint</span><span class="o">=-</span><span class="mf">0.133</span><span class="p">)</span><span class="o">.</span><span class="n">bin</span><span class="p">()</span><span class="o">.</span><span class="n">errorbar</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mf">0.015</span><span class="p">,</span><span class="mf">0.015</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="mf">0.998</span><span class="p">,</span><span class="mf">1.0015</span><span class="p">);</span>
+<span></span><span class="n">pipeline_lc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mf">24.57537</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mf">21.3</span><span class="p">)</span><span class="o">.</span><span class="n">bin</span><span class="p">()</span><span class="o">.</span><span class="n">errorbar</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mf">0.015</span><span class="p">,</span> <span class="mf">0.015</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="mf">0.998</span><span class="p">,</span> <span class="mf">1.0015</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
@@ -377,7 +376,7 @@ but this time</p>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1">#Build the NEW aperture, and the light curve</span>
+<span></span><span class="c1"># Build the NEW aperture, and the light curve</span>
 <span class="n">aper</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">tpfs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
 <span class="n">aper</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="n">user_lc</span> <span class="o">=</span> <span class="n">tpfs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">aper</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">))</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
@@ -386,7 +385,7 @@ but this time</p>
     <span class="n">aper</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span><span class="o">=</span><span class="mi">1</span>
     <span class="n">user_lc</span> <span class="o">=</span> <span class="n">user_lc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">aper</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">))</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
 
-<span class="c1">#Clean the light curve</span>
+<span class="c1"># Clean the light curve</span>
 <span class="n">user_lc</span> <span class="o">=</span> <span class="n">user_lc</span><span class="o">.</span><span class="n">remove_nans</span><span class="p">()</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -399,7 +398,7 @@ there is still a planet signal.</p>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">user_lc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mf">24.57537</span><span class="p">,</span> <span class="n">transit_midpoint</span><span class="o">=-</span><span class="mf">0.133</span><span class="p">)</span><span class="o">.</span><span class="n">bin</span><span class="p">()</span><span class="o">.</span><span class="n">errorbar</span><span class="p">();</span>
+<span></span><span class="n">user_lc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mf">24.57537</span><span class="p">,</span> <span class="n">t0</span><span class="o">=-</span><span class="mf">0.133</span><span class="p">)</span><span class="o">.</span><span class="n">bin</span><span class="p">()</span><span class="o">.</span><span class="n">errorbar</span><span class="p">();</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mf">0.015</span><span class="p">,</span><span class="mf">0.015</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="mf">0.998</span><span class="p">,</span><span class="mf">1.0015</span><span class="p">)</span>
 </pre></div>

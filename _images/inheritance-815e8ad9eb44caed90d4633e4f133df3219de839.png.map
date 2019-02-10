@@ -1,5 +1,0 @@
-<map id="inheritancec0fbea2858" name="inheritancec0fbea2858">
-<area shape="rect" id="node1" href="lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile" target="_top" title="Subclass of :class:`TargetPixelFile &lt;lightkurve.targetpixelfile.TargetPixelFile&gt;`" alt="" coords="169,5,327,31"/>
-<area shape="rect" id="node2" href="lightkurve.targetpixelfile.TargetPixelFile.html#lightkurve.targetpixelfile.TargetPixelFile" target="_top" title="Generic class representing FITS files which contain time series imaging data." alt="" coords="5,31,121,56"/>
-<area shape="rect" id="node3" href="lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile" target="_top" title="Subclass of :class:`TargetPixelFile &lt;lightkurve.targetpixelfile.TargetPixelFile&gt;`" alt="" coords="176,55,320,80"/>
-</map>

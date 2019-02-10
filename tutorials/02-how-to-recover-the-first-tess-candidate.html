@@ -27,7 +27,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b26</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b27</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -414,7 +414,7 @@ can use the <code class="docutils literal notranslate"><span class="pre">hdu</sp
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
-<span></span>[&lt;astropy.io.fits.hdu.image.PrimaryHDU object at 0x1c1b034e80&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x1c1b059470&gt;, &lt;astropy.io.fits.hdu.image.ImageHDU object at 0x1c1b099f28&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x1c22b3ae80&gt;]
+<span></span>[&lt;astropy.io.fits.hdu.image.PrimaryHDU object at 0x7f8bb363ee80&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x7f8bb3663ef0&gt;, &lt;astropy.io.fits.hdu.image.ImageHDU object at 0x7f8badca7400&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x7f8badbbc320&gt;]
 </pre></div>
 </div>
 </div>
@@ -768,7 +768,7 @@ Here we’ll use a <code class="docutils literal notranslate"><span class="pre">
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-(18067,)
+(18104,)
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -823,7 +823,7 @@ we’ll select the times that had the jitter.</p>
 <img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_35_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_35_0.png" />
 </div>
 </div>
-<p>We can use <em>lightkurve</em> to plot these two light curves over each other
+<p>We can use <em>Lightkurve</em> to plot these two light curves over each other
 to see the difference.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
@@ -916,7 +916,7 @@ orbital period and see if we can see the transit.</p>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">folded_lc</span> <span class="o">=</span> <span class="n">clipped_lc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mf">6.27</span><span class="p">,</span> <span class="n">transit_midpoint</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
+<span></span><span class="n">folded_lc</span> <span class="o">=</span> <span class="n">clipped_lc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mf">6.27</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mf">1325.504</span><span class="p">)</span>
 <span class="n">folded_lc</span><span class="o">.</span><span class="n">errorbar</span><span class="p">();</span>
 </pre></div>
 </div>
@@ -953,13 +953,13 @@ uncertainty of those points.</p>
 <p>Note that you can actually do all these steps in just a few lines:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [27]:
+<span></span>In [28]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">lc</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">aperture_mask</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">window_length</span><span class="o">=</span><span class="mi">1001</span><span class="p">)</span>
 <span class="n">lc</span> <span class="o">=</span> <span class="n">lc</span><span class="p">[(</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span> <span class="o">&lt;</span> <span class="mi">1346</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span> <span class="o">&gt;</span> <span class="mi">1350</span><span class="p">)]</span>
-<span class="n">lc</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">(</span><span class="n">sigma</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mf">6.27</span><span class="p">,</span> <span class="n">transit_midpoint</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span><span class="o">.</span><span class="n">bin</span><span class="p">(</span><span class="n">binsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">errorbar</span><span class="p">();</span>
+<span class="n">lc</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">(</span><span class="n">sigma</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mf">6.27</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mf">1325.504</span><span class="p">)</span><span class="o">.</span><span class="n">bin</span><span class="p">(</span><span class="n">binsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">errorbar</span><span class="p">();</span>
 </pre></div>
 </div>
 </div>
@@ -978,23 +978,23 @@ aperture. Let’s compare the results from using these two different
 apertures.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [28]:
+<span></span>In [30]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="c1"># Use the default</span>
 <span class="n">lc</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">tpf</span><span class="o">.</span><span class="n">pipeline_mask</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">window_length</span><span class="o">=</span><span class="mi">1001</span><span class="p">)</span>
-<span class="n">lc</span> <span class="o">=</span> <span class="n">lc</span><span class="p">[(</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span> <span class="o">&lt;</span> <span class="mi">1346</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span> <span class="o">&gt;</span> <span class="mi">1350</span><span class="p">)]</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mf">6.27</span><span class="p">,</span> <span class="n">transit_midpoint</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span><span class="o">.</span><span class="n">bin</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">lc</span> <span class="o">=</span> <span class="n">lc</span><span class="p">[(</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span> <span class="o">&lt;</span> <span class="mi">1346</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span> <span class="o">&gt;</span> <span class="mi">1350</span><span class="p">)]</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mf">6.27</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mf">1325.504</span><span class="p">)</span><span class="o">.</span><span class="n">bin</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
 
 <span class="c1"># Use a custom aperture</span>
 <span class="n">custom_lc</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">to_lightcurve</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">aperture_mask</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">window_length</span><span class="o">=</span><span class="mi">1001</span><span class="p">)</span>
-<span class="n">custom_lc</span> <span class="o">=</span> <span class="n">custom_lc</span><span class="p">[(</span><span class="n">custom_lc</span><span class="o">.</span><span class="n">time</span> <span class="o">&lt;</span> <span class="mi">1346</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">custom_lc</span><span class="o">.</span><span class="n">time</span> <span class="o">&gt;</span> <span class="mi">1350</span><span class="p">)]</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mf">6.27</span><span class="p">,</span> <span class="n">transit_midpoint</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span><span class="o">.</span><span class="n">bin</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">custom_lc</span> <span class="o">=</span> <span class="n">custom_lc</span><span class="p">[(</span><span class="n">custom_lc</span><span class="o">.</span><span class="n">time</span> <span class="o">&lt;</span> <span class="mi">1346</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">custom_lc</span><span class="o">.</span><span class="n">time</span> <span class="o">&gt;</span> <span class="mi">1350</span><span class="p">)]</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mf">6.27</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mf">1325.504</span><span class="p">)</span><span class="o">.</span><span class="n">bin</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [29]:
+<span></span>In [31]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>

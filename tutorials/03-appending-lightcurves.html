@@ -27,7 +27,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b26</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b27</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -252,16 +252,14 @@ The append function is called by doing</p>
 </div>
 <p>It works in the same way as appending a list in python.</p>
 <p>Below is an example of how to stitch together all the quarters for the
-exoplanet target Kepler-8b. (<em>Note: We’ll use the jupyter notebook magic
-command ``%%capture`` to supress the output for the cell so that it
-doesn’t print a long download message</em>)</p>
+exoplanet target Kepler-8b.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre>
 <span></span>In [1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">lightkurve</span> <span class="k">import</span> <span class="n">search_lightcurvefile</span><span class="p">,</span> <span class="n">log</span>
+<span></span><span class="kn">from</span> <span class="nn">lightkurve</span> <span class="k">import</span> <span class="n">search_lightcurvefile</span>
 <span class="n">target</span> <span class="o">=</span> <span class="s1">&#39;Kepler-8b&#39;</span>
 </pre></div>
 </div>
@@ -272,8 +270,7 @@ doesn’t print a long download message</em>)</p>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">log</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="s2">&quot;WARNING&quot;</span><span class="p">)</span>  <span class="c1"># Ignore download messages</span>
-<span class="n">lc</span> <span class="o">=</span> <span class="n">search_lightcurvefile</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span><span class="o">.</span><span class="n">PDCSAP_FLUX</span>
+<span></span><span class="n">lc</span> <span class="o">=</span> <span class="n">search_lightcurvefile</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span><span class="o">.</span><span class="n">PDCSAP_FLUX</span>
 <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">17</span><span class="p">):</span>
     <span class="n">lc</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">search_lightcurvefile</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="n">q</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span><span class="o">.</span><span class="n">PDCSAP_FLUX</span><span class="p">)</span>
 </pre></div>
@@ -378,7 +375,7 @@ of the data for Kepler-8b.</p>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="mf">3.52254</span><span class="p">,</span> <span class="n">transit_midpoint</span><span class="o">=</span><span class="mf">0.38</span><span class="p">)</span><span class="o">.</span><span class="n">bin</span><span class="p">()</span><span class="o">.</span><span class="n">scatter</span><span class="p">();</span>
+<span></span><span class="n">lc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mf">3.52254</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mf">1.35</span><span class="p">)</span><span class="o">.</span><span class="n">bin</span><span class="p">()</span><span class="o">.</span><span class="n">scatter</span><span class="p">();</span>
 </pre></div>
 </div>
 </div>
@@ -386,14 +383,8 @@ of the data for Kepler-8b.</p>
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<div class="highlight"><pre>
-<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
-<span class="ansi-red-fg">TypeError</span>                                 Traceback (most recent call last)
-<span class="ansi-green-fg">&lt;ipython-input-8-6e6cb74d8237&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
-<span class="ansi-green-fg">----&gt; 1</span><span class="ansi-red-fg"> </span>lc<span class="ansi-blue-fg">.</span>fold<span class="ansi-blue-fg">(</span><span class="ansi-cyan-fg">3.52254</span><span class="ansi-blue-fg">,</span> transit_midpoint<span class="ansi-blue-fg">=</span><span class="ansi-cyan-fg">0.38</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">.</span>bin<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">.</span>scatter<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">;</span>
-
-<span class="ansi-red-fg">TypeError</span>: fold() got an unexpected keyword argument &#39;transit_midpoint&#39;
-</pre></div></div>
+<img alt="../_images/tutorials_03-appending-lightcurves_13_0.png" src="../_images/tutorials_03-appending-lightcurves_13_0.png" />
+</div>
 </div>
 </div>
 
