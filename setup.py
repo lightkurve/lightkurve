@@ -32,7 +32,7 @@ setup(name='lightkurve',
                         'matplotlib>=1.5.3', 'astroquery>=0.3.9',
                         'oktopus', 'bs4', 'requests', 'tqdm', 'pandas'],
       extras_require={
-            "interact":  ["bokeh>=1.0"],
+            "interact":  ["bokeh>=1.0", "ipython"],
             "pld": ["scikit-learn", "pybind11", "celerite"],
             "bls": ["astropy>=3.1"],
             "test": tests_require},
