@@ -19,7 +19,6 @@ install:
   - conda config --set always_yes yes --set changeps1 no
   - "conda create -q -n test-environment python=%PYTHON_VERSION% numpy astropy scipy matplotlib requests tqdm pandas bokeh ipython scikit-learn pybind11 pytest pytest-cov pytest-remotedata"
   - activate test-environment
-  - conda install -c conda-forge celerite
   - python setup.py develop
 
 test_script:
