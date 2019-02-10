@@ -1,11 +1,7 @@
-image: Visual Studio 2017 # required to install pybind11 (celerite dependency)
-
 build: false
 
 environment:
   matrix:
-    - PYTHON_VERSION: 2.7
-      MINICONDA: C:\Miniconda
     - PYTHON_VERSION: 3.7
       MINICONDA: C:\Miniconda3
 
