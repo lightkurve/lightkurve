@@ -20,7 +20,6 @@ install:
   - "conda create -q -n test-environment python=%PYTHON_VERSION% numpy astropy scipy matplotlib requests tqdm pandas bokeh ipython scikit-learn pybind11"
   - activate test-environment
   - conda install -c conda-forge celerite
-  - conda update pip
   - python setup.py develop
 
 test_script:
