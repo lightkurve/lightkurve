@@ -10,11 +10,20 @@ if "release" in sys.argv[-1]:
     os.system("rm -rf dist/lightkurve*")
     sys.exit()
 
-
 # Load the __version__ variable without importing the package already
 exec(open('lightkurve/version.py').read())
 
+# DEPENDENCIES
+# 1. What are the required dependencies?
+with open('requirements.txt') as f:
+    install_requires = f.read().splitlines()
+# 2. What dependencies required to run the unit tests? (i.e. `pytest --remote-data`)
 tests_require = ['pytest', 'pytest-cov', 'pytest-remotedata']
+# 3. What dependencies are required for optional features?
+extras_require = {"interact":  ["bokeh>=1.0", "ipython"],
+                  "pld": ["scikit-learn", "pybind11", "celerite"],
+                  "bls": ["astropy>=3.1"],
+                  "test": tests_require}
 
 setup(name='lightkurve',
       version=__version__,
@@ -28,14 +37,8 @@ setup(name='lightkurve',
             'lightkurve': 'lightkurve',
             'lightkurve.prf': 'lightkurve/prf'},
       packages=['lightkurve', 'lightkurve.prf'],
-      install_requires=['numpy>=1.11', 'astropy>=1.3', 'scipy>=0.19.0',
-                        'matplotlib>=1.5.3', 'astroquery>=0.3.9',
-                        'oktopus', 'bs4', 'requests', 'tqdm', 'pandas'],
-      extras_require={
-            "interact":  ["bokeh>=1.0", "ipython"],
-            "pld": ["scikit-learn", "pybind11", "celerite"],
-            "bls": ["astropy>=3.1"],
-            "test": tests_require},
+      install_requires=install_requires,
+      extras_require=extras_require,
       setup_requires=['pytest-runner'],
       tests_require=tests_require,
       include_package_data=True,
