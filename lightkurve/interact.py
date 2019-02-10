@@ -400,7 +400,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
         if bokeh.__version__[0] == '0':
             warnings.warn("interact() requires Bokeh version 1.0 or later", LightkurveWarning)
     except ImportError:
-        log.error("The interact() tool requires the `bokeh` package; "
+        log.error("The interact() tool requires the `bokeh` Python package; "
                   "you can install bokeh using e.g. `conda install bokeh`.")
         return None
 
@@ -578,7 +578,7 @@ def show_skyview_widget(tpf, notebook_url='localhost:8888', magnitude_limit=18):
             warnings.warn("interact_sky() requires Bokeh version 1.0 or later",
                           LightkurveWarning)
     except ImportError:
-        log.error("The interact_sky() tool requires the `bokeh` package; "
+        log.error("The interact_sky() tool requires the `bokeh` Python package; "
                   "you can install bokeh using e.g. `conda install bokeh`.")
         return None
 

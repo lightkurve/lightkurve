@@ -20,7 +20,7 @@ def test_bokeh_import_error(caplog):
     except ImportError:
         tpf = TessTargetPixelFile(example_tpf)
         tpf.interact()
-        assert "requires the `bokeh` package" in caplog.text
+        assert "requires the `bokeh` Python package" in caplog.text
 
 
 @pytest.mark.skipif('bokeh' not in sys.modules, reason="requires bokeh")
