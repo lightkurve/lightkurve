@@ -20,9 +20,12 @@ with open('requirements.txt') as f:
 # 2. What dependencies required to run the unit tests? (i.e. `pytest --remote-data`)
 tests_require = ['pytest', 'pytest-cov', 'pytest-remotedata']
 # 3. What dependencies are required for optional features?
-extras_require = {"interact":  ["bokeh>=1.0", "ipython"],
-                  "pld": ["scikit-learn", "pybind11", "celerite"],
-                  "bls": ["astropy>=3.1"],
+# `BoxLeastSquaresPeriodogram` requires astropy>=3.1.
+# `interact()` requires bokeh>=1.0, ipython.
+# `PLDCorrector` requires scikit-learn, pybind11, celerite.
+extras_require = {"all":  ["astropy>=3.1",
+                           "bokeh>=1.0", "ipython",
+                           "scikit-learn", "pybind11", "celerite"],
                   "test": tests_require}
 
 setup(name='lightkurve',
