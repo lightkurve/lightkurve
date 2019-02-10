@@ -5,6 +5,7 @@ time series photometry data.
 """
 from __future__ import division, print_function
 
+import logging
 import requests
 import warnings
 
@@ -23,9 +24,9 @@ from .utils import channel_to_module_output
 from .lightcurve import LightCurve
 from .lightcurvefile import KeplerLightCurveFile
 
-from sklearn.decomposition import PCA
 from itertools import combinations_with_replacement as multichoose
-import celerite
+
+log = logging.getLogger(__name__)
 
 __all__ = ['SFFCorrector', 'PLDCorrector', 'KeplerCBVCorrector']
 
@@ -634,6 +635,20 @@ class PLDCorrector(object):
             returned object will be a `KeplerLightCurve`, `TessLightCurve`, or
             general `LightCurve` object.
         """
+        # Verify optional dependencies
+        try:
+            import celerite
+        except ImportError:
+            log.error("PLD requires the `celerite` Python package. "
+                      "See the installation instructions at "
+                      "https://docs.lightkurve.org/about/install.html")
+        try:
+            from sklearn.decomposition import PCA
+        except ImportError:
+            log.error("PLD requires the `scikit-learn` Python package. "
+                      "See the installation instructions at "
+                      "https://docs.lightkurve.org/about/install.html")
+
         # Parse the aperture mask to accept strings etc.
         aperture = self.tpf._parse_aperture_mask(aperture_mask)
 
