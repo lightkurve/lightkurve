@@ -760,7 +760,6 @@ class BoxLeastSquaresPeriodogram(Periodogram):
             dy = None
 
         bls = BoxLeastSquares(lc.time, lc.flux, dy)
-        bls = BoxLeastSquares(lc.time, lc.flux, lc.flux_err)
         duration = kwargs.pop("duration", 0.25)
         if hasattr(duration, '__iter__'):
             raise ValueError('`duration` must be a single value.')
