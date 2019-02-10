@@ -20,7 +20,7 @@ install:
   - "conda create -q -n test-environment python=%PYTHON_VERSION% numpy scipy astropy matplotlib tqdm requests pybind11"
   - activate test-environment
   - conda install -c conda-forge celerite
-  - pip install -e .[interact,pld,bls,test];
+  - pip install -e '.[interact,pld,bls,test]';
 
 test_script:
   - pytest --remote-data
