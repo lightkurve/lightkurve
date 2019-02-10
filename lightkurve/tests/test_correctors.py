@@ -95,7 +95,8 @@ def test_sff_knots():
 
 
 @pytest.mark.remote_data
-@pytest.mark.skipif('celerite' not in sys.modules, reason="requires celerite")
+@pytest.mark.skipif(('celerite' not in sys.modules) or ('sklearn' not in sys.modules),
+                    reason="PLD requires celerite and scikit-learn")
 def test_pld_corrector():
     # download tpf data for a target
     k2_target = 247887989
