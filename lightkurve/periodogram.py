@@ -752,6 +752,14 @@ class BoxLeastSquaresPeriodogram(Periodogram):
         except ImportError:
             raise Exception("BLS requires AstroPy v3.1 or later")
 
+        # BoxLeastSquares will not work if flux or flux_err contain NaNs
+        lc = lc.remove_nans()
+        if np.isfinite(lc.flux_err).all():
+            dy = lc.flux_err
+        else:
+            dy = None
+
+        bls = BoxLeastSquares(lc.time, lc.flux, dy)
         bls = BoxLeastSquares(lc.time, lc.flux, lc.flux_err)
         duration = kwargs.pop("duration", 0.25)
         if hasattr(duration, '__iter__'):
