@@ -642,12 +642,14 @@ class PLDCorrector(object):
             log.error("PLD requires the `celerite` Python package. "
                       "See the installation instructions at "
                       "https://docs.lightkurve.org/about/install.html")
+            return None
         try:
             from sklearn.decomposition import PCA
         except ImportError:
             log.error("PLD requires the `scikit-learn` Python package. "
                       "See the installation instructions at "
                       "https://docs.lightkurve.org/about/install.html")
+            return None
 
         # Parse the aperture mask to accept strings etc.
         aperture = self.tpf._parse_aperture_mask(aperture_mask)

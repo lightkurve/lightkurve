@@ -8,17 +8,9 @@ services:
   - xvfb  # X Virtual FrameBuffer (enables plotting in a headless environment)
 before_install:  # optional dependencies
   - pip install codecov
-  - pip install pytest-cov
-  - pip install pytest-remotedata
-  - pip install sphinx_rtd_theme
-  - pip install numpydoc
-  - pip install pandas
-  - pip install ipython  # required by bokeh
-  - pip install bokeh
 install:
-  - pip install -r requirements.txt
+  - pip install '.[interact,pld,bls,test]'
 script:  # how to run the tests?
-  - python setup.py develop
   - pytest --remote-data
 after_success:
   - codecov

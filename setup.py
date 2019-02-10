@@ -14,6 +14,8 @@ if "release" in sys.argv[-1]:
 # Load the __version__ variable without importing the package already
 exec(open('lightkurve/version.py').read())
 
+tests_require = ['pytest', 'pytest-cov', 'pytest-remotedata']
+
 setup(name='lightkurve',
       version=__version__,
       description="A friendly package for Kepler & TESS time series analysis "
@@ -32,9 +34,10 @@ setup(name='lightkurve',
       extras_require={
             "interact":  ["bokeh>=1.0"],
             "pld": ["scikit-learn", "pybind11", "celerite"],
-            "bls": ["astropy>=3.1"]},
+            "bls": ["astropy>=3.1"],
+            "test": tests_require},
       setup_requires=['pytest-runner'],
-      tests_require=['pytest', 'pytest-cov', 'pytest-remotedata'],
+      tests_require=tests_require,
       include_package_data=True,
       classifiers=[
           "Development Status :: 5 - Production/Stable",
