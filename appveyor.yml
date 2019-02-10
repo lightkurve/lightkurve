@@ -21,7 +21,8 @@ install:
   - activate test-environment
   - conda install -c conda-forge celerite
   - conda update pip
-  - pip install -e '.[interact,pld,bls,test]';
+  - cd %APPVEYOR_BUILD_FOLDER%
+  - pip install -e .[interact,pld,bls,test];
 
 test_script:
   - pytest --remote-data
