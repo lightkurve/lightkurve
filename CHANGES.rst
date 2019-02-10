@@ -1,7 +1,32 @@
-
-1.0b27 (unreleased)
+1.0b28 (unreleased)
 ===================
 
+
+
+1.0b27 (2019-02-09)
+===================
+
+Changes
+-------
+
+- Added `search_tesscut()`: an easy interface to access data produced using
+  the `MAST TESSCut service <https://mast.stsci.edu/tesscut/>`_. This service
+  extracts Target Pixel Files (TPFs) from TESS Full Frame Images (FFIs). [#418]
+
+- Added `TargetPixelFile.interact_sky()`: an interactive Bokeh widget to
+  overlay Gaia DR2 source positions on top of TPFs. [#124]
+
+- Changed `LightCurve.fold()`: the `transit_midpoint` parameter has been
+  deprecated in favor of the `t0` parameter. [#419]
+
+Bugfixes
+--------
+
+- Made `BoxLeastSquaresPeriodogram` robust against light curves that contain
+  NaNs. [#432]
+
+- `TargetPixelFile.wcs` now works for Target Pixel Files produced using the
+  MAST TessCut service. [#434]
 
 
 
