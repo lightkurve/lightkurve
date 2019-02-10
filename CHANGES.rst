@@ -1,6 +1,6 @@
+
 1.0b28 (unreleased)
 ===================
-
 
 
 1.0b27 (2019-02-09)
@@ -8,6 +8,10 @@
 
 Changes
 -------
+
+- Simplified the installation of Lightkurve by turning several packages into
+  optional rather than required dependencies (`celerite`, `pybind`,
+  `scikit-learn`, and `bokeh`). [#436]
 
 - Added `search_tesscut()`: an easy interface to access data produced using
   the `MAST TESSCut service <https://mast.stsci.edu/tesscut/>`_. This service
