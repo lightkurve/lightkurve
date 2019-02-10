@@ -1,5 +1,6 @@
 from __future__ import division, print_function
 
+import sys
 import pytest
 import numpy as np
 from numpy.testing import assert_almost_equal, assert_array_equal
@@ -94,6 +95,7 @@ def test_sff_knots():
 
 
 @pytest.mark.remote_data
+@pytest.mark.skipif('celerite' not in sys.modules, reason="requires celerite")
 def test_pld_corrector():
     # download tpf data for a target
     k2_target = 247887989
