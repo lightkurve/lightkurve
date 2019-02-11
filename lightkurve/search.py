@@ -289,7 +289,6 @@ class SearchResult(object):
 
         # Resolve SkyCoord of given target
         coords = MastClass()._resolve_object(target)
-        sector = self.table[0]['sequence_number']
         cutout_path = TesscutClass().download_cutouts(coords, size=cutout_size,
                                                       sector=sector, path=download_dir)
 
