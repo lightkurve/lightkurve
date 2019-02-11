@@ -282,10 +282,6 @@ class SearchResult(object):
         # Enforce bounds on cutout_size
         if cutout_size is None:
             cutout_size = 5
-        elif cutout_size <= 0:
-            raise ValueError('`cutout_size` must be positive.')
-        elif cutout_size > 100:
-            warnings.warn('Cutout size is large and may take a few minutes to download.')
 
         # Resolve SkyCoord of given target
         coords = MastClass()._resolve_object(target)
