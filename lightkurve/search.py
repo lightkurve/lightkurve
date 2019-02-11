@@ -878,7 +878,8 @@ def open(path_or_url, **kwargs):
         >>> tpf = open("mytpf.fits")  # doctest: +SKIP
     """
     # pass header into `detect_filetype()`
-    filetype = detect_filetype(fits.open(path_or_url)[0].header)
+    with fits.open(path_or_url) as temp:
+        filetype = detect_filetype(temp[0].header)
 
     # if the filetype is recognized, instantiate a class of that name
     if filetype is not None:
