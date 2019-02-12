@@ -118,8 +118,9 @@ class SearchResult(object):
         download_dir : str
             Location where the data files will be stored.
             Defaults to "~/.lightkurve-cache" if `None` is passed.
-        cutout_size : int or float
-            Side length of cutout in pixels. Default value is 5.
+        cutout_size : int, float or tuple
+            Side length of cutout in pixels. Tuples should have dimensions (y, x).
+            Default size is (5, 5)
 
         Returns
         -------
@@ -189,8 +190,9 @@ class SearchResult(object):
         download_dir : str
             Location where the data files will be stored.
             Defaults to "~/.lightkurve-cache" if `None` is passed.
-        cutout_size : int or float
-            Side length of cutout in pixels. Default value is 5.
+        cutout_size : int, float or tuple
+            Side length of cutout in pixels. Tuples should have dimensions (y, x).
+            Default size is (5, 5)
 
         Returns
         -------
@@ -267,8 +269,9 @@ class SearchResult(object):
         download_dir : str
             Path to location of `.lightkurve-cache` directory where downloaded
             cutouts are stored
-        cutout_size : int or float
-            Side length of cutout in pixels
+        cutout_size : int, float or tuple
+            Side length of cutout in pixels. Tuples should have dimensions (y, x).
+            Default size is (5, 5)
 
         Returns
         -------
@@ -279,7 +282,7 @@ class SearchResult(object):
         from astroquery.mast.core import MastClass
         coords = MastClass()._resolve_object(target)
 
-        # Enforce bounds on cutout_size
+        # Set cutout_size defaults
         if cutout_size is None:
             cutout_size = 5
 
