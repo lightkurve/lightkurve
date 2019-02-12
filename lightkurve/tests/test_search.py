@@ -133,6 +133,9 @@ def test_search_tesscut_download():
     assert(isinstance(tpfc, TargetPixelFileCollection))
     # Ensure correct dimensions
     assert(tpfc[0].flux[0].shape == (4, 4))
+    # Download with rectangular dimennsions?
+    rect_tpf = search_string.download(cutout_size=(3,5))
+    assert(rect_tpf.flux[0].shape == (3,5))
 
 
 @pytest.mark.remote_data
