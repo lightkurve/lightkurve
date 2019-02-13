@@ -58,7 +58,7 @@ def test_search_targetpixelfile():
     search_targetpixelfile(tic, mission='TESS').download()
     assert(len(search_targetpixelfile("pi Mensae", sector=1).table) == 1)
     # Issue #445: indexing with -1 should return the last index of the search result
-    assert(len(search_targetpixelfile("pi Men")[-1] == 1))
+    assert(len(search_targetpixelfile("pi Men")[-1]) == 1)
 
 
 @pytest.mark.remote_data
