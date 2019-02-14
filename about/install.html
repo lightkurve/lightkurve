@@ -27,7 +27,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b27</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b29</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -71,14 +71,15 @@
 <span id="installation"></span><h1>Installing Lightkurve<a class="headerlink" href="#installing-lightkurve" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="using-conda">
 <h2>Using conda<a class="headerlink" href="#using-conda" title="Permalink to this headline">¶</a></h2>
-<p>The easiest way to install <em>Lightkurve</em> and its dependencies is to use
+<p>The easiest way to install <em>Lightkurve</em> and all of its dependencies is to use
 the <code class="docutils literal notranslate"><span class="pre">conda</span></code> package manager, which is part of the
 <a class="reference external" href="https://www.continuum.io/downloads">Anaconda Python</a> distribution.
 With <code class="docutils literal notranslate"><span class="pre">conda</span></code> installed, simply run the following command in a terminal window:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda install --channel conda-forge lightkurve
 </pre></div>
 </div>
-<p>If you have a previous version of <em>Lightkurve</em> installed, you can update it using:</p>
+<p>If you have a previous version of <em>Lightkurve</em> installed,
+you can update it using:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda update lightkurve
 </pre></div>
 </div>
@@ -89,22 +90,26 @@ With <code class="docutils literal notranslate"><span class="pre">conda</span></
 </div>
 <div class="section" id="using-pip">
 <h2>Using pip<a class="headerlink" href="#using-pip" title="Permalink to this headline">¶</a></h2>
-<p>An alternative way to install <em>Lightkurve</em> is to use the <code class="docutils literal notranslate"><span class="pre">pip</span></code> package manager,
-which is a standard part of all Python distributions.
+<p>An alternative way to install <em>Lightkurve</em> is to use the <code class="docutils literal notranslate"><span class="pre">pip</span></code> package
+manager, which is a standard part of all Python distributions.
 To install <em>Lightkurve</em>, run the following command in a terminal window:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install lightkurve --upgrade
 </pre></div>
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">--upgrade</span></code> flag is optional, but recommended if you already
 have <em>Lightkurve</em> installed and want to upgrade to the latest version.</p>
-<p>Note that, by default, <code class="docutils literal notranslate"><span class="pre">pip</span></code> will not install any of <em>Lightkurve</em>’s optional
-dependencies.  To install these, use:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install lightkurve[interact,pld,bls]
+<p>By default, <code class="docutils literal notranslate"><span class="pre">pip</span></code> won’t install <em>Lightkurve</em>’s optional dependencies.
+We configured it this way because <code class="docutils literal notranslate"><span class="pre">pip</span></code> requires a C compiler to install
+some of these optional dependencies, which is not usually available
+on Windows systems. If you want to try to install these, you can use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install lightkurve[all]
 </pre></div>
 </div>
+<p>If you encounter any compilation errors using this command, then we recommend
+that you use the <code class="docutils literal notranslate"><span class="pre">conda</span></code> package manager instead.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">If you get a <code class="docutils literal notranslate"><span class="pre">PermissionError</span></code> this means that you do not have the
+<p class="last">If you encounter a <code class="docutils literal notranslate"><span class="pre">PermissionError</span></code> this means that you do not have the
 required administrative access to install new packages to your Python
 installation.  In this case you may consider using the <code class="docutils literal notranslate"><span class="pre">--user</span></code> option
 to install the package into your home directory.  You can read more
@@ -125,9 +130,9 @@ about how to do this in the <a class="reference external" href="http://www.pip-i
 </ul>
 <p>A few extra features (interact widgets, PLD correction, and BLS periodograms) require optional dependencies which are not installed by default using <code class="docutils literal notranslate"><span class="pre">pip</span></code> (though they are installed if you use <code class="docutils literal notranslate"><span class="pre">conda</span></code>):</p>
 <ul class="simple">
-<li>Bokeh: 1.0 or later.</li>
-<li>Scikit-learn.</li>
-<li>Celerite.</li>
+<li>Astropy: 3.1 or later (for BLS periodograms).</li>
+<li>Bokeh: 1.0 or later (for interactive widgets).</li>
+<li>Scikit-learn and Celerite (for PLD systematics correction).</li>
 </ul>
 <p>We recommend using the <a class="reference external" href="https://www.continuum.io/downloads">Anaconda Python</a>
 distribution, which will install Python alongside its most common scientific
