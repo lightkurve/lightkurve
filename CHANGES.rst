@@ -1,6 +1,17 @@
 
-1.0b29 (unreleased)
+1.0b30 (unreleased)
 ===================
+
+
+
+1.0b29 (2019-02-14)
+===================
+
+- The `search_tesscut(...).download()` feature now supports downloading rectangular TESS FFI cut-outs. It previously only supported squares. [#441]
+
+- Fixed a bug which prevented `search_tesscut(...).download_all()` from downloading all sectors. [#440]
+
+- Minor bug fixes and performance improvements. [#439, #446]
 
 
 
