@@ -235,7 +235,7 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
     one_over_parallax = 1.0 / (result['Plx']/1000.)
     source = ColumnDataSource(data=dict(ra=result['RA_ICRS'],
                                         dec=result['DE_ICRS'],
-                                        source=result['Source'],
+                                        source=result['Source'].astype(str),
                                         Gmag=result['Gmag'],
                                         plx=result['Plx'],
                                         one_over_plx=one_over_parallax,
