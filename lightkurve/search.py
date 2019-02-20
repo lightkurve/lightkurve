@@ -240,6 +240,43 @@ class SearchResult(object):
     def _default_download_dir(self):
         return(default_download_dir())
 
+    def _fetch_tesscut_path(self, target, sector, download_dir, cutout_size):
+        """Downloads TESS FFI cutout and returns path to local file.
+        Parameters
+        ----------
+        download_dir : str
+            Path to location of `.lightkurve-cache` directory where downloaded
+            cutouts are stored
+        cutout_size : int, float or tuple
+            Side length of cutout in pixels. Tuples should have dimensions (y, x).
+            Default size is (5, 5)
+        Returns
+        -------
+        path : str
+            Path to locally downloaded cutout file
+        """
+        from astroquery.mast import TesscutClass
+        from astroquery.mast.core import MastClass
+        coords = MastClass()._resolve_object(target)
+        # Set cutout_size defaults
+        if cutout_size is None:
+            cutout_size = 5
+        # Check existence of `~/.lightkurve-cache/tesscut`
+        tesscut_dir = os.path.join(download_dir, 'tesscut')
+        if not os.path.isdir(tesscut_dir):
+            # if it doesn't exist, make a new cache directory
+            try:
+                os.mkdir(tesscut_dir)
+            # downloads into default cache if OSError occurs
+            except OSError:
+                tesscut_dir = download_dir
+        # Resolve SkyCoord of given target
+        coords = MastClass()._resolve_object(target)
+        cutout_path = TesscutClass().download_cutouts(coords, size=cutout_size,
+                                                      sector=sector, path=tesscut_dir)
+        path = os.path.join(download_dir, cutout_path[0][0])
+        return path
+
 
 def default_download_dir():
     """Returns the default path to the directory where files will be downloaded.
