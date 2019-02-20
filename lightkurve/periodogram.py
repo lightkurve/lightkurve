@@ -159,7 +159,7 @@ class Periodogram(object):
 
         Periodograms that are unsmoothed have multiplicative noise that is
         distributed as chi squared 2 degrees of freedom.  This noise
-        distirbution has a well defined mean and median but the two are not
+        distribution has a well defined mean and median but the two are not
         equivalent.  The mean of a chi squared 2 dof distribution is 2, but the
         median is 2(8/9)**3.
         (see https://en.wikipedia.org/wiki/Chi-squared_distribution)
