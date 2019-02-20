@@ -8,20 +8,20 @@ import numpy as np
 from numpy.testing import assert_allclose
 import pytest
 
-from ...prf import KeplerPRF, TessPRF
+from ...prf import KeplerPRF, TessPRF, GaussianPRF
 from ...targetpixelfile import KeplerTargetPixelFile
 
 
 def test_kepler_prf_normalization():
     """Does the PRF model integrate to the requested flux across the focal plane?"""
-    for channel in [1, 20, 40, 60, 84]:
+    for channel in [1, 20, 40, 60]:
         for col in [123, 678]:
             for row in [234, 789]:
                 shape = (18, 14)
                 flux = 100
                 prf = KeplerPRF(channel=channel, column=col, row=row, shape=shape)
                 prf_sum = prf.evaluate(col + shape[0]/2, row + shape[1]/2, flux, 1, 1, 0).sum()
-                assert np.isclose(prf_sum, flux, rtol=0.1)
+                assert np.isclose(prf_sum, flux, rtol=1e-6)
 
 
 def test_tess_prf_normalization():
@@ -32,7 +32,7 @@ def test_tess_prf_normalization():
             flux = 100
             prf = TessPRF(camera=camera, ccd=ccd, column=0, row=0, shape=shape)
             prf_sum = prf.evaluate(shape[0]/2, shape[1]/2, flux, 1, 1, 0).sum()
-            assert np.isclose(prf_sum, flux, rtol=0.1)
+            assert np.isclose(prf_sum, flux, rtol=1e-6)
 
 
 def test_kepler_prf():
@@ -107,3 +107,10 @@ def test_keplerprf_gradient_against_calculus(param_to_test):
     prf_grad = prf.gradient(**params)
     # assert that the average absolute/relative error is less than 1e-5
     assert np.mean(np.abs(prf_grad[param_order[param_to_test]] - diff_prf) / (1. + np.abs(diff_prf))) < 1e-5
+
+
+def test_gaussianprf_normalization():
+    prf = GaussianPRF(shape=(20, 20), column=0, row=0)
+    for flux in [0.1, 1.0, 10.0]:
+        assert np.isclose(prf.evaluate(center_col=10, center_row=10, flux=flux).sum(), flux, rtol=1e-6)
+        assert np.isclose(prf.evaluate(center_col=20, center_row=10, flux=flux).sum(), flux / 2, rtol=1e-6)

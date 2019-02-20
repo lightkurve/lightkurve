@@ -8,6 +8,7 @@ if no internet connection is available.
 from __future__ import division, print_function
 
 import os
+import sys
 import pytest
 import numpy as np
 from numpy.testing import assert_almost_equal, assert_array_equal
@@ -18,7 +19,8 @@ import astropy.units as u
 from astropy.table import Table
 
 from ..utils import LightkurveWarning
-from ..search import search_lightcurvefile, search_targetpixelfile, SearchResult, open
+from ..search import search_lightcurvefile, search_targetpixelfile, \
+                     search_tesscut, SearchResult, SearchError, open
 from .. import KeplerLightCurveFile
 from .. import KeplerTargetPixelFile, TessTargetPixelFile, TargetPixelFileCollection
 
@@ -49,13 +51,14 @@ def test_search_targetpixelfile():
         cc = search_targetpixelfile(idx, campaign=c[2]).table
         assert(len(cc) == 2)
     search_targetpixelfile(11904151, quarter=11).download()
-
     # with mission='TESS', it should return TESS observations
     tic = 273985862
     assert(len(search_targetpixelfile(tic, mission='TESS').table) == 1)
     assert(len(search_targetpixelfile(tic, mission='TESS', radius=100).table) == 2)
     search_targetpixelfile(tic, mission='TESS').download()
     assert(len(search_targetpixelfile("pi Mensae", sector=1).table) == 1)
+    # Issue #445: indexing with -1 should return the last index of the search result
+    assert(len(search_targetpixelfile("pi Men")[-1]) == 1)
 
 
 @pytest.mark.remote_data
@@ -83,6 +86,57 @@ def test_search_lightcurvefile(caplog):
     assert(len(search_lightcurvefile(tic, mission='TESS', radius=100).table) == 2)
     search_lightcurvefile(tic, mission='TESS').download()
     assert(len(search_lightcurvefile("pi Mensae", sector=1).table) == 1)
+
+
+@pytest.mark.remote_data
+def test_search_tesscut():
+    # Cutout by target name
+    assert(len(search_tesscut("pi Mensae", sector=1).table) == 1)
+    assert(len(search_tesscut("pi Mensae").table) > 1)
+    # Cutout by TIC ID
+    assert(len(search_tesscut('TIC 206669860', sector=2).table) == 1)
+    # Cutout by RA, dec string
+    search_string = search_tesscut('30.578761, -83.210593')
+    # Cutout by SkyCoord
+    c = SkyCoord('30.578761 -83.210593', unit=(u.deg, u.deg))
+    search_coords = search_tesscut(c)
+    # These should be identical
+    assert(len(search_string.table) == len(search_coords.table))
+    # Test cutout at edge of FFI
+    search_edge = search_tesscut('30.578761, 6.210593')
+    assert(len(search_edge.table) == 1)
+    try:
+        # This is too near the FFI edge and should fail to download
+        search_edge.download()
+    except SearchError:
+        pass
+
+
+# See issue #433 to understand why this test is skipped on Python 3.7 for now
+@pytest.mark.remote_data
+@pytest.mark.skipif(sys.version_info.minor == 7, reason="GitHub issue #433")
+def test_search_tesscut_download():
+    """Can we download TESS cutouts via `search_cutout().download()?"""
+    ra, dec = 30.578761, -83.210593
+    search_string = search_tesscut('{}, {}'.format(ra, dec))
+    # Make sure they can be downloaded with default size
+    tpf = search_string.download()
+    # Ensure the correct object has been read in
+    assert(isinstance(tpf, TessTargetPixelFile))
+    # Ensure default size is 5x5
+    assert(tpf.flux[0].shape == (5, 5))
+    # Ensure the WCS is valid (#434 regression test)
+    center_ra, center_dec = tpf.wcs.all_pix2world([[2.5, 2.5]], 1)[0]
+    assert_almost_equal(ra, center_ra, decimal=1)
+    assert_almost_equal(dec, center_dec, decimal=1)
+    # Download with different dimensions
+    tpfc = search_string.download_all(cutout_size=4)
+    assert(isinstance(tpfc, TargetPixelFileCollection))
+    # Ensure correct dimensions
+    assert(tpfc[0].flux[0].shape == (4, 4))
+    # Download with rectangular dimennsions?
+    rect_tpf = search_string.download(cutout_size=(3,5))
+    assert(rect_tpf.flux[0].shape == (3,5))
 
 
 @pytest.mark.remote_data
