@@ -153,6 +153,12 @@ class PRFModel:
         return [deriv_center_col, deriv_center_row, deriv_flux,
                 deriv_scale_col, deriv_scale_row, deriv_rotation_angle]
 
+    def plot(self, *params, title="PRF Model", **kwargs):
+        pflux = self.evaluate(*params)
+        plot_image(pflux, title=title,
+                   extent=(self.column, self.column + self.shape[1],
+                           self.row, self.row + self.shape[0]), **kwargs)
+
 
 class KeplerPRF(PRFModel):
     """
@@ -350,11 +356,12 @@ class TessPRF(PRFModel):
 
 
 class GaussianPRF(PRFModel):
-    def __init__(self, shape, column, row):
+    def __init__(self, shape, column, row, padding=5):
         self.shape = shape
         self.column = column
         self.row = row
-        rowdim, coldim = self.shape[0], self.shape[1]
+        self.padding = padding
+        rowdim, coldim = self.shape[0] + self.padding*2, self.shape[1] + self.padding*2
         self.x, self.y = np.meshgrid(np.arange(self.column + .5, self.column + coldim + .5),
                                      np.arange(self.row + .5, self.row + rowdim + .5))
 
@@ -363,11 +370,12 @@ class GaussianPRF(PRFModel):
         a = .5 * ((scale_col * math.cos(psi)) ** 2 + (scale_row * math.sin(psi) ** 2))
         b = .25 * math.sin(2 * psi) * (scale_row ** 2 - scale_col ** 2)
         c = .5 * ((scale_col * math.sin(psi)) ** 2 + (scale_row * math.cos(psi) ** 2))
-        xo, yo = center_col, center_row
+        xo, yo = center_col + self.padding, center_row + self.padding
         density = np.exp(-(a * (self.x - xo) ** 2 +
                            2 * b * (self.x - xo) * (self.y - yo) +
                            c * (self.y - yo) ** 2))
-        return flux * density / np.sum(density)
+        result = flux * density / np.nansum(density)
+        return result[self.padding:-self.padding, self.padding:-self.padding]
 
     def gradient(self):
         pass
