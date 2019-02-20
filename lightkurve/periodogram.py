@@ -226,7 +226,7 @@ class Periodogram(object):
             count = np.zeros(len(self.frequency.value), dtype=int)
             bkg = np.zeros_like(self.frequency.value)
             x0 = np.log10(self.frequency[0].value)
-            corr_factor = (8.0/9.0)**3
+            corr_factor = (8.0 / 9.0)**3
             while x0 < np.log10(self.frequency[-1].value):
                 m = np.abs(np.log10(self.frequency.value) - x0) < filter_width
                 if len(bkg[m] > 0):
