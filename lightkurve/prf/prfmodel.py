@@ -180,59 +180,6 @@ class KeplerPRF(PRFModel):
         self.padding = padding
         self.col_coord, self.row_coord, self.model, self.supersampled_prf = self._prepare_prf()
 
-
-class KeplerPRF(PRFModel):
-    """
-    Kepler's Pixel Response Function as designed by [1]_.
-
-    This class provides the necessary interface to load Kepler PRF
-    calibration files and to create a model that can be fit as a function
-    of flux, center positions, width, and rotation angle.
-
-    Attributes
-    ----------
-    channel : int
-        KeplerTargetPixelFile.channel
-    shape : (int, int)
-        KeplerTargetPixelFile.shape[1:]
-    column : int
-        KeplerTargetPixelFile.column
-    row : int
-        KeplerTargetPixelFile.row
-
-    Examples
-    --------
-    Objects from the KeplerPRF class are defined by a channel number, a pair of
-    dimensions (the size of the image), and a reference coordinate (bottom left
-    corner). In this example, we create a KeplerPRF object located at channel
-    #44 with dimension equals 10 x 10, reference row and column coordinate
-    equals (5, 5). After the object has been created, we may translate it to a
-    given center coordinate. Additionally, we can specify total flux, pixel
-    scales, and rotation around the object's center.
-
-    >>> import math
-    >>> import matplotlib.pyplot as plt
-    >>> from lightkurve import KeplerPRF
-    >>> kepprf = KeplerPRF(channel=44, shape=(10, 10), column=5, row=5) # doctest: +SKIP
-    Downloading http://archive.stsci.edu/missions/kepler/fpc/prf
-    /extracted/kplr13.4_2011265_prf.fits [Done]
-    >>> prf = kepprf(flux=1000, center_col=10, center_row=10,
-    ...              scale_row=0.7, scale_col=0.7, rotation_angle=math.pi/2) # doctest: +SKIP
-    >>> plt.imshow(prf, origin='lower') # doctest: +SKIP
-
-    References
-    ----------
-    .. [1] S. T. Bryson. The Kepler Pixel Response Function, 2010.
-           <https://arxiv.org/abs/1001.0331>.
-    """
-
-    def __init__(self, channel, shape, column, row):
-        self.channel = channel
-        self.shape = shape
-        self.column = column
-        self.row = row
-        self.col_coord, self.row_coord, self.model, self.supersampled_prf = self._prepare_prf()
-
     def _read_prf_calibration_file(self, path, ext):
         prf_cal_file = pyfits.open(path)
         data = prf_cal_file[ext].data
