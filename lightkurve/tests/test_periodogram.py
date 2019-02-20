@@ -135,7 +135,7 @@ def test_smooth():
         p.smooth(method='logmedian',  filter_width=5.*u.day)
 
     # Check logmedian smooth that the mean of the smoothed power should be consistent with the mean of the power
-    assert np.isclose(np.mean(p.smooth(method='logmedian').power), np.mean(p.power), atol=0.05)
+    assert np.isclose(np.mean(p.smooth(method='logmedian').power.value), np.mean(p.power), atol=0.05)
 
 
 def test_flatten():
@@ -149,7 +149,7 @@ def test_flatten():
     assert all(p.flatten(method='boxkernel').frequency == p.frequency)
 
     # Check logmedian flatten of white noise returns mean of ~unity
-    assert np.isclose(np.mean(p.flatten(method='logmedian').power), 1.0,
+    assert np.isclose(np.mean(p.flatten(method='logmedian').power.value), 1.0,
                       atol=0.05)
 
     # Check return trend works
