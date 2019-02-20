@@ -179,7 +179,6 @@ class KeplerPRF(PRFModel):
         self.row = row
         self.padding = padding
         self.col_coord, self.row_coord, self.model, self.supersampled_prf = self._prepare_prf()
->>>>>>> 510604d7fcec77b24c7dc7b971a5b7917bceb178
 
 
 class KeplerPRF(PRFModel):
