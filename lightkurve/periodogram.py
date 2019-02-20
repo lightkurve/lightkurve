@@ -157,6 +157,25 @@ class Periodogram(object):
         where `filter width` is in log10(frequency) space. This is best for
         estimating the noise background, as it filters over the seismic peaks.
 
+        Periodograms that are unsmoothed have multiplicative noise that is
+        distributed as chi squared 2 degrees of freedom.  This noise
+        distirbution has a well defined mean and median but the two are not
+        equivalent.  The mean of a chi squared 2 dof distribution is 2, but the
+        median is 2(8/9)**3.
+        (see https://en.wikipedia.org/wiki/Chi-squared_distribution)
+        In order to maintain consistency between 'boxkernel' and 'logmedian' a
+        correction factor of (8/9)**3 is applied to (i.e., the median is divided
+        by the factor) to the median values.
+
+        In addition to consistency with the 'boxkernel' method, the correction
+        of the median values is useful when applying the periodogram flatten
+        method.  The flatten method divides the periodgram by the smoothed
+        periodogram using the 'logmedian' method.  By appyling the correction
+        factor we follow asteroseismic convention that the signal-to-noise
+        power has a mean value of unity.  (note the signal-to-noise power is
+        really the signal plus noise divided by the noise and hence should be
+        unity in the absence of any signal)
+
         Parameters
         ----------
         method : str, one of 'boxkernel' or 'logmedian'
@@ -207,8 +226,6 @@ class Periodogram(object):
             count = np.zeros(len(self.frequency.value), dtype=int)
             bkg = np.zeros_like(self.frequency.value)
             x0 = np.log10(self.frequency[0].value)
-            # The median of chi squared 2 dof noise is 2(8/9)**3 where as the
-            # mean is 2.  To correct for this we divide the median by (8/9)**3
             corr_factor = (8.0/9.0)**3
             while x0 < np.log10(self.frequency[-1].value):
                 m = np.abs(np.log10(self.frequency.value) - x0) < filter_width

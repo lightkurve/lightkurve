@@ -134,8 +134,8 @@ def test_smooth():
     with pytest.raises(ValueError) as err:
         p.smooth(method='logmedian',  filter_width=5.*u.day)
 
-    # Check logmedian smooth returns mean of unity
-    assert np.abs(p.smooth().power - 1.0) < 0.05
+    # Check logmedian smooth that the mean of the smoothed power should be consistent with the mean of the power
+    assert np.isclose(np.mean(p.smooth(method='logmedian').power), np.mean(p.power), atol=0.05)
 
 
 def test_flatten():
@@ -148,8 +148,9 @@ def test_flatten():
     assert all(p.flatten(method='logmedian').frequency == p.frequency)
     assert all(p.flatten(method='boxkernel').frequency == p.frequency)
 
-    # Check logmedian flatten returns mean of unity
-    assert np.abs(p.flatten(method='logmedian').power - 1.0) < 0.05
+    # Check logmedian flatten of white noise returns mean of ~unity
+    assert np.isclose(np.mean(p.flatten(method='logmedian').power), 1.0,
+                      atol=0.05)
 
     # Check return trend works
     s, b = p.flatten(return_trend=True)
