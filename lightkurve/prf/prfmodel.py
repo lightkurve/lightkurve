@@ -75,18 +75,21 @@ class PRFModel:
         cosa = math.cos(rotation_angle)
         sina = math.sin(rotation_angle)
 
-        delta_col = self.col_coord - center_col
-        delta_row = self.row_coord - center_row
+        delta_col = self.col_coord - (center_col + self.padding)
+        delta_row = self.row_coord - (center_row + self.padding)
         delta_col, delta_row = np.meshgrid(delta_col, delta_row)
 
         rot_row = delta_row * cosa - delta_col * sina
         rot_col = delta_row * sina + delta_col * cosa
 
-        self.prf_model = (flux * scale_row * scale_col *
-                          self.model(rot_row.flatten() * scale_row,
-                                     rot_col.flatten() * scale_col,
-                                     grid=False).reshape(self.shape))
-        return self.prf_model
+        modelshape = (self.shape[0] + self.padding*2, self.shape[1] + self.padding*2)
+        prf_model = self.model(rot_row.flatten() * scale_row,
+                               rot_col.flatten() * scale_col,
+                               grid=False).reshape(modelshape)
+        density = prf_model / np.nansum(prf_model)
+        if self.padding == 0:  # TODO: May want to move this to constructor
+            return flux * density
+        return flux * density[self.padding:-self.padding, self.padding:-self.padding]
 
     def gradient(self, center_col, center_row, flux=1., scale_col=1., scale_row=1.,
                  rotation_angle=0.):
@@ -115,43 +118,7 @@ class PRFModel:
             of the KeplerPRF model with respect to center_col, center_row, flux, scale_col,
             scale_row, and rotation_angle, respectively.
         """
-        cosa = math.cos(rotation_angle)
-        sina = math.sin(rotation_angle)
-
-        delta_col = self.col_coord - center_col
-        delta_row = self.row_coord - center_row
-        delta_col, delta_row = np.meshgrid(delta_col, delta_row)
-
-        rot_row = delta_row * cosa - delta_col * sina
-        rot_col = delta_row * sina + delta_col * cosa
-
-        # for a proof of the maths that follow, see the pdf attached
-        # on pull request #198 in lightkurve GitHub repo.
-        interp = self.model(rot_row.flatten() * scale_row,
-                            rot_col.flatten() * scale_col,
-                            grid=False).reshape(self.shape)
-
-        deriv_flux = scale_row * scale_col * interp
-
-        interp_dy = self.model(rot_row.flatten() * scale_row,
-                               rot_col.flatten() * scale_col,
-                               grid=False, dy=1).reshape(self.shape)
-
-        interp_dx = self.model(rot_row.flatten() * scale_row,
-                               rot_col.flatten() * scale_col,
-                               grid=False, dx=1).reshape(self.shape)
-
-        scale_row_times_interp_dx = scale_row * interp_dx
-        scale_col_times_interp_dy = scale_col * interp_dy
-
-        deriv_center_col = - scale_row * scale_col * flux * (cosa * scale_col_times_interp_dy - sina * scale_row_times_interp_dx)
-        deriv_center_row = - scale_row * scale_col * flux * (sina * scale_col_times_interp_dy + cosa * scale_row_times_interp_dx)
-        deriv_scale_row = flux * scale_col * (scale_row * interp_dx * rot_row + interp)
-        deriv_scale_col = flux * scale_row * (scale_col * interp_dy * rot_col + interp)
-        deriv_rotation_angle = scale_row * scale_col * flux * (interp_dy * scale_col * (delta_row * cosa - delta_col * sina)
-                                       - interp_dx * scale_row * (delta_row * sina + delta_col * cosa))
-        return [deriv_center_col, deriv_center_row, deriv_flux,
-                deriv_scale_col, deriv_scale_row, deriv_rotation_angle]
+        raise NotImplementedError("Gradients are hard dude.")
 
     def plot(self, *params, title="PRF Model", **kwargs):
         pflux = self.evaluate(*params)
@@ -205,11 +172,12 @@ class KeplerPRF(PRFModel):
            <https://arxiv.org/abs/1001.0331>.
     """
 
-    def __init__(self, channel, shape, column, row):
+    def __init__(self, channel, shape, column, row, padding=10):
         self.channel = channel
         self.shape = shape
         self.column = column
         self.row = row
+        self.padding = padding
         self.col_coord, self.row_coord, self.model, self.supersampled_prf = self._prepare_prf()
 
     def _read_prf_calibration_file(self, path, ext):
@@ -254,10 +222,10 @@ class KeplerPRF(PRFModel):
         PRFrow = (PRFrow - np.size(PRFrow) / 2) * cdelt2p[0]
 
         # interpolate the calibrated PRF shape to the target position
-        rowdim, coldim = self.shape[0], self.shape[1]
+        rowdim, coldim = self.shape[0] + self.padding*2, self.shape[1] + self.padding*2
         prf = np.zeros(np.shape(prfn[0]), dtype='float32')
-        ref_column = self.column + .5 * coldim
-        ref_row = self.row + .5 * rowdim
+        ref_column = self.column + .5 * coldim + self.padding
+        ref_row = self.row + .5 * rowdim + self.padding
 
         for i in range(n_hdu):
             prf_weight = math.sqrt((ref_column - crval1p[i]) ** 2
@@ -300,12 +268,13 @@ class TessPRF(PRFModel):
     column, row: ints
         Column and row numbers of the bottom-left corner of the tpf.
     """
-    def __init__(self, camera, ccd, shape, column, row):
+    def __init__(self, camera, ccd, shape, column, row, padding=10):
         self.camera = camera
         self.ccd = ccd
         self.shape = shape
         self.column = column
         self.row = row
+        self.padding = padding
         self.col_coord, self.row_coord, self.model = self.build_model()
 
     def build_model(self):
@@ -317,7 +286,7 @@ class TessPRF(PRFModel):
         row_diff = abs(prf_row[0] - prf_row[1])
         col_diff = abs(prf_col[0] - prf_col[1])
         prf_values /= (np.sum(prf_values) * row_diff * col_diff)
-        rowdim, coldim = self.shape[0], self.shape[1]
+        rowdim, coldim = self.shape[0] + self.padding*2, self.shape[1] + self.padding*2
         col_coord = np.arange(self.column + .5, self.column + coldim + .5)
         row_coord = np.arange(self.row + .5, self.row + rowdim + .5)
         model = scinterp.RectBivariateSpline(prf_row, prf_col, prf_values)
