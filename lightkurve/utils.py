@@ -412,9 +412,9 @@ def plot_image(image, ax=None, scale='linear', origin='lower',
     norm = None
     if scale is not None:
         if scale == 'linear':
-            norm = ImageNormalize(vmin=vmin, vmax=vmax, stretch=LinearStretch())
+            norm = ImageNormalize(vmin=vmin, vmax=vmax, stretch=LinearStretch(), clip=False)
         elif scale == 'sqrt':
-            norm = ImageNormalize(vmin=vmin, vmax=vmax, stretch=SqrtStretch())
+            norm = ImageNormalize(vmin=vmin, vmax=vmax, stretch=SqrtStretch(), clip=False)
         elif scale == 'log':
             # To use log scale we need to guarantee that vmin > 0, so that
             # we avoid division by zero and/or negative values.
@@ -422,7 +422,6 @@ def plot_image(image, ax=None, scale='linear', origin='lower',
                            clip=True)
         else:
             raise ValueError("scale {} is not available.".format(scale))
-
     cax = ax.imshow(image, origin=origin, norm=norm, **kwargs)
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
