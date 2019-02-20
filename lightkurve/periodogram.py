@@ -207,10 +207,13 @@ class Periodogram(object):
             count = np.zeros(len(self.frequency.value), dtype=int)
             bkg = np.zeros_like(self.frequency.value)
             x0 = np.log10(self.frequency[0].value)
+            # The median of chi squared 2 dof noise is 2(8/9)**3 where as the
+            # mean is 2.  To correct for this we divide the median by (8/9)**3
+            corr_factor = (8.0/9.0)**3
             while x0 < np.log10(self.frequency[-1].value):
                 m = np.abs(np.log10(self.frequency.value) - x0) < filter_width
                 if len(bkg[m] > 0):
-                    bkg[m] += np.nanmedian(self.power[m].value)
+                    bkg[m] += np.nanmedian(self.power[m].value) / corr_factor
                     count[m] += 1
                 x0 += 0.5 * filter_width
             bkg /= count

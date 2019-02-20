@@ -134,6 +134,9 @@ def test_smooth():
     with pytest.raises(ValueError) as err:
         p.smooth(method='logmedian',  filter_width=5.*u.day)
 
+    # Check logmedian smooth returns mean of unity
+    assert np.abs(p.smooth().power - 1.0) < 0.05
+
 
 def test_flatten():
     lc = LightCurve(time=np.arange(1000),
@@ -144,6 +147,9 @@ def test_flatten():
     # Check method returns equal frequency
     assert all(p.flatten(method='logmedian').frequency == p.frequency)
     assert all(p.flatten(method='boxkernel').frequency == p.frequency)
+
+    # Check logmedian flatten returns mean of unity
+    assert np.abs(p.flatten(method='logmedian').power - 1.0) < 0.05
 
     # Check return trend works
     s, b = p.flatten(return_trend=True)
