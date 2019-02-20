@@ -135,7 +135,7 @@ def test_smooth():
         p.smooth(method='logmedian',  filter_width=5.*u.day)
 
     # Check logmedian smooth that the mean of the smoothed power should be consistent with the mean of the power
-    assert np.isclose(np.mean(p.smooth(method='logmedian').power.value), np.mean(p.power), atol=0.05)
+    assert np.isclose(np.mean(p.smooth(method='logmedian').power.value), np.mean(p.power.value), atol=0.05)
 
 
 def test_flatten():
