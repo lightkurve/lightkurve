@@ -3,13 +3,25 @@
 About
 =====
 
+Package info
+------------
+
 .. toctree::
     :maxdepth: 1
 
     install.rst
-    contributing.rst
-    developer.rst
     citing.rst
-    other_software.rst
     changelog.rst
-    
+    other_software.rst
+
+
+Developer documentation
+-----------------------
+
+.. toctree::
+    :maxdepth: 1
+
+    contributing.rst
+    testing.rst
+    documentation.rst
+    release-procedure.rst
