@@ -106,6 +106,7 @@ def test_bin():
 def test_smooth():
     """Test if you can smooth the periodogram and check any pitfalls
     """
+    np.random.seed(42)
     lc = LightCurve(time=np.arange(1000),
                     flux=np.random.normal(1, 0.1, 1000),
                     flux_err=np.zeros(1000)+0.1)
@@ -115,6 +116,12 @@ def test_smooth():
     assert all(p.smooth(method='logmedian').frequency == p.frequency)
     # Check output units
     assert p.smooth().power.unit == p.power.unit
+
+    # Check logmedian smooth that the mean of the smoothed power should
+    # be consistent with the mean of the power
+    assert np.isclose(np.mean(p.smooth(method='logmedian').power.value),
+                     np.mean(p.power.value), atol=0.05*np.mean(p.power.value))
+
 
     # Can't pass filter_width below 0.
     with pytest.raises(ValueError) as err:
@@ -134,16 +141,15 @@ def test_smooth():
     with pytest.raises(ValueError) as err:
         p.smooth(method='logmedian',  filter_width=5.*u.day)
 
-    # Check logmedian smooth that the mean of the smoothed power should
-    # be consistent with the mean of the power
-    assert np.isclose(np.mean(p.smooth(method='logmedian').power.value),
-                     np.mean(p.power.value), atol=0.05*np.mean(p.power.value))
+
 
 
 def test_flatten():
-    lc = LightCurve(time=np.arange(1000),
-                    flux=np.random.normal(1, 0.1, 1000),
-                    flux_err=np.zeros(1000)+0.1)
+    npts = 10000
+    np.random.seed(12069424)
+    lc = LightCurve(time=np.arange(npts),
+                    flux=np.random.normal(1, 0.1, npts),
+                    flux_err=np.zeros(npts)+0.1)
     p = lc.to_periodogram()
 
     # Check method returns equal frequency
