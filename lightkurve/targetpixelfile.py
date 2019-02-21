@@ -31,11 +31,10 @@ log = logging.getLogger(__name__)
 
 
 class TargetPixelFile(object):
-    """
-    Generic TargetPixelFile class for Kepler, K2, and TESS data.
+    """Abstract class representing FITS files which contain time series imaging data.
 
-    See `KeplerTargetPixelFile` and `TessTargetPixelFile` for constructor
-    documentation.
+    You should probably not be using this abstract class directly;
+    see `KeplerTargetPixelFile` and `TessTargetPixelFile` instead.
     """
     def __init__(self, path, quality_bitmask='default', targetid=None, **kwargs):
         self.path = path
@@ -214,27 +213,35 @@ class TargetPixelFile(object):
         w : astropy.wcs.WCS object
             WCS solution
         """
-        # Use WCS keywords of the 5th column (FLUX)
-        wcs_keywords = {'1CTYP5': 'CTYPE1',
-                        '2CTYP5': 'CTYPE2',
-                        '1CRPX5': 'CRPIX1',
-                        '2CRPX5': 'CRPIX2',
-                        '1CRVL5': 'CRVAL1',
-                        '2CRVL5': 'CRVAL2',
-                        '1CUNI5': 'CUNIT1',
-                        '2CUNI5': 'CUNIT2',
-                        '1CDLT5': 'CDELT1',
-                        '2CDLT5': 'CDELT2',
-                        '11PC5': 'PC1_1',
-                        '12PC5': 'PC1_2',
-                        '21PC5': 'PC2_1',
-                        '22PC5': 'PC2_2',
-                        'NAXIS1': 'NAXIS1',
-                        'NAXIS2': 'NAXIS2'}
-        mywcs = {}
-        for oldkey, newkey in wcs_keywords.items():
-            mywcs[newkey] = self.hdu[1].header[oldkey]
-        return WCS(mywcs)
+        if 'MAST' in self.hdu[0].header['ORIGIN']:  # Is it a TessCut TPF?
+            # TPF's generated using the TESSCut service in early 2019 only appear
+            # to contain a valid WCS in the second extension (the aperture
+            # extension), so we treat such files as a special case.
+            return WCS(self.hdu[2])
+        else:
+            # For standard (Ames-pipeline-produced) TPF files, we use the WCS
+            # keywords provided in the first extension (the data table extension).
+            # Specifically, we use the WCS keywords for the 5th data column (FLUX).
+            wcs_keywords = {'1CTYP5': 'CTYPE1',
+                            '2CTYP5': 'CTYPE2',
+                            '1CRPX5': 'CRPIX1',
+                            '2CRPX5': 'CRPIX2',
+                            '1CRVL5': 'CRVAL1',
+                            '2CRVL5': 'CRVAL2',
+                            '1CUNI5': 'CUNIT1',
+                            '2CUNI5': 'CUNIT2',
+                            '1CDLT5': 'CDELT1',
+                            '2CDLT5': 'CDELT2',
+                            '11PC5': 'PC1_1',
+                            '12PC5': 'PC1_2',
+                            '21PC5': 'PC2_1',
+                            '22PC5': 'PC2_2',
+                            'NAXIS1': 'NAXIS1',
+                            'NAXIS2': 'NAXIS2'}
+            mywcs = {}
+            for oldkey, newkey in wcs_keywords.items():
+                mywcs[newkey] = self.hdu[1].header[oldkey]
+            return WCS(mywcs)
 
     @classmethod
     def from_fits(cls, path_or_url, **kwargs):
@@ -457,7 +464,7 @@ class TargetPixelFile(object):
         mad_cut = (1.4826 * MAD(vals) * threshold) + np.nanmedian(median_image)
         # Create a mask containing the pixels above the threshold flux
         threshold_mask = np.nan_to_num(median_image) > mad_cut
-        if reference_pixel is None:
+        if (reference_pixel is None) or (not threshold_mask.any()):
             # return all regions above threshold
             return threshold_mask
         else:
@@ -590,7 +597,7 @@ class TargetPixelFile(object):
         self.hdu.writeto(output_fn, overwrite=overwrite, checksum=True)
 
     def interact(self, notebook_url='localhost:8888', max_cadences=30000,
-                aperture_mask='pipeline', exported_filename=None):
+                 aperture_mask='pipeline', exported_filename=None):
         """Display an interactive Jupyter Notebook widget to inspect the pixel data.
 
         The widget will show both the lightcurve and pixel data.  By default,
@@ -637,11 +644,60 @@ class TargetPixelFile(object):
                                     aperture_mask=aperture_mask,
                                     exported_filename=exported_filename)
 
+    def interact_sky(self, notebook_url='localhost:8888', magnitude_limit=18):
+        """Display a Jupyter Notebook widget showing Gaia DR2 positions on top of the pixels.
+
+        Parameters
+        ----------
+        notebook_url: str
+            Location of the Jupyter notebook page (default: "localhost:8888")
+            When showing Bokeh applications, the Bokeh server must be
+            explicitly configured to allow connections originating from
+            different URLs. This parameter defaults to the standard notebook
+            host and port. If you are running on a different location, you
+            will need to supply this value for the application to display
+            properly. If no protocol is supplied in the URL, e.g. if it is
+            of the form "localhost:8888", then "http" will be used.
+        magnitude_limit : float
+            A value to limit the results in based on Gaia Gmag. Default, 18.
+        """
+        from .interact import show_skyview_widget
+        return show_skyview_widget(self, notebook_url=notebook_url,
+                                   magnitude_limit=magnitude_limit)
+
+    def to_corrector(self, method="pld"):
+        """Returns a `Corrector` instance to remove systematics.
+
+        Parameters
+        ----------
+        methods : string
+            Currently, only "pld" is supported.  This will return a
+            `PLDCorrector` class instance.
+
+        Returns
+        -------
+        correcter : `lightkurve.Correcter`
+            Instance of a Corrector class, which typically provides `correct()`
+            and `diagnose()` methods.
+        """
+        allowed_methods = ["pld"]
+        if method == "sff":
+            raise ValueError("The 'sff' method requires a `LightCurve` instead "
+                             "of a `TargetPixelFile` object.  Use `to_lightcurve()` "
+                             "to obtain a `LightCurve` first.")
+        if method not in allowed_methods:
+            raise ValueError(("Unrecognized method '{0}'\n"
+                              "allowed methods are: {1}")
+                             .format(method, allowed_methods))
+        if method == "pld":
+            from .correctors import PLDCorrector
+            return PLDCorrector(self)
+
 
 class KeplerTargetPixelFile(TargetPixelFile):
-    """
-    Defines a TargetPixelFile class for the Kepler/K2 Mission.
-    Enables extraction of raw lightcurves and centroid positions.
+    """Represents pixel data products created by NASA's Kepler pipeline.
+
+    This class enables extraction of custom light curves and centroid positions.
 
     Parameters
     ----------
@@ -856,6 +912,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                 flux=np.nansum(self.flux[:, aperture_mask], axis=1),
                                 flux_err=flux_err,
                                 **keys)
+
 
     def get_bkg_lightcurve(self, aperture_mask=None):
         aperture_mask = self._parse_aperture_mask(aperture_mask)
@@ -1313,9 +1370,9 @@ class KeplerTargetPixelFileFactory(object):
 
 
 class TessTargetPixelFile(TargetPixelFile):
-    """
-    Defines a TargetPixelFile class for the TESS Mission.
-    Enables extraction of raw lightcurves and centroid positions.
+    """Represents pixel data products created by NASA's TESS pipeline.
+
+    This class enables extraction of custom light curves and centroid positions.
 
     Parameters
     ----------
@@ -1336,7 +1393,8 @@ class TessTargetPixelFile(TargetPixelFile):
         # Early TESS releases had cadences with time=NaN (i.e. missing data)
         # which were not flagged by a QUALITY flag yet; the line below prevents
         # these cadences from being used. They would break most methods!
-        self.quality_mask &= np.isfinite(self.hdu[1].data['TIME'])
+        if (quality_bitmask != 0) and (quality_bitmask != 'none'):
+            self.quality_mask &= np.isfinite(self.hdu[1].data['TIME'])
 
         # check to make sure the correct filetype has been provided
         filetype = detect_filetype(self.header)

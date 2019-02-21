@@ -41,3 +41,6 @@ Comments, corrections & suggestions:
 - `Brian Jackson <https://github.com/decaelus>`_
 - `Rishi Paudel <https://github.com/rrpastro>`_
 - `Marusa Zerjal <https://github.com/marusazerjal>`_
+- `Michael Hippke <https://github.com/hippke>`_
+- `Molnár László <https://github.com/lacalaca85>`_
+- `Tom Wilson <https://github.com/Onoddil>`_
