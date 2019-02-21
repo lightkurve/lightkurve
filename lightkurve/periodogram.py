@@ -719,6 +719,50 @@ class LombScarglePeriodogram(Periodogram):
         return LombScarglePeriodogram(frequency=frequency, power=power, nyquist=nyquist,
                                       targetid=lc.targetid, label=lc.label)
 
+    def get_lombscargle_model(self, frequency=None, period=None):
+        """Returns the Lomb Scargle model at a given frequency or period.
+        This is especially useful for reducing noise for hot stars through
+        iterative sine fitting, or removing periodic noise (such as the Kepler
+        spacecraft roll noise).
+
+        Parameters
+        ----------
+        lc : LightCurve object
+            The LightCurve object of the timeseries from which the periodogram
+            was computed
+        frequency : float
+            The frequency at which to evaluate the Lomb Scargle model. If none
+            is given, defaults to the frequency of maximum power.
+        period : float
+            The period at which to evaluate the Lomb Scargle model. If none is
+            given, defaults to the period of maximum power.
+
+        Returns
+        -------
+        y_fit : array
+            The Lomb-Scargle model at a given frequency. Has the same length as
+            the LightCurve object.
+        """
+        if (frequency is not None) & (period is not None):
+            raise ValueError('You have input keyword arguments for both frequency and period. '
+                             'Please only use one.')
+
+        if (frequency is None) & (period is not None):
+            frequency = 1./period   #Convert period into frequency space
+
+        elif (frequency is None) & (period is None):
+            frequency = self.frequency_at_max_power
+
+        # LombScargle.model does not deal with units, so to do this model the
+        # frequencies must be in units of 1/[time]
+        # We hardcode the assumption that values for period are given in days
+        frequency = u.Quantity(frequency, 1/u.day)
+
+        #Caculate the model
+        lc = lc.normalize() #Repeat any operations made to the lc when calculating the periodogram
+        y_fit = LombScargle(lc.time, lc.flux, lc.flux_err).model(lc.time, frequency.value)
+        return y_fit
+
 
 class BoxLeastSquaresPeriodogram(Periodogram):
     """Subclass of :class:`Periodogram <lightkurve.periodogram.Periodogram>`
