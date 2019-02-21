@@ -719,7 +719,7 @@ class LombScarglePeriodogram(Periodogram):
         return LombScarglePeriodogram(frequency=frequency, power=power, nyquist=nyquist,
                                       targetid=lc.targetid, label=lc.label)
 
-    def get_lombscargle_model(self, frequency=None, period=None):
+    def get_lombscargle_model(self, lc, frequency=None, period=None):
         """Returns the Lomb Scargle model at a given frequency or period.
         This is especially useful for reducing noise for hot stars through
         iterative sine fitting, or removing periodic noise (such as the Kepler
