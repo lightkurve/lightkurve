@@ -555,8 +555,8 @@ class LombScarglePeriodogram(Periodogram):
     def from_lightcurve(lc, minimum_frequency=None, maximum_frequency=None,
                         minimum_period=None, maximum_period=None,
                         frequency=None, period=None,
-                        nterms=1, nyquist_factor=1, oversample_factor=2,
-                        freq_unit=1/u.day, normalization="psd", **kwargs):
+                        nterms=1, nyquist_factor=1, oversample_factor=5,
+                        freq_unit=1/u.day, normalization="amplitude", **kwargs):
         """Creates a Periodogram from a LightCurve using the Lomb-Scargle method.
 
         By default, the periodogram will be created for a regular grid of
