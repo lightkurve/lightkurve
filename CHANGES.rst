@@ -158,11 +158,17 @@ Bugfixes
 ===================
 
 - We adopted a rule that all method names must include a verb, and all class properties must be a noun [#286].  As a result, we renamed the following methods:
+
   * ``LightCurve.cdpp()`` is now ``LightCurve.estimate_cdpp()``
+
   * ``LightCurve.periodogram()`` is now ``LightCurve.to_periodogram()``
+
   * ``LichtCurve.properties()`` is now ``LightCurve.show_properties()``
+
   * ``TargetPixelFile.aperture_photometry()`` is now ``TargetPixelFile.extract_aperture_photometry()``
+
   * ``TargetPixelFile.centroids()`` is now ``TargetPixelFile.estimate_centroids()``
+
   * ``TargetPixelFile.header()`` is now a property.
 
 - Added ``Periodogram.smooth()`` [#288].
