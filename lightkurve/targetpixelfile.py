@@ -1143,7 +1143,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
             else:
                 cutout = Cutout2D(hdu.data, position, wcs=WCS(hdu.header),
                                   size=size, mode='partial')
-            factory.add_cadence(frameno=idx, flux=cutout.data, header=hdu.header)
+            factory.add_cadence(frameno=idx, wcs=wcs_ref, flux=cutout.data, header=hdu.header)
         return factory.get_tpf(hdu0_keywords=allkeys, ext_info=ext_info, **kwargs)
 
 
@@ -1213,6 +1213,10 @@ class KeplerTargetPixelFileFactory(object):
             self.cadenceno[frameno] = header['CADENCEN']
         if 'QUALITY' in header:
             self.quality[frameno] = header['QUALITY']
+        if 'POS_CORR1' in header:
+            self.pos_corr1[frameno] = header['POS_CORR1']
+        if 'POS_CORR2' in header:
+            self.pos_corr2[frameno] = header['POS_CORR2']
         if wcs is None:
             self.pos_corr1[frameno], self.pos_corr2[frameno] = None, None
 
