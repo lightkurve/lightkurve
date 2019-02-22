@@ -743,9 +743,10 @@ class LombScarglePeriodogram(Periodogram):
 
         Returns
         -------
-        y_fit : array
+        model : lightkurve.LightCurve
             The Lomb-Scargle model at a given frequency. Has the same length as
-            the LightCurve object.
+            the input time array.
+
         """
         if (frequency is not None) & (period is not None):
             raise ValueError('You have input keyword arguments for both frequency and period. '
