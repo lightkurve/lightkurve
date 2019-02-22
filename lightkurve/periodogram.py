@@ -521,6 +521,7 @@ class LombScarglePeriodogram(Periodogram):
     representing a power spectrum generated using the Lomb Scargle method.
     """
     def __init__(self, *args, **kwargs):
+        self._LS_object = kwargs.pop("ls_object", None)
         super(LombScarglePeriodogram, self).__init__(*args, **kwargs)
 
     def __repr__(self):
@@ -716,8 +717,12 @@ class LombScarglePeriodogram(Periodogram):
         power = power / fs
 
         # Periodogram needs properties
-        return LombScarglePeriodogram(frequency=frequency, power=power, nyquist=nyquist,
-                                      targetid=lc.targetid, label=lc.label)
+        return LombScarglePeriodogram(  frequency=frequency,
+                                        power=power,
+                                        nyquist=nyquist,
+                                        targetid=lc.targetid,
+                                        label=lc.label,
+                                        ls_object=LS)
 
     def get_lombscargle_model(self, lc, frequency=None, period=None):
         """Returns the Lomb Scargle model at a given frequency or period.
@@ -758,9 +763,10 @@ class LombScarglePeriodogram(Periodogram):
         # We hardcode the assumption that values for period are given in days
         frequency = u.Quantity(frequency, 1/u.day)
 
+        time = lc.time.copy() * u.day
+
         #Caculate the model
-        lc = lc.normalize() #Repeat any operations made to the lc when calculating the periodogram
-        y_fit = LombScargle(lc.time, lc.flux, lc.flux_err).model(lc.time, frequency.value)
+        y_fit = self._LS_object.model(time, frequency) / 1e6 #Rescale to normalised flux
         return y_fit
 
 
