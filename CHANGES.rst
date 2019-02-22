@@ -2,6 +2,12 @@
 1.0b30 (unreleased)
 ===================
 
+- Improved the normalization of the result returned by `Periodogram.smooth(method='logmedian')`. [#453]
+
+- Improved the visualization of NaN values in `TargetPixelFile.plot()`. [#455]
+
+- Various minor bug fixes. [#448, #450]
+
 
 
 1.0b29 (2019-02-14)

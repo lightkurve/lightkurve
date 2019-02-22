@@ -22,6 +22,7 @@ Direct contributions:
 - `Natalie Gosnell <https://github.com/nattieg>`_
 - `Peter Williams <https://github.com/pkgw>`_
 - `Richard Elkins <https://github.com/texadactyl>`_
+- `Guy Davies <https://github.com/grd349>`_
 
 
 Comments, corrections & suggestions:
