@@ -57,10 +57,10 @@ def test_periodogram_units():
 
     # Has the correct units
     assert p.frequency.unit == 1./u.day
-    assert p.power.unit == u.cds.ppm**2*u.day
+    assert p.power.unit == u.cds.ppm
     assert p.period.unit == u.day
     assert p.frequency_at_max_power.unit == 1./u.day
-    assert p.max_power.unit == u.cds.ppm**2*u.day
+    assert p.max_power.unit == u.cds.ppm
 
 
 def test_periodogram_can_find_periods():
