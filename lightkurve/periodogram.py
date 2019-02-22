@@ -724,7 +724,7 @@ class LombScarglePeriodogram(Periodogram):
                                         label=lc.label,
                                         ls_object=LS)
 
-    def get_lombscargle_model(self, lc, frequency=None, period=None):
+    def get_lombscargle_model(self, time, frequency=None, period=None):
         """Returns the Lomb Scargle model at a given frequency or period.
         This is especially useful for reducing noise for hot stars through
         iterative sine fitting, or removing periodic noise (such as the Kepler
@@ -732,9 +732,8 @@ class LombScarglePeriodogram(Periodogram):
 
         Parameters
         ----------
-        lc : LightCurve object
-            The LightCurve object of the timeseries from which the periodogram
-            was computed
+        time : ndarray
+            The timeseries onto which you want the model to be fit.
         frequency : float
             The frequency at which to evaluate the Lomb Scargle model. If none
             is given, defaults to the frequency of maximum power.
@@ -763,7 +762,7 @@ class LombScarglePeriodogram(Periodogram):
         # We hardcode the assumption that values for period are given in days
         frequency = u.Quantity(frequency, 1/u.day)
 
-        time = lc.time.copy() * u.day
+        time = time * u.day
 
         #Caculate the model
         y_fit = self._LS_object.model(time, frequency) / 1e6 #Rescale to normalised flux
