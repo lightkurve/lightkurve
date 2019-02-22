@@ -2,9 +2,9 @@
 1.0b30 (unreleased)
 ===================
 
-- Improved the normalization of the result returned by `Periodogram.smooth(method='logmedian')`. [#453]
+- Improved the normalization of the result returned by ``Periodogram.smooth(method='logmedian')``. [#453]
 
-- Improved the visualization of NaN values in `TargetPixelFile.plot()`. [#455]
+- Improved the visualization of NaN values in ``TargetPixelFile.plot()``. [#455]
 
 - Various minor bug fixes. [#448, #450]
 
@@ -13,9 +13,9 @@
 1.0b29 (2019-02-14)
 ===================
 
-- The `search_tesscut(...).download()` feature now supports downloading rectangular TESS FFI cut-outs. It previously only supported squares. [#441]
+- The ``search_tesscut(...).download()`` feature now supports downloading rectangular TESS FFI cut-outs. It previously only supported squares. [#441]
 
-- Fixed a bug which prevented `search_tesscut(...).download_all()` from downloading all sectors. [#440]
+- Fixed a bug which prevented ``search_tesscut(...).download_all()`` from downloading all sectors. [#440]
 
 - Minor bug fixes and performance improvements. [#439, #446]
 
@@ -28,26 +28,26 @@ Changes
 -------
 
 - Simplified the installation of Lightkurve by turning several packages into
-  optional rather than required dependencies (`celerite`, `pybind`,
-  `scikit-learn`, and `bokeh`). [#436]
+  optional rather than required dependencies (``celerite``, ``pybind``,
+  ``scikit-learn``, and ``bokeh``). [#436]
 
-- Added `search_tesscut()`: an easy interface to access data produced using
+- Added ``search_tesscut()``: an easy interface to access data produced using
   the `MAST TESSCut service <https://mast.stsci.edu/tesscut/>`_. This service
   extracts Target Pixel Files (TPFs) from TESS Full Frame Images (FFIs). [#418]
 
-- Added `TargetPixelFile.interact_sky()`: an interactive Bokeh widget to
+- Added ``TargetPixelFile.interact_sky()``: an interactive Bokeh widget to
   overlay Gaia DR2 source positions on top of TPFs. [#124]
 
-- Changed `LightCurve.fold()`: the `transit_midpoint` parameter has been
-  deprecated in favor of the `t0` parameter. [#419]
+- Changed ``LightCurve.fold()``: the ``transit_midpoint`` parameter has been
+  deprecated in favor of the ``t0`` parameter. [#419]
 
 Bugfixes
 --------
 
-- Made `BoxLeastSquaresPeriodogram` robust against light curves that contain
+- Made ``BoxLeastSquaresPeriodogram`` robust against light curves that contain
   NaNs. [#432]
 
-- `TargetPixelFile.wcs` now works for Target Pixel Files produced using the
+- ``TargetPixelFile.wcs`` now works for Target Pixel Files produced using the
   MAST TessCut service. [#434]
 
 
@@ -56,25 +56,25 @@ Bugfixes
 ===================
 
 - Introduced a new layout for the
-  `online documentation <https://docs.lightkurve.org>`_. [#360, #400, #406]
+  ``online documentation <https://docs.lightkurve.org>``_. [#360, #400, #406]
 
-- Added `LightCurve.interact_bls()`: an interactive Bokeh widget to find
+- Added ``LightCurve.interact_bls()``: an interactive Bokeh widget to find
   planets using the Box Least Squares (BLS) method. [#401]
 
-- Added `LombScarglePeriodogram` and `BoxLeastSquarePeriodogam` sub-classes
+- Added ``LombScarglePeriodogram`` and ``BoxLeastSquarePeriodogam`` sub-classes
   to distinguish periodograms generated using different methods. [#403]
 
-- Added the `PLDCorrector` class to remove instrument systematics using the
+- Added the ``PLDCorrector`` class to remove instrument systematics using the
   Pixel Level Decorrelation (PLD) method. [#305]
 
-- Added the `TargetPixelFile.to_corrector()` convenience method to make
+- Added the ``TargetPixelFile.to_corrector()`` convenience method to make
   systematics correction classes easy to access. [#305]
 
-- Refactored `SFFCorrector` to make its API consistent with `PLDCorrector`,
-  and deprecated the `LightCurve.correct()` method in favor of
-  `LightCurve.to_corrector()`. [#408, #417]
+- Refactored ``SFFCorrector`` to make its API consistent with ``PLDCorrector``,
+  and deprecated the ``LightCurve.correct()`` method in favor of
+  ``LightCurve.to_corrector()``. [#408, #417]
 
-- Made `SFFCorrector` robust against light curves that contain big gaps in
+- Made ``SFFCorrector`` robust against light curves that contain big gaps in
   time. [#414]
 
 - Minor bug fixes. [#392, #397, #420]
@@ -86,24 +86,24 @@ Bugfixes
 1.0b25 (2018-12-14)
 ===================
 
-- The `TargetPixelFile.interact()` bokeh app now includes a `Save Lightcurve` button [#329].
+- The ``TargetPixelFile.interact()`` bokeh app now includes a ``Save Lightcurve`` button [#329].
 
-- Fixed a minor bug in `LightCurve.bin()` [#377].
+- Fixed a minor bug in ``LightCurve.bin()`` [#377].
 
 
 
 1.0b24 (2018-12-10)
 ===================
 
-- Added support for TESS to `search_targetpixelfile()` and `search_lightcurvefile()`  [#367].
+- Added support for TESS to ``search_targetpixelfile()`` and ``search_lightcurvefile()``  [#367].
 
 - Added support for data generated by the `TESScut service <https://mast.stsci.edu/tesscut/>`_ [#369, #375].
 
 - Removed "Impulsive outliers" from the default set of quality constraints applied to TESS data [#374].
 
-- `LightCurve.flatten()` is now more robust against outliers [#372].
+- ``LightCurve.flatten()`` is now more robust against outliers [#372].
 
-- `LightCurve.fold()` now takes a `transit_midpoint` parameter instead of the `phase` parameter [#361, #363].
+- ``LightCurve.fold()`` now takes a ``transit_midpoint`` parameter instead of the ``phase`` parameter [#361, #363].
 
 - Various minor bugfixes [#372].
 
@@ -112,15 +112,15 @@ Bugfixes
 1.0b23 (2018-11-30)
 ===================
 
-- `TargetPixelFile.create_threshold_mask()` now only returns one contiguous mask, which is configurable using the new `reference_pixel` argument [#345].
+- ``TargetPixelFile.create_threshold_mask()`` now only returns one contiguous mask, which is configurable using the new ``reference_pixel`` argument [#345].
 
-- `TargetPixelFile.interact()`: now requires Bokeh v1.0 or later [#355].
+- ``TargetPixelFile.interact()``: now requires ``Bokeh v1.0`` or later [#355].
 
-- `utils.detect_filetype()` automatically detects Kepler or TESS Target Pixel Files and Light Curve files [#340, #350, #356].
+- ``utils.detect_filetype()`` automatically detects Kepler or TESS Target Pixel Files and Light Curve files [#340, #350, #356].
 
-- `LightCurve.estimate_cdpp()`: the argument `sigma_clip` was renamed into `sigma` [#359].
+- ``LightCurve.estimate_cdpp()``: the argument ``sigma_clip`` was renamed into ``sigma`` [#359].
 
-- Fixed minor bugs in `LightCurve.to_pandas()` [#343], `LightCurve.correct()` [#347], `FoldedLightCurve.errorbar()` [#352], `LightCurve.fold()` [#353].
+- Fixed minor bugs in ``LightCurve.to_pandas()`` [#343], ``LightCurve.correct()`` [#347], ``FoldedLightCurve.errorbar()`` [#352], ``LightCurve.fold()`` [#353].
 
 - Documentation improvements [#344, #358].
 
@@ -131,11 +131,11 @@ Bugfixes
 1.0b22 (2018-11-17)
 ===================
 
-- `lightkurve.open()` was added to provide a single function to read in any light curve or target pixel file from Kepler or TESS and return the appropriate object [#317].
+- ``lightkurve.open()`` was added to provide a single function to read in any light curve or target pixel file from Kepler or TESS and return the appropriate object [#317].
 
-- The `from_fits()` methods have been deprecated in favor of `lightkurve.open()` [#336].
+- The ``from_fits()`` methods have been deprecated in favor of ``lightkurve.open()`` [#336].
 
-- The `lightkurve.mast` module has been removed in favor of the new `lightkurve.search` module.
+- The ``lightkurve.mast`` module has been removed in favor of the new ``lightkurve.search`` module.
 
 - Various small bugfixes, speed-ups, and documentation improvements [#314, #315, #322, #323, #325, #331, #334, #335].
 
@@ -144,11 +144,11 @@ Bugfixes
 1.0b21 (2018-10-29)
 ===================
 
-- The `from_archive()` methods of `KeplerTargetPixelFile` and `KeplerLightCurveFile` have been deprecated in favor of the new `search_targetpixelfile()` and `search_lightcurvefile()` functions.  These allow users to inspect the results of their queries and offer more powerful features, e.g. cone-searches.  If you are currently using `tpf = KeplerTargetPixelFile.from_archive("objectname")`, please start using `tpf = search_targetpixelfile("objectname").download()` instead.
+- The ``from_archive()`` methods of ``KeplerTargetPixelFile`` and ``KeplerLightCurveFile`` have been deprecated in favor of the new ``search_targetpixelfile()`` and ``search_lightcurvefile()`` functions.  These allow users to inspect the results of their queries and offer more powerful features, e.g. cone-searches.  If you are currently using ``tpf = KeplerTargetPixelFile.from_archive("objectname")``, please start using ``tpf = search_targetpixelfile("objectname").download()`` instead.
 
-- `TargetPixelFile` objects can now be indexed and sliced. [#308]
+- ``TargetPixelFile`` objects can now be indexed and sliced. [#308]
 
-- The default number of `windows` used by the SFF systematics removal algorithm has been changed from 1 to 10. [#312]
+- The default number of ``windows`` used by the SFF systematics removal algorithm has been changed from 1 to 10. [#312]
 
 - Various small bug fixes and unit test improvements.
 
@@ -158,24 +158,24 @@ Bugfixes
 ===================
 
 - We adopted a rule that all method names must include a verb, and all class properties must be a noun [#286].  As a result, we renamed the following methods:
-  * `LightCurve.cdpp()` is now `LightCurve.estimate_cdpp()`
-  * `LightCurve.periodogram()` is now `LightCurve.to_periodogram()`
-  * `LichtCurve.properties()` is now `LightCurve.show_properties()` 
-  * `TargetPixelFile.aperture_photometry()` is now `TargetPixelFile.extract_aperture_photometry()`
-  * `TargetPixelFile.centroids()` is now `TargetPixelFile.estimate_centroids()`
-  * `TargetPixelFile.header()` is now a property.
+  * ``LightCurve.cdpp()`` is now ``LightCurve.estimate_cdpp()``
+  * ``LightCurve.periodogram()`` is now ``LightCurve.to_periodogram()``
+  * ``LichtCurve.properties()`` is now ``LightCurve.show_properties()``
+  * ``TargetPixelFile.aperture_photometry()`` is now ``TargetPixelFile.extract_aperture_photometry()``
+  * ``TargetPixelFile.centroids()`` is now ``TargetPixelFile.estimate_centroids()``
+  * ``TargetPixelFile.header()`` is now a property.
 
-- Added `Periodogram.smooth()` [#288].
+- Added ``Periodogram.smooth()`` [#288].
 
-- `Periodogram.estimate_snr()` was renamed to `Periodogram.p.flatten()` [#290].
+- ``Periodogram.estimate_snr()`` was renamed to ``Periodogram.p.flatten()`` [#290].
 
-- Lightkurve can now read in light curve files produced using `LightCurveFile.to_fits()` [#297].
+- Lightkurve can now read in light curve files produced using ``LightCurveFile.to_fits()`` [#297].
 
 
 
 1.0b19 (2018-10-10)
 ===================
 
-- The `Periodogram` class has been refactored;
+- The ``Periodogram`` class has been refactored;
 
-- The `LightCurve.remove_outliers()` method now accepts `sigma_lower` and `sigma_upper` parameters.
+- The ``LightCurve.remove_outliers()`` method now accepts ``sigma_lower`` and ``sigma_upper`` parameters.
