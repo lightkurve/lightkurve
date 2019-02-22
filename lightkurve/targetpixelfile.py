@@ -1126,6 +1126,18 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
             if idx == 0:  # Get default keyword values from the first image
                 factory.keywords = hdu.header
+
+
+            # Get positional shift of the image compared to the reference WCS
+            wcs_current = WCS(hdu.header)
+            column_current, row_current = wcs_current.wcs_world2pix(
+                          np.asarray([[position.ra.deg], [position.dec.deg]]).T,0)[0]
+            column_ref, row_ref = wcs_ref.wcs_world2pix(
+                          np.asarray([[position.ra.deg], [position.dec.deg]]).T,0)[0]
+
+            hdu.header['POS_CORR1'] = column_current - column_ref
+            hdu.header['POS_CORR2'] = row_current - row_ref
+
             if position is None:
                 cutout = hdu
             else:
@@ -1201,10 +1213,6 @@ class KeplerTargetPixelFileFactory(object):
             self.cadenceno[frameno] = header['CADENCEN']
         if 'QUALITY' in header:
             self.quality[frameno] = header['QUALITY']
-        if 'POS_CORR1' in header:
-            self.pos_corr1[frameno] = header['POS_CORR1']
-        if 'POS_CORR2' in header:
-            self.pos_corr2[frameno] = header['POS_CORR2']
         if wcs is None:
             self.pos_corr1[frameno], self.pos_corr2[frameno] = None, None
 
