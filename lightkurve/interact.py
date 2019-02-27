@@ -165,7 +165,15 @@ def make_lightcurve_figure_elements(lc, lc_source):
                  border_fill_color="whitesmoke")
     fig.title.offset = -10
     fig.yaxis.axis_label = 'Flux (e/s)'
-    fig.xaxis.axis_label = 'Time - 2454833 (days)'
+    fig.xaxis.axis_label = 'Time (days)'
+    try:
+        if (lc.mission == 'K2') or (lc.mission == 'Kepler'):
+            fig.xaxis.axis_label = 'Time - 2454833 (days)'
+        elif lc.mission == 'TESS':
+            fig.xaxis.axis_label = 'Time - 2457000 (days)'
+    except AttributeError:  # no mission keyword available
+      pass
+        
 
     ylims = get_lightcurve_y_limits(lc_source)
     fig.y_range = Range1d(start=ylims[0], end=ylims[1])
