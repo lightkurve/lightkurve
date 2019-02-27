@@ -1,8 +1,18 @@
 import pytest
 from astropy import units as u
 import numpy as np
+from numpy.testing import assert_almost_equal
+
 from ..lightcurve import LightCurve
 from ..periodogram import Periodogram
+import sys
+
+try:
+    from astropy.stats.bls import BoxLeastSquares
+except:
+    print('no bls, tests will be skipped')
+
+bad_optional_imports = np.any([('astropy.stats.bls' not in sys.modules)])
 
 
 def test_periodogram_basics():
@@ -11,7 +21,7 @@ def test_periodogram_basics():
                     flux_err=np.zeros(1000)+0.1)
     pg = lc.to_periodogram()
     pg.plot()
-    pg.plot(format='period')
+    pg.plot(view='period')
     pg.show_properties()
     pg.to_table()
     str(pg)
@@ -96,6 +106,7 @@ def test_bin():
 def test_smooth():
     """Test if you can smooth the periodogram and check any pitfalls
     """
+    np.random.seed(42)
     lc = LightCurve(time=np.arange(1000),
                     flux=np.random.normal(1, 0.1, 1000),
                     flux_err=np.zeros(1000)+0.1)
@@ -105,6 +116,12 @@ def test_smooth():
     assert all(p.smooth(method='logmedian').frequency == p.frequency)
     # Check output units
     assert p.smooth().power.unit == p.power.unit
+
+    # Check logmedian smooth that the mean of the smoothed power should
+    # be consistent with the mean of the power
+    assert np.isclose(np.mean(p.smooth(method='logmedian').power.value),
+                     np.mean(p.power.value), atol=0.05*np.mean(p.power.value))
+
 
     # Can't pass filter_width below 0.
     with pytest.raises(ValueError) as err:
@@ -125,15 +142,23 @@ def test_smooth():
         p.smooth(method='logmedian',  filter_width=5.*u.day)
 
 
+
+
 def test_flatten():
-    lc = LightCurve(time=np.arange(1000),
-                    flux=np.random.normal(1, 0.1, 1000),
-                    flux_err=np.zeros(1000)+0.1)
+    npts = 10000
+    np.random.seed(12069424)
+    lc = LightCurve(time=np.arange(npts),
+                    flux=np.random.normal(1, 0.1, npts),
+                    flux_err=np.zeros(npts)+0.1)
     p = lc.to_periodogram()
 
     # Check method returns equal frequency
     assert all(p.flatten(method='logmedian').frequency == p.frequency)
     assert all(p.flatten(method='boxkernel').frequency == p.frequency)
+
+    # Check logmedian flatten of white noise returns mean of ~unity
+    assert np.isclose(np.mean(p.flatten(method='logmedian').power.value), 1.0,
+                      atol=0.05)
 
     # Check return trend works
     s, b = p.flatten(return_trend=True)
@@ -152,6 +177,98 @@ def test_index():
     mask = (p.frequency > 0.1*(1/u.day)) & (p.frequency < 0.2*(1/u.day))
     assert len(p[mask].frequency) == mask.sum()
 
+@pytest.mark.skipif(bad_optional_imports,
+                    reason="requires bokeh and astropy.stats.bls")
+def test_bls(caplog):
+    ''' Test that BLS periodogram works and gives reasonable errors
+    '''
+    lc = LightCurve(time=np.linspace(0, 10, 1000), flux=np.random.normal(1, 0.1, 1000),
+                    flux_err=np.zeros(1000)+0.1)
+
+    # should be able to make a periodogram
+    p = lc.to_periodogram(method='bls')
+    keys = ['period', 'power', 'duration', 'transit_time', 'depth', 'snr']
+    assert np.all([key in  dir(p) for key in keys])
+
+    p.plot()
+
+    # we should be able to specify some keywords
+    lc.to_periodogram(method='bls', minimum_period=0.2, duration=0.1, maximum_period=0.5)
+
+    # Ridiculous BLS spectra should break.
+    with pytest.raises(ValueError) as err:
+        lc.to_periodogram(method='bls', frequency_factor=0.00001)
+        assert err.value.args[0] == ('`period` contains over 72000001 points.Periodogram is too large to evaluate. Consider setting `frequency_factor` to a higher value.')
+
+    # Some errors should occur
+    p.compute_stats()
+    for record in caplog.records:
+        assert record.levelname == 'WARNING'
+    assert len(caplog.records) == 4
+    assert 'No period specified.' in caplog.text
+
+    # No more errors
+    stats = p.compute_stats(1, 0.1, 0)
+    assert len(caplog.records) == 4
+    assert isinstance(stats, dict)
+
+    # Some errors should occur
+    p.get_transit_model()
+    for record in caplog.records:
+        assert record.levelname == 'WARNING'
+    assert len(caplog.records) == 7
+    assert 'No period specified.' in caplog.text
+
+    model = p.get_transit_model(1, 0.1, 0)
+    # No more errors
+    assert len(caplog.records) == 7
+    # Model is LC
+    assert isinstance(model, LightCurve)
+    # Model is otherwise identical to LC
+    assert np.in1d(model.time, lc.time).all()
+    assert np.in1d(lc.time, model.time).all()
+
+    mask = p.get_transit_mask(1, 0.1, 0)
+    assert isinstance(mask, np.ndarray)
+    assert isinstance(mask[0], np.bool_)
+    assert mask.sum() > (~mask).sum()
+
+    assert isinstance(p.period_at_max_power, u.Quantity)
+    assert isinstance(p.duration_at_max_power, float)
+    assert isinstance(p.transit_time_at_max_power, float)
+    assert isinstance(p.depth_at_max_power, float)
+
+
+@pytest.mark.skipif(bad_optional_imports, reason="requires astropy.stats.bls")
+def test_bls_period_recovery():
+    """Can BLS Periodogram recover the period of a synthetic light curve?"""
+    # Planet parameters
+    period = 2.0
+    transit_time = 0.5
+    duration = 0.1
+    depth = 0.2
+    flux_err = 0.01
+
+    # Create the synthetic light curve
+    time = np.arange(0, 100, 0.1)
+    flux = np.ones_like(time)
+    transit_mask = np.abs((time-transit_time+0.5*period) % period-0.5*period) < 0.5*duration
+    flux[transit_mask] = 1.0 - depth
+    flux += flux_err * np.random.randn(len(time))
+    synthetic_lc = LightCurve(time, flux)
+
+    # Can BLS recover the period?
+    bls_period = synthetic_lc.to_periodogram("bls").period_at_max_power
+    assert_almost_equal(bls_period.value, period, decimal=2)
+    # Does it work if we inject a sneaky NaN?
+    synthetic_lc.flux[10] = np.nan
+    bls_period = synthetic_lc.to_periodogram("bls").period_at_max_power
+    assert_almost_equal(bls_period.value, period, decimal=2)
+    # Does it work if all errors are NaNs?
+    # This is a regression test for issue #428
+    synthetic_lc.flux_err = np.array([np.nan] * len(time))
+    assert_almost_equal(bls_period.value, period, decimal=2)
+
 
 def test_error_messages():
     """Test periodogram raises reasonable errors
@@ -167,10 +284,23 @@ def test_error_messages():
     # Can't have a minimum frequency > maximum frequency
     with pytest.raises(ValueError) as err:
         lc.to_periodogram(max_frequency=0.1, min_frequency=10)
+        assert err.value.args[0] == 'min_frequency cannot be larger than max_frequency'
+
+    # Can't have a minimum period > maximum period
+    with pytest.raises(ValueError) as err:
+        lc.to_periodogram(max_period=0.1, min_period=10)
+        assert err.value.args[0] == 'min_period cannot be larger than max_period'
 
     # Can't specify periods and frequencies
     with pytest.raises(ValueError) as err:
         lc.to_periodogram(frequency=np.arange(10), period=np.arange(10))
+
+    # Don't accept NaNs
+    with pytest.raises(ValueError) as err:
+        lc_with_nans = lc.copy()
+        lc_with_nans.flux[0] = np.nan
+        lc_with_nans.to_periodogram()
+        assert('Lightcurve contains NaN values.' in err.value.args[0])
 
     # No unitless periodograms
     with pytest.raises(ValueError) as err:
@@ -201,3 +331,13 @@ def test_error_messages():
     with pytest.raises(ValueError) as err:
         Periodogram([0, 1, 2]*u.Hz, [1, 1, 1]*u.K).bin(binsize=-2)
         assert err.value.args[0] == 'binsize must be larger than or equal to 1'
+
+    # Bad binning method
+    with pytest.raises(ValueError) as err:
+        Periodogram([0, 1, 2]*u.Hz, [1, 1, 1]*u.K).bin(method='not-implemented')
+        assert("is not a valid method, must be 'mean' or 'median'" in err.value.args[0])
+
+    # Bad smooth method
+    with pytest.raises(ValueError) as err:
+        Periodogram([0, 1, 2]*u.Hz, [1, 1, 1]*u.K).smooth(method="not-implemented")
+        assert("parameter must be one 'boxkernel' or 'logmedian'" in err.value.args[0])

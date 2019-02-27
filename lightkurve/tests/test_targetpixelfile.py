@@ -1,6 +1,7 @@
 from __future__ import division, print_function
 
 import os
+import sys
 from astropy.utils.data import get_pkg_data_filename
 from astropy.io.fits.verify import VerifyWarning
 import matplotlib.pyplot as plt
@@ -215,6 +216,7 @@ def test_aperture_photometry():
         tpf.extract_aperture_photometry(aperture_mask='all')
         tpf.extract_aperture_photometry(aperture_mask='pipeline')
 
+
 def test_tpf_to_fits():
     """Can we write a TPF back to a fits file?"""
     for tpf in [KeplerTargetPixelFile(filename_tpf_all_zeros),
@@ -373,8 +375,13 @@ def test_interact():
     for tpf in [KeplerTargetPixelFile(filename_tpf_one_center),
                 TessTargetPixelFile(filename_tess)]:
         tpf.interact()
-        tpf.interact(lc=tpf.to_lightcurve(aperture_mask='all'))
 
+@pytest.mark.remote_data
+def test_interact_sky():
+    """Test the Jupyter notebook interact() widget."""
+    for tpf in [KeplerTargetPixelFile(filename_tpf_one_center),
+                TessTargetPixelFile(filename_tess)]:
+        tpf.interact_sky()
 
 def test_get_models():
     """Can we obtain PRF and TPF models?"""
@@ -409,6 +416,9 @@ def test_threshold_aperture_mask():
     assert tpf.create_threshold_mask(threshold=2., reference_pixel='center').sum() == 25
     assert tpf.create_threshold_mask(threshold=2., reference_pixel=None).sum() == 28
     assert tpf.create_threshold_mask(threshold=2., reference_pixel=(5, 0)).sum() == 2
+    # A mask which contains zero pixels should work without crashing
+    tpf = KeplerTargetPixelFile(filename_tpf_all_zeros)
+    assert tpf.create_threshold_mask().sum() == 0
 
 
 def test_tpf_tess():
@@ -450,3 +460,12 @@ def test_get_keyword():
     assert tpf.get_keyword("TELESCOP") == "Kepler"
     assert tpf.get_keyword("TTYPE1", hdu=1) == "TIME"
     assert tpf.get_keyword("DOESNOTEXIST", default=5) == 5
+
+
+@pytest.mark.skipif(('celerite' not in sys.modules) or ('sklearn' not in sys.modules),
+                    reason="PLD requires celerite and scikit-learn")
+def test_to_corrector():
+    """Does the tpf.pld() convenience method work?"""
+    tpf = KeplerTargetPixelFile(TABBY_TPF)
+    lc = tpf.to_corrector("pld").correct()
+    assert len(lc.flux) == len(tpf.time)

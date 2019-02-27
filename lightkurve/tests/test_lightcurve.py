@@ -1,16 +1,19 @@
 from __future__ import division, print_function
 
 from astropy.io import fits as pyfits
+from astropy.utils.data import get_pkg_data_filename
 import matplotlib.pyplot as plt
 import numpy as np
 
 from numpy.testing import (assert_almost_equal, assert_array_equal,
                            assert_allclose)
 import pytest
+import tempfile
 import warnings
 
 from ..lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
 from ..lightcurvefile import LightCurveFile, KeplerLightCurveFile, TessLightCurveFile
+from ..targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
 from ..utils import LightkurveWarning
 
 # 8th Quarter of Tabby's star
@@ -24,6 +27,7 @@ KEPLER10 = ("https://archive.stsci.edu/missions/kepler/lightcurves/"
             "0119/011904151/kplr011904151-2010009091648_llc.fits")
 TESS_SIM = ("https://archive.stsci.edu/missions/tess/ete-6/tid/00/000/"
             "004/104/tess2019128220341-0000000410458113-0016-s_lc.fits")
+filename_tess = get_pkg_data_filename("data/tess25155310-s01-first-cadences.fits.gz")
 
 
 def test_invalid_lightcurve():
@@ -160,10 +164,15 @@ def test_lightcurve_fold():
     assert fold.meta == lc.meta
     assert_array_equal(np.sort(fold.time_original), lc.time)
     assert len(fold.time_original) == len(lc.time)
-    fold = lc.fold(period=1, transit_midpoint=-0.1)
+    fold = lc.fold(period=1, t0=-0.1)
     assert_almost_equal(fold.time[0], -0.5, 2)
     assert_almost_equal(np.min(fold.phase), -0.5, 2)
     assert_almost_equal(np.max(fold.phase), 0.5, 2)
+    with warnings.catch_warnings():
+        # `transit_midpoint` is deprecated and its use will emit a warning
+        warnings.simplefilter("ignore", LightkurveWarning)
+        fold = lc.fold(period=1, transit_midpoint=-0.1)
+    assert_almost_equal(fold.time[0], -0.5, 2)
     ax = fold.plot()
     assert (ax.get_xlabel() == 'Phase')
     ax = fold.scatter()
@@ -255,17 +264,17 @@ def test_lightcurve_copy():
     # with a repeating decimal. However, float precision for python 2.7 is 10
     # decimal digits, while python 3.6's is 13 decimal digits. Therefore,
     # a regular expression is needed for both versions.
-    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
+    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+'):
         assert_array_equal(lc.time, nlc.time)
-    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
+    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+'):
         assert_array_equal(lc.flux, nlc.flux)
-    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
+    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+'):
         assert_array_equal(lc.centroid_col, nlc.centroid_col)
-    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
+    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+'):
         assert_array_equal(lc.centroid_row, nlc.centroid_row)
-    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
+    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+'):
         assert_array_equal(lc.cadenceno, nlc.cadenceno)
-    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
+    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+'):
         assert_array_equal(lc.quality, nlc.quality)
 
 
@@ -342,6 +351,15 @@ def test_bin():
                     flux=2*np.ones(10))
     binned_lc = lc.bin(binsize=2)
     assert_allclose(binned_lc.flux_err, np.zeros(5))
+    # Regression test for #377
+    lc = KeplerLightCurve(time=np.arange(10),
+                          flux=2*np.ones(10))
+    lc.bin(5).remove_outliers()
+    # Second regression test for #377
+    lc = KeplerLightCurve(time=np.arange(1000) * 0.02,
+                          flux=1*np.ones(1000) + np.random.normal(0, 1e-6, 1000),
+                          cadenceno=np.arange(1000))
+    assert np.isclose(lc.bin(2).estimate_cdpp(), 1, rtol=1)
 
 
 def test_bin_quality():
@@ -373,6 +391,7 @@ def test_to_pandas():
         assert_allclose(df.index, time)
         assert_allclose(df.flux, flux)
         assert_allclose(df.flux_err, flux_err)
+        df.describe() # Will fail if for Endianness bugs
     except ImportError:
         # pandas is an optional dependency
         pass
@@ -406,7 +425,7 @@ def test_to_csv():
     time, flux, flux_err = range(3), np.ones(3), np.zeros(3)
     try:
         lc = LightCurve(time, flux, flux_err)
-        assert(lc.to_csv(index=False) == 'time,flux,flux_err\n0,1.0,0.0\n1,1.0,0.0\n2,1.0,0.0\n')
+        assert(lc.to_csv(index=False, line_terminator='\n') == 'time,flux,flux_err\n0,1.0,0.0\n1,1.0,0.0\n2,1.0,0.0\n')
     except ImportError:
         # pandas is an optional dependency
         pass
@@ -427,11 +446,34 @@ def test_to_fits():
     assert hdu[1].header['TTYPE3'] == 'FLUX_ERR'
     assert hdu[1].header['TTYPE4'] == 'CADENCENO'
     hdu = LightCurve([0, 1, 2, 3, 4], [1, 1, 1, 1, 1]).to_fits()
+
+    # Test "round-tripping": can we read-in what we write
     lcf_new = LightCurveFile(hdu)  # Regression test for #233
     assert hdu[0].header['EXTNAME'] == 'PRIMARY'
     assert hdu[1].header['EXTNAME'] == 'LIGHTCURVE'
     assert hdu[1].header['TTYPE1'] == 'TIME'
     assert hdu[1].header['TTYPE2'] == 'FLUX'
+
+    # Test aperture mask support in to_fits
+    for tpf in [KeplerTargetPixelFile(TABBY_TPF), TessTargetPixelFile(filename_tess)]:
+        random_mask = np.random.randint(0, 2, size=tpf.flux[0].shape, dtype=bool)
+        thresh_mask = tpf.create_threshold_mask(threshold=3)
+
+        lc = tpf.to_lightcurve(aperture_mask=random_mask)
+        lc.to_fits(path=tempfile.NamedTemporaryFile().name, aperture_mask=random_mask)
+
+        lc = tpf[0:2].to_lightcurve(aperture_mask=thresh_mask)
+        lc.to_fits(aperture_mask=thresh_mask, path=tempfile.NamedTemporaryFile().name)
+
+        # Test the extra data kwargs
+        bkg_mask = ~tpf.create_threshold_mask(threshold=0.1)
+        bkg_lc = tpf.to_lightcurve(aperture_mask=bkg_mask)
+        lc = tpf.to_lightcurve(aperture_mask=tpf.hdu['APERTURE'].data)
+        lc = tpf.to_lightcurve(aperture_mask=None)
+        lc = tpf.to_lightcurve(aperture_mask=thresh_mask)
+        lc_out = lc - bkg_lc.flux * (thresh_mask.sum()/bkg_mask.sum())
+        lc_out.to_fits(aperture_mask=thresh_mask, path=tempfile.NamedTemporaryFile().name,
+                       overwrite=True, extra_data={'BKG': bkg_lc.flux})
 
 
 @pytest.mark.remote_data
@@ -656,4 +698,13 @@ def test_targetid():
 def test_regression_346():
     """Regression test for https://github.com/KeplerGO/lightkurve/issues/346"""
     # This previously triggered an IndexError:
-    KeplerLightCurveFile(K2_C08).PDCSAP_FLUX.correct().estimate_cdpp()
+    KeplerLightCurveFile(K2_C08).PDCSAP_FLUX.to_corrector().correct().estimate_cdpp()
+
+
+def test_new_corrector_api():
+    """This test can be remove after we remove the deprecated `LightCurve.correct()` method"""
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", LightkurveWarning)  # Deprecation warning
+        lc1 = KeplerLightCurveFile(K2_C08).PDCSAP_FLUX.correct()
+    lc2 = KeplerLightCurveFile(K2_C08).PDCSAP_FLUX.to_corrector().correct()
+    assert_allclose(lc1.flux, lc2.flux)

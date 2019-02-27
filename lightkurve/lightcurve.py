@@ -19,27 +19,27 @@ from astropy.stats import sigma_clip
 from astropy.table import Table
 from astropy.io import fits
 from astropy.time import Time
-from astropy import units as u
+
 from . import PACKAGEDIR, MPLSTYLE
+from .utils import (
+    running_mean, bkjd_to_astropy_time, btjd_to_astropy_time,
+    LightkurveWarning
+)
 
-from .utils import running_mean, bkjd_to_astropy_time, btjd_to_astropy_time, LightkurveWarning
-
-__all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve',
-           'FoldedLightCurve']
+__all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve']
 
 log = logging.getLogger(__name__)
 
 
 class LightCurve(object):
-    """
-    Implements a simple class for a generic light curve.
+    """Generic class to work with any time series photometry data set.
 
     Attributes
     ----------
     time : array-like
-        Time measurements
+        Time values
     flux : array-like
-        Data flux for every time point
+        Flux values for every time point
     flux_err : array-like
         Uncertainty on each flux data point
     time_format : str
@@ -47,13 +47,27 @@ class LightCurve(object):
         e.g. 'bkjd' or 'jd'.
     time_scale : str
         String which specifies how the time is measured,
-        e.g. tdb', 'tt', 'ut1', or 'utc'.
+        e.g. 'tdb', 'tt', 'ut1', or 'utc'.
     targetid : str
         Identifier of the target.
     label : str
         Human-friendly object label, e.g. "KIC 123456789"
     meta : dict
         Free-form metadata associated with the LightCurve.
+
+    Examples
+    --------
+    Create a new `LightCurve` object, access the data,
+    and apply binning as follows:
+
+    >>> import lightkurve as lk
+    >>> lc = lk.LightCurve(time=[1, 2, 3, 4], flux=[0.97, 1.01, 1.03, 0.99])
+    >>> lc.time
+    array([1, 2, 3, 4])
+    >>> lc.flux
+    array([0.97, 1.01, 1.03, 0.99])
+    >>> lc.bin(binsize=2).flux
+    array([0.99, 1.01])
     """
     def __init__(self, time=None, flux=None, flux_err=None, time_format=None,
                  time_scale=None, targetid=None, label=None, meta={}):
@@ -135,16 +149,17 @@ class LightCurve(object):
 
     @property
     def astropy_time(self):
-        """Returns an `astropy.time.Time` object.
+        """Returns the time values as an Astropy `~astropy.time.Time` object
+        (if ``time_format`` is set).
 
-        The Time object will be created using the values in `self.time`
-        and the `self.time_format` and `self.time_scale` attributes.
+        The Time object will be created using the values in the ``time``,
+        `time_format`, and ``time_scale`` attributes.
         For Kepler data products, the times are Barycentric.
 
         Raises
         ------
         ValueError
-            If `self.time_format` is not set or not one of the formats
+            If the ``time_format`` attribute is not set or not one of the formats
             allowed by AstroPy.
         """
         from astropy.time import Time
@@ -298,7 +313,7 @@ class LightCurve(object):
         -------
         flatten_lc : LightCurve object
             Flattened lightcurve.
-        If `return_trend` is `True`, the method will also return:
+        If ``return_trend`` is `True`, the method will also return:
         trend_lc : LightCurve object
             Trend in the lightcurve data
         """
@@ -361,39 +376,50 @@ class LightCurve(object):
             return flatten_lc, trend_lc
         return flatten_lc
 
-    def fold(self, period, transit_midpoint=0.):
-        """Folds the lightcurve at a specified ``period`` and ``transit_midpoint``.
+    def fold(self, period, t0=None, transit_midpoint=None):
+        """Folds the lightcurve at a specified ``period`` and reference time ``t0``.
 
-        This method returns a new ``LightCurve`` object in which the time
+        This method returns a `FoldedLightCurve` object in which the time
         values range between -0.5 to +0.5 (i.e. the phase).
-        Data points which occur exactly at ``transit_midpoint`` or an integer
-        multiple of `transit_midpoint + n*period` will have time value 0.0.
+        Data points which occur exactly at ``t0`` or an integer multiple of
+        ``t0 + n*period`` will have phase value 0.0.
 
         Parameters
         ----------
         period : float
             The period upon which to fold.
+        t0 : float, optional
+            Time corresponding to zero phase. In the same units as the
+            LightCurve's ``time`` attribute.  Defaults to 0 if not set.
         transit_midpoint : float, optional
-            Time reference point in the same units as the LightCurve's `time`
-            attribute.
+            Deprecated.  Use `t0` instead.
 
         Returns
         -------
-        folded_lightcurve : LightCurve object
-            A new ``LightCurve`` in which the data are folded and sorted by
-            phase.
+        folded_lightcurve : `FoldedLightCurve`
+            A new light curve object in which the data are folded and sorted by
+            phase. The object contains an extra ``phase`` attribute.
         """
+        # `transit_midpoint` is deprecated
+        if transit_midpoint is not None:
+            warnings.warn('`transit_midpoint` is deprecated, please use `t0` instead.',
+                          LightkurveWarning)
+            if t0 is None:
+                t0 = transit_midpoint
 
-        if (transit_midpoint > 2450000):
+        if t0 is None:
+            t0 = 0.
+
+        if (t0 > 2450000):
             if self.time_format == 'bkjd':
-                warnings.warn('`transit_midpoint` appears to be given in JD, '
+                warnings.warn('`t0` appears to be given in JD, '
                               'however the light curve time uses BKJD '
                               '(i.e. JD - 2454833).', LightkurveWarning)
             elif self.time_format == 'btjd':
-                warnings.warn('`transit_midpoint` appears to be given in JD, '
+                warnings.warn('`t0` appears to be given in JD, '
                               'however the light curve time uses BTJD '
                               '(i.e. JD - 2457000).', LightkurveWarning)
-        phase = (transit_midpoint % period) / period
+        phase = (t0 % period) / period
         fold_time = (((self.time - phase * period) / period) % 1)
         # fold time domain from -.5 to .5
         fold_time[fold_time > 0.5] -= 1
@@ -407,15 +433,15 @@ class LightCurve(object):
                                 meta=self.meta)
 
     def normalize(self):
-        """Returns a normalized version of the lightcurve.
+        """Returns a normalized version of the light curve.
 
-        The normalized lightcurve is obtained by dividing `flux` and `flux_err`
-        by the median flux.
+        The normalized light curve is obtained by dividing the ``flux`` and
+        ``flux_err`` object attributes by the by the median flux.
 
         Returns
         -------
-        normalized_lightcurve : LightCurve object
-            A new ``LightCurve`` in which `flux` and `flux_err` are divided
+        normalized_lightcurve : `LightCurve`
+            A new light curve object in which ``flux`` and ``flux_err`` are divided
             by the median.
         """
         lc = self.copy()
@@ -428,8 +454,8 @@ class LightCurve(object):
 
         Returns
         -------
-        clean_lightcurve : LightCurve object
-            A new ``LightCurve`` from which NaNs fluxes have been removed.
+        clean_lightcurve : `LightCurve`
+            A new light curve object from which NaNs fluxes have been removed.
         """
         return self[~np.isnan(self.flux)]  # This will return a sliced copy
 
@@ -443,9 +469,9 @@ class LightCurve(object):
 
         Returns
         -------
-        nlc : LightCurve object
-            A new ``LightCurve`` in which NaNs values and gaps in time have been
-            filled.
+        filled_lightcurve : `LightCurve`
+            A new light curve object in which NaN values and gaps in time
+            have been filled.
         """
         clc = lc.remove_nans().copy()
         nlc = lc.copy()
@@ -479,7 +505,7 @@ class LightCurve(object):
     def remove_outliers(self, sigma=5., return_mask=False, **kwargs):
         """Removes outlier data points using sigma-clipping.
 
-        This method returns a new :class:`LightCurve` object from which data
+        This method returns a new `LightCurve` object from which data
         points are removed if their flux values are greater or smaller than
         the median flux by at least ``sigma`` times the standard deviation.
 
@@ -491,9 +517,7 @@ class LightCurve(object):
 
         .. note::
             This function is a convenience wrapper around
-            `astropy.stats.sigma_clip
-            <http://docs.astropy.org/en/stable/api/astropy.stats.sigma_clip.html>`_
-            and provides the same functionality.
+            `astropy.stats.sigma_clip()` and provides the same functionality.
 
         Parameters
         ----------
@@ -528,13 +552,13 @@ class LightCurve(object):
 
         Returns
         -------
-        clean_lc : LightCurve object
-            A new :class:`LightCurve` from which outlier data points have been
+        clean_lc : `LightCurve`
+            A new light curve object from which outlier data points have been
             removed.
 
         Examples
         --------
-        This example generates a new LightCurve in which all points
+        This example generates a new light curve in which all points
         that are more than 1 standard deviation from the median are removed::
 
             >>> lc = LightCurve(time=[1, 2, 3, 4, 5], flux=[1, 1000, 1, -1000, 1])
@@ -559,16 +583,16 @@ class LightCurve(object):
         with warnings.catch_warnings():  # Ignore warnings due to NaNs or Infs
             warnings.simplefilter("ignore")
             outlier_mask = sigma_clip(data=self.flux, sigma=sigma, **kwargs).mask
-        # Second, we return the masked lightcurve and optionally the mask itself
+        # Second, we return the masked light curve and optionally the mask itself
         if return_mask:
             return self[~outlier_mask], outlier_mask
         return self[~outlier_mask]
 
     def bin(self, binsize=13, method='mean'):
-        """Bins a lightcurve in blocks of size `binsize`.
+        """Bins a lightcurve in blocks of size ``binsize``.
 
-        The value of the bins will contain the mean (`method='mean'`) or the
-        median (`method='median'`) of the original data.  The default is mean.
+        The value of the bins will contain the mean (``method='mean'``) or the
+        median (``method='median'``) of the original data.  The default is mean.
 
         Parameters
         ----------
@@ -579,15 +603,15 @@ class LightCurve(object):
 
         Returns
         -------
-        binned_lc : LightCurve object
-            Binned lightcurve.
+        binned_lc : `LightCurve`
+            A new light curve which has been binned.
 
         Notes
         -----
         - If the ratio between the lightcurve length and the binsize is not
           a whole number, then the remainder of the data points will be
           ignored.
-        - If the original lightcurve contains flux uncertainties (flux_err),
+        - If the original light curve contains flux uncertainties (``flux_err``),
           the binned lightcurve will report the root-mean-square error.
           If no uncertainties are included, the binned curve will return the
           standard deviation of the data.
@@ -616,14 +640,21 @@ class LightCurve(object):
             binned_lc.flux_err = np.zeros(len(binned_lc.flux))
 
         if hasattr(binned_lc, 'quality'):
+            # Note: np.bitwise_or only works if there are no NaNs
             binned_lc.quality = np.array(
-                [np.bitwise_or.reduce(a) for a in np.array_split(self.quality, n_bins)])
+                [np.bitwise_or.reduce(a) if np.all(np.isfinite(a)) else np.nan
+                 for a in np.array_split(self.quality, n_bins)])
+        if hasattr(binned_lc, 'cadenceno'):
+            binned_lc.cadenceno = np.array([np.nan] * n_bins)
         if hasattr(binned_lc, 'centroid_col'):
+            # Note: nanmean/nanmedian yield a RuntimeWarning if a slice is all NaNs
             binned_lc.centroid_col = np.array(
-                [methodf(a) for a in np.array_split(self.centroid_col, n_bins)])
+                [methodf(a) if np.any(np.isfinite(a)) else np.nan
+                 for a in np.array_split(self.centroid_col, n_bins)])
         if hasattr(binned_lc, 'centroid_row'):
             binned_lc.centroid_row = np.array(
-                [methodf(a) for a in np.array_split(self.centroid_row, n_bins)])
+                [methodf(a) if np.any(np.isfinite(a)) else np.nan
+                 for a in np.array_split(self.centroid_row, n_bins)])
 
         return binned_lc
 
@@ -769,7 +800,7 @@ class LightCurve(object):
         return ax
 
     def plot(self, **kwargs):
-        """Plot the light curve using matplotlib's `plot` method.
+        """Plot the light curve using Matplotlib's `~matplotlib.pyplot.plot()` method.
 
         Parameters
         ----------
@@ -799,7 +830,7 @@ class LightCurve(object):
         return self._create_plot(method='plot', **kwargs)
 
     def scatter(self, colorbar_label='', show_colorbar=True, **kwargs):
-        """Plots the light curve using matplotlib's `scatter` method.
+        """Plots the light curve using Matplotlib's `~matplotlib.pyplot.scatter()` method.
 
         Parameters
         ----------
@@ -834,7 +865,7 @@ class LightCurve(object):
                                  show_colorbar=show_colorbar, **kwargs)
 
     def errorbar(self, linestyle='', **kwargs):
-        """Plots the light curve using matplotlib's `errorbar` method.
+        """Plots the light curve using Matplotlib's `~matplotlib.pyplot.errorbar()` method.
 
         Parameters
         ----------
@@ -867,12 +898,68 @@ class LightCurve(object):
             kwargs['linestyle'] = linestyle
         return self._create_plot(method='errorbar', **kwargs)
 
+    def interact_bls(self, notebook_url='localhost:8888', minimum_period=None,
+                     maximum_period=None, resolution=2000):
+        """Display an interactive Jupyter Notebook widget to find planets.
+
+        The Box Least Squares (BLS) periodogram is a statistical tool used
+        for detecting transiting exoplanets and eclipsing binaries in
+        light curves.  This method will display a Jupyter Notebook Widget
+        which enables the BLS algorithm to be used interactively.
+        Behind the scenes, the widget uses the AstroPy implementation of BLS [1]_.
+
+        This feature only works inside an active Jupyter Notebook.
+        It requires Bokeh v1.0 (or later) and AstroPy v3.1 (or later),
+        which are optional dependencies. An error message will be shown
+        if these dependencies are not available.
+
+        Parameters
+        ----------
+        notebook_url: str
+            Location of the Jupyter notebook page (default: "localhost:8888")
+            When showing Bokeh applications, the Bokeh server must be
+            explicitly configured to allow connections originating from
+            different URLs. This parameter defaults to the standard notebook
+            host and port. If you are running on a different location, you
+            will need to supply this value for the application to display
+            properly. If no protocol is supplied in the URL, e.g. if it is
+            of the form "localhost:8888", then "http" will be used.
+        minimum_period : float or None
+            Minimum period to assess the BLS to. If None, default value of 0.3 days
+            will be used.
+        maximum_period : float or None
+            Maximum period to evaluate the BLS to. If None, the time coverage of the
+            lightcurve / 4 will be used.
+        resolution : int
+            Number of points to use in the BLS panel. Lower this value for faster
+            but less accurate performance. You can also vary this value using the
+            widget's Resolution Slider.
+
+        Examples
+        --------
+        Load the light curve for Kepler-10, remove long-term trends, and
+        display the BLS tool as follows:
+
+        >>> import lightkurve as lk
+        >>> lc = lk.search_lightcurvefile('kepler-10', quarter=3).download()  # doctest: +SKIP
+        >>> lc = lc.PDCSAP_FLUX.normalize().flatten()  # doctest: +SKIP
+        >>> lc.interact_bls()  # doctest: +SKIP
+
+        References
+        ----------
+        .. [1] http://docs.astropy.org/en/latest/stats/bls.html
+        """
+        from .interact_bls import show_interact_widget
+        clean = self.remove_nans()
+        return show_interact_widget(clean, notebook_url=notebook_url, minimum_period=minimum_period,
+                                    maximum_period=maximum_period, resolution=resolution)
+
     def to_table(self):
-        """Export the LightCurve as an AstroPy Table.
+        """Converts the light curve to an Astropy `~astropy.table.Table` object.
 
         Returns
         -------
-        table : `astropy.table.Table` object
+        table : `astropy.table.Table`
             An AstroPy Table with columns 'time', 'flux', and 'flux_err'.
         """
         return Table(data=(self.time, self.flux, self.flux_err),
@@ -880,19 +967,19 @@ class LightCurve(object):
                      meta=self.meta)
 
     def to_pandas(self, columns=['time', 'flux', 'flux_err']):
-        """Export the LightCurve as a Pandas DataFrame.
+        """Converts the light curve to a Pandas `~pandas.DataFrame` object.
 
         Parameters
         ----------
         columns : list of str
             List of columns to include in the DataFrame.  The names must match
-            attributes of the `LightCurve` object (e.g. `time`, `flux`).
+            attributes of the `LightCurve` object (e.g. ``time``, ``flux``).
 
         Returns
         -------
-        dataframe : `pandas.DataFrame` object
-            A dataframe indexed by `time` and containing the columns `flux`
-            and `flux_err`.
+        dataframe : `pandas.DataFrame`
+            A data frame indexed by `time` and containing the columns ``flux``
+            and ``flux_err``.
         """
         try:
             import pandas as pd
@@ -915,7 +1002,7 @@ class LightCurve(object):
         return df
 
     def to_csv(self, path_or_buf=None, **kwargs):
-        """Writes the LightCurve to a csv file.
+        """Writes the light curve to a csv file.
 
         Parameters
         ----------
@@ -928,82 +1015,96 @@ class LightCurve(object):
         Returns
         -------
         csv : str or None
-            Returns a csv-formatted string if `path_or_buf=None`,
+            Returns a csv-formatted string if ``path_or_buf=None``,
             returns None otherwise.
         """
         return self.to_pandas().to_csv(path_or_buf=path_or_buf, **kwargs)
 
-    def to_periodogram(self, nterms=1, nyquist_factor=1, oversample_factor=1,
-                       min_frequency=None, max_frequency=None,
-                       min_period=None, max_period=None,
-                       frequency=None, period=None,
-                       freq_unit=1/u.day, **kwargs):
-        """Returns a `Periodogram` power spectrum object.
+    def to_periodogram(self, method="lombscargle", **kwargs):
+        """Converts the light curve to a `~lightkurve.periodogram.Periodogram`
+        power spectrum object.
 
         Parameters
         ----------
-        min_frequency : float
-            If specified, use this minimum frequency rather than one over the
-            time baseline.
-        max_frequency : float
-            If specified, use this maximum frequency rather than nyquist_factor
-            times the nyquist frequency.
-        min_period : float
-            If specified, use 1./minium_period as the maximum frequency rather
-            than nyquist_factor times the nyquist frequency.
-        max_period : float
-            If specified, use 1./maximum_period as the minimum frequency rather
-            than one over the time baseline.
-        frequency :  array-like
-            The regular grid of frequencies to use. If given a unit, it is
-            converted to units of freq_unit. If not, it is assumed to be in
-            units of freq_unit. This over rides any set frequency limits.
-        period : array-like
-            The regular grid of periods to use (as 1/period). If given a unit,
-            it is converted to units of freq_unit. If not, it is assumed to be
-            in units of 1/freq_unit. This overrides any set period limits.
-        nterms : int
-            Default 1. Number of terms to use in the Fourier fit.
-        nyquist_factor : int
-            Default 1. The multiple of the average Nyquist frequency. Is
-            overriden by maximum_frequency (or minimum period).
-        oversample_factor : int
-            The frequency spacing, determined by the time baseline of the
-            lightcurve, is divided by this factor, oversampling frequency space.
-            This parameter is identical to the samples_per_peak parameter in
-            astropy.LombScargle()
-        freq_unit : `astropy.units.core.CompositeUnit`
-            Default: 1/u.day. The desired frequency units for the Lomb Scargle
-            periodogram. This implies that 1/freq_unit is the units for period.
+        method : {'lombscargle', 'boxleastsquares', 'ls', 'bls'}
+            Use the Lomb Scargle or Box Least Squares (BLS) method to
+            extract the power spectrum. Defaults to ``'lombscargle'``.
+            ``'ls'`` and ``'bls'`` are shorthands for ``'lombscargle'``
+            and ``'boxleastsquares'``.
         kwargs : dict
-            Keyword arguments passed to `astropy.stats.LombScargle()`
+            Keyword arguments passed to the constructor of either
+            `~lightkurve.periodogram.LombScarglePeriodogram` or
+            `~lightkurve.periodogram.BoxLeastSquaresPeriodogram`.
+            Keywords accepted by `~lightkurve.periodogram.LombScarglePeriodogram` are:
+            ``min_frequency``, ``max_frequency``, ``min_period``, ``max_period``, ``frequency``,
+            ``period``, ``nterms``, ``nyquist_factor``, ``oversample_factor``, ``freq_unit``.
+            Keywords accepted by `~lightkurve.periodogram.BoxLeastSquaresPeriodogram` are:
+            ``min_period``, ``max_period``, ``period``, ``frequency_factor``.
 
         Returns
         -------
-        Periodogram : `Periodogram` object
-            Returns a Periodogram object extracted from the lightcurve.
+        Periodogram : `~lightkurve.periodogram.Periodogram` object
+            The power spectrum object extracted from the light curve.
         """
-        from . import Periodogram
-        return Periodogram.from_lightcurve(lc=self,
-                                           min_frequency=min_frequency,
-                                           max_frequency=max_frequency,
-                                           min_period=min_period,
-                                           max_period=max_period,
-                                           frequency=frequency,
-                                           period=period,
-                                           nterms=nterms,
-                                           nyquist_factor=nyquist_factor,
-                                           oversample_factor=oversample_factor,
-                                           freq_unit=freq_unit,
-                                           **kwargs)
+        method_clean = method.replace(' ', '').lower()
+        allowed_methods = ["ls", "bls", "lombscargle", "boxleastsquares"]
+        if method_clean not in allowed_methods:
+            raise ValueError(("Unrecognized method '{0}'\n"
+                              "allowed methods are: {1}")
+                             .format(method, allowed_methods))
+        if method_clean in ["bls", "boxleastsquares"]:
+            from . import BoxLeastSquaresPeriodogram
+            return BoxLeastSquaresPeriodogram.from_lightcurve(lc=self, **kwargs)
+        else:
+            from . import LombScarglePeriodogram
+            return LombScarglePeriodogram.from_lightcurve(lc=self, **kwargs)
 
-    def to_fits(self, path=None, overwrite=False, **extra_data):
-        """Writes the LightCurve to a FITS file.
+    def _boolean_mask_to_bitmask(self, aperture_mask):
+        """Takes in an aperture_mask and returns a Kepler-style bitmask
 
         Parameters
         ----------
-        path : string, default None
-            File path, if `None` returns an astropy.io.fits.HDUList object.
+        aperture_mask : array-like
+            2D aperture mask. The mask can be either a boolean mask or an integer
+            mask mimicking the Kepler/TESS convention; boolean or boolean-like masks
+            are converted to the Kepler/TESS conventions.  Kepler bitmasks are
+            returned unchanged except for possible datatype conversion.
+
+        Returns
+        -------
+        bitmask : numpy uint8 array
+            A bitmask incompletely mimicking the Kepler/TESS convention: Bit 2,
+            value = 3, means "pixel was part of the custom aperture".  The other
+            bits have no meaning and are currently assigned a value of 1.
+        """
+        # Masks can either be boolean input or Kepler pipeline style
+        clean_mask = np.nan_to_num(aperture_mask)
+
+        contains_bit2 = (clean_mask.astype(np.int) & 2).any()
+        all_zeros_or_ones = ( (clean_mask.dtype in ['float', 'int']) &
+                              ((set(np.unique(clean_mask)) - {0,1}) == set()) )
+        is_bool_mask = ( (aperture_mask.dtype == 'bool') | all_zeros_or_ones )
+
+
+        if is_bool_mask:
+            out_mask = np.ones(aperture_mask.shape, dtype=np.uint8)
+            out_mask[aperture_mask == 1] = 3
+            out_mask = out_mask.astype(np.uint8)
+        elif contains_bit2:
+            out_mask = aperture_mask.astype(np.uint8)
+        else:
+            log.warn("The input aperture mask must be boolean or follow the \
+                    Kepler-pipeline standard; returning None.")
+            out_mask = None
+        return out_mask
+
+    def to_fits(self, path=None, overwrite=False, **extra_data):
+        """Writes the light curve to a FITS file.
+
+        Parameters
+        ----------
+        path : string, default ``None``
+            If set, location where the FITS file will be written.
         overwrite : bool
             Whether or not to overwrite the file
         extra_data : dict
@@ -1015,8 +1116,8 @@ class LightCurve(object):
 
         Returns
         -------
-        hdu : astropy.io.fits
-            Returns an astropy.io.fits object if path is None
+        hdu : `astropy.io.fits.HDUList`
+            Returns an `~astropy.io.fits.HDUList` object.
         """
         typedir = {int: 'J', str: 'A', float: 'D', bool: 'L',
                    np.int32: 'J', np.int32: 'K', np.float32: 'E', np.float64: 'D'}
@@ -1046,12 +1147,6 @@ class LightCurve(object):
                 hdu.header['{}'.format(kw).upper()] = default[kw]
                 if default[kw] is None:
                     log.warning('Value for {} is None.'.format(kw))
-            if ('quarter' in dir(self)) and (self.quarter is not None):
-                hdu.header['QUARTER'] = self.quarter
-            elif ('campaign' in dir(self)) and self.campaign is not None:
-                hdu.header['CAMPAIGN'] = self.campaign
-            else:
-                log.warning('Cannot find Campaign or Quarter number.')
 
             for kw in extra_data:
                 if isinstance(extra_data[kw], (str, float, int, bool, type(None))):
@@ -1095,17 +1190,45 @@ class LightCurve(object):
 
         def _hdulist(**extra_data):
             """Returns an astropy.io.fits.HDUList object."""
-            return fits.HDUList([_make_primary_hdu(extra_data=extra_data),
-                                 _make_lightcurve_extension(extra_data=extra_data)])
+            list_out = fits.HDUList([_make_primary_hdu(extra_data=extra_data),
+                             _make_lightcurve_extension(extra_data=extra_data)])
+            return list_out
 
         hdu = _hdulist(**extra_data)
         if path is not None:
             hdu.writeto(path, overwrite=overwrite, checksum=True)
         return hdu
 
+    def to_corrector(self, method="sff"):
+        """Returns a `Corrector` instance to remove systematics.
+
+        Parameters
+        ----------
+        methods : string
+            Currently, only "sff" is supported.  This will return a
+            `SFFCorrector` class instance.
+
+        Returns
+        -------
+        correcter : `lightkurve.Correcter`
+            Instance of a Corrector class, which typically provides `correct()`
+            and `diagnose()` methods.
+        """
+        allowed_methods = ["sff"]
+        if method == "pld":
+            raise ValueError("The 'pld' method can only be used on "
+                             "`TargetPixelFile` objects, not `LightCurve` objects.")
+        if method not in allowed_methods:
+            raise ValueError(("Unrecognized method '{0}'\n"
+                              "allowed methods are: {1}")
+                             .format(method, allowed_methods))
+        if method == "sff":
+            from .correctors import SFFCorrector
+            return SFFCorrector(self)
+
 
 class FoldedLightCurve(LightCurve):
-    """Class to hold a phase-folded lightcurve, i.e. the output of `LightCurve.fold()`.
+    """Generic class to store and plot phase-folded light curves.
 
     Compared to the standard `LightCurve` class, this class offers an extra
     `phase` property and implements different plotting defaults.
@@ -1139,7 +1262,7 @@ class FoldedLightCurve(LightCurve):
         return ax
 
     def scatter(self, **kwargs):
-        """Plot the folded light curve usng matplotlib's `scatter` method.
+        """Plot the folded light curve usng matplotlib's `~matplotlib.pyplot.scatter` method.
 
         See `LightCurve.scatter` for details on the accepted arguments.
 
@@ -1178,8 +1301,10 @@ class FoldedLightCurve(LightCurve):
             ax.set_xlabel("Phase")
         return ax
 
+
 class KeplerLightCurve(LightCurve):
-    """Defines a light curve class for NASA's Kepler and K2 missions.
+    """Subclass of :class:`LightCurve <lightkurve.lightcurve.LightCurve>`
+    which holds extra data specific to the Kepler mission.
 
     Attributes
     ----------
@@ -1248,7 +1373,7 @@ class KeplerLightCurve(LightCurve):
         return('KeplerLightCurve(ID: {})'.format(self.targetid))
 
     def correct(self, method='sff', **kwargs):
-        """Corrects a lightcurve for motion-dependent systematic errors.
+        """DEPRECATED: use `to_corrector(method).correct()` instead.
 
         Parameters
         ----------
@@ -1264,13 +1389,16 @@ class KeplerLightCurve(LightCurve):
         new_lc : KeplerLightCurve object
             Corrected lightcurve
         """
+        warnings.warn('`KeplerLightCurve.correct()` is deprecated and will be '
+                      'removed in Lightkurve v1.0.0, '
+                      'please use `LightCurve.to_corrector("sff").correct()` instead.',
+                      LightkurveWarning)
+
         not_nan = np.isfinite(self.flux)
         if method == 'sff':
             from .correctors import SFFCorrector
-            self.corrector = SFFCorrector()
-            corrected_lc = self.corrector.correct(time=self.time[not_nan],
-                                                  flux=self.flux[not_nan],
-                                                  centroid_col=self.centroid_col[not_nan],
+            self.corrector = SFFCorrector(self[not_nan])
+            corrected_lc = self.corrector.correct(centroid_col=self.centroid_col[not_nan],
                                                   centroid_row=self.centroid_row[not_nan],
                                                   **kwargs)
         else:
@@ -1283,7 +1411,7 @@ class KeplerLightCurve(LightCurve):
 
     def to_pandas(self, columns=['time', 'flux', 'flux_err', 'quality',
                                  'centroid_col', 'centroid_row']):
-        """Export the LightCurve as a Pandas DataFrame.
+        """Converts the light curve to a Pandas `~pandas.DataFrame` object.
 
         Parameters
         ----------
@@ -1299,7 +1427,7 @@ class KeplerLightCurve(LightCurve):
         """
         return super(KeplerLightCurve, self).to_pandas(columns=columns)
 
-    def to_fits(self, path=None, overwrite=False, **extra_data):
+    def to_fits(self, path=None, overwrite=False, aperture_mask=None, **extra_data):
         """Writes the KeplerLightCurve to a FITS file.
 
         Parameters
@@ -1308,6 +1436,11 @@ class KeplerLightCurve(LightCurve):
             File path, if `None` returns an astropy.io.fits.HDUList object.
         overwrite : bool
             Whether or not to overwrite the file
+        aperture_mask : array-like
+            Optional 2D aperture mask to save with this lightcurve object, if
+            defined.  The mask can be either a boolean mask or an integer mask
+            mimicking the Kepler/TESS convention; boolean masks are
+            automatically converted to the Kepler/TESS conventions
         extra_data : dict
             Extra keywords or columns to include in the FITS file.
             Arguments of type str, int, float, or bool will be stored as
@@ -1332,16 +1465,42 @@ class KeplerLightCurve(LightCurve):
             'EQUINOX': 2000,
             'DATE-OBS': Time(self.time[0]+2454833., format=('jd')).isot,
             'SAP_QUALITY': self.quality}
+
+        def _make_aperture_extension(hdu_list, aperture_mask):
+            """Create the 'APERTURE' extension (e.g. extension #2)."""
+
+            if aperture_mask is not None:
+                bitmask = self._boolean_mask_to_bitmask(aperture_mask)
+                hdu = fits.ImageHDU(bitmask)
+                hdu.header['EXTNAME'] = 'APERTURE'
+                hdu_list.append(hdu)
+            return hdu_list
+
         for kw in kepler_specific_data:
             if ~np.asarray([kw.lower == k.lower() for k in extra_data]).any():
                 extra_data[kw] = kepler_specific_data[kw]
-        return super(KeplerLightCurve, self).to_fits(path=path,
-                                                     overwrite=overwrite,
-                                                     **extra_data)
+        hdu = super(KeplerLightCurve, self).to_fits(path=None,
+                                                    overwrite=overwrite,
+                                                    **extra_data)
+
+        if ('quarter' in dir(self)) and (self.quarter is not None):
+            hdu[0].header['QUARTER'] = self.quarter
+        elif ('campaign' in dir(self)) and self.campaign is not None:
+            hdu[0].header['CAMPAIGN'] = self.campaign
+        else:
+            log.warning('Cannot find Campaign or Quarter number.')
+
+        hdu = _make_aperture_extension(hdu, aperture_mask)
+
+        if path is not None:
+            hdu.writeto(path, overwrite=overwrite, checksum=True)
+        else:
+            return hdu
 
 
 class TessLightCurve(LightCurve):
-    """Defines a light curve class for NASA's TESS mission.
+    """Subclass of :class:`LightCurve <lightkurve.lightcurve.LightCurve>`
+    which holds extra data specific to the TESS mission.
 
     Attributes
     ----------
@@ -1398,3 +1557,62 @@ class TessLightCurve(LightCurve):
 
     def __repr__(self):
         return('TessLightCurve(TICID: {})'.format(self.targetid))
+
+
+    def to_fits(self, path=None, overwrite=False, aperture_mask=None, **extra_data):
+        """Writes the KeplerLightCurve to a FITS file.
+
+        Parameters
+        ----------
+        path : string, default None
+            File path, if `None` returns an astropy.io.fits.HDUList object.
+        overwrite : bool
+            Whether or not to overwrite the file
+        aperture_mask : array-like
+            Optional 2D aperture mask to save with this lightcurve object, if
+            defined.  The mask can be either a boolean mask or an integer mask
+            mimicking the Kepler/TESS convention; boolean masks are
+            automatically converted to the Kepler/TESS conventions
+        extra_data : dict
+            Extra keywords or columns to include in the FITS file.
+            Arguments of type str, int, float, or bool will be stored as
+            keywords in the primary header.
+            Arguments of type np.array or list will be stored as columns
+            in the first extension.
+
+        Returns
+        -------
+        hdu : astropy.io.fits
+            Returns an astropy.io.fits object if path is None
+        """
+        # TODO: populate more TESS specific metadata
+
+        tess_specific_data = {
+            'OBJECT': '{}'.format(self.targetid),
+            'MISSION': self.mission,
+            'RA_OBJ': self.ra,
+            'DEC_OBJ': self.dec} # ... insert more here!
+
+        def _make_aperture_extension(hdu_list, aperture_mask):
+            """Create the 'APERTURE' extension (e.g. extension #2)."""
+
+            if aperture_mask is not None:
+                bitmask = self._boolean_mask_to_bitmask(aperture_mask)
+                hdu = fits.ImageHDU(bitmask)
+                hdu.header['EXTNAME'] = 'APERTURE'
+                hdu_list.append(hdu)
+            return hdu_list
+
+        for kw in tess_specific_data:
+            if ~np.asarray([kw.lower == k.lower() for k in extra_data]).any():
+                extra_data[kw] = tess_specific_data[kw]
+        hdu = super(TessLightCurve, self).to_fits(path=None,
+                                                    overwrite=overwrite,
+                                                    **extra_data)
+
+        hdu = _make_aperture_extension(hdu, aperture_mask)
+
+        if path is not None:
+            hdu.writeto(path, overwrite=overwrite, checksum=True)
+        else:
+            return hdu

@@ -1,26 +1,36 @@
 language: python
-python:
-  - 2.7
-  - 3.6
+
+matrix:
+  include:
+  - name: "Python 2.7"
+    python: 2.7
+    env: EXTRAS_INSTALL="all,test"
+  - name: "Python 3.6"
+    python: 3.6
+    env: EXTRAS_INSTALL="all,test"
+  - name: "Python 3.7"
+    python: 3.7
+    env: EXTRAS_INSTALL="all,test"
+  - name: "Python 3.7 without optional dependencies"
+    python: 3.7
+    env: EXTRAS_INSTALL="test"
+
+dist: xenial
+
+services:
+  - xvfb  # X Virtual FrameBuffer (enables plotting in a headless environment)
+
 before_install:  # optional dependencies
   - pip install codecov
-  - pip install pytest-cov
-  - pip install pytest-remotedata
-  - pip install sphinx_rtd_theme
-  - pip install numpydoc
-  - pip install pandas
-  - pip install ipython  # required by bokeh
-  - pip install bokeh
+
 install:
-  - pip install -r requirements.txt
-# command to run tests
-before_script: # configure a headless display to test plot generation
-  - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
-  - sleep 3 # give xvfb some time to start
-# command to run tests
-script:
-  - python setup.py develop
+  - if [ -z $EXTRAS_INSTALL ]; then
+      pip install -e .;
+    else
+      pip install -e .[$EXTRAS_INSTALL];
+    fi
+
+script:  # how to run the tests?
   - pytest --remote-data
 
 after_success:

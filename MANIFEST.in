@@ -1,4 +1,6 @@
-include README.rst AUTHORS.rst CONTRIBUTING.md LICENSE
+include README.rst AUTHORS.rst CHANGES.rst CONTRIBUTING.rst LICENSE
+include requirements.txt
 include lightkurve/data/*
 include lightkurve/prf/*
+include lightkurve/tests/*
 include lightkurve/tests/data/*
