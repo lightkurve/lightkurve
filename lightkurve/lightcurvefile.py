@@ -380,8 +380,16 @@ class TessLightCurveFile(LightCurveFile):
                           LightkurveWarning)
 
         self.quality_bitmask = quality_bitmask
+        # Custom lightcurves may not have quality flags; assign zeros
+
+        if 'QUALITY' in self.hdu[1].data.columns.names:
+            quality_vector = self.hdu[1].data['QUALITY']
+        elif 'SAP_QUALITY' in self.hdu[1].data.columns.names:
+            quality_vector = self.hdu[1].data['SAP_QUALITY']
+        else:
+            quality_vector = self.hdu[1].data['TIME']*0.0
         self.quality_mask = TessQualityFlags.create_quality_mask(
-                                quality_array=self.hdu[1].data['QUALITY'],
+                                quality_array=quality_vector,
                                 bitmask=quality_bitmask)
         # Early TESS releases had cadences with time=NaN (i.e. missing data)
         # which were not flagged by a QUALITY flag yet; the line below prevents
