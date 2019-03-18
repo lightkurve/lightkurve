@@ -405,6 +405,20 @@ class TessLightCurveFile(LightCurveFile):
         return('TessLightCurveFile(TICID: {})'.format(self.targetid))
 
     def get_lightcurve(self, flux_type, centroid_type='MOM_CENTR'):
+        if centroid_type+"1" in self.hdu[1].data.columns.names:
+            centroid_col = self.hdu[1].data[centroid_type + "1"][self.quality_mask]
+            centroid_row = self.hdu[1].data[centroid_type + "2"][self.quality_mask]
+        else:
+            centroid_col = self.hdu[1].data["TIME"][self.quality_mask]*0.0
+            centroid_row = self.hdu[1].data["TIME"][self.quality_mask]*0.0
+
+        if 'QUALITY' in self.hdu[1].data.columns.names:
+            quality_vector = self.hdu[1].data['QUALITY']
+        elif 'SAP_QUALITY' in self.hdu[1].data.columns.names:
+            quality_vector = self.hdu[1].data['SAP_QUALITY']
+        else:
+            quality_vector = self.hdu[1].data['TIME']*0.0
+
         if flux_type in self._flux_types():
             # We did not import TessLightCurve at the top to prevent circular imports
             from .lightcurve import TessLightCurve
@@ -414,9 +428,9 @@ class TessLightCurveFile(LightCurveFile):
                 time_scale='tdb',
                 flux=self.hdu[1].data[flux_type][self.quality_mask],
                 flux_err=self.hdu[1].data[flux_type + "_ERR"][self.quality_mask],
-                centroid_col=self.hdu[1].data[centroid_type + "1"][self.quality_mask],
-                centroid_row=self.hdu[1].data[centroid_type + "2"][self.quality_mask],
-                quality=self.hdu[1].data['QUALITY'][self.quality_mask],
+                centroid_col=centroid_col,
+                centroid_row=centroid_row,
+                quality=quality_vector,
                 quality_bitmask=self.quality_bitmask,
                 cadenceno=self.cadenceno,
                 targetid=self.targetid,
