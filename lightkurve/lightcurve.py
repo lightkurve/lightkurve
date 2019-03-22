@@ -1138,10 +1138,10 @@ class LightCurve(object):
 
             # Override the defaults where necessary
             from . import __version__
-            default = default = {'ORIGIN': "Unofficial data product",
-                                 'DATE': datetime.datetime.now().strftime("%Y-%m-%d"),
-                                 'CREATOR': "lightkurve.LightCurve.to_fits()",
-                                 'PROCVER': str(__version__)}
+            default = {'ORIGIN': "Unofficial data product",
+                         'DATE': datetime.datetime.now().strftime("%Y-%m-%d"),
+                         'CREATOR': "lightkurve.LightCurve.to_fits()",
+                         'PROCVER': str(__version__)}
 
             for kw in default:
                 hdu.header['{}'.format(kw).upper()] = default[kw]
@@ -1609,6 +1609,7 @@ class TessLightCurve(LightCurve):
         hdu = super(TessLightCurve, self).to_fits(path=None,
                                                     overwrite=overwrite,
                                                     **extra_data)
+        hdu[1].columns.change_name('SAP_QUALITY', 'QUALITY')
 
         hdu = _make_aperture_extension(hdu, aperture_mask)
 
