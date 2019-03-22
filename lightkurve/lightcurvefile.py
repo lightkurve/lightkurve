@@ -91,6 +91,18 @@ class LightCurveFile(object):
         types = [n for n in types if not ('ERR' in n)]
         return types
 
+    def _get_quality(self):
+        """Returns the quality flag vector, which may go by different names
+        """
+        if 'QUALITY' in self.hdu[1].data.columns.names:
+            quality_vector = self.hdu[1].data['QUALITY']
+        elif 'SAP_QUALITY' in self.hdu[1].data.columns.names:
+            quality_vector = self.hdu[1].data['SAP_QUALITY']
+        else:
+            quality_vector = np.zeros(len(self.hdu[1].data['TIME']))
+        return quality_vector
+
+
     def plot(self, flux_types=None, style='lightkurve', **kwargs):
         """Plot all the light curves contained in this light curve file.
 
@@ -380,17 +392,10 @@ class TessLightCurveFile(LightCurveFile):
                           LightkurveWarning)
 
         self.quality_bitmask = quality_bitmask
-        # Custom lightcurves may not have quality flags; assign zeros
-
-        if 'QUALITY' in self.hdu[1].data.columns.names:
-            quality_vector = self.hdu[1].data['QUALITY']
-        elif 'SAP_QUALITY' in self.hdu[1].data.columns.names:
-            quality_vector = self.hdu[1].data['SAP_QUALITY']
-        else:
-            quality_vector = self.hdu[1].data['TIME']*0.0
         self.quality_mask = TessQualityFlags.create_quality_mask(
-                                quality_array=quality_vector,
-                                bitmask=quality_bitmask)
+                        quality_array=self._get_quality(),
+                        bitmask=quality_bitmask)
+
         # Early TESS releases had cadences with time=NaN (i.e. missing data)
         # which were not flagged by a QUALITY flag yet; the line below prevents
         # these cadences from being used. They would break most methods!
@@ -412,13 +417,6 @@ class TessLightCurveFile(LightCurveFile):
             centroid_col = self.hdu[1].data["TIME"][self.quality_mask]*0.0
             centroid_row = self.hdu[1].data["TIME"][self.quality_mask]*0.0
 
-        if 'QUALITY' in self.hdu[1].data.columns.names:
-            quality_vector = self.hdu[1].data['QUALITY']
-        elif 'SAP_QUALITY' in self.hdu[1].data.columns.names:
-            quality_vector = self.hdu[1].data['SAP_QUALITY']
-        else:
-            quality_vector = self.hdu[1].data['TIME']*0.0
-
         if flux_type in self._flux_types():
             # We did not import TessLightCurve at the top to prevent circular imports
             from .lightcurve import TessLightCurve
@@ -430,7 +428,7 @@ class TessLightCurveFile(LightCurveFile):
                 flux_err=self.hdu[1].data[flux_type + "_ERR"][self.quality_mask],
                 centroid_col=centroid_col,
                 centroid_row=centroid_row,
-                quality=quality_vector,
+                quality=self._get_quality(),
                 quality_bitmask=self.quality_bitmask,
                 cadenceno=self.cadenceno,
                 targetid=self.targetid,
