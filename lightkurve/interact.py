@@ -170,7 +170,7 @@ def make_lightcurve_figure_elements(lc, lc_source):
             fig.xaxis.axis_label = 'Time - 2457000 (days)'
     except AttributeError:  # no mission keyword available
       pass
-        
+
 
     ylims = get_lightcurve_y_limits(lc_source)
     fig.y_range = Range1d(start=ylims[0], end=ylims[1])
@@ -424,19 +424,34 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
         exported_filename += '.fits'
 
     lc = tpf.to_lightcurve(aperture_mask=aperture_mask)
+    global_lc = {'lc':lc}
 
     npix = tpf.flux[0, :, :].size
     pixel_index_array = np.arange(0, npix, 1).reshape(tpf.flux[0].shape)
 
+    ## New behavior! see lightkurve Issue #201, and related Pull Requests!
     # Bokeh cannot handle many data points
     # https://github.com/bokeh/bokeh/issues/7490
-    if len(lc.cadenceno) > max_cadences:
-        msg = 'Interact cannot display more than {} cadences.'
-        raise RuntimeError(msg.format(max_cadences))
+    #if len(lc.cadenceno) > max_cadences:
+    #    msg = 'Interact cannot display more than {} cadences.'
+    #    raise RuntimeError(msg.format(max_cadences))
 
     def create_interact_ui(doc):
         # The data source includes metadata for hover-over tooltips
-        lc_source = prepare_lightcurve_datasource(lc)
+        if (tpf.obsmode == 'short cadence') | (len(lc.cadenceno) > max_cadences):
+            # Only show a window of 5% of the data
+            # TODO: replace hardcoded percentage with something else...
+            cad0 = np.nanpercentile(tpf.cadenceno, 47)
+            cad1 = np.nanpercentile(tpf.cadenceno, 52)
+            id_lo = np.argmin(np.abs(tpf.cadenceno-cad0))
+            id_hi = np.argmin(np.abs(tpf.cadenceno-cad1))
+            lc_new = lc[id_lo:id_hi]
+        else:
+            lc_new = lc
+
+        global_lc['lc_new'] = lc_new
+
+        lc_source = prepare_lightcurve_datasource(lc_new)
         tpf_source = prepare_tpf_datasource(tpf, aperture_mask)
 
         # Create the lightcurve figure and its vertical marker
@@ -458,6 +473,21 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
                                 step=1,
                                 title="Cadence Number",
                                 width=490)
+
+        window_slider = RangeSlider(start=np.min(tpf.cadenceno),
+                                    end=np.max(tpf.cadenceno),
+                                    step=1,
+                                    title='Display window',
+                                    value=(np.nanpercentile(tpf.cadenceno, 45),
+                                           np.nanpercentile(tpf.cadenceno, 55)),
+                                    orientation='horizontal',
+                                    width=490,
+                                    direction='ltr',
+                                    show_value=True,
+                                    sizing_mode='fixed',
+                                    callback_policy='mouseup',
+                                    name='winslide')
+
         r_button = Button(label=">", button_type="default", width=30)
         l_button = Button(label="<", button_type="default", width=30)
         export_button = Button(label="Save Lightcurve",
@@ -475,7 +505,10 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
             if new != []:
                 selected_indices = np.array(new)
                 selected_mask = np.isin(pixel_index_array, selected_indices)
-                lc_new = tpf.to_lightcurve(aperture_mask=selected_mask)
+                submask = np.in1d(tpf.cadenceno, lc_source.data['cadence'] )
+                global_lc['lc'] = tpf.to_lightcurve(aperture_mask=selected_mask)
+                lc_new = tpf[submask].to_lightcurve(aperture_mask=selected_mask)
+                global_lc['lc_new'] = lc_new
                 lc_source.data['flux'] = lc_new.flux
                 ylims = get_lightcurve_y_limits(lc_source)
                 fig_lc.y_range.start = ylims[0]
@@ -499,6 +532,24 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
                 fig_tpf.select('tpfimg')[0].data_source.data['image'] = \
                     [tpf.flux[0, :, :] * np.NaN]
             lc_source.selected.indices = []
+
+        def update_windowing(attr, old, new):
+            '''Callback to .... fix short cadence'''
+            # See issue #201
+            id_lo = np.argmin(np.abs(tpf.cadenceno-new[0]))
+            id_hi = np.argmin(np.abs(tpf.cadenceno-new[1]))
+            selected_indices = np.array(tpf_source.selected.indices)
+            selected_mask = np.isin(pixel_index_array, selected_indices)
+            lc_new = global_lc['lc'][id_lo:id_hi]
+            key_map = {'time':'time', 'flux':'flux', 'cadenceno':'cadence', 'quality':'quality_code'}
+            dict_out = {key_map[key]:lc_new.__getattribute__(key) for key in key_map.keys()}
+            dict_out['time_iso'] = np.repeat([' '], len(lc_new.time))
+            dict_out['quality'] = np.repeat([' '], len(lc_new.time))
+            lc_source.data = dict_out
+            ylims = get_lightcurve_y_limits(lc_source)
+            fig_lc.y_range.start = ylims[0]
+            fig_lc.y_range.end = ylims[1]
+            global_lc['lc_new'] = lc_new
 
         def go_right_by_one():
             """Step forward in time by a single cadence"""
@@ -537,9 +588,10 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
 
         def jump_to_lightcurve_position(attr, old, new):
             if new != []:
-                cadence_slider.value = lc.cadenceno[new[0]]
+                cadence_slider.value = global_lc['lc_new'].cadenceno[new[0]]
 
         # Map changes to callbacks
+        window_slider.on_change('value', update_windowing)
         r_button.on_click(go_right_by_one)
         l_button.on_click(go_left_by_one)
         tpf_source.selected.on_change('indices', update_upon_pixel_selection)
@@ -550,9 +602,13 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
         # Layout all of the plots
         sp1, sp2, sp3, sp4 = (Spacer(width=15), Spacer(width=30),
                               Spacer(width=80), Spacer(width=60))
+        optional_short_cadence_slider = Spacer(width=1)
+        if (tpf.obsmode == 'short cadence') | (len(lc.cadenceno) > max_cadences):
+            optional_short_cadence_slider = window_slider
         widgets_and_figures = layout([fig_lc, fig_tpf],
                                      [l_button, sp1, r_button, sp2,
                                      cadence_slider, sp3, stretch_slider],
+                                     [optional_short_cadence_slider],
                                      [export_button, sp4, message_on_save])
         doc.add_root(widgets_and_figures)
 
