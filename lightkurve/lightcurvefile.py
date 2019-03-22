@@ -255,6 +255,12 @@ class KeplerLightCurveFile(LightCurveFile):
         return bkjd_to_astropy_time(bkjd=self.time)
 
     def get_lightcurve(self, flux_type, centroid_type='MOM_CENTR'):
+        if centroid_type+"1" in self.hdu[1].data.columns.names:
+            centroid_col = self.hdu[1].data[centroid_type + "1"][self.quality_mask]
+            centroid_row = self.hdu[1].data[centroid_type + "2"][self.quality_mask]
+        else:
+            centroid_col = np.repeat(np.NaN, self.quality_mask.sum())
+            centroid_row = np.repeat(np.NaN, self.quality_mask.sum())
         if flux_type in self._flux_types():
             # We did not import lightcurve at the top to prevent circular imports
             from .lightcurve import KeplerLightCurve
@@ -264,9 +270,9 @@ class KeplerLightCurveFile(LightCurveFile):
                 time_scale='tdb',
                 flux=self.hdu[1].data[flux_type][self.quality_mask],
                 flux_err=self.hdu[1].data[flux_type + "_ERR"][self.quality_mask],
-                centroid_col=self.hdu[1].data[centroid_type + "1"][self.quality_mask],
-                centroid_row=self.hdu[1].data[centroid_type + "2"][self.quality_mask],
-                quality=self.hdu[1].data['SAP_QUALITY'][self.quality_mask],
+                centroid_col=centroid_col,
+                centroid_row=centroid_row,
+                quality=self._get_quality()[self.quality_mask],
                 quality_bitmask=self.quality_bitmask,
                 channel=self.channel,
                 campaign=self.campaign,
@@ -414,8 +420,8 @@ class TessLightCurveFile(LightCurveFile):
             centroid_col = self.hdu[1].data[centroid_type + "1"][self.quality_mask]
             centroid_row = self.hdu[1].data[centroid_type + "2"][self.quality_mask]
         else:
-            centroid_col = self.hdu[1].data["TIME"][self.quality_mask]*0.0
-            centroid_row = self.hdu[1].data["TIME"][self.quality_mask]*0.0
+            centroid_col = np.repeat(np.NaN, self.quality_mask.sum())
+            centroid_row = np.repeat(np.NaN, self.quality_mask.sum())
 
         if flux_type in self._flux_types():
             # We did not import TessLightCurve at the top to prevent circular imports
@@ -428,7 +434,7 @@ class TessLightCurveFile(LightCurveFile):
                 flux_err=self.hdu[1].data[flux_type + "_ERR"][self.quality_mask],
                 centroid_col=centroid_col,
                 centroid_row=centroid_row,
-                quality=self._get_quality(),
+                quality=self._get_quality()[self.quality_mask],
                 quality_bitmask=self.quality_bitmask,
                 cadenceno=self.cadenceno,
                 targetid=self.targetid,
