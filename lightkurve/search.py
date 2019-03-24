@@ -11,9 +11,6 @@ from astropy.io import ascii, fits
 from astropy import units as u
 from astropy.utils.exceptions import AstropyWarning
 
-from astroquery.mast import Observations
-from astroquery.exceptions import ResolverError
-
 from .collections import TargetPixelFileCollection, LightCurveFileCollection
 from .utils import suppress_stdout, LightkurveWarning, detect_filetype
 from . import PACKAGEDIR
@@ -164,7 +161,7 @@ class SearchResult(object):
             if cutout_size is not None:
                 warnings.warn('`cutout_size` can only be specified for TESS '
                               'Full Frame Image cutouts.', LightkurveWarning)
-
+            from astroquery.mast import Observations
             path = Observations.download_products(self.table[:1], mrp_only=False,
                                                   download_dir=download_dir)['Local Path'][0]
 
@@ -224,7 +221,7 @@ class SearchResult(object):
             if cutout_size is not None:
                 warnings.warn('`cutout_size` can only be specified for TESS '
                               'Full Frame Image cutouts.', LightkurveWarning)
-
+            from astroquery.mast import Observations
             path = Observations.download_products(self.table, mrp_only=False,
                                                   download_dir=download_dir)['Local Path']
 
@@ -557,6 +554,7 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
 
     # Light curves and target pixel files
     if filetype.lower() != 'ffi':
+        from astroquery.mast import Observations
         products = Observations.get_product_list(observations)
         result = join(products, observations, keys="obs_id", join_type='left',
                       uniq_col_name='{col_name}{table_name}', table_names=['', '_2'])
@@ -638,6 +636,7 @@ def _query_mast(target, radius=None, project=['Kepler', 'K2', 'TESS']):
         with warnings.catch_warnings():
             # suppress misleading AstropyWarning
             warnings.simplefilter('ignore', AstropyWarning)
+            from astroquery.mast import Observations
             target_obs = Observations.query_criteria(target_name=target_name,
                                                      radius=str(radius.to(u.deg)),
                                                      project=project,
@@ -659,6 +658,7 @@ def _query_mast(target, radius=None, project=['Kepler', 'K2', 'TESS']):
             with warnings.catch_warnings():
                 # suppress misleading AstropyWarning
                 warnings.simplefilter('ignore', AstropyWarning)
+                from astroquery.mast import Observations
                 obs = Observations.query_criteria(coordinates='{} {}'.format(ra, dec),
                                                   radius=str(radius.to(u.deg)),
                                                   project=project,
@@ -671,10 +671,12 @@ def _query_mast(target, radius=None, project=['Kepler', 'K2', 'TESS']):
     # If `target` did not look like a KIC or EPIC ID, then we let MAST
     # resolve the target name to a sky position. Convert radius from arcsec
     # to degrees for query_criteria().
+    from astroquery.exceptions import ResolverError
     try:
         with warnings.catch_warnings():
             # suppress misleading AstropyWarning
             warnings.simplefilter('ignore', AstropyWarning)
+            from astroquery.mast import Observations
             obs = Observations.query_criteria(objectname=target,
                                               radius=str(radius.to(u.deg)),
                                               project=project,
