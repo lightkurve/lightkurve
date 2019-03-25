@@ -590,9 +590,9 @@ class PLDCorrector(object):
     def __init__(self, tpf):
         self.tpf = tpf
 
-        self.flux = np.nan_to_num(tpf.flux)
-        self.flux_err = np.nan_to_num(tpf.flux_err)
-        self.time = np.nan_to_num(tpf.time)
+        self.flux = tpf.flux
+        self.flux_err = tpf.flux_err
+        self.time = tpf.time
 
     def correct(self, aperture_mask=None, cadence_mask=None, gp_timescale=30,
                 use_gp=True):
@@ -658,14 +658,10 @@ class PLDCorrector(object):
             warnings.simplefilter("ignore", RuntimeWarning)
             flux_err = np.nansum(flux_err_crop[:, aperture_crop]**2, axis=1)**0.5
 
-        # set default transit mask
-        if cadence_mask is None:
-            cadence_mask = np.where(self.time)
-        M = lambda x: x[cadence_mask]
-
         # generate flux light curve from desired pixels
         lc = self.tpf.to_lightcurve(aperture_mask=aperture)
         rawflux = lc.flux
+        rawflux_err = lc.flux_err
 
         # first order PLD design matrix
         pld_flux = flux_crop[:, aperture_crop]
@@ -684,10 +680,22 @@ class PLDCorrector(object):
         # X = np.concatenate((np.ones((len(flux_crop), 1)), X1, X2), axis=-1)
         X = np.concatenate((np.ones((len(flux_crop), 1)), X1), axis=-1)
 
+        # set default transit mask
+        if cadence_mask is None:
+            cadence_mask = np.ones_like(self.time, dtype=bool)
+        m = np.zeros_like(self.time, dtype=bool)
+        m[cadence_mask] = True
+
+        m &= np.isfinite(self.time)
+        m &= np.isfinite(rawflux)
+        m &= np.isfinite(rawflux_err)
+        m &= np.abs(rawflux_err) > 1e-12
+
+        cadence_mask = m
+        M = lambda x: x[cadence_mask]
+
         # mask transits in design matrix
         MX = M(X)
-
-        sigma_diag = np.sum(M(flux_err_crop).reshape(len(M(flux_err_crop)), -1)**2, axis=1)
 
         if use_gp:
             # We use a Gaussian Process to model the long term trend.
@@ -709,23 +717,27 @@ class PLDCorrector(object):
             # we use a Matern-3/2 kernel for its flexibility and non-periodicity
             kernel = celerite.terms.Matern32Term(np.log(amp), np.log(tau))
             gp = celerite.GP(kernel)
+            gp.compute(M(self.time), M(rawflux_err))
 
             # recover GP covariance matrix from celerite model
             # sigma is expected to have shape (n_unmasked_cadences, n_unmasked_cadences)
-            sigma = gp.get_matrix(M(self.time))
-            sigma[np.diag_indices_from(sigma)] += sigma_diag
+            # sigma = gp.get_matrix(M(self.time))
+            # sigma[np.diag_indices_from(sigma)] += sigma_diag
 
             # compute the coefficients C on the basis vectors;
             # the PLD design matrix will be dotted with C to solve for the noise model.
-            factor = linalg.cho_factor(sigma, overwrite_a=True)
-            A = np.dot(MX.T, linalg.cho_solve(factor, MX))
-            B = np.dot(MX.T, linalg.cho_solve(factor, M(rawflux)))
+            # factor = linalg.cho_factor(sigma, overwrite_a=True)
+            # A = np.dot(MX.T, linalg.cho_solve(factor, MX))
+            # B = np.dot(MX.T, linalg.cho_solve(factor, M(rawflux)))
+            A = np.dot(MX.T, gp.apply_inverse(MX))
+            B = np.dot(MX.T, gp.apply_inverse(M(rawflux)[:, None])[:, 0])
 
         else:
             # compute the coefficients C on the basis vectors;
             # the PLD design matrix will be dotted with C to solve for the noise model.
-            A = np.dot(MX.T, MX / sigma_diag[:, None])
-            B = np.dot(MX.T, M(rawflux) / sigma_diag)
+            ivar = 1.0 / M(rawflux_err)**2
+            A = np.dot(MX.T, MX * ivar[:, None])
+            B = np.dot(MX.T, M(rawflux) * ivar)
 
         try:
             C = np.linalg.solve(A, B)  # shape (regressors, 1)
