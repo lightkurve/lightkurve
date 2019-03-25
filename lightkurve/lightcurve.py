@@ -963,7 +963,8 @@ class LightCurve(object):
             An AstroPy Table with columns 'time', 'flux', and 'flux_err'.
         """
         tbl = Table.from_pandas(self.to_pandas())
-        tbl['time'] = self.astropy_time  # Ensure 'time' is an AstroPy `Time` object
+        if self.time_format is not None:
+            tbl['time'] = self.astropy_time  # Ensure 'time' is an AstroPy `Time` object
         tbl.meta = self.meta
         return tbl
 
