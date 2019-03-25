@@ -234,11 +234,11 @@ def test_lightcurve_copy():
     # By changing 1 of the 4 data points in the new lightcurve's array-like
     # attributes, we expect assert_array_equal to raise an AssertionError
     # indicating a mismatch of 1/4 (or 25%).
-    with pytest.raises(AssertionError, match='(mismatch 25.0%)'):
+    with pytest.raises(AssertionError, match='ismatch 25'):
         assert_array_equal(lc.time, nlc.time)
-    with pytest.raises(AssertionError, match='(mismatch 25.0%)'):
+    with pytest.raises(AssertionError, match='ismatch 25'):
         assert_array_equal(lc.flux, nlc.flux)
-    with pytest.raises(AssertionError, match='(mismatch 25.0%)'):
+    with pytest.raises(AssertionError, match='ismatch 25'):
         assert_array_equal(lc.flux_err, nlc.flux_err)
 
     # KeplerLightCurve has extra data
@@ -264,17 +264,17 @@ def test_lightcurve_copy():
     # with a repeating decimal. However, float precision for python 2.7 is 10
     # decimal digits, while python 3.6's is 13 decimal digits. Therefore,
     # a regular expression is needed for both versions.
-    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+'):
+    with pytest.raises(AssertionError, match=r'\(ismatch 33\.3+'):
         assert_array_equal(lc.time, nlc.time)
-    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+'):
+    with pytest.raises(AssertionError, match=r'\(ismatch 33\.3+'):
         assert_array_equal(lc.flux, nlc.flux)
-    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+'):
+    with pytest.raises(AssertionError, match=r'\(ismatch 33\.3+'):
         assert_array_equal(lc.centroid_col, nlc.centroid_col)
-    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+'):
+    with pytest.raises(AssertionError, match=r'\(ismatch 33\.3+'):
         assert_array_equal(lc.centroid_row, nlc.centroid_row)
-    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+'):
+    with pytest.raises(AssertionError, match=r'\(ismatch 33\.3+'):
         assert_array_equal(lc.cadenceno, nlc.cadenceno)
-    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+'):
+    with pytest.raises(AssertionError, match=r'\(ismatch 33\.3+'):
         assert_array_equal(lc.quality, nlc.quality)
 
 
