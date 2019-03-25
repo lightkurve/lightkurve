@@ -264,17 +264,17 @@ def test_lightcurve_copy():
     # with a repeating decimal. However, float precision for python 2.7 is 10
     # decimal digits, while python 3.6's is 13 decimal digits. Therefore,
     # a regular expression is needed for both versions.
-    with pytest.raises(AssertionError, match=r'ismatch 33\.3+'):
+    with pytest.raises(AssertionError, match=r'ismatch. 33\.3+'):
         assert_array_equal(lc.time, nlc.time)
-    with pytest.raises(AssertionError, match=r'ismatch 33\.3+'):
+    with pytest.raises(AssertionError, match=r'ismatch. 33\.3+'):
         assert_array_equal(lc.flux, nlc.flux)
-    with pytest.raises(AssertionError, match=r'ismatch 33\.3+'):
+    with pytest.raises(AssertionError, match=r'ismatch. 33\.3+'):
         assert_array_equal(lc.centroid_col, nlc.centroid_col)
-    with pytest.raises(AssertionError, match=r'ismatch 33\.3+'):
+    with pytest.raises(AssertionError, match=r'ismatch. 33\.3+'):
         assert_array_equal(lc.centroid_row, nlc.centroid_row)
-    with pytest.raises(AssertionError, match=r'ismatch 33\.3+'):
+    with pytest.raises(AssertionError, match=r'ismatch. 33\.3+'):
         assert_array_equal(lc.cadenceno, nlc.cadenceno)
-    with pytest.raises(AssertionError, match=r'ismatch 33\.3+'):
+    with pytest.raises(AssertionError, match=r'ismatch. 33\.3+'):
         assert_array_equal(lc.quality, nlc.quality)
 
 
