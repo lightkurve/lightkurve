@@ -962,9 +962,33 @@ class LightCurve(object):
         table : `astropy.table.Table`
             An AstroPy Table with columns 'time', 'flux', and 'flux_err'.
         """
-        return Table(data=(self.time, self.flux, self.flux_err),
-                     names=('time', 'flux', 'flux_err'),
-                     meta=self.meta)
+        tbl = Table.from_pandas(self.to_pandas())
+        tbl['time'] = self.astropy_time  # Ensure 'time' is an AstroPy `Time` object
+        tbl.meta = self.meta
+        return tbl
+
+    def to_timeseries(self):
+        """Converts the light curve to an `~astropy_timeseries.TimeSeries` object.
+
+        This is an experimental feature which depends on the placeholder
+        `astropy_timeseries` package (https://astropy-timeseries.readthedocs.io).
+        This package will likely be merged into AstroPy in the near future.
+
+        Returns
+        -------
+        timeseries : `~astropy_timeseries.TimeSeries`
+            An AstroPy TimeSeries object.
+        """
+        from astropy_timeseries import TimeSeries
+        return TimeSeries(self.to_table())
+
+    @staticmethod
+    def from_timeseries(ts):
+        """Create a new `LightCurve` from an `~astropy_timeseries.TimeSeries` object.
+
+        Note: `ts` must have 'time', 'flux', and 'flux_err' columns
+        """
+        return LightCurve(time=ts['time'].value, flux=ts['flux'], flux_err=ts['flux_err'])
 
     def to_pandas(self, columns=['time', 'flux', 'flux_err']):
         """Converts the light curve to a Pandas `~pandas.DataFrame` object.
