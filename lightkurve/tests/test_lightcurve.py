@@ -234,11 +234,11 @@ def test_lightcurve_copy():
     # By changing 1 of the 4 data points in the new lightcurve's array-like
     # attributes, we expect assert_array_equal to raise an AssertionError
     # indicating a mismatch of 1/4 (or 25%).
-    with pytest.raises(AssertionError, match='ismatch 25'):
+    with pytest.raises(AssertionError, match='ismatch. 25'):
         assert_array_equal(lc.time, nlc.time)
-    with pytest.raises(AssertionError, match='ismatch 25'):
+    with pytest.raises(AssertionError, match='ismatch. 25'):
         assert_array_equal(lc.flux, nlc.flux)
-    with pytest.raises(AssertionError, match='ismatch 25'):
+    with pytest.raises(AssertionError, match=r'ismatch. 25'):
         assert_array_equal(lc.flux_err, nlc.flux_err)
 
     # KeplerLightCurve has extra data
