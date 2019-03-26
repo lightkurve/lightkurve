@@ -641,14 +641,15 @@ class PLDCorrector(object):
             returned object will be a `KeplerLightCurve`, `TessLightCurve`, or
             general `LightCurve` object.
         """
-        # Verify optional dependencies
-        try:
-            import celerite
-        except ImportError:
-            log.error("PLD requires the `celerite` Python package. "
-                      "See the installation instructions at "
-                      "https://docs.lightkurve.org/about/install.html")
-            return None
+        if use_gp:
+            # Verify optional dependency
+            try:
+                import celerite
+            except ImportError:
+                log.error("PLD requires the `celerite` Python package. "
+                          "See the installation instructions at "
+                          "https://docs.lightkurve.org/about/install.html")
+                use_gp = False
 
         # Parse the aperture mask to accept strings etc.
         aperture = self.tpf._parse_aperture_mask(aperture_mask)
