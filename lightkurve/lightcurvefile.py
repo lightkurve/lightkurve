@@ -171,6 +171,9 @@ class KeplerLightCurveFile(LightCurveFile):
         elif filetype is None:
             warnings.warn("Given fits file not recognized as Kepler or TESS "
                           "observation.", LightkurveWarning)
+        elif filetype == 'KeplerLightCurveFile-interact':
+            warnings.warn("Custom-made Kepler fits files have limited "\
+                          "functionality.", LightkurveWarning)
         elif "TargetPixelFile" in filetype:
             warnings.warn("A `TargetPixelFile` object is being opened as a "
                           "`KeplerLightCurveFile`. "
@@ -391,6 +394,9 @@ class TessLightCurveFile(LightCurveFile):
         elif filetype is None:
             warnings.warn("Given fits file not recognized as Kepler or TESS "
                           "observation.", LightkurveWarning)
+        elif filetype == 'TessLightCurveFile-interact':
+            warnings.warn("Custom-made TESS fits files have limited "\
+                          "functionality.", LightkurveWarning)
         elif "TargetPixelFile" in filetype:
             warnings.warn("A `TargetPixelFile` object is being opened as a "
                           "`TessLightCurveFile`. "

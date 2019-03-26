@@ -469,6 +469,8 @@ def detect_filetype(header):
 
     If the file is not recognized as a Kepler or TESS data product, then
     `None` will be returned.
+    If the file was generated as an interact-generated fits file, it will
+    append `-interact` and warn users that the object has limited functionality
 
     Parameters
     ----------
@@ -484,6 +486,16 @@ def detect_filetype(header):
     try:
         # use `telescop` keyword to determine mission
         # and `creator` to determine tpf or lc
+
+        if "SOURCE" in header.keys():
+            # Could be a custom lightcurve
+            if header['SOURCE'] == 'lightkurve interact':
+                if header['mission'].lower() == 'tess':
+                    return 'TessLightCurveFile-interact'
+                elif header['mission'].lower()[0] == 'k':
+                    return 'KeplerLightCurveFile-interact'
+
+        # Traditional filetypes
         telescop = header['telescop'].lower()
         creator = header['creator'].lower()
         origin = header['origin'].lower()
