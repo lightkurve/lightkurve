@@ -28,6 +28,8 @@ KEPLER10 = ("https://archive.stsci.edu/missions/kepler/lightcurves/"
 TESS_SIM = ("https://archive.stsci.edu/missions/tess/ete-6/tid/00/000/"
             "004/104/tess2019128220341-0000000410458113-0016-s_lc.fits")
 filename_tess = get_pkg_data_filename("data/tess25155310-s01-first-cadences.fits.gz")
+filename_tess_custom = get_pkg_data_filename("data/test_TESS_interact_generated_custom-lc.fits")
+filename_K2_custom = get_pkg_data_filename("data/test_K2_interact_generated_custom-lc.fits")
 
 
 def test_invalid_lightcurve():
@@ -276,6 +278,42 @@ def test_lightcurve_copy():
         assert_array_equal(lc.cadenceno, nlc.cadenceno)
     with pytest.raises(AssertionError, match=r'ismatch.* 33\.3+'):
         assert_array_equal(lc.quality, nlc.quality)
+
+@pytest.mark.parametrize("path, mission", [(filename_tess_custom, "TESS"),
+                                           (filename_K2_custom, "K2")])
+def test_custom_lightcurve_file(path, mission):
+    """Test whether we can read in custom interact()-produced lightcurvefiles"""
+    if mission == "K2":
+        lcf_custom = KeplerLightCurveFile(path)
+    elif mission == "TESS":
+        lcf_custom = TessLightCurveFile(path)
+    assert lcf_custom.hdu[2].name == 'APERTURE'
+    assert lcf_custom.cadenceno[0] >= 0
+    assert lcf_custom.dec == lcf_custom.dec
+    assert lcf_custom.time[-1] > lcf_custom.time[0]
+    # .interact() files currently define FLUX, and not SAP_FLUX nor PDCSAP_FLUX
+    lc = lcf_custom.get_lightcurve('FLUX')
+    assert len(lc.flux) > 0
+    with pytest.raises(KeyError):
+        lcf_custom.SAP_FLUX
+    with pytest.raises(KeyError):
+        lcf_custom.PDCSAP_FLUX
+
+    assert lc.mission.lower() == mission.lower()
+    # Does the data match what one would obtain using pyfits.open?
+    hdu = pyfits.open(path)
+    assert lc.label == hdu[0].header['OBJECT']
+    assert_array_equal(lc.time, hdu[1].data['TIME'])
+    assert_array_equal(lc.flux, hdu[1].data['FLUX'])
+
+    # TESS has QUALITY while Kepler/K2 has SAP_QUALITY:
+    if mission == "TESS":
+        assert "QUALITY" in lcf_custom.hdu[1].columns.names
+        assert_array_equal(lc.quality, hdu[1].data['QUALITY'])
+    if mission in ["K2", "Kepler"]:
+        assert "SAP_QUALITY" in lcf_custom.hdu[1].columns.names
+        assert_array_equal(lc.quality, hdu[1].data['SAP_QUALITY'])
+
 
 
 @pytest.mark.remote_data
