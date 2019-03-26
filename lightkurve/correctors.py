@@ -669,9 +669,9 @@ class PLDCorrector(object):
         X1 = f1 / np.sum(pld_flux, axis=-1)[:, None]
 
         # second order PLD design matrix
-        # f2 = np.reshape(X1[:, None, :] * X1[:, :, None], (len(flux_crop), -1))
-        # pca, _, _ = np.linalg.svd(f2, full_matrices=False)
-        # X2 = pca[:, :X1.shape[1]]
+        f2 = np.reshape(X1[:, None, :] * X1[:, :, None], (len(flux_crop), -1))
+        pca, _, _ = np.linalg.svd(f2, full_matrices=False)
+        X2 = pca[:, :X1.shape[1]]
 
         # Create the design matrix X by stacking X1 and X2 and adding a column
         # vector of 1s for numerical stability (see Luger et al.).
