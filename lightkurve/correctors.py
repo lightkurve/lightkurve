@@ -671,22 +671,18 @@ class PLDCorrector(object):
         X1 = f1 / np.sum(pld_flux, axis=-1)[:, None]
 
         # higher order PLD design matrices
-        X_sections = []
+        X_sections = [np.ones((len(flux_crop), 1)), X1]
         nterms = 10
         for i in range(2, pld_order+1):
-            f2 = np.product(list(multichoose(f1[:, :nterms].T, pld_order)), axis=1).T
+            f2 = np.product(list(multichoose(X1.T, pld_order)), axis=1).T
             pca, _, _ = np.linalg.svd(f2)
-            X_n = pca[:, :nterms] / (np.sum(pld_flux, axis=-1)[:, None])**pld_order
+            X_n = pca[:, :nterms]
             X_sections.append(X_n)
 
         # Create the design matrix X by stacking X1 and higher order components, and
         # adding a column vector of 1s for numerical stability (see Luger et al.).
         # X has shape (n_components_first + n_components_second + 1, n_cadences)
-        if len(X_sections) > 0:
-            X = np.concatenate((np.ones((len(flux_crop), 1)), X1,
-                                np.concatenate(X_sections, axis=1)), axis=-1)
-        else:
-            X = np.concatenate((np.ones((len(flux_crop), 1)), X1), axis=-1)
+        X = np.concatenate(X_sections, axis=1)
 
         # set default transit mask
         if cadence_mask is None:
@@ -713,16 +709,11 @@ class PLDCorrector(object):
             # preliminary PLD model defined above and subtracting it from the raw light curve.
             # The "in transit" cadences are masked out in this step to prevent the
             # long term approximation from over-fitting the transits.
-            try:
-                y = M(rawflux) - np.dot(MX, np.linalg.solve(np.dot(MX.T, MX),
-                                        np.dot(MX.T, M(rawflux))))
-            except np.linalg.LinAlgError:
-                XTX = np.dot(MX.T, MX)
-                XTX[np.diag_indices_from(XTX)] += 1e-8
-                XTy = np.dot(MX.T, M(rawflux))
-                y = M(rawflux) - np.dot(MX, np.linalg.solve(XTX, XTy))
-                # raise ValueError("Unable to compute matrix. Try limiting the number of "
-                #                   "pixels in aperture with aperture_mask='threshold'.")
+            XTX = np.dot(MX.T, MX)
+            XTX[np.diag_indices_from(XTX)] += 1e-8
+            XTy = np.dot(MX.T, M(rawflux))
+            y = M(rawflux) - np.dot(MX, np.linalg.solve(XTX, XTy))
+
             # Estimate the amplitude parameter of a Matern-3/2 kernel GP
             # by computing the standard deviation of y.
             amp = np.nanstd(y)
@@ -745,14 +736,9 @@ class PLDCorrector(object):
             A = np.dot(MX.T, MX * ivar[:, None])
             B = np.dot(MX.T, M(rawflux) * ivar)
 
-        try:
-            C = np.linalg.solve(A, B)  # shape (regressors, 1)
-        except np.linalg.LinAlgError:
-            # apply prior to design matrix weights for numerical stability
-            A[np.diag_indices_from(A)] += 1e-8
-            C = np.linalg.solve(A, B)
-            # raise ValueError("Unable to compute matrix. Try limiting the number of "
-            #                  "pixels in aperture with aperture_mask='threshold'.")
+        # apply prior to design matrix weights for numerical stability
+        A[np.diag_indices_from(A)] += 1e-8
+        C = np.linalg.solve(A, B)
 
         # compute detrended light curve
         model = np.dot(X, C)
