@@ -295,8 +295,10 @@ def test_custom_lightcurve_file(path, mission):
     lc = lcf_custom.get_lightcurve('FLUX')
     assert len(lc.flux) > 0
     with pytest.raises(KeyError):
+        lcf_custom.get_lightcurve('BLABLA')
+    with pytest.warns(LightkurveWarning, match='custom file does not have'):
         lcf_custom.SAP_FLUX
-    with pytest.raises(KeyError):
+    with pytest.warns(LightkurveWarning, match='custom file does not have'):
         lcf_custom.PDCSAP_FLUX
 
     assert lc.mission.lower() == mission.lower()
