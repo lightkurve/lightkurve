@@ -531,13 +531,12 @@ class PLDCorrector(object):
         for quick-look analyses and detrending experiments.
 
         Our simple implementation of PLD is performed by first calculating the
-        noise model for each cadence in time. This function goes up to second
+        noise model for each cadence in time. This function goes up to arbitrary
         order, and is represented by
 
         .. math::
 
-            m_i = \sum_l a_l \frac{f_{il}}{\sum_k f_{ik}} + \sum_l \sum_m b_{lm} \frac{f_{il}f_{im}}{\left( \sum_k f_{ik} \right)^2} + \alpha + \beta t_i + \gamma t_i^2
-
+            m_i = \alpha + \beta t_i + \gamma t_i^2 + \sum_l a_l \frac{f_{il}}{\sum_k f_{ik}} + \sum_l \sum_m b_{lm} \frac{f_{il}f_{im}}{\left( \sum_k f_{ik} \right)^2} + ...
         where
 
           - :math:`m_i` is the noise model at time :math:`t_i`
@@ -551,7 +550,7 @@ class PLDCorrector(object):
         We perform Principal Component Analysis (PCA) to reduce the number of
         vectors in our final model to limit the set to best capture instrumental
         noise. With a PCA-reduced set of vectors, we can construct a design matrix
-        containing first and second order fractional pixel fluxes.
+        containing fractional pixel fluxes.
 
         To solve for the PLD model, we need to minimize the difference squared
 
@@ -596,7 +595,7 @@ class PLDCorrector(object):
         self.time = tpf.time
 
     def correct(self, aperture_mask=None, cadence_mask=None, gp_timescale=30,
-                use_gp=True, pld_order=2):
+                use_gp=True, pld_order=2, n_pca_terms=10):
         r"""Returns a PLD systematics-corrected LightCurve.
 
         Parameters
@@ -625,7 +624,15 @@ class PLDCorrector(object):
             this to False to speed up the correction (at the cost of precision),
             or if you suspect the presence of systematic noise at long timescales.
         pld_order : int
-
+            The order of Pixel Level De-correlation to be performed. First order
+            (`n=1`) uses only the pixel fluxes to construct the design matrix.
+            Higher order populates the design matrix with columns constructed
+            from the products of pixel fluxes.
+        n_pca_terms : int
+            Number of terms to add to the design matrix from each order of PLD
+            when performing Principle Component Analysis for models higher than
+            first order. Increasing this value may provide higher precision at
+            the expense of computational time.
 
         Returns
         -------
@@ -673,11 +680,10 @@ class PLDCorrector(object):
 
         # higher order PLD design matrices
         X_sections = [np.ones((len(flux_crop), 1)), X1]
-        nterms = 10
         for i in range(2, pld_order+1):
             f2 = np.product(list(multichoose(X1.T, pld_order)), axis=1).T
-            components, _, _ = pca(f2, 10)
-            X_n = components[:, :nterms]
+            components, _, _ = pca(f2, n_pca_terms)
+            X_n = components[:, :n_pca_terms]
             X_sections.append(X_n)
 
         # Create the design matrix X by stacking X1 and higher order components, and
