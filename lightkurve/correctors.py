@@ -16,6 +16,7 @@ import oktopus
 import numpy as np
 from scipy import linalg, interpolate
 from matplotlib import pyplot as plt
+from fbpca import pca
 
 from astropy.io import fits as pyfits
 from astropy.stats import sigma_clip
@@ -675,8 +676,8 @@ class PLDCorrector(object):
         nterms = 10
         for i in range(2, pld_order+1):
             f2 = np.product(list(multichoose(X1.T, pld_order)), axis=1).T
-            pca, _, _ = np.linalg.svd(f2)
-            X_n = pca[:, :nterms]
+            components, _, _ = pca(f2, 10)
+            X_n = components[:, :nterms]
             X_sections.append(X_n)
 
         # Create the design matrix X by stacking X1 and higher order components, and
