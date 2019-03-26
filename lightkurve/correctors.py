@@ -595,7 +595,7 @@ class PLDCorrector(object):
         self.time = tpf.time
 
     def correct(self, aperture_mask=None, cadence_mask=None, gp_timescale=30,
-                use_gp=True):
+                use_gp=True, pld_order=2):
         r"""Returns a PLD systematics-corrected LightCurve.
 
         Parameters
@@ -623,6 +623,8 @@ class PLDCorrector(object):
             Option to turn GP fitting on or off.  You would typically only set
             this to False to speed up the correction (at the cost of precision),
             or if you suspect the presence of systematic noise at long timescales.
+        pld_order : int
+
 
         Returns
         -------
@@ -668,17 +670,24 @@ class PLDCorrector(object):
         f1 = np.reshape(pld_flux, (len(pld_flux), -1))
         X1 = f1 / np.sum(pld_flux, axis=-1)[:, None]
 
-        # second order PLD design matrix
-        f2 = np.reshape(X1[:, None, :] * X1[:, :, None], (len(flux_crop), -1))
-        pca, _, _ = np.linalg.svd(f2, full_matrices=False)
-        X2 = pca[:, :X1.shape[1]]
+        # higher order PLD design matrices
+        X_sections = []
+        nterms = 10
+        for i in range(2, pld_order+1):
+            f2 = np.product(list(
+                multichoose(f1[:, :nterms].T, pld_order)), axis=1).T
+            pca, _, _ = np.linalg.svd(f2)
+            X_n = pca[:, :nterms] / (np.sum(pld_flux, axis=-1)[:, None])**pld_order
+            X_sections.append(X_n)
 
-        # Create the design matrix X by stacking X1 and X2 and adding a column
-        # vector of 1s for numerical stability (see Luger et al.).
+        # Create the design matrix X by stacking X1 and X_higher_order and
+        # adding a column vector of 1s for numerical stability (see Luger et al.).
         # X has shape (n_components_first + n_components_second + 1, n_cadences)
-
-        # X = np.concatenate((np.ones((len(flux_crop), 1)), X1, X2), axis=-1)
-        X = np.concatenate((np.ones((len(flux_crop), 1)), X1), axis=-1)
+        if len(X_sections) > 0:
+            X_higher_order = np.concatenate(X_sections, axis=1)
+            X = np.concatenate((np.ones((len(flux_crop), 1)), X1, X_higher_order), axis=-1)
+        else:
+            X = np.concatenate((np.ones((len(flux_crop), 1)), X1), axis=-1)
 
         # set default transit mask
         if cadence_mask is None:
@@ -686,11 +695,13 @@ class PLDCorrector(object):
         m = np.zeros_like(self.time, dtype=bool)
         m[cadence_mask] = True
 
+        # mask out any infinite or nan indices
         m &= np.isfinite(self.time)
         m &= np.isfinite(rawflux)
         m &= np.isfinite(rawflux_err)
         m &= np.abs(rawflux_err) > 1e-12
 
+        # create mask function
         cadence_mask = m
         M = lambda x: x[cadence_mask]
 
