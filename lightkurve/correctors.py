@@ -674,18 +674,17 @@ class PLDCorrector(object):
         X_sections = []
         nterms = 10
         for i in range(2, pld_order+1):
-            f2 = np.product(list(
-                multichoose(f1[:, :nterms].T, pld_order)), axis=1).T
+            f2 = np.product(list(multichoose(f1[:, :nterms].T, pld_order)), axis=1).T
             pca, _, _ = np.linalg.svd(f2)
             X_n = pca[:, :nterms] / (np.sum(pld_flux, axis=-1)[:, None])**pld_order
             X_sections.append(X_n)
 
-        # Create the design matrix X by stacking X1 and X_higher_order and
+        # Create the design matrix X by stacking X1 and higher order components, and
         # adding a column vector of 1s for numerical stability (see Luger et al.).
         # X has shape (n_components_first + n_components_second + 1, n_cadences)
         if len(X_sections) > 0:
-            X_higher_order = np.concatenate(X_sections, axis=1)
-            X = np.concatenate((np.ones((len(flux_crop), 1)), X1, X_higher_order), axis=-1)
+            X = np.concatenate((np.ones((len(flux_crop), 1)), X1,
+                                np.concatenate(X_sections, axis=1)), axis=-1)
         else:
             X = np.concatenate((np.ones((len(flux_crop), 1)), X1), axis=-1)
 
@@ -718,8 +717,12 @@ class PLDCorrector(object):
                 y = M(rawflux) - np.dot(MX, np.linalg.solve(np.dot(MX.T, MX),
                                         np.dot(MX.T, M(rawflux))))
             except np.linalg.LinAlgError:
-                 raise ValueError("Unable to compute matrix. Try limiting the number of "
-                                  "pixels in aperture with aperture_mask='threshold'.")
+                XTX = np.dot(MX.T, MX)
+                XTX[np.diag_indices_from(XTX)] += 1e-8
+                XTy = np.dot(MX.T, M(rawflux))
+                y = M(rawflux) - np.dot(MX, np.linalg.solve(XTX, XTy))
+                # raise ValueError("Unable to compute matrix. Try limiting the number of "
+                #                   "pixels in aperture with aperture_mask='threshold'.")
             # Estimate the amplitude parameter of a Matern-3/2 kernel GP
             # by computing the standard deviation of y.
             amp = np.nanstd(y)
@@ -730,16 +733,8 @@ class PLDCorrector(object):
             gp = celerite.GP(kernel)
             gp.compute(M(self.time), M(rawflux_err))
 
-            # recover GP covariance matrix from celerite model
-            # sigma is expected to have shape (n_unmasked_cadences, n_unmasked_cadences)
-            # sigma = gp.get_matrix(M(self.time))
-            # sigma[np.diag_indices_from(sigma)] += sigma_diag
-
             # compute the coefficients C on the basis vectors;
             # the PLD design matrix will be dotted with C to solve for the noise model.
-            # factor = linalg.cho_factor(sigma, overwrite_a=True)
-            # A = np.dot(MX.T, linalg.cho_solve(factor, MX))
-            # B = np.dot(MX.T, linalg.cho_solve(factor, M(rawflux)))
             A = np.dot(MX.T, gp.apply_inverse(MX))
             B = np.dot(MX.T, gp.apply_inverse(M(rawflux)[:, None])[:, 0])
 
@@ -753,8 +748,11 @@ class PLDCorrector(object):
         try:
             C = np.linalg.solve(A, B)  # shape (regressors, 1)
         except np.linalg.LinAlgError:
-            raise ValueError("Unable to compute matrix. Try limiting the number of "
-                             "pixels in aperture with aperture_mask='threshold'.")
+            # apply prior to design matrix weights for numerical stability
+            A[np.diag_indices_from(A)] += 1e-8
+            C = np.linalg.solve(A, B)
+            # raise ValueError("Unable to compute matrix. Try limiting the number of "
+            #                  "pixels in aperture with aperture_mask='threshold'.")
 
         # compute detrended light curve
         model = np.dot(X, C)
