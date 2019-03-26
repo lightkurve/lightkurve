@@ -1609,6 +1609,9 @@ class TessLightCurve(LightCurve):
         hdu = super(TessLightCurve, self).to_fits(path=None,
                                                     overwrite=overwrite,
                                                     **extra_data)
+
+        # We do this because the TESS file format is subtly different in the
+        #    name of this column.
         hdu[1].columns.change_name('SAP_QUALITY', 'QUALITY')
 
         hdu = _make_aperture_extension(hdu, aperture_mask)
