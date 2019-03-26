@@ -16,7 +16,6 @@ import oktopus
 import numpy as np
 from scipy import linalg, interpolate
 from matplotlib import pyplot as plt
-from fbpca import pca
 
 from astropy.io import fits as pyfits
 from astropy.stats import sigma_clip
@@ -646,9 +645,10 @@ class PLDCorrector(object):
             try:
                 import celerite
             except ImportError:
-                log.error("PLD requires the `celerite` Python package. "
+                log.error("PLD uses the `celerite` Python package. "
                           "See the installation instructions at "
-                          "https://docs.lightkurve.org/about/install.html")
+                          "https://docs.lightkurve.org/about/install.html. "
+                          "`use_gp` has been set to `False`.")
                 use_gp = False
 
         # Parse the aperture mask to accept strings etc.
@@ -683,7 +683,14 @@ class PLDCorrector(object):
         X_sections = [np.ones((len(flux_crop), 1)), X1]
         for i in range(2, pld_order+1):
             f2 = np.product(list(multichoose(X1.T, pld_order)), axis=1).T
-            components, _, _ = pca(f2, n_pca_terms)
+            try:
+                from fbpca import pca
+                components, _, _ = pca(f2, n_pca_terms)
+            except ImportError:
+                log.error("PLD uses the `fbpca` package. You can pip install "
+                          "with `pip install fbpca`. Using `np.linalg.svd` "
+                          "instead.")
+                components, _, _ = np.linalg.svd(f2)
             X_n = components[:, :n_pca_terms]
             X_sections.append(X_n)
 
