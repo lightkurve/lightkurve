@@ -25,7 +25,7 @@ tests_require = ['pytest', 'pytest-cov', 'pytest-remotedata']
 # `PLDCorrector` requires pybind11, celerite.
 extras_require = {"all":  ["astropy>=3.1",
                            "bokeh>=1.0", "ipython",
-                           "pybind11", "celerite"],
+                           "pybind11", "celerite", "fbpca"],
                   "test": tests_require}
 
 setup(name='lightkurve',
