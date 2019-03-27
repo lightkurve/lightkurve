@@ -5,7 +5,7 @@
 1.0b30 (2019-03-27)
 ===================
 
-- Significantly improved the performance of the PLDCorrector feature for systematics removal. [#470]
+- Significantly improved the performance of the ``PLDCorrector`` feature for systematics removal. [#470]
 
 - Improved the normalization of the result returned by ``Periodogram.smooth(method='logmedian')``. [#453]
 
