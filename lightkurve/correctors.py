@@ -628,7 +628,7 @@ class PLDCorrector(object):
             Higher order populates the design matrix with columns constructed
             from the products of pixel fluxes.
         n_pca_terms : int
-            Number of terms to add to the design matrix from each order of PLD
+            Number of terms added to the design matrix from each order of PLD
             when performing Principle Component Analysis for models higher than
             first order. Increasing this value may provide higher precision at
             the expense of computational time.
@@ -684,6 +684,7 @@ class PLDCorrector(object):
         for i in range(2, pld_order+1):
             f2 = np.product(list(multichoose(X1.T, pld_order)), axis=1).T
             try:
+                # optionally dependency for PCA
                 from fbpca import pca
                 components, _, _ = pca(f2, n_pca_terms)
             except ImportError:
@@ -696,7 +697,7 @@ class PLDCorrector(object):
 
         # Create the design matrix X by stacking X1 and higher order components, and
         # adding a column vector of 1s for numerical stability (see Luger et al.).
-        # X has shape (n_components_first + n_components_second + 1, n_cadences)
+        # X has shape (n_components_first + n_components_higher_order + 1, n_cadences)
         X = np.concatenate(X_sections, axis=1)
 
         # set default transit mask
@@ -747,7 +748,7 @@ class PLDCorrector(object):
         else:
             # compute the coefficients C on the basis vectors;
             # the PLD design matrix will be dotted with C to solve for the noise model.
-            ivar = 1.0 / M(rawflux_err)**2
+            ivar = 1.0 / M(rawflux_err)**2 # inverse variance
             A = np.dot(MX.T, MX * ivar[:, None])
             B = np.dot(MX.T, M(rawflux) * ivar)
 
