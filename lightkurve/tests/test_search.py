@@ -303,8 +303,8 @@ def test_open():
 
 def test_issue_472():
     """Regression test for https://github.com/KeplerGO/lightkurve/issues/472"""
-    # The line below previously threw an exception;
-    # we're expecting an empty SearchResult instead:
+    # The line below previously threw an exception because the target was not
+    # observed in Sector 2; we're expecting an empty SearchResult instead.
     search = search_tesscut("TIC41336498", sector=2)
     assert isinstance(search, SearchResult)
     len(search) == 0
