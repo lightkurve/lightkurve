@@ -14,7 +14,9 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
@@ -27,7 +29,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b29</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b30</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -84,10 +86,10 @@ these references. Lightkurve provides a reference implementation
 of PLD that is less sophisticated than EVEREST, but is suitable
 for quick-look analyses and detrending experiments.</p>
 <p>Our simple implementation of PLD is performed by first calculating the
-noise model for each cadence in time. This function goes up to second
+noise model for each cadence in time. This function goes up to arbitrary
 order, and is represented by</p>
 <div class="math notranslate nohighlight">
-\[m_i = \sum_l a_l \frac{f_{il}}{\sum_k f_{ik}} + \sum_l \sum_m b_{lm} \frac{f_{il}f_{im}}{\left( \sum_k f_{ik} \right)^2} + \alpha + \beta t_i + \gamma t_i^2\]</div>
+\[m_i = \alpha + \beta t_i + \gamma t_i^2 + \sum_l a_l \frac{f_{il}}{\sum_k f_{ik}} + \sum_l \sum_m b_{lm} \frac{f_{il}f_{im}}{\left( \sum_k f_{ik} \right)^2} + ...\]</div>
 <p>where</p>
 <blockquote>
 <div><ul class="simple">
@@ -103,7 +105,7 @@ Gaussian Process terms applied to capture long-period variability.</li>
 <p>We perform Principal Component Analysis (PCA) to reduce the number of
 vectors in our final model to limit the set to best capture instrumental
 noise. With a PCA-reduced set of vectors, we can construct a design matrix
-containing first and second order fractional pixel fluxes.</p>
+containing fractional pixel fluxes.</p>
 <p>To solve for the PLD model, we need to minimize the difference squared</p>
 <div class="math notranslate nohighlight">
 \[\chi^2 = \sum_i \frac{(y_i - m_i)^2}{\sigma_i^2},\]</div>
@@ -165,7 +167,7 @@ It is necessary to mask the transits using <code class="xref py py-obj docutils 
 <p class="rubric">Methods Documentation</p>
 <dl class="method">
 <dt id="lightkurve.correctors.PLDCorrector.correct">
-<code class="descname">correct</code><span class="sig-paren">(</span><em>aperture_mask=None</em>, <em>cadence_mask=None</em>, <em>gp_timescale=30</em>, <em>n_components_first=None</em>, <em>n_components_second=20</em>, <em>use_gp=True</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.PLDCorrector.correct" title="Permalink to this definition">¶</a></dt>
+<code class="descname">correct</code><span class="sig-paren">(</span><em>aperture_mask=None</em>, <em>cadence_mask=None</em>, <em>gp_timescale=30</em>, <em>use_gp=True</em>, <em>pld_order=2</em>, <em>n_pca_terms=10</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.PLDCorrector.correct" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a PLD systematics-corrected LightCurve.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -194,17 +196,22 @@ By default, no cadences will be masked.</p>
 <dd><p class="first last">Gaussian Process time scale length term (<code class="xref py py-obj docutils literal notranslate"><span class="pre">tau</span></code>) used to define
 length of fit variability in days.</p>
 </dd>
-<dt><strong>n_components_first</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
-<dd><p class="first last">Number of first-order PLD components to reduce to with PCA.
-Must be smaller than the number of pixels in the aperture mask.
-If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, then 25 or the number of pixels in the mask will be used,
-whichever is smaller.</p>
-</dd>
-<dt><strong>n_components_second</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
-<dd><p class="first last">Number of second-order PLD components to reduce to with PCA.</p>
-</dd>
 <dt><strong>use_gp</strong> <span class="classifier-delimiter">:</span> <span class="classifier">boolean</span></dt>
-<dd><p class="first last">Option to turn GP fitting on or off.</p>
+<dd><p class="first last">Option to turn GP fitting on or off.  You would typically only set
+this to False to speed up the correction (at the cost of precision),
+or if you suspect the presence of systematic noise at long timescales.</p>
+</dd>
+<dt><strong>pld_order</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">The order of Pixel Level De-correlation to be performed. First order
+(<code class="xref py py-obj docutils literal notranslate"><span class="pre">n=1</span></code>) uses only the pixel fluxes to construct the design matrix.
+Higher order populates the design matrix with columns constructed
+from the products of pixel fluxes.</p>
+</dd>
+<dt><strong>n_pca_terms</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">Number of terms added to the design matrix from each order of PLD
+when performing Principal Component Analysis for models higher than
+first order. Increasing this value may provide higher precision at
+the expense of computational time.</p>
 </dd>
 </dl>
 </td>

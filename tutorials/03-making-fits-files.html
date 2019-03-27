@@ -14,7 +14,9 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
@@ -27,7 +29,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b29</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b30</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -122,18 +124,18 @@ div.nblast {
 
 /* input prompt */
 div.nbinput div.prompt pre {
-    color: #303F9F;
+    color: #307FC1;
 }
 
 /* output prompt */
 div.nboutput div.prompt pre {
-    color: #D84315;
+    color: #BF5B3D;
 }
 
 /* all prompts */
 div.nbinput div.prompt,
 div.nboutput div.prompt {
-    min-width: 9ex;
+    min-width: 7ex;
     padding-top: 0.4em;
     padding-right: 0.4em;
     text-align: right;
@@ -173,9 +175,9 @@ div.nboutput div.output_area {
 
 /* input area */
 div.nbinput div.input_area {
-    border: 1px solid #cfcfcf;
+    border: 1px solid #e0e0e0;
     border-radius: 2px;
-    background: #f7f7f7;
+    background: #f5f5f5;
 }
 
 /* override MathJax center alignment in output cells */
@@ -183,7 +185,7 @@ div.nboutput div[class*=MathJax] {
     text-align: left !important;
 }
 
-/* override sphinx.ext.pngmath center alignment in output cells */
+/* override sphinx.ext.imgmath center alignment in output cells */
 div.nboutput div.math p {
     text-align: left;
 }
@@ -232,6 +234,40 @@ div.nboutput div.output_area.stderr {
 
 .ansi-bold { font-weight: bold; }
 .ansi-underline { text-decoration: underline; }
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
 </style>
 <div class="admonition note">
 <p class="admonition-title"><strong>This page is a static version of an interactive Jupyter notebook</strong></p>
@@ -242,24 +278,14 @@ div.nboutput div.output_area.stderr {
 </div>
 <div class="section" id="How-to-save-a-LightCurve-in-FITS-format?">
 <h1>How to save a LightCurve in FITS format?<a class="headerlink" href="#How-to-save-a-LightCurve-in-FITS-format?" title="Permalink to this headline">¶</a></h1>
-<p>Once you have detrended or altered a lightcurve in some way, you may
-want to save it as a FITS file. This allows you to easily share the file
-with your collaborators or submit your lightcurves as a <a class="reference external" href="https://archive.stsci.edu/hlsp/hlsp_guidelines.html">MAST High Level
-Science Product</a>
-(HLSP). Lightkurve provides a <code class="docutils literal notranslate"><span class="pre">to_fits()</span></code> method which will easily
-convert your <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> object into a fits file.</p>
+<p>Once you have detrended or altered a lightcurve in some way, you may want to save it as a FITS file. This allows you to easily share the file with your collaborators or submit your lightcurves as a <a class="reference external" href="https://archive.stsci.edu/hlsp/hlsp_guidelines.html">MAST High Level Science Product</a> (HLSP). Lightkurve provides a <code class="docutils literal notranslate"><span class="pre">to_fits()</span></code> method which will easily convert your <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> object into a fits file.</p>
 <p>Below is a brief demostration showing how <code class="docutils literal notranslate"><span class="pre">to_fits()</span></code> works.</p>
-<p>Note: if you are considering contributing a HLSP you may want to read
-the
-<a class="reference external" href="https://archive.stsci.edu/hlsp/hlsp_guidelines_timeseries.html">guidelines</a>
-for contributing fits files. These include which fits headers are
-required/suggested for your HLSP to be accepted.</p>
+<p>Note: if you are considering contributing a HLSP you may want to read the <a class="reference external" href="https://archive.stsci.edu/hlsp/hlsp_guidelines_timeseries.html">guidelines</a> for contributing fits files. These include which fits headers are required/suggested for your HLSP to be accepted.</p>
 <div class="section" id="Example:-editing-and-writing-a-lightcurve">
 <h2>Example: editing and writing a lightcurve<a class="headerlink" href="#Example:-editing-and-writing-a-lightcurve" title="Permalink to this headline">¶</a></h2>
 <p>First we’ll obtain a random Kepler lightcurve from MAST.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -268,11 +294,9 @@ required/suggested for your HLSP to be accepted.</p>
 </pre></div>
 </div>
 </div>
-<p>Now we’ll make some edits to the lightcurve. Below we use the PDCSAP
-flux from MAST, remove NaN values and clip out any outliers.</p>
+<p>Now we’ll make some edits to the lightcurve. Below we use the PDCSAP flux from MAST, remove NaN values and clip out any outliers.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -285,14 +309,12 @@ flux from MAST, remove NaN values and clip out any outliers.</p>
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_03-making-fits-files_4_0.png" src="../_images/tutorials_03-making-fits-files_4_0.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_03-making-fits-files_4_0.png"><img alt="../_images/tutorials_03-making-fits-files_4_0.png" src="../_images/tutorials_03-making-fits-files_4_0.png" style="width: 755px; height: 368px;" /></a>
 </div>
 </div>
-<p>Now we can use the <code class="docutils literal notranslate"><span class="pre">to_fits</span></code> method to save the lightcurve to a file
-called <em>output.fits</em>.</p>
+<p>Now we can use the <code class="docutils literal notranslate"><span class="pre">to_fits</span></code> method to save the lightcurve to a file called <em>output.fits</em>.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -302,8 +324,7 @@ called <em>output.fits</em>.</p>
 </div>
 <p>Let’s take a look at the file and check that it behaved as we expect</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -314,8 +335,7 @@ called <em>output.fits</em>.</p>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>Out[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -323,11 +343,9 @@ called <em>output.fits</em>.</p>
 </pre></div>
 </div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">hdu</span></code> is a set of astropy.io.fits objects, which is what we would
-expect. Lets take a look at the header of the first extension.</p>
+<p><code class="docutils literal notranslate"><span class="pre">hdu</span></code> is a set of astropy.io.fits objects, which is what we would expect. Lets take a look at the header of the first extension.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -336,8 +354,7 @@ expect. Lets take a look at the header of the first extension.</p>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>Out[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -369,11 +386,9 @@ DATASUM = &#39;0       &#39;           / data unit checksum updated 2019-01-25T1
 </pre></div>
 </div>
 </div>
-<p>Looks like it has all the correct information about the target. What
-about the second extension?</p>
+<p>Looks like it has all the correct information about the target. What about the second extension?</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -382,8 +397,7 @@ about the second extension?</p>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>Out[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -414,14 +428,9 @@ DATASUM = &#39;2548479009&#39;         / data unit checksum updated 2019-01-25T1
 </pre></div>
 </div>
 </div>
-<p>This extension has 4 columns, <code class="docutils literal notranslate"><span class="pre">TIME</span></code>, <code class="docutils literal notranslate"><span class="pre">FLUX</span></code>, <code class="docutils literal notranslate"><span class="pre">FLUX_ERR</span></code> and
-<code class="docutils literal notranslate"><span class="pre">CADENCENO</span></code>. This is great! What about if we wanted to add new
-keywords to our fits file? HLSP products require some extra keywords.
-Let’s add some keywords to explain who made the data, and what our HLSP
-is.</p>
+<p>This extension has 4 columns, <code class="docutils literal notranslate"><span class="pre">TIME</span></code>, <code class="docutils literal notranslate"><span class="pre">FLUX</span></code>, <code class="docutils literal notranslate"><span class="pre">FLUX_ERR</span></code> and <code class="docutils literal notranslate"><span class="pre">CADENCENO</span></code>. This is great! What about if we wanted to add new keywords to our fits file? HLSP products require some extra keywords. Let’s add some keywords to explain who made the data, and what our HLSP is.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -434,8 +443,7 @@ is.</p>
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -444,8 +452,7 @@ is.</p>
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -454,8 +461,7 @@ is.</p>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>Out[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -490,12 +496,9 @@ DATASUM = &#39;0       &#39;           / data unit checksum updated 2019-01-25T1
 </pre></div>
 </div>
 </div>
-<p>Now our new keywords are included in the primary header! What about if
-we want to add more data columns to our fits file? We can simply add
-this in the same way. Let’s add the data quality to our fits file.</p>
+<p>Now our new keywords are included in the primary header! What about if we want to add more data columns to our fits file? We can simply add this in the same way. Let’s add the data quality to our fits file.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -509,8 +512,7 @@ this in the same way. Let’s add the data quality to our fits file.</p>
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -519,8 +521,7 @@ this in the same way. Let’s add the data quality to our fits file.</p>
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -529,8 +530,7 @@ this in the same way. Let’s add the data quality to our fits file.</p>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>Out[12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -563,9 +563,7 @@ DATASUM = &#39;2652111809&#39;         / data unit checksum updated 2019-01-25T1
 </pre></div>
 </div>
 </div>
-<p>Now the quality from our lightcurve appears in the second extension.
-Once all your lightcurves are saved as fits files and you have a README
-file, you can consider submitting your data produces to MAST.</p>
+<p>Now the quality from our lightcurve appears in the second extension. Once all your lightcurves are saved as fits files and you have a README file, you can consider submitting your data produces to MAST.</p>
 </div>
 </div>
 

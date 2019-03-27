@@ -14,7 +14,9 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
@@ -27,7 +29,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b29</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b30</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -69,15 +71,27 @@
     
   <div class="section" id="about">
 <span id="id1"></span><h1>About<a class="headerlink" href="#about" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="package-info">
+<h2>Package info<a class="headerlink" href="#package-info" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installing Lightkurve</a></li>
-<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing and reporting issues</a></li>
-<li class="toctree-l1"><a class="reference internal" href="developer.html">Developer documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="citing.html">Citing and acknowledging Lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="citing.html">Citing Lightkurve</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Full changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="other_software.html">Other software</a></li>
-<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
+</div>
+</div>
+<div class="section" id="developer-documentation">
+<h2>Developer documentation<a class="headerlink" href="#developer-documentation" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Reporting issues and proposing changes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Running the unit tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentation.html">Building the documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release-procedure.html">Releasing a new version</a></li>
+</ul>
+</div>
 </div>
 </div>
 

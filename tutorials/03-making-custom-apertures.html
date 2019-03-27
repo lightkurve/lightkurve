@@ -14,7 +14,9 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
@@ -27,7 +29,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b29</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b30</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -122,18 +124,18 @@ div.nblast {
 
 /* input prompt */
 div.nbinput div.prompt pre {
-    color: #303F9F;
+    color: #307FC1;
 }
 
 /* output prompt */
 div.nboutput div.prompt pre {
-    color: #D84315;
+    color: #BF5B3D;
 }
 
 /* all prompts */
 div.nbinput div.prompt,
 div.nboutput div.prompt {
-    min-width: 9ex;
+    min-width: 7ex;
     padding-top: 0.4em;
     padding-right: 0.4em;
     text-align: right;
@@ -173,9 +175,9 @@ div.nboutput div.output_area {
 
 /* input area */
 div.nbinput div.input_area {
-    border: 1px solid #cfcfcf;
+    border: 1px solid #e0e0e0;
     border-radius: 2px;
-    background: #f7f7f7;
+    background: #f5f5f5;
 }
 
 /* override MathJax center alignment in output cells */
@@ -183,7 +185,7 @@ div.nboutput div[class*=MathJax] {
     text-align: left !important;
 }
 
-/* override sphinx.ext.pngmath center alignment in output cells */
+/* override sphinx.ext.imgmath center alignment in output cells */
 div.nboutput div.math p {
     text-align: left;
 }
@@ -232,6 +234,40 @@ div.nboutput div.output_area.stderr {
 
 .ansi-bold { font-weight: bold; }
 .ansi-underline { text-decoration: underline; }
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
 </style>
 <div class="admonition note">
 <p class="admonition-title"><strong>This page is a static version of an interactive Jupyter notebook</strong></p>
@@ -242,25 +278,11 @@ div.nboutput div.output_area.stderr {
 </div>
 <div class="section" id="How-to-perform-aperture-photometry-with-custom-apertures?">
 <h1>How to perform aperture photometry with custom apertures?<a class="headerlink" href="#How-to-perform-aperture-photometry-with-custom-apertures?" title="Permalink to this headline">¶</a></h1>
-<p>We have discussed in <a class="reference external" href="http://lightkurve.keplerscience.org/tutorials/1.03-what-are-lightcurves.html">previous
-tutorials</a>
-how Simple Aperture Photometry works. We choose a set of pixels in the
-image and sum those to produce a single flux value. We do this for every
-image as a function of time to produce a light curve.</p>
-<p>The <a class="reference external" href="https://github.com/nasa/kepler-pipeline">Kepler Data Pipeline</a>
-produces an aperture, which is used by default by lightkurve. However,
-there are some cases where you might want to produce your own aperture.
-The field may be crowded, or you may wish to change the aperture size to
-change the relative contribution of the background. We can do this
-simply with lightkurve.</p>
-<p>First, let’s load a target pixel file. Let’s choose <a class="reference external" href="https://exoplanetarchive.ipac.caltech.edu/cgi-bin/DisplayOverview/nph-DisplayOverview?objname=KOI-2862.01&amp;type=KEPLER_CANDIDATE">KIC
-6679295</a>.
-This is a Kepler planet canidate. We’ll use the
-<code class="docutils literal notranslate"><span class="pre">search_targetpixelfile</span></code> function to download every target pixel file
-available for each quarter of this data set.</p>
+<p>We have discussed in <a class="reference external" href="http://lightkurve.keplerscience.org/tutorials/1.03-what-are-lightcurves.html">previous tutorials</a> how Simple Aperture Photometry works. We choose a set of pixels in the image and sum those to produce a single flux value. We do this for every image as a function of time to produce a light curve.</p>
+<p>The <a class="reference external" href="https://github.com/nasa/kepler-pipeline">Kepler Data Pipeline</a> produces an aperture, which is used by default by lightkurve. However, there are some cases where you might want to produce your own aperture. The field may be crowded, or you may wish to change the aperture size to change the relative contribution of the background. We can do this simply with lightkurve.</p>
+<p>First, let’s load a target pixel file. Let’s choose <a class="reference external" href="https://exoplanetarchive.ipac.caltech.edu/cgi-bin/DisplayOverview/nph-DisplayOverview?objname=KOI-2862.01&amp;type=KEPLER_CANDIDATE">KIC 6679295</a>. This is a Kepler planet canidate. We’ll use the <code class="docutils literal notranslate"><span class="pre">search_targetpixelfile</span></code> function to download every target pixel file available for each quarter of this data set.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -273,13 +295,10 @@ available for each quarter of this data set.</p>
 </pre></div>
 </div>
 </div>
-<p>We’ve now created a list of <code class="docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code> objects, where
-each item is a different quarter. We’re going to be able to combine
-these just like in the <a href="#id2"><span class="problematic" id="id4">`stitching tutorial &lt;&gt;`__</span></a>.</p>
+<p>We’ve now created a list of <code class="docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code> objects, where each item is a different quarter. We’re going to be able to combine these just like in the <a href="#id2"><span class="problematic" id="id4">`stitching tutorial &lt;&gt;`__</span></a>.</p>
 <p>Let’s take a look at just one of those target pixel files.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -293,21 +312,16 @@ these just like in the <a href="#id2"><span class="problematic" id="id4">`stitch
 </pre></div>
 </div>
 </div>
-<p>Above we have created the light curve from the target pixel files,
-stitched them all together in the same way as in the [stitching
-tutorial] using lightkurves <code class="docutils literal notranslate"><span class="pre">append</span></code> function. To recap the steps we:</p>
+<p>Above we have created the light curve from the target pixel files, stitched them all together in the same way as in the [stitching tutorial] using lightkurves <code class="docutils literal notranslate"><span class="pre">append</span></code> function. To recap the steps we:</p>
 <ul class="simple">
 <li>Convert to a <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> object with <code class="docutils literal notranslate"><span class="pre">to_lightcurve()</span></code></li>
 <li>Remove NaNs with <code class="docutils literal notranslate"><span class="pre">remove_nans()</span></code></li>
 <li>Remove long term trends with <code class="docutils literal notranslate"><span class="pre">flatten()</span></code></li>
-<li>Remove outliers with simple sigma clipping using
-<code class="docutils literal notranslate"><span class="pre">remove_outliers()</span></code></li>
+<li>Remove outliers with simple sigma clipping using <code class="docutils literal notranslate"><span class="pre">remove_outliers()</span></code></li>
 </ul>
-<p>The period for this planet candidate is 24.57537 days. Let’s plot it up
-and take a look.</p>
+<p>The period for this planet candidate is 24.57537 days. Let’s plot it up and take a look.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -324,11 +338,9 @@ and take a look.</p>
 <img alt="../_images/tutorials_03-making-custom-apertures_7_0.png" src="../_images/tutorials_03-making-custom-apertures_7_0.png" />
 </div>
 </div>
-<p>Looks like a great candidate. However, we might just want to check on
-the pixels. Let’s plot one of the target pixel files.</p>
+<p>Looks like a great candidate. However, we might just want to check on the pixels. Let’s plot one of the target pixel files.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -343,13 +355,9 @@ the pixels. Let’s plot one of the target pixel files.</p>
 <img alt="../_images/tutorials_03-making-custom-apertures_9_0.png" src="../_images/tutorials_03-making-custom-apertures_9_0.png" />
 </div>
 </div>
-<p>The Kepler Pipeline aperture is in red. It looks like there is a nearby
-contaminate star! We might want to check that the signal is not really
-coming from the bright, nearby contaminant, rather than our target star.
-Let’s use the top right corner four pixels as our new mask.</p>
+<p>The Kepler Pipeline aperture is in red. It looks like there is a nearby contaminate star! We might want to check that the signal is not really coming from the bright, nearby contaminant, rather than our target star. Let’s use the top right corner four pixels as our new mask.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -367,12 +375,9 @@ Let’s use the top right corner four pixels as our new mask.</p>
 <img alt="../_images/tutorials_03-making-custom-apertures_11_0.png" src="../_images/tutorials_03-making-custom-apertures_11_0.png" />
 </div>
 </div>
-<p>The new mask covers the bright star. Now we can iterate through the
-target pixel files and build the light curve in the same way as before,
-but this time</p>
+<p>The new mask covers the bright star. Now we can iterate through the target pixel files and build the light curve in the same way as before, but this time</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -390,11 +395,9 @@ but this time</p>
 </pre></div>
 </div>
 </div>
-<p>Now we have our new light curve we can plot it up again and find out if
-there is still a planet signal.</p>
+<p>Now we have our new light curve we can plot it up again and find out if there is still a planet signal.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -405,8 +408,7 @@ there is still a planet signal.</p>
 </div>
 </div>
 <div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>Out[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -421,9 +423,7 @@ there is still a planet signal.</p>
 <img alt="../_images/tutorials_03-making-custom-apertures_15_1.png" src="../_images/tutorials_03-making-custom-apertures_15_1.png" />
 </div>
 </div>
-<p>Looks like the planet signal is only in the target star and doesn’t
-belong to the contaminant. This is just one of many checks you might
-want to perform to validate your planet candidates!</p>
+<p>Looks like the planet signal is only in the target star and doesn’t belong to the contaminant. This is just one of many checks you might want to perform to validate your planet candidates!</p>
 </div>
 
 

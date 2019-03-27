@@ -14,7 +14,9 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
@@ -27,7 +29,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b29</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b30</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -72,7 +74,7 @@
 <dl class="function">
 <dt id="lightkurve.utils.btjd_to_astropy_time">
 <code class="descclassname">lightkurve.utils.</code><code class="descname">btjd_to_astropy_time</code><span class="sig-paren">(</span><em>btjd</em>, <em>bjdref=2457000.0</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.utils.btjd_to_astropy_time" title="Permalink to this definition">¶</a></dt>
-<dd><p>Converts BTJD time values to an <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v3.2.dev1622)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.time.Time</span></code></a> object.</p>
+<dd><p>Converts BTJD time values to an <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v3.2.dev1144)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.time.Time</span></code></a> object.</p>
 <p>TESS Barycentric Julian Day (BTJD) is a Julian day minus 2457000.0
 and corrected to the arrival times at the barycenter of the Solar System.
 BTJD is the format in which times are recorded in the TESS data products.

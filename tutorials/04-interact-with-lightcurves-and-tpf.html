@@ -14,7 +14,9 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
@@ -27,7 +29,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b29</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b30</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -122,18 +124,18 @@ div.nblast {
 
 /* input prompt */
 div.nbinput div.prompt pre {
-    color: #303F9F;
+    color: #307FC1;
 }
 
 /* output prompt */
 div.nboutput div.prompt pre {
-    color: #D84315;
+    color: #BF5B3D;
 }
 
 /* all prompts */
 div.nbinput div.prompt,
 div.nboutput div.prompt {
-    min-width: 9ex;
+    min-width: 7ex;
     padding-top: 0.4em;
     padding-right: 0.4em;
     text-align: right;
@@ -173,9 +175,9 @@ div.nboutput div.output_area {
 
 /* input area */
 div.nbinput div.input_area {
-    border: 1px solid #cfcfcf;
+    border: 1px solid #e0e0e0;
     border-radius: 2px;
-    background: #f7f7f7;
+    background: #f5f5f5;
 }
 
 /* override MathJax center alignment in output cells */
@@ -183,7 +185,7 @@ div.nboutput div[class*=MathJax] {
     text-align: left !important;
 }
 
-/* override sphinx.ext.pngmath center alignment in output cells */
+/* override sphinx.ext.imgmath center alignment in output cells */
 div.nboutput div.math p {
     text-align: left;
 }
@@ -232,6 +234,40 @@ div.nboutput div.output_area.stderr {
 
 .ansi-bold { font-weight: bold; }
 .ansi-underline { text-decoration: underline; }
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
 </style>
 <div class="admonition note">
 <p class="admonition-title"><strong>This page is a static version of an interactive Jupyter notebook</strong></p>
@@ -242,42 +278,20 @@ div.nboutput div.output_area.stderr {
 </div>
 <div class="section" id="Interactively-inspecting-Target-Pixel-Files-and-Lightcurves">
 <h1>Interactively inspecting Target Pixel Files and Lightcurves<a class="headerlink" href="#Interactively-inspecting-Target-Pixel-Files-and-Lightcurves" title="Permalink to this headline">¶</a></h1>
-<p>One of the most common questions we get at the Kepler/K2 Guest Observer
-Office is “I see a noise blip in my K2 lightcurve. Is it real or
-instrumental?” Answering the question usually entails ticking through
-our (long, incomplete) mental list of conceivable, sometimes exotic
-instrumental artifacts. Space-craft induced periodic motion. Rolling
-band. Cosmic Rays. Collateral cosmic rays. Smear. Sudden pixel
-sensitivity dropouts. Fine-guidance-sensor cross talk. Regular cross
-talk. <a class="reference external" href="https://twitter.com/gully_/status/941707161058586624">Sweater
+<p>One of the most common questions we get at the Kepler/K2 Guest Observer Office is “I see a noise blip in my K2 lightcurve. Is it real or instrumental?” Answering the question usually entails ticking through our (long, incomplete) mental list of conceivable, sometimes exotic instrumental artifacts. Space-craft induced periodic motion. Rolling band. Cosmic Rays. Collateral cosmic rays. Smear. Sudden pixel sensitivity dropouts. Fine-guidance-sensor cross talk. Regular cross talk. <a class="reference external" href="https://twitter.com/gully_/status/941707161058586624">Sweater
 fuzzy</a>.</p>
-<p>In this tutorial we introduce and explain the <code class="docutils literal notranslate"><span class="pre">tpf.interact()</span></code> tool
-that accomplishes the goal of interactively inspecting the TPFs and
-lightcurve simultaneously.</p>
+<p>In this tutorial we introduce and explain the <code class="docutils literal notranslate"><span class="pre">tpf.interact()</span></code> tool that accomplishes the goal of interactively inspecting the TPFs and lightcurve simultaneously.</p>
 <div class="section" id="Pixel-selection">
 <h2>Pixel selection<a class="headerlink" href="#Pixel-selection" title="Permalink to this headline">¶</a></h2>
-<p>We have recently extended <code class="docutils literal notranslate"><span class="pre">.interact()</span></code> to offer instantaneous
-interactive selection of the pixel mask. You can now click on individual
-pixels and the aperture photometry updates. The mask can be defined with
-either individual clicking of pixels, or clicking and dragging a box
-over a rectangular set of pixels. <em>De</em>selection of individual pixels
-also works– simply re-click a pixel that you wish to take away from your
-mask.</p>
-<p>The default mask is the Kepler “pipeline” mask, and can be modified as
-described above.</p>
+<p>We have recently extended <code class="docutils literal notranslate"><span class="pre">.interact()</span></code> to offer instantaneous interactive selection of the pixel mask. You can now click on individual pixels and the aperture photometry updates. The mask can be defined with either individual clicking of pixels, or clicking and dragging a box over a rectangular set of pixels. <em>De</em>selection of individual pixels also works– simply re-click a pixel that you wish to take away from your mask.</p>
+<p>The default mask is the Kepler “pipeline” mask, and can be modified as described above.</p>
 </div>
 <div class="section" id="The-.interact()-method-applies-to-target-pixel-files.">
 <h2>The <code class="docutils literal notranslate"><span class="pre">.interact()</span></code> method applies to target pixel files.<a class="headerlink" href="#The-.interact()-method-applies-to-target-pixel-files." title="Permalink to this headline">¶</a></h2>
-<p>Using interact should be as simple as downloading a Kepler Target Pixel
-File (TPF) and running the method <code class="docutils literal notranslate"><span class="pre">.interact()</span></code>. This method can only
-be run in a Jupyter Notebook at the moment, and is limited to
-lightcurves with fewer than 30000 cadences.</p>
-<p>Let’s first look at the target HL Tau, a young star that possesses a
-gapped circumstellar disk <a class="reference external" href="http://www.almaobservatory.org/en/press-release/revolutionary-alma-image-reveals-planetary-genesis/">imaged by the Atacama Large Millimeter
-Array</a>.</p>
+<p>Using interact should be as simple as downloading a Kepler Target Pixel File (TPF) and running the method <code class="docutils literal notranslate"><span class="pre">.interact()</span></code>. This method can only be run in a Jupyter Notebook at the moment, and is limited to lightcurves with fewer than 30000 cadences.</p>
+<p>Let’s first look at the target HL Tau, a young star that possesses a gapped circumstellar disk <a class="reference external" href="http://www.almaobservatory.org/en/press-release/revolutionary-alma-image-reveals-planetary-genesis/">imaged by the Atacama Large Millimeter Array</a>.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -286,59 +300,28 @@ Array</a>.</p>
 </pre></div>
 </div>
 </div>
-<p>The K2 postage stamp of HL Tau contains a portion of a nearby source of
-comparable brightness. The weakly overlapping point spread functions
-(PSFs) of these sources motivate some caution in aperture choice. Let’s
-interactively assign a custom aperture photometry pixel mask:</p>
+<p>The K2 postage stamp of HL Tau contains a portion of a nearby source of comparable brightness. The weakly overlapping point spread functions (PSFs) of these sources motivate some caution in aperture choice. Let’s interactively assign a custom aperture photometry pixel mask:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span><span class="o">.</span><span class="n">interact</span><span class="p">()</span>
 </pre></div>
 </div>
-<div class="figure" id="id2">
-<img alt="Lightkurve interact() demo" src="../_images/20180924_interact_HLTau.gif" />
-<p class="caption"><span class="caption-text">Lightkurve interact() demo</span></p>
-</div>
-<p>You can move the large bottom left slider to change the location of the
-verical red bar, which indicates which cadence is being shown in the TPF
-postage stamp image. The slider beneath the TPF postage stamp image
-controls the screen stretch, which defaults to logarithmic scaling
-initialized to 1% and 95% lower and upper limits respectively.</p>
-<p>You can move your cursor over individual data points to show hover-over
-tool-tips indicating additional information about that datum. Currently
-the tool tips list the cadence, time, flux, and quality flags. The tools
-on the right hand side of the plots enable zooming, and pixel selection.</p>
-<p>We see that the starting mask (the Kepler pipeline mask, by default),
-shows huge jumps in flux between times 3000 and 3020. These jagged
-artifacts disappear upon the selection of a larger aperture– large
-enough to encompass most of the point spread function of the star. The
-end result shows a time-series lightcurve of a young disk-bearing star.</p>
+<p><img alt="Lightkurve interact() demo" src="../_images/20180925_interact_EB_contam.gif" /></p>
+<p>You can move the large bottom left slider to change the location of the verical red bar, which indicates which cadence is being shown in the TPF postage stamp image. The slider beneath the TPF postage stamp image controls the screen stretch, which defaults to logarithmic scaling initialized to 1% and 95% lower and upper limits respectively.</p>
+<p>You can move your cursor over individual data points to show hover-over tool-tips indicating additional information about that datum. Currently the tool tips list the cadence, time, flux, and quality flags. The tools on the right hand side of the plots enable zooming, and pixel selection.</p>
+<p>We see that the starting mask (the Kepler pipeline mask, by default), shows huge jumps in flux between times 3000 and 3020. These jagged artifacts disappear upon the selection of a larger aperture– large enough to encompass most of the point spread function of the star. The end result shows a time-series lightcurve of a young disk-bearing star.</p>
 <p>Interaction modes:</p>
 <ul class="simple">
-<li>Clicking on a single pixel shows the time-series lightcurve of that
-pixel alone.</li>
-<li><code class="docutils literal notranslate"><span class="pre">shift</span></code>-clicking on multiple pixels shows the lightcurve using that
-pixel mask.</li>
-<li><code class="docutils literal notranslate"><span class="pre">shift</span></code>-clicking on an already-selected pixel will <em>de</em>-select that
-pixel.</li>
-<li>Clicking and dragging a box will make a rectangular aperture mask–
-individual pixels can be deselected from this mask by shift-clicking
-(box de-selecting does not work).</li>
-<li>The screen stretch high and low limits can be changed independently
-by clicking and dragging each end, or simultaneously by clicking and
-dragging in the middle.</li>
-<li>The cadence slider updates the postage stamp image at the position of
-the vertical red bar in the lightcurve.</li>
-<li>Clicking on a position in the lightcurve automatically seeks to that
-Cadence Number.</li>
-<li>The left and right arrows can be clicked to increment the cadence
-number by one.</li>
+<li>Clicking on a single pixel shows the time-series lightcurve of that pixel alone.</li>
+<li><code class="docutils literal notranslate"><span class="pre">shift</span></code>-clicking on multiple pixels shows the lightcurve using that pixel mask.</li>
+<li><code class="docutils literal notranslate"><span class="pre">shift</span></code>-clicking on an already-selected pixel will <em>de</em>-select that pixel.</li>
+<li>Clicking and dragging a box will make a rectangular aperture mask– individual pixels can be deselected from this mask by shift-clicking (box de-selecting does not work).</li>
+<li>The screen stretch high and low limits can be changed independently by clicking and dragging each end, or simultaneously by clicking and dragging in the middle.</li>
+<li>The cadence slider updates the postage stamp image at the position of the vertical red bar in the lightcurve.</li>
+<li>Clicking on a position in the lightcurve automatically seeks to that Cadence Number.</li>
+<li>The left and right arrows can be clicked to increment the cadence number by one.</li>
 </ul>
-<p>The <code class="docutils literal notranslate"><span class="pre">interact()</span></code> tool works for both Kepler or K2 data. KOI 6.01 (KIC
-3248033) sits 4 pixels away from eclipsing binary KOI 1759.01 (KIC
-3248019). An unwise choice of pixels can give rise to a spurious
-exoplanet signal.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">interact()</span></code> tool works for both Kepler or K2 data. KOI 6.01 (KIC 3248033) sits 4 pixels away from eclipsing binary KOI 1759.01 (KIC 3248019). An unwise choice of pixels can give rise to a spurious exoplanet signal.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -349,32 +332,18 @@ exoplanet signal.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span><span class="o">.</span><span class="n">interact</span><span class="p">()</span>
 </pre></div>
 </div>
-<div class="figure" id="id3">
-<img alt="Lightkurve interact() demo" src="../_images/20180925_interact_EB_contam.gif" />
-<p class="caption"><span class="caption-text">Lightkurve interact() demo</span></p>
-</div>
-<p>You can see that the Kepler pointing is remarkably stable over this
-Kepler quarter of 89 days. The value of interact arises from its ability
-to discern the spatial origin of signals. In this case, an eclipsing
-binary occupies the pixels towards the top of the postage stamp image.
-The target of interest occupies the pixels in the middle. The optimal
-aperture mask should avoid pixels near the top in order to mitigate an
-artificial planet signal.</p>
+<p><img alt="Lightkurve interact() demo" src="../_images/20180925_interact_EB_contam.gif" /></p>
+<p>You can see that the Kepler pointing is remarkably stable over this Kepler quarter of 89 days. The value of interact arises from its ability to discern the spatial origin of signals. In this case, an eclipsing binary occupies the pixels towards the top of the postage stamp image. The target of interest occupies the pixels in the middle. The optimal aperture mask should avoid pixels near the top in order to mitigate an artificial planet signal.</p>
 </div>
 <div class="section" id="Troubleshooting-.interact()">
 <h2>Troubleshooting <code class="docutils literal notranslate"><span class="pre">.interact()</span></code><a class="headerlink" href="#Troubleshooting-.interact()" title="Permalink to this headline">¶</a></h2>
-<p>There are a few known limitations of <code class="docutils literal notranslate"><span class="pre">interact()</span></code>. First, interact
-only works in a Jupyter Notebook. We are experimenting with solutions to
-allow interact to work from additional settings. Second, you must either
-run interact from the default Jupyter notebook address “localhost:8888”,
-<strong>or tell interact the name of the notebook server</strong>, for example:</p>
+<p>There are a few known limitations of <code class="docutils literal notranslate"><span class="pre">interact()</span></code>. First, interact only works in a Jupyter Notebook. We are experimenting with solutions to allow interact to work from additional settings. Second, you must either run interact from the default Jupyter notebook address “localhost:8888”, <strong>or tell interact the name of the notebook server</strong>, for example:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span><span class="o">.</span><span class="n">interact</span><span class="p">(</span><span class="n">notebook_url</span><span class="o">=</span><span class="s1">&#39;localhost:8893&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>otherwise, you will likely see an error message like this:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
-<span></span>In [3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -656,35 +625,22 @@ var element = document.currentScript.previousSibling.previousSibling;
 <div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
-<div class="output_area docutils container">
+<div class="output_area rendered_html docutils container">
 <script src="http://localhost:55190/autoload.js?bokeh-autoload-element=1001&bokeh-absolute-url=http://localhost:55190&resources=none" id="1001"></script></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
-<div class="stderr output_area docutils container">
+<div class="output_area stderr docutils container">
 <div class="highlight"><pre>
 ERROR:bokeh.server.views.ws:Refusing websocket connection from Origin &#39;http://localhost:8888&#39;;                       use --allow-websocket-origin=localhost:8888 to permit this; currently we allow origins {&#39;localhost:4321&#39;}
 WARNING:tornado.access:403 GET /ws?bokeh-protocol-version=1.0&amp;bokeh-session-id=KSh6DrNHkfFp6F1GHhvqu0BGG2pP54LZ54sKSnaazovo (::1) 6.41ms
 </pre></div></div>
 </div>
-<p>Other unexpected behaviors can occur in interact. For example, when
-resetting the image views the revised plot scaling may not display the
-data. Attempting to de-select with a box will cause unexpected toggling
-of pixels. De-selection only works with the tap tool, so box-selections
-should use caution not to overlap with existing pixels. Short cadence
-lightcurves do not work with interact at the moment. There is no way to
-save the generated mask at the moment. If you would like to see a way to
-export masks, please upvote our <a class="reference external" href="https://github.com/KeplerGO/lightkurve/issues/265">GitHub Issue about mask generation with
-interact</a>.</p>
-<p>We are continuing to improve interact. We welcome any feedback about the
-tool or feature requests. You can <a class="reference external" href="https://keplerscience.arc.nasa.gov/helpdesk.html">email
-us</a> or <a class="reference external" href="https://github.com/KeplerGO/lightkurve/issues">open an
-Issue on our lightkurve GitHub
-repository</a>.</p>
-<p>Finally, we’d like to thank the developers of
-<a class="reference external" href="https://bokeh.pydata.org/en/latest/">Bokeh</a>, upon which interact
-relies.</p>
+<p>Other unexpected behaviors can occur in interact. For example, when resetting the image views the revised plot scaling may not display the data. Attempting to de-select with a box will cause unexpected toggling of pixels. De-selection only works with the tap tool, so box-selections should use caution not to overlap with existing pixels. Short cadence lightcurves do not work with interact at the moment. There is no way to save the generated mask at the moment. If you would like to see a way to
+export masks, please upvote our <a class="reference external" href="https://github.com/KeplerGO/lightkurve/issues/265">GitHub Issue about mask generation with interact</a>.</p>
+<p>We are continuing to improve interact. We welcome any feedback about the tool or feature requests. You can <a class="reference external" href="https://keplerscience.arc.nasa.gov/helpdesk.html">email us</a> or <a class="reference external" href="https://github.com/KeplerGO/lightkurve/issues">open an Issue on our lightkurve GitHub repository</a>.</p>
+<p>Finally, we’d like to thank the developers of <a class="reference external" href="https://bokeh.pydata.org/en/latest/">Bokeh</a>, upon which interact relies.</p>
 </div>
 </div>
 
