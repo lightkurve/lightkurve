@@ -1,12 +1,17 @@
-
-1.0b30 (unreleased)
+1.0b31 (unreleased)
 ===================
+
+
+1.0b30 (2019-03-27)
+===================
+
+- Significantly improved the performance of the PLDCorrector feature for systematics removal. [#470]
 
 - Improved the normalization of the result returned by ``Periodogram.smooth(method='logmedian')``. [#453]
 
 - Improved the visualization of NaN values in ``TargetPixelFile.plot()``. [#455]
 
-- Various minor bug fixes. [#448, #450]
+- Various minor bug fixes. [#448, #450, #463, #471]
 
 
 
