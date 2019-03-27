@@ -629,7 +629,7 @@ class PLDCorrector(object):
             from the products of pixel fluxes.
         n_pca_terms : int
             Number of terms added to the design matrix from each order of PLD
-            when performing Principle Component Analysis for models higher than
+            when performing Principal Component Analysis for models higher than
             first order. Increasing this value may provide higher precision at
             the expense of computational time.
 
