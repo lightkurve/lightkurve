@@ -530,13 +530,12 @@ class PLDCorrector(object):
         for quick-look analyses and detrending experiments.
 
         Our simple implementation of PLD is performed by first calculating the
-        noise model for each cadence in time. This function goes up to second
+        noise model for each cadence in time. This function goes up to arbitrary
         order, and is represented by
 
         .. math::
 
-            m_i = \sum_l a_l \frac{f_{il}}{\sum_k f_{ik}} + \sum_l \sum_m b_{lm} \frac{f_{il}f_{im}}{\left( \sum_k f_{ik} \right)^2} + \alpha + \beta t_i + \gamma t_i^2
-
+            m_i = \alpha + \beta t_i + \gamma t_i^2 + \sum_l a_l \frac{f_{il}}{\sum_k f_{ik}} + \sum_l \sum_m b_{lm} \frac{f_{il}f_{im}}{\left( \sum_k f_{ik} \right)^2} + ...
         where
 
           - :math:`m_i` is the noise model at time :math:`t_i`
@@ -550,7 +549,7 @@ class PLDCorrector(object):
         We perform Principal Component Analysis (PCA) to reduce the number of
         vectors in our final model to limit the set to best capture instrumental
         noise. With a PCA-reduced set of vectors, we can construct a design matrix
-        containing first and second order fractional pixel fluxes.
+        containing fractional pixel fluxes.
 
         To solve for the PLD model, we need to minimize the difference squared
 
@@ -589,12 +588,13 @@ class PLDCorrector(object):
     """
     def __init__(self, tpf):
         self.tpf = tpf
-        self.flux = np.nan_to_num(tpf.flux)
-        self.flux_err = np.nan_to_num(tpf.flux_err)
-        self.time = np.nan_to_num(tpf.time)
+
+        self.flux = tpf.flux
+        self.flux_err = tpf.flux_err
+        self.time = tpf.time
 
     def correct(self, aperture_mask=None, cadence_mask=None, gp_timescale=30,
-                n_components_first=None, n_components_second=20, use_gp=True):
+                use_gp=True, pld_order=2, n_pca_terms=10):
         r"""Returns a PLD systematics-corrected LightCurve.
 
         Parameters
@@ -618,15 +618,20 @@ class PLDCorrector(object):
         gp_timescale : float
             Gaussian Process time scale length term (`tau`) used to define
             length of fit variability in days.
-        n_components_first : int
-            Number of first-order PLD components to reduce to with PCA.
-            Must be smaller than the number of pixels in the aperture mask.
-            If `None`, then 25 or the number of pixels in the mask will be used,
-            whichever is smaller.
-        n_components_second : int
-            Number of second-order PLD components to reduce to with PCA.
         use_gp : boolean
-            Option to turn GP fitting on or off.
+            Option to turn GP fitting on or off.  You would typically only set
+            this to False to speed up the correction (at the cost of precision),
+            or if you suspect the presence of systematic noise at long timescales.
+        pld_order : int
+            The order of Pixel Level De-correlation to be performed. First order
+            (`n=1`) uses only the pixel fluxes to construct the design matrix.
+            Higher order populates the design matrix with columns constructed
+            from the products of pixel fluxes.
+        n_pca_terms : int
+            Number of terms added to the design matrix from each order of PLD
+            when performing Principal Component Analysis for models higher than
+            first order. Increasing this value may provide higher precision at
+            the expense of computational time.
 
         Returns
         -------
@@ -635,28 +640,19 @@ class PLDCorrector(object):
             returned object will be a `KeplerLightCurve`, `TessLightCurve`, or
             general `LightCurve` object.
         """
-        # Verify optional dependencies
-        try:
-            import celerite
-        except ImportError:
-            log.error("PLD requires the `celerite` Python package. "
-                      "See the installation instructions at "
-                      "https://docs.lightkurve.org/about/install.html")
-            return None
-        try:
-            from sklearn.decomposition import PCA
-        except ImportError:
-            log.error("PLD requires the `scikit-learn` Python package. "
-                      "See the installation instructions at "
-                      "https://docs.lightkurve.org/about/install.html")
-            return None
+        if use_gp:
+            # Verify optional dependency
+            try:
+                import celerite
+            except ImportError:
+                log.error("PLD uses the `celerite` Python package. "
+                          "See the installation instructions at "
+                          "https://docs.lightkurve.org/about/install.html. "
+                          "`use_gp` has been set to `False`.")
+                use_gp = False
 
         # Parse the aperture mask to accept strings etc.
         aperture = self.tpf._parse_aperture_mask(aperture_mask)
-
-        # n_components_first cannot be larger than the number of pixels in the mask
-        if n_components_first is None:
-            n_components_first = min(25, (aperture > 0).sum())
 
         # find pixel bounds of aperture on tpf
         xmin, xmax = min(np.where(aperture)[0]),  max(np.where(aperture)[0])
@@ -673,38 +669,53 @@ class PLDCorrector(object):
             warnings.simplefilter("ignore", RuntimeWarning)
             flux_err = np.nansum(flux_err_crop[:, aperture_crop]**2, axis=1)**0.5
 
-        # set default transit mask
-        if cadence_mask is None:
-            cadence_mask = np.where(self.time)
-        M = lambda x: x[cadence_mask]
-
         # generate flux light curve from desired pixels
         lc = self.tpf.to_lightcurve(aperture_mask=aperture)
+        rawflux = lc.flux
+        rawflux_err = lc.flux_err
 
-        # set aperture values
-        aperture_vals = np.copy(aperture_crop).astype(int)
+        # first order PLD design matrix
+        pld_flux = flux_crop[:, aperture_crop]
+        f1 = np.reshape(pld_flux, (len(pld_flux), -1))
+        X1 = f1 / np.sum(pld_flux, axis=-1)[:, None]
 
-        # `aperture_flux` contains the per-pixel lightcurve in a matrix
-        # with shape (n_cadences, n_pixels).
-        # We will run PCA on this matrix further below to arrive at the design
-        # matrix for the noise model.
-        self.aperture_flux = np.array([f*aperture_vals for f in flux_crop]).reshape(len(flux_crop), -1)
-        rawflux = np.sum(self.aperture_flux.reshape(len(self.aperture_flux), -1), axis=1)
+        # higher order PLD design matrices
+        X_sections = [np.ones((len(flux_crop), 1)), X1]
+        for i in range(2, pld_order+1):
+            f2 = np.product(list(multichoose(X1.T, pld_order)), axis=1).T
+            try:
+                # We use an optional dependency for very fast PCA (fbpca).
+                # If the import fails we will fall back on using the slower `np.linalg.svd`
+                from fbpca import pca
+                components, _, _ = pca(f2, n_pca_terms)
+            except ImportError:
+                log.error("PLD uses the `fbpca` package. You can pip install "
+                          "with `pip install fbpca`. Using `np.linalg.svd` "
+                          "instead.")
+                components, _, _ = np.linalg.svd(f2)
+            X_n = components[:, :n_pca_terms]
+            X_sections.append(X_n)
 
-        # first order PLD
-        f1 = self.aperture_flux / rawflux.reshape(-1, 1)
-        pca = PCA(n_components=n_components_first)
-        X1 = pca.fit_transform(f1)
+        # Create the design matrix X by stacking X1 and higher order components, and
+        # adding a column vector of 1s for numerical stability (see Luger et al.).
+        # X has shape (n_components_first + n_components_higher_order + 1, n_cadences)
+        X = np.concatenate(X_sections, axis=1)
 
-        # second order PLD
-        f2 = np.product(list(multichoose(f1.T, 2)), axis=1).T
-        pca = PCA(n_components=n_components_second)
-        X2 = pca.fit_transform(f2)
+        # set default transit mask
+        if cadence_mask is None:
+            cadence_mask = np.ones_like(self.time, dtype=bool)
+        m = np.zeros_like(self.time, dtype=bool)
+        m[cadence_mask] = True
 
-        # Create the design matrix X by stacking X1 and X2 and adding a column
-        # vector of 1s for numerical stability (see Luger et al.).
-        # X has shape (n_components_first + n_components_second + 1, n_cadences)
-        X = np.hstack([np.ones(X1.shape[0]).reshape(-1, 1), X1, X2])
+        # mask out any infinite or nan indices
+        m &= np.isfinite(self.time)
+        m &= np.isfinite(rawflux)
+        m &= np.isfinite(rawflux_err)
+        m &= np.abs(rawflux_err) > 1e-12
+
+        # create mask function
+        cadence_mask = m
+        M = lambda x: x[cadence_mask]
 
         # mask transits in design matrix
         MX = M(X)
@@ -715,8 +726,11 @@ class PLDCorrector(object):
             # preliminary PLD model defined above and subtracting it from the raw light curve.
             # The "in transit" cadences are masked out in this step to prevent the
             # long term approximation from over-fitting the transits.
-            y = M(rawflux) - np.dot(MX, np.linalg.solve(np.dot(MX.T, MX),
-                                    np.dot(MX.T, M(rawflux))))
+            XTX = np.dot(MX.T, MX)
+            XTX[np.diag_indices_from(XTX)] += 1e-8
+            XTy = np.dot(MX.T, M(rawflux))
+            y = M(rawflux) - np.dot(MX, np.linalg.solve(XTX, XTy))
+
             # Estimate the amplitude parameter of a Matern-3/2 kernel GP
             # by computing the standard deviation of y.
             amp = np.nanstd(y)
@@ -725,22 +739,23 @@ class PLDCorrector(object):
             # we use a Matern-3/2 kernel for its flexibility and non-periodicity
             kernel = celerite.terms.Matern32Term(np.log(amp), np.log(tau))
             gp = celerite.GP(kernel)
+            gp.compute(M(self.time), M(rawflux_err))
 
-            # recover GP covariance matrix from celerite model
-            # sigma is expected to have shape (n_unmasked_cadences, n_unmasked_cadences)
-            sigma = gp.get_matrix(M(self.time)) + \
-                np.diag(
-                    np.sum(M(flux_err_crop).reshape(len(M(flux_err_crop)), -1), axis=1)**2
-                       )
+            # compute the coefficients C on the basis vectors;
+            # the PLD design matrix will be dotted with C to solve for the noise model.
+            A = np.dot(MX.T, gp.apply_inverse(MX))
+            B = np.dot(MX.T, gp.apply_inverse(M(rawflux)[:, None])[:, 0])
+
         else:
-            sigma = np.diag(np.sum(M(flux_err_crop).reshape(len(M(flux_err_crop)),
-                            -1), axis=1)**2)
+            # compute the coefficients C on the basis vectors;
+            # the PLD design matrix will be dotted with C to solve for the noise model.
+            ivar = 1.0 / M(rawflux_err)**2 # inverse variance
+            A = np.dot(MX.T, MX * ivar[:, None])
+            B = np.dot(MX.T, M(rawflux) * ivar)
 
-        # compute the coefficients C on the basis vectors;
-        # the PLD design matrix will be dotted with C to solve for the noise model.
-        A = np.dot(MX.T, np.linalg.solve(sigma, MX))
-        B = np.dot(MX.T, np.linalg.solve(sigma, M(rawflux)))
-        C = np.linalg.solve(A, B)  # shape (regressors, 1)
+        # apply prior to design matrix weights for numerical stability
+        A[np.diag_indices_from(A)] += 1e-8
+        C = np.linalg.solve(A, B)
 
         # compute detrended light curve
         model = np.dot(X, C)
