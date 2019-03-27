@@ -684,7 +684,8 @@ class PLDCorrector(object):
         for i in range(2, pld_order+1):
             f2 = np.product(list(multichoose(X1.T, pld_order)), axis=1).T
             try:
-                # optionally dependency for PCA
+                # We use an optional dependency for very fast PCA (fbpca).
+                # If the import fails we will fall back on using the slower `np.linalg.svd`
                 from fbpca import pca
                 components, _, _ = pca(f2, n_pca_terms)
             except ImportError:
