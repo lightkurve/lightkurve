@@ -584,8 +584,11 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
                                 'distance': 0.0,
                                 'sequence_number': s}
                                )
-        masked_result = Table(cutouts)
-        masked_result.sort(['distance', 'sequence_number'])
+        if len(cutouts) > 0:
+            masked_result = Table(cutouts)
+            masked_result.sort(['distance', 'sequence_number'])
+        else:
+            masked_result = None
         return SearchResult(masked_result)
 
 
