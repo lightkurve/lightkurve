@@ -654,6 +654,24 @@ class PLDCorrector(object):
         # Parse the aperture mask to accept strings etc.
         aperture = self.tpf._parse_aperture_mask(aperture_mask)
 
+        # generate flux light curve from desired pixels
+        lc = self.tpf.to_lightcurve(aperture_mask=aperture)
+        rawflux = lc.flux
+        rawflux_err = lc.flux_err
+
+        # create nan mask
+        nanmask = np.isfinite(self.time)
+        nanmask &= np.isfinite(rawflux)
+        nanmask &= np.isfinite(rawflux_err)
+        nanmask &= np.abs(rawflux_err) > 1e-12
+
+        # mask out nan values
+        rawflux = rawflux[nanmask]
+        rawflux_err = rawflux_err[nanmask]
+        self.flux = self.flux[nanmask]
+        self.flux_err = self.flux_err[nanmask]
+        self.time = self.time[nanmask]
+
         # find pixel bounds of aperture on tpf
         xmin, xmax = min(np.where(aperture)[0]),  max(np.where(aperture)[0])
         ymin, ymax = min(np.where(aperture)[1]),  max(np.where(aperture)[1])
@@ -668,11 +686,6 @@ class PLDCorrector(object):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", RuntimeWarning)
             flux_err = np.nansum(flux_err_crop[:, aperture_crop]**2, axis=1)**0.5
-
-        # generate flux light curve from desired pixels
-        lc = self.tpf.to_lightcurve(aperture_mask=aperture)
-        rawflux = lc.flux
-        rawflux_err = lc.flux_err
 
         # first order PLD design matrix
         pld_flux = flux_crop[:, aperture_crop]
@@ -704,17 +717,6 @@ class PLDCorrector(object):
         # set default transit mask
         if cadence_mask is None:
             cadence_mask = np.ones_like(self.time, dtype=bool)
-        m = np.zeros_like(self.time, dtype=bool)
-        m[cadence_mask] = True
-
-        # mask out any infinite or nan indices
-        m &= np.isfinite(self.time)
-        m &= np.isfinite(rawflux)
-        m &= np.isfinite(rawflux_err)
-        m &= np.abs(rawflux_err) > 1e-12
-
-        # create mask function
-        cadence_mask = m
         M = lambda x: x[cadence_mask]
 
         # mask transits in design matrix
@@ -762,7 +764,7 @@ class PLDCorrector(object):
         self.detrended_flux = rawflux - (model - np.nanmean(model))
 
         # Create and return a new LightCurve object with the corrected flux
-        corrected_lc = lc.copy()
+        corrected_lc = lc.copy()[nanmask]
         corrected_lc.flux = self.detrended_flux
         corrected_lc.flux_err = flux_err
         return corrected_lc
