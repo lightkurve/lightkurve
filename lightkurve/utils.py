@@ -484,18 +484,11 @@ def detect_filetype(header):
     try:
         # use `telescop` keyword to determine mission
         # and `creator` to determine tpf or lc
-
-        # Non-pipeline file types from e.g. lightkurve .interact()
-        if "SOURCE" in header.keys():
-            # Could be a custom lightcurve
-            if header['SOURCE'] == 'lightkurve interact':
-                if header['mission'].lower() == 'tess':
-                    return 'TessLightCurveFile'
-                elif header['mission'].lower()[0] == 'k':
-                    return 'KeplerLightCurveFile'
-
-        # Traditional filetypes
-        telescop = header['telescop'].lower()
+        # Some old custom TESS data did not define the `TELESCOP` card
+        if 'TELESCOP' in header.keys():
+            telescop = header['telescop'].lower()
+        else:
+            telescop = header['mission'].lower()
         creator = header['creator'].lower()
         origin = header['origin'].lower()
         if telescop == 'kepler':
@@ -503,14 +496,15 @@ def detect_filetype(header):
             if 'targetpixel' in creator:
                 return 'KeplerTargetPixelFile'
             # Kepler LCFs will contain "FluxExporter2PipelineModule"
-            elif 'fluxexporter' in creator or 'lightcurve' in creator:
+            elif ('fluxexporter' in creator or 'lightcurve' in creator
+                or 'to_fits()' in creator):
                 return 'KeplerLightCurveFile'
         elif telescop == 'tess':
             # TESS TPFs will contain "TargetPixelExporterPipelineModule"
             if 'targetpixel' in creator:
                 return 'TessTargetPixelFile'
             # TESS LCFs will contain "LightCurveExporterPipelineModule"
-            elif 'lightcurve' in creator:
+            elif 'lightcurve' in creator or 'to_fits()' in creator:
                 return 'TessLightCurveFile'
             # Early versions of TESScut did not set a good CREATOR keyword
             elif 'stsci' in origin:

@@ -1585,13 +1585,16 @@ class TessLightCurve(LightCurve):
         hdu : astropy.io.fits
             Returns an astropy.io.fits object if path is None
         """
-        # TODO: populate more TESS specific metadata
-
         tess_specific_data = {
             'OBJECT': '{}'.format(self.targetid),
             'MISSION': self.mission,
             'RA_OBJ': self.ra,
-            'DEC_OBJ': self.dec} # ... insert more here!
+            'TELESCOP': self.mission,
+            'CAMERA': self.camera,
+            'CCD': self.ccd,
+            'SECTOR': self.sector,
+            'TARGETID': self.targetid,
+            'DEC_OBJ': self.dec}
 
         def _make_aperture_extension(hdu_list, aperture_mask):
             """Create the 'APERTURE' extension (e.g. extension #2)."""
