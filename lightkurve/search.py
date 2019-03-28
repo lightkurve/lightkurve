@@ -157,6 +157,10 @@ class SearchResult(object):
                 raise SearchError('Unable to download FFI cutout. Desired target '
                                   'coordinates may be too near the edge of the FFI.')
 
+            return open(path,
+                        quality_bitmask=quality_bitmask,
+                        targetid=self.table[0]['targetid'])
+
         else:
             if cutout_size is not None:
                 warnings.warn('`cutout_size` can only be specified for TESS '
@@ -165,8 +169,8 @@ class SearchResult(object):
             path = Observations.download_products(self.table[:1], mrp_only=False,
                                                   download_dir=download_dir)['Local Path'][0]
 
-        # open() will determine filetype and return
-        return open(path, quality_bitmask=quality_bitmask)
+            # open() will determine filetype and return
+            return open(path, quality_bitmask=quality_bitmask)
 
     @suppress_stdout
     def download_all(self, quality_bitmask='default', download_dir=None, cutout_size=None):
