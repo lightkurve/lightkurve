@@ -21,10 +21,7 @@ from astropy.stats import sigma_clip
 from .utils import KeplerQualityFlags, LightkurveWarning
 import os
 from astropy.coordinates import SkyCoord, Angle
-from astroquery.vizier import Vizier
 import astropy.units as u
-
-Vizier.ROW_LIMIT = -1
 
 log = logging.getLogger(__name__)
 
@@ -165,7 +162,15 @@ def make_lightcurve_figure_elements(lc, lc_source):
                  border_fill_color="whitesmoke")
     fig.title.offset = -10
     fig.yaxis.axis_label = 'Flux (e/s)'
-    fig.xaxis.axis_label = 'Time - 2454833 (days)'
+    fig.xaxis.axis_label = 'Time (days)'
+    try:
+        if (lc.mission == 'K2') or (lc.mission == 'Kepler'):
+            fig.xaxis.axis_label = 'Time - 2454833 (days)'
+        elif lc.mission == 'TESS':
+            fig.xaxis.axis_label = 'Time - 2457000 (days)'
+    except AttributeError:  # no mission keyword available
+      pass
+        
 
     ylims = get_lightcurve_y_limits(lc_source)
     fig.y_range = Range1d(start=ylims[0], end=ylims[1])
@@ -209,6 +214,8 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
     if tpf.mission == 'TESS':
         pix_scale = 21.0
     # We are querying with a diameter as the radius, overfilling by 2x.
+    from astroquery.vizier import Vizier
+    Vizier.ROW_LIMIT = -1
     result = Vizier.query_region(c1, catalog=["I/345/gaia2"],
                                  radius=Angle(np.max(tpf.shape[1:]) * pix_scale, "arcsec"))
     no_targets_found_message = ValueError('Either no sources were found in the query region '

@@ -13,7 +13,7 @@ install:
   - "ECHO %PATH%"
   - where conda
   - conda config --set always_yes yes --set changeps1 no
-  - "conda create -q -n test-environment python=%PYTHON_VERSION% numpy astropy scipy matplotlib requests tqdm pandas bokeh ipython scikit-learn pybind11 pytest pytest-cov pytest-remotedata"
+  - "conda create -q -n test-environment python=%PYTHON_VERSION% numpy astropy scipy matplotlib requests tqdm pandas bokeh ipython pybind11 pytest pytest-cov pytest-remotedata"
   - activate test-environment
   - python setup.py develop
 

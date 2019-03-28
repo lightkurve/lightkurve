@@ -22,10 +22,10 @@ tests_require = ['pytest', 'pytest-cov', 'pytest-remotedata']
 # 3. What dependencies are required for optional features?
 # `BoxLeastSquaresPeriodogram` requires astropy>=3.1.
 # `interact()` requires bokeh>=1.0, ipython.
-# `PLDCorrector` requires scikit-learn, pybind11, celerite.
+# `PLDCorrector` requires pybind11, celerite, fbpca.
 extras_require = {"all":  ["astropy>=3.1",
                            "bokeh>=1.0", "ipython",
-                           "scikit-learn", "pybind11", "celerite"],
+                           "pybind11", "celerite", "fbpca"],
                   "test": tests_require}
 
 setup(name='lightkurve',
