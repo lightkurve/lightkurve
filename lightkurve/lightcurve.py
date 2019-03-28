@@ -1039,15 +1039,17 @@ class LightCurve(object):
 
         Parameters
         ----------
-        method : {'lombscargle', 'boxleastsquares', 'ls', 'bls'}
-            Use the Lomb Scargle or Box Least Squares (BLS) method to
-            extract the power spectrum. Defaults to ``'lombscargle'``.
-            ``'ls'`` and ``'bls'`` are shorthands for ``'lombscargle'``
-            and ``'boxleastsquares'``.
+        method : {'lombscargle', 'boxleastsquares', 'transitleastsquares',
+                  'ls', 'bls', 'tls'}
+            Use the Lomb Scargle, Box Least Squares (BLS), or Transit Least Squares (TLS)
+            method to extract the power spectrum. Defaults to ``'lombscargle'``.
+            ``'ls'``, ``'bls'``, and ``'tls'`` are shorthands for
+            ``'lombscargle'``, ``'boxleastsquares'``, and ``'transitleastsquares'``.
         kwargs : dict
-            Keyword arguments passed to either
-            `~lightkurve.periodogram.LombScarglePeriodogram` or
-            `~lightkurve.periodogram.BoxLeastSquaresPeriodogram`.
+            Keyword arguments passed to the constructor of either
+            `~lightkurve.periodogram.LombScarglePeriodogram`,
+            `~lightkurve.periodogram.BoxLeastSquaresPeriodogram`,
+            or `~lightkurve.periodogram.TransitLeastSquaresPeriodogram`.
 
         Returns
         -------
@@ -1055,7 +1057,8 @@ class LightCurve(object):
             The power spectrum object extracted from the light curve.
         """
         method_clean = method.replace(' ', '').lower()
-        allowed_methods = ["ls", "bls", "lombscargle", "boxleastsquares"]
+        allowed_methods = ["ls", "bls", "tls",
+                           "lombscargle", "boxleastsquares", "transitleastsquares"]
         if method_clean not in allowed_methods:
             raise ValueError(("Unrecognized method '{0}'\n"
                               "allowed methods are: {1}")
@@ -1063,6 +1066,9 @@ class LightCurve(object):
         if method_clean in ["bls", "boxleastsquares"]:
             from . import BoxLeastSquaresPeriodogram
             return BoxLeastSquaresPeriodogram.from_lightcurve(lc=self, **kwargs)
+        elif method_clean in ["tls", "transitleastsquares"]:
+            from . import TransitLeastSquaresPeriodogram
+            return TransitLeastSquaresPeriodogram.from_lightcurve(lc=self, **kwargs)
         else:
             from . import LombScarglePeriodogram
             return LombScarglePeriodogram.from_lightcurve(lc=self, **kwargs)

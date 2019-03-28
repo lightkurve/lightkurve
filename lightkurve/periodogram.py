@@ -19,7 +19,8 @@ from . import MPLSTYLE
 
 log = logging.getLogger(__name__)
 
-__all__ = ['Periodogram', 'LombScarglePeriodogram', 'BoxLeastSquaresPeriodogram']
+__all__ = ['Periodogram', 'LombScarglePeriodogram', 'BoxLeastSquaresPeriodogram',
+           'TransitLeastSquaresPeriodogram']
 
 
 class Periodogram(object):
@@ -971,3 +972,54 @@ class BoxLeastSquaresPeriodogram(Periodogram):
 
     def smooth(self, **kwargs):
         raise NotImplementedError('`smooth` is not implemented for `BoxLeastSquaresPeriodogram`. ')
+
+
+class TransitLeastSquaresPeriodogram(Periodogram):
+    """Subclass of :class:`Periodogram <lightkurve.periodogram.Periodogram>`
+    representing a power spectrum generated using the Transit Least Squares (TLS) method.
+    """
+    def __init__(self, *args, **kwargs):
+        self.duration = kwargs.pop("duration", None)
+        self.depth = kwargs.pop("depth", None)
+        self.snr = kwargs.pop("snr", None)
+        self._TLS_result = kwargs.pop("tls_result", None)
+        self._TLS_object = kwargs.pop("tls_obj", None)
+        self.transit_time = kwargs.pop("transit_time", None)
+        self.time = kwargs.pop("time", None)
+        self.flux = kwargs.pop("flux", None)
+        super(TransitLeastSquaresPeriodogram, self).__init__(*args, **kwargs)
+
+    def __repr__(self):
+        return('TransitLeastSquaresPeriodogram(ID: {})'.format(self.targetid))
+
+    @staticmethod
+    def from_lightcurve(lc, **kwargs):
+        """Creates a Periodogram from a LightCurve using the TLS method."""
+        try:
+            from transitleastsquares import transitleastsquares
+        except ImportError:
+            raise Exception("This feature requires the `transitleastsquares` package. "
+                            "You can install it using `pip install transitleastsquares`.")
+
+        minimum_period = kwargs.pop("minimum_period", None)
+        maximum_period = kwargs.pop("maximum_period", None)
+
+        tls = transitleastsquares(lc.time, lc.flux)
+        result = tls.power(period_min=minimum_period, period_max=maximum_period, **kwargs)
+        if not isinstance(result.period, u.quantity.Quantity):
+            result.periods = u.Quantity(result.periods, u.day)
+        if not isinstance(result.power, u.quantity.Quantity):
+            result.power = result.power * u.dimensionless_unscaled
+
+        return TransitLeastSquaresPeriodogram(frequency=1. / result.periods,
+                                              power=result.power,
+                                              default_view='period',
+                                              label=lc.label,
+                                              targetid=lc.targetid,
+                                              transit_time=result.transit_times,
+                                              duration=result.duration,
+                                              depth=result.depth,
+                                              tls_result=result,
+                                              tls_obj=tls,
+                                              time=lc.time,
+                                              flux=lc.flux)
