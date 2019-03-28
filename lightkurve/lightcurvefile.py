@@ -283,12 +283,6 @@ class KeplerLightCurveFile(LightCurveFile):
                 label=self.hdu[0].header['OBJECT'],
                 ra=self.ra,
                 dec=self.dec)
-        elif flux_type in ['SAP_FLUX', 'PDCSAP_FLUX']:
-            # Must be a custom FITS file:
-            warnings.warn("This custom file does not have a {} column. "
-                        "The available flux columns are {}".
-                        format(flux_type, self._flux_types()), LightkurveWarning)
-            return None # Could possibly return NaN array.
         else:
             raise KeyError("{} is not a valid flux type. Available types are: {}".
                            format(flux_type, self._flux_types()))
@@ -445,12 +439,6 @@ class TessLightCurveFile(LightCurveFile):
                 cadenceno=self.cadenceno,
                 targetid=self.targetid,
                 label=self.hdu[0].header['OBJECT'])
-        elif flux_type in ['SAP_FLUX', 'PDCSAP_FLUX']:
-            # Must be a custom FITS file:
-            warnings.warn("This custom file does not have a {} column. "
-                        "The available flux columns are {}".
-                        format(flux_type, self._flux_types()), LightkurveWarning)
-            return None # Could possibly return NaN array.
         else:
             raise KeyError("{} is not a valid flux type. Available types are: {}".
                            format(flux_type, self._flux_types()))
