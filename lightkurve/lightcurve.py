@@ -1024,6 +1024,19 @@ class LightCurve(object):
         """Converts the light curve to a `~lightkurve.periodogram.Periodogram`
         power spectrum object.
 
+        This method will call either `lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve()`
+        or `lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve()`,
+        which in turn wrap `astropy.stats.LombScargle` and `astropy.stats.BoxLeastSquares`.
+
+        Optional keywords accepted if ``method='lombscargle'`` are:
+            ``min_frequency``, ``max_frequency``, ``min_period``, ``max_period``,
+            ``frequency``, ``period``, ``nterms``, ``nyquist_factor``,
+            ``oversample_factor``, ``freq_unit``.
+
+        Optional keywords accepted for ``method='bls'`` are:
+            ``minimum_period``, ``maximum_period``, ``period``, ``frequency_factor``,
+            ``duration``.
+
         Parameters
         ----------
         method : {'lombscargle', 'boxleastsquares', 'ls', 'bls'}
@@ -1032,14 +1045,9 @@ class LightCurve(object):
             ``'ls'`` and ``'bls'`` are shorthands for ``'lombscargle'``
             and ``'boxleastsquares'``.
         kwargs : dict
-            Keyword arguments passed to the constructor of either
+            Keyword arguments passed to either
             `~lightkurve.periodogram.LombScarglePeriodogram` or
             `~lightkurve.periodogram.BoxLeastSquaresPeriodogram`.
-            Keywords accepted by `~lightkurve.periodogram.LombScarglePeriodogram` are:
-            ``min_frequency``, ``max_frequency``, ``min_period``, ``max_period``, ``frequency``,
-            ``period``, ``nterms``, ``nyquist_factor``, ``oversample_factor``, ``freq_unit``.
-            Keywords accepted by `~lightkurve.periodogram.BoxLeastSquaresPeriodogram` are:
-            ``min_period``, ``max_period``, ``period``, ``frequency_factor``.
 
         Returns
         -------

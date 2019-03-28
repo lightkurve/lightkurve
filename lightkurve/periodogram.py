@@ -781,8 +781,6 @@ class BoxLeastSquaresPeriodogram(Periodogram):
 
         bls = BoxLeastSquares(lc.time, lc.flux, dy)
         duration = kwargs.pop("duration", 0.25)
-        if hasattr(duration, '__iter__'):
-            raise ValueError('`duration` must be a single value.')
         minimum_period = kwargs.pop("minimum_period", None)
         maximum_period = kwargs.pop("maximum_period", None)
         period = kwargs.pop("period", None)
@@ -791,7 +789,7 @@ class BoxLeastSquaresPeriodogram(Periodogram):
                 minimum_period = period.min()
             else:
                 minimum_period = np.max([np.median(np.diff(lc.time)) * 4,
-                                         duration + np.median(np.diff(lc.time))])
+                                         np.max(duration) + np.median(np.diff(lc.time))])
         if maximum_period is None:
             if 'period' in kwargs:
                 maximum_period = period.max()
@@ -799,7 +797,7 @@ class BoxLeastSquaresPeriodogram(Periodogram):
                 maximum_period = (np.max(lc.time) - np.min(lc.time)) / 3.
 
         frequency_factor = kwargs.pop("frequency_factor", 10)
-        df = frequency_factor * duration / (np.max(lc.time) - np.min(lc.time))**2
+        df = frequency_factor * np.min(duration) / (np.max(lc.time) - np.min(lc.time))**2
         npoints = int(((1/minimum_period) - (1/maximum_period))/df)
 
         # Too many points
