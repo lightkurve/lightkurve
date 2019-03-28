@@ -4,6 +4,7 @@ from __future__ import division, print_function
 import copy
 import logging
 import math
+import warnings
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -16,6 +17,7 @@ from astropy.units import cds
 from astropy.convolution import convolve, Box1DKernel
 
 from . import MPLSTYLE
+from .utils import LightkurveWarning
 
 log = logging.getLogger(__name__)
 
@@ -631,6 +633,27 @@ class LombScarglePeriodogram(Periodogram):
         Periodogram : `Periodogram` object
             Returns a Periodogram object extracted from the lightcurve.
         """
+        if "min_period" in kwargs:
+            warnings.warn("`min_period` keyword is deprecated, "
+                          "please use `minimum_period` instead.",
+                          LightkurveWarning)
+            minimum_period = kwargs.pop("min_period", None)
+        if "max_period" in kwargs:
+            warnings.warn("`max_period` keyword is deprecated, "
+                          "please use `maximum_period` instead.",
+                          LightkurveWarning)
+            maximum_period = kwargs.pop("max_period", None)
+        if "min_frequency" in kwargs:
+            warnings.warn("`min_frequency` keyword is deprecated, "
+                          "please use `minimum_frequency` instead.",
+                          LightkurveWarning)
+            minimum_frequency = kwargs.pop("min_frequency", None)
+        if "max_frequency" in kwargs:
+            warnings.warn("`max_frequency` keyword is deprecated, "
+                          "please use `maximum_frequency` instead.",
+                          LightkurveWarning)
+            maximum_frequency = kwargs.pop("max_frequency", None)
+
         # Make sure the lightcurve object is normalized
         lc = lc.normalize()
 
