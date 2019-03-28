@@ -1029,13 +1029,13 @@ class LightCurve(object):
         which in turn wrap `astropy.stats.LombScargle` and `astropy.stats.BoxLeastSquares`.
 
         Optional keywords accepted if ``method='lombscargle'`` are:
-            ``min_frequency``, ``max_frequency``, ``min_period``, ``max_period``,
-            ``frequency``, ``period``, ``nterms``, ``nyquist_factor``,
-            ``oversample_factor``, ``freq_unit``.
+            ``minimum_frequency``, ``maximum_frequency``, ``mininum_period``,
+            ``maximum_period``, ``frequency``, ``period``, ``nterms``,
+            ``nyquist_factor``, ``oversample_factor``, ``freq_unit``.
 
         Optional keywords accepted for ``method='bls'`` are:
-            ``minimum_period``, ``maximum_period``, ``period``, ``frequency_factor``,
-            ``duration``.
+            ``minimum_period``, ``maximum_period``, ``period``,
+            ``frequency_factor``, ``duration``.
 
         Parameters
         ----------

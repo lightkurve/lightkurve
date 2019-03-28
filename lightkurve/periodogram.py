@@ -547,8 +547,8 @@ class LombScarglePeriodogram(Periodogram):
         return('LombScarglePeriodogram(ID: {})'.format(self.targetid))
 
     @staticmethod
-    def from_lightcurve(lc, min_frequency=None, max_frequency=None,
-                        min_period=None, max_period=None,
+    def from_lightcurve(lc, minimum_frequency=None, maximum_frequency=None,
+                        minimum_period=None, maximum_period=None,
                         frequency=None, period=None,
                         nterms=1, nyquist_factor=1, oversample_factor=1,
                         freq_unit=1/u.day, **kwargs):
@@ -590,16 +590,16 @@ class LombScarglePeriodogram(Periodogram):
         ----------
         lc : LightCurve object
             The LightCurve from which to compute the Periodogram.
-        min_frequency : float
+        minimum_frequency : float
             If specified, use this minimum frequency rather than one over the
             time baseline.
-        max_frequency : float
+        maximum_frequency : float
             If specified, use this maximum frequency rather than nyquist_factor
             times the nyquist frequency.
-        min_period : float
+        minimum_period : float
             If specified, use 1./minium_period as the maximum frequency rather
             than nyquist_factor times the nyquist frequency.
-        max_period : float
+        maximum_period : float
             If specified, use 1./maximum_period as the minimum frequency rather
             than one over the time baseline.
         frequency :  array-like
@@ -635,14 +635,14 @@ class LombScarglePeriodogram(Periodogram):
         lc = lc.normalize()
 
         # Check if any values of period have been passed and set format accordingly
-        if not all(b is None for b in [period, min_period, max_period]):
+        if not all(b is None for b in [period, minimum_period, maximum_period]):
             view = 'period'
         else:
             view = 'frequency'
 
         # If period and frequency keywords have both been set, throw an error
-        if (not all(b is None for b in [period, min_period, max_period])) & \
-           (not all(b is None for b in [frequency, min_frequency, max_frequency])):
+        if (not all(b is None for b in [period, minimum_period, maximum_period])) & \
+           (not all(b is None for b in [frequency, minimum_frequency, maximum_frequency])):
             raise ValueError('You have input keyword arguments for both frequency and period. '
                              'Please only use one.')
 
@@ -662,46 +662,46 @@ class LombScarglePeriodogram(Periodogram):
         fs = fs.to(freq_unit)
 
         # Warn if there is confusing input
-        if (frequency is not None) & (any([a is not None for a in [min_frequency, max_frequency]])):
+        if (frequency is not None) & (any([a is not None for a in [minimum_frequency, maximum_frequency]])):
             log.warning("You have passed both a grid of frequencies "
-                        "and min_frequency/max_frequency arguments; "
+                        "and min_frequency/maximum_frequency arguments; "
                         "the latter will be ignored.")
-        if (period is not None) & (any([a is not None for a in [min_period, max_period]])):
+        if (period is not None) & (any([a is not None for a in [minimum_period, maximum_period]])):
             log.warning("You have passed a grid of periods "
-                        "and min_period/max_period arguments; "
+                        "and minimum_period/maximum_period arguments; "
                         "the latter will be ignored.")
 
         # Tidy up the period stuff...
-        if max_period is not None:
-            # min_frequency MUST be none by this point.
-            min_frequency = 1. / max_period
-        if min_period is not None:
-            # max_frequency MUST be none by this point.
-            max_frequency = 1. / min_period
+        if maximum_period is not None:
+            # minimum_frequency MUST be none by this point.
+            minimum_frequency = 1. / maximum_period
+        if minimum_period is not None:
+            # maximum_frequency MUST be none by this point.
+            maximum_frequency = 1. / minimum_period
         # If the user specified a period, copy it into the frequency.
         if (period is not None):
             frequency = 1. / period
 
         # Do unit conversions if user input min/max frequency or period
         if frequency is None:
-            if min_frequency is not None:
-                min_frequency = u.Quantity(min_frequency, freq_unit)
-            if max_frequency is not None:
-                max_frequency = u.Quantity(max_frequency, freq_unit)
-            if (min_frequency is not None) & (max_frequency is not None):
-                if (min_frequency > max_frequency):
+            if minimum_frequency is not None:
+                minimum_frequency = u.Quantity(minimum_frequency, freq_unit)
+            if maximum_frequency is not None:
+                maximum_frequency = u.Quantity(maximum_frequency, freq_unit)
+            if (minimum_frequency is not None) & (maximum_frequency is not None):
+                if (minimum_frequency > maximum_frequency):
                     if view == 'frequency':
-                        raise ValueError('min_frequency cannot be larger than max_frequency')
+                        raise ValueError('minimum_frequency cannot be larger than maximum_frequency')
                     if view == 'period':
-                        raise ValueError('min_period cannot be larger than max_period')
+                        raise ValueError('minimum_period cannot be larger than maximum_period')
             # If nothing has been passed in, set them to the defaults
-            if min_frequency is None:
-                min_frequency = fs
-            if max_frequency is None:
-                max_frequency = nyquist * nyquist_factor
+            if minimum_frequency is None:
+                minimum_frequency = fs
+            if maximum_frequency is None:
+                maximum_frequency = nyquist * nyquist_factor
 
             # Create frequency grid evenly spaced in frequency
-            frequency = np.arange(min_frequency.value, max_frequency.value, fs.to(freq_unit).value)
+            frequency = np.arange(minimum_frequency.value, maximum_frequency.value, fs.to(freq_unit).value)
 
         # Convert to desired units
         frequency = u.Quantity(frequency, freq_unit)
