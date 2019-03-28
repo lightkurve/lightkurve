@@ -17,7 +17,8 @@ from . import PACKAGEDIR
 
 log = logging.getLogger(__name__)
 
-__all__ = ['search_targetpixelfile', 'search_lightcurvefile', 'search_tesscut', 'open']
+__all__ = ['search_targetpixelfile', 'search_lightcurvefile', 'search_tesscut',
+           'open', 'SearchResult']
 
 
 class SearchError(Exception):
@@ -25,8 +26,8 @@ class SearchError(Exception):
 
 
 class SearchResult(object):
-    """Container for the results returned by `search_targetpixelfile` or
-    `search_lightcurvefile`.
+    """Container for the results returned by `search_targetpixelfile`,
+    `search_lightcurvefile`, and `search_tesscut`.
 
     The purpose of this class is to provide a convenient way to inspect and
     download products that have been identified using one of the data search
