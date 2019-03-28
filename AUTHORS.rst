@@ -45,3 +45,4 @@ Comments, corrections & suggestions:
 - `Michael Hippke <https://github.com/hippke>`_
 - `Molnár László <https://github.com/lacalaca85>`_
 - `Tom Wilson <https://github.com/Onoddil>`_
+- `Tara Fetherolf <https://github.com/tfetherolf>`_
