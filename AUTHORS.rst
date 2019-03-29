@@ -22,6 +22,8 @@ Direct contributions:
 - `Natalie Gosnell <https://github.com/nattieg>`_
 - `Peter Williams <https://github.com/pkgw>`_
 - `Richard Elkins <https://github.com/texadactyl>`_
+- `Guy Davies <https://github.com/grd349>`_
+- `Daniel Foreman-Mackey <https://github.com/dfm>`_
 
 
 Comments, corrections & suggestions:
@@ -30,7 +32,6 @@ Comments, corrections & suggestions:
 - `Doug Caldwell <https://github.com/dacmess>`_
 - `Jessie Dotson <https://github.com/jessie-dotson>`_
 - `Scott Fleming <https://github.com/scfleming>`_
-- `Daniel Foreman-Mackey <https://github.com/dfm>`_
 - TJ Jaffe
 - `Susan Mullally <https://github.com/mustaric>`_
 - `Elisa Quintana <https://github.com/elisaquintana>`_
@@ -44,3 +45,4 @@ Comments, corrections & suggestions:
 - `Michael Hippke <https://github.com/hippke>`_
 - `Molnár László <https://github.com/lacalaca85>`_
 - `Tom Wilson <https://github.com/Onoddil>`_
+- `Tara Fetherolf <https://github.com/tfetherolf>`_

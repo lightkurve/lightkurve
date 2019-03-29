@@ -1408,10 +1408,11 @@ class TessTargetPixelFile(TargetPixelFile):
                           "observation.", LightkurveWarning)
 
         # Use the TICID keyword as the default targetid
-        try:
-            self.targetid = self.header['TICID']
-        except KeyError:
-            self.targetid = None
+        if self.targetid is None:
+            try:
+                self.targetid = self.header['TICID']
+            except KeyError:
+                pass
 
     def __repr__(self):
         return('TessTargetPixelFile(TICID: {})'.format(self.targetid))

@@ -11,16 +11,14 @@ from astropy.io import ascii, fits
 from astropy import units as u
 from astropy.utils.exceptions import AstropyWarning
 
-from astroquery.mast import Observations
-from astroquery.exceptions import ResolverError
-
 from .collections import TargetPixelFileCollection, LightCurveFileCollection
 from .utils import suppress_stdout, LightkurveWarning, detect_filetype
 from . import PACKAGEDIR
 
 log = logging.getLogger(__name__)
 
-__all__ = ['search_targetpixelfile', 'search_lightcurvefile', 'search_tesscut', 'open']
+__all__ = ['search_targetpixelfile', 'search_lightcurvefile', 'search_tesscut',
+           'open', 'SearchResult']
 
 
 class SearchError(Exception):
@@ -28,8 +26,8 @@ class SearchError(Exception):
 
 
 class SearchResult(object):
-    """Container for the results returned by `search_targetpixelfile` or
-    `search_lightcurvefile`.
+    """Container for the results returned by `search_targetpixelfile`,
+    `search_lightcurvefile`, and `search_tesscut`.
 
     The purpose of this class is to provide a convenient way to inspect and
     download products that have been identified using one of the data search
@@ -160,16 +158,20 @@ class SearchResult(object):
                 raise SearchError('Unable to download FFI cutout. Desired target '
                                   'coordinates may be too near the edge of the FFI.')
 
+            return open(path,
+                        quality_bitmask=quality_bitmask,
+                        targetid=self.table[0]['targetid'])
+
         else:
             if cutout_size is not None:
                 warnings.warn('`cutout_size` can only be specified for TESS '
                               'Full Frame Image cutouts.', LightkurveWarning)
-
+            from astroquery.mast import Observations
             path = Observations.download_products(self.table[:1], mrp_only=False,
                                                   download_dir=download_dir)['Local Path'][0]
 
-        # open() will determine filetype and return
-        return open(path, quality_bitmask=quality_bitmask)
+            # open() will determine filetype and return
+            return open(path, quality_bitmask=quality_bitmask)
 
     @suppress_stdout
     def download_all(self, quality_bitmask='default', download_dir=None, cutout_size=None):
@@ -224,7 +226,7 @@ class SearchResult(object):
             if cutout_size is not None:
                 warnings.warn('`cutout_size` can only be specified for TESS '
                               'Full Frame Image cutouts.', LightkurveWarning)
-
+            from astroquery.mast import Observations
             path = Observations.download_products(self.table, mrp_only=False,
                                                   download_dir=download_dir)['Local Path']
 
@@ -557,6 +559,7 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
 
     # Light curves and target pixel files
     if filetype.lower() != 'ffi':
+        from astroquery.mast import Observations
         products = Observations.get_product_list(observations)
         result = join(products, observations, keys="obs_id", join_type='left',
                       uniq_col_name='{col_name}{table_name}', table_names=['', '_2'])
@@ -586,8 +589,11 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
                                 'distance': 0.0,
                                 'sequence_number': s}
                                )
-        masked_result = Table(cutouts)
-        masked_result.sort(['distance', 'sequence_number'])
+        if len(cutouts) > 0:
+            masked_result = Table(cutouts)
+            masked_result.sort(['distance', 'sequence_number'])
+        else:
+            masked_result = None
         return SearchResult(masked_result)
 
 
@@ -638,6 +644,7 @@ def _query_mast(target, radius=None, project=['Kepler', 'K2', 'TESS']):
         with warnings.catch_warnings():
             # suppress misleading AstropyWarning
             warnings.simplefilter('ignore', AstropyWarning)
+            from astroquery.mast import Observations
             target_obs = Observations.query_criteria(target_name=target_name,
                                                      radius=str(radius.to(u.deg)),
                                                      project=project,
@@ -659,6 +666,7 @@ def _query_mast(target, radius=None, project=['Kepler', 'K2', 'TESS']):
             with warnings.catch_warnings():
                 # suppress misleading AstropyWarning
                 warnings.simplefilter('ignore', AstropyWarning)
+                from astroquery.mast import Observations
                 obs = Observations.query_criteria(coordinates='{} {}'.format(ra, dec),
                                                   radius=str(radius.to(u.deg)),
                                                   project=project,
@@ -671,10 +679,12 @@ def _query_mast(target, radius=None, project=['Kepler', 'K2', 'TESS']):
     # If `target` did not look like a KIC or EPIC ID, then we let MAST
     # resolve the target name to a sky position. Convert radius from arcsec
     # to degrees for query_criteria().
+    from astroquery.exceptions import ResolverError
     try:
         with warnings.catch_warnings():
             # suppress misleading AstropyWarning
             warnings.simplefilter('ignore', AstropyWarning)
+            from astroquery.mast import Observations
             obs = Observations.query_criteria(objectname=target,
                                               radius=str(radius.to(u.deg)),
                                               project=project,
