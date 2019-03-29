@@ -384,10 +384,8 @@ class SearchResult(object):
         temp_path = os.path.join(download_dir, (sector_name + '_' + coords_str
                                  + '_' + size_str + '_astrocut.fits'))
 
-        print(temp_path)
         if os.path.isfile(temp_path):
             path = temp_path
-            print('quick download')
         else:
             cutout_path = TesscutClass().download_cutouts(coords, size=cutout_size,
                                                           sector=sector, path=tesscut_dir)
