@@ -269,6 +269,16 @@ def test_bls_period_recovery():
     synthetic_lc.flux_err = np.array([np.nan] * len(time))
     assert_almost_equal(bls_period.value, period, decimal=2)
 
+def test_get_lombscargle_model():
+    """Can the LombScargle model return a simple input sinusoid?"""
+    lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000),
+                    flux_err=np.zeros(1000)+0.1)
+    sine = np.sin((lc.time/float(lc.time.max())) * 20 * np.pi)
+    lc *= sine
+    lc += 1.
+    pg = lc.to_periodogram()
+    y_fit = pg.get_lombscargle_model(lc.time)
+    assert all(np.isclose(y_fit, sine+1, atol=0.01))
 
 def test_error_messages():
     """Test periodogram raises reasonable errors

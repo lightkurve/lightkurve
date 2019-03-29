@@ -810,7 +810,6 @@ class LombScarglePeriodogram(Periodogram):
 
         #Caculate the model
         y_fit = self._LS_object.model(time, frequency) / 1e6 #Rescale to normalised flux
-        model = LightCurve(time, y_fit, label='Lomb Scargle Model Flux')
         return y_fit
 
 
