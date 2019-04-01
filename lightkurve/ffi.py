@@ -1,12 +1,20 @@
 """Tools to interact more easily with Full Frame Image files."""
 from __future__ import division, print_function
 
+import numpy as np
+import matplotlib.pyplot as plt
+
 from astropy.io import fits
 from astropy.wcs import WCS
 
 from .utils import plot_image
 
+
+
 __all__ = ['FullFrameImage']
+
+_CHANNEL_LIST = np.arange(1, 85)
+_MODULE_LIST = np.asarray(np.array_split(_CHANNEL_LIST, 21)).reshape((21, 4))
 
 
 class FullFrameImage(object):
@@ -40,6 +48,32 @@ class FullFrameImage(object):
         img = self.hdulist[channel].data[extent[2]: extent[3],
                                          extent[0]: extent[1]]
         plot_image(img, extent=extent, **kwargs)
+
+
+    def plot_module(self, skycoord, size=10, **kwargs):
+        """Plots a Module"""
+        vmin = kwargs.pop('vmin', 1)
+        vmax = kwargs.pop('vmax', 1e5)
+
+        channel, col, row = self.skycoord_to_pixel(skycoord)
+        group = _MODULE_LIST[np.asarray([channel in m for m in _MODULE_LIST])][0]
+        fig, axs = plt.subplots(1, 4, figsize=(16, 3.))
+        for idx, channel in enumerate(group):
+            extent = (int(col-size/2), int(col+size/2),
+                      int(row-size/2), int(row+size/2))
+            img = self.hdulist[channel].data[extent[2]: extent[3],
+                                             extent[0]: extent[1]]
+            if idx < 3:
+                ax = plot_image(img, extent=extent, vmax=vmax, vmin=vmin, **kwargs,
+                        ax=axs[idx], show_colorbar=False)
+            else:
+                ax = plot_image(img, extent=extent, vmax=vmax, vmin=vmin, **kwargs,
+                        ax=axs[idx], show_colorbar=True)
+            if idx > 0:
+                ax.set_ylabel('')
+            ax.set_title('Channel : {}'.format(channel))
+        return fig
+
 
     def plot(self):
         """Plot all channels on a grid."""
