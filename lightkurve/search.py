@@ -381,10 +381,11 @@ class SearchResult(object):
         elif isinstance(cutout_size, tuple) or isinstance(cutout_size, list):
             size_str = str(int(cutout_size[0])) + 'x' + str(int(cutout_size[1]))
 
-        temp_path = os.path.join(download_dir, (sector_name + '_' + coords_str
-                                 + '_' + size_str + '_astrocut.fits'))
+        fname = sector_name + '_' + coords_str + '_' + size_str + '_astrocut.fits'
+        temp_path = os.path.join(download_dir, fname)
 
-        if os.path.isfile(temp_path):
+        print(temp_path)
+        if os.path.exists(temp_path):
             path = temp_path
         else:
             cutout_path = TesscutClass().download_cutouts(coords, size=cutout_size,
