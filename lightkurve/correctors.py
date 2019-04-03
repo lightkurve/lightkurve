@@ -716,7 +716,6 @@ class PLDCorrector(object):
         # X has shape (n_components_first + n_components_higher_order + 1, n_cadences)
         X = np.concatenate(X_sections, axis=1)
 
-
         # set default transit mask
         if cadence_mask is None:
             cadence_mask = np.ones_like(self.time, dtype=bool)
