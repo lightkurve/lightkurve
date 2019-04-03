@@ -739,7 +739,7 @@ class LombScarglePeriodogram(Periodogram):
         # Hard coding that time is in days.
         time = lc.time.copy() * u.day
 
-        # Calculate Nyquist Frequency and frequency bin width in terms of days
+        # Approximate Nyquist Frequency and frequency bin width in terms of days
         nyquist = 0.5 * (1./(np.median(np.diff(time))))
         fs = (1./(time[-1] - time[0])) / oversample_factor
 
@@ -814,12 +814,8 @@ class LombScarglePeriodogram(Periodogram):
 
         # Power spectral density
         if normalization == 'psd':
-            # Normalise according to Parseval's theorem
-            norm = np.std(lc.flux * 1e6)**2 / np.sum(power)
-            power *= norm
-            power = power * (cds.ppm**2)
             # Rescale power to units of ppm^2 / [frequency unit]
-            power = power / fs
+            power *=  2./(len(time)*oversample_factor*fs)
 
         # Amplitude spectrum
         elif normalization == 'amplitude':
