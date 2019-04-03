@@ -815,7 +815,7 @@ class LombScarglePeriodogram(Periodogram):
         # Power spectral density
         if normalization == 'psd':
             # Rescale power to units of ppm^2 / [frequency unit]
-            power *=  2./(len(time)*oversample_factor*fs)
+            power *=  2./(len(time)*oversample_factor*fs) * (cds.ppm**2)
 
         # Amplitude spectrum
         elif normalization == 'amplitude':
