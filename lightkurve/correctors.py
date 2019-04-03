@@ -690,7 +690,9 @@ class PLDCorrector(object):
         # first order PLD design matrix
         pld_flux = flux_crop[:, aperture_crop]
         f1 = np.reshape(pld_flux, (len(pld_flux), -1))
-        X1 = f1 / np.sum(pld_flux, axis=-1)[:, None]
+        X1 = f1 / np.nansum(pld_flux, axis=-1)[:, None]
+        # No NaN pixels
+        X1 = X1[:, np.isfinite(X1).all(axis=0)]
 
         # higher order PLD design matrices
         X_sections = [np.ones((len(flux_crop), 1)), X1]
@@ -713,6 +715,7 @@ class PLDCorrector(object):
         # adding a column vector of 1s for numerical stability (see Luger et al.).
         # X has shape (n_components_first + n_components_higher_order + 1, n_cadences)
         X = np.concatenate(X_sections, axis=1)
+
 
         # set default transit mask
         if cadence_mask is None:
