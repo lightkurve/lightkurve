@@ -1146,10 +1146,10 @@ class LightCurve(object):
 
             # Override the defaults where necessary
             from . import __version__
-            default = default = {'ORIGIN': "Unofficial data product",
-                                 'DATE': datetime.datetime.now().strftime("%Y-%m-%d"),
-                                 'CREATOR': "lightkurve.LightCurve.to_fits()",
-                                 'PROCVER': str(__version__)}
+            default = {'ORIGIN': "Unofficial data product",
+                         'DATE': datetime.datetime.now().strftime("%Y-%m-%d"),
+                         'CREATOR': "lightkurve.LightCurve.to_fits()",
+                         'PROCVER': str(__version__)}
 
             for kw in default:
                 hdu.header['{}'.format(kw).upper()] = default[kw]
@@ -1593,13 +1593,16 @@ class TessLightCurve(LightCurve):
         hdu : astropy.io.fits
             Returns an astropy.io.fits object if path is None
         """
-        # TODO: populate more TESS specific metadata
-
         tess_specific_data = {
             'OBJECT': '{}'.format(self.targetid),
             'MISSION': self.mission,
             'RA_OBJ': self.ra,
-            'DEC_OBJ': self.dec} # ... insert more here!
+            'TELESCOP': self.mission,
+            'CAMERA': self.camera,
+            'CCD': self.ccd,
+            'SECTOR': self.sector,
+            'TARGETID': self.targetid,
+            'DEC_OBJ': self.dec}
 
         def _make_aperture_extension(hdu_list, aperture_mask):
             """Create the 'APERTURE' extension (e.g. extension #2)."""
@@ -1617,6 +1620,10 @@ class TessLightCurve(LightCurve):
         hdu = super(TessLightCurve, self).to_fits(path=None,
                                                     overwrite=overwrite,
                                                     **extra_data)
+
+        # We do this because the TESS file format is subtly different in the
+        #    name of this column.
+        hdu[1].columns.change_name('SAP_QUALITY', 'QUALITY')
 
         hdu = _make_aperture_extension(hdu, aperture_mask)
 
