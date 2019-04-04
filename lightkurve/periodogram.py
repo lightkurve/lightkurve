@@ -814,7 +814,9 @@ class LombScarglePeriodogram(Periodogram):
 
         # Power spectral density
         if normalization == 'psd':
-            # Rescale power to units of ppm^2 / [frequency unit]
+            # Rescale from the unnormalized  power output by Astropy's
+            # Lomb-Scargle function to units of ppm^2 / [frequency unit]
+            # that may be of more interest for asteroseismology.
             power *=  2./(len(time)*oversample_factor*fs) * (cds.ppm**2)
 
         # Amplitude spectrum
