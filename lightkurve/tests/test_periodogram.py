@@ -38,20 +38,12 @@ def test_periodogram_normalization():
     pg = lc.to_periodogram(freq_unit=u.microhertz, normalization='psd')
     assert pg.power.unit == u.cds.ppm**2 / u.microhertz
 
-def test_psd():
-    """Tests the PSD helper function"""
-    lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000),
-                    flux_err=np.zeros(1000)+0.1)
-    # Test amplitude normalization and correct units
-    pg = lc.to_psd(freq_unit=u.microhertz)
-    assert pg.power.unit == u.cds.ppm**2 / u.microhertz
-
 def test_periodogram_units():
     """Tests whether periodogram has correct units"""
     # Fake, noisy data
     lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000),
                     flux_err=np.zeros(1000)+0.1)
-    p = lc.to_periodogram()
+    p = lc.to_periodogram(normalization='psd')
     # Has units
     assert hasattr(p.frequency, 'unit')
 
