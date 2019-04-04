@@ -555,8 +555,9 @@ class LombScarglePeriodogram(Periodogram):
     def from_lightcurve(lc, minimum_frequency=None, maximum_frequency=None,
                         minimum_period=None, maximum_period=None,
                         frequency=None, period=None,
-                        nterms=1, nyquist_factor=1, oversample_factor=5,
-                        freq_unit=1/u.day, normalization="amplitude", **kwargs):
+                        nterms=1, nyquist_factor=1, oversample_factor=None,
+                        freq_unit=None, normalization="amplitude",
+                        **kwargs):
         """Creates a Periodogram from a LightCurve using the Lomb-Scargle method.
 
         By default, the periodogram will be created for a regular grid of
@@ -621,17 +622,23 @@ class LombScarglePeriodogram(Periodogram):
             Default 1. The multiple of the average Nyquist frequency. Is
             overriden by maximum_frequency (or minimum period).
         oversample_factor : int
-            The frequency spacing, determined by the time baseline of the
-            lightcurve, is divided by this factor, oversampling the frequency
-            space. This parameter is identical to the samples_per_peak parameter
-            in astropy.LombScargle()
-        freq_unit : `astropy.units.core.CompositeUnit`
-            Default: 1/u.day. The desired frequency units for the Lomb Scargle
+            Default: None. The frequency spacing, determined by the time
+            baseline of the lightcurve, is divided by this factor,
+            oversampling the frequency space. This parameter is identical
+            to the samples_per_peak parameter in astropy.LombScargle().
+            If normalization='amplitude', oversample_factor will be set to
+            5. If normalization='psd', it will be 1. These defaults can
+            be overridden.
+         freq_unit : `astropy.units.core.CompositeUnit`
+            Default: None. The desired frequency units for the Lomb Scargle
             periodogram. This implies that 1/freq_unit is the units for period.
+            With default normalization ('amplitude'), the freq_unit is set to
+            1/day, which can be overridden. 'psd' normalization will set
+            freq_unit to microhertz.
         normalization : 'psd' or 'amplitude'
-            Default: `'psd'`. The desired normalization of the power spectrum. 
-            Can be either power spectral density (`'psd'`) or amplitude 
-            (`'amplitude'`)
+            Default: `'amplitude'`. The desired normalization of the spectrum.
+            Can be either power spectral density (`'psd'`) or amplitude
+            (`'amplitude'`).
         kwargs : dict
             Keyword arguments passed to `astropy.stats.LombScargle()`
 
@@ -645,6 +652,14 @@ class LombScarglePeriodogram(Periodogram):
         if normalization not in ('psd', 'amplitude'):
             raise ValueError("the `normalization` parameter must be one of "
                              "'psd' or 'amplitude'.")
+
+        # Setting default frequency units
+        if freq_unit is None:
+            freq_unit = 1/u.day if normalization == 'amplitude' else u.microhertz
+
+        # Default oversample factor
+        if oversample_factor is None:
+            oversample_factor = 5. if normalization == 'amplitude' else 1.
 
         if "min_period" in kwargs:
             warnings.warn("`min_period` keyword is deprecated, "
