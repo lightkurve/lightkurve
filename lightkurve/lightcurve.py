@@ -1073,34 +1073,6 @@ class LightCurve(object):
             from . import LombScarglePeriodogram
             return LombScarglePeriodogram.from_lightcurve(lc=self, **kwargs)
 
-    def to_psd(self, normalization="psd", oversample_factor=1., **kwargs):
-        """Helper function to calculation Lomb-Scargle with power spectral 
-        density normalization
-        
-        Parameters
-        ----------
-        oversample_factor : int
-            The frequency spacing, determined by the time baseline of the
-            lightcurve, is divided by this factor, oversampling the frequency
-            space.
-        kwargs : dict
-            Keyword arguments passed to the constructor of either
-            `~lightkurve.periodogram.LombScarglePeriodogram`
-            Keywords accepted by `~lightkurve.periodogram.LombScarglePeriodogram` are:
-            ``min_frequency``, ``max_frequency``, ``min_period``, ``max_period``, ``frequency``,
-            ``period``, ``nterms``, ``nyquist_factor``, ``oversample_factor``, ``freq_unit``,
-            ``normalization``.
-
-        Returns
-        -------
-        Periodogram : `~lightkurve.periodogram.Periodogram` object
-            The power spectral density object extracted from the light curve.
-        
-        """
-        return self.to_periodogram(normalization=normalization,
-                                    oversample_factor=1.,
-                                    **kwargs)
-
     def _boolean_mask_to_bitmask(self, aperture_mask):
         """Takes in an aperture_mask and returns a Kepler-style bitmask
 
