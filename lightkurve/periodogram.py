@@ -570,17 +570,50 @@ class LombScarglePeriodogram(Periodogram):
         parameter or a custom regular grid of periods using the `period`
         parameter.
 
-        The spectrum can be oversampled by increasing the oversample_factor
-        parameter. The parameter nterms controls how many Fourier terms are used
-        in the model. Note that many terms could lead to spurious peaks. Setting
-        the Nyquist_factor to be greater than 1 will sample the space beyond the
-        Nyquist frequency, which may introduce aliasing.
+        The spectrum can be oversampled or critically sampled by changing the
+        `oversample_factor` parameter. An oversampled spectrum (oversample_factor
+        > 1) is useful for displaying the full dynamics of the spectrum, where
+        the frequencies and amplitudes can be measured directly from the plot
+        itself, with no fitting required. On the other hand, an
+        oversample_factor of 1 means the spectrum is critically sampled, where
+        every point in the spectrum is independent of the others. This is
+        useful for stars whose mode lifetimes are shorter than the time-base of
+        the data, which is a behaviour usually observed in solar-like
+        oscillators where Lorentzians are fit to modes in the power spectrum.
+        An oversample_factor of 1 is less likely to cause issues for these
+        stars, because the modes are usually fully resolved. That is, the power
+        from each mode is spread over a range of frequencies due to damping.
+        Hence, any small error from measuring mode frequencies by taking the
+        maximum of the peak is negligible compared with the intrinsic linewidth
+        of the modes.
 
-        The unit parameter allows a request for alternative units in frequency
-        space. By default frequency is in (1/day) and power in (ppm^2 * day).
-        Asteroseismologists for example may want frequency in (microHz) and
-        power in (ppm^2 / microHz), in which case they would pass
-        `unit = u.microhertz` where `u` is `astropy.units`
+        The `normalization` parameter will normalize the spectrum to either
+        power spectral density ("psd") or amplitude ("amplitude"). Users doing
+        asteroseismology on stars that do not exhibit solar-like oscillations
+        (e.g. delta Scutis) typically prefer `normalization="amplitude"`
+        because "amplitude" has higher dynamic range (high and low peaks
+        visible simultaneously), and we often want to read off amplitudes from
+        the plot. If `normalization="amplitude"`, the default value for
+        `oversample_factor` is set to 5 and `freq_unit` is 1/day.
+        Alternatively, users doing asteroseismology on solar-like oscillators
+        tend to prefer `normalization="psd"` because power density has a scaled
+        axis that depends on the length of the observing time, and is used when
+        we are interested in noise levels (e.g. granulation) and to look at
+        damped oscillations. If `normalization="psd"`, the default value for
+        `oversample_factor` is set to 1 and `freq_unit` is set to microHz.
+        Default values of `freq_unit` and `oversample_factor` can be
+        overridden. See Appendix A of Kjeldsen & Bedding, 1995 for a full
+        discussion of normalization and measurement of oscillation amplitudes
+        (http://adsabs.harvard.edu/abs/1995A%26A...293...87K).
+
+        The parameter nterms controls how many Fourier terms are used in the
+        model. Setting the Nyquist_factor to be greater than 1 will sample the
+        space beyond the Nyquist frequency, which may introduce aliasing.
+
+        The `freq_unit` parameter allows a request for alternative units in frequency
+        space. By default frequency is in (1/day) and power in (amplitude
+        (ppm)). Asteroseismologists for example may want frequency in (microHz)
+        in which case they would pass `freq_unit=u.microhertz`.
 
         By default this method uses the LombScargle 'fast' method, which assumes
         a regular grid. If a regular grid of periods (i.e. an irregular grid of
@@ -623,12 +656,12 @@ class LombScarglePeriodogram(Periodogram):
             overriden by maximum_frequency (or minimum period).
         oversample_factor : int
             Default: None. The frequency spacing, determined by the time
-            baseline of the lightcurve, is divided by this factor,
-            oversampling the frequency space. This parameter is identical
-            to the samples_per_peak parameter in astropy.LombScargle().
-            If normalization='amplitude', oversample_factor will be set to
-            5. If normalization='psd', it will be 1. These defaults can
-            be overridden.
+            baseline of the lightcurve, is divided by this factor, oversampling
+            the frequency space. This parameter is identical to the
+            samples_per_peak parameter in astropy.LombScargle(). If
+            normalization='amplitude', oversample_factor will be set to 5. If
+            normalization='psd', it will be 1. These defaults can be
+            overridden.
          freq_unit : `astropy.units.core.CompositeUnit`
             Default: None. The desired frequency units for the Lomb Scargle
             periodogram. This implies that 1/freq_unit is the units for period.
@@ -650,8 +683,8 @@ class LombScarglePeriodogram(Periodogram):
 
         # Input validation for spectrum type
         if normalization not in ('psd', 'amplitude'):
-            raise ValueError("the `normalization` parameter must be one of "
-                             "'psd' or 'amplitude'.")
+            raise ValueError("The `normalization` parameter must be one of "
+                             "either 'psd' or 'amplitude'.")
 
         # Setting default frequency units
         if freq_unit is None:
