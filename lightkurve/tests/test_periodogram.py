@@ -43,7 +43,7 @@ def test_periodogram_units():
     # Fake, noisy data
     lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000),
                     flux_err=np.zeros(1000)+0.1)
-    p = lc.to_periodogram(normalization='psd')
+    p = lc.to_periodogram(normalization='amplitude')
     # Has units
     assert hasattr(p.frequency, 'unit')
 
@@ -62,7 +62,7 @@ def test_periodogram_can_find_periods():
                     flux_err=np.zeros(1000)+0.1)
     # Add a 100 day period signal
     lc.flux *= np.sin((lc.time/float(lc.time.max())) * 20 * np.pi)
-    p = lc.to_periodogram()
+    p = lc.to_periodogram(normalization='amplitude')
     assert np.isclose(p.period_at_max_power.value, 100, rtol=1e-3)
 
 
@@ -121,7 +121,7 @@ def test_smooth():
     lc = LightCurve(time=np.arange(1000),
                     flux=np.random.normal(1, 0.1, 1000),
                     flux_err=np.zeros(1000)+0.1)
-    p = lc.to_periodogram()
+    p = lc.to_periodogram(normalization='psd', freq_unit=u.microhertz)
     # Test boxkernel and logmedian methods
     assert all(p.smooth(method='boxkernel').frequency == p.frequency)
     assert all(p.smooth(method='logmedian').frequency == p.frequency)
@@ -161,7 +161,7 @@ def test_flatten():
     lc = LightCurve(time=np.arange(npts),
                     flux=np.random.normal(1, 0.1, npts),
                     flux_err=np.zeros(npts)+0.1)
-    p = lc.to_periodogram()
+    p = lc.to_periodogram(normalization='psd', freq_unit=1/u.day)
 
     # Check method returns equal frequency
     assert all(p.flatten(method='logmedian').frequency == p.frequency)
