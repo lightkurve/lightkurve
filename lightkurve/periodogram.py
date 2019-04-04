@@ -619,8 +619,7 @@ class LombScarglePeriodogram(Periodogram):
         a regular grid. If a regular grid of periods (i.e. an irregular grid of
         frequencies) it will use the 'slow' method. If nterms > 1 is passed, it
         will use the 'fastchi2' method for regular grids, and 'chi2' for
-        irregular grids. The normalization of the Lomb Scargle periodogram is
-        fixed to `psd`, and cannot be overridden.
+        irregular grids.
 
         Caution: this method assumes that the LightCurve's time (lc.time)
         is given in units of days.

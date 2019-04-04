@@ -1031,7 +1031,8 @@ class LightCurve(object):
         Optional keywords accepted if ``method='lombscargle'`` are:
             ``minimum_frequency``, ``maximum_frequency``, ``mininum_period``,
             ``maximum_period``, ``frequency``, ``period``, ``nterms``,
-            ``nyquist_factor``, ``oversample_factor``, ``freq_unit``.
+            ``nyquist_factor``, ``oversample_factor``, ``freq_unit``,
+            ``normalization``.
 
         Optional keywords accepted for ``method='bls'`` are:
             ``minimum_period``, ``maximum_period``, ``period``,
@@ -1048,12 +1049,6 @@ class LightCurve(object):
             Keyword arguments passed to either
             `~lightkurve.periodogram.LombScarglePeriodogram` or
             `~lightkurve.periodogram.BoxLeastSquaresPeriodogram`.
-            Keywords accepted by `~lightkurve.periodogram.LombScarglePeriodogram` are:
-            ``min_frequency``, ``max_frequency``, ``min_period``, ``max_period``, ``frequency``,
-            ``normalization``.
-            ``period``, ``nterms``, ``nyquist_factor``, ``oversample_factor``, ``freq_unit``.
-            Keywords accepted by `~lightkurve.periodogram.BoxLeastSquaresPeriodogram` are:
-            ``min_period``, ``max_period``, ``period``, ``frequency_factor``.
 
         Returns
         -------
