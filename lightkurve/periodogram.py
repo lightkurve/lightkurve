@@ -570,40 +570,43 @@ class LombScarglePeriodogram(Periodogram):
         parameter or a custom regular grid of periods using the `period`
         parameter.
 
-        The spectrum can be oversampled or critically sampled by changing the
-        `oversample_factor` parameter. An oversampled spectrum (oversample_factor
-        > 1) is useful for displaying the full dynamics of the spectrum, where
-        the frequencies and amplitudes can be measured directly from the plot
-        itself, with no fitting required. On the other hand, an
-        oversample_factor of 1 means the spectrum is critically sampled, where
-        every point in the spectrum is independent of the others. This is
-        useful for stars whose mode lifetimes are shorter than the time-base of
-        the data, which is a behaviour usually observed in solar-like
-        oscillators where Lorentzians are fit to modes in the power spectrum.
-        An oversample_factor of 1 is less likely to cause issues for these
-        stars, because the modes are usually fully resolved. That is, the power
-        from each mode is spread over a range of frequencies due to damping.
-        Hence, any small error from measuring mode frequencies by taking the
-        maximum of the peak is negligible compared with the intrinsic linewidth
-        of the modes.
+        The sampling of the spectrum can be changed using the
+        `oversample_factor` parameter. An oversampled spectrum
+        (oversample_factor > 1) is useful for displaying the full details
+        of the spectrum, allowing the frequencies and amplitudes to be
+        measured directly from the plot itself, with no fitting required.
+        This is recommended for most applications, with a value of 5 or
+        10. On the other hand, an oversample_factor of 1 means the spectrum
+        is critically sampled, where every point in the spectrum is
+        independent of the others. This may be used when Lorentzians are to
+        be fitted to modes in the power spectrum, in cases where the mode
+        lifetimes are shorter than the time-base of the data (which is
+        sometimes the case for solar-like oscillations). An
+        oversample_factor of 1 is suitable for these stars because the
+        modes are usually fully resolved. That is, the power from each mode
+        is spread over a range of frequencies due to damping.  Hence, any
+        small error from measuring mode frequencies by taking the maximum
+        of the peak is negligible compared with the intrinsic linewidth of
+        the modes.
 
         The `normalization` parameter will normalize the spectrum to either
-        power spectral density ("psd") or amplitude ("amplitude"). Users doing
-        asteroseismology on stars that do not exhibit solar-like oscillations
-        (e.g. delta Scutis) typically prefer `normalization="amplitude"`
-        because "amplitude" has higher dynamic range (high and low peaks
-        visible simultaneously), and we often want to read off amplitudes from
-        the plot. If `normalization="amplitude"`, the default value for
+        power spectral density ("psd") or amplitude ("amplitude"). Users
+        doing asteroseismology on classical pulsators (e.g. delta Scutis)
+        typically prefer `normalization="amplitude"` because "amplitude"
+        has higher dynamic range (high and low peaks visible
+        simultaneously), and we often want to read off amplitudes from the
+        plot. If `normalization="amplitude"`, the default value for
         `oversample_factor` is set to 5 and `freq_unit` is 1/day.
-        Alternatively, users doing asteroseismology on solar-like oscillators
-        tend to prefer `normalization="psd"` because power density has a scaled
-        axis that depends on the length of the observing time, and is used when
-        we are interested in noise levels (e.g. granulation) and to look at
-        damped oscillations. If `normalization="psd"`, the default value for
-        `oversample_factor` is set to 1 and `freq_unit` is set to microHz.
-        Default values of `freq_unit` and `oversample_factor` can be
-        overridden. See Appendix A of Kjeldsen & Bedding, 1995 for a full
-        discussion of normalization and measurement of oscillation amplitudes
+        Alternatively, users doing asteroseismology on solar-like
+        oscillators tend to prefer `normalization="psd"` because power
+        density has a scaled axis that depends on the length of the
+        observing time, and is used when we are interested in noise levels
+        (e.g. granulation) and are looking at damped oscillations. If
+        `normalization="psd"`, the default value for `oversample_factor` is
+        set to 1 and `freq_unit` is set to microHz.  Default values of
+        `freq_unit` and `oversample_factor` can be overridden. See Appendix
+        A of Kjeldsen & Bedding, 1995 for a full discussion of
+        normalization and measurement of oscillation amplitudes
         (http://adsabs.harvard.edu/abs/1995A%26A...293...87K).
 
         The parameter nterms controls how many Fourier terms are used in the
