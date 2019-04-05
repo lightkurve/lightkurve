@@ -328,6 +328,7 @@ def test_tpf_from_images():
                                                  position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
     assert isinstance(tpf, KeplerTargetPixelFile)
 
+
     with warnings.catch_warnings():
         # Some cards are too long -- to be investigated.
         warnings.simplefilter("ignore", VerifyWarning)
@@ -359,6 +360,51 @@ def test_tpf_from_images():
         tpf_hdus = KeplerTargetPixelFile.from_fits_images(hdus,
                                                           size=(3, 3),
                                                           position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
+
+
+def test_tpf_wcs_from_images():
+    """Test to see if tpf.from_fits_images() output a tpf with WCS in the header"""
+    from astropy.io import fits
+    from astropy import wcs
+    import astropy.units as u
+    from astropy.coordinates import SkyCoord
+    from astropy.io.fits.card import UNDEFINED
+
+    # Can we read in a load of images?
+    header = fits.Header()
+    images = []
+    for i in range(5):
+        header['TSTART'] = i
+        header['TSTOP'] = i + 1
+        images.append(fits.ImageHDU(data=np.ones((5, 5)), header=header))
+
+    # Not without a wcs...
+    with pytest.raises(Exception):
+        KeplerTargetPixelFile.from_fits_images(images, size=(3, 3),
+                                               position=SkyCoord(-234.75, 8.3393, unit='deg'))
+
+    # Make a fake WCS based on astropy.docs...
+    w = wcs.WCS(naxis=2)
+    w.wcs.crpix = [-234.75, 8.3393]
+    w.wcs.cdelt = np.array([-0.066667, 0.066667])
+    w.wcs.crval = [0, -90]
+    w.wcs.ctype = ["RA---TAN", "DEC--TAN"]
+    w.wcs.set_pv([(2, 1, 45.0)])
+    pixcrd = np.array([[0, 0], [24, 38], [45, 98]], np.float_)
+    header = w.to_header()
+    ra, dec = 268.21686048, -73.66991904
+
+    # Add that header to our images...
+    images = []
+    for i in range(5):
+        header['TSTART'] = i
+        header['TSTOP'] = i + 1
+        images.append(fits.ImageHDU(data=np.ones((5, 5)), header=header))
+
+    # Now this should work.
+    tpf = KeplerTargetPixelFile.from_fits_images(images, size=(3, 3),
+                                                 position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
+    assert newtpf.hdu[1].header['1CRPX5'] != UNDEFINED
 
 
 def test_properties2(capfd):
