@@ -46,4 +46,5 @@ Comments, corrections & suggestions:
 - `Molnár László <https://github.com/lacalaca85>`_
 - `Tom Wilson <https://github.com/Onoddil>`_
 - `Tara Fetherolf <https://github.com/tfetherolf>`_
+- `James Kuszlewicz <https://github.com/jsk389>`_
 - `Timothy Bedding <https://github.com/timbedding>`_
