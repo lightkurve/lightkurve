@@ -1119,8 +1119,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
         allkeys = hdu0_keywords.copy()
         allkeys.update(carry_keywords)
 
-        ext_info = {'1CRV5P': column, '2CRV5P': row}
-
         for idx, img in tqdm(enumerate(images), total=len(images)):
             hdu = _open_image(img, extension)
 
@@ -1144,6 +1142,12 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 cutout = Cutout2D(hdu.data, position, wcs=WCS(hdu.header),
                                   size=size, mode='partial')
             factory.add_cadence(frameno=idx, flux=cutout.data, header=hdu.header)
+
+        ext_info = {'1CRV5P': column, '2CRV5P': row}
+        ext_info['TFORM4'] = '{}J'.format(size[0] * size[1])
+        ext_info['TDIM4'] = '({},{})'.format(size[0], size[1])
+        ext_info.update(cutout.wcs.to_header())
+
         return factory.get_tpf(hdu0_keywords=allkeys, ext_info=ext_info, **kwargs)
 
 
