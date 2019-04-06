@@ -1031,7 +1031,8 @@ class LightCurve(object):
         Optional keywords accepted if ``method='lombscargle'`` are:
             ``minimum_frequency``, ``maximum_frequency``, ``mininum_period``,
             ``maximum_period``, ``frequency``, ``period``, ``nterms``,
-            ``nyquist_factor``, ``oversample_factor``, ``freq_unit``.
+            ``nyquist_factor``, ``oversample_factor``, ``freq_unit``,
+            ``normalization``.
 
         Optional keywords accepted for ``method='bls'`` are:
             ``minimum_period``, ``maximum_period``, ``period``,

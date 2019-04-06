@@ -24,7 +24,7 @@ Direct contributions:
 - `Richard Elkins <https://github.com/texadactyl>`_
 - `Guy Davies <https://github.com/grd349>`_
 - `Daniel Foreman-Mackey <https://github.com/dfm>`_
-
+- `Daniel Hey <https://github.com/danielhey>`_
 
 Comments, corrections & suggestions:
 
@@ -47,3 +47,4 @@ Comments, corrections & suggestions:
 - `Tom Wilson <https://github.com/Onoddil>`_
 - `Tara Fetherolf <https://github.com/tfetherolf>`_
 - `James Kuszlewicz <https://github.com/jsk389>`_
+- `Timothy Bedding <https://github.com/timbedding>`_

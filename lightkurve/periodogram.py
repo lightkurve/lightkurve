@@ -287,7 +287,10 @@ class Periodogram(object):
         if style is None or style == 'lightkurve':
             style = MPLSTYLE
         if ylabel is None:
-            ylabel = "Power Spectral Density [{}]".format(self.power.unit.to_string('latex'))
+            if self.power.unit == cds.ppm:
+                ylabel = "Amplitude [{}]".format(self.power.unit.to_string('latex'))
+            else:
+                ylabel = "Power Spectral Density [{}]".format(self.power.unit.to_string('latex'))
 
         # This will need to be fixed with housekeeping. Self.label currently doesnt exist.
         if ('label' not in kwargs) and ('label' in dir(self)):
@@ -552,8 +555,9 @@ class LombScarglePeriodogram(Periodogram):
     def from_lightcurve(lc, minimum_frequency=None, maximum_frequency=None,
                         minimum_period=None, maximum_period=None,
                         frequency=None, period=None,
-                        nterms=1, nyquist_factor=1, oversample_factor=1,
-                        freq_unit=1/u.day, **kwargs):
+                        nterms=1, nyquist_factor=1, oversample_factor=None,
+                        freq_unit=None, normalization="amplitude",
+                        **kwargs):
         """Creates a Periodogram from a LightCurve using the Lomb-Scargle method.
 
         By default, the periodogram will be created for a regular grid of
@@ -566,24 +570,59 @@ class LombScarglePeriodogram(Periodogram):
         parameter or a custom regular grid of periods using the `period`
         parameter.
 
-        The spectrum can be oversampled by increasing the oversample_factor
-        parameter. The parameter nterms controls how many Fourier terms are used
-        in the model. Note that many terms could lead to spurious peaks. Setting
-        the Nyquist_factor to be greater than 1 will sample the space beyond the
-        Nyquist frequency, which may introduce aliasing.
+        The sampling of the spectrum can be changed using the
+        `oversample_factor` parameter. An oversampled spectrum
+        (oversample_factor > 1) is useful for displaying the full details
+        of the spectrum, allowing the frequencies and amplitudes to be
+        measured directly from the plot itself, with no fitting required.
+        This is recommended for most applications, with a value of 5 or
+        10. On the other hand, an oversample_factor of 1 means the spectrum
+        is critically sampled, where every point in the spectrum is
+        independent of the others. This may be used when Lorentzians are to
+        be fitted to modes in the power spectrum, in cases where the mode
+        lifetimes are shorter than the time-base of the data (which is
+        sometimes the case for solar-like oscillations). An
+        oversample_factor of 1 is suitable for these stars because the
+        modes are usually fully resolved. That is, the power from each mode
+        is spread over a range of frequencies due to damping.  Hence, any
+        small error from measuring mode frequencies by taking the maximum
+        of the peak is negligible compared with the intrinsic linewidth of
+        the modes.
 
-        The unit parameter allows a request for alternative units in frequency
-        space. By default frequency is in (1/day) and power in (ppm^2 * day).
-        Asteroseismologists for example may want frequency in (microHz) and
-        power in (ppm^2 / microHz), in which case they would pass
-        `unit = u.microhertz` where `u` is `astropy.units`
+        The `normalization` parameter will normalize the spectrum to either
+        power spectral density ("psd") or amplitude ("amplitude"). Users
+        doing asteroseismology on classical pulsators (e.g. delta Scutis)
+        typically prefer `normalization="amplitude"` because "amplitude"
+        has higher dynamic range (high and low peaks visible
+        simultaneously), and we often want to read off amplitudes from the
+        plot. If `normalization="amplitude"`, the default value for
+        `oversample_factor` is set to 5 and `freq_unit` is 1/day.
+        Alternatively, users doing asteroseismology on solar-like
+        oscillators tend to prefer `normalization="psd"` because power
+        density has a scaled axis that depends on the length of the
+        observing time, and is used when we are interested in noise levels
+        (e.g. granulation) and are looking at damped oscillations. If
+        `normalization="psd"`, the default value for `oversample_factor` is
+        set to 1 and `freq_unit` is set to microHz.  Default values of
+        `freq_unit` and `oversample_factor` can be overridden. See Appendix
+        A of Kjeldsen & Bedding, 1995 for a full discussion of
+        normalization and measurement of oscillation amplitudes
+        (http://adsabs.harvard.edu/abs/1995A%26A...293...87K).
+
+        The parameter nterms controls how many Fourier terms are used in the
+        model. Setting the Nyquist_factor to be greater than 1 will sample the
+        space beyond the Nyquist frequency, which may introduce aliasing.
+
+        The `freq_unit` parameter allows a request for alternative units in frequency
+        space. By default frequency is in (1/day) and power in (amplitude
+        (ppm)). Asteroseismologists for example may want frequency in (microHz)
+        in which case they would pass `freq_unit=u.microhertz`.
 
         By default this method uses the LombScargle 'fast' method, which assumes
         a regular grid. If a regular grid of periods (i.e. an irregular grid of
         frequencies) it will use the 'slow' method. If nterms > 1 is passed, it
         will use the 'fastchi2' method for regular grids, and 'chi2' for
-        irregular grids. The normalizatin of the Lomb Scargle periodogram is
-        fixed to `psd`, and cannot be overridden.
+        irregular grids.
 
         Caution: this method assumes that the LightCurve's time (lc.time)
         is given in units of days.
@@ -618,13 +657,23 @@ class LombScarglePeriodogram(Periodogram):
             Default 1. The multiple of the average Nyquist frequency. Is
             overriden by maximum_frequency (or minimum period).
         oversample_factor : int
-            The frequency spacing, determined by the time baseline of the
-            lightcurve, is divided by this factor, oversampling the frequency
-            space. This parameter is identical to the samples_per_peak parameter
-            in astropy.LombScargle()
-        freq_unit : `astropy.units.core.CompositeUnit`
-            Default: 1/u.day. The desired frequency units for the Lomb Scargle
+            Default: None. The frequency spacing, determined by the time
+            baseline of the lightcurve, is divided by this factor, oversampling
+            the frequency space. This parameter is identical to the
+            samples_per_peak parameter in astropy.LombScargle(). If
+            normalization='amplitude', oversample_factor will be set to 5. If
+            normalization='psd', it will be 1. These defaults can be
+            overridden.
+         freq_unit : `astropy.units.core.CompositeUnit`
+            Default: None. The desired frequency units for the Lomb Scargle
             periodogram. This implies that 1/freq_unit is the units for period.
+            With default normalization ('amplitude'), the freq_unit is set to
+            1/day, which can be overridden. 'psd' normalization will set
+            freq_unit to microhertz.
+        normalization : 'psd' or 'amplitude'
+            Default: `'amplitude'`. The desired normalization of the spectrum.
+            Can be either power spectral density (`'psd'`) or amplitude
+            (`'amplitude'`).
         kwargs : dict
             Keyword arguments passed to `astropy.stats.LombScargle()`
 
@@ -633,6 +682,20 @@ class LombScarglePeriodogram(Periodogram):
         Periodogram : `Periodogram` object
             Returns a Periodogram object extracted from the lightcurve.
         """
+
+        # Input validation for spectrum type
+        if normalization not in ('psd', 'amplitude'):
+            raise ValueError("The `normalization` parameter must be one of "
+                             "either 'psd' or 'amplitude'.")
+
+        # Setting default frequency units
+        if freq_unit is None:
+            freq_unit = 1/u.day if normalization == 'amplitude' else u.microhertz
+
+        # Default oversample factor
+        if oversample_factor is None:
+            oversample_factor = 5. if normalization == 'amplitude' else 1.
+
         if "min_period" in kwargs:
             warnings.warn("`min_period` keyword is deprecated, "
                           "please use `minimum_period` instead.",
@@ -739,24 +802,31 @@ class LombScarglePeriodogram(Periodogram):
             log.warning("You have passed an evenly-spaced grid of periods. "
                         "These are not evenly spaced in frequency space.\n"
                         "Method has been set to 'slow' to allow for this.")
-
+        flux_scaling = 1e6               
         if float(astropy.__version__[0]) >= 3:
-            LS = LombScargle(time, lc.flux * 1e6,
+            LS = LombScargle(time, lc.flux * flux_scaling,
                              nterms=nterms, normalization='psd', **kwargs)
             power = LS.power(frequency, method=method)
         else:
-            LS = LombScargle(time, lc.flux * 1e6,
+            LS = LombScargle(time, lc.flux * flux_scaling,
                              nterms=nterms, **kwargs)
             power = LS.power(frequency, method=method, normalization='psd')
 
-        # Normalise the according to Parseval's theorem
-        norm = np.std(lc.flux * 1e6)**2 / np.sum(power)
-        power *= norm
+        # Power spectral density
+        if normalization == 'psd':
+            # Normalise according to Parseval's theorem
+            norm = np.std(lc.flux * 1e6)**2 / np.sum(power)
+            power *= norm
+            power = power * (cds.ppm**2)
+            # Rescale power to units of ppm^2 / [frequency unit]
+            power = power / fs
 
-        power = power * (cds.ppm**2)
-
-        # Rescale power to units of ppm^2 / [frequency unit]
-        power = power / fs
+        # Amplitude spectrum
+        elif normalization == 'amplitude':
+            factor = np.sqrt(4./len(lc.time))
+            power = np.sqrt(power) * factor
+            # Units of ppm
+            power *= cds.ppm
 
         # Periodogram needs properties
         return LombScarglePeriodogram(frequency=frequency, power=power, nyquist=nyquist,
