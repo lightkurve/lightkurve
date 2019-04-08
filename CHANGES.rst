@@ -1,5 +1,27 @@
-1.0b31 (unreleased)
-===================
+
+1.0.0 (2019-04-08)
+==================
+
+This is the first stable release of Lightkurve.  It was prepared with the help of 45 contributors!
+
+This release contains major changes to the ``LombScarglePeriodogram`` class:
+
+- Changed the default behavior of ``LombScarglePeriodogram.from_lightcurve()`` to use ``normalization='amplitude'`` and ``oversample_factor=5`` (the previous defaults were ``normalization='psd'`` and ``oversample_factor=1``). The docstring has been expanded to help users understand these options. [#491]
+
+- Added a ``LightkurveWarning`` to alert users of the changes to the default behavior. [#493]
+
+- Deprecated the ``min_frequency``/``max_frequency`` arguments in favor of ``minimum_frequency``/``maximum_frequency`` to be consistent with the other Periodogram classes. [#478]
+
+- Likewise, deprecated the ``min_period``/``max_period`` arguments in favor of ``minimum_period``/``maximum_period`` to be consistent with the other Periodogram classes. [#478]
+
+Other changes are:
+
+- Improved ``PLDCorrector`` to be more robust against the presence of NaNs. [#479, #488]
+
+- Improved ``search_tesscut`` to avoid crashing in the event of an empty search result, and to ensure that the files it returns carry the search string as the ``targetid`` attribute. [#475, #477]
+
+- Various minor bug fixes. [#488, #490, #494]
+
 
 
 1.0b30 (2019-03-27)
