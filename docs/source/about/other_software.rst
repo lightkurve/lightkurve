@@ -8,7 +8,7 @@ Lightkurve provides general purpose tools for interacting with astronomical ligh
 Many other tools have been developed to solve related scientific and data analysis problems.
 On this page we list community-produced software that may complement lightkurve.
 
-If your software is not listed, please `open a Pull Request <https://github.com/KeplerGO/lightkurve/blob/master/docs/source/other_software.rst>`_ to add it!
+If your software is not listed, please `open a Pull Request <https://github.com/KeplerGO/lightkurve/blob/master/docs/source/other_software.rst>`_ to add it, we aim to be inclusive of all Kepler- and TESS-related tools!
 
 
 Detrending & Analysis
