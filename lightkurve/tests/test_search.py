@@ -131,13 +131,14 @@ def test_search_tesscut_download():
     assert_almost_equal(ra, center_ra, decimal=1)
     assert_almost_equal(dec, center_dec, decimal=1)
     # Download with different dimensions
-    tpfc = search_string.download_all(cutout_size=4)
+    tpfc = search_string.download_all(cutout_size=4, quality_bitmask='hard')
     assert(isinstance(tpfc, TargetPixelFileCollection))
+    assert(tpfc[0].quality_bitmask == 'hard')  # Regression test for #494
     # Ensure correct dimensions
     assert(tpfc[0].flux[0].shape == (4, 4))
     # Download with rectangular dimennsions?
-    rect_tpf = search_string.download(cutout_size=(3,5))
-    assert(rect_tpf.flux[0].shape == (3,5))
+    rect_tpf = search_string.download(cutout_size=(3, 5))
+    assert(rect_tpf.flux[0].shape == (3, 5))
 
 
 @pytest.mark.remote_data
