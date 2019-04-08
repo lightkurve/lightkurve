@@ -235,9 +235,9 @@ class SearchResult(object):
         tpf_extensions = ['lpd-targ.fits', 'spd-targ.fits', '_tp.fits', 'n/a']
         lcf_extensions = ['llc.fits', 'slc.fits', '_lc.fits']
         if any(e in self.table['productFilename'][0] for e in tpf_extensions):
-            return TargetPixelFileCollection([open(p) for p in path])
+            return TargetPixelFileCollection([open(p, quality_bitmask=quality_bitmask) for p in path])
         elif any(e in self.table['productFilename'][0] for e in lcf_extensions):
-            return LightCurveFileCollection([open(p) for p in path])
+            return LightCurveFileCollection([open(p, quality_bitmask=quality_bitmask) for p in path])
 
     def _default_download_dir(self):
         """Returns the default path to the directory where files will be downloaded.
