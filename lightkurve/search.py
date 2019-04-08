@@ -375,16 +375,15 @@ class SearchResult(object):
         # this is necessary to ensure cutouts are not downloaded multiple times
         sec = TesscutClass().get_sectors(coords)
         sector_name = sec[sec['sector'] == 1]['sectorName'][0]
-        coords_str = str(round(coords.ra.value,5)) + '_' + str(round(coords.dec.value,5))
+        coords_str = str(round(coords.ra.value,13)) + '_' + str(round(coords.dec.value,13))
         if isinstance(cutout_size, int):
             size_str = str(int(cutout_size)) + 'x' + str(int(cutout_size))
         elif isinstance(cutout_size, tuple) or isinstance(cutout_size, list):
             size_str = str(int(cutout_size[0])) + 'x' + str(int(cutout_size[1]))
 
         fname = sector_name + '_' + coords_str + '_' + size_str + '_astrocut.fits'
-        temp_path = os.path.join(download_dir, fname)
+        temp_path = os.path.join(download_dir, 'tesscut', fname)
 
-        print(temp_path)
         if os.path.exists(temp_path):
             path = temp_path
         else:
