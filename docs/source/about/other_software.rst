@@ -14,7 +14,8 @@ If your software is not listed, please `open a Pull Request <https://github.com/
 Detrending & Analysis
 ~~~~~~~~~~~~~~~~~~~~~~
 
-- `PyKE <http://github.com/KeplerGO/PyKE>`_ : Kepler, K2 & TESS Data Analysis Tools
+- `VARTOOLS <https://www.astro.princeton.edu/~jhartman/vartools.html>`_ : a command line utility to analyze light curves from Hartman and Bakos (2016).
+- `PyKE <http://github.com/KeplerGO/PyKE>`_ : Kepler, K2 & TESS Data Analysis Tools (the precursor to Lightkurve)
 - `everest <http://github.com/rodluger/everest>`_ : De-trending of K2 Light curves
 - `k2sc <http://github.com/OxES/k2sc>`_ : K2 systematics correction using Gaussian processes
 - `nutella <http://github.com/benmontet/nutella>`_ : Great (point) spreads for beautiful Kepler/K2 inference
