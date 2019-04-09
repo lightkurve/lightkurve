@@ -408,7 +408,7 @@ def test_tpf_wcs_from_images():
     # Now this should work.
     tpf = KeplerTargetPixelFile.from_fits_images(images, size=(3, 3),
                                                  position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
-    assert newtpf.hdu[1].header['1CRPX5'] != UNDEFINED
+    assert tpf.hdu[1].header['1CRPX5'] != UNDEFINED
 
 
 def test_properties2(capfd):
