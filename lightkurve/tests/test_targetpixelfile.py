@@ -408,7 +408,7 @@ def test_tpf_wcs_from_images():
                                                  position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
     assert tpf.hdu[1].header['1CRPX5'] != UNDEFINED
     assert tpf.hdu[1].header['1CTYP5'] == 'RA---TAN'
-    assert tpf.hdu[1].header['2CTYP5'] == 'DEC---TAN'
+    assert tpf.hdu[1].header['2CTYP5'] == 'DEC--TAN'
     assert tpf.hdu[1].header['1CRPX5'] != UNDEFINED
     assert tpf.hdu[1].header['2CRPX5'] != UNDEFINED
     assert tpf.hdu[1].header['1CUNI5'] == 'deg'
