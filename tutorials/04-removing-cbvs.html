@@ -29,7 +29,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b31</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.0.0</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -269,14 +269,12 @@ div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 </style>
-<div class="admonition note">
-<p class="admonition-title"><strong>This page is a static version of an interactive Jupyter notebook</strong></p>
-<ul class="simple">
-<li>Try the interactive version: <span class="raw-html"><a href="https://mybinder.org/v2/gh/KeplerGO/lightkurve/master?filepath=docs/source/tutorials/04-removing-cbvs.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg" style="vertical-align:text-bottom"></a></span></li>
-<li>Download the source file: <a class="reference external" href="https://github.com/KeplerGO/lightkurve/blob/master/docs/source/tutorials/04-removing-cbvs.ipynb">tutorials/04-removing-cbvs.ipynb</a></li>
-</ul>
+<div style="float:right; margin-top:1em; margin-bottom:-1em;">
+    <a href="https://github.com/KeplerGO/lightkurve/tree/master/docs/source/tutorials/04-removing-cbvs.ipynb"><img src="https://img.shields.io/badge/Jupyter%20Notebook-Download-blue.svg"></a>
+    <a href=" https://colab.research.google.com/github/KeplerGO/lightkurve/blob/master/docs/source/tutorials/04-removing-cbvs.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
+    <a href="https://mybinder.org/v2/gh/KeplerGO/lightkurve/master?filepath=docs/source/tutorials/04-removing-cbvs.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
 </div>
-<div class="section" id="How-to-remove-common-systematics-using-basis-vectors-(CBVs)">
+<br style="clear:both;"><div class="section" id="How-to-remove-common-systematics-using-basis-vectors-(CBVs)">
 <h1>How to remove common systematics using basis vectors (CBVs)<a class="headerlink" href="#How-to-remove-common-systematics-using-basis-vectors-(CBVs)" title="Permalink to this headline">¶</a></h1>
 <p>Cotrending Basis Vectors are used to remove long term trends in light curves. They are built from the most common trends observed in each channel. You can read more about CBVs in <a class="reference external" href="https://arxiv.org/pdf/1207.3093.pdf">Demystifying Kepler Data</a>. They can be used to clean lightcurves of common trends experience by all targets.</p>
 <p>Below is an example workflow to remove CBVs from an light curve in Kepler; <a class="reference external" href="https://en.wikipedia.org/wiki/KIC_8462852">Tabby’s star</a>.</p>

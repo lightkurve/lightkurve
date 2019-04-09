@@ -29,7 +29,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b31</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.0.0</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -114,7 +114,7 @@ representing a power spectrum generated using the Lomb Scargle method.</p>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.periodogram.LombScarglePeriodogram.flatten" title="lightkurve.periodogram.LombScarglePeriodogram.flatten"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flatten</span></code></a>([method,&nbsp;filter_width,&nbsp;return_trend])</td>
 <td>Estimates the Signal-To-Noise (SNR) spectrum by dividing out an estimate of the noise background.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve" title="lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_lightcurve</span></code></a>(lc[,&nbsp;min_frequency,&nbsp;…])</td>
+<tr class="row-even"><td><a class="reference internal" href="#lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve" title="lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_lightcurve</span></code></a>(lc[,&nbsp;minimum_frequency,&nbsp;…])</td>
 <td>Creates a Periodogram from a LightCurve using the Lomb-Scargle method.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.periodogram.LombScarglePeriodogram.plot" title="lightkurve.periodogram.LombScarglePeriodogram.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>([scale,&nbsp;ax,&nbsp;xlabel,&nbsp;ylabel,&nbsp;title,&nbsp;…])</td>
@@ -262,7 +262,7 @@ returned if <code class="xref py py-obj docutils literal notranslate"><span clas
 
 <dl class="staticmethod">
 <dt id="lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve">
-<em class="property">static </em><code class="descname">from_lightcurve</code><span class="sig-paren">(</span><em>lc</em>, <em>min_frequency=None</em>, <em>max_frequency=None</em>, <em>min_period=None</em>, <em>max_period=None</em>, <em>frequency=None</em>, <em>period=None</em>, <em>nterms=1</em>, <em>nyquist_factor=1</em>, <em>oversample_factor=1</em>, <em>freq_unit=&lt;Quantity 1. 1 / d&gt;</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">from_lightcurve</code><span class="sig-paren">(</span><em>lc</em>, <em>minimum_frequency=None</em>, <em>maximum_frequency=None</em>, <em>minimum_period=None</em>, <em>maximum_period=None</em>, <em>frequency=None</em>, <em>period=None</em>, <em>nterms=1</em>, <em>nyquist_factor=1</em>, <em>oversample_factor=None</em>, <em>freq_unit=None</em>, <em>normalization='amplitude'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a Periodogram from a LightCurve using the Lomb-Scargle method.</p>
 <p>By default, the periodogram will be created for a regular grid of
 frequencies from one frequency separation to the Nyquist frequency,
@@ -272,22 +272,55 @@ can be passed to set custom limits for the frequency grid. Alternatively,
 the user can provide a custom regular grid using the <code class="xref py py-obj docutils literal notranslate"><span class="pre">frequency</span></code>
 parameter or a custom regular grid of periods using the <a class="reference internal" href="#lightkurve.periodogram.LombScarglePeriodogram.period" title="lightkurve.periodogram.LombScarglePeriodogram.period"><code class="xref py py-obj docutils literal notranslate"><span class="pre">period</span></code></a>
 parameter.</p>
-<p>The spectrum can be oversampled by increasing the oversample_factor
-parameter. The parameter nterms controls how many Fourier terms are used
-in the model. Note that many terms could lead to spurious peaks. Setting
-the Nyquist_factor to be greater than 1 will sample the space beyond the
-Nyquist frequency, which may introduce aliasing.</p>
-<p>The unit parameter allows a request for alternative units in frequency
-space. By default frequency is in (1/day) and power in (ppm^2 * day).
-Asteroseismologists for example may want frequency in (microHz) and
-power in (ppm^2 / microHz), in which case they would pass
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">unit</span> <span class="pre">=</span> <span class="pre">u.microhertz</span></code> where <code class="xref py py-obj docutils literal notranslate"><span class="pre">u</span></code> is <a class="reference external" href="http://docs.astropy.org/en/latest/units/index.html#module-astropy.units" title="(in Astropy v3.2.dev1144)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.units</span></code></a></p>
+<p>The sampling of the spectrum can be changed using the
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">oversample_factor</span></code> parameter. An oversampled spectrum
+(oversample_factor &gt; 1) is useful for displaying the full details
+of the spectrum, allowing the frequencies and amplitudes to be
+measured directly from the plot itself, with no fitting required.
+This is recommended for most applications, with a value of 5 or
+10. On the other hand, an oversample_factor of 1 means the spectrum
+is critically sampled, where every point in the spectrum is
+independent of the others. This may be used when Lorentzians are to
+be fitted to modes in the power spectrum, in cases where the mode
+lifetimes are shorter than the time-base of the data (which is
+sometimes the case for solar-like oscillations). An
+oversample_factor of 1 is suitable for these stars because the
+modes are usually fully resolved. That is, the power from each mode
+is spread over a range of frequencies due to damping.  Hence, any
+small error from measuring mode frequencies by taking the maximum
+of the peak is negligible compared with the intrinsic linewidth of
+the modes.</p>
+<p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">normalization</span></code> parameter will normalize the spectrum to either
+power spectral density (“psd”) or amplitude (“amplitude”). Users
+doing asteroseismology on classical pulsators (e.g. delta Scutis)
+typically prefer <code class="xref py py-obj docutils literal notranslate"><span class="pre">normalization=&quot;amplitude&quot;</span></code> because “amplitude”
+has higher dynamic range (high and low peaks visible
+simultaneously), and we often want to read off amplitudes from the
+plot. If <code class="xref py py-obj docutils literal notranslate"><span class="pre">normalization=&quot;amplitude&quot;</span></code>, the default value for
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">oversample_factor</span></code> is set to 5 and <code class="xref py py-obj docutils literal notranslate"><span class="pre">freq_unit</span></code> is 1/day.
+Alternatively, users doing asteroseismology on solar-like
+oscillators tend to prefer <code class="xref py py-obj docutils literal notranslate"><span class="pre">normalization=&quot;psd&quot;</span></code> because power
+density has a scaled axis that depends on the length of the
+observing time, and is used when we are interested in noise levels
+(e.g. granulation) and are looking at damped oscillations. If
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">normalization=&quot;psd&quot;</span></code>, the default value for <code class="xref py py-obj docutils literal notranslate"><span class="pre">oversample_factor</span></code> is
+set to 1 and <code class="xref py py-obj docutils literal notranslate"><span class="pre">freq_unit</span></code> is set to microHz.  Default values of
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">freq_unit</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">oversample_factor</span></code> can be overridden. See Appendix
+A of Kjeldsen &amp; Bedding, 1995 for a full discussion of
+normalization and measurement of oscillation amplitudes
+(<a class="reference external" href="http://adsabs.harvard.edu/abs/1995A%26A...293...87K">http://adsabs.harvard.edu/abs/1995A%26A…293…87K</a>).</p>
+<p>The parameter nterms controls how many Fourier terms are used in the
+model. Setting the Nyquist_factor to be greater than 1 will sample the
+space beyond the Nyquist frequency, which may introduce aliasing.</p>
+<p>The <code class="xref py py-obj docutils literal notranslate"><span class="pre">freq_unit</span></code> parameter allows a request for alternative units in frequency
+space. By default frequency is in (1/day) and power in (amplitude
+(ppm)). Asteroseismologists for example may want frequency in (microHz)
+in which case they would pass <code class="xref py py-obj docutils literal notranslate"><span class="pre">freq_unit=u.microhertz</span></code>.</p>
 <p>By default this method uses the LombScargle ‘fast’ method, which assumes
 a regular grid. If a regular grid of periods (i.e. an irregular grid of
 frequencies) it will use the ‘slow’ method. If nterms &gt; 1 is passed, it
 will use the ‘fastchi2’ method for regular grids, and ‘chi2’ for
-irregular grids. The normalizatin of the Lomb Scargle periodogram is
-fixed to <code class="xref py py-obj docutils literal notranslate"><span class="pre">psd</span></code>, and cannot be overridden.</p>
+irregular grids.</p>
 <p>Caution: this method assumes that the LightCurve’s time (lc.time)
 is given in units of days.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -298,19 +331,19 @@ is given in units of days.</p>
 <dt><strong>lc</strong> <span class="classifier-delimiter">:</span> <span class="classifier">LightCurve object</span></dt>
 <dd><p class="first last">The LightCurve from which to compute the Periodogram.</p>
 </dd>
-<dt><strong>min_frequency</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dt><strong>minimum_frequency</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
 <dd><p class="first last">If specified, use this minimum frequency rather than one over the
 time baseline.</p>
 </dd>
-<dt><strong>max_frequency</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dt><strong>maximum_frequency</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
 <dd><p class="first last">If specified, use this maximum frequency rather than nyquist_factor
 times the nyquist frequency.</p>
 </dd>
-<dt><strong>min_period</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dt><strong>minimum_period</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
 <dd><p class="first last">If specified, use 1./minium_period as the maximum frequency rather
 than nyquist_factor times the nyquist frequency.</p>
 </dd>
-<dt><strong>max_period</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dt><strong>maximum_period</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
 <dd><p class="first last">If specified, use 1./maximum_period as the minimum frequency rather
 than one over the time baseline.</p>
 </dd>
@@ -332,14 +365,29 @@ in units of 1/freq_unit. This overrides any set period limits.</p>
 overriden by maximum_frequency (or minimum period).</p>
 </dd>
 <dt><strong>oversample_factor</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
-<dd><p class="first last">The frequency spacing, determined by the time baseline of the
-lightcurve, is divided by this factor, oversampling the frequency
-space. This parameter is identical to the samples_per_peak parameter
-in astropy.LombScargle()</p>
+<dd><blockquote class="first">
+<div><p>Default: None. The frequency spacing, determined by the time
+baseline of the lightcurve, is divided by this factor, oversampling
+the frequency space. This parameter is identical to the
+samples_per_peak parameter in astropy.LombScargle(). If
+normalization=’amplitude’, oversample_factor will be set to 5. If
+normalization=’psd’, it will be 1. These defaults can be
+overridden.</p>
+</div></blockquote>
+<dl class="last docutils">
+<dt>freq_unit <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.units.core.CompositeUnit</span></code></span></dt>
+<dd><p class="first last">Default: None. The desired frequency units for the Lomb Scargle
+periodogram. This implies that 1/freq_unit is the units for period.
+With default normalization (‘amplitude’), the freq_unit is set to
+1/day, which can be overridden. ‘psd’ normalization will set
+freq_unit to microhertz.</p>
 </dd>
-<dt><strong>freq_unit</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.units.core.CompositeUnit</span></code></span></dt>
-<dd><p class="first last">Default: 1/u.day. The desired frequency units for the Lomb Scargle
-periodogram. This implies that 1/freq_unit is the units for period.</p>
+</dl>
+</dd>
+<dt><strong>normalization</strong> <span class="classifier-delimiter">:</span> <span class="classifier">‘psd’ or ‘amplitude’</span></dt>
+<dd><p class="first last">Default: <code class="xref py py-obj docutils literal notranslate"><span class="pre">'amplitude'</span></code>. The desired normalization of the spectrum.
+Can be either power spectral density (<code class="xref py py-obj docutils literal notranslate"><span class="pre">'psd'</span></code>) or amplitude
+(<code class="xref py py-obj docutils literal notranslate"><span class="pre">'amplitude'</span></code>).</p>
 </dd>
 <dt><strong>kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
 <dd><p class="first last">Keyword arguments passed to <code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.stats.LombScargle()</span></code></p>
@@ -489,7 +537,7 @@ has been smoothed.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>table</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v3.2.dev1144)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.table.Table</span></code></a> object</span></dt>
+<dt><strong>table</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v3.2.dev1194)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.table.Table</span></code></a> object</span></dt>
 <dd><p class="first last">An AstroPy Table with columns ‘frequency’, ‘period’, and ‘power’.</p>
 </dd>
 </dl>

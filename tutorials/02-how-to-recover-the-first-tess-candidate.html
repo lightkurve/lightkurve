@@ -29,7 +29,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b31</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.0.0</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -269,14 +269,12 @@ div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 </style>
-<div class="admonition note">
-<p class="admonition-title"><strong>This page is a static version of an interactive Jupyter notebook</strong></p>
-<ul class="simple">
-<li>Try the interactive version: <span class="raw-html"><a href="https://mybinder.org/v2/gh/KeplerGO/lightkurve/master?filepath=docs/source/tutorials/02-how-to-recover-the-first-tess-candidate.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg" style="vertical-align:text-bottom"></a></span></li>
-<li>Download the source file: <a class="reference external" href="https://github.com/KeplerGO/lightkurve/blob/master/docs/source/tutorials/02-how-to-recover-the-first-tess-candidate.ipynb">tutorials/02-how-to-recover-the-first-tess-candidate.ipynb</a></li>
-</ul>
+<div style="float:right; margin-top:1em; margin-bottom:-1em;">
+    <a href="https://github.com/KeplerGO/lightkurve/tree/master/docs/source/tutorials/02-how-to-recover-the-first-tess-candidate.ipynb"><img src="https://img.shields.io/badge/Jupyter%20Notebook-Download-blue.svg"></a>
+    <a href=" https://colab.research.google.com/github/KeplerGO/lightkurve/blob/master/docs/source/tutorials/02-how-to-recover-the-first-tess-candidate.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
+    <a href="https://mybinder.org/v2/gh/KeplerGO/lightkurve/master?filepath=docs/source/tutorials/02-how-to-recover-the-first-tess-candidate.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
 </div>
-<div class="section" id="How-to-recover-the-first-TESS-planet-candidate-with-Lightkurve?">
+<br style="clear:both;"><div class="section" id="How-to-recover-the-first-TESS-planet-candidate-with-Lightkurve?">
 <h1>How to recover the first TESS planet candidate with <em>Lightkurve</em>?<a class="headerlink" href="#How-to-recover-the-first-TESS-planet-candidate-with-Lightkurve?" title="Permalink to this headline">¶</a></h1>
 <p>Recently, the first public pixel data from the TESS mission have become <a class="reference external" href="https://archive.stsci.edu/prepds/tess-data-alerts/">available from the data archive at MAST</a>. This tutorial demonstrates how the <a class="reference external" href="http://lightkurve.keplerscience.org">Lightkurve Python package</a> can be used to read in these data and create your own TESS light curves with different aperture masks.</p>
 <p>Below is a quick tutorial on how to get started using <em>Lightkurve</em> and TESS data. We’ll use the nearby, bright target Pi Mensae (ID 261136679), around which the mission team recently discovered a short period planet candidate on a 6.27 day orbit. See the <a class="reference external" href="https://arxiv.org/abs/1809.05967">pre-print paper by Huang et al (2018)</a> for more details.</p>

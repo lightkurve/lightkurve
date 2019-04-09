@@ -29,7 +29,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b31</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.0.0</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -127,7 +127,7 @@ e.g. tdb’, ‘tt’, ‘ut1’, or ‘utc’.</p>
 </colgroup>
 <tbody valign="top">
 <tr class="row-odd"><td><a class="reference internal" href="#lightkurve.lightcurve.TessLightCurve.astropy_time" title="lightkurve.lightcurve.TessLightCurve.astropy_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy_time</span></code></a></td>
-<td>Returns the time values as an Astropy <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v3.2.dev1144)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> object (if <code class="docutils literal notranslate"><span class="pre">time_format</span></code> is set).</td>
+<td>Returns the time values as an Astropy <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v3.2.dev1194)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> object (if <code class="docutils literal notranslate"><span class="pre">time_format</span></code> is set).</td>
 </tr>
 </tbody>
 </table>
@@ -196,7 +196,7 @@ e.g. tdb’, ‘tt’, ‘ut1’, or ‘utc’.</p>
 <td>Converts the light curve to a <a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> power spectrum object.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#lightkurve.lightcurve.TessLightCurve.to_table" title="lightkurve.lightcurve.TessLightCurve.to_table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_table</span></code></a>()</td>
-<td>Converts the light curve to an Astropy <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v3.2.dev1144)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> object.</td>
+<td>Converts the light curve to an Astropy <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v3.2.dev1194)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> object.</td>
 </tr>
 </tbody>
 </table>
@@ -204,7 +204,7 @@ e.g. tdb’, ‘tt’, ‘ut1’, or ‘utc’.</p>
 <dl class="attribute">
 <dt id="lightkurve.lightcurve.TessLightCurve.astropy_time">
 <code class="descname">astropy_time</code><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.astropy_time" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the time values as an Astropy <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v3.2.dev1144)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> object
+<dd><p>Returns the time values as an Astropy <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v3.2.dev1194)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> object
 (if <code class="docutils literal notranslate"><span class="pre">time_format</span></code> is set).</p>
 <p>The Time object will be created using the values in the <code class="docutils literal notranslate"><span class="pre">time</span></code>,
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">time_format</span></code>, and <code class="docutils literal notranslate"><span class="pre">time_scale</span></code> attributes.
@@ -713,7 +713,7 @@ be a callable that takes in a masked array and outputs the
 central value. Defaults to the median (<a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ma.median.html#numpy.ma.median" title="(in NumPy v1.16)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">numpy.ma.median</span></code></a>).</p>
 </dd>
 <dt><strong>**kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
-<dd><p class="first last">Dictionary of arguments to be passed to <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.stats.sigma_clip.html#astropy.stats.sigma_clip" title="(in Astropy v3.2.dev1144)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.stats.sigma_clip</span></code></a>.</p>
+<dd><p class="first last">Dictionary of arguments to be passed to <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.stats.sigma_clip.html#astropy.stats.sigma_clip" title="(in Astropy v3.2.dev1194)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.stats.sigma_clip</span></code></a>.</p>
 </dd>
 </dl>
 </td>
@@ -918,6 +918,19 @@ and <code class="docutils literal notranslate"><span class="pre">flux_err</span>
 <code class="descname">to_periodogram</code><span class="sig-paren">(</span><em>method='lombscargle'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.to_periodogram" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts the light curve to a <a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a>
 power spectrum object.</p>
+<p>This method will call either <a class="reference internal" href="lightkurve.periodogram.LombScarglePeriodogram.html#lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve" title="lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve()</span></code></a>
+or <a class="reference internal" href="lightkurve.periodogram.BoxLeastSquaresPeriodogram.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve" title="lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve()</span></code></a>,
+which in turn wrap <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.stats.LombScargle.html#astropy.stats.LombScargle" title="(in Astropy v3.2.dev1194)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.stats.LombScargle</span></code></a> and <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.stats.BoxLeastSquares.html#astropy.stats.BoxLeastSquares" title="(in Astropy v3.2.dev1194)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.stats.BoxLeastSquares</span></code></a>.</p>
+<dl class="docutils">
+<dt>Optional keywords accepted if <code class="docutils literal notranslate"><span class="pre">method='lombscargle'</span></code> are:</dt>
+<dd><code class="docutils literal notranslate"><span class="pre">minimum_frequency</span></code>, <code class="docutils literal notranslate"><span class="pre">maximum_frequency</span></code>, <code class="docutils literal notranslate"><span class="pre">mininum_period</span></code>,
+<code class="docutils literal notranslate"><span class="pre">maximum_period</span></code>, <code class="docutils literal notranslate"><span class="pre">frequency</span></code>, <code class="docutils literal notranslate"><span class="pre">period</span></code>, <code class="docutils literal notranslate"><span class="pre">nterms</span></code>,
+<code class="docutils literal notranslate"><span class="pre">nyquist_factor</span></code>, <code class="docutils literal notranslate"><span class="pre">oversample_factor</span></code>, <code class="docutils literal notranslate"><span class="pre">freq_unit</span></code>,
+<code class="docutils literal notranslate"><span class="pre">normalization</span></code>.</dd>
+<dt>Optional keywords accepted for <code class="docutils literal notranslate"><span class="pre">method='bls'</span></code> are:</dt>
+<dd><code class="docutils literal notranslate"><span class="pre">minimum_period</span></code>, <code class="docutils literal notranslate"><span class="pre">maximum_period</span></code>, <code class="docutils literal notranslate"><span class="pre">period</span></code>,
+<code class="docutils literal notranslate"><span class="pre">frequency_factor</span></code>, <code class="docutils literal notranslate"><span class="pre">duration</span></code>.</dd>
+</dl>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -930,14 +943,9 @@ extract the power spectrum. Defaults to <code class="docutils literal notranslat
 and <code class="docutils literal notranslate"><span class="pre">'boxleastsquares'</span></code>.</p>
 </dd>
 <dt><strong>kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
-<dd><p class="first last">Keyword arguments passed to the constructor of either
+<dd><p class="first last">Keyword arguments passed to either
 <a class="reference internal" href="lightkurve.periodogram.LombScarglePeriodogram.html#lightkurve.periodogram.LombScarglePeriodogram" title="lightkurve.periodogram.LombScarglePeriodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LombScarglePeriodogram</span></code></a> or
-<a class="reference internal" href="lightkurve.periodogram.BoxLeastSquaresPeriodogram.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram" title="lightkurve.periodogram.BoxLeastSquaresPeriodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BoxLeastSquaresPeriodogram</span></code></a>.
-Keywords accepted by <a class="reference internal" href="lightkurve.periodogram.LombScarglePeriodogram.html#lightkurve.periodogram.LombScarglePeriodogram" title="lightkurve.periodogram.LombScarglePeriodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LombScarglePeriodogram</span></code></a> are:
-<code class="docutils literal notranslate"><span class="pre">min_frequency</span></code>, <code class="docutils literal notranslate"><span class="pre">max_frequency</span></code>, <code class="docutils literal notranslate"><span class="pre">min_period</span></code>, <code class="docutils literal notranslate"><span class="pre">max_period</span></code>, <code class="docutils literal notranslate"><span class="pre">frequency</span></code>,
-<code class="docutils literal notranslate"><span class="pre">period</span></code>, <code class="docutils literal notranslate"><span class="pre">nterms</span></code>, <code class="docutils literal notranslate"><span class="pre">nyquist_factor</span></code>, <code class="docutils literal notranslate"><span class="pre">oversample_factor</span></code>, <code class="docutils literal notranslate"><span class="pre">freq_unit</span></code>.
-Keywords accepted by <a class="reference internal" href="lightkurve.periodogram.BoxLeastSquaresPeriodogram.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram" title="lightkurve.periodogram.BoxLeastSquaresPeriodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BoxLeastSquaresPeriodogram</span></code></a> are:
-<code class="docutils literal notranslate"><span class="pre">min_period</span></code>, <code class="docutils literal notranslate"><span class="pre">max_period</span></code>, <code class="docutils literal notranslate"><span class="pre">period</span></code>, <code class="docutils literal notranslate"><span class="pre">frequency_factor</span></code>.</p>
+<a class="reference internal" href="lightkurve.periodogram.BoxLeastSquaresPeriodogram.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram" title="lightkurve.periodogram.BoxLeastSquaresPeriodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BoxLeastSquaresPeriodogram</span></code></a>.</p>
 </dd>
 </dl>
 </td>
@@ -956,13 +964,13 @@ Keywords accepted by <a class="reference internal" href="lightkurve.periodogram.
 <dl class="method">
 <dt id="lightkurve.lightcurve.TessLightCurve.to_table">
 <code class="descname">to_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.to_table" title="Permalink to this definition">¶</a></dt>
-<dd><p>Converts the light curve to an Astropy <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v3.2.dev1144)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> object.</p>
+<dd><p>Converts the light curve to an Astropy <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v3.2.dev1194)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> object.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>table</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v3.2.dev1144)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.table.Table</span></code></a></span></dt>
+<dt><strong>table</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v3.2.dev1194)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.table.Table</span></code></a></span></dt>
 <dd><p class="first last">An AstroPy Table with columns ‘time’, ‘flux’, and ‘flux_err’.</p>
 </dd>
 </dl>

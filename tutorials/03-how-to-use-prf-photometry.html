@@ -29,7 +29,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b31</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.0.0</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -269,14 +269,12 @@ div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 </style>
-<div class="admonition note">
-<p class="admonition-title"><strong>This page is a static version of an interactive Jupyter notebook</strong></p>
-<ul class="simple">
-<li>Try the interactive version: <span class="raw-html"><a href="https://mybinder.org/v2/gh/KeplerGO/lightkurve/master?filepath=docs/source/tutorials/03-how-to-use-prf-photometry.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg" style="vertical-align:text-bottom"></a></span></li>
-<li>Download the source file: <a class="reference external" href="https://github.com/KeplerGO/lightkurve/blob/master/docs/source/tutorials/03-how-to-use-prf-photometry.ipynb">tutorials/03-how-to-use-prf-photometry.ipynb</a></li>
-</ul>
+<div style="float:right; margin-top:1em; margin-bottom:-1em;">
+    <a href="https://github.com/KeplerGO/lightkurve/tree/master/docs/source/tutorials/03-how-to-use-prf-photometry.ipynb"><img src="https://img.shields.io/badge/Jupyter%20Notebook-Download-blue.svg"></a>
+    <a href=" https://colab.research.google.com/github/KeplerGO/lightkurve/blob/master/docs/source/tutorials/03-how-to-use-prf-photometry.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
+    <a href="https://mybinder.org/v2/gh/KeplerGO/lightkurve/master?filepath=docs/source/tutorials/03-how-to-use-prf-photometry.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
 </div>
-<div class="section" id="How-to-perform-PRF-photometry?">
+<br style="clear:both;"><div class="section" id="How-to-perform-PRF-photometry?">
 <h1>How to perform PRF photometry?<a class="headerlink" href="#How-to-perform-PRF-photometry?" title="Permalink to this headline">¶</a></h1>
 <p>In previous tutorials we discussed <a class="reference external" href="1.03-what-are-lightcurves.html">how aperture photometry works</a> and how you can <a class="reference external" href="2.05-making-custom-apertures.html">create your own custom masks</a> to extract aperture photometry.</p>
 <p>As a reminder, aperture photometry works by summing up the flux values across all the pixels in a pre-defined mask. It tends to offer the fastest and most robust way to extract photometry for an isolated star, but it suffers from the three limitations: 1. When two or more stars overlap, aperture photometry will return the sum of the flux of all stars. Separating their signals requires additional assumptions. 2. When the telescope experience motion or focus changes, the fraction of the flux of a

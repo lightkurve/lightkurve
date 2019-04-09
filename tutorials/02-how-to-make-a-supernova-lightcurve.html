@@ -29,7 +29,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b31</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.0.0</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -269,14 +269,12 @@ div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 </style>
-<div class="admonition note">
-<p class="admonition-title"><strong>This page is a static version of an interactive Jupyter notebook</strong></p>
-<ul class="simple">
-<li>Try the interactive version: <span class="raw-html"><a href="https://mybinder.org/v2/gh/KeplerGO/lightkurve/master?filepath=docs/source/tutorials/02-how-to-make-a-supernova-lightcurve.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg" style="vertical-align:text-bottom"></a></span></li>
-<li>Download the source file: <a class="reference external" href="https://github.com/KeplerGO/lightkurve/blob/master/docs/source/tutorials/02-how-to-make-a-supernova-lightcurve.ipynb">tutorials/02-how-to-make-a-supernova-lightcurve.ipynb</a></li>
-</ul>
+<div style="float:right; margin-top:1em; margin-bottom:-1em;">
+    <a href="https://github.com/KeplerGO/lightkurve/tree/master/docs/source/tutorials/02-how-to-make-a-supernova-lightcurve.ipynb"><img src="https://img.shields.io/badge/Jupyter%20Notebook-Download-blue.svg"></a>
+    <a href=" https://colab.research.google.com/github/KeplerGO/lightkurve/blob/master/docs/source/tutorials/02-how-to-make-a-supernova-lightcurve.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
+    <a href="https://mybinder.org/v2/gh/KeplerGO/lightkurve/master?filepath=docs/source/tutorials/02-how-to-make-a-supernova-lightcurve.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
 </div>
-<div class="section" id="How-to-make-a-supernova-lightcurve?">
+<br style="clear:both;"><div class="section" id="How-to-make-a-supernova-lightcurve?">
 <h1>How to make a supernova lightcurve?<a class="headerlink" href="#How-to-make-a-supernova-lightcurve?" title="Permalink to this headline">¶</a></h1>
 <p>You can use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> to extract a lightcurve of transient phenomena, including supernovae. Supernovae data analysis presents a few unique challenges compared to data analysis of isolated point sources. We can anticipate some of the common limitations of the Kepler pipeline-processed lightcurves, which make no attempt to hone-in on supernovae. For example, the supernova resides in a host galaxy which may itself be time variable due to, <em>e.g.</em>, active galactic nuclei (AGN). Common detrending
 methods, such as “Self Flat Fielding” (<a class="reference external" href="https://archive.stsci.edu/prepds/k2sff/">SFF</a>) assume that centroid shifts are due entirely to undesired motion of the spacecraft, while transients induce bona-fide astrophysical centroid motion as the postage-stamp photocenter gets weighted towards the increasingly luminous transient’s photocenter.</p>

@@ -29,7 +29,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b31</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.0.0</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -269,14 +269,12 @@ div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 </style>
-<div class="admonition note">
-<p class="admonition-title"><strong>This page is a static version of an interactive Jupyter notebook</strong></p>
-<ul class="simple">
-<li>Try the interactive version: <span class="raw-html"><a href="https://mybinder.org/v2/gh/KeplerGO/lightkurve/master?filepath=docs/source/tutorials/03-appending-lightcurves.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg" style="vertical-align:text-bottom"></a></span></li>
-<li>Download the source file: <a class="reference external" href="https://github.com/KeplerGO/lightkurve/blob/master/docs/source/tutorials/03-appending-lightcurves.ipynb">tutorials/03-appending-lightcurves.ipynb</a></li>
-</ul>
+<div style="float:right; margin-top:1em; margin-bottom:-1em;">
+    <a href="https://github.com/KeplerGO/lightkurve/tree/master/docs/source/tutorials/03-appending-lightcurves.ipynb"><img src="https://img.shields.io/badge/Jupyter%20Notebook-Download-blue.svg"></a>
+    <a href=" https://colab.research.google.com/github/KeplerGO/lightkurve/blob/master/docs/source/tutorials/03-appending-lightcurves.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
+    <a href="https://mybinder.org/v2/gh/KeplerGO/lightkurve/master?filepath=docs/source/tutorials/03-appending-lightcurves.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
 </div>
-<div class="section" id="How-to-combine-lightcurves-from-different-Kepler-quarters">
+<br style="clear:both;"><div class="section" id="How-to-combine-lightcurves-from-different-Kepler-quarters">
 <h1>How to combine lightcurves from different Kepler quarters<a class="headerlink" href="#How-to-combine-lightcurves-from-different-Kepler-quarters" title="Permalink to this headline">¶</a></h1>
 <p>The Kepler mission took 17 quarters of continuous observations on the same targets. For applications such as finding long period planets or asteroseismology it is useful to be able to turn these quarters into one long light curve. We can do this using lightkurve’s <code class="docutils literal notranslate"><span class="pre">append</span></code> function. The append function is called by doing</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">stitched_lc</span> <span class="o">=</span> <span class="n">lc1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lc2</span><span class="p">)</span>

@@ -29,7 +29,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b31</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.0.0</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -269,14 +269,12 @@ div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 </style>
-<div class="admonition note">
-<p class="admonition-title"><strong>This page is a static version of an interactive Jupyter notebook</strong></p>
-<ul class="simple">
-<li>Try the interactive version: <span class="raw-html"><a href="https://mybinder.org/v2/gh/KeplerGO/lightkurve/master?filepath=docs/source/tutorials/03-making-fits-files.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg" style="vertical-align:text-bottom"></a></span></li>
-<li>Download the source file: <a class="reference external" href="https://github.com/KeplerGO/lightkurve/blob/master/docs/source/tutorials/03-making-fits-files.ipynb">tutorials/03-making-fits-files.ipynb</a></li>
-</ul>
+<div style="float:right; margin-top:1em; margin-bottom:-1em;">
+    <a href="https://github.com/KeplerGO/lightkurve/tree/master/docs/source/tutorials/03-making-fits-files.ipynb"><img src="https://img.shields.io/badge/Jupyter%20Notebook-Download-blue.svg"></a>
+    <a href=" https://colab.research.google.com/github/KeplerGO/lightkurve/blob/master/docs/source/tutorials/03-making-fits-files.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
+    <a href="https://mybinder.org/v2/gh/KeplerGO/lightkurve/master?filepath=docs/source/tutorials/03-making-fits-files.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
 </div>
-<div class="section" id="How-to-save-a-LightCurve-in-FITS-format?">
+<br style="clear:both;"><div class="section" id="How-to-save-a-LightCurve-in-FITS-format?">
 <h1>How to save a LightCurve in FITS format?<a class="headerlink" href="#How-to-save-a-LightCurve-in-FITS-format?" title="Permalink to this headline">¶</a></h1>
 <p>Once you have detrended or altered a lightcurve in some way, you may want to save it as a FITS file. This allows you to easily share the file with your collaborators or submit your lightcurves as a <a class="reference external" href="https://archive.stsci.edu/hlsp/hlsp_guidelines.html">MAST High Level Science Product</a> (HLSP). Lightkurve provides a <code class="docutils literal notranslate"><span class="pre">to_fits()</span></code> method which will easily convert your <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> object into a fits file.</p>
 <p>Below is a brief demostration showing how <code class="docutils literal notranslate"><span class="pre">to_fits()</span></code> works.</p>

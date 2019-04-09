@@ -29,7 +29,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b31</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.0.0</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -71,8 +71,22 @@
     
   <div class="section" id="full-changelog">
 <span id="changelog"></span><h1>Full changelog<a class="headerlink" href="#full-changelog" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="b31-unreleased">
-<h2>1.0b31 (unreleased)<a class="headerlink" href="#b31-unreleased" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h2>1.0.0 (2019-04-08)<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>This is the first stable release of Lightkurve.  It was prepared with the help of 45 contributors!</p>
+<p>This release contains major changes to the <code class="docutils literal notranslate"><span class="pre">LombScarglePeriodogram</span></code> class:</p>
+<ul class="simple">
+<li>Changed the default behavior of <code class="docutils literal notranslate"><span class="pre">LombScarglePeriodogram.from_lightcurve()</span></code> to use <code class="docutils literal notranslate"><span class="pre">normalization='amplitude'</span></code> and <code class="docutils literal notranslate"><span class="pre">oversample_factor=5</span></code> (the previous defaults were <code class="docutils literal notranslate"><span class="pre">normalization='psd'</span></code> and <code class="docutils literal notranslate"><span class="pre">oversample_factor=1</span></code>). The docstring has been expanded to help users understand these options. [#491]</li>
+<li>Added a <code class="docutils literal notranslate"><span class="pre">LightkurveWarning</span></code> to alert users of the changes to the default behavior. [#493]</li>
+<li>Deprecated the <code class="docutils literal notranslate"><span class="pre">min_frequency</span></code>/<code class="docutils literal notranslate"><span class="pre">max_frequency</span></code> arguments in favor of <code class="docutils literal notranslate"><span class="pre">minimum_frequency</span></code>/<code class="docutils literal notranslate"><span class="pre">maximum_frequency</span></code> to be consistent with the other Periodogram classes. [#478]</li>
+<li>Likewise, deprecated the <code class="docutils literal notranslate"><span class="pre">min_period</span></code>/<code class="docutils literal notranslate"><span class="pre">max_period</span></code> arguments in favor of <code class="docutils literal notranslate"><span class="pre">minimum_period</span></code>/<code class="docutils literal notranslate"><span class="pre">maximum_period</span></code> to be consistent with the other Periodogram classes. [#478]</li>
+</ul>
+<p>Other changes are:</p>
+<ul class="simple">
+<li>Improved <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code> to be more robust against the presence of NaNs. [#479, #488]</li>
+<li>Improved <code class="docutils literal notranslate"><span class="pre">search_tesscut</span></code> to avoid crashing in the event of an empty search result, and to ensure that the files it returns carry the search string as the <code class="docutils literal notranslate"><span class="pre">targetid</span></code> attribute. [#475, #477]</li>
+<li>Various minor bug fixes. [#488, #490, #494]</li>
+</ul>
 </div>
 <div class="section" id="b30-2019-03-27">
 <h2>1.0b30 (2019-03-27)<a class="headerlink" href="#b30-2019-03-27" title="Permalink to this headline">¶</a></h2>
@@ -122,7 +136,7 @@ MAST TessCut service. [#434]</li>
 <h2>1.0b26 (2019-02-04)<a class="headerlink" href="#b26-2019-02-04" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li>Introduced a new layout for the
-<a href="#id1"><span class="problematic" id="id2">``</span></a>online documentation &lt;<a class="reference external" href="https://docs.lightkurve.org">https://docs.lightkurve.org</a>&gt;``_. [#360, #400, #406]</li>
+<a href="#id2"><span class="problematic" id="id3">``</span></a>online documentation &lt;<a class="reference external" href="https://docs.lightkurve.org">https://docs.lightkurve.org</a>&gt;``_. [#360, #400, #406]</li>
 <li>Added <code class="docutils literal notranslate"><span class="pre">LightCurve.interact_bls()</span></code>: an interactive Bokeh widget to find
 planets using the Box Least Squares (BLS) method. [#401]</li>
 <li>Added <code class="docutils literal notranslate"><span class="pre">LombScarglePeriodogram</span></code> and <code class="docutils literal notranslate"><span class="pre">BoxLeastSquarePeriodogam</span></code> sub-classes

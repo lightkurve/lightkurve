@@ -29,7 +29,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b31</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.0.0</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -269,14 +269,12 @@ div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 </style>
-<div class="admonition note">
-<p class="admonition-title"><strong>This page is a static version of an interactive Jupyter notebook</strong></p>
-<ul class="simple">
-<li>Try the interactive version: <span class="raw-html"><a href="https://mybinder.org/v2/gh/KeplerGO/lightkurve/master?filepath=docs/source/tutorials/01-what-are-lightcurves.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg" style="vertical-align:text-bottom"></a></span></li>
-<li>Download the source file: <a class="reference external" href="https://github.com/KeplerGO/lightkurve/blob/master/docs/source/tutorials/01-what-are-lightcurves.ipynb">tutorials/01-what-are-lightcurves.ipynb</a></li>
-</ul>
+<div style="float:right; margin-top:1em; margin-bottom:-1em;">
+    <a href="https://github.com/KeplerGO/lightkurve/tree/master/docs/source/tutorials/01-what-are-lightcurves.ipynb"><img src="https://img.shields.io/badge/Jupyter%20Notebook-Download-blue.svg"></a>
+    <a href=" https://colab.research.google.com/github/KeplerGO/lightkurve/blob/master/docs/source/tutorials/01-what-are-lightcurves.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
+    <a href="https://mybinder.org/v2/gh/KeplerGO/lightkurve/master?filepath=docs/source/tutorials/01-what-are-lightcurves.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
 </div>
-<div class="section" id="What-are-LightCurve-objects?">
+<br style="clear:both;"><div class="section" id="What-are-LightCurve-objects?">
 <h1>What are LightCurve objects?<a class="headerlink" href="#What-are-LightCurve-objects?" title="Permalink to this headline">¶</a></h1>
 <p><code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> objects are data objects which encapsulate the brightness of a star over time. They provide a series of common operations, for example folding, binning, plotting, etc. There are a range of subclasses of <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> objects specific to telescopes, including <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> for Kepler and K2 data and <code class="docutils literal notranslate"><span class="pre">TessLightCurve</span></code> for TESS data.</p>
 <p>Although <em>lightkurve</em> was designed with Kepler, K2 and TESS in mind, these objects can be used for a range of astronomy data.</p>

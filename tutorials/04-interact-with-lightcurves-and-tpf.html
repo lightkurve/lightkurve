@@ -29,7 +29,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b31</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.0.0</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -269,14 +269,12 @@ div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 </style>
-<div class="admonition note">
-<p class="admonition-title"><strong>This page is a static version of an interactive Jupyter notebook</strong></p>
-<ul class="simple">
-<li>Try the interactive version: <span class="raw-html"><a href="https://mybinder.org/v2/gh/KeplerGO/lightkurve/master?filepath=docs/source/tutorials/04-interact-with-lightcurves-and-tpf.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg" style="vertical-align:text-bottom"></a></span></li>
-<li>Download the source file: <a class="reference external" href="https://github.com/KeplerGO/lightkurve/blob/master/docs/source/tutorials/04-interact-with-lightcurves-and-tpf.ipynb">tutorials/04-interact-with-lightcurves-and-tpf.ipynb</a></li>
-</ul>
+<div style="float:right; margin-top:1em; margin-bottom:-1em;">
+    <a href="https://github.com/KeplerGO/lightkurve/tree/master/docs/source/tutorials/04-interact-with-lightcurves-and-tpf.ipynb"><img src="https://img.shields.io/badge/Jupyter%20Notebook-Download-blue.svg"></a>
+    <a href=" https://colab.research.google.com/github/KeplerGO/lightkurve/blob/master/docs/source/tutorials/04-interact-with-lightcurves-and-tpf.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
+    <a href="https://mybinder.org/v2/gh/KeplerGO/lightkurve/master?filepath=docs/source/tutorials/04-interact-with-lightcurves-and-tpf.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
 </div>
-<div class="section" id="Interactively-inspecting-Target-Pixel-Files-and-Lightcurves">
+<br style="clear:both;"><div class="section" id="Interactively-inspecting-Target-Pixel-Files-and-Lightcurves">
 <h1>Interactively inspecting Target Pixel Files and Lightcurves<a class="headerlink" href="#Interactively-inspecting-Target-Pixel-Files-and-Lightcurves" title="Permalink to this headline">¶</a></h1>
 <p>One of the most common questions we get at the Kepler/K2 Guest Observer Office is “I see a noise blip in my K2 lightcurve. Is it real or instrumental?” Answering the question usually entails ticking through our (long, incomplete) mental list of conceivable, sometimes exotic instrumental artifacts. Space-craft induced periodic motion. Rolling band. Cosmic Rays. Collateral cosmic rays. Smear. Sudden pixel sensitivity dropouts. Fine-guidance-sensor cross talk. Regular cross talk. <a class="reference external" href="https://twitter.com/gully_/status/941707161058586624">Sweater
 fuzzy</a>.</p>

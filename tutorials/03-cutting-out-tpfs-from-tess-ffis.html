@@ -29,7 +29,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b31</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.0.0</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -269,14 +269,12 @@ div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 </style>
-<div class="admonition note">
-<p class="admonition-title"><strong>This page is a static version of an interactive Jupyter notebook</strong></p>
-<ul class="simple">
-<li>Try the interactive version: <span class="raw-html"><a href="https://mybinder.org/v2/gh/KeplerGO/lightkurve/master?filepath=docs/source/tutorials/03-cutting-out-tpfs-from-tess-ffis.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg" style="vertical-align:text-bottom"></a></span></li>
-<li>Download the source file: <a class="reference external" href="https://github.com/KeplerGO/lightkurve/blob/master/docs/source/tutorials/03-cutting-out-tpfs-from-tess-ffis.ipynb">tutorials/03-cutting-out-tpfs-from-tess-ffis.ipynb</a></li>
-</ul>
+<div style="float:right; margin-top:1em; margin-bottom:-1em;">
+    <a href="https://github.com/KeplerGO/lightkurve/tree/master/docs/source/tutorials/03-cutting-out-tpfs-from-tess-ffis.ipynb"><img src="https://img.shields.io/badge/Jupyter%20Notebook-Download-blue.svg"></a>
+    <a href=" https://colab.research.google.com/github/KeplerGO/lightkurve/blob/master/docs/source/tutorials/03-cutting-out-tpfs-from-tess-ffis.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
+    <a href="https://mybinder.org/v2/gh/KeplerGO/lightkurve/master?filepath=docs/source/tutorials/03-cutting-out-tpfs-from-tess-ffis.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
 </div>
-<div class="section" id="How-to-cut-out-Target-Pixel-Files-from-Kepler-Superstamps-or-TESS-FFIs?">
+<br style="clear:both;"><div class="section" id="How-to-cut-out-Target-Pixel-Files-from-Kepler-Superstamps-or-TESS-FFIs?">
 <h1>How to cut out Target Pixel Files from Kepler Superstamps or TESS FFIs?<a class="headerlink" href="#How-to-cut-out-Target-Pixel-Files-from-Kepler-Superstamps-or-TESS-FFIs?" title="Permalink to this headline">¶</a></h1>
 <p>You can use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> to cut Target Pixel Files (TPFs) out of a series of standard astronomical images, such as <a class="reference external" href="https://archive.stsci.edu/prepds/k2superstamp/">K2 Superstamp Mosaics</a> or TESS Full-Frame-Images (FFIs). This brief tutorial will demonstrate how!</p>
 <p>Let’s assume you have downloaded a set <a class="reference external" href="http://archive.stsci.edu/tess/ete-6.html">simulated TESS FFI images</a> to a local directory called <code class="docutils literal notranslate"><span class="pre">data</span></code>. <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> will assume that the files are given in <em>time order</em>. So we’ll sort the filenames first:</p>

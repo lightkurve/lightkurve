@@ -29,7 +29,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.0b31</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.0.0</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -269,14 +269,12 @@ div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
 </style>
-<div class="admonition note">
-<p class="admonition-title"><strong>This page is a static version of an interactive Jupyter notebook</strong></p>
-<ul class="simple">
-<li>Try the interactive version: <span class="raw-html"><a href="https://mybinder.org/v2/gh/KeplerGO/lightkurve/master?filepath=docs/source/tutorials/03-making-custom-apertures.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg" style="vertical-align:text-bottom"></a></span></li>
-<li>Download the source file: <a href="#id2"><span class="problematic" id="id3">`tutorials/03-making-custom-apertures.ipynb`__</span></a></li>
-</ul>
+<div style="float:right; margin-top:1em; margin-bottom:-1em;">
+    <a href="https://github.com/KeplerGO/lightkurve/tree/master/docs/source/tutorials/03-making-custom-apertures.ipynb"><img src="https://img.shields.io/badge/Jupyter%20Notebook-Download-blue.svg"></a>
+    <a href=" https://colab.research.google.com/github/KeplerGO/lightkurve/blob/master/docs/source/tutorials/03-making-custom-apertures.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
+    <a href="https://mybinder.org/v2/gh/KeplerGO/lightkurve/master?filepath=docs/source/tutorials/03-making-custom-apertures.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
 </div>
-<div class="section" id="How-to-perform-aperture-photometry-with-custom-apertures?">
+<br style="clear:both;"><div class="section" id="How-to-perform-aperture-photometry-with-custom-apertures?">
 <h1>How to perform aperture photometry with custom apertures?<a class="headerlink" href="#How-to-perform-aperture-photometry-with-custom-apertures?" title="Permalink to this headline">¶</a></h1>
 <p>We have discussed in <a class="reference external" href="http://lightkurve.keplerscience.org/tutorials/1.03-what-are-lightcurves.html">previous tutorials</a> how Simple Aperture Photometry works. We choose a set of pixels in the image and sum those to produce a single flux value. We do this for every image as a function of time to produce a light curve.</p>
 <p>The <a class="reference external" href="https://github.com/nasa/kepler-pipeline">Kepler Data Pipeline</a> produces an aperture, which is used by default by lightkurve. However, there are some cases where you might want to produce your own aperture. The field may be crowded, or you may wish to change the aperture size to change the relative contribution of the background. We can do this simply with lightkurve.</p>
@@ -295,7 +293,7 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
-<p>We’ve now created a list of <code class="docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code> objects, where each item is a different quarter. We’re going to be able to combine these just like in the <a href="#id2"><span class="problematic" id="id4">`stitching tutorial &lt;&gt;`__</span></a>.</p>
+<p>We’ve now created a list of <code class="docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code> objects, where each item is a different quarter. We’re going to be able to combine these just like in the <a href="#id1"><span class="problematic" id="id2">`stitching tutorial &lt;&gt;`__</span></a>.</p>
 <p>Let’s take a look at just one of those target pixel files.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
