@@ -314,6 +314,8 @@ def test_tpf_from_images():
     w.wcs.set_pv([(2, 1, 45.0)])
     pixcrd = np.array([[0, 0], [24, 38], [45, 98]], np.float_)
     header = w.to_header()
+    header['CRVAL1P'] = 10
+    header['CRVAL2P'] = 20
     ra, dec = 268.21686048, -73.66991904
 
     # Add that header to our images...
