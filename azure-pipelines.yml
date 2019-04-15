@@ -23,6 +23,7 @@ steps:
 
 - script: |
     python -m pip install --upgrade pip
+    pip install numpy  # celerite needs numpy to build
     pip install -e .[all,test]
   displayName: 'Install Lightkurve & dependencies'
 
