@@ -28,6 +28,6 @@ steps:
   displayName: 'Install Lightkurve & dependencies'
 
 - script: |
-    pip install codecov pytest-azurepipelines
+    pip install codecov
     pytest
   displayName: 'pytest'
