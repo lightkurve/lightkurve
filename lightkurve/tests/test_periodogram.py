@@ -4,6 +4,7 @@ import numpy as np
 from numpy.testing import assert_almost_equal, assert_array_equal
 
 from ..lightcurve import LightCurve
+from ..search import search_lightcurvefile
 from ..periodogram import Periodogram
 import sys
 
@@ -14,6 +15,16 @@ try:
 except ImportError:
     bad_optional_imports = True
 
+def test_asteroseismology():
+    datalist = search_lightcurvefile('KIC11615890')
+    data = datalist.download_all()
+    lc = data[0].PDCSAP_FLUX.normalize().flatten()
+    for nlc in data[0:5]:
+        lc = lc.append(nlc.PDCSAP_FLUX.normalize().flatten())
+    lc = lc.remove_nans()
+    pg = lc.to_periodogram(normalization='psd')
+    snr = pg.flatten()
+    snr.estimate_numax()
 
 def test_periodogram_basics():
     """Sanity check to verify that periodogram plotting works"""
@@ -151,7 +162,6 @@ def test_smooth():
     # Check logmedian doesn't work if I give the filter width units
     with pytest.raises(ValueError) as err:
         p.smooth(method='logmedian',  filter_width=5.*u.day)
-
 
 
 

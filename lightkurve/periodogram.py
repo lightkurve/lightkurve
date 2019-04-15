@@ -549,6 +549,120 @@ class SNRPeriodogram(Periodogram):
             ax.set_ylabel("Signal to Noise Ratio (SNR)")
         return ax
 
+    def estimate_numax(self, numaxs = None, show_plots=False):
+        """Estimates the peak of the envelope of seismic oscillation modes,
+        numax using an autocorrelation function, based on Huber et al. 2009
+
+        We first create an array of sensible numax values based on the cadence
+        of the timeseries. We then estimate the width of the mode envelope at
+        each numax using a standard relation, and autocorrelates this region.
+        For a numax around the true numax, this will provide the correlation of
+        the mode envelope with itself. Due to the equally spaced pattern of
+        modes, the correlation at this numax will be large, revealing the likely
+        numax value.
+
+        Parameters:
+        -----------
+        numaxs : array-like
+            An array of numaxs at which to evaluate the autocorrelation. If
+            none is given, a sensible range will be chosen.
+
+        show_plots : bool
+            If show_plots = True, displays a diagnostic plot and returns an axis.
+
+        Returns:
+        --------
+        numax : float
+            The numax of the periodogram. In the units of the periodogram object
+            frequency.
+        numax_err : float
+            The uncertainty on the numax estimate.
+        ax : matplotlib.axes._subplots.AxesSubplot
+            The matplotlib axes object. Only returned if show_plots = True.
+        """
+        #TODO: This won't hold for main sequence stars
+        if numaxs is None:
+            numaxs = np.linspace(np.log(10), np.log(self.nyquist.value), 200)
+
+        #We want to find the numax which returns in the highest autocorrelation
+        #power, so we will return the maximum value in the ACF.
+        maxacf = np.zeros(len(numaxs))
+
+        #Iterate over all the numax values and return an acf
+        for idx, numax in enumerate(numaxs):
+            acf = self._autocorrelate(numax)       #Return the acf at this numax
+            maxacf[idx] = np.nanmax(acf)           #Store the maximum acf value
+
+        ylim = int(40/frequency_spacing)
+        lags = np.linspace(0,ylim*frequency_spacing,ylim)
+        xlim = int(numaxs.max()/frequency_spacing)
+
+        best_numax = numaxs[np.argmax(maxacf)]     #The best numax is the numax that results in the highest ACF
+
+        fig, ax = plt.subplots(2,sharex=True,figsize=(8,8))
+        self.plot(ax=ax[0])
+        ax[0].set_ylabel(r'SNR')
+        ax[0].set_title(r'SNR vs Frequency')
+
+        ax[1].plot(numaxs,maxacf)
+        ax[1].set_xlabel(r'Frequency [$\mu$Hz]')
+        ax[1].set_ylabel(r'Max. Correlation')
+        ax[0].axvline(best_numax,c='r', linewidth=2,alpha=.4)
+        ax[1].axvline(best_numax,c='r', linewidth=2,alpha=.4, label='{:.2f} uHz'.format(best_numax))
+        ax[1].legend()
+
+        if show_plots:
+            return best_numax, ax
+        return best_numax
+
+    def _autocorrelate(self, numax):
+        """An autocorrelation function for seismic mode envelopes.
+        For a given numax, the method calculates the expected Full Width Half
+        Maximum of the seismic mode envelope as (Mosser et al 2010) for RGB
+        stars:
+
+        fwhm = 0.66 * numax^0.88,
+
+        if the data is generated for a long-cadence timeseries. If the
+        timeseries is short-cadence, the relation will be:
+
+        fwhm = 0.25 * numax.
+
+        This will be based on the highest frequency in the periodogram.
+        Before autocorrelating, it also multiplies the section with a hanning
+        window, which will increase the autocorrelation power if the region
+        has a Gaussian shape, as we'd expect for seismic oscillations.
+
+        Parameters:
+        ----------
+            numax : float
+                The estimated position of the numax of the power spectrum. This
+                is used to calculated the region autocorrelated with itself.
+
+            width_factor : float
+                This factor is multiplied with the estimated fwhm of the
+                oscillation modes, effectively increasing or decreasing the
+                autocorrelation range.
+
+        Returns:
+        --------
+            acf : array-like
+                The autocorrelation power calculated for the given numax
+        """
+        fs = np.median(np.diff(self.frequency))
+
+        #Calculate the index FWHM for a given numax
+        if u.Quantity(self.nyquist, u.microhertz) > u.Quantity(500., u.microhertz):
+            fwhm = int(np.floor(0.25 * numax.value / fs.value)) #Express the FWHM in indices in the array
+        else:
+            fwhm = int(np.floor(0.66 * numax.value**0.88 / fs.value)) #Express the FWHM in indices in the array
+        fwhm -= fwhm % 2                                    # Make the FWHM value even (%2 = 0 if even, 1 if odd)
+        x = int(numax / fs)                                 #Find the index value of numax
+        s = np.hanning(len(self.power[x-fwhm:x+fwhm]))      #Define the hanning window for the evaluated frequency space
+        C = self.power[x-fwhm:x+fwhm].value * s             #Multiply the evaluated SNR space by the hanning window
+        result = np.correlate(C, C, mode='full')            #Correlated the resulting SNR space with itself
+        return result[int(len(result)/2):]                  #Return one half of the autocorrelation function
+
 
 class LombScarglePeriodogram(Periodogram):
     """Subclass of :class:`Periodogram <lightkurve.periodogram.Periodogram>`
@@ -810,7 +924,7 @@ class LombScarglePeriodogram(Periodogram):
             log.warning("You have passed an evenly-spaced grid of periods. "
                         "These are not evenly spaced in frequency space.\n"
                         "Method has been set to 'slow' to allow for this.")
-        flux_scaling = 1e6               
+        flux_scaling = 1e6
         if float(astropy.__version__[0]) >= 3:
             LS = LombScargle(time, lc.flux * flux_scaling,
                              nterms=nterms, normalization='psd', **kwargs)
