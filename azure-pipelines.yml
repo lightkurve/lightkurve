@@ -19,6 +19,7 @@ steps:
   displayName: 'Use Python $(python.version)'
 
 - script: |
+    sudo apt-get install python-tk  # Needed for Python 2
     python -m pip install --upgrade pip
     pip install numpy  # celerite needs numpy to build
     pip install -e .[all,test]
