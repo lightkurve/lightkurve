@@ -3,10 +3,12 @@ Lightkurve
 
 **A friendly package for Kepler & TESS time series analysis in Python.**
 
-|pypi-badge| |ci-badge| |appveyor-badge| |cov-badge| |doi-badge| |astropy-badge|
+|pypi-badge| |conda-badge| |ci-badge| |appveyor-badge| |cov-badge| |doi-badge| |astropy-badge|
 
 .. |pypi-badge| image:: https://img.shields.io/pypi/v/lightkurve.svg
                 :target: https://pypi.python.org/pypi/lightkurve
+.. |conda-badge| image:: https://img.shields.io/conda/vn/conda-forge/lightkurve.svg
+                 :target: https://anaconda.org/conda-forge/lightkurve
 .. |ci-badge| image:: https://travis-ci.org/KeplerGO/lightkurve.svg?branch=master
               :target: https://travis-ci.org/KeplerGO/lightkurve
 .. |appveyor-badge| image:: https://ci.appveyor.com/api/projects/status/6jvv5d7a142gwm8a/branch/master?svg=true
