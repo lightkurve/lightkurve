@@ -413,6 +413,7 @@ def test_tpf_wcs_from_images():
     assert tpf.hdu[1].header['2CRPX5'] != UNDEFINED
     assert tpf.hdu[1].header['1CUNI5'] == 'deg'
     assert tpf.hdu[1].header['2CUNI5'] == 'deg'
+    assert tpf.wcs.to_header()['CDELT1'] == w.wcs.cdelt[0]
 
 def test_properties2(capfd):
     '''Test if the describe function produces an output.
