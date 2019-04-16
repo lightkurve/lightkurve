@@ -21,7 +21,10 @@ try:
 except ImportError:
     from astropy.stats import LombScargle
 
+from scipy.optimize import curve_fit
+
 from . import MPLSTYLE
+plt.style.use(MPLSTYLE)
 from .utils import LightkurveWarning
 
 log = logging.getLogger(__name__)
@@ -549,7 +552,7 @@ class SNRPeriodogram(Periodogram):
             ax.set_ylabel("Signal to Noise Ratio (SNR)")
         return ax
 
-    def estimate_numax(self, numaxs = None, show_plots=False):
+    def estimate_numax(self, numaxs=None, show_plots=False):
         """Estimates the peak of the envelope of seismic oscillation modes,
         numax using an autocorrelation function, based on Huber et al. 2009
 
@@ -582,7 +585,7 @@ class SNRPeriodogram(Periodogram):
         """
         #TODO: This won't hold for main sequence stars
         if numaxs is None:
-            numaxs = np.linspace(np.log(10), np.log(self.nyquist.value), 200)
+            numaxs = 10**np.linspace(np.log10(10), np.log10(self.nyquist.value), 200)
 
         #We want to find the numax which returns in the highest autocorrelation
         #power, so we will return the maximum value in the ACF.
@@ -593,31 +596,43 @@ class SNRPeriodogram(Periodogram):
             acf = self._autocorrelate(numax)       #Return the acf at this numax
             maxacf[idx] = np.nanmax(acf)           #Store the maximum acf value
 
-        ylim = int(40/frequency_spacing)
-        lags = np.linspace(0,ylim*frequency_spacing,ylim)
-        xlim = int(numaxs.max()/frequency_spacing)
+        acf_numax = numaxs[np.argmax(maxacf)]     #The best numax is the numax that results in the highest ACF
+        best_numax = acf_numax
 
-        best_numax = numaxs[np.argmax(maxacf)]     #The best numax is the numax that results in the highest ACF
+        #Now lets fit a Gaussian to the region around the best guess numax
+        fwhm = self._get_fwhm(acf_numax)
+        sel = np.where((numaxs > (acf_numax-fwhm)) &
+                        (numaxs < acf_numax + fwhm))
+        popt, pcov = curve_fit(self._gaussian, numaxs[sel], maxacf[sel],
+                                p0 = [fwhm/2.35, np.nanmax(maxacf), acf_numax])
+        best_numax = popt[2]
+        numax_err = popt[0]
 
-        fig, ax = plt.subplots(2,sharex=True,figsize=(8,8))
-        self.plot(ax=ax[0])
-        ax[0].set_ylabel(r'SNR')
-        ax[0].set_title(r'SNR vs Frequency')
+        if show_plots == True:
+            fig, ax = plt.subplots(2,sharex=True,figsize=(12,10))
+            self.plot(ax=ax[0])
+            ax[0].set_ylabel(r'SNR')
+            ax[0].set_title(r'SNR vs Frequency')
+            ax[0].set_xlabel(None)
 
-        ax[1].plot(numaxs,maxacf)
-        ax[1].set_xlabel(r'Frequency [$\mu$Hz]')
-        ax[1].set_ylabel(r'Max. Correlation')
-        ax[0].axvline(best_numax,c='r', linewidth=2,alpha=.4)
-        ax[1].axvline(best_numax,c='r', linewidth=2,alpha=.4, label='{:.2f} uHz'.format(best_numax))
-        ax[1].legend()
+            ax[1].plot(numaxs,maxacf)
+            ax[1].plot(numaxs[sel], self._gaussian(numaxs[sel], *popt),
+                        linewidth=3,linestyle='--',label='Gaussian Fit')
+            ax[1].set_xlabel(r'Frequency [$\mu$Hz]')
+            ax[1].set_ylabel(r'Max. Correlation')
+            ax[0].axvline(best_numax,c='r', linewidth=2,alpha=.4)
+            ax[1].axvline(best_numax,c='r', linewidth=2,alpha=.4,
+                label=r'{:.2f} $\pm$ {:.2f} $\mu$Hz'.format(best_numax, numax_err))
+            ax[1].legend(fontsize=20, loc='best')
 
         if show_plots:
-            return best_numax, ax
-        return best_numax
+            return u.Quantity(best_numax, self.frequency.unit), \
+                    u.Quantity(numax_err, self.frequency.unit), ax, maxacf
+        return u.Quantity(best_numax, self.frequency.unit), \
+                u.Quantity(numax_err, self.frequency.unit)
 
-    def _autocorrelate(self, numax):
-        """An autocorrelation function for seismic mode envelopes.
-        For a given numax, the method calculates the expected Full Width Half
+    def _get_fwhm(self, numax):
+        """For a given numax, the method calculates the expected Full Width Half
         Maximum of the seismic mode envelope as (Mosser et al 2010) for RGB
         stars:
 
@@ -629,7 +644,32 @@ class SNRPeriodogram(Periodogram):
         fwhm = 0.25 * numax.
 
         This will be based on the highest frequency in the periodogram.
-        Before autocorrelating, it also multiplies the section with a hanning
+
+        Parameters:
+        ----------
+            numax : float
+                The estimated position of the numax of the power spectrum. This
+                is used to calculated the region autocorrelated with itself.
+
+        Returns:
+        --------
+            fwhm: float
+                The estimate full-width-half-maximum of the seismic mode envelope
+        """
+        fs = np.median(np.diff(self.frequency.value))
+
+        #Calculate the index FWHM for a given numax
+        if u.Quantity(self.frequency[-1], u.microhertz) > u.Quantity(500., u.microhertz):
+            fwhm = 0.25 * numax
+        else:
+            fwhm = 0.66 * numax**0.88
+        return fwhm
+
+    def _autocorrelate(self, numax):
+        """An autocorrelation function for seismic mode envelopes.
+        We autocorrelate the region one FWHM of the mode envelope either side
+        of the proposed numax.
+        Before autocorrelating, it multiplies the section with a hanning
         window, which will increase the autocorrelation power if the region
         has a Gaussian shape, as we'd expect for seismic oscillations.
 
@@ -639,23 +679,13 @@ class SNRPeriodogram(Periodogram):
                 The estimated position of the numax of the power spectrum. This
                 is used to calculated the region autocorrelated with itself.
 
-            width_factor : float
-                This factor is multiplied with the estimated fwhm of the
-                oscillation modes, effectively increasing or decreasing the
-                autocorrelation range.
-
         Returns:
         --------
             acf : array-like
                 The autocorrelation power calculated for the given numax
         """
-        fs = np.median(np.diff(self.frequency))
-
-        #Calculate the index FWHM for a given numax
-        if u.Quantity(self.nyquist, u.microhertz) > u.Quantity(500., u.microhertz):
-            fwhm = int(np.floor(0.25 * numax.value / fs.value)) #Express the FWHM in indices in the array
-        else:
-            fwhm = int(np.floor(0.66 * numax.value**0.88 / fs.value)) #Express the FWHM in indices in the array
+        fs = np.median(np.diff(self.frequency.value))
+        fwhm = int(np.floor(self._get_fwhm(numax) / fs))    # Express the fwhm in indices
         fwhm -= fwhm % 2                                    # Make the FWHM value even (%2 = 0 if even, 1 if odd)
         x = int(numax / fs)                                 #Find the index value of numax
         s = np.hanning(len(self.power[x-fwhm:x+fwhm]))      #Define the hanning window for the evaluated frequency space
@@ -663,6 +693,9 @@ class SNRPeriodogram(Periodogram):
         result = np.correlate(C, C, mode='full')            #Correlated the resulting SNR space with itself
         return result[int(len(result)/2):]                  #Return one half of the autocorrelation function
 
+    def _gaussian(self, x, sigma, height, mu):
+        """A simple Gaussian function for fitting to autocorrelation peaks."""
+        return height * np.exp(-(x - mu)**2 / (2.0 * sigma**2))
 
 class LombScarglePeriodogram(Periodogram):
     """Subclass of :class:`Periodogram <lightkurve.periodogram.Periodogram>`
