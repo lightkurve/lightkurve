@@ -718,7 +718,7 @@ class PLDCorrector(object):
 
         # set default transit mask
         if cadence_mask is None:
-            cadence_mask = np.ones_like(self.time, dtype=bool)
+            cadence_mask = np.ones_like(lc.time, dtype=bool)
         M = lambda x: x[cadence_mask[nanmask]]
 
         # mask transits in design matrix
