@@ -609,25 +609,25 @@ class SNRPeriodogram(Periodogram):
         numax_err = popt[0]
 
         if show_plots == True:
-            fig, ax = plt.subplots(2,sharex=True,figsize=(12,10))
-            self.plot(ax=ax[0])
-            ax[0].set_ylabel(r'SNR')
-            ax[0].set_title(r'SNR vs Frequency')
-            ax[0].set_xlabel(None)
+            with plt.style.context(MPLSTYLE):
+                fig, ax = plt.subplots(2,sharex=True,figsize=(8.485, 8))
+                self.plot(ax=ax[0])
+                ax[0].set_ylabel(r'SNR')
+                ax[0].set_title(r'SNR vs Frequency')
+                ax[0].set_xlabel(None)
 
-            ax[1].plot(numaxs,maxacf)
-            ax[1].plot(numaxs[sel], self._gaussian(numaxs[sel], *popt),
-                        linewidth=3,linestyle='--',label='Gaussian Fit')
-            ax[1].set_xlabel(r'Frequency [$\mu$Hz]')
-            ax[1].set_ylabel(r'Max. Correlation')
-            ax[0].axvline(best_numax,c='r', linewidth=2,alpha=.4)
-            ax[1].axvline(best_numax,c='r', linewidth=2,alpha=.4,
-                label=r'{:.2f} $\pm$ {:.2f} $\mu$Hz'.format(best_numax, numax_err))
-            ax[1].legend(fontsize=20, loc='best')
+                ax[1].plot(numaxs,maxacf)
+                ax[1].plot(numaxs[sel], self._gaussian(numaxs[sel], *popt),
+                            linewidth=3,linestyle='--',label='Gaussian Fit')
+                ax[1].set_xlabel(r'Frequency [$\mu$Hz]')
+                ax[1].set_ylabel(r'Max. Correlation')
+                ax[0].axvline(best_numax,c='r', linewidth=2,alpha=.4)
+                ax[1].axvline(best_numax,c='r', linewidth=2,alpha=.4,
+                    label=r'{:.2f} $\pm$ {:.2f} $\mu$Hz'.format(best_numax, numax_err))
 
         if show_plots:
             return u.Quantity(best_numax, self.frequency.unit), \
-                    u.Quantity(numax_err, self.frequency.unit), ax, maxacf
+                    u.Quantity(numax_err, self.frequency.unit), ax
         return u.Quantity(best_numax, self.frequency.unit), \
                 u.Quantity(numax_err, self.frequency.unit)
 
