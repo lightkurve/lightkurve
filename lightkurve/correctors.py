@@ -66,7 +66,7 @@ class KeplerCBVCorrector(object):
     >>> plt.legend() # doctest: +SKIP
     """
 
-    def __init__(self, lc, likelihood=oktopus.LaplacianLikelihood,
+    def __init__(self, lc, cbv_array=None, cbv_time=None, likelihood=oktopus.LaplacianLikelihood,
                  prior=oktopus.LaplacianPrior):
         self.lc = lc
         if not hasattr(self.lc, 'channel'):
@@ -79,6 +79,13 @@ class KeplerCBVCorrector(object):
             self.cbv_base_url = "http://archive.stsci.edu/missions/kepler/cbv/"
         elif self.lc.mission == 'K2':
             self.cbv_base_url = "http://archive.stsci.edu/missions/k2/cbv/"
+
+        if cbv_array is None:
+            cbv_array, cbv_time = self._get_cbv_data(np.arange(1, self._ncbvs))
+        self.cbv_array = cbv_array
+        self.cbv_time = cbv_time
+        print(self.cbv_array.shape)
+        print(self.cbv_time.shape)
 
     @property
     def lc(self):
@@ -143,7 +150,6 @@ class KeplerCBVCorrector(object):
         options : dict
             Dictionary of options to be passed to scipy.optimize.minimize.
         """
-        cbv_array, _ = self._get_cbv_data(cbvs)
 
         median_flux = np.nanmedian(self.lc.flux)
         norm_flux = self.lc.flux / median_flux - 1
@@ -151,7 +157,7 @@ class KeplerCBVCorrector(object):
 
         def mean_model(*theta):
             coeffs = np.asarray(theta)
-            return np.dot(coeffs, cbv_array)
+            return np.dot(coeffs, self.cbv_array)
 
         prior = self.prior(mean=np.zeros(len(cbvs)), var=16.)
         likelihood = self.likelihood(data=norm_flux, mean=mean_model,
@@ -242,9 +248,8 @@ class KeplerCBVCorrector(object):
         with plt.style.context(MPLSTYLE):
             if ax is None:
                 _, ax = plt.subplots(1)
-            cbv_array, time = self._get_cbv_data(cbvs)
-            for idx, cbv in enumerate(cbv_array):
-                ax.plot(time, cbv+idx/10., label='{}'.format(idx + 1))
+            for idx, cbv in enumerate(self.cbv_array):
+                ax.plot(self.cbv_time, cbv+idx/10., label='{}'.format(idx + 1))
             ax.set_yticks([])
             ax.set_xlabel('Time (MJD)')
             module, output = channel_to_module_output(self.lc.channel)
