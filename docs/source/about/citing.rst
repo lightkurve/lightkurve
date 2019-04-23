@@ -4,10 +4,17 @@
 Citing Lightkurve
 =================
 
-If you find Lightkurve useful in your research, please make sure to cite it in your publications.
 
-A journal publication describing Lightkurve is in preparation.
-In meanwhile, please cite our `Astrophysics Source Code Library entry <https://ascl.net/1812.013>`_ using the Bibtex code below:
+If you use Lightkurve for work or research presented in a publication (whether
+directly, or as a dependency to another package), we recommend and encourage
+the following acknowledgment:
+
+.. code-block:: text
+
+  This research made use of Lightkurve, a Python package for Kepler and TESS data analysis (Lightkurve Collaboration, 2018).
+
+where (Lightkurve Collaboration, 2018) is a citation to the ADS entry `2018ascl.soft12013L <http://adsabs.harvard.edu/abs/2018ascl.soft12013L>`_.
+The recommended BibTeX entry for this citation is:
 
 .. code-block:: latex
 
