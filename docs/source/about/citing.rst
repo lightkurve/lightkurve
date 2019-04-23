@@ -20,12 +20,13 @@ The recommended BibTeX entry for this citation is:
 
 
     @MISC{2018ascl.soft12013L,
-       author = {{Lightkurve Collaboration} and {Cardoso}, J.~V.~d.~M. and {Hedges}, C. and 
-        {Gully-Santiago}, M. and {Saunders}, N. and {Cody}, A.~M. and 
-        {Barclay}, T. and {Hall}, O. and {Sagear}, S. and {Turtelboom}, E. and 
-        {Zhang}, J. and {Tzanidakis}, A. and {Mighell}, K. and {Coughlin}, J. and 
-        {Bell}, K. and {Berta-Thompson}, Z. and {Williams}, P. and {Dotson}, J. and 
-        {Barentsen}, G.},
+       author = {{Lightkurve Collaboration} and {Cardoso}, J.~V.~d.~M. and 
+                 {Hedges}, C. and {Gully-Santiago}, M. and {Saunders}, N. and 
+                 {Cody}, A.~M. and {Barclay}, T. and {Hall}, O. and 
+                 {Sagear}, S. and {Turtelboom}, E. and {Zhang}, J. and 
+                 {Tzanidakis}, A. and {Mighell}, K. and {Coughlin}, J. and 
+                 {Bell}, K. and {Berta-Thompson}, Z. and {Williams}, P. and 
+                 {Dotson}, J. and {Barentsen}, G.},
         title = "{Lightkurve: Kepler and TESS time series analysis in Python}",
      keywords = {Software, NASA},
     howpublished = {Astrophysics Source Code Library},
@@ -34,7 +35,6 @@ The recommended BibTeX entry for this citation is:
     archivePrefix = "ascl",
        eprint = {1812.013},
        adsurl = {http://adsabs.harvard.edu/abs/2018ascl.soft12013L},
-      adsnote = {Provided by the SAO/NASA Astrophysics Data System}
     }
 
 In addition, you may elect to cite a specific version of Lightkurve using the `version-specific DOI <https://doi.org/10.5281/zenodo.1181928>`_ provided by Zenodo.
