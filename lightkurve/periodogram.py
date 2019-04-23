@@ -8,6 +8,7 @@ import warnings
 
 import numpy as np
 from matplotlib import pyplot as plt
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
 import astropy
 from astropy.table import Table
@@ -569,8 +570,6 @@ class SNRPeriodogram(Periodogram):
         numax : float
             The numax of the periodogram. In the units of the periodogram object
             frequency.
-        numax_err : float
-            The uncertainty on the numax estimate.
         ax : matplotlib.axes._subplots.AxesSubplot
             The matplotlib axes object. Only returned if show_plots = True.
         """
@@ -590,14 +589,14 @@ class SNRPeriodogram(Periodogram):
         acf_numax = numaxs[np.argmax(maxacf)]     #The best numax is the numax that results in the highest ACF
         best_numax = acf_numax
 
-        #Now lets fit a Gaussian to the region around the best guess numax
-        fwhm = self._get_fwhm(acf_numax)
-        sel = np.where((numaxs > (acf_numax-fwhm)) &
-                        (numaxs < acf_numax + fwhm))
-        popt, pcov = curve_fit(self._gaussian, numaxs[sel], maxacf[sel],
-                                p0 = [fwhm/2.35, np.nanmax(maxacf), acf_numax])
-        best_numax = popt[2]
-        numax_err = popt[0]
+        # #Now lets fit a Gaussian to the region around the best guess numax
+        # fwhm = self._get_fwhm(acf_numax)
+        # sel = np.where((numaxs > (acf_numax-fwhm)) &
+        #                 (numaxs < acf_numax + fwhm))
+        # popt, pcov = curve_fit(self._gaussian, numaxs[sel], maxacf[sel],
+        #                         p0 = [fwhm/2.35, np.nanmax(maxacf), acf_numax])
+        # best_numax = popt[2]
+        # numax_err = popt[0]
 
         if show_plots == True:
             with plt.style.context(MPLSTYLE):
@@ -608,19 +607,87 @@ class SNRPeriodogram(Periodogram):
                 ax[0].set_xlabel(None)
 
                 ax[1].plot(numaxs,maxacf)
-                ax[1].plot(numaxs[sel], self._gaussian(numaxs[sel], *popt),
-                            linewidth=3,linestyle='--',label='Gaussian Fit')
+                # ax[1].plot(numaxs[sel], self._gaussian(numaxs[sel], *popt),
+                #             linewidth=3,linestyle='--',label='Gaussian Fit')
                 ax[1].set_xlabel(r'Frequency [$\mu$Hz]')
                 ax[1].set_ylabel(r'Max. Correlation')
                 ax[0].axvline(best_numax,c='r', linewidth=2,alpha=.4)
                 ax[1].axvline(best_numax,c='r', linewidth=2,alpha=.4,
-                    label=r'{:.2f} $\pm$ {:.2f} $\mu$Hz'.format(best_numax, numax_err))
-
+                    label=r'{:.1f} $\mu$Hz'.format(best_numax))
+                ax[1].legend()
         if show_plots:
-            return u.Quantity(best_numax, self.frequency.unit), \
-                    u.Quantity(numax_err, self.frequency.unit), ax
-        return u.Quantity(best_numax, self.frequency.unit), \
-                u.Quantity(numax_err, self.frequency.unit)
+            return u.Quantity(best_numax, self.frequency.unit), ax
+        return u.Quantity(best_numax, self.frequency.unit)
+
+    def estimate_dnu(self, numax=None, show_plots=False):
+        """ Estimates the average value of the large frequency spacing, DeltaNu,
+        of the seismic oscillations of the target.
+
+        The method will autocorrelate the region around the estimated numax
+        expected to contain seismic oscillation modes. Repeating peaks in the
+        autocorrelation implies an evenly spaced structure of modes.
+        The peak closest to an empirical estimate of dnu is taken as the true
+        value.
+
+        Our empirical estimate for numax is taken from Stello et al. 2009 as
+
+        dnu = 0.294 * numax^0.772
+
+        If `numax` is None, a numax is calculated using the estimate_numax()
+        function with default settings.
+
+        Parameters:
+        ----------
+        numax : float
+            An estimated numax value of the mode envelope in the periodogram. If
+            not given units it is assumed to be in units of the periodogram
+            frequency attribute.
+
+        show_plots : bool
+            If show_plots = True, displays a diagnostic plot and returns an axis.
+
+        Returns:
+        -------
+        deltanu : float
+            The average large frequency spacing of the seismic oscillation modes.
+            In units of the periodogram frequency attribute.
+        """
+        if numax is None:
+            numax = self.estimate_numax()
+
+        #Calcluate dnu using the method by Stello et al. 2009
+        dnu_emp = 0.294 * numax.value ** 0.772
+
+        acf = self._autocorrelate(numax = numax.value)
+        fs = np.median(np.diff(self.frequency.value))
+        lags = np.linspace(0., len(acf)*fs, len(acf))
+
+        #Select a 30% region region around the empirical dnu
+        sel = (lags > dnu_emp - .30*dnu_emp) & (lags < dnu_emp + .30*dnu_emp)
+
+        #Select the peak of highest autocorrelation to be Dnu.
+        best_dnu = lags[sel][np.argmax(acf[sel])]
+
+        if show_plots == True:
+            with plt.style.context(MPLSTYLE):
+                fig, ax = plt.subplots(figsize=(8.485, 4))
+                ax.plot(lags,acf)
+                ax.set_xlabel(r'Frequency Lag [$\mu$Hz]')
+                ax.set_ylabel(r'Correlation')
+                ax.axvline(best_dnu,c='r', linewidth=2,alpha=.4,
+                    label=r'{:.1f} $\mu$Hz'.format(best_dnu))
+                ax.set_title(r'ACF vs Lag for a given $\nu_{\rm max}$')
+
+                axin = inset_axes(ax, width="50%",height="50%", loc="upper right")
+                axin.set_yticks([])
+                axin.plot(lags[sel],acf[sel])
+                axin.axvline(best_dnu,c='r', linewidth=2,alpha=.4,
+                    label=r'{:.1f} $\mu$Hz'.format(best_dnu))
+                axin.legend(loc='best')
+        if show_plots:
+            return u.Quantity(best_dnu, self.frequency.unit), ax
+        return u.Quantity(best_dnu, self.frequency.unit)
+
 
     def _get_fwhm(self, numax):
         """For a given numax, the method calculates the expected Full Width Half
