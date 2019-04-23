@@ -84,8 +84,6 @@ class KeplerCBVCorrector(object):
             cbv_array, cbv_time = self._get_cbv_data(np.arange(1, self._ncbvs))
         self.cbv_array = cbv_array
         self.cbv_time = cbv_time
-        print(self.cbv_array.shape)
-        print(self.cbv_time.shape)
 
     @property
     def lc(self):
@@ -155,9 +153,10 @@ class KeplerCBVCorrector(object):
         norm_flux = self.lc.flux / median_flux - 1
         norm_err_flux = self.lc.flux_err / median_flux
 
+        clip = np.in1d(np.arange(1, len(self.cbv_array)+1), np.asarray(cbvs))
         def mean_model(*theta):
             coeffs = np.asarray(theta)
-            return np.dot(coeffs, self.cbv_array)
+            return np.dot(coeffs, self.cbv_array[clip, :])
 
         prior = self.prior(mean=np.zeros(len(cbvs)), var=16.)
         likelihood = self.likelihood(data=norm_flux, mean=mean_model,
@@ -246,9 +245,10 @@ class KeplerCBVCorrector(object):
             Matplotlib axis object
         '''
         with plt.style.context(MPLSTYLE):
+            clip = np.in1d(np.arange(1, len(self.cbv_array)+1), np.asarray(cbvs))
             if ax is None:
                 _, ax = plt.subplots(1)
-            for idx, cbv in enumerate(self.cbv_array):
+            for idx, cbv in enumerate(self.cbv_array[clip, :]):
                 ax.plot(self.cbv_time, cbv+idx/10., label='{}'.format(idx + 1))
             ax.set_yticks([])
             ax.set_xlabel('Time (MJD)')
