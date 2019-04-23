@@ -170,7 +170,7 @@ def make_lightcurve_figure_elements(lc, lc_source):
             fig.xaxis.axis_label = 'Time - 2457000 (days)'
     except AttributeError:  # no mission keyword available
       pass
-        
+
 
     ylims = get_lightcurve_y_limits(lc_source)
     fig.y_range = Range1d(start=ylims[0], end=ylims[1])

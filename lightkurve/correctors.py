@@ -67,7 +67,7 @@ class KeplerCBVCorrector(object):
     """
 
     def __init__(self, lc, likelihood=oktopus.LaplacianLikelihood,
-                 prior=oktopus.LaplacianPrior, use_gp=False):
+                 prior=oktopus.LaplacianPrior):
         self.lc = lc
         if not hasattr(self.lc, 'channel'):
             raise ValueError('Input must have a `channel` attribute.')
@@ -75,7 +75,6 @@ class KeplerCBVCorrector(object):
         self.prior = prior
         self._ncbvs = 16  # number of cbvs for Kepler/K2
 
-        self.use_gp = use_gp
         if self.lc.mission == 'Kepler':
             self.cbv_base_url = "http://archive.stsci.edu/missions/kepler/cbv/"
         elif self.lc.mission == 'K2':
@@ -113,7 +112,7 @@ class KeplerCBVCorrector(object):
         """
         return self._opt_result
 
-    def _get_cbv_data(self, cbvs=[1, 2], use_gp=False):
+    def _get_cbv_data(self, cbvs=[1, 2]):
         '''Gets the CBV data for a channel and module
         '''
         module, output = channel_to_module_output(self.lc.channel)
@@ -125,39 +124,6 @@ class KeplerCBVCorrector(object):
         for i in cbvs:
             cbv_array.append(cbv_data.field('VECTOR_{}'.format(i))[quality_mask])
         cbv_array = np.asarray(cbv_array)
-
-        if use_gp:
-            from celerite import terms, GP
-            from scipy.optimize import minimize
-
-            for idx, cbv in enumerate(cbv_array):
-                y = np.copy(cbv) * 1e3
-                kernel = terms.Matern32Term(log_sigma=1, log_rho=np.log(30), bounds=((-1, 2), (2, 10)))
-                kernel += terms.JitterTerm(log_sigma=-3)
-
-                gp = GP(kernel)
-                gp.compute(time)
-
-                # Define a cost function
-                def neg_log_like(params, y, gp):
-                    gp.set_parameter_vector(params)
-                    return -gp.log_likelihood(y)
-
-                def grad_neg_log_like(params, y, gp):
-                    gp.set_parameter_vector(params)
-                    return -gp.grad_log_likelihood(y)[1]
-
-                # Fit for the maximum likelihood parameters
-                initial_params = gp.get_parameter_vector()
-                bounds = gp.get_parameter_bounds()
-                soln = minimize(neg_log_like, initial_params, jac=grad_neg_log_like,
-                                method="L-BFGS-B", bounds=bounds, args=(y, gp))
-                gp.set_parameter_vector(soln.x)
-
-                # Make the maximum likelihood prediction
-                mu, var = gp.predict(y, time, return_var=True)
-                std = np.sqrt(var)
-                cbv_array[idx, :] = mu*1e-3
 
         return cbv_array, time
 
@@ -177,7 +143,7 @@ class KeplerCBVCorrector(object):
         options : dict
             Dictionary of options to be passed to scipy.optimize.minimize.
         """
-        cbv_array, _ = self._get_cbv_data(cbvs, use_gp=self.use_gp)
+        cbv_array, _ = self._get_cbv_data(cbvs)
 
         median_flux = np.nanmedian(self.lc.flux)
         norm_flux = self.lc.flux / median_flux - 1
@@ -276,7 +242,7 @@ class KeplerCBVCorrector(object):
         with plt.style.context(MPLSTYLE):
             if ax is None:
                 _, ax = plt.subplots(1)
-            cbv_array, time = self._get_cbv_data(cbvs, use_gp=self.use_gp)
+            cbv_array, time = self._get_cbv_data(cbvs)
             for idx, cbv in enumerate(cbv_array):
                 ax.plot(time, cbv+idx/10., label='{}'.format(idx + 1))
             ax.set_yticks([])
