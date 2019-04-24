@@ -4,14 +4,13 @@ import sys
 import numpy as np
 from ..lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
 
+bad_optional_imports = False
 try:
     import bokeh
-except:
-    print('no bokeh, tests will be skipped')
-try:
     from astropy.stats.bls import BoxLeastSquares
 except:
-    print('no bls, tests will be skipped')
+    bad_optional_imports = True
+
 
 
 KEPLER10 = ("https://archive.stsci.edu/missions/kepler/lightcurves/"

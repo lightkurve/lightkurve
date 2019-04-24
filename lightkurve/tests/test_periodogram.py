@@ -7,12 +7,12 @@ from ..lightcurve import LightCurve
 from ..periodogram import Periodogram
 import sys
 
+
+bad_optional_imports = False
 try:
     from astropy.stats.bls import BoxLeastSquares
-except:
-    print('no bls, tests will be skipped')
-
-bad_optional_imports = np.any([('astropy.stats.bls' not in sys.modules)])
+except ImportError:
+    bad_optional_imports = True
 
 
 def test_periodogram_basics():

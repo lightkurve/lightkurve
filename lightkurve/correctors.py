@@ -66,7 +66,7 @@ class KeplerCBVCorrector(object):
     >>> plt.legend() # doctest: +SKIP
     """
 
-    def __init__(self, lc, cbv_array=None, cbv_time=None, likelihood=oktopus.LaplacianLikelihood,
+    def __init__(self, lc, cbv_array=None, cbv_cadenceno=None, likelihood=oktopus.LaplacianLikelihood,
                  prior=oktopus.LaplacianPrior):
         self.lc = lc
         if not hasattr(self.lc, 'channel'):
@@ -81,11 +81,12 @@ class KeplerCBVCorrector(object):
             self.cbv_base_url = "http://archive.stsci.edu/missions/k2/cbv/"
 
         if cbv_array is None:
-            cbv_array, cbv_time = self._get_cbv_data(np.arange(1, self._ncbvs))
+            cbv_array, cbv_cadenceno = self._get_cbv_data(np.arange(1, self._ncbvs))
+        if (cbv_array is not None) & (cbv_cadenceno is None):
+            raise ValueError('Please specify both `cbv_array` and `cbv_cadenceno`')
         self.cbv_array = cbv_array
-        self.cbv_time = cbv_time
-        if not np.in1d(self.lc.time, self.cbv_time).all():
-            raise ValueError('CBV array does not cover all time points in the light curve.')
+        self.cbv_cadenceno = cbv_cadenceno
+
 
     @property
     def lc(self):
@@ -126,7 +127,7 @@ class KeplerCBVCorrector(object):
         cbv_file = pyfits.open(self.get_cbv_url())
         cbv_data = cbv_file['MODOUT_{0}_{1}'.format(module, output)].data
         quality_mask = np.in1d(cbv_data['CADENCENO'], self.lc.cadenceno)
-        time = cbv_file['MODOUT_{0}_{1}'.format(module, output)].data['TIME_MJD'][quality_mask]
+        time = cbv_file['MODOUT_{0}_{1}'.format(module, output)].data['CADENCENO'][quality_mask]
         cbv_array = []
         for i in cbvs:
             cbv_array.append(cbv_data.field('VECTOR_{}'.format(i))[quality_mask])
@@ -157,7 +158,7 @@ class KeplerCBVCorrector(object):
 
         # Trim down to the right number of cbvs
         clip = np.in1d(np.arange(1, len(self.cbv_array)+1), np.asarray(cbvs))
-        time_clip = np.in1d(self.cbv_time, self.lc.time)
+        time_clip = np.in1d(self.cbv_cadenceno, self.lc.cadenceno)
         def mean_model(*theta):
             coeffs = np.asarray(theta)
             return np.dot(coeffs, self.cbv_array[clip, :][:, time_clip])
@@ -250,12 +251,12 @@ class KeplerCBVCorrector(object):
         '''
         with plt.style.context(MPLSTYLE):
             clip = np.in1d(np.arange(1, len(self.cbv_array)+1), np.asarray(cbvs))
-            time_clip = np.in1d(self.cbv_time, self.lc.time)
+            time_clip = np.in1d(self.cbv_cadenceno, self.lc.cadenceno)
 
             if ax is None:
                 _, ax = plt.subplots(1)
             for idx, cbv in enumerate(self.cbv_array[clip, :][:, time_clip]):
-                ax.plot(self.cbv_time[time_clip], cbv+idx/10., label='{}'.format(idx + 1))
+                ax.plot(self.cbv_cadenceno[time_clip], cbv+idx/10., label='{}'.format(idx + 1))
             ax.set_yticks([])
             ax.set_xlabel('Time (MJD)')
             module, output = channel_to_module_output(self.lc.channel)
