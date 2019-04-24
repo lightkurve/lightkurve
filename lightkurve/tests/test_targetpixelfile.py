@@ -346,15 +346,16 @@ def test_tpf_from_images():
 
         # Can we read in a list of file names or a list of HDUlists?
         hdus = []
+        tmpfile_names = []
         for idx, im in enumerate(images):
+            tmpfile = tempfile.NamedTemporaryFile(delete=False)
+            tmpfile_names.append(tmpfile.name)
             hdu = fits.HDUList([fits.PrimaryHDU(), im])
-            hdu.writeto(get_pkg_data_filename('data/test_factory{}.fits'.format(idx)), overwrite=True)
+            hdu.writeto(tmpfile.name)
             hdus.append(hdu)
 
-        fnames = [get_pkg_data_filename('data/test_factory{}.fits'.format(i)) for i in range(5)]
-
         # Should be able to run with a list of file names
-        tpf_fnames = KeplerTargetPixelFile.from_fits_images(fnames,
+        tpf_tmpfiles = KeplerTargetPixelFile.from_fits_images(tmpfile_names,
                                                             size=(3, 3),
                                                             position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
 
@@ -362,6 +363,10 @@ def test_tpf_from_images():
         tpf_hdus = KeplerTargetPixelFile.from_fits_images(hdus,
                                                           size=(3, 3),
                                                           position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
+
+        # Clean up the temporary files we created
+        for filename in tmpfile_names:
+            os.remove(filename)
 
 
 def test_tpf_wcs_from_images():

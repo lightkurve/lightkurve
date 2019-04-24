@@ -293,7 +293,7 @@ def test_open():
     assert(isinstance(tesstpf, TessTargetPixelFile))
     # Open should fail if the filetype is not recognized
     try:
-        open(os.path.join(PACKAGEDIR, "tests", "data", "test_factory0.fits"))
+        open(os.path.join(PACKAGEDIR, "data", "lightkurve.mplstyle"))
     except ValueError:
         pass
     # Can you instantiate with a path?
