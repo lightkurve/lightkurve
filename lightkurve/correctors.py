@@ -84,6 +84,8 @@ class KeplerCBVCorrector(object):
             cbv_array, cbv_time = self._get_cbv_data(np.arange(1, self._ncbvs))
         self.cbv_array = cbv_array
         self.cbv_time = cbv_time
+        if not np.in1d(self.lc.time, self.cbv_time).all():
+            raise ValueError('CBV array does not cover all time points in the light curve.')
 
     @property
     def lc(self):
@@ -94,7 +96,7 @@ class KeplerCBVCorrector(object):
         # this enables `lc` to be either a string
         # or an object from KeplerLightCurveFile
         if isinstance(value, str):
-            self._lc = KeplerLightCurveFile(value)
+            self._lc = KeplerLightCurveFile(value).PDCSAP_FLUX
         elif isinstance(value, KeplerLightCurveFile):
             self._lc = value.SAP_FLUX
         elif isinstance(value, KeplerLightCurve):
@@ -153,10 +155,12 @@ class KeplerCBVCorrector(object):
         norm_flux = self.lc.flux / median_flux - 1
         norm_err_flux = self.lc.flux_err / median_flux
 
+        # Trim down to the right number of cbvs
         clip = np.in1d(np.arange(1, len(self.cbv_array)+1), np.asarray(cbvs))
+        time_clip = np.in1d(self.cbv_time, self.lc.time)
         def mean_model(*theta):
             coeffs = np.asarray(theta)
-            return np.dot(coeffs, self.cbv_array[clip, :])
+            return np.dot(coeffs, self.cbv_array[clip, :][:, time_clip])
 
         prior = self.prior(mean=np.zeros(len(cbvs)), var=16.)
         likelihood = self.likelihood(data=norm_flux, mean=mean_model,
@@ -246,10 +250,12 @@ class KeplerCBVCorrector(object):
         '''
         with plt.style.context(MPLSTYLE):
             clip = np.in1d(np.arange(1, len(self.cbv_array)+1), np.asarray(cbvs))
+            time_clip = np.in1d(self.cbv_time, self.lc.time)
+
             if ax is None:
                 _, ax = plt.subplots(1)
-            for idx, cbv in enumerate(self.cbv_array[clip, :]):
-                ax.plot(self.cbv_time, cbv+idx/10., label='{}'.format(idx + 1))
+            for idx, cbv in enumerate(self.cbv_array[clip, :][:, time_clip]):
+                ax.plot(self.cbv_time[time_clip], cbv+idx/10., label='{}'.format(idx + 1))
             ax.set_yticks([])
             ax.set_xlabel('Time (MJD)')
             module, output = channel_to_module_output(self.lc.channel)
