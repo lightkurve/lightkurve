@@ -400,6 +400,10 @@ def test_bin():
                           flux=1*np.ones(1000) + np.random.normal(0, 1e-6, 1000),
                           cadenceno=np.arange(1000))
     assert np.isclose(lc.bin(2).estimate_cdpp(), 1, rtol=1)
+    # Regression test for #500
+    lc = LightCurve(time=np.arange(2000),
+                    flux=np.random.normal(loc=42, scale=0.01, size=2000))
+    assert np.round(lc.bin(2000).flux_err[0], 2) == 0.01
 
 
 def test_bin_quality():
