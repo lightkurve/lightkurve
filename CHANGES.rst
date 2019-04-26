@@ -1,8 +1,9 @@
 1.0.1 (unreleased)
 ==================
 
-- Small bug fixes in ``LightCurve.bin()`` [#503], ``PLDCorrector.correct()`` [#498].
-
+- Fixed minor bugs in ``PLDCorrector.correct()`` [#498],
+  ``TargetPixelFile.create_threshold_mask()`` [#502],
+  and ``LightCurve.bin()`` [#503].
 
 
 1.0.0 (2019-04-08)
