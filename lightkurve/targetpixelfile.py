@@ -455,7 +455,7 @@ class TargetPixelFile(object):
             threshold.
         """
         if reference_pixel == 'center':
-            reference_pixel = (self.shape[1] / 2, self.shape[2] / 2)
+            reference_pixel = (self.shape[2] / 2, self.shape[1] / 2)
         # Calculate the median image
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
