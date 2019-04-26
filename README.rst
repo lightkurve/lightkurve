@@ -42,19 +42,15 @@ Read the documentation at `http://docs.lightkurve.org <http://docs.lightkurve.or
 
 Quickstart
 ----------
-If you have a working version of Python 2 or 3 on your system, you can simply install this package using `pip`:
-::
 
-  pip install lightkurve
-
-Once installed, visit our quickstart guide at `http://docs.lightkurve.org/quickstart.html <http://docs.lightkurve.org/quickstart.html>`_.
+Please visit our quickstart guide at `http://docs.lightkurve.org/quickstart.html <http://docs.lightkurve.org/quickstart.html>`_.
 
 
 Contributing
 ------------
 
-We welcome community contributions from everyone!
-Please read the contribution guidelines at `http://docs.lightkurve.org/about/contributing.html <http://docs.lightkurve.org/about/contributing.html>`_.
+We welcome community contributions!
+Please read the  guidelines at `http://docs.lightkurve.org/about/contributing.html <http://docs.lightkurve.org/about/contributing.html>`_.
 
 
 Citing
