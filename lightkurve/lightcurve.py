@@ -636,8 +636,9 @@ class LightCurve(object):
                  for a in indexes]
             ) / binsize
         else:
-            # Make them zeros.
-            binned_lc.flux_err = np.zeros(len(binned_lc.flux))
+            # If the original light curve does not provide `flux_err`,
+            # then report the standard deviations of the fluxes in each bin.
+            binned_lc.flux_err = np.array([np.nanstd(self.flux[a]) for a in indexes])
 
         if hasattr(binned_lc, 'quality'):
             # Note: np.bitwise_or only works if there are no NaNs
