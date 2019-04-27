@@ -711,12 +711,16 @@ def _query_mast(target, radius=None, project=('Kepler', 'K2', 'TESS')):
         # `target_name` under which MAST will know the object to prevent
         # source confusion (see GitHub issue #148).
         target = int(target)
-        if (target > 0) and (target < 200000000):
-            target_name = 'kplr{:09d}'.format(target)
-        elif (target > 200000000) and (target < 300000000):
-            target_name = 'ktwo{:09d}'.format(target)
+        if isinstance(target, str) and target.lower().startswith(('epic', 'kic')):
+            target = int(''.join(filter(str.isdigit, target)))
+            if (target > 0) and (target < 200000000):
+                target_name = 'kplr{:09d}'.format(target)
+            elif (target > 200000000) and (target < 300000000):
+                target_name = 'ktwo{:09d}'.format(target)
+        elif isinstance(target, str) and target.lower().startswith(('tic')):
+            target_name = int(''.join(filter(str.isdigit, target)))
         else:
-            raise ValueError("{:09d}: not in the KIC or EPIC ID range".format(target))
+            raise ValueError("{:09d}: not in the KIC, TIC, or EPIC ID range".format(target))
 
         # query_criteria does not allow a cone search when target_name is passed in
         # so first grab desired target with ~0 arcsecond radius

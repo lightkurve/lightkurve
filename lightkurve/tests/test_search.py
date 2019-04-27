@@ -295,3 +295,14 @@ def test_indexerror_631():
     # This previously triggered an exception:
     result = search_lightcurvefile("KIC 8462852", sector=15)
     assert len(result) == 1
+    len(search) == 0
+
+
+def test_overlap():
+    """Regression test for ..."""
+    # The following search previously returned two targets when given a single
+    # ID, and should now return only the desired target.
+    search = search_targetpixelfile("EPIC 203348744")
+    assert(len(search) == 1)
+    # it should return the same result when searching for just the int ID
+    assert(len(search) == len(search_targetpixelfile(203348744)))
