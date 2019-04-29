@@ -294,7 +294,7 @@ def test_open():
     # Open should fail if the filetype is not recognized
     try:
         open(os.path.join(PACKAGEDIR, "data", "lightkurve.mplstyle"))
-    except ValueError, IOError:
+    except (ValueError, IOError):
         pass
     # Can you instantiate with a path?
     assert(isinstance(KeplerTargetPixelFile(k2_path), KeplerTargetPixelFile))
