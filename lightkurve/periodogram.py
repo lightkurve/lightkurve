@@ -582,9 +582,11 @@ class SNRPeriodogram(Periodogram):
         ax : matplotlib.axes._subplots.AxesSubplot
             The matplotlib axes object. Only returned if show_plots = True.
         """
-        #TODO: This won't hold for main sequence stars
         if numaxs is None:
-            numaxs = 10**np.linspace(np.log10(10), np.log10(self.nyquist.value), 200)
+            if self.nyquist is not None:
+                numaxs = 10**np.linspace(np.log10(10), np.log10(self.nyquist.value), 200)
+            else:
+                numaxs = 10**np.linspace(np.log10(10), np.log10(np.nanmax(self.frequency.value)),200)
 
         #We want to find the numax which returns in the highest autocorrelation
         #power, so we will return the maximum value in the ACF.
@@ -597,15 +599,6 @@ class SNRPeriodogram(Periodogram):
 
         acf_numax = numaxs[np.argmax(maxacf)]     #The best numax is the numax that results in the highest ACF
         best_numax = acf_numax
-
-        # #Now lets fit a Gaussian to the region around the best guess numax
-        # fwhm = self._get_fwhm(acf_numax)
-        # sel = np.where((numaxs > (acf_numax-fwhm)) &
-        #                 (numaxs < acf_numax + fwhm))
-        # popt, pcov = curve_fit(self._gaussian, numaxs[sel], maxacf[sel],
-        #                         p0 = [fwhm/2.35, np.nanmax(maxacf), acf_numax])
-        # best_numax = popt[2]
-        # numax_err = popt[0]
 
         if show_plots == True:
             with plt.style.context(MPLSTYLE):
@@ -624,6 +617,7 @@ class SNRPeriodogram(Periodogram):
                 ax[1].axvline(best_numax,c='r', linewidth=2,alpha=.4,
                     label=r'{:.1f} $\mu$Hz'.format(best_numax))
                 ax[1].legend()
+
         if show_plots:
             return u.Quantity(best_numax, self.frequency.unit), ax
         return u.Quantity(best_numax, self.frequency.unit)
