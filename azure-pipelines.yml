@@ -13,7 +13,7 @@ strategy:
       vmImage: 'vs2017-win2016'
       python.version: '3.7'
 pool:
-  vmImage: $(imageName)
+  vmImage: $(vmImage)
 
 steps:
 - task: UsePythonVersion@0
