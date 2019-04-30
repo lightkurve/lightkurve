@@ -15,7 +15,7 @@ steps:
   displayName: 'Run pytest'
 
 - script: bash <(curl https://codecov.io/bash)
-  displayName: 'codecov'
+  displayName: 'Run codecov'
   condition: eq(variables['Agent.JobName'], 'Python37_RemoteData')
 
 - task: PublishTestResults@2
