@@ -366,7 +366,10 @@ def test_tpf_from_images():
 
         # Clean up the temporary files we created
         for filename in tmpfile_names:
-            os.remove(filename)
+            try:
+                os.remove(filename)
+            except PermissionError:
+                pass  # This appears to happen on Windows
 
 
 def test_tpf_wcs_from_images():
