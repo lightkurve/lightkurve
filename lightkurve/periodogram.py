@@ -582,6 +582,17 @@ class SNRPeriodogram(Periodogram):
         ax : matplotlib.axes._subplots.AxesSubplot
             The matplotlib axes object. Only returned if show_plots = True.
         """
+        # Run some checks on the passed in numaxs
+        if numaxs is not None:
+            numaxs = u.Quantity(numaxs, self.frequency.unit).value
+            fs = np.median(np.diff(self.frequency.value))
+            if any(numaxs < fs):
+                raise ValueError("A custom range of numaxs can not extend below"
+                                "a a single frequency bin.")
+            if any(numaxs > np.nanmax(self.frequency.value)):
+                raise ValueError("A custom range of numaxs can not extend above"
+                                "the highest frequency value in the periodogram.")
+
         if numaxs is None:
             if self.nyquist is not None:
                 numaxs = 10**np.linspace(np.log10(10), np.log10(self.nyquist.value), 200)
@@ -609,9 +620,7 @@ class SNRPeriodogram(Periodogram):
                 ax[0].set_xlabel(None)
 
                 ax[1].plot(numaxs,maxacf)
-                # ax[1].plot(numaxs[sel], self._gaussian(numaxs[sel], *popt),
-                #             linewidth=3,linestyle='--',label='Gaussian Fit')
-                ax[1].set_xlabel(r'Frequency [$\mu$Hz]')
+                ax[1].set_xlabel("Frequency [{}]".format(self.frequency.unit.to_string('latex')))
                 ax[1].set_ylabel(r'Max. Correlation')
                 ax[0].axvline(best_numax,c='r', linewidth=2,alpha=.4)
                 ax[1].axvline(best_numax,c='r', linewidth=2,alpha=.4,
