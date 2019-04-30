@@ -2,7 +2,7 @@ trigger:
 - master
 
 jobs:
-- job: LinuxTest
+- job: Linux
   pool:
     vmImage: 'ubuntu-16.04'
   strategy:
@@ -10,8 +10,8 @@ jobs:
       Python27:
         python.version: '2.7'
         pytest.options: ''
-      Python38:
-        python.version: '3.8'
+      Python36:
+        python.version: '3.6'
         pytest.options: ''
       Python37_RemoteData:
         python.version: '3.7'
@@ -19,7 +19,7 @@ jobs:
   steps:
   - template: azure-steps.yml
 
-- job: WindowsTest
+- job: Windows
   pool:
     vmImage: 'vs2017-win2016'
   strategy:
