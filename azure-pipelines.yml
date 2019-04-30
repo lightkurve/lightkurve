@@ -2,7 +2,7 @@ trigger:
 - master
 
 jobs:
-- job: Test on Linux
+- job: LinuxTest
   pool:
     vmImage: 'ubuntu-16.04'
   strategy:
@@ -16,7 +16,7 @@ jobs:
   steps:
   - template: azure-steps.yml
 
-- job: Test on Windows
+- job: WindowsTest
   pool:
     vmImage: 'vs2017-win2016'
   strategy:
