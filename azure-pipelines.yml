@@ -7,7 +7,8 @@ jobs:
     vmImage: 'ubuntu-16.04'
   steps:
   - bash: |
-      source $HOME/miniconda/etc/profile.d/conda.sh
+      echo $CONDA
+      source $CONDA/etc/profile.d/conda.sh
     displayName: Add conda to PATH
   - template: azure-steps.yml
 
@@ -18,7 +19,7 @@ jobs:
   # See https://docs.microsoft.com/en-us/azure/devops/pipelines/languages/anaconda
   - bash: |
       echo $CONDA
-      source $HOME/miniconda/etc/profile.d/conda.sh
+      source $CONDA/etc/profile.d/conda.sh
     displayName: Add conda to PATH
   - bash: |
       echo $CONDA
@@ -31,6 +32,7 @@ jobs:
     vmImage: 'vs2017-win2016'
   steps:
   # See https://docs.microsoft.com/en-us/azure/devops/pipelines/languages/anaconda
+  - script: echo $CONDA
   - powershell: Write-Host "##vso[task.prependpath]$env:CONDA\Scripts"
     displayName: Add conda to PATH
   - template: azure-steps.yml
