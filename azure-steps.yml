@@ -1,0 +1,16 @@
+steps:
+- bash: conda env create --quiet --file environment.yml
+  displayName: Create Anaconda environment
+
+- bash: conda activate lightkurve
+  displayName: Activate Anaconda environment
+
+- script: |
+    #python -m pip install --upgrade pip
+    #pip install numpy  # celerite needs numpy to build, so we install it first
+    pip install -e .[all,test]
+  displayName: 'Install Lightkurve & dependencies'
+
+- script: |
+    pytest
+  displayName: 'pytest'

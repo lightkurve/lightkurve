@@ -1,38 +1,24 @@
 trigger:
 - master
 
-strategy:
-  matrix:
-    Linux_Python36:
-      vmImage: 'ubuntu-16.04'
-      python.version: '3.6'
-    Linux_Python37:
-      vmImage: 'ubuntu-16.04'
-      python.version: '3.7'
-    Windows_Python37:
-      vmImage: 'vs2017-win2016'
-      python.version: '3.7'
-pool:
-  vmImage: $(vmImage)
+jobs:
+- job: Linux
+  pool:
+    vmImage: 'ubuntu-16.04'
+  steps:
+  - template: azure-steps.yml
 
-steps:
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: '$(python.version)'
-  displayName: 'Use Python $(python.version)'
+- job: macOS
+  pool:
+    vmImage: 'macOS-10.13'
+  steps:
+  - template: azure-steps.yml
 
-- bash: conda env create --quiet --file environment.yml
-  displayName: Create Anaconda environment
-
-- bash: conda activate lightkurve
-  displayName: Activate Anaconda environment
-
-- script: |
-    #python -m pip install --upgrade pip
-    #pip install numpy  # celerite needs numpy to build, so we install it first
-    pip install -e .[all,test]
-  displayName: 'Install Lightkurve & dependencies'
-
-- script: |
-    pytest
-  displayName: 'pytest'
+- job: Windows
+  pool:
+    vmImage: 'vs2017-win2016'
+  steps:
+  - powershell: Write-Host "##vso[task.prependpath]$env:CONDA\Scripts"
+    displayName: Add conda to PATH
+  - template: azure-steps.yml
+  - script: echo This step runs after the template's steps.
