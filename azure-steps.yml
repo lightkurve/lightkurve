@@ -1,5 +1,5 @@
 steps:
-- script: conda env create --quiet --file environment.yml
+- script: conda env create --quiet --file environment.yml python=3.7
   displayName: Create Anaconda environment
 
 - script: conda activate lightkurve
