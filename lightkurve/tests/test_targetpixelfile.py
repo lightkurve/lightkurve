@@ -221,8 +221,14 @@ def test_tpf_to_fits():
     """Can we write a TPF back to a fits file?"""
     for tpf in [KeplerTargetPixelFile(filename_tpf_all_zeros),
                 TessTargetPixelFile(filename_tess)]:
-        with tempfile.NamedTemporaryFile() as tmp:
+        # `delete=False` is necessary to enable writing to the file on Windows
+        # but it means we have to clean up the tmp file ourselves
+        tmp = tempfile.NamedTemporaryFile(delete=False)
+        try:
             tpf.to_fits(tmp.name)
+        finally:
+            tmp.close()
+            os.remove(tmp.name)
 
 
 def test_tpf_factory():
@@ -331,8 +337,12 @@ def test_tpf_from_images():
         # Can we write the output to disk?
         # `delete=False` is necessary below to enable writing to the file on Windows
         # but it means we have to clean up the tmp file ourselves
-        with tempfile.NamedTemporaryFile() as tmp:
+        tmp = tempfile.NamedTemporaryFile(delete=False)
+        try:
             tpf.to_fits(tmp.name)
+        finally:
+            tmp.close()
+            os.remove(tmp.name)
 
         # Can we read in a list of file names or a list of HDUlists?
         hdus = []
@@ -355,11 +365,11 @@ def test_tpf_from_images():
                                                           position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
 
         # Clean up the temporary files we created
-        try:
-            for filename in tmpfile_names:
+        for filename in tmpfile_names:
+            try:
                 os.remove(filename)
-        except PermissionError:  # Appears to happen on Windows because the file is in use
-            pass
+            except PermissionError:
+                pass  # This appears to happen on Windows
 
 
 def test_tpf_wcs_from_images():

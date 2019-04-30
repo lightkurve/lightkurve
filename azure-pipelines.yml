@@ -9,10 +9,13 @@ jobs:
     matrix:
       Python27:
         python.version: '2.7'
+        pytest.options: ''
       Python36:
         python.version: '3.6'
+        pytest.options: ''
       Python37:
         python.version: '3.7'
+        pytest.options: '--remote-data'
   steps:
   - template: azure-steps.yml
 
