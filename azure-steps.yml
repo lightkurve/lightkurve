@@ -1,11 +1,8 @@
 steps:
-- script: conda env create --quiet --file environment.yml python=3.7
-  displayName: Create Anaconda environment
-
-- script: conda activate lightkurve
-  displayName: Activate Anaconda environment
-
-- script: pip install -e .[all,test]
+- script: |
+    python -m pip install --upgrade pip
+    pip install numpy  # celerite needs numpy to build, so we install it first
+    pip install -e .[all,test]
   displayName: 'Install Lightkurve & dependencies'
 
 - script: |
