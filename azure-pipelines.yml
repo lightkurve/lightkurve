@@ -7,6 +7,8 @@ jobs:
     vmImage: 'ubuntu-16.04'
   strategy:
     matrix:
+      Python27:
+        python.version: '2.7'
       Python36:
         python.version: '3.6'
       Python37:
@@ -17,11 +19,19 @@ jobs:
 - job: macOS
   pool:
     vmImage: 'macOS-10.13'
+  strategy:
+    matrix:
+      Python37:
+        python.version: '3.7'
   steps:
   - template: azure-steps.yml
 
 - job: Windows
   pool:
     vmImage: 'vs2017-win2016'
+  strategy:
+    matrix:
+      Python37:
+        python.version: '3.7'
   steps:
   - template: azure-steps.yml

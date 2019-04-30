@@ -1,6 +1,3 @@
-parameters:
-  python.version: '3.7'
-
 steps:
 
 - task: UsePythonVersion@0
@@ -9,11 +6,23 @@ steps:
   displayName: 'Use Python $(python.version)'
 
 - script: |
-    python -m pip install --upgrade pip
+    python -m pip install --upgrade pip setuptools wheel
     pip install numpy  # celerite needs numpy to build, so we install it first
     pip install -e .[all,test]
   displayName: 'Install Lightkurve & dependencies'
 
 - script: |
-    pytest
+    pytest --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
   displayName: 'pytest'
+
+- task: PublishTestResults@2
+  condition: succeededOrFailed()
+  inputs:
+    testResultsFiles: '**/test-*.xml'
+    testRunTitle: 'Publish test results for Python $(python.version)'
+
+- task: PublishCodeCoverageResults@1
+  inputs:
+    codeCoverageTool: Cobertura
+    summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
+    reportDirectory: '$(System.DefaultWorkingDirectory)/**/htmlcov'
