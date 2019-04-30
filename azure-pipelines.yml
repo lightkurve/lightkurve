@@ -3,17 +3,15 @@ trigger:
 
 strategy:
   matrix:
-    Linux:
-      imageName: 'Ubuntu-16.04'
-    Windows:
-      imageName: 'vs2017-win2016'
-    Python27:
-      python.version: '2.7'
-    Python36:
+    Linux_Python36:
+      vmImage: 'ubuntu-16.04'
       python.version: '3.6'
-    Python37:
+    Linux_Python37:
+      vmImage: 'ubuntu-16.04'
       python.version: '3.7'
-
+    Windows_Python37:
+      vmImage: 'vs2017-win2016'
+      python.version: '3.7'
 pool:
   vmImage: $(imageName)
 
@@ -23,9 +21,14 @@ steps:
     versionSpec: '$(python.version)'
   displayName: 'Use Python $(python.version)'
 
+- script:
+    conda env create --quiet --file environment.yml
+    source activate lightkurve
+  displayName: Create Anaconda environment
+
 - script: |
-    python -m pip install --upgrade pip
-    pip install numpy  # celerite needs numpy to build, so we install it first
+    #python -m pip install --upgrade pip
+    #pip install numpy  # celerite needs numpy to build, so we install it first
     pip install -e .[all,test]
   displayName: 'Install Lightkurve & dependencies'
 
