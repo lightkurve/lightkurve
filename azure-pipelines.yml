@@ -25,7 +25,7 @@ jobs:
         pip.command: 'pip install -e .[test]'
 
   steps:
-  - template: azure-steps.yml
+  - template: .azure-template.yml
 
 - job: Windows
   pool:
@@ -37,4 +37,4 @@ jobs:
         pytest.options: ''
         pip.command: 'pip install -e .[all,test]'
   steps:
-  - template: azure-steps.yml
+  - template: .azure-template.yml
