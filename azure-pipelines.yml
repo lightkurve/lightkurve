@@ -17,11 +17,11 @@ jobs:
   steps:
   # See https://docs.microsoft.com/en-us/azure/devops/pipelines/languages/anaconda
   - bash: |
-      - source $HOME/miniconda/etc/profile.d/conda.sh
+      source $HOME/miniconda/etc/profile.d/conda.sh
     displayName: Add conda to PATH
   - bash: |
-      - echo $CONDA
-      - sudo chown -R $USER $CONDA
+      echo $CONDA
+      sudo chown -R $USER $CONDA
     displayName: Take ownership of conda installation
   - template: azure-steps.yml
 
