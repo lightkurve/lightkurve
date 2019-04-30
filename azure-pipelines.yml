@@ -6,7 +6,8 @@ jobs:
   pool:
     vmImage: 'ubuntu-16.04'
   steps:
-  - bash: echo "##vso[task.prependpath]$CONDA/bin"
+  - bash: |
+      - source $HOME/miniconda/etc/profile.d/conda.sh
     displayName: Add conda to PATH
   - template: azure-steps.yml
 
@@ -15,9 +16,12 @@ jobs:
     vmImage: 'macOS-10.13'
   steps:
   # See https://docs.microsoft.com/en-us/azure/devops/pipelines/languages/anaconda
-  - bash: echo "##vso[task.prependpath]$CONDA/bin"
+  - bash: |
+      - source $HOME/miniconda/etc/profile.d/conda.sh
     displayName: Add conda to PATH
-  - bash: sudo chown -R $USER $CONDA
+  - bash: |
+      - echo $CONDA
+      - sudo chown -R $USER $CONDA
     displayName: Take ownership of conda installation
   - template: azure-steps.yml
 
