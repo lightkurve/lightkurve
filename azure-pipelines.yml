@@ -9,6 +9,7 @@ jobs:
   - bash: |
       echo $CONDA
       source $CONDA/etc/profile.d/conda.sh
+      conda activate
     displayName: Add conda to PATH
   - template: azure-steps.yml
 
@@ -17,14 +18,11 @@ jobs:
     vmImage: 'macOS-10.13'
   steps:
   # See https://docs.microsoft.com/en-us/azure/devops/pipelines/languages/anaconda
-  - bash: |
-      echo $CONDA
-      source $CONDA/etc/profile.d/conda.sh
+  - bash: source $CONDA/etc/profile.d/conda.sh
     displayName: Add conda to PATH
-  - bash: |
-      echo $CONDA
-      sudo chown -R $USER $CONDA
+  - bash: sudo chown -R $USER $CONDA
     displayName: Take ownership of conda installation
+  - bash: echo "##vso[task.prependpath]$CONDA/bin"
   - template: azure-steps.yml
 
 - job: Windows
