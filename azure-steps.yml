@@ -1,6 +1,3 @@
-parameters:
-  pytestOptions: ''
-
 steps:
 
 - task: UsePythonVersion@0
@@ -11,11 +8,14 @@ steps:
 - script: |
     python -m pip install --upgrade pip setuptools wheel
     pip install numpy  # celerite needs numpy to build, so we install it first
-    pip install -e .[all,test]
+    $(pip.command)
   displayName: 'Install Lightkurve & dependencies'
 
 - script: pytest $(pytest.options) --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
   displayName: 'Run pytest'
+
+- script: codecov
+  displayName: 'Run codecov'
 
 - task: PublishTestResults@2
   condition: succeededOrFailed()
