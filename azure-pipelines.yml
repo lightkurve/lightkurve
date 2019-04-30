@@ -21,10 +21,11 @@ steps:
     versionSpec: '$(python.version)'
   displayName: 'Use Python $(python.version)'
 
-- script:
-    conda env create --quiet --file environment.yml
-    source activate lightkurve
+- bash: conda env create --quiet --file environment.yml
   displayName: Create Anaconda environment
+
+- bash: conda activate lightkurve
+  displayName: Activate Anaconda environment
 
 - script: |
     #python -m pip install --upgrade pip
