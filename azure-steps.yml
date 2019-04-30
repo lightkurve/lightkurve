@@ -12,7 +12,7 @@ steps:
   displayName: 'Install Lightkurve & dependencies'
 
 - script: |
-    pytest --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
+    pytest --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml
   displayName: 'pytest'
 
 - task: PublishTestResults@2
