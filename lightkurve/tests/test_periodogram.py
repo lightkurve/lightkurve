@@ -2,10 +2,12 @@ import pytest
 from astropy import units as u
 import numpy as np
 from numpy.testing import assert_almost_equal, assert_array_equal
+from scipy.signal import unit_impulse as deltafn
 
 from ..lightcurve import LightCurve
 from ..search import search_lightcurvefile
 from ..periodogram import Periodogram
+from ..periodogram import SNRPeriodogram
 import sys
 
 
@@ -188,7 +190,6 @@ def test_flatten():
     str(s)
     s.plot()
 
-
 def test_index():
     """Test if you can mask out periodogram
     """
@@ -197,6 +198,78 @@ def test_index():
     p = lc.to_periodogram()
     mask = (p.frequency > 0.1*(1/u.day)) & (p.frequency < 0.2*(1/u.day))
     assert len(p[mask].frequency) == mask.sum()
+
+def generate_test_spectrum():
+    """Generates a simple solar-like oscillator spectrum of oscillation modes
+    """
+    f = np.arange(0, 4000., 0.4)
+    p = np.ones(len(f))
+    nmx = 2500.
+    fs = f.max()/len(f)
+
+    s = 0.25*nmx/2.335    #std of the hump
+    p *= 10 * np.exp(-0.5*(f-nmx)**2/s**2)  #gaussian profile of the hump
+
+    m = np.zeros(len(f))
+    lo = int(np.floor(.5*nmx/fs))
+    hi = int(np.floor(1.5*nmx/fs))
+
+    dnu_true = 0.294 * nmx ** 0.772
+    modelocs = np.arange(lo, hi, dnu_true, dtype=int)
+
+    for modeloc in modelocs:
+        m += deltafn(len(f), modeloc)
+    p *= m
+    p += 1
+    return f, p, nmx, dnu_true
+
+def test_estimate_numax_basics():
+    """Test if we can estimate a numax
+    """
+    f, p, true_numax, _ = generate_test_spectrum()
+    snr = SNRPeriodogram(f*u.microhertz, u.Quantity(p, None))
+    numax = snr.estimate_numax()
+
+    #Assert recovers numax within 10%
+    assert(np.isclose(true_numax, numax.value, atol=.1*true_numax))
+    #Assert numax has unit equal to input frequency unit
+    assert(numax.unit == u.microhertz)
+    #Assert numax estimator works when input frequency is not in microhertz
+    fday = u.Quantity(f*u.microhertz, 1/u.day)
+    snr = SNRPeriodogram(fday, u.Quantity(p, None))
+    numax = snr.estimate_numax()
+    nmxday = u.Quantity(true_numax*u.microhertz, 1/u.day)
+    assert(np.isclose(nmxday, numax, atol=.1*nmxday))
+
+def test_estimate_numax_kwargs():
+    """Test if we can estimate a numax using its various keyword arguments
+    """
+    f, p, true_numax, _ = generate_test_spectrum()
+    std = 0.25*true_numax/2.335  # The standard deviation of the mode envelope
+    snr = SNRPeriodogram(f*u.microhertz, u.Quantity(p, None))
+    numaxs = np.linspace(true_numax-2*std, true_numax+2*std, 500)
+    numax = snr.estimate_numax(numaxs=numaxs)
+
+    #Assert we can recover numax using a custom numax
+    assert(np.isclose(numax.value, true_numax, atol=.1*true_numax))
+
+    #Assert we can't pass custom numaxs outside a functional range
+    with pytest.raises(ValueError) as err:
+        numax = snr.estimate_numax(numaxs=np.linspace(-5, 5.))
+    with pytest.raises(ValueError) as err:
+        numax = snr.estimate_numax(numaxs=np.linspace(1., 5000.))
+
+    #Assert it doesn't matter what units of frqeuency numaxs are passed in as
+    #Assert the output is still in the same units as the object frequencies
+    daynumaxs = u.Quantity(numaxs*u.microhertz, 1/u.day)
+    numax = snr.estimate_numax(numaxs=daynumaxs)
+    assert(np.isclose(numax.value, true_numax, atol=.1*true_numax))
+    assert(numax.unit == u.microhertz)
+
+    # Sanity check that plotting works under all conditions
+    numax, ax = snr.estimate_numax(show_plots=True)
+    numax, ax = snr.estimate_numax(numaxs=numaxs,show_plots=True)
+    numax, ax = snr.estimate_numax(numaxs=daynumaxs, show_plots=True)
 
 @pytest.mark.skipif(bad_optional_imports,
                     reason="requires bokeh and astropy.stats.bls")
