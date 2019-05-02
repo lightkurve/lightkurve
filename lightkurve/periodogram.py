@@ -23,6 +23,7 @@ except ImportError:
     from astropy.stats import LombScargle
 
 from scipy.optimize import curve_fit
+from scipy.signal import find_peaks
 
 from . import MPLSTYLE
 plt.style.use(MPLSTYLE)
@@ -624,14 +625,16 @@ class SNRPeriodogram(Periodogram):
                 ax[1].set_ylabel(r'Max. Correlation')
                 ax[0].axvline(best_numax,c='r', linewidth=2,alpha=.4)
                 ax[1].axvline(best_numax,c='r', linewidth=2,alpha=.4,
-                    label=r'{:.1f} $\mu$Hz'.format(best_numax))
+                    label=r'{:.1f} {}'.format(best_numax,
+                                        self.frequency.unit.to_string('latex')))
                 ax[1].legend()
 
         if show_plots:
             return u.Quantity(best_numax, self.frequency.unit), ax
         return u.Quantity(best_numax, self.frequency.unit)
 
-    def estimate_dnu(self, numax=None, show_plots=False):
+
+    def estimate_dnu(self, numax=None, show_plots=False, test=False):
         """ Estimates the average value of the large frequency spacing, DeltaNu,
         of the seismic oscillations of the target.
 
@@ -667,34 +670,43 @@ class SNRPeriodogram(Periodogram):
         if numax is None:
             numax = self.estimate_numax()
 
+        # Ensure input numax is in the correct units
+        numax = u.Quantity(numax, self.frequency.unit)
+
         #Calcluate dnu using the method by Stello et al. 2009
-        dnu_emp = 0.294 * numax.value ** 0.772
+        #Make sure that this relation only ever happens in microhertz space
+        dnu_emp = u.Quantity((0.294 * u.Quantity(numax, u.microhertz).value ** 0.772)*u.microhertz,
+                            self.frequency.unit).value
 
         acf = self._autocorrelate(numax = numax.value)
         fs = np.median(np.diff(self.frequency.value))
         lags = np.linspace(0., len(acf)*fs, len(acf))
 
         #Select a 30% region region around the empirical dnu
-        sel = (lags > dnu_emp - .30*dnu_emp) & (lags < dnu_emp + .30*dnu_emp)
+        sel = (lags > dnu_emp - .25*dnu_emp) & (lags < dnu_emp + .25*dnu_emp)
 
-        #Select the peak of highest autocorrelation to be Dnu.
-        best_dnu = lags[sel][np.argmax(acf[sel])]
+        #Run a peak finder on this region
+        peaks, _ = find_peaks(acf[sel])
+
+        #Select the peak closest to the empirical value
+        best_dnu = lags[sel][peaks][np.argmin(np.abs(lags[sel][peaks] - dnu_emp))]
 
         if show_plots == True:
             with plt.style.context(MPLSTYLE):
                 fig, ax = plt.subplots(figsize=(8.485, 4))
                 ax.plot(lags,acf)
-                ax.set_xlabel(r'Frequency Lag [$\mu$Hz]')
+                ax.set_xlabel("Frequency [{}]".format(self.frequency.unit.to_string('latex')))
                 ax.set_ylabel(r'Correlation')
-                ax.axvline(best_dnu,c='r', linewidth=2,alpha=.4,
-                    label=r'{:.1f} $\mu$Hz'.format(best_dnu))
+                ax.axvline(best_dnu,c='r', linewidth=2,alpha=.4)
                 ax.set_title(r'ACF vs Lag for a given $\nu_{\rm max}$')
 
                 axin = inset_axes(ax, width="50%",height="50%", loc="upper right")
                 axin.set_yticks([])
                 axin.plot(lags[sel],acf[sel])
+                axin.scatter(lags[sel][peaks], acf[sel][peaks],c='r',s=5)
                 axin.axvline(best_dnu,c='r', linewidth=2,alpha=.4,
-                    label=r'{:.1f} $\mu$Hz'.format(best_dnu))
+                    label=r'{:.1f} {}'.format(best_dnu,
+                                        self.frequency.unit.to_string('latex')))
                 axin.legend(loc='best')
         if show_plots:
             return u.Quantity(best_dnu, self.frequency.unit), ax
