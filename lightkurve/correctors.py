@@ -21,8 +21,9 @@ from astropy.io import fits as pyfits
 from astropy.stats import sigma_clip
 
 from .utils import channel_to_module_output
-from .lightcurve import LightCurve
+from .lightcurve import LightCurve, KeplerLightCurve
 from .lightcurvefile import KeplerLightCurveFile
+from . import MPLSTYLE
 
 from itertools import combinations_with_replacement as multichoose
 
@@ -41,7 +42,7 @@ class KeplerCBVCorrector(object):
 
     Attributes
     ----------
-    lc_file : KeplerLightCurveFile object or str
+    lc : KeplerLightCurveFile, KeplerLightCurve object or str
         An instance from KeplerLightCurveFile or a path for the .fits
         file of a NASA's Kepler/K2 light curve.
     likelihood : oktopus.Likelihood subclass
@@ -65,32 +66,44 @@ class KeplerCBVCorrector(object):
     >>> plt.legend() # doctest: +SKIP
     """
 
-    def __init__(self, lc_file, likelihood=oktopus.LaplacianLikelihood,
+    def __init__(self, lc, cbv_array=None, cbv_cadenceno=None, likelihood=oktopus.LaplacianLikelihood,
                  prior=oktopus.LaplacianPrior):
-        self.lc_file = lc_file
+        self.lc = lc
+        if not hasattr(self.lc, 'channel'):
+            raise ValueError('Input must have a `channel` attribute.')
         self.likelihood = likelihood
         self.prior = prior
         self._ncbvs = 16  # number of cbvs for Kepler/K2
 
-        if self.lc_file.mission == 'Kepler':
+        if self.lc.mission == 'Kepler':
             self.cbv_base_url = "http://archive.stsci.edu/missions/kepler/cbv/"
-        elif self.lc_file.mission == 'K2':
+        elif self.lc.mission == 'K2':
             self.cbv_base_url = "http://archive.stsci.edu/missions/k2/cbv/"
 
-    @property
-    def lc_file(self):
-        return self._lc_file
+        if cbv_array is None:
+            cbv_array, cbv_cadenceno = self._get_cbv_data(np.arange(1, self._ncbvs))
+        if (cbv_array is not None) & (cbv_cadenceno is None):
+            raise ValueError('Please specify both `cbv_array` and `cbv_cadenceno`')
+        self.cbv_array = cbv_array
+        self.cbv_cadenceno = cbv_cadenceno
 
-    @lc_file.setter
-    def lc_file(self, value):
-        # this enables `lc_file` to be either a string
+
+    @property
+    def lc(self):
+        return self._lc
+
+    @lc.setter
+    def lc(self, value):
+        # this enables `lc` to be either a string
         # or an object from KeplerLightCurveFile
         if isinstance(value, str):
-            self._lc_file = KeplerLightCurveFile(value)
+            self._lc = KeplerLightCurveFile(value).PDCSAP_FLUX
         elif isinstance(value, KeplerLightCurveFile):
-            self._lc_file = value
+            self._lc = value.SAP_FLUX
+        elif isinstance(value, KeplerLightCurve):
+            self._lc = value
         else:
-            raise ValueError("lc_file must be either a string or a"
+            raise ValueError("lc must be either a string, a KeplerLightCurve or a"
                              " KeplerLightCurveFile instance, got {}.".format(value))
 
     @property
@@ -110,14 +123,16 @@ class KeplerCBVCorrector(object):
     def _get_cbv_data(self, cbvs=[1, 2]):
         '''Gets the CBV data for a channel and module
         '''
-        module, output = channel_to_module_output(self.lc_file.channel)
+        module, output = channel_to_module_output(self.lc.channel)
         cbv_file = pyfits.open(self.get_cbv_url())
         cbv_data = cbv_file['MODOUT_{0}_{1}'.format(module, output)].data
-        time = cbv_file['MODOUT_{0}_{1}'.format(module, output)].data['TIME_MJD'][self.lc_file.quality_mask]
+        quality_mask = np.in1d(cbv_data['CADENCENO'], self.lc.cadenceno)
+        time = cbv_file['MODOUT_{0}_{1}'.format(module, output)].data['CADENCENO'][quality_mask]
         cbv_array = []
         for i in cbvs:
-            cbv_array.append(cbv_data.field('VECTOR_{}'.format(i))[self.lc_file.quality_mask])
+            cbv_array.append(cbv_data.field('VECTOR_{}'.format(i))[quality_mask])
         cbv_array = np.asarray(cbv_array)
+
         return cbv_array, time
 
     def correct(self, cbvs=[1, 2], method='powell', options={}):
@@ -136,29 +151,31 @@ class KeplerCBVCorrector(object):
         options : dict
             Dictionary of options to be passed to scipy.optimize.minimize.
         """
-        cbv_array, _ = self._get_cbv_data(cbvs)
 
-        sap_lc = self.lc_file.SAP_FLUX
-        median_sap_flux = np.nanmedian(sap_lc.flux)
-        norm_sap_flux = sap_lc.flux / median_sap_flux - 1
-        norm_err_sap_flux = sap_lc.flux_err / median_sap_flux
+        median_flux = np.nanmedian(self.lc.flux)
+        norm_flux = self.lc.flux / median_flux - 1
+        norm_err_flux = self.lc.flux_err / median_flux
 
+        # Trim down to the right number of cbvs
+        clip = np.in1d(np.arange(1, len(self.cbv_array)+1), np.asarray(cbvs))
+        time_clip = np.in1d(self.cbv_cadenceno, self.lc.cadenceno)
         def mean_model(*theta):
             coeffs = np.asarray(theta)
-            return np.dot(coeffs, cbv_array)
+            return np.dot(coeffs, self.cbv_array[clip, :][:, time_clip])
 
         prior = self.prior(mean=np.zeros(len(cbvs)), var=16.)
-        likelihood = self.likelihood(data=norm_sap_flux, mean=mean_model,
-                                     var=norm_err_sap_flux)
+        likelihood = self.likelihood(data=norm_flux, mean=mean_model,
+                                     var=norm_err_flux)
         x0 = likelihood.fit(x0=prior.mean, method=method, options=options).x
         posterior = oktopus.Posterior(likelihood=likelihood, prior=prior)
 
         self._opt_result = posterior.fit(x0=x0, method=method,
                                          options=options)
         self._coeffs = self._opt_result.x
-        flux_hat = sap_lc.flux - median_sap_flux * mean_model(self._coeffs)
-        return LightCurve(time=sap_lc.time, flux=flux_hat.reshape(-1),
-                          flux_err=sap_lc.flux_err)
+        flux_hat = self.lc.flux - median_flux * mean_model(self._coeffs)
+        clc = self.lc.copy()
+        clc.flux = flux_hat.reshape(-1)
+        return clc
 
     def get_cbvs_list(self):
         """Returns the subsequence of subsequent CBVs that maximizes
@@ -204,23 +221,16 @@ class KeplerCBVCorrector(object):
         soup = BeautifulSoup(requests.get(self.cbv_base_url).text, 'html.parser')
         cbv_files = [fn['href'] for fn in soup.find_all('a') if fn['href'].endswith('fits')]
 
-        if self.lc_file.mission == 'Kepler':
-            if self.lc_file.quarter < 10:
-                quarter = 'q0' + str(self.lc_file.quarter)
-            else:
-                quarter = 'q' + str(self.lc_file.quarter)
+        if self.lc.mission == 'Kepler':
+            quarter = 'q{:02}'.format(self.lc.quarter)
             for cbv_file in cbv_files:
                 if quarter + '-d25' in cbv_file:
                     break
-        elif self.lc_file.mission == 'K2':
-            if self.lc_file.campaign <= 8:
-                campaign = 'c0' + str(self.lc_file.campaign)
-            else:
-                campaign = 'c' + str(self.lc_file.campaign)
+        elif self.lc.mission == 'K2':
+            campaign = 'c{:02}'.format(self.lc.campaign)
             for cbv_file in cbv_files:
                 if campaign in cbv_file:
                     break
-
         return self.cbv_base_url + cbv_file
 
     def plot_cbvs(self, cbvs=[1, 2], ax=None):
@@ -239,22 +249,25 @@ class KeplerCBVCorrector(object):
         ax : matplotlib.pyplot.Axes.AxesSubplot
             Matplotlib axis object
         '''
-        if ax is None:
-            _, ax = plt.subplots(1)
-        cbv_array, time = self._get_cbv_data(cbvs)
-        for idx, cbv in enumerate(cbv_array):
-            ax.plot(time, cbv+idx/10., label='{}'.format(idx + 1))
-        ax.set_yticks([])
-        ax.set_xlabel('Time (MJD)')
-        module, output = channel_to_module_output(self.lc_file.channel)
-        if self.lc_file.mission == 'Kepler':
-            ax.set_title('Kepler CBVs (Module : {}, Output : {}, Quarter : {})'
-                         ''.format(module, output, self.lc_file.quarter))
-        elif self.lc_file.mission == 'K2':
-            ax.set_title('K2 CBVs (Module : {}, Output : {}, Campaign : {})'
-                         ''.format(module, output, self.lc_file.campaign))
-        ax.grid(':', alpha=0.3)
-        ax.legend()
+        with plt.style.context(MPLSTYLE):
+            clip = np.in1d(np.arange(1, len(self.cbv_array)+1), np.asarray(cbvs))
+            time_clip = np.in1d(self.cbv_cadenceno, self.lc.cadenceno)
+
+            if ax is None:
+                _, ax = plt.subplots(1)
+            for idx, cbv in enumerate(self.cbv_array[clip, :][:, time_clip]):
+                ax.plot(self.cbv_cadenceno[time_clip], cbv+idx/10., label='{}'.format(idx + 1))
+            ax.set_yticks([])
+            ax.set_xlabel('Time (MJD)')
+            module, output = channel_to_module_output(self.lc.channel)
+            if self.lc.mission == 'Kepler':
+                ax.set_title('Kepler CBVs (Module : {}, Output : {}, Quarter : {})'
+                             ''.format(module, output, self.lc.quarter))
+            elif self.lc.mission == 'K2':
+                ax.set_title('K2 CBVs (Module : {}, Output : {}, Campaign : {})'
+                             ''.format(module, output, self.lc.campaign))
+            ax.grid(':', alpha=0.3)
+            ax.legend()
         return ax
 
 
