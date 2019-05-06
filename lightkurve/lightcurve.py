@@ -506,9 +506,9 @@ class LightCurve(object):
                         return_mask=False, **kwargs):
         """Removes outlier data points using sigma-clipping.
 
-        This method returns a new `LightCurve` object from which data
-        points are removed if their flux values are greater or smaller than
-        the median flux by at least ``sigma`` times the standard deviation.
+        This method returns a new `LightCurve` object from which data points
+        are removed if their flux values are greater or smaller than the median
+        flux by at least ``sigma`` times the standard deviation.
 
         Sigma-clipping works by iterating over data points, each time rejecting
         values that are discrepant by more than a specified number of standard
