@@ -503,7 +503,7 @@ class LightCurve(object):
         return nlc
 
     def remove_outliers(self, sigma=5., sigma_lower=None, sigma_upper=None,
-                        return_mask=False, maxiters=5, **kwargs):
+                        return_mask=False, **kwargs):
         """Removes outlier data points using sigma-clipping.
 
         This method returns a new `LightCurve` object from which data
@@ -542,10 +542,6 @@ class LightCurve(object):
             Whether or not to return a mask (i.e. a boolean array) indicating
             which data points were removed. Entries marked as `True` in the
             mask are considered outliers. Defaults to `True`.
-        maxiters : int or `None`
-            The number of iterations to perform sigma clipping, or `None` to
-            clip until convergence is achieved (i.e., continue until the
-            last iteration clips nothing). Defaults to 5.
         **kwargs : dict
             Dictionary of arguments to be passed to `astropy.stats.sigma_clip`.
 
@@ -585,7 +581,6 @@ class LightCurve(object):
                                       sigma=sigma,
                                       sigma_lower=sigma_lower,
                                       sigma_upper=sigma_upper,
-                                      maxiters=maxiters,
                                       **kwargs).mask
         # Second, we return the masked light curve and optionally the mask itself
         if return_mask:

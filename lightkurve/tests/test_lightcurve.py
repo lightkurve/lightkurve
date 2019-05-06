@@ -627,7 +627,7 @@ def test_remove_outliers():
     assert(outlier_mask.sum() == 1)
     # Can we set sigma_lower, sigma_upper, and maxiters?
     lc = LightCurve(time=[1, 2, 3, 4, 5], flux=[1, 1000, 1, -1000, 1])
-    lc_clean = lc.remove_outliers(sigma_lower=float('inf'), sigma_upper=1, maxiters=2)
+    lc_clean = lc.remove_outliers(sigma_lower=float('inf'), sigma_upper=1)
     assert_array_equal(lc_clean.time, [1, 3, 4, 5])
     assert_array_equal(lc_clean.flux, [1, 1, -1000, 1])
 
