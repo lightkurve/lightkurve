@@ -502,7 +502,8 @@ class LightCurve(object):
         nlc.time = np.asarray(ts.index)
         return nlc
 
-    def remove_outliers(self, sigma=5., return_mask=False, **kwargs):
+    def remove_outliers(self, sigma=5., sigma_lower=None, sigma_upper=None,
+                        return_mask=False, maxiters=5, **kwargs):
         """Removes outlier data points using sigma-clipping.
 
         This method returns a new `LightCurve` object from which data
@@ -518,6 +519,8 @@ class LightCurve(object):
         .. note::
             This function is a convenience wrapper around
             `astropy.stats.sigma_clip()` and provides the same functionality.
+            Any extra arguments passed to this method will be passed on to
+            ``sigma_clip``.
 
         Parameters
         ----------
@@ -539,14 +542,10 @@ class LightCurve(object):
             Whether or not to return a mask (i.e. a boolean array) indicating
             which data points were removed. Entries marked as `True` in the
             mask are considered outliers. Defaults to `True`.
-        iters : int or `None`
+        maxiters : int or `None`
             The number of iterations to perform sigma clipping, or `None` to
             clip until convergence is achieved (i.e., continue until the
             last iteration clips nothing). Defaults to 5.
-        cenfunc : callable
-            The function used to compute the center for the clipping. Must
-            be a callable that takes in a masked array and outputs the
-            central value. Defaults to the median (`numpy.ma.median`).
         **kwargs : dict
             Dictionary of arguments to be passed to `astropy.stats.sigma_clip`.
 
@@ -582,7 +581,12 @@ class LightCurve(object):
         # First, we create the outlier mask using AstroPy's sigma_clip function
         with warnings.catch_warnings():  # Ignore warnings due to NaNs or Infs
             warnings.simplefilter("ignore")
-            outlier_mask = sigma_clip(data=self.flux, sigma=sigma, **kwargs).mask
+            outlier_mask = sigma_clip(data=self.flux,
+                                      sigma=sigma,
+                                      sigma_lower=sigma_lower,
+                                      sigma_upper=sigma_upper,
+                                      maxiters=maxiters,
+                                      **kwargs).mask
         # Second, we return the masked light curve and optionally the mask itself
         if return_mask:
             return self[~outlier_mask], outlier_mask
