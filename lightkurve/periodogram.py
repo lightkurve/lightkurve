@@ -785,6 +785,7 @@ class SNRPeriodogram(Periodogram):
         s = np.hanning(len(self.power[x-fwhm:x+fwhm]))      #Define the hanning window for the evaluated frequency space
         C = self.power[x-fwhm:x+fwhm].value * s             #Multiply the evaluated SNR space by the hanning window
         result = np.correlate(C, C, mode='full')            #Correlated the resulting SNR space with itself
+        result /= len(C)                                    #Normalise the ACF by length of input array
         return result[int(len(result)/2):]                  #Return one half of the autocorrelation function
 
     def _gaussian(self, x, sigma, height, mu):
