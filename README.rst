@@ -3,6 +3,8 @@ Lightkurve
 
 **A friendly package for Kepler & TESS time series analysis in Python.**
 
+**Documentation: https://docs.lightkurve.org**
+
 |pypi-badge| |conda-badge| |azure-badge| |cov-badge| |doi-badge| |astropy-badge|
 
 .. |pypi-badge| image:: https://img.shields.io/pypi/v/lightkurve.svg
@@ -35,27 +37,27 @@ which enable both hand-tailored data analyses and advanced automated pipelines.
 Documentation
 -------------
 
-Read the documentation at `http://docs.lightkurve.org <http://docs.lightkurve.org>`_.
+Read the documentation at `https://docs.lightkurve.org <https://docs.lightkurve.org>`_.
 
 
 Quickstart
 ----------
 
-Please visit our quickstart guide at `http://docs.lightkurve.org/quickstart.html <http://docs.lightkurve.org/quickstart.html>`_.
+Please visit our quickstart guide at `https://docs.lightkurve.org/quickstart <https://docs.lightkurve.org/quickstart>`_.
 
 
 Contributing
 ------------
 
 We welcome community contributions!
-Please read the  guidelines at `http://docs.lightkurve.org/about/contributing.html <http://docs.lightkurve.org/about/contributing.html>`_.
+Please read the  guidelines at `https://docs.lightkurve.org/about/contributing.html <https://docs.lightkurve.org/about/contributing.html>`_.
 
 
 Citing
 ------
 
 If you find Lightkurve useful in your research, please cite it and give us a GitHub star!
-Please read the citation instructions at `http://docs.lightkurve.org/about/citing.html <http://docs.lightkurve.org/about/citing.html>`_.
+Please read the citation instructions at `https://docs.lightkurve.org/about/citing.html <https://docs.lightkurve.org/about/citing.html>`_.
 
 
 Contact
