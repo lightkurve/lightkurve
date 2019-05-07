@@ -752,3 +752,17 @@ def test_new_corrector_api():
         lc1 = KeplerLightCurveFile(K2_C08).PDCSAP_FLUX.correct()
     lc2 = KeplerLightCurveFile(K2_C08).PDCSAP_FLUX.to_corrector().correct()
     assert_allclose(lc1.flux, lc2.flux)
+
+
+def test_to_timeseries():
+    """Test the `LightCurve.to_timeseries()` method."""
+    time, flux, flux_err = range(3), np.ones(3), np.zeros(3)
+    lc = LightCurve(time, flux, flux_err)
+    try:
+        ts = lc.to_timeseries()
+        assert_allclose(ts.time, time)
+        assert_allclose(ts.flux, flux)
+        assert_allclose(ts.flux_err, flux_err)
+    except ImportError:
+        # Requires AstroPy v3.2 or later
+        pass

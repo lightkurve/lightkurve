@@ -969,25 +969,32 @@ class LightCurve(object):
         return tbl
 
     def to_timeseries(self):
-        """Converts the light curve to an `~astropy_timeseries.TimeSeries` object.
+        """Converts the light curve to an `~astropy.timeseries.TimeSeries` object.
 
-        This is an experimental feature which depends on the placeholder
-        `astropy_timeseries` package (https://astropy-timeseries.readthedocs.io).
-        This package will likely be merged into AstroPy in the near future.
+        This feature requires AstroPy v3.2 or later (released in 2019).
+        An `ImportError` will be raised if this version is not available.
 
         Returns
         -------
-        timeseries : `~astropy_timeseries.TimeSeries`
+        timeseries : `~astropy.timeseries.TimeSeries`
             An AstroPy TimeSeries object.
         """
-        from astropy_timeseries import TimeSeries
+        try:
+            from astropy.timeseries import TimeSeries
+        except ImportError:
+            raise ImportError("You need to install AstroPy v3.2 or later to "
+                              "use the LightCurve.to_timeseries() method.")
         return TimeSeries(self.to_table())
 
     @staticmethod
     def from_timeseries(ts):
-        """Create a new `LightCurve` from an `~astropy_timeseries.TimeSeries` object.
+        """Create a new `LightCurve` from an `~astropy.timeseries.TimeSeries`.
 
-        Note: `ts` must have 'time', 'flux', and 'flux_err' columns
+        Parameters
+        ----------
+        ts : `~astropy.timeseries.TimeSeries`
+            An AstroPy TimeSeries object.  The object must contain columns
+            named 'time', 'flux', and 'flux_err'.
         """
         return LightCurve(time=ts['time'].value, flux=ts['flux'], flux_err=ts['flux_err'])
 
