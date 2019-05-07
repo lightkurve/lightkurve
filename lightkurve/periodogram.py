@@ -580,7 +580,7 @@ class SNRPeriodogram(Periodogram):
             fs = np.median(np.diff(self.frequency.value))
             if any(numaxs < fs):
                 raise ValueError("A custom range of numaxs can not extend below"
-                                "a a single frequency bin.")
+                                "a single frequency bin.")
             if any(numaxs > np.nanmax(self.frequency.value)):
                 raise ValueError("A custom range of numaxs can not extend above"
                                 "the highest frequency value in the periodogram.")
@@ -625,7 +625,7 @@ class SNRPeriodogram(Periodogram):
         return u.Quantity(best_numax, self.frequency.unit)
 
 
-    def estimate_dnu(self, numax=None, show_plots=False, test=False):
+    def estimate_dnu(self, numax=None, show_plots=False):
         """ Estimates the average value of the large frequency spacing, DeltaNu,
         of the seismic oscillations of the target.
 
@@ -658,11 +658,23 @@ class SNRPeriodogram(Periodogram):
             The average large frequency spacing of the seismic oscillation modes.
             In units of the periodogram frequency attribute.
         """
-        if numax is None:
-            numax = self.estimate_numax()
 
-        # Ensure input numax is in the correct units
-        numax = u.Quantity(numax, self.frequency.unit)
+
+        # Run some checks on the passed in numaxs
+        if numax is not None:
+            # Ensure input numax is in the correct units
+            numax = u.Quantity(numax, self.frequency.unit)
+            fs = np.median(np.diff(self.frequency.value))
+            if numax.value < fs:
+                raise ValueError("The input numax can not be lower than"
+                                " a single frequency bin.")
+            if numax.value > np.nanmax(self.frequency.value):
+                raise ValueError("The input numax can not be higher than"
+                                "the highest frequency value in the periodogram.")
+
+        elif numax is None:
+            #Estimate numax using the default settings
+            numax = self.estimate_numax()
 
         #Calcluate dnu using the method by Stello et al. 2009
         #Make sure that this relation only ever happens in microhertz space
