@@ -598,7 +598,8 @@ class SNRPeriodogram(Periodogram):
         #Iterate over all the numax values and return an acf
         for idx, numax in enumerate(numaxs):
             acf = self._autocorrelate(numax)       #Return the acf at this numax
-            maxacf[idx] = np.nanmax(acf)           #Store the maximum acf value
+            maxacf[idx] = np.nansum(acf)
+            # maxacf[idx] = np.nanmax(acf)           #Store the maximum acf value
 
         acf_numax = numaxs[np.argmax(maxacf)]     #The best numax is the numax that results in the highest ACF
         best_numax = acf_numax
@@ -685,7 +686,7 @@ class SNRPeriodogram(Periodogram):
         fs = np.median(np.diff(self.frequency.value))
         lags = np.linspace(0., len(acf)*fs, len(acf))
 
-        #Select a 30% region region around the empirical dnu
+        #Select a 25% region region around the empirical dnu
         sel = (lags > dnu_emp - .25*dnu_emp) & (lags < dnu_emp + .25*dnu_emp)
 
         #Run a peak finder on this region
@@ -776,7 +777,8 @@ class SNRPeriodogram(Periodogram):
         s = np.hanning(len(self.power[x-fwhm:x+fwhm]))      #Define the hanning window for the evaluated frequency space
         C = self.power[x-fwhm:x+fwhm].value * s             #Multiply the evaluated SNR space by the hanning window
         result = np.correlate(C, C, mode='full')            #Correlated the resulting SNR space with itself
-        result /= len(C)                                    #Normalise the ACF by length of input array
+        result /= result[C.size-1]                          #Normalise the ACF by length of input array
+
         return result[int(len(result)/2):]                  #Return one half of the autocorrelation function
 
     def _gaussian(self, x, sigma, height, mu):
