@@ -1,11 +1,9 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>search_targetpixelfile &#8212; Lightkurve</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -24,6 +22,16 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
     <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-69171-9');
+    </script>
 
   </head><body>
 <header>
@@ -80,58 +88,46 @@
 that fall within a region of sky centered around the position of <code class="xref py py-obj docutils literal notranslate"><span class="pre">target</span></code>
 and within a cone of a given <code class="xref py py-obj docutils literal notranslate"><span class="pre">radius</span></code>. If no value is provided for <code class="xref py py-obj docutils literal notranslate"><span class="pre">radius</span></code>,
 only a single target will be returned.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>target</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, int, or <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.coordinates.SkyCoord.html#astropy.coordinates.SkyCoord" title="(in Astropy v3.2.dev1194)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.coordinates.SkyCoord</span></code></a> object</span></dt>
-<dd><p class="first">Target around which to search. Valid inputs include:</p>
-<blockquote class="last">
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>target</strong><span class="classifier">str, int, or <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.coordinates.SkyCoord.html#astropy.coordinates.SkyCoord" title="(in Astropy v4.0.dev873)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.coordinates.SkyCoord</span></code></a> object</span></dt><dd><p>Target around which to search. Valid inputs include:</p>
+<blockquote>
 <div><ul class="simple">
-<li>The name of the object as a string, e.g. “Kepler-10”.</li>
-<li>The KIC or EPIC identifier as an integer, e.g. 11904151.</li>
-<li>A coordinate string in decimal format, e.g. “285.67942179 +50.24130576”.</li>
-<li>A coordinate string in sexagesimal format, e.g. “19:02:43.1 +50:14:28.7”.</li>
-<li>An <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.coordinates.SkyCoord.html#astropy.coordinates.SkyCoord" title="(in Astropy v3.2.dev1194)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.coordinates.SkyCoord</span></code></a> object.</li>
+<li><p>The name of the object as a string, e.g. “Kepler-10”.</p></li>
+<li><p>The KIC or EPIC identifier as an integer, e.g. 11904151.</p></li>
+<li><p>A coordinate string in decimal format, e.g. “285.67942179 +50.24130576”.</p></li>
+<li><p>A coordinate string in sexagesimal format, e.g. “19:02:43.1 +50:14:28.7”.</p></li>
+<li><p>An <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.coordinates.SkyCoord.html#astropy.coordinates.SkyCoord" title="(in Astropy v4.0.dev873)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.coordinates.SkyCoord</span></code></a> object.</p></li>
 </ul>
 </div></blockquote>
 </dd>
-<dt><strong>radius</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float or <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v3.2.dev1194)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.units.Quantity</span></code></a> object</span></dt>
-<dd><p class="first last">Conesearch radius.  If a float is given it will be assumed to be in
+<dt><strong>radius</strong><span class="classifier">float or <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.0.dev873)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.units.Quantity</span></code></a> object</span></dt><dd><p>Conesearch radius.  If a float is given it will be assumed to be in
 units of arcseconds.  If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> then we default to 0.0001 arcsec.</p>
 </dd>
-<dt><strong>cadence</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
-<dd><p class="first last">‘long’ or ‘short’.</p>
+<dt><strong>cadence</strong><span class="classifier">str</span></dt><dd><p>‘long’ or ‘short’.</p>
 </dd>
-<dt><strong>mission</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, list of str</span></dt>
-<dd><p class="first last">‘Kepler’, ‘K2’, or ‘TESS’. By default, all will be returned.</p>
+<dt><strong>mission</strong><span class="classifier">str, list of str</span></dt><dd><p>‘Kepler’, ‘K2’, or ‘TESS’. By default, all will be returned.</p>
 </dd>
-<dt><strong>quarter, campaign, sector</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int, list of ints</span></dt>
-<dd><p class="first last">Kepler Quarter, K2 Campaign, or TESS Sector number.
+<dt><strong>quarter, campaign, sector</strong><span class="classifier">int, list of ints</span></dt><dd><p>Kepler Quarter, K2 Campaign, or TESS Sector number.
 By default all quarters/campaigns/sectors will be returned.</p>
 </dd>
-<dt><strong>month</strong> <span class="classifier-delimiter">:</span> <span class="classifier">1, 2, 3, 4 or list of int</span></dt>
-<dd><p class="first last">For Kepler’s prime mission, there are three short-cadence
+<dt><strong>month</strong><span class="classifier">1, 2, 3, 4 or list of int</span></dt><dd><p>For Kepler’s prime mission, there are three short-cadence
 TargetPixelFiles for each quarter, each covering one month.
 Hence, if cadence=’short’ you can specify month=1, 2, 3, or 4.
 By default all months will be returned.</p>
 </dd>
-<dt><strong>limit</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
-<dd><p class="first last">Maximum number of products to return.</p>
+<dt><strong>limit</strong><span class="classifier">int</span></dt><dd><p>Maximum number of products to return.</p>
 </dd>
 </dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>result</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference internal" href="lightkurve.search.SearchResult.html#lightkurve.search.SearchResult" title="lightkurve.search.SearchResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">SearchResult</span></code></a> object</span></dt>
-<dd><p class="first last">Object detailing the data products found.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>result</strong><span class="classifier"><a class="reference internal" href="lightkurve.search.SearchResult.html#lightkurve.search.SearchResult" title="lightkurve.search.SearchResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">SearchResult</span></code></a> object</span></dt><dd><p>Object detailing the data products found.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
 <p>This example demonstrates how to use the <a class="reference internal" href="#lightkurve.search.search_targetpixelfile" title="lightkurve.search.search_targetpixelfile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_targetpixelfile()</span></code></a> function to
 query and download data. Before instantiating a <code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code> object or
@@ -174,8 +170,8 @@ for these targets in Quarter 4 with:</p>
 <div class="container" style="padding-top: 2em;">
     <hr>
     <p class="text-center">
-        Created with ♥ by the Lightkurve developers.
-        <a href="https://github.com/KeplerGO/lightkurve">Join us on GitHub.</a>
+        Created with ♥ by the Lightkurve collaboration.
+        Please <a href="../about/citing.html">cite us</a> or <a href="https://github.com/KeplerGO/lightkurve">join us on GitHub.</a>
     </p>
 </div>
   </body>

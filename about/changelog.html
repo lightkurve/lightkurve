@@ -1,11 +1,9 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>Full changelog &#8212; Lightkurve</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -24,6 +22,16 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
     <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-69171-9');
+    </script>
 
   </head><body>
 <header>
@@ -71,38 +79,62 @@
     
   <div class="section" id="full-changelog">
 <span id="changelog"></span><h1>Full changelog<a class="headerlink" href="#full-changelog" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="unreleased">
+<h2>1.0.1 (unreleased)<a class="headerlink" href="#unreleased" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Fixed minor bugs in <code class="docutils literal notranslate"><span class="pre">PLDCorrector.correct()</span></code> [#498],
+<code class="docutils literal notranslate"><span class="pre">TargetPixelFile.create_threshold_mask()</span></code> [#502],
+and <code class="docutils literal notranslate"><span class="pre">LightCurve.bin()</span></code> [#503].</p></li>
+</ul>
+</div>
 <div class="section" id="id1">
 <h2>1.0.0 (2019-04-08)<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
-<p>This is the first stable release of Lightkurve.  It was prepared with the help of 45 contributors!</p>
+<p>This is the first stable release of Lightkurve.  It was prepared with the help
+of 45 contributors!</p>
 <p>This release contains major changes to the <code class="docutils literal notranslate"><span class="pre">LombScarglePeriodogram</span></code> class:</p>
 <ul class="simple">
-<li>Changed the default behavior of <code class="docutils literal notranslate"><span class="pre">LombScarglePeriodogram.from_lightcurve()</span></code> to use <code class="docutils literal notranslate"><span class="pre">normalization='amplitude'</span></code> and <code class="docutils literal notranslate"><span class="pre">oversample_factor=5</span></code> (the previous defaults were <code class="docutils literal notranslate"><span class="pre">normalization='psd'</span></code> and <code class="docutils literal notranslate"><span class="pre">oversample_factor=1</span></code>). The docstring has been expanded to help users understand these options. [#491]</li>
-<li>Added a <code class="docutils literal notranslate"><span class="pre">LightkurveWarning</span></code> to alert users of the changes to the default behavior. [#493]</li>
-<li>Deprecated the <code class="docutils literal notranslate"><span class="pre">min_frequency</span></code>/<code class="docutils literal notranslate"><span class="pre">max_frequency</span></code> arguments in favor of <code class="docutils literal notranslate"><span class="pre">minimum_frequency</span></code>/<code class="docutils literal notranslate"><span class="pre">maximum_frequency</span></code> to be consistent with the other Periodogram classes. [#478]</li>
-<li>Likewise, deprecated the <code class="docutils literal notranslate"><span class="pre">min_period</span></code>/<code class="docutils literal notranslate"><span class="pre">max_period</span></code> arguments in favor of <code class="docutils literal notranslate"><span class="pre">minimum_period</span></code>/<code class="docutils literal notranslate"><span class="pre">maximum_period</span></code> to be consistent with the other Periodogram classes. [#478]</li>
+<li><p>Changed the default behavior of <code class="docutils literal notranslate"><span class="pre">LombScarglePeriodogram.from_lightcurve()</span></code>
+to use <code class="docutils literal notranslate"><span class="pre">normalization='amplitude'</span></code> and <code class="docutils literal notranslate"><span class="pre">oversample_factor=5</span></code> (the previous
+defaults were <code class="docutils literal notranslate"><span class="pre">normalization='psd'</span></code> and <code class="docutils literal notranslate"><span class="pre">oversample_factor=1</span></code>).
+The docstring has been expanded to help users understand these options. [#491]</p></li>
+<li><p>Added a <code class="docutils literal notranslate"><span class="pre">LightkurveWarning</span></code> to alert users of the changes to the default
+behavior. [#493]</p></li>
+<li><p>Deprecated the <code class="docutils literal notranslate"><span class="pre">min_frequency</span></code>/<code class="docutils literal notranslate"><span class="pre">max_frequency</span></code> arguments in favor of
+<code class="docutils literal notranslate"><span class="pre">minimum_frequency</span></code>/<code class="docutils literal notranslate"><span class="pre">maximum_frequency</span></code> to be consistent with the other
+Periodogram classes. [#478]</p></li>
+<li><p>Likewise, deprecated the <code class="docutils literal notranslate"><span class="pre">min_period</span></code>/<code class="docutils literal notranslate"><span class="pre">max_period</span></code> arguments in favor of
+<code class="docutils literal notranslate"><span class="pre">minimum_period</span></code>/<code class="docutils literal notranslate"><span class="pre">maximum_period</span></code> to be consistent with the other
+Periodogram classes. [#478]</p></li>
 </ul>
 <p>Other changes are:</p>
 <ul class="simple">
-<li>Improved <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code> to be more robust against the presence of NaNs. [#479, #488]</li>
-<li>Improved <code class="docutils literal notranslate"><span class="pre">search_tesscut</span></code> to avoid crashing in the event of an empty search result, and to ensure that the files it returns carry the search string as the <code class="docutils literal notranslate"><span class="pre">targetid</span></code> attribute. [#475, #477]</li>
-<li>Various minor bug fixes. [#488, #490, #494]</li>
+<li><p>Improved <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code> to be more robust against the presence of NaNs.
+[#479, #488]</p></li>
+<li><p>Improved <code class="docutils literal notranslate"><span class="pre">search_tesscut</span></code> to avoid crashing in the event of an empty search
+result, and to ensure that the files it returns carry the search string as
+the <code class="docutils literal notranslate"><span class="pre">targetid</span></code> attribute. [#475, #477]</p></li>
+<li><p>Various minor bug fixes. [#488, #490, #494]</p></li>
 </ul>
 </div>
 <div class="section" id="b30-2019-03-27">
 <h2>1.0b30 (2019-03-27)<a class="headerlink" href="#b30-2019-03-27" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>Significantly improved the performance of the <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code> feature for systematics removal. [#470]</li>
-<li>Improved the normalization of the result returned by <code class="docutils literal notranslate"><span class="pre">Periodogram.smooth(method='logmedian')</span></code>. [#453]</li>
-<li>Improved the visualization of NaN values in <code class="docutils literal notranslate"><span class="pre">TargetPixelFile.plot()</span></code>. [#455]</li>
-<li>Various minor bug fixes. [#448, #450, #463, #471]</li>
+<li><p>Significantly improved the performance of the <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code> feature for
+systematics removal. [#470]</p></li>
+<li><p>Improved the normalization of the result returned by
+<code class="docutils literal notranslate"><span class="pre">Periodogram.smooth(method='logmedian')</span></code>. [#453]</p></li>
+<li><p>Improved the visualization of NaN values in <code class="docutils literal notranslate"><span class="pre">TargetPixelFile.plot()</span></code>. [#455]</p></li>
+<li><p>Various minor bug fixes. [#448, #450, #463, #471]</p></li>
 </ul>
 </div>
 <div class="section" id="b29-2019-02-14">
 <h2>1.0b29 (2019-02-14)<a class="headerlink" href="#b29-2019-02-14" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>The <code class="docutils literal notranslate"><span class="pre">search_tesscut(...).download()</span></code> feature now supports downloading rectangular TESS FFI cut-outs. It previously only supported squares. [#441]</li>
-<li>Fixed a bug which prevented <code class="docutils literal notranslate"><span class="pre">search_tesscut(...).download_all()</span></code> from downloading all sectors. [#440]</li>
-<li>Minor bug fixes and performance improvements. [#439, #446]</li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">search_tesscut(...).download()</span></code> feature now supports downloading
+rectangular TESS FFI cut-outs. It previously only supported squares. [#441]</p></li>
+<li><p>Fixed a bug which prevented <code class="docutils literal notranslate"><span class="pre">search_tesscut(...).download_all()</span></code> from
+downloading all sectors. [#440]</p></li>
+<li><p>Minor bug fixes and performance improvements. [#439, #446]</p></li>
 </ul>
 </div>
 <div class="section" id="b28-2019-02-09">
@@ -110,120 +142,147 @@
 <div class="section" id="changes">
 <h3>Changes<a class="headerlink" href="#changes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>Simplified the installation of Lightkurve by turning several packages into
+<li><p>Simplified the installation of Lightkurve by turning several packages into
 optional rather than required dependencies (<code class="docutils literal notranslate"><span class="pre">celerite</span></code>, <code class="docutils literal notranslate"><span class="pre">pybind</span></code>,
-<code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>, and <code class="docutils literal notranslate"><span class="pre">bokeh</span></code>). [#436]</li>
-<li>Added <code class="docutils literal notranslate"><span class="pre">search_tesscut()</span></code>: an easy interface to access data produced using
+<code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>, and <code class="docutils literal notranslate"><span class="pre">bokeh</span></code>). [#436]</p></li>
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">search_tesscut()</span></code>: an easy interface to access data produced using
 the <a class="reference external" href="https://mast.stsci.edu/tesscut/">MAST TESSCut service</a>. This service
-extracts Target Pixel Files (TPFs) from TESS Full Frame Images (FFIs). [#418]</li>
-<li>Added <code class="docutils literal notranslate"><span class="pre">TargetPixelFile.interact_sky()</span></code>: an interactive Bokeh widget to
-overlay Gaia DR2 source positions on top of TPFs. [#124]</li>
-<li>Changed <code class="docutils literal notranslate"><span class="pre">LightCurve.fold()</span></code>: the <code class="docutils literal notranslate"><span class="pre">transit_midpoint</span></code> parameter has been
-deprecated in favor of the <code class="docutils literal notranslate"><span class="pre">t0</span></code> parameter. [#419]</li>
+extracts Target Pixel Files (TPFs) from TESS Full Frame Images (FFIs). [#418]</p></li>
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">TargetPixelFile.interact_sky()</span></code>: an interactive Bokeh widget to
+overlay Gaia DR2 source positions on top of TPFs. [#124]</p></li>
+<li><p>Changed <code class="docutils literal notranslate"><span class="pre">LightCurve.fold()</span></code>: the <code class="docutils literal notranslate"><span class="pre">transit_midpoint</span></code> parameter has been
+deprecated in favor of the <code class="docutils literal notranslate"><span class="pre">t0</span></code> parameter. [#419]</p></li>
 </ul>
 </div>
 <div class="section" id="bugfixes">
 <h3>Bugfixes<a class="headerlink" href="#bugfixes" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li>Made <code class="docutils literal notranslate"><span class="pre">BoxLeastSquaresPeriodogram</span></code> robust against light curves that contain
-NaNs. [#432]</li>
-<li><code class="docutils literal notranslate"><span class="pre">TargetPixelFile.wcs</span></code> now works for Target Pixel Files produced using the
-MAST TessCut service. [#434]</li>
+<li><p>Made <code class="docutils literal notranslate"><span class="pre">BoxLeastSquaresPeriodogram</span></code> robust against light curves that contain
+NaNs. [#432]</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TargetPixelFile.wcs</span></code> now works for Target Pixel Files produced using the
+MAST TessCut service. [#434]</p></li>
 </ul>
 </div>
 </div>
 <div class="section" id="b26-2019-02-04">
 <h2>1.0b26 (2019-02-04)<a class="headerlink" href="#b26-2019-02-04" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>Introduced a new layout for the
-<a href="#id2"><span class="problematic" id="id3">``</span></a>online documentation &lt;<a class="reference external" href="https://docs.lightkurve.org">https://docs.lightkurve.org</a>&gt;``_. [#360, #400, #406]</li>
-<li>Added <code class="docutils literal notranslate"><span class="pre">LightCurve.interact_bls()</span></code>: an interactive Bokeh widget to find
-planets using the Box Least Squares (BLS) method. [#401]</li>
-<li>Added <code class="docutils literal notranslate"><span class="pre">LombScarglePeriodogram</span></code> and <code class="docutils literal notranslate"><span class="pre">BoxLeastSquarePeriodogam</span></code> sub-classes
-to distinguish periodograms generated using different methods. [#403]</li>
-<li>Added the <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code> class to remove instrument systematics using the
-Pixel Level Decorrelation (PLD) method. [#305]</li>
-<li>Added the <code class="docutils literal notranslate"><span class="pre">TargetPixelFile.to_corrector()</span></code> convenience method to make
-systematics correction classes easy to access. [#305]</li>
-<li>Refactored <code class="docutils literal notranslate"><span class="pre">SFFCorrector</span></code> to make its API consistent with <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code>,
+<li><p>Introduced a new layout for the
+<a href="#id2"><span class="problematic" id="id3">``</span></a>online documentation &lt;<a class="reference external" href="https://docs.lightkurve.org">https://docs.lightkurve.org</a>&gt;``_. [#360, #400, #406]</p></li>
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">LightCurve.interact_bls()</span></code>: an interactive Bokeh widget to find
+planets using the Box Least Squares (BLS) method. [#401]</p></li>
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">LombScarglePeriodogram</span></code> and <code class="docutils literal notranslate"><span class="pre">BoxLeastSquarePeriodogam</span></code> sub-classes
+to distinguish periodograms generated using different methods. [#403]</p></li>
+<li><p>Added the <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code> class to remove instrument systematics using the
+Pixel Level Decorrelation (PLD) method. [#305]</p></li>
+<li><p>Added the <code class="docutils literal notranslate"><span class="pre">TargetPixelFile.to_corrector()</span></code> convenience method to make
+systematics correction classes easy to access. [#305]</p></li>
+<li><p>Refactored <code class="docutils literal notranslate"><span class="pre">SFFCorrector</span></code> to make its API consistent with <code class="docutils literal notranslate"><span class="pre">PLDCorrector</span></code>,
 and deprecated the <code class="docutils literal notranslate"><span class="pre">LightCurve.correct()</span></code> method in favor of
-<code class="docutils literal notranslate"><span class="pre">LightCurve.to_corrector()</span></code>. [#408, #417]</li>
-<li>Made <code class="docutils literal notranslate"><span class="pre">SFFCorrector</span></code> robust against light curves that contain big gaps in
-time. [#414]</li>
-<li>Minor bug fixes. [#392, #397, #420]</li>
-<li>Increased the unit test coverage. [#387, #388]</li>
+<code class="docutils literal notranslate"><span class="pre">LightCurve.to_corrector()</span></code>. [#408, #417]</p></li>
+<li><p>Made <code class="docutils literal notranslate"><span class="pre">SFFCorrector</span></code> robust against light curves that contain big gaps in
+time. [#414]</p></li>
+<li><p>Minor bug fixes. [#392, #397, #420]</p></li>
+<li><p>Increased the unit test coverage. [#387, #388]</p></li>
 </ul>
 </div>
 <div class="section" id="b25-2018-12-14">
 <h2>1.0b25 (2018-12-14)<a class="headerlink" href="#b25-2018-12-14" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>The <code class="docutils literal notranslate"><span class="pre">TargetPixelFile.interact()</span></code> bokeh app now includes a <code class="docutils literal notranslate"><span class="pre">Save</span> <span class="pre">Lightcurve</span></code> button [#329].</li>
-<li>Fixed a minor bug in <code class="docutils literal notranslate"><span class="pre">LightCurve.bin()</span></code> [#377].</li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">TargetPixelFile.interact()</span></code> bokeh app now includes a <code class="docutils literal notranslate"><span class="pre">Save</span> <span class="pre">Lightcurve</span></code>
+button [#329].</p></li>
+<li><p>Fixed a minor bug in <code class="docutils literal notranslate"><span class="pre">LightCurve.bin()</span></code> [#377].</p></li>
 </ul>
 </div>
 <div class="section" id="b24-2018-12-10">
 <h2>1.0b24 (2018-12-10)<a class="headerlink" href="#b24-2018-12-10" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>Added support for TESS to <code class="docutils literal notranslate"><span class="pre">search_targetpixelfile()</span></code> and <code class="docutils literal notranslate"><span class="pre">search_lightcurvefile()</span></code>  [#367].</li>
-<li>Added support for data generated by the <a class="reference external" href="https://mast.stsci.edu/tesscut/">TESScut service</a> [#369, #375].</li>
-<li>Removed “Impulsive outliers” from the default set of quality constraints applied to TESS data [#374].</li>
-<li><code class="docutils literal notranslate"><span class="pre">LightCurve.flatten()</span></code> is now more robust against outliers [#372].</li>
-<li><code class="docutils literal notranslate"><span class="pre">LightCurve.fold()</span></code> now takes a <code class="docutils literal notranslate"><span class="pre">transit_midpoint</span></code> parameter instead of the <code class="docutils literal notranslate"><span class="pre">phase</span></code> parameter [#361, #363].</li>
-<li>Various minor bugfixes [#372].</li>
+<li><p>Added support for TESS to <code class="docutils literal notranslate"><span class="pre">search_targetpixelfile()</span></code> and
+<code class="docutils literal notranslate"><span class="pre">search_lightcurvefile()</span></code> [#367].</p></li>
+<li><p>Added support for data generated by the
+<a class="reference external" href="https://mast.stsci.edu/tesscut/">TESScut service</a> [#369, #375].</p></li>
+<li><p>Removed “Impulsive outliers” from the default set of quality constraints
+applied to TESS data [#374].</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LightCurve.flatten()</span></code> is now more robust against outliers [#372].</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LightCurve.fold()</span></code> now takes a <code class="docutils literal notranslate"><span class="pre">transit_midpoint</span></code> parameter instead of
+the <code class="docutils literal notranslate"><span class="pre">phase</span></code> parameter [#361, #363].</p></li>
+<li><p>Various minor bugfixes [#372].</p></li>
 </ul>
 </div>
 <div class="section" id="b23-2018-11-30">
 <h2>1.0b23 (2018-11-30)<a class="headerlink" href="#b23-2018-11-30" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">TargetPixelFile.create_threshold_mask()</span></code> now only returns one contiguous mask, which is configurable using the new <code class="docutils literal notranslate"><span class="pre">reference_pixel</span></code> argument [#345].</li>
-<li><code class="docutils literal notranslate"><span class="pre">TargetPixelFile.interact()</span></code>: now requires <code class="docutils literal notranslate"><span class="pre">Bokeh</span> <span class="pre">v1.0</span></code> or later [#355].</li>
-<li><code class="docutils literal notranslate"><span class="pre">utils.detect_filetype()</span></code> automatically detects Kepler or TESS Target Pixel Files and Light Curve files [#340, #350, #356].</li>
-<li><code class="docutils literal notranslate"><span class="pre">LightCurve.estimate_cdpp()</span></code>: the argument <code class="docutils literal notranslate"><span class="pre">sigma_clip</span></code> was renamed into <code class="docutils literal notranslate"><span class="pre">sigma</span></code> [#359].</li>
-<li>Fixed minor bugs in <code class="docutils literal notranslate"><span class="pre">LightCurve.to_pandas()</span></code> [#343], <code class="docutils literal notranslate"><span class="pre">LightCurve.correct()</span></code> [#347], <code class="docutils literal notranslate"><span class="pre">FoldedLightCurve.errorbar()</span></code> [#352], <code class="docutils literal notranslate"><span class="pre">LightCurve.fold()</span></code> [#353].</li>
-<li>Documentation improvements [#344, #358].</li>
-<li>Increased the unit test coverage [#351].</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TargetPixelFile.create_threshold_mask()</span></code> now only returns one contiguous
+mask, which is configurable using the new <code class="docutils literal notranslate"><span class="pre">reference_pixel</span></code> argument [#345].</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TargetPixelFile.interact()</span></code>: now requires <code class="docutils literal notranslate"><span class="pre">Bokeh</span> <span class="pre">v1.0</span></code> or later [#355].</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">utils.detect_filetype()</span></code> automatically detects Kepler or TESS Target Pixel
+Files and Light Curve files [#340, #350, #356].</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LightCurve.estimate_cdpp()</span></code>: the argument <code class="docutils literal notranslate"><span class="pre">sigma_clip</span></code> was renamed into
+<code class="docutils literal notranslate"><span class="pre">sigma</span></code> [#359].</p></li>
+<li><p>Fixed minor bugs in <code class="docutils literal notranslate"><span class="pre">LightCurve.to_pandas()</span></code> [#343],
+<code class="docutils literal notranslate"><span class="pre">LightCurve.correct()</span></code> [#347], <code class="docutils literal notranslate"><span class="pre">FoldedLightCurve.errorbar()</span></code> [#352],
+<code class="docutils literal notranslate"><span class="pre">LightCurve.fold()</span></code> [#353].</p></li>
+<li><p>Documentation improvements [#344, #358].</p></li>
+<li><p>Increased the unit test coverage [#351].</p></li>
 </ul>
 </div>
 <div class="section" id="b22-2018-11-17">
 <h2>1.0b22 (2018-11-17)<a class="headerlink" href="#b22-2018-11-17" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><code class="docutils literal notranslate"><span class="pre">lightkurve.open()</span></code> was added to provide a single function to read in any light curve or target pixel file from Kepler or TESS and return the appropriate object [#317].</li>
-<li>The <code class="docutils literal notranslate"><span class="pre">from_fits()</span></code> methods have been deprecated in favor of <code class="docutils literal notranslate"><span class="pre">lightkurve.open()</span></code> [#336].</li>
-<li>The <code class="docutils literal notranslate"><span class="pre">lightkurve.mast</span></code> module has been removed in favor of the new <code class="docutils literal notranslate"><span class="pre">lightkurve.search</span></code> module.</li>
-<li>Various small bugfixes, speed-ups, and documentation improvements [#314, #315, #322, #323, #325, #331, #334, #335].</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lightkurve.open()</span></code> was added to provide a single function to read in any
+light curve or target pixel file from Kepler or TESS and return the appropriate
+object [#317].</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">from_fits()</span></code> methods have been deprecated in favor of
+<code class="docutils literal notranslate"><span class="pre">lightkurve.open()</span></code> [#336].</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">lightkurve.mast</span></code> module has been removed in favor of the new
+<code class="docutils literal notranslate"><span class="pre">lightkurve.search</span></code> module.</p></li>
+<li><p>Various small bugfixes, speed-ups, and documentation improvements
+[#314, #315, #322, #323, #325, #331, #334, #335].</p></li>
 </ul>
 </div>
 <div class="section" id="b21-2018-10-29">
 <h2>1.0b21 (2018-10-29)<a class="headerlink" href="#b21-2018-10-29" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>The <code class="docutils literal notranslate"><span class="pre">from_archive()</span></code> methods of <code class="docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code> and <code class="docutils literal notranslate"><span class="pre">KeplerLightCurveFile</span></code> have been deprecated in favor of the new <code class="docutils literal notranslate"><span class="pre">search_targetpixelfile()</span></code> and <code class="docutils literal notranslate"><span class="pre">search_lightcurvefile()</span></code> functions.  These allow users to inspect the results of their queries and offer more powerful features, e.g. cone-searches.  If you are currently using <code class="docutils literal notranslate"><span class="pre">tpf</span> <span class="pre">=</span> <span class="pre">KeplerTargetPixelFile.from_archive(&quot;objectname&quot;)</span></code>, please start using <code class="docutils literal notranslate"><span class="pre">tpf</span> <span class="pre">=</span> <span class="pre">search_targetpixelfile(&quot;objectname&quot;).download()</span></code> instead.</li>
-<li><code class="docutils literal notranslate"><span class="pre">TargetPixelFile</span></code> objects can now be indexed and sliced. [#308]</li>
-<li>The default number of <code class="docutils literal notranslate"><span class="pre">windows</span></code> used by the SFF systematics removal algorithm has been changed from 1 to 10. [#312]</li>
-<li>Various small bug fixes and unit test improvements.</li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">from_archive()</span></code> methods of <code class="docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code> and
+<code class="docutils literal notranslate"><span class="pre">KeplerLightCurveFile</span></code> have been deprecated in favor of the new
+<code class="docutils literal notranslate"><span class="pre">search_targetpixelfile()</span></code> and <code class="docutils literal notranslate"><span class="pre">search_lightcurvefile()</span></code> functions.
+These allow users to inspect the results of their queries and offer more
+powerful features, e.g. cone-searches.  If you are currently using
+<code class="docutils literal notranslate"><span class="pre">tpf</span> <span class="pre">=</span> <span class="pre">KeplerTargetPixelFile.from_archive(&quot;objectname&quot;)</span></code>, please start
+using <code class="docutils literal notranslate"><span class="pre">tpf</span> <span class="pre">=</span> <span class="pre">search_targetpixelfile(&quot;objectname&quot;).download()</span></code> instead.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TargetPixelFile</span></code> objects can now be indexed and sliced. [#308]</p></li>
+<li><p>The default number of <code class="docutils literal notranslate"><span class="pre">windows</span></code> used by the SFF systematics removal
+algorithm has been changed from 1 to 10. [#312]</p></li>
+<li><p>Various small bug fixes and unit test improvements.</p></li>
 </ul>
 </div>
 <div class="section" id="b20-2018-10-16">
 <h2>1.0b20 (2018-10-16)<a class="headerlink" href="#b20-2018-10-16" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>We adopted a rule that all method names must include a verb, and all class properties must be a noun [#286].  As a result, we renamed the following methods:<ul>
-<li><code class="docutils literal notranslate"><span class="pre">LightCurve.cdpp()</span></code> is now <code class="docutils literal notranslate"><span class="pre">LightCurve.estimate_cdpp()</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">LightCurve.periodogram()</span></code> is now <code class="docutils literal notranslate"><span class="pre">LightCurve.to_periodogram()</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">LichtCurve.properties()</span></code> is now <code class="docutils literal notranslate"><span class="pre">LightCurve.show_properties()</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">TargetPixelFile.aperture_photometry()</span></code> is now <code class="docutils literal notranslate"><span class="pre">TargetPixelFile.extract_aperture_photometry()</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">TargetPixelFile.centroids()</span></code> is now <code class="docutils literal notranslate"><span class="pre">TargetPixelFile.estimate_centroids()</span></code></li>
-<li><code class="docutils literal notranslate"><span class="pre">TargetPixelFile.header()</span></code> is now a property.</li>
+<li><p>We adopted a rule that all method names must include a verb, and all class
+properties must be a noun [#286].  As a result, we renamed the following methods:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">LightCurve.cdpp()</span></code> is now <code class="docutils literal notranslate"><span class="pre">LightCurve.estimate_cdpp()</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LightCurve.periodogram()</span></code> is now <code class="docutils literal notranslate"><span class="pre">LightCurve.to_periodogram()</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LichtCurve.properties()</span></code> is now <code class="docutils literal notranslate"><span class="pre">LightCurve.show_properties()</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TargetPixelFile.aperture_photometry()</span></code> is now
+<code class="docutils literal notranslate"><span class="pre">TargetPixelFile.extract_aperture_photometry()</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TargetPixelFile.centroids()</span></code> is now <code class="docutils literal notranslate"><span class="pre">TargetPixelFile.estimate_centroids()</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TargetPixelFile.header()</span></code> is now a property.</p></li>
 </ul>
 </li>
-<li>Added <code class="docutils literal notranslate"><span class="pre">Periodogram.smooth()</span></code> [#288].</li>
-<li><code class="docutils literal notranslate"><span class="pre">Periodogram.estimate_snr()</span></code> was renamed to <code class="docutils literal notranslate"><span class="pre">Periodogram.p.flatten()</span></code> [#290].</li>
-<li>Lightkurve can now read in light curve files produced using <code class="docutils literal notranslate"><span class="pre">LightCurveFile.to_fits()</span></code> [#297].</li>
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">Periodogram.smooth()</span></code> [#288].</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Periodogram.estimate_snr()</span></code> was renamed to <code class="docutils literal notranslate"><span class="pre">Periodogram.p.flatten()</span></code> [#290].</p></li>
+<li><p>Lightkurve can now read in light curve files produced using
+<code class="docutils literal notranslate"><span class="pre">LightCurveFile.to_fits()</span></code> [#297].</p></li>
 </ul>
 </div>
 <div class="section" id="b19-2018-10-10">
 <h2>1.0b19 (2018-10-10)<a class="headerlink" href="#b19-2018-10-10" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>The <code class="docutils literal notranslate"><span class="pre">Periodogram</span></code> class has been refactored;</li>
-<li>The <code class="docutils literal notranslate"><span class="pre">LightCurve.remove_outliers()</span></code> method now accepts <code class="docutils literal notranslate"><span class="pre">sigma_lower</span></code> and <code class="docutils literal notranslate"><span class="pre">sigma_upper</span></code> parameters.</li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">Periodogram</span></code> class has been refactored;</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">LightCurve.remove_outliers()</span></code> method now accepts <code class="docutils literal notranslate"><span class="pre">sigma_lower</span></code> and
+<code class="docutils literal notranslate"><span class="pre">sigma_upper</span></code> parameters.</p></li>
 </ul>
 </div>
 </div>
@@ -233,8 +292,8 @@ time. [#414]</li>
 <div class="container" style="padding-top: 2em;">
     <hr>
     <p class="text-center">
-        Created with ♥ by the Lightkurve developers.
-        <a href="https://github.com/KeplerGO/lightkurve">Join us on GitHub.</a>
+        Created with ♥ by the Lightkurve collaboration.
+        Please <a href="citing.html">cite us</a> or <a href="https://github.com/KeplerGO/lightkurve">join us on GitHub.</a>
     </p>
 </div>
   </body>

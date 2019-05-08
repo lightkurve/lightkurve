@@ -1,11 +1,9 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>Periodogram &#8212; Lightkurve</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -24,6 +22,16 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
     <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-69171-9');
+    </script>
 
   </head><body>
 <header>
@@ -79,91 +87,80 @@
 <p>The Periodogram class represents a power spectrum, with values of
 frequency on the x-axis (in any frequency units) and values of power on the
 y-axis (in units of ppm^2 / [frequency units]).</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Attributes:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>frequency</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v3.2.dev1194)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.units.Quantity</span></code></a> object</span></dt>
-<dd><p class="first last">Array of frequencies with associated astropy unit.</p>
+<dl class="field-list">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl>
+<dt><strong>frequency</strong><span class="classifier"><a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.0.dev873)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.units.Quantity</span></code></a> object</span></dt><dd><p>Array of frequencies with associated astropy unit.</p>
 </dd>
-<dt><strong>power</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v3.2.dev1194)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.units.Quantity</span></code></a> object</span></dt>
-<dd><p class="first last">Array of power-spectral-densities. The Quantity array must have units
+<dt><strong>power</strong><span class="classifier"><a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.0.dev873)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.units.Quantity</span></code></a> object</span></dt><dd><p>Array of power-spectral-densities. The Quantity array must have units
 of <code class="xref py py-obj docutils literal notranslate"><span class="pre">ppm^2</span> <span class="pre">/</span> <span class="pre">freq_unit</span></code>, where freq_unit is the unit of the frequency
 attribute.</p>
 </dd>
-<dt><strong>nyquist</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float, optional</span></dt>
-<dd><p class="first last">The Nyquist frequency of the lightcurve. In units of freq_unit, where
+<dt><strong>nyquist</strong><span class="classifier">float, optional</span></dt><dd><p>The Nyquist frequency of the lightcurve. In units of freq_unit, where
 freq_unit is the unit of the frequency attribute.</p>
 </dd>
-<dt><strong>label</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
-<dd><p class="first last">Human-friendly object label, e.g. “KIC 123456789”.</p>
+<dt><strong>label</strong><span class="classifier">str, optional</span></dt><dd><p>Human-friendly object label, e.g. “KIC 123456789”.</p>
 </dd>
-<dt><strong>targetid</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
-<dd><p class="first last">Identifier of the target.</p>
+<dt><strong>targetid</strong><span class="classifier">str, optional</span></dt><dd><p>Identifier of the target.</p>
 </dd>
-<dt><strong>default_view</strong> <span class="classifier-delimiter">:</span> <span class="classifier">“frequency” or “period”</span></dt>
-<dd><p class="first last">Should plots be shown in frequency space or period space by default?</p>
+<dt><strong>default_view</strong><span class="classifier">“frequency” or “period”</span></dt><dd><p>Should plots be shown in frequency space or period space by default?</p>
 </dd>
-<dt><strong>meta</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict, optional</span></dt>
-<dd><p class="first last">Free-form metadata associated with the Periodogram.</p>
+<dt><strong>meta</strong><span class="classifier">dict, optional</span></dt><dd><p>Free-form metadata associated with the Periodogram.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Attributes Summary</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-center">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.periodogram.Periodogram.frequency_at_max_power" title="lightkurve.periodogram.Periodogram.frequency_at_max_power"><code class="xref py py-obj docutils literal notranslate"><span class="pre">frequency_at_max_power</span></code></a></td>
-<td>Returns the frequency corresponding to the highest peak in the periodogram.</td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.periodogram.Periodogram.frequency_at_max_power" title="lightkurve.periodogram.Periodogram.frequency_at_max_power"><code class="xref py py-obj docutils literal notranslate"><span class="pre">frequency_at_max_power</span></code></a></p></td>
+<td><p>Returns the frequency corresponding to the highest peak in the periodogram.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.periodogram.Periodogram.max_power" title="lightkurve.periodogram.Periodogram.max_power"><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_power</span></code></a></td>
-<td>Returns the power of the highest peak in the periodogram.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.periodogram.Periodogram.max_power" title="lightkurve.periodogram.Periodogram.max_power"><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_power</span></code></a></p></td>
+<td><p>Returns the power of the highest peak in the periodogram.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.periodogram.Periodogram.period" title="lightkurve.periodogram.Periodogram.period"><code class="xref py py-obj docutils literal notranslate"><span class="pre">period</span></code></a></td>
-<td>Returns the array of periods, i.e.</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.periodogram.Periodogram.period" title="lightkurve.periodogram.Periodogram.period"><code class="xref py py-obj docutils literal notranslate"><span class="pre">period</span></code></a></p></td>
+<td><p>Returns the array of periods, i.e.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.periodogram.Periodogram.period_at_max_power" title="lightkurve.periodogram.Periodogram.period_at_max_power"><code class="xref py py-obj docutils literal notranslate"><span class="pre">period_at_max_power</span></code></a></td>
-<td>Returns the period corresponding to the highest peak in the periodogram.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.periodogram.Periodogram.period_at_max_power" title="lightkurve.periodogram.Periodogram.period_at_max_power"><code class="xref py py-obj docutils literal notranslate"><span class="pre">period_at_max_power</span></code></a></p></td>
+<td><p>Returns the period corresponding to the highest peak in the periodogram.</p></td>
 </tr>
 </tbody>
 </table>
 <p class="rubric">Methods Summary</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-center">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.periodogram.Periodogram.bin" title="lightkurve.periodogram.Periodogram.bin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bin</span></code></a>([binsize,&nbsp;method])</td>
-<td>Bins the power spectrum.</td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.periodogram.Periodogram.bin" title="lightkurve.periodogram.Periodogram.bin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bin</span></code></a>(self[, binsize, method])</p></td>
+<td><p>Bins the power spectrum.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.periodogram.Periodogram.copy" title="lightkurve.periodogram.Periodogram.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a>()</td>
-<td>Returns a copy of the Periodogram object.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.periodogram.Periodogram.copy" title="lightkurve.periodogram.Periodogram.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a>(self)</p></td>
+<td><p>Returns a copy of the Periodogram object.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.periodogram.Periodogram.flatten" title="lightkurve.periodogram.Periodogram.flatten"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flatten</span></code></a>([method,&nbsp;filter_width,&nbsp;return_trend])</td>
-<td>Estimates the Signal-To-Noise (SNR) spectrum by dividing out an estimate of the noise background.</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.periodogram.Periodogram.flatten" title="lightkurve.periodogram.Periodogram.flatten"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flatten</span></code></a>(self[, method, filter_width, …])</p></td>
+<td><p>Estimates the Signal-To-Noise (SNR) spectrum by dividing out an estimate of the noise background.</p></td>
 </tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram.from_lightcurve</span></code></td>
-<td></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram.from_lightcurve</span></code></p></td>
+<td><p></p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.periodogram.Periodogram.plot" title="lightkurve.periodogram.Periodogram.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>([scale,&nbsp;ax,&nbsp;xlabel,&nbsp;ylabel,&nbsp;title,&nbsp;…])</td>
-<td>Plots the Periodogram.</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.periodogram.Periodogram.plot" title="lightkurve.periodogram.Periodogram.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(self[, scale, ax, xlabel, ylabel, …])</p></td>
+<td><p>Plots the Periodogram.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.periodogram.Periodogram.show_properties" title="lightkurve.periodogram.Periodogram.show_properties"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_properties</span></code></a>()</td>
-<td>Prints a summary of the non-callable attributes of the Periodogram object.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.periodogram.Periodogram.show_properties" title="lightkurve.periodogram.Periodogram.show_properties"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_properties</span></code></a>(self)</p></td>
+<td><p>Prints a summary of the non-callable attributes of the Periodogram object.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.periodogram.Periodogram.smooth" title="lightkurve.periodogram.Periodogram.smooth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">smooth</span></code></a>([method,&nbsp;filter_width])</td>
-<td>Smooths the power spectrum using the ‘boxkernel’ or ‘logmedian’ method.</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.periodogram.Periodogram.smooth" title="lightkurve.periodogram.Periodogram.smooth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">smooth</span></code></a>(self[, method, filter_width])</p></td>
+<td><p>Smooths the power spectrum using the ‘boxkernel’ or ‘logmedian’ method.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.periodogram.Periodogram.to_table" title="lightkurve.periodogram.Periodogram.to_table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_table</span></code></a>()</td>
-<td>Exports the Periodogram as an Astropy Table.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.periodogram.Periodogram.to_table" title="lightkurve.periodogram.Periodogram.to_table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_table</span></code></a>(self)</p></td>
+<td><p>Exports the Periodogram as an Astropy Table.</p></td>
 </tr>
 </tbody>
 </table>
@@ -195,60 +192,48 @@ freq_unit is the unit of the frequency attribute.</p>
 <p class="rubric">Methods Documentation</p>
 <dl class="method">
 <dt id="lightkurve.periodogram.Periodogram.bin">
-<code class="descname">bin</code><span class="sig-paren">(</span><em>binsize=10</em>, <em>method='mean'</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.Periodogram.bin" title="Permalink to this definition">¶</a></dt>
+<code class="descname">bin</code><span class="sig-paren">(</span><em>self</em>, <em>binsize=10</em>, <em>method='mean'</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.Periodogram.bin" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bins the power spectrum.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>binsize</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
-<dd><p class="first last">The factor by which to bin the power spectrum, in the sense that
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>binsize</strong><span class="classifier">int</span></dt><dd><p>The factor by which to bin the power spectrum, in the sense that
 the power spectrum will be smoothed by taking the mean in bins
 of size N / binsize, where N is the length of the original
 frequency array. Defaults to 10.</p>
 </dd>
-<dt><strong>method</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, one of ‘mean’ or ‘median’</span></dt>
-<dd><p class="first last">Method to use for binning. Default is ‘mean’.</p>
+<dt><strong>method</strong><span class="classifier">str, one of ‘mean’ or ‘median’</span></dt><dd><p>Method to use for binning. Default is ‘mean’.</p>
 </dd>
 </dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>binned_periodogram</strong> <span class="classifier-delimiter">:</span> <span class="classifier">a <a class="reference internal" href="#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> object</span></dt>
-<dd><p class="first last">Returns a new <a class="reference internal" href="#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> object which has been binned.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>binned_periodogram</strong><span class="classifier">a <a class="reference internal" href="#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> object</span></dt><dd><p>Returns a new <a class="reference internal" href="#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> object which has been binned.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="lightkurve.periodogram.Periodogram.copy">
-<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.Periodogram.copy" title="Permalink to this definition">¶</a></dt>
+<code class="descname">copy</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.Periodogram.copy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a copy of the Periodogram object.</p>
 <p>This method uses the <a class="reference external" href="https://docs.python.org/3/library/copy.html#copy.deepcopy" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy.deepcopy</span></code></a> function to ensure that all
 objects stored within the Periodogram are copied.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>pg_copy</strong> <span class="classifier-delimiter">:</span> <span class="classifier">Periodogram</span></dt>
-<dd><p class="first last">A new <a class="reference internal" href="#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> object which is a copy of the original.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>pg_copy</strong><span class="classifier">Periodogram</span></dt><dd><p>A new <a class="reference internal" href="#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> object which is a copy of the original.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="lightkurve.periodogram.Periodogram.flatten">
-<code class="descname">flatten</code><span class="sig-paren">(</span><em>method='logmedian'</em>, <em>filter_width=0.01</em>, <em>return_trend=False</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.Periodogram.flatten" title="Permalink to this definition">¶</a></dt>
+<code class="descname">flatten</code><span class="sig-paren">(</span><em>self</em>, <em>method='logmedian'</em>, <em>filter_width=0.01</em>, <em>return_trend=False</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.Periodogram.flatten" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimates the Signal-To-Noise (SNR) spectrum by dividing out an
 estimate of the noise background.</p>
 <p>This method divides the power spectrum by a background estimated
@@ -257,100 +242,78 @@ using a moving filter in log10 space by default. For details on the
 <p>Dividing the power through by the noise background produces a spectrum
 with no units of power. Since the signal is divided through by a measure
 of the noise, we refer to this as a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Signal-To-Noise</span></code> spectrum.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>method</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, one of ‘boxkernel’ or ‘logmedian’</span></dt>
-<dd><p class="first last">Background estimation method passed on to <a class="reference internal" href="#lightkurve.periodogram.Periodogram.smooth" title="lightkurve.periodogram.Periodogram.smooth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram.smooth()</span></code></a>.
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>method</strong><span class="classifier">str, one of ‘boxkernel’ or ‘logmedian’</span></dt><dd><p>Background estimation method passed on to <a class="reference internal" href="#lightkurve.periodogram.Periodogram.smooth" title="lightkurve.periodogram.Periodogram.smooth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram.smooth()</span></code></a>.
 Defaults to ‘logmedian’.</p>
 </dd>
-<dt><strong>filter_width</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
-<dd><p class="first last">If <code class="xref py py-obj docutils literal notranslate"><span class="pre">method</span></code> = ‘boxkernel’, this is the width of the smoothing filter
+<dt><strong>filter_width</strong><span class="classifier">float</span></dt><dd><p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">method</span></code> = ‘boxkernel’, this is the width of the smoothing filter
 in units of frequency.
 If method = <code class="xref py py-obj docutils literal notranslate"><span class="pre">logmedian</span></code>, this is the width of the smoothing filter
 in log10(frequency) space.</p>
 </dd>
-<dt><strong>return_trend</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
-<dd><p class="first last">If True, then the background estimate, alongside the SNR spectrum,
+<dt><strong>return_trend</strong><span class="classifier">bool</span></dt><dd><p>If True, then the background estimate, alongside the SNR spectrum,
 will be returned.</p>
 </dd>
 </dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>snr_spectrum</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference internal" href="#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> object</span></dt>
-<dd><p class="first last">Returns a periodogram object where the power is an estimate of the
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>snr_spectrum</strong><span class="classifier"><a class="reference internal" href="#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> object</span></dt><dd><p>Returns a periodogram object where the power is an estimate of the
 signal-to-noise of the spectrum, creating by dividing the powers
 with a simple estimate of the noise background using a smoothing filter.</p>
 </dd>
-<dt><strong>bkg</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference internal" href="#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> object</span></dt>
-<dd><p class="first last">The estimated power spectrum of the background noise. This is only
+<dt><strong>bkg</strong><span class="classifier"><a class="reference internal" href="#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> object</span></dt><dd><p>The estimated power spectrum of the background noise. This is only
 returned if <code class="xref py py-obj docutils literal notranslate"><span class="pre">return_trend</span> <span class="pre">=</span> <span class="pre">True</span></code>.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="lightkurve.periodogram.Periodogram.plot">
-<code class="descname">plot</code><span class="sig-paren">(</span><em>scale='linear'</em>, <em>ax=None</em>, <em>xlabel=None</em>, <em>ylabel=None</em>, <em>title=''</em>, <em>style='lightkurve'</em>, <em>view=None</em>, <em>unit=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.Periodogram.plot" title="Permalink to this definition">¶</a></dt>
+<code class="descname">plot</code><span class="sig-paren">(</span><em>self</em>, <em>scale='linear'</em>, <em>ax=None</em>, <em>xlabel=None</em>, <em>ylabel=None</em>, <em>title=''</em>, <em>style='lightkurve'</em>, <em>view=None</em>, <em>unit=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.Periodogram.plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots the Periodogram.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>scale: str</strong></dt>
-<dd><p class="first last">Set x,y axis to be “linear” or “log”. Default is linear.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>scale: str</strong></dt><dd><p>Set x,y axis to be “linear” or “log”. Default is linear.</p>
 </dd>
-<dt><strong>ax</strong> <span class="classifier-delimiter">:</span> <span class="classifier">matplotlib.axes._subplots.AxesSubplot</span></dt>
-<dd><p class="first last">A matplotlib axes object to plot into. If no axes is provided,
+<dt><strong>ax</strong><span class="classifier">matplotlib.axes._subplots.AxesSubplot</span></dt><dd><p>A matplotlib axes object to plot into. If no axes is provided,
 a new one will be generated.</p>
 </dd>
-<dt><strong>xlabel</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
-<dd><p class="first last">Plot x axis label</p>
+<dt><strong>xlabel</strong><span class="classifier">str</span></dt><dd><p>Plot x axis label</p>
 </dd>
-<dt><strong>ylabel</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
-<dd><p class="first last">Plot y axis label</p>
+<dt><strong>ylabel</strong><span class="classifier">str</span></dt><dd><p>Plot y axis label</p>
 </dd>
-<dt><strong>title</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
-<dd><p class="first last">Plot set_title</p>
+<dt><strong>title</strong><span class="classifier">str</span></dt><dd><p>Plot set_title</p>
 </dd>
-<dt><strong>style</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
-<dd><p class="first last">Path or URL to a matplotlib style file, or name of one of
+<dt><strong>style</strong><span class="classifier">str</span></dt><dd><p>Path or URL to a matplotlib style file, or name of one of
 matplotlib’s built-in stylesheets (e.g. ‘ggplot’).
 Lightkurve’s custom stylesheet is used by default.</p>
 </dd>
-<dt><strong>view</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
-<dd><p class="first last">{‘frequency’, ‘period’}. Default ‘frequency’. If ‘frequency’, x-axis
+<dt><strong>view</strong><span class="classifier">str</span></dt><dd><p>{‘frequency’, ‘period’}. Default ‘frequency’. If ‘frequency’, x-axis
 units will be frequency. If ‘period’, the x-axis units will be
 period and ‘log’ scale.</p>
 </dd>
-<dt><strong>kwargs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
-<dd><p class="first last">Dictionary of arguments to be passed to <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.0.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib.pyplot.plot</span></code></a>.</p>
+<dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of arguments to be passed to <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.0.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib.pyplot.plot</span></code></a>.</p>
 </dd>
 </dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>ax</strong> <span class="classifier-delimiter">:</span> <span class="classifier">matplotlib.axes._subplots.AxesSubplot</span></dt>
-<dd><p class="first last">The matplotlib axes object.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>ax</strong><span class="classifier">matplotlib.axes._subplots.AxesSubplot</span></dt><dd><p>The matplotlib axes object.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="lightkurve.periodogram.Periodogram.show_properties">
-<code class="descname">show_properties</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.Periodogram.show_properties" title="Permalink to this definition">¶</a></dt>
+<code class="descname">show_properties</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.Periodogram.show_properties" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prints a summary of the non-callable attributes of the Periodogram object.</p>
 <p>Prints in order of type (ints, strings, lists, arrays and others).
 Prints in alphabetical order.</p>
@@ -358,7 +321,7 @@ Prints in alphabetical order.</p>
 
 <dl class="method">
 <dt id="lightkurve.periodogram.Periodogram.smooth">
-<code class="descname">smooth</code><span class="sig-paren">(</span><em>method='boxkernel'</em>, <em>filter_width=0.1</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.Periodogram.smooth" title="Permalink to this definition">¶</a></dt>
+<code class="descname">smooth</code><span class="sig-paren">(</span><em>self</em>, <em>method='boxkernel'</em>, <em>filter_width=0.1</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.Periodogram.smooth" title="Permalink to this definition">¶</a></dt>
 <dd><p>Smooths the power spectrum using the ‘boxkernel’ or ‘logmedian’ method.</p>
 <p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">method</span></code> is set to ‘boxkernel’, this method will smooth the power
 spectrum by convolving with a numpy Box1DKernel with a width of
@@ -389,52 +352,40 @@ factor we follow asteroseismic convention that the signal-to-noise
 power has a mean value of unity.  (note the signal-to-noise power is
 really the signal plus noise divided by the noise and hence should be
 unity in the absence of any signal)</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>method</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, one of ‘boxkernel’ or ‘logmedian’</span></dt>
-<dd><p class="first last">The smoothing method to use. Defaults to ‘boxkernel’.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>method</strong><span class="classifier">str, one of ‘boxkernel’ or ‘logmedian’</span></dt><dd><p>The smoothing method to use. Defaults to ‘boxkernel’.</p>
 </dd>
-<dt><strong>filter_width</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
-<dd><p class="first last">If <code class="xref py py-obj docutils literal notranslate"><span class="pre">method</span></code> = ‘boxkernel’, this is the width of the smoothing filter
+<dt><strong>filter_width</strong><span class="classifier">float</span></dt><dd><p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">method</span></code> = ‘boxkernel’, this is the width of the smoothing filter
 in units of frequency.
 If method = <code class="xref py py-obj docutils literal notranslate"><span class="pre">logmedian</span></code>, this is the width of the smoothing filter
 in log10(frequency) space.</p>
 </dd>
 </dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>smoothed_pg</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference internal" href="#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> object</span></dt>
-<dd><p class="first last">Returns a new <a class="reference internal" href="#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> object in which the power spectrum
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>smoothed_pg</strong><span class="classifier"><a class="reference internal" href="#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> object</span></dt><dd><p>Returns a new <a class="reference internal" href="#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> object in which the power spectrum
 has been smoothed.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="lightkurve.periodogram.Periodogram.to_table">
-<code class="descname">to_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.Periodogram.to_table" title="Permalink to this definition">¶</a></dt>
+<code class="descname">to_table</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.Periodogram.to_table" title="Permalink to this definition">¶</a></dt>
 <dd><p>Exports the Periodogram as an Astropy Table.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>table</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v3.2.dev1194)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.table.Table</span></code></a> object</span></dt>
-<dd><p class="first last">An AstroPy Table with columns ‘frequency’, ‘period’, and ‘power’.</p>
+<dl class="field-list">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl>
+<dt><strong>table</strong><span class="classifier"><a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v4.0.dev873)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.table.Table</span></code></a> object</span></dt><dd><p>An AstroPy Table with columns ‘frequency’, ‘period’, and ‘power’.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -446,8 +397,8 @@ has been smoothed.</p>
 <div class="container" style="padding-top: 2em;">
     <hr>
     <p class="text-center">
-        Created with ♥ by the Lightkurve developers.
-        <a href="https://github.com/KeplerGO/lightkurve">Join us on GitHub.</a>
+        Created with ♥ by the Lightkurve collaboration.
+        Please <a href="../about/citing.html">cite us</a> or <a href="https://github.com/KeplerGO/lightkurve">join us on GitHub.</a>
     </p>
 </div>
   </body>

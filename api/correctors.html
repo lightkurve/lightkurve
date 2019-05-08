@@ -1,11 +1,9 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>Systematics correction classes &#8212; Lightkurve</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -24,6 +22,16 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
     <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-69171-9');
+    </script>
 
   </head><body>
 <header>
@@ -76,20 +84,20 @@
 time series photometry data.</p>
 <div class="section" id="classes">
 <h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-center">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="lightkurve.correctors.SFFCorrector.html#lightkurve.correctors.SFFCorrector" title="lightkurve.correctors.SFFCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SFFCorrector</span></code></a>(lightcurve)</td>
-<td>Implements the Self-Flat-Fielding (SFF) systematics removal method.</td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.correctors.SFFCorrector.html#lightkurve.correctors.SFFCorrector" title="lightkurve.correctors.SFFCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SFFCorrector</span></code></a>(lightcurve)</p></td>
+<td><p>Implements the Self-Flat-Fielding (SFF) systematics removal method.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="lightkurve.correctors.PLDCorrector.html#lightkurve.correctors.PLDCorrector" title="lightkurve.correctors.PLDCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PLDCorrector</span></code></a>(tpf)</td>
-<td>Implements the Pixel Level Decorrelation (PLD) systematics removal method.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.correctors.PLDCorrector.html#lightkurve.correctors.PLDCorrector" title="lightkurve.correctors.PLDCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PLDCorrector</span></code></a>(tpf)</p></td>
+<td><p>Implements the Pixel Level Decorrelation (PLD) systematics removal method.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="lightkurve.correctors.KeplerCBVCorrector.html#lightkurve.correctors.KeplerCBVCorrector" title="lightkurve.correctors.KeplerCBVCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerCBVCorrector</span></code></a>(lc_file[,&nbsp;likelihood,&nbsp;prior])</td>
-<td>Remove systematic trends from Kepler light curves by fitting Cotrending Basis Vectors (CBVs).</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.correctors.KeplerCBVCorrector.html#lightkurve.correctors.KeplerCBVCorrector" title="lightkurve.correctors.KeplerCBVCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerCBVCorrector</span></code></a>(lc[, cbv_array, …])</p></td>
+<td><p>Remove systematic trends from Kepler light curves by fitting Cotrending Basis Vectors (CBVs).</p></td>
 </tr>
 </tbody>
 </table>
@@ -109,8 +117,8 @@ time series photometry data.</p>
 <div class="container" style="padding-top: 2em;">
     <hr>
     <p class="text-center">
-        Created with ♥ by the Lightkurve developers.
-        <a href="https://github.com/KeplerGO/lightkurve">Join us on GitHub.</a>
+        Created with ♥ by the Lightkurve collaboration.
+        Please <a href="../about/citing.html">cite us</a> or <a href="https://github.com/KeplerGO/lightkurve">join us on GitHub.</a>
     </p>
 </div>
   </body>

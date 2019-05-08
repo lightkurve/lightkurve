@@ -1,11 +1,9 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>Interactively inspecting Target Pixel Files and Lightcurves &#8212; Lightkurve</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -24,6 +22,16 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
     <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-69171-9');
+    </script>
 
   </head><body>
 <header>
@@ -308,14 +316,14 @@ fuzzy</a>.</p>
 <p>We see that the starting mask (the Kepler pipeline mask, by default), shows huge jumps in flux between times 3000 and 3020. These jagged artifacts disappear upon the selection of a larger aperture– large enough to encompass most of the point spread function of the star. The end result shows a time-series lightcurve of a young disk-bearing star.</p>
 <p>Interaction modes:</p>
 <ul class="simple">
-<li>Clicking on a single pixel shows the time-series lightcurve of that pixel alone.</li>
-<li><code class="docutils literal notranslate"><span class="pre">shift</span></code>-clicking on multiple pixels shows the lightcurve using that pixel mask.</li>
-<li><code class="docutils literal notranslate"><span class="pre">shift</span></code>-clicking on an already-selected pixel will <em>de</em>-select that pixel.</li>
-<li>Clicking and dragging a box will make a rectangular aperture mask– individual pixels can be deselected from this mask by shift-clicking (box de-selecting does not work).</li>
-<li>The screen stretch high and low limits can be changed independently by clicking and dragging each end, or simultaneously by clicking and dragging in the middle.</li>
-<li>The cadence slider updates the postage stamp image at the position of the vertical red bar in the lightcurve.</li>
-<li>Clicking on a position in the lightcurve automatically seeks to that Cadence Number.</li>
-<li>The left and right arrows can be clicked to increment the cadence number by one.</li>
+<li><p>Clicking on a single pixel shows the time-series lightcurve of that pixel alone.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">shift</span></code>-clicking on multiple pixels shows the lightcurve using that pixel mask.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">shift</span></code>-clicking on an already-selected pixel will <em>de</em>-select that pixel.</p></li>
+<li><p>Clicking and dragging a box will make a rectangular aperture mask– individual pixels can be deselected from this mask by shift-clicking (box de-selecting does not work).</p></li>
+<li><p>The screen stretch high and low limits can be changed independently by clicking and dragging each end, or simultaneously by clicking and dragging in the middle.</p></li>
+<li><p>The cadence slider updates the postage stamp image at the position of the vertical red bar in the lightcurve.</p></li>
+<li><p>Clicking on a position in the lightcurve automatically seeks to that Cadence Number.</p></li>
+<li><p>The left and right arrows can be clicked to increment the cadence number by one.</p></li>
 </ul>
 <p>The <code class="docutils literal notranslate"><span class="pre">interact()</span></code> tool works for both Kepler or K2 data. KOI 6.01 (KIC 3248033) sits 4 pixels away from eclipsing binary KOI 1759.01 (KIC 3248019). An unwise choice of pixels can give rise to a spurious exoplanet signal.</p>
 <div class="nbinput nblast docutils container">
@@ -647,8 +655,8 @@ export masks, please upvote our <a class="reference external" href="https://gith
 <div class="container" style="padding-top: 2em;">
     <hr>
     <p class="text-center">
-        Created with ♥ by the Lightkurve developers.
-        <a href="https://github.com/KeplerGO/lightkurve">Join us on GitHub.</a>
+        Created with ♥ by the Lightkurve collaboration.
+        Please <a href="../about/citing.html">cite us</a> or <a href="https://github.com/KeplerGO/lightkurve">join us on GitHub.</a>
     </p>
 </div>
   </body>

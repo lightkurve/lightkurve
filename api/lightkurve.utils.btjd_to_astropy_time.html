@@ -1,11 +1,9 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>btjd_to_astropy_time &#8212; Lightkurve</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -24,6 +22,16 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
     <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-69171-9');
+    </script>
 
   </head><body>
 <header>
@@ -74,35 +82,28 @@
 <dl class="function">
 <dt id="lightkurve.utils.btjd_to_astropy_time">
 <code class="descclassname">lightkurve.utils.</code><code class="descname">btjd_to_astropy_time</code><span class="sig-paren">(</span><em>btjd</em>, <em>bjdref=2457000.0</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.utils.btjd_to_astropy_time" title="Permalink to this definition">¶</a></dt>
-<dd><p>Converts BTJD time values to an <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v3.2.dev1194)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.time.Time</span></code></a> object.</p>
+<dd><p>Converts BTJD time values to an <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v4.0.dev873)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.time.Time</span></code></a> object.</p>
 <p>TESS Barycentric Julian Day (BTJD) is a Julian day minus 2457000.0
 and corrected to the arrival times at the barycenter of the Solar System.
 BTJD is the format in which times are recorded in the TESS data products.
 The time is in the Barycentric Dynamical Time frame (TDB), which is a
 time system that is not affected by leap seconds.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>btjd</strong> <span class="classifier-delimiter">:</span> <span class="classifier">array of floats</span></dt>
-<dd><p class="first last">Barycentric Kepler Julian Day</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>btjd</strong><span class="classifier">array of floats</span></dt><dd><p>Barycentric Kepler Julian Day</p>
 </dd>
-<dt><strong>bjdref</strong> <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
-<dd><p class="first last">BJD reference date.</p>
+<dt><strong>bjdref</strong><span class="classifier">float</span></dt><dd><p>BJD reference date.</p>
 </dd>
 </dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>time</strong> <span class="classifier-delimiter">:</span> <span class="classifier">astropy.time.Time object</span></dt>
-<dd><p class="first last">Resulting time object</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>time</strong><span class="classifier">astropy.time.Time object</span></dt><dd><p>Resulting time object</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -112,8 +113,8 @@ time system that is not affected by leap seconds.</p>
 <div class="container" style="padding-top: 2em;">
     <hr>
     <p class="text-center">
-        Created with ♥ by the Lightkurve developers.
-        <a href="https://github.com/KeplerGO/lightkurve">Join us on GitHub.</a>
+        Created with ♥ by the Lightkurve collaboration.
+        Please <a href="../about/citing.html">cite us</a> or <a href="https://github.com/KeplerGO/lightkurve">join us on GitHub.</a>
     </p>
 </div>
   </body>

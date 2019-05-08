@@ -1,11 +1,9 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>Reporting issues and proposing changes &#8212; Lightkurve</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -24,6 +22,16 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
     <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-69171-9');
+    </script>
 
   </head><body>
 <header>
@@ -85,28 +93,28 @@ Once you are ready to propose the changes, please go ahead and open a pull reque
 “<a class="reference external" href="http://docs.astropy.org/en/stable/development/workflow/development_workflow.html">How to make a code contribution</a>” tutorial.
 In brief, the steps are as follows:</p>
 <ol class="arabic simple">
-<li>Fork the main <strong>lightkurve</strong> repository by logging into GitHub, browsing to
-<code class="docutils literal notranslate"><span class="pre">https://github.com/KeplerGO/lightkurve</span></code> and clicking on <code class="docutils literal notranslate"><span class="pre">Fork</span></code> in the top right corner.</li>
-<li>Clone your fork to your computer:</li>
+<li><p>Fork the main <strong>lightkurve</strong> repository by logging into GitHub, browsing to
+<code class="docutils literal notranslate"><span class="pre">https://github.com/KeplerGO/lightkurve</span></code> and clicking on <code class="docutils literal notranslate"><span class="pre">Fork</span></code> in the top right corner.</p></li>
+<li><p>Clone your fork to your computer:</p></li>
 </ol>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/YOUR-GITHUB-USERNAME/lightkurve.git
 </pre></div>
 </div>
 <ol class="arabic simple" start="3">
-<li>Install the development version of lightkurve:</li>
+<li><p>Install the development version of lightkurve:</p></li>
 </ol>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> lightkurve
 $ pip install -e .
 </pre></div>
 </div>
 <ol class="arabic simple" start="4">
-<li>Add the KeplerGO remote to your GitHub enviroment:</li>
+<li><p>Add the KeplerGO remote to your GitHub enviroment:</p></li>
 </ol>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git remote add upstream https://github.com/KeplerGO/lightkurve.git
 </pre></div>
 </div>
 <ol class="arabic simple" start="5">
-<li>Let’s make sure everything is setup correctly. Execute:</li>
+<li><p>Let’s make sure everything is setup correctly. Execute:</p></li>
 </ol>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git remote -v
 </pre></div>
@@ -119,29 +127,29 @@ upstream    https://github.com/KeplerGO/lightkurve.git <span class="o">(</span>p
 </pre></div>
 </div>
 <ol class="arabic simple" start="6">
-<li>Now you are ready to start contributing; make a new branch with a name of your choice and checkout:</li>
+<li><p>Now you are ready to start contributing; make a new branch with a name of your choice and checkout:</p></li>
 </ol>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git branch name-of-your-branch
 $ git checkout name-of-your-branch
 </pre></div>
 </div>
 <ol class="arabic simple" start="7">
-<li>Do the changes you want and add them:</li>
+<li><p>Do the changes you want and add them:</p></li>
 </ol>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git add FILE-YOU-ADDED-OR-MODIFIED
 </pre></div>
 </div>
 <ol class="arabic simple" start="8">
-<li>Commit and push your changes:</li>
+<li><p>Commit and push your changes:</p></li>
 </ol>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git commit -m <span class="s2">&quot;description of changes&quot;</span>
 $ git push origin name-of-your-branch
 </pre></div>
 </div>
 <ol class="arabic simple" start="9">
-<li>Head to <a class="reference external" href="https://github.com/KeplerGO/lightkurve">https://github.com/KeplerGO/lightkurve</a> and you should now see a button
-“Compare and open a pull request”.  Click the button and submit your pull request.</li>
-<li>That’s it! :)</li>
+<li><p>Head to <a class="reference external" href="https://github.com/KeplerGO/lightkurve">https://github.com/KeplerGO/lightkurve</a> and you should now see a button
+“Compare and open a pull request”.  Click the button and submit your pull request.</p></li>
+<li><p>That’s it! :)</p></li>
 </ol>
 </div>
 </div>
@@ -151,8 +159,8 @@ $ git push origin name-of-your-branch
 <div class="container" style="padding-top: 2em;">
     <hr>
     <p class="text-center">
-        Created with ♥ by the Lightkurve developers.
-        <a href="https://github.com/KeplerGO/lightkurve">Join us on GitHub.</a>
+        Created with ♥ by the Lightkurve collaboration.
+        Please <a href="citing.html">cite us</a> or <a href="https://github.com/KeplerGO/lightkurve">join us on GitHub.</a>
     </p>
 </div>
   </body>

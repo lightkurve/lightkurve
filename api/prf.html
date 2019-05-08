@@ -1,11 +1,9 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>PRF photometry classes &#8212; Lightkurve</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -24,6 +22,16 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
     <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-69171-9');
+    </script>
 
   </head><body>
 <header>
@@ -73,59 +81,59 @@
 <span id="prf-photometry-classes"></span><h1>PRF photometry classes<a class="headerlink" href="#module-lightkurve.prf" title="Permalink to this headline">¶</a></h1>
 <span class="target" id="module-lightkurve.prf"></span><div class="section" id="classes">
 <h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-center">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="lightkurve.prf.BackgroundParameters.html#lightkurve.prf.BackgroundParameters" title="lightkurve.prf.BackgroundParameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BackgroundParameters</span></code></a>([flux,&nbsp;err_flux,&nbsp;fitted])</td>
-<td>Container class to hold the parameters of the background in a <code class="docutils literal notranslate"><span class="pre">TPFModel</span></code>.</td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.prf.BackgroundParameters.html#lightkurve.prf.BackgroundParameters" title="lightkurve.prf.BackgroundParameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BackgroundParameters</span></code></a>([flux, err_flux, fitted])</p></td>
+<td><p>Container class to hold the parameters of the background in a <code class="docutils literal notranslate"><span class="pre">TPFModel</span></code>.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="lightkurve.prf.BackgroundPrior.html#lightkurve.prf.BackgroundPrior" title="lightkurve.prf.BackgroundPrior"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BackgroundPrior</span></code></a>([flux])</td>
-<td>Container class to capture a user’s beliefs about the background flux.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.prf.BackgroundPrior.html#lightkurve.prf.BackgroundPrior" title="lightkurve.prf.BackgroundPrior"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BackgroundPrior</span></code></a>([flux])</p></td>
+<td><p>Container class to capture a user’s beliefs about the background flux.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="lightkurve.prf.FixedValuePrior.html#lightkurve.prf.FixedValuePrior" title="lightkurve.prf.FixedValuePrior"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FixedValuePrior</span></code></a>(value[,&nbsp;name])</td>
-<td>An improper prior with a negative log probability of 0 at a single fixed value and inf elsewhere.</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.prf.FixedValuePrior.html#lightkurve.prf.FixedValuePrior" title="lightkurve.prf.FixedValuePrior"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FixedValuePrior</span></code></a>(value[, name])</p></td>
+<td><p>An improper prior with a negative log probability of 0 at a single fixed value and inf elsewhere.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="lightkurve.prf.FocusParameters.html#lightkurve.prf.FocusParameters" title="lightkurve.prf.FocusParameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FocusParameters</span></code></a>([scale_col,&nbsp;scale_row,&nbsp;…])</td>
-<td>Container class to hold the parameters of the telescope focus in a <code class="docutils literal notranslate"><span class="pre">TPFModel</span></code>.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.prf.FocusParameters.html#lightkurve.prf.FocusParameters" title="lightkurve.prf.FocusParameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FocusParameters</span></code></a>([scale_col, scale_row, …])</p></td>
+<td><p>Container class to hold the parameters of the telescope focus in a <code class="docutils literal notranslate"><span class="pre">TPFModel</span></code>.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="lightkurve.prf.FocusPrior.html#lightkurve.prf.FocusPrior" title="lightkurve.prf.FocusPrior"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FocusPrior</span></code></a>([scale_col,&nbsp;var,&nbsp;scale_row,&nbsp;var,&nbsp;…])</td>
-<td>Container class to capture a user’s beliefs about the telescope focus.</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.prf.FocusPrior.html#lightkurve.prf.FocusPrior" title="lightkurve.prf.FocusPrior"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FocusPrior</span></code></a>([scale_col, var, scale_row, var, …])</p></td>
+<td><p>Container class to capture a user’s beliefs about the telescope focus.</p></td>
 </tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">GaussianPrior</span></code>(mean,&nbsp;var[,&nbsp;name])</td>
-<td>Computes the negative log pdf for a n-dimensional independent Gaussian distribution.</td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">GaussianPrior</span></code>(mean, var[, name])</p></td>
+<td><p>Computes the negative log pdf for a n-dimensional independent Gaussian distribution.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="lightkurve.prf.KeplerPRF.html#lightkurve.prf.KeplerPRF" title="lightkurve.prf.KeplerPRF"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerPRF</span></code></a>(channel,&nbsp;shape,&nbsp;column,&nbsp;row)</td>
-<td>Kepler’s Pixel Response Function as designed by <a class="reference internal" href="lightkurve.prf.KeplerPRF.html#r2d3bf0a39f5d-1" id="id1">[R2d3bf0a39f5d-1]</a>.</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.prf.KeplerPRF.html#lightkurve.prf.KeplerPRF" title="lightkurve.prf.KeplerPRF"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerPRF</span></code></a>(channel, shape, column, row)</p></td>
+<td><p>Kepler’s Pixel Response Function as designed by <a class="reference internal" href="lightkurve.prf.KeplerPRF.html#r2d3bf0a39f5d-1" id="id1"><span>[R2d3bf0a39f5d-1]</span></a>.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="lightkurve.prf.MotionParameters.html#lightkurve.prf.MotionParameters" title="lightkurve.prf.MotionParameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MotionParameters</span></code></a>([shift_col,&nbsp;shift_row,&nbsp;fitted])</td>
-<td>Container class to hold the parameters of the telescope motion in a <code class="docutils literal notranslate"><span class="pre">TPFModel</span></code>.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.prf.MotionParameters.html#lightkurve.prf.MotionParameters" title="lightkurve.prf.MotionParameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MotionParameters</span></code></a>([shift_col, shift_row, fitted])</p></td>
+<td><p>Container class to hold the parameters of the telescope motion in a <code class="docutils literal notranslate"><span class="pre">TPFModel</span></code>.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="lightkurve.prf.MotionPrior.html#lightkurve.prf.MotionPrior" title="lightkurve.prf.MotionPrior"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MotionPrior</span></code></a>([shift_col,&nbsp;var,&nbsp;shift_row,&nbsp;var])</td>
-<td>Container class to capture a user’s beliefs about the telescope motion.</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.prf.MotionPrior.html#lightkurve.prf.MotionPrior" title="lightkurve.prf.MotionPrior"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MotionPrior</span></code></a>([shift_col, var, shift_row, var])</p></td>
+<td><p>Container class to capture a user’s beliefs about the telescope motion.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="lightkurve.prf.PRFPhotometry.html#lightkurve.prf.PRFPhotometry" title="lightkurve.prf.PRFPhotometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PRFPhotometry</span></code></a>(model)</td>
-<td>This class performs PRF Photometry on TPF-like data given a <code class="docutils literal notranslate"><span class="pre">TPFModel</span></code>.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.prf.PRFPhotometry.html#lightkurve.prf.PRFPhotometry" title="lightkurve.prf.PRFPhotometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PRFPhotometry</span></code></a>(model)</p></td>
+<td><p>This class performs PRF Photometry on TPF-like data given a <code class="docutils literal notranslate"><span class="pre">TPFModel</span></code>.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="lightkurve.prf.SimpleKeplerPRF.html#lightkurve.prf.SimpleKeplerPRF" title="lightkurve.prf.SimpleKeplerPRF"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimpleKeplerPRF</span></code></a>(channel,&nbsp;shape,&nbsp;column,&nbsp;row)</td>
-<td>Simple model of KeplerPRF.</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.prf.SimpleKeplerPRF.html#lightkurve.prf.SimpleKeplerPRF" title="lightkurve.prf.SimpleKeplerPRF"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimpleKeplerPRF</span></code></a>(channel, shape, column, row)</p></td>
+<td><p>Simple model of KeplerPRF.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="lightkurve.prf.StarParameters.html#lightkurve.prf.StarParameters" title="lightkurve.prf.StarParameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StarParameters</span></code></a>(col,&nbsp;row,&nbsp;flux[,&nbsp;err_col,&nbsp;…])</td>
-<td>Container class to hold the parameters of a star in a <code class="docutils literal notranslate"><span class="pre">TPFModel</span></code>.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.prf.StarParameters.html#lightkurve.prf.StarParameters" title="lightkurve.prf.StarParameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StarParameters</span></code></a>(col, row, flux[, err_col, …])</p></td>
+<td><p>Container class to hold the parameters of a star in a <code class="docutils literal notranslate"><span class="pre">TPFModel</span></code>.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="lightkurve.prf.StarPrior.html#lightkurve.prf.StarPrior" title="lightkurve.prf.StarPrior"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StarPrior</span></code></a>(col,&nbsp;row[,&nbsp;flux,&nbsp;ub,&nbsp;targetid])</td>
-<td>Container class to capture a user’s beliefs about a star’s position and flux.</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.prf.StarPrior.html#lightkurve.prf.StarPrior" title="lightkurve.prf.StarPrior"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StarPrior</span></code></a>(col, row[, flux, ub, targetid])</p></td>
+<td><p>Container class to capture a user’s beliefs about a star’s position and flux.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="lightkurve.prf.TPFModel.html#lightkurve.prf.TPFModel" title="lightkurve.prf.TPFModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TPFModel</span></code></a>([star_priors,&nbsp;background_prior,&nbsp;…])</td>
-<td>A model which describes a single-cadence Kepler image.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.prf.TPFModel.html#lightkurve.prf.TPFModel" title="lightkurve.prf.TPFModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TPFModel</span></code></a>([star_priors, background_prior, …])</p></td>
+<td><p>A model which describes a single-cadence Kepler image.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="lightkurve.prf.TPFModelParameters.html#lightkurve.prf.TPFModelParameters" title="lightkurve.prf.TPFModelParameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TPFModelParameters</span></code></a>([stars,&nbsp;background,&nbsp;…])</td>
-<td>Container class to combine all parameters that parameterize a <code class="docutils literal notranslate"><span class="pre">TPFModel</span></code>.</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.prf.TPFModelParameters.html#lightkurve.prf.TPFModelParameters" title="lightkurve.prf.TPFModelParameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TPFModelParameters</span></code></a>([stars, background, …])</p></td>
+<td><p>Container class to combine all parameters that parameterize a <code class="docutils literal notranslate"><span class="pre">TPFModel</span></code>.</p></td>
 </tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">UniformPrior</span></code>(lb,&nbsp;ub[,&nbsp;name])</td>
-<td>Computes the negative log pdf for a n-dimensional independent uniform distribution.</td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">UniformPrior</span></code>(lb, ub[, name])</p></td>
+<td><p>Computes the negative log pdf for a n-dimensional independent uniform distribution.</p></td>
 </tr>
 </tbody>
 </table>
@@ -141,8 +149,8 @@
 <div class="container" style="padding-top: 2em;">
     <hr>
     <p class="text-center">
-        Created with ♥ by the Lightkurve developers.
-        <a href="https://github.com/KeplerGO/lightkurve">Join us on GitHub.</a>
+        Created with ♥ by the Lightkurve collaboration.
+        Please <a href="../about/citing.html">cite us</a> or <a href="https://github.com/KeplerGO/lightkurve">join us on GitHub.</a>
     </p>
 </div>
   </body>

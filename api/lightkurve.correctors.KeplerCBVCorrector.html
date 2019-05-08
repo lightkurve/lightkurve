@@ -1,11 +1,9 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>KeplerCBVCorrector &#8212; Lightkurve</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -24,6 +22,16 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
     <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-69171-9');
+    </script>
 
   </head><body>
 <header>
@@ -73,7 +81,7 @@
 <h1>KeplerCBVCorrector<a class="headerlink" href="#keplercbvcorrector" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="lightkurve.correctors.KeplerCBVCorrector">
-<em class="property">class </em><code class="descclassname">lightkurve.correctors.</code><code class="descname">KeplerCBVCorrector</code><span class="sig-paren">(</span><em>lc_file</em>, <em>likelihood=&lt;class 'oktopus.likelihood.LaplacianLikelihood'&gt;</em>, <em>prior=&lt;class 'oktopus.prior.LaplacianPrior'&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">lightkurve.correctors.</code><code class="descname">KeplerCBVCorrector</code><span class="sig-paren">(</span><em>lc</em>, <em>cbv_array=None</em>, <em>cbv_cadenceno=None</em>, <em>likelihood=&lt;class 'oktopus.likelihood.LaplacianLikelihood'&gt;</em>, <em>prior=&lt;class 'oktopus.prior.LaplacianPrior'&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Remove systematic trends from Kepler light curves by fitting
 Cotrending Basis Vectors (CBVs).</p>
@@ -94,61 +102,55 @@ Cotrending Basis Vectors (CBVs).</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span> <span class="c1"># doctest: +SKIP</span>
 </pre></div>
 </div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Attributes:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>lc_file</strong> <span class="classifier-delimiter">:</span> <span class="classifier">KeplerLightCurveFile object or str</span></dt>
-<dd><p class="first last">An instance from KeplerLightCurveFile or a path for the .fits
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>lc</strong><span class="classifier">KeplerLightCurveFile, KeplerLightCurve object or str</span></dt><dd><p>An instance from KeplerLightCurveFile or a path for the .fits
 file of a NASA’s Kepler/K2 light curve.</p>
 </dd>
-<dt><strong>likelihood</strong> <span class="classifier-delimiter">:</span> <span class="classifier">oktopus.Likelihood subclass</span></dt>
-<dd><p class="first last">A class that describes a cost function.
+<dt><strong>likelihood</strong><span class="classifier">oktopus.Likelihood subclass</span></dt><dd><p>A class that describes a cost function.
 The default is <code class="xref py py-class docutils literal notranslate"><span class="pre">oktopus.LaplacianLikelihood</span></code>, which is tantamount
 to the L1 norm.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">Attributes Summary</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-center">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.correctors.KeplerCBVCorrector.coeffs" title="lightkurve.correctors.KeplerCBVCorrector.coeffs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">coeffs</span></code></a></td>
-<td>Returns the fitted coefficients.</td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.correctors.KeplerCBVCorrector.coeffs" title="lightkurve.correctors.KeplerCBVCorrector.coeffs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">coeffs</span></code></a></p></td>
+<td><p>Returns the fitted coefficients.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.correctors.KeplerCBVCorrector.lc_file" title="lightkurve.correctors.KeplerCBVCorrector.lc_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lc_file</span></code></a></td>
-<td></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerCBVCorrector.lc_file</span></code></p></td>
+<td><p></p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.correctors.KeplerCBVCorrector.opt_result" title="lightkurve.correctors.KeplerCBVCorrector.opt_result"><code class="xref py py-obj docutils literal notranslate"><span class="pre">opt_result</span></code></a></td>
-<td>Returns the result of the optimization process.</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.correctors.KeplerCBVCorrector.opt_result" title="lightkurve.correctors.KeplerCBVCorrector.opt_result"><code class="xref py py-obj docutils literal notranslate"><span class="pre">opt_result</span></code></a></p></td>
+<td><p>Returns the result of the optimization process.</p></td>
 </tr>
 </tbody>
 </table>
 <p class="rubric">Methods Summary</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-center">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.correctors.KeplerCBVCorrector.correct" title="lightkurve.correctors.KeplerCBVCorrector.correct"><code class="xref py py-obj docutils literal notranslate"><span class="pre">correct</span></code></a>([cbvs,&nbsp;method,&nbsp;options])</td>
-<td>Correct the SAP_FLUX by fitting a number of cotrending basis vectors <code class="xref py py-obj docutils literal notranslate"><span class="pre">cbvs</span></code>.</td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.correctors.KeplerCBVCorrector.correct" title="lightkurve.correctors.KeplerCBVCorrector.correct"><code class="xref py py-obj docutils literal notranslate"><span class="pre">correct</span></code></a>(self[, cbvs, method, options])</p></td>
+<td><p>Correct the SAP_FLUX by fitting a number of cotrending basis vectors <code class="xref py py-obj docutils literal notranslate"><span class="pre">cbvs</span></code>.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.correctors.KeplerCBVCorrector.get_cbv_url" title="lightkurve.correctors.KeplerCBVCorrector.get_cbv_url"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_cbv_url</span></code></a>()</td>
-<td></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.correctors.KeplerCBVCorrector.get_cbv_url" title="lightkurve.correctors.KeplerCBVCorrector.get_cbv_url"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_cbv_url</span></code></a>(self)</p></td>
+<td><p></p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#lightkurve.correctors.KeplerCBVCorrector.get_cbvs_list" title="lightkurve.correctors.KeplerCBVCorrector.get_cbvs_list"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_cbvs_list</span></code></a>()</td>
-<td>Returns the subsequence of subsequent CBVs that maximizes Bayes’ factor <a class="reference internal" href="#r327af9fd7ac9-1" id="id1">[1]</a>.</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.correctors.KeplerCBVCorrector.get_cbvs_list" title="lightkurve.correctors.KeplerCBVCorrector.get_cbvs_list"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_cbvs_list</span></code></a>(self)</p></td>
+<td><p>Returns the subsequence of subsequent CBVs that maximizes Bayes’ factor <a class="reference internal" href="#r327af9fd7ac9-1" id="id1">[1]</a>.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#lightkurve.correctors.KeplerCBVCorrector.plot_cbvs" title="lightkurve.correctors.KeplerCBVCorrector.plot_cbvs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_cbvs</span></code></a>([cbvs,&nbsp;ax])</td>
-<td>Plot the CBVs for a given list of CBVs</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.correctors.KeplerCBVCorrector.plot_cbvs" title="lightkurve.correctors.KeplerCBVCorrector.plot_cbvs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_cbvs</span></code></a>(self[, cbvs, ax])</p></td>
+<td><p>Plot the CBVs for a given list of CBVs</p></td>
 </tr>
 </tbody>
 </table>
@@ -160,11 +162,6 @@ to the L1 norm.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="lightkurve.correctors.KeplerCBVCorrector.lc_file">
-<code class="descname">lc_file</code><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector.lc_file" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
 <dt id="lightkurve.correctors.KeplerCBVCorrector.opt_result">
 <code class="descname">opt_result</code><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector.opt_result" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the result of the optimization process.</p>
@@ -173,92 +170,72 @@ to the L1 norm.</p>
 <p class="rubric">Methods Documentation</p>
 <dl class="method">
 <dt id="lightkurve.correctors.KeplerCBVCorrector.correct">
-<code class="descname">correct</code><span class="sig-paren">(</span><em>cbvs=[1, 2], method='powell', options={}</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector.correct" title="Permalink to this definition">¶</a></dt>
+<code class="descname">correct</code><span class="sig-paren">(</span><em>self, cbvs=[1, 2], method='powell', options={}</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector.correct" title="Permalink to this definition">¶</a></dt>
 <dd><p>Correct the SAP_FLUX by fitting a number of cotrending basis vectors
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">cbvs</span></code>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>cbvs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of ints</span></dt>
-<dd><p class="first last">The list of cotrending basis vectors to fit to the data. For example,
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>cbvs</strong><span class="classifier">list of ints</span></dt><dd><p>The list of cotrending basis vectors to fit to the data. For example,
 [1, 2] will fit the first two basis vectors.</p>
 </dd>
-<dt><strong>method</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
-<dd><p class="first last">Numerical optimization method. See scipy.optimize.minimize for the
+<dt><strong>method</strong><span class="classifier">str</span></dt><dd><p>Numerical optimization method. See scipy.optimize.minimize for the
 full list of methods.</p>
 </dd>
-<dt><strong>options</strong> <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
-<dd><p class="first last">Dictionary of options to be passed to scipy.optimize.minimize.</p>
+<dt><strong>options</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of options to be passed to scipy.optimize.minimize.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="lightkurve.correctors.KeplerCBVCorrector.get_cbv_url">
-<code class="descname">get_cbv_url</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector.get_cbv_url" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_cbv_url</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector.get_cbv_url" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="lightkurve.correctors.KeplerCBVCorrector.get_cbvs_list">
-<code class="descname">get_cbvs_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector.get_cbvs_list" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_cbvs_list</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector.get_cbvs_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the subsequence of subsequent CBVs that maximizes
 Bayes’ factor <a class="reference internal" href="#r327af9fd7ac9-1" id="id2">[1]</a>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>cbv_list</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list</span></dt>
-<dd><p class="first last">Subsequence of subsequent CBVs that maximizes the Bayes’ factor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>cbv_list</strong><span class="classifier">list</span></dt><dd><p>Subsequence of subsequent CBVs that maximizes the Bayes’ factor.</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 <p class="rubric">References</p>
-<table class="docutils citation" frame="void" id="r327af9fd7ac9-1" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label">[1]</td><td><em>(<a class="fn-backref" href="#id1">1</a>, <a class="fn-backref" href="#id2">2</a>, <a class="fn-backref" href="#id3">3</a>)</em> <a class="reference external" href="https://en.wikipedia.org/wiki/Bayes_factor">https://en.wikipedia.org/wiki/Bayes_factor</a></td></tr>
-</tbody>
-</table>
+<dl class="citation">
+<dt class="label" id="r327af9fd7ac9-1"><span class="brackets">1</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id2">2</a>)</span></dt>
+<dd><p><a class="reference external" href="https://en.wikipedia.org/wiki/Bayes_factor">https://en.wikipedia.org/wiki/Bayes_factor</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="lightkurve.correctors.KeplerCBVCorrector.plot_cbvs">
-<code class="descname">plot_cbvs</code><span class="sig-paren">(</span><em>cbvs=[1, 2], ax=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector.plot_cbvs" title="Permalink to this definition">¶</a></dt>
+<code class="descname">plot_cbvs</code><span class="sig-paren">(</span><em>self, cbvs=[1, 2], ax=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector.plot_cbvs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the CBVs for a given list of CBVs</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>cbvs</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of ints</span></dt>
-<dd><p class="first last">The list of cotrending basis vectors to fit to the data. For example,
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>cbvs</strong><span class="classifier">list of ints</span></dt><dd><p>The list of cotrending basis vectors to fit to the data. For example,
 [1, 2] will fit the first two basis vectors.</p>
 </dd>
-<dt><strong>ax</strong> <span class="classifier-delimiter">:</span> <span class="classifier">matplotlib.pyplot.Axes.AxesSubplot</span></dt>
-<dd><p class="first last">Matplotlib axis object. If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, one will be generated.</p>
+<dt><strong>ax</strong><span class="classifier">matplotlib.pyplot.Axes.AxesSubplot</span></dt><dd><p>Matplotlib axis object. If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, one will be generated.</p>
 </dd>
 </dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>ax</strong> <span class="classifier-delimiter">:</span> <span class="classifier">matplotlib.pyplot.Axes.AxesSubplot</span></dt>
-<dd><p class="first last">Matplotlib axis object</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>ax</strong><span class="classifier">matplotlib.pyplot.Axes.AxesSubplot</span></dt><dd><p>Matplotlib axis object</p>
 </dd>
 </dl>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -270,8 +247,8 @@ Bayes’ factor <a class="reference internal" href="#r327af9fd7ac9-1" id="id2">[
 <div class="container" style="padding-top: 2em;">
     <hr>
     <p class="text-center">
-        Created with ♥ by the Lightkurve developers.
-        <a href="https://github.com/KeplerGO/lightkurve">Join us on GitHub.</a>
+        Created with ♥ by the Lightkurve collaboration.
+        Please <a href="../about/citing.html">cite us</a> or <a href="https://github.com/KeplerGO/lightkurve">join us on GitHub.</a>
     </p>
 </div>
   </body>
