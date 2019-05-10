@@ -699,8 +699,7 @@ class SNRPeriodogram(Periodogram):
         sel = (lags > dnu_emp - .25*dnu_emp) & (lags < dnu_emp + .25*dnu_emp)
 
         #Run a peak finder on this region
-        distance = np.floor(dnu_emp/2. / fs)
-        peaks, _ = find_peaks(acf[sel], distance=distance)
+        peaks, _ = find_peaks(acf[sel], distance=np.floor(dnu_emp/2. / fs))
 
         #Select the peak closest to the empirical value
         best_dnu = lags[sel][peaks][np.argmin(np.abs(lags[sel][peaks] - dnu_emp))]
