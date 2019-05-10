@@ -26,7 +26,7 @@ from scipy.optimize import curve_fit
 from scipy.signal import find_peaks
 
 from . import MPLSTYLE
-plt.style.use(MPLSTYLE)
+
 from .utils import LightkurveWarning
 
 log = logging.getLogger(__name__)
@@ -607,7 +607,7 @@ class SNRPeriodogram(Periodogram):
         #Iterate over all the numax values and return an acf
         for idx, numax in enumerate(numaxs):
             acf = self._autocorrelate(numax)       #Return the acf at this numax
-            maxacf[idx] = np.nansum(acf)
+            maxacf[idx] = np.nansum(acf) / np.sqrt(len(acf))
             # maxacf[idx] = np.nanmax(acf)           #Store the maximum acf value
 
         acf_numax = numaxs[np.argmax(maxacf)]     #The best numax is the numax that results in the highest ACF
