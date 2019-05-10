@@ -215,7 +215,7 @@ def generate_test_spectrum():
     hi = int(np.floor(1.5*nmx/fs))
 
     dnu_true = 0.294 * nmx ** 0.772
-    modelocs = np.arange(lo, hi, dnu_true, dtype=int)
+    modelocs = np.arange(lo, hi, dnu_true/2, dtype=int)
 
     for modeloc in modelocs:
         m += deltafn(len(f), modeloc)
@@ -270,6 +270,57 @@ def test_estimate_numax_kwargs():
     numax, ax = snr.estimate_numax(show_plots=True)
     numax, ax = snr.estimate_numax(numaxs=numaxs,show_plots=True)
     numax, ax = snr.estimate_numax(numaxs=daynumaxs, show_plots=True)
+
+def test_estimate_dnu_basics():
+    """Test if we can estimate a dnu
+    """
+    f, p, _, true_dnu = generate_test_spectrum()
+    snr = SNRPeriodogram(f*u.microhertz, u.Quantity(p, None))
+    dnu = snr.estimate_dnu()
+
+    #Assert recovers dnu within 25%
+    assert(np.isclose(true_dnu, dnu.value, atol=.25*true_dnu))
+    #Assert dnu has unit equal to input frequency unit
+    assert(dnu.unit == u.microhertz)
+    #Assert dnu estimator works when input frequency is not in microhertz
+    fday = u.Quantity(f*u.microhertz, 1/u.day)
+    daysnr = SNRPeriodogram(fday, u.Quantity(p, None))
+    dnu = daysnr.estimate_dnu()
+    dnuday = u.Quantity(true_dnu*u.microhertz, 1/u.day)
+    assert(np.isclose(dnuday.value, dnu.value, atol=.25*dnuday.value))
+
+def test_estimate_dnu_kwargs():
+    """Test if we can estimate a dnu using its various keyword arguments
+    """
+    f, p, _, true_dnu = generate_test_spectrum()
+    snr = SNRPeriodogram(f*u.microhertz, u.Quantity(p, None))
+
+    # Assert custom numax works
+    numax = snr.estimate_numax()
+    dnu = snr.estimate_dnu(numax)
+    assert(np.isclose(dnu.value, true_dnu, atol=.25*true_dnu))
+
+    # Assert you can't pass custom numax outside of appropriate range
+    with pytest.raises(ValueError) as err:
+        dnu = snr.estimate_dnu(numax= -5.)
+    with pytest.raises(ValueError) as err:
+        dnu = snr.estimate_dnu(numax=5000)
+
+    # Assert it doesn't matter what units of frequency numax is passed in as
+    daynumax = u.Quantity(numax.value*u.microhertz, 1/u.day)
+    dnu = snr.estimate_dnu(numax=daynumax)
+    assert(np.isclose(dnu.value, true_dnu, atol=.25*true_dnu))
+    assert(dnu.unit == u.microhertz)
+
+    # Sanity check that plotting works under all conditions
+    dnu, ax = snr.estimate_dnu(show_plots=True)
+    dnu, ax = snr.estimate_dnu(numax=numax,show_plots=True)
+    dnu, ax = snr.estimate_dnu(numax=daynumax, show_plots=True)
+
+    fday = u.Quantity(f*u.microhertz, 1/u.day)
+    daysnr = SNRPeriodogram(fday, u.Quantity(p, None))
+    dnu, ax = daysnr.estimate_dnu(numax=daynumax, show_plots=True)
+
 
 @pytest.mark.skipif(bad_optional_imports,
                     reason="requires bokeh and astropy.stats.bls")
