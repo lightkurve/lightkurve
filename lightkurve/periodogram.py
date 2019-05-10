@@ -598,8 +598,8 @@ class SNRPeriodogram(Periodogram):
         #Iterate over all the numax values and return an acf
         for idx, numax in enumerate(numaxs):
             acf = self._autocorrelate(numax)       #Return the acf at this numax
-            maxacf[idx] = np.nansum(acf) / np.sqrt(len(acf))
-            # maxacf[idx] = np.nanmax(acf)           #Store the maximum acf value
+            # maxacf[idx] = np.nansum(acf) / np.sqrt(len(acf))
+            maxacf[idx] = np.nanmax(acf)           #Store the maximum acf value
 
         acf_numax = numaxs[np.argmax(maxacf)]     #The best numax is the numax that results in the highest ACF
         best_numax = acf_numax
@@ -614,7 +614,7 @@ class SNRPeriodogram(Periodogram):
 
                 ax[1].plot(numaxs,maxacf)
                 ax[1].set_xlabel("Frequency [{}]".format(self.frequency.unit.to_string('latex')))
-                ax[1].set_ylabel(r'Max. Correlation')
+                ax[1].set_ylabel(r'Max. Correlation Power')
                 ax[0].axvline(best_numax,c='r', linewidth=2,alpha=.4)
                 ax[1].axvline(best_numax,c='r', linewidth=2,alpha=.4,
                     label=r'{:.1f} {}'.format(best_numax,
@@ -698,11 +698,11 @@ class SNRPeriodogram(Periodogram):
         if show_plots == True:
             with plt.style.context(MPLSTYLE):
                 fig, ax = plt.subplots(figsize=(8.485, 4))
-                ax.plot(lags,acf)
+                ax.plot(lags,acf/acf[0])
                 ax.set_xlabel("Frequency [{}]".format(self.frequency.unit.to_string('latex')))
                 ax.set_ylabel(r'Correlation')
                 ax.axvline(best_dnu,c='r', linewidth=2,alpha=.4)
-                ax.set_title(r'ACF vs Lag for a given $\nu_{\rm max}$')
+                ax.set_title(r'Correlation vs Lag for a given $\nu_{\rm max}$')
 
                 axin = inset_axes(ax, width="50%",height="50%", loc="upper right")
                 axin.set_yticks([])
@@ -772,14 +772,13 @@ class SNRPeriodogram(Periodogram):
         """
         fs = np.median(np.diff(self.frequency.value))
         fwhm = int(np.floor(self._get_fwhm(numax) / fs))    # Express the fwhm in indices
-        fwhm -= fwhm % 2                                    # Make the FWHM value even (%2 = 0 if even, 1 if odd)
+        # fwhm -= fwhm % 2                                    # Make the FWHM value even (%2 = 0 if even, 1 if odd)
         x = int(numax / fs)                                 #Find the index value of numax
         s = np.hanning(len(self.power[x-fwhm:x+fwhm]))      #Define the hanning window for the evaluated frequency space
         C = self.power[x-fwhm:x+fwhm].value * s             #Multiply the evaluated SNR space by the hanning window
         result = np.correlate(C, C, mode='full')            #Correlated the resulting SNR space with itself
-        result /= result[C.size-1]                          #Normalise the ACF by length of input array
 
-        return result[int(len(result)/2):]                  #Return one half of the autocorrelation function
+        return result[len(C)-1:]                  #Return one half of the autocorrelation function
 
     def _gaussian(self, x, sigma, height, mu):
         """A simple Gaussian function for fitting to autocorrelation peaks."""
