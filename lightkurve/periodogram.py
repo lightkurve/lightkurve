@@ -643,7 +643,8 @@ class SNRPeriodogram(Periodogram):
         expected to contain seismic oscillation modes. Repeating peaks in the
         autocorrelation implies an evenly spaced structure of modes.
         The peak closest to an empirical estimate of dnu is taken as the true
-        value.
+        value. The peak finding algorithm is limited by a minimum spacing
+        between peaks of 0.5 times the empirical value for dnu.
 
         Our empirical estimate for numax is taken from Stello et al. 2009 as
 
@@ -725,6 +726,36 @@ class SNRPeriodogram(Periodogram):
             return u.Quantity(best_dnu, self.frequency.unit), ax
         return u.Quantity(best_dnu, self.frequency.unit)
 
+    def plot_echelle(self, dnu, **kwargs):
+        """Plots an echelle diagram of the SNR periodogram by stacking the
+        periodogram in slices of dnu. Modes of equal radial degree should
+        appear approximately vertically aligned. If no structure is present,
+        you are likely dealing with a faulty dnu value or a low signal to noise
+        case.
+
+        Parameters
+        ----------
+        dnu : float
+            Value for the large frequency separation of the seismic mode
+            frequencies in the periodogram. Assumed to have the same units as
+            the frequencies, unless given an Astropy unit.
+
+        kwargs : dict
+            Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
+
+        Returns
+        -------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            The matplotlib axes object.
+        """
+
+        # Ensure input dnu is in the correct units
+        dnu = u.Quantity(dnu, self.frequency.unit)
+
+
+
+
+        return ax
 
     def _get_fwhm(self, numax):
         """For a given numax, the method calculates the expected Full Width Half
