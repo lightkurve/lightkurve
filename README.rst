@@ -43,7 +43,7 @@ Read the documentation at `https://docs.lightkurve.org <https://docs.lightkurve.
 Quickstart
 ----------
 
-Please visit our quickstart guide at `https://docs.lightkurve.org/quickstart <https://docs.lightkurve.org/quickstart>`_.
+Please visit our quickstart guide at `https://docs.lightkurve.org/quickstart.html <https://docs.lightkurve.org/quickstart.html>`_.
 
 
 Contributing
