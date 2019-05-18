@@ -11,6 +11,7 @@ from astropy.io import ascii, fits
 from astropy import units as u
 from astropy.utils.exceptions import AstropyWarning
 
+from .targetpixelfile import TargetPixelFile
 from .collections import TargetPixelFileCollection, LightCurveFileCollection
 from .utils import suppress_stdout, LightkurveWarning, detect_filetype
 from . import PACKAGEDIR
@@ -94,6 +95,43 @@ class SearchResult(object):
         """Returns an array of dec values for targets in search"""
         return self.table['s_dec'].data.data
 
+    def _download_one(self, table, quality_bitmask, download_dir, cutout_size):
+        """Private method wrapped by `download()` and `download_all()`.
+
+        Returns a TargetPixelFile or LightCurveFile object.
+        """
+        # Make sure astroquery uses the same level of verbosity
+        logging.getLogger('astropy').setLevel(log.getEffectiveLevel())
+
+        if download_dir is None:
+            download_dir = self._default_download_dir()
+
+        # if the SearchResult row is a TESScut entry, then download cutout
+        if 'FFI Cutout' in table[0]['description']:
+            try:
+                path = self._fetch_tesscut_path(table[0]['target_name'],
+                                                table[0]['sequence_number'],
+                                                download_dir,
+                                                cutout_size)
+            except:
+                raise SearchError('Unable to download FFI cutout. Desired target '
+                                  'coordinates may be too near the edge of the FFI.')
+
+            return open(path,
+                        quality_bitmask=quality_bitmask,
+                        targetid=table[0]['targetid'])
+
+        else:
+            if cutout_size is not None:
+                warnings.warn('`cutout_size` can only be specified for TESS '
+                              'Full Frame Image cutouts.', LightkurveWarning)
+            from astroquery.mast import Observations
+            path = Observations.download_products(table[:1], mrp_only=False,
+                                                  download_dir=download_dir)['Local Path'][0]
+
+            # open() will determine filetype and return
+            return open(path, quality_bitmask=quality_bitmask)
+
     @suppress_stdout
     def download(self, quality_bitmask='default', download_dir=None, cutout_size=None):
         """Returns a single `KeplerTargetPixelFile` or `KeplerLightCurveFile` object.
@@ -141,37 +179,10 @@ class SearchResult(object):
                           'to limit your search.'.format(len(self.table)),
                           LightkurveWarning)
 
-        # Make sure astroquery uses the same level of verbosity
-        logging.getLogger('astropy').setLevel(log.getEffectiveLevel())
-
-        # download first product in table
-        if download_dir is None:
-            download_dir = self._default_download_dir()
-
-        # if table contains TESScut search results, download cutout
-        if 'FFI Cutout' in self.table[0]['description']:
-            try:
-                path = self._fetch_tesscut_path(self.table[0]['target_name'],
-                                                self.table[0]['sequence_number'],
-                                                download_dir, cutout_size)
-            except:
-                raise SearchError('Unable to download FFI cutout. Desired target '
-                                  'coordinates may be too near the edge of the FFI.')
-
-            return open(path,
-                        quality_bitmask=quality_bitmask,
-                        targetid=self.table[0]['targetid'])
-
-        else:
-            if cutout_size is not None:
-                warnings.warn('`cutout_size` can only be specified for TESS '
-                              'Full Frame Image cutouts.', LightkurveWarning)
-            from astroquery.mast import Observations
-            path = Observations.download_products(self.table[:1], mrp_only=False,
-                                                  download_dir=download_dir)['Local Path'][0]
-
-            # open() will determine filetype and return
-            return open(path, quality_bitmask=quality_bitmask)
+        return self._download_one(table=self.table[:1],
+                                  quality_bitmask=quality_bitmask,
+                                  download_dir=download_dir,
+                                  cutout_size=cutout_size)
 
     @suppress_stdout
     def download_all(self, quality_bitmask='default', download_dir=None, cutout_size=None):
@@ -211,33 +222,16 @@ class SearchResult(object):
                           LightkurveWarning)
             return None
 
-        # Make sure astroquery uses the same level of verbosity
-        logging.getLogger('astropy').setLevel(log.getEffectiveLevel())
-
-        # download all products listed in self.products
-        if download_dir is None:
-            download_dir = self._default_download_dir()
-
-        # if table contains TESScut search results, download cutouts
-        if 'FFI Cutout' in self.table[0]['description']:
-            path = [self._fetch_tesscut_path(t, s, download_dir, cutout_size)
-                    for t,s in zip(self.table['target_name'], self.table['sequence_number'])]
+        products = []
+        for idx in range(len(self.table)):
+            products.append(self._download_one(table=self.table[idx:idx+1],
+                                               quality_bitmask=quality_bitmask,
+                                               download_dir=download_dir,
+                                               cutout_size=cutout_size))
+        if isinstance(products[0], TargetPixelFile):
+            return TargetPixelFileCollection(products)
         else:
-            if cutout_size is not None:
-                warnings.warn('`cutout_size` can only be specified for TESS '
-                              'Full Frame Image cutouts.', LightkurveWarning)
-            from astroquery.mast import Observations
-            path = Observations.download_products(self.table, mrp_only=False,
-                                                  download_dir=download_dir)['Local Path']
-
-        # open() will determine filetype and return
-        # return a collection containing opened files
-        tpf_extensions = ['lpd-targ.fits', 'spd-targ.fits', '_tp.fits', 'n/a']
-        lcf_extensions = ['llc.fits', 'slc.fits', '_lc.fits']
-        if any(e in self.table['productFilename'][0] for e in tpf_extensions):
-            return TargetPixelFileCollection([open(p, quality_bitmask=quality_bitmask) for p in path])
-        elif any(e in self.table['productFilename'][0] for e in lcf_extensions):
-            return LightCurveFileCollection([open(p, quality_bitmask=quality_bitmask) for p in path])
+            return LightCurveFileCollection(products)
 
     def _default_download_dir(self):
         """Returns the default path to the directory where files will be downloaded.
