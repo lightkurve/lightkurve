@@ -96,9 +96,10 @@ class SearchResult(object):
         return self.table['s_dec'].data.data
 
     def _download_one(self, table, quality_bitmask, download_dir, cutout_size):
-        """Private method wrapped by `download()` and `download_all()`.
+        """Private method used by `download()` and `download_all()` to download
+        exactly one file from the MAST archive.
 
-        Returns a TargetPixelFile or LightCurveFile object.
+        Always returns a `TargetPixelFile` or `LightCurveFile` object.
         """
         # Make sure astroquery uses the same level of verbosity
         logging.getLogger('astropy').setLevel(log.getEffectiveLevel())
@@ -117,9 +118,9 @@ class SearchResult(object):
                 raise SearchError('Unable to download FFI cutout. Desired target '
                                   'coordinates may be too near the edge of the FFI.')
 
-            return open(path,
-                        quality_bitmask=quality_bitmask,
-                        targetid=table[0]['targetid'])
+            return _open_downloaded_file(path,
+                                         quality_bitmask=quality_bitmask,
+                                         targetid=table[0]['targetid'])
 
         else:
             if cutout_size is not None:
@@ -130,7 +131,7 @@ class SearchResult(object):
                                                   download_dir=download_dir)['Local Path'][0]
 
             # open() will determine filetype and return
-            return open(path, quality_bitmask=quality_bitmask)
+            return _open_downloaded_file(path, quality_bitmask=quality_bitmask)
 
     @suppress_stdout
     def download(self, quality_bitmask='default', download_dir=None, cutout_size=None):
@@ -907,3 +908,15 @@ def open(path_or_url, **kwargs):
         # if these keywords don't exist, raise `ValueError`
         raise ValueError("Not recognized as a Kepler or TESS data product: "
                          "{}".format(path_or_url))
+
+
+def _open_downloaded_file(path, **kwargs):
+    """Wrapper around `open()` which yields a more clear error message when
+    the file was downloaded from MAST but corrupted, e.g. due to the
+    download having been interrupted."""
+    try:
+        return open(path, **kwargs)
+    except ValueError:
+        raise SearchError("Failed to open the downloaded file ({}). "
+                          "The file was likely only partially downloaded. "
+                          "Please remove it from your disk and try again.".format(path))
