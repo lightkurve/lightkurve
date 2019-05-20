@@ -12,6 +12,7 @@ import sys
 import pytest
 import numpy as np
 from numpy.testing import assert_almost_equal, assert_array_equal
+import tempfile
 import warnings
 
 from astropy.coordinates import SkyCoord
@@ -310,3 +311,25 @@ def test_issue_472():
     search = search_tesscut("TIC41336498", sector=2)
     assert isinstance(search, SearchResult)
     len(search) == 0
+
+
+@pytest.mark.remote_data
+def test_corrupt_download_handling():
+    """When a corrupt file exists in the cache, make sure the user receives
+    a helpful error message.
+
+    This is a regression test for #511.
+    """
+    from builtins import open  # Because open is imported as lightkurve.open at the top
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        # Pretend a corrupt file exists at the expected cache location
+        expected_dir = os.path.join(tmpdirname,
+                                   "mastDownload",
+                                   "Kepler",
+                                   "kplr011904151_lc_Q111111110111011101")
+        expected_fn = os.path.join(expected_dir, "kplr011904151-2010009091648_lpd-targ.fits.gz")
+        os.makedirs(expected_dir)
+        open(expected_fn, 'w').close()  # create "corrupt" i.e. empty file
+        with pytest.raises(SearchError) as err:
+            search_targetpixelfile("Kepler-10", quarter=4).download(download_dir=tmpdirname)
+        assert "The file was likely only partially downloaded." in err.value.args[0]
