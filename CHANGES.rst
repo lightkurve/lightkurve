@@ -1,9 +1,27 @@
-1.0.1 (unreleased)
+1.0.2 (unreleased)
 ==================
+
+
+
+1.0.1 (2019-05-20)
+==================
+
+This is a minor bugfix release containing the following improvements:
 
 - Fixed minor bugs in ``PLDCorrector.correct()`` [#498],
   ``TargetPixelFile.create_threshold_mask()`` [#502],
   and ``LightCurve.bin()`` [#503].
+
+- Ensure users are alerted if a large number of cadences are masked out by
+`quality_bitmask` when opening data products. [#495]
+
+- `CBVCorrector` now accepts a `KeplerLightCurve` as input. [#504]
+
+- The `~lightkurve.search` functions now provide a more helpful error message
+if the download cache contains a corrupt file. [#512]
+
+- Switched continuous integration from Travis/Appveyor to Azure pipelines. [#497]
+
 
 
 1.0.0 (2019-04-08)
