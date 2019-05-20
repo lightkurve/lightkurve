@@ -50,3 +50,5 @@ Comments, corrections & suggestions:
 - `Natalie Gosnell <https://github.com/nattieg>`_
 - `Richard Elkins <https://github.com/texadactyl>`_
 - `Daniel Foreman-Mackey <https://github.com/dfm>`_
+- `Saeed Hojjatpanah <https://github.com/saeedm31>`_
+
