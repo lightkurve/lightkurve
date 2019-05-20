@@ -37,7 +37,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.0.0</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.0.1</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -80,15 +80,29 @@
   <div class="section" id="full-changelog">
 <span id="changelog"></span><h1>Full changelog<a class="headerlink" href="#full-changelog" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="unreleased">
-<h2>1.0.1 (unreleased)<a class="headerlink" href="#unreleased" title="Permalink to this headline">¶</a></h2>
+<h2>1.0.2 (unreleased)<a class="headerlink" href="#unreleased" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="id1">
+<h2>1.0.1 (2019-05-20)<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>This is a minor bugfix release containing the following improvements:</p>
 <ul class="simple">
 <li><p>Fixed minor bugs in <code class="docutils literal notranslate"><span class="pre">PLDCorrector.correct()</span></code> [#498],
 <code class="docutils literal notranslate"><span class="pre">TargetPixelFile.create_threshold_mask()</span></code> [#502],
 and <code class="docutils literal notranslate"><span class="pre">LightCurve.bin()</span></code> [#503].</p></li>
+<li><p>Ensure users are alerted if a large number of cadences are masked out by</p></li>
+</ul>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">quality_bitmask</span></code> when opening data products. [#495]</p>
+<ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">CBVCorrector</span></code> now accepts a <code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> as input. [#504]</p></li>
+<li><p>The <a class="reference internal" href="../api/search.html#module-lightkurve.search" title="lightkurve.search"><code class="xref py py-obj docutils literal notranslate"><span class="pre">search</span></code></a> functions now provide a more helpful error message</p></li>
+</ul>
+<p>if the download cache contains a corrupt file. [#512]</p>
+<ul class="simple">
+<li><p>Switched continuous integration from Travis/Appveyor to Azure pipelines. [#497]</p></li>
 </ul>
 </div>
-<div class="section" id="id1">
-<h2>1.0.0 (2019-04-08)<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id2">
+<h2>1.0.0 (2019-04-08)<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>This is the first stable release of Lightkurve.  It was prepared with the help
 of 45 contributors!</p>
 <p>This release contains major changes to the <code class="docutils literal notranslate"><span class="pre">LombScarglePeriodogram</span></code> class:</p>
@@ -168,7 +182,7 @@ MAST TessCut service. [#434]</p></li>
 <h2>1.0b26 (2019-02-04)<a class="headerlink" href="#b26-2019-02-04" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Introduced a new layout for the
-<a href="#id2"><span class="problematic" id="id3">``</span></a>online documentation &lt;<a class="reference external" href="https://docs.lightkurve.org">https://docs.lightkurve.org</a>&gt;``_. [#360, #400, #406]</p></li>
+<a href="#id3"><span class="problematic" id="id4">``</span></a>online documentation &lt;<a class="reference external" href="https://docs.lightkurve.org">https://docs.lightkurve.org</a>&gt;``_. [#360, #400, #406]</p></li>
 <li><p>Added <code class="docutils literal notranslate"><span class="pre">LightCurve.interact_bls()</span></code>: an interactive Bokeh widget to find
 planets using the Box Least Squares (BLS) method. [#401]</p></li>
 <li><p>Added <code class="docutils literal notranslate"><span class="pre">LombScarglePeriodogram</span></code> and <code class="docutils literal notranslate"><span class="pre">BoxLeastSquarePeriodogam</span></code> sub-classes
