@@ -486,6 +486,11 @@ def search_lightcurvefile(target, radius=None, cadence='long',
 def search_tesscut(target, sector=None):
     """Searches MAST for TESS Full Frame Image cutouts containing a desired target or region.
 
+    This feature uses the `TESScut service <https://mast.stsci.edu/tesscut/>`_
+    provided by the TESS data archive at MAST.  If you use this service in
+    your work, please `cite TESScut <https://ascl.net/code/v/2239>`_ in your
+    publications.
+
     Parameters
     ----------
     target : str, int, or `astropy.coordinates.SkyCoord` object
