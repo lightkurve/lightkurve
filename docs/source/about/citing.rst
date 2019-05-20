@@ -48,7 +48,7 @@ In particular, we request that all astronomy publications cite the relevant
 astronomy packages, which include:
 
 * `astropy <https://astropy.org>`_ (see `citation instructions <https://www.astropy.org/acknowledging.html>`_) enabled all features.
-* `astroquery <https://astroquery.readthedocs.io>`_ (see `citation instructions <https://github.com/astropy/astroquery#citing-astroquery>`_) enabled `~lightkurve.search.search_targetpixelfile` and `~lightkurve.search.search_lightcurvefile`.
+* `astroquery <https://astroquery.readthedocs.io>`_ (see `citation instructions <https://github.com/astropy/astroquery#citing-astroquery>`_) enabled all `~lightkurve.search` functions.
 * `tesscut <https://mast.stsci.edu/tesscut/>`_ (see `citation instructions <https://ascl.net/code/v/2239>`_) enabled `~lightkurve.search.search_tesscut`.
 * `celerite <https://celerite.readthedocs.io>`_ (see `citation instructions <https://celerite.readthedocs.io/en/stable/#license-attribution>`_) enabled `~lightkurve.correctors.PLDCorrector`.
 
