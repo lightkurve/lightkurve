@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Citing Lightkurve &#8212; Lightkurve</title>
+    <title>Citing Lightkurve &amp; its dependencies &#8212; Lightkurve</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -77,11 +77,10 @@
 
 <div class="container">
     
-  <div class="section" id="citing-lightkurve">
-<span id="citing"></span><h1>Citing Lightkurve<a class="headerlink" href="#citing-lightkurve" title="Permalink to this headline">¶</a></h1>
-<p>If you use Lightkurve for work or research presented in a publication (whether
-directly, or as a dependency to another package), we recommend and encourage
-the following acknowledgment:</p>
+  <div class="section" id="citing-lightkurve-its-dependencies">
+<span id="citing"></span><h1>Citing Lightkurve &amp; its dependencies<a class="headerlink" href="#citing-lightkurve-its-dependencies" title="Permalink to this headline">¶</a></h1>
+<p>If you use Lightkurve for work or research presented in a publication, we
+request the following acknowledgment:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>This research made use of Lightkurve, a Python package for Kepler and TESS data analysis (Lightkurve Collaboration, 2018).
 </pre></div>
 </div>
@@ -107,7 +106,21 @@ archivePrefix = &quot;ascl&quot;,
 </pre></div>
 </div>
 <p>In addition, you may elect to cite a specific version of Lightkurve using the <a class="reference external" href="https://doi.org/10.5281/zenodo.1181928">version-specific DOI</a> provided by Zenodo.</p>
-<p>Lightkurve was built on top of a number of powerful libraries, including <a class="reference external" href="https://astropy.org">Astropy</a>, <a class="reference external" href="https://astroquery.readthedocs.io">Astroquery</a>, <a class="reference external" href="https://celerite.readthedocs.io">Celerite</a>, <a class="reference external" href="https://www.numpy.org/">NumPy</a>, <a class="reference external" href="https://scipy.org">SciPy</a>, and <a class="reference external" href="https://matplotlib.org/">Matplotlib</a>.  We strongly encourage you to cite these packages as well.</p>
+<div class="section" id="citing-dependencies">
+<h2>Citing dependencies<a class="headerlink" href="#citing-dependencies" title="Permalink to this headline">¶</a></h2>
+<p>Lightkurve was built on top of a number of powerful libraries,
+including <a class="reference external" href="https://www.numpy.org/">NumPy</a>, <a class="reference external" href="https://scipy.org">SciPy</a>, and <a class="reference external" href="https://matplotlib.org/">Matplotlib</a>.
+We strongly encourage you to cite these packages as well.
+In particular, we request that all astronomy publications cite the relevant
+astronomy packages, which include:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://astropy.org">astropy</a> (see <a class="reference external" href="https://www.astropy.org/acknowledging.html">citation instructions</a>) enabled all features.</p></li>
+<li><p><a class="reference external" href="https://astroquery.readthedocs.io">astroquery</a> (see <a class="reference external" href="https://github.com/astropy/astroquery#citing-astroquery">citation instructions</a>) enabled <a class="reference internal" href="../api/lightkurve.search.search_targetpixelfile.html#lightkurve.search.search_targetpixelfile" title="lightkurve.search.search_targetpixelfile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_targetpixelfile</span></code></a> and <a class="reference internal" href="../api/lightkurve.search.search_lightcurvefile.html#lightkurve.search.search_lightcurvefile" title="lightkurve.search.search_lightcurvefile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_lightcurvefile</span></code></a>.</p></li>
+<li><p><a class="reference external" href="https://mast.stsci.edu/tesscut/">tesscut</a> (see <a class="reference external" href="https://ascl.net/code/v/2239">citation instructions</a>) enabled <a class="reference internal" href="../api/lightkurve.search.search_tesscut.html#lightkurve.search.search_tesscut" title="lightkurve.search.search_tesscut"><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_tesscut</span></code></a>.</p></li>
+<li><p><a class="reference external" href="https://celerite.readthedocs.io">celerite</a> (see <a class="reference external" href="https://celerite.readthedocs.io/en/stable/#license-attribution">citation instructions</a>) enabled <a class="reference internal" href="../api/lightkurve.correctors.PLDCorrector.html#lightkurve.correctors.PLDCorrector" title="lightkurve.correctors.PLDCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PLDCorrector</span></code></a>.</p></li>
+</ul>
+<p>If your package is missing from the list above, please <a class="reference external" href="https://github.com/KeplerGO/lightkurve">open a pull request</a> to add it.</p>
+</div>
 </div>
 
 

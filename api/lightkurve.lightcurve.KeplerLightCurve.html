@@ -131,7 +131,7 @@ e.g. tdb’, ‘tt’, ‘ut1’, or ‘utc’.</p>
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.astropy_time" title="lightkurve.lightcurve.KeplerLightCurve.astropy_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy_time</span></code></a></p></td>
-<td><p>Returns the time values as an Astropy <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v4.0.dev799)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> object (if <code class="docutils literal notranslate"><span class="pre">time_format</span></code> is set).</p></td>
+<td><p>Returns the time values as an Astropy <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v4.0.dev558)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> object (if <code class="docutils literal notranslate"><span class="pre">time_format</span></code> is set).</p></td>
 </tr>
 </tbody>
 </table>
@@ -203,7 +203,7 @@ e.g. tdb’, ‘tt’, ‘ut1’, or ‘utc’.</p>
 <td><p>Converts the light curve to a <a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code></a> power spectrum object.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurve.KeplerLightCurve.to_table" title="lightkurve.lightcurve.KeplerLightCurve.to_table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_table</span></code></a>(self)</p></td>
-<td><p>Converts the light curve to an Astropy <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v4.0.dev799)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> object.</p></td>
+<td><p>Converts the light curve to an Astropy <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v4.0.dev558)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> object.</p></td>
 </tr>
 </tbody>
 </table>
@@ -211,7 +211,7 @@ e.g. tdb’, ‘tt’, ‘ut1’, or ‘utc’.</p>
 <dl class="attribute">
 <dt id="lightkurve.lightcurve.KeplerLightCurve.astropy_time">
 <code class="descname">astropy_time</code><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurve.astropy_time" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the time values as an Astropy <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v4.0.dev799)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> object
+<dd><p>Returns the time values as an Astropy <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.time.Time.html#astropy.time.Time" title="(in Astropy v4.0.dev558)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Time</span></code></a> object
 (if <code class="docutils literal notranslate"><span class="pre">time_format</span></code> is set).</p>
 <p>The Time object will be created using the values in the <code class="docutils literal notranslate"><span class="pre">time</span></code>,
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">time_format</span></code>, and <code class="docutils literal notranslate"><span class="pre">time_scale</span></code> attributes.
@@ -354,7 +354,7 @@ Lightkurve’s custom stylesheet is used by default.</p>
 </dd>
 <dt><strong>linestyle</strong><span class="classifier">str</span></dt><dd><p>Connect the error bars using a line?</p>
 </dd>
-<dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of arguments to be passed to <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.scatter.html#matplotlib.pyplot.scatter" title="(in Matplotlib v3.0.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib.pyplot.scatter</span></code></a>.</p>
+<dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of arguments to be passed to <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.scatter.html#matplotlib.pyplot.scatter" title="(in Matplotlib v3.1.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib.pyplot.scatter</span></code></a>.</p>
 </dd>
 </dl>
 </dd>
@@ -451,7 +451,7 @@ have been filled.</p>
 <dt id="lightkurve.lightcurve.KeplerLightCurve.flatten">
 <code class="descname">flatten</code><span class="sig-paren">(</span><em>self</em>, <em>window_length=101</em>, <em>polyorder=2</em>, <em>return_trend=False</em>, <em>break_tolerance=5</em>, <em>niters=3</em>, <em>sigma=3</em>, <em>mask=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurve.flatten" title="Permalink to this definition">¶</a></dt>
 <dd><p>Removes the low frequency trend using scipy’s Savitzky-Golay filter.</p>
-<p>This method wraps <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.savgol_filter.html#scipy.signal.savgol_filter" title="(in SciPy v1.2.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scipy.signal.savgol_filter</span></code></a>.</p>
+<p>This method wraps <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.savgol_filter.html#scipy.signal.savgol_filter" title="(in SciPy v1.3.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scipy.signal.savgol_filter</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
@@ -480,7 +480,7 @@ mask is True will not be used to flatten the data. An interpolated
 result will be provided for these points. Use this mask to remove
 data you want to preserve, e.g. transits.</p>
 </dd>
-<dt><strong>**kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of arguments to be passed to <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.savgol_filter.html#scipy.signal.savgol_filter" title="(in SciPy v1.2.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scipy.signal.savgol_filter</span></code></a>.</p>
+<dt><strong>**kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of arguments to be passed to <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.savgol_filter.html#scipy.signal.savgol_filter" title="(in SciPy v1.3.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scipy.signal.savgol_filter</span></code></a>.</p>
 </dd>
 </dl>
 </dd>
@@ -565,7 +565,7 @@ a new one will be generated.</p>
 matplotlib’s built-in stylesheets (e.g. ‘ggplot’).
 Lightkurve’s custom stylesheet is used by default.</p>
 </dd>
-<dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of arguments to be passed to <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.0.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib.pyplot.plot</span></code></a>.</p>
+<dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of arguments to be passed to <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.1.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib.pyplot.plot</span></code></a>.</p>
 </dd>
 </dl>
 </dd>
@@ -632,7 +632,7 @@ value of <code class="docutils literal notranslate"><span class="pre">sigma</spa
 which data points were removed. Entries marked as <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> in the
 mask are considered outliers. Defaults to <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a>.</p>
 </dd>
-<dt><strong>**kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of arguments to be passed to <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.stats.sigma_clip.html#astropy.stats.sigma_clip" title="(in Astropy v4.0.dev799)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.stats.sigma_clip</span></code></a>.</p>
+<dt><strong>**kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of arguments to be passed to <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.stats.sigma_clip.html#astropy.stats.sigma_clip" title="(in Astropy v4.0.dev558)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.stats.sigma_clip</span></code></a>.</p>
 </dd>
 </dl>
 </dd>
@@ -694,7 +694,7 @@ Lightkurve’s custom stylesheet is used by default.</p>
 </dd>
 <dt><strong>show_colorbar</strong><span class="classifier">boolean</span></dt><dd><p>Show the colorbar if colors are given using the <code class="xref py py-obj docutils literal notranslate"><span class="pre">c</span></code> argument?</p>
 </dd>
-<dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of arguments to be passed to <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.scatter.html#matplotlib.pyplot.scatter" title="(in Matplotlib v3.0.3)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib.pyplot.scatter</span></code></a>.</p>
+<dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of arguments to be passed to <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.scatter.html#matplotlib.pyplot.scatter" title="(in Matplotlib v3.1.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib.pyplot.scatter</span></code></a>.</p>
 </dd>
 </dl>
 </dd>
@@ -800,7 +800,7 @@ and <code class="xref py py-obj docutils literal notranslate"><span class="pre">
 power spectrum object.</p>
 <p>This method will call either <a class="reference internal" href="lightkurve.periodogram.LombScarglePeriodogram.html#lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve" title="lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve()</span></code></a>
 or <a class="reference internal" href="lightkurve.periodogram.BoxLeastSquaresPeriodogram.html#lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve" title="lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve()</span></code></a>,
-which in turn wrap <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.stats.LombScargle.html#astropy.stats.LombScargle" title="(in Astropy v4.0.dev799)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.stats.LombScargle</span></code></a> and <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.stats.BoxLeastSquares.html#astropy.stats.BoxLeastSquares" title="(in Astropy v4.0.dev799)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.stats.BoxLeastSquares</span></code></a>.</p>
+which in turn wrap <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.stats.LombScargle.html#astropy.stats.LombScargle" title="(in Astropy v4.0.dev558)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.stats.LombScargle</span></code></a> and <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.stats.BoxLeastSquares.html#astropy.stats.BoxLeastSquares" title="(in Astropy v4.0.dev558)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.stats.BoxLeastSquares</span></code></a>.</p>
 <dl class="simple">
 <dt>Optional keywords accepted if <code class="docutils literal notranslate"><span class="pre">method='lombscargle'</span></code> are:</dt><dd><p><code class="docutils literal notranslate"><span class="pre">minimum_frequency</span></code>, <code class="docutils literal notranslate"><span class="pre">maximum_frequency</span></code>, <code class="docutils literal notranslate"><span class="pre">mininum_period</span></code>,
 <code class="docutils literal notranslate"><span class="pre">maximum_period</span></code>, <code class="docutils literal notranslate"><span class="pre">frequency</span></code>, <code class="docutils literal notranslate"><span class="pre">period</span></code>, <code class="docutils literal notranslate"><span class="pre">nterms</span></code>,
@@ -837,11 +837,11 @@ and <code class="docutils literal notranslate"><span class="pre">'boxleastsquare
 <dl class="method">
 <dt id="lightkurve.lightcurve.KeplerLightCurve.to_table">
 <code class="descname">to_table</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.KeplerLightCurve.to_table" title="Permalink to this definition">¶</a></dt>
-<dd><p>Converts the light curve to an Astropy <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v4.0.dev799)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> object.</p>
+<dd><p>Converts the light curve to an Astropy <a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v4.0.dev558)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> object.</p>
 <dl class="field-list">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><dl>
-<dt><strong>table</strong><span class="classifier"><a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v4.0.dev799)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.table.Table</span></code></a></span></dt><dd><p>An AstroPy Table with columns ‘time’, ‘flux’, and ‘flux_err’.</p>
+<dt><strong>table</strong><span class="classifier"><a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v4.0.dev558)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.table.Table</span></code></a></span></dt><dd><p>An AstroPy Table with columns ‘time’, ‘flux’, and ‘flux_err’.</p>
 </dd>
 </dl>
 </dd>
