@@ -1,12 +1,12 @@
 .. _citing:
 
-=================
-Citing Lightkurve
-=================
+====================================
+Citing Lightkurve & its dependencies
+====================================
 
 
 If you use Lightkurve for work or research presented in a publication, we
-request the following acknowledgment:
+request the following acknowledgment or citation:
 
 .. code-block:: text
 
