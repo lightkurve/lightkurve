@@ -327,6 +327,112 @@ class Periodogram(object):
             ax.set_title(title)
         return ax
 
+    def plot_echelle(self, dnu, numax=None,
+                    minimum_frequency=None, maximum_frequency=None, cmap='Blues',
+                    **kwargs):
+        """Plots an echelle diagram of the periodogram by stacking the
+        periodogram in slices of dnu. Modes of equal radial degree should
+        appear approximately vertically aligned. If no structure is present,
+        you are likely dealing with a faulty dnu value or a low signal to noise
+        case.
+
+        This method is adapted from work by Daniel Hey & Guy Davies.
+
+        Parameters
+        ----------
+        dnu : float
+            Value for the large frequency separation of the seismic mode
+            frequencies in the periodogram. Assumed to have the same units as
+            the frequencies, unless given an Astropy unit.
+
+        numax : float
+            Value for the frequency of maximum oscillation. If a numax is
+            passed, a suitable range one FWHM of the mode envelope either side
+            of the will be shown. This is overwritten by custom frequency ranges.
+
+        minimum_freuqency : float
+            The minimum frequency at which to display the echelle
+
+        maximum_frequency : float
+            The maximum frequency at which to display the echelle.
+
+        cmap : str
+            The name of the matplotlib colourmap to use in the echelle diagram.
+
+        kwargs : dict
+            Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
+
+        Returns
+        -------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            The matplotlib axes object.
+        """
+
+        # Ensure input dnu is in the correct units
+        dnu = u.Quantity(dnu, self.frequency.unit).value
+
+        fmin = self.frequency[0].value
+        fmax = self.frequency[-1].value
+
+        # Check for any superfluous input
+        if (numax is not None) & (any([a is not None for a in [minimum_frequency, maximum_frequency]])):
+            warnings.warn('You have passed both a numax and a frequency limit'
+                          'The frequency limit will override the numax input')
+
+        # Ensure input numax is in the correct units (if there is one)
+        if numax is not None:
+            numax = u.Quantity(numax, self.frequency.unit).value
+            fmin = numax - 2*self._get_fwhm(numax)
+            fmax = numax + 2*self._get_fwhm(numax)
+
+        # Set limits and set them in the right units
+        if minimum_frequency is not None:
+            fmin =  u.Quantity(minimum_frequency, self.frequency.unit).value
+        if maximum_frequency is not None:
+            fmax = u.Quantity(maximum_frequency, self.frequency.unit).value
+
+        # Add on 1x Dnu so we don't miss off any important range due to rounding
+        if fmax < self.frequency[-1].value - 1.5*dnu:
+            fmax += dnu
+
+        fs = np.median(np.diff(self.frequency.value))
+
+        ff = self.frequency[int(fmin/fs):int(fmax/fs)].value   #The the selected frequency range
+        pp = self.power[int(fmin/fs):int(fmax/fs)].value   #The selected power range
+
+        n_rows = int((ff[-1]-ff[0])/dnu)     #The number of stacks to use
+        n_columns = int(dnu/fs)               #The number of elements in each stack
+
+        #Reshape the power into n_rowss of n_columnss
+        ep = np.reshape(pp[:(n_rows*n_columns)],(n_rows,n_columns))
+
+        #Reshape the freq into n_rowss of n_columnss & create arays
+        ef = np.reshape(ff[:(n_rows*n_columns)],(n_rows,n_columns))
+        x_f = ((ef[0,:]-ef[0,0]) % dnu)
+        y_f = (ef[:,0])
+
+        #Plot the echelle diagram
+        with plt.style.context(MPLSTYLE):
+            fig, ax = plt.subplots()
+
+            extent = (x_f[0],x_f[-1],y_f[0],y_f[-1])
+            figsize = plt.rcParams['figure.figsize']
+            a = figsize[1]/figsize[0]
+            b = (extent[3]-extent[2])/extent[1]
+
+
+            ax.imshow(ep,cmap='Blues', aspect=a/b, origin='lower',
+                     extent=extent)
+
+            ax.set_xlabel(r'Frequency mod. {:.2f} {}'.format(dnu,
+                                        self.frequency.unit.to_string('latex')))
+            ax.set_ylabel(r'Frequency [{}]'.format(self.frequency.unit.to_string('latex')))
+            ax.set_title('Echelle diagram for {}'.format(self.label))
+
+        return ax
+
+
+
     def flatten(self, method='logmedian', filter_width=0.01, return_trend=False):
         """Estimates the Signal-To-Noise (SNR) spectrum by dividing out an
         estimate of the noise background.
@@ -371,6 +477,40 @@ class Periodogram(object):
         if return_trend:
             return snr, bkg
         return snr
+
+    def _get_fwhm(self, numax):
+        """For a given numax, the method calculates the expected Full Width Half
+        Maximum of the seismic mode envelope as (Mosser et al 2010) for RGB
+        stars:
+
+        fwhm = 0.66 * numax^0.88,
+
+        if the data is generated for a long-cadence timeseries. If the
+        timeseries is short-cadence, the relation will be:
+
+        fwhm = 0.25 * numax.
+
+        This will be based on the highest frequency in the periodogram.
+
+        Parameters:
+        ----------
+            numax : float
+                The estimated position of the numax of the power spectrum. This
+                is used to calculated the region autocorrelated with itself.
+
+        Returns:
+        --------
+            fwhm: float
+                The estimate full-width-half-maximum of the seismic mode envelope
+        """
+        fs = np.median(np.diff(self.frequency.value))
+
+        #Calculate the index FWHM for a given numax
+        if u.Quantity(self.frequency[-1], u.microhertz) > u.Quantity(500., u.microhertz):
+            fwhm = 0.25 * numax
+        else:
+            fwhm = 0.66 * numax**0.88
+        return fwhm
 
     def to_table(self):
         """Exports the Periodogram as an Astropy Table.
@@ -716,71 +856,6 @@ class SNRPeriodogram(Periodogram):
         if show_plots:
             return u.Quantity(best_dnu, self.frequency.unit), ax
         return u.Quantity(best_dnu, self.frequency.unit)
-
-    def plot_echelle(self, dnu, **kwargs):
-        """Plots an echelle diagram of the SNR periodogram by stacking the
-        periodogram in slices of dnu. Modes of equal radial degree should
-        appear approximately vertically aligned. If no structure is present,
-        you are likely dealing with a faulty dnu value or a low signal to noise
-        case.
-
-        Parameters
-        ----------
-        dnu : float
-            Value for the large frequency separation of the seismic mode
-            frequencies in the periodogram. Assumed to have the same units as
-            the frequencies, unless given an Astropy unit.
-
-        kwargs : dict
-            Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
-
-        Returns
-        -------
-        ax : matplotlib.axes._subplots.AxesSubplot
-            The matplotlib axes object.
-        """
-
-        # Ensure input dnu is in the correct units
-        dnu = u.Quantity(dnu, self.frequency.unit)
-
-
-
-
-        return ax
-
-    def _get_fwhm(self, numax):
-        """For a given numax, the method calculates the expected Full Width Half
-        Maximum of the seismic mode envelope as (Mosser et al 2010) for RGB
-        stars:
-
-        fwhm = 0.66 * numax^0.88,
-
-        if the data is generated for a long-cadence timeseries. If the
-        timeseries is short-cadence, the relation will be:
-
-        fwhm = 0.25 * numax.
-
-        This will be based on the highest frequency in the periodogram.
-
-        Parameters:
-        ----------
-            numax : float
-                The estimated position of the numax of the power spectrum. This
-                is used to calculated the region autocorrelated with itself.
-
-        Returns:
-        --------
-            fwhm: float
-                The estimate full-width-half-maximum of the seismic mode envelope
-        """
-        fs = np.median(np.diff(self.frequency.value))
-
-        #Calculate the index FWHM for a given numax
-        if u.Quantity(self.frequency[-1], u.microhertz) > u.Quantity(500., u.microhertz):
-            fwhm = 0.25 * numax
-        else:
-            fwhm = 0.66 * numax**0.88
-        return fwhm
 
     def _autocorrelate(self, numax):
         """An autocorrelation function for seismic mode envelopes.
