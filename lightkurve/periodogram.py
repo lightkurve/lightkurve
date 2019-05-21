@@ -337,8 +337,7 @@ class Periodogram(object):
         return ax
 
     def plot_echelle(self, dnu, numax=None,
-                    minimum_frequency=None, maximum_frequency=None, cmap='Blues',
-                    **kwargs):
+                    minimum_frequency=None, maximum_frequency=None, cmap='Blues'):
         """Plots an echelle diagram of the periodogram by stacking the
         periodogram in slices of dnu. Modes of equal radial degree should
         appear approximately vertically aligned. If no structure is present,
@@ -353,23 +352,27 @@ class Periodogram(object):
             Value for the large frequency separation of the seismic mode
             frequencies in the periodogram. Assumed to have the same units as
             the frequencies, unless given an Astropy unit.
+            Is assumed to be in the same units as frequency if not given a unit.
+
 
         numax : float
             Value for the frequency of maximum oscillation. If a numax is
             passed, a suitable range one FWHM of the mode envelope either side
             of the will be shown. This is overwritten by custom frequency ranges.
+            Is assumed to be in the same units as frequency if not given a unit.
 
-        minimum_freuqency : float
+        minimum_frequency : float
             The minimum frequency at which to display the echelle
+            Is assumed to be in the same units as frequency if not given a unit.
+
 
         maximum_frequency : float
             The maximum frequency at which to display the echelle.
+            Is assumed to be in the same units as frequency if not given a unit.
+
 
         cmap : str
             The name of the matplotlib colourmap to use in the echelle diagram.
-
-        kwargs : dict
-            Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
 
         Returns
         -------
@@ -391,14 +394,25 @@ class Periodogram(object):
         # Ensure input numax is in the correct units (if there is one)
         if numax is not None:
             numax = u.Quantity(numax, self.frequency.unit).value
+            if numax > self.frequency[-1].value:
+                raise ValueError("You can't pass in a numax outside the"
+                                "frequency range of the periodogram.")
+
             fmin = numax - 2*self._get_fwhm(numax)
             fmax = numax + 2*self._get_fwhm(numax)
 
         # Set limits and set them in the right units
         if minimum_frequency is not None:
             fmin =  u.Quantity(minimum_frequency, self.frequency.unit).value
+            if fmin > self.frequency[-1].value:
+                raise ValueError("You can't pass in a limit outside the"
+                                "frequency range of the periodogram.")
+
         if maximum_frequency is not None:
             fmax = u.Quantity(maximum_frequency, self.frequency.unit).value
+            if fmax > self.frequency[-1].value:
+                raise ValueError("You can't pass in a limit outside the"
+                                "frequency range of the periodogram.")
 
         # Add on 1x Dnu so we don't miss off any important range due to rounding
         if fmax < self.frequency[-1].value - 1.5*dnu:
@@ -429,8 +443,7 @@ class Periodogram(object):
             a = figsize[1]/figsize[0]
             b = (extent[3]-extent[2])/extent[1]
 
-
-            ax.imshow(ep,cmap='Blues', aspect=a/b, origin='lower',
+            ax.imshow(ep,cmap=cmap, aspect=a/b, origin='lower',
                      extent=extent)
 
             ax.set_xlabel(r'Frequency mod. {:.2f} {}'.format(dnu,
