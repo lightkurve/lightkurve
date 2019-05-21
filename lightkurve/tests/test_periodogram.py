@@ -322,6 +322,39 @@ def test_estimate_dnu_kwargs():
     daysnr = SNRPeriodogram(fday, u.Quantity(p, None))
     dnu, ax = daysnr.estimate_dnu(numax=daynumax, show_plots=True)
 
+def test_plot_echelle():
+    f, p, numax, dnu = generate_test_spectrum()
+    numax *= u.microhertz
+    dnu *= u.microhertz
+
+    pg = Periodogram(f*u.microhertz, u.Quantity(p, None))
+
+    #Assert basic echelle works
+    pg.plot_echelle(dnu)
+    pg.plot_echelle(u.Quantity(dnu, 1/u.day))
+
+    #Assert echelle works with numax
+    pg.plot_echelle(dnu, numax)
+    pg.plot_echelle(dnu, u.Quantity(numax, 1/u.day))
+
+    #Assert echelle works with minimum limit
+    pg.plot_echelle(dnu, minimum_frequency = numax)
+    pg.plot_echelle(dnu, maximum_frequency = numax)
+    pg.plot_echelle(dnu, minimum_frequency = u.Quantity(numax, 1/u.day))
+    pg.plot_echelle(dnu, maximum_frequency = u.Quantity(numax, 1/u.day))
+    pg.plot_echelle(dnu, minimum_frequency = u.Quantity(numax-dnu, 1/u.day),
+                        maximum_frequency = numax+dnu)
+
+    #Assert raises error if numax or either of the limits are too high
+    with pytest.raises(ValueError) as err:
+        pg.plot_echelle(dnu, minimum_frequency = f[-1]+10)
+    with pytest.raises(ValueError) as err:
+        pg.plot_echelle(dnu, maximum_frequency = f[-1]+10)
+    with pytest.raises(ValueError) as err:
+        pg.plot_echelle(dnu, numax = f[-1]+10)
+
+    #Assert can pass colourmap
+    pg.plot_echelle(dnu, cmap='viridis')
 
 @pytest.mark.skipif(bad_optional_imports,
                     reason="requires bokeh and astropy.stats.bls")
