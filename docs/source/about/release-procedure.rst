@@ -34,13 +34,7 @@ The procedure requires the following steps:
 
     $ python setup.py release
 
-8. Increment the version number on the `lightkurve conda feedstock <https://github.com/conda-forge/lightkurve-feedstock>`_.  Navigate to the :code:`meta.yaml` file in the :code:`recipe` directory and change two lines:
-
-.. code-block:: yaml
-
-  {% set version = "1.0b20" %}
-  {% set sha256 = "b65f556362b64d9fcc8aa4b0e89991c2b8f7fc059dfa22269b0877a8b758b255" %}
-
-Replace the `version` and `sha256` values with the most recent release info in `the lightkurve PyPI <https://pypi.org/project/lightkurve/>`_.  Submit your update as a Pull Request, which offers a checklist to guide programmatic spot-checking of your code.
+8. Update the version number on the `Lightkurve conda feedstock <https://github.com/conda-forge/lightkurve-feedstock>`_.
+A friendly robot will tend to open a PR to make this change within 1-2 hours, so all we need to do is review any necessary changes in the dependencies and make sure the PR is merged.
 
 9. Edit `lightkurve/version.py` to contain the next version number with suffix `.dev`.
