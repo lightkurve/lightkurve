@@ -1,7 +1,7 @@
 import pytest
 from astropy import units as u
 import numpy as np
-from numpy.testing import assert_almost_equal
+from numpy.testing import assert_almost_equal, assert_array_equal
 
 from ..lightcurve import LightCurve
 from ..periodogram import Periodogram
@@ -352,3 +352,11 @@ def test_error_messages():
     with pytest.raises(ValueError) as err:
         Periodogram([0, 1, 2]*u.Hz, [1, 1, 1]*u.K).smooth(method="not-implemented")
         assert("parameter must be one 'boxkernel' or 'logmedian'" in err.value.args[0])
+
+
+def test_bls_period():
+    """Regression test for #514."""
+    lc = LightCurve(time=[1, 2, 3], flux=[4, 5, 6])
+    period = [1, 2, 3, 4, 5]
+    pg = lc.to_periodogram(method="bls", period=period)
+    assert_array_equal(pg.period.value, period)

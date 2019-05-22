@@ -885,16 +885,16 @@ class BoxLeastSquaresPeriodogram(Periodogram):
         maximum_period = kwargs.pop("maximum_period", None)
         period = kwargs.pop("period", None)
         if minimum_period is None:
-            if 'period' in kwargs:
-                minimum_period = period.min()
-            else:
+            if period is None:
                 minimum_period = np.max([np.median(np.diff(lc.time)) * 4,
                                          np.max(duration) + np.median(np.diff(lc.time))])
-        if maximum_period is None:
-            if 'period' in kwargs:
-                maximum_period = period.max()
             else:
+                minimum_period = np.min(period)
+        if maximum_period is None:
+            if period is None:
                 maximum_period = (np.max(lc.time) - np.min(lc.time)) / 3.
+            else:
+                maximum_period = np.max(period)
 
         frequency_factor = kwargs.pop("frequency_factor", 10)
         df = frequency_factor * np.min(duration) / (np.max(lc.time) - np.min(lc.time))**2
@@ -914,17 +914,18 @@ class BoxLeastSquaresPeriodogram(Periodogram):
                              'Consider setting `frequency_factor` to a higher value.'
                              ''.format(np.round(npoints, 4)))
 
-        period = kwargs.pop("period",
-                            bls.autoperiod(duration,
-                                           minimum_period=minimum_period,
-                                           maximum_period=maximum_period,
-                                           frequency_factor=frequency_factor))
-
+        if period is None:
+            period = bls.autoperiod(duration,
+                                    minimum_period=minimum_period,
+                                    maximum_period=maximum_period,
+                                    frequency_factor=frequency_factor)
         result = bls.power(period, duration, **kwargs)
         if not isinstance(result.period, u.quantity.Quantity):
             result.period = u.Quantity(result.period, time_unit)
         if not isinstance(result.power, u.quantity.Quantity):
             result.power = result.power * u.dimensionless_unscaled
+        if not isinstance(result.duration, u.quantity.Quantity):
+            result.duration = u.Quantity(result.duration, time_unit)
 
         return BoxLeastSquaresPeriodogram(frequency=1. / result.period,
                                           power=result.power,
