@@ -68,20 +68,27 @@ class Periodogram(object):
             raise ValueError('frequency and power must have a length greater than 1.')
         if frequency.shape != power.shape:
             raise ValueError('frequency and power must have the same length.')
-        # Default view must be "frequency" or "period"
-        allowed_views = ["frequency", "period"]
-        if default_view not in allowed_views:
-            raise ValueError(("Unrecognized default_view '{0}'\n"
-                              "allowed values are: {1}")
-                             .format(default_view, allowed_views))
 
         self.frequency = frequency
         self.power = power
         self.nyquist = nyquist
         self.label = label
         self.targetid = targetid
-        self.default_view = default_view
+        self.default_view = self._validate_view(default_view)
         self.meta = meta
+
+    def _validate_view(self, view):
+        """Verifies whether `view` is is one of {"frequency", "period"} and
+        raises a helpful `ValueError` if not.
+        """
+        if view is None and hasattr(self, 'default_view'):
+            view = self.default_view
+        allowed_views = ["frequency", "period"]
+        if view not in allowed_views:
+            raise ValueError(("'{}' is an invalid value for view; \n"
+                              "allowed values are: {}")
+                             .format(view, allowed_views))
+        return view
 
     @property
     def period(self):
@@ -276,8 +283,7 @@ class Periodogram(object):
         if isinstance(unit, u.quantity.Quantity):
             unit = unit.unit
 
-        if view is None:
-            view = self.default_view
+        view = self._validate_view(view)
 
         if unit is None:
             unit = self.frequency.unit
@@ -301,16 +307,14 @@ class Periodogram(object):
                 fig, ax = plt.subplots()
 
             # Plot frequency and power
-            if view.lower() == 'frequency':
+            if view == 'frequency':
                 ax.plot(self.frequency.to(unit), self.power, **kwargs)
                 if xlabel is None:
                     xlabel = "Frequency [{}]".format(unit.to_string('latex'))
-            elif view.lower() == 'period':
+            elif view == 'period':
                 ax.plot(self.period.to(unit), self.power, **kwargs)
                 if xlabel is None:
                     xlabel = "Period [{}]".format(unit.to_string('latex'))
-            else:
-                raise ValueError('{} is not a valid plotting view'.format(view))
             ax.set_xlabel(xlabel)
             ax.set_ylabel(ylabel)
             # Show the legend if labels were set
@@ -731,9 +735,9 @@ class LombScarglePeriodogram(Periodogram):
 
         # Check if any values of period have been passed and set format accordingly
         if not all(b is None for b in [period, minimum_period, maximum_period]):
-            view = 'period'
+            default_view = 'period'
         else:
-            view = 'frequency'
+            default_view = 'frequency'
 
         # If period and frequency keywords have both been set, throw an error
         if (not all(b is None for b in [period, minimum_period, maximum_period])) & \
@@ -785,9 +789,9 @@ class LombScarglePeriodogram(Periodogram):
                 maximum_frequency = u.Quantity(maximum_frequency, freq_unit)
             if (minimum_frequency is not None) & (maximum_frequency is not None):
                 if (minimum_frequency > maximum_frequency):
-                    if view == 'frequency':
+                    if default_view == 'frequency':
                         raise ValueError('minimum_frequency cannot be larger than maximum_frequency')
-                    if view == 'period':
+                    if default_view == 'period':
                         raise ValueError('minimum_period cannot be larger than maximum_period')
             # If nothing has been passed in, set them to the defaults
             if minimum_frequency is None:
@@ -837,7 +841,8 @@ class LombScarglePeriodogram(Periodogram):
 
         # Periodogram needs properties
         return LombScarglePeriodogram(frequency=frequency, power=power, nyquist=nyquist,
-                                      targetid=lc.targetid, label=lc.label)
+                                      targetid=lc.targetid, label=lc.label,
+                                      default_view=default_view)
 
 
 class BoxLeastSquaresPeriodogram(Periodogram):
