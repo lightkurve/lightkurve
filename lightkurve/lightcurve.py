@@ -387,9 +387,10 @@ class LightCurve(object):
         Parameters
         ----------
         period : float
-            The period upon which to fold.
+            The period upon which to fold, in the same units as this
+            LightCurve's ``time`` attribute.
         t0 : float, optional
-            Time corresponding to zero phase. In the same units as the
+            Time corresponding to zero phase, in the same units as this
             LightCurve's ``time`` attribute.  Defaults to 0 if not set.
         transit_midpoint : float, optional
             Deprecated.  Use `t0` instead.
