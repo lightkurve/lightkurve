@@ -354,6 +354,7 @@ def test_error_messages():
         assert("parameter must be one 'boxkernel' or 'logmedian'" in err.value.args[0])
 
 
+@pytest.mark.skipif(bad_optional_imports, reason="requires astropy.stats.bls")
 def test_bls_period():
     """Regression test for #514."""
     lc = LightCurve(time=[1, 2, 3], flux=[4, 5, 6])
