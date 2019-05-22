@@ -85,8 +85,8 @@ class Periodogram(object):
             view = self.default_view
         allowed_views = ["frequency", "period"]
         if view not in allowed_views:
-            raise ValueError(("'{}' is an invalid value for view; \n"
-                              "allowed values are: {}")
+            raise ValueError(("'{}' is an invalid value for view, "
+                              "allowed values are: {}.")
                              .format(view, allowed_views))
         return view
 
