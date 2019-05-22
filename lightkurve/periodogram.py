@@ -708,7 +708,8 @@ class SNRPeriodogram(Periodogram):
         For a numax around the true numax, this will provide the correlation of
         the mode envelope with itself. Due to the equally spaced pattern of
         modes, the correlation at this numax will be large, revealing the likely
-        numax value.
+        numax value. The correlation is divided through by the square root of
+        its length, to avoid bias towards broader filters at higher numax.
 
         Parameters:
         -----------
@@ -745,14 +746,13 @@ class SNRPeriodogram(Periodogram):
                 numaxs = 10**np.linspace(np.log10(10), np.log10(np.nanmax(self.frequency.value)),200)
 
         #We want to find the numax which returns in the highest autocorrelation
-        #power, so we will return the maximum value in the ACF.
+        #power
         maxacf = np.zeros(len(numaxs))
 
         #Iterate over all the numax values and return an acf
         for idx, numax in enumerate(numaxs):
             acf = self._autocorrelate(numax)       #Return the acf at this numax
-            # maxacf[idx] = np.nansum(acf) / np.sqrt(len(acf))
-            maxacf[idx] = np.nanmax(acf)           #Store the maximum acf value
+            maxacf[idx] = np.nanmax(np.sqrt(acf/len(acf)))           #Store the max acf power normalised by the length
 
         acf_numax = numaxs[np.argmax(maxacf)]     #The best numax is the numax that results in the highest ACF
         best_numax = acf_numax
@@ -767,7 +767,7 @@ class SNRPeriodogram(Periodogram):
 
                 ax[1].plot(numaxs,maxacf)
                 ax[1].set_xlabel("Frequency [{}]".format(self.frequency.unit.to_string('latex')))
-                ax[1].set_ylabel(r'Max. Correlation Power')
+                ax[1].set_ylabel(r'Max. Reduced Correlation Power')
                 ax[0].axvline(best_numax,c='r', linewidth=2,alpha=.4)
                 ax[1].axvline(best_numax,c='r', linewidth=2,alpha=.4,
                     label=r'{:.1f} {}'.format(best_numax,
@@ -853,7 +853,7 @@ class SNRPeriodogram(Periodogram):
             with plt.style.context(MPLSTYLE):
                 fig, ax = plt.subplots(figsize=(8.485, 4))
                 ax.plot(lags,acf/acf[0])
-                ax.set_xlabel("Frequency [{}]".format(self.frequency.unit.to_string('latex')))
+                ax.set_xlabel("Frequency Lag [{}]".format(self.frequency.unit.to_string('latex')))
                 ax.set_ylabel(r'Correlation')
                 ax.axvline(best_dnu,c='r', linewidth=2,alpha=.4)
                 ax.set_title(r'Correlation vs Lag for a given $\nu_{\rm max}$')
@@ -871,7 +871,7 @@ class SNRPeriodogram(Periodogram):
         return u.Quantity(best_dnu, self.frequency.unit)
 
     def _autocorrelate(self, numax):
-        """An autocorrelation function for seismic mode envelopes.
+        """An autocorrelation function (ACF) for seismic mode envelopes.
         We autocorrelate the region one FWHM of the mode envelope either side
         of the proposed numax.
         Before autocorrelating, it multiplies the section with a hanning
@@ -891,13 +891,13 @@ class SNRPeriodogram(Periodogram):
         """
         fs = np.median(np.diff(self.frequency.value))
         fwhm = int(np.floor(self._get_fwhm(numax) / fs))    # Express the fwhm in indices
-        # fwhm -= fwhm % 2                                    # Make the FWHM value even (%2 = 0 if even, 1 if odd)
+        # fwhm -= fwhm % 2                                  # Make the FWHM value even (%2 = 0 if even, 1 if odd)
         x = int(numax / fs)                                 #Find the index value of numax
         s = np.hanning(len(self.power[x-fwhm:x+fwhm]))      #Define the hanning window for the evaluated frequency space
-        C = self.power[x-fwhm:x+fwhm].value * s             #Multiply the evaluated SNR space by the hanning window
-        result = np.correlate(C, C, mode='full')            #Correlated the resulting SNR space with itself
-
-        return result[len(C)-1:]                  #Return one half of the autocorrelation function
+        p_han = self.power[x-fwhm:x+fwhm].value * s         #Multiply the evaluated SNR space by the hanning window
+        C = np.correlate(p_han, p_han, mode='full')         #Correlated the resulting SNR space with itself
+        C = C[len(p_han)-1:]                                #Truncate the ACF
+        return C
 
     def _gaussian(self, x, sigma, height, mu):
         """A simple Gaussian function for fitting to autocorrelation peaks."""
