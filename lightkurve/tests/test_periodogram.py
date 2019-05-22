@@ -245,7 +245,7 @@ def test_bls(caplog):
     assert mask.sum() > (~mask).sum()
 
     assert isinstance(p.period_at_max_power, u.Quantity)
-    assert isinstance(p.duration_at_max_power, float)
+    assert isinstance(p.duration_at_max_power, u.Quantity)
     assert isinstance(p.transit_time_at_max_power, float)
     assert isinstance(p.depth_at_max_power, float)
 
