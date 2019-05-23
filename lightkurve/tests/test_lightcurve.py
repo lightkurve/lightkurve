@@ -15,12 +15,11 @@ from ..lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
 from ..lightcurvefile import LightCurveFile, KeplerLightCurveFile, TessLightCurveFile
 from ..targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
 from ..utils import LightkurveWarning
+from .test_targetpixelfile import TABBY_TPF
 
 # 8th Quarter of Tabby's star
 TABBY_Q8 = ("https://archive.stsci.edu/missions/kepler/lightcurves"
             "/0084/008462852/kplr008462852-2011073133259_llc.fits")
-TABBY_TPF = ("https://archive.stsci.edu/missions/kepler/target_pixel_files"
-             "/0084/008462852/kplr008462852-2011073133259_lpd-targ.fits.gz")
 K2_C08 = ("https://archive.stsci.edu/missions/k2/lightcurves/c8/"
           "220100000/39000/ktwo220139473-c08_llc.fits")
 KEPLER10 = ("https://archive.stsci.edu/missions/kepler/lightcurves/"

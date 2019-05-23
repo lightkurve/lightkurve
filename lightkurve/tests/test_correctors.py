@@ -16,7 +16,7 @@ from .test_lightcurve import TABBY_Q8
 bad_optional_imports = False
 try:
     import celerite
-    import sklearn
+    import fbpca
 except ImportError:
     bad_optional_imports = True
 
@@ -107,8 +107,7 @@ def test_sff_knots():
 
 
 @pytest.mark.remote_data
-@pytest.mark.skipif(bad_optional_imports,
-                    reason="PLD requires celerite and scikit-learn")
+@pytest.mark.skipif(bad_optional_imports, reason="PLD requires celerite and fbpca")
 def test_pld_corrector():
     # download tpf data for a target
     k2_target = 247887989
@@ -140,3 +139,14 @@ def test_pld_corrector():
     assert(corrected_lc.estimate_cdpp() < raw_lc.estimate_cdpp())
     # make sure the returned object is the correct type (`TessLightCurve`)
     assert(isinstance(corrected_lc, TessLightCurve))
+
+
+@pytest.mark.remote_data
+@pytest.mark.skipif(bad_optional_imports, reason="PLD requires celerite and fbpca")
+def test_to_corrector():
+    """Does the tpf.pld() convenience method work?"""
+    from .. import KeplerTargetPixelFile
+    from .test_targetpixelfile import TABBY_TPF
+    tpf = KeplerTargetPixelFile(TABBY_TPF)
+    lc = tpf.to_corrector("pld").correct()
+    assert len(lc.flux) == len(tpf.time)

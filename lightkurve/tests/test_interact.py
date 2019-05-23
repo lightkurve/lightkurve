@@ -6,6 +6,7 @@ import sys
 
 from .. import LightkurveWarning
 from ..targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
+from .test_targetpixelfile import TABBY_TPF
 
 bad_optional_imports = False
 try:
@@ -14,8 +15,6 @@ except ImportError:
     bad_optional_imports = True
 
 example_tpf = get_pkg_data_filename("data/tess25155310-s01-first-cadences.fits.gz")
-TABBY_TPF = ("https://archive.stsci.edu/missions/kepler/target_pixel_files"
-             "/0084/008462852/kplr008462852-2011073133259_lpd-targ.fits.gz")
 
 
 def test_bokeh_import_error(caplog):

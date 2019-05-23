@@ -2,7 +2,9 @@
 import pytest
 import sys
 import numpy as np
+
 from ..lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
+from .test_lightcurve import KEPLER10, TESS_SIM
 
 bad_optional_imports = False
 try:
@@ -11,14 +13,6 @@ try:
 except:
     bad_optional_imports = True
 
-
-
-KEPLER10 = ("https://archive.stsci.edu/missions/kepler/lightcurves/"
-            "0119/011904151/kplr011904151-2010009091648_llc.fits")
-TESS_SIM = ("https://archive.stsci.edu/missions/tess/ete-6/tid/00/000/"
-            "004/104/tess2019128220341-0000000410458113-0016-s_lc.fits")
-
-bad_optional_imports = np.any([('bokeh' not in sys.modules), ('astropy.stats.bls' not in sys.modules)])
 
 @pytest.mark.remote_data
 @pytest.mark.skipif(bad_optional_imports,

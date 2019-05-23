@@ -522,18 +522,3 @@ def test_get_keyword():
     assert tpf.get_keyword("TELESCOP") == "Kepler"
     assert tpf.get_keyword("TTYPE1", hdu=1) == "TIME"
     assert tpf.get_keyword("DOESNOTEXIST", default=5) == 5
-
-bad_optional_imports = False
-try:
-    import celerite
-    import sklearn
-except ImportError:
-    bad_optional_imports = True
-
-@pytest.mark.skipif(bad_optional_imports,
-                    reason="PLD requires celerite and scikit-learn")
-def test_to_corrector():
-    """Does the tpf.pld() convenience method work?"""
-    tpf = KeplerTargetPixelFile(TABBY_TPF)
-    lc = tpf.to_corrector("pld").correct()
-    assert len(lc.flux) == len(tpf.time)
