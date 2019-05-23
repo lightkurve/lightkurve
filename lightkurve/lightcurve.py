@@ -385,6 +385,37 @@ class LightCurve(object):
         Data points which occur exactly at ``t0`` or an integer multiple of
         ``t0 + n*period`` will have phase value 0.0.
 
+        Examples
+        --------
+        The example below shows a light curve with a period dip which occurs near
+        time value 1001 and has a period of 5 days. Calling the `fold` method
+        will transform the light curve into a `FoldedLightCurve` object::
+
+            >>> import lightkurve as lk
+            >>> lc = lk.LightCurve(time=range(1001, 1012), flux=[0.5, 1.0, 1.0, 1.0, 1.0, 0.5, 1.0, 1.0, 1.0, 1.0, 0.5])
+            >>> folded_lc = lc.fold(period=5., t0=1006.)
+            >>> folded_lc   # doctest: +SKIP
+            <lightkurve.lightcurve.FoldedLightCurve>
+
+        An object of type `FoldedLightCurve` is useful because it provides
+        convenient access to the phase values and the phase-folded fluxes::
+
+            >>> folded_lc.phase
+            array([-0.4, -0.4, -0.2, -0.2,  0. ,  0. ,  0. ,  0.2,  0.2,  0.4,  0.4])
+            >>> folded_lc.flux
+            array([1. , 1. , 1. , 1. , 0.5, 0.5, 0.5, 1. , 1. , 1. , 1. ])
+
+        We can still access the original time values as follows::
+
+            >>> folded_lc.time_original
+            array([1004, 1009, 1005, 1010, 1001, 1006, 1011, 1002, 1007, 1003, 1008])
+        
+        A `FoldedLightCurve` inherits all the features of a standard `LightCurve`
+        object. For example, we can very quickly obtain a phase-folded plot using:
+
+            >>> folded_lc.plot()    # doctest: +SKIP
+
+
         Parameters
         ----------
         period : float
@@ -530,6 +561,29 @@ class LightCurve(object):
             `astropy.stats.sigma_clip()` and provides the same functionality.
             Any extra arguments passed to this method will be passed on to
             ``sigma_clip``.
+
+        Examples
+        --------
+        This example generates a new light curve in which all points
+        that are more than 1 standard deviation from the median are removed::
+
+            >>> lc = LightCurve(time=[1, 2, 3, 4, 5], flux=[1, 1000, 1, -1000, 1])
+            >>> lc_clean = lc.remove_outliers(sigma=1)
+            >>> lc_clean.time
+            array([1, 3, 5])
+            >>> lc_clean.flux
+            array([1, 1, 1])
+
+        This example removes only points where the flux is larger than 1
+        standard deviation from the median, but leaves negative outliers
+        in place::
+
+            >>> lc = LightCurve(time=[1, 2, 3, 4, 5], flux=[1, 1000, 1, -1000, 1])
+            >>> lc_clean = lc.remove_outliers(sigma_lower=float('inf'), sigma_upper=1)
+            >>> lc_clean.time
+            array([1, 3, 4, 5])
+            >>> lc_clean.flux
+            array([    1,     1, -1000,     1])
 
         Parameters
         ----------
