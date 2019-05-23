@@ -61,14 +61,14 @@ class LightCurve(object):
     Create a new `LightCurve` object, access the data,
     and apply binning as follows:
 
-    >>> import lightkurve as lk
-    >>> lc = lk.LightCurve(time=[1, 2, 3, 4], flux=[0.97, 1.01, 1.03, 0.99])
-    >>> lc.time
-    array([1, 2, 3, 4])
-    >>> lc.flux
-    array([0.97, 1.01, 1.03, 0.99])
-    >>> lc.bin(binsize=2).flux
-    array([0.99, 1.01])
+        >>> import lightkurve as lk
+        >>> lc = lk.LightCurve(time=[1, 2, 3, 4], flux=[0.97, 1.01, 1.03, 0.99])
+        >>> lc.time
+        array([1, 2, 3, 4])
+        >>> lc.flux
+        array([0.97, 1.01, 1.03, 0.99])
+        >>> lc.bin(binsize=2).flux
+        array([0.99, 1.01])
     """
     def __init__(self, time=None, flux=None, flux_err=None, time_format=None,
                  time_scale=None, targetid=None, label=None, meta={}):
@@ -156,6 +156,49 @@ class LightCurve(object):
         The Time object will be created using the values in the ``time``,
         `time_format`, and ``time_scale`` attributes.
         For Kepler data products, the times are Barycentric.
+
+        Examples
+        --------
+        The section below demonstrates working with time values using the TESS
+        light curve of Pi Mensae as an example, which we obtained as follows::
+
+            >>> import lightkurve as lk
+            >>> lc = lk.search_lightcurvefile("Pi Mensae", mission="TESS", sector=1).download().PDCSAP_FLUX
+            >>> lc
+            TessLightCurve(TICID: 261136679)
+
+        Every `LightCurve` object has a `time` attribute, which provides access
+        to the original array of time values given in the native format and
+        scale used by the data product from which the light curve was obtained::
+
+            >>> lc.time
+            array([1325.29698328, 1325.29837215, 1325.29976102, ..., 1353.17431099,
+            1353.17569985, 1353.17708871])
+            >>> lc.time_format
+            'btjd'
+            >>> lc.time_scale
+            'tdb'
+
+        To enable users to convert these time values to different formats or
+        scales, Lightkurve provides an easy way to access the time values
+        as an `AstroPy Time object <http://docs.astropy.org/en/stable/time/>`_::
+
+            >>> lc.astropy_time
+            <Time object: scale='tdb' format='jd' value=[2458325.29698328 2458325.29837215 2458325.29976102 ... 2458353.17431099
+            2458353.17569985 2458353.17708871]>
+
+        This is convenient because AstroPy Time objects provide a lot of useful
+        features. For example, we can now obtain the Julian Day or ISO values
+        that correspond to the raw time values::
+
+            >>> lc.astropy_time.iso
+            array(['2018-07-25 19:07:39.356', '2018-07-25 19:09:39.354',
+            '2018-07-25 19:11:39.352', ..., '2018-08-22 16:11:00.470',
+            '2018-08-22 16:13:00.467', '2018-08-22 16:15:00.464'], dtype='<U23')
+            >>> lc.astropy_time.jd
+            array([2458325.29698328, 2458325.29837215, 2458325.29976102, ...,
+            2458353.17431099, 2458353.17569985, 2458353.17708871])
+
 
         Raises
         ------
@@ -405,7 +448,7 @@ class LightCurve(object):
             >>> folded_lc.flux
             array([1. , 1. , 1. , 1. , 0.5, 0.5, 0.5, 1. , 1. , 1. , 1. ])
 
-        We can still access the original time values as follows::
+        We can still access the original time values as well::
 
             >>> folded_lc.time_original
             array([1004, 1009, 1005, 1010, 1001, 1006, 1011, 1002, 1007, 1003, 1008])
@@ -1013,10 +1056,10 @@ class LightCurve(object):
         Load the light curve for Kepler-10, remove long-term trends, and
         display the BLS tool as follows:
 
-        >>> import lightkurve as lk
-        >>> lc = lk.search_lightcurvefile('kepler-10', quarter=3).download()  # doctest: +SKIP
-        >>> lc = lc.PDCSAP_FLUX.normalize().flatten()  # doctest: +SKIP
-        >>> lc.interact_bls()  # doctest: +SKIP
+            >>> import lightkurve as lk
+            >>> lc = lk.search_lightcurvefile('kepler-10', quarter=3).download()  # doctest: +SKIP
+            >>> lc = lc.PDCSAP_FLUX.normalize().flatten()  # doctest: +SKIP
+            >>> lc.interact_bls()  # doctest: +SKIP
 
         References
         ----------
