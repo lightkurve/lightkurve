@@ -677,14 +677,6 @@ class LightCurve(object):
 
         return binned_lc
 
-    def cdpp(self, **kwargs):
-        """DEPRECATED: use `estimate_cdpp()` instead."""
-        warnings.warn('`LightCurve.cdpp()` is deprecated and will be '
-                      'removed in Lightkurve v1.0.0, '
-                      'please use `LightCurve.estimate_cdpp()` instead.',
-                      LightkurveWarning)
-        return self.estimate_cdpp(**kwargs)
-
     def estimate_cdpp(self, transit_duration=13, savgol_window=101,
                       savgol_polyorder=2, sigma=5.):
         """Estimate the CDPP noise metric using the Savitzky-Golay (SG) method.
@@ -1431,43 +1423,6 @@ class KeplerLightCurve(LightCurve):
 
     def __repr__(self):
         return('KeplerLightCurve(ID: {})'.format(self.targetid))
-
-    def correct(self, method='sff', **kwargs):
-        """DEPRECATED: use `to_corrector(method).correct()` instead.
-
-        Parameters
-        ----------
-        method : str
-            Method used to correct the lightcurve.
-            Right now only 'sff' (Vanderburg's Self-Flat Fielding) is supported.
-        kwargs : dict
-            Dictionary of keyword arguments to be passed to the function
-            defined by `method`.
-
-        Returns
-        -------
-        new_lc : KeplerLightCurve object
-            Corrected lightcurve
-        """
-        warnings.warn('`KeplerLightCurve.correct()` is deprecated and will be '
-                      'removed in Lightkurve v1.0.0, '
-                      'please use `LightCurve.to_corrector("sff").correct()` instead.',
-                      LightkurveWarning)
-
-        not_nan = np.isfinite(self.flux)
-        if method == 'sff':
-            from .correctors import SFFCorrector
-            self.corrector = SFFCorrector(self[not_nan])
-            corrected_lc = self.corrector.correct(centroid_col=self.centroid_col[not_nan],
-                                                  centroid_row=self.centroid_row[not_nan],
-                                                  **kwargs)
-        else:
-            raise ValueError("method {} is not available.".format(method))
-        new_lc = self[not_nan].copy()
-        new_lc.time = corrected_lc.time
-        new_lc.flux = corrected_lc.flux
-        new_lc.flux_err = self.normalize().flux_err[not_nan]
-        return new_lc
 
     def to_pandas(self, columns=['time', 'flux', 'flux_err', 'quality',
                                  'centroid_col', 'centroid_row']):
