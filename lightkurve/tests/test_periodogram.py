@@ -215,24 +215,24 @@ def test_bls(caplog):
     p.compute_stats()
     for record in caplog.records:
         assert record.levelname == 'WARNING'
-    assert len(caplog.records) == 4
+    assert len(caplog.records) == 3
     assert 'No period specified.' in caplog.text
 
     # No more errors
     stats = p.compute_stats(1, 0.1, 0)
-    assert len(caplog.records) == 4
+    assert len(caplog.records) == 3
     assert isinstance(stats, dict)
 
     # Some errors should occur
     p.get_transit_model()
     for record in caplog.records:
         assert record.levelname == 'WARNING'
-    assert len(caplog.records) == 7
+    assert len(caplog.records) == 6
     assert 'No period specified.' in caplog.text
 
     model = p.get_transit_model(1, 0.1, 0)
     # No more errors
-    assert len(caplog.records) == 7
+    assert len(caplog.records) == 6
     # Model is LC
     assert isinstance(model, LightCurve)
     # Model is otherwise identical to LC
@@ -311,47 +311,47 @@ def test_error_messages():
         lc_with_nans = lc.copy()
         lc_with_nans.flux[0] = np.nan
         lc_with_nans.to_periodogram()
-        assert('Lightcurve contains NaN values.' in err.value.args[0])
+    assert('Lightcurve contains NaN values.' in err.value.args[0])
 
     # No unitless periodograms
     with pytest.raises(ValueError) as err:
         Periodogram([0], [1])
-        assert err.value.args[0] == 'frequency must be an `astropy.units.Quantity` object.'
+    assert err.value.args[0] == 'frequency must be an `astropy.units.Quantity` object.'
 
     # No unitless periodograms
     with pytest.raises(ValueError) as err:
         Periodogram([0]*u.Hz, [1])
-        assert err.value.args[0] == 'power must be an `astropy.units.Quantity` object.'
+    assert err.value.args[0] == 'power must be an `astropy.units.Quantity` object.'
 
     # No single value periodograms
     with pytest.raises(ValueError) as err:
         Periodogram([0]*u.Hz, [1]*u.K)
-        assert err.value.args[0] == 'frequency and power must have a length greater than 1.'
+    assert err.value.args[0] == 'frequency and power must have a length greater than 1.'
 
     # No uneven arrays
     with pytest.raises(ValueError) as err:
         Periodogram([0, 1, 2, 3]*u.Hz, [1, 1]*u.K)
-        assert err.value.args[0] == 'frequency and power must have the same length.'
+    assert err.value.args[0] == 'frequency and power must have the same length.'
 
     # Bad frequency units
     with pytest.raises(ValueError) as err:
         Periodogram([0, 1, 2]*u.K, [1, 1, 1]*u.K)
-        assert err.value.args[0] == 'Frequency must be in units of 1/time.'
+    assert err.value.args[0] == 'Frequency must be in units of 1/time.'
 
     # Bad binning
     with pytest.raises(ValueError) as err:
         Periodogram([0, 1, 2]*u.Hz, [1, 1, 1]*u.K).bin(binsize=-2)
-        assert err.value.args[0] == 'binsize must be larger than or equal to 1'
+    assert err.value.args[0] == 'binsize must be larger than or equal to 1'
 
     # Bad binning method
     with pytest.raises(ValueError) as err:
         Periodogram([0, 1, 2]*u.Hz, [1, 1, 1]*u.K).bin(method='not-implemented')
-        assert("is not a valid method, must be 'mean' or 'median'" in err.value.args[0])
+    assert("is not a valid method, must be 'mean' or 'median'" in err.value.args[0])
 
     # Bad smooth method
     with pytest.raises(ValueError) as err:
         Periodogram([0, 1, 2]*u.Hz, [1, 1, 1]*u.K).smooth(method="not-implemented")
-        assert("parameter must be one 'boxkernel' or 'logmedian'" in err.value.args[0])
+    assert("parameter must be one of 'boxkernel' or 'logmedian'" in err.value.args[0])
 
 
 @pytest.mark.skipif(bad_optional_imports, reason="requires astropy.stats.bls")
@@ -361,3 +361,6 @@ def test_bls_period():
     period = [1, 2, 3, 4, 5]
     pg = lc.to_periodogram(method="bls", period=period)
     assert_array_equal(pg.period.value, period)
+    with pytest.raises(ValueError) as err:  # NaNs should raise a nice error message
+        lc.to_periodogram(method="bls", period=[1, 2, 3, np.nan, 4])
+    assert("period" in err.value.args[0])

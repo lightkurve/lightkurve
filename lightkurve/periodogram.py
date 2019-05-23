@@ -863,27 +863,30 @@ class BoxLeastSquaresPeriodogram(Periodogram):
     @staticmethod
     def from_lightcurve(lc, **kwargs):
         """Creates a Periodogram from a LightCurve using the Box Least Squares (BLS) method."""
-        time_unit = (kwargs.pop("time_unit", "day"))
-        if time_unit not in dir(u):
-            raise ValueError('{} is not a valid unit for time.'.format(time_unit))
-
         try:
             from astropy.stats import BoxLeastSquares
         except ImportError:
-            raise Exception("BLS requires AstroPy v3.1 or later")
+            raise ImportError("BLS requires AstroPy v3.1 or later")
 
-        # BoxLeastSquares will not work if flux or flux_err contain NaNs
+        # Validate user input for `lc`
+        # (BoxLeastSquares will not work if flux or flux_err contain NaNs)
         lc = lc.remove_nans()
         if np.isfinite(lc.flux_err).all():
             dy = lc.flux_err
         else:
             dy = None
 
-        bls = BoxLeastSquares(lc.time, lc.flux, dy)
+        # Validate user input for `duration`
         duration = kwargs.pop("duration", 0.25)
+        if duration is not None and ~np.all(np.isfinite(duration)):
+            raise ValueError("`duration` parameter contains illegal nan or inf value(s)")
+
+        # Validate user input for `period`
+        period = kwargs.pop("period", None)
         minimum_period = kwargs.pop("minimum_period", None)
         maximum_period = kwargs.pop("maximum_period", None)
-        period = kwargs.pop("period", None)
+        if period is not None and ~np.all(np.isfinite(period)):
+            raise ValueError("`period` parameter contains illegal nan or inf value(s)")
         if minimum_period is None:
             if period is None:
                 minimum_period = np.max([np.median(np.diff(lc.time)) * 4,
@@ -896,24 +899,28 @@ class BoxLeastSquaresPeriodogram(Periodogram):
             else:
                 maximum_period = np.max(period)
 
+        # Validate user input for `time_unit`
+        time_unit = (kwargs.pop("time_unit", "day"))
+        if time_unit not in dir(u):
+            raise ValueError('{} is not a valid value for `time_unit`'.format(time_unit))
+
+        # Validate user input for `frequency_factor`
         frequency_factor = kwargs.pop("frequency_factor", 10)
         df = frequency_factor * np.min(duration) / (np.max(lc.time) - np.min(lc.time))**2
         npoints = int(((1/minimum_period) - (1/maximum_period))/df)
-
-        # Too many points
-        if npoints > 1e5:
-            log.warning('`period` contains {} points.'
-                        'Periodogram is likely to be large, and slow to evaluate. '
-                        'Consider setting `frequency_factor` to a higher value.'
-                        ''.format(np.round(npoints, 4)))
-
-        # Way too many points
         if npoints > 1e7:
             raise ValueError('`period` contains {} points.'
                              'Periodogram is too large to evaluate. '
                              'Consider setting `frequency_factor` to a higher value.'
                              ''.format(np.round(npoints, 4)))
+        elif npoints > 1e5:
+            log.warning('`period` contains {} points.'
+                        'Periodogram is likely to be large, and slow to evaluate. '
+                        'Consider setting `frequency_factor` to a higher value.'
+                        ''.format(np.round(npoints, 4)))
 
+        # Create BLS object and run the BLS search
+        bls = BoxLeastSquares(lc.time, lc.flux, dy)
         if period is None:
             period = bls.autoperiod(duration,
                                     minimum_period=minimum_period,
