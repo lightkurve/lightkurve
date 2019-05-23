@@ -19,6 +19,7 @@ from astropy.stats import sigma_clip
 from astropy.table import Table
 from astropy.io import fits
 from astropy.time import Time
+from astropy import units as u
 
 from . import PACKAGEDIR, MPLSTYLE
 from .utils import (
@@ -401,6 +402,10 @@ class LightCurve(object):
             A new light curve object in which the data are folded and sorted by
             phase. The object contains an extra ``phase`` attribute.
         """
+        # Input validation
+        if isinstance(period, u.quantity.Quantity):
+            period = period.value
+    
         # `transit_midpoint` is deprecated
         if transit_midpoint is not None:
             warnings.warn('`transit_midpoint` is deprecated, please use `t0` instead.',
