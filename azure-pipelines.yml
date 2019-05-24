@@ -27,9 +27,46 @@ jobs:
   steps:
   - template: .azure-template.yml
 
+
+- job: Windows
+  pool:
+    vmImage: 'win1803'
+  strategy:
+    matrix:
+      Python37_WithRemoteData:
+        python.version: '3.7'
+        pytest.options: '--remote-data'
+        pip.command: 'pip install -e .[all,test]'
+  steps:
+  - template: .azure-template.yml
+
 - job: Windows
   pool:
     vmImage: 'vs2017-win2016'
+  strategy:
+    matrix:
+      Python37_WithRemoteData:
+        python.version: '3.7'
+        pytest.options: '--remote-data'
+        pip.command: 'pip install -e .[all,test]'
+  steps:
+  - template: .azure-template.yml
+
+- job: Windows
+  pool:
+    vmImage: 'vs2015-win2012r2'
+  strategy:
+    matrix:
+      Python37_WithRemoteData:
+        python.version: '3.7'
+        pytest.options: '--remote-data'
+        pip.command: 'pip install -e .[all,test]'
+  steps:
+  - template: .azure-template.yml
+
+- job: Windows
+  pool:
+    vmImage: 'windows-2019'
   strategy:
     matrix:
       Python37_WithRemoteData:
