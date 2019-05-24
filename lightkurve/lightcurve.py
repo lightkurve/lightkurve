@@ -521,11 +521,21 @@ class LightCurve(object):
         The normalized light curve is obtained by dividing the ``flux`` and
         ``flux_err`` object attributes by the by the median flux.
 
+        Examples
+        --------
+            >>> import lightkurve as lk
+            >>> lc = lk.LightCurve(time=[1, 2, 3], flux=[25945.7, 25901.5, 25931.2], flux_err=[6.8, 4.6, 6.2])
+            >>> normalized_lc = lc.normalize()
+            >>> normalized_lc.flux
+            array([1.00055917, 0.99885466, 1.        ])
+            >>> normalized_lc.flux_err
+            array([0.00026223, 0.00017739, 0.00023909])
+
         Returns
         -------
         normalized_lightcurve : `LightCurve`
-            A new light curve object in which ``flux`` and ``flux_err`` are divided
-            by the median.
+            A new light curve object in which ``flux`` and ``flux_err`` have
+            been divided by the median flux.
         """
         lc = self.copy()
         lc.flux_err = lc.flux_err / np.nanmedian(lc.flux)
