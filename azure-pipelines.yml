@@ -28,7 +28,7 @@ jobs:
   - template: .azure-template.yml
 
 
-- job: Windows
+- job: Windows1
   pool:
     vmImage: 'win1803'
   strategy:
@@ -40,7 +40,7 @@ jobs:
   steps:
   - template: .azure-template.yml
 
-- job: Windows
+- job: Windows2
   pool:
     vmImage: 'vs2017-win2016'
   strategy:
@@ -52,7 +52,7 @@ jobs:
   steps:
   - template: .azure-template.yml
 
-- job: Windows
+- job: Windows3
   pool:
     vmImage: 'vs2015-win2012r2'
   strategy:
@@ -64,7 +64,7 @@ jobs:
   steps:
   - template: .azure-template.yml
 
-- job: Windows
+- job: Windows4
   pool:
     vmImage: 'windows-2019'
   strategy:
