@@ -754,9 +754,9 @@ class SNRPeriodogram(Periodogram):
 
         if numaxs is None:
             if self.nyquist is not None:
-                numaxs = 10**np.linspace(np.log10(10), np.log10(self.nyquist.value), 200)
+                numaxs = 10**np.linspace(np.log10(5), np.log10(self.nyquist.value), 500)
             else:
-                numaxs = 10**np.linspace(np.log10(10), np.log10(np.nanmax(self.frequency.value)),200)
+                numaxs = 10**np.linspace(np.log10(5), np.log10(np.nanmax(self.frequency.value)),500)
 
         #We want to find the numax which returns in the highest autocorrelation
         #power
@@ -765,7 +765,7 @@ class SNRPeriodogram(Periodogram):
         #Iterate over all the numax values and return an acf
         if method=='GRD':
             h0 = 1.0 - np.exp(-self.power.value)
-            det = self.frequency[h0 > 0.99].value
+            det = self.frequency[h0 > 0.98].value
             for idx, numax in enumerate(numaxs):
                 width = 0.66 * numax**0.88
                 inlie = len(det[np.abs(det - numax) < width/6]) / width
@@ -867,7 +867,7 @@ class SNRPeriodogram(Periodogram):
         lags = np.linspace(0., len(acf)*fs, len(acf))
 
         #Select a 25% region region around the empirical dnu
-        sel = (lags > dnu_emp - .25*dnu_emp) & (lags < dnu_emp + .25*dnu_emp)
+        sel = (lags > dnu_emp - .35*dnu_emp) & (lags < dnu_emp + .35*dnu_emp)
 
         #Run a peak finder on this region
         peaks, _ = find_peaks(acf[sel], distance=np.floor(dnu_emp/2. / fs))
