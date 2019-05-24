@@ -38,7 +38,7 @@ setup(name='lightkurve',
       license='MIT',
       package_dir={
             'lightkurve': 'lightkurve',
-            'lightkurve.correctors': 'lightkurve/correctors'
+            'lightkurve.correctors': 'lightkurve/correctors',
             'lightkurve.prf': 'lightkurve/prf'},
       packages=['lightkurve', 'lightkurve.correctors', 'lightkurve.prf'],
       install_requires=install_requires,
