@@ -156,8 +156,8 @@ def test_to_corrector():
 @pytest.mark.remote_data
 @pytest.mark.skipif(bad_optional_imports, reason="PLD requires celerite and fbpca")
 def test_pld_aperture_mask():
-    """Regression test for #523: does PLDCorrector.correct() accept separate
-    apertures for PLD pixels?"""
+    """Test for #523: does PLDCorrector.correct() accept separate apertures for
+    PLD pixels?"""
     from .. import KeplerTargetPixelFile
     from .test_targetpixelfile import TABBY_TPF
     tpf = KeplerTargetPixelFile(TABBY_TPF)
