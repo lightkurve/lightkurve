@@ -328,7 +328,9 @@ class Periodogram(object):
         return ax
 
     def plot_echelle(self, dnu, numax=None,
-                    minimum_frequency=None, maximum_frequency=None, cmap='Blues'):
+                    minimum_frequency=None, maximum_frequency=None,
+                    power_log=True,
+                    cmap='Blues'):
         """Plots an echelle diagram of the periodogram by stacking the
         periodogram in slices of dnu. Modes of equal radial degree should
         appear approximately vertically aligned. If no structure is present,
@@ -419,6 +421,8 @@ class Periodogram(object):
 
         #Reshape the power into n_rowss of n_columnss
         ep = np.reshape(pp[:(n_rows*n_columns)],(n_rows,n_columns))
+        if power_log:
+            ep = np.log10(ep)
 
         #Reshape the freq into n_rowss of n_columnss & create arays
         ef = np.reshape(ff[:(n_rows*n_columns)],(n_rows,n_columns))
@@ -698,7 +702,7 @@ class SNRPeriodogram(Periodogram):
             ax.set_ylabel("Signal to Noise Ratio (SNR)")
         return ax
 
-    def estimate_numax(self, numaxs=None, show_plots=False):
+    def estimate_numax(self, numaxs=None, method='GRD', show_plots=False):
         """Estimates the peak of the envelope of seismic oscillation modes,
         numax using an autocorrelation function, based on Huber et al. 2009
 
@@ -741,20 +745,32 @@ class SNRPeriodogram(Periodogram):
 
         if numaxs is None:
             if self.nyquist is not None:
-                numaxs = 10**np.linspace(np.log10(10), np.log10(self.nyquist.value), 200)
+                numaxs = 10**np.linspace(np.log10(5), np.log10(self.nyquist.value), 500)
             else:
-                numaxs = 10**np.linspace(np.log10(10), np.log10(np.nanmax(self.frequency.value)),200)
+                numaxs = 10**np.linspace(np.log10(5), np.log10(np.nanmax(self.frequency.value)),500)
 
         #We want to find the numax which returns in the highest autocorrelation
         #power
         maxacf = np.zeros(len(numaxs))
 
         #Iterate over all the numax values and return an acf
-        for idx, numax in enumerate(numaxs):
-            acf = self._autocorrelate(numax)       #Return the acf at this numax
-            maxacf[idx] = np.nanmax(np.sqrt(acf/len(acf)))           #Store the max acf power normalised by the length
+        if method=='GRD':
+            h0 = 1.0 - np.exp(-self.power.value)
+            det = self.frequency[h0 > 0.98].value
+            for idx, numax in enumerate(numaxs):
+                width = 0.66 * numax**0.88
+                inlie = len(det[np.abs(det - numax) < width/6]) / width
+                maxacf[idx] = inlie          #Store the max acf power normalised by the length
 
-        acf_numax = numaxs[np.argmax(maxacf)]     #The best numax is the numax that results in the highest ACF
+        else:
+            for idx, numax in enumerate(numaxs):
+                acf = self._autocorrelate(numax)       #Return the acf at this numax
+                maxacf[idx] = np.nanmax(np.sqrt(acf/len(acf)))           #Store the max acf power normalised by the length
+
+        from astropy.convolution import Gaussian1DKernel, convolve
+        g = Gaussian1DKernel(stddev=5)
+        maxacf_smooth = convolve(maxacf, g)
+        acf_numax = numaxs[np.argmax(maxacf_smooth)]     #The best numax is the numax that results in the highest ACF
         best_numax = acf_numax
 
         if show_plots == True:
@@ -766,6 +782,7 @@ class SNRPeriodogram(Periodogram):
                 ax[0].set_xlabel(None)
 
                 ax[1].plot(numaxs,maxacf)
+                ax[1].plot(numaxs,maxacf_smooth)
                 ax[1].set_xlabel("Frequency [{}]".format(self.frequency.unit.to_string('latex')))
                 ax[1].set_ylabel(r'Max. Reduced Correlation Power')
                 ax[0].axvline(best_numax,c='r', linewidth=2,alpha=.4)
@@ -841,7 +858,7 @@ class SNRPeriodogram(Periodogram):
         lags = np.linspace(0., len(acf)*fs, len(acf))
 
         #Select a 25% region region around the empirical dnu
-        sel = (lags > dnu_emp - .25*dnu_emp) & (lags < dnu_emp + .25*dnu_emp)
+        sel = (lags > dnu_emp - .35*dnu_emp) & (lags < dnu_emp + .35*dnu_emp)
 
         #Run a peak finder on this region
         peaks, _ = find_peaks(acf[sel], distance=np.floor(dnu_emp/2. / fs))
