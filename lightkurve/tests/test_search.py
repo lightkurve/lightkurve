@@ -54,8 +54,8 @@ def test_search_targetpixelfile():
     search_targetpixelfile(11904151, quarter=11).download()
     # with mission='TESS', it should return TESS observations
     target = "pi Mensae"
-    assert(len(search_targetpixelfile(target, mission='TESS').table) == 1)
-    assert(len(search_targetpixelfile(target, mission='TESS', radius=100).table) == 2)
+    assert(len(search_targetpixelfile(target, mission='TESS').unique_targets) == 1)
+    assert(len(search_targetpixelfile(target, mission='TESS', radius=100).unique_targets) == 2)
     search_targetpixelfile(target, mission='TESS').download()
     # Issue #445: indexing with -1 should return the last index of the search result
     assert(len(search_targetpixelfile("pi Men")[-1]) == 1)
