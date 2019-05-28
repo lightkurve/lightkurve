@@ -594,14 +594,14 @@ class PLDCorrector(object):
         self.time = tpf.time
 
     def correct(self, aperture_mask=None, cadence_mask=None, gp_timescale=30,
-                use_gp=True, pld_order=2, n_pca_terms=10):
+                use_gp=True, pld_order=2, n_pca_terms=10, pld_aperture=None):
         r"""Returns a PLD systematics-corrected LightCurve.
 
         Parameters
         ----------
         aperture_mask : array-like, 'pipeline', 'all', 'threshold', or None
             A boolean array describing the aperture such that `True` means
-            that the pixel will be used.
+            that the pixel will be used to generate the raw light curve.
             If `None` or 'all' are passed, all pixels will be used.
             If 'pipeline' is passed, the mask suggested by the official pipeline
             will be returned.
@@ -632,6 +632,10 @@ class PLDCorrector(object):
             when performing Principal Component Analysis for models higher than
             first order. Increasing this value may provide higher precision at
             the expense of computational time.
+        pld_aperture : array-like or None
+            A boolean array describing the aperture such that `True` means
+            that the pixel will be used when selecting the PLD basis vectors.
+            If `None` is passed in, all pixels will be used.
 
         Returns
         -------
@@ -672,15 +676,18 @@ class PLDCorrector(object):
         self.flux_err = self.flux_err[nanmask]
         self.time = self.time[nanmask]
 
+        # parse PLD aperture mask
+        pld_pixels = self.tpf._parse_aperture_mask(pld_aperture)
+
         # find pixel bounds of aperture on tpf
-        xmin, xmax = min(np.where(aperture)[0]),  max(np.where(aperture)[0])
-        ymin, ymax = min(np.where(aperture)[1]),  max(np.where(aperture)[1])
+        xmin, xmax = min(np.where(pld_pixels)[0]),  max(np.where(pld_pixels)[0])
+        ymin, ymax = min(np.where(pld_pixels)[1]),  max(np.where(pld_pixels)[1])
 
         # crop data cube to include only desired pixels
         # this is required for superstamps to ensure matrix is invertable
         flux_crop = self.flux[:, xmin:xmax+1, ymin:ymax+1]
         flux_err_crop = self.flux_err[:, xmin:xmax+1, ymin:ymax+1]
-        aperture_crop = aperture[xmin:xmax+1, ymin:ymax+1]
+        aperture_crop = pld_pixels[xmin:xmax+1, ymin:ymax+1]
 
         # calculate errors (ignore warnings related to zero or negative errors)
         with warnings.catch_warnings():
