@@ -127,8 +127,9 @@ def test_pld_corrector():
     # reduce using fewer principle components
     corrected_lc = pld.correct(n_pca_terms=20)
     # try PLD on a TESS observation
-    tess_target = 273985862
-    tess_tpf = search_targetpixelfile(tess_target, mission='TESS').download()
+    from .. import TessTargetPixelFile
+    from .test_targetpixelfile import TESS_SIM
+    tess_tpf = TessTargetPixelFile(TESS_SIM)
     # instantiate PLD corrector object
     pld = PLDCorrector(tess_tpf[:500])
     # produce a PLD-corrected light curve with a pipeline aperture mask
