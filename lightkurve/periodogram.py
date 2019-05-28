@@ -10,12 +10,13 @@ import numpy as np
 from matplotlib import pyplot as plt
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
+
 import astropy
 from astropy.table import Table
 from astropy.stats import LombScargle
 from astropy import units as u
 from astropy.units import cds
-from astropy.convolution import convolve, Box1DKernel
+from astropy.convolution import convolve, Box1DKernel, Gaussian1DKernel
 
 from scipy.optimize import curve_fit
 from scipy.signal import find_peaks
@@ -702,9 +703,11 @@ class SNRPeriodogram(Periodogram):
             ax.set_ylabel("Signal to Noise Ratio (SNR)")
         return ax
 
-    def estimate_numax(self, numaxs=None, method='GRD', show_plots=False):
+    def estimate_numax(self, numaxs=None, method='H0', show_plots=False):
         """Estimates the peak of the envelope of seismic oscillation modes,
         numax using an autocorrelation function, based on Huber et al. 2009
+
+        TODO: Update this
 
         We first create an array of sensible numax values based on the cadence
         of the timeseries. We then estimate the width of the mode envelope at
@@ -754,20 +757,20 @@ class SNRPeriodogram(Periodogram):
         maxacf = np.zeros(len(numaxs))
 
         #Iterate over all the numax values and return an acf
-        if method=='GRD':
-            h0 = 1.0 - np.exp(-self.power.value)
-            det = self.frequency[h0 > 0.98].value
+        if method=='H0':
+            h0 = 1.0 - np.exp(-self.power.value/2)      #Calculate probability signal is not noise
+            det = self.frequency[h0 > 0.98].value     #Call it a detection if >98% likely
             for idx, numax in enumerate(numaxs):
-                width = 0.66 * numax**0.88
-                inlie = len(det[np.abs(det - numax) < width/6]) / width
-                maxacf[idx] = inlie          #Store the max acf power normalised by the length
+                width = self._get_fwhm(numax)
+                inlie = len(det[np.abs(det - numax) < width]) / width
+                maxacf[idx] = inlie
 
-        else:
+        elif method=='ACF':
             for idx, numax in enumerate(numaxs):
                 acf = self._autocorrelate(numax)       #Return the acf at this numax
                 maxacf[idx] = np.nanmax(np.sqrt(acf/len(acf)))           #Store the max acf power normalised by the length
 
-        from astropy.convolution import Gaussian1DKernel, convolve
+        # Smooth the data to find the peak
         g = Gaussian1DKernel(stddev=5)
         maxacf_smooth = convolve(maxacf, g)
         acf_numax = numaxs[np.argmax(maxacf_smooth)]     #The best numax is the numax that results in the highest ACF
@@ -858,7 +861,7 @@ class SNRPeriodogram(Periodogram):
         lags = np.linspace(0., len(acf)*fs, len(acf))
 
         #Select a 25% region region around the empirical dnu
-        sel = (lags > dnu_emp - .35*dnu_emp) & (lags < dnu_emp + .35*dnu_emp)
+        sel = (lags > dnu_emp - .25*dnu_emp) & (lags < dnu_emp + .25*dnu_emp)
 
         #Run a peak finder on this region
         peaks, _ = find_peaks(acf[sel], distance=np.floor(dnu_emp/2. / fs))
