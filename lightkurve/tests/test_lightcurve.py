@@ -2,6 +2,7 @@ from __future__ import division, print_function
 
 from astropy.io import fits as pyfits
 from astropy.utils.data import get_pkg_data_filename
+from astropy import units as u
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -187,6 +188,10 @@ def test_lightcurve_fold():
     with pytest.warns(LightkurveWarning, match='appears to be given in JD'):
         lc.fold(10, 2456600)
 
+def test_lightcurve_fold_issue520():
+    """Regression test for #520; accept quantities in `fold()`."""
+    lc = LightCurve(time=np.linspace(0, 10, 100), flux=np.zeros(100)+1)
+    lc.fold(period=1*u.day, t0=5*u.day)
 
 def test_lightcurve_append():
     """Test ``LightCurve.append()``."""
