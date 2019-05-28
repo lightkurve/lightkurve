@@ -150,3 +150,19 @@ def test_to_corrector():
     tpf = KeplerTargetPixelFile(TABBY_TPF)
     lc = tpf.to_corrector("pld").correct()
     assert len(lc.flux) == len(tpf.time)
+
+
+@pytest.mark.remote_data
+@pytest.mark.skipif(bad_optional_imports, reason="PLD requires celerite and fbpca")
+def test_pld_aperture_mask():
+    """Regression test for #523: does PLDCorrector.correct() accept separate
+    apertures for PLD pixels?"""
+    from .. import KeplerTargetPixelFile
+    from .test_targetpixelfile import TABBY_TPF
+    tpf = KeplerTargetPixelFile(TABBY_TPF)
+    # use only the pixels in the pipeline mask
+    lc_pipeline = tpf.to_corrector("pld").correct(pld_aperture_mask='pipeline')
+    # use all pixels in the tpf
+    lc_all = tpf.to_corrector("pld").correct(pld_aperture_mask='all')
+    # does this improve the correction?
+    assert(lc_all.estimate_cdpp() < lc_pipeline.estimate_cdpp())
