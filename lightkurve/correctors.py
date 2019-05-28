@@ -632,10 +632,14 @@ class PLDCorrector(object):
             when performing Principal Component Analysis for models higher than
             first order. Increasing this value may provide higher precision at
             the expense of computational time.
-        pld_aperture : array-like or None
+        pld_aperture : array-like, 'pipeline', 'all', 'threshold', or None
             A boolean array describing the aperture such that `True` means
             that the pixel will be used when selecting the PLD basis vectors.
-            If `None` is passed in, all pixels will be used.
+            If `None` or `all` are passed in, all pixels will be used.
+            If 'pipeline' is passed, the mask suggested by the official pipeline
+            will be returned.
+            If 'threshold' is passed, all pixels brighter than 3-sigma above
+            the median flux will be used.
 
         Returns
         -------
