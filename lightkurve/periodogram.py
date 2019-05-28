@@ -762,8 +762,8 @@ class SNRPeriodogram(Periodogram):
             det = self.frequency[h0 > 0.98].value     #Call it a detection if >98% likely
             for idx, numax in enumerate(numaxs):
                 width = self._get_fwhm(numax)
-                inlie = len(det[np.abs(det - numax) < width]) / width
-                maxacf[idx] = inlie
+                inliers = len(det[np.abs(det - numax) < width]) / width
+                maxacf[idx] = inliers
 
         elif method=='ACF':
             for idx, numax in enumerate(numaxs):
