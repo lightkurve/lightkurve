@@ -339,7 +339,7 @@ class Periodogram(object):
 
     def plot_echelle(self, dnu, numax=None,
                     minimum_frequency=None, maximum_frequency=None,
-                    power_log=True,
+                    scale='linear',
                     cmap='Blues'):
         """Plots an echelle diagram of the periodogram by stacking the
         periodogram in slices of dnu. Modes of equal radial degree should
@@ -373,6 +373,8 @@ class Periodogram(object):
             The maximum frequency at which to display the echelle.
             Is assumed to be in the same units as frequency if not given a unit.
 
+        scale: str
+            Set z axis to be "linear" or "log". Default is linear.
 
         cmap : str
             The name of the matplotlib colourmap to use in the echelle diagram.
@@ -402,7 +404,12 @@ class Periodogram(object):
                                 "frequency range of the periodogram.")
 
             fmin = numax - 2*self._get_fwhm(numax)
+            if fmin < 0.:
+                fmin = 0.
+
             fmax = numax + 2*self._get_fwhm(numax)
+            if fmax > self.frequency[-1].value:
+                fmax = self.frequency[-1].value
 
         # Set limits and set them in the right units
         if minimum_frequency is not None:
@@ -431,7 +438,8 @@ class Periodogram(object):
 
         #Reshape the power into n_rowss of n_columnss
         ep = np.reshape(pp[:(n_rows*n_columns)],(n_rows,n_columns))
-        if power_log:
+
+        if scale=='log':
             ep = np.log10(ep)
 
         #Reshape the freq into n_rowss of n_columnss & create arays
