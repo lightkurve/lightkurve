@@ -771,27 +771,26 @@ class SNRPeriodogram(Periodogram):
 
         #We want to find the numax which returns in the highest autocorrelation
         #power
-        maxacf = np.zeros(len(numaxs))
+        metric = np.zeros(len(numaxs))
 
         #Iterate over all the numax values and return an acf
         if method=='H0':
-            h0 = 1.0 - np.exp(-self.power.value/2)      #Calculate probability signal is not noise
-            det = self.frequency[h0 > 0.98].value     #Call it a detection if >98% likely
-            for idx, numax in enumerate(numaxs):
-                width = self._get_fwhm(numax)
-                inliers = len(det[np.abs(det - numax) < width]) / width
-                maxacf[idx] = inliers
+            h0 = 1.0 - np.exp(-self.power.value)      #Calculate probability signal is not noise
+            det = self.frequency[h0 > 0.98].value       #Call it a detection if >98% likely
+            for idx, numax in enumerate(numaxs):        #Cycle through a range of numax values
+                width = self._get_fwhm(numax)           #Calculate how many detections fall within the fwhm
+                inliers = len(det[np.abs(det - numax) < width]/10) / width
+                metric[idx] = inliers
 
         elif method=='ACF':
             for idx, numax in enumerate(numaxs):
-                acf = self._autocorrelate(numax)       #Return the acf at this numax
-                maxacf[idx] = np.nanmax(np.sqrt(acf/len(acf)))           #Store the max acf power normalised by the length
+                acf = self._autocorrelate(numax)      #Return the acf at this numax
+                metric[idx] = np.nanmax(np.sqrt(acf/len(acf)))   #Store the max acf power normalised by the length
 
         # Smooth the data to find the peak
         g = Gaussian1DKernel(stddev=5)
-        maxacf_smooth = convolve(maxacf, g)
-        acf_numax = numaxs[np.argmax(maxacf_smooth)]     #The best numax is the numax that results in the highest ACF
-        best_numax = acf_numax
+        metric_smooth = convolve(metric, g)
+        best_numax = numaxs[np.argmax(metric_smooth)]     #The highest value of the metric corresponds to numax
 
         if show_plots == True:
             with plt.style.context(MPLSTYLE):
@@ -801,8 +800,8 @@ class SNRPeriodogram(Periodogram):
                 ax[0].set_title(r'SNR vs Frequency')
                 ax[0].set_xlabel(None)
 
-                ax[1].plot(numaxs,maxacf)
-                ax[1].plot(numaxs,maxacf_smooth)
+                ax[1].plot(numaxs,metric)
+                ax[1].plot(numaxs,metric_smooth)
                 ax[1].set_xlabel("Frequency [{}]".format(self.frequency.unit.to_string('latex')))
                 ax[1].set_ylabel(r'Max. Reduced Correlation Power')
                 ax[0].axvline(best_numax,c='r', linewidth=2,alpha=.4)
