@@ -402,10 +402,13 @@ class LightCurve(object):
             A new light curve object in which the data are folded and sorted by
             phase. The object contains an extra ``phase`` attribute.
         """
-        # Input validation
+        # Input validation.  (Note: Quantities are simply ignored for now;
+        # we should consider adding extra validation here.)
         if isinstance(period, u.quantity.Quantity):
             period = period.value
-    
+        if isinstance(t0, u.quantity.Quantity):
+            t0 = t0.value
+
         # `transit_midpoint` is deprecated
         if transit_midpoint is not None:
             warnings.warn('`transit_midpoint` is deprecated, please use `t0` instead.',
