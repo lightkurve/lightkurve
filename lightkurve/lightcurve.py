@@ -458,15 +458,31 @@ class LightCurve(object):
         lc.flux = lc.flux / np.nanmedian(lc.flux)
         return lc
 
-    def remove_nans(self):
-        """Removes cadences where the flux is NaN.
+    def remove_nans(self, return_mask=False):
+        """Removes cadences where the time, flux, or flux_err is NaN or Inf.
+
+        Parameters
+        ----------
+        return_mask : bool
+            If `True`, return the mask (i.e. a boolean array) indicating which
+            data points were removed. Entries marked as `True` in the
+            mask suffer from NaN or Inf values.
 
         Returns
         -------
         clean_lightcurve : `LightCurve`
-            A new light curve object from which NaNs fluxes have been removed.
+            A new light curve object from which NaN fluxes have been removed.
         """
-        return self[~np.isnan(self.flux)]  # This will return a sliced copy
+        nan_mask = ~np.isfinite(self.time)
+        nan_mask |= ~np.isfinite(self.flux)
+        if np.any(np.isfinite(self.flux_err)):
+            nan_mask |= ~np.isfinite(self.flux_err)
+        # flux_err equal to 0 indicated an unflagged but invalid cadence in early TESS data:
+        nan_mask |= np.abs(self.flux_err) < 1e-12
+
+        if return_mask:
+            return self[~nan_mask], nan_mask
+        return self[~nan_mask]  # This will return a sliced copy
 
     def fill_gaps(lc, method='nearest'):
         """Fill in gaps in time with linear interpolation.
