@@ -3,7 +3,7 @@ import numpy as np
 from ... import open
 from ..pymcpldcorrector import PyMCPLDCorrector as PLDCorrector
 
-from ...tests.test_targetpixelfile import filename_tpf_one_center
+from ...tests.test_targetpixelfile import filename_tpf_one_center, filename_tess
 
 
 def test_first_order_matrix():
@@ -32,3 +32,9 @@ def test_design_matrix():
         for n_pca_terms in [1, 3]:
             matrix = corr.create_design_matrix(pld_order=pld_order, n_pca_terms=n_pca_terms)
             assert matrix.shape == (len(tpf.time), n_pixels + n_pca_terms*(pld_order - 1))
+
+def test_pymc_model():
+    tpf = open(filename_tess)
+    corr = PLDCorrector(tpf, pld_aperture_mask="all")
+    model = corr.create_pymc_model(design_matrix=corr.create_design_matrix(pld_order=1))
+    model = corr.create_pymc_model(design_matrix=corr.create_design_matrix(pld_order=2))
