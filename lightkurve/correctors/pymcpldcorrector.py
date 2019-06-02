@@ -1,10 +1,15 @@
-"""Defines PyMCPLDCorrector
+"""Defines PyMCPLDCorrector (eventually to be renamed PLDCorrector).
 
 TODO
 ----
 * Add input validation on pld_order etc.
-* Remove saturated pixels from design matrix.
+* The design matrix can be improved by rejecting pixels which are saturated,
+  and optionally including the collapsed sums of their CCD columns instead.
 * Add convenience method to plot the design matrix.
+* Add pymc & exoplanet & theano to Lightkurve's dependencies or treat it properly as an optional import.
+* Port the existing suite of PLDCorrector tests.va
+* It is not clear whether the inclusion of a column vector of ones in the
+  design matrix is necessary for numerical stability.
 """
 from __future__ import division, print_function
 
@@ -13,6 +18,9 @@ import warnings
 from itertools import combinations_with_replacement as multichoose
 
 import numpy as np
+import pymc3 as pm
+import exoplanet as xo
+import theano.tensor as tt
 
 log = logging.getLogger(__name__)
 
@@ -66,19 +74,6 @@ class PyMCPLDCorrector(object):
 
             \frac{\partial \chi^2}{\partial a_l} = 0.
 
-    Examples
-    --------
-    Download the pixel data for GJ 9827 and obtain a PLD-corrected light curve:
-
-    >>> import lightkurve as lk
-    >>> tpf = lk.search_targetpixelfile("GJ9827").download() # doctest: +SKIP
-    >>> corrector = lk.PLDCorrector(tpf) # doctest: +SKIP
-    >>> lc = corrector.correct() # doctest: +SKIP
-    >>> lc.plot() # doctest: +SKIP
-
-    However, the above example will over-fit the small transits!
-    It is necessary to mask the transits using `corrector.correct(cadence_mask=...)`.
-
     References
     ----------
     .. [1] Deming et al. (2015), ads:2015ApJ...805..132D.
@@ -114,14 +109,20 @@ class PyMCPLDCorrector(object):
             First order PLD design matrix.
         """ 
         # Re-arrange the cube of flux values observed in a user-specified mask
-        # into a 2D matrix of shape (n_cadences, n_pixels_in_mask)
-        matrix = self.tpf.flux[:, self.pld_aperture_mask]
+        # into a 2D matrix of shape (n_cadences, n_pixels_in_mask).
+        # Note that Theano appears to require 64-bit floats.
+        matrix = np.asarray(self.tpf.flux[:, self.pld_aperture_mask], np.float64)
         assert matrix.shape == (len(self.raw_lc.time), self.pld_aperture_mask.sum())
         # Remove all NaN or Inf values
         matrix = matrix[:, np.isfinite(matrix).all(axis=0)]
         # Normalize each cadence to 1 by dividing by the per-cadence pixel sums
         matrix = matrix / np.sum(matrix, axis=-1)[:, None]
-        return matrix
+        # If we return matrix at this point, theano will raise a "dimension mismatch".
+        # The origin of this bug is not understood, but copying the matrix
+        # into a new one as shown below circumvents it:
+        result = np.zeros((matrix.shape[0], matrix.shape[1]))
+        result[:, :] = matrix[:, :]
+        return result
 
     def create_design_matrix(self, pld_order=2, n_pca_terms=10, include_column_of_ones=False):
         """Returns a matrix designed to contain suitable regressors for the
@@ -146,14 +147,6 @@ class PyMCPLDCorrector(object):
         Thus, the shape of the design matrix will be
         (n_cadences, n_pld_mask_pixels + n_pca_terms*(pld_order-1) + include_column_of_ones)
 
-        TODO
-        ----
-        * The design matrix can be improved by rejecting pixels which are
-          saturated, and optionally including the collapsed sums of their CCD
-          columns instead.
-        * It is not clear whether the inclusion of a column vector of ones
-          is necessary for numerical stability.
-
         Returns
         -------
         design_matrix : 2D numpy array
@@ -172,6 +165,13 @@ class PyMCPLDCorrector(object):
 
         matrix_sections = []  # list to hold the design matrix components
         first_order_matrix = self.create_first_order_matrix()
+
+        # Input validation: n_pca_terms cannot be larger than the number of cadences
+        n_cadences = len(first_order_matrix)
+        if n_pca_terms > n_cadences:
+            log.warning("`n_pca_terms` ({}) cannot be larger than the number of cadences ({});"
+                        "using n_pca_terms={}".format(n_pca_terms, n_cadences, n_cadences))
+            n_pca_terms = n_cadences
 
         # The original EVEREST paper includes a column vector of ones in the
         # design matrix to improve the numerical stability (see Luger et al.);
@@ -199,14 +199,75 @@ class PyMCPLDCorrector(object):
 
         return np.concatenate(matrix_sections, axis=1)
 
-    def plot_design_matrix(self):
-        pass
+    def create_pymc_model(self, design_matrix=None, cadence_mask=None):
+        """Returns a PYMC3 model.
 
-    def get_pymc_model(self):
-        pass
-    
+        Parameters
+        ----------
+        design_matrix : np.ndarray
+            Matrix of shape (n_cadences, n_regressors) used to create the
+            motion model.
+        cadence_mask : np.ndarray
+            Boolean array to mask cadences. Cadences that are False will be excluded
+            from the model fit
+
+        Returns
+        -------
+        model : pymc3.model.Model
+            A pymc3 model
+        """
+        if design_matrix is None:
+            design_matrix = self.create_design_matrix()
+        if cadence_mask is None:
+            cadence_mask = np.zeros(len(self.raw_lc.time), dtype=bool)
+
+        # Theano raises an `AsTensorError` ("Cannot convert to TensorType")
+        # if the floats are not in 64-bit format, so we convert them here:
+        lc_time = np.asarray(self.raw_lc.time, np.float64)
+        lc_flux = np.asarray(self.raw_lc.flux, np.float64)
+        lc_flux_err = np.asarray(self.raw_lc.flux_err, np.float64)
+
+        # Covariance matrix diagonal
+        diag = lc_flux_err**2
+
+        # The cadence mask is applied by inflating the uncertainties in the covariance matrix;
+        # this is because celerite will run much faster if it is able to predict
+        # data for cadences that have been fed into the model.
+        diag[cadence_mask] += 1e12
+
+        with pm.Model() as model:
+            # Create a Gaussian Process to model the long-term stellar variability
+            logs2 = pm.Normal("logs2", mu=np.log(np.var(lc_flux)), sd=4)
+            logsigma = pm.Normal("logsigma", mu=np.log(np.std(lc_flux)), sd=4)
+            logrho = pm.Normal("logrho", mu=np.log(150), sd=4)
+            kernel = xo.gp.terms.Matern32Term(log_sigma=logsigma, log_rho=logrho)
+            gp = xo.gp.GP(kernel, lc_time, diag + tt.exp(logs2))
+
+            # The motion model regresses against the design matrix
+            A = tt.dot(design_matrix.T, gp.apply_inverse(design_matrix))
+            B = tt.dot(design_matrix.T, gp.apply_inverse(lc_flux[:, None]))
+            C = tt.slinalg.solve(A, B)
+            motion_model = pm.Deterministic("motion_model", tt.dot(design_matrix, C)[:, 0])
+
+            # Likelihood
+            pm.Potential("obs", gp.log_likelihood(lc_flux - motion_model))
+
+            # gp predicted flux
+            gp_pred = gp.predict()
+            pm.Deterministic("gp_pred", gp_pred)
+            pm.Deterministic("weights", C)
+
+        return model
+
     def optimize(self):
         pass
 
     def sample(self):
+        pass
+
+    def plot_diagnostics():
+        pass
+
+    def plot_design_matrix(self):
+        """To be implemented. Possibly useful as a diagnostic?"""
         pass
