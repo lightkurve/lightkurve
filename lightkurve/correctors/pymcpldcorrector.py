@@ -1,22 +1,36 @@
 """Defines PyMCPLDCorrector (eventually to be renamed PLDCorrector).
 
-TODO
-----
-* Add input validation on pld_order etc.
+TODO Now
+--------
+* Implement diagnostic plots, `corr.plot_design_matrix()` and `corr.plot_diagnostics()`.
+* Port the existing suite of PLDCorrector tests.
+* Fix the units of corrected_flux, corrected_flux_without_star, etc.
+  In Lightkurve we currently add back the mean of the model.
+* Document the meaning of logs2, logsigma (amplitude of variability),
+  and logrho (timescale of variability), and make sure their
+  prior values are configurable.
+
+TODO Before release
+-------------------
+* Rename PyMCPLDCorrector as PLDCorrector.
 * The design matrix can be improved by rejecting pixels which are saturated,
-  and optionally including the collapsed sums of their CCD columns instead.
-* Add convenience method to plot the design matrix.
-* Add pymc & exoplanet & theano to Lightkurve's dependencies or treat it properly as an optional import.
-* Port the existing suite of PLDCorrector tests.va
+  and including the collapsed sums of their CCD columns instead.
+* Add pymc & exoplanet & theano to Lightkurve's dependencies or treat it properly 
+  as an optional import. [Geert]
+* Set PyMC verbosity to match the lightkurve.log.level. [Geert]
+
+Future enhancements
+-------------------
+* In `create_first_order_matrix`, we need to explain why we are dividing each
+  cadence by the sum of all pixels. We think this is explained in the EVEREST paper,
+  i.e. is is likely because PLD optimizes towards a flat light curve. We need
+  to find the right words to explain this and refer to papers where possible.
 * It is not clear whether the inclusion of a column vector of ones in the
   design matrix is necessary for numerical stability.
-* Document the meaning of logs2, logsigma, and logrho, and make sure their
-  prior values are configureable.
 """
 from __future__ import division, print_function
 
 import logging
-import warnings
 from itertools import combinations_with_replacement as multichoose
 
 import numpy as np
@@ -97,8 +111,9 @@ class PyMCPLDCorrector(object):
         self.tpf = tpf[~self.nan_mask]
 
     def create_first_order_matrix(self):
-        """Returns normalized pixel flux values in the PLD mask re-arranged
-        into a 2D matrix with shape (n_cadences, n_pixels_in_pld_mask).
+        """Returns a matrix which encodes the fractional pixel fluxes as a function
+        of cadence (row) and pixel (column). As such, the method returns a
+        2D matrix with shape (n_cadences, n_pixels_in_pld_mask).
         
         This matrix will form the basis of the PLD regressor design matrix
         and is often called the first order component.
@@ -117,12 +132,14 @@ class PyMCPLDCorrector(object):
         assert matrix.shape == (len(self.raw_lc.time), self.pld_aperture_mask.sum())
         # Remove all NaN or Inf values
         matrix = matrix[:, np.isfinite(matrix).all(axis=0)]
-        # Normalize each cadence to 1 by dividing by the per-cadence pixel sums
+        # To ensure that each column contains the fractional pixel flux,
+        # we divide by the sum of all pixels in the same cadence.
+        # The reason for doing this is described in Section 2 of Luger et al. (2016).
         matrix = matrix / np.sum(matrix, axis=-1)[:, None]
         # If we return matrix at this point, theano will raise a "dimension mismatch".
         # The origin of this bug is not understood, but copying the matrix
         # into a new one as shown below circumvents it:
-        result = np.zeros((matrix.shape[0], matrix.shape[1]))
+        result = np.empty((matrix.shape[0], matrix.shape[1]))
         result[:, :] = matrix[:, :]
         return result
 
@@ -300,14 +317,22 @@ q
             trace = sampler.sample(draws=ndraws, chains=4)
         return trace
 
-    def correct(self, **kwargs):
+    def correct(self, sample=False, **kwargs):
         """Returns a systematics-corrected light curve."""
-        sol = self.optimize(**kwargs)
         corrected_lc = self.raw_lc.copy()
-        corrected_lc.flux = sol['corrected_flux']
+        if sample:
+            raise NotImplementedError("We've been slacking")
+            #call self.sample(**kwargs)
+            #set corrected_flux to mean of the sampled corrected light curves
+            #add sample errors in quadrature to existing flux_err?
+        else:
+            sol = self.optimize(**kwargs)
+            corrected_lc.flux = sol['corrected_flux']
         return corrected_lc
 
-    def plot_diagnostics(self):
+    def plot_diagnostics(self, solution=None, **kwargs):
+        if solution is None:
+            solution = self.optimize(**kwargs)
         pass
 
     def plot_design_matrix(self):
