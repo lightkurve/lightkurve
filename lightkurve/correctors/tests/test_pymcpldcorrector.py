@@ -37,4 +37,4 @@ def test_pymc_model():
     tpf = open(filename_tess)
     corr = PLDCorrector(tpf, pld_aperture_mask="all")
     model = corr.create_pymc_model(design_matrix=corr.create_design_matrix(pld_order=1))
-    model = corr.create_pymc_model(design_matrix=corr.create_design_matrix(pld_order=2))
+    sol = corr.optimize(model)

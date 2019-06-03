@@ -10,6 +10,8 @@ TODO
 * Port the existing suite of PLDCorrector tests.va
 * It is not clear whether the inclusion of a column vector of ones in the
   design matrix is necessary for numerical stability.
+* Document the meaning of logs2, logsigma, and logrho, and make sure their
+  prior values are configureable.
 """
 from __future__ import division, print_function
 
@@ -124,7 +126,7 @@ class PyMCPLDCorrector(object):
         result[:, :] = matrix[:, :]
         return result
 
-    def create_design_matrix(self, pld_order=2, n_pca_terms=10, include_column_of_ones=False):
+    def create_design_matrix(self, pld_order=1, n_pca_terms=10, include_column_of_ones=False):
         """Returns a matrix designed to contain suitable regressors for the
         systematics noise model.
 
@@ -199,7 +201,7 @@ class PyMCPLDCorrector(object):
 
         return np.concatenate(matrix_sections, axis=1)
 
-    def create_pymc_model(self, design_matrix=None, cadence_mask=None):
+    def create_pymc_model(self, design_matrix=None, cadence_mask=None, **kwargs):
         """Returns a PYMC3 model.
 
         Parameters
@@ -217,7 +219,7 @@ class PyMCPLDCorrector(object):
             A pymc3 model
         """
         if design_matrix is None:
-            design_matrix = self.create_design_matrix()
+            design_matrix = self.create_design_matrix(**kwargs)
         if cadence_mask is None:
             cadence_mask = np.zeros(len(self.raw_lc.time), dtype=bool)
 
@@ -246,26 +248,66 @@ class PyMCPLDCorrector(object):
             # The motion model regresses against the design matrix
             A = tt.dot(design_matrix.T, gp.apply_inverse(design_matrix))
             B = tt.dot(design_matrix.T, gp.apply_inverse(lc_flux[:, None]))
-            C = tt.slinalg.solve(A, B)
-            motion_model = pm.Deterministic("motion_model", tt.dot(design_matrix, C)[:, 0])
+            weights = tt.slinalg.solve(A, B)
+            motion_model = pm.Deterministic("motion_model", tt.dot(design_matrix, weights)[:, 0])
+            pm.Deterministic("weights", weights)
 
-            # Likelihood
+            # Likelihood to optimize
             pm.Potential("obs", gp.log_likelihood(lc_flux - motion_model))
 
-            # gp predicted flux
-            gp_pred = gp.predict()
-            pm.Deterministic("gp_pred", gp_pred)
-            pm.Deterministic("weights", C)
+            # Add deterministic variables for easy of use
+            star_model = gp.predict()
+            pm.Deterministic("star_model", star_model)
+            pm.Deterministic("corrected_flux", lc_flux - motion_model)
+            pm.Deterministic("corrected_flux_without_star", lc_flux - motion_model - star_model)
 
         return model
 
-    def optimize(self):
-        pass
+    def optimize(self, model=None, start=None, **kwargs):
+        """Returns the maximum likelihood solution.
+q
+        Returns
+        -------
+        map_soln : dict
+            Maximum likelihood values.
+        """
+        if model is None:
+            model = self.create_pymc_model(**kwargs)
+        if start is None:
+            start = model.test_point
 
-    def sample(self):
-        pass
+        with model:
+            map_soln = xo.optimize(start=start, vars=[model.logsigma])
+            map_soln = xo.optimize(start=start, vars=[model.logrho, model.logsigma])
+            map_soln = xo.optimize(start=start, vars=[model.logsigma])
+            map_soln = xo.optimize(start=start, vars=[model.logrho, model.logsigma])
+            map_soln = xo.optimize(start=map_soln, vars=[model.logs2])
+            map_soln = xo.optimize(start=map_soln, vars=[model.logrho, model.logsigma, model.logs2])
+        return map_soln
 
-    def plot_diagnostics():
+    def sample(self, model=None, start=None, ndraws=1000):
+        """Sample the systematics correction model."""
+        if model is None:
+            model = self.create_pymc_model()
+        if start is None:
+            start = self.optimize()
+        sampler = xo.PyMC3Sampler()
+        with model:
+            burnin = sampler.tune(tune=np.max([int(ndraws*0.3), 150]),
+                                  start=start,
+                                  step_kwargs=dict(target_accept=0.9),
+                                  chains=4)
+            trace = sampler.sample(draws=ndraws, chains=4)
+        return trace
+
+    def correct(self, **kwargs):
+        """Returns a systematics-corrected light curve."""
+        sol = self.optimize(**kwargs)
+        corrected_lc = self.raw_lc.copy()
+        corrected_lc.flux = sol['corrected_flux']
+        return corrected_lc
+
+    def plot_diagnostics(self):
         pass
 
     def plot_design_matrix(self):
