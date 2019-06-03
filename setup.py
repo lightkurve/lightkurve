@@ -26,7 +26,7 @@ tests_require = ['pytest', 'pytest-cov', 'pytest-remotedata', 'codecov']
 extras_require = {"all":  ["astropy>=3.1",
                            "bokeh>=1.0", "ipython",
                            "pybind11", "celerite", "fbpca",
-                           "pymc", "exoplanet", "theano"],
+                           "pymc3", "exoplanet", "theano"],
                   "test": tests_require}
 
 setup(name='lightkurve',
