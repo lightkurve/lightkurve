@@ -37,6 +37,9 @@ import numpy as np
 import pymc3 as pm
 import exoplanet as xo
 import theano.tensor as tt
+import matplotlib.pyplot as plt
+
+from .. import MPLSTYLE
 
 log = logging.getLogger(__name__)
 
@@ -282,7 +285,7 @@ class PyMCPLDCorrector(object):
 
     def optimize(self, model=None, start=None, **kwargs):
         """Returns the maximum likelihood solution.
-q
+
         Returns
         -------
         map_soln : dict
@@ -335,6 +338,14 @@ q
             solution = self.optimize(**kwargs)
         pass
 
-    def plot_design_matrix(self):
-        """To be implemented. Possibly useful as a diagnostic?"""
-        pass
+    def plot_design_matrix(self, design_matrix=None, **kwargs):
+        """Plots the design matrix.
+        I'm not convinced that this is a valuable diagnostic..."""
+        if design_matrix is None:
+            design_matrix = self.create_design_matrix(**kwargs)
+
+        with plt.style.context(MPLSTYLE):
+            fig, ax = plt.subplots(1, figsize=(5,5))
+            ax.imshow(design_matrix, aspect='auto')
+            ax.set_ylabel('Cadence Number')
+            ax.set_xlabel('Regressors')
