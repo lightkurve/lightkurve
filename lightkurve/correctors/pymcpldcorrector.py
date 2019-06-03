@@ -1,4 +1,4 @@
-"""Defines PyMCPLDCorrector (eventually to be renamed PLDCorrector).
+"""Defines PyMCPLDCorrector.
 
 TODO Now
 --------
@@ -15,7 +15,7 @@ TODO Before release
 * Rename PyMCPLDCorrector as PLDCorrector.
 * The design matrix can be improved by rejecting pixels which are saturated,
   and including the collapsed sums of their CCD columns instead.
-* Add pymc & exoplanet & theano to Lightkurve's dependencies or treat it properly 
+* Add pymc & exoplanet & theano to Lightkurve's dependencies or treat it properly
   as an optional import. [Geert]
 * Set PyMC verbosity to match the lightkurve.log.level. [Geert]
 
@@ -114,7 +114,7 @@ class PyMCPLDCorrector(object):
         """Returns a matrix which encodes the fractional pixel fluxes as a function
         of cadence (row) and pixel (column). As such, the method returns a
         2D matrix with shape (n_cadences, n_pixels_in_pld_mask).
-        
+
         This matrix will form the basis of the PLD regressor design matrix
         and is often called the first order component.
 
@@ -124,7 +124,7 @@ class PyMCPLDCorrector(object):
         -------
         matrix : numpy array
             First order PLD design matrix.
-        """ 
+        """
         # Re-arrange the cube of flux values observed in a user-specified mask
         # into a 2D matrix of shape (n_cadences, n_pixels_in_mask).
         # Note that Theano appears to require 64-bit floats.
