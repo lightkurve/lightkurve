@@ -8,7 +8,9 @@ from ..pymcpldcorrector import PyMCPLDCorrector as PLDCorrector
 
 from ... import open
 from ...search import search_targetpixelfile
-from ...tests.test_targetpixelfile import filename_tpf_one_center, filename_tess
+from ... import KeplerTargetPixelFile, TessTargetPixelFile
+from ...lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
+from ...tests.test_targetpixelfile import filename_tpf_one_center, filename_tess, TABBY_TPF, TESS_SIM
 
 bad_optional_imports = False
 try:
@@ -63,7 +65,7 @@ def test_pld_corrector():
     k2_target = 247887989
     k2_tpf = search_targetpixelfile(k2_target).download()
     # instantiate PLD corrector object
-    pld = PLDCorrector(k2_tpf[:500])
+    pld = PLDCorrector(k2_tpf[:500], aperture_mask='threshold')
     # produce a PLD-corrected light curve with a default aperture mask
     corrected_lc = pld.correct()
     # ensure the CDPP was reduced by the corrector
@@ -73,19 +75,16 @@ def test_pld_corrector():
     # make sure the returned object is the correct type (`KeplerLightCurve`)
     assert(isinstance(corrected_lc, KeplerLightCurve))
     # try detrending using a threshold mask
-    corrected_lc = pld.correct(aperture_mask='threshold')
+    corrected_lc = pld.correct()
     # reduce using fewer principle components
     corrected_lc = pld.correct(n_pca_terms=20)
     # try PLD on a TESS observation
-    from .. import TessTargetPixelFile
-    from .test_targetpixelfile import TESS_SIM
     tess_tpf = TessTargetPixelFile(TESS_SIM)
     # instantiate PLD corrector object
-    pld = PLDCorrector(tess_tpf[:500])
+    pld = PLDCorrector(tess_tpf[:500], aperture_mask='pipeline')
     # produce a PLD-corrected light curve with a pipeline aperture mask
     raw_lc = tess_tpf.to_lightcurve(aperture_mask='pipeline')
-    corrected_lc = pld.correct(aperture_mask='pipeline', n_pca_terms=20,
-                               use_gp=False)
+    corrected_lc = pld.correct(n_pca_terms=20)
     # the corrected light curve should have higher precision
     assert(corrected_lc.estimate_cdpp() < raw_lc.estimate_cdpp())
     # make sure the returned object is the correct type (`TessLightCurve`)
@@ -96,8 +95,6 @@ def test_pld_corrector():
 @pytest.mark.skipif(bad_optional_imports, reason="PLD requires celerite and fbpca")
 def test_to_corrector():
     """Does the tpf.pld() convenience method work?"""
-    from .. import KeplerTargetPixelFile
-    from .test_targetpixelfile import TABBY_TPF
     tpf = KeplerTargetPixelFile(TABBY_TPF)
     lc = tpf.to_corrector("pld").correct()
     assert len(lc.flux) == len(tpf.time)
@@ -108,12 +105,15 @@ def test_to_corrector():
 def test_pld_aperture_mask():
     """Test for #523: does PLDCorrector.correct() accept separate apertures for
     PLD pixels?"""
-    from .. import KeplerTargetPixelFile
-    from .test_targetpixelfile import TABBY_TPF
     tpf = KeplerTargetPixelFile(TABBY_TPF)
     # use only the pixels in the pipeline mask
-    lc_pipeline = tpf.to_corrector("pld").correct(pld_aperture_mask='pipeline')
+    lc_pipeline = PLDCorrector(tpf, pld_aperture_mask='pipeline').correct(gp_timescale_prior=30)
     # use all pixels in the tpf
-    lc_all = tpf.to_corrector("pld").correct(pld_aperture_mask='all')
+    lc_all = PLDCorrector(tpf, pld_aperture_mask='all').correct(gp_timescale_prior=30)
     # does this improve the correction?
     assert(lc_all.estimate_cdpp() < lc_pipeline.estimate_cdpp())
+
+
+def test_gp_timescale():
+    """Does the GP optimization fail?"""
+    pass
