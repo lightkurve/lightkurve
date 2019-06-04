@@ -2,7 +2,7 @@
 
 TODO Now
 --------
-* Implement diagnostic plots, `corr.plot_design_matrix()` and `corr.plot_diagnostics()`.
+* [DONE] Implement diagnostic plots, `corr.plot_design_matrix()` and `corr.plot_diagnostics()`.
 * Port the existing suite of PLDCorrector tests.
 * Fix the units of corrected_flux, corrected_flux_without_star, etc.
   In Lightkurve we currently add back the mean of the model.
@@ -221,7 +221,7 @@ class PyMCPLDCorrector(object):
 
         return np.concatenate(matrix_sections, axis=1)
 
-    def create_pymc_model(self, design_matrix=None, cadence_mask=None, **kwargs):
+    def create_pymc_model(self, design_matrix=None, cadence_mask=None, gp_timescale=150, **kwargs):
         """Returns a PYMC3 model.
 
         Parameters
@@ -261,7 +261,7 @@ class PyMCPLDCorrector(object):
             # Create a Gaussian Process to model the long-term stellar variability
             logs2 = pm.Normal("logs2", mu=np.log(np.var(lc_flux)), sd=4)
             logsigma = pm.Normal("logsigma", mu=np.log(np.std(lc_flux)), sd=4)
-            logrho = pm.Normal("logrho", mu=np.log(150), sd=4)
+            logrho = pm.Normal("logrho", mu=np.log(gp_timescale), sd=4)
             kernel = xo.gp.terms.Matern32Term(log_sigma=logsigma, log_rho=logrho)
             gp = xo.gp.GP(kernel, lc_time, diag + tt.exp(logs2))
 
@@ -277,6 +277,8 @@ class PyMCPLDCorrector(object):
 
             # Add deterministic variables for easy of use
             star_model = gp.predict()
+            pm.Deterministic("lc_time", tt.as_tensor_variable(lc_time))
+            pm.Deterministic("lc_flux", tt.as_tensor_variable(lc_flux))
             pm.Deterministic("star_model", star_model)
             pm.Deterministic("corrected_flux", lc_flux - motion_model)
             pm.Deterministic("corrected_flux_without_star", lc_flux - motion_model - star_model)
@@ -334,9 +336,40 @@ class PyMCPLDCorrector(object):
         return corrected_lc
 
     def plot_diagnostics(self, solution=None, **kwargs):
+        """Plots a series of useful figures to help understand the noise removal
+        process.
+
+        IDEA: Add indicator for masked cadences in plotted light curves."""
         if solution is None:
             solution = self.optimize(**kwargs)
-        pass
+
+        # until we fix units on corrected light curves, we need to add back the
+        # mean of the subtracted motion model when plotting
+        mean = np.mean(solution["motion_model"])
+
+        # Set up subplots with lightkurve plot style
+        with plt.style.context(MPLSTYLE):
+            fig, ax = plt.subplots(3, sharex=True, sharey=True, figsize=(8.485, 10))
+            # Plot the raw light curve with the noise model overlaid
+            ax[0].plot(solution["lc_time"], solution["lc_flux"], "r.", alpha=0.3, label="Raw Flux")
+            ax[0].plot(solution["lc_time"], solution["corrected_flux"]+mean, "k.", label="Corrected Flux")
+            ax[0].set_ylabel("Flux [e$^-$s$^{-1}$]")
+            ax[0].legend(loc="best")
+
+            # Plot the raw light curve with motion noise model overlaid
+            ax[1].plot(solution["lc_time"], solution["lc_flux"], "r.", alpha=0.3, label="Raw Flux")
+            ax[1].plot(solution["lc_time"], solution["motion_model"], "k.", label="Motion Model")
+            ax[1].set_ylabel("Flux [e$^-$s$^{-1}$]")
+            ax[1].legend(loc="best")
+
+            # Plot the raw light curve with GP overlaid
+            ax[2].plot(solution["lc_time"], solution["lc_flux"], "r.", alpha=0.3, label="Raw Flux")
+            ax[2].plot(solution["lc_time"], solution["star_model"]+mean, "k", label="Stellar Model")
+            ax[2].set_ylabel("Flux [e$^-$s$^{-1}$]")
+            ax[2].legend(loc="best")
+
+            fig.tight_layout()
+            plt.xlabel("Time - 2454833 [BKJD days]")
 
     def plot_design_matrix(self, design_matrix=None, **kwargs):
         """Plots the design matrix.
