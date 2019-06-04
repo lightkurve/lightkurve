@@ -4,9 +4,9 @@ TODO Now
 --------
 * [DONE] Implement diagnostic plots, `corr.plot_design_matrix()` and `corr.plot_diagnostics()`.
 * Port the existing suite of PLDCorrector tests.
-* Fix the units of corrected_flux, corrected_flux_without_star, etc.
+* [kinda done] Fix the units of corrected_flux, corrected_flux_without_star, etc.
   In Lightkurve we currently add back the mean of the model.
-* Document the meaning of logs2, logsigma (amplitude of variability),
+* [DONE] Document the meaning of logs2, logsigma (amplitude of variability),
   and logrho (timescale of variability), and make sure their
   prior values are configurable.
 
@@ -221,8 +221,8 @@ class PyMCPLDCorrector(object):
 
         return np.concatenate(matrix_sections, axis=1)
 
-    def create_pymc_model(self, design_matrix=None, cadence_mask=None, gp_timescale=150, **kwargs):
-        """Returns a PYMC3 model.
+    def create_pymc_model(self, design_matrix=None, cadence_mask=None, gp_timescale_prior=150, **kwargs):
+        r"""Returns a PYMC3 model.
 
         Parameters
         ----------
@@ -232,11 +232,19 @@ class PyMCPLDCorrector(object):
         cadence_mask : np.ndarray
             Boolean array to mask cadences. Cadences that are False will be excluded
             from the model fit
+        gp_timescale_prior : int
+            The parameter `rho` in the definition of the Matern-3/2 kernel, which
+            influences the timescale of variability fit by the Gaussian Process.
+            For more information, see [1]
 
         Returns
         -------
         model : pymc3.model.Model
             A pymc3 model
+
+        References
+        ----------
+        .. [1] the `celerite` documentation https://celerite.readthedocs.io
         """
         if design_matrix is None:
             design_matrix = self.create_design_matrix(**kwargs)
@@ -259,26 +267,27 @@ class PyMCPLDCorrector(object):
 
         with pm.Model() as model:
             # Create a Gaussian Process to model the long-term stellar variability
-            logs2 = pm.Normal("logs2", mu=np.log(np.var(lc_flux)), sd=4)
+            # log(sigma) is the amplitude of variability, estimated from the raw flux scatter
             logsigma = pm.Normal("logsigma", mu=np.log(np.std(lc_flux)), sd=4)
-            logrho = pm.Normal("logrho", mu=np.log(gp_timescale), sd=4)
+            # log(rho) is the timescale of variability with a user-defined prior
+            logrho = pm.Normal("logrho", mu=np.log(gp_timescale_prior), sd=4)
+            # Add a jitter term
+            logs2 = pm.Normal("logs2", mu=np.log(np.var(lc_flux)), sd=4)
             kernel = xo.gp.terms.Matern32Term(log_sigma=logsigma, log_rho=logrho)
-            gp = xo.gp.GP(kernel, lc_time, diag + tt.exp(logs2))
+            model.gp = xo.gp.GP(kernel, lc_time, diag + tt.exp(logs2))
 
             # The motion model regresses against the design matrix
-            A = tt.dot(design_matrix.T, gp.apply_inverse(design_matrix))
-            B = tt.dot(design_matrix.T, gp.apply_inverse(lc_flux[:, None]))
+            A = tt.dot(design_matrix.T, model.gp.apply_inverse(design_matrix))
+            B = tt.dot(design_matrix.T, model.gp.apply_inverse(lc_flux[:, None]))
             weights = tt.slinalg.solve(A, B)
             motion_model = pm.Deterministic("motion_model", tt.dot(design_matrix, weights)[:, 0])
             pm.Deterministic("weights", weights)
 
             # Likelihood to optimize
-            pm.Potential("obs", gp.log_likelihood(lc_flux - motion_model))
+            pm.Potential("obs", model.gp.log_likelihood(lc_flux - motion_model))
 
             # Add deterministic variables for easy of use
-            star_model = gp.predict()
-            pm.Deterministic("lc_time", tt.as_tensor_variable(lc_time))
-            pm.Deterministic("lc_flux", tt.as_tensor_variable(lc_flux))
+            star_model = model.gp.predict()
             pm.Deterministic("star_model", star_model)
             pm.Deterministic("corrected_flux", lc_flux - motion_model)
             pm.Deterministic("corrected_flux_without_star", lc_flux - motion_model - star_model)
@@ -351,20 +360,20 @@ class PyMCPLDCorrector(object):
         with plt.style.context(MPLSTYLE):
             fig, ax = plt.subplots(3, sharex=True, sharey=True, figsize=(8.485, 10))
             # Plot the raw light curve with the noise model overlaid
-            ax[0].plot(solution["lc_time"], solution["lc_flux"], "r.", alpha=0.3, label="Raw Flux")
-            ax[0].plot(solution["lc_time"], solution["corrected_flux"]+mean, "k.", label="Corrected Flux")
+            ax[0].plot(self.raw_lc.time, self.raw_lc.flux, "r.", alpha=0.3, label="Raw Flux")
+            ax[0].plot(self.raw_lc.time, solution["corrected_flux"]+mean, "k.", label="Corrected Flux")
             ax[0].set_ylabel("Flux [e$^-$s$^{-1}$]")
             ax[0].legend(loc="best")
 
             # Plot the raw light curve with motion noise model overlaid
-            ax[1].plot(solution["lc_time"], solution["lc_flux"], "r.", alpha=0.3, label="Raw Flux")
-            ax[1].plot(solution["lc_time"], solution["motion_model"], "k.", label="Motion Model")
+            ax[1].plot(self.raw_lc.time, self.raw_lc.flux, "r.", alpha=0.3, label="Raw Flux")
+            ax[1].plot(self.raw_lc.time, solution["motion_model"], "k.", label="Motion Model")
             ax[1].set_ylabel("Flux [e$^-$s$^{-1}$]")
             ax[1].legend(loc="best")
 
             # Plot the raw light curve with GP overlaid
-            ax[2].plot(solution["lc_time"], solution["lc_flux"], "r.", alpha=0.3, label="Raw Flux")
-            ax[2].plot(solution["lc_time"], solution["star_model"]+mean, "k", label="Stellar Model")
+            ax[2].plot(self.raw_lc.time, self.raw_lc.flux, "r.", alpha=0.3, label="Raw Flux")
+            ax[2].plot(self.raw_lc.time, solution["star_model"]+mean, "k", label="Stellar Model")
             ax[2].set_ylabel("Flux [e$^-$s$^{-1}$]")
             ax[2].legend(loc="best")
 
