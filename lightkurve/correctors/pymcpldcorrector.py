@@ -332,7 +332,7 @@ class PyMCPLDCorrector(object):
             #add sample errors in quadrature to existing flux_err?
         else:
             sol = self.optimize(**kwargs)
-            corrected_lc.flux = sol['corrected_flux']
+            corrected_lc.flux = sol['corrected_flux'] + np.mean(sol['motion_model'])
         return corrected_lc
 
     def plot_diagnostics(self, solution=None, **kwargs):
