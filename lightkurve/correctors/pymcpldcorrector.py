@@ -141,6 +141,7 @@ class PyMCPLDCorrector(object):
         # It is critical to remove all NaNs or the linear algebra below will crash
         self.raw_lc, self.nan_mask = raw_lc.remove_nans(return_mask=True)
         self.tpf = tpf[~self.nan_mask]
+        self.solution = None
 
     def _check_optional_dependencies(self):
         """Emits a user-friendly error message if one of Lightkurve's
@@ -311,7 +312,8 @@ class PyMCPLDCorrector(object):
         if design_matrix is None:
             design_matrix = self.create_design_matrix(**kwargs)
         if cadence_mask is None:
-            cadence_mask = np.zeros(len(self.raw_lc.time), dtype=bool)
+            cadence_mask = np.ones(len(self.raw_lc.time), dtype=bool)
+        self.cadence_mask = cadence_mask
 
         # Theano raises an `AsTensorError` ("Cannot convert to TensorType")
         # if the floats are not in 64-bit format, so we convert them here:
@@ -325,7 +327,7 @@ class PyMCPLDCorrector(object):
         # The cadence mask is applied by inflating the uncertainties in the covariance matrix;
         # this is because celerite will run much faster if it is able to predict
         # data for cadences that have been fed into the model.
-        diag[cadence_mask] += 1e12
+        diag[~cadence_mask] += 1e12
 
         with pm.Model() as model:
             # Create a Gaussian Process to model the long-term stellar variability
@@ -349,8 +351,9 @@ class PyMCPLDCorrector(object):
             pm.Potential("obs", model.gp.log_likelihood(lc_flux - motion_model))
 
             # Add deterministic variables for easy of use
-            star_model = model.gp.predict()
+            star_model, star_model_var = model.gp.predict(return_var=True)
             pm.Deterministic("star_model", star_model)
+            pm.Deterministic("star_model_std", np.sqrt(star_model_var))
             pm.Deterministic("corrected_flux", lc_flux - motion_model)
             pm.Deterministic("corrected_flux_without_star", lc_flux - motion_model - star_model)
 
@@ -376,6 +379,8 @@ class PyMCPLDCorrector(object):
             map_soln = xo.optimize(start=start, vars=[model.logrho, model.logsigma])
             map_soln = xo.optimize(start=map_soln, vars=[model.logs2])
             map_soln = xo.optimize(start=map_soln, vars=[model.logrho, model.logsigma, model.logs2])
+
+        self.solution = map_soln
         return map_soln
 
     def sample(self, model=None, start=None, ndraws=1000):
@@ -393,7 +398,7 @@ class PyMCPLDCorrector(object):
             trace = sampler.sample(draws=ndraws, chains=4)
         return trace
 
-    def correct(self, sample=False, **kwargs):
+    def correct(self, sample=False, remove_gp_trend=False, **kwargs):
         """Returns a systematics-corrected light curve."""
         corrected_lc = self.raw_lc.copy()
         if sample:
@@ -403,8 +408,32 @@ class PyMCPLDCorrector(object):
             #add sample errors in quadrature to existing flux_err?
         else:
             sol = self.optimize(**kwargs)
-            corrected_lc.flux = sol['corrected_flux'] + np.mean(sol['motion_model'])
+            # Add mean of motion model back into corrected light curve
+            if remove_gp_trend:
+                corrected_lc.flux = sol['corrected_flux_without_star'] + np.mean(sol['motion_model'])
+            else:
+                corrected_lc.flux = sol['corrected_flux'] + np.mean(sol['motion_model'])
+
         return corrected_lc
+
+    def get_diagnostic_lightcurves(self, solution=None, **kwargs):
+        """Return useful diagnostic light curves.
+
+        Returns
+        -------
+        some stuff
+        """
+        if solution is None and not self.solution_found:
+            solution = self.optimize(**kwargs)
+        else:
+            solution = self.solution
+
+        gp_lc = lk.lightcurve(time=self.raw_lc.time, flux=solution['star_model'],
+                                      flux_err=solution['star_model_std'])
+
+        motion_lc = lk.lightcurve(time=self.raw_lc.time, flux=solution['motion_model'])
+
+        return self.raw_flux, gp_lc, motion_lc
 
     def plot_diagnostics(self, solution=None, **kwargs):
         """Plots a series of useful figures to help understand the noise removal
