@@ -45,6 +45,7 @@ try:
     import pymc3 as pm
     import exoplanet as xo
     import theano.tensor as tt
+    tt.config.exception_verbosity='high'
 except ImportError:
     # Fail quietly here so we don't break `import lightkurve`.
     # We will raise a user-friendly ImportError inside PLDCorrector.__init__().
