@@ -113,8 +113,3 @@ def test_pld_aperture_mask():
     lc_all = PLDCorrector(tpf, pld_aperture_mask='all').correct(gp_timescale_prior=30)
     # does this improve the correction?
     assert(lc_all.estimate_cdpp() < lc_pipeline.estimate_cdpp())
-
-
-def test_gp_timescale():
-    """Does the GP optimization fail?"""
-    pass
