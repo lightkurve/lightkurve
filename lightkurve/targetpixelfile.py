@@ -666,7 +666,7 @@ class TargetPixelFile(object):
         return show_skyview_widget(self, notebook_url=notebook_url,
                                    magnitude_limit=magnitude_limit)
 
-    def to_corrector(self, method="pld"):
+    def to_corrector(self, method="pld", **kwargs):
         """Returns a `Corrector` instance to remove systematics.
 
         Parameters
@@ -692,7 +692,7 @@ class TargetPixelFile(object):
                              .format(method, allowed_methods))
         if method == "pld":
             from .correctors import PLDCorrector
-            return PLDCorrector(self)
+            return PLDCorrector(self, **kwargs)
 
 
 class KeplerTargetPixelFile(TargetPixelFile):
