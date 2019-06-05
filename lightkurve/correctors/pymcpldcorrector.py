@@ -1,4 +1,8 @@
-"""Defines PyMCPLDCorrector.
+"""Defines PLDCorrector.
+
+This module requires 3 optional dependencies (theano, pymc3, exoplanet) for
+PLD correction to work.  One additional dependency (fbpca) is not required
+but will speed up the computation if installed.
 
 TODO Now
 --------
@@ -34,10 +38,17 @@ import logging
 from itertools import combinations_with_replacement as multichoose
 
 import numpy as np
-import pymc3 as pm
-import exoplanet as xo
-import theano.tensor as tt
 import matplotlib.pyplot as plt
+
+# Optional dependencies
+try:
+    import pymc3 as pm
+    import exoplanet as xo
+    import theano.tensor as tt
+except ImportError:
+    # Fail quietly here so we don't break `import lightkurve`.
+    # We will raise a user-friendly ImportError inside PLDCorrector.__init__().
+    pass
 
 from .. import MPLSTYLE
 
@@ -102,8 +113,25 @@ class PyMCPLDCorrector(object):
     .. [3] Luger et al. (2018), ads:2018AJ....156...99L
         (arXiv:1702.05488)
     .. [4] EVEREST pipeline webpage, https://rodluger.github.io/everest
+
+    Parameters
+    ----------
+    tpf : TargetPixelFile
+    aperture_mask : 2D boolean array or str
+    pld_aperture_mask : 2D boolean array or str
+
+    Raises
+    ------
+    ImportError : if one of Lightkurve's optional dependencies required by
+        this class are missing.
     """
     def __init__(self, tpf, aperture_mask=None, pld_aperture_mask=None):
+        # Ensure the optional dependencies requires by this class are installed
+        success, messages = self._check_optional_dependencies()
+        if not success:
+            [log.error(message) for message in messages]
+            raise ImportError("\n".join(messages))
+
         # Input validation: parse the aperture masks to accept strings etc.
         self.aperture_mask = tpf._parse_aperture_mask(aperture_mask)
         self.pld_aperture_mask = tpf._parse_aperture_mask(pld_aperture_mask)
@@ -112,6 +140,39 @@ class PyMCPLDCorrector(object):
         # It is critical to remove all NaNs or the linear algebra below will crash
         self.raw_lc, self.nan_mask = raw_lc.remove_nans(return_mask=True)
         self.tpf = tpf[~self.nan_mask]
+
+    def _check_optional_dependencies(self):
+        """Emits a user-friendly error message if one of Lightkurve's
+        optional dependencies which are required for PLDCorrector are missing.
+
+        Returns
+        -------
+        success : bool
+            True if all optional dependencies are available, False otherwise.
+        message : list of str
+            User-friendly error message if success == False.
+        """
+        success, messages = True, []
+
+        try:
+            import pymc3 as pm
+        except ImportError as e:
+            success = False
+            messages.append("PLDCorrector requires pymc3 to be installed (`pip install pymc3`).")
+
+        try:
+            import exoplanet as xo
+        except ImportError as e:
+            success = False
+            messages.append("PLDCorrector requires exoplanet to be installed (`pip install exoplanet`).")
+
+        try:
+            import theano.tensor as tt
+        except ImportError as e:
+            success = False
+            message.append("PLDCorrector requires theano to be installed (`pip install theano`).")
+
+        return success, messages
 
     def create_first_order_matrix(self):
         """Returns a matrix which encodes the fractional pixel fluxes as a function

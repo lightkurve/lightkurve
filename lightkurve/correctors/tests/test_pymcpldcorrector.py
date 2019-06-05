@@ -14,12 +14,13 @@ from ...tests.test_targetpixelfile import filename_tpf_one_center, filename_tess
 
 bad_optional_imports = False
 try:
-    import celerite
-    import fbpca
+    import theano
+    import pymc3
+    import exoplanet
 except ImportError:
     bad_optional_imports = True
 
-@pytest.mark.skipif(bad_optional_imports, reason="PLD requires celerite and fbpca")
+@pytest.mark.skipif(bad_optional_imports, reason="PLD requires theano, pymc3, and exoplanet")
 def test_first_order_matrix():
     """Test the basic construction of the 1st order regressor matrix."""
     # Open a 3x3 TPF which has flux=1 in the center pixel and 0 elsewhere
@@ -36,7 +37,7 @@ def test_first_order_matrix():
     assert np.sum(matrix) == len(tpf.time)
 
 
-@pytest.mark.skipif(bad_optional_imports, reason="PLD requires celerite and fbpca")
+@pytest.mark.skipif(bad_optional_imports, reason="PLD requires theano, pymc3, and exoplanet")
 def test_design_matrix():
     """Test the basic construction of the PLD design matrix."""
     # Open a 3x3 TPF which has flux=1 in the center pixel and 0 elsewhere
@@ -50,7 +51,7 @@ def test_design_matrix():
             assert matrix.shape == (len(tpf.time), n_pixels + n_pca_terms*(pld_order - 1))
 
 
-@pytest.mark.skipif(bad_optional_imports, reason="PLD requires celerite and fbpca")
+@pytest.mark.skipif(bad_optional_imports, reason="PLD requires theano, pymc3, and exoplanet")
 def test_pymc_model():
     tpf = open(filename_tess)
     corr = PLDCorrector(tpf, pld_aperture_mask="all")
@@ -59,7 +60,7 @@ def test_pymc_model():
 
 
 @pytest.mark.remote_data
-@pytest.mark.skipif(bad_optional_imports, reason="PLD requires celerite and fbpca")
+@pytest.mark.skipif(bad_optional_imports, reason="PLD requires theano, pymc3, and exoplanet")
 def test_pld_corrector():
     # download tpf data for a target
     k2_target = 247887989
@@ -92,7 +93,7 @@ def test_pld_corrector():
 
 
 @pytest.mark.remote_data
-@pytest.mark.skipif(bad_optional_imports, reason="PLD requires celerite and fbpca")
+@pytest.mark.skipif(bad_optional_imports, reason="PLD requires theano, pymc3, and exoplanet")
 def test_to_corrector():
     """Does the tpf.pld() convenience method work?"""
     tpf = KeplerTargetPixelFile(TABBY_TPF)
@@ -101,7 +102,7 @@ def test_to_corrector():
 
 
 @pytest.mark.remote_data
-@pytest.mark.skipif(bad_optional_imports, reason="PLD requires celerite and fbpca")
+@pytest.mark.skipif(bad_optional_imports, reason="PLD requires theano, pymc3, and exoplanet")
 def test_pld_aperture_mask():
     """Test for #523: does PLDCorrector.correct() accept separate apertures for
     PLD pixels?"""
