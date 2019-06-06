@@ -355,9 +355,9 @@ class PyMCPLDCorrector(object):
             logs2 = pm.Normal("logs2", mu=np.log(np.var(lc_flux)), sd=4)
             kernel = xo.gp.terms.Matern32Term(log_sigma=logsigma, log_rho=logrho)
 
-            # Store the GP and cadence mask as properties of the model to aid debugging
+            # Store the GP and cadence mask to aid debugging
             model.gp = xo.gp.GP(kernel, lc_time, diag + tt.exp(logs2))
-            model.cadence_mask = cadence_mask
+            self.cadence_mask = cadence_mask
 
             # The motion model regresses against the design matrix
             A = tt.dot(design_matrix.T, model.gp.apply_inverse(design_matrix))
@@ -370,11 +370,11 @@ class PyMCPLDCorrector(object):
             pm.Potential("obs", model.gp.log_likelihood(lc_flux - motion_model))
 
             # Add deterministic variables for easy of use
-            star_model, star_model_var = model.gp.predict(return_var=True)
-            pm.Deterministic("star_model", star_model)
-            pm.Deterministic("star_model_std", np.sqrt(star_model_var))
+            gp_model, gp_model_var = model.gp.predict(return_var=True)
+            pm.Deterministic("gp_model", gp_model)
+            pm.Deterministic("gp_model_std", np.sqrt(gp_model_var))
             pm.Deterministic("corrected_flux", lc_flux - motion_model + tt.mean(motion_model))
-            pm.Deterministic("corrected_flux_without_star", lc_flux - motion_model - star_model + tt.mean(motion_model))
+            pm.Deterministic("corrected_flux_without_star", lc_flux - motion_model - gp_model + tt.mean(motion_model))
 
         return model
 
@@ -409,7 +409,6 @@ class PyMCPLDCorrector(object):
             map_soln = xo.optimize(start=map_soln, vars=[model.logs2])
             map_soln = xo.optimize(start=map_soln, vars=[model.logrho, model.logsigma, model.logs2])
 
-        map_soln['cadence_mask'] = model.cadence_mask
         self.most_recent_solution = map_soln
         return map_soln
 
@@ -468,24 +467,23 @@ class PyMCPLDCorrector(object):
         corrected_lc : `~lightkurve.lightcurve.LightCurve`
             Motion noise corrected light curve object.
         """
-        corrected_lc = self.raw_lc.copy()
-        if sample:
-            model = self.create_pymc_model(**kwargs)
-            sol = self.optimize(model=model, **kwargs)
-            solution_or_trace = self.sample(model=model, start=sol, draws=draws)
-        else:
-            solution_or_trace = self.optimize(**kwargs)
-
         if remove_gp_trend:
-            corrected_lc = self._lightcurve_from_solution(solution_or_trace, column_name='corrected_flux_without_star')
+            corrected_lc = self._get_lightcurve(sample=sample, column_name='corrected_flux_without_star', **kwargs)
         else:
-            corrected_lc = self._lightcurve_from_solution(solution_or_trace, column_name='corrected_flux')
+            corrected_lc = self._get_lightcurve(sample=sample, column_name='corrected_flux', **kwargs)
 
         return corrected_lc
 
-    def _lightcurve_from_solution(self, solution_or_trace, column_name='corrected_flux'):
+    def _get_lightcurve(self, solution_or_trace=None, sample=False, column_name='corrected_flux', **kwargs):
         """Helper function to generate light curve objects from a trace."""
         lc = self.raw_lc.copy()
+        if solution_or_trace is None:
+            if sample:
+                model = self.create_pymc_model(**kwargs)
+                sol = self.optimize(model=model, **kwargs)
+                solution_or_trace = self.sample(model=model, start=sol, draws=draws)
+            else:
+                solution_or_trace = self.optimize(**kwargs)
         # If a trace is given, find the mean and std
         if isinstance(solution_or_trace, pm.backends.base.MultiTrace):
             lc.flux = np.nanmean(solution_or_trace[column_name], axis=0)
@@ -496,7 +494,7 @@ class PyMCPLDCorrector(object):
 
         return lc
 
-    def get_diagnostic_lightcurves(self, solution=None, **kwargs):
+    def get_diagnostic_lightcurves(self, solution_or_trace=None, **kwargs):
         """Return useful diagnostic light curves.
 
         Parameters
@@ -518,30 +516,17 @@ class PyMCPLDCorrector(object):
         motion_lc : `~lightkurve.lightcurve.LightCurve`
             Light curve object with the motion model removed by the corrector.
         """
-        if solution is None and not self.solution_found:
-            solution = self.optimize(**kwargs)
-        else:
-            solution = self.solution
+        if self.most_recent_trace is not None and solution_or_trace is None:
+            solution_or_trace = self.most_recent_trace
+        elif self.most_recent_solution is not None and solution_or_trace is None:
+            solution_or_trace = self.most_recent_solution
 
-        # until we fix units on corrected light curves, we need to add back the
-        # mean of the subtracted motion model when plotting
-        mean = np.mean(solution["motion_model"])
-        if self.parameters_sampled:
-            flux_err = self.probabilistic_err
-            star_model = self.star_model
-            star_model_err = self.star_model_err
-            motion_model = self.motion_model
-        else:
-            flux_err = self.raw_lc.flux_err
-            star_model = solution['star_model']
-            star_model_err = solution['star_model_std']
-            motion_model = solution['motion_model']
-
-        corrected_lc = LightCurve(time=self.raw_lc.time, flux=solution['corrected_flux']+mean,
-                                  flux_err=self.raw_lc.flux_err)
-        gp_lc = LightCurve(time=self.raw_lc.time, flux=star_model + mean,
-                           flux_err=star_model_err)
-        motion_lc = LightCurve(time=self.raw_lc.time, flux=motion_model)
+        corrected_lc = self._get_lightcurve(solution_or_trace=solution_or_trace,
+                                            column_name='corrected_flux', **kwargs)
+        gp_lc = self._get_lightcurve(solution_or_trace=solution_or_trace,
+                                     column_name='gp_model', **kwargs)
+        motion_lc = self._get_lightcurve(solution_or_trace=solution_or_trace,
+                                         column_name='motion_model', **kwargs)
 
         return self.raw_lc, corrected_lc, gp_lc, motion_lc
 
@@ -564,7 +549,7 @@ class PyMCPLDCorrector(object):
         """
 
         # Generate diagnostic light curves
-        raw_lc, corrected_lc, gp_lc, motion_lc = self.get_diagnostic_lightcurves(solution)
+        raw_lc, corrected_lc, gp_lc, motion_lc = self.get_diagnostic_lightcurves(solution, **kwargs)
 
         fig, ax = plt.subplots(3, figsize=(8.45, 10))
         # Plot the corrected light curve over the raw flux
@@ -573,7 +558,7 @@ class PyMCPLDCorrector(object):
         # Plot the stellar model over the raw flux, indicating masked cadences
         raw_lc.scatter(c='r', alpha=0.3, ax=ax[1], label='Raw Flux')
         gp_lc.plot(c='k', ax=ax[1], label='Stellar Model')
-        gp_lc[~solution.cadence_mask].scatter(ax=ax[1], label='Masked Cadences', marker='d')
+        gp_lc[~self.cadence_mask].scatter(ax=ax[1], label='Masked Cadences', marker='d')
         # Plot the motion model over the raw light curve
         raw_lc.scatter(c='r', alpha=0.3, ax=ax[2], label='Raw Flux')
         motion_lc.scatter(c='k', ax=ax[2], label='Noise Model')
