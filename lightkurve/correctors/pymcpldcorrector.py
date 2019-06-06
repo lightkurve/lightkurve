@@ -41,6 +41,8 @@ from itertools import combinations_with_replacement as multichoose
 import numpy as np
 import matplotlib.pyplot as plt
 
+from .. import LightCurve
+
 # Optional dependencies
 try:
     import pymc3 as pm
@@ -152,7 +154,7 @@ class PyMCPLDCorrector(object):
         # It is critical to remove all NaNs or the linear algebra below will crash
         self.raw_lc, self.nan_mask = raw_lc.remove_nans(return_mask=True)
         self.tpf = tpf[~self.nan_mask]
-        self.solution = None
+        self.solution_found = False
 
     def _check_optional_dependencies(self):
         """Emits a user-friendly error message if one of Lightkurve's
@@ -439,48 +441,42 @@ class PyMCPLDCorrector(object):
         else:
             solution = self.solution
 
-        gp_lc = lk.lightcurve(time=self.raw_lc.time, flux=solution['star_model'],
-                                      flux_err=solution['star_model_std'])
+        # until we fix units on corrected light curves, we need to add back the
+        # mean of the subtracted motion model when plotting
+        mean = np.mean(solution["motion_model"])
 
-        motion_lc = lk.lightcurve(time=self.raw_lc.time, flux=solution['motion_model'])
+        gp_lc = LightCurve(time=self.raw_lc.time, flux=solution['star_model'] + mean,
+                           flux_err=solution['star_model_std'])
 
-        return self.raw_flux, gp_lc, motion_lc
+        motion_lc = LightCurve(time=self.raw_lc.time, flux=solution['motion_model'])
+
+        corrected_lc = LightCurve(time=self.raw_lc.time, flux=solution['corrected_flux']+mean,
+                                  flux_err=self.raw_lc.flux_err)
+
+        return self.raw_lc, corrected_lc, gp_lc, motion_lc
 
     def plot_diagnostics(self, solution=None, **kwargs):
         """Plots a series of useful figures to help understand the noise removal
         process.
 
         IDEA: Add indicator for masked cadences in plotted light curves."""
-        if solution is None:
-            solution = self.optimize(**kwargs)
 
-        # until we fix units on corrected light curves, we need to add back the
-        # mean of the subtracted motion model when plotting
-        mean = np.mean(solution["motion_model"])
+        # Generate diagnostic light curves
+        raw_lc, corrected_lc, gp_lc, motion_lc = self.get_diagnostic_lightcurves()
 
-        # Set up subplots with lightkurve plot style
-        with plt.style.context(MPLSTYLE):
-            fig, ax = plt.subplots(3, sharex=True, sharey=True, figsize=(8.485, 10))
-            # Plot the raw light curve with the noise model overlaid
-            ax[0].plot(self.raw_lc.time, self.raw_lc.flux, "r.", alpha=0.3, label="Raw Flux")
-            ax[0].plot(self.raw_lc.time, solution["corrected_flux"]+mean, "k.", label="Corrected Flux")
-            ax[0].set_ylabel("Flux [e$^-$s$^{-1}$]")
-            ax[0].legend(loc="best")
+        fig, ax = plt.subplots(3, figsize=(8.45, 10))
 
-            # Plot the raw light curve with motion noise model overlaid
-            ax[1].plot(self.raw_lc.time, self.raw_lc.flux, "r.", alpha=0.3, label="Raw Flux")
-            ax[1].plot(self.raw_lc.time, solution["motion_model"], "k.", label="Motion Model")
-            ax[1].set_ylabel("Flux [e$^-$s$^{-1}$]")
-            ax[1].legend(loc="best")
+        raw_lc.scatter(c='r', alpha=0.3, ax=ax[0], label='Raw Flux')
+        corrected_lc.scatter(c='k', ax=ax[0], label='Corrected Flux')
 
-            # Plot the raw light curve with GP overlaid
-            ax[2].plot(self.raw_lc.time, self.raw_lc.flux, "r.", alpha=0.3, label="Raw Flux")
-            ax[2].plot(self.raw_lc.time, solution["star_model"]+mean, "k", label="Stellar Model")
-            ax[2].set_ylabel("Flux [e$^-$s$^{-1}$]")
-            ax[2].legend(loc="best")
+        raw_lc.scatter(c='r', alpha=0.3, ax=ax[1], label='Raw Flux')
+        gp_lc.plot(c='k', ax=ax[1], label='Stellar Model')
+        gp_lc[~self.cadence_mask].scatter(ax=ax[1], label='Masked Cadences', marker='d')
 
-            fig.tight_layout()
-            plt.xlabel("Time - 2454833 [BKJD days]")
+        raw_lc.scatter(c='r', alpha=0.3, ax=ax[2], label='Raw Flux')
+        motion_lc.scatter(c='k', ax=ax[2], label='Noise Model')
+
+        return ax
 
     def plot_design_matrix(self, design_matrix=None, **kwargs):
         """Plots the design matrix.
