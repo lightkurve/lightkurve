@@ -1,9 +1,23 @@
 steps:
 
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: '$(python.version)'
-  displayName: 'Use Python $(python.version)'
+- bash: echo "##vso[task.prependpath]$CONDA/bin"
+  displayName: Add conda to PATH
+
+- bash: sudo chown -R $USER $CONDA
+  displayName: Take ownership of conda installation
+
+- bash: conda create --yes --quiet --name myEnvironment
+  displayName: Create Anaconda environment
+
+- bash: |
+    source activate myEnvironment
+    conda install --yes --quiet --name myEnvironment numpy scipy astropy
+  displayName: Install Anaconda packages
+
+#- task: UsePythonVersion@0
+#  inputs:
+#    versionSpec: '$(python.version)'
+#  displayName: 'Use Python $(python.version)'
 
 - script: |
     python -m pip install --upgrade pip setuptools wheel
