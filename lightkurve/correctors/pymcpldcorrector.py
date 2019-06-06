@@ -13,6 +13,7 @@ TODO Now
 * [DONE] Document the meaning of logs2, logsigma (amplitude of variability),
   and logrho (timescale of variability), and make sure their
   prior values are configurable.
+* [DONE] Add description of new PyMC3 implimentation to docstring
 
 TODO Before release
 -------------------
@@ -71,13 +72,13 @@ class PyMCPLDCorrector(object):
         of PLD that is less sophisticated than EVEREST, but is suitable
         for quick-look analyses and detrending experiments.
 
-        Our simple implementation of PLD is performed by first calculating the
-        noise model for each cadence in time. This function goes up to arbitrary
+        Our implementation of PLD is performed by first calculating the noise
+        model for each cadence in time. This function goes up to arbitrary
         order, and is represented by
 
         .. math::
 
-            m_i = \alpha + \beta t_i + \gamma t_i^2 + \sum_l a_l \frac{f_{il}}{\sum_k f_{ik}} + \sum_l \sum_m b_{lm} \frac{f_{il}f_{im}}{\left( \sum_k f_{ik} \right)^2} + ...
+            m_i = \sum_l a_l \frac{f_{il}}{\sum_k f_{ik}} + \sum_l \sum_m b_{lm} \frac{f_{il}f_{im}}{\left( \sum_k f_{ik} \right)^2} + ...
         where
 
           - :math:`m_i` is the noise model at time :math:`t_i`
@@ -85,13 +86,20 @@ class PyMCPLDCorrector(object):
           - :math:`a_l` is the first-order PLD coefficient on the linear term
           - :math:`b_{lm}` is the second-order PLD coefficient on the :math:`l^\text{th}`,
             :math:`m^\text{th}` pixel pair
-          - :math:`\alpha`, :math:`\beta`, and :math:`\gamma` are the
-            Gaussian Process terms applied to capture long-period variability.
 
         We perform Principal Component Analysis (PCA) to reduce the number of
         vectors in our final model to limit the set to best capture instrumental
         noise. With a PCA-reduced set of vectors, we can construct a design matrix
         containing fractional pixel fluxes.
+
+        To capture long-term variability, we simultaneously fit a Gaussian Process
+        model ([5]_) to the underlying stellar signal. We use the gradient-based
+        probabilistic modeling toolkit [6]_ to optimize the GP hyperparameters and
+        solve for the motion model.
+
+        To robustly estimate errors on our parameter estimates and output flux
+        values, we optionally sample the output model with [7]_ and infer errors from
+        the posterior distribution.
 
         To solve for the PLD model, we need to minimize the difference squared
 
@@ -114,6 +122,9 @@ class PyMCPLDCorrector(object):
     .. [3] Luger et al. (2018), ads:2018AJ....156...99L
         (arXiv:1702.05488)
     .. [4] EVEREST pipeline webpage, https://rodluger.github.io/everest
+    .. [5] Celerite documentation, https://celerite.readthedocs.io/en/stable/
+    .. [6] Exoplanet documentation, https://exoplanet.readthedocs.io/en/stable/
+    .. [7] PyMC3 documentation, https://docs.pymc.io
 
     Parameters
     ----------
