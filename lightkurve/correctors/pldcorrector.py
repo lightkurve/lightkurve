@@ -18,7 +18,7 @@ TODO Now
 
 TODO Before release
 -------------------
-* Rename PyMCPLDCorrector as PLDCorrector.
+* [DONE] Rename PyMCPLDCorrector as PLDCorrector.
 * The design matrix can be improved by rejecting pixels which are saturated,
   and including the collapsed sums of their CCD columns instead.
 * Add pymc & exoplanet & theano to Lightkurve's dependencies or treat it properly
@@ -59,7 +59,7 @@ from .. import MPLSTYLE
 
 log = logging.getLogger(__name__)
 
-__all__ = ['PyMCPLDCorrector']
+__all__ = ['PLDCorrector']
 
 
 class PLDCorrector(object):
