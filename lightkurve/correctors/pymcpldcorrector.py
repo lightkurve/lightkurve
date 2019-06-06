@@ -154,7 +154,9 @@ class PyMCPLDCorrector(object):
         # It is critical to remove all NaNs or the linear algebra below will crash
         self.raw_lc, self.nan_mask = raw_lc.remove_nans(return_mask=True)
         self.tpf = tpf[~self.nan_mask]
+        # Global booleans
         self.solution_found = False
+        self.parameters_sampled = False
 
     def _check_optional_dependencies(self):
         """Emits a user-friendly error message if one of Lightkurve's
@@ -220,6 +222,7 @@ class PyMCPLDCorrector(object):
         # into a new one as shown below circumvents it:
         result = np.empty((matrix.shape[0], matrix.shape[1]))
         result[:, :] = matrix[:, :]
+
         return result
 
     def create_design_matrix(self, pld_order=1, n_pca_terms=10, include_column_of_ones=False):
@@ -326,6 +329,7 @@ class PyMCPLDCorrector(object):
             design_matrix = self.create_design_matrix(**kwargs)
         if cadence_mask is None:
             cadence_mask = np.ones(len(self.raw_lc.time), dtype=bool)
+        self.design_matrix = design_matrix
         self.cadence_mask = cadence_mask
 
         # Theano raises an `AsTensorError` ("Cannot convert to TensorType")
@@ -402,9 +406,10 @@ class PyMCPLDCorrector(object):
             map_soln = xo.optimize(start=start, vars=[model.logrho, model.logsigma])
             map_soln = xo.optimize(start=map_soln, vars=[model.logs2])
             map_soln = xo.optimize(start=map_soln, vars=[model.logrho, model.logsigma, model.logs2])
-
         self.solution = map_soln
-        return map_soln
+        self.solution_found = True
+
+        return map_soln, model
 
     def sample(self, model=None, start=None, ndraws=1000):
         """Sample the systematics correction model.
@@ -420,31 +425,92 @@ class PyMCPLDCorrector(object):
 
         Returns
         -------
-        trace :
+        trace : `pymc3.trace`
+            Trace object containing parameters and their samples
         """
+        # Create the model
         if model is None:
             model = self.create_pymc_model()
         if start is None:
             start = self.optimize()
+
+        # Initialize the sampler
         sampler = xo.PyMC3Sampler()
         with model:
+            # Burn in the sampler
             burnin = sampler.tune(tune=np.max([int(ndraws*0.3), 150]),
                                   start=start,
                                   step_kwargs=dict(target_accept=0.9),
                                   chains=4)
+            # Sample the parameters
             trace = sampler.sample(draws=ndraws, chains=4)
+
         return trace
 
-    def correct(self, sample=False, remove_gp_trend=False, **kwargs):
-        """Returns a systematics-corrected light curve."""
+    def correct(self, remove_gp_trend=False, sample=False, ndraws=1000, **kwargs):
+        """Returns a systematics-corrected light curve.
+
+        Parameters
+        ----------
+        remove_gp_trend : boolean
+            `True` will subtract the fit GP stellar signal from the returned
+            flux light curve.
+        sample : boolean
+            Boolean expression: `True` will sample the output of the optimization
+            step and include robust errors on the output light curve.
+        ndraws : int
+            Number of samples
+
+        Returns
+        -------
+        corrected_lc : `~lightkurve.lightcurve.LightCurve`
+            Motion noise corrected light curve object.
+        """
         corrected_lc = self.raw_lc.copy()
         if sample:
-            raise NotImplementedError("We've been slacking")
-            #call self.sample(**kwargs)
-            #set corrected_flux to mean of the sampled corrected light curves
-            #add sample errors in quadrature to existing flux_err?
+            sol, model = self.optimize(**kwargs)
+            trace = self.sample(model=model, start=sol, ndraws=ndraws)
+            varnames = ["logrho", "logsigma", "logs2"]
+            # pm.traceplot(trace, varnames=varnames);
+            samples = pm.trace_to_dataframe(trace, varnames=varnames)
+
+            # Generate 50 realizations of the prediction sampling randomly from the chain
+            N_pred = 50
+            pred_star = np.empty((N_pred, len(self.raw_lc.time)))
+            pred_motion = np.empty((N_pred, len(self.raw_lc.time)))
+            with model:
+                pred = model.gp.predict(np.array(self.raw_lc.time, dtype=np.float64))
+                for i, samples in enumerate(xo.get_samples_from_trace(trace, size=N_pred)):
+                    pred_star[i] = xo.eval_in_model(pred, samples)
+                    # Find motion model
+                    pred_motion[i, :] = np.dot(self.design_matrix, samples['weights']).reshape(-1)
+
+            # Find star model and motioon model predicted by sample
+            star_model = np.mean(pred_star, axis=0)
+            star_model_err = np.std(pred_star, axis=0)
+            motion_model = np.mean(pred_motion, axis=0)
+            motion_model_err = np.std(pred_motion, axis=0)
+            probabilistic_err = (self.raw_lc.flux_err**2 + star_model_err**2 + motion_model_err**2)**0.5
+
+            # Optionally remove stellar signal from returned light curve
+            # Add mean of motion model back into corrected light curve
+            if remove_gp_trend:
+                corrected_lc.flux = self.raw_lc.flux - motion_model - star_model + np.mean(motion_model)
+            else:
+                corrected_lc.flux = self.raw_lc.flux - motion_model + np.mean(motion_model)
+            corrected_lc.flux_err = probabilistic_err
+
+            # Store updated predictions for diagnostics
+            self.parameters_sampled = True
+            self.motion_model = motion_model
+            self.star_model = star_model
+            self.star_model_err = star_model_err
+            self.probabilistic_err = probabilistic_err
+
         else:
-            sol = self.optimize(**kwargs)
+            sol, model = self.optimize(**kwargs)
+
+            # Optionally remove stellar signal from returned light curve
             # Add mean of motion model back into corrected light curve
             if remove_gp_trend:
                 corrected_lc.flux = sol['corrected_flux_without_star'] + np.mean(sol['motion_model'])
@@ -483,14 +549,22 @@ class PyMCPLDCorrector(object):
         # until we fix units on corrected light curves, we need to add back the
         # mean of the subtracted motion model when plotting
         mean = np.mean(solution["motion_model"])
-
-        gp_lc = LightCurve(time=self.raw_lc.time, flux=solution['star_model'] + mean,
-                           flux_err=solution['star_model_std'])
-
-        motion_lc = LightCurve(time=self.raw_lc.time, flux=solution['motion_model'])
+        if self.parameters_sampled:
+            flux_err = self.probabilistic_err
+            star_model = self.star_model
+            star_model_err = self.star_model_err
+            motion_model = self.motion_model
+        else:
+            flux_err = self.raw_lc.flux_err
+            star_model = solution['star_model']
+            star_model_err = solution['star_model_std']
+            motion_model = solution['motion_model']
 
         corrected_lc = LightCurve(time=self.raw_lc.time, flux=solution['corrected_flux']+mean,
                                   flux_err=self.raw_lc.flux_err)
+        gp_lc = LightCurve(time=self.raw_lc.time, flux=star_model + mean,
+                           flux_err=star_model_err)
+        motion_lc = LightCurve(time=self.raw_lc.time, flux=motion_model)
 
         return self.raw_lc, corrected_lc, gp_lc, motion_lc
 
@@ -516,14 +590,14 @@ class PyMCPLDCorrector(object):
         raw_lc, corrected_lc, gp_lc, motion_lc = self.get_diagnostic_lightcurves(solution)
 
         fig, ax = plt.subplots(3, figsize=(8.45, 10))
-
+        # Plot the corrected light curve over the raw flux
         raw_lc.scatter(c='r', alpha=0.3, ax=ax[0], label='Raw Flux')
         corrected_lc.scatter(c='k', ax=ax[0], label='Corrected Flux')
-
+        # Plot the stellar model over the raw flux, indicating masked cadences
         raw_lc.scatter(c='r', alpha=0.3, ax=ax[1], label='Raw Flux')
         gp_lc.plot(c='k', ax=ax[1], label='Stellar Model')
         gp_lc[~self.cadence_mask].scatter(ax=ax[1], label='Masked Cadences', marker='d')
-
+        # Plot the motion model over the raw light curve
         raw_lc.scatter(c='r', alpha=0.3, ax=ax[2], label='Raw Flux')
         motion_lc.scatter(c='k', ax=ax[2], label='Noise Model')
 
