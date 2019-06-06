@@ -375,6 +375,16 @@ class PyMCPLDCorrector(object):
     def optimize(self, model=None, start=None, **kwargs):
         """Returns the maximum likelihood solution.
 
+        Parameters
+        ----------
+        model : pymc3.model.Model
+            A pymc3 model
+        start : dict
+            MAP Solution from exoplanet
+        **kwargs : dict
+            Dictionary of arguments to be passed to
+            `lightkurve.correctors.PLDCorrector.create_pymc_model`.
+
         Returns
         -------
         map_soln : dict
@@ -397,7 +407,21 @@ class PyMCPLDCorrector(object):
         return map_soln
 
     def sample(self, model=None, start=None, ndraws=1000):
-        """Sample the systematics correction model."""
+        """Sample the systematics correction model.
+
+        Parameters
+        ----------
+        model : pymc3.model.Model
+            A pymc3 model
+        start : dict
+            MAP Solution from exoplanet
+        ndraws : int
+            Number of samples
+
+        Returns
+        -------
+        trace :
+        """
         if model is None:
             model = self.create_pymc_model()
         if start is None:
@@ -432,9 +456,24 @@ class PyMCPLDCorrector(object):
     def get_diagnostic_lightcurves(self, solution=None, **kwargs):
         """Return useful diagnostic light curves.
 
+        Parameters
+        ----------
+        solution : dict
+            Dictionary containing output of `exoplanet` optimization.
+        **kwargs : dict
+            Dictionary of arguments to be passed to
+            `lightkurve.correctors.PLDCorrector.optimize`.
+
         Returns
         -------
-        some stuff
+        raw_lc : `~lightkurve.lightcurve.LightCurve`
+            Light curve object with raw (uncorrected) flux.
+        corrected_lc : `~lightkurve.lightcurve.LightCurve`
+            Motion noise corrected light curve object.
+        gp_lc : `~lightkurve.lightcurve.LightCurve`
+            Light curve object containing GP model of the stellar signal.
+        motion_lc : `~lightkurve.lightcurve.LightCurve`
+            Light curve object with the motion model removed by the corrector.
         """
         if solution is None and not self.solution_found:
             solution = self.optimize(**kwargs)
@@ -459,10 +498,22 @@ class PyMCPLDCorrector(object):
         """Plots a series of useful figures to help understand the noise removal
         process.
 
-        IDEA: Add indicator for masked cadences in plotted light curves."""
+        Parameters
+        ----------
+        solution : dict
+            Dictionary containing output of `exoplanet` optimization.
+        **kwargs : dict
+            Dictionary of arguments to be passed to
+            `lightkurve.correctors.PLDCorrector.optimize`.
+
+        Returns
+        -------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            The matplotlib axes object.
+        """
 
         # Generate diagnostic light curves
-        raw_lc, corrected_lc, gp_lc, motion_lc = self.get_diagnostic_lightcurves()
+        raw_lc, corrected_lc, gp_lc, motion_lc = self.get_diagnostic_lightcurves(solution)
 
         fig, ax = plt.subplots(3, figsize=(8.45, 10))
 
@@ -480,12 +531,28 @@ class PyMCPLDCorrector(object):
 
     def plot_design_matrix(self, design_matrix=None, **kwargs):
         """Plots the design matrix.
-        I'm not convinced that this is a valuable diagnostic..."""
+
+        Parameters
+        ----------
+        design_matrix : np.ndarray
+            Matrix of shape (n_cadences, n_regressors) used to create the
+            motion model.
+        **kwargs : dict
+            Dictionary of arguments to be passed to
+            `lightkurve.correctors.PLDCorrector.create_design_matrix`.
+
+        Returns
+        -------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            The matplotlib axes object.
+                    """
         if design_matrix is None:
             design_matrix = self.create_design_matrix(**kwargs)
 
         with plt.style.context(MPLSTYLE):
-            fig, ax = plt.subplots(1, figsize=(5,5))
+            fig, ax = plt.subplots(1, figsize=(8.45, 8.45))
             ax.imshow(design_matrix, aspect='auto')
             ax.set_ylabel('Cadence Number')
             ax.set_xlabel('Regressors')
+
+        return ax
