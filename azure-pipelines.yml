@@ -30,7 +30,7 @@ jobs:
       sudo chown -R $USER $CONDA
       conda create --yes --quiet --name myEnvironment
       source activate myEnvironment
-      conda install --yes --quiet --name myEnvironment numpy scipy astropy
+      conda install --yes --quiet --name myEnvironment numpy scipy matplotlib pandas astropy astroquery
     displayName: Setup anaconda
   - template: .azure-template.yml
 
