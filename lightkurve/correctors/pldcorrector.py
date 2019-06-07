@@ -356,7 +356,9 @@ class PLDCorrector(object):
             # log(rho) is the timescale of variability with a user-defined prior
             logrho = pm.Normal("logrho", mu=np.log(gp_timescale_prior), sd=4)
             # log(s2) is a jitter term to compensate for underestimated flux errors
-            logs2 = pm.Normal("logs2", mu=np.log(self.raw_lc.estimate_cdpp()), sd=4)
+            # We estimate the magnitude of jitter from the CDPP (normalized to the flux)
+            s2_mu = self.raw_lc.estimate_cdpp() * 1e-6 * mean
+            logs2 = pm.Normal("logs2", mu=np.log(s2_mu), sd=4)
             kernel = xo.gp.terms.Matern32Term(log_sigma=logsigma, log_rho=logrho)
 
             # Store the GP and cadence mask to aid debugging
