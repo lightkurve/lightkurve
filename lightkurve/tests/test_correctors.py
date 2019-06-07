@@ -18,8 +18,6 @@ try:
     import theano
     import pymc3
     import exoplanet
-    import celerite
-    import fbpca
 except ImportError:
     bad_optional_imports = True
 
