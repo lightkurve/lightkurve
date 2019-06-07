@@ -4,52 +4,28 @@ This module requires 3 optional dependencies (theano, pymc3, exoplanet) for
 PLD correction to work.  One additional dependency (fbpca) is not required
 but will speed up the computation if installed.
 
-TODO Now
---------
-* [DONE] Implement diagnostic plots, `corr.plot_design_matrix()` and `corr.plot_diagnostics()`.
-* Port the existing suite of PLDCorrector tests.
-* [kinda done] Fix the units of corrected_flux, corrected_flux_without_star, etc.
+TODO
+----
+* Make sure the prior of logs2/logsigma/logrho has a user-configurable width.
+* [kinda done] Fix the units of corrected_flux, corrected_flux_without_gp, etc.
   In Lightkurve we currently add back the mean of the model.
-* [DONE] Document the meaning of logs2, logsigma (amplitude of variability),
-  and logrho (timescale of variability), and make sure their
-  prior values are configurable.
-* [DONE] Add description of new PyMC3 implimentation to docstring
-* [DONE] Rename star model
-
-TODO Before release
--------------------
-* [DONE] Rename PyMCPLDCorrector as PLDCorrector.
 * The design matrix can be improved by rejecting pixels which are saturated,
   and including the collapsed sums of their CCD columns instead.
-* Add pymc & exoplanet & theano to Lightkurve's dependencies or treat it properly
-  as an optional import. [Geert]
-* Set PyMC verbosity to match the lightkurve.log.level. [Geert]
-
-Future enhancements
--------------------
-* In `create_first_order_matrix`, we need to explain why we are dividing each
-  cadence by the sum of all pixels. We think this is explained in the EVEREST paper,
-  i.e. is is likely because PLD optimizes towards a flat light curve. We need
-  to find the right words to explain this and refer to papers where possible.
+* Set PyMC verbosity to match the lightkurve.log.level.
 * It is not clear whether the inclusion of a column vector of ones in the
   design matrix is necessary for numerical stability.
 """
-from __future__ import division, print_function
-
 import logging
 from itertools import combinations_with_replacement as multichoose
 
 import numpy as np
 import matplotlib.pyplot as plt
 
-from .. import LightCurve
-
 # Optional dependencies
 try:
     import pymc3 as pm
     import exoplanet as xo
     import theano.tensor as tt
-    tt.config.exception_verbosity='high'
 except ImportError:
     # Fail quietly here so we don't break `import lightkurve`.
     # We will raise a user-friendly ImportError inside PLDCorrector.__init__().
@@ -144,7 +120,8 @@ class PLDCorrector(object):
         # Ensure the optional dependencies requires by this class are installed
         success, messages = self._check_optional_dependencies()
         if not success:
-            [log.error(message) for message in messages]
+            for message in messages:
+                log.error(message)
             raise ImportError("\n".join(messages))
 
         # Input validation: parse the aperture masks to accept strings etc.
@@ -174,21 +151,21 @@ class PLDCorrector(object):
 
         try:
             import pymc3 as pm
-        except ImportError as e:
+        except ImportError:
             success = False
             messages.append("PLDCorrector requires pymc3 to be installed (`pip install pymc3`).")
 
         try:
             import exoplanet as xo
-        except ImportError as e:
+        except ImportError:
             success = False
             messages.append("PLDCorrector requires exoplanet to be installed (`pip install exoplanet`).")
 
         try:
             import theano.tensor as tt
-        except ImportError as e:
+        except ImportError:
             success = False
-            message.append("PLDCorrector requires theano to be installed (`pip install theano`).")
+            messages.append("PLDCorrector requires theano to be installed (`pip install theano`).")
 
         return success, messages
 
@@ -198,9 +175,8 @@ class PLDCorrector(object):
         2D matrix with shape (n_cadences, n_pixels_in_pld_mask).
 
         This matrix will form the basis of the PLD regressor design matrix
-        and is often called the first order component.
-
-        The matrix returned is guaranteed to be free of NaN values.
+        and is often called the first order component. The matrix returned
+        here is guaranteed to be free of NaN values.
 
         Returns
         -------
@@ -216,7 +192,7 @@ class PLDCorrector(object):
         matrix = matrix[:, np.isfinite(matrix).all(axis=0)]
         # To ensure that each column contains the fractional pixel flux,
         # we divide by the sum of all pixels in the same cadence.
-        # The reason for doing this is described in Section 2 of Luger et al. (2016).
+        # This is an important step, as explained in Section 2 of Luger et al. (2016).
         matrix = matrix / np.sum(matrix, axis=-1)[:, None]
         # If we return matrix at this point, theano will raise a "dimension mismatch".
         # The origin of this bug is not understood, but copying the matrix
@@ -301,7 +277,8 @@ class PLDCorrector(object):
 
         return np.concatenate(matrix_sections, axis=1)
 
-    def create_pymc_model(self, design_matrix=None, cadence_mask=None, gp_timescale_prior=150, **kwargs):
+    def create_pymc_model(self, design_matrix=None, cadence_mask=None,
+                          gp_timescale_prior=150, **kwargs):
         r"""Returns a PYMC3 model.
 
         Parameters
@@ -320,7 +297,7 @@ class PLDCorrector(object):
         Returns
         -------
         model : pymc3.model.Model
-            A pymc3 model
+            A pymc3 model.
 
         References
         ----------
@@ -351,7 +328,7 @@ class PLDCorrector(object):
             logsigma = pm.Normal("logsigma", mu=np.log(np.std(lc_flux)), sd=4)
             # log(rho) is the timescale of variability with a user-defined prior
             logrho = pm.Normal("logrho", mu=np.log(gp_timescale_prior), sd=4)
-            # Add a jitter term
+            # log(s2) is a jitter term to compensate for underestimated flux errors
             logs2 = pm.Normal("logs2", mu=np.log(np.var(lc_flux)), sd=4)
             kernel = xo.gp.terms.Matern32Term(log_sigma=logsigma, log_rho=logrho)
 
@@ -374,7 +351,7 @@ class PLDCorrector(object):
             pm.Deterministic("gp_model", gp_model)
             pm.Deterministic("gp_model_std", np.sqrt(gp_model_var))
             pm.Deterministic("corrected_flux", lc_flux - motion_model + tt.mean(motion_model))
-            pm.Deterministic("corrected_flux_without_star", lc_flux - motion_model - gp_model + tt.mean(motion_model))
+            pm.Deterministic("corrected_flux_without_gp", lc_flux - motion_model - gp_model + tt.mean(motion_model))
 
         self.most_recent_model = model
         return model
@@ -440,17 +417,17 @@ class PLDCorrector(object):
         sampler = xo.PyMC3Sampler()
         with model:
             # Burn in the sampler
-            burnin = sampler.tune(tune=np.max([int(draws*0.3), 150]),
-                                  start=start,
-                                  step_kwargs=dict(target_accept=0.9),
-                                  chains=4)
+            sampler.tune(tune=np.max([int(draws*0.3), 150]),
+                         start=start,
+                         step_kwargs=dict(target_accept=0.9),
+                         chains=4)
             # Sample the parameters
             trace = sampler.sample(draws=draws, chains=4)
 
         self.most_recent_solution_or_trace = trace
         return trace
 
-    def correct(self, remove_gp_trend=False, sample=False, draws=1000, **kwargs):
+    def correct(self, remove_gp_trend=False, sample=False, **kwargs):
         """Returns a systematics-corrected light curve.
 
         Parameters
@@ -462,20 +439,22 @@ class PLDCorrector(object):
             Boolean expression: `True` will sample the output of the optimization
             step and include robust errors on the output light curve.
         draws : int
-            Number of samples
+            Number of samples.
 
         Returns
         -------
         corrected_lc : `~lightkurve.lightcurve.LightCurve`
             Motion noise corrected light curve object.
         """
-        solution_or_trace = self._compute(sample=sample, **kwargs)
+        solution_or_trace = self._compute(**kwargs)
         if remove_gp_trend:
-            corrected_lc = self._lightcurve_from_solution(solution_or_trace, sample=sample, column_name='corrected_flux_without_star', **kwargs)
+            column_name = 'corrected_flux_without_gp'
         else:
-            corrected_lc = self._lightcurve_from_solution(solution_or_trace, sample=sample, column_name='corrected_flux', **kwargs)
-
-        return corrected_lc
+            column_name = 'corrected_flux'
+        lc = self._lightcurve_from_solution(solution_or_trace,
+                                            column_name=column_name,
+                                            **kwargs)
+        return lc
 
     def _compute(self, model=None, sample=False, **kwargs):
         """Helper function to compute output solution or trace.
@@ -501,13 +480,13 @@ class PLDCorrector(object):
             model = self.create_pymc_model(**kwargs)
         solution = self.optimize(model=model, **kwargs)
         if sample:
-            solution_or_trace = self.sample(model=model, start=solution, draws=draws)
+            solution_or_trace = self.sample(model=model, start=solution, **kwargs)
         else:
             solution_or_trace = solution
 
         return solution_or_trace
 
-    def _lightcurve_from_solution(self, solution_or_trace, sample=False, column_name='corrected_flux'):
+    def _lightcurve_from_solution(self, solution_or_trace, column_name='corrected_flux'):
         """Helper function to generate light curve objects from a trace.
         Parameters
         ----------
@@ -534,7 +513,6 @@ class PLDCorrector(object):
         # Otherwise, read value from the dictionary
         else:
             lc.flux = solution_or_trace[column_name]
-
         return lc
 
     def get_diagnostic_lightcurves(self, solution_or_trace=None, **kwargs):
