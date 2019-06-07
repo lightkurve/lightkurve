@@ -478,17 +478,54 @@ class PLDCorrector(object):
         return corrected_lc
 
     def _compute(self, model=None, sample=False, **kwargs):
-        """ """
+        """Helper function to compute output solution or trace.
+
+        Parameters
+        ----------
+        model : pymc3.model.Model
+            A pymc3 model
+        sample : boolean
+            Boolean expression: `True` will sample the output of the optimization
+            step and include robust errors on the output light curve.
+        **kwargs : dict
+            Dictionary of arguments to be passed to
+            `lightkurve.correctors.PLDCorrector.create_pymc_model`.
+
+        Returns
+        -------
+        solution_or_trace : dict or `pymc3.backends.base.MultiTrace`
+            Dictionary containing output of `exoplanet` optimization, or outoput
+            trace from sampling the solution.
+        """
         if model is None:
             model = self.create_pymc_model(**kwargs)
-        sol = self.optimize(model=model, **kwargs)
+        solution = self.optimize(model=model, **kwargs)
         if sample:
-            solution_or_trace = self.sample(model=model, start=sol, draws=draws)
+            solution_or_trace = self.sample(model=model, start=solution, draws=draws)
+        else:
+            solution_or_trace = solution
 
         return solution_or_trace
 
-    def _lightcurve_from_solution(self, solution_or_trace, sample=False, column_name='corrected_flux', **kwargs):
-        """Helper function to generate light curve objects from a trace."""
+    def _lightcurve_from_solution(self, solution_or_trace, sample=False, column_name='corrected_flux'):
+        """Helper function to generate light curve objects from a trace.
+        Parameters
+        ----------
+        solution_or_trace : dict or `pymc3.backends.base.MultiTrace`
+            Dictionary containing output of `exoplanet` optimization, or outoput
+            trace from sampling the solution.
+        sample : boolean
+            Boolean expression: `True` will sample the output of the optimization
+            step and include robust errors on the output light curve.
+        column_name : str
+            Key for determining which light curve to extract from the given
+            solution or trace.
+
+        Returns
+        -------
+        lc : `~lightkurve.lightcurve.LightCurve`
+            Light curve object corresponding to the input 'column_name'
+        """
         lc = self.raw_lc.copy()
         # If a trace is given, find the mean and std
         if isinstance(solution_or_trace, pm.backends.base.MultiTrace):
@@ -505,16 +542,15 @@ class PLDCorrector(object):
 
         Parameters
         ----------
-        solution : dict
-            Dictionary containing output of `exoplanet` optimization.
+        solution_or_trace : dict or `pymc3.backends.base.MultiTrace`
+            Dictionary containing output of `exoplanet` optimization, or outoput
+            trace from sampling the solution.
         **kwargs : dict
             Dictionary of arguments to be passed to
             `lightkurve.correctors.PLDCorrector.optimize`.
 
         Returns
         -------
-        raw_lc : `~lightkurve.lightcurve.LightCurve`
-            Light curve object with raw (uncorrected) flux.
         corrected_lc : `~lightkurve.lightcurve.LightCurve`
             Motion noise corrected light curve object.
         gp_lc : `~lightkurve.lightcurve.LightCurve`
