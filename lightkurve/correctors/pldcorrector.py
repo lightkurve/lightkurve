@@ -381,9 +381,9 @@ class PLDCorrector(object):
 
         with model:
             map_soln = xo.optimize(start=start, vars=[model.logsigma])
-            map_soln = xo.optimize(start=start, vars=[model.logrho, model.logsigma])
-            map_soln = xo.optimize(start=start, vars=[model.logsigma])
-            map_soln = xo.optimize(start=start, vars=[model.logrho, model.logsigma])
+            map_soln = xo.optimize(start=map_soln, vars=[model.logrho, model.logsigma])
+            map_soln = xo.optimize(start=map_soln, vars=[model.logsigma])
+            map_soln = xo.optimize(start=map_soln, vars=[model.logrho, model.logsigma])
             map_soln = xo.optimize(start=map_soln, vars=[model.logs2])
             map_soln = xo.optimize(start=map_soln, vars=[model.logrho, model.logsigma, model.logs2])
 
