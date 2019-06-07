@@ -107,14 +107,19 @@ class PLDCorrector(object):
 
     Parameters
     ----------
-    tpf : TargetPixelFile
+    tpf : `TargetPixelFile` object
+        The pixel data from which a light curve will be extracted.
     aperture_mask : 2D boolean array or str
+        The pixel aperture mask that will be used to extract the raw light curve.
     pld_aperture_mask : 2D boolean array or str
+        The pixel aperture mask that will be used to create the regression matrix
+        (i.e. the design matrix) used to model the systematics.  If `None`,
+        then the `aperture_mask` value will be used.
 
     Raises
     ------
     ImportError : if one of Lightkurve's optional dependencies required by
-        this class are missing.
+        this class are not available (i.e. `pymc`, `theano`, or `exoplanet`).
     """
     def __init__(self, tpf, aperture_mask=None, pld_aperture_mask=None):
         # Ensure the optional dependencies requires by this class are installed
@@ -126,13 +131,16 @@ class PLDCorrector(object):
 
         # Input validation: parse the aperture masks to accept strings etc.
         self.aperture_mask = tpf._parse_aperture_mask(aperture_mask)
-        self.pld_aperture_mask = tpf._parse_aperture_mask(pld_aperture_mask)
+        if pld_aperture_mask is None:
+            self.pld_aperture_mask = self.aperture_mask
+        else:
+            self.pld_aperture_mask = tpf._parse_aperture_mask(pld_aperture_mask)
         # Generate raw flux light curve from desired pixels
         raw_lc = tpf.to_lightcurve(aperture_mask=self.aperture_mask)
         # It is critical to remove all NaNs or the linear algebra below will crash
         self.raw_lc, self.nan_mask = raw_lc.remove_nans(return_mask=True)
         self.tpf = tpf[~self.nan_mask]
-        # For user-friendliness, store most recent solutions
+        # For user-friendliness, we will track the most recently used model and solution:
         self.most_recent_model = None
         self.most_recent_solution_or_trace = None
 
@@ -285,10 +293,11 @@ class PLDCorrector(object):
         ----------
         design_matrix : np.ndarray
             Matrix of shape (n_cadences, n_regressors) used to create the
-            motion model.
+            motion model.  If `None`, then the output of this object's
+            `create_design_matrix` method will be used.
         cadence_mask : np.ndarray
             Boolean array to mask cadences. Cadences that are False will be excluded
-            from the model fit
+            from the model fit.  If `None`, then all cadences will be used.
         gp_timescale_prior : int
             The parameter `rho` in the definition of the Matern-3/2 kernel, which
             influences the timescale of variability fit by the Gaussian Process.
@@ -361,8 +370,9 @@ class PLDCorrector(object):
 
         Parameters
         ----------
-        model : pymc3.model.Model
-            A pymc3 model
+        model : `pymc3.model.Model` object
+            A pymc3 model.  If `None`, the the output of this object's
+            `create_pymc_model` method will be used.
         start : dict
             MAP Solution from exoplanet
         robust : bool
@@ -371,11 +381,11 @@ class PLDCorrector(object):
             significantly slower but increases the likelihood of success.
         **kwargs : dict
             Dictionary of arguments to be passed to
-            `lightkurve.correctors.PLDCorrector.create_pymc_model`.
+            `~lightkurve.correctors.PLDCorrector.create_pymc_model`.
 
         Returns
         -------
-        map_soln : dict
+        solution : dict
             Maximum likelihood values.
         """
         if model is None:
@@ -384,39 +394,42 @@ class PLDCorrector(object):
             start = model.test_point
 
         with model:
-            map_soln = xo.optimize(start=start, vars=[model.logs2])
+            solution = xo.optimize(start=start, vars=[model.logs2])
             # Optimizing parameters separately appears to make finding a solution more likely
             if robust:
-                map_soln = xo.optimize(start=map_soln, vars=[model.logsigma])
-                map_soln = xo.optimize(start=map_soln, vars=[model.logrho, model.logsigma])
-                map_soln = xo.optimize(start=map_soln, vars=[model.logs2])
-            map_soln = xo.optimize(start=map_soln)  # Optimize all parameters
+                solution = xo.optimize(start=solution, vars=[model.logsigma])
+                solution = xo.optimize(start=solution, vars=[model.logrho, model.logsigma])
+                solution = xo.optimize(start=solution, vars=[model.logs2])
+            solution = xo.optimize(start=solution)  # Optimize all parameters
 
-        self.most_recent_solution_or_trace = map_soln
-        return map_soln
+        self.most_recent_solution_or_trace = solution
+        return solution
 
-    def sample(self, model=None, start=None, draws=1000):
+    def sample(self, model=None, start=None, draws=1000, chains=4):
         """Sample the systematics correction model.
 
         Parameters
         ----------
-        model : pymc3.model.Model
-            A pymc3 model
+        model : `pymc3.model.Model`
+            A pymc3 model.
         start : dict
-            MAP Solution from exoplanet
+            Initial parameter values to initiate the sampling. If `None`,
+            the output of this object's `optimize()` method will be used.
         draws : int
-            Number of samples
+            Number of MCMC samples.
+        chains : int
+            Number of MCMC chains.
 
         Returns
         -------
-        trace : `pymc3.trace`
-            Trace object containing parameters and their samples
+        trace : `~pymc3.backends.base.MultiTrace`
+            Trace object containing parameters and their samples.
         """
         # Create the model
         if model is None:
             model = self.create_pymc_model()
         if start is None:
-            start = self.optimize()
+            start = self.optimize(model=model)
 
         # Initialize the sampler
         sampler = xo.PyMC3Sampler()
@@ -425,111 +438,83 @@ class PLDCorrector(object):
             sampler.tune(tune=np.max([int(draws*0.3), 150]),
                          start=start,
                          step_kwargs=dict(target_accept=0.9),
-                         chains=4)
+                         chains=chains)
             # Sample the parameters
-            trace = sampler.sample(draws=draws, chains=4)
+            trace = sampler.sample(draws=draws, chains=chains)
 
         self.most_recent_solution_or_trace = trace
         return trace
 
-    def correct(self, remove_gp_trend=False, sample=False, **kwargs):
+    def correct(self, sample=False, remove_gp_trend=False, **kwargs):
         """Returns a systematics-corrected light curve.
 
         Parameters
         ----------
-        remove_gp_trend : boolean
-            `True` will subtract the fit GP stellar signal from the returned
-            flux light curve.
         sample : boolean
-            Boolean expression: `True` will sample the output of the optimization
+            `True` will sample the output of the optimization
             step and include robust errors on the output light curve.
-        draws : int
-            Number of samples.
+        remove_gp_trend : boolean
+            `True` will subtract the fit the long term GP signal from the returned
+            flux light curve.
+        **kwargs : dict
+            Optional arguments to be passed to
+            `~lightkurve.correctors.PLDCorrector.create_pymc_model`,
+            `~lightkurve.correctors.PLDCorrector.optimize`, or
+            `~lightkurve.correctors.PLDCorrector.sample`.
 
         Returns
         -------
         corrected_lc : `~lightkurve.lightcurve.LightCurve`
-            Motion noise corrected light curve object.
+            Systematics-corrected light curve.
         """
-        solution_or_trace = self._compute(**kwargs)
-        if remove_gp_trend:
-            column_name = 'corrected_flux_without_gp'
-        else:
-            column_name = 'corrected_flux'
-        lc = self._lightcurve_from_solution(solution_or_trace,
-                                            column_name=column_name)
-        return lc
-
-    def _compute(self, model=None, sample=False, **kwargs):
-        """Helper function to compute output solution or trace.
-
-        Parameters
-        ----------
-        model : pymc3.model.Model
-            A pymc3 model
-        sample : boolean
-            Boolean expression: `True` will sample the output of the optimization
-            step and include robust errors on the output light curve.
-        **kwargs : dict
-            Dictionary of arguments to be passed to
-            `lightkurve.correctors.PLDCorrector.create_pymc_model`.
-
-        Returns
-        -------
-        solution_or_trace : dict or `pymc3.backends.base.MultiTrace`
-            Dictionary containing output of `exoplanet` optimization, or outoput
-            trace from sampling the solution.
-        """
-        if model is None:
-            model = self.create_pymc_model(**kwargs)
-        solution = self.optimize(model=model, **kwargs)
+        model = self.create_pymc_model(**kwargs)
+        solution_or_trace = self.optimize(model=model, **kwargs)
         if sample:
-            solution_or_trace = self.sample(model=model, start=solution, **kwargs)
+            solution_or_trace = self.sample(model=model, start=solution_or_trace, **kwargs)
+
+        if remove_gp_trend:
+            variable = 'corrected_flux_without_gp'
         else:
-            solution_or_trace = solution
+            variable = 'corrected_flux'
 
-        return solution_or_trace
+        return self._lightcurve_from_solution(solution_or_trace, variable=variable)
 
-    def _lightcurve_from_solution(self, solution_or_trace, column_name='corrected_flux'):
-        """Helper function to generate light curve objects from a trace.
+    def _lightcurve_from_solution(self, solution_or_trace, variable='corrected_flux'):
+        """Helper function to generate light curve objects from the maximum
+        likelihood solution or the sample trace.
+
         Parameters
         ----------
-        solution_or_trace : dict or `pymc3.backends.base.MultiTrace`
-            Dictionary containing output of `exoplanet` optimization, or outoput
-            trace from sampling the solution.
-        sample : boolean
-            Boolean expression: `True` will sample the output of the optimization
-            step and include robust errors on the output light curve.
-        column_name : str
+        solution_or_trace : dict or `~pymc3.backends.base.MultiTrace`
+            The output returned by the `optimize()` or `sample()` methods
+            of this object.
+        variable : str
             Key for determining which light curve to extract from the given
             solution or trace.
 
         Returns
         -------
-        lc : `~lightkurve.lightcurve.LightCurve`
-            Light curve object corresponding to the input 'column_name'
+        lc : `~lightkurve.LightCurve`
+            Light curve object corresponding to the model variable.
         """
         lc = self.raw_lc.copy()
-        # If a trace is given, find the mean and std
+        # If the model was sampled, use the mean and std of the flux values.
         if isinstance(solution_or_trace, pm.backends.base.MultiTrace):
-            lc.flux = np.nanmean(solution_or_trace[column_name], axis=0)
-            lc.flux_err = np.nanstd(solution_or_trace[column_name], axis=0)
-        # Otherwise, read value from the dictionary
-        else:
-            lc.flux = solution_or_trace[column_name]
+            lc.flux = np.nanmean(solution_or_trace[variable], axis=0)
+            lc.flux_err = np.nanstd(solution_or_trace[variable], axis=0)
+        else:  # Otherwise, use the maximum likelihood flux values.
+            lc.flux = solution_or_trace[variable]
         return lc
 
-    def get_diagnostic_lightcurves(self, solution_or_trace=None, **kwargs):
+    def get_diagnostic_lightcurves(self, solution_or_trace=None):
         """Return useful diagnostic light curves.
 
         Parameters
         ----------
         solution_or_trace : dict or `pymc3.backends.base.MultiTrace`
-            Dictionary containing output of `exoplanet` optimization, or outoput
-            trace from sampling the solution.
-        **kwargs : dict
-            Dictionary of arguments to be passed to
-            `lightkurve.correctors.PLDCorrector.optimize`.
+            The output returned by the `optimize()` or `sample()` methods
+            of this object.  If `None`, then the solution most recently
+            computed by the object will be used.
 
         Returns
         -------
@@ -541,40 +526,32 @@ class PLDCorrector(object):
             Light curve object with the motion model removed by the corrector.
         """
         if solution_or_trace is None:
-            if self.most_recent_solution_or_trace is not None:
-                solution_or_trace = self.most_recent_solution_or_trace
+            if self.most_recent_solution_or_trace is None:
+                raise RuntimeError("You need to call the `optimize()` or `sample()` methods first.")
             else:
-                solution_or_trace = self._compute(**kwargs)
+                solution_or_trace = self.most_recent_solution_or_trace
 
-        corrected_lc = self._lightcurve_from_solution(solution_or_trace=solution_or_trace,
-                                                      column_name='corrected_flux')
-        gp_lc = self._lightcurve_from_solution(solution_or_trace=solution_or_trace,
-                                               column_name='gp_model')
-        motion_lc = self._lightcurve_from_solution(solution_or_trace=solution_or_trace,
-                                                   column_name='motion_model')
+        return [self._lightcurve_from_solution(solution_or_trace, variable=variable)
+                for variable in ['corrected_flux', 'gp_model', 'motion_model']]
 
-        return corrected_lc, gp_lc, motion_lc
-
-    def plot_diagnostics(self, solution=None, **kwargs):
+    def plot_diagnostics(self, solution_or_trace=None):
         """Plots a series of useful figures to help understand the noise removal
         process.
 
         Parameters
         ----------
-        solution : dict
-            Dictionary containing output of `exoplanet` optimization.
-        **kwargs : dict
-            Dictionary of arguments to be passed to
-            `lightkurve.correctors.PLDCorrector.optimize`.
+        solution_or_trace : dict or `pymc3.backends.base.MultiTrace`
+            The output returned by the `optimize()` or `sample()` methods
+            of this object.  If `None`, then the solution most recently
+            computed by the object will be used.
 
         Returns
         -------
         ax : matplotlib.axes._subplots.AxesSubplot
             The matplotlib axes object.
         """
-
         # Generate diagnostic light curves
-        corrected_lc, gp_lc, motion_lc = self.get_diagnostic_lightcurves(solution, **kwargs)
+        corrected_lc, gp_lc, motion_lc = self.get_diagnostic_lightcurves(solution_or_trace)
 
         # Increase the GP light curve flux normalization from 0 to the motion
         # model mean for visual comparison purposes
