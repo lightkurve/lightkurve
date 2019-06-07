@@ -7,7 +7,7 @@ but will speed up the computation if installed.
 TODO
 ----
 * Make sure the prior of logs2/logsigma/logrho has a user-configurable width.
-* [kinda done] Fix the units of corrected_flux, corrected_flux_without_gp, etc.
+* Verify the units of corrected_flux, corrected_flux_without_gp, etc.
   In Lightkurve we currently add back the mean of the model.
 * The design matrix can be improved by rejecting pixels which are saturated,
   and including the collapsed sums of their CCD columns instead.
@@ -51,6 +51,8 @@ class PLDCorrector(object):
         of PLD that is less sophisticated than EVEREST, but is suitable
         for quick-look analyses and detrending experiments.
 
+        Background
+        ----------
         Our implementation of PLD is performed by first calculating the noise
         model for each cadence in time. This function goes up to arbitrary
         order, and is represented by
@@ -91,6 +93,19 @@ class PLDCorrector(object):
         .. math::
 
             \frac{\partial \chi^2}{\partial a_l} = 0.
+
+    Examples	
+    --------	
+    Download the pixel data for GJ 9827 and obtain a PLD-corrected light curve:
+
+    >>> import lightkurve as lk	
+    >>> tpf = lk.search_targetpixelfile("GJ9827").download() # doctest: +SKIP	
+    >>> corrector = lk.PLDCorrector(tpf) # doctest: +SKIP	
+    >>> lc = corrector.correct() # doctest: +SKIP	
+    >>> lc.plot() # doctest: +SKIP	
+
+    However, the above example will over-fit the small transits!	
+    It is necessary to mask the transits using `corrector.correct(cadence_mask=...)`.
 
     References
     ----------
@@ -210,7 +225,8 @@ class PLDCorrector(object):
 
         return result
 
-    def create_design_matrix(self, pld_order=1, n_pca_terms=10, include_column_of_ones=False, **kwargs):
+    def create_design_matrix(self, pld_order=1, n_pca_terms=10,
+                             include_column_of_ones=False, **kwargs):
         """Returns a matrix designed to contain suitable regressors for the
         systematics noise model.
 
@@ -355,12 +371,14 @@ class PLDCorrector(object):
             # Likelihood to optimize
             pm.Potential("obs", model.gp.log_likelihood(lc_flux - motion_model))
 
-            # Add deterministic variables for easy of use
+            # Track the flux values of the different diagnostic light curves for ease of use
             gp_model, gp_model_var = model.gp.predict(return_var=True)
             pm.Deterministic("gp_model", gp_model)
             pm.Deterministic("gp_model_std", np.sqrt(gp_model_var))
-            pm.Deterministic("corrected_flux", lc_flux - motion_model + tt.mean(motion_model))
-            pm.Deterministic("corrected_flux_without_gp", lc_flux - motion_model - gp_model + tt.mean(motion_model))
+            pm.Deterministic("corrected_flux",
+                             lc_flux - motion_model + tt.mean(motion_model))
+            pm.Deterministic("corrected_flux_without_gp",
+                             lc_flux - motion_model - gp_model + tt.mean(motion_model))
 
         self.most_recent_model = model
         return model
@@ -454,12 +472,12 @@ class PLDCorrector(object):
             `True` will sample the output of the optimization
             step and include robust errors on the output light curve.
         remove_gp_trend : boolean
-            `True` will subtract the fit the long term GP signal from the returned
-            flux light curve.
+            `True` will subtract the fit the long term GP signal from the
+            returned flux light curve.
         **kwargs : dict
             Optional arguments to be passed to
             `~lightkurve.correctors.PLDCorrector.create_pymc_model`,
-            `~lightkurve.correctors.PLDCorrector.optimize`, or
+            `~lightkurve.correctors.PLDCorrector.optimize`, and
             `~lightkurve.correctors.PLDCorrector.sample`.
 
         Returns
@@ -476,7 +494,6 @@ class PLDCorrector(object):
             variable = 'corrected_flux_without_gp'
         else:
             variable = 'corrected_flux'
-
         return self._lightcurve_from_solution(solution_or_trace, variable=variable)
 
     def _lightcurve_from_solution(self, solution_or_trace, variable='corrected_flux'):
@@ -512,9 +529,9 @@ class PLDCorrector(object):
         Parameters
         ----------
         solution_or_trace : dict or `pymc3.backends.base.MultiTrace`
-            The output returned by the `optimize()` or `sample()` methods
-            of this object.  If `None`, then the solution most recently
-            computed by the object will be used.
+            The output returned by this object's `optimize()` or `sample()`
+            methods.  If `None`, then the solution most recently computed
+            by those methods will be used.
 
         Returns
         -------
@@ -524,10 +541,16 @@ class PLDCorrector(object):
             Light curve object containing GP model of the stellar signal.
         motion_lc : `~lightkurve.lightcurve.LightCurve`
             Light curve object with the motion model removed by the corrector.
+
+        Raises
+        ------
+        RuntimeError : if no `solution_or_trace` has been passed and the object's
+            `optimize()` or `sample()` methods have not yet been called.
         """
         if solution_or_trace is None:
             if self.most_recent_solution_or_trace is None:
-                raise RuntimeError("You need to call the `optimize()` or `sample()` methods first.")
+                raise RuntimeError("You need to call the `optimize()` or "
+                                   "`sample()` methods first.")
             else:
                 solution_or_trace = self.most_recent_solution_or_trace
 
@@ -541,9 +564,9 @@ class PLDCorrector(object):
         Parameters
         ----------
         solution_or_trace : dict or `pymc3.backends.base.MultiTrace`
-            The output returned by the `optimize()` or `sample()` methods
-            of this object.  If `None`, then the solution most recently
-            computed by the object will be used.
+            The output returned by this object's `optimize()` or `sample()`
+            methods.  If `None`, then the solution most recently computed
+            by those methods will be used.
 
         Returns
         -------
@@ -564,7 +587,8 @@ class PLDCorrector(object):
         # Plot the stellar model over the raw flux, indicating masked cadences
         self.raw_lc.scatter(c='r', alpha=0.3, ax=ax[1], label='Raw Flux', normalize=False)
         gp_lc.plot(c='k', ax=ax[1], label='GP Model', normalize=False)
-        gp_lc[~self.most_recent_model.cadence_mask].scatter(ax=ax[1], label='Masked Cadences', marker='d', normalize=False)
+        gp_lc[~self.most_recent_model.cadence_mask].scatter(ax=ax[1], label='Masked Cadences',
+                                                            marker='d', normalize=False)
         # Plot the motion model over the raw light curve
         self.raw_lc.scatter(c='r', alpha=0.3, ax=ax[2], label='Raw Flux', normalize=False)
         motion_lc.scatter(c='k', ax=ax[2], label='Noise Model', normalize=False)
@@ -578,10 +602,12 @@ class PLDCorrector(object):
         ----------
         design_matrix : np.ndarray
             Matrix of shape (n_cadences, n_regressors) used to create the
-            motion model.
+            motion model.  If `None`, then the output of this object's
+            `~lightkurve.correctors.PLDCorrector.create_design_matrix` method
+            will be used.
         **kwargs : dict
             Dictionary of arguments to be passed to
-            `lightkurve.correctors.PLDCorrector.create_design_matrix`.
+            `~lightkurve.correctors.PLDCorrector.create_design_matrix`.
 
         Returns
         -------
@@ -590,11 +616,9 @@ class PLDCorrector(object):
         """
         if design_matrix is None:
             design_matrix = self.create_design_matrix(**kwargs)
-
         with plt.style.context(MPLSTYLE):
             fig, ax = plt.subplots(1, figsize=(8.45, 8.45))
             ax.imshow(design_matrix, aspect='auto')
             ax.set_ylabel('Cadence Number')
             ax.set_xlabel('Regressors')
-
         return ax
