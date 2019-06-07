@@ -94,17 +94,17 @@ class PLDCorrector(object):
 
             \frac{\partial \chi^2}{\partial a_l} = 0.
 
-    Examples	
-    --------	
+    Examples
+    --------
     Download the pixel data for GJ 9827 and obtain a PLD-corrected light curve:
 
-    >>> import lightkurve as lk	
-    >>> tpf = lk.search_targetpixelfile("GJ9827").download() # doctest: +SKIP	
-    >>> corrector = lk.PLDCorrector(tpf) # doctest: +SKIP	
-    >>> lc = corrector.correct() # doctest: +SKIP	
-    >>> lc.plot() # doctest: +SKIP	
+    >>> import lightkurve as lk
+    >>> tpf = lk.search_targetpixelfile("GJ9827").download() # doctest: +SKIP
+    >>> corrector = lk.PLDCorrector(tpf) # doctest: +SKIP
+    >>> lc = corrector.correct() # doctest: +SKIP
+    >>> lc.plot() # doctest: +SKIP
 
-    However, the above example will over-fit the small transits!	
+    However, the above example will over-fit the small transits!
     It is necessary to mask the transits using `corrector.correct(cadence_mask=...)`.
 
     References
@@ -354,7 +354,7 @@ class PLDCorrector(object):
             # log(rho) is the timescale of variability with a user-defined prior
             logrho = pm.Normal("logrho", mu=np.log(gp_timescale_prior), sd=4)
             # log(s2) is a jitter term to compensate for underestimated flux errors
-            logs2 = pm.Normal("logs2", mu=np.log(np.var(lc_flux)), sd=4)
+            logs2 = pm.Normal("logs2", mu=np.log(self.raw_lc.estimate_cdpp()), sd=4)
             kernel = xo.gp.terms.Matern32Term(log_sigma=logsigma, log_rho=logrho)
 
             # Store the GP and cadence mask to aid debugging
