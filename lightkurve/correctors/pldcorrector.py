@@ -348,6 +348,8 @@ class PLDCorrector(object):
         diag[~cadence_mask] += 1e12
 
         with pm.Model() as model:
+            # The mean baseline flux value for the star
+            mean = pm.Normal("mean", mu=np.nanmean(lc_flux), sd=np.std(lc_flux))
             # Create a Gaussian Process to model the long-term stellar variability
             # log(sigma) is the amplitude of variability, estimated from the raw flux scatter
             logsigma = pm.Normal("logsigma", mu=np.log(np.std(lc_flux)), sd=4)
@@ -369,16 +371,15 @@ class PLDCorrector(object):
             pm.Deterministic("weights", weights)
 
             # Likelihood to optimize
-            pm.Potential("obs", model.gp.log_likelihood(lc_flux - motion_model))
+            pm.Potential("obs", model.gp.log_likelihood(lc_flux - motion_model - mean))
 
             # Track the flux values of the different diagnostic light curves for ease of use
             gp_model, gp_model_var = model.gp.predict(return_var=True)
-            pm.Deterministic("gp_model", gp_model)
+            pm.Deterministic("gp_model", gp_model + mean)
             pm.Deterministic("gp_model_std", np.sqrt(gp_model_var))
-            pm.Deterministic("corrected_flux",
-                             lc_flux - motion_model + tt.mean(motion_model))
+            pm.Deterministic("corrected_flux", lc_flux - motion_model + mean)
             pm.Deterministic("corrected_flux_without_gp",
-                             lc_flux - motion_model - gp_model + tt.mean(motion_model))
+                             lc_flux - motion_model - gp_model + mean)
 
         self.most_recent_model = model
         return model
@@ -415,8 +416,8 @@ class PLDCorrector(object):
             solution = xo.optimize(start=start, vars=[model.logs2])
             # Optimizing parameters separately appears to make finding a solution more likely
             if robust:
-                solution = xo.optimize(start=solution, vars=[model.logsigma])
-                solution = xo.optimize(start=solution, vars=[model.logrho, model.logsigma])
+                solution = xo.optimize(start=solution, vars=[model.logsigma, model.mean])
+                solution = xo.optimize(start=solution, vars=[model.logrho, model.logsigma, model.mean])
                 solution = xo.optimize(start=solution, vars=[model.logs2])
             solution = xo.optimize(start=solution)  # Optimize all parameters
 
