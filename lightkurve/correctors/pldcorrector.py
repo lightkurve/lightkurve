@@ -202,7 +202,7 @@ class PLDCorrector(object):
 
         return result
 
-    def create_design_matrix(self, pld_order=1, n_pca_terms=10, include_column_of_ones=False):
+    def create_design_matrix(self, pld_order=1, n_pca_terms=10, include_column_of_ones=False, **kwargs):
         """Returns a matrix designed to contain suitable regressors for the
         systematics noise model.
 
@@ -356,7 +356,7 @@ class PLDCorrector(object):
         self.most_recent_model = model
         return model
 
-    def optimize(self, model=None, start=None, **kwargs):
+    def optimize(self, model=None, start=None, robust=False, **kwargs):
         """Returns the maximum likelihood solution.
 
         Parameters
@@ -365,6 +365,10 @@ class PLDCorrector(object):
             A pymc3 model
         start : dict
             MAP Solution from exoplanet
+        robust : bool
+            If `True`, all parameters will be optimized separately before
+            attempting to optimize all parameters together.  This will be
+            significantly slower but increases the likelihood of success.
         **kwargs : dict
             Dictionary of arguments to be passed to
             `lightkurve.correctors.PLDCorrector.create_pymc_model`.
@@ -380,12 +384,13 @@ class PLDCorrector(object):
             start = model.test_point
 
         with model:
-            map_soln = xo.optimize(start=start, vars=[model.logsigma])
-            map_soln = xo.optimize(start=map_soln, vars=[model.logrho, model.logsigma])
-            map_soln = xo.optimize(start=map_soln, vars=[model.logsigma])
-            map_soln = xo.optimize(start=map_soln, vars=[model.logrho, model.logsigma])
-            map_soln = xo.optimize(start=map_soln, vars=[model.logs2])
-            map_soln = xo.optimize(start=map_soln, vars=[model.logrho, model.logsigma, model.logs2])
+            map_soln = xo.optimize(start=start, vars=[model.logs2])
+            # Optimizing parameters separately appears to make finding a solution more likely
+            if robust:
+                map_soln = xo.optimize(start=map_soln, vars=[model.logsigma])
+                map_soln = xo.optimize(start=map_soln, vars=[model.logrho, model.logsigma])
+                map_soln = xo.optimize(start=map_soln, vars=[model.logs2])
+            map_soln = xo.optimize(start=map_soln)  # Optimize all parameters
 
         self.most_recent_solution_or_trace = map_soln
         return map_soln
@@ -452,8 +457,7 @@ class PLDCorrector(object):
         else:
             column_name = 'corrected_flux'
         lc = self._lightcurve_from_solution(solution_or_trace,
-                                            column_name=column_name,
-                                            **kwargs)
+                                            column_name=column_name)
         return lc
 
     def _compute(self, model=None, sample=False, **kwargs):
@@ -543,11 +547,11 @@ class PLDCorrector(object):
                 solution_or_trace = self._compute(**kwargs)
 
         corrected_lc = self._lightcurve_from_solution(solution_or_trace=solution_or_trace,
-                                                      column_name='corrected_flux', **kwargs)
+                                                      column_name='corrected_flux')
         gp_lc = self._lightcurve_from_solution(solution_or_trace=solution_or_trace,
-                                               column_name='gp_model', **kwargs)
+                                               column_name='gp_model')
         motion_lc = self._lightcurve_from_solution(solution_or_trace=solution_or_trace,
-                                                   column_name='motion_model', **kwargs)
+                                                   column_name='motion_model')
 
         return corrected_lc, gp_lc, motion_lc
 
