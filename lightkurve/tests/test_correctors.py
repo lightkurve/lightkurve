@@ -1,6 +1,3 @@
-from __future__ import division, print_function
-
-import sys
 import pytest
 import numpy as np
 from numpy.testing import assert_almost_equal, assert_array_equal
@@ -8,10 +5,12 @@ from astropy.utils.data import get_pkg_data_filename
 
 from ..lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
 from ..lightcurvefile import KeplerLightCurveFile
+from ..targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
 from ..correctors import KeplerCBVCorrector, SFFCorrector, PLDCorrector
-from ..search import search_targetpixelfile
+from ..search import search_targetpixelfile, open
 
 from .test_lightcurve import TABBY_Q8
+from .test_targetpixelfile import filename_tpf_one_center, filename_tess, TESS_SIM, TABBY_TPF
 
 bad_optional_imports = False
 try:
@@ -193,10 +192,10 @@ def test_to_corrector():
 def test_pld_aperture_mask():
     """Test for #523: does PLDCorrector.correct() accept separate apertures for
     PLD pixels?"""
-    tpf = KeplerTargetPixelFile(TABBY_TPF)
+    tpf = open(TABBY_TPF)
     # use only the pixels in the pipeline mask
-    lc_pipeline = PLDCorrector(tpf, pld_aperture_mask='pipeline').correct(gp_timescale_prior=30)
+    lc_pipeline = PLDCorrector(tpf, pld_aperture_mask='pipeline').correct(robust=True)
     # use all pixels in the tpf
-    lc_all = PLDCorrector(tpf, pld_aperture_mask='all').correct(gp_timescale_prior=30)
+    lc_all = PLDCorrector(tpf, pld_aperture_mask='all').correct(robust=True)
     # does this improve the correction?
     assert(lc_all.estimate_cdpp() < lc_pipeline.estimate_cdpp())
