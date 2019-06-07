@@ -25,6 +25,13 @@ jobs:
         pip.command: 'pip install -e .[test]'
 
   steps:
+  - bash: |
+      echo "##vso[task.prependpath]$CONDA/bin"
+      sudo chown -R $USER $CONDA
+      conda create --yes --quiet --name myEnvironment
+      source activate myEnvironment
+      conda install --yes --quiet --name myEnvironment numpy scipy astropy
+    displayName: Setup anaconda
   - template: .azure-template.yml
 
 - job: Windows
@@ -37,6 +44,10 @@ jobs:
         pytest.options: '--remote-data'
         pip.command: 'pip install -e .[all,test]'
   steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+    displayName: 'Use Python $(python.version)'
   - template: .azure-template.yml
 
 - job: macOS
@@ -49,4 +60,8 @@ jobs:
         pytest.options: ''
         pip.command: 'pip install -e .[all,test]'
   steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+    displayName: 'Use Python $(python.version)'
   - template: .azure-template.yml
