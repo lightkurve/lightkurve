@@ -147,7 +147,7 @@ class PLDCorrector(object):
         # Input validation: parse the aperture masks to accept strings etc.
         self.aperture_mask = tpf._parse_aperture_mask(aperture_mask)
         if pld_aperture_mask is None:
-            self.pld_aperture_mask = self.aperture_mask
+            self.pld_aperture_mask = tpf._parse_aperture_mask('all')
         else:
             self.pld_aperture_mask = tpf._parse_aperture_mask(pld_aperture_mask)
         # Generate raw flux light curve from desired pixels
