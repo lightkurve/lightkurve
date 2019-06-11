@@ -126,7 +126,7 @@ class PLDCorrector(object):
         The pixel data from which a light curve will be extracted.
     aperture_mask : 2D boolean array or str
         The pixel aperture mask that will be used to extract the raw light curve.
-    pld_aperture_mask : 2D boolean array or str
+    design_matrix_aperture_mask : 2D boolean array or str
         The pixel aperture mask that will be used to create the regression matrix
         (i.e. the design matrix) used to model the systematics.  If `None`,
         then the `aperture_mask` value will be used.
@@ -136,7 +136,7 @@ class PLDCorrector(object):
     ImportError : if one of Lightkurve's optional dependencies required by
         this class are not available (i.e. `pymc`, `theano`, or `exoplanet`).
     """
-    def __init__(self, tpf, aperture_mask=None, pld_aperture_mask=None):
+    def __init__(self, tpf, aperture_mask=None, design_matrix_aperture_mask=None):
         # Ensure the optional dependencies requires by this class are installed
         success, messages = self._check_optional_dependencies()
         if not success:
@@ -146,10 +146,10 @@ class PLDCorrector(object):
 
         # Input validation: parse the aperture masks to accept strings etc.
         self.aperture_mask = tpf._parse_aperture_mask(aperture_mask)
-        if pld_aperture_mask is None:
-            self.pld_aperture_mask = tpf._parse_aperture_mask('all')
+        if design_matrix_aperture_mask is None:
+            self.design_matrix_aperture_mask = tpf._parse_aperture_mask('all')
         else:
-            self.pld_aperture_mask = tpf._parse_aperture_mask(pld_aperture_mask)
+            self.design_matrix_aperture_mask = tpf._parse_aperture_mask(design_matrix_aperture_mask)
         # Generate raw flux light curve from desired pixels
         raw_lc = tpf.to_lightcurve(aperture_mask=self.aperture_mask)
         # It is critical to remove all cadences with NaNs or the linear algebra below will crash
@@ -209,8 +209,8 @@ class PLDCorrector(object):
         # Re-arrange the cube of flux values observed in a user-specified mask
         # into a 2D matrix of shape (n_cadences, n_pixels_in_mask).
         # Note that Theano appears to require 64-bit floats.
-        matrix = np.asarray(self.tpf.flux[:, self.pld_aperture_mask], np.float64)
-        assert matrix.shape == (len(self.raw_lc.time), self.pld_aperture_mask.sum())
+        matrix = np.asarray(self.tpf.flux[:, self.design_matrix_aperture_mask], np.float64)
+        assert matrix.shape == (len(self.raw_lc.time), self.design_matrix_aperture_mask.sum())
         # Remove all NaN or Inf values
         matrix = matrix[:, np.isfinite(matrix).all(axis=0)]
         # To ensure that each column contains the fractional pixel flux,

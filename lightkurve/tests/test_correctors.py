@@ -112,12 +112,12 @@ def test_first_order_matrix():
     # Open a 3x3 TPF which has flux=1 in the center pixel and 0 elsewhere
     tpf = open(filename_tpf_one_center)
     # Try with all pixels in the mask
-    corr = PLDCorrector(tpf, pld_aperture_mask="all")
+    corr = PLDCorrector(tpf, design_matrix_aperture_mask="all")
     matrix = corr._create_first_order_matrix()
     assert matrix.shape == (len(tpf.time), 9)
     assert np.sum(matrix) == len(tpf.time)
     # Only include central pixel
-    corr = PLDCorrector(tpf, pld_aperture_mask=(tpf.flux[0] > 0))
+    corr = PLDCorrector(tpf, design_matrix_aperture_mask=(tpf.flux[0] > 0))
     matrix = corr._create_first_order_matrix()
     assert matrix.shape == (len(tpf.time), 1)
     assert np.sum(matrix) == len(tpf.time)
@@ -129,7 +129,7 @@ def test_design_matrix():
     # Open a 3x3 TPF which has flux=1 in the center pixel and 0 elsewhere
     tpf = open(filename_tpf_one_center)
     n_pixels = tpf.flux[0].size
-    corr = PLDCorrector(tpf, pld_aperture_mask="all")
+    corr = PLDCorrector(tpf, design_matrix_aperture_mask="all")
     # Does the design matrix shape increase as expected for higher-order PLD?
     for pld_order in [1, 2, 3]:
         for n_pca_terms in [1, 3]:
@@ -140,7 +140,7 @@ def test_design_matrix():
 @pytest.mark.skipif(bad_optional_imports, reason="PLD requires theano, pymc3, and exoplanet")
 def test_pymc_model():
     tpf = TessTargetPixelFile(TESS_SIM)
-    corr = PLDCorrector(tpf[:500], pld_aperture_mask="all")
+    corr = PLDCorrector(tpf[:500], design_matrix_aperture_mask="all")
     model = corr.create_pymc_model(design_matrix=corr.create_design_matrix(pld_order=1))
     sol = corr.optimize(model)
 
@@ -189,13 +189,13 @@ def test_to_corrector():
 
 @pytest.mark.remote_data
 @pytest.mark.skipif(bad_optional_imports, reason="PLD requires theano, pymc3, and exoplanet")
-def test_pld_aperture_mask():
+def test_design_matrix_aperture_mask():
     """Test for #523: does PLDCorrector.correct() accept separate apertures for
     PLD pixels?"""
     tpf = open(TABBY_TPF)
     # use only the pixels in the pipeline mask
-    lc_pipeline = PLDCorrector(tpf, pld_aperture_mask='pipeline').correct(robust=True, pld_order=2)
+    lc_pipeline = PLDCorrector(tpf, design_matrix_aperture_mask='pipeline').correct(robust=True, pld_order=2)
     # use all pixels in the tpf
-    lc_all = PLDCorrector(tpf, pld_aperture_mask='all').correct(robust=True, pld_order=2)
+    lc_all = PLDCorrector(tpf, design_matrix_aperture_mask='all').correct(robust=True, pld_order=2)
     # does this improve the correction?
     assert(lc_all.estimate_cdpp() < lc_pipeline.estimate_cdpp())
