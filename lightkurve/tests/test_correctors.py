@@ -139,8 +139,8 @@ def test_design_matrix():
 
 @pytest.mark.skipif(bad_optional_imports, reason="PLD requires theano, pymc3, and exoplanet")
 def test_pymc_model():
-    tpf = open(filename_tess)
-    corr = PLDCorrector(tpf, pld_aperture_mask="all")
+    tpf = TessTargetPixelFile(TESS_SIM)
+    corr = PLDCorrector(tpf[:500], pld_aperture_mask="all")
     model = corr.create_pymc_model(design_matrix=corr.create_design_matrix(pld_order=1))
     sol = corr.optimize(model)
 
@@ -194,8 +194,8 @@ def test_pld_aperture_mask():
     PLD pixels?"""
     tpf = open(TABBY_TPF)
     # use only the pixels in the pipeline mask
-    lc_pipeline = PLDCorrector(tpf, pld_aperture_mask='pipeline').correct(robust=True)
+    lc_pipeline = PLDCorrector(tpf, pld_aperture_mask='pipeline').correct(robust=True, pld_order=2)
     # use all pixels in the tpf
-    lc_all = PLDCorrector(tpf, pld_aperture_mask='all').correct(robust=True)
+    lc_all = PLDCorrector(tpf, pld_aperture_mask='all').correct(robust=True, pld_order=2)
     # does this improve the correction?
     assert(lc_all.estimate_cdpp() < lc_pipeline.estimate_cdpp())
