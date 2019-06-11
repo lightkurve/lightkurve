@@ -30,7 +30,7 @@ jobs:
   - bash: |
       echo "##vso[task.prependpath]$CONDA/bin"
       conda create --yes --quiet --name myEnvironment
-      source activate myEnvironment
+      conda activate myEnvironment
       conda install --yes --quiet --name myEnvironment python=$(python.version) pip numpy scipy matplotlib pandas astropy
     displayName: Setup anaconda
   - template: .azure-template.yml
