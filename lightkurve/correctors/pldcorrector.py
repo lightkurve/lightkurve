@@ -467,9 +467,7 @@ class PLDCorrector(object):
         self.most_recent_solution_or_trace = trace
         return trace
 
-    def correct(self, sample=False, remove_gp_trend=False, design_matrix=None,
-                cadence_mask=None, gp_timescale_prior=150, model=None,
-                start=None, robust=False, draws=1000, chains=4):
+    def correct(self, sample=False, remove_gp_trend=False, **kwargs):
         """Returns a systematics-corrected light curve.
 
         Parameters
@@ -480,6 +478,11 @@ class PLDCorrector(object):
         remove_gp_trend : boolean
             `True` will subtract the fit the long term GP signal from the
             returned flux light curve.
+        **kwargs : dict
+            Optional arguments to be passed to
+            `~lightkurve.correctors.PLDCorrector.create_pymc_model`,
+            `~lightkurve.correctors.PLDCorrector.optimize`, and
+            `~lightkurve.correctors.PLDCorrector.sample`.
         design_matrix : np.ndarray
             Matrix of shape (n_cadences, n_regressors) used to create the
             motion model.  If `None`, then the output of this object's
@@ -494,13 +497,13 @@ class PLDCorrector(object):
         model : `pymc3.model.Model` object
             A pymc3 model.  If `None`, the the output of this object's
             `create_pymc_model` method will be used.
-        start : dict
-            Initial parameter values to initiate the sampling. If `None`,
-            the output of this object's `optimize()` method will be used.
         robust : bool
             If `True`, all parameters will be optimized separately before
             attempting to optimize all parameters together.  This will be
             significantly slower but increases the likelihood of success.
+        start : dict
+            Initial parameter values to initiate the sampling. If `None`,
+            the output of this object's `optimize()` method will be used.
         draws : int
             Number of MCMC samples.
         chains : int
@@ -511,13 +514,10 @@ class PLDCorrector(object):
         corrected_lc : `~lightkurve.lightcurve.LightCurve`
             Systematics-corrected light curve.
         """
-        model = self.create_pymc_model(design_matrix=design_matrix,
-                                       cadence_mask=cadence_mask,
-                                       gp_timescale_prior=gp_timescale_prior)
-        solution_or_trace = self.optimize(model=model, start=start, robust=robust)
+        model = self.create_pymc_model(**kwargs)
+        solution_or_trace = self.optimize(model=model, **kwargs)
         if sample:
-            solution_or_trace = self.sample(model=model, start=start,
-                                            draws=draws, chains=chains)
+            solution_or_trace = self.sample(model=model, start=solution_or_trace, **kwargs)
 
         if remove_gp_trend:
             variable = 'corrected_flux_without_gp'
