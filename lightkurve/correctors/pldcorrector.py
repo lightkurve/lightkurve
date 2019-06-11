@@ -152,7 +152,7 @@ class PLDCorrector(object):
             self.pld_aperture_mask = tpf._parse_aperture_mask(pld_aperture_mask)
         # Generate raw flux light curve from desired pixels
         raw_lc = tpf.to_lightcurve(aperture_mask=self.aperture_mask)
-        # It is critical to remove all NaNs or the linear algebra below will crash
+        # It is critical to remove all cadences with NaNs or the linear algebra below will crash
         self.raw_lc, self.nan_mask = raw_lc.remove_nans(return_mask=True)
         self.tpf = tpf[~self.nan_mask]
         # For user-friendliness, we will track the most recently used model and solution:
@@ -192,7 +192,7 @@ class PLDCorrector(object):
 
         return success, messages
 
-    def create_first_order_matrix(self):
+    def _create_first_order_matrix(self):
         """Returns a matrix which encodes the fractional pixel fluxes as a function
         of cadence (row) and pixel (column). As such, the method returns a
         2D matrix with shape (n_cadences, n_pixels_in_pld_mask).
@@ -266,14 +266,15 @@ class PLDCorrector(object):
                         "(`pip install fbpca`).")
 
         matrix_sections = []  # list to hold the design matrix components
-        first_order_matrix = self.create_first_order_matrix()
+        first_order_matrix = self._create_first_order_matrix()
 
-        # Input validation: n_pca_terms cannot be larger than the number of cadences
-        n_cadences = len(first_order_matrix)
-        if n_pca_terms > n_cadences:
-            log.warning("`n_pca_terms` ({}) cannot be larger than the number of cadences ({});"
-                        "using n_pca_terms={}".format(n_pca_terms, n_cadences, n_cadences))
-            n_pca_terms = n_cadences
+        # Input validation: n_pca_terms cannot be larger than the number of regressors (pixels)
+        n_pixels = len(first_order_matrix.T)
+        if n_pca_terms > n_pixels:
+            log.warning("`n_pca_terms` ({}) cannot be larger than the number of pixels ({});"
+                        "using n_pca_terms={}".format(n_pca_terms, n_pixels, n_pixels))
+            n_pca_terms = n_pixels
+
 
         # The original EVEREST paper includes a column vector of ones in the
         # design matrix to improve the numerical stability (see Luger et al.);
@@ -290,6 +291,7 @@ class PLDCorrector(object):
             # Take the product of all combinations of pixels; order=2 will
             # multiply all pairs of pixels, order=3 will multiple triples, etc.
             matrix = np.product(list(multichoose(first_order_matrix.T, order)), axis=1).T
+            print()
             # This product matrix becomes very big very quickly, so we reduce
             # its dimensionality using PCA.
             if use_fbpca:  # fast mode
