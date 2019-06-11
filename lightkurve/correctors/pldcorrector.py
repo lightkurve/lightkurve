@@ -417,12 +417,11 @@ class PLDCorrector(object):
             start = model.test_point
 
         with model:
-            solution = xo.optimize(start=start, vars=[model.logs2])
+            solution = xo.optimize(start=start, vars=[model.logrho, model.mean])
             # Optimizing parameters separately appears to make finding a solution more likely
             if robust:
-                solution = xo.optimize(start=solution, vars=[model.logsigma, model.mean])
                 solution = xo.optimize(start=solution, vars=[model.logrho, model.logsigma, model.mean])
-                solution = xo.optimize(start=solution, vars=[model.logs2])
+                solution = xo.optimize(start=solution, vars=[model.logrho, model.logsigma, model.logs2])
             solution = xo.optimize(start=solution)  # Optimize all parameters
 
         self.most_recent_solution_or_trace = solution
