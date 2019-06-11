@@ -316,9 +316,10 @@ class PLDCorrector(object):
         cadence_mask : np.ndarray
             Boolean array to mask cadences. Cadences that are False will be excluded
             from the model fit.  If `None`, then all cadences will be used.
-        gp_timescale_prior : int
+        gp_timescale_prior : int or float
             The parameter `rho` in the definition of the Matern-3/2 kernel, which
-            influences the timescale of variability fit by the Gaussian Process.
+            influences the timescale of variability fit by the Gaussian Process,
+            in the same units as `tpf.time`.
             For more information, see [1]
 
         Returns
@@ -490,9 +491,10 @@ class PLDCorrector(object):
         cadence_mask : np.ndarray
             Boolean array to mask cadences. Cadences that are False will be excluded
             from the model fit.  If `None`, then all cadences will be used.
-        gp_timescale_prior : int
+        gp_timescale_prior : int or float
             The parameter `rho` in the definition of the Matern-3/2 kernel, which
-            influences the timescale of variability fit by the Gaussian Process.
+            influences the timescale of variability fit by the Gaussian Process,
+            in the same units as `tpf.time`.
             For more information, see [1]
         model : `pymc3.model.Model` object
             A pymc3 model.  If `None`, the the output of this object's
