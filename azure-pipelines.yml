@@ -28,10 +28,10 @@ jobs:
   # Theano does not appear to work with system Python on Azure Ubuntu 16.04,
   # so we use anaconda instead here.
   - bash: |
-      echo "##vso[task.prependpath]$CONDA/bin"
+      echo "##vso[task.setvariable variable=PATH;]$CONDA/bin"
       conda create --yes --quiet --name myEnvironment
       source activate myEnvironment
-      conda install --yes --quiet --name myEnvironment python=$(python.version) numpy scipy matplotlib pandas astropy
+      conda install --yes --quiet --name myEnvironment python=$(python.version) pip numpy scipy matplotlib pandas astropy
     displayName: Setup anaconda
   - template: .azure-template.yml
 
