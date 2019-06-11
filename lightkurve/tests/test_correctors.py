@@ -113,12 +113,12 @@ def test_first_order_matrix():
     tpf = open(filename_tpf_one_center)
     # Try with all pixels in the mask
     corr = PLDCorrector(tpf, pld_aperture_mask="all")
-    matrix = corr.create_first_order_matrix()
+    matrix = corr._create_first_order_matrix()
     assert matrix.shape == (len(tpf.time), 9)
     assert np.sum(matrix) == len(tpf.time)
     # Only include central pixel
     corr = PLDCorrector(tpf, pld_aperture_mask=(tpf.flux[0] > 0))
-    matrix = corr.create_first_order_matrix()
+    matrix = corr._create_first_order_matrix()
     assert matrix.shape == (len(tpf.time), 1)
     assert np.sum(matrix) == len(tpf.time)
 
