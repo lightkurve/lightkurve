@@ -16,6 +16,7 @@ TODO
   design matrix is necessary for numerical stability.
 """
 import logging
+import warnings
 from itertools import combinations_with_replacement as multichoose
 
 import numpy as np
@@ -32,7 +33,7 @@ except ImportError:
     pass
 
 from .. import MPLSTYLE
-from ..utils import LightkurveError, suppress_stdout
+from ..utils import LightkurveError, LightkurveWarning, suppress_stdout
 
 log = logging.getLogger(__name__)
 
@@ -148,9 +149,8 @@ class PLDCorrector(object):
         # Input validation: parse the aperture masks to accept strings etc.
         self.aperture_mask = tpf._parse_aperture_mask(aperture_mask)
         if design_matrix_aperture_mask is None:
-            self.design_matrix_aperture_mask = tpf._parse_aperture_mask('all')
-        else:
-            self.design_matrix_aperture_mask = tpf._parse_aperture_mask(design_matrix_aperture_mask)
+            design_matrix_aperture_mask = 'all'
+        self.design_matrix_aperture_mask = tpf._parse_aperture_mask(design_matrix_aperture_mask)
         # Generate raw flux light curve from desired pixels
         raw_lc = tpf.to_lightcurve(aperture_mask=self.aperture_mask)
         # It is critical to remove all cadences with NaNs or the linear algebra below will crash
@@ -479,8 +479,7 @@ class PLDCorrector(object):
         self.most_recent_solution_or_trace = trace
         return trace
 
-    def correct(self, sample=False, remove_gp_trend=False,
-                aperture_mask=None, design_matrix_aperture_mask=None, **kwargs):
+    def correct(self, sample=False, remove_gp_trend=False, **kwargs):
         """Returns a systematics-corrected light curve.
 
         Parameters
@@ -529,7 +528,7 @@ class PLDCorrector(object):
             Systematics-corrected light curve.
         """
         # Provide warning for deprecated syntax
-        if any(mask is not None for mask in [aperture_mask, design_matrix_aperture_mask]):
+        if any(mask in kwargs for mask in ['aperture_mask', 'design_matrix_aperture_mask']):
             warnings.warn('`PLDCorrector` has been recently updated, and no longer '
                           'accepts `aperture_mask` or `design_matrix_aperture_mask` '
                           'in the `correct` function. Please pass these masks into '

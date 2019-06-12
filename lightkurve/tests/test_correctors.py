@@ -152,12 +152,12 @@ def test_pld_corrector():
     k2_target = 247887989
     k2_tpf = search_targetpixelfile(k2_target).download()
     # instantiate PLD corrector object
-    pld = PLDCorrector(k2_tpf[:500], aperture_mask='threshold')
+    pld = PLDCorrector(k2_tpf[:700], aperture_mask='threshold')
     # produce a PLD-corrected light curve with a default aperture mask
     corrected_lc = pld.correct()
     # ensure the CDPP was reduced by the corrector
     pld_cdpp = corrected_lc.estimate_cdpp()
-    raw_cdpp = k2_tpf.to_lightcurve().estimate_cdpp()
+    raw_cdpp = k2_tpf[:700].to_lightcurve().estimate_cdpp()
     assert(pld_cdpp < raw_cdpp)
     # make sure the returned object is the correct type (`KeplerLightCurve`)
     assert(isinstance(corrected_lc, KeplerLightCurve))
@@ -171,7 +171,7 @@ def test_pld_corrector():
     pld = PLDCorrector(tess_tpf[:700], aperture_mask='pipeline')
     # produce a PLD-corrected light curve with a pipeline aperture mask
     raw_lc = tess_tpf[:700].to_lightcurve(aperture_mask='pipeline')
-    corrected_lc = pld.correct(n_pca_terms=20, include_column_of_ones=True)
+    corrected_lc = pld.correct(n_pca_terms=20, pld_order=3, include_column_of_ones=True)
     # the corrected light curve should have higher precision
     assert(corrected_lc.estimate_cdpp() < raw_lc.estimate_cdpp())
     # make sure the returned object is the correct type (`TessLightCurve`)
