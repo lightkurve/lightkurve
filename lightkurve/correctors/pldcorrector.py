@@ -225,8 +225,7 @@ class PLDCorrector(object):
 
         return result
 
-    def create_design_matrix(self, pld_order=1, n_pca_terms=10,
-                             include_column_of_ones=False, **kwargs):
+    def create_design_matrix(self, pld_order=1, n_pca_terms=10):
         """Returns a matrix designed to contain suitable regressors for the
         systematics noise model.
 
@@ -244,10 +243,22 @@ class PLDCorrector(object):
           smaller number of PCA terms, i.e. the number of columns is
           n_pca_terms*(pld_order-1).  This is also known as the higher order
           components.
-        * Optionally, a single column of ones for numerical stability.
 
         Thus, the shape of the design matrix will be
-        (n_cadences, n_pld_mask_pixels + n_pca_terms*(pld_order-1) + include_column_of_ones)
+        (n_cadences, n_pld_mask_pixels + n_pca_terms*(pld_order-1))
+
+        Parameters
+        ----------
+        pld_order : int
+            The order of Pixel Level De-correlation to be performed. First order
+            (`n=1`) uses only the pixel fluxes to construct the design matrix.
+            Higher order populates the design matrix with columns constructed
+            from the products of pixel fluxes.
+        n_pca_terms : int
+            Number of terms added to the design matrix from each order of PLD
+            when performing Principal Component Analysis for models higher than
+            first order. Increasing this value may provide higher precision at
+            the expense of computational time.
 
         Returns
         -------
@@ -274,14 +285,6 @@ class PLDCorrector(object):
             log.warning("`n_pca_terms` ({}) cannot be larger than the number of pixels ({});"
                         "using n_pca_terms={}".format(n_pca_terms, n_pixels, n_pixels))
             n_pca_terms = n_pixels
-
-
-        # The original EVEREST paper includes a column vector of ones in the
-        # design matrix to improve the numerical stability (see Luger et al.);
-        # it is unclear whether this is necessary, so this is an optional step
-        # for now.
-        if include_column_of_ones:
-            matrix_sections.append([np.ones((len(first_order_matrix), 1))])
 
         # Add the first order matrix
         matrix_sections.append(first_order_matrix)
@@ -552,6 +555,7 @@ class PLDCorrector(object):
             lc.flux_err = np.nanstd(solution_or_trace[variable], axis=0)
         else:  # Otherwise, use the maximum likelihood flux values.
             lc.flux = solution_or_trace[variable]
+        lc.label = 'PLD Corrected {}'.format(self.raw_lc.label)
         return lc
 
     def get_diagnostic_lightcurves(self, solution_or_trace=None):
