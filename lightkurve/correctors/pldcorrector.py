@@ -296,7 +296,8 @@ class PLDCorrector(object):
             # Take the product of all combinations of pixels; order=2 will
             # multiply all pairs of pixels, order=3 will multiple triples, etc.
             matrix = np.product(list(multichoose(first_order_matrix.T, order)), axis=1).T
-            print()
+            # Normalize the higher order components
+            matrix = matrix / np.sum(first_order_matrix, axis=-1)[:, None]**order
             # This product matrix becomes very big very quickly, so we reduce
             # its dimensionality using PCA.
             if use_fbpca:  # fast mode
@@ -542,9 +543,7 @@ class PLDCorrector(object):
         except ValueError:
             raise LightkurveError('Unable to find a noise model solution for the given '
                                   'target pixel file. Try increasing the PLD order or '
-                                  'changing the `design_matrix_aperture_mask`. Alternatively, '
-                                  'try setting `include_column_of_ones=True` to improve '
-                                  'numerical stability.')
+                                  'changing the `design_matrix_aperture_mask`.')
 
         if sample:
             solution_or_trace = self.sample(model=model, start=solution_or_trace, **kwargs)
