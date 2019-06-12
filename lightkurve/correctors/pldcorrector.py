@@ -471,7 +471,8 @@ class PLDCorrector(object):
         self.most_recent_solution_or_trace = trace
         return trace
 
-    def correct(self, sample=False, remove_gp_trend=False, **kwargs):
+    def correct(self, sample=False, remove_gp_trend=False, aperture_mask=None,
+                design_matrix_aperture_mask=None, **kwargs):
         """Returns a systematics-corrected light curve.
 
         Parameters
@@ -519,6 +520,13 @@ class PLDCorrector(object):
         corrected_lc : `~lightkurve.lightcurve.LightCurve`
             Systematics-corrected light curve.
         """
+        # Provide warning for deprecated syntax
+        if any(mask is not None for mask in [aperture_mask, design_matrix_aperture_mask]):
+            warnings.warn('`PLDCorrector` has been recently updated, and no longer '
+                          'accepts `aperture_mask` or `design_matrix_aperture_mask` '
+                          'in the `correct` function. Please pass these masks into '
+                          'the `PLDCorrector` constructor.', LightkurveWarning)
+
         model = self.create_pymc_model(**kwargs)
         solution_or_trace = self.optimize(model=model, **kwargs)
         if sample:
