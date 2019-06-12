@@ -296,8 +296,6 @@ class PLDCorrector(object):
             # Take the product of all combinations of pixels; order=2 will
             # multiply all pairs of pixels, order=3 will multiple triples, etc.
             matrix = np.product(list(multichoose(first_order_matrix.T, order)), axis=1).T
-            # Normalize the higher order components
-            matrix = matrix / np.sum(first_order_matrix, axis=-1)[:, None]**order
             # This product matrix becomes very big very quickly, so we reduce
             # its dimensionality using PCA.
             if use_fbpca:  # fast mode
@@ -305,6 +303,8 @@ class PLDCorrector(object):
             else:  # slow mode
                 components, _, _ = np.linalg.svd(matrix)
             section = components[:, :n_pca_terms]
+            # Normalize the higher order components
+            section = section / np.sum(first_order_matrix, axis=-1)[:, None]**order
             matrix_sections.append(section)
 
         # For low-rank matrices, it can be necessary to add a column of ones
