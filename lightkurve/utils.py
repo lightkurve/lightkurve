@@ -15,7 +15,7 @@ from functools import wraps
 
 log = logging.getLogger(__name__)
 
-__all__ = ['LightkurveWarning',
+__all__ = ['LightkurveWarning', 'LightkurveError',
            'KeplerQualityFlags', 'TessQualityFlags',
            'bkjd_to_astropy_time', 'btjd_to_astropy_time']
 
@@ -446,6 +446,9 @@ class LightkurveWarning(Warning):
     """Class for all Lightkurve warnings."""
     pass
 
+class LightkurveError(Exception):
+    """Class for Lightkurve errors."""
+    pass
 
 def suppress_stdout(f, *args, **kwargs):
     """A simple decorator to suppress function print outputs."""

@@ -32,6 +32,7 @@ except ImportError:
     pass
 
 from .. import MPLSTYLE
+from ..utils import LightkurveError
 
 log = logging.getLogger(__name__)
 
@@ -225,7 +226,8 @@ class PLDCorrector(object):
 
         return result
 
-    def create_design_matrix(self, pld_order=1, n_pca_terms=10):
+    def create_design_matrix(self, pld_order=1, n_pca_terms=10,
+                             include_column_of_ones=False, **kwargs):
         """Returns a matrix designed to contain suitable regressors for the
         systematics noise model.
 
@@ -303,6 +305,11 @@ class PLDCorrector(object):
                 components, _, _ = np.linalg.svd(matrix)
             section = components[:, :n_pca_terms]
             matrix_sections.append(section)
+
+        # For low-rank matrices, it can be necessary to add a column of ones
+        # for numerical stability
+        if include_column_of_ones:
+            matrix_sections.append(np.ones((len(first_order_matrix), 1)))
 
         return np.concatenate(matrix_sections, axis=1)
 
@@ -431,7 +438,7 @@ class PLDCorrector(object):
         self.most_recent_solution_or_trace = solution
         return solution
 
-    def sample(self, model=None, start=None, draws=1000, chains=4):
+    def sample(self, model=None, start=None, draws=1000, chains=4, **kwargs):
         """Sample the systematics correction model.
 
         Parameters
@@ -471,8 +478,8 @@ class PLDCorrector(object):
         self.most_recent_solution_or_trace = trace
         return trace
 
-    def correct(self, sample=False, remove_gp_trend=False, aperture_mask=None,
-                design_matrix_aperture_mask=None, **kwargs):
+    def correct(self, sample=False, remove_gp_trend=False,
+                aperture_mask=None, design_matrix_aperture_mask=None, **kwargs):
         """Returns a systematics-corrected light curve.
 
         Parameters
@@ -528,7 +535,17 @@ class PLDCorrector(object):
                           'the `PLDCorrector` constructor.', LightkurveWarning)
 
         model = self.create_pymc_model(**kwargs)
-        solution_or_trace = self.optimize(model=model, **kwargs)
+
+        # If a solution cannot be found by `optimize`, raise a LightkurveError
+        try:
+            solution_or_trace = self.optimize(model=model, **kwargs)
+        except ValueError:
+            raise LightkurveError('Unable to find a noise model solution for the given '
+                                  'target pixel file. Try increasing the PLD order or '
+                                  'changing the `design_matrix_aperture_mask`. Alternatively, '
+                                  'try setting `include_column_of_ones=True` to improve '
+                                  'numerical stability.')
+
         if sample:
             solution_or_trace = self.sample(model=model, start=solution_or_trace, **kwargs)
 

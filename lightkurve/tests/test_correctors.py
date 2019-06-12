@@ -163,7 +163,7 @@ def test_pld_corrector():
     assert(isinstance(corrected_lc, KeplerLightCurve))
     # try detrending using a threshold mask
     corrected_lc = pld.correct()
-    # reduce using fewer principle components
+    # reduce using more principle components
     corrected_lc = pld.correct(n_pca_terms=20)
     # try PLD on a TESS observation
     tess_tpf = TessTargetPixelFile(TESS_SIM)
@@ -171,7 +171,7 @@ def test_pld_corrector():
     pld = PLDCorrector(tess_tpf[:500], aperture_mask='pipeline')
     # produce a PLD-corrected light curve with a pipeline aperture mask
     raw_lc = tess_tpf.to_lightcurve(aperture_mask='pipeline')
-    corrected_lc = pld.correct(n_pca_terms=20)
+    corrected_lc = pld.correct(n_pca_terms=20, include_column_of_ones=True)
     # the corrected light curve should have higher precision
     assert(corrected_lc.estimate_cdpp() < raw_lc.estimate_cdpp())
     # make sure the returned object is the correct type (`TessLightCurve`)
