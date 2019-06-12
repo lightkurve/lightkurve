@@ -32,7 +32,7 @@ except ImportError:
     pass
 
 from .. import MPLSTYLE
-from ..utils import LightkurveError
+from ..utils import LightkurveError, suppress_stdout
 
 log = logging.getLogger(__name__)
 
@@ -399,6 +399,7 @@ class PLDCorrector(object):
         self.most_recent_model = model
         return model
 
+    @suppress_stdout
     def optimize(self, model=None, start=None, robust=False, **kwargs):
         """Returns the maximum likelihood solution.
 

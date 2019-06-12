@@ -168,9 +168,9 @@ def test_pld_corrector():
     # try PLD on a TESS observation
     tess_tpf = TessTargetPixelFile(TESS_SIM)
     # instantiate PLD corrector object
-    pld = PLDCorrector(tess_tpf[:500], aperture_mask='pipeline')
+    pld = PLDCorrector(tess_tpf[:700], aperture_mask='pipeline')
     # produce a PLD-corrected light curve with a pipeline aperture mask
-    raw_lc = tess_tpf.to_lightcurve(aperture_mask='pipeline')
+    raw_lc = tess_tpf[:700].to_lightcurve(aperture_mask='pipeline')
     corrected_lc = pld.correct(n_pca_terms=20, include_column_of_ones=True)
     # the corrected light curve should have higher precision
     assert(corrected_lc.estimate_cdpp() < raw_lc.estimate_cdpp())
@@ -194,8 +194,8 @@ def test_design_matrix_aperture_mask():
     PLD pixels?"""
     tpf = open(TABBY_TPF)
     # use only the pixels in the pipeline mask
-    lc_pipeline = PLDCorrector(tpf, design_matrix_aperture_mask='pipeline').correct(robust=True, pld_order=2)
+    lc_pipeline = PLDCorrector(tpf, design_matrix_aperture_mask='pipeline').correct(robust=True, pld_order=3)
     # use all pixels in the tpf
-    lc_all = PLDCorrector(tpf, design_matrix_aperture_mask='all').correct(robust=True, pld_order=2)
+    lc_all = PLDCorrector(tpf, design_matrix_aperture_mask='all').correct(robust=True, pld_order=3)
     # does this improve the correction?
     assert(lc_all.estimate_cdpp() < lc_pipeline.estimate_cdpp())
