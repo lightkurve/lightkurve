@@ -161,21 +161,6 @@ def test_pld_corrector():
     assert(pld_cdpp < raw_cdpp)
     # make sure the returned object is the correct type (`KeplerLightCurve`)
     assert(isinstance(corrected_lc, KeplerLightCurve))
-    # try detrending using a threshold mask
-    corrected_lc = pld.correct()
-    # reduce using more principle components
-    corrected_lc = pld.correct(n_pca_terms=20)
-    # try PLD on a TESS observation
-    tess_tpf = TessTargetPixelFile(TESS_SIM)
-    # instantiate PLD corrector object
-    pld = PLDCorrector(tess_tpf[:700], aperture_mask='pipeline')
-    # produce a PLD-corrected light curve with a pipeline aperture mask
-    raw_lc = tess_tpf[:700].to_lightcurve(aperture_mask='pipeline')
-    corrected_lc = pld.correct(n_pca_terms=20, pld_order=3, include_column_of_ones=True)
-    # the corrected light curve should have higher precision
-    assert(corrected_lc.estimate_cdpp() < raw_lc.estimate_cdpp())
-    # make sure the returned object is the correct type (`TessLightCurve`)
-    assert(isinstance(corrected_lc, TessLightCurve))
 
 
 @pytest.mark.remote_data
@@ -192,7 +177,8 @@ def test_to_corrector():
 def test_design_matrix_aperture_mask():
     """Test for #523: does PLDCorrector.correct() accept separate apertures for
     PLD pixels?"""
-    tpf = open(TABBY_TPF)
+    target = 'k2-105'
+    tpf = search_targetpixelfile(target).download()
     # use only the pixels in the pipeline mask
     lc_pipeline = PLDCorrector(tpf, design_matrix_aperture_mask='pipeline').correct(robust=True, pld_order=3)
     # use all pixels in the tpf

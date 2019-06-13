@@ -158,7 +158,8 @@ class PLDCorrector(object):
         self.tpf = tpf[~self.nan_mask]
         # For user-friendliness, we will track the most recently used model and solution:
         self.most_recent_model = None
-        self.most_recent_solution_or_trace = None
+        self.most_recent_solution = None
+        self.most_recent_trace = None
 
     def _check_optional_dependencies(self):
         """Emits a user-friendly error message if one of Lightkurve's
@@ -389,13 +390,8 @@ class PLDCorrector(object):
             # Likelihood to optimize
             pm.Potential("obs", model.gp.log_likelihood(lc_flux - motion_model - mean))
 
-            # Track the flux values of the different diagnostic light curves for ease of use
-            gp_model, gp_model_var = model.gp.predict(return_var=True)
-            pm.Deterministic("gp_model", gp_model + mean)
-            pm.Deterministic("gp_model_std", np.sqrt(gp_model_var))
+            # Track the corrected flux values
             pm.Deterministic("corrected_flux", lc_flux - motion_model + mean)
-            pm.Deterministic("corrected_flux_without_gp",
-                             lc_flux - motion_model - gp_model + mean)
 
         self.most_recent_model = model
         return model
@@ -437,7 +433,7 @@ class PLDCorrector(object):
                 solution = xo.optimize(start=solution, vars=[model.logrho, model.logsigma, model.logs2])
             solution = xo.optimize(start=solution)  # Optimize all parameters
 
-        self.most_recent_solution_or_trace = solution
+        self.most_recent_solution = solution
         return solution
 
     def sample(self, model=None, start=None, draws=1000, chains=4, **kwargs):
@@ -477,7 +473,7 @@ class PLDCorrector(object):
             # Sample the parameters
             trace = sampler.sample(draws=draws, chains=chains)
 
-        self.most_recent_solution_or_trace = trace
+        self.most_recent_trace = trace
         return trace
 
     def correct(self, sample=False, remove_gp_trend=False, **kwargs):
@@ -582,6 +578,33 @@ class PLDCorrector(object):
         lc.label = 'PLD Corrected {}'.format(self.raw_lc.label)
         return lc
 
+    def _gp_from_solution(self, solution):
+        """Helper function to generate a light curve for the initial Gaussian
+        Process fit from the most recent model model.
+
+        Parameters
+        ----------
+        solution : dict
+            The output returned by the `sample()` method.
+
+        Returns
+        -------
+        lc : `~lightkurve.LightCurve`
+            Light curve object with the Gaussian Process trend.
+        """
+        lc = self.raw_lc.copy()
+        # Get the GP stored in the most recent model
+        gp = self.most_recent_model.gp
+        # Exoplanet requires arrays to be in float64 format
+        time = np.array(self.raw_lc.time, dtype=np.float64)
+        # Evaluate the most recent model using the most recent parameters
+        with self.most_recent_model:
+            mu, var = xo.eval_in_model(gp.predict(time, return_var=True), solution)
+        lc.flux = mu + solution['mean']
+        lc.flux_err = np.sqrt(var)
+        lc.label = 'PLD Corrected {} GP Trend'.format(self.raw_lc.label)
+        return lc
+
     def get_diagnostic_lightcurves(self, solution_or_trace=None):
         """Return useful diagnostic light curves.
 
@@ -607,14 +630,22 @@ class PLDCorrector(object):
             `optimize()` or `sample()` methods have not yet been called.
         """
         if solution_or_trace is None:
-            if self.most_recent_solution_or_trace is None:
+            if self.most_recent_solution is None and self.most_recent_trace is None:
                 raise RuntimeError("You need to call the `optimize()` or "
                                    "`sample()` methods first.")
+            elif self.most_recent_trace is None:
+                solution_or_trace = self.most_recent_solution
             else:
-                solution_or_trace = self.most_recent_solution_or_trace
+                solution_or_trace = self.most_recent_trace
 
-        return [self._lightcurve_from_solution(solution_or_trace, variable=variable)
-                for variable in ['corrected_flux', 'gp_model', 'motion_model']]
+        # Use the most recent trace if available to create corrected and motion
+        # model model light curves, otherwise use the most recent solution
+        corrected_lc, motion_lc = [self._lightcurve_from_solution(solution_or_trace, variable=variable)
+                                   for variable in ['corrected_flux', 'motion_model']]
+        # Always use the most recent solution for the GP light curve because it isn't sampled
+        gp_lc = self._gp_from_solution(self.most_recent_solution)
+
+        return corrected_lc, motion_lc, gp_lc
 
     def plot_diagnostics(self, solution_or_trace=None):
         """Plots a series of useful figures to help understand the noise removal
@@ -633,7 +664,7 @@ class PLDCorrector(object):
             The matplotlib axes object.
         """
         # Generate diagnostic light curves
-        corrected_lc, gp_lc, motion_lc = self.get_diagnostic_lightcurves(solution_or_trace)
+        corrected_lc, motion_lc, gp_lc = self.get_diagnostic_lightcurves(solution_or_trace)
 
         # Increase the GP light curve flux normalization from 0 to the motion
         # model mean for visual comparison purposes
