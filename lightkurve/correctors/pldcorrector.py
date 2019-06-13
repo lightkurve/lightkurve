@@ -7,7 +7,7 @@ but will speed up the computation if installed.
 TODO
 ----
 * Make sure the prior of logs2/logsigma/logrho has a user-configurable width.
-* Verify the units of corrected_flux, corrected_flux_without_gp, etc.
+* [Done] Verify the units of corrected_flux, corrected_flux_without_gp, etc.
   In Lightkurve we currently add back the mean of the model.
 * The design matrix can be improved by rejecting pixels which are saturated,
   and including the collapsed sums of their CCD columns instead.
@@ -227,8 +227,7 @@ class PLDCorrector(object):
 
         return result
 
-    def create_design_matrix(self, pld_order=1, n_pca_terms=10,
-                             include_column_of_ones=False, **kwargs):
+    def create_design_matrix(self, pld_order=1, n_pca_terms=10, **kwargs):
         """Returns a matrix designed to contain suitable regressors for the
         systematics noise model.
 
@@ -312,11 +311,6 @@ class PLDCorrector(object):
             section = section / norm**order
             matrix_sections.append(section)
 
-        # For low-rank matrices, it can be necessary to add a column of ones
-        # for numerical stability
-        if include_column_of_ones:
-            matrix_sections.append(np.ones((len(first_order_matrix), 1)))
-
         return np.concatenate(matrix_sections, axis=1)
 
     def create_pymc_model(self, design_matrix=None, cadence_mask=None,
@@ -376,20 +370,20 @@ class PLDCorrector(object):
             mean = pm.Normal("mean", mu=np.nanmean(lc_flux), sd=np.std(lc_flux))
             # Create a Gaussian Process to model the long-term stellar variability
             # log(sigma) is the amplitude of variability, estimated from the raw flux scatter
-            logsigma = pm.Normal("logsigma", mu=np.log(np.std(lc_flux)), sd=4)
+            logsigma = pm.Normal("logsigma", mu=np.log(np.std(lc_flux)), sd=5)
             # log(rho) is the timescale of variability with a user-defined prior
-            logrho = pm.Normal("logrho", mu=np.log(gp_timescale_prior), sd=4)
+            logrho = pm.Normal("logrho", mu=np.log(gp_timescale_prior), sd=5)
             # log(s2) is a jitter term to compensate for underestimated flux errors
             # We estimate the magnitude of jitter from the CDPP (normalized to the flux)
             s2_mu = self.raw_lc.estimate_cdpp() * 1e-6 * mean
-            logs2 = pm.Normal("logs2", mu=np.log(s2_mu), sd=4)
+            logs2 = pm.Normal("logs2", mu=np.log(s2_mu), sd=5)
             kernel = xo.gp.terms.Matern32Term(log_sigma=logsigma, log_rho=logrho)
 
             # Store the GP and cadence mask to aid debugging
             model.gp = xo.gp.GP(kernel, lc_time, diag + tt.exp(logs2))
             model.cadence_mask = cadence_mask
 
-            # Cast the ridge dimensions into tensor space
+            # Cast the ridge indices into tensor space
             ridge = tt.cast(ridge, 'int64')
 
             # The motion model regresses against the design matrix
@@ -405,7 +399,7 @@ class PLDCorrector(object):
             pm.Potential("obs", model.gp.log_likelihood(lc_flux - motion_model - mean))
 
             # Track the corrected flux values
-            pm.Deterministic("corrected_flux", lc_flux - motion_model + mean)
+            pm.Deterministic("corrected_flux", lc_flux - motion_model)
 
         self.most_recent_model = model
         return model
@@ -440,8 +434,7 @@ class PLDCorrector(object):
             start = model.test_point
 
         with model:
-            solution = xo.optimize(start=start, vars=[model.logs2])
-            solution = xo.optimize(start=solution, vars=[model.logrho, model.mean])
+            solution = xo.optimize(start=start, vars=[model.logrho, model.mean])
             # Optimizing parameters separately appears to make finding a solution more likely
             if robust:
                 solution = xo.optimize(start=solution, vars=[model.logrho, model.logsigma, model.mean])
@@ -560,10 +553,12 @@ class PLDCorrector(object):
             solution_or_trace = self.sample(model=model, start=solution_or_trace, **kwargs)
 
         if remove_gp_trend:
-            variable = 'corrected_flux_without_gp'
+            lc = self._lightcurve_from_solution(solution_or_trace, variable='corrected_flux')
+            gp = self._gp_from_solution(self.most_recent_solution)
+            lc.flux = lc.flux - gp.flux
         else:
-            variable = 'corrected_flux'
-        return self._lightcurve_from_solution(solution_or_trace, variable=variable)
+            lc = self._lightcurve_from_solution(solution_or_trace, variable='corrected_flux')
+        return lc
 
     def _lightcurve_from_solution(self, solution_or_trace, variable='corrected_flux'):
         """Helper function to generate light curve objects from the maximum
