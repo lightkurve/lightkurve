@@ -292,6 +292,10 @@ class PLDCorrector(object):
         # Add the first order matrix
         matrix_sections.append(first_order_matrix)
 
+        # Define normalization array
+        norm = np.sum(np.asarray(self.tpf.flux[:, self.design_matrix_aperture_mask],
+                                 np.float64), axis=1)[:, None]
+
         # Add the higher order PLD design matrix columns
         for order in range(2, pld_order + 1):
             # Take the product of all combinations of pixels; order=2 will
@@ -305,7 +309,7 @@ class PLDCorrector(object):
                 components, _, _ = np.linalg.svd(matrix)
             section = components[:, :n_pca_terms]
             # Normalize the higher order components
-            section = section / np.sum(first_order_matrix, axis=-1)[:, None]**order
+            section = section / norm**order
             matrix_sections.append(section)
 
         # For low-rank matrices, it can be necessary to add a column of ones
@@ -362,6 +366,11 @@ class PLDCorrector(object):
         # data for cadences that have been fed into the model.
         diag[~cadence_mask] += 1e12
 
+        # To ensure the weights can be solved for, we need to perform ridge regression
+        # to avoid an ill-conditioned matrix A. Here we define the size of the diagonal
+        # along which we will add small values
+        ridge = np.array(range(design_matrix.shape[1]))
+
         with pm.Model() as model:
             # The mean baseline flux value for the star
             mean = pm.Normal("mean", mu=np.nanmean(lc_flux), sd=np.std(lc_flux))
@@ -380,8 +389,13 @@ class PLDCorrector(object):
             model.gp = xo.gp.GP(kernel, lc_time, diag + tt.exp(logs2))
             model.cadence_mask = cadence_mask
 
+            # Cast the ridge dimensions into tensor space
+            ridge = tt.cast(ridge, 'int64')
+
             # The motion model regresses against the design matrix
             A = tt.dot(design_matrix.T, model.gp.apply_inverse(design_matrix))
+            # Apply ridge regression by adding small numbers along the diagonal
+            A = tt.set_subtensor(A[ridge, ridge], A[ridge, ridge] + 1e-8)
             B = tt.dot(design_matrix.T, model.gp.apply_inverse(lc_flux[:, None]))
             weights = tt.slinalg.solve(A, B)
             motion_model = pm.Deterministic("motion_model", tt.dot(design_matrix, weights)[:, 0])
@@ -426,7 +440,8 @@ class PLDCorrector(object):
             start = model.test_point
 
         with model:
-            solution = xo.optimize(start=start, vars=[model.logrho, model.mean])
+            solution = xo.optimize(start=start, vars=[model.logs2])
+            solution = xo.optimize(start=solution, vars=[model.logrho, model.mean])
             # Optimizing parameters separately appears to make finding a solution more likely
             if robust:
                 solution = xo.optimize(start=solution, vars=[model.logrho, model.logsigma, model.mean])
