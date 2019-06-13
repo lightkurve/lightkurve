@@ -180,8 +180,8 @@ def test_design_matrix_aperture_mask():
     target = 'k2-105'
     tpf = search_targetpixelfile(target).download()
     # use only the pixels in the pipeline mask
-    lc_pipeline = PLDCorrector(tpf, design_matrix_aperture_mask='pipeline').correct(robust=True, pld_order=3)
+    lc_pipeline = PLDCorrector(tpf[:700], design_matrix_aperture_mask='pipeline').correct(robust=True, pld_order=3)
     # use all pixels in the tpf
-    lc_all = PLDCorrector(tpf, design_matrix_aperture_mask='all').correct(robust=True, pld_order=3)
+    lc_all = PLDCorrector(tpf[:700], design_matrix_aperture_mask='all').correct(robust=True, pld_order=3)
     # does this improve the correction?
     assert(lc_all.estimate_cdpp() < lc_pipeline.estimate_cdpp())
