@@ -717,8 +717,75 @@ class PLDCorrector(object):
         if design_matrix is None:
             design_matrix = self.create_design_matrix(**kwargs)
         with plt.style.context(MPLSTYLE):
-            fig, ax = plt.subplots(1, figsize=(8.45, 8.45))
+            fig, ax = plt.subplots(1, figsize=(8.485, 8.485))
             ax.imshow(design_matrix, aspect='auto')
             ax.set_ylabel('Cadence Number')
             ax.set_xlabel('Regressors')
+        return ax
+
+    def plot_weights(self, solution_or_trace=None):
+        """Plot the weights on the design matrix.
+
+        Parameters
+        ----------
+        solution_or_trace : dict or `pymc3.backends.base.MultiTrace`
+            The output returned by this object's `optimize()` or `sample()`
+            methods.  If `None`, then the solution most recently computed
+            by those methods will be used.
+
+        Returns
+        -------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            The matplotlib axes object.
+        """
+        if solution_or_trace is None:
+            if self.most_recent_solution is None and self.most_recent_trace is None:
+                raise RuntimeError("You need to call the `optimize()` or "
+                                   "`sample()` methods first.")
+            elif self.most_recent_trace is None:
+                solution_or_trace = self.most_recent_solution
+            else:
+                solution_or_trace = self.most_recent_trace
+
+        if isinstance(solution_or_trace, pm.backends.base.MultiTrace):
+            weights = np.nanmean(solution_or_trace['weights'], axis=0)
+        else:
+            weights = solution_or_trace['weights']
+
+        with plt.style.context(MPLSTYLE):
+            fig, ax = plt.subplots(1, figsize=(8.485, 4.242))
+            ax.plot(weights)
+            ax.set_ylabel('Weight')
+            ax.set_xlabel('Basis Vector')
+        return ax
+
+    def plot_weights_and_matrix(self, solution_or_trace=None, design_matrix=None, **kwargs):
+        """Visualize both the design matrix elements and their respective weights.
+        """
+        if design_matrix is None:
+            design_matrix = self.create_design_matrix(**kwargs)
+
+        if solution_or_trace is None:
+            if self.most_recent_solution is None and self.most_recent_trace is None:
+                raise RuntimeError("You need to call the `optimize()` or "
+                                   "`sample()` methods first.")
+            elif self.most_recent_trace is None:
+                solution_or_trace = self.most_recent_solution
+            else:
+                solution_or_trace = self.most_recent_trace
+
+        if isinstance(solution_or_trace, pm.backends.base.MultiTrace):
+            weights = np.nanmean(solution_or_trace['weights'], axis=0)
+        else:
+            weights = solution_or_trace['weights']
+
+        with plt.style.context(MPLSTYLE):
+            fig, ax = plt.subplots(2, figsize=(8.485, 8.485), sharex=True, gridspec_kw={'height_ratios': [1, 2]})
+            ax[0].plot(weights)
+            ax[0].set_ylabel('Weight')
+            ax[1].imshow(np.log(design_matrix), aspect='auto')
+            ax[1].set_ylabel('Cadence Number')
+            ax[1].set_xlabel('Regressors (log intensity)')
+            fig.subplots_adjust(wspace=0)
+            fig.tight_layout()
         return ax
