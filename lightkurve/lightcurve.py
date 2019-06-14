@@ -131,44 +131,81 @@ class LightCurve(object):
         return arr
 
     def __getitem__(self, key):
-        copy_self = copy.copy(self)
+        copy_self = self.copy()
         copy_self.time = self.time[key]
         copy_self.flux = self.flux[key]
         copy_self.flux_err = self.flux_err[key]
         return copy_self
 
+    def __len__(self):
+        return len(self.time)
+
     def __add__(self, other):
-        copy_self = copy.copy(self)
-        copy_self.flux = copy_self.flux + other
-        return copy_self
+        newlc = self.copy()
+        if isinstance(other, LightCurve):
+            if len(self) != len(other):
+                raise ValueError("Cannot add LightCurve objects because "
+                                 "they do not have equal length ({} vs {})."
+                                 "".format(len(self), len(other)))
+            if np.any(self.time != other.time):
+                warnings.warn("Two LightCurve objects with inconsistent time "
+                              "values are being added.")
+            newlc.flux = self.flux + other.flux
+            newlc.flux_err = np.hypot(self.flux_err, other.flux_err)
+        else:
+            newlc.flux = self.flux + other
+        return newlc
 
     def __radd__(self, other):
         return self.__add__(other)
 
     def __sub__(self, other):
-        return self.__add__(-other)
+        return self.__add__(-1 * other)
 
     def __rsub__(self, other):
-        copy_self = copy.copy(self)
-        copy_self.flux = other - copy_self.flux
-        return copy_self
+        return (-1 * self).__add__(other)
 
     def __mul__(self, other):
-        copy_self = copy.copy(self)
-        copy_self.flux = other * copy_self.flux
-        copy_self.flux_err = abs(other) * copy_self.flux_err
-        return copy_self
+        newlc = self.copy()
+        if isinstance(other, LightCurve):
+            if len(self) != len(other):
+                raise ValueError("Cannot multiply LightCurve objects because "
+                                 "they do not have equal length ({} vs {})."
+                                 "".format(len(self), len(other)))
+            if np.any(self.time != other.time):
+                warnings.warn("Two LightCurve objects with inconsistent time "
+                              "values are being multiplied.")
+            newlc.flux = self.flux * other.flux
+            # Applying standard uncertainty propagation, cf.
+            # https://en.wikipedia.org/wiki/Propagation_of_uncertainty#Example_formulae
+            newlc.flux_err = abs(newlc.flux) * np.hypot(self.flux_err / self.flux, other.flux_err / other.flux)
+        else:
+            newlc.flux = other * self.flux
+            newlc.flux_err = abs(other) * self.flux_err
+        return newlc
 
     def __rmul__(self, other):
         return self.__mul__(other)
 
     def __truediv__(self, other):
-        return self.__mul__(1./other)
+        return self.__mul__(1. / other)
 
     def __rtruediv__(self, other):
-        copy_self = copy.copy(self)
-        copy_self.flux = other / copy_self.flux
-        return copy_self
+        newlc = self.copy()
+        if isinstance(other, LightCurve):
+            if len(self) != len(other):
+                raise ValueError("Cannot divide LightCurve objects because "
+                                 "they do not have equal length ({} vs {})."
+                                 "".format(len(self), len(other)))
+            if np.any(self.time != other.time):
+                warnings.warn("Two LightCurve objects with inconsistent time "
+                              "values are being divided.")
+            newlc.flux = other.flux / self.flux
+            newlc.flux_err = abs(newlc.flux) * np.hypot(self.flux_err / self.flux, other.flux_err / other.flux)
+        else:
+            newlc.flux = other / self.flux
+            newlc.flux_err = abs((other * self.flux_err) / (self.flux**2))
+        return newlc
 
     def __div__(self, other):
         return self.__truediv__(other)
@@ -340,7 +377,7 @@ class LightCurve(object):
         if inplace:
             new_lc = self
         else:
-            new_lc = copy.copy(self)
+            new_lc = self.copy()
 
         for i in range(len(others)):
             new_lc.time = np.append(new_lc.time, others[i].time)
