@@ -194,7 +194,7 @@ class PLDCorrector(object):
 
         return success, messages
 
-    def _create_first_order_matrix(self):
+    def _create_first_order_matrix(self, normalize=True):
         """Returns a matrix which encodes the fractional pixel fluxes as a function
         of cadence (row) and pixel (column). As such, the method returns a
         2D matrix with shape (n_cadences, n_pixels_in_pld_mask).
@@ -218,7 +218,8 @@ class PLDCorrector(object):
         # To ensure that each column contains the fractional pixel flux,
         # we divide by the sum of all pixels in the same cadence.
         # This is an important step, as explained in Section 2 of Luger et al. (2016).
-        matrix = matrix / np.sum(matrix, axis=-1)[:, None]
+        if normalize:
+            matrix = matrix / np.sum(matrix, axis=-1)[:, None]
         # If we return matrix at this point, theano will raise a "dimension mismatch".
         # The origin of this bug is not understood, but copying the matrix
         # into a new one as shown below circumvents it:
@@ -291,9 +292,8 @@ class PLDCorrector(object):
         # Add the first order matrix
         matrix_sections.append(first_order_matrix)
 
-        # Define normalization array
-        norm = np.sum(np.asarray(self.tpf.flux[:, self.design_matrix_aperture_mask],
-                                 np.float64), axis=1)[:, None]
+        # Get the normalization matrix
+        norm = np.sum(self._create_first_order_matrix(normalize=False), axis=1)[:, None]
 
         # Add the higher order PLD design matrix columns
         for order in range(2, pld_order + 1):
@@ -311,10 +311,14 @@ class PLDCorrector(object):
             section = section / norm**order
             matrix_sections.append(section)
 
-        return np.concatenate(matrix_sections, axis=1)
+        design_matrix = np.concatenate(matrix_sections, axis=1)
+        # No columns in the design matrix should be NaN
+        assert np.isfinite(design_matrix).any()
+
+        return design_matrix
 
     def create_pymc_model(self, design_matrix=None, cadence_mask=None,
-                          gp_timescale_prior=150, **kwargs):
+                          gp_timescale_prior=150, fractional_prior_width=.05, **kwargs):
         r"""Returns a PYMC3 model.
 
         Parameters
@@ -360,11 +364,6 @@ class PLDCorrector(object):
         # data for cadences that have been fed into the model.
         diag[~cadence_mask] += 1e12
 
-        # To ensure the weights can be solved for, we need to perform ridge regression
-        # to avoid an ill-conditioned matrix A. Here we define the size of the diagonal
-        # along which we will add small values
-        ridge = np.array(range(design_matrix.shape[1]))
-
         with pm.Model() as model:
             # The mean baseline flux value for the star
             mean = pm.Normal("mean", mu=np.nanmean(lc_flux), sd=np.std(lc_flux))
@@ -372,7 +371,10 @@ class PLDCorrector(object):
             # log(sigma) is the amplitude of variability, estimated from the raw flux scatter
             logsigma = pm.Normal("logsigma", mu=np.log(np.std(lc_flux)), sd=5)
             # log(rho) is the timescale of variability with a user-defined prior
-            logrho = pm.Normal("logrho", mu=np.log(gp_timescale_prior), sd=5)
+            logrho = pm.Normal("logrho", mu=np.log(gp_timescale_prior),
+                               sd=np.log(fractional_prior_width*gp_timescale_prior))
+            # Enforce that the scale of variability should be no shorter than 0.5 days
+            pm.Potential("logrho_prior", tt.switch(logrho > np.log(0.5), 0, np.inf))
             # log(s2) is a jitter term to compensate for underestimated flux errors
             # We estimate the magnitude of jitter from the CDPP (normalized to the flux)
             s2_mu = self.raw_lc.estimate_cdpp() * 1e-6 * mean
@@ -383,13 +385,18 @@ class PLDCorrector(object):
             model.gp = xo.gp.GP(kernel, lc_time, diag + tt.exp(logs2))
             model.cadence_mask = cadence_mask
 
-            # Cast the ridge indices into tensor space
-            ridge = tt.cast(ridge, 'int64')
-
             # The motion model regresses against the design matrix
             A = tt.dot(design_matrix.T, model.gp.apply_inverse(design_matrix))
+
+            # To ensure the weights can be solved for, we need to perform ridge regression
+            # to avoid an ill-conditioned matrix A. Here we define the size of the diagonal
+            # along which we will add small values
+            ridge = np.array(range(design_matrix.shape[1]))
+            # Cast the ridge indices into tensor space
+            ridge = tt.cast(ridge, 'int64')
             # Apply ridge regression by adding small numbers along the diagonal
-            A = tt.set_subtensor(A[ridge, ridge], A[ridge, ridge] + 1e-8)
+            A = tt.set_subtensor(A[ridge, ridge], A[ridge, ridge] + 1e-6)
+
             B = tt.dot(design_matrix.T, model.gp.apply_inverse(lc_flux[:, None]))
             weights = tt.slinalg.solve(A, B)
             motion_model = pm.Deterministic("motion_model", tt.dot(design_matrix, weights)[:, 0])
@@ -629,10 +636,10 @@ class PLDCorrector(object):
         -------
         corrected_lc : `~lightkurve.lightcurve.LightCurve`
             Motion noise corrected light curve object.
-        gp_lc : `~lightkurve.lightcurve.LightCurve`
-            Light curve object containing GP model of the stellar signal.
         motion_lc : `~lightkurve.lightcurve.LightCurve`
             Light curve object with the motion model removed by the corrector.
+        gp_lc : `~lightkurve.lightcurve.LightCurve`
+            Light curve object containing GP model of the stellar signal.
 
         Raises
         ------
@@ -649,7 +656,7 @@ class PLDCorrector(object):
                 solution_or_trace = self.most_recent_trace
 
         # Use the most recent trace if available to create corrected and motion
-        # model model light curves, otherwise use the most recent solution
+        # model light curves, otherwise use the most recent solution
         corrected_lc, motion_lc = [self._lightcurve_from_solution(solution_or_trace, variable=variable)
                                    for variable in ['corrected_flux', 'motion_model']]
         # Always use the most recent solution for the GP light curve because it isn't sampled
@@ -687,10 +694,13 @@ class PLDCorrector(object):
         # Plot the stellar model over the raw flux, indicating masked cadences
         self.raw_lc.scatter(c='r', alpha=0.3, ax=ax[1], label='Raw Flux', normalize=False)
         gp_lc.plot(c='k', ax=ax[1], label='GP Model', normalize=False)
-        gp_lc[~self.most_recent_model.cadence_mask].scatter(ax=ax[1], label='Masked Cadences',
-                                                            marker='d', normalize=False)
+        if len(gp_lc[~self.most_recent_model.cadence_mask].flux) > 0:
+            gp_lc[~self.most_recent_model.cadence_mask].scatter(ax=ax[1], label='Masked Cadences',
+                                                                marker='d', normalize=False)
         # Plot the motion model over the raw light curve
         self.raw_lc.scatter(c='r', alpha=0.3, ax=ax[2], label='Raw Flux', normalize=False)
+        # Add the mean of the raw flux to plot them at the same y-value
+        motion_lc.flux += np.mean(self.raw_lc.flux)
         motion_lc.scatter(c='k', ax=ax[2], label='Noise Model', normalize=False)
 
         return ax
