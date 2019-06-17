@@ -441,12 +441,18 @@ class PLDCorrector(object):
             start = model.test_point
 
         with model:
-            solution = xo.optimize(start=start, vars=[model.logrho, model.mean])
-            # Optimizing parameters separately appears to make finding a solution more likely
-            if robust:
-                solution = xo.optimize(start=solution, vars=[model.logrho, model.logsigma, model.mean])
-                solution = xo.optimize(start=solution, vars=[model.logrho, model.logsigma, model.logs2])
-            solution = xo.optimize(start=solution)  # Optimize all parameters
+            # If a solution cannot be found, fail with an informative LightkurveError
+            try:
+                solution = xo.optimize(start=start, vars=[model.logrho, model.mean])
+                # Optimizing parameters separately appears to make finding a solution more likely
+                if robust:
+                    solution = xo.optimize(start=solution, vars=[model.logrho, model.logsigma, model.mean])
+                    solution = xo.optimize(start=solution, vars=[model.logrho, model.logsigma, model.logs2])
+                solution = xo.optimize(start=solution)  # Optimize all parameters
+            except ValueError:
+                raise LightkurveError('Unable to find a noise model solution for the given '
+                                      'target pixel file. Try increasing the PLD order or '
+                                      'changing the `design_matrix_aperture_mask`.')
 
         self.most_recent_solution = solution
         return solution
@@ -546,17 +552,14 @@ class PLDCorrector(object):
                           'in the `correct` function. Please pass these masks into '
                           'the `PLDCorrector` constructor.', LightkurveWarning)
 
+        # Instantiate a PyMC3 model
         model = self.create_pymc_model(**kwargs)
 
-        # If a solution cannot be found by `optimize`, raise a LightkurveError
-        try:
-            solution_or_trace = self.optimize(model=model, **kwargs)
-        except ValueError:
-            raise LightkurveError('Unable to find a noise model solution for the given '
-                                  'target pixel file. Try increasing the PLD order or '
-                                  'changing the `design_matrix_aperture_mask`.')
+        # Optimize the model parameters
+        solution_or_trace = self.optimize(model=model, **kwargs)
 
         if sample:
+            # Sample the posterior
             solution_or_trace = self.sample(model=model, start=solution_or_trace, **kwargs)
 
         if remove_gp_trend:
