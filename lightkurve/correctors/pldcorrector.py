@@ -228,7 +228,7 @@ class PLDCorrector(object):
 
         return result
 
-    def create_design_matrix(self, pld_order=1, n_pca_terms=10, **kwargs):
+    def create_design_matrix(self, pld_order=1, n_pca_terms=20, **kwargs):
         """Returns a matrix designed to contain suitable regressors for the
         systematics noise model.
 
@@ -289,9 +289,6 @@ class PLDCorrector(object):
                         "using n_pca_terms={}".format(n_pca_terms, n_pixels, n_pixels))
             n_pca_terms = n_pixels
 
-        # Add the first order matrix
-        matrix_sections.append(first_order_matrix)
-
         # Get the normalization matrix
         norm = np.sum(self._create_first_order_matrix(normalize=False), axis=1)[:, None]
 
@@ -311,7 +308,15 @@ class PLDCorrector(object):
             section = section / norm**order
             matrix_sections.append(section)
 
+        if use_fbpca:  # fast mode
+            first_order_matrix, _, _ = pca(first_order_matrix, n_pca_terms)
+        else:  # slow mode
+            first_order_matrix, _, _ = np.linalg.svd(first_order_matrix)[:, :n_pca_terms]
+
+        # Add the first order matrix
+        matrix_sections.insert(0, first_order_matrix)
         design_matrix = np.concatenate(matrix_sections, axis=1)
+
         # No columns in the design matrix should be NaN
         assert np.isfinite(design_matrix).any()
 
