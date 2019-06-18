@@ -316,8 +316,8 @@ class PLDCorrector(object):
         # If we return matrix at this point, theano will raise a "dimension mismatch".
         # The origin of this bug is not understood, but copying the matrix
         # into a new one as shown below circumvents it:
-        result = np.empty((matrix.shape[0], matrix.shape[1]))
-        result[:, :] = matrix[:, :]
+        result = np.empty((first_order_matrix.shape[0], first_order_matrix.shape[1]))
+        result[:, :] = first_order_matrix[:, :]
 
         # Add the first order matrix
         matrix_sections.insert(0, first_order_matrix)
