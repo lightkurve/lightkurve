@@ -385,18 +385,30 @@ class PLDCorrector(object):
 
         with pm.Model() as model:
             # The mean baseline flux value for the star
-            mean = pm.Normal("mean", mu=np.nanmean(self._lc_flux), sd=np.std(self._lc_flux))
+            # mean = pm.Normal("mean", mu=np.nanmean(self._lc_flux), sd=np.std(self._lc_flux))
+            mean = pm.Uniform("mean", testval=np.nanmean(self._lc_flux),
+                              lower=np.nanmean(self._lc_flux)-np.std(self._lc_flux),
+                              upper=np.nanmean(self._lc_flux)+np.std(self._lc_flux))
             # Create a Gaussian Process to model the long-term stellar variability
             # log(sigma) is the amplitude of variability, estimated from the raw flux scatter
-            logsigma = pm.Normal("logsigma", mu=np.log(np.std(self._lc_flux)), sd=2)
+            # logsigma = pm.Normal("logsigma", mu=np.log(np.std(self._lc_flux)), sd=2)
+            logsigma = pm.Uniform("logsigma", testval=np.log(np.std(self._lc_flux)),
+                                  lower=np.log(np.std(self._lc_flux))-1,
+                                  upper=np.log(np.std(self._lc_flux))+1)
             # log(rho) is the timescale of variability with a user-defined prior
-            logrho = pm.Normal("logrho", mu=np.log(gp_timescale_prior),
-                               sd=2)
+            # logrho = pm.Normal("logrho", mu=np.log(gp_timescale_prior),
+            #                    sd=2)
+            logrho = pm.Uniform("logrho", testval=np.log(gp_timescale_prior),
+                               lower=np.log(gp_timescale_prior)-2,
+                               upper=np.log(gp_timescale_prior)+2)
             # Enforce that the scale of variability should be no shorter than 0.5 days
-            pm.Potential("logrho_prior", tt.switch(logrho > np.log(0.5), 0, np.inf))
+            # pm.Potential("logrho_prior", tt.switch(logrho > np.log(0.5), 0, np.inf))
             # log(s2) is a jitter term to compensate for underestimated flux errors
             # We estimate the magnitude of jitter from the CDPP (normalized to the flux)
-            logs2 = pm.Normal("logs2", mu=np.log(self._s2_mu), sd=2)
+            # logs2 = pm.Normal("logs2", mu=np.log(self._s2_mu), sd=2)
+            logs2 = pm.Uniform("logs2", testval=np.log(self._s2_mu),
+                               lower=np.log(self._s2_mu)-2,
+                               upper=np.log(self._s2_mu)+2)
             kernel = xo.gp.terms.Matern32Term(log_sigma=logsigma, log_rho=logrho)
 
             # Store the GP and cadence mask to aid debugging
@@ -407,14 +419,14 @@ class PLDCorrector(object):
 
             A = tt.dot(design_matrix.T, model.gp.apply_inverse(design_matrix))
 
-            # To ensure the weights can be solved for, we need to perform ridge regression
+            # To ensure the weights can be solved for, we need to perform L2 normalization
             # to avoid an ill-conditioned matrix A. Here we define the size of the diagonal
             # along which we will add small values
             ridge = np.array(range(design_matrix.shape[1]))
-            # Cast the ridge indices into tensor space
+            # Cast the diagonal indices into tensor space
             ridge = tt.cast(ridge, 'int64')
-            # Apply ridge regression by adding small numbers along the diagonal
-            A = tt.set_subtensor(A[ridge, ridge], A[ridge, ridge] + 1e-6)
+            # Add small numbers along the diagonal
+            A = tt.set_subtensor(A[ridge, ridge], A[ridge, ridge] + 1e-8)
 
             B = tt.dot(design_matrix.T, model.gp.apply_inverse(self._lc_flux[:, None]))
             weights = tt.slinalg.solve(A, B)
@@ -427,6 +439,7 @@ class PLDCorrector(object):
             # Track the corrected flux values
             pm.Deterministic("corrected_flux", self._lc_flux - motion_model)
 
+        self.most_recent_model = model
         return model
 
     @suppress_stdout
@@ -472,7 +485,6 @@ class PLDCorrector(object):
                                       'target pixel file. Try increasing the PLD order or '
                                       'changing the `design_matrix_aperture_mask`.')
 
-        self.most_recent_model = model
         self.most_recent_solution = solution
         return solution
 
@@ -623,7 +635,10 @@ class PLDCorrector(object):
             lc.flux_err = np.nanstd(solution_or_trace[variable], axis=0)
         else:  # Otherwise, use the maximum likelihood flux values.
             lc.flux = solution_or_trace[variable]
-        lc.label = 'PLD Corrected {}'.format(self.raw_lc.label)
+        if variable == 'corrected_flux':
+            lc.label = 'PLD Corrected {}'.format(self.raw_lc.label)
+        elif variable == 'motion_model':
+            lc.label = 'Motion Model for {}'.format(self.raw_lc.label)
         return lc
 
     def _gp_from_solution(self, solution):
