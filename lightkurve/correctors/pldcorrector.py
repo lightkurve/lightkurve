@@ -166,8 +166,12 @@ class PLDCorrector(object):
         # Theano raises an `AsTensorError` ("Cannot convert to TensorType")
         # if the floats are not in 64-bit format, so we convert them here:
         self._lc_time = np.asarray(self.raw_lc.time, np.float64)
-        self._lc_flux = np.asarray(self.raw_lc.flux, np.float64)
-        self._lc_flux_err = np.asarray(self.raw_lc.flux_err, np.float64)
+        self._lc_flux = np.asarray(self.raw_lc.flux / np.nanmedian(self.raw_lc.flux), np.float64)
+        self._lc_flux -= 1
+        self._lc_flux_err = np.asarray(self.raw_lc.flux_err / np.nanmedian(self.raw_lc.flux), np.float64)
+
+        self._lc_flux *= 1e6
+        self._lc_flux_err *= 1e6
 
         # For user-friendliness, we will track the most recently used model and solution:
         self.most_recent_model = None
@@ -386,29 +390,26 @@ class PLDCorrector(object):
         with pm.Model() as model:
             # The mean baseline flux value for the star
             # mean = pm.Normal("mean", mu=np.nanmean(self._lc_flux), sd=np.std(self._lc_flux))
-            mean = pm.Uniform("mean", testval=np.nanmean(self._lc_flux),
-                              lower=np.nanmean(self._lc_flux)-np.std(self._lc_flux),
-                              upper=np.nanmean(self._lc_flux)+np.std(self._lc_flux))
             # Create a Gaussian Process to model the long-term stellar variability
             # log(sigma) is the amplitude of variability, estimated from the raw flux scatter
             # logsigma = pm.Normal("logsigma", mu=np.log(np.std(self._lc_flux)), sd=2)
             logsigma = pm.Uniform("logsigma", testval=np.log(np.std(self._lc_flux)),
-                                  lower=np.log(np.std(self._lc_flux))-1,
-                                  upper=np.log(np.std(self._lc_flux))+1)
+                                  lower=np.log(np.std(self._lc_flux))-6,
+                                  upper=np.log(np.std(self._lc_flux))+6)
             # log(rho) is the timescale of variability with a user-defined prior
             # logrho = pm.Normal("logrho", mu=np.log(gp_timescale_prior),
             #                    sd=2)
             logrho = pm.Uniform("logrho", testval=np.log(gp_timescale_prior),
-                               lower=np.log(gp_timescale_prior)-2,
-                               upper=np.log(gp_timescale_prior)+2)
+                                lower=np.log(gp_timescale_prior)-6,
+                                upper=np.log(gp_timescale_prior)+6)
             # Enforce that the scale of variability should be no shorter than 0.5 days
             # pm.Potential("logrho_prior", tt.switch(logrho > np.log(0.5), 0, np.inf))
             # log(s2) is a jitter term to compensate for underestimated flux errors
             # We estimate the magnitude of jitter from the CDPP (normalized to the flux)
             # logs2 = pm.Normal("logs2", mu=np.log(self._s2_mu), sd=2)
             logs2 = pm.Uniform("logs2", testval=np.log(self._s2_mu),
-                               lower=np.log(self._s2_mu)-2,
-                               upper=np.log(self._s2_mu)+2)
+                               lower=np.log(self._s2_mu)-6,
+                               upper=np.log(self._s2_mu)+6)
             kernel = xo.gp.terms.Matern32Term(log_sigma=logsigma, log_rho=logrho)
 
             # Store the GP and cadence mask to aid debugging
@@ -434,7 +435,7 @@ class PLDCorrector(object):
             pm.Deterministic("weights", weights)
 
             # Likelihood to optimize
-            pm.Potential("obs", model.gp.log_likelihood(self._lc_flux - motion_model - mean))
+            pm.Potential("obs", model.gp.log_likelihood(self._lc_flux - motion_model))# - mean))
 
             # Track the corrected flux values
             pm.Deterministic("corrected_flux", self._lc_flux - motion_model)
@@ -474,10 +475,10 @@ class PLDCorrector(object):
         with model:
             # If a solution cannot be found, fail with an informative LightkurveError
             try:
-                solution = xo.optimize(start=start, vars=[model.logrho, model.mean])
+                solution = xo.optimize(start=start, vars=[model.logrho])#, model.mean])
                 # Optimizing parameters separately appears to make finding a solution more likely
                 if robust:
-                    solution = xo.optimize(start=solution, vars=[model.logrho, model.logsigma, model.mean])
+                    solution = xo.optimize(start=solution, vars=[model.logrho, model.logsigma])#, model.mean])
                     solution = xo.optimize(start=solution, vars=[model.logrho, model.logsigma, model.logs2])
                 solution = xo.optimize(start=solution)  # Optimize all parameters
             except ValueError:
@@ -608,6 +609,9 @@ class PLDCorrector(object):
             lc.flux = lc.flux - (gp.flux  - mean)
         else:
             lc = self._lightcurve_from_solution(solution_or_trace, variable='corrected_flux')
+
+        lc.flux *= 1e-6
+        lc.flux += np.nanmedian(self.raw_lc.flux)
         return lc
 
     def _lightcurve_from_solution(self, solution_or_trace, variable='corrected_flux'):
@@ -711,7 +715,7 @@ class PLDCorrector(object):
         return corrected_lc, motion_lc, gp_lc
 
     def plot_distributions(self):
-        varnames = ['logrho', 'logsigma', 'logs2', 'mean']
+        varnames = ['logrho', 'logsigma', 'logs2']#, 'mean']
         model = self.most_recent_model
         map_soln = self.most_recent_solution
 
