@@ -35,6 +35,9 @@ except ImportError:
 from .. import MPLSTYLE
 from ..utils import LightkurveError, LightkurveWarning, suppress_stdout
 
+
+from astropy.modeling.models import Gaussian1D, Box1D
+
 log = logging.getLogger(__name__)
 
 __all__ = ['PLDCorrector']
@@ -138,7 +141,7 @@ class PLDCorrector(object):
     ImportError : if one of Lightkurve's optional dependencies required by
         this class are not available (i.e. `pymc`, `theano`, or `exoplanet`).
     """
-    def __init__(self, tpf, aperture_mask=None, design_matrix_aperture_mask=None):
+    def __init__(self, tpf, aperture_mask=None, design_matrix_aperture_mask='all'):
         # Ensure the optional dependencies requires by this class are installed
         success, messages = self._check_optional_dependencies()
         if not success:
@@ -146,16 +149,26 @@ class PLDCorrector(object):
                 log.error(message)
             raise ImportError("\n".join(messages))
 
+        # C: We should use the pipeline mask by default. `to_lightcurve` defaults to the pipeline mask. Otherwise, when I plot side by side there is an offset.
+        if aperture_mask is None:
+            aperture_mask = tpf.pipeline_mask
+
         # Input validation: parse the aperture masks to accept strings etc.
         self.aperture_mask = tpf._parse_aperture_mask(aperture_mask)
-        if design_matrix_aperture_mask is None:
-            design_matrix_aperture_mask = 'all'
         self.design_matrix_aperture_mask = tpf._parse_aperture_mask(design_matrix_aperture_mask)
         # Generate raw flux light curve from desired pixels
         raw_lc = tpf.to_lightcurve(aperture_mask=self.aperture_mask)
         # It is critical to remove all cadences with NaNs or the linear algebra below will crash
         self.raw_lc, self.nan_mask = raw_lc.remove_nans(return_mask=True)
+        self._s2_mu = self.raw_lc.estimate_cdpp() * 1e-6 * self.raw_lc.flux.mean()
         self.tpf = tpf[~self.nan_mask]
+
+        # Theano raises an `AsTensorError` ("Cannot convert to TensorType")
+        # if the floats are not in 64-bit format, so we convert them here:
+        self._lc_time = np.asarray(self.raw_lc.time, np.float64)
+        self._lc_flux = np.asarray(self.raw_lc.flux, np.float64)
+        self._lc_flux_err = np.asarray(self.raw_lc.flux_err, np.float64)
+
         # For user-friendliness, we will track the most recently used model and solution:
         self.most_recent_model = None
         self.most_recent_solution = None
@@ -326,9 +339,12 @@ class PLDCorrector(object):
         # No columns in the design matrix should be NaN
         assert np.isfinite(design_matrix).any()
 
-        return design_matrix
+        # This gotcha cropped up when running kepler-11
+        dt = np.empty((design_matrix.shape[0], design_matrix.shape[1]))
+        dt[:, :] = design_matrix[:, :]
+        return dt
 
-    def create_pymc_model(self, design_matrix=None, cadence_mask=None,
+    def create_pymc_model(self, design_matrix, cadence_mask=None,
                           gp_timescale_prior=150, fractional_prior_width=.05, **kwargs):
         r"""Returns a PYMC3 model.
 
@@ -356,19 +372,11 @@ class PLDCorrector(object):
         ----------
         .. [1] the `celerite` documentation https://celerite.readthedocs.io
         """
-        if design_matrix is None:
-            design_matrix = self.create_design_matrix(**kwargs)
         if cadence_mask is None:
             cadence_mask = np.ones(len(self.raw_lc.time), dtype=bool)
 
-        # Theano raises an `AsTensorError` ("Cannot convert to TensorType")
-        # if the floats are not in 64-bit format, so we convert them here:
-        lc_time = np.asarray(self.raw_lc.time, np.float64)
-        lc_flux = np.asarray(self.raw_lc.flux, np.float64)
-        lc_flux_err = np.asarray(self.raw_lc.flux_err, np.float64)
-
         # Covariance matrix diagonal
-        diag = lc_flux_err**2
+        diag = self._lc_flux_err**2
 
         # The cadence mask is applied by inflating the uncertainties in the covariance matrix;
         # this is because celerite will run much faster if it is able to predict
@@ -377,26 +385,26 @@ class PLDCorrector(object):
 
         with pm.Model() as model:
             # The mean baseline flux value for the star
-            mean = pm.Normal("mean", mu=np.nanmean(lc_flux), sd=np.std(lc_flux))
+            mean = pm.Normal("mean", mu=np.nanmean(self._lc_flux), sd=np.std(self._lc_flux))
             # Create a Gaussian Process to model the long-term stellar variability
             # log(sigma) is the amplitude of variability, estimated from the raw flux scatter
-            logsigma = pm.Normal("logsigma", mu=np.log(np.std(lc_flux)), sd=5)
+            logsigma = pm.Normal("logsigma", mu=np.log(np.std(self._lc_flux)), sd=2)
             # log(rho) is the timescale of variability with a user-defined prior
             logrho = pm.Normal("logrho", mu=np.log(gp_timescale_prior),
-                               sd=np.log(fractional_prior_width*gp_timescale_prior))
+                               sd=2)
             # Enforce that the scale of variability should be no shorter than 0.5 days
             pm.Potential("logrho_prior", tt.switch(logrho > np.log(0.5), 0, np.inf))
             # log(s2) is a jitter term to compensate for underestimated flux errors
             # We estimate the magnitude of jitter from the CDPP (normalized to the flux)
-            s2_mu = self.raw_lc.estimate_cdpp() * 1e-6 * mean
-            logs2 = pm.Normal("logs2", mu=np.log(s2_mu), sd=5)
+            logs2 = pm.Normal("logs2", mu=np.log(self._s2_mu), sd=2)
             kernel = xo.gp.terms.Matern32Term(log_sigma=logsigma, log_rho=logrho)
 
             # Store the GP and cadence mask to aid debugging
-            model.gp = xo.gp.GP(kernel, lc_time, diag + tt.exp(logs2))
+            model.gp = xo.gp.GP(kernel, self._lc_time, diag + tt.exp(logs2))
             model.cadence_mask = cadence_mask
 
             # The motion model regresses against the design matrix
+
             A = tt.dot(design_matrix.T, model.gp.apply_inverse(design_matrix))
 
             # To ensure the weights can be solved for, we need to perform ridge regression
@@ -408,18 +416,17 @@ class PLDCorrector(object):
             # Apply ridge regression by adding small numbers along the diagonal
             A = tt.set_subtensor(A[ridge, ridge], A[ridge, ridge] + 1e-6)
 
-            B = tt.dot(design_matrix.T, model.gp.apply_inverse(lc_flux[:, None]))
+            B = tt.dot(design_matrix.T, model.gp.apply_inverse(self._lc_flux[:, None]))
             weights = tt.slinalg.solve(A, B)
             motion_model = pm.Deterministic("motion_model", tt.dot(design_matrix, weights)[:, 0])
             pm.Deterministic("weights", weights)
 
             # Likelihood to optimize
-            pm.Potential("obs", model.gp.log_likelihood(lc_flux - motion_model - mean))
+            pm.Potential("obs", model.gp.log_likelihood(self._lc_flux - motion_model - mean))
 
             # Track the corrected flux values
-            pm.Deterministic("corrected_flux", lc_flux - motion_model)
+            pm.Deterministic("corrected_flux", self._lc_flux - motion_model)
 
-        self.most_recent_model = model
         return model
 
     @suppress_stdout
@@ -465,6 +472,7 @@ class PLDCorrector(object):
                                       'target pixel file. Try increasing the PLD order or '
                                       'changing the `design_matrix_aperture_mask`.')
 
+        self.most_recent_model = model
         self.most_recent_solution = solution
         return solution
 
@@ -563,6 +571,13 @@ class PLDCorrector(object):
                           'in the `correct` function. Please pass these masks into '
                           'the `PLDCorrector` constructor.', LightkurveWarning)
 
+        if 'design_matrix' not in kwargs:
+            kwargs['design_matrix'] = self.create_design_matrix()
+        if kwargs['design_matrix'] is None:
+            kwargs['design_matrix'] = self.create_design_matrix()
+
+        self.design_matrix = kwargs['design_matrix']
+
         # Instantiate a PyMC3 model
         model = self.create_pymc_model(**kwargs)
 
@@ -576,7 +591,9 @@ class PLDCorrector(object):
         if remove_gp_trend:
             lc = self._lightcurve_from_solution(solution_or_trace, variable='corrected_flux')
             gp = self._gp_from_solution(self.most_recent_solution)
-            lc.flux = lc.flux - gp.flux
+            # If passed a trace, we should take the median value of the `mean` parameter, not the optimized solution..
+            mean = self.most_recent_solution['mean']
+            lc.flux = lc.flux - (gp.flux  - mean)
         else:
             lc = self._lightcurve_from_solution(solution_or_trace, variable='corrected_flux')
         return lc
@@ -677,6 +694,46 @@ class PLDCorrector(object):
         gp_lc = self._gp_from_solution(self.most_recent_solution)
 
         return corrected_lc, motion_lc, gp_lc
+
+    def plot_distributions(self):
+        varnames = ['logrho', 'logsigma', 'logs2', 'mean']
+        model = self.most_recent_model
+        map_soln = self.most_recent_solution
+
+        with plt.style.context(MPLSTYLE):
+            fig, ax = plt.subplots(1, len(varnames), figsize=(len(varnames)*5, 5), sharey=True)
+            for idx, var in enumerate(varnames):
+
+                # Normal Distributions
+                if isinstance(model[var].distribution, pm.distributions.continuous.Normal):
+                    m, s, tv = model[var].distribution.mu.eval(), model[var].distribution.sd.eval(), model[var].distribution.testval
+                    if tv is None:
+                        tv = m
+                    x = np.linspace(m-s*5, m+s*5, 100)
+                    ax[idx].plot(x, Gaussian1D(1, m, s)(x), c='k')
+
+                # Uniform Distributions
+                elif isinstance(model[var].distribution, pm.distributions.continuous.Uniform):
+                    l, u, tv = model[var].distribution.lower.eval(), model[var].distribution.upper.eval(), model[var].distribution.testval
+                    if tv is None:
+                        tv = np.mean([u, l])
+                    w = (u - l)/2
+                    x = np.linspace(l - w, u + w, 100)
+                    ax[idx].plot(x, Box1D(1, np.mean([u, l]), w*2)(x), c='k')
+
+                else:
+                    raise ValueError("I don't understand this distribution: {}, {}".format(var, model[var].distribution.__class__))
+
+                ax[idx].set_title(var, fontsize=12)
+                ax[idx].axvline(tv, ls='--', c='r', label='Init: {0:4.4}'.format(tv), lw=2)
+                ax[idx].axvline(map_soln[var], ls='--', c='g', label='MAP: {0:4.4}'.format(tv), lw=2)
+                ax[idx].fill_between([tv, map_soln[var]], 0, 1, color='b', alpha=0.2, label='diff: {0:4.4}'.format(tv - map_soln[var]))
+                ax[idx].legend()
+                ax[idx].set_yticks([]);
+
+        return fig
+
+
 
     def plot_diagnostics(self, solution_or_trace=None):
         """Plots a series of useful figures to help understand the noise removal
