@@ -160,18 +160,15 @@ class PLDCorrector(object):
         raw_lc = tpf.to_lightcurve(aperture_mask=self.aperture_mask)
         # It is critical to remove all cadences with NaNs or the linear algebra below will crash
         self.raw_lc, self.nan_mask = raw_lc.remove_nans(return_mask=True)
-        self._s2_mu = self.raw_lc.estimate_cdpp() * 1e-6 * self.raw_lc.flux.mean()
         self.tpf = tpf[~self.nan_mask]
 
         # Theano raises an `AsTensorError` ("Cannot convert to TensorType")
         # if the floats are not in 64-bit format, so we convert them here:
         self._lc_time = np.asarray(self.raw_lc.time, np.float64)
-        self._lc_flux = np.asarray(self.raw_lc.flux / np.nanmedian(self.raw_lc.flux), np.float64)
-        self._lc_flux -= 1
-        self._lc_flux_err = np.asarray(self.raw_lc.flux_err / np.nanmedian(self.raw_lc.flux), np.float64)
+        self._lc_flux = np.asarray(self.raw_lc.flux, np.float64)
+        self._lc_flux_err = np.asarray(self.raw_lc.flux_err, np.float64)
 
-        self._lc_flux *= 1e6
-        self._lc_flux_err *= 1e6
+        self._s2_mu = np.var(self._lc_flux.flatten())
 
         # For user-friendliness, we will track the most recently used model and solution:
         self.most_recent_model = None
@@ -389,27 +386,27 @@ class PLDCorrector(object):
 
         with pm.Model() as model:
             # The mean baseline flux value for the star
-            # mean = pm.Normal("mean", mu=np.nanmean(self._lc_flux), sd=np.std(self._lc_flux))
+            mean = pm.Normal("mean", mu=np.nanmean(self._lc_flux), sd=np.std(self._lc_flux))
             # Create a Gaussian Process to model the long-term stellar variability
             # log(sigma) is the amplitude of variability, estimated from the raw flux scatter
             # logsigma = pm.Normal("logsigma", mu=np.log(np.std(self._lc_flux)), sd=2)
             logsigma = pm.Uniform("logsigma", testval=np.log(np.std(self._lc_flux)),
-                                  lower=np.log(np.std(self._lc_flux))-6,
-                                  upper=np.log(np.std(self._lc_flux))+6)
+                                  lower=np.log(np.std(self._lc_flux))-10,
+                                  upper=np.log(np.std(self._lc_flux))+10)
             # log(rho) is the timescale of variability with a user-defined prior
+            # Enforce that the scale of variability should be no shorter than 0.5 days
             # logrho = pm.Normal("logrho", mu=np.log(gp_timescale_prior),
             #                    sd=2)
             logrho = pm.Uniform("logrho", testval=np.log(gp_timescale_prior),
-                                lower=np.log(gp_timescale_prior)-6,
-                                upper=np.log(gp_timescale_prior)+6)
-            # Enforce that the scale of variability should be no shorter than 0.5 days
-            # pm.Potential("logrho_prior", tt.switch(logrho > np.log(0.5), 0, np.inf))
+                                lower=np.log(0.5),
+                                upper=np.log(gp_timescale_prior)+10)
             # log(s2) is a jitter term to compensate for underestimated flux errors
             # We estimate the magnitude of jitter from the CDPP (normalized to the flux)
             # logs2 = pm.Normal("logs2", mu=np.log(self._s2_mu), sd=2)
             logs2 = pm.Uniform("logs2", testval=np.log(self._s2_mu),
-                               lower=np.log(self._s2_mu)-6,
-                               upper=np.log(self._s2_mu)+6)
+                               lower=np.log(self._s2_mu)-5,
+                               upper=np.log(self._s2_mu)+5)
+            # logs2 = pm.Constant("logs2", np.log(self._s2_mu))
             kernel = xo.gp.terms.Matern32Term(log_sigma=logsigma, log_rho=logrho)
 
             # Store the GP and cadence mask to aid debugging
@@ -417,17 +414,15 @@ class PLDCorrector(object):
             model.cadence_mask = cadence_mask
 
             # The motion model regresses against the design matrix
-
             A = tt.dot(design_matrix.T, model.gp.apply_inverse(design_matrix))
-
             # To ensure the weights can be solved for, we need to perform L2 normalization
             # to avoid an ill-conditioned matrix A. Here we define the size of the diagonal
             # along which we will add small values
-            ridge = np.array(range(design_matrix.shape[1]))
+            diag_inds = np.array(range(design_matrix.shape[1]))
             # Cast the diagonal indices into tensor space
-            ridge = tt.cast(ridge, 'int64')
+            diag_inds = tt.cast(diag_inds, 'int64')
             # Add small numbers along the diagonal
-            A = tt.set_subtensor(A[ridge, ridge], A[ridge, ridge] + 1e-8)
+            A = tt.set_subtensor(A[diag_inds, diag_inds], A[diag_inds, diag_inds] + 1e-8)
 
             B = tt.dot(design_matrix.T, model.gp.apply_inverse(self._lc_flux[:, None]))
             weights = tt.slinalg.solve(A, B)
@@ -435,7 +430,7 @@ class PLDCorrector(object):
             pm.Deterministic("weights", weights)
 
             # Likelihood to optimize
-            pm.Potential("obs", model.gp.log_likelihood(self._lc_flux - motion_model))# - mean))
+            pm.Potential("obs", model.gp.log_likelihood(self._lc_flux - (motion_model + mean)))
 
             # Track the corrected flux values
             pm.Deterministic("corrected_flux", self._lc_flux - motion_model)
@@ -443,7 +438,7 @@ class PLDCorrector(object):
         self.most_recent_model = model
         return model
 
-    @suppress_stdout
+    # @suppress_stdout
     def optimize(self, model=None, start=None, robust=False, **kwargs):
         """Returns the maximum likelihood solution.
 
@@ -475,12 +470,12 @@ class PLDCorrector(object):
         with model:
             # If a solution cannot be found, fail with an informative LightkurveError
             try:
-                solution = xo.optimize(start=start, vars=[model.logrho])#, model.mean])
+                # solution = xo.optimize(start=start, vars=[model.logrho, model.mean])
                 # Optimizing parameters separately appears to make finding a solution more likely
                 if robust:
-                    solution = xo.optimize(start=solution, vars=[model.logrho, model.logsigma])#, model.mean])
-                    solution = xo.optimize(start=solution, vars=[model.logrho, model.logsigma, model.logs2])
-                solution = xo.optimize(start=solution)  # Optimize all parameters
+                    solution = xo.optimize(start=solution, vars=[model.logrho, model.logsigma, model.mean])
+                    solution = xo.optimize(start=solution, vars=[model.logrho, model.logsigma])#, model.logs2])
+                solution = xo.optimize(start=start)  # Optimize all parameters
             except ValueError:
                 raise LightkurveError('Unable to find a noise model solution for the given '
                                       'target pixel file. Try increasing the PLD order or '
@@ -523,6 +518,7 @@ class PLDCorrector(object):
                          start=start,
                          step_kwargs=dict(target_accept=0.9),
                          chains=chains)
+        with model:
             # Sample the parameters
             trace = sampler.sample(draws=draws, chains=chains)
 
@@ -601,17 +597,15 @@ class PLDCorrector(object):
             # Sample the posterior
             solution_or_trace = self.sample(model=model, start=solution_or_trace, **kwargs)
 
-        if remove_gp_trend:
+        """if remove_gp_trend:
             lc = self._lightcurve_from_solution(solution_or_trace, variable='corrected_flux')
             gp = self._gp_from_solution(self.most_recent_solution)
             # If passed a trace, we should take the median value of the `mean` parameter, not the optimized solution..
             mean = self.most_recent_solution['mean']
             lc.flux = lc.flux - (gp.flux  - mean)
-        else:
-            lc = self._lightcurve_from_solution(solution_or_trace, variable='corrected_flux')
+        else:"""
+        lc = self._lightcurve_from_solution(solution_or_trace, variable='corrected_flux')
 
-        lc.flux *= 1e-6
-        lc.flux += np.nanmedian(self.raw_lc.flux)
         return lc
 
     def _lightcurve_from_solution(self, solution_or_trace, variable='corrected_flux'):
@@ -667,7 +661,7 @@ class PLDCorrector(object):
         # Evaluate the most recent model using the most recent parameters
         with self.most_recent_model:
             mu, var = xo.eval_in_model(gp.predict(time, return_var=True), solution)
-        lc.flux = mu + solution['mean']
+        lc.flux = mu
         lc.flux_err = np.sqrt(var)
         lc.label = 'PLD Corrected {} GP Trend'.format(self.raw_lc.label)
         return lc
@@ -715,7 +709,7 @@ class PLDCorrector(object):
         return corrected_lc, motion_lc, gp_lc
 
     def plot_distributions(self):
-        varnames = ['logrho', 'logsigma', 'logs2']#, 'mean']
+        varnames = ['logrho', 'logsigma', 'mean']
         model = self.most_recent_model
         map_soln = self.most_recent_solution
 
@@ -745,7 +739,7 @@ class PLDCorrector(object):
 
                 ax[idx].set_title(var, fontsize=12)
                 ax[idx].axvline(tv, ls='--', c='r', label='Init: {0:4.4}'.format(tv), lw=2)
-                ax[idx].axvline(map_soln[var], ls='--', c='g', label='MAP: {0:4.4}'.format(tv), lw=2)
+                ax[idx].axvline(map_soln[var], ls='--', c='g', label='MAP: {0:4.4}'.format(map_soln[var]), lw=2)
                 ax[idx].fill_between([tv, map_soln[var]], 0, 1, color='b', alpha=0.2, label='diff: {0:4.4}'.format(tv - map_soln[var]))
                 ax[idx].legend()
                 ax[idx].set_yticks([]);
@@ -773,10 +767,6 @@ class PLDCorrector(object):
         # Generate diagnostic light curves
         corrected_lc, motion_lc, gp_lc = self.get_diagnostic_lightcurves(solution_or_trace)
 
-        # Increase the GP light curve flux normalization from 0 to the motion
-        # model mean for visual comparison purposes
-        gp_lc.flux = gp_lc.flux + np.nanmean(motion_lc.flux)
-
         fig, ax = plt.subplots(3, sharex=True, figsize=(8.485, 10))
         # Plot the corrected light curve over the raw flux
         self.raw_lc.scatter(c='r', alpha=0.3, ax=ax[0], label='Raw Flux', normalize=False)
@@ -790,7 +780,6 @@ class PLDCorrector(object):
         # Plot the motion model over the raw light curve
         self.raw_lc.scatter(c='r', alpha=0.3, ax=ax[2], label='Raw Flux', normalize=False)
         # Add the mean of the raw flux to plot them at the same y-value
-        motion_lc.flux += np.mean(self.raw_lc.flux)
         motion_lc.scatter(c='k', ax=ax[2], label='Noise Model', normalize=False)
 
         return ax
