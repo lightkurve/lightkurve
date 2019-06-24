@@ -550,7 +550,7 @@ class LightCurve(object):
         return_mask : bool
             Whether or not to return a mask (i.e. a boolean array) indicating
             which data points were removed. Entries marked as `True` in the
-            mask are considered outliers. Defaults to `True`.
+            mask are considered outliers.  This mask is not returned by default.
         **kwargs : dict
             Dictionary of arguments to be passed to `astropy.stats.sigma_clip`.
 
@@ -559,6 +559,9 @@ class LightCurve(object):
         clean_lc : `LightCurve`
             A new light curve object from which outlier data points have been
             removed.
+        outlier_mask : NumPy array, optional
+            Boolean array flagging which cadences were removed.
+            Only returned if `return_mask=True`.
 
         Examples
         --------
@@ -572,9 +575,9 @@ class LightCurve(object):
             >>> lc_clean.flux
             array([1, 1, 1])
 
-        This example removes only points where the flux is larger than 1
-        standard deviation from the median, but leaves negative outliers
-        in place::
+        Instead of specifying `sigma`, you may specify separate `sigma_lower`
+        and `sigma_upper` parameters to remove only outliers above or below
+        the median. For example::
 
             >>> lc = LightCurve(time=[1, 2, 3, 4, 5], flux=[1, 1000, 1, -1000, 1])
             >>> lc_clean = lc.remove_outliers(sigma_lower=float('inf'), sigma_upper=1)
@@ -582,6 +585,13 @@ class LightCurve(object):
             array([1, 3, 4, 5])
             >>> lc_clean.flux
             array([    1,     1, -1000,     1])
+
+        Optionally, you may use the `return_mask` parameter to return a boolean
+        array which flags the outliers identified by the method. For example::
+
+            >>> lc_clean, mask = lc.remove_outliers(sigma=1, return_mask=True)
+            >>> mask
+            array([False,  True, False,  True, False])
         """
         # First, we create the outlier mask using AstroPy's sigma_clip function
         with warnings.catch_warnings():  # Ignore warnings due to NaNs or Infs
