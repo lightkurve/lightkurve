@@ -11,10 +11,15 @@ from matplotlib import pyplot as plt
 
 import astropy
 from astropy.table import Table
-from astropy.stats import LombScargle
 from astropy import units as u
 from astropy.units import cds
 from astropy.convolution import convolve, Box1DKernel
+
+# LombScargle was moved from astropy.stats to astropy.timeseries in AstroPy v3.2
+try:
+    from astropy.timeseries import LombScargle
+except ImportError:
+    from astropy.stats import LombScargle
 
 from . import MPLSTYLE
 from .utils import LightkurveWarning
@@ -868,10 +873,16 @@ class BoxLeastSquaresPeriodogram(Periodogram):
     @staticmethod
     def from_lightcurve(lc, **kwargs):
         """Creates a Periodogram from a LightCurve using the Box Least Squares (BLS) method."""
+        # BoxLeastSquares was added to `astropy.stats` in AstroPy v3.1 and then
+        # moved to `astropy.timeseries` in v3.2, which makes the import below
+        # somewhat complicated.
         try:
-            from astropy.stats import BoxLeastSquares
+            from astropy.timeseries import BoxLeastSquares
         except ImportError:
-            raise ImportError("BLS requires AstroPy v3.1 or later")
+            try:
+                from astropy.stats import BoxLeastSquares
+            except ImportError:
+                raise ImportError("BLS requires AstroPy v3.1 or later")
 
         # Validate user input for `lc`
         # (BoxLeastSquares will not work if flux or flux_err contain NaNs)
