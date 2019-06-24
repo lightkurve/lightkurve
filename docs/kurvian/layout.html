@@ -6,6 +6,16 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
     <link rel="stylesheet" href="{{ pathto('_static/css/theme.css', 1) }}" type="text/css" />
+
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-69171-9');
+    </script>
 {% endblock %}
 
 
@@ -53,8 +63,8 @@
 <div class="container" style="padding-top: 2em;">
     <hr>
     <p class="text-center">
-        Created with ♥ by the Lightkurve developers.
-        <a href="https://github.com/KeplerGO/lightkurve">Join us on GitHub.</a>
+        Created with ♥ by the Lightkurve collaboration.
+        Please <a href="{{ pathto('about/citing') }}">cite us</a> or <a href="https://github.com/KeplerGO/lightkurve">join us on GitHub.</a>
     </p>
 </div>
 {%- endblock %}

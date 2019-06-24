@@ -19,6 +19,7 @@ from astropy.stats import sigma_clip
 from astropy.table import Table
 from astropy.io import fits
 from astropy.time import Time
+from astropy import units as u
 
 from . import PACKAGEDIR, MPLSTYLE
 from .utils import (
@@ -387,9 +388,10 @@ class LightCurve(object):
         Parameters
         ----------
         period : float
-            The period upon which to fold.
+            The period upon which to fold, in the same units as this
+            LightCurve's ``time`` attribute.
         t0 : float, optional
-            Time corresponding to zero phase. In the same units as the
+            Time corresponding to zero phase, in the same units as this
             LightCurve's ``time`` attribute.  Defaults to 0 if not set.
         transit_midpoint : float, optional
             Deprecated.  Use `t0` instead.
@@ -400,6 +402,13 @@ class LightCurve(object):
             A new light curve object in which the data are folded and sorted by
             phase. The object contains an extra ``phase`` attribute.
         """
+        # Input validation.  (Note: Quantities are simply ignored for now;
+        # we should consider adding extra validation here.)
+        if isinstance(period, u.quantity.Quantity):
+            period = period.value
+        if isinstance(t0, u.quantity.Quantity):
+            t0 = t0.value
+
         # `transit_midpoint` is deprecated
         if transit_midpoint is not None:
             warnings.warn('`transit_midpoint` is deprecated, please use `t0` instead.',
@@ -502,12 +511,13 @@ class LightCurve(object):
         nlc.time = np.asarray(ts.index)
         return nlc
 
-    def remove_outliers(self, sigma=5., return_mask=False, **kwargs):
+    def remove_outliers(self, sigma=5., sigma_lower=None, sigma_upper=None,
+                        return_mask=False, **kwargs):
         """Removes outlier data points using sigma-clipping.
 
-        This method returns a new `LightCurve` object from which data
-        points are removed if their flux values are greater or smaller than
-        the median flux by at least ``sigma`` times the standard deviation.
+        This method returns a new `LightCurve` object from which data points
+        are removed if their flux values are greater or smaller than the median
+        flux by at least ``sigma`` times the standard deviation.
 
         Sigma-clipping works by iterating over data points, each time rejecting
         values that are discrepant by more than a specified number of standard
@@ -518,6 +528,8 @@ class LightCurve(object):
         .. note::
             This function is a convenience wrapper around
             `astropy.stats.sigma_clip()` and provides the same functionality.
+            Any extra arguments passed to this method will be passed on to
+            ``sigma_clip``.
 
         Parameters
         ----------
@@ -538,15 +550,7 @@ class LightCurve(object):
         return_mask : bool
             Whether or not to return a mask (i.e. a boolean array) indicating
             which data points were removed. Entries marked as `True` in the
-            mask are considered outliers. Defaults to `True`.
-        iters : int or `None`
-            The number of iterations to perform sigma clipping, or `None` to
-            clip until convergence is achieved (i.e., continue until the
-            last iteration clips nothing). Defaults to 5.
-        cenfunc : callable
-            The function used to compute the center for the clipping. Must
-            be a callable that takes in a masked array and outputs the
-            central value. Defaults to the median (`numpy.ma.median`).
+            mask are considered outliers.  This mask is not returned by default.
         **kwargs : dict
             Dictionary of arguments to be passed to `astropy.stats.sigma_clip`.
 
@@ -555,6 +559,9 @@ class LightCurve(object):
         clean_lc : `LightCurve`
             A new light curve object from which outlier data points have been
             removed.
+        outlier_mask : NumPy array, optional
+            Boolean array flagging which cadences were removed.
+            Only returned if `return_mask=True`.
 
         Examples
         --------
@@ -568,9 +575,9 @@ class LightCurve(object):
             >>> lc_clean.flux
             array([1, 1, 1])
 
-        This example removes only points where the flux is larger than 1
-        standard deviation from the median, but leaves negative outliers
-        in place::
+        Instead of specifying `sigma`, you may specify separate `sigma_lower`
+        and `sigma_upper` parameters to remove only outliers above or below
+        the median. For example::
 
             >>> lc = LightCurve(time=[1, 2, 3, 4, 5], flux=[1, 1000, 1, -1000, 1])
             >>> lc_clean = lc.remove_outliers(sigma_lower=float('inf'), sigma_upper=1)
@@ -578,11 +585,22 @@ class LightCurve(object):
             array([1, 3, 4, 5])
             >>> lc_clean.flux
             array([    1,     1, -1000,     1])
+
+        Optionally, you may use the `return_mask` parameter to return a boolean
+        array which flags the outliers identified by the method. For example::
+
+            >>> lc_clean, mask = lc.remove_outliers(sigma=1, return_mask=True)
+            >>> mask
+            array([False,  True, False,  True, False])
         """
         # First, we create the outlier mask using AstroPy's sigma_clip function
         with warnings.catch_warnings():  # Ignore warnings due to NaNs or Infs
             warnings.simplefilter("ignore")
-            outlier_mask = sigma_clip(data=self.flux, sigma=sigma, **kwargs).mask
+            outlier_mask = sigma_clip(data=self.flux,
+                                      sigma=sigma,
+                                      sigma_lower=sigma_lower,
+                                      sigma_upper=sigma_upper,
+                                      **kwargs).mask
         # Second, we return the masked light curve and optionally the mask itself
         if return_mask:
             return self[~outlier_mask], outlier_mask
@@ -636,8 +654,9 @@ class LightCurve(object):
                  for a in indexes]
             ) / binsize
         else:
-            # Make them zeros.
-            binned_lc.flux_err = np.zeros(len(binned_lc.flux))
+            # If the original light curve does not provide `flux_err`,
+            # then report the standard deviations of the fluxes in each bin.
+            binned_lc.flux_err = np.array([np.nanstd(self.flux[a]) for a in indexes])
 
         if hasattr(binned_lc, 'quality'):
             # Note: np.bitwise_or only works if there are no NaNs
@@ -962,9 +981,41 @@ class LightCurve(object):
         table : `astropy.table.Table`
             An AstroPy Table with columns 'time', 'flux', and 'flux_err'.
         """
-        return Table(data=(self.time, self.flux, self.flux_err),
-                     names=('time', 'flux', 'flux_err'),
-                     meta=self.meta)
+        tbl = Table.from_pandas(self.to_pandas())
+        if self.time_format is not None:
+            tbl['time'] = self.astropy_time  # Ensure 'time' is an AstroPy `Time` object
+        tbl.meta = self.meta
+        return tbl
+
+    def to_timeseries(self):
+        """Converts the light curve to an `~astropy.timeseries.TimeSeries` object.
+
+        This feature requires AstroPy v3.2 or later (released in 2019).
+        An `ImportError` will be raised if this version is not available.
+
+        Returns
+        -------
+        timeseries : `~astropy.timeseries.TimeSeries`
+            An AstroPy TimeSeries object.
+        """
+        try:
+            from astropy.timeseries import TimeSeries
+        except ImportError:
+            raise ImportError("You need to install AstroPy v3.2 or later to "
+                              "use the LightCurve.to_timeseries() method.")
+        return TimeSeries(self.to_table())
+
+    @staticmethod
+    def from_timeseries(ts):
+        """Create a new `LightCurve` from an `~astropy.timeseries.TimeSeries`.
+
+        Parameters
+        ----------
+        ts : `~astropy.timeseries.TimeSeries`
+            An AstroPy TimeSeries object.  The object must contain columns
+            named 'time', 'flux', and 'flux_err'.
+        """
+        return LightCurve(time=ts['time'].value, flux=ts['flux'], flux_err=ts['flux_err'])
 
     def to_pandas(self, columns=['time', 'flux', 'flux_err']):
         """Converts the light curve to a Pandas `~pandas.DataFrame` object.

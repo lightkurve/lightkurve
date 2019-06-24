@@ -2,6 +2,7 @@ from __future__ import division, print_function
 
 from astropy.io import fits as pyfits
 from astropy.utils.data import get_pkg_data_filename
+from astropy import units as u
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -15,12 +16,11 @@ from ..lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
 from ..lightcurvefile import LightCurveFile, KeplerLightCurveFile, TessLightCurveFile
 from ..targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
 from ..utils import LightkurveWarning
+from .test_targetpixelfile import TABBY_TPF
 
 # 8th Quarter of Tabby's star
 TABBY_Q8 = ("https://archive.stsci.edu/missions/kepler/lightcurves"
             "/0084/008462852/kplr008462852-2011073133259_llc.fits")
-TABBY_TPF = ("https://archive.stsci.edu/missions/kepler/target_pixel_files"
-             "/0084/008462852/kplr008462852-2011073133259_lpd-targ.fits.gz")
 K2_C08 = ("https://archive.stsci.edu/missions/k2/lightcurves/c8/"
           "220100000/39000/ktwo220139473-c08_llc.fits")
 KEPLER10 = ("https://archive.stsci.edu/missions/kepler/lightcurves/"
@@ -188,6 +188,10 @@ def test_lightcurve_fold():
     with pytest.warns(LightkurveWarning, match='appears to be given in JD'):
         lc.fold(10, 2456600)
 
+def test_lightcurve_fold_issue520():
+    """Regression test for #520; accept quantities in `fold()`."""
+    lc = LightCurve(time=np.linspace(0, 10, 100), flux=np.zeros(100)+1)
+    lc.fold(period=1*u.day, t0=5*u.day)
 
 def test_lightcurve_append():
     """Test ``LightCurve.append()``."""
@@ -400,6 +404,10 @@ def test_bin():
                           flux=1*np.ones(1000) + np.random.normal(0, 1e-6, 1000),
                           cadenceno=np.arange(1000))
     assert np.isclose(lc.bin(2).estimate_cdpp(), 1, rtol=1)
+    # Regression test for #500
+    lc = LightCurve(time=np.arange(2000),
+                    flux=np.random.normal(loc=42, scale=0.01, size=2000))
+    assert np.round(lc.bin(2000).flux_err[0], 2) == 0.01
 
 
 def test_bin_quality():
@@ -748,3 +756,17 @@ def test_new_corrector_api():
         lc1 = KeplerLightCurveFile(K2_C08).PDCSAP_FLUX.correct()
     lc2 = KeplerLightCurveFile(K2_C08).PDCSAP_FLUX.to_corrector().correct()
     assert_allclose(lc1.flux, lc2.flux)
+
+
+def test_to_timeseries():
+    """Test the `LightCurve.to_timeseries()` method."""
+    time, flux, flux_err = range(3), np.ones(3), np.zeros(3)
+    lc = LightCurve(time, flux, flux_err, time_format="jd")
+    try:
+        ts = lc.to_timeseries()
+        assert_allclose(ts['time'].value, time)
+        assert_allclose(ts['flux'], flux)
+        assert_allclose(ts['flux_err'], flux_err)
+    except ImportError:
+        # Requires AstroPy v3.2 or later
+        pass

@@ -240,7 +240,8 @@ class TargetPixelFile(object):
                             'NAXIS2': 'NAXIS2'}
             mywcs = {}
             for oldkey, newkey in wcs_keywords.items():
-                mywcs[newkey] = self.hdu[1].header[oldkey]
+                if (self.hdu[1].header[oldkey] != Undefined):
+                   mywcs[newkey] = self.hdu[1].header[oldkey]
             return WCS(mywcs)
 
     @classmethod
@@ -454,7 +455,7 @@ class TargetPixelFile(object):
             threshold.
         """
         if reference_pixel == 'center':
-            reference_pixel = (self.shape[1] / 2, self.shape[2] / 2)
+            reference_pixel = (self.shape[2] / 2, self.shape[1] / 2)
         # Calculate the median image
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
@@ -1119,19 +1120,48 @@ class KeplerTargetPixelFile(TargetPixelFile):
         allkeys = hdu0_keywords.copy()
         allkeys.update(carry_keywords)
 
-        ext_info = {'1CRV5P': column, '2CRV5P': row}
-
         for idx, img in tqdm(enumerate(images), total=len(images)):
             hdu = _open_image(img, extension)
 
             if idx == 0:  # Get default keyword values from the first image
                 factory.keywords = hdu.header
+
+
+            # Get positional shift of the image compared to the reference WCS
+            wcs_current = WCS(hdu.header)
+            column_current, row_current = wcs_current.wcs_world2pix(
+                          np.asarray([[position.ra.deg], [position.dec.deg]]).T,0)[0]
+            column_ref, row_ref = wcs_ref.wcs_world2pix(
+                          np.asarray([[position.ra.deg], [position.dec.deg]]).T,0)[0]
+
+            hdu.header['POS_CORR1'] = column_current - column_ref
+            hdu.header['POS_CORR2'] = row_current - row_ref
+
             if position is None:
                 cutout = hdu
             else:
                 cutout = Cutout2D(hdu.data, position, wcs=WCS(hdu.header),
                                   size=size, mode='partial')
             factory.add_cadence(frameno=idx, flux=cutout.data, header=hdu.header)
+
+        ext_info = {}
+        ext_info['TFORM4'] = '{}J'.format(size[0] * size[1])
+        ext_info['TDIM4'] = '({},{})'.format(size[0], size[1])
+        ext_info.update(cutout.wcs.to_header())
+
+        # TPF contains multiple data columns that require WCS
+        for m in [4, 5, 6, 7, 8, 9]:
+            if m > 4:
+                ext_info["TFORM{}".format(m)] = '{}E'.format(size[0] * size[1])
+                ext_info['TDIM{}'.format(m)] = '({},{})'.format(size[0], size[1])
+            # Compute location of TPF lower left corner
+            # Int statement contains modulus so that .5 values always round up.
+            # We cannot use numpy.round() as it rounds to the even number.
+            half_tpfsize_col = int((size[0] - 1) / 2 + (size[0] + 1) % 2)
+            half_tpfsize_row = int((size[1] - 1) / 2 + (size[1] + 1) % 2)
+            ext_info['1CRV{}P'.format(m)] = column - half_tpfsize_col + factory.keywords['CRVAL1P']
+            ext_info['2CRV{}P'.format(m)] = row - half_tpfsize_row + factory.keywords['CRVAL2P']
+
         return factory.get_tpf(hdu0_keywords=allkeys, ext_info=ext_info, **kwargs)
 
 
@@ -1176,7 +1206,7 @@ class KeplerTargetPixelFileFactory(object):
         self.pos_corr1 = np.zeros(n_cadences, dtype='float32')
         self.pos_corr2 = np.zeros(n_cadences, dtype='float32')
 
-    def add_cadence(self, frameno, wcs=None, raw_cnts=None, flux=None, flux_err=None,
+    def add_cadence(self, frameno, raw_cnts=None, flux=None, flux_err=None,
                     flux_bkg=None, flux_bkg_err=None, cosmic_rays=None,
                     header={}):
         """Populate the data for a single cadence."""
@@ -1205,8 +1235,6 @@ class KeplerTargetPixelFileFactory(object):
             self.pos_corr1[frameno] = header['POS_CORR1']
         if 'POS_CORR2' in header:
             self.pos_corr2[frameno] = header['POS_CORR2']
-        if wcs is None:
-            self.pos_corr1[frameno], self.pos_corr2[frameno] = None, None
 
     def _check_data(self):
         """Check the data before writing to a TPF for any obvious errors."""
