@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.ndimage import label
 from tqdm import tqdm
+from copy import deepcopy
 from astropy.coordinates import SkyCoord
 from astropy.stats.funcs import median_absolute_deviation as MAD
 
@@ -693,6 +694,125 @@ class TargetPixelFile(object):
         if method == "pld":
             from .correctors import PLDCorrector
             return PLDCorrector(self)
+
+
+    def cutout(self, center=None, size=5):
+        '''Cutout the target pixel file in spatial coordinates
+
+        Paramters
+        ---------
+        center : tuple, astropy.SkyCoord, string
+            Coordinates of center to trim at
+        size : int or tuple
+            Number of pixels across the cutout should be. If tuple, should be
+            (column, row).
+
+        Returns
+        -------
+        ntpf : lk.TargetPixelFile
+            New TPF object.
+        '''
+        imshape = self.flux.shape[1:]
+
+        # Parse center point
+        if center is None:
+            x, y = imshape[0]//2, imshape[1]//2
+
+        elif isinstance(center, SkyCoord):
+            x, y = self.wcs.world_to_pixel(center)
+
+        elif isinstance(center, (tuple, list, np.ndarray)):
+            x, y = center
+
+        x = int(x)
+        y = int(y)
+
+        if isinstance(size, int):
+            s = (size/2, size/2)
+
+        if isinstance(size, (tuple, list, np.ndarray)):
+            s = (size[0]/2, size[1]/2)
+
+        # Find the TPF edges
+        xedges = np.asarray([np.max([0, x-s[0]]), np.min([x+s[0], imshape[0] - 1])], dtype=int)
+        yedges = np.asarray([np.max([0, y-s[1]]), np.min([y+s[1], imshape[1] - 1])], dtype=int)
+
+        # Make a copy of the data extension
+        hdu = self.hdu[0].copy()
+
+        # Find the new object coordinates
+        r, d = self.get_coordinates(cadence=len(self.flux)//2)
+        hdu.header['RA_OBJ'] = np.nanmean(r[xedges[0]:xedges[1], yedges[0]:yedges[1]])
+        hdu.header['DEC_OBJ'] = np.nanmean(d[xedges[0]:xedges[1], yedges[0]:yedges[1]])
+
+        # Remove any KIC labels
+        labels = ['*MAG', 'PM*', 'GL*', 'OBJECT', 'PARALLAX', '*COLOR', 'TEFF', 'LOGG', 'FEH', 'EBMINUSV', 'AV', "RADIUS", "TMINDEX", "OBJECT"]
+        for label in labels:
+            hdu.header[label] = fits.card.Undefined()
+
+        keys = np.asarray([k for k in self.header.keys()])
+        if 'KEPLERID' in keys:
+            hdu.header['KEPLERID'] = '{}{}'.format(hdu.header['KEPLERID'], '_CUTOUT')
+        if 'TICID' in keys:
+            hdu.header['TICID'] = '{}{}'.format(hdu.header['TICID'], '_CUTOUT')
+
+        #HDUList
+        hdus = [hdu]
+
+        # Copy the header
+        hdr = deepcopy(self.hdu[1].header)
+
+        # Trim any columns that have the shape of the image, to be the new shape
+        cols = []
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            for idx, col in enumerate(self.hdu[1].columns):
+                # If the column is 3D
+                if (len(self.hdu[1].data[col.name].shape) == 3):
+                    # Make a copy, trim it and change the format
+                    col = deepcopy(col)
+                    col.array = col.array[:, xedges[0]:xedges[1], yedges[0]:yedges[1]]
+                    col._dim = '{}'.format(col.array.shape[1:]).replace(' ', '')
+                    col._dims = col.array.shape[1:]
+                    col._format=fits.column._ColumnFormat('{}{}'.format(np.product(col.array.shape[1:]), col._format[-1]))
+                    cols.append(col)
+                    hdr['TDIM{}'.format(idx)] = '{}'.format(col.array.shape[1:]).replace(' ', '')
+                    hdr['TDIM9'] = '{}'.format(col.array.shape[1:]).replace(' ', '')
+                    hdr['TDIM13'] = '{}'.format((0, col.array.shape[1])).replace(' ', '')
+                else:
+                    cols.append(col)
+
+        # Get those coordinates sorted for the corner of the TPF and the WCS
+        hdr['1CRV*P'] = hdr['1CRV4P'] + yedges[0]
+        hdr['2CRV*P'] = hdr['2CRV4P'] + xedges[0]
+        hdr['1CRPX*'] = hdr['1CRPX4'] - yedges[0]
+        hdr['2CRPX*'] = hdr['2CRPX4'] - xedges[0]
+
+        # Make a table for the data
+        cols[-1]._dim = '{}'.format((0, int(cols[5]._dim.split(',')[1][:-1]))).replace(' ', '')
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            btbl = fits.BinTableHDU.from_columns(cols, header=hdr)
+
+        # Append it to the hdulist
+        hdus.append(btbl)
+
+        # Correct the aperture mask
+        hdu = self.hdu[2].copy()
+        ar = hdu.data
+        ar = ar[xedges[0]:xedges[1], yedges[0]:yedges[1]]
+        hdu.header['NAXIS1'] = ar.shape[0]
+        hdu.header['NAXIS2'] = ar.shape[1]
+        hdu.data = ar
+        hdus.append(hdu)
+
+        # Make a new tpf
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            newfits = fits.HDUList(hdus)
+        return self.__class__(newfits)
+
+
 
 
 class KeplerTargetPixelFile(TargetPixelFile):
@@ -1395,6 +1515,7 @@ class KeplerTargetPixelFileFactory(object):
                 hdu.header[keyword] = ""  # override wcs keywords
         hdu.header['EXTNAME'] = 'APERTURE'
         return hdu
+
 
 
 class TessTargetPixelFile(TargetPixelFile):
