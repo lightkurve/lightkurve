@@ -782,6 +782,13 @@ class SNRPeriodogram(Periodogram):
                 acf = self._autocorrelate(numax)      #Return the acf at this numax
                 metric[idx] = np.nanmax(np.sqrt(acf/len(acf)))   #Store the max acf power normalised by the length
 
+        elif method=='flat':
+            numaxs = np.arange(125, np.floor(np.nanmax(self.frequency.value)) - 125, 25.)
+            metric = np.zeros(len(numaxs))
+            for idx, numax in enumerate(numaxs):
+                acf = self._autocorrelate(numax, method='flat')
+                metric[idx] = (np.sum(np.abs(acf)) - 1 ) / len(acf)
+
         # Smooth the data to find the peak
         g = Gaussian1DKernel(stddev=5)
         metric_smooth = convolve(metric, g)
@@ -901,7 +908,7 @@ class SNRPeriodogram(Periodogram):
             return u.Quantity(best_dnu, self.frequency.unit), ax
         return u.Quantity(best_dnu, self.frequency.unit)
 
-    def _autocorrelate(self, numax):
+    def _autocorrelate(self, numax, method='hanning'):
         """An autocorrelation function (ACF) for seismic mode envelopes.
         We autocorrelate the region one FWHM of the mode envelope either side
         of the proposed numax.
@@ -921,11 +928,19 @@ class SNRPeriodogram(Periodogram):
                 The autocorrelation power calculated for the given numax
         """
         fs = np.median(np.diff(self.frequency.value))
-        fwhm = int(np.floor(self._get_fwhm(numax) / fs))    # Express the fwhm in indices
-        # fwhm -= fwhm % 2                                  # Make the FWHM value even (%2 = 0 if even, 1 if odd)
-        x = int(numax / fs)                                 #Find the index value of numax
-        s = np.hanning(len(self.power[x-fwhm:x+fwhm]))      #Define the hanning window for the evaluated frequency space
-        p_han = self.power[x-fwhm:x+fwhm].value * s         #Multiply the evaluated SNR space by the hanning window
+
+        if method == 'hanning':
+            fwhm = int(np.floor(self._get_fwhm(numax) / fs))    # Express the fwhm in indices
+            # fwhm -= fwhm % 2                                  # Make the FWHM value even (%2 = 0 if even, 1 if odd)
+            x = int(numax / fs)                                 #Find the index value of numax
+            s = np.hanning(len(self.power[x-fwhm:x+fwhm]))      #Define the hanning window for the evaluated frequency space
+            p_han = self.power[x-fwhm:x+fwhm].value * s         #Multiply the evaluated SNR space by the hanning window
+
+        elif method == 'flat':
+            spread = int(125/fs)
+            x = int(numax / fs)
+            p_han = self.power[x-spread:x+spread].value
+
         C = np.correlate(p_han, p_han, mode='full')         #Correlated the resulting SNR space with itself
         C = C[len(p_han)-1:]                                #Truncate the ACF
         return C
