@@ -783,10 +783,15 @@ class SNRPeriodogram(Periodogram):
                 metric[idx] = np.nanmax(np.sqrt(acf/len(acf)))   #Store the max acf power normalised by the length
 
         elif method=='flat':
-            numaxs = np.arange(125, np.floor(np.nanmax(self.frequency.value)) - 125, 25.)
+            if u.Quantity(self.frequency[-1], u.microhertz) > u.Quantity(500., u.microhertz):
+                window = 250.
+            else:
+                window = 25.
+
+            numaxs = np.arange(window/2, np.floor(np.nanmax(self.frequency.value)) - window/2, 1.)
             metric = np.zeros(len(numaxs))
             for idx, numax in enumerate(numaxs):
-                acf = self._autocorrelate(numax, method='flat')
+                acf = self._autocorrelate(numax, method='flat', window=window)
                 metric[idx] = (np.sum(np.abs(acf)) - 1 ) / len(acf)
 
         # Smooth the data to find the peak
@@ -908,7 +913,7 @@ class SNRPeriodogram(Periodogram):
             return u.Quantity(best_dnu, self.frequency.unit), ax
         return u.Quantity(best_dnu, self.frequency.unit)
 
-    def _autocorrelate(self, numax, method='hanning'):
+    def _autocorrelate(self, numax, method='hanning', window=250.):
         """An autocorrelation function (ACF) for seismic mode envelopes.
         We autocorrelate the region one FWHM of the mode envelope either side
         of the proposed numax.
@@ -937,7 +942,7 @@ class SNRPeriodogram(Periodogram):
             p_han = self.power[x-fwhm:x+fwhm].value * s         #Multiply the evaluated SNR space by the hanning window
 
         elif method == 'flat':
-            spread = int(125/fs)
+            spread = int(window/2/fs)
             x = int(numax / fs)
             p_han = self.power[x-spread:x+spread].value
 
