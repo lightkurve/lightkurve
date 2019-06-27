@@ -767,6 +767,9 @@ class SNRPeriodogram(Periodogram):
         to noise (such as for single sector TESS data). Exercise caution when
         using this module!
 
+        NOTE: This function is intended for use with solar like Main Sequence
+        and Red Giant Branch oscillators only.
+
         Parameters:
         -----------
         numaxs : array-like
@@ -835,7 +838,6 @@ class SNRPeriodogram(Periodogram):
             return u.Quantity(best_numax, self.frequency.unit), ax
         return u.Quantity(best_numax, self.frequency.unit)
 
-
     def estimate_dnu(self, numax=None, show_plots=False):
         """ Estimates the average value of the large frequency spacing, DeltaNu,
         of the seismic oscillations of the target, using an autocorrelation
@@ -877,8 +879,11 @@ class SNRPeriodogram(Periodogram):
         If `numax` is None, a numax is calculated using the estimate_numax()
         function with default settings.
 
-        Note: When plotting the acf, we exclude the first frequency lag bin, to
+        NOTE: When plotting the acf, we exclude the first frequency lag bin, to
         make the relevant features on the plot clearer.
+
+        NOTE: This function is intended for use with solar like Main Sequence
+        and Red Giant Branch oscillators only.
 
         Parameters:
         ----------
