@@ -779,8 +779,8 @@ class PLDCorrector(object):
         ax1.set_ylim([np.mean(gp_lc.flux) - y_range, np.mean(gp_lc.flux) + y_range])
 
         # Plot the stellar model over the raw flux, indicating masked cadences
-        self.raw_lc.scatter(c='r', alpha=0.3, ax=ax[1], label='Raw Flux', normalize=False)
-        gp_lc.plot(c='k', ax=ax1, label='GP Model', normalize=False)
+        self.raw_lc.scatter(c='r', alpha=0.3, ax=ax[1], label='Raw Flux', ylabel='Raw Flux', normalize=False)
+        gp_lc.plot(c='k', ax=ax1, label='GP Model', ylabel='GP Model Flux', normalize=False)
         if len(gp_lc[~self.most_recent_model.cadence_mask].flux) > 0:
             gp_lc[~self.most_recent_model.cadence_mask].scatter(ax=ax[1], label='Masked Cadences',
                                                                 marker='d', normalize=False)
@@ -790,9 +790,9 @@ class PLDCorrector(object):
         ax[2].set_ylim([np.mean(self.raw_lc.flux) - y_range, np.mean(self.raw_lc.flux) + y_range])
         ax2.set_ylim([np.mean(motion_lc.flux) - y_range, np.mean(motion_lc.flux) + y_range])
 
-        self.raw_lc.scatter(c='r', alpha=0.3, ax=ax[2], label='Raw Flux', normalize=False)
+        self.raw_lc.scatter(c='r', alpha=0.3, ax=ax[2], label='Raw Flux', ylabel='Raw Flux', normalize=False)
         # Add the mean of the raw flux to plot them at the same y-value
-        motion_lc.scatter(c='k', ax=ax2, label='Noise Model', normalize=False)
+        motion_lc.scatter(c='k', ax=ax2, label='Noise Model', ylabel='Motion Model Flux', normalize=False)
 
         return ax
 
