@@ -470,7 +470,7 @@ class PLDCorrector(object):
         with model:
             # If a solution cannot be found, fail with an informative LightkurveError
             try:
-                # solution = xo.optimize(start=start, vars=[model.logrho, model.mean])
+                solution = xo.optimize(start=start, vars=[model.logrho, model.mean])
                 # Optimizing parameters separately appears to make finding a solution more likely
                 if robust:
                     solution = xo.optimize(start=solution, vars=[model.logrho, model.logsigma, model.mean])
@@ -771,16 +771,28 @@ class PLDCorrector(object):
         # Plot the corrected light curve over the raw flux
         self.raw_lc.scatter(c='r', alpha=0.3, ax=ax[0], label='Raw Flux', normalize=False)
         corrected_lc.scatter(c='k', ax=ax[0], label='Corrected Flux', normalize=False)
+
+        # Plot the following diagnostics on separate axes from the raw flux
+        ax1 = ax[1].twinx()
+        y_range = 5 * np.std(self.raw_lc.flux)
+        ax[1].set_ylim([np.mean(self.raw_lc.flux) - y_range, np.mean(self.raw_lc.flux) + y_range])
+        ax1.set_ylim([np.mean(gp_lc.flux) - y_range, np.mean(gp_lc.flux) + y_range])
+
         # Plot the stellar model over the raw flux, indicating masked cadences
         self.raw_lc.scatter(c='r', alpha=0.3, ax=ax[1], label='Raw Flux', normalize=False)
-        gp_lc.plot(c='k', ax=ax[1], label='GP Model', normalize=False)
+        gp_lc.plot(c='k', ax=ax1, label='GP Model', normalize=False)
         if len(gp_lc[~self.most_recent_model.cadence_mask].flux) > 0:
             gp_lc[~self.most_recent_model.cadence_mask].scatter(ax=ax[1], label='Masked Cadences',
                                                                 marker='d', normalize=False)
+
         # Plot the motion model over the raw light curve
+        ax2 = ax[2].twinx()
+        ax[2].set_ylim([np.mean(self.raw_lc.flux) - y_range, np.mean(self.raw_lc.flux) + y_range])
+        ax2.set_ylim([np.mean(motion_lc.flux) - y_range, np.mean(motion_lc.flux) + y_range])
+
         self.raw_lc.scatter(c='r', alpha=0.3, ax=ax[2], label='Raw Flux', normalize=False)
         # Add the mean of the raw flux to plot them at the same y-value
-        motion_lc.scatter(c='k', ax=ax[2], label='Noise Model', normalize=False)
+        motion_lc.scatter(c='k', ax=ax2, label='Noise Model', normalize=False)
 
         return ax
 
