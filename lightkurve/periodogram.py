@@ -737,7 +737,7 @@ class SNRPeriodogram(Periodogram):
         reduces power of peaks in the spectrum that do not follow the expected
         shape of a seismic mode envelope.
 
-        The correlation is typically given as:
+        The correlation (numpy.correlate) is typically given as:
 
         C[x, y] = sum( x * conj(y) ) .
 
@@ -850,7 +850,7 @@ class SNRPeriodogram(Periodogram):
         numax is taken of one estimated full-width-half-maximum (FWHM) of the
         mode envelope either side of the central frequency.
 
-        The autocorrelation is given as:
+        The autocorrelation (numpy.correlate) is given as:
 
         C = sum(s * s)
 
