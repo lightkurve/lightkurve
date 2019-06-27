@@ -168,7 +168,8 @@ class PLDCorrector(object):
         self._lc_flux = np.asarray(self.raw_lc.flux, np.float64)
         self._lc_flux_err = np.asarray(self.raw_lc.flux_err, np.float64)
 
-        self._s2_mu = np.var(self._lc_flux.flatten())
+        # Multiply by the mean of the raw flux because flatten returns a normalized light curve
+        self._s2_mu = np.var(self.raw_lc.flatten().flux * np.mean(self._lc_flux))
 
         # For user-friendliness, we will track the most recently used model and solution:
         self.most_recent_model = None
@@ -346,7 +347,7 @@ class PLDCorrector(object):
         return dt
 
     def create_pymc_model(self, design_matrix, cadence_mask=None,
-                          gp_timescale_prior=150, fractional_prior_width=.05, **kwargs):
+                          gp_timescale_prior=50, fractional_prior_width=.05, **kwargs):
         r"""Returns a PYMC3 model.
 
         Parameters
@@ -391,26 +392,26 @@ class PLDCorrector(object):
             # log(sigma) is the amplitude of variability, estimated from the raw flux scatter
             # logsigma = pm.Normal("logsigma", mu=np.log(np.std(self._lc_flux)), sd=2)
             logsigma = pm.Uniform("logsigma", testval=np.log(np.std(self._lc_flux)),
-                                  lower=np.log(np.std(self._lc_flux))-10,
-                                  upper=np.log(np.std(self._lc_flux))+10)
+                                  lower=np.log(np.std(self._lc_flux))-2,
+                                  upper=np.log(np.std(self._lc_flux))+2)
             # log(rho) is the timescale of variability with a user-defined prior
             # Enforce that the scale of variability should be no shorter than 0.5 days
             # logrho = pm.Normal("logrho", mu=np.log(gp_timescale_prior),
             #                    sd=2)
             logrho = pm.Uniform("logrho", testval=np.log(gp_timescale_prior),
                                 lower=np.log(0.5),
-                                upper=np.log(gp_timescale_prior)+10)
+                                upper=np.log(gp_timescale_prior)+2)
             # log(s2) is a jitter term to compensate for underestimated flux errors
             # We estimate the magnitude of jitter from the CDPP (normalized to the flux)
             # logs2 = pm.Normal("logs2", mu=np.log(self._s2_mu), sd=2)
-            logs2 = pm.Uniform("logs2", testval=np.log(self._s2_mu),
-                               lower=np.log(self._s2_mu)-5,
-                               upper=np.log(self._s2_mu)+5)
+            """logs2 = pm.Uniform("logs2", testval=np.log(self._s2_mu),
+                               lower=np.log(self._s2_mu)-9,
+                               upper=np.log(self._s2_mu)+2)"""
             # logs2 = pm.Constant("logs2", np.log(self._s2_mu))
             kernel = xo.gp.terms.Matern32Term(log_sigma=logsigma, log_rho=logrho)
 
             # Store the GP and cadence mask to aid debugging
-            model.gp = xo.gp.GP(kernel, self._lc_time, diag + tt.exp(logs2))
+            model.gp = xo.gp.GP(kernel, self._lc_time, diag)# + tt.exp(logs2))
             model.cadence_mask = cadence_mask
 
             # The motion model regresses against the design matrix
@@ -713,6 +714,9 @@ class PLDCorrector(object):
         model = self.most_recent_model
         map_soln = self.most_recent_solution
 
+        init = []
+        map_out = []
+
         with plt.style.context(MPLSTYLE):
             fig, ax = plt.subplots(1, len(varnames), figsize=(len(varnames)*5, 5), sharey=True)
             for idx, var in enumerate(varnames):
@@ -743,8 +747,12 @@ class PLDCorrector(object):
                 ax[idx].fill_between([tv, map_soln[var]], 0, 1, color='b', alpha=0.2, label='diff: {0:4.4}'.format(tv - map_soln[var]))
                 ax[idx].legend()
                 ax[idx].set_yticks([]);
+                init.append(float(tv))
+                map_out.append(float(map_soln[var]))
 
-        return fig
+
+        print(map_out)
+        return ax
 
 
 
@@ -884,9 +892,9 @@ class PLDCorrector(object):
             fig, ax = plt.subplots(2, figsize=(8.485, 8.485), sharex=True, gridspec_kw={'height_ratios': [1, 2]})
             ax[0].plot(weights)
             ax[0].set_ylabel('Weight')
-            ax[1].imshow(np.log(design_matrix), aspect='auto')
+            ax[1].imshow(design_matrix, aspect='auto')
             ax[1].set_ylabel('Cadence Number')
-            ax[1].set_xlabel('Regressors (log intensity)')
+            ax[1].set_xlabel('Regressors')
             fig.subplots_adjust(wspace=0)
             fig.tight_layout()
         return ax
