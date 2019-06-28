@@ -899,20 +899,14 @@ def open(path_or_url, **kwargs):
 
         >>> tpf = open("mytpf.fits")  # doctest: +SKIP
     """
-    # Python 2 uses IOError instead of FileNotFoundError;
-    # the block below can be removed when we drop Python 2 support.
-    try:
-        FileNotFoundError
-    except NameError:
-        FileNotFoundError = IOError
-    
     # pass header into `detect_filetype()`
     try:
         with fits.open(path_or_url) as temp:
             filetype = detect_filetype(temp[0].header)
     except OSError as e:
         filetype = None
-        if type(e) == 'FileNotFoundError':
+        # Raise an explicit FileNotFoundError if file not found
+        if 'No such file' in str(e):
             raise e
 
     # if the filetype is recognized, instantiate a class of that name
