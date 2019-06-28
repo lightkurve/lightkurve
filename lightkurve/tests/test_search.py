@@ -333,3 +333,9 @@ def test_corrupt_download_handling():
         with pytest.raises(SearchError) as err:
             search_targetpixelfile("Kepler-10", quarter=4).download(download_dir=tmpdirname)
         assert "The file was likely only partially downloaded." in err.value.args[0]
+
+
+def test_filenotfound():
+    """Regression test for #540; ensure lk.open() yields `FileNotFoundError`."""
+    with pytest.raises(FileNotFoundError):
+        open("DOESNOTEXIST")
