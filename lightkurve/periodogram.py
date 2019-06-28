@@ -824,7 +824,7 @@ class SNRPeriodogram(Periodogram):
             ax[1].plot(numaxrange,metric)
             ax[1].plot(numaxrange,metric_smooth)
             ax[1].set_xlabel("Frequency [{}]".format(self.frequency.unit.to_string('latex')))
-            ax[1].set_ylabel(r'Max. Reduced Correlation Power')
+            ax[1].set_ylabel(r'Correlation Metric')
             ax[0].axvline(numax.value,c='r', linewidth=2,alpha=.4)
             ax[1].axvline(numax.value,c='r', linewidth=2,alpha=.4,
                 label=r'{:.1f} {}'.format(numax.value,
@@ -936,7 +936,7 @@ class SNRPeriodogram(Periodogram):
             In units of the periodogram frequency attribute.
         """
 
-        dnu,_,_,_,_ = self._estimate_numax(numaxs)
+        dnu,_,_,_,_ = self._estimate_dnu(numax)
         return dnu
 
     def plot_dnu_diagnostics(self, numax=None, return_metric=False):
@@ -975,9 +975,9 @@ class SNRPeriodogram(Periodogram):
             # ax.plot(lags, acf/acf[0])
             ax.plot(lags[1:], metric[1:])
             ax.set_xlabel("Frequency Lag [{}]".format(self.frequency.unit.to_string('latex')))
-            ax.set_ylabel(r'Correlation')
+            ax.set_ylabel(r'Scaled Correlation')
             ax.axvline(dnu.value,c='r', linewidth=2,alpha=.4)
-            ax.set_title(r'Correlation vs Lag for a given $\nu_{\rm max}$')
+            ax.set_title(r'Scaled Correlation vs Lag for a given $\nu_{\rm max}$')
 
             axin = inset_axes(ax, width="50%",height="50%", loc="upper right")
             axin.set_yticks([])
