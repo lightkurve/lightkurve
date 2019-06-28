@@ -720,7 +720,7 @@ class SNRPeriodogram(Periodogram):
             ax.set_ylabel("Signal to Noise Ratio (SNR)")
         return ax
 
-    def estimate_numax(self, numaxs=None, show_plots=False):
+    def estimate_numax(self, numaxs=None):
         """Estimates the peak of the envelope of seismic oscillation modes,
         numax using an autocorrelation function. There are many papers on the
         topic of autocorrelation functions for estimating seismic parameters,
@@ -776,8 +776,30 @@ class SNRPeriodogram(Periodogram):
             An array of numaxs at which to evaluate the autocorrelation. If
             none is given, a sensible range will be chosen.
 
-        show_plots : bool
-            If show_plots = True, displays a diagnostic plot and returns an axis.
+        Returns:
+        --------
+        numax : float
+            The numax of the periodogram. In the units of the periodogram object
+            frequency.
+        """
+
+        numax,_,_ = self._estimate_numax(numaxs)
+        return numax
+
+    def plot_numax_diagnostics(self, numaxs, return_metric=False):
+        """
+        Returns diagnostic plots as well as an estimated value for numax. For
+        details on the numax estimation, see the `estimate_numax()` function.
+        The calculation performed is identical
+
+        Parameters:
+        -----------
+        numaxs : array-like
+            An array of numaxs at which to evaluate the autocorrelation. If
+            none is given, a sensible range will be chosen.
+
+        return_metric : bool
+            If True, returns the metric data shown in the lower diagnostic plot.
 
         Returns:
         --------
@@ -785,7 +807,41 @@ class SNRPeriodogram(Periodogram):
             The numax of the periodogram. In the units of the periodogram object
             frequency.
         ax : matplotlib.axes._subplots.AxesSubplot
-            The matplotlib axes object. Only returned if show_plots = True.
+            The matplotlib axes object.
+        metric : ndarray
+            The (unsmoothed) autocorrelation metric shown in the diagnostic plot.
+            Only returned if `return_metric = True`.
+        """
+        numax, metric, metric_smooth = self._estimate_numax(numaxs)
+
+        with plt.style.context(MPLSTYLE):
+            fig, ax = plt.subplots(2,sharex=True,figsize=(8.485, 8))
+            self.plot(ax=ax[0])
+            ax[0].set_ylabel(r'SNR')
+            ax[0].set_title(r'SNR vs Frequency')
+            ax[0].set_xlabel(None)
+
+            ax[1].plot(numaxs,metric)
+            ax[1].plot(numaxs,metric_smooth)
+            ax[1].set_xlabel("Frequency [{}]".format(self.frequency.unit.to_string('latex')))
+            ax[1].set_ylabel(r'Max. Reduced Correlation Power')
+            ax[0].axvline(numax,c='r', linewidth=2,alpha=.4)
+            ax[1].axvline(numax,c='r', linewidth=2,alpha=.4,
+                label=r'{:.1f} {}'.format(numax,
+                                    self.frequency.unit.to_string('latex')))
+            ax[1].legend()
+
+        if return_metric:
+            return numax, ax, metric
+        else:
+            return numax, ax
+
+    def _estimate_numax(self, numaxs):
+        """
+        Helper function to perform the numax estimation for both the
+        `estimate_numax()` and `plot_numax_diagnostics()` functions.
+
+        For details, see the `estimate_numax()` function.
         """
         # Run some checks on the passed in numaxs
         if numaxs is not None:
@@ -816,27 +872,8 @@ class SNRPeriodogram(Periodogram):
         metric_smooth = convolve(metric, g)
         best_numax = numaxs[np.argmax(metric_smooth)]     #The highest value of the metric corresponds to numax
 
-        if show_plots == True:
-            with plt.style.context(MPLSTYLE):
-                fig, ax = plt.subplots(2,sharex=True,figsize=(8.485, 8))
-                self.plot(ax=ax[0])
-                ax[0].set_ylabel(r'SNR')
-                ax[0].set_title(r'SNR vs Frequency')
-                ax[0].set_xlabel(None)
-
-                ax[1].plot(numaxs,metric)
-                ax[1].plot(numaxs,metric_smooth)
-                ax[1].set_xlabel("Frequency [{}]".format(self.frequency.unit.to_string('latex')))
-                ax[1].set_ylabel(r'Max. Reduced Correlation Power')
-                ax[0].axvline(best_numax,c='r', linewidth=2,alpha=.4)
-                ax[1].axvline(best_numax,c='r', linewidth=2,alpha=.4,
-                    label=r'{:.1f} {}'.format(best_numax,
-                                        self.frequency.unit.to_string('latex')))
-                ax[1].legend()
-
-        if show_plots:
-            return u.Quantity(best_numax, self.frequency.unit), ax
-        return u.Quantity(best_numax, self.frequency.unit)
+        return u.Quantity(best_numax, self.frequency.unit),
+                metric, metric_smooth
 
     def estimate_dnu(self, numax=None, show_plots=False):
         """ Estimates the average value of the large frequency spacing, DeltaNu,
