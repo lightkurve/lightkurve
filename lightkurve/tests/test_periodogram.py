@@ -257,10 +257,34 @@ def test_estimate_numax_kwargs():
     assert(np.isclose(numax.value, true_numax, atol=.1*true_numax))
     assert(numax.unit == u.microhertz)
 
+def test_plot_numax_diagnostics():
+    """Test if we can estimate numax using the diagnostics function, and that
+    it returns a correct metric when requested
+    """
+    f, p, true_numax, _ = generate_test_spectrum()
+    std = 0.25*true_numax/2.335  # The standard deviation of the mode envelope
+    snr = SNRPeriodogram(f*u.microhertz, u.Quantity(p, None))
+    numaxs = np.linspace(true_numax-2*std, true_numax+2*std, 500)
+
+    numax, _ = snr.plot_numax_diagnostics()
+    #Note: checks on the `numaxs` kwarg in `estimate_numax_kwargs` also apply
+    #to this function, no need to check them twice.
+
+    #Assert recovers numax within 10%
+    assert(np.isclose(true_numax, numax.value, atol=.1*true_numax))
+    #Assert numax has unit equal to input frequency unit
+    assert(numax.unit == u.microhertz)
+
     # Sanity check that plotting works under all conditions
-    numax, ax = snr.estimate_numax(show_plots=True)
-    numax, ax = snr.estimate_numax(numaxs=numaxs,show_plots=True)
-    numax, ax = snr.estimate_numax(numaxs=daynumaxs, show_plots=True)
+    numax, ax = snr.plot_numax_diagnostics()
+    numax, ax = snr.plot_numax_diagnostics(numaxs=numaxs)
+    daynumaxs = u.Quantity(numaxs*u.microhertz, 1/u.day)
+    numax, ax = snr.plot_numax_diagnostics(numaxs=daynumaxs)
+
+    #Check metric of appropriate length is returned
+    _, _, metric = snr.plot_numax_diagnostics(numaxs=numaxs,return_metric=True)
+    assert(len(metric) == len(numaxs))
+
 
 def test_estimate_dnu_basics():
     """Test if we can estimate a dnu
@@ -303,14 +327,34 @@ def test_estimate_dnu_kwargs():
     assert(np.isclose(dnu.value, true_dnu, atol=.25*true_dnu))
     assert(dnu.unit == u.microhertz)
 
-    # Sanity check that plotting works under all conditions
-    dnu, ax = snr.estimate_dnu(show_plots=True)
-    dnu, ax = snr.estimate_dnu(numax=numax,show_plots=True)
-    dnu, ax = snr.estimate_dnu(numax=daynumax, show_plots=True)
+def test_plot_dnu_diagnostics():
+    """Test if we can estimate numax using the diagnostics function, and that
+    it returns a correct metric when requested
+    """
+    f, p, _, true_dnu = generate_test_spectrum()
+    snr = SNRPeriodogram(f*u.microhertz, u.Quantity(p, None))
 
+    # Assert custom numax works
+    dnu, _ = snr.plot_dnu_diagnostics()
+    assert(np.isclose(dnu.value, true_dnu, atol=.25*true_dnu))
+    assert(dnu.unit == u.microhertz)
+
+    #Note: checks on the `numax` kwarg in `estimate_dnu_kwargs` also apply
+    #to this function, no need to check them twice.
+
+    # Sanity check that plotting works under all conditions
+    dnu, ax = snr.plot_dnu_diagnostics()
+    dnu, ax = snr.plot_dnu_diagnostics(numax=numax)
+    dnu, ax = snr.plot_dnu_diagnostics(numax=daynumax)
+
+    #Check it plots when frequency is in days
     fday = u.Quantity(f*u.microhertz, 1/u.day)
     daysnr = SNRPeriodogram(fday, u.Quantity(p, None))
-    dnu, ax = daysnr.estimate_dnu(numax=daynumax, show_plots=True)
+    dnu, ax = daysnr.plot_dnu_diagnostics(numax=daynumax)
+
+    #Check metric of appropriate length is returned
+    _, _, metric = snr.plot_dnu_diagnostics(numax=numax, return_metric=True)
+    assert(len(metric) == len(snr._autocorrelate(numax.value)))
 
 def test_plot_echelle():
     f, p, numax, dnu = generate_test_spectrum()
