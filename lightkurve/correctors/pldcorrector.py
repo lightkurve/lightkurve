@@ -392,7 +392,7 @@ class PLDCorrector(object):
             # log(sigma) is the amplitude of variability, estimated from the raw flux scatter
             # logsigma = pm.Normal("logsigma", mu=np.log(np.std(self._lc_flux)), sd=2)
             logsigma = pm.Uniform("logsigma", testval=np.log(np.std(self._lc_flux)),
-                                  lower=np.log(np.std(self._lc_flux))-2,
+                                  lower=0,
                                   upper=np.log(np.std(self._lc_flux))+2)
             # log(rho) is the timescale of variability with a user-defined prior
             # Enforce that the scale of variability should be no shorter than 0.5 days
@@ -405,7 +405,7 @@ class PLDCorrector(object):
             # We estimate the magnitude of jitter from the CDPP (normalized to the flux)
             # logs2 = pm.Normal("logs2", mu=np.log(self._s2_mu), sd=2)
             """logs2 = pm.Uniform("logs2", testval=np.log(self._s2_mu),
-                               lower=np.log(self._s2_mu)-9,
+                               lower=np.log(self._s2_mu)-15,
                                upper=np.log(self._s2_mu)+2)"""
             # logs2 = pm.Constant("logs2", np.log(self._s2_mu))
             kernel = xo.gp.terms.Matern32Term(log_sigma=logsigma, log_rho=logrho)
