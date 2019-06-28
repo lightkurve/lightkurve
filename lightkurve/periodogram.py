@@ -783,10 +783,10 @@ class SNRPeriodogram(Periodogram):
             frequency.
         """
 
-        numax,_,_ = self._estimate_numax(numaxs)
+        numax,_,_,_ = self._estimate_numax(numaxs)
         return numax
 
-    def plot_numax_diagnostics(self, numaxs, return_metric=False):
+    def plot_numax_diagnostics(self, numaxs=None, return_metric=False):
         """
         Returns diagnostic plots as well as an estimated value for numax. For
         details on the numax estimation, see the `estimate_numax()` function.
@@ -812,7 +812,7 @@ class SNRPeriodogram(Periodogram):
             The (unsmoothed) autocorrelation metric shown in the diagnostic plot.
             Only returned if `return_metric = True`.
         """
-        numax, metric, metric_smooth = self._estimate_numax(numaxs)
+        numax, numaxrange, metric, metric_smooth = self._estimate_numax(numaxs)
 
         with plt.style.context(MPLSTYLE):
             fig, ax = plt.subplots(2,sharex=True,figsize=(8.485, 8))
@@ -821,13 +821,13 @@ class SNRPeriodogram(Periodogram):
             ax[0].set_title(r'SNR vs Frequency')
             ax[0].set_xlabel(None)
 
-            ax[1].plot(numaxs,metric)
-            ax[1].plot(numaxs,metric_smooth)
+            ax[1].plot(numaxrange,metric)
+            ax[1].plot(numaxrange,metric_smooth)
             ax[1].set_xlabel("Frequency [{}]".format(self.frequency.unit.to_string('latex')))
             ax[1].set_ylabel(r'Max. Reduced Correlation Power')
-            ax[0].axvline(numax,c='r', linewidth=2,alpha=.4)
-            ax[1].axvline(numax,c='r', linewidth=2,alpha=.4,
-                label=r'{:.1f} {}'.format(numax,
+            ax[0].axvline(numax.value,c='r', linewidth=2,alpha=.4)
+            ax[1].axvline(numax.value,c='r', linewidth=2,alpha=.4,
+                label=r'{:.1f} {}'.format(numax.value,
                                     self.frequency.unit.to_string('latex')))
             ax[1].legend()
 
@@ -872,10 +872,10 @@ class SNRPeriodogram(Periodogram):
         metric_smooth = convolve(metric, g)
         best_numax = numaxs[np.argmax(metric_smooth)]     #The highest value of the metric corresponds to numax
 
-        return u.Quantity(best_numax, self.frequency.unit),
-                metric, metric_smooth
+        return u.Quantity(best_numax, self.frequency.unit), \
+                numaxs, metric, metric_smooth
 
-    def estimate_dnu(self, numax=None, show_plots=False):
+    def estimate_dnu(self, numax=None):
         """ Estimates the average value of the large frequency spacing, DeltaNu,
         of the seismic oscillations of the target, using an autocorrelation
         function. There are many papers on the topic of autocorrelation
@@ -929,16 +929,77 @@ class SNRPeriodogram(Periodogram):
             not given units it is assumed to be in units of the periodogram
             frequency attribute.
 
-        show_plots : bool
-            If show_plots = True, displays a diagnostic plot and returns an axis.
-
         Returns:
         -------
-        deltanu : float
+        dnu : float
             The average large frequency spacing of the seismic oscillation modes.
             In units of the periodogram frequency attribute.
         """
 
+        dnu,_,_,_,_ = self._estimate_numax(numaxs)
+        return dnu
+
+    def plot_dnu_diagnostics(self, numax=None, return_metric=False):
+        """
+        Returns diagnostic plots as well as an estimated value for dnu. For
+        details on the dnu estimation, see the `estimate_dnu()` function.
+        The calculation performed is identical.
+
+        Parameters:
+        -----------
+        numax : float
+            An estimated numax value of the mode envelope in the periodogram. If
+            not given units it is assumed to be in units of the periodogram
+            frequency attribute.
+
+        return_metric : bool
+            If True, returns the metric data shown in the lower diagnostic plot.
+
+        Returns:
+        --------
+        dnu : float
+            The average large frequency spacing of the seismic oscillation modes.
+            In units of the periodogram frequency attribute.
+
+        ax : matplotlib.axes._subplots.AxesSubplot
+            The matplotlib axes object.
+
+        metric : ndarray
+            The (unsmoothed) autocorrelation metric shown in the diagnostic plot.
+            Only returned if `return_metric = True`.
+        """
+        dnu, lags, metric, peaks, sel = self._estimate_dnu(numax)
+
+        with plt.style.context(MPLSTYLE):
+            fig, ax = plt.subplots()
+            # ax.plot(lags, acf/acf[0])
+            ax.plot(lags[1:], metric[1:])
+            ax.set_xlabel("Frequency Lag [{}]".format(self.frequency.unit.to_string('latex')))
+            ax.set_ylabel(r'Correlation')
+            ax.axvline(dnu.value,c='r', linewidth=2,alpha=.4)
+            ax.set_title(r'Correlation vs Lag for a given $\nu_{\rm max}$')
+
+            axin = inset_axes(ax, width="50%",height="50%", loc="upper right")
+            axin.set_yticks([])
+            axin.plot(lags[sel],metric[sel])
+            axin.scatter(lags[sel][peaks], metric[sel][peaks],c='r',s=5)
+            axin.axvline(dnu.value,c='r', linewidth=2,alpha=.4,
+                label=r'{:.1f} {}'.format(dnu.value,
+                                    self.frequency.unit.to_string('latex')))
+            axin.legend(loc='best')
+
+        if return_metric:
+            return dnu, ax, metric
+        else:
+            return dnu, ax
+
+    def _estimate_dnu(self, numax):
+        """
+        Helper function to perform the dnu estimation for both the
+        `estimate_dnu()` and `plot_dnu_diagnostics()` functions.
+
+        For details, see the `estimate_dnu()` function.
+        """
 
         # Run some checks on the passed in numaxs
         if numax is not None:
@@ -975,27 +1036,8 @@ class SNRPeriodogram(Periodogram):
         #Select the peak closest to the empirical value
         best_dnu = lags[sel][peaks][np.argmin(np.abs(lags[sel][peaks] - dnu_emp))]
 
-        if show_plots == True:
-            with plt.style.context(MPLSTYLE):
-                fig, ax = plt.subplots()
-                # ax.plot(lags, acf/acf[0])
-                ax.plot(lags[1:], acf[1:])
-                ax.set_xlabel("Frequency Lag [{}]".format(self.frequency.unit.to_string('latex')))
-                ax.set_ylabel(r'Correlation')
-                ax.axvline(best_dnu,c='r', linewidth=2,alpha=.4)
-                ax.set_title(r'Correlation vs Lag for a given $\nu_{\rm max}$')
-
-                axin = inset_axes(ax, width="50%",height="50%", loc="upper right")
-                axin.set_yticks([])
-                axin.plot(lags[sel],acf[sel])
-                axin.scatter(lags[sel][peaks], acf[sel][peaks],c='r',s=5)
-                axin.axvline(best_dnu,c='r', linewidth=2,alpha=.4,
-                    label=r'{:.1f} {}'.format(best_dnu,
-                                        self.frequency.unit.to_string('latex')))
-                axin.legend(loc='best')
-        if show_plots:
-            return u.Quantity(best_dnu, self.frequency.unit), ax
-        return u.Quantity(best_dnu, self.frequency.unit)
+        return u.Quantity(best_dnu, self.frequency.unit),\
+                lags, acf, peaks, sel
 
     def _autocorrelate(self, numax):
         """An autocorrelation function (ACF) for seismic mode envelopes.
