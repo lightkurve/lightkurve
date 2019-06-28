@@ -899,6 +899,13 @@ def open(path_or_url, **kwargs):
 
         >>> tpf = open("mytpf.fits")  # doctest: +SKIP
     """
+    # Python 2 uses IOError instead of FileNotFoundError;
+    # the block below can be removed when we drop Python 2 support. 
+    try:
+        FileNotFoundError
+    except NameError:
+        FileNotFoundError = IOError
+    
     # pass header into `detect_filetype()`
     try:
         with fits.open(path_or_url) as temp:
