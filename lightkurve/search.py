@@ -900,7 +900,7 @@ def open(path_or_url, **kwargs):
         >>> tpf = open("mytpf.fits")  # doctest: +SKIP
     """
     # Python 2 uses IOError instead of FileNotFoundError;
-    # the block below can be removed when we drop Python 2 support. 
+    # the block below can be removed when we drop Python 2 support.
     try:
         FileNotFoundError
     except NameError:
