@@ -725,7 +725,7 @@ class TargetPixelFile(object):
                 x, y = self.wcs.world_to_pixel(center)
             except AttributeError:
                 # Python 2 compatibility (i.e. syntax of older AstroPy versions)
-                x, y = self.wcs.wcs_world2pix(center)
+                x, y = self.wcs.all_world2pix([center], 1)[0]
         elif isinstance(center, (tuple, list, np.ndarray)):
             x, y = center
 
