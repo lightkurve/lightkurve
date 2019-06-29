@@ -697,30 +697,35 @@ class TargetPixelFile(object):
 
 
     def cutout(self, center=None, size=5):
-        '''Cutout the target pixel file in spatial coordinates
+        """Cut a rectangle out the target pixel file.
 
-        Paramters
-        ---------
-        center : tuple, astropy.SkyCoord, string
-            Coordinates of center to trim at
+        Parameters
+        ----------
+        center : tuple or `astropy.SkyCoord`
+            Center of the cutout in pixel coordinates (if a tuple is passed) or
+            in sky coordinates (if an `astropy.SkyCoord` is passed).
+            If `None` (default), then the center of the TPF will be used.
         size : int or tuple
-            Number of pixels across the cutout should be. If tuple, should be
-            (column, row).
+            Number of pixels to cut out. A square will be cut out if an integer
+            is passed, or a rectangle will be cut out if a (column_size, row_size)
+            tuple is passed.
 
         Returns
         -------
-        ntpf : lk.TargetPixelFile
+        ntpf : `lightkurve.TargetPixelFile` object
             New TPF object.
-        '''
+        """
         imshape = self.flux.shape[1:]
 
         # Parse center point
         if center is None:
             x, y = imshape[0]//2, imshape[1]//2
-
         elif isinstance(center, SkyCoord):
-            x, y = self.wcs.world_to_pixel(center)
-
+            try:
+                x, y = self.wcs.world_to_pixel(center)
+            except AttributeError:
+                # Python 2 compatibility (i.e. syntax of older AstroPy versions)
+                x, y = self.wcs.wcs_world2pix(center)
         elif isinstance(center, (tuple, list, np.ndarray)):
             x, y = center
 
@@ -729,8 +734,7 @@ class TargetPixelFile(object):
 
         if isinstance(size, int):
             s = (size/2, size/2)
-
-        if isinstance(size, (tuple, list, np.ndarray)):
+        elif isinstance(size, (tuple, list, np.ndarray)):
             s = (size[0]/2, size[1]/2)
 
         # Find the TPF edges
@@ -746,7 +750,8 @@ class TargetPixelFile(object):
         hdu.header['DEC_OBJ'] = np.nanmean(d[xedges[0]:xedges[1], yedges[0]:yedges[1]])
 
         # Remove any KIC labels
-        labels = ['*MAG', 'PM*', 'GL*', 'OBJECT', 'PARALLAX', '*COLOR', 'TEFF', 'LOGG', 'FEH', 'EBMINUSV', 'AV', "RADIUS", "TMINDEX", "OBJECT"]
+        labels = ['*MAG', 'PM*', 'GL*', 'OBJECT', 'PARALLAX', '*COLOR', 'TEFF',
+                  'LOGG', 'FEH', 'EBMINUSV', 'AV', "RADIUS", "TMINDEX", "OBJECT"]
         for label in labels:
             hdu.header[label] = fits.card.Undefined()
 
@@ -756,7 +761,7 @@ class TargetPixelFile(object):
         if 'TICID' in keys:
             hdu.header['TICID'] = '{}{}'.format(hdu.header['TICID'], '_CUTOUT')
 
-        #HDUList
+        # HDUList
         hdus = [hdu]
 
         # Copy the header
@@ -811,8 +816,6 @@ class TargetPixelFile(object):
             warnings.simplefilter('ignore')
             newfits = fits.HDUList(hdus)
         return self.__class__(newfits)
-
-
 
 
 class KeplerTargetPixelFile(TargetPixelFile):

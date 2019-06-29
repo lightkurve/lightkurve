@@ -526,10 +526,13 @@ def test_get_keyword():
 
 
 def test_cutout():
-    '''Test the cutout function'''
+    """Test tpf.cutout() function."""
     for tpf in [KeplerTargetPixelFile(filename_tpf_one_center),
-                    TessTargetPixelFile(filename_tess, quality_bitmask=None)]:
+                TessTargetPixelFile(filename_tess, quality_bitmask=None)]:
         ntpf = tpf.cutout(size=2)
+        assert ntpf.flux[0].shape == (2, 2)
+        assert ntpf.flux_err[0].shape == (2, 2)
+        assert ntpf.flux_bkg[0].shape == (2, 2)
         ntpf = tpf.cutout((0, 0), size=2)
         ntpf = tpf.cutout((0, 0), size=(2, 3))
         ntpf = tpf.cutout(SkyCoord(tpf.ra, tpf.dec, unit='deg'), size=2)
