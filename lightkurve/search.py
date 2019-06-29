@@ -903,8 +903,11 @@ def open(path_or_url, **kwargs):
     try:
         with fits.open(path_or_url) as temp:
             filetype = detect_filetype(temp[0].header)
-    except OSError:  # Raised if not a fits file ("Header missing END card")
+    except OSError as e:
         filetype = None
+        # Raise an explicit FileNotFoundError if file not found
+        if 'No such file' in str(e):
+            raise e
 
     # if the filetype is recognized, instantiate a class of that name
     if filetype is not None:
