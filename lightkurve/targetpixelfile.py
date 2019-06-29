@@ -697,7 +697,10 @@ class TargetPixelFile(object):
 
 
     def cutout(self, center=None, size=5):
-        """Cut a rectangle out the target pixel file.
+        """Cut a rectangle out of the Target Pixel File.
+
+        This methods returns a new `TargetPixelFile` object containing a
+        rectangle of a given ``size`` cut out around a given ``center``.
 
         Parameters
         ----------
@@ -706,18 +709,19 @@ class TargetPixelFile(object):
             in sky coordinates (if an `astropy.SkyCoord` is passed).
             If `None` (default), then the center of the TPF will be used.
         size : int or tuple
-            Number of pixels to cut out. A square will be cut out if an integer
-            is passed, or a rectangle will be cut out if a (column_size, row_size)
-            tuple is passed.
+            Number of pixels to cut out. If a single integer is passed then
+            a square of that size will be cut. If a tuple is passed then a
+            rectangle with dimensions (column_size, row_size) will be cut.
 
         Returns
         -------
-        ntpf : `lightkurve.TargetPixelFile` object
-            New TPF object.
+        tpf : `lightkurve.TargetPixelFile` object
+            New and smaller Target Pixel File object containing only the data
+            cut out.
         """
         imshape = self.flux.shape[1:]
 
-        # Parse center point
+        # Parse the user input (``center``) into an (x, y) coordinate
         if center is None:
             x, y = imshape[0]//2, imshape[1]//2
         elif isinstance(center, SkyCoord):
@@ -728,10 +732,10 @@ class TargetPixelFile(object):
                 x, y = self.wcs.all_world2pix([[center.ra.value, center.dec.value]], 1)[0]
         elif isinstance(center, (tuple, list, np.ndarray)):
             x, y = center
-
         x = int(x)
         y = int(y)
 
+        # Parse the user input (``size``)
         if isinstance(size, int):
             s = (size/2, size/2)
         elif isinstance(size, (tuple, list, np.ndarray)):
@@ -753,7 +757,8 @@ class TargetPixelFile(object):
         labels = ['*MAG', 'PM*', 'GL*', 'OBJECT', 'PARALLAX', '*COLOR', 'TEFF',
                   'LOGG', 'FEH', 'EBMINUSV', 'AV', "RADIUS", "TMINDEX", "OBJECT"]
         for label in labels:
-            hdu.header[label] = fits.card.Undefined()
+            if label in hdu.header:
+                hdu.header[label] = fits.card.Undefined()
 
         keys = np.asarray([k for k in self.header.keys()])
         if 'KEPLERID' in keys:
