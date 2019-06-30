@@ -21,18 +21,15 @@ from astropy.io import fits
 from astropy.time import Time
 from astropy import units as u
 
-<<<<<<< HEAD
 from .utils import running_mean, bkjd_to_astropy_time
 from . import PACKAGEDIR
 from lightkurve import injection
 
-=======
 from . import PACKAGEDIR, MPLSTYLE
 from .utils import (
     running_mean, bkjd_to_astropy_time, btjd_to_astropy_time,
     LightkurveWarning
 )
->>>>>>> 6be0b96fb4210f32cf4321a6c0d51d554f43db03
 
 __all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve']
 
