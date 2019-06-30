@@ -1,0 +1,156 @@
+@import url('https://fonts.googleapis.com/css?family=Lato:300,300i,400,400i,500,500i,600,600i,700,700i"');
+
+body {
+    font-family: 'Lato', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin-top: 0.8em;
+    margin-bottom: 0.4em;
+}
+
+h1 {
+    font-size: 2.5rem;
+}
+
+h2 {
+    font-size: 1.8rem;
+}
+
+h3, h4, h5, h6 {
+    font-size: 1.5rem;
+}
+
+p {
+    line-height: 1.5rem;
+    margin: 0;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.lead {
+    line-height: 2rem;
+}
+
+.nav-item {
+    margin-left: 0.4em;
+}
+
+.btn-primary {
+    background-color: #3498db;
+    border-color: #3498db;
+}
+
+.headerlink {
+    font-size: 0.5em;
+    vertical-align: super;
+    color: rgba(0, 0, 0, .5);
+}
+
+/* Info boxes */
+div.admonition {
+    background: #e7f2fa;
+    padding: 12px;
+    margin-top: 1.5em;
+    margin-bottom: 1.5em;
+}
+
+div.admonition p.last {
+    margin: 0;
+}
+
+div.admonition ul {
+    margin: 0;
+    padding: 0.6em;
+    list-style: none;
+}
+
+p.admonition-title {
+    display: block;
+    background: #6ab0de;
+    font-weight: bold;
+    color: #ffffff;
+    margin: -12px;
+    padding: 6px 12px;
+    margin-bottom: 12px;
+}
+
+/* prevent notebook images from expanding too wide */
+.nboutput img {
+    max-width: 560px;
+    height: auto;
+}
+
+/* code blocks */
+div.highlight {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    overflow-x: auto;
+    margin: 1px 0 24px 0;
+}
+
+div.highlight pre {
+    white-space: pre;
+    margin: 0;
+    padding: 12px 12px;
+    background: #f7f7f7;
+}    
+
+/* Jupyter notebook content */
+.nbinput.nblast, .nboutput.nblast {
+    margin-bottom: 1.5rem;
+}
+
+/* Function signatured generated using automodapi */
+dt:target, span.highlighted {
+    background-color: #f6e58d;
+}
+
+table.field-list {
+    border-spacing: 0px;
+    margin-left: 1px;
+    border-left: 5px solid rgba(0, 0, 0, .1) !important;
+}
+
+table.field-list th.field-name {
+    display: inline-block;
+    padding: 1px 8px 1px 5px;
+    white-space: nowrap;
+    background-color: rgba(0, 0, 0, .1);
+}
+
+table.longtable {
+    border: 0;
+    border-spacing: 5px;
+    border-collapse: separate;
+}
+
+table.docutils td {
+    text-align: left;
+    padding: 1px 8px 1px 5px;
+    border-top: 0;
+    border-left: 0;
+    border-right: 0;
+    border-bottom: 0;
+}
+
+/* Add lines below each entry in the Attributes and Methods Summary tables. */
+table.longtable td {
+    border-bottom: 1px solid rgba(0, 0, 0, .1);
+}
+
+table.docutils td:first-child {
+    white-space: nowrap;
+}
+
+/* Titles: "Attributes summary", "Methods summary" */
+p.rubric {
+    margin-top: 30px;
+    font-weight: bold;
+}
+
+code.descname {
+    background-color: transparent;
+    font-weight: bold;
+    font-size: 1.2em;
+}

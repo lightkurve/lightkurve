@@ -1,84 +1,30 @@
+"""This module provides various helper functions."""
 from __future__ import division, print_function
+import logging
+import sys
+import os
+import warnings
 
 from astropy.visualization import (PercentileInterval, ImageNormalize,
-                                   SqrtStretch, LogStretch, LinearStretch)
+                                   SqrtStretch, LinearStretch)
 from astropy.time import Time
 import matplotlib.pyplot as plt
+from matplotlib.colors import LogNorm
 import numpy as np
+from functools import wraps
+
+log = logging.getLogger(__name__)
+
+__all__ = ['LightkurveWarning',
+           'KeplerQualityFlags', 'TessQualityFlags',
+           'bkjd_to_astropy_time', 'btjd_to_astropy_time']
 
 
-__all__ = ['KeplerQualityFlags', 'TessQualityFlags', 'bkjd_to_astropy_time',
-           'channel_to_module_output', 'module_output_to_channel',
-           'running_mean']
+class QualityFlags(object):
+    """Abstract class"""
 
-
-class KeplerQualityFlags(object):
-    """
-    This class encodes the meaning of the various Kepler QUALITY bitmask flags,
-    as documented in the Kepler Archive Manual (Table 2.3).
-    """
-    AttitudeTweak = 1
-    SafeMode = 2
-    CoarsePoint = 4
-    EarthPoint = 8
-    ZeroCrossing = 16
-    Desat = 32
-    Argabrightening = 64
-    ApertureCosmic = 128
-    ManualExclude = 256
-    SensitivityDropout = 1024
-    ImpulsiveOutlier = 2048
-    ArgabrighteningOnCCD = 4096
-    CollateralCosmic = 8192
-    DetectorAnomaly = 16384
-    NoFinePoint = 32768
-    NoData = 65536
-    RollingBandInAperture = 131072
-    RollingBandInMask = 262144
-    PossibleThrusterFiring = 524288
-    ThrusterFiring = 1048576
-
-    # Which is the recommended QUALITY mask to identify bad data?
-    DEFAULT_BITMASK = (AttitudeTweak | SafeMode | CoarsePoint | EarthPoint |
-                       Desat | ManualExclude |
-                       DetectorAnomaly | NoData | ThrusterFiring)
-
-    # This bitmask includes flags that are known to identify both good and bad cadences.
-    # Use it wisely.
-    HARD_BITMASK = (DEFAULT_BITMASK | SensitivityDropout | ApertureCosmic |
-                    CollateralCosmic | PossibleThrusterFiring)
-
-    # Using this bitmask only QUALITY == 0 cadences will remain
-    HARDEST_BITMASK = 2096639
-
-    # Give the recommended bitmask options friendly names
-    OPTIONS = {'default': DEFAULT_BITMASK,
-               'hard': HARD_BITMASK,
-               'hardest': HARDEST_BITMASK}
-
-    # Pretty string descriptions for each flag
-    STRINGS = {
-        1: "Attitude tweak",
-        2: "Safe mode",
-        4: "Coarse point",
-        8: "Earth point",
-        16: "Zero crossing",
-        32: "Desaturation event",
-        64: "Argabrightening",
-        128: "Cosmic ray in optimal aperture",
-        256: "Manual exclude",
-        1024: "Sudden sensitivity dropout",
-        2048: "Impulsive outlier",
-        4096: "Argabrightening on CCD",
-        8192: "Cosmic ray in collateral data",
-        16384: "Detector anomaly",
-        32768: "No fine point",
-        65536: "No data",
-        131072: "Rolling band in optimal aperture",
-        262144: "Rolling band in full mask",
-        524288: "Possible thruster firing",
-        1048576: "Thruster firing"
-    }
+    STRINGS = {}
+    OPTIONS = {}
 
     @classmethod
     def decode(cls, quality):
@@ -105,10 +51,179 @@ class KeplerQualityFlags(object):
                 result.append(cls.STRINGS[flag])
         return result
 
+    @classmethod
+    def create_quality_mask(cls, quality_array, bitmask=None):
+        """Returns a boolean array which flags good cadences given a bitmask.
 
-class TessQualityFlags(KeplerQualityFlags):
-    pass
+        This method is used by the constructors of :class:`KeplerTargetPixelFile`
+        and :class:`KeplerLightCurveFile` to initialize their `quality_mask`
+        class attribute which is used to ignore bad-quality data.
 
+        Parameters
+        ----------
+        quality_array : array of int
+            'QUALITY' column of a Kepler target pixel or lightcurve file.
+        bitmask : int or str
+            Bitmask (int) or one of 'none', 'default', 'hard', or 'hardest'.
+
+        Returns
+        -------
+        boolean_mask : array of bool
+            Boolean array in which `True` means the data is of good quality.
+        """
+        # Return an array filled with `True` by default (i.e. ignore nothing)
+        if bitmask is None:
+            return np.ones(len(quality_array), dtype=bool)
+        # A few pre-defined bitmasks can be specified as strings
+        if isinstance(bitmask, str):
+            try:
+                bitmask = cls.OPTIONS[bitmask]
+            except KeyError:
+                valid_options = tuple(cls.OPTIONS.keys())
+                raise ValueError("quality_bitmask='{}' is not supported, "
+                                 "expected one of {}"
+                                 "".format(bitmask, valid_options))
+        # The bitmask is applied using the bitwise AND operator
+        quality_mask = (quality_array & bitmask) == 0
+        # Log the quality masking as info or warning
+        n_cadences = len(quality_array)
+        n_cadences_masked = (~quality_mask).sum()
+        percent_masked = 100. * n_cadences_masked / n_cadences
+        logmsg = "{:.0f}% ({}/{}) of the cadences will be ignored due to the " \
+                 "quality mask (quality_bitmask={})." \
+                 "".format(percent_masked, n_cadences_masked, n_cadences, bitmask)
+        if percent_masked > 20:
+            log.warning("Warning: " + logmsg)
+        else:
+            log.info(logmsg)
+        return quality_mask
+
+
+class KeplerQualityFlags(QualityFlags):
+    """
+    This class encodes the meaning of the various Kepler QUALITY bitmask flags,
+    as documented in the Kepler Archive Manual (Ref. [1], Table 2.3).
+
+    References
+    ----------
+    .. [1] Kepler: A Search for Terrestrial Planets. Kepler Archive Manual.
+        http://archive.stsci.edu/kepler/manuals/archive_manual.pdf
+    """
+    AttitudeTweak = 1
+    SafeMode = 2
+    CoarsePoint = 4
+    EarthPoint = 8
+    ZeroCrossing = 16
+    Desat = 32
+    Argabrightening = 64
+    ApertureCosmic = 128
+    ManualExclude = 256
+    # Bit 2**10 = 512 is unused by Kepler
+    SensitivityDropout = 1024
+    ImpulsiveOutlier = 2048
+    ArgabrighteningOnCCD = 4096
+    CollateralCosmic = 8192
+    DetectorAnomaly = 16384
+    NoFinePoint = 32768
+    NoData = 65536
+    RollingBandInAperture = 131072
+    RollingBandInMask = 262144
+    PossibleThrusterFiring = 524288
+    ThrusterFiring = 1048576
+
+    #: DEFAULT bitmask identifies all cadences which are definitely useless.
+    DEFAULT_BITMASK = (AttitudeTweak | SafeMode | CoarsePoint | EarthPoint |
+                       Desat | ManualExclude | DetectorAnomaly | NoData | ThrusterFiring)
+    #: HARD bitmask is conservative and may identify cadences which are useful.
+    HARD_BITMASK = (DEFAULT_BITMASK | SensitivityDropout | ApertureCosmic |
+                    CollateralCosmic | PossibleThrusterFiring)
+    #: HARDEST bitmask identifies cadences with any flag set. Its use is not recommended.
+    HARDEST_BITMASK = 2096639
+
+    #: Dictionary which provides friendly names for the various bitmasks.
+    OPTIONS = {'none': 0,
+               'default': DEFAULT_BITMASK,
+               'hard': HARD_BITMASK,
+               'hardest': HARDEST_BITMASK}
+
+    #: Pretty string descriptions for each flag
+    STRINGS = {
+        1: "Attitude tweak",
+        2: "Safe mode",
+        4: "Coarse point",
+        8: "Earth point",
+        16: "Zero crossing",
+        32: "Desaturation event",
+        64: "Argabrightening",
+        128: "Cosmic ray in optimal aperture",
+        256: "Manual exclude",
+        1024: "Sudden sensitivity dropout",
+        2048: "Impulsive outlier",
+        4096: "Argabrightening on CCD",
+        8192: "Cosmic ray in collateral data",
+        16384: "Detector anomaly",
+        32768: "No fine point",
+        65536: "No data",
+        131072: "Rolling band in optimal aperture",
+        262144: "Rolling band in full mask",
+        524288: "Possible thruster firing",
+        1048576: "Thruster firing"
+    }
+
+
+class TessQualityFlags(QualityFlags):
+    """
+    This class encodes the meaning of the various TESS QUALITY bitmask flags,
+    as documented in the TESS Data Products Description Document (Ref. [1], Table 26).
+
+    References
+    ----------
+    .. [1] TESS Science Data Products Description Document (EXP-TESS-ARC-ICD-0014)
+        https://archive.stsci.edu/missions/tess/doc/EXP-TESS-ARC-ICD-TM-0014.pdf
+    """
+    AttitudeTweak = 1
+    SafeMode = 2
+    CoarsePoint = 4
+    EarthPoint = 8
+    Argabrightening = 16
+    Desat = 32
+    ApertureCosmic = 64
+    ManualExclude = 128
+    Discontinuity = 256
+    ImpulsiveOutlier = 512
+    CollateralCosmic = 1024
+    Straylight = 2048
+
+    #: DEFAULT bitmask identifies all cadences which are definitely useless.
+    DEFAULT_BITMASK = (AttitudeTweak | SafeMode | CoarsePoint | EarthPoint |
+                       Desat | ManualExclude)
+    #: HARD bitmask is conservative and may identify cadences which are useful.
+    HARD_BITMASK = (DEFAULT_BITMASK | ApertureCosmic |
+                    CollateralCosmic | Straylight)
+    #: HARDEST bitmask identifies cadences with any flag set. Its use is not recommended.
+    HARDEST_BITMASK = 4095
+
+    #: Dictionary which provides friendly names for the various bitmasks.
+    OPTIONS = {'none': 0,
+               'default': DEFAULT_BITMASK,
+               'hard': HARD_BITMASK,
+               'hardest': HARDEST_BITMASK}
+
+    #: Pretty string descriptions for each flag
+    STRINGS = {
+        1: "Attitude tweak",
+        2: "Safe mode",
+        4: "Coarse point",
+        8: "Earth point",
+        16: "Argabrightening",
+        32: "Desaturation event",
+        64: "Cosmic ray in optimal aperture",
+        128: "Manual exclude",
+        256: "Discontinuity corrected",
+        512: "Impulsive outlier",
+        1024: "Cosmic ray in collateral data",
+        2048: "Straylight"
+    }
 
 def channel_to_module_output(channel):
     """Returns a (module, output) pair given a CCD channel number.
@@ -215,13 +330,9 @@ def bkjd_to_astropy_time(bkjd, bjdref=2454833.):
     Parameters
     ----------
     bkjd : array of floats
-        Barycentric Kepler Julian Day
-    timecorr : array of floats
-        Kepler barycentric correction
-    timslice : array of floats
-        Kepler time-slice correction
+        Barycentric Kepler Julian Day.
     bjdref : float
-        BJD reference date, for Kepler this is 2454833
+        BJD reference date, for Kepler this is 2454833.
 
     Returns
     -------
@@ -231,6 +342,32 @@ def bkjd_to_astropy_time(bkjd, bjdref=2454833.):
     jd = bkjd + bjdref
     # Some data products have missing time values;
     # we need to set these to zero or `Time` cannot be instantiated.
+    jd[~np.isfinite(jd)] = 0
+    return Time(jd, format='jd', scale='tdb')
+
+
+def btjd_to_astropy_time(btjd, bjdref=2457000.):
+    """Converts BTJD time values to an `astropy.time.Time` object.
+
+    TESS Barycentric Julian Day (BTJD) is a Julian day minus 2457000.0
+    and corrected to the arrival times at the barycenter of the Solar System.
+    BTJD is the format in which times are recorded in the TESS data products.
+    The time is in the Barycentric Dynamical Time frame (TDB), which is a
+    time system that is not affected by leap seconds.
+
+    Parameters
+    ----------
+    btjd : array of floats
+        Barycentric Kepler Julian Day
+    bjdref : float
+        BJD reference date.
+
+    Returns
+    -------
+    time : astropy.time.Time object
+        Resulting time object
+    """
+    jd = btjd + bjdref
     jd[~np.isfinite(jd)] = 0
     return Time(jd, format='jd', scale='tdb')
 
@@ -273,23 +410,115 @@ def plot_image(image, ax=None, scale='linear', origin='lower',
     """
     if ax is None:
         _, ax = plt.subplots()
-    vmin, vmax = PercentileInterval(95.).get_limits(image)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", RuntimeWarning)  # ignore image NaN values
+        mask = np.nan_to_num(image) > 0
+        if mask.any() > 0:
+            vmin, vmax = PercentileInterval(95.).get_limits(image[mask])
+        else:
+            vmin, vmax = 0, 0
 
     norm = None
     if scale is not None:
         if scale == 'linear':
-            norm = ImageNormalize(vmin=vmin, vmax=vmax, stretch=LinearStretch())
+            norm = ImageNormalize(vmin=vmin, vmax=vmax, stretch=LinearStretch(), clip=False)
         elif scale == 'sqrt':
-            norm = ImageNormalize(vmin=vmin, vmax=vmax, stretch=SqrtStretch())
+            norm = ImageNormalize(vmin=vmin, vmax=vmax, stretch=SqrtStretch(), clip=False)
         elif scale == 'log':
-            norm = ImageNormalize(vmin=vmin, vmax=vmax, stretch=LogStretch())
+            # To use log scale we need to guarantee that vmin > 0, so that
+            # we avoid division by zero and/or negative values.
+            norm = LogNorm(vmin=max(vmin, sys.float_info.epsilon), vmax=vmax,
+                           clip=True)
         else:
             raise ValueError("scale {} is not available.".format(scale))
-
     cax = ax.imshow(image, origin=origin, norm=norm, **kwargs)
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
     ax.set_title(title)
     if show_colorbar:
-        plt.colorbar(cax, ax=ax, norm=norm, label=clabel)
+        cbar = plt.colorbar(cax, ax=ax, norm=norm, label=clabel)
+        cbar.ax.yaxis.set_tick_params(tick1On=False, tick2On=False)
+        cbar.ax.minorticks_off()
     return ax
+
+
+class LightkurveWarning(Warning):
+    """Class for all Lightkurve warnings."""
+    pass
+
+
+def suppress_stdout(f, *args, **kwargs):
+    """A simple decorator to suppress function print outputs."""
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        # redirect output to `null`
+        with open(os.devnull, 'w') as devnull:
+            old_out = sys.stdout
+            sys.stdout = devnull
+            try:
+                return f(*args, **kwargs)
+            # restore to default
+            finally:
+                sys.stdout = old_out
+    return wrapper
+
+
+def detect_filetype(header):
+    """Returns Kepler and TESS file types given their primary header.
+
+    This function will detect the file type by looking at both the TELESCOP and
+    CREATOR keywords in the first extension of the FITS header. If the file is
+    recognized as a Kepler or TESS data product, one of the following strings
+    will be returned:
+
+        * `'KeplerTargetPixelFile'`
+        * `'TessTargetPixelFile'`
+        * `'KeplerLightCurveFile'`
+        * `'TessLightCurveFile'`
+
+    If the file is not recognized as a Kepler or TESS data product, then
+    `None` will be returned.
+
+    Parameters
+    ----------
+    header : astropy.io.fits.Header object
+        The primary header of a FITS file.
+
+    Returns
+    -------
+    filetype : str or None
+        A string describing the detected filetype. If the filetype is not
+        recognized, `None` will be returned.
+    """
+    try:
+        # use `telescop` keyword to determine mission
+        # and `creator` to determine tpf or lc
+        if 'TELESCOP' in header.keys():
+            telescop = header['telescop'].lower()
+        else:
+            # Some old custom TESS data did not define the `TELESCOP` card
+            telescop = header['mission'].lower()
+        creator = header['creator'].lower()
+        origin = header['origin'].lower()
+        if telescop == 'kepler':
+            # Kepler TPFs will contain "TargetPixelExporterPipelineModule"
+            if 'targetpixel' in creator:
+                return 'KeplerTargetPixelFile'
+            # Kepler LCFs will contain "FluxExporter2PipelineModule"
+            elif ('fluxexporter' in creator or 'lightcurve' in creator
+                or 'lightcurve' in creator):
+                return 'KeplerLightCurveFile'
+        elif telescop == 'tess':
+            # TESS TPFs will contain "TargetPixelExporterPipelineModule"
+            if 'targetpixel' in creator:
+                return 'TessTargetPixelFile'
+            # TESS LCFs will contain "LightCurveExporterPipelineModule"
+            elif 'lightcurve' in creator:
+                return 'TessLightCurveFile'
+            # Early versions of TESScut did not set a good CREATOR keyword
+            elif 'stsci' in origin:
+                return 'TessTargetPixelFile'
+    # If the TELESCOP or CREATOR keywords don't exist we expect a KeyError;
+    # if one of them is Undefined we expect `.lower()` to yield an AttributeError.
+    except (KeyError, AttributeError):
+        return None

@@ -1,0 +1,73 @@
+{% extends "basic/layout.html" %}
+
+{%- block extrahead %}
+    <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="{{ pathto('_static/css/theme.css', 1) }}" type="text/css" />
+
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-69171-9');
+    </script>
+{% endblock %}
+
+
+{%- block header %}
+<header>
+<nav class="navbar navbar-expand-lg navbar-light border-bottom">
+  <div class="container">
+    <a class="navbar-brand" href="{{ pathto('index') }}">{{ theme_navbar_title }}</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarsExample07">
+      <ul class="navbar-nav mr-auto">
+        {% if theme_navbar_links %}
+          {%- for link in theme_navbar_links %}
+            {% if pagename == link[1] %}
+            <li class="nav-item active">
+            {% else %}
+            <li class="nav-item">
+            {% endif %}
+              <a class="nav-link" href="{{ pathto(*link[1:]) }}">{{ link[0] }}</a>
+            </li>
+          {%- endfor %}
+        {% endif %}
+      </ul>
+        <form class="form-inline my-2 my-md-0" action="{{ pathto('search') }}" method="get">
+            <input class="form-control" type="text" placeholder="Search" aria-label="Search" name="q" />
+        </form>
+    </div>
+  </div>
+</nav>
+</header>
+{% endblock %}
+
+
+{%- block content %}
+<div class="container">
+    {% block body %}{% endblock %}
+</div>
+{%- endblock %}
+
+
+{%- block footer %}
+<div class="container" style="padding-top: 2em;">
+    <hr>
+    <p class="text-center">
+        Created with ♥ by the Lightkurve collaboration.
+        Please <a href="{{ pathto('about/citing') }}">cite us</a> or <a href="https://github.com/KeplerGO/lightkurve">join us on GitHub.</a>
+    </p>
+</div>
+{%- endblock %}
+
+{%- block relbar1 %}{% endblock %}
+{%- block relbar2 %}{% endblock %}
