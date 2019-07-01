@@ -2,6 +2,7 @@ from __future__ import division, print_function
 
 import numpy as np
 
+from astropy.utils.data import get_pkg_data_filename
 import pytest
 import warnings
 
@@ -9,6 +10,7 @@ from ..lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
 from ..lightcurvefile import LightCurveFile, KeplerLightCurveFile, TessLightCurveFile
 from ..targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
 from ..utils import LightkurveWarning
+from ..correctors import SFFCorrector, PLDCorrector
 
 filename_synthetic_sine = get_pkg_data_filename("data/synthetic/synthetic-k2-sinusoid.targ.fits.gz")
 
@@ -16,13 +18,13 @@ filename_synthetic_sine = get_pkg_data_filename("data/synthetic/synthetic-k2-sin
 def test_sine_SFF():
     """Test the SFF implementation with known signals"""
     # Retrieve the custom, known signal properties
-    tpf_sine = lk.KeplerTargetPixelFile(filename_synthetic_sine)
+    tpf_sine = KeplerTargetPixelFile(filename_synthetic_sine)
     true_period = np.float(tpf_sine.hdu[3].header['PERIOD'])
     true_amplitude = np.float(tpf_sine.hdu[3].header['SINE_AMP'])
 
     # Run the SFF algorithm
     lc_sine = tpf_sine.to_lightcurve()
-    corrector = lk.SFFCorrector(lc_sine)
+    corrector = SFFCorrector(lc_sine)
     cor_sine = corrector.correct(tpf_sine.pos_corr2, tpf_sine.pos_corr1,
                                  niters=4, windows=5, bins=7, restore_trend=True)
 
