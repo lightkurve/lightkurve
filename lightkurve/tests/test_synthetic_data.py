@@ -6,10 +6,7 @@ from astropy.utils.data import get_pkg_data_filename
 import pytest
 import warnings
 
-from ..lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
-from ..lightcurvefile import LightCurveFile, KeplerLightCurveFile, TessLightCurveFile
 from ..targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
-from ..utils import LightkurveWarning
 from ..correctors import SFFCorrector, PLDCorrector
 
 filename_synthetic_sine = get_pkg_data_filename("data/synthetic/synthetic-k2-sinusoid.targ.fits.gz")
