@@ -14,6 +14,7 @@ from ..correctors import SFFCorrector, PLDCorrector
 
 filename_synthetic_sine = get_pkg_data_filename("data/synthetic/synthetic-k2-sinusoid.targ.fits.gz")
 filename_synthetic_transit = get_pkg_data_filename("data/synthetic/synthetic-k2-planet.targ.fits.gz")
+filename_synthetic_flat = get_pkg_data_filename("data/synthetic/synthetic-k2-flat.targ.fits.gz")
 
 
 lacks_BLS = False
@@ -147,3 +148,25 @@ def test_sine_PLD():
     print(ret_period, fractional_amplitude)
     assert ((fractional_amplitude > true_amplitude/2) &
             (fractional_amplitude < true_amplitude*2) )
+
+
+def test_cdpp_improvement():
+    """Test the SFF and PLD CDPP improvement"""
+    # Retrieve the custom, known signal properties
+    tpf = KeplerTargetPixelFile(filename_synthetic_flat)
+
+    # Run the SFF algorithm
+    lc = tpf.to_lightcurve()
+    corrector = SFFCorrector(lc)
+    cor_lc = corrector.correct(tpf.pos_corr2, tpf.pos_corr1,
+                                 niters=10, windows=5, bins=7, restore_trend=True)
+
+    # Verify that we get a significant reduction in RMS
+    cdpp_improvement = lc.estimate_cdpp()/cor_lc.estimate_cdpp()
+    assert cdpp_improvement > 10.0
+
+    corrector = PLDCorrector(tpf)
+    cor_lc = corrector.correct(use_gp=False)
+
+    cdpp_improvement = lc.estimate_cdpp()/cor_lc.estimate_cdpp()
+    assert cdpp_improvement > 10.0
