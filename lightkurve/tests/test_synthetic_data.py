@@ -170,3 +170,22 @@ def test_cdpp_improvement():
 
     cdpp_improvement = lc.estimate_cdpp()/cor_lc.estimate_cdpp()
     assert cdpp_improvement > 10.0
+
+
+def test_centroids():
+    """Test the estimate centroid command"""
+    filename_synthetic_sine = get_pkg_data_filename("data/synthetic/synthetic-k2-sinusoid.targ.fits.gz")
+    filename_synthetic_transit = get_pkg_data_filename("data/synthetic/synthetic-k2-planet.targ.fits.gz")
+    filename_synthetic_flat = get_pkg_data_filename("data/synthetic/synthetic-k2-flat.targ.fits.gz")
+
+    for fn in (filename_synthetic_sine, filename_synthetic_transit,
+               filename_synthetic_flat):
+        tpf = KeplerTargetPixelFile(fn)
+        xraw, yraw = tpf.estimate_centroids()
+        xnorm = xraw - np.median(xraw)
+        ynorm = yraw - np.median(yraw)
+        xposc = tpf.pos_corr2 - np.median(tpf.pos_corr2)
+        yposc = tpf.pos_corr1 - np.median(tpf.pos_corr1)
+        rmax = np.max(np.sqrt((xnorm-xposc)**2 + (ynorm-yposc)**2))
+        # The centroids should agree to within a hundredth of a pixel.
+        assert rmax < 0.01
