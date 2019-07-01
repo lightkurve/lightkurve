@@ -13,6 +13,7 @@ from ..utils import LightkurveWarning
 from ..correctors import SFFCorrector, PLDCorrector
 
 filename_synthetic_sine = get_pkg_data_filename("data/synthetic/synthetic-k2-sinusoid.targ.fits.gz")
+filename_synthetic_transit = get_pkg_data_filename("data/synthetic/synthetic-k2-planet.targ.fits.gz")
 
 
 def test_sine_SFF():
@@ -48,3 +49,30 @@ def test_sine_SFF():
     fractional_amplitude = (sin_weight**2+cos_weight**2)**(0.5) / const
     assert ((fractional_amplitude > true_amplitude/2) &
             (fractional_amplitude < true_amplitude*2) )
+
+
+
+def test_transit_SFF():
+    """Test the SFF implementation with known signals"""
+    # Retrieve the custom, known signal properties
+    tpf = KeplerTargetPixelFile(filename_synthetic_transit)
+    true_period = np.float(tpf.hdu[3].header['PERIOD'])
+    true_depth = np.float(tpf.hdu[3].header['RPRS'])**2.0
+
+    # Run the SFF algorithm
+    lc = tpf.to_lightcurve()
+    corrector = SFFCorrector(lc)
+    cor_lc = corrector.correct(tpf.pos_corr2, tpf.pos_corr1,
+                                 niters=4, windows=5, bins=7, restore_trend=False)
+
+    # Verify that we get the transit period within 5%
+    pg = cor_lc.to_periodogram(method='bls', minimum_period=1, maximum_period=9,
+                               frequency_factor=0.05, duration=np.arange(0.1, 0.6, 0.1))
+    ret_period = pg.period_at_max_power.value
+    threshold = 0.05
+    assert ((ret_period > true_period*(1-threshold)) &
+            (ret_period < true_period*(1+threshold)) )
+
+    # Verify that we get the transit depth to within a factor of 50%
+    assert ((pg.depth_at_max_power > true_depth/1.5) &
+            (pg.depth_at_max_power < true_depth*1.5))
