@@ -4,9 +4,9 @@ import numpy as np
 
 from astropy.utils.data import get_pkg_data_filename
 import pytest
-import warnings
+from scipy import stats
 
-from ..targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
+from ..targetpixelfile import KeplerTargetPixelFile
 from ..correctors import SFFCorrector, PLDCorrector
 
 filename_synthetic_sine = get_pkg_data_filename("data/synthetic/synthetic-k2-sinusoid.targ.fits.gz")
@@ -14,13 +14,13 @@ filename_synthetic_transit = get_pkg_data_filename("data/synthetic/synthetic-k2-
 filename_synthetic_flat = get_pkg_data_filename("data/synthetic/synthetic-k2-flat.targ.fits.gz")
 
 
-lacks_BLS = False
+lacks_bls = False
 try:
     from astropy.stats.bls import BoxLeastSquares
 except ImportError:
-    lacks_BLS = True
+    lacks_bls = True
 
-def test_sine_SFF():
+def test_sine_sff():
     """Test the SFF implementation with known signals"""
     # Retrieve the custom, known signal properties
     tpf = KeplerTargetPixelFile(filename_synthetic_sine)
@@ -51,16 +51,18 @@ def test_sine_SFF():
     const, sin_weight, cos_weight = least_squares_coeffs
 
     fractional_amplitude = (sin_weight**2+cos_weight**2)**(0.5) / const
-    assert ((fractional_amplitude > true_amplitude/2) &
-            (fractional_amplitude < true_amplitude*2) )
+    assert ((fractional_amplitude > true_amplitude/1.1) &
+            (fractional_amplitude < true_amplitude*1.1) )
 
-@pytest.mark.skipif(lacks_BLS, reason="Astropy BLS requires Python 3")
-def test_transit_SFF():
+@pytest.mark.skipif(lacks_bls, reason="Astropy BLS requires Python 3")
+def test_transit_sff():
     """Test the SFF implementation with known signals"""
     # Retrieve the custom, known signal properties
     tpf = KeplerTargetPixelFile(filename_synthetic_transit)
     true_period = np.float(tpf.hdu[3].header['PERIOD'])
-    true_depth = np.float(tpf.hdu[3].header['RPRS'])**2.0
+    true_rprs = np.float(tpf.hdu[3].header['RPRS'])
+    true_transit_lc = tpf.hdu[3].data['NOISELESS_INPUT']
+    max_depth = 1-np.min(true_transit_lc)
 
     # Run the SFF algorithm
     lc = tpf.to_lightcurve()
@@ -76,18 +78,20 @@ def test_transit_SFF():
     assert ((ret_period > true_period*(1-threshold)) &
             (ret_period < true_period*(1+threshold)) )
 
-    # Verify that we get the transit depth to within a factor of 50%
-    assert ((pg.depth_at_max_power > true_depth/1.5) &
-            (pg.depth_at_max_power < true_depth*1.5))
+    # Verify that we get the transit depth in expected bounds
+    assert ((pg.depth_at_max_power >= true_rprs**2) &
+            (pg.depth_at_max_power < max_depth))
 
 
-@pytest.mark.skipif(lacks_BLS, reason="Astropy BLS requires Python 3")
-def test_transit_PLD():
-    """Test the SFF implementation with known signals"""
+@pytest.mark.skipif(lacks_bls, reason="Astropy BLS requires Python 3")
+def test_transit_pld():
+    """Test the PLD implementation with known signals"""
     # Retrieve the custom, known signal properties
     tpf = KeplerTargetPixelFile(filename_synthetic_transit)
     true_period = np.float(tpf.hdu[3].header['PERIOD'])
-    true_depth = np.float(tpf.hdu[3].header['RPRS'])**2.0
+    true_rprs = np.float(tpf.hdu[3].header['RPRS'])
+    true_transit_lc = tpf.hdu[3].data['NOISELESS_INPUT']
+    max_depth = 1-np.min(true_transit_lc)
 
     # Run the PLD algorithm on a first pass
     corrector = PLDCorrector(tpf)
@@ -106,15 +110,13 @@ def test_transit_PLD():
     assert ((ret_period > true_period*(1-threshold)) &
             (ret_period < true_period*(1+threshold)) )
 
-    # Verify that we get the transit depth to within a factor of 50%
-
-    print(pg.depth_at_max_power, true_depth)
-    assert ((pg.depth_at_max_power > true_depth/1.5) &
-            (pg.depth_at_max_power < true_depth*1.5))
+    # Verify that we get the transit depth in expected bounds
+    assert ((pg.depth_at_max_power >= true_rprs**2) &
+            (pg.depth_at_max_power < max_depth))
 
 
-def test_sine_PLD():
-    """Test the SFF implementation with known signals"""
+def test_sine_pld():
+    """Test the PLD implementation with Sine wave"""
     # Retrieve the custom, known signal properties
     tpf = KeplerTargetPixelFile(filename_synthetic_sine)
     true_period = np.float(tpf.hdu[3].header['PERIOD'])
@@ -142,13 +144,12 @@ def test_sine_PLD():
     const, sin_weight, cos_weight = least_squares_coeffs
 
     fractional_amplitude = (sin_weight**2+cos_weight**2)**(0.5) / const
-    print(ret_period, fractional_amplitude)
-    assert ((fractional_amplitude > true_amplitude/2) &
-            (fractional_amplitude < true_amplitude*2) )
+    assert ((fractional_amplitude > true_amplitude/1.1) &
+            (fractional_amplitude < true_amplitude*1.1) )
 
 
-def test_cdpp_improvement():
-    """Test the SFF and PLD CDPP improvement"""
+def test_detrending_residuals():
+    """Test the detrending residual distributions"""
     # Retrieve the custom, known signal properties
     tpf = KeplerTargetPixelFile(filename_synthetic_flat)
 
@@ -156,11 +157,22 @@ def test_cdpp_improvement():
     lc = tpf.to_lightcurve()
     corrector = SFFCorrector(lc)
     cor_lc = corrector.correct(tpf.pos_corr2, tpf.pos_corr1,
-                                 niters=10, windows=5, bins=7, restore_trend=True)
+                                niters=10, windows=5, bins=7, restore_trend=True)
 
     # Verify that we get a significant reduction in RMS
     cdpp_improvement = lc.estimate_cdpp()/cor_lc.estimate_cdpp()
     assert cdpp_improvement > 10.0
+
+    # The residuals should be Gaussian-"ish"
+    # Table 4.1 of Ivezic, Connolly, Vanerplas, Gray 2014
+    anderson_threshold = 1.57
+
+    resid_n_sigmas = (cor_lc.flux - np.mean(cor_lc.flux))/cor_lc.flux_err
+    A_value, crit, sig = stats.anderson(resid_n_sigmas)
+    assert A_value**2 < anderson_threshold
+
+    n_sigma = np.std(resid_n_sigmas)
+    assert n_sigma < 2.0
 
     corrector = PLDCorrector(tpf)
     cor_lc = corrector.correct(use_gp=False)
@@ -168,12 +180,16 @@ def test_cdpp_improvement():
     cdpp_improvement = lc.estimate_cdpp()/cor_lc.estimate_cdpp()
     assert cdpp_improvement > 10.0
 
+    resid_n_sigmas = (cor_lc.flux - np.mean(cor_lc.flux))/cor_lc.flux_err
+    A_value, crit, sig = stats.anderson(resid_n_sigmas)
+    assert A_value**2 < anderson_threshold
+
+    n_sigma = np.std(resid_n_sigmas)
+    assert n_sigma < 2.0
+
 
 def test_centroids():
     """Test the estimate centroid command"""
-    filename_synthetic_sine = get_pkg_data_filename("data/synthetic/synthetic-k2-sinusoid.targ.fits.gz")
-    filename_synthetic_transit = get_pkg_data_filename("data/synthetic/synthetic-k2-planet.targ.fits.gz")
-    filename_synthetic_flat = get_pkg_data_filename("data/synthetic/synthetic-k2-flat.targ.fits.gz")
 
     for fn in (filename_synthetic_sine, filename_synthetic_transit,
                filename_synthetic_flat):
