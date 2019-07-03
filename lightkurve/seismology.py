@@ -17,14 +17,13 @@ from uncertainties import umath
 
 log = logging.getLogger(__name__)
 
-__all__ = ['dnu_mass_prior', 'estimate_radius', '_get_radius_err', 'estimate_mass',
-            '_get_mass_err', 'estimate_logg','_get_logg_err']
+__all__ = ['estimate_radius','estimate_mass','estimate_logg']
 
 """Global parameters for the sun"""
 numaxsol = ufloat(3090, 30) # microhertz | Huber et al. 2011
 dnusol = ufloat(135.1, 0.1) # microhertz | Huber et al. 2011
 teffsol = ufloat(5772., 0.8) # Kelvin    | Prša et al. 2016
-gsol = (const.G * const.M_sun)/(const.R_sun)**2).to(u.cm/u.second**2) #cms^2
+gsol = ((const.G * const.M_sun)/(const.R_sun)**2).to(u.cm/u.second**2) #cms^2
 
 def estimate_radius(numax, dnu, Teff, numax_err=None, dnu_err=None, Teff_err=None):
     """Calculates radius using the asteroseismic scaling relations. This method
@@ -64,10 +63,12 @@ def estimate_radius(numax, dnu, Teff, numax_err=None, dnu_err=None, Teff_err=Non
     """
     numax = u.Quantity(numax, u.microhertz).value
     dnu = u.Quantity(dnu, u.microhertz).value
+    Teff = u.Quantity(Teff, u. Kelvin).value
 
-    if not all(b is not None for b in [numax_err, dnu_err, Teff_err]):
+    if all(b is not None for b in [numax_err, dnu_err, Teff_err]):
         numax_err = u.Quantity(numax_err, u.microhertz).value
         dnu_err = u.Quantity(dnu_err, u.microhertz).value
+        Teff_err = u.Quantity(Teff_err, u.Kelvin).value
         unumax = ufloat(numax, numax_err)
         udnu = ufloat(dnu, dnu_err)
         uTeff = ufloat(Teff, Teff_err)
@@ -82,7 +83,7 @@ def estimate_radius(numax, dnu, Teff, numax_err=None, dnu_err=None, Teff_err=Non
     R = uR.n * u.solRad
     R_e = uR.s * u.solRad
 
-    if not all(b is not None for b in [numax_err, dnu_err, Teff_err]):
+    if all(b is not None for b in [numax_err, dnu_err, Teff_err]):
         return R, R_e
     else:
         return R
@@ -125,10 +126,13 @@ def estimate_mass(numax, dnu, Teff, numax_err=None, dnu_err=None, Teff_err=None)
     """
     numax = u.Quantity(numax, u.microhertz).value
     dnu = u.Quantity(dnu, u.microhertz).value
+    Teff = u.Quantity(Teff, u.Kelvin).value
 
-    if not all(b is not None for b in [numax_err, dnu_err, Teff_err]):
+    if all(b is not None for b in [numax_err, dnu_err, Teff_err]):
         numax_err = u.Quantity(numax_err, u.microhertz).value
         dnu_err = u.Quantity(dnu_err, u.microhertz).value
+        Teff_err = u.Quantity(Teff_err, u.Kelvin).value
+
         unumax = ufloat(numax, numax_err)
         udnu = ufloat(dnu, dnu_err)
         uTeff = ufloat(Teff, Teff_err)
@@ -143,7 +147,7 @@ def estimate_mass(numax, dnu, Teff, numax_err=None, dnu_err=None, Teff_err=None)
     M = uM.n * u.solMass
     M_e = uM.s * u.solMass
 
-    if not all(b is not None for b in [numax_err, dnu_err, Teff_err]):
+    if all(b is not None for b in [numax_err, dnu_err, Teff_err]):
         return M, M_e
     else:
         return M
@@ -178,9 +182,12 @@ def estimate_logg(numax, Teff, numax_err=None, Teff_err=None):
         if both of `numax_err` and `teff_err` are passed.
     """
     numax = u.Quantity(numax, u.microhertz).value
+    Teff = u.Quantity(Teff, u.Kelvin).value
 
-    if not all(b is not None for b in [numax_err, Teff_err]):
+    if all(b is not None for b in [numax_err, Teff_err]):
         numax_err = u.Quantity(numax_err, u.microhertz).value
+        Teff_err = u.Quantity(Teff_err, u.Kelvin).value
+
         unumax = ufloat(numax, numax_err)
         uTeff = ufloat(Teff, Teff_err)
 
@@ -194,6 +201,6 @@ def estimate_logg(numax, Teff, numax_err=None, Teff_err=None):
     logg = ulogg.n * u.dex
     logg_e = ulogg.s * u.dex
 
-    if not all(b is None for b in [numax_err, Teff_err]):
+    if all(b is not None for b in [numax_err, Teff_err]):
         return  logg, logg_e
     return logg
