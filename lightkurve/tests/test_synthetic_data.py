@@ -1,27 +1,31 @@
+"""Use synthetic data to verify lightkurve detrending and signal recovery.
+"""
 from __future__ import division, print_function
 
-import numpy as np
-
 from astropy.utils.data import get_pkg_data_filename
+import numpy as np
 import pytest
 from scipy import stats
 
 from ..targetpixelfile import KeplerTargetPixelFile
 from ..correctors import SFFCorrector, PLDCorrector
 
+# See `data/synthetic/README.md` for details about these synthetic test files
 filename_synthetic_sine = get_pkg_data_filename("data/synthetic/synthetic-k2-sinusoid.targ.fits.gz")
 filename_synthetic_transit = get_pkg_data_filename("data/synthetic/synthetic-k2-planet.targ.fits.gz")
 filename_synthetic_flat = get_pkg_data_filename("data/synthetic/synthetic-k2-flat.targ.fits.gz")
 
-
+# BLS is only available in Python 3 versions of AstroPy;
+# so we will need to skip BLS-based tests below when in Python 2.
 lacks_bls = False
 try:
     from astropy.stats.bls import BoxLeastSquares
 except ImportError:
     lacks_bls = True
 
+
 def test_sine_sff():
-    """Test the SFF implementation with known signals"""
+    """Can we recover a synthetic sine curve using SFF and LombScargle?"""
     # Retrieve the custom, known signal properties
     tpf = KeplerTargetPixelFile(filename_synthetic_sine)
     true_period = np.float(tpf.hdu[3].header['PERIOD'])
@@ -31,17 +35,17 @@ def test_sine_sff():
     lc = tpf.to_lightcurve()
     corrector = SFFCorrector(lc)
     cor_lc = corrector.correct(tpf.pos_corr2, tpf.pos_corr1,
-                                 niters=4, windows=5, bins=7, restore_trend=True)
+                               niters=4, windows=5, bins=7, restore_trend=True)
 
     # Verify that we get the period within ~20%
     pg = cor_lc.to_periodogram(method='lombscargle', minimum_period=1,
-                                 maximum_period=10, oversample_factor=10)
+                               maximum_period=10, oversample_factor=10)
     ret_period = pg.period_at_max_power.value
     threshold = 0.2
     assert ((ret_period > true_period*(1-threshold)) &
             (ret_period < true_period*(1+threshold)) )
 
-    # Verify that we get the amplitude to within a factor of 2
+    # Verify that we get the amplitude to within 10%
     n_cad = len(tpf.time)
     design_matrix = np.vstack([np.ones(n_cad),
                               np.sin(2.0*np.pi*cor_lc.time/ret_period),
@@ -54,9 +58,10 @@ def test_sine_sff():
     assert ((fractional_amplitude > true_amplitude/1.1) &
             (fractional_amplitude < true_amplitude*1.1) )
 
+
 @pytest.mark.skipif(lacks_bls, reason="Astropy BLS requires Python 3")
 def test_transit_sff():
-    """Test the SFF implementation with known signals"""
+    """Can we recover a synthetic exoplanet signal using SFF and BLS?"""
     # Retrieve the custom, known signal properties
     tpf = KeplerTargetPixelFile(filename_synthetic_transit)
     true_period = np.float(tpf.hdu[3].header['PERIOD'])
@@ -68,7 +73,7 @@ def test_transit_sff():
     lc = tpf.to_lightcurve()
     corrector = SFFCorrector(lc)
     cor_lc = corrector.correct(tpf.pos_corr2, tpf.pos_corr1,
-                                 niters=4, windows=5, bins=7, restore_trend=False)
+                               niters=4, windows=5, bins=7, restore_trend=False)
 
     # Verify that we get the transit period within 5%
     pg = cor_lc.to_periodogram(method='bls', minimum_period=1, maximum_period=9,
@@ -76,7 +81,7 @@ def test_transit_sff():
     ret_period = pg.period_at_max_power.value
     threshold = 0.05
     assert ((ret_period > true_period*(1-threshold)) &
-            (ret_period < true_period*(1+threshold)) )
+            (ret_period < true_period*(1+threshold)))
 
     # Verify that we get the transit depth in expected bounds
     assert ((pg.depth_at_max_power >= true_rprs**2) &
@@ -85,7 +90,7 @@ def test_transit_sff():
 
 @pytest.mark.skipif(lacks_bls, reason="Astropy BLS requires Python 3")
 def test_transit_pld():
-    """Test the PLD implementation with known signals"""
+    """Can we recover a synthetic exoplanet signal using PLD and BLS?"""
     # Retrieve the custom, known signal properties
     tpf = KeplerTargetPixelFile(filename_synthetic_transit)
     true_period = np.float(tpf.hdu[3].header['PERIOD'])
@@ -108,7 +113,7 @@ def test_transit_pld():
     ret_period = pg.period_at_max_power.value
     threshold = 0.05
     assert ((ret_period > true_period*(1-threshold)) &
-            (ret_period < true_period*(1+threshold)) )
+            (ret_period < true_period*(1+threshold)))
 
     # Verify that we get the transit depth in expected bounds
     assert ((pg.depth_at_max_power >= true_rprs**2) &
@@ -116,25 +121,25 @@ def test_transit_pld():
 
 
 def test_sine_pld():
-    """Test the PLD implementation with Sine wave"""
+    """Can we recover a synthetic sine wave using PLD and LombScargle?"""
     # Retrieve the custom, known signal properties
     tpf = KeplerTargetPixelFile(filename_synthetic_sine)
     true_period = np.float(tpf.hdu[3].header['PERIOD'])
     true_amplitude = np.float(tpf.hdu[3].header['SINE_AMP'])
 
-    # Run the SFF algorithm
+    # Run the PLD algorithm
     corrector = PLDCorrector(tpf)
     cor_lc = corrector.correct(use_gp=False)
 
     # Verify that we get the period within ~20%
     pg = cor_lc.to_periodogram(method='lombscargle', minimum_period=1,
-                                 maximum_period=10, oversample_factor=10)
+                               maximum_period=10, oversample_factor=10)
     ret_period = pg.period_at_max_power.value
     threshold = 0.2
     assert ((ret_period > true_period*(1-threshold)) &
             (ret_period < true_period*(1+threshold)) )
 
-    # Verify that we get the amplitude to within a factor of 2
+    # Verify that we get the amplitude to within 20%
     n_cad = len(tpf.time)
     design_matrix = np.vstack([np.ones(n_cad),
                               np.sin(2.0*np.pi*cor_lc.time/ret_period),
@@ -157,10 +162,10 @@ def test_detrending_residuals():
     lc = tpf.to_lightcurve()
     corrector = SFFCorrector(lc)
     cor_lc = corrector.correct(tpf.pos_corr2, tpf.pos_corr1,
-                                niters=10, windows=5, bins=7, restore_trend=True)
+                               niters=10, windows=5, bins=7, restore_trend=True)
 
     # Verify that we get a significant reduction in RMS
-    cdpp_improvement = lc.estimate_cdpp()/cor_lc.estimate_cdpp()
+    cdpp_improvement = lc.estimate_cdpp() / cor_lc.estimate_cdpp()
     assert cdpp_improvement > 10.0
 
     # The residuals should be Gaussian-"ish"
@@ -189,8 +194,7 @@ def test_detrending_residuals():
 
 
 def test_centroids():
-    """Test the estimate centroid command"""
-
+    """Test the estimate centroid method."""
     for fn in (filename_synthetic_sine, filename_synthetic_transit,
                filename_synthetic_flat):
         tpf = KeplerTargetPixelFile(fn)
