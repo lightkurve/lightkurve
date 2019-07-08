@@ -37,7 +37,8 @@
 
     import lightkurve as lk
 
-    pixels = lk.search_targetpixelfile("Kepler-10", quarter=5).download()
+    pixels = lk.search_targetpixelfile("Kepler-10",
+                                       quarter=5).download()
     pixels.plot()
 
     lightcurve = pixels.to_lightcurve()
