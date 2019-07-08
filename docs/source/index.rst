@@ -37,13 +37,13 @@
 
     import lightkurve as lk
 
-    pixels = lk.search_targetpixelfile("Kepler-10").download()
+    pixels = lk.search_targetpixelfile("Kepler-10", quarter=5).download()
     pixels.plot()
 
     lightcurve = pixels.to_lightcurve()
     lightcurve.plot()
 
-    exoplanet = lightcurve.flatten().fold(period=0.838)
+    exoplanet = lightcurve.flatten().fold(period=0.8375)
     exoplanet.plot()
 
 
