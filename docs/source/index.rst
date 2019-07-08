@@ -25,10 +25,10 @@
           in particular NASA’s Kepler and TESS exoplanet missions.
         </p>
         <p>
-          It intends to lowers the barrier for <i>anyone</i> to analyze
+          It intends to lower the barrier for <i>anyone</i> to analyze
           NASA data by providing a well-tested, well-documented, and fluent <a href="api/index.html">API</a> and <a href="tutorials/index.html">tutorials</a>.
         </p>
-      </div> 
+      </div>
 
       <div class="col-md-6">
 
