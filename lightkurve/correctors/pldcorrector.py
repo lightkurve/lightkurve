@@ -391,27 +391,37 @@ class PLDCorrector(object):
             # Create a Gaussian Process to model the long-term stellar variability
             # log(sigma) is the amplitude of variability, estimated from the raw flux scatter
             # logsigma = pm.Normal("logsigma", mu=np.log(np.std(self._lc_flux)), sd=2)
-            logsigma = pm.Uniform("logsigma", testval=np.log(np.std(self._lc_flux)),
-                                  lower=0,
-                                  upper=np.log(np.std(self._lc_flux))+2)
+            # logsigma = pm.Uniform("logsigma", testval=np.log(np.std(self._lc_flux)),
+            #                       lower=0,
+            #                       upper=np.log(np.std(self._lc_flux))+3)
+            '''
+            A = pm.Uniform("A", testval=np.std(self._lc_flux),
+                           lower=0, upper=np.std(self._lc_flux)*3)
+            lam = pm.Uniform("lam", testval=gp_timescale_prior,
+                             upper=0.5,
+                             lower=gp_timescale_prior*3)
+            tau = pm.Deterministic("tau", tt.log(2) / lam)
+
+            logsigma = tt.log(tt.sqrt(3) / lam)
+            logrho = tt.log(tt.sqrt(A / (1 + lam * tau)))
+            '''
+
+            sigma = pm.Uniform("sigma", testval=np.std(self._lc_flux),
+                               lower=0, upper=np.std(self._lc_flux)*3)
             # log(rho) is the timescale of variability with a user-defined prior
             # Enforce that the scale of variability should be no shorter than 0.5 days
             # logrho = pm.Normal("logrho", mu=np.log(gp_timescale_prior),
             #                    sd=2)
-            logrho = pm.Uniform("logrho", testval=np.log(gp_timescale_prior),
-                                lower=np.log(0.5),
-                                upper=np.log(gp_timescale_prior)+2)
-            # log(s2) is a jitter term to compensate for underestimated flux errors
-            # We estimate the magnitude of jitter from the CDPP (normalized to the flux)
-            # logs2 = pm.Normal("logs2", mu=np.log(self._s2_mu), sd=2)
-            """logs2 = pm.Uniform("logs2", testval=np.log(self._s2_mu),
-                               lower=np.log(self._s2_mu)-15,
-                               upper=np.log(self._s2_mu)+2)"""
-            # logs2 = pm.Constant("logs2", np.log(self._s2_mu))
-            kernel = xo.gp.terms.Matern32Term(log_sigma=logsigma, log_rho=logrho)
+            # logrho = pm.Uniform("logrho", testval=-np.log(gp_timescale_prior),
+            #                     upper=-np.log(0.5),
+            #                     lower=-np.log(gp_timescale_prior)-2)
+            rho = pm.Uniform("rho", testval=gp_timescale_prior,
+                             lower=0.5, upper=gp_timescale_prior*3)
+
+            kernel = xo.gp.terms.Matern32Term(log_sigma=tt.log(sigma), log_rho=tt.log(rho))
 
             # Store the GP and cadence mask to aid debugging
-            model.gp = xo.gp.GP(kernel, self._lc_time, diag)# + tt.exp(logs2))
+            model.gp = xo.gp.GP(kernel, self._lc_time, diag)
             model.cadence_mask = cadence_mask
 
             # The motion model regresses against the design matrix
@@ -439,7 +449,7 @@ class PLDCorrector(object):
         self.most_recent_model = model
         return model
 
-    # @suppress_stdout
+    @suppress_stdout
     def optimize(self, model=None, start=None, robust=False, **kwargs):
         """Returns the maximum likelihood solution.
 
@@ -471,11 +481,14 @@ class PLDCorrector(object):
         with model:
             # If a solution cannot be found, fail with an informative LightkurveError
             try:
-                solution = xo.optimize(start=start, vars=[model.logrho, model.mean])
+                # solution = xo.optimize(start=start, vars=[model.lam, model.mean])
+                solution = xo.optimize(start=start, vars=[model.rho, model.mean])
                 # Optimizing parameters separately appears to make finding a solution more likely
                 if robust:
-                    solution = xo.optimize(start=solution, vars=[model.logrho, model.logsigma, model.mean])
-                    solution = xo.optimize(start=solution, vars=[model.logrho, model.logsigma])#, model.logs2])
+                    solution = xo.optimize(start=solution, vars=[model.rho, model.sigma, model.mean])
+                    solution = xo.optimize(start=solution, vars=[model.rho, model.sigma])
+                    # solution = xo.optimize(start=solution, vars=[model.A, model.model.lam, model.mean])
+                    # solution = xo.optimize(start=solution, vars=[model.A, model.tau])
                 solution = xo.optimize(start=start)  # Optimize all parameters
             except ValueError:
                 raise LightkurveError('Unable to find a noise model solution for the given '
@@ -710,7 +723,8 @@ class PLDCorrector(object):
         return corrected_lc, motion_lc, gp_lc
 
     def plot_distributions(self):
-        varnames = ['logrho', 'logsigma', 'mean']
+        varnames = ['rho', 'sigma', 'mean']
+        # varnames = ['A', 'lam', 'tau', 'mean']
         model = self.most_recent_model
         map_soln = self.most_recent_solution
 
@@ -742,9 +756,9 @@ class PLDCorrector(object):
                     raise ValueError("I don't understand this distribution: {}, {}".format(var, model[var].distribution.__class__))
 
                 ax[idx].set_title(var, fontsize=12)
-                ax[idx].axvline(tv, ls='--', c='r', label='Init: {0:4.4}'.format(tv), lw=2)
-                ax[idx].axvline(map_soln[var], ls='--', c='g', label='MAP: {0:4.4}'.format(map_soln[var]), lw=2)
-                ax[idx].fill_between([tv, map_soln[var]], 0, 1, color='b', alpha=0.2, label='diff: {0:4.4}'.format(tv - map_soln[var]))
+                ax[idx].axvline(tv, ls='--', c='r', label='Init: {}'.format(tv), lw=2)
+                ax[idx].axvline(map_soln[var], ls='--', c='g', label='MAP: {}'.format(map_soln[var]), lw=2)
+                ax[idx].fill_between([tv, map_soln[var]], 0, 1, color='b', alpha=0.2, label='diff: {}'.format(tv - map_soln[var]))
                 ax[idx].legend()
                 ax[idx].set_yticks([]);
                 init.append(float(tv))
