@@ -461,8 +461,6 @@ class Periodogram(object):
 
         return ax
 
-
-
     def flatten(self, method='logmedian', filter_width=0.01, return_trend=False):
         """Estimates the Signal-To-Noise (SNR) spectrum by dividing out an
         estimate of the noise background.
@@ -789,9 +787,23 @@ class SNRPeriodogram(Periodogram):
         return numax
 
     def plot_numax_diagnostics(self, numaxs=None, return_metric=False):
-        """
-        Returns diagnostic plots as well as an estimated value for numax. For
-        details on the numax estimation, see the `estimate_numax()` function.
+        """ Returns three diagnostic plots and an estimated value for numax.
+
+        [1] The SNRPeriodogram plotted with a red line indicating the estimated
+        numax value.
+
+        [2] An image showing the 2D autocorrelation. On the y-axis is the
+        frequency lag of the autocorrelation window. On the x-axis is the
+        central frequency at which the autocorrelation was calculated. In the
+        z-axis is the unitless autocorrelatin power. Shown in red is the
+        estmated numax.
+
+        [3] The Mean Collapsed Correlation (MCC, see Viani et al. 2019) against
+        central frequency at which the MCC was calculated. Shown in red is the
+        estimated numax. Shown in blue is the MCC convolved with a Gaussian
+        smoothing kernel with a standard deviation of 1/5th the window size.
+
+        For details on the numax estimation, see the `estimate_numax()` function.
         The calculation performed is identical
 
         Parameters:
@@ -959,9 +971,13 @@ class SNRPeriodogram(Periodogram):
         return dnu
 
     def plot_dnu_diagnostics(self, numax=None, return_metric=False):
-        """
-        Returns diagnostic plots as well as an estimated value for dnu. For
-        details on the dnu estimation, see the `estimate_dnu()` function.
+        """ Returns one diagnostic plots and an estimated value for dnu.
+
+        [1] Scaled correlation metrix vs frequecy lag of the autocorrelation
+        window, with inset close up on the determined dnu and a line indicating
+        the determined dnu.
+
+        For details on the dnu estimation, see the `estimate_dnu()` function.
         The calculation performed is identical.
 
         Parameters:
