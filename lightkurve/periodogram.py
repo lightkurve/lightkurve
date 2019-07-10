@@ -781,7 +781,7 @@ class SNRPeriodogram(Periodogram):
             frequency.
         """
 
-        numax,_,_,_ = self._estimate_numax(numaxs)
+        numax,_,_,_,_,_ = self._estimate_numax(numaxs)
         return numax
 
     def plot_numax_diagnostics(self, numaxs=None, return_metric=False):
@@ -810,24 +810,34 @@ class SNRPeriodogram(Periodogram):
             The (unsmoothed) autocorrelation metric shown in the diagnostic plot.
             Only returned if `return_metric = True`.
         """
-        numax, numaxrange, metric, metric_smooth = self._estimate_numax(numaxs)
+        numax, numaxrange, acf2d, window, metric, metric_smooth = self._estimate_numax(numaxs)
 
         with plt.style.context(MPLSTYLE):
-            fig, ax = plt.subplots(2,sharex=True,figsize=(8.485, 8))
+            fig, ax = plt.subplots(3,sharex=True,figsize=(8.485, 12))
             self.plot(ax=ax[0])
             ax[0].set_ylabel(r'SNR')
             ax[0].set_title(r'SNR vs Frequency')
             ax[0].set_xlabel(None)
 
-            ax[1].plot(numaxrange,metric)
-            ax[1].plot(numaxrange,metric_smooth)
-            ax[1].set_xlabel("Frequency [{}]".format(self.frequency.unit.to_string('latex')))
-            ax[1].set_ylabel(r'Correlation Metric')
+            windowarray = np.linspace(0, window, num=acf2d.shape[1])
+            extent = (numaxrange[0],numaxrange[-1],windowarray[0],windowarray[-1])
+            figsize = [8.485, 4]
+            a = figsize[1]/figsize[0]
+            b = (extent[3]-extent[2])/extent[1]
+
+            ax[1].imshow(acf2d,cmap='Blues', aspect=a/b, origin='lower',extent=extent)
+            ax[1].set_ylabel(r'Frequency lag [{}]'.format(self.frequency.unit.to_string('latex')))
+
+            ax[2].plot(numaxrange,metric)
+            ax[2].plot(numaxrange,metric_smooth)
+            ax[2].set_xlabel("Frequency [{}]".format(self.frequency.unit.to_string('latex')))
+            ax[2].set_ylabel(r'Correlation Metric')
             ax[0].axvline(numax.value,c='r', linewidth=2,alpha=.4)
-            ax[1].axvline(numax.value,c='r', linewidth=2,alpha=.4,
+            ax[1].axvline(numax.value,c='r', linewidth=2,alpha=.4)
+            ax[2].axvline(numax.value,c='r', linewidth=2,alpha=.4,
                 label=r'{:.1f} {}'.format(numax.value,
                                     self.frequency.unit.to_string('latex')))
-            ax[1].legend()
+            ax[2].legend()
 
         if return_metric:
             return numax, ax, metric
@@ -852,26 +862,33 @@ class SNRPeriodogram(Periodogram):
                 raise ValueError("A custom range of numaxs can not extend above"
                                 "the highest frequency value in the periodogram.")
 
+        # Calcualte the window size
+        if u.Quantity(self.frequency[-1], u.microhertz) > u.Quantity(500., u.microhertz):
+            window = 250.
+        else:
+            window = 25.
+
         if numaxs is None:
-            if self.nyquist is not None:
-                numaxs = 10**np.linspace(np.log10(5), np.log10(self.nyquist.value), 500)
-            else:
-                numaxs = 10**np.linspace(np.log10(5), np.log10(np.nanmax(self.frequency.value)),500)
+            numaxs = np.arange(window/2, np.floor(np.nanmax(self.frequency.value)) - window/2, 1.)
 
         #We want to find the numax which returns in the highest autocorrelation
         #power, rescaled based on filter width
+        fs = np.median(np.diff(self.frequency.value))
+
         metric = np.zeros(len(numaxs))
+        acf2d = np.zeros([int(window/2/fs)*2,len(numaxs)])
         for idx, numax in enumerate(numaxs):
-            acf = self._autocorrelate(numax)      #Return the acf at this numax
-            metric[idx] = np.nanmax(np.sqrt(acf/len(acf)))   #Store the max acf power normalised by the length
+            acf = self._autocorrelate(numax, window=window)      #Return the acf at this numax
+            acf2d[:,idx] = acf                                     #Store the 2D acf
+            metric[idx] = (np.sum(np.abs(acf)) - 1 ) / len(acf)  #Store the max acf power normalised by the length
 
         # Smooth the data to find the peak
-        g = Gaussian1DKernel(stddev=5)
+        g = Gaussian1DKernel(stddev=int(window/5))
         metric_smooth = convolve(metric, g)
         best_numax = numaxs[np.argmax(metric_smooth)]     #The highest value of the metric corresponds to numax
 
         return u.Quantity(best_numax, self.frequency.unit), \
-                numaxs, metric, metric_smooth
+                numaxs, acf2d, window, metric, metric_smooth
 
     def estimate_dnu(self, numax=None):
         """ Estimates the average value of the large frequency spacing, DeltaNu,
@@ -1020,7 +1037,8 @@ class SNRPeriodogram(Periodogram):
         dnu_emp = u.Quantity((0.294 * u.Quantity(numax, u.microhertz).value ** 0.772)*u.microhertz,
                             self.frequency.unit).value
 
-        aacf = self._autocorrelate(numax = numax.value)
+        window = 2*int(np.floor(self._get_fwhm(numax.value)))
+        aacf = self._autocorrelate(numax = numax.value, window=window)
         acf = (np.abs(aacf**2)/np.abs(aacf[0]**2)) / (3/(2*len(aacf)))
         fs = np.median(np.diff(self.frequency.value))
         lags = np.linspace(0., len(acf)*fs, len(acf))
@@ -1037,7 +1055,7 @@ class SNRPeriodogram(Periodogram):
         return u.Quantity(best_dnu, self.frequency.unit),\
                 lags, acf, peaks, sel
 
-    def _autocorrelate(self, numax):
+    def _autocorrelate(self, numax, window=25.):
         """An autocorrelation function (ACF) for seismic mode envelopes.
         We autocorrelate the region one full-width-half-maximum (FWHM) of the
         mode envelope either side of the proposed numax.
@@ -1058,13 +1076,12 @@ class SNRPeriodogram(Periodogram):
         """
         fs = np.median(np.diff(self.frequency.value))
 
-        fwhm = int(np.floor(self._get_fwhm(numax) / fs))    # Express the fwhm in indices
-        x = int(numax / fs)                                 #Find the index value of numax
-        s = np.hanning(len(self.power[x-fwhm:x+fwhm]))      #Define the hanning window for the evaluated frequency space
-        p_han = self.power[x-fwhm:x+fwhm].value * s         #Multiply the evaluated SNR space by the hanning window
+        spread = int(window/2/fs)                           # Find the spread in indices
+        x = int(numax / fs)                                 # Find the index value of numax
+        p_sel = self.power[x-spread:x+spread].value         # Make the window selection
 
-        C = np.correlate(p_han, p_han, mode='full')         #Correlated the resulting SNR space with itself
-        C = C[len(p_han)-1:]                                #Truncate the ACF
+        C = np.correlate(p_sel, p_sel, mode='full')         #Correlated the resulting SNR space with itself
+        C = C[len(p_sel)-1:]                                #Truncate the ACF
         return C
 
 class LombScarglePeriodogram(Periodogram):
