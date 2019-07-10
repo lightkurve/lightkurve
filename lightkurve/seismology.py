@@ -20,14 +20,30 @@ log = logging.getLogger(__name__)
 __all__ = ['estimate_radius','estimate_mass','estimate_logg']
 
 """Global parameters for the sun"""
-numaxsol = ufloat(3090, 30) # microhertz | Huber et al. 2011
-dnusol = ufloat(135.1, 0.1) # microhertz | Huber et al. 2011
-teffsol = ufloat(5772., 0.8) # Kelvin    | Prša et al. 2016
-gsol = ((const.G * const.M_sun)/(const.R_sun)**2).to(u.cm/u.second**2) #cms^2
+NUMAX_SOL = ufloat(3090, 30) # microhertz | Huber et al. 2011
+DNU_SOL = ufloat(135.1, 0.1) # microhertz | Huber et al. 2011
+TEFF_SOL = ufloat(5772., 0.8) # Kelvin    | Prša et al. 2016
+G_SOL = ((const.G * const.M_sun)/(const.R_sun)**2).to(u.cm/u.second**2) #cms^2
 
 def estimate_radius(numax, dnu, Teff, numax_err=None, dnu_err=None, Teff_err=None):
-    """Calculates radius using the asteroseismic scaling relations. This method
-    borrows heavily from work done in Bellinger et al. (2019).
+    """Calculates radius using the asteroseismic scaling relations.
+    The two global observable seismic parameters, numax and dnu, along with
+    temperature, scale with fundamental stellar properties (Brown et al. 1991;
+    Kjeldsen & Bedding 1995). These scaling relations can be rearranged to
+    calculate a stellar radius as
+
+    R = Rsol * (numax/numax_sol)(dnu/dnusol)^-2(Teff/Teffsol)^0.5
+
+    where R is the radius and Teff is the effective temperature, and the suffix
+    'sol' indicates a solar value. In this method we use the solar values for
+    numax and dnu as given in Huber et al. (2011) and for Teff as given in
+    Prša et al. (2016).
+
+    This code structure borrows from work done in Bellinger et al. (2019), which
+    also functions as an accessible explanation of seismic scaling relations.
+
+    NOTE: These scaling relations are scaled to the Sun, and therefore do not
+    always produce an entirely accurate result for more evolved stars.
 
     Parameters
     ----------
@@ -78,7 +94,7 @@ def estimate_radius(numax, dnu, Teff, numax_err=None, dnu_err=None, Teff_err=Non
         udnu = ufloat(dnu, 0)
         uTeff = ufloat(Teff, 0)
 
-    uR = (unumax / numaxsol) * (udnu / dnusol)**(-2.) * (uTeff / teffsol)**(0.5)
+    uR = (unumax / NUMAX_SOL) * (udnu / DNU_SOL)**(-2.) * (uTeff / TEFF_SOL)**(0.5)
 
     R = uR.n * u.solRad
     R_e = uR.s * u.solRad
@@ -89,8 +105,24 @@ def estimate_radius(numax, dnu, Teff, numax_err=None, dnu_err=None, Teff_err=Non
         return R
 
 def estimate_mass(numax, dnu, Teff, numax_err=None, dnu_err=None, Teff_err=None):
-    """Calculates mass using the asteroseismic scaling relations. This method
-    borrows heavily from work done in Bellinger et al. (2019).
+    """Calculates mass using the asteroseismic scaling relations.
+    The two global observable seismic parameters, numax and dnu, along with
+    temperature, scale with fundamental stellar properties (Brown et al. 1991;
+    Kjeldsen & Bedding 1995). These scaling relations can be rearranged to
+    calculate a stellar mass as
+
+    M = Msol * (numax/numax_sol)^3(dnu/dnusol)^-4(Teff/Teffsol)^1.5
+
+    where M is the mass and Teff is the effective temperature, and the suffix
+    'sol' indicates a solar value. In this method we use the solar values for
+    numax and dnu as given in Huber et al. (2011) and for Teff as given in
+    Prša et al. (2016).
+
+    This code structure borrows from work done in Bellinger et al. (2019), which
+    also functions as an accessible explanation of seismic scaling relations.
+
+    NOTE: These scaling relations are scaled to the Sun, and therefore do not
+    always produce an entirely accurate result for more evolved stars.
 
     Parameters
     ----------
@@ -142,7 +174,7 @@ def estimate_mass(numax, dnu, Teff, numax_err=None, dnu_err=None, Teff_err=None)
         udnu = ufloat(dnu, 0)
         uTeff = ufloat(Teff, 0)
 
-    uM = (unumax / numaxsol)**3. * (udnu / dnusol)**(-4.) * (uTeff / teffsol)**(1.5)
+    uM = (unumax / NUMAX_SOL)**3. * (udnu / DNU_SOL)**(-4.) * (uTeff / TEFF_SOL)**(1.5)
 
     M = uM.n * u.solMass
     M_e = uM.s * u.solMass
@@ -154,8 +186,28 @@ def estimate_mass(numax, dnu, Teff, numax_err=None, dnu_err=None, Teff_err=None)
 
 def estimate_logg(numax, Teff, numax_err=None, Teff_err=None):
     """Calculates the log of the surface gravity using the asteroseismic scaling
-    relations. This method borrows heavily from work done in
-    Bellinger et al. (2019).
+    relations.
+    The two global observable seismic parameters, numax and dnu, along with
+    temperature, scale with fundamental stellar properties (Brown et al. 1991;
+    Kjeldsen & Bedding 1995). These scaling relations can be rearranged to
+    calculate a stellar surface gravity as
+
+    g = gsol * (numax/numax_sol)(Teff/Teffsol)^0.5
+
+    where g is the surface gravity and Teff is the effective temperature,
+    and the suffix 'sol' indicates a solar value. In this method we use the
+    solar values for numax as given in Huber et al. (2011) and for Teff as given
+    in Prša et al. (2016). The solar surface gravity is calcluated from the
+    astropy constants for solar mass and radius and does not have an error.
+
+    The solar surface gravity is returned as log10(g) with units in dex, as is
+    common in the astrophysics literature.
+
+    This code structure borrows from work done in Bellinger et al. (2019), which
+    also functions as an accessible explanation of seismic scaling relations.
+
+    NOTE: These scaling relations are scaled to the Sun, and therefore do not
+    always produce an entirely accurate result for more evolved stars.
 
     Parameters
     ----------
@@ -195,7 +247,7 @@ def estimate_logg(numax, Teff, numax_err=None, Teff_err=None):
         unumax = ufloat(numax, 0)
         uTeff = ufloat(Teff, 0)
 
-    ug = gsol.value * (unumax / numaxsol) * (uTeff / teffsol)**0.5
+    ug = G_SOL.value * (unumax / NUMAX_SOL) * (uTeff / TEFF_SOL)**0.5
     ulogg = umath.log(ug, 10)
 
     logg = ulogg.n * u.dex

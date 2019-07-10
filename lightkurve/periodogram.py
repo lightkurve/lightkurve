@@ -538,8 +538,6 @@ class Periodogram(object):
             fwhm: float
                 The estimate full-width-half-maximum of the seismic mode envelope
         """
-        fs = np.median(np.diff(self.frequency.value))
-
         #Calculate the index FWHM for a given numax
         if u.Quantity(self.frequency[-1], u.microhertz) > u.Quantity(500., u.microhertz):
             fwhm = 0.25 * numax
