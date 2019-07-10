@@ -792,7 +792,7 @@ class SNRPeriodogram(Periodogram):
             frequency.
         """
 
-        numax,_,_,_,_,_ = self._estimate_numax(numaxs, windows)
+        numax,_,_,_,_,_ = self._estimate_numax(numaxs, window)
         return numax
 
     def plot_numax_diagnostics(self, numaxs=None, window=None, return_metric=False):
@@ -900,7 +900,7 @@ class SNRPeriodogram(Periodogram):
             if window < fs:
                 raise ValueError("You can't have a window smaller than the"
                                 "frequency separation!")
-            if window > self.frequency[-1]:
+            if window > (self.frequency[-1].value - self.frequency[0].value):
                 raise ValueError("You can't have a window wider than the entire"
                                 "power spectrum!")
             if window < 0:
@@ -909,12 +909,14 @@ class SNRPeriodogram(Periodogram):
         # Calcualte the window size
         if window is None:
             if u.Quantity(self.frequency[-1], u.microhertz) > u.Quantity(500., u.microhertz):
-                window = 250.
+                window = u.Quantity(250., u.microhertz).to(self.frequency.unit).value
             else:
-                window = 25.
+                window = u.Quantity(25., u.microhertz).to(self.frequency.unit).value
 
         if numaxs is None:
-            numaxs = np.arange(window/2, np.floor(np.nanmax(self.frequency.value)) - window/2, 1.)
+            numaxs = np.arange(np.ceil(np.nanmin(self.frequency.value)) + window/2,
+                        np.floor(np.nanmax(self.frequency.value)) - window/2,
+                        u.Quantity(1., u.microhertz).to(self.frequency.unit).value)
 
         #We want to find the numax which returns in the highest autocorrelation
         #power, rescaled based on filter width
@@ -1132,7 +1134,9 @@ class SNRPeriodogram(Periodogram):
 
         spread = int(window/2/fs)                           # Find the spread in indices
         x = int(numax / fs)                                 # Find the index value of numax
-        p_sel = self.power[x-spread:x+spread].value         # Make the window selection
+        x0 = int((self.frequency[0].value/fs))              # Transform in case the index isn't from 0
+        xt = x - x0
+        p_sel = self.power[xt-spread:xt+spread].value       # Make the window selection
 
         C = np.correlate(p_sel, p_sel, mode='full')         #Correlated the resulting SNR space with itself
         C = C[len(p_sel)-1:]                                #Truncate the ACF
