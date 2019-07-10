@@ -314,7 +314,7 @@ def test_plot_numax_diagnostics():
 
     # Check plotting works when periodogram is sliced
     rsnr = snr[(snr.frequency.value>1600)&(snr.frequency.value<3200)]
-    numax, ax = rsnr.plot_numax_diagnotics()
+    numax, ax = rsnr.plot_numax_diagnostics()
 
     #Check metric of appropriate length is returned
     _, _, metric = snr.plot_numax_diagnostics(numaxs=numaxs,return_metric=True)
@@ -384,6 +384,8 @@ def test_plot_dnu_diagnostics():
     #to this function, no need to check them twice.
 
     # Sanity check that plotting works under all conditions
+    numax = snr.estimate_numax()
+    daynumax = u.Quantity(numax.value*u.microhertz, 1/u.day)
     dnu, ax = snr.plot_dnu_diagnostics()
     dnu, ax = snr.plot_dnu_diagnostics(numax=numax)
     dnu, ax = snr.plot_dnu_diagnostics(numax=daynumax)
