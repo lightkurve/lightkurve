@@ -514,18 +514,27 @@ class Periodogram(object):
         return snr
 
     def _get_fwhm(self, numax):
-        """For a given numax, the method calculates the expected Full Width Half
-        Maximum of the seismic mode envelope as (Mosser et al 2010) for RGB
-        stars:
+        """In a power spectrum of a solar-like oscillator, the power of the
+        modes of oscillation will appear in the shape of that looks
+        approximately Gaussian, for all basic purposes, also referred to as the
+        'mode envelope'. For a given numax (the central frequency of the mode
+        envelope), the expected Full Width Half Maximum of the envelope is known
+        as a function of numax for evolved Red Giant Branch stars as follows
+        (see Mosser et al 2010):
 
-        fwhm = 0.66 * numax^0.88,
+        fwhm = 0.66 * numax^0.88 .
 
-        if the data is generated for a long-cadence timeseries. If the
-        timeseries is short-cadence, the relation will be:
+        If the maximum frequency in the periodogram is less than 500 microhertz,
+        this functio will default to the above equation under the assumption it
+        is dealing with an RGB star, which oscillate at lower frequencies.
 
-        fwhm = 0.25 * numax.
+        If the maximum frequency is above 500 microhertz, the envelope is given
+        as a different function of numax (see Lund et al. 2017), as
 
-        This will be based on the highest frequency in the periodogram.
+        fwhm = 0.25 * numax,
+
+        in which case the function assumes it is dealing with a main sequence
+        star, which oscillate at higher frequencies.
 
         Parameters:
         ----------
