@@ -720,7 +720,7 @@ class SNRPeriodogram(Periodogram):
             ax.set_ylabel("Signal to Noise Ratio (SNR)")
         return ax
 
-    def estimate_numax(self, numaxs=None):
+    def estimate_numax(self, numaxs=None, window=None):
         """Estimates the peak of the envelope of seismic oscillation modes,
         numax using an autocorrelation function. There are many papers on the
         topic of autocorrelation functions for estimating seismic parameters,
@@ -787,10 +787,10 @@ class SNRPeriodogram(Periodogram):
             frequency.
         """
 
-        numax,_,_,_,_,_ = self._estimate_numax(numaxs)
+        numax,_,_,_,_,_ = self._estimate_numax(numaxs, windows)
         return numax
 
-    def plot_numax_diagnostics(self, numaxs=None, return_metric=False):
+    def plot_numax_diagnostics(self, numaxs=None, window=None, return_metric=False):
         """ Returns three diagnostic plots and an estimated value for numax.
 
         [1] The SNRPeriodogram plotted with a red line indicating the estimated
@@ -816,6 +816,12 @@ class SNRPeriodogram(Periodogram):
             An array of numaxs at which to evaluate the autocorrelation. If
             none is given, a sensible range will be chosen.
 
+        window : int or float
+            The width of the autocorrelation window around each central
+            frequency in 'numaxs'. If none is given, a sensible value will be
+            chosen. If no units are given it is assumed to be in the same units
+            as the periodogram frequency.
+
         return_metric : bool
             If True, returns the metric data shown in the lower diagnostic plot.
 
@@ -830,7 +836,7 @@ class SNRPeriodogram(Periodogram):
             The (unsmoothed) autocorrelation metric shown in the diagnostic plot.
             Only returned if `return_metric = True`.
         """
-        numax, numaxrange, acf2d, window, metric, metric_smooth = self._estimate_numax(numaxs)
+        numax, numaxrange, acf2d, window, metric, metric_smooth = self._estimate_numax(numaxs, window)
 
         with plt.style.context(MPLSTYLE):
             fig, ax = plt.subplots(3,sharex=True,figsize=(8.485, 12))
@@ -864,7 +870,7 @@ class SNRPeriodogram(Periodogram):
         else:
             return numax, ax
 
-    def _estimate_numax(self, numaxs):
+    def _estimate_numax(self, numaxs, window=None):
         """
         Helper function to perform the numax estimation for both the
         `estimate_numax()` and `plot_numax_diagnostics()` functions.
@@ -882,11 +888,25 @@ class SNRPeriodogram(Periodogram):
                 raise ValueError("A custom range of numaxs can not extend above"
                                 "the highest frequency value in the periodogram.")
 
+        # Run some checks on the window size
+        if window is not None:
+            window = u.Quantity(window, self.frequency.unit).value
+            fs = np.median(np.diff(self.frequency.value))
+            if window < fs:
+                raise ValueError("You can't have a window smaller than the"
+                                "frequency separation!")
+            if window > self.frequency[-1]:
+                raise ValueError("You can't have a window wider than the entire"
+                                "power spectrum!")
+            if window < 0:
+                raise ValueError("Please pass a positive window.")
+
         # Calcualte the window size
-        if u.Quantity(self.frequency[-1], u.microhertz) > u.Quantity(500., u.microhertz):
-            window = 250.
-        else:
-            window = 25.
+        if window is None:
+            if u.Quantity(self.frequency[-1], u.microhertz) > u.Quantity(500., u.microhertz):
+                window = 250.
+            else:
+                window = 25.
 
         if numaxs is None:
             numaxs = np.arange(window/2, np.floor(np.nanmax(self.frequency.value)) - window/2, 1.)
@@ -922,7 +942,8 @@ class SNRPeriodogram(Periodogram):
         We base this approach first and foremost off the approach taken in
         Mosser & Appourchaux (2009). Given a known numax, a window around this
         numax is taken of one estimated full-width-half-maximum (FWHM) of the
-        mode envelope either side of the central frequency.
+        seismic mode envelope either side of numax. This width is chosen so that
+        the autocorrelation includes all of the visible mode peaks.
 
         The autocorrelation (numpy.correlate) is given as:
 
@@ -944,15 +965,12 @@ class SNRPeriodogram(Periodogram):
         value. The peak finding algorithm is limited by a minimum spacing
         between peaks of 0.5 times the empirical value for dnu.
 
-        Our empirical estimate for numax is taken from Stello et al. 2009 as
+        Our empirical estimate for numax is taken from Stello et al. (2009) as
 
         dnu = 0.294 * numax^0.772
 
         If `numax` is None, a numax is calculated using the estimate_numax()
         function with default settings.
-
-        NOTE: When plotting the acf, we exclude the first frequency lag bin, to
-        make the relevant features on the plot clearer.
 
         NOTE: This function is intended for use with solar like Main Sequence
         and Red Giant Branch oscillators only.
@@ -977,12 +995,15 @@ class SNRPeriodogram(Periodogram):
     def plot_dnu_diagnostics(self, numax=None, return_metric=False):
         """ Returns one diagnostic plots and an estimated value for dnu.
 
-        [1] Scaled correlation metrix vs frequecy lag of the autocorrelation
+        [1] Scaled correlation metric vs frequecy lag of the autocorrelation
         window, with inset close up on the determined dnu and a line indicating
         the determined dnu.
 
         For details on the dnu estimation, see the `estimate_dnu()` function.
         The calculation performed is identical.
+
+        NOTE: When plotting , we exclude the first frequency lag bin, to
+        make the relevant features on the plot clearer.
 
         Parameters:
         -----------
@@ -1092,6 +1113,10 @@ class SNRPeriodogram(Periodogram):
             numax : float
                 The estimated position of the numax of the power spectrum. This
                 is used to calculated the region autocorrelated with itself.
+
+            window : int or float
+                The width of the autocorrelation window around the central
+                frequency numax.
 
         Returns:
         --------
