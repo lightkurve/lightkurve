@@ -9,7 +9,7 @@ from uncertainties import ufloat
 from ..lightcurve import LightCurve
 from ..search import search_lightcurvefile
 from ..seismology import *
-from ..seismology import numaxsol, dnusol, teffsol, gsol
+from ..seismology import NUMAX_SOL, DNU_SOL, TEFF_SOL, G_SOL
 import sys
 
 
@@ -33,14 +33,14 @@ cdnu = 4.934
 def test_constants():
     """Assert the basic solar parameters are still loaded in and have
     appopriate units where necessary"""
-    assert numaxsol.n == 3090.0
-    assert numaxsol.s == 30.0
-    assert dnusol.n == 135.1
-    assert dnusol.s == 0.1
-    assert teffsol.n == 5772.
-    assert teffsol.s == 0.8
-    assert np.isclose(gsol.value, 27420)
-    assert gsol.unit == u.cm/u.second**2
+    assert NUMAX_SOL.n == 3090.0
+    assert NUMAX_SOL.s == 30.0
+    assert DNU_SOL.n == 135.1
+    assert DNU_SOL.s == 0.1
+    assert TEFF_SOL.n == 5772.
+    assert TEFF_SOL.s == 0.8
+    assert np.isclose(G_SOL.value, 27420)
+    assert G_SOL.unit == u.cm/u.second**2
 
 def test_estimate_radius_basic():
     """Assert the basic functions of estimate_radius
