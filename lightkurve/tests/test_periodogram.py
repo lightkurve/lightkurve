@@ -225,6 +225,12 @@ def test_estimate_numax_basics():
     assert(np.isclose(true_numax, numax.value, atol=.1*true_numax))
     #Assert numax has unit equal to input frequency unit
     assert(numax.unit == u.microhertz)
+
+    #Assert you can recover numax with a chopped periodogram
+    rsnr = snr[(snr.frequency.value>1600)&(snr.frequency.value<3200)]
+    numax = rsnr.estimate_numax()
+    assert(np.isclose(true_numax, numax.value, atol=.1*true_numax))
+
     #Assert numax estimator works when input frequency is not in microhertz
     fday = u.Quantity(f*u.microhertz, 1/u.day)
     snr = SNRPeriodogram(fday, u.Quantity(p, None))
@@ -249,6 +255,21 @@ def test_estimate_numax_kwargs():
         numax = snr.estimate_numax(numaxs=np.linspace(-5, 5.))
     with pytest.raises(ValueError) as err:
         numax = snr.estimate_numax(numaxs=np.linspace(1., 5000.))
+
+    #Assert we can pass a custom window in microhertz or days
+    numax = snr.estimate_numax(window=200.)
+    assert(np.isclose(numax.value, true_numax, atol=.1*true_numax))
+    numax = snr.estimate_numax(window=u.Quantity(200., u.microhertz).to(1/u.day))
+    assert(np.isclose(numax.value, true_numax, atol=.1*true_numax))
+
+    #Assert we can't pass in windows outside functional range
+    #Assert we can't pass custom numaxs outside a functional range
+    with pytest.raises(ValueError) as err:
+        numax = snr.estimate_numax(window=-5)
+    with pytest.raises(ValueError) as err:
+        numax = snr.estimate_numax(window=1e6)
+    with pytest.raises(ValueError) as err:
+        numax = snr.estimate_numax(window=0.001)
 
     #Assert it doesn't matter what units of frqeuency numaxs are passed in as
     #Assert the output is still in the same units as the object frequencies
@@ -280,6 +301,11 @@ def test_plot_numax_diagnostics():
     numax, ax = snr.plot_numax_diagnostics(numaxs=numaxs)
     daynumaxs = u.Quantity(numaxs*u.microhertz, 1/u.day)
     numax, ax = snr.plot_numax_diagnostics(numaxs=daynumaxs)
+    numax, ax = snr.plot_numax_diagnostics(window=100.)
+
+    # Check plotting works when periodogram is sliced
+    rsnr = snr[(snr.frequency.value>1600)&(snr.frequency.value<3200)]
+    numax, ax = rsnr.plot_numax_diagnotics()
 
     #Check metric of appropriate length is returned
     _, _, metric = snr.plot_numax_diagnostics(numaxs=numaxs,return_metric=True)
@@ -297,6 +323,12 @@ def test_estimate_dnu_basics():
     assert(np.isclose(true_dnu, dnu.value, atol=.25*true_dnu))
     #Assert dnu has unit equal to input frequency unit
     assert(dnu.unit == u.microhertz)
+
+    #Assert you can recover numax with a sliced periodogram
+    rsnr = snr[(snr.frequency.value>1600)&(snr.frequency.value<3200)]
+    numax = rsnr.estimate_dnu()
+    assert(np.isclose(true_dnu, dnu.value, atol=.25*true_dnu))
+
     #Assert dnu estimator works when input frequency is not in microhertz
     fday = u.Quantity(f*u.microhertz, 1/u.day)
     daysnr = SNRPeriodogram(fday, u.Quantity(p, None))
@@ -347,6 +379,10 @@ def test_plot_dnu_diagnostics():
     dnu, ax = snr.plot_dnu_diagnostics(numax=numax)
     dnu, ax = snr.plot_dnu_diagnostics(numax=daynumax)
 
+    # Check plotting works when periodogram is sliced
+    rsnr = snr[(snr.frequency.value>1600)&(snr.frequency.value<3200)]
+    dnu, ax = rsnr.plot_dnu_diagnostics()
+
     #Check it plots when frequency is in days
     fday = u.Quantity(f*u.microhertz, 1/u.day)
     daysnr = SNRPeriodogram(fday, u.Quantity(p, None))
@@ -354,7 +390,8 @@ def test_plot_dnu_diagnostics():
 
     #Check metric of appropriate length is returned
     _, _, metric = snr.plot_dnu_diagnostics(numax=numax, return_metric=True)
-    assert(len(metric) == len(snr._autocorrelate(numax.value)))
+    window = 2*int(np.floor(snr._get_fwhm(numax.value)))
+    assert(len(metric) == len(snr._autocorrelate(numax.value, window)))
 
 def test_plot_echelle():
     f, p, numax, dnu = generate_test_spectrum()
