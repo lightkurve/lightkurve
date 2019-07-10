@@ -729,13 +729,11 @@ class SNRPeriodogram(Periodogram):
         Verner & Roxburgh (2011) & Viani et al. (2019).
 
         We base this approach first and foremost off the 2D ACF numax estimation
-        presented in Viani et al. (2019) and other papers above, but instead of
-        using a moving window of fixed width, we use a moving window equal to
-        one estimated full width half maximum (FWHM) either side of a central
-        frequency, where the central frequency functions as numax in estimating
-        the FWHM. This window is then mulitplied wiht a hanning window, which
-        reduces power of peaks in the spectrum that do not follow the expected
-        shape of a seismic mode envelope.
+        presented in Viani et al. (2019) and other papers above. A window of
+        fixed width (either given by the user, 25 microhertz for Red Giants or
+        250 microhertz for Main Sequence stars) is moved along the power
+        spectrum, where the central frequency of the window moves in steps of 1
+        microhertz and evaluates the autocorrelation at each step.
 
         The correlation (numpy.correlate) is typically given as:
 
@@ -746,21 +744,19 @@ class SNRPeriodogram(Periodogram):
         C = sum(s * s),
 
         where s is a window of the signal-to-noise spectrum.
-        As FWHM is a function of numax, the autocorrelated spectrum will be
-        larger for evaluations at larger numax. To avoid unfair weighting
-        towards higher numax values, we rescale to a metric M as
+        In order to evaluate where the correlation power is highest (indicative
+        of the power excess of the modes) we calculate the Mean Collapsed
+        Correlation (MCC, see Kiefer 2013, Viani et al. 2019) as
 
-        M = sqrt(C / len(C))
+        MCC = (sum(|C|) - 1) / nlags ,
 
-        We first create an array of sensible numax values based on the cadence
-        of the timeseries. We then estimate the FWHM of the mode envelope at
-        each numax, and calculate the ACF for this region. Near the true numax,
-        the consistent power excess of the modes will increase the value of
-        the ACF, highlighting the location of numax.
+        where C is the autocorrelation power at a given central freqeuncy, and
+        nlags is the number of lags in the autocorrelation.
 
-        We then covolve M with an Astropy Gaussian 1D Kernel with a standard
-        deviation of 5 to smooth it. The frequency that results in the highest
-        value of M is the detected numax.
+        The MCC metric is covolved with an Astropy Gaussian 1D Kernel with a
+        standard deviation of 1/5th of the window size to smooth it. The
+        frequency that results in the highest value of the smoothed MCC is the
+        detected numax.
 
         NOTE: This method is not robust against large peaks in the spectrum (due
         to e.g. spacecraft rotation), nor is it robust in the case of low signal
@@ -774,7 +770,15 @@ class SNRPeriodogram(Periodogram):
         -----------
         numaxs : array-like
             An array of numaxs at which to evaluate the autocorrelation. If
-            none is given, a sensible range will be chosen.
+            none is given, a sensible range will be chosen. If no units are
+            given it is assumed to be in the same units as the periodogram
+            frequency.
+
+        window : int or float
+            The width of the autocorrelation window around each central
+            frequency in 'numaxs'. If none is given, a sensible value will be
+            chosen. If no units are given it is assumed to be in the same units
+            as the periodogram frequency.
 
         Returns:
         --------
