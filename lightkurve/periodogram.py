@@ -424,9 +424,10 @@ class Periodogram(object):
             fmax += dnu
 
         fs = np.median(np.diff(self.frequency.value))
+        x0 = int(self.frequency.value[0] / fs)
 
-        ff = self.frequency[int(fmin/fs):int(fmax/fs)].value   #The the selected frequency range
-        pp = self.power[int(fmin/fs):int(fmax/fs)].value   #The selected power range
+        ff = self.frequency[int(fmin/fs)-x0:int(fmax/fs)-x0].value   #The the selected frequency range
+        pp = self.power[int(fmin/fs)-x0:int(fmax/fs)-x0].value   #The selected power range
 
         n_rows = int((ff[-1]-ff[0])/dnu)     #The number of stacks to use
         n_columns = int(dnu/fs)               #The number of elements in each stack
@@ -849,7 +850,7 @@ class SNRPeriodogram(Periodogram):
             extent = (numaxrange[0],numaxrange[-1],windowarray[0],windowarray[-1])
             figsize = [8.485, 4]
             a = figsize[1]/figsize[0]
-            b = (extent[3]-extent[2])/extent[1]
+            b = (extent[3]-extent[2])/(extent[1]-extent[0])
 
             ax[1].imshow(acf2d,cmap='Blues', aspect=a/b, origin='lower',extent=extent)
             ax[1].set_ylabel(r'Frequency lag [{}]'.format(self.frequency.unit.to_string('latex')))
