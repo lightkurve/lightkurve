@@ -22,7 +22,7 @@ __all__ = ['estimate_radius','estimate_mass','estimate_logg']
 """Global parameters for the sun"""
 NUMAX_SOL = ufloat(3090, 30) # microhertz | Huber et al. 2011
 DNU_SOL = ufloat(135.1, 0.1) # microhertz | Huber et al. 2011
-TEFF_SOL = ufloat(5772., 0.8) # Kelvin    | Prša et al. 2016
+TEFF_SOL = ufloat(5772., 0.8) # Kelvin    | Prsa et al. 2016
 G_SOL = ((const.G * const.M_sun)/(const.R_sun)**2).to(u.cm/u.second**2) #cms^2
 
 def estimate_radius(numax, dnu, Teff, numax_err=None, dnu_err=None, Teff_err=None):
