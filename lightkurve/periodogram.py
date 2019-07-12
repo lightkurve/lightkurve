@@ -337,21 +337,21 @@ class Periodogram(object):
             ax.set_title(title)
         return ax
 
-    def plot_echelle(self, dnu, numax=None,
+    def plot_echelle(self, deltanu, numax=None,
                     minimum_frequency=None, maximum_frequency=None,
                     scale='linear',
                     cmap='Blues'):
         """Plots an echelle diagram of the periodogram by stacking the
-        periodogram in slices of dnu. Modes of equal radial degree should
+        periodogram in slices of deltanu. Modes of equal radial degree should
         appear approximately vertically aligned. If no structure is present,
-        you are likely dealing with a faulty dnu value or a low signal to noise
+        you are likely dealing with a faulty deltanu value or a low signal to noise
         case.
 
         This method is adapted from work by Daniel Hey & Guy Davies.
 
         Parameters
         ----------
-        dnu : float
+        deltanu : float
             Value for the large frequency separation of the seismic mode
             frequencies in the periodogram. Assumed to have the same units as
             the frequencies, unless given an Astropy unit.
@@ -385,8 +385,8 @@ class Periodogram(object):
             The matplotlib axes object.
         """
 
-        # Ensure input dnu is in the correct units
-        dnu = u.Quantity(dnu, self.frequency.unit).value
+        # Ensure input deltanu is in the correct units
+        deltanu = u.Quantity(deltanu, self.frequency.unit).value
 
         fmin = self.frequency[0].value
         fmax = self.frequency[-1].value
@@ -424,9 +424,9 @@ class Periodogram(object):
                 raise ValueError("You can't pass in a limit outside the"
                                 "frequency range of the periodogram.")
 
-        # Add on 1x Dnu so we don't miss off any important range due to rounding
-        if fmax < self.frequency[-1].value - 1.5*dnu:
-            fmax += dnu
+        # Add on 1x deltanu so we don't miss off any important range due to rounding
+        if fmax < self.frequency[-1].value - 1.5*deltanu:
+            fmax += deltanu
 
         fs = np.median(np.diff(self.frequency.value))
         x0 = int(self.frequency.value[0] / fs)
@@ -434,8 +434,8 @@ class Periodogram(object):
         ff = self.frequency[int(fmin/fs)-x0:int(fmax/fs)-x0].value   #The the selected frequency range
         pp = self.power[int(fmin/fs)-x0:int(fmax/fs)-x0].value   #The selected power range
 
-        n_rows = int((ff[-1]-ff[0])/dnu)     #The number of stacks to use
-        n_columns = int(dnu/fs)               #The number of elements in each stack
+        n_rows = int((ff[-1]-ff[0])/deltanu)     #The number of stacks to use
+        n_columns = int(deltanu/fs)               #The number of elements in each stack
 
         #Reshape the power into n_rowss of n_columnss
         ep = np.reshape(pp[:(n_rows*n_columns)],(n_rows,n_columns))
@@ -445,7 +445,7 @@ class Periodogram(object):
 
         #Reshape the freq into n_rowss of n_columnss & create arays
         ef = np.reshape(ff[:(n_rows*n_columns)],(n_rows,n_columns))
-        x_f = ((ef[0,:]-ef[0,0]) % dnu)
+        x_f = ((ef[0,:]-ef[0,0]) % deltanu)
         y_f = (ef[:,0])
 
         #Plot the echelle diagram
@@ -460,7 +460,7 @@ class Periodogram(object):
             ax.imshow(ep,cmap=cmap, aspect=a/b, origin='lower',
                      extent=extent)
 
-            ax.set_xlabel(r'Frequency mod. {:.2f} {}'.format(dnu,
+            ax.set_xlabel(r'Frequency mod. {:.2f} {}'.format(deltanu,
                                         self.frequency.unit.to_string('latex')))
             ax.set_ylabel(r'Frequency [{}]'.format(self.frequency.unit.to_string('latex')))
             ax.set_title('Echelle diagram for {}'.format(self.label))
@@ -938,7 +938,7 @@ class SNRPeriodogram(Periodogram):
         return u.Quantity(best_numax, self.frequency.unit), \
                 numaxs, acf2d, window, metric, metric_smooth
 
-    def estimate_dnu(self, numax=None):
+    def estimate_deltanu(self, numax=None):
         """ Estimates the average value of the large frequency spacing, DeltaNu,
         of the seismic oscillations of the target, using an autocorrelation
         function. There are many papers on the topic of autocorrelation
@@ -969,13 +969,13 @@ class SNRPeriodogram(Periodogram):
         The method will autocorrelate the region around the estimated numax
         expected to contain seismic oscillation modes. Repeating peaks in the
         autocorrelation implies an evenly spaced structure of modes.
-        The peak closest to an empirical estimate of dnu is taken as the true
+        The peak closest to an empirical estimate of deltanu is taken as the true
         value. The peak finding algorithm is limited by a minimum spacing
-        between peaks of 0.5 times the empirical value for dnu.
+        between peaks of 0.5 times the empirical value for deltanu.
 
         Our empirical estimate for numax is taken from Stello et al. (2009) as
 
-        dnu = 0.294 * numax^0.772
+        deltanu = 0.294 * numax^0.772
 
         If `numax` is None, a numax is calculated using the estimate_numax()
         function with default settings.
@@ -992,22 +992,22 @@ class SNRPeriodogram(Periodogram):
 
         Returns:
         -------
-        dnu : float
+        deltanu : float
             The average large frequency spacing of the seismic oscillation modes.
             In units of the periodogram frequency attribute.
         """
 
-        dnu,_,_,_,_ = self._estimate_dnu(numax)
-        return dnu
+        deltanu,_,_,_,_ = self._estimate_deltanu(numax)
+        return deltanu
 
-    def plot_dnu_diagnostics(self, numax=None, return_metric=False):
-        """ Returns one diagnostic plots and an estimated value for dnu.
+    def plot_deltanu_diagnostics(self, numax=None, return_metric=False):
+        """ Returns one diagnostic plots and an estimated value for deltanu.
 
         [1] Scaled correlation metric vs frequecy lag of the autocorrelation
-        window, with inset close up on the determined dnu and a line indicating
-        the determined dnu.
+        window, with inset close up on the determined deltanu and a line indicating
+        the determined deltanu.
 
-        For details on the dnu estimation, see the `estimate_dnu()` function.
+        For details on the deltanu estimation, see the `estimate_deltanu()` function.
         The calculation performed is identical.
 
         NOTE: When plotting , we exclude the first frequency lag bin, to
@@ -1025,7 +1025,7 @@ class SNRPeriodogram(Periodogram):
 
         Returns:
         --------
-        dnu : float
+        deltanu : float
             The average large frequency spacing of the seismic oscillation modes.
             In units of the periodogram frequency attribute.
 
@@ -1036,7 +1036,7 @@ class SNRPeriodogram(Periodogram):
             The (unsmoothed) autocorrelation metric shown in the diagnostic plot.
             Only returned if `return_metric = True`.
         """
-        dnu, lags, metric, peaks, sel = self._estimate_dnu(numax)
+        deltanu, lags, metric, peaks, sel = self._estimate_deltanu(numax)
 
         with plt.style.context(MPLSTYLE):
             fig, ax = plt.subplots()
@@ -1044,29 +1044,29 @@ class SNRPeriodogram(Periodogram):
             ax.plot(lags[1:], metric[1:])
             ax.set_xlabel("Frequency Lag [{}]".format(self.frequency.unit.to_string('latex')))
             ax.set_ylabel(r'Scaled Correlation')
-            ax.axvline(dnu.value,c='r', linewidth=2,alpha=.4)
+            ax.axvline(deltanu.value,c='r', linewidth=2,alpha=.4)
             ax.set_title(r'Scaled Correlation vs Lag for a given $\nu_{\rm max}$')
 
             axin = inset_axes(ax, width="50%",height="50%", loc="upper right")
             axin.set_yticks([])
             axin.plot(lags[sel],metric[sel])
             axin.scatter(lags[sel][peaks], metric[sel][peaks],c='r',s=5)
-            axin.axvline(dnu.value,c='r', linewidth=2,alpha=.4,
-                label=r'{:.1f} {}'.format(dnu.value,
+            axin.axvline(deltanu.value,c='r', linewidth=2,alpha=.4,
+                label=r'{:.1f} {}'.format(deltanu.value,
                                     self.frequency.unit.to_string('latex')))
             axin.legend(loc='best')
 
         if return_metric:
-            return dnu, ax, metric
+            return deltanu, ax, metric
         else:
-            return dnu, ax
+            return deltanu, ax
 
-    def _estimate_dnu(self, numax):
+    def _estimate_deltanu(self, numax):
         """
-        Helper function to perform the dnu estimation for both the
-        `estimate_dnu()` and `plot_dnu_diagnostics()` functions.
+        Helper function to perform the deltanu estimation for both the
+        `estimate_deltanu()` and `plot_deltanu_diagnostics()` functions.
 
-        For details, see the `estimate_dnu()` function.
+        For details, see the `estimate_deltanu()` function.
         """
 
         # Run some checks on the passed in numaxs
@@ -1085,9 +1085,9 @@ class SNRPeriodogram(Periodogram):
             #Estimate numax using the default settings
             numax = self.estimate_numax()
 
-        #Calcluate dnu using the method by Stello et al. 2009
+        #Calcluate deltanu using the method by Stello et al. 2009
         #Make sure that this relation only ever happens in microhertz space
-        dnu_emp = u.Quantity((0.294 * u.Quantity(numax, u.microhertz).value ** 0.772)*u.microhertz,
+        deltanu_emp = u.Quantity((0.294 * u.Quantity(numax, u.microhertz).value ** 0.772)*u.microhertz,
                             self.frequency.unit).value
 
         window = 2*int(np.floor(self._get_fwhm(numax.value)))
@@ -1096,16 +1096,16 @@ class SNRPeriodogram(Periodogram):
         fs = np.median(np.diff(self.frequency.value))
         lags = np.linspace(0., len(acf)*fs, len(acf))
 
-        #Select a 25% region region around the empirical dnu
-        sel = (lags > dnu_emp - .25*dnu_emp) & (lags < dnu_emp + .25*dnu_emp)
+        #Select a 25% region region around the empirical deltanu
+        sel = (lags > deltanu_emp - .25*deltanu_emp) & (lags < deltanu_emp + .25*deltanu_emp)
 
         #Run a peak finder on this region
-        peaks, _ = find_peaks(acf[sel], distance=np.floor(dnu_emp/2. / fs))
+        peaks, _ = find_peaks(acf[sel], distance=np.floor(deltanu_emp/2. / fs))
 
         #Select the peak closest to the empirical value
-        best_dnu = lags[sel][peaks][np.argmin(np.abs(lags[sel][peaks] - dnu_emp))]
+        best_deltanu = lags[sel][peaks][np.argmin(np.abs(lags[sel][peaks] - deltanu_emp))]
 
-        return u.Quantity(best_dnu, self.frequency.unit),\
+        return u.Quantity(best_deltanu, self.frequency.unit),\
                 lags, acf, peaks, sel
 
     def _autocorrelate(self, numax, window=25.):
