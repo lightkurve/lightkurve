@@ -37,7 +37,7 @@ def estimate_radius(numax, dnu, Teff, numax_err=None, dnu_err=None, Teff_err=Non
     where R is the radius and Teff is the effective temperature, and the suffix
     'sol' indicates a solar value. In this method we use the solar values for
     numax and dnu as given in Huber et al. (2011) and for Teff as given in
-    Prša et al. (2016).
+    Prsa et al. (2016).
 
     This code structure borrows from work done in Bellinger et al. (2019), which
     also functions as an accessible explanation of seismic scaling relations.
@@ -116,7 +116,7 @@ def estimate_mass(numax, dnu, Teff, numax_err=None, dnu_err=None, Teff_err=None)
     where M is the mass and Teff is the effective temperature, and the suffix
     'sol' indicates a solar value. In this method we use the solar values for
     numax and dnu as given in Huber et al. (2011) and for Teff as given in
-    Prša et al. (2016).
+    Prsa et al. (2016).
 
     This code structure borrows from work done in Bellinger et al. (2019), which
     also functions as an accessible explanation of seismic scaling relations.
@@ -197,7 +197,7 @@ def estimate_logg(numax, Teff, numax_err=None, Teff_err=None):
     where g is the surface gravity and Teff is the effective temperature,
     and the suffix 'sol' indicates a solar value. In this method we use the
     solar values for numax as given in Huber et al. (2011) and for Teff as given
-    in Prša et al. (2016). The solar surface gravity is calcluated from the
+    in Prsa et al. (2016). The solar surface gravity is calcluated from the
     astropy constants for solar mass and radius and does not have an error.
 
     The solar surface gravity is returned as log10(g) with units in dex, as is
