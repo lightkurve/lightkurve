@@ -524,7 +524,7 @@ class Periodogram(object):
         fwhm = 0.66 * numax^0.88 .
 
         If the maximum frequency in the periodogram is less than 500 microhertz,
-        this functio will default to the above equation under the assumption it
+        this function will default to the above equation under the assumption it
         is dealing with an RGB star, which oscillate at lower frequencies.
 
         If the maximum frequency is above 500 microhertz, the envelope is given
