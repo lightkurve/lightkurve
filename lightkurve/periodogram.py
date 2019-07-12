@@ -907,7 +907,7 @@ class SNRPeriodogram(Periodogram):
             if window < 0:
                 raise ValueError("Please pass a positive window.")
 
-        # Calcualte the window size
+        # Calculate the window size
         if window is None:
             if u.Quantity(self.frequency[-1], u.microhertz) > u.Quantity(500., u.microhertz):
                 window = u.Quantity(250., u.microhertz).to(self.frequency.unit).value
