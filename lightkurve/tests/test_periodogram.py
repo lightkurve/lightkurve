@@ -205,14 +205,14 @@ def generate_test_spectrum():
     lo = int(np.floor(.5*nmx/fs))
     hi = int(np.floor(1.5*nmx/fs))
 
-    dnu_true = 0.294 * nmx ** 0.772
-    modelocs = np.arange(lo, hi, dnu_true/2, dtype=int)
+    deltanu_true = 0.294 * nmx ** 0.772
+    modelocs = np.arange(lo, hi, deltanu_true/2, dtype=int)
 
     for modeloc in modelocs:
         m += deltafn(len(f), modeloc)
     p *= m
     p += 1
-    return f, p, nmx, dnu_true
+    return f, p, nmx, deltanu_true
 
 def test_estimate_numax_basics():
     """Test if we can estimate a numax
@@ -312,122 +312,122 @@ def test_plot_numax_diagnostics():
     assert(len(metric) == len(numaxs))
 
 
-def test_estimate_dnu_basics():
-    """Test if we can estimate a dnu
+def test_estimate_deltanu_basics():
+    """Test if we can estimate a deltanu
     """
-    f, p, _, true_dnu = generate_test_spectrum()
+    f, p, _, true_deltanu = generate_test_spectrum()
     snr = SNRPeriodogram(f*u.microhertz, u.Quantity(p, None))
-    dnu = snr.estimate_dnu()
+    deltanu = snr.estimate_deltanu()
 
-    #Assert recovers dnu within 25%
-    assert(np.isclose(true_dnu, dnu.value, atol=.25*true_dnu))
-    #Assert dnu has unit equal to input frequency unit
-    assert(dnu.unit == u.microhertz)
+    #Assert recovers deltanu within 25%
+    assert(np.isclose(true_deltanu, deltanu.value, atol=.25*true_deltanu))
+    #Assert deltanu has unit equal to input frequency unit
+    assert(deltanu.unit == u.microhertz)
 
     #Assert you can recover numax with a sliced periodogram
     rsnr = snr[(snr.frequency.value>1600)&(snr.frequency.value<3200)]
-    numax = rsnr.estimate_dnu()
-    assert(np.isclose(true_dnu, dnu.value, atol=.25*true_dnu))
+    numax = rsnr.estimate_deltanu()
+    assert(np.isclose(true_deltanu, deltanu.value, atol=.25*true_deltanu))
 
-    #Assert dnu estimator works when input frequency is not in microhertz
+    #Assert deltanu estimator works when input frequency is not in microhertz
     fday = u.Quantity(f*u.microhertz, 1/u.day)
     daysnr = SNRPeriodogram(fday, u.Quantity(p, None))
-    dnu = daysnr.estimate_dnu()
-    dnuday = u.Quantity(true_dnu*u.microhertz, 1/u.day)
-    assert(np.isclose(dnuday.value, dnu.value, atol=.25*dnuday.value))
+    deltanu = daysnr.estimate_deltanu()
+    deltanuday = u.Quantity(true_deltanu*u.microhertz, 1/u.day)
+    assert(np.isclose(deltanuday.value, deltanu.value, atol=.25*deltanuday.value))
 
-def test_estimate_dnu_kwargs():
-    """Test if we can estimate a dnu using its various keyword arguments
+def test_estimate_deltanu_kwargs():
+    """Test if we can estimate a deltanu using its various keyword arguments
     """
-    f, p, _, true_dnu = generate_test_spectrum()
+    f, p, _, true_deltanu = generate_test_spectrum()
     snr = SNRPeriodogram(f*u.microhertz, u.Quantity(p, None))
 
     # Assert custom numax works
     numax = snr.estimate_numax()
-    dnu = snr.estimate_dnu(numax)
-    assert(np.isclose(dnu.value, true_dnu, atol=.25*true_dnu))
+    deltanu = snr.estimate_deltanu(numax)
+    assert(np.isclose(deltanu.value, true_deltanu, atol=.25*true_deltanu))
 
     # Assert you can't pass custom numax outside of appropriate range
     with pytest.raises(ValueError) as err:
-        dnu = snr.estimate_dnu(numax= -5.)
+        deltanu = snr.estimate_deltanu(numax= -5.)
     with pytest.raises(ValueError) as err:
-        dnu = snr.estimate_dnu(numax=5000)
+        deltanu = snr.estimate_deltanu(numax=5000)
 
     # Assert it doesn't matter what units of frequency numax is passed in as
     daynumax = u.Quantity(numax.value*u.microhertz, 1/u.day)
-    dnu = snr.estimate_dnu(numax=daynumax)
-    assert(np.isclose(dnu.value, true_dnu, atol=.25*true_dnu))
-    assert(dnu.unit == u.microhertz)
+    deltanu = snr.estimate_deltanu(numax=daynumax)
+    assert(np.isclose(deltanu.value, true_deltanu, atol=.25*true_deltanu))
+    assert(deltanu.unit == u.microhertz)
 
-def test_plot_dnu_diagnostics():
+def test_plot_deltanu_diagnostics():
     """Test if we can estimate numax using the diagnostics function, and that
     it returns a correct metric when requested
     """
-    f, p, _, true_dnu = generate_test_spectrum()
+    f, p, _, true_deltanu = generate_test_spectrum()
     snr = SNRPeriodogram(f*u.microhertz, u.Quantity(p, None))
 
     # Assert custom numax works
-    dnu, _ = snr.plot_dnu_diagnostics()
-    assert(np.isclose(dnu.value, true_dnu, atol=.25*true_dnu))
-    assert(dnu.unit == u.microhertz)
+    deltanu, _ = snr.plot_deltanu_diagnostics()
+    assert(np.isclose(deltanu.value, true_deltanu, atol=.25*true_deltanu))
+    assert(deltanu.unit == u.microhertz)
 
-    #Note: checks on the `numax` kwarg in `estimate_dnu_kwargs` also apply
+    #Note: checks on the `numax` kwarg in `estimate_deltanu_kwargs` also apply
     #to this function, no need to check them twice.
 
     # Sanity check that plotting works under all conditions
     numax = snr.estimate_numax()
     daynumax = u.Quantity(numax.value*u.microhertz, 1/u.day)
-    dnu, ax = snr.plot_dnu_diagnostics()
-    dnu, ax = snr.plot_dnu_diagnostics(numax=numax)
-    dnu, ax = snr.plot_dnu_diagnostics(numax=daynumax)
+    deltanu, ax = snr.plot_deltanu_diagnostics()
+    deltanu, ax = snr.plot_deltanu_diagnostics(numax=numax)
+    deltanu, ax = snr.plot_deltanu_diagnostics(numax=daynumax)
 
     # Check plotting works when periodogram is sliced
     rsnr = snr[(snr.frequency.value>1600)&(snr.frequency.value<3200)]
-    dnu, ax = rsnr.plot_dnu_diagnostics()
+    deltanu, ax = rsnr.plot_deltanu_diagnostics()
 
     #Check it plots when frequency is in days
     fday = u.Quantity(f*u.microhertz, 1/u.day)
     daysnr = SNRPeriodogram(fday, u.Quantity(p, None))
-    dnu, ax = daysnr.plot_dnu_diagnostics(numax=daynumax)
+    deltanu, ax = daysnr.plot_deltanu_diagnostics(numax=daynumax)
 
     #Check metric of appropriate length is returned
-    _, _, metric = snr.plot_dnu_diagnostics(numax=numax, return_metric=True)
+    _, _, metric = snr.plot_deltanu_diagnostics(numax=numax, return_metric=True)
     window = 2*int(np.floor(snr._get_fwhm(numax.value)))
     assert(len(metric) == len(snr._autocorrelate(numax.value, window)))
 
 def test_plot_echelle():
-    f, p, numax, dnu = generate_test_spectrum()
+    f, p, numax, deltanu = generate_test_spectrum()
     numax *= u.microhertz
-    dnu *= u.microhertz
+    deltanu *= u.microhertz
 
     pg = Periodogram(f*u.microhertz, u.Quantity(p, None))
 
     #Assert basic echelle works
-    pg.plot_echelle(dnu)
-    pg.plot_echelle(u.Quantity(dnu, 1/u.day))
+    pg.plot_echelle(deltanu)
+    pg.plot_echelle(u.Quantity(deltanu, 1/u.day))
 
     #Assert echelle works with numax
-    pg.plot_echelle(dnu, numax)
-    pg.plot_echelle(dnu, u.Quantity(numax, 1/u.day))
+    pg.plot_echelle(deltanu, numax)
+    pg.plot_echelle(deltanu, u.Quantity(numax, 1/u.day))
 
     #Assert echelle works with minimum limit
-    pg.plot_echelle(dnu, minimum_frequency = numax)
-    pg.plot_echelle(dnu, maximum_frequency = numax)
-    pg.plot_echelle(dnu, minimum_frequency = u.Quantity(numax, 1/u.day))
-    pg.plot_echelle(dnu, maximum_frequency = u.Quantity(numax, 1/u.day))
-    pg.plot_echelle(dnu, minimum_frequency = u.Quantity(numax-dnu, 1/u.day),
-                        maximum_frequency = numax+dnu)
+    pg.plot_echelle(deltanu, minimum_frequency = numax)
+    pg.plot_echelle(deltanu, maximum_frequency = numax)
+    pg.plot_echelle(deltanu, minimum_frequency = u.Quantity(numax, 1/u.day))
+    pg.plot_echelle(deltanu, maximum_frequency = u.Quantity(numax, 1/u.day))
+    pg.plot_echelle(deltanu, minimum_frequency = u.Quantity(numax-deltanu, 1/u.day),
+                        maximum_frequency = numax+deltanu)
 
     #Assert raises error if numax or either of the limits are too high
     with pytest.raises(ValueError) as err:
-        pg.plot_echelle(dnu, minimum_frequency = f[-1]+10)
+        pg.plot_echelle(deltanu, minimum_frequency = f[-1]+10)
     with pytest.raises(ValueError) as err:
-        pg.plot_echelle(dnu, maximum_frequency = f[-1]+10)
+        pg.plot_echelle(deltanu, maximum_frequency = f[-1]+10)
     with pytest.raises(ValueError) as err:
-        pg.plot_echelle(dnu, numax = f[-1]+10)
+        pg.plot_echelle(deltanu, numax = f[-1]+10)
 
     #Assert can pass colourmap
-    pg.plot_echelle(dnu, cmap='viridis')
+    pg.plot_echelle(deltanu, cmap='viridis')
 
 @pytest.mark.skipif(bad_optional_imports,
                     reason="requires bokeh and astropy.stats.bls")
