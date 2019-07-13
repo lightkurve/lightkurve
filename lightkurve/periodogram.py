@@ -963,7 +963,7 @@ class SNRPeriodogram(Periodogram):
             metric[idx] = (np.sum(np.abs(acf)) - 1 ) / len(acf)  #Store the max acf power normalised by the length
 
         # Smooth the data to find the peak
-        g = Gaussian1DKernel(stddev=int(window/5))
+        g = Gaussian1DKernel(stddev=np.sqrt(len(metric)))
         metric_smooth = convolve(metric, g)
         best_numax = numaxs[np.argmax(metric_smooth)]     #The highest value of the metric corresponds to numax
 
