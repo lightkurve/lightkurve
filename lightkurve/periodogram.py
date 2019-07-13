@@ -726,7 +726,7 @@ class SNRPeriodogram(Periodogram):
             ax.set_ylabel("Signal to Noise Ratio (SNR)")
         return ax
 
-    def estimate_numax(self, numaxs=None, window=None):
+    def estimate_numax(self, numaxs=None, spacing=None, window=None):
         """Estimates the peak of the envelope of seismic oscillation modes,
         numax using an autocorrelation function. There are many papers on the
         topic of autocorrelation functions for estimating seismic parameters,
@@ -786,6 +786,12 @@ class SNRPeriodogram(Periodogram):
             chosen. If no units are given it is assumed to be in the same units
             as the periodogram frequency.
 
+        spacing : int or float
+            The spacing between central frequencies at which the autocorrelation
+            is evaluated. If none is given, a sensible value will be assumed. If
+            no units are given it is assumed to be in teh same units as the
+            periodogram frequency.
+
         Returns:
         --------
         numax : float
@@ -793,10 +799,10 @@ class SNRPeriodogram(Periodogram):
             frequency.
         """
 
-        numax,_,_,_,_,_ = self._estimate_numax(numaxs, window)
+        numax,_,_,_,_,_ = self._estimate_numax(numaxs, window, spacing)
         return numax
 
-    def plot_numax_diagnostics(self, numaxs=None, window=None, return_metric=False):
+    def plot_numax_diagnostics(self, numaxs=None, window=None, spacing=None, return_metric=False):
         """ Returns three diagnostic plots and an estimated value for numax.
 
         [1] The SNRPeriodogram plotted with a red line indicating the estimated
@@ -828,6 +834,12 @@ class SNRPeriodogram(Periodogram):
             chosen. If no units are given it is assumed to be in the same units
             as the periodogram frequency.
 
+        spacing : int or float
+            The spacing between central frequencies at which the autocorrelation
+            is evaluated. If none is given, a sensible value will be assumed. If
+            no units are given it is assumed to be in teh same units as the
+            periodogram frequency.
+
         return_metric : bool
             If True, returns the metric data shown in the lower diagnostic plot.
 
@@ -842,7 +854,7 @@ class SNRPeriodogram(Periodogram):
             The (unsmoothed) autocorrelation metric shown in the diagnostic plot.
             Only returned if `return_metric = True`.
         """
-        numax, numaxrange, acf2d, window, metric, metric_smooth = self._estimate_numax(numaxs, window)
+        numax, numaxrange, acf2d, window, metric, metric_smooth = self._estimate_numax(numaxs, window, spacing)
 
         with plt.style.context(MPLSTYLE):
             fig, ax = plt.subplots(3,sharex=True,figsize=(8.485, 12))
@@ -876,7 +888,7 @@ class SNRPeriodogram(Periodogram):
         else:
             return numax, ax
 
-    def _estimate_numax(self, numaxs, window=None):
+    def _estimate_numax(self, numaxs, window=None, spacing=None):
         """
         Helper function to perform the numax estimation for both the
         `estimate_numax()` and `plot_numax_diagnostics()` functions.
@@ -907,17 +919,39 @@ class SNRPeriodogram(Periodogram):
             if window < 0:
                 raise ValueError("Please pass a positive window.")
 
+        # Run some checks on the spacing size
+        if spacing is not None:
+            spacing = u.Quantity(spacing, self.frequency.unit).value
+            fs = np.median(np.diff(self.frequency.value))
+            if spacing < fs:
+                raise ValueError("You can't have a spacing than the"
+                                "frequency separation!")
+            if spacing > (self.frequency[-1].value - self.frequency[0].value):
+                raise ValueError("You can't have a spacing wider than the entire"
+                                "power spectrum!")
+            if spacing < 0:
+                raise ValueError("Please pass a positive spacing.")
+
         # Calculate the window size
         if window is None:
             if u.Quantity(self.frequency[-1], u.microhertz) > u.Quantity(500., u.microhertz):
                 window = u.Quantity(250., u.microhertz).to(self.frequency.unit).value
+                spacing = u.Quantity(10., u.microhertz).to(self.frequency.unit).value
             else:
                 window = u.Quantity(25., u.microhertz).to(self.frequency.unit).value
+                spacing = u.Quantity(10., u.microhertz).to(self.frequency.unit).value
+
+        # Calculate the spacing size
+        if spacing is None:
+            if u.Quantity(self.frequency[-1], u.microhertz) > u.Quantity(500., u.microhertz):
+                spacing = u.Quantity(10., u.microhertz).to(self.frequency.unit).value
+            else:
+                spacing = u.Quantity(1., u.microhertz).to(self.frequency.unit).value
 
         if numaxs is None:
             numaxs = np.arange(np.ceil(np.nanmin(self.frequency.value)) + window/2,
                         np.floor(np.nanmax(self.frequency.value)) - window/2,
-                        u.Quantity(1., u.microhertz).to(self.frequency.unit).value)
+                        spacing)
 
         #We want to find the numax which returns in the highest autocorrelation
         #power, rescaled based on filter width
