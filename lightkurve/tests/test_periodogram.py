@@ -271,6 +271,20 @@ def test_estimate_numax_kwargs():
     with pytest.raises(ValueError) as err:
         numax = snr.estimate_numax(window=0.001)
 
+    #Assert we can pass a custom spacing in microhertz or days
+    numax = snr.estimate_numax(spacing=15.)
+    assert(np.isclose(numax.value, true_numax, atol=.1*true_numax))
+    numax = snr.estimate_numax(spacing=u.Quantity(15., u.microhertz).to(1/u.day))
+    assert(np.isclose(numax.value, true_numax, atol=.1*true_numax))
+
+    #Assert we can't pass in spacing outside functional range
+    with pytest.raises(ValueError) as err:
+        numax = snr.estimate_numax(spacing=-5)
+    with pytest.raises(ValueError) as err:
+        numax = snr.estimate_numax(spacing=1e6)
+    with pytest.raises(ValueError) as err:
+        numax = snr.estimate_numax(spacing=0.001)
+
     #Assert it doesn't matter what units of frqeuency numaxs are passed in as
     #Assert the output is still in the same units as the object frequencies
     daynumaxs = u.Quantity(numaxs*u.microhertz, 1/u.day)
@@ -287,7 +301,9 @@ def test_plot_numax_diagnostics():
     snr = SNRPeriodogram(f*u.microhertz, u.Quantity(p, None))
     numaxs = np.linspace(true_numax-2*std, true_numax+2*std, 500)
 
-    numax, _ = snr.plot_numax_diagnostics()
+    numax, _ = snr.plot_numax_diagnostics(numaxs = numaxs,
+                                            window=250.,
+                                            spacing=10.)
     #Note: checks on the `numaxs` kwarg in `estimate_numax_kwargs` also apply
     #to this function, no need to check them twice.
 
