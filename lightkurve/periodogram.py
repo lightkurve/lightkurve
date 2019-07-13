@@ -726,7 +726,7 @@ class SNRPeriodogram(Periodogram):
             ax.set_ylabel("Signal to Noise Ratio (SNR)")
         return ax
 
-    def estimate_numax(self, numaxs=None, spacing=None, window=None):
+    def estimate_numax(self, numaxs=None, window=None, spacing=None):
         """Estimates the peak of the envelope of seismic oscillation modes,
         numax using an autocorrelation function. There are many papers on the
         topic of autocorrelation functions for estimating seismic parameters,
@@ -888,7 +888,7 @@ class SNRPeriodogram(Periodogram):
         else:
             return numax, ax
 
-    def _estimate_numax(self, numaxs, window=None, spacing=None):
+    def _estimate_numax(self, numaxs, window, spacing):
         """
         Helper function to perform the numax estimation for both the
         `estimate_numax()` and `plot_numax_diagnostics()` functions.
@@ -900,10 +900,10 @@ class SNRPeriodogram(Periodogram):
             numaxs = u.Quantity(numaxs, self.frequency.unit).value
             fs = np.median(np.diff(self.frequency.value))
             if any(numaxs < fs):
-                raise ValueError("A custom range of numaxs can not extend below"
+                raise ValueError("A custom range of numaxs can not extend below "
                                 "a single frequency bin.")
             if any(numaxs > np.nanmax(self.frequency.value)):
-                raise ValueError("A custom range of numaxs can not extend above"
+                raise ValueError("A custom range of numaxs can not extend above "
                                 "the highest frequency value in the periodogram.")
 
         # Run some checks on the window size
@@ -911,10 +911,10 @@ class SNRPeriodogram(Periodogram):
             window = u.Quantity(window, self.frequency.unit).value
             fs = np.median(np.diff(self.frequency.value))
             if window < fs:
-                raise ValueError("You can't have a window smaller than the"
+                raise ValueError("You can't have a window smaller than the "
                                 "frequency separation!")
             if window > (self.frequency[-1].value - self.frequency[0].value):
-                raise ValueError("You can't have a window wider than the entire"
+                raise ValueError("You can't have a window wider than the entire "
                                 "power spectrum!")
             if window < 0:
                 raise ValueError("Please pass a positive window.")
@@ -924,10 +924,10 @@ class SNRPeriodogram(Periodogram):
             spacing = u.Quantity(spacing, self.frequency.unit).value
             fs = np.median(np.diff(self.frequency.value))
             if spacing < fs:
-                raise ValueError("You can't have a spacing than the"
+                raise ValueError("You can't have a spacing smaller than the "
                                 "frequency separation!")
             if spacing > (self.frequency[-1].value - self.frequency[0].value):
-                raise ValueError("You can't have a spacing wider than the entire"
+                raise ValueError("You can't have a spacing wider than the entire "
                                 "power spectrum!")
             if spacing < 0:
                 raise ValueError("Please pass a positive spacing.")
@@ -936,10 +936,8 @@ class SNRPeriodogram(Periodogram):
         if window is None:
             if u.Quantity(self.frequency[-1], u.microhertz) > u.Quantity(500., u.microhertz):
                 window = u.Quantity(250., u.microhertz).to(self.frequency.unit).value
-                spacing = u.Quantity(10., u.microhertz).to(self.frequency.unit).value
             else:
                 window = u.Quantity(25., u.microhertz).to(self.frequency.unit).value
-                spacing = u.Quantity(10., u.microhertz).to(self.frequency.unit).value
 
         # Calculate the spacing size
         if spacing is None:
