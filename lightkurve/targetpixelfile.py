@@ -704,11 +704,13 @@ class TargetPixelFile(object):
 
         Parameters
         ----------
-        center : tuple or `astropy.SkyCoord`
-            Center of the cutout in pixel coordinates (if a tuple is passed) or
-            in sky coordinates (if an `astropy.SkyCoord` is passed).
-            If `None` (default), then the center of the TPF will be used.
-        size : int or tuple
+        center : (int, int) tuple or `astropy.SkyCoord`
+            Center of the cutout.  If an (int, int) tuple is passed, it wil be
+            interpreted as the (column, row) coordinates relative to
+            the bottom-left corner of the TPF.  If an `astropy.SkyCoord` is
+            passed then the sky coordinate will be used instead.
+            If `None` (default) then the center of the TPF will be used.
+        size : int or (int, int) tuple
             Number of pixels to cut out. If a single integer is passed then
             a square of that size will be cut. If a tuple is passed then a
             rectangle with dimensions (column_size, row_size) will be cut.
@@ -732,26 +734,28 @@ class TargetPixelFile(object):
                 x, y = self.wcs.all_world2pix([[center.ra.value, center.dec.value]], 1)[0]
         elif isinstance(center, (tuple, list, np.ndarray)):
             x, y = center
-        x = int(x)
-        y = int(y)
+        col = int(x)
+        row = int(y)
 
         # Parse the user input (``size``)
         if isinstance(size, int):
             s = (size/2, size/2)
         elif isinstance(size, (tuple, list, np.ndarray)):
-            s = (size[0]/2, size[1]/2)
+            s = (size[1]/2, size[0]/2)
 
         # Find the TPF edges
-        xedges = np.asarray([np.max([0, x-s[0]]), np.min([x+s[0], imshape[0] - 1])], dtype=int)
-        yedges = np.asarray([np.max([0, y-s[1]]), np.min([y+s[1], imshape[1] - 1])], dtype=int)
+        row_edges = np.asarray([np.max([0, row-s[0]]), np.min([row+s[0], imshape[0] - 1])],
+                            dtype=int)
+        col_edges = np.asarray([np.max([0, col-s[1]]), np.min([col+s[1], imshape[1] - 1])],
+                            dtype=int)
 
         # Make a copy of the data extension
         hdu = self.hdu[0].copy()
 
         # Find the new object coordinates
         r, d = self.get_coordinates(cadence=len(self.flux)//2)
-        hdu.header['RA_OBJ'] = np.nanmean(r[xedges[0]:xedges[1], yedges[0]:yedges[1]])
-        hdu.header['DEC_OBJ'] = np.nanmean(d[xedges[0]:xedges[1], yedges[0]:yedges[1]])
+        hdu.header['RA_OBJ'] = np.nanmean(r[row_edges[0]:row_edges[1], col_edges[0]:col_edges[1]])
+        hdu.header['DEC_OBJ'] = np.nanmean(d[row_edges[0]:row_edges[1], col_edges[0]:col_edges[1]])
 
         # Remove any KIC labels
         labels = ['*MAG', 'PM*', 'GL*', 'OBJECT', 'PARALLAX', '*COLOR', 'TEFF',
@@ -773,36 +777,37 @@ class TargetPixelFile(object):
         hdr = deepcopy(self.hdu[1].header)
 
         # Trim any columns that have the shape of the image, to be the new shape
-        cols = []
+        data_columns = []
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
-            for idx, col in enumerate(self.hdu[1].columns):
+            for idx, datacol in enumerate(self.hdu[1].columns):
                 # If the column is 3D
-                if (len(self.hdu[1].data[col.name].shape) == 3):
+                if (len(self.hdu[1].data[datacol.name].shape) == 3):
                     # Make a copy, trim it and change the format
-                    col = deepcopy(col)
-                    col.array = col.array[:, xedges[0]:xedges[1], yedges[0]:yedges[1]]
-                    col._dim = '{}'.format(col.array.shape[1:]).replace(' ', '')
-                    col._dims = col.array.shape[1:]
-                    col._format=fits.column._ColumnFormat('{}{}'.format(np.product(col.array.shape[1:]), col._format[-1]))
-                    cols.append(col)
-                    hdr['TDIM{}'.format(idx)] = '{}'.format(col.array.shape[1:]).replace(' ', '')
-                    hdr['TDIM9'] = '{}'.format(col.array.shape[1:]).replace(' ', '')
-                    hdr['TDIM13'] = '{}'.format((0, col.array.shape[1])).replace(' ', '')
+                    datacol = deepcopy(datacol)
+                    datacol.array = datacol.array[:, row_edges[0]:row_edges[1], col_edges[0]:col_edges[1]]
+                    datacol._dim = '{}'.format(datacol.array.shape[1:]).replace(' ', '')
+                    datacol._dims = datacol.array.shape[1:]
+                    datacol._format = fits.column._ColumnFormat('{}{}'.format(np.product(datacol.array.shape[1:]),
+                                                                              datacol._format[-1]))
+                    data_columns.append(datacol)
+                    hdr['TDIM{}'.format(idx)] = '{}'.format(datacol.array.shape[1:]).replace(' ', '')
+                    hdr['TDIM9'] = '{}'.format(datacol.array.shape[1:]).replace(' ', '')
+                    hdr['TDIM13'] = '{}'.format((0, datacol.array.shape[1])).replace(' ', '')
                 else:
-                    cols.append(col)
+                    data_columns.append(datacol)
 
         # Get those coordinates sorted for the corner of the TPF and the WCS
-        hdr['1CRV*P'] = hdr['1CRV4P'] + yedges[0]
-        hdr['2CRV*P'] = hdr['2CRV4P'] + xedges[0]
-        hdr['1CRPX*'] = hdr['1CRPX4'] - yedges[0]
-        hdr['2CRPX*'] = hdr['2CRPX4'] - xedges[0]
+        hdr['1CRV*P'] = hdr['1CRV4P'] + col_edges[0]
+        hdr['2CRV*P'] = hdr['2CRV4P'] + row_edges[0]
+        hdr['1CRPX*'] = hdr['1CRPX4'] - col_edges[0]
+        hdr['2CRPX*'] = hdr['2CRPX4'] - row_edges[0]
 
         # Make a table for the data
-        cols[-1]._dim = '{}'.format((0, int(cols[5]._dim.split(',')[1][:-1]))).replace(' ', '')
+        data_columns[-1]._dim = '{}'.format((0, int(data_columns[5]._dim.split(',')[1][:-1]))).replace(' ', '')
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
-            btbl = fits.BinTableHDU.from_columns(cols, header=hdr)
+            btbl = fits.BinTableHDU.from_columns(data_columns, header=hdr)
 
         # Append it to the hdulist
         hdus.append(btbl)
@@ -810,7 +815,7 @@ class TargetPixelFile(object):
         # Correct the aperture mask
         hdu = self.hdu[2].copy()
         ar = hdu.data
-        ar = ar[xedges[0]:xedges[1], yedges[0]:yedges[1]]
+        ar = ar[row_edges[0]:row_edges[1], col_edges[0]:col_edges[1]]
         hdu.header['NAXIS1'] = ar.shape[0]
         hdu.header['NAXIS2'] = ar.shape[1]
         hdu.data = ar
