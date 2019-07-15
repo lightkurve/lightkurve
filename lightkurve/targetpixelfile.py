@@ -741,13 +741,15 @@ class TargetPixelFile(object):
         if isinstance(size, int):
             s = (size/2, size/2)
         elif isinstance(size, (tuple, list, np.ndarray)):
-            s = (size[1]/2, size[0]/2)
+            s = (size[0]/2, size[1]/2)
 
         # Find the TPF edges
-        row_edges = np.asarray([np.max([0, row-s[0]]), np.min([row+s[0], imshape[0] - 1])],
-                            dtype=int)
-        col_edges = np.asarray([np.max([0, col-s[1]]), np.min([col+s[1], imshape[1] - 1])],
-                            dtype=int)
+        col_edges = np.asarray([np.max([0, col-s[0]]),
+                                np.min([col+s[0], imshape[1] - 1])],
+                               dtype=int)
+        row_edges = np.asarray([np.max([0, row-s[1]]),
+                                np.min([row+s[1], imshape[0] - 1])],
+                               dtype=int)
 
         # Make a copy of the data extension
         hdu = self.hdu[0].copy()

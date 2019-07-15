@@ -533,8 +533,10 @@ def test_cutout():
         assert ntpf.flux[0].shape == (2, 2)
         assert ntpf.flux_err[0].shape == (2, 2)
         assert ntpf.flux_bkg[0].shape == (2, 2)
-        ntpf = tpf.cutout((0, 0), size=2)
-        ntpf = tpf.cutout((0, 0), size=(2, 3))
+        ntpf = tpf.cutout((0, 0), size=3)
+        ntpf = tpf.cutout(size=(1, 2))
+        assert ntpf.flux.shape[1] == 2
+        assert ntpf.flux.shape[2] == 1
         ntpf = tpf.cutout(SkyCoord(tpf.ra, tpf.dec, unit='deg'), size=2)
         ntpf = tpf.cutout(size=2)
         assert np.product(ntpf.flux.shape[1:]) == 4
