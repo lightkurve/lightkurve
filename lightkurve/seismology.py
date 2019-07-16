@@ -353,7 +353,7 @@ class SeismologyButler(object):
         return result
 
 
-    def estimate_numax(self, numaxs=None, window=None, spacing=None):
+    def estimate_numax(self, numaxs=None, window=None, numax_spacing=None):
         """Estimates the peak of the envelope of seismic oscillation modes,
         numax using an autocorrelation function. There are many papers on the
         topic of autocorrelation functions for estimating seismic parameters,
@@ -366,7 +366,8 @@ class SeismologyButler(object):
         fixed width (either given by the user, 25 microhertz for Red Giants or
         250 microhertz for Main Sequence stars) is moved along the power
         spectrum, where the central frequency of the window moves in steps of 1
-        microhertz and evaluates the autocorrelation at each step.
+        microhertz (or given by the user as `numax_spacing`) and evaluates the
+        autocorrelation at each step.
 
         The correlation (numpy.correlate) is typically given as:
 
@@ -413,11 +414,11 @@ class SeismologyButler(object):
             chosen. If no units are given it is assumed to be in the same units
             as the periodogram frequency.
 
-        spacing : int or float
-            The spacing between central frequencies at which the autocorrelation
-            is evaluated. If none is given, a sensible value will be assumed. If
-            no units are given it is assumed to be in teh same units as the
-            periodogram frequency.
+        numax_spacing : int or float
+            The spacing between central frequencies (numaxs) at which the
+            autocorrelation is evaluated. If none is given, a sensible value
+            will be assumed. If no units are given it is assumed to be in the
+            same units as the periodogram frequency.
 
         Returns:
         --------
@@ -426,21 +427,22 @@ class SeismologyButler(object):
             frequency.
         """
 
-        r = self._estimate_numax_acf(numaxs, window, spacing)
+        r = self._estimate_numax_acf(numaxs, window, numax_spacing)
         self._numax_result = r
         return r['best_numax']
 
-    def plot_numax_diagnostics(self, numaxs=None, window=None, spacing=None, return_metric=False):
+    def plot_numax_diagnostics(self, numaxs=None, window=None, numax_spacing=None, return_metric=False):
         """ Returns three diagnostic plots and an estimated value for numax.
 
         [1] The SNRPeriodogram plotted with a red line indicating the estimated
         numax value.
 
         [2] An image showing the 2D autocorrelation. On the y-axis is the
-        frequency lag of the autocorrelation window. On the x-axis is the
-        central frequency at which the autocorrelation was calculated. In the
-        z-axis is the unitless autocorrelatin power. Shown in red is the
-        estmated numax.
+        frequency lag of the autocorrelation window. The width of the window is
+        equal to `window`, and the spacing between lags is equal to
+        `numax_spacing`. On the x-axis is the central frequency at which the
+        autocorrelation was calculated. In the z-axis is the unitless
+        autocorrelation power. Shown in red is the estimated numax.
 
         [3] The Mean Collapsed Correlation (MCC, see Viani et al. 2019) against
         central frequency at which the MCC was calculated. Shown in red is the
@@ -462,11 +464,11 @@ class SeismologyButler(object):
             chosen. If no units are given it is assumed to be in the same units
             as the periodogram frequency.
 
-        spacing : int or float
-            The spacing between central frequencies at which the autocorrelation
-            is evaluated. If none is given, a sensible value will be assumed. If
-            no units are given it is assumed to be in teh same units as the
-            periodogram frequency.
+        numax_spacing : int or float
+            The spacing between central frequencies (numaxs) at which the
+            autocorrelation is evaluated. If none is given, a sensible value
+            will be assumed. If no units are given it is assumed to be in the
+            same units as the periodogram frequency.
 
         return_metric : bool
             If True, returns the metric data shown in the lower diagnostic plot.
@@ -477,7 +479,7 @@ class SeismologyButler(object):
             The matplotlib axes object.
         """
         if self._numax_result is None:
-            self.estimate_numax()
+            self.estimate_numax(numaxs, window, numax_spacing)
         result = self._numax_result
 
         with plt.style.context(MPLSTYLE):
@@ -623,11 +625,11 @@ class SeismologyButler(object):
         """Returns one diagnostic plots and an estimated value for deltanu.
 
         [1] Scaled correlation metric vs frequecy lag of the autocorrelation
-        window, with inset close up on the determined deltanu and a line indicating
-        the determined deltanu.
+        window, with inset close up on the determined deltanu and a line
+        indicating the determined deltanu.
 
-        For details on the deltanu estimation, see the `estimate_deltanu()` function.
-        The calculation performed is identical.
+        For details on the deltanu estimation, see the `estimate_deltanu()`
+        function. The calculation performed is identical.
 
         NOTE: When plotting , we exclude the first frequency lag bin, to
         make the relevant features on the plot clearer.
@@ -648,7 +650,7 @@ class SeismologyButler(object):
             The matplotlib axes object.
         """
         if self._deltanu_result is None:
-            self.estimate_deltanu()
+            self.estimate_deltanu(numax)
 
         result = self._deltanu_result
 
