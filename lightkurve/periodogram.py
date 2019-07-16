@@ -13,7 +13,7 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
 import astropy
 from astropy.table import Table
-from astropy.stats import LombScargle
+from astropy.timeseries.periodograms import LombScargle
 from astropy import units as u
 from astropy.units import cds
 from astropy.convolution import convolve, Box1DKernel, Gaussian1DKernel
@@ -24,6 +24,7 @@ from scipy.signal import find_peaks
 from . import MPLSTYLE
 
 from .utils import LightkurveWarning
+from .lightcurve import LightCurve
 
 log = logging.getLogger(__name__)
 
@@ -332,135 +333,6 @@ class Periodogram(object):
             ax.set_title(title)
         return ax
 
-    def plot_echelle(self, deltanu, numax=None,
-                    minimum_frequency=None, maximum_frequency=None,
-                    scale='linear',
-                    cmap='Blues'):
-        """Plots an echelle diagram of the periodogram by stacking the
-        periodogram in slices of deltanu. Modes of equal radial degree should
-        appear approximately vertically aligned. If no structure is present,
-        you are likely dealing with a faulty deltanu value or a low signal to noise
-        case.
-
-        This method is adapted from work by Daniel Hey & Guy Davies.
-
-        Parameters
-        ----------
-        deltanu : float
-            Value for the large frequency separation of the seismic mode
-            frequencies in the periodogram. Assumed to have the same units as
-            the frequencies, unless given an Astropy unit.
-            Is assumed to be in the same units as frequency if not given a unit.
-
-
-        numax : float
-            Value for the frequency of maximum oscillation. If a numax is
-            passed, a suitable range one FWHM of the mode envelope either side
-            of the will be shown. This is overwritten by custom frequency ranges.
-            Is assumed to be in the same units as frequency if not given a unit.
-
-        minimum_frequency : float
-            The minimum frequency at which to display the echelle
-            Is assumed to be in the same units as frequency if not given a unit.
-
-
-        maximum_frequency : float
-            The maximum frequency at which to display the echelle.
-            Is assumed to be in the same units as frequency if not given a unit.
-
-        scale: str
-            Set z axis to be "linear" or "log". Default is linear.
-
-        cmap : str
-            The name of the matplotlib colourmap to use in the echelle diagram.
-
-        Returns
-        -------
-        ax : matplotlib.axes._subplots.AxesSubplot
-            The matplotlib axes object.
-        """
-
-        # Ensure input deltanu is in the correct units
-        deltanu = u.Quantity(deltanu, self.frequency.unit).value
-
-        fmin = self.frequency[0].value
-        fmax = self.frequency[-1].value
-
-        # Check for any superfluous input
-        if (numax is not None) & (any([a is not None for a in [minimum_frequency, maximum_frequency]])):
-            warnings.warn('You have passed both a numax and a frequency limit'
-                          'The frequency limit will override the numax input')
-
-        # Ensure input numax is in the correct units (if there is one)
-        if numax is not None:
-            numax = u.Quantity(numax, self.frequency.unit).value
-            if numax > self.frequency[-1].value:
-                raise ValueError("You can't pass in a numax outside the"
-                                "frequency range of the periodogram.")
-
-            fmin = numax - 2*self._get_fwhm(numax)
-            if fmin < 0.:
-                fmin = 0.
-
-            fmax = numax + 2*self._get_fwhm(numax)
-            if fmax > self.frequency[-1].value:
-                fmax = self.frequency[-1].value
-
-        # Set limits and set them in the right units
-        if minimum_frequency is not None:
-            fmin =  u.Quantity(minimum_frequency, self.frequency.unit).value
-            if fmin > self.frequency[-1].value:
-                raise ValueError("You can't pass in a limit outside the"
-                                "frequency range of the periodogram.")
-
-        if maximum_frequency is not None:
-            fmax = u.Quantity(maximum_frequency, self.frequency.unit).value
-            if fmax > self.frequency[-1].value:
-                raise ValueError("You can't pass in a limit outside the"
-                                "frequency range of the periodogram.")
-
-        # Add on 1x deltanu so we don't miss off any important range due to rounding
-        if fmax < self.frequency[-1].value - 1.5*deltanu:
-            fmax += deltanu
-
-        fs = np.median(np.diff(self.frequency.value))
-        x0 = int(self.frequency.value[0] / fs)
-
-        ff = self.frequency[int(fmin/fs)-x0:int(fmax/fs)-x0].value   #The the selected frequency range
-        pp = self.power[int(fmin/fs)-x0:int(fmax/fs)-x0].value   #The selected power range
-
-        n_rows = int((ff[-1]-ff[0])/deltanu)     #The number of stacks to use
-        n_columns = int(deltanu/fs)               #The number of elements in each stack
-
-        #Reshape the power into n_rowss of n_columnss
-        ep = np.reshape(pp[:(n_rows*n_columns)],(n_rows,n_columns))
-
-        if scale=='log':
-            ep = np.log10(ep)
-
-        #Reshape the freq into n_rowss of n_columnss & create arays
-        ef = np.reshape(ff[:(n_rows*n_columns)],(n_rows,n_columns))
-        x_f = ((ef[0,:]-ef[0,0]) % deltanu)
-        y_f = (ef[:,0])
-
-        #Plot the echelle diagram
-        with plt.style.context(MPLSTYLE):
-            fig, ax = plt.subplots()
-
-            extent = (x_f[0],x_f[-1],y_f[0],y_f[-1])
-            figsize = plt.rcParams['figure.figsize']
-            a = figsize[1]/figsize[0]
-            b = (extent[3]-extent[2])/extent[1]
-
-            ax.imshow(ep,cmap=cmap, aspect=a/b, origin='lower',
-                     extent=extent)
-
-            ax.set_xlabel(r'Frequency mod. {:.2f} {}'.format(deltanu,
-                                        self.frequency.unit.to_string('latex')))
-            ax.set_ylabel(r'Frequency [{}]'.format(self.frequency.unit.to_string('latex')))
-            ax.set_title('Echelle diagram for {}'.format(self.label))
-
-        return ax
 
     def flatten(self, method='logmedian', filter_width=0.01, return_trend=False):
         """Estimates the Signal-To-Noise (SNR) spectrum by dividing out an
@@ -506,47 +378,6 @@ class Periodogram(object):
         if return_trend:
             return snr, bkg
         return snr
-
-    def _get_fwhm(self, numax):
-        """In a power spectrum of a solar-like oscillator, the power of the
-        modes of oscillation will appear in the shape of that looks
-        approximately Gaussian, for all basic purposes, also referred to as the
-        'mode envelope'. For a given numax (the central frequency of the mode
-        envelope), the expected Full Width Half Maximum of the envelope is known
-        as a function of numax for evolved Red Giant Branch stars as follows
-        (see Mosser et al 2010):
-
-        fwhm = 0.66 * numax^0.88 .
-
-        If the maximum frequency in the periodogram is less than 500 microhertz,
-        this function will default to the above equation under the assumption it
-        is dealing with an RGB star, which oscillate at lower frequencies.
-
-        If the maximum frequency is above 500 microhertz, the envelope is given
-        as a different function of numax (see Lund et al. 2017), as
-
-        fwhm = 0.25 * numax,
-
-        in which case the function assumes it is dealing with a main sequence
-        star, which oscillate at higher frequencies.
-
-        Parameters:
-        ----------
-            numax : float
-                The estimated position of the numax of the power spectrum. This
-                is used to calculated the region autocorrelated with itself.
-
-        Returns:
-        --------
-            fwhm: float
-                The estimate full-width-half-maximum of the seismic mode envelope
-        """
-        #Calculate the index FWHM for a given numax
-        if u.Quantity(self.frequency[-1], u.microhertz) > u.Quantity(500., u.microhertz):
-            fwhm = 0.25 * numax
-        else:
-            fwhm = 0.66 * numax**0.88
-        return fwhm
 
     def to_table(self):
         """Exports the Periodogram as an Astropy Table.
@@ -689,6 +520,17 @@ class Periodogram(object):
         print('lightkurve.Periodogram properties:')
         output.pprint(max_lines=-1, max_width=-1)
 
+    def to_seismology(self,**kwargs):
+        """Converts the periodogram to a `lightkurve.seismology.SeismologyButler` spectrum object.
+
+        Returns
+        -------
+        seismologybutler : `lightkurve.seismology.SeismologyButler`
+            Helper object to run asteroseismology methods
+        """
+        from .seismology import SeismologyButler
+        return SeismologyButler.from_periodogram(periodogram=self, **kwargs)
+
 
 class SNRPeriodogram(Periodogram):
     """Defines a Signal-to-Noise Ratio (SNR) Periodogram class.
@@ -721,460 +563,15 @@ class SNRPeriodogram(Periodogram):
             ax.set_ylabel("Signal to Noise Ratio (SNR)")
         return ax
 
-    def estimate_numax(self, numaxs=None, window=None, spacing=None):
-        """Estimates the peak of the envelope of seismic oscillation modes,
-        numax using an autocorrelation function. There are many papers on the
-        topic of autocorrelation functions for estimating seismic parameters,
-        including but not limited to: Roxburgh & Vorontsov (2006),
-        Roxburgh (2009), Mosser & Appourchaux (2009), Huber et al. (2009),
-        Verner & Roxburgh (2011) & Viani et al. (2019).
-
-        We base this approach first and foremost off the 2D ACF numax estimation
-        presented in Viani et al. (2019) and other papers above. A window of
-        fixed width (either given by the user, 25 microhertz for Red Giants or
-        250 microhertz for Main Sequence stars) is moved along the power
-        spectrum, where the central frequency of the window moves in steps of 1
-        microhertz and evaluates the autocorrelation at each step.
-
-        The correlation (numpy.correlate) is typically given as:
-
-        C[x, y] = sum( x * conj(y) ) .
-
-        The autocorrelation power of a full spectrum with itself is then
-
-        C = sum(s * s),
-
-        where s is a window of the signal-to-noise spectrum.
-        In order to evaluate where the correlation power is highest (indicative
-        of the power excess of the modes) we calculate the Mean Collapsed
-        Correlation (MCC, see Kiefer 2013, Viani et al. 2019) as
-
-        MCC = (sum(|C|) - 1) / nlags ,
-
-        where C is the autocorrelation power at a given central freqeuncy, and
-        nlags is the number of lags in the autocorrelation.
-
-        The MCC metric is covolved with an Astropy Gaussian 1D Kernel with a
-        standard deviation of 1/5th of the window size to smooth it. The
-        frequency that results in the highest value of the smoothed MCC is the
-        detected numax.
-
-        NOTE: This method is not robust against large peaks in the spectrum (due
-        to e.g. spacecraft rotation), nor is it robust in the case of low signal
-        to noise (such as for single sector TESS data). Exercise caution when
-        using this module!
-
-        NOTE: This function is intended for use with solar like Main Sequence
-        and Red Giant Branch oscillators only.
-
-        Parameters:
-        -----------
-        numaxs : array-like
-            An array of numaxs at which to evaluate the autocorrelation. If
-            none is given, a sensible range will be chosen. If no units are
-            given it is assumed to be in the same units as the periodogram
-            frequency.
-
-        window : int or float
-            The width of the autocorrelation window around each central
-            frequency in 'numaxs'. If none is given, a sensible value will be
-            chosen. If no units are given it is assumed to be in the same units
-            as the periodogram frequency.
-
-        spacing : int or float
-            The spacing between central frequencies at which the autocorrelation
-            is evaluated. If none is given, a sensible value will be assumed. If
-            no units are given it is assumed to be in teh same units as the
-            periodogram frequency.
-
-        Returns:
-        --------
-        numax : float
-            The numax of the periodogram. In the units of the periodogram object
-            frequency.
-        """
-
-        numax,_,_,_,_,_ = self._estimate_numax(numaxs, window, spacing)
-        return numax
-
-    def plot_numax_diagnostics(self, numaxs=None, window=None, spacing=None, return_metric=False):
-        """ Returns three diagnostic plots and an estimated value for numax.
-
-        [1] The SNRPeriodogram plotted with a red line indicating the estimated
-        numax value.
-
-        [2] An image showing the 2D autocorrelation. On the y-axis is the
-        frequency lag of the autocorrelation window. On the x-axis is the
-        central frequency at which the autocorrelation was calculated. In the
-        z-axis is the unitless autocorrelatin power. Shown in red is the
-        estmated numax.
-
-        [3] The Mean Collapsed Correlation (MCC, see Viani et al. 2019) against
-        central frequency at which the MCC was calculated. Shown in red is the
-        estimated numax. Shown in blue is the MCC convolved with a Gaussian
-        smoothing kernel with a standard deviation of 1/5th the window size.
-
-        For details on the numax estimation, see the `estimate_numax()` function.
-        The calculation performed is identical
-
-        Parameters:
-        -----------
-        numaxs : array-like
-            An array of numaxs at which to evaluate the autocorrelation. If
-            none is given, a sensible range will be chosen.
-
-        window : int or float
-            The width of the autocorrelation window around each central
-            frequency in 'numaxs'. If none is given, a sensible value will be
-            chosen. If no units are given it is assumed to be in the same units
-            as the periodogram frequency.
-
-        spacing : int or float
-            The spacing between central frequencies at which the autocorrelation
-            is evaluated. If none is given, a sensible value will be assumed. If
-            no units are given it is assumed to be in teh same units as the
-            periodogram frequency.
-
-        return_metric : bool
-            If True, returns the metric data shown in the lower diagnostic plot.
-
-        Returns:
-        --------
-        numax : float
-            The numax of the periodogram. In the units of the periodogram object
-            frequency.
-        ax : matplotlib.axes._subplots.AxesSubplot
-            The matplotlib axes object.
-        metric : ndarray
-            The (unsmoothed) autocorrelation metric shown in the diagnostic plot.
-            Only returned if `return_metric = True`.
-        """
-        numax, numaxrange, acf2d, window, metric, metric_smooth = self._estimate_numax(numaxs, window, spacing)
-
-        with plt.style.context(MPLSTYLE):
-            fig, ax = plt.subplots(3,sharex=True,figsize=(8.485, 12))
-            self.plot(ax=ax[0])
-            ax[0].set_ylabel(r'SNR')
-            ax[0].set_title(r'SNR vs Frequency')
-            ax[0].set_xlabel(None)
-
-            windowarray = np.linspace(0, window, num=acf2d.shape[1])
-            extent = (numaxrange[0],numaxrange[-1],windowarray[0],windowarray[-1])
-            figsize = [8.485, 4]
-            a = figsize[1]/figsize[0]
-            b = (extent[3]-extent[2])/(extent[1]-extent[0])
-
-            ax[1].imshow(acf2d,cmap='Blues', aspect=a/b, origin='lower',extent=extent)
-            ax[1].set_ylabel(r'Frequency lag [{}]'.format(self.frequency.unit.to_string('latex')))
-
-            ax[2].plot(numaxrange,metric)
-            ax[2].plot(numaxrange,metric_smooth)
-            ax[2].set_xlabel("Frequency [{}]".format(self.frequency.unit.to_string('latex')))
-            ax[2].set_ylabel(r'Correlation Metric')
-            ax[0].axvline(numax.value,c='r', linewidth=2,alpha=.4)
-            ax[1].axvline(numax.value,c='r', linewidth=2,alpha=.4)
-            ax[2].axvline(numax.value,c='r', linewidth=2,alpha=.4,
-                label=r'{:.1f} {}'.format(numax.value,
-                                    self.frequency.unit.to_string('latex')))
-            ax[2].legend()
-
-        if return_metric:
-            return numax, ax, metric
-        else:
-            return numax, ax
-
-    def _estimate_numax(self, numaxs, window, spacing):
-        """
-        Helper function to perform the numax estimation for both the
-        `estimate_numax()` and `plot_numax_diagnostics()` functions.
-
-        For details, see the `estimate_numax()` function.
-        """
-        # Run some checks on the passed in numaxs
-        if numaxs is not None:
-            numaxs = u.Quantity(numaxs, self.frequency.unit).value
-            fs = np.median(np.diff(self.frequency.value))
-            if any(numaxs < fs):
-                raise ValueError("A custom range of numaxs can not extend below "
-                                "a single frequency bin.")
-            if any(numaxs > np.nanmax(self.frequency.value)):
-                raise ValueError("A custom range of numaxs can not extend above "
-                                "the highest frequency value in the periodogram.")
-
-        # Run some checks on the window size
-        if window is not None:
-            window = u.Quantity(window, self.frequency.unit).value
-            fs = np.median(np.diff(self.frequency.value))
-            if window < fs:
-                raise ValueError("You can't have a window smaller than the "
-                                "frequency separation!")
-            if window > (self.frequency[-1].value - self.frequency[0].value):
-                raise ValueError("You can't have a window wider than the entire "
-                                "power spectrum!")
-            if window < 0:
-                raise ValueError("Please pass a positive window.")
-
-        # Run some checks on the spacing size
-        if spacing is not None:
-            spacing = u.Quantity(spacing, self.frequency.unit).value
-            fs = np.median(np.diff(self.frequency.value))
-            if spacing < fs:
-                raise ValueError("You can't have a spacing smaller than the "
-                                "frequency separation!")
-            if spacing > (self.frequency[-1].value - self.frequency[0].value):
-                raise ValueError("You can't have a spacing wider than the entire "
-                                "power spectrum!")
-            if spacing < 0:
-                raise ValueError("Please pass a positive spacing.")
-
-        # Calculate the window size
-        if window is None:
-            if u.Quantity(self.frequency[-1], u.microhertz) > u.Quantity(500., u.microhertz):
-                window = u.Quantity(250., u.microhertz).to(self.frequency.unit).value
-            else:
-                window = u.Quantity(25., u.microhertz).to(self.frequency.unit).value
-
-        # Calculate the spacing size
-        if spacing is None:
-            if u.Quantity(self.frequency[-1], u.microhertz) > u.Quantity(500., u.microhertz):
-                spacing = u.Quantity(10., u.microhertz).to(self.frequency.unit).value
-            else:
-                spacing = u.Quantity(1., u.microhertz).to(self.frequency.unit).value
-
-        if numaxs is None:
-            numaxs = np.arange(np.ceil(np.nanmin(self.frequency.value)) + window/2,
-                        np.floor(np.nanmax(self.frequency.value)) - window/2,
-                        spacing)
-
-        #We want to find the numax which returns in the highest autocorrelation
-        #power, rescaled based on filter width
-        fs = np.median(np.diff(self.frequency.value))
-
-        metric = np.zeros(len(numaxs))
-        acf2d = np.zeros([int(window/2/fs)*2,len(numaxs)])
-        for idx, numax in enumerate(numaxs):
-            acf = self._autocorrelate(numax, window=window)      #Return the acf at this numax
-            acf2d[:,idx] = acf                                     #Store the 2D acf
-            metric[idx] = (np.sum(np.abs(acf)) - 1 ) / len(acf)  #Store the max acf power normalised by the length
-
-        # Smooth the data to find the peak
-        g = Gaussian1DKernel(stddev=np.sqrt(len(metric)))
-        metric_smooth = convolve(metric, g)
-        best_numax = numaxs[np.argmax(metric_smooth)]     #The highest value of the metric corresponds to numax
-
-        return u.Quantity(best_numax, self.frequency.unit), \
-                numaxs, acf2d, window, metric, metric_smooth
-
-    def estimate_deltanu(self, numax=None):
-        """ Estimates the average value of the large frequency spacing, DeltaNu,
-        of the seismic oscillations of the target, using an autocorrelation
-        function. There are many papers on the topic of autocorrelation
-        functions for estimating seismic parameters, including but not limited
-        to: Roxburgh & Vorontsov (2006), Roxburgh (2009),
-        Mosser & Appourchaux (2009), Huber et al. (2009),
-        Verner & Roxburgh (2011) & Viani et al. (2019).
-
-        We base this approach first and foremost off the approach taken in
-        Mosser & Appourchaux (2009). Given a known numax, a window around this
-        numax is taken of one estimated full-width-half-maximum (FWHM) of the
-        seismic mode envelope either side of numax. This width is chosen so that
-        the autocorrelation includes all of the visible mode peaks.
-
-        The autocorrelation (numpy.correlate) is given as:
-
-        C = sum(s * s)
-
-        where s is a window of the signal-to-noise spectrum. When shifting
-        the spectrum over itself, C will increase when two mode peaks are
-        overlapping.
-
-        As is done in Mosser & Appourchaux, we rescale the value of C in terms
-        of the noise level in the ACF spectrum as
-
-        A = |C^2| / |C[0]^2|) * (2 * len(C) / 3) .
-
-        The method will autocorrelate the region around the estimated numax
-        expected to contain seismic oscillation modes. Repeating peaks in the
-        autocorrelation implies an evenly spaced structure of modes.
-        The peak closest to an empirical estimate of deltanu is taken as the true
-        value. The peak finding algorithm is limited by a minimum spacing
-        between peaks of 0.5 times the empirical value for deltanu.
-
-        Our empirical estimate for numax is taken from Stello et al. (2009) as
-
-        deltanu = 0.294 * numax^0.772
-
-        If `numax` is None, a numax is calculated using the estimate_numax()
-        function with default settings.
-
-        NOTE: This function is intended for use with solar like Main Sequence
-        and Red Giant Branch oscillators only.
-
-        Parameters:
-        ----------
-        numax : float
-            An estimated numax value of the mode envelope in the periodogram. If
-            not given units it is assumed to be in units of the periodogram
-            frequency attribute.
-
-        Returns:
-        -------
-        deltanu : float
-            The average large frequency spacing of the seismic oscillation modes.
-            In units of the periodogram frequency attribute.
-        """
-
-        deltanu,_,_,_,_ = self._estimate_deltanu(numax)
-        return deltanu
-
-    def plot_deltanu_diagnostics(self, numax=None, return_metric=False):
-        """ Returns one diagnostic plots and an estimated value for deltanu.
-
-        [1] Scaled correlation metric vs frequecy lag of the autocorrelation
-        window, with inset close up on the determined deltanu and a line indicating
-        the determined deltanu.
-
-        For details on the deltanu estimation, see the `estimate_deltanu()` function.
-        The calculation performed is identical.
-
-        NOTE: When plotting , we exclude the first frequency lag bin, to
-        make the relevant features on the plot clearer.
-
-        Parameters:
-        -----------
-        numax : float
-            An estimated numax value of the mode envelope in the periodogram. If
-            not given units it is assumed to be in units of the periodogram
-            frequency attribute.
-
-        return_metric : bool
-            If True, returns the metric data shown in the lower diagnostic plot.
-
-        Returns:
-        --------
-        deltanu : float
-            The average large frequency spacing of the seismic oscillation modes.
-            In units of the periodogram frequency attribute.
-
-        ax : matplotlib.axes._subplots.AxesSubplot
-            The matplotlib axes object.
-
-        metric : ndarray
-            The (unsmoothed) autocorrelation metric shown in the diagnostic plot.
-            Only returned if `return_metric = True`.
-        """
-        deltanu, lags, metric, peaks, sel = self._estimate_deltanu(numax)
-
-        with plt.style.context(MPLSTYLE):
-            fig, ax = plt.subplots()
-            # ax.plot(lags, acf/acf[0])
-            ax.plot(lags[1:], metric[1:])
-            ax.set_xlabel("Frequency Lag [{}]".format(self.frequency.unit.to_string('latex')))
-            ax.set_ylabel(r'Scaled Correlation')
-            ax.axvline(deltanu.value,c='r', linewidth=2,alpha=.4)
-            ax.set_title(r'Scaled Correlation vs Lag for a given $\nu_{\rm max}$')
-
-            axin = inset_axes(ax, width="50%",height="50%", loc="upper right")
-            axin.set_yticks([])
-            axin.plot(lags[sel],metric[sel])
-            axin.scatter(lags[sel][peaks], metric[sel][peaks],c='r',s=5)
-            axin.axvline(deltanu.value,c='r', linewidth=2,alpha=.4,
-                label=r'{:.1f} {}'.format(deltanu.value,
-                                    self.frequency.unit.to_string('latex')))
-            axin.legend(loc='best')
-
-        if return_metric:
-            return deltanu, ax, metric
-        else:
-            return deltanu, ax
-
-    def _estimate_deltanu(self, numax):
-        """
-        Helper function to perform the deltanu estimation for both the
-        `estimate_deltanu()` and `plot_deltanu_diagnostics()` functions.
-
-        For details, see the `estimate_deltanu()` function.
-        """
-
-        # Run some checks on the passed in numaxs
-        if numax is not None:
-            # Ensure input numax is in the correct units
-            numax = u.Quantity(numax, self.frequency.unit)
-            fs = np.median(np.diff(self.frequency.value))
-            if numax.value < fs:
-                raise ValueError("The input numax can not be lower than"
-                                " a single frequency bin.")
-            if numax.value > np.nanmax(self.frequency.value):
-                raise ValueError("The input numax can not be higher than"
-                                "the highest frequency value in the periodogram.")
-
-        elif numax is None:
-            #Estimate numax using the default settings
-            numax = self.estimate_numax()
-
-        #Calcluate deltanu using the method by Stello et al. 2009
-        #Make sure that this relation only ever happens in microhertz space
-        deltanu_emp = u.Quantity((0.294 * u.Quantity(numax, u.microhertz).value ** 0.772)*u.microhertz,
-                            self.frequency.unit).value
-
-        window = 2*int(np.floor(self._get_fwhm(numax.value)))
-        aacf = self._autocorrelate(numax = numax.value, window=window)
-        acf = (np.abs(aacf**2)/np.abs(aacf[0]**2)) / (3/(2*len(aacf)))
-        fs = np.median(np.diff(self.frequency.value))
-        lags = np.linspace(0., len(acf)*fs, len(acf))
-
-        #Select a 25% region region around the empirical deltanu
-        sel = (lags > deltanu_emp - .25*deltanu_emp) & (lags < deltanu_emp + .25*deltanu_emp)
-
-        #Run a peak finder on this region
-        peaks, _ = find_peaks(acf[sel], distance=np.floor(deltanu_emp/2. / fs))
-
-        #Select the peak closest to the empirical value
-        best_deltanu = lags[sel][peaks][np.argmin(np.abs(lags[sel][peaks] - deltanu_emp))]
-
-        return u.Quantity(best_deltanu, self.frequency.unit),\
-                lags, acf, peaks, sel
-
-    def _autocorrelate(self, numax, window=25.):
-        """An autocorrelation function (ACF) for seismic mode envelopes.
-        We autocorrelate the region one full-width-half-maximum (FWHM) of the
-        mode envelope either side of the proposed numax.
-        Before autocorrelating, it multiplies the section with a hanning
-        window, which will increase the autocorrelation power if the region
-        has a Gaussian shape, as we'd expect for seismic oscillations.
-
-        Parameters:
-        ----------
-            numax : float
-                The estimated position of the numax of the power spectrum. This
-                is used to calculated the region autocorrelated with itself.
-
-            window : int or float
-                The width of the autocorrelation window around the central
-                frequency numax.
-
-        Returns:
-        --------
-            acf : array-like
-                The autocorrelation power calculated for the given numax
-        """
-        fs = np.median(np.diff(self.frequency.value))
-
-        spread = int(window/2/fs)                           # Find the spread in indices
-        x = int(numax / fs)                                 # Find the index value of numax
-        x0 = int((self.frequency[0].value/fs))              # Transform in case the index isn't from 0
-        xt = x - x0
-        p_sel = self.power[xt-spread:xt+spread].value       # Make the window selection
-
-        C = np.correlate(p_sel, p_sel, mode='full')         #Correlated the resulting SNR space with itself
-        C = C[len(p_sel)-1:]                                #Truncate the ACF
-        return C
-
 class LombScarglePeriodogram(Periodogram):
     """Subclass of :class:`Periodogram <lightkurve.periodogram.Periodogram>`
     representing a power spectrum generated using the Lomb Scargle method.
     """
     def __init__(self, *args, **kwargs):
+        self._LS_object = kwargs.pop("ls_obj", None)
+        self.nterms = kwargs.pop("nterms", 1)
+        self.lc = kwargs.pop("lc", None)
+        self.ls_method = kwargs.pop("ls_method", 'fastchi2')
         super(LombScarglePeriodogram, self).__init__(*args, **kwargs)
 
     def __repr__(self):
@@ -1185,7 +582,7 @@ class LombScarglePeriodogram(Periodogram):
                         minimum_period=None, maximum_period=None,
                         frequency=None, period=None,
                         nterms=1, nyquist_factor=1, oversample_factor=None,
-                        freq_unit=None, normalization="amplitude",
+                        freq_unit=None, normalization="amplitude", ls_method='fast',
                         **kwargs):
         """Creates a Periodogram from a LightCurve using the Lomb-Scargle method.
 
@@ -1312,14 +709,16 @@ class LombScarglePeriodogram(Periodogram):
             Returns a Periodogram object extracted from the lightcurve.
         """
         # If the defaults are used, issue a warning to point out they changed!
-        if normalization == 'amplitude' and freq_unit is None and oversample_factor is None:
-            warnings.warn("As of Lightkurve v1.0.0 (Apr 2019), the default behavior "
-                          "of Lomb Scargle periodograms changed to use "
-                          "normalization='amplitude' and oversample_factor=5 "
-                          "(the previous defaults were normalization='psd' and "
-                          "oversample_factor=1). You can suppress this warning using "
-                          "`warnings.filterwarnings('ignore', category=lk.LightkurveWarning)`.",
-                          LightkurveWarning)
+        # if normalization == 'amplitude' and freq_unit is None and oversample_factor is None:
+        #     warnings.warn("As of Lightkurve v1.0.0 (Apr 2019), the default behavior "
+        #                   "of Lomb Scargle periodograms changed to use "
+        #                   "normalization='amplitude' and oversample_factor=5 "
+        #                   "(the previous defaults were normalization='psd' and "
+        #                   "oversample_factor=1). You can suppress this warning using "
+        #                   "`warnings.filterwarnings('ignore', category=lk.LightkurveWarning)`.",
+        #                   LightkurveWarning)
+
+        # Carry the input light curve
 
         # Input validation for spectrum type
         if normalization not in ('psd', 'amplitude'):
@@ -1356,7 +755,10 @@ class LombScarglePeriodogram(Periodogram):
             maximum_frequency = kwargs.pop("max_frequency", None)
 
         # Make sure the lightcurve object is normalized
-        lc = lc.normalize()
+        if not np.in1d(lc.flux, lc.normalize().flux).all():
+            warnings.warn("Input light curve will be normalized.",
+                          LightkurveWarning)
+            lc = lc.normalize()
 
         # Check if any values of period have been passed and set format accordingly
         if not all(b is None for b in [period, minimum_period, maximum_period]):
@@ -1374,8 +776,10 @@ class LombScarglePeriodogram(Periodogram):
             raise ValueError('Lightcurve contains NaN values. Use lc.remove_nans()'
                              ' to remove NaN values from a LightCurve.')
 
-        # Hard coding that time is in days.
-        time = lc.time.copy() * u.day
+        if lc.time_format in ['bkjd', 'btjd', 'd', 'days', 'day', None]:
+            time = lc.time.copy() * u.day
+        else:
+            raise NotImplementedError('time in format {} is not supported.'.format(lc.time_format))
 
         # Approximate Nyquist Frequency and frequency bin width in terms of days
         nyquist = 0.5 * (1./(np.median(np.diff(time))))
@@ -1430,25 +834,37 @@ class LombScarglePeriodogram(Periodogram):
         # Convert to desired units
         frequency = u.Quantity(frequency, freq_unit)
 
-        if nterms > 1:
-            raise NotImplementedError('Increasing the number of terms is not implemented yet.')
-        else:
-            method = 'fast'
+
 
         if period is not None:
-            method = 'slow'
+            if ls_method is 'fastchi2':
+                ls_method = 'chi2'
+            elif ls_method is 'fast':
+                ls_method = 'slow'
+
+#            ls_method = 'chi2'
             log.warning("You have passed an evenly-spaced grid of periods. "
                         "These are not evenly spaced in frequency space.\n"
-                        "Method has been set to 'slow' to allow for this.")
+                        "Method has been set to '{}' to allow for this.".format(ls_method))
+
+        if (nterms > 1) and (ls_method not in ['fastchi2', 'chi2']):
+            warnings.warn("Building a Lomb Scargle Periodogram using the `slow` method. "
+                            "`nterms` has been set to >1, however this is not supported under the `{}` method. "
+                            "To run with higher nterms, set `ls_method` to either 'fastchi2', or 'chi2'. "
+                            "Please refer to the `astropy.timeseries.periodogram.LombScargle` documentation.".format(ls_method),
+                          LightkurveWarning)
+            nterms = 1
+
+
         flux_scaling = 1e6
         if float(astropy.__version__[0]) >= 3:
             LS = LombScargle(time, lc.flux * flux_scaling,
                              nterms=nterms, normalization='psd', **kwargs)
-            power = LS.power(frequency, method=method)
+            power = LS.power(frequency, method=ls_method)
         else:
             LS = LombScargle(time, lc.flux * flux_scaling,
                              nterms=nterms, **kwargs)
-            power = LS.power(frequency, method=method, normalization='psd')
+            power = LS.power(frequency, method=ls_method, normalization='psd')
 
         # Power spectral density
         if normalization == 'psd':
@@ -1467,7 +883,40 @@ class LombScarglePeriodogram(Periodogram):
         # Periodogram needs properties
         return LombScarglePeriodogram(frequency=frequency, power=power, nyquist=nyquist,
                                       targetid=lc.targetid, label=lc.label,
-                                      default_view=default_view)
+                                      default_view=default_view, ls_obj=LS,
+                                      nterms=nterms, ls_method=ls_method, lc=lc)
+
+
+    def flux_model(self, time=None, frequency=None):
+        '''Obtain the flux model for a given frequency and time
+
+        Parameters
+        ----------
+        time : np.ndarray
+            Time points to evaluate model. Default is the original
+            input light curve time.
+        frequency : frequency to evaluate model. Default is the frequency at
+                    max power.
+
+        Returns
+        -------
+        result : lightkurve.LightCurve
+            Model object with the time and flux model
+        '''
+        if self._LS_object is None:
+            raise ValueError('No `astropy` Lomb Scargle object exists.')
+
+        if time is None:
+            if self.lc.time_format in ['bkjd', 'btjd', 'd', 'days', 'day', None]:
+                time = self.lc.time.copy() * u.day
+            else:
+                raise NotImplementedError('time in format {} is not supported.'.format(self.lc.time_format))
+        if frequency is None:
+            frequency = self.frequency_at_max_power
+        f = self._LS_object.model(time, frequency)
+        return LightCurve(time, f, label='LS Model', meta={'frequency':frequency},
+                            targetid='{} LS Model'.format(self.lc.targetid)).normalize()
+
 
 
 class BoxLeastSquaresPeriodogram(Periodogram):
