@@ -8,6 +8,7 @@ import warnings
 
 import numpy as np
 from matplotlib import pyplot as plt
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import astropy
 from astropy import units as u
 from astropy import constants as const
@@ -18,6 +19,8 @@ from uncertainties import ufloat
 from uncertainties import umath
 
 from . import MPLSTYLE
+
+from scipy.signal import find_peaks
 
 from .utils import LightkurveWarning
 
@@ -41,7 +44,7 @@ class SeismologyButler(object):
         self.frequency = periodogram.frequency
         self.power = periodogram.power
         self._numax_result = None
-        self._delta_nu_result = None
+        self._deltanu_result = None
 
 #        super(LombScarglePeriodogram, self).__init__(*args, **kwargs)
 
@@ -511,20 +514,16 @@ class SeismologyButler(object):
         """
 
         # Run some checks on the passed in numaxs
-        if numax is not None:
-            # Ensure input numax is in the correct units
-            numax = u.Quantity(numax, self.frequency.unit)
-            fs = np.median(np.diff(self.frequency.value))
-            if numax.value < fs:
-                raise ValueError("The input numax can not be lower than"
-                                " a single frequency bin.")
-            if numax.value > np.nanmax(self.frequency.value):
-                raise ValueError("The input numax can not be higher than"
-                                "the highest frequency value in the periodogram.")
+        # Ensure input numax is in the correct units
+        numax = u.Quantity(numax, self.frequency.unit)
+        fs = np.median(np.diff(self.frequency.value))
+        if numax.value < fs:
+            raise ValueError("The input numax can not be lower than"
+                            " a single frequency bin.")
+        if numax.value > np.nanmax(self.frequency.value):
+            raise ValueError("The input numax can not be higher than"
+                            "the highest frequency value in the periodogram.")
 
-        elif numax is None:
-            #Estimate numax using the default settings
-            numax = self.estimate_numax()
 
         #Calcluate deltanu using the method by Stello et al. 2009
         #Make sure that this relation only ever happens in microhertz space
@@ -546,8 +545,9 @@ class SeismologyButler(object):
         #Select the peak closest to the empirical value
         best_deltanu = lags[sel][peaks][np.argmin(np.abs(lags[sel][peaks] - deltanu_emp))]
 
-        return u.Quantity(best_deltanu, self.frequency.unit),\
-                lags, acf, peaks, sel
+        result = {'best_deltanu':u.Quantity(best_deltanu, self.frequency.unit),
+                'lags':lags, 'acf':acf, 'peaks':peaks, 'sel':sel}
+        return result
 
     def estimate_deltanu(self, numax=None, method='acf'):
         """ Estimates the average value of the large frequency spacing, DeltaNu,
@@ -607,9 +607,13 @@ class SeismologyButler(object):
             The average large frequency spacing of the seismic oscillation modes.
             In units of the periodogram frequency attribute.
         """
-        deltanu,_,_,_,_ = self._estimate_deltanu_acf(numax)
-        #self._deltanu_result = r
-        return deltanu
+        if numax is None:
+            if self._numax_result is None:
+                self.estimate_numax()
+            numax = self._numax_result['best_numax']
+        r= self._estimate_deltanu_acf(numax)
+        self._deltanu_result = r
+        return r['best_deltanu']
 
     def plot_deltanu_diagnostics(self, numax=None, return_metric=False):
         """Returns one diagnostic plots and an estimated value for deltanu.
@@ -636,41 +640,33 @@ class SeismologyButler(object):
 
         Returns:
         --------
-        deltanu : float
-            The average large frequency spacing of the seismic oscillation modes.
-            In units of the periodogram frequency attribute.
-
         ax : matplotlib.axes._subplots.AxesSubplot
             The matplotlib axes object.
-
-        metric : ndarray
-            The (unsmoothed) autocorrelation metric shown in the diagnostic plot.
-            Only returned if `return_metric = True`.
         """
-        deltanu, lags, metric, peaks, sel = self._estimate_deltanu_acf(numax)
+        if self._deltanu_result is None:
+            self.estimate_deltanu()
+
+        result = self._deltanu_result
 
         with plt.style.context(MPLSTYLE):
             fig, ax = plt.subplots()
             # ax.plot(lags, acf/acf[0])
-            ax.plot(lags[1:], metric[1:])
+            ax.plot(result['lags'][1:], result['acf'][1:])
             ax.set_xlabel("Frequency Lag [{}]".format(self.frequency.unit.to_string('latex')))
             ax.set_ylabel(r'Scaled Correlation')
-            ax.axvline(deltanu.value,c='r', linewidth=2,alpha=.4)
+            ax.axvline(result['best_deltanu'].value,c='r', linewidth=2,alpha=.4)
             ax.set_title(r'Scaled Correlation vs Lag for a given $\nu_{\rm max}$')
 
             axin = inset_axes(ax, width="50%",height="50%", loc="upper right")
             axin.set_yticks([])
-            axin.plot(lags[sel],metric[sel])
-            axin.scatter(lags[sel][peaks], metric[sel][peaks],c='r',s=5)
-            axin.axvline(deltanu.value,c='r', linewidth=2,alpha=.4,
-                label=r'{:.1f} {}'.format(deltanu.value,
+            axin.plot(result['lags'][result['sel']],result['acf'][result['sel']])
+            axin.scatter(result['lags'][result['sel']][result['peaks']], result['acf'][result['sel']][result['peaks']],c='r',s=5)
+            axin.axvline(result['best_deltanu'].value,c='r', linewidth=2,alpha=.4,
+                label=r'{:.1f} {}'.format(result['best_deltanu'].value,
                                     self.frequency.unit.to_string('latex')))
             axin.legend(loc='best')
 
-        if return_metric:
-            return deltanu, ax, metric
-        else:
-            return deltanu, ax
+            return ax
 
 
     def estimate_radius(numax, deltanu, Teff, numax_err=None, deltanu_err=None, Teff_err=None):
