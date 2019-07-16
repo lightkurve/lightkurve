@@ -333,3 +333,15 @@ def test_corrupt_download_handling():
         with pytest.raises(SearchError) as err:
             search_targetpixelfile("Kepler-10", quarter=4).download(download_dir=tmpdirname)
         assert "The file was likely only partially downloaded." in err.value.args[0]
+
+
+def test_filenotfound():
+    """Regression test for #540; ensure lk.open() yields `FileNotFoundError`."""
+    # Python 2 uses IOError instead of FileNotFoundError;
+    # the block below can be removed when we drop Python 2 support.
+    try:
+        FileNotFoundError
+    except NameError:
+        FileNotFoundError = IOError
+    with pytest.raises(FileNotFoundError):
+        open("DOESNOTEXIST")
