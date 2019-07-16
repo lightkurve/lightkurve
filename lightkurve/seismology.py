@@ -110,11 +110,11 @@ class SeismologyButler(object):
 
     def _autocorrelate(self, numax, window=25., frequency_spacing=None):
         """An autocorrelation function (ACF) for seismic mode envelopes.
-        We autocorrelate the region one full-width-half-maximum (FWHM) of the
-        mode envelope either side of the proposed numax.
-        Before autocorrelating, it multiplies the section with a hanning
-        window, which will increase the autocorrelation power if the region
-        has a Gaussian shape, as we'd expect for seismic oscillations.
+        We autocorrelate a region with a width of `window` (in microhertz)
+        around a central frequency `numax` (in microhertz). The window size is
+        determined based on the location of the nyquist frequency when
+        estimating numax, and based on the expected width of the mode envelope
+        of the asteroseismic oscillations when calculating deltanu.
 
         Parameters:
         ----------
@@ -125,6 +125,10 @@ class SeismologyButler(object):
             window : int or float
                 The width of the autocorrelation window around the central
                 frequency numax.
+
+            frequency_spacing : float
+                The frequency spacing of the periodogram. If none is passed, it
+                is calculated internally. This should never be set by the user.
 
         Returns:
         --------
