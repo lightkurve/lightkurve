@@ -13,7 +13,7 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
 import astropy
 from astropy.table import Table
-from astropy.timeseries.periodograms import LombScargle
+from astropy.stats import LombScargle
 from astropy import units as u
 from astropy.units import cds
 from astropy.convolution import convolve, Box1DKernel, Gaussian1DKernel
