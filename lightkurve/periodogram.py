@@ -8,8 +8,6 @@ import warnings
 
 import numpy as np
 from matplotlib import pyplot as plt
-from mpl_toolkits.axes_grid1.inset_locator import inset_axes
-
 
 import astropy
 from astropy.table import Table
@@ -534,7 +532,7 @@ class Periodogram(object):
             Helper object to run asteroseismology methods
         """
         from .seismology import SeismologyButler
-        return SeismologyButler.from_periodogram(periodogram=self, **kwargs)
+        return SeismologyButler(self)
 
 
 class SNRPeriodogram(Periodogram):
@@ -575,7 +573,6 @@ class LombScarglePeriodogram(Periodogram):
     def __init__(self, *args, **kwargs):
         self._LS_object = kwargs.pop("ls_obj", None)
         self.nterms = kwargs.pop("nterms", 1)
-        self.lc = kwargs.pop("lc", None)
         self.ls_method = kwargs.pop("ls_method", 'fastchi2')
         super(LombScarglePeriodogram, self).__init__(*args, **kwargs)
 
@@ -827,15 +824,12 @@ class LombScarglePeriodogram(Periodogram):
         # Convert to desired units
         frequency = u.Quantity(frequency, freq_unit)
 
-
-
         if period is not None:
             if ls_method is 'fastchi2':
                 ls_method = 'chi2'
             elif ls_method is 'fast':
                 ls_method = 'slow'
 
-#            ls_method = 'chi2'
             log.warning("You have passed an evenly-spaced grid of periods. "
                         "These are not evenly spaced in frequency space.\n"
                         "Method has been set to '{}' to allow for this.".format(ls_method))
@@ -847,7 +841,6 @@ class LombScarglePeriodogram(Periodogram):
                             "Please refer to the `astropy.timeseries.periodogram.LombScargle` documentation.".format(ls_method),
                           LightkurveWarning)
             nterms = 1
-
 
         flux_scaling = 1e6
         if float(astropy.__version__[0]) >= 3:
@@ -877,17 +870,15 @@ class LombScarglePeriodogram(Periodogram):
         return LombScarglePeriodogram(frequency=frequency, power=power, nyquist=nyquist,
                                       targetid=lc.targetid, label=lc.label,
                                       default_view=default_view, ls_obj=LS,
-                                      nterms=nterms, ls_method=ls_method, lc=lc)
+                                      nterms=nterms, ls_method=ls_method)
 
-
-    def flux_model(self, time=None, frequency=None):
-        '''Obtain the flux model for a given frequency and time
+    def model(self, time, frequency=None):
+        """Obtain the flux model for a given frequency and time
 
         Parameters
         ----------
         time : np.ndarray
-            Time points to evaluate model. Default is the original
-            input light curve time.
+            Time points to evaluate model.
         frequency : frequency to evaluate model. Default is the frequency at
                     max power.
 
@@ -895,21 +886,14 @@ class LombScarglePeriodogram(Periodogram):
         -------
         result : lightkurve.LightCurve
             Model object with the time and flux model
-        '''
+        """
         if self._LS_object is None:
             raise ValueError('No `astropy` Lomb Scargle object exists.')
-
-        if time is None:
-            if self.lc.time_format in ['bkjd', 'btjd', 'd', 'days', 'day', None]:
-                time = self.lc.time.copy() * u.day
-            else:
-                raise NotImplementedError('time in format {} is not supported.'.format(self.lc.time_format))
         if frequency is None:
             frequency = self.frequency_at_max_power
         f = self._LS_object.model(time, frequency)
         return LightCurve(time, f, label='LS Model', meta={'frequency':frequency},
-                            targetid='{} LS Model'.format(self.lc.targetid)).normalize()
-
+                            targetid='{} LS Model'.format(self.targetid)).normalize()
 
 
 class BoxLeastSquaresPeriodogram(Periodogram):
