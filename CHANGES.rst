@@ -1,6 +1,8 @@
-1.0.2 (unreleased)
+1.1.0 (unreleased)
 ==================
 
+- Added the `tpf.cutout()` method which enables smaller Target Pixel Files to
+  be extracted from large ones. [#537]
 
 
 1.0.1 (2019-05-20)
