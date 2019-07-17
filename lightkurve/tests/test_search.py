@@ -53,10 +53,10 @@ def test_search_targetpixelfile():
         assert(len(cc) == 2)
     search_targetpixelfile(11904151, quarter=11).download()
     # with mission='TESS', it should return TESS observations
-    tic = 273985862
-    assert(len(search_targetpixelfile(tic, mission='TESS').table) == 1)
-    assert(len(search_targetpixelfile(tic, mission='TESS', radius=100).table) == 2)
-    search_targetpixelfile(tic, mission='TESS').download()
+    tic = 273985862  # Has been observed in multiple sectors including 1
+    assert(len(search_targetpixelfile(tic, mission='TESS').table) > 1)
+    assert(len(search_targetpixelfile(tic, mission='TESS', sector=1, radius=100).table) == 2)
+    search_targetpixelfile(tic, mission='TESS', sector=1).download()
     assert(len(search_targetpixelfile("pi Mensae", sector=1).table) == 1)
     # Issue #445: indexing with -1 should return the last index of the search result
     assert(len(search_targetpixelfile("pi Men")[-1]) == 1)
@@ -83,9 +83,9 @@ def test_search_lightcurvefile(caplog):
     search_lightcurvefile(c, quarter=6).download()
     # with mission='TESS', it should return TESS observations
     tic = 273985862
-    assert(len(search_lightcurvefile(tic, mission='TESS').table) == 1)
-    assert(len(search_lightcurvefile(tic, mission='TESS', radius=100).table) == 2)
-    search_lightcurvefile(tic, mission='TESS').download()
+    assert(len(search_lightcurvefile(tic, mission='TESS').table) > 1)
+    assert(len(search_lightcurvefile(tic, mission='TESS', sector=1, radius=100).table) == 2)
+    search_lightcurvefile(tic, mission='TESS', sector=1).download()
     assert(len(search_lightcurvefile("pi Mensae", sector=1).table) == 1)
 
 
@@ -304,6 +304,7 @@ def test_open():
     assert(open(k2_path, quality_bitmask='hard').quality_bitmask == 'hard')
 
 
+@pytest.mark.remote_data
 def test_issue_472():
     """Regression test for https://github.com/KeplerGO/lightkurve/issues/472"""
     # The line below previously threw an exception because the target was not
