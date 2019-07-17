@@ -2,6 +2,8 @@
 
 Functions in this module should be named "estimate_deltanu_methodname()".
 """
+from __future__ import division, print_function
+
 import numpy as np
 from scipy.signal import find_peaks
 from matplotlib import pyplot as plt
