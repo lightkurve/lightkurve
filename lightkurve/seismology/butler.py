@@ -126,11 +126,13 @@ class SeismologyButler(object):
                 raise ValueError("You can't pass in a numax outside the"
                                 "frequency range of the periodogram.")
 
-            fmin = numax - 2*utils.get_fwhm(numax)
+            fwhm = utils.get_fwhm(self.periodogram, numax)
+
+            fmin = numax - 2*fwhm
             if fmin < 0.:
                 fmin = 0.
 
-            fmax = numax + 2*utils.get_fwhm(numax)
+            fmax = numax + 2*fwhm
             if fmax > freq[-1].value:
                 fmax = freq[-1].value
 
@@ -146,6 +148,10 @@ class SeismologyButler(object):
             if fmax > freq[-1].value:
                 raise ValueError("You can't pass in a limit outside the"
                                  "frequency range of the periodogram.")
+
+        # Make sure fmin and fmax are Quantities or code below will break
+        fmin = u.Quantity(fmin, freq.unit)
+        fmax = u.Quantity(fmax, freq.unit)
 
         # Add on 1x deltanu so we don't miss off any important range due to rounding
         if fmax < freq[-1] - 1.5*deltanu:
@@ -190,7 +196,7 @@ class SeismologyButler(object):
         return ax
 
 
-    def estimate_numax(self, method="acf", numaxs=None, window=None, numax_spacing=None):
+    def estimate_numax(self, method="acf", numaxs=None, window=None, spacing=None):
         """Estimates the peak of the envelope of seismic oscillation modes,
         numax using an autocorrelation function. There are many papers on the
         topic of autocorrelation functions for estimating seismic parameters,
@@ -203,7 +209,7 @@ class SeismologyButler(object):
         fixed width (either given by the user, 25 microhertz for Red Giants or
         250 microhertz for Main Sequence stars) is moved along the power
         spectrum, where the central frequency of the window moves in steps of 1
-        microhertz (or given by the user as `numax_spacing`) and evaluates the
+        microhertz (or given by the user as `spacing`) and evaluates the
         autocorrelation at each step.
 
         The correlation (numpy.correlate) is typically given as:
@@ -249,7 +255,7 @@ class SeismologyButler(object):
             frequency in 'numaxs'. If none is given, a sensible value will be
             chosen. If no units are given it is assumed to be in the same units
             as the periodogram frequency.
-        numax_spacing : int or float
+        spacing : int or float
             The spacing between central frequencies (numaxs) at which the
             autocorrelation is evaluated. If none is given, a sensible value
             will be assumed. If no units are given it is assumed to be in the
@@ -264,8 +270,8 @@ class SeismologyButler(object):
         method = self._validate_method(method, supported_methods=["acf"])
         if method == "acf":
             from .numax_estimators import estimate_numax_acf
-            result = estimate_numax_acf(self.periodogram, numaxs, window,
-                                        numax_spacing)
+            result = estimate_numax_acf(self.periodogram, numaxs=numaxs,
+                                        window=window, spacing=spacing)
         self.numax = result
         return result
 
