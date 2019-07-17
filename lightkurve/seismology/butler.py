@@ -2,10 +2,9 @@
 
 TODO
 ----
-* Considering putting Teff in repr of stellar parameters.
+* Consider putting Teff in repr of stellar parameters.
 * Errors are not yet passed to stellar_estimator functions.
-* Clean up docstrings.
-* Clean up plots.
+* Clean up docstrings and plots.
 """
 import logging
 import warnings
@@ -16,8 +15,7 @@ from matplotlib import pyplot as plt
 from astropy import units as u
 
 from .. import MPLSTYLE
-from . import numax_estimators, deltanu_estimators, stellar_estimators
-from . import utils
+from . import utils, stellar_estimators
 
 log = logging.getLogger(__name__)
 
@@ -43,6 +41,13 @@ class SeismologyButler(object):
                  "uses default periodogram parameters. For further tuneability, "
                  "create a periodogram object first, using `to_periodogram`.")
         return SeismologyButler(periodogram=lc.to_periodogram(**kwargs))
+
+    def _validate_method(self, method, supported_methods):
+        """Raises ValueError if a method is not supported."""
+        if method in supported_methods:
+            return method
+        raise ValueError("method {} is not supported; "
+                         "must be one of {}".format(method, supported_methods))        
 
     def _validate_numax(self, numax):
         """Raises exception if `numax` is None and `self.numax` is not set."""
@@ -185,7 +190,7 @@ class SeismologyButler(object):
         return ax
 
 
-    def estimate_numax(self, numaxs=None, window=None, numax_spacing=None):
+    def estimate_numax(self, method="acf", numaxs=None, window=None, numax_spacing=None):
         """Estimates the peak of the envelope of seismic oscillation modes,
         numax using an autocorrelation function. There are many papers on the
         topic of autocorrelation functions for estimating seismic parameters,
@@ -256,10 +261,11 @@ class SeismologyButler(object):
             The numax of the periodogram. In the units of the periodogram object
             frequency.
         """
-        result = numax_estimators.estimate_numax_acf(self.periodogram,
-                                                     numaxs,
-                                                     window,
-                                                     numax_spacing)
+        method = self._validate_method(method, supported_methods=["acf"])
+        if method == "acf":
+            from .numax_estimators import estimate_numax_acf
+            result = estimate_numax_acf(self.periodogram, numaxs, window,
+                                        numax_spacing)
         self.numax = result
         return result
 
@@ -268,7 +274,7 @@ class SeismologyButler(object):
         numax = self._validate_numax(numax)
         return numax.diagnostics_plot_method(numax, self.periodogram)
 
-    def estimate_deltanu(self, numax=None, method='acf'):
+    def estimate_deltanu(self, method='acf', numax=None):
         """Estimates the average value of the large frequency spacing, DeltaNu,
         of the seismic oscillations of the target, using an autocorrelation
         function. There are many papers on the topic of autocorrelation
@@ -326,13 +332,17 @@ class SeismologyButler(object):
             The average large frequency spacing of the seismic oscillation modes.
             In units of the periodogram frequency attribute.
         """
+        method = self._validate_method(method, supported_methods=["acf"])
         numax = self._validate_numax(numax)
-        result = deltanu_estimators.estimate_deltanu_acf(self.periodogram,
-                                                         numax=numax)
+
+        if method == "acf":
+            from .deltanu_estimators import estimate_deltanu_acf
+            result = estimate_deltanu_acf(self.periodogram, numax=numax)
+
         self.deltanu = result
         return result
 
-    def diagnose_deltanu(self, deltanu=None):
+    def diagnose_deltanu(self, method="acf", deltanu=None):
         """Create diagnostic plots showing how numax was estimated."""
         deltanu = self._validate_deltanu(deltanu)
         return deltanu.diagnostics_plot_method(deltanu, self.periodogram)
