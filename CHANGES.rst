@@ -4,6 +4,16 @@
 - Added the `tpf.cutout()` method which enables smaller Target Pixel Files to
   be extracted from large ones. [#537]
 
+- Removed seven methods which had been deprecated prior to v1.0: [#515]
+  * removed `lc.cdpp()` in favor of `lc.estimate_cdpp()`;
+  * removed `lc.correct()` in favor of `lc.to_corrector().correct()`;
+  * removed `lcf.from_fits()` in favor of `open()`;
+  * removed `tpf.from_fits()` in favor of `open()`;
+  * removed `lcf.from_archive()` in favor of `search_lightcurvefile()`;
+  * removed `tpf.from_archive()` in favor of `search_targetpixelfile()`;
+  * removed `tpf.centroids()` in favor of `tpf.estimate_centroids()`.
+
+
 
 1.0.1 (2019-05-20)
 ==================
