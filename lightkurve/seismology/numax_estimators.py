@@ -14,11 +14,8 @@ from .utils import SeismologyQuantity
 
 
 def estimate_numax_acf(periodogram, numaxs=None, window=None, spacing=None):
-    """
-    Helper function to perform the numax estimation for both the
-    `estimate_numax()` and `plot_numax_diagnostics()` functions.
-
-    For details, see the `estimate_numax()` function.
+    """Estimate the frequency at maximum power from a periodogram using
+    the autocorrelation method.
     """
     # Calculate the window size
 
@@ -48,7 +45,8 @@ def estimate_numax_acf(periodogram, numaxs=None, window=None, spacing=None):
         numaxs = np.asarray([numaxs])
 
     fs = np.median(np.diff(periodogram.frequency.value))
-    for var, label in zip([np.asarray(window), np.asarray(spacing), numaxs], ['window', 'spacing', 'numaxs']):
+    for var, label in zip([np.asarray(window), np.asarray(spacing), numaxs],
+                          ['window', 'spacing', 'numaxs']):
         if (var < fs).any():
             raise ValueError("You can't have {} smaller than the "
                             "frequency separation!".format(label))
@@ -58,15 +56,15 @@ def estimate_numax_acf(periodogram, numaxs=None, window=None, spacing=None):
         if (var < 0).any():
             raise ValueError("Please pass an entirely positive {}.".format(label))
 
-    #We want to find the numax which returns in the highest autocorrelation
-    #power, rescaled based on filter width
+    # We want to find the numax which returns in the highest autocorrelation
+    # power, rescaled based on filter width
     fs = np.median(np.diff(periodogram.frequency.value))
 
     metric = np.zeros(len(numaxs))
     acf2d = np.zeros([int(window/2/fs)*2,len(numaxs)])
     for idx, numax in enumerate(numaxs):
         acf = utils.autocorrelate(periodogram, numax, window=window, frequency_spacing=fs)      #Return the acf at this numax
-        acf2d[:,idx] = acf                                     #Store the 2D acf
+        acf2d[:, idx] = acf                                     #Store the 2D acf
         metric[idx] = (np.sum(np.abs(acf)) - 1 ) / len(acf)  #Store the max acf power normalised by the length
 
     # Smooth the data to find the peak
@@ -77,12 +75,14 @@ def estimate_numax_acf(periodogram, numaxs=None, window=None, spacing=None):
         metric_smooth = convolve(metric, g, boundary='extend')
     else:
         metric_smooth = metric
-    best_numax = numaxs[np.argmax(metric_smooth)]     #The highest value of the metric corresponds to numax
 
-    # This should be a dictionary...
+    # The highest value of the metric corresponds to numax
+    best_numax = numaxs[np.argmax(metric_smooth)]     
     best_numax = u.Quantity(best_numax, periodogram.frequency.unit)
-    diagnostics = {'numaxs':numaxs, 'acf2d':acf2d, 'window':window, 'metric':metric,
-                   'metric_smooth': metric_smooth}
+
+    # Create and return the object containing the result and diagnostics
+    diagnostics = {'numaxs':numaxs, 'acf2d':acf2d, 'window':window,
+                   'metric':metric, 'metric_smooth': metric_smooth}
     result = SeismologyQuantity(best_numax,
                                 name="numax",
                                 method="2D ACF (Viani et al. 2019)",
@@ -92,7 +92,7 @@ def estimate_numax_acf(periodogram, numaxs=None, window=None, spacing=None):
 
 
 def diagnose_numax_acf(numax, periodogram):
-    """ Returns three diagnostic plots and an estimated value for numax.
+    """Returns a diagnostic plot which elucidates how numax was estimated.
 
     [1] The SNRPeriodogram plotted with a red line indicating the estimated
     numax value.
@@ -114,7 +114,7 @@ def diagnose_numax_acf(numax, periodogram):
 
     Parameters:
     -----------
-    numax : SeismologyResult object
+    numax : `SeismologyResult` object
         The object returned by `estimate_numax_acf()`.
 
     Returns:
@@ -125,17 +125,20 @@ def diagnose_numax_acf(numax, periodogram):
     with plt.style.context(MPLSTYLE):
         fig, ax = plt.subplots(3, sharex=True, figsize=(8.485, 12))
         periodogram.plot(ax=ax[0])
-#            ax[0].set_ylabel(r'SNR')
-#            ax[0].set_title(r'SNR vs Frequency')
         ax[0].set_xlabel('')
 
-        windowarray = np.linspace(0, numax.diagnostics['window'], num=numax.diagnostics['acf2d'].shape[1])
-        extent = (numax.diagnostics['numaxs'][0], numax.diagnostics['numaxs'][-1], windowarray[0], windowarray[-1])
+        windowarray = np.linspace(0, numax.diagnostics['window'],
+                                  num=numax.diagnostics['acf2d'].shape[1])
+        extent = (numax.diagnostics['numaxs'][0],
+                  numax.diagnostics['numaxs'][-1],
+                  windowarray[0],
+                  windowarray[-1])
         figsize = [8.485, 4]
         a = figsize[1] / figsize[0]
         b = (extent[3] - extent[2]) / (extent[1] - extent[0])
 
-        ax[1].imshow(numax.diagnostics['acf2d'],cmap='Blues', aspect=a/b, origin='lower',extent=extent)
+        ax[1].imshow(numax.diagnostics['acf2d'], cmap='Blues', aspect=a/b,
+                     origin='lower', extent=extent)
         ax[1].set_ylabel(r'Frequency lag [{}]'.format(periodogram.frequency.unit.to_string('latex')))
 
         ax[2].plot(numax.diagnostics['numaxs'], numax.diagnostics['metric'])

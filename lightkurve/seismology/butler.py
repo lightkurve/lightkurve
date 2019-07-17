@@ -4,7 +4,6 @@ TODO
 ----
 * Considering putting Teff in repr of stellar parameters.
 * Errors are not yet passed to stellar_estimator functions.
-* `plot_echelle` is broken due to a Quantity problem; should be easy to fix.
 * Clean up docstrings.
 * Clean up plots.
 """
@@ -26,43 +25,43 @@ __all__ = ['SeismologyButler']
 
 
 class SeismologyButler(object):
-    """Good day, I am the Seismology Butler, I am here to help clean up your seismic mess.
-    
+    """Good day, I am the Seismology Butler. I am here to help you do asteroseismology.
+
     This class provides easy access to methods to estimate numax and deltanu,
     and stores them on its tray for easy diagnostic plotting.
     """
     def __init__(self, periodogram):
         self.periodogram = periodogram
-        self.frequency = periodogram.frequency
-        self.power = periodogram.power
-        self.numax = None
-        self.deltanu = None
-        self.radius = None
 
     def __repr__(self):
         return 'SeismologyButler(ID: {})'.format(self.periodogram.targetid)
 
     @staticmethod
-    def from_lightcurve(lightcurve, **kwargs):
-        warnings.warn("Building a SeismologyButler object directly from a light curve "
-                      "using default periodogram parameters. For further tuneability, "
-                      "create a periodogram object first, using `to_periodogram`.")
-        return SeismologyButler(periodogram=lightcurve.to_periodogram())
+    def from_lightcurve(lc, **kwargs):
+        """Returns a `SeismologyButler` given a `LightCurve` object."""
+        log.info("Building a SeismologyButler object directly from a light curve "
+                 "uses default periodogram parameters. For further tuneability, "
+                 "create a periodogram object first, using `to_periodogram`.")
+        return SeismologyButler(periodogram=lc.to_periodogram(**kwargs))
 
     def _validate_numax(self, numax):
-        """Raises an exception if both `numax` and `self.numax` are `None`."""
+        """Raises exception if `numax` is None and `self.numax` is not set."""
         if numax is None:
-            if self.numax is None:
-                raise ValueError("You need to call `butler.estimate_numax()` first.")
-            return self.numax
+            try:
+                return self.numax
+            except AttributeError:
+                raise AttributeError("You need to call `SeismologyButler"
+                                     ".estimate_numax()` first.")
         return numax
 
     def _validate_deltanu(self, deltanu):
-        """Raises an exception if both `deltanu` and `self.deltanu` are `None`."""
+        """Raises exception if `deltanu` is None and `self.deltanu` is not set."""
         if deltanu is None:
-            if self.deltanu is None:
-                raise ValueError("You need to call `butler.estimate_deltanu()` first.")
-            return self.deltanu
+            try:
+                return self.deltanu
+            except AttributeError:
+                raise AttributeError("You need to call `SeismologyButler"
+                                     ".estimate_deltanu()` first.")
         return deltanu
 
     def plot_echelle(self, deltanu=None, numax=None,
@@ -105,9 +104,10 @@ class SeismologyButler(object):
             The matplotlib axes object.
         """
         deltanu = self._validate_deltanu(deltanu)
+        freq = self.periodogram.frequency  # Makes code below more readable
 
-        fmin = self.frequency[0]
-        fmax = self.frequency[-1]
+        fmin = freq[0]
+        fmax = freq[-1]
 
         # Check for any superfluous input
         if (numax is not None) & (any([a is not None for a in [minimum_frequency, maximum_frequency]])):
@@ -116,8 +116,8 @@ class SeismologyButler(object):
 
         # Ensure input numax is in the correct units (if there is one)
         if numax is not None:
-            numax = u.Quantity(numax, self.frequency.unit).value
-            if numax > self.frequency[-1].value:
+            numax = u.Quantity(numax, freq.unit).value
+            if numax > freq[-1].value:
                 raise ValueError("You can't pass in a numax outside the"
                                 "frequency range of the periodogram.")
 
@@ -126,34 +126,34 @@ class SeismologyButler(object):
                 fmin = 0.
 
             fmax = numax + 2*utils.get_fwhm(numax)
-            if fmax > self.frequency[-1].value:
-                fmax = self.frequency[-1].value
+            if fmax > freq[-1].value:
+                fmax = freq[-1].value
 
         # Set limits and set them in the right units
         if minimum_frequency is not None:
-            fmin =  u.Quantity(minimum_frequency, self.frequency.unit).value
-            if fmin > self.frequency[-1].value:
+            fmin =  u.Quantity(minimum_frequency, freq.unit).value
+            if fmin > freq[-1].value:
                 raise ValueError("You can't pass in a limit outside the"
-                                "frequency range of the periodogram.")
+                                 "frequency range of the periodogram.")
 
         if maximum_frequency is not None:
-            fmax = u.Quantity(maximum_frequency, self.frequency.unit).value
-            if fmax > self.frequency[-1].value:
+            fmax = u.Quantity(maximum_frequency, freq.unit).value
+            if fmax > freq[-1].value:
                 raise ValueError("You can't pass in a limit outside the"
-                                "frequency range of the periodogram.")
+                                 "frequency range of the periodogram.")
 
         # Add on 1x deltanu so we don't miss off any important range due to rounding
-        if fmax < self.frequency[-1] - 1.5*deltanu:
+        if fmax < freq[-1] - 1.5*deltanu:
             fmax += deltanu
 
-        fs = np.median(np.diff(self.frequency))
-        x0 = int(self.frequency[0] / fs)
+        fs = np.median(np.diff(freq))
+        x0 = int(freq[0] / fs)
 
-        ff = self.frequency[int(fmin/fs)-x0:int(fmax/fs)-x0]   # The the selected frequency range
-        pp = self.power[int(fmin/fs)-x0:int(fmax/fs)-x0]   # The selected power range
+        ff = freq[int(fmin/fs)-x0:int(fmax/fs)-x0] # Selected frequency range
+        pp = self.periodogram.power[int(fmin/fs)-x0:int(fmax/fs)-x0] # Power range
 
-        n_rows = int((ff[-1]-ff[0])/deltanu)     # The number of stacks to use
-        n_columns = int(deltanu/fs)               # The number of elements in each stack
+        n_rows = int((ff[-1]-ff[0])/deltanu) # Number of stacks to use
+        n_columns = int(deltanu/fs)          # Number of elements in each stack
 
         # Reshape the power into n_rows of n_columns
         ep = np.reshape(pp[:(n_rows*n_columns)], (n_rows, n_columns))
@@ -169,19 +169,18 @@ class SeismologyButler(object):
         #Plot the echelle diagram
         with plt.style.context(MPLSTYLE):
             fig, ax = plt.subplots()
-
-            extent = (x_f[0],x_f[-1],y_f[0],y_f[-1])
+            extent = (x_f[0].value, x_f[-1].value, y_f[0].value, y_f[-1].value)
             figsize = plt.rcParams['figure.figsize']
-            a = figsize[1]/figsize[0]
-            b = (extent[3]-extent[2])/extent[1]
+            a = figsize[1] / figsize[0]
+            b = (extent[3] - extent[2]) / extent[1]
 
-            ax.imshow(ep,cmap=cmap, aspect=a/b, origin='lower',
-                     extent=extent)
+            ax.imshow(ep.value, cmap=cmap, aspect=a/b, origin='lower',
+                      extent=extent)
 
             ax.set_xlabel(r'Frequency mod. {:.2f} {}'.format(deltanu,
-                                        self.frequency.unit.to_string('latex')))
-            ax.set_ylabel(r'Frequency [{}]'.format(self.frequency.unit.to_string('latex')))
-            ax.set_title('Echelle diagram for {}'.format(self.label))
+                                        freq.unit.to_string('latex')))
+            ax.set_ylabel(r'Frequency [{}]'.format(freq.unit.to_string('latex')))
+            ax.set_title('Echelle diagram for {}'.format(self.periodogram.label))
 
         return ax
 
@@ -253,7 +252,7 @@ class SeismologyButler(object):
 
         Returns
         -------
-        numax : SeismologyResult
+        numax : `SeismologyQuantity`
             The numax of the periodogram. In the units of the periodogram object
             frequency.
         """
@@ -323,7 +322,7 @@ class SeismologyButler(object):
 
         Returns:
         -------
-        deltanu : SeismologyResult
+        deltanu : `SeismologyQuantity`
             The average large frequency spacing of the seismic oscillation modes.
             In units of the periodogram frequency attribute.
         """
@@ -355,7 +354,7 @@ class SeismologyButler(object):
         return result
 
     def estimate_logg(self, teff, numax=None):
-        """Returns a surface gravty estimate based on the scaling relations."""
+        """Returns a surface gravity estimate based on the scaling relations."""
         numax = self._validate_numax(numax)
         result = stellar_estimators.estimate_logg(numax, teff)
         self.logg = result

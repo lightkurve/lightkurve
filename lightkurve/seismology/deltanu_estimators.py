@@ -63,7 +63,7 @@ def estimate_deltanu_acf(periodogram, numax):
 
 
 def diagnose_deltanu_acf(deltanu, periodogram):
-    """Returns one diagnostic plots and an estimated value for deltanu.
+    """Returns a diagnostic plot which elucidates how deltanu was estimated.
 
     [1] Scaled correlation metric vs frequecy lag of the autocorrelation
     window, with inset close up on the determined deltanu and a line
@@ -96,8 +96,11 @@ def diagnose_deltanu_acf(deltanu, periodogram):
 
         axin = inset_axes(ax, width="50%",height="50%", loc="upper right")
         axin.set_yticks([])
-        axin.plot(deltanu.diagnostics['lags'][deltanu.diagnostics['sel']],deltanu.diagnostics['acf'][deltanu.diagnostics['sel']])
-        axin.scatter(deltanu.diagnostics['lags'][deltanu.diagnostics['sel']][deltanu.diagnostics['peaks']], deltanu.diagnostics['acf'][deltanu.diagnostics['sel']][deltanu.diagnostics['peaks']],c='r',s=5)
+        axin.plot(deltanu.diagnostics['lags'][deltanu.diagnostics['sel']],
+                  deltanu.diagnostics['acf'][deltanu.diagnostics['sel']])
+        axin.scatter(deltanu.diagnostics['lags'][deltanu.diagnostics['sel']][deltanu.diagnostics['peaks']],
+                     deltanu.diagnostics['acf'][deltanu.diagnostics['sel']][deltanu.diagnostics['peaks']],
+                     c='r', s=5)
         axin.axvline(deltanu.value,c='r', linewidth=2,alpha=.4,
             label=r'{:.1f} {}'.format(deltanu.value,
                                       periodogram.frequency.unit.to_string('latex')))
