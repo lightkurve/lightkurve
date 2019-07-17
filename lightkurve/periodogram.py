@@ -691,16 +691,6 @@ class LombScarglePeriodogram(Periodogram):
         Periodogram : `Periodogram` object
             Returns a Periodogram object extracted from the lightcurve.
         """
-        # If the defaults are used, issue a warning to point out they changed!
-        if normalization == 'amplitude' and freq_unit is None and oversample_factor is None:
-            warnings.warn("As of Lightkurve v1.0.0 (Apr 2019), the default behavior "
-                          "of Lomb Scargle periodograms changed to use "
-                          "normalization='amplitude' and oversample_factor=5 "
-                          "(the previous defaults were normalization='psd' and "
-                          "oversample_factor=1). You can suppress this warning using "
-                          "`warnings.filterwarnings('ignore', category=lk.LightkurveWarning)`.",
-                          LightkurveWarning)
-
         # Input validation for spectrum type
         if normalization not in ('psd', 'amplitude'):
             raise ValueError("The `normalization` parameter must be one of "
