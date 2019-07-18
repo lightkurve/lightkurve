@@ -58,7 +58,7 @@ def estimate_deltanu_acf(periodogram, numax):
     diagnostics = {'lags':lags, 'acf':acf, 'peaks':peaks, 'sel':sel}
     result = SeismologyQuantity(best_deltanu,
                                 name="deltanu",
-                                method="Mosser & Appourchaux 2009",
+                                method="ACF",
                                 diagnostics=diagnostics,
                                 diagnostics_plot_method=diagnose_deltanu_acf)
     return result

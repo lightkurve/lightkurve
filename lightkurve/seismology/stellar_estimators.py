@@ -80,7 +80,7 @@ def estimate_radius(numax, deltanu, teff, numax_err=None, deltanu_err=None, teff
     result = SeismologyQuantity(uR.n * u.solRad,
                                 error=uR.s * u.solRad,
                                 name="radius",
-                                method="Bellinger et al. 2019")
+                                method="Uncorrected Scaling Relations")
     return result
 
 
@@ -149,7 +149,7 @@ def estimate_mass(numax, deltanu, teff, numax_err=None, deltanu_err=None, teff_e
     result = SeismologyQuantity(uM.n * u.solMass,
                                 error=uM.s * u.solMass,
                                 name="mass",
-                                method="Bellinger et al. 2019")
+                                method="Uncorected Scaling Relations")
     return result
 
 
@@ -213,5 +213,5 @@ def estimate_logg(numax, teff, numax_err=None, teff_err=None):
     result = SeismologyQuantity(ulogg.n * u.dex,
                                 error=ulogg.s * u.dex,
                                 name="logg",
-                                method="Bellinger et al. 2019")
+                                method="Uncorrected Scaling Relations")
     return result

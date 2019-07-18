@@ -45,8 +45,9 @@ def estimate_numax_acf(periodogram, numaxs=None, window=None, spacing=None):
         numaxs = np.asarray([numaxs])
 
     fs = np.median(np.diff(periodogram.frequency.value))
-    for var, label in zip([np.asarray(window), np.asarray(spacing), numaxs],
-                          ['window', 'spacing', 'numaxs']):
+    # Perform checks on spacing and window
+    for var, label in zip([np.asarray(window), np.asarray(spacing)],
+                          ['window', 'spacing']):
         if (var < fs).any():
             raise ValueError("You can't have {} smaller than the "
                             "frequency separation!".format(label))
@@ -55,6 +56,14 @@ def estimate_numax_acf(periodogram, numaxs=None, window=None, spacing=None):
                             "power spectrum!".format(label))
         if (var < 0).any():
             raise ValueError("Please pass an entirely positive {}.".format(label))
+
+    # Perform checks on numaxs
+    if any(numaxs < fs):
+        raise ValueError("A custom range of numaxs can not extend below "
+                        "a single frequency bin.")
+    if any(numaxs > np.nanmax(self.frequency.value)):
+        raise ValueError("A custom range of numaxs can not extend above "
+                        "the highest frequency value in the periodogram.")
 
     # We want to find the numax which returns in the highest autocorrelation
     # power, rescaled based on filter width
@@ -68,16 +77,17 @@ def estimate_numax_acf(periodogram, numaxs=None, window=None, spacing=None):
         metric[idx] = (np.sum(np.abs(acf)) - 1 ) / len(acf)  #Store the max acf power normalised by the length
 
     # Smooth the data to find the peak
-    # Previous smoothing could be completely wrong, it's based on the length of the array, not the frequency!!!
-    # It needs to be based on the frequency differences in `numaxs`
+    # Gaussian1D kernel takes a standard deviation in unitless indices. A stddev
+    # of sqrt(len(numaxs) will result in a smoothing kernel that works for all
+    # resolutions of numax.
     if len(numaxs) > 10:
-        g = Gaussian1DKernel(stddev=100 * np.nanmedian(np.diff(numaxs)))
+        g = Gaussian1DKernel(stddev=np.sqrt(len(numaxs))))
         metric_smooth = convolve(metric, g, boundary='extend')
     else:
         metric_smooth = metric
 
     # The highest value of the metric corresponds to numax
-    best_numax = numaxs[np.argmax(metric_smooth)]     
+    best_numax = numaxs[np.argmax(metric_smooth)]
     best_numax = u.Quantity(best_numax, periodogram.frequency.unit)
 
     # Create and return the object containing the result and diagnostics
@@ -85,7 +95,7 @@ def estimate_numax_acf(periodogram, numaxs=None, window=None, spacing=None):
                    'metric':metric, 'metric_smooth': metric_smooth}
     result = SeismologyQuantity(best_numax,
                                 name="numax",
-                                method="2D ACF (Viani et al. 2019)",
+                                method="ACF",
                                 diagnostics=diagnostics,
                                 diagnostics_plot_method=diagnose_numax_acf)
     return result
