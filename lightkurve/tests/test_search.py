@@ -111,7 +111,6 @@ def test_search_tesscut():
         pass
 
 
-# See issue #433 to understand why this test is skipped on Python 3.7 for now
 @pytest.mark.remote_data
 def test_search_tesscut_download():
     """Can we download TESS cutouts via `search_cutout().download()?"""
