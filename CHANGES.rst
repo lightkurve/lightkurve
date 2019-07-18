@@ -31,6 +31,8 @@
 - Fixed a bug which prevented the `t0` argument of `lc.fold()` from being an
   AstroPy Quantity object. [#521]
 
+- Added several new usage examples to the docstrings of functions. [#516]
+
 
 
 1.0.1 (2019-05-20)
