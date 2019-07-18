@@ -452,7 +452,7 @@ class LightCurve(object):
 
             >>> folded_lc.time_original
             array([1004, 1009, 1005, 1010, 1001, 1006, 1011, 1002, 1007, 1003, 1008])
-        
+
         A `FoldedLightCurve` inherits all the features of a standard `LightCurve`
         object. For example, we can very quickly obtain a phase-folded plot using:
 
