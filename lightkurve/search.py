@@ -653,7 +653,8 @@ def _query_mast(target, radius=None, project=['Kepler', 'K2', 'TESS']):
             # suppress misleading AstropyWarning
             warnings.simplefilter('ignore', AstropyWarning)
             from astroquery.mast import Observations
-            log.debug("Started querying MAST for target_name='{}'.".format(target_name))
+            log.debug("Started querying MAST for observations within {} of target_name='{}'."
+                      "".format(radius.to(u.arcsec), target_name))
             target_obs = Observations.query_criteria(target_name=target_name,
                                                      radius=str(radius.to(u.deg)),
                                                      project=project,
@@ -676,7 +677,8 @@ def _query_mast(target, radius=None, project=['Kepler', 'K2', 'TESS']):
                 # suppress misleading AstropyWarning
                 warnings.simplefilter('ignore', AstropyWarning)
                 from astroquery.mast import Observations
-                log.debug("Started querying MAST for coordinates='{} {}'.".format(ra, dec))
+                log.debug("Started querying MAST for observations within {} of coordinates='{} {}'."
+                          "".format(radius.to(u.arcsec), ra, dec))
                 obs = Observations.query_criteria(coordinates='{} {}'.format(ra, dec),
                                                   radius=str(radius.to(u.deg)),
                                                   project=project,
@@ -695,7 +697,8 @@ def _query_mast(target, radius=None, project=['Kepler', 'K2', 'TESS']):
             # suppress misleading AstropyWarning
             warnings.simplefilter('ignore', AstropyWarning)
             from astroquery.mast import Observations
-            log.debug("Started querying MAST for objectname='{}'.".format(target))
+            log.debug("Started querying MAST for observations within {} of objectname='{}'."
+                      "".format(radius.to(u.arcsec), target))
             obs = Observations.query_criteria(objectname=target,
                                               radius=str(radius.to(u.deg)),
                                               project=project,
