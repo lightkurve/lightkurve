@@ -61,7 +61,7 @@ def estimate_numax_acf(periodogram, numaxs=None, window=None, spacing=None):
     if any(numaxs < fs):
         raise ValueError("A custom range of numaxs can not extend below "
                         "a single frequency bin.")
-    if any(numaxs > np.nanmax(self.frequency.value)):
+    if any(numaxs > np.nanmax(periodogram.frequency.value)):
         raise ValueError("A custom range of numaxs can not extend above "
                         "the highest frequency value in the periodogram.")
 
