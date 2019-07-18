@@ -40,8 +40,8 @@ def estimate_deltanu_acf(periodogram, numax):
     deltanu_emp = u.Quantity((0.294 * u.Quantity(numax, u.microhertz).value ** 0.772)*u.microhertz,
                         periodogram.frequency.unit).value
 
-    window = 2*int(np.floor(utils.get_fwhm(periodogram, numax.value)))
-    aacf = utils.autocorrelate(periodogram, numax=numax.value, window=window)
+    window_width = 2*int(np.floor(utils.get_fwhm(periodogram, numax.value)))
+    aacf = utils.autocorrelate(periodogram, numax=numax.value, window_width=window_width)
     acf = (np.abs(aacf**2)/np.abs(aacf[0]**2)) / (3/(2*len(aacf)))
     fs = np.median(np.diff(periodogram.frequency.value))
     lags = np.linspace(0., len(acf)*fs, len(acf))
@@ -99,9 +99,9 @@ def diagnose_deltanu_acf(deltanu, periodogram):
                     transform=ax.transAxes, fontsize=11)
 
 
-        window = 2*int(np.floor(utils.get_fwhm(periodogram, deltanu.diagnostics['numax'].value)))
+        window_width = 2*int(np.floor(utils.get_fwhm(periodogram, deltanu.diagnostics['numax'].value)))
         frequency_spacing = np.median(np.diff(periodogram.frequency.value))
-        spread = int(window/2/frequency_spacing)                           # Find the spread in indices
+        spread = int(window_width/2/frequency_spacing)                           # Find the spread in indices
 
 
         a = periodogram.frequency.value[np.argmin(np.abs(periodogram.frequency.value - deltanu.diagnostics['numax'].value)) + spread]

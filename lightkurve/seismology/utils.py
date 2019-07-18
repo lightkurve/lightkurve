@@ -73,10 +73,10 @@ def get_fwhm(periodogram, numax):
     return fwhm
 
 
-def autocorrelate(periodogram, numax, window=25., frequency_spacing=None):
+def autocorrelate(periodogram, numax, window_width=25., frequency_spacing=None):
     """An autocorrelation function (ACF) for seismic mode envelopes.
 
-    We autocorrelate a region with a width of `window` (in microhertz)
+    We autocorrelate a region with a width of `window_width` (in microhertz)
     around a central frequency `numax` (in microhertz). The window size is
     determined based on the location of the nyquist frequency when
     estimating numax, and based on the expected width of the mode envelope
@@ -88,7 +88,7 @@ def autocorrelate(periodogram, numax, window=25., frequency_spacing=None):
             The estimated position of the numax of the power spectrum. This
             is used to calculated the region autocorrelated with itself.
 
-        window : int or float
+        window_width : int or float
             The width of the autocorrelation window around the central
             frequency numax.
 
@@ -104,7 +104,7 @@ def autocorrelate(periodogram, numax, window=25., frequency_spacing=None):
     if frequency_spacing is None:
         frequency_spacing = np.median(np.diff(periodogram.frequency.value))
 
-    spread = int(window/2/frequency_spacing)                           # Find the spread in indices
+    spread = int(window_width/2/frequency_spacing)                           # Find the spread in indices
     x = int(numax / frequency_spacing)                                 # Find the index value of numax
     x0 = int((periodogram.frequency[0].value/frequency_spacing))              # Transform in case the index isn't from 0
     xt = x - x0
