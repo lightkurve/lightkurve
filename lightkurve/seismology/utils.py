@@ -7,7 +7,7 @@ from astropy.units import Quantity
 
 class SeismologyQuantity(Quantity):
     """Container to hold a seismological result and its meta data.
-    
+
     Quantity is a bit peculiar to sub-class because it inherits from `ndarray`;
     see https://docs.astropy.org/en/stable/units/quantity.html#subclassing-quantity.
     """
@@ -26,7 +26,9 @@ class SeismologyQuantity(Quantity):
         return super().__repr__()
 
     def _repr_latex_(self):
-        return "{}: {} (method: {})".format(self.name, super()._repr_latex_(), self.method)
+        return "{}: {} (method: {})".format(self.name,
+                                    '$ {} $'.format(np.round(super().value,2)),
+                                    super().unit._repr_latex_(), self.method)
 
 
 def get_fwhm(periodogram, numax):
