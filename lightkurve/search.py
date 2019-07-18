@@ -110,10 +110,13 @@ class SearchResult(object):
         # if the SearchResult row is a TESScut entry, then download cutout
         if 'FFI Cutout' in table[0]['description']:
             try:
+                log.debug("Started downloading TESSCut for '{}' sector {}."
+                          "".format(table[0]['target_name'], table[0]['sequence_number']))
                 path = self._fetch_tesscut_path(table[0]['target_name'],
                                                 table[0]['sequence_number'],
                                                 download_dir,
                                                 cutout_size)
+                log.debug("Finished downloading.")
             except:
                 raise SearchError('Unable to download FFI cutout. Desired target '
                                   'coordinates may be too near the edge of the FFI.')
