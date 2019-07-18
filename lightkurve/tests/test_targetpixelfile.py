@@ -4,6 +4,7 @@ import os
 import sys
 from astropy.utils.data import get_pkg_data_filename
 from astropy.io.fits.verify import VerifyWarning
+from astropy.coordinates import SkyCoord
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy.testing import assert_array_equal
@@ -522,3 +523,21 @@ def test_get_keyword():
     assert tpf.get_keyword("TELESCOP") == "Kepler"
     assert tpf.get_keyword("TTYPE1", hdu=1) == "TIME"
     assert tpf.get_keyword("DOESNOTEXIST", default=5) == 5
+
+
+def test_cutout():
+    """Test tpf.cutout() function."""
+    for tpf in [KeplerTargetPixelFile(filename_tpf_one_center),
+                TessTargetPixelFile(filename_tess, quality_bitmask=None)]:
+        ntpf = tpf.cutout(size=2)
+        assert ntpf.flux[0].shape == (2, 2)
+        assert ntpf.flux_err[0].shape == (2, 2)
+        assert ntpf.flux_bkg[0].shape == (2, 2)
+        ntpf = tpf.cutout((0, 0), size=3)
+        ntpf = tpf.cutout(size=(1, 2))
+        assert ntpf.flux.shape[1] == 2
+        assert ntpf.flux.shape[2] == 1
+        ntpf = tpf.cutout(SkyCoord(tpf.ra, tpf.dec, unit='deg'), size=2)
+        ntpf = tpf.cutout(size=2)
+        assert np.product(ntpf.flux.shape[1:]) == 4
+        assert ntpf.targetid == '{}_CUTOUT'.format(tpf.targetid)

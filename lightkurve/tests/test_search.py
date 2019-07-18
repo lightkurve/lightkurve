@@ -5,8 +5,6 @@ with the `@pytest.mark.remote_data` decorator below will only run if the
 `--remote-data` argument is passed to py.test.  This allows tests to pass
 if no internet connection is available.
 """
-from __future__ import division, print_function
-
 import os
 import sys
 import pytest
@@ -53,10 +51,10 @@ def test_search_targetpixelfile():
         assert(len(cc) == 2)
     search_targetpixelfile(11904151, quarter=11).download()
     # with mission='TESS', it should return TESS observations
-    tic = 273985862
-    assert(len(search_targetpixelfile(tic, mission='TESS').table) == 1)
-    assert(len(search_targetpixelfile(tic, mission='TESS', radius=100).table) == 2)
-    search_targetpixelfile(tic, mission='TESS').download()
+    tic = 273985862  # Has been observed in multiple sectors including 1
+    assert(len(search_targetpixelfile(tic, mission='TESS').table) > 1)
+    assert(len(search_targetpixelfile(tic, mission='TESS', sector=1, radius=100).table) == 2)
+    search_targetpixelfile(tic, mission='TESS', sector=1).download()
     assert(len(search_targetpixelfile("pi Mensae", sector=1).table) == 1)
     # Issue #445: indexing with -1 should return the last index of the search result
     assert(len(search_targetpixelfile("pi Men")[-1]) == 1)
@@ -83,9 +81,9 @@ def test_search_lightcurvefile(caplog):
     search_lightcurvefile(c, quarter=6).download()
     # with mission='TESS', it should return TESS observations
     tic = 273985862
-    assert(len(search_lightcurvefile(tic, mission='TESS').table) == 1)
-    assert(len(search_lightcurvefile(tic, mission='TESS', radius=100).table) == 2)
-    search_lightcurvefile(tic, mission='TESS').download()
+    assert(len(search_lightcurvefile(tic, mission='TESS').table) > 1)
+    assert(len(search_lightcurvefile(tic, mission='TESS', sector=1, radius=100).table) == 2)
+    search_lightcurvefile(tic, mission='TESS', sector=1).download()
     assert(len(search_lightcurvefile("pi Mensae", sector=1).table) == 1)
 
 
@@ -224,65 +222,6 @@ def test_empty_searchresult():
         sr.download_all()
 
 
-###
-# DEPRECATED TESTS
-# The tests below verify the DEPRECATED `from_archive` methods.
-# These can be removed once `from_archive` is removed.
-###
-
-@pytest.mark.remote_data
-@pytest.mark.filterwarnings('ignore:Query returned no results')
-def test_kepler_tpf_from_archive_DEPRECATED():
-    # Ignore all deprecation warnings
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", LightkurveWarning)
-        # Request an object name that does not exist
-        with pytest.raises(ValueError):
-            KeplerTargetPixelFile.from_archive("LightKurve_Unit_Test_Invalid_Target")
-        # Request an EPIC ID that was not observed
-        with pytest.raises(ValueError):
-            KeplerTargetPixelFile.from_archive(246000000)
-        KeplerTargetPixelFile.from_archive('Kepler-10', quarter=11)
-        KeplerTargetPixelFile.from_archive('Kepler-10', quarter=11, cadence='short')
-        KeplerTargetPixelFile.from_archive('Kepler-10', quarter=11, month=1, cadence='short')
-        # If we request 2 quarters it should give a list of two TPFs, ordered by quarter
-        tpfs = KeplerTargetPixelFile.from_archive(5728079, cadence='long', quarter=[1, 2])
-        assert(isinstance(tpfs, TargetPixelFileCollection))
-        assert(isinstance(tpfs[0], KeplerTargetPixelFile))
-        assert(tpfs[0].quarter == 1)
-
-
-@pytest.mark.remote_data
-@pytest.mark.filterwarnings('ignore:Query returned no results')
-def test_kepler_lightcurve_from_archive_DEPRECATED():
-    # Ignore all deprecation warnings
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", LightkurveWarning)
-        # Request an object name that does not exist
-        with pytest.raises(ValueError):
-            KeplerLightCurveFile.from_archive("LightKurve_Unit_Test_Invalid_Target")
-        # Request an EPIC ID that was not observed
-        with pytest.raises(ValueError):
-            KeplerLightCurveFile.from_archive(246000000)
-        KeplerLightCurveFile.from_archive('Kepler-10', quarter=11)
-        KeplerLightCurveFile.from_archive('Kepler-10', quarter=11, cadence='short')
-        KeplerLightCurveFile.from_archive('Kepler-10', quarter=11, month=1, cadence='short')
-
-
-@pytest.mark.remote_data
-def test_source_confusion_DEPRECATED():
-    # Regression test for issue #148.
-    # When obtaining the TPF for target 6507433, @benmontet noticed that
-    # a target 4 arcsec away was returned instead.
-    # See https://github.com/KeplerGO/lightkurve/issues/148
-    # Ignore all deprecation warnings
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", LightkurveWarning)
-        desired_target = 6507433
-        tpf = KeplerTargetPixelFile.from_archive(desired_target, quarter=8)
-        assert tpf.targetid == desired_target
-
-
 def test_open():
     # define paths to k2 and  tess data
     k2_path = os.path.join(PACKAGEDIR, "tests", "data", "test-tpf-star.fits")
@@ -304,6 +243,7 @@ def test_open():
     assert(open(k2_path, quality_bitmask='hard').quality_bitmask == 'hard')
 
 
+@pytest.mark.remote_data
 def test_issue_472():
     """Regression test for https://github.com/KeplerGO/lightkurve/issues/472"""
     # The line below previously threw an exception because the target was not
@@ -333,3 +273,15 @@ def test_corrupt_download_handling():
         with pytest.raises(SearchError) as err:
             search_targetpixelfile("Kepler-10", quarter=4).download(download_dir=tmpdirname)
         assert "The file was likely only partially downloaded." in err.value.args[0]
+
+
+def test_filenotfound():
+    """Regression test for #540; ensure lk.open() yields `FileNotFoundError`."""
+    # Python 2 uses IOError instead of FileNotFoundError;
+    # the block below can be removed when we drop Python 2 support.
+    try:
+        FileNotFoundError
+    except NameError:
+        FileNotFoundError = IOError
+    with pytest.raises(FileNotFoundError):
+        open("DOESNOTEXIST")

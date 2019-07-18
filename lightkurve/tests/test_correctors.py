@@ -77,8 +77,8 @@ def test_sff_corrector():
     # test using KeplerLightCurve interface
     klc = KeplerLightCurve(time=time, flux=raw_flux, centroid_col=centroid_col,
                            centroid_row=centroid_row)
-    klc = klc.correct(niters=1, windows=1)
-    sff = klc.corrector
+    sff = klc.to_corrector("sff")
+    klc = sff.correct(niters=1, windows=1)
 
     assert_almost_equal(klc.flux*sff.bspline(time),
                         corrected_flux, decimal=3)
@@ -103,7 +103,7 @@ def test_sff_knots():
                           flux=np.random.normal(1.0, 0.1, n_points),
                           centroid_col=np.random.normal(1.0, 0.1, n_points),
                           centroid_row=np.random.normal(1.0, 0.1, n_points))
-    lc.correct()  # should not raise an exception
+    lc.to_corrector(method="sff").correct()  # should not raise an exception
 
 
 @pytest.mark.remote_data

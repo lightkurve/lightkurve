@@ -18,7 +18,7 @@ exec(open('lightkurve/version.py').read())
 with open('requirements.txt') as f:
     install_requires = f.read().splitlines()
 # 2. What dependencies required to run the unit tests? (i.e. `pytest --remote-data`)
-tests_require = ['pytest', 'pytest-cov', 'pytest-remotedata', 'codecov']
+tests_require = ['pytest', 'pytest-cov', 'pytest-remotedata', 'codecov', 'pytest-doctestplus']
 # 3. What dependencies are required for optional features?
 # `BoxLeastSquaresPeriodogram` requires astropy>=3.1.
 # `interact()` requires bokeh>=1.0, ipython.
@@ -39,8 +39,10 @@ setup(name='lightkurve',
       package_dir={
             'lightkurve': 'lightkurve',
             'lightkurve.correctors': 'lightkurve/correctors',
+            'lightkurve.seismology': 'lightkurve/seismology',
             'lightkurve.prf': 'lightkurve/prf'},
-      packages=['lightkurve', 'lightkurve.correctors', 'lightkurve.prf'],
+      packages=['lightkurve', 'lightkurve.correctors',
+                'lightkurve.seismology', 'lightkurve.prf'],
       install_requires=install_requires,
       extras_require=extras_require,
       setup_requires=['pytest-runner'],

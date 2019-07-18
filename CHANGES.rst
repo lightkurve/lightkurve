@@ -1,5 +1,37 @@
-1.0.2 (unreleased)
+1.1.0 (unreleased)
 ==================
+
+- Added the `tpf.cutout()` method which enables smaller Target Pixel Files to
+  be extracted from larger ones. [#537]
+
+- Added the `pld_aperture_mask` argument to `PLDCorrector.correct()` to enable
+  users to select the pixels used for creating the PLD basis vectors. [#523]
+
+- Added a new unit test module (test_synthetic_data.py) which utilizes
+  synthetic Target Pixel Files to validate various Lightkurve features. [#534]
+
+- Removed seven methods which had been deprecated prior to v1.0: [#515]
+  * removed `lc.cdpp()` in favor of `lc.estimate_cdpp()`;
+  * removed `lc.correct()` in favor of `lc.to_corrector().correct()`;
+  * removed `lcf.from_fits()` in favor of `lightkurve.open()`;
+  * removed `tpf.from_fits()` in favor of `lightkurve.open()`;
+  * removed `lcf.from_archive()` in favor of `search_lightcurvefile()`;
+  * removed `tpf.from_archive()` in favor of `search_targetpixelfile()`;
+  * removed `tpf.centroids()` in favor of `tpf.estimate_centroids()`.
+
+- Moved the `Corrector` systematics removal classes into their own sub-package,
+  named `lightkurve.correctors`. [#519]
+
+- Fixed a bug which prevented `lightkurve.open()` from raising a
+  `FileNotFoundError` when a file does not exist. [#540]
+
+- Fixed a bug which caused `BoxLeastSquaresPeriodogram` to ignore the `period`
+  parameter. [#514]
+
+- Fixed a bug which prevented the `t0` argument of `lc.fold()` from being an
+  AstroPy Quantity object. [#521]
+
+- Added several new usage examples to the docstrings of functions. [#516]
 
 
 
