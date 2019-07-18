@@ -74,17 +74,6 @@ class LightCurveFile(object):
         """Cadence number"""
         return self.hdu[1].data['CADENCENO'][self.quality_mask]
 
-    @classmethod
-    def from_fits(cls, path_or_url, **kwargs):
-        """WARNING: THIS FUNCTION IS DEPRECATED AND WILL BE REMOVED VERY SOON.
-
-        Please use `lightkurve.open()` instead.
-        """
-        warnings.warn('`LightCurveFile.from_fits()` is deprecated and will be '
-                      'removed soon, please use `lightkurve.open()` instead.',
-                      LightkurveWarning)
-        return cls(path_or_url, **kwargs)
-
     def _flux_types(self):
         """Returns a list of available flux types for this light curve file"""
         types = [n for n in self.hdu[1].data.columns.names if 'FLUX' in n]
@@ -185,66 +174,6 @@ class KeplerLightCurveFile(LightCurveFile):
             self.targetid = self.header()['KEPLERID']
         except KeyError:
             self.targetid = None
-
-    @staticmethod
-    def from_archive(target, cadence='long', quarter=None, month=None,
-                     campaign=None, quality_bitmask="default", **kwargs):
-        """WARNING: THIS FUNCTION IS DEPRECATED AND WILL BE REMOVED VERY SOON.
-        Use `lightkurve.search_lightcurvefile()` instead.
-
-        Parameters
-        ----------
-        target : str or int
-            KIC/EPIC ID or object name.
-        cadence : str
-            'long' or 'short'.
-        quarter, campaign : int, list of ints, or 'all'
-            Kepler Quarter or K2 Campaign number.
-        month : 1, 2, 3, list of int, or 'all'
-            For Kepler's prime mission, there are three short-cadence
-            LightCurveFile objects for each quarter, each covering one month.
-            Hence, if cadence='short' you need to specify month=1, 2, or 3.
-        quality_bitmask : str or int
-            Bitmask (integer) which identifies the quality flag bitmask that should
-            be used to mask out bad cadences. If a string is passed, it has the
-            following meaning:
-
-                * "none": no cadences will be ignored (`quality_bitmask=0`).
-                * "default": cadences with severe quality issues will be ignored
-                  (`quality_bitmask=1130799`).
-                * "hard": more conservative choice of flags to ignore
-                  (`quality_bitmask=1664431`). This is known to remove good data.
-                * "hardest": removes all data that has been flagged
-                  (`quality_bitmask=2096639`). This mask is not recommended.
-
-            See the :class:`KeplerQualityFlags` class for details on the bitmasks.
-        kwargs : dict
-            Keywords arguments passed to `KeplerLightCurveFile`.
-
-        Returns
-        -------
-        lcf : KeplerLightCurveFile or LightCurveFileCollection
-        """
-        warnings.warn("`LightCurveFile.from_archive()` is deprecated and will be removed soon, "
-                      "please use `lightkurve.search_lightcurvefile()` instead.",
-                      LightkurveWarning)
-
-        # Be tolerant if a direct path or url is passed to this function by accident
-        if os.path.exists(str(target)) or str(target).startswith('http'):
-            log.warning('Warning: from_archive() is not intended to accept a '
-                        'direct path, use KeplerLightCurveFile(path) instead.')
-            KeplerLightCurveFile(target)
-        else:
-            from .search import search_lightcurvefile
-            sr = search_lightcurvefile(target, cadence=cadence,
-                                       quarter=quarter, month=month,
-                                       campaign=campaign)
-            if len(sr) == 1:
-                return sr.download(quality_bitmask=quality_bitmask, **kwargs)
-            elif len(sr) > 1:
-                return sr.download_all(quality_bitmask=quality_bitmask, **kwargs)
-            else:
-                raise ValueError("No light curve files found that match the search criteria.")
 
     def __repr__(self):
         return('KeplerLightCurveFile(ID: {})'.format(self.targetid))
