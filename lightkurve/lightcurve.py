@@ -183,7 +183,7 @@ class LightCurve(object):
         scales, Lightkurve provides an easy way to access the time values
         as an `AstroPy Time object <http://docs.astropy.org/en/stable/time/>`_::
 
-            >>> lc.astropy_time
+            >>> lc.astropy_time  # doctest: +SKIP
             <Time object: scale='tdb' format='jd' value=[2458325.29698328 2458325.29837215 2458325.29976102 ... 2458353.17431099
             2458353.17569985 2458353.17708871]>
 
@@ -191,11 +191,11 @@ class LightCurve(object):
         features. For example, we can now obtain the Julian Day or ISO values
         that correspond to the raw time values::
 
-            >>> lc.astropy_time.iso
+            >>> lc.astropy_time.iso  # doctest: +SKIP
             array(['2018-07-25 19:07:39.356', '2018-07-25 19:09:39.354',
                    '2018-07-25 19:11:39.352', ..., '2018-08-22 16:11:00.470',
                    '2018-08-22 16:13:00.467', '2018-08-22 16:15:00.464'], dtype='<U23')
-            >>> lc.astropy_time.jd
+            >>> lc.astropy_time.jd   # doctest: +SKIP
             array([2458325.29698328, 2458325.29837215, 2458325.29976102, ...,
                    2458353.17431099, 2458353.17569985, 2458353.17708871])
 
