@@ -61,14 +61,14 @@ class LightCurve(object):
     Create a new `LightCurve` object, access the data,
     and apply binning as follows:
 
-    >>> import lightkurve as lk
-    >>> lc = lk.LightCurve(time=[1, 2, 3, 4], flux=[0.97, 1.01, 1.03, 0.99])
-    >>> lc.time
-    array([1, 2, 3, 4])
-    >>> lc.flux
-    array([0.97, 1.01, 1.03, 0.99])
-    >>> lc.bin(binsize=2).flux
-    array([0.99, 1.01])
+        >>> import lightkurve as lk
+        >>> lc = lk.LightCurve(time=[1, 2, 3, 4], flux=[0.97, 1.01, 1.03, 0.99])
+        >>> lc.time
+        array([1, 2, 3, 4])
+        >>> lc.flux
+        array([0.97, 1.01, 1.03, 0.99])
+        >>> lc.bin(binsize=2).flux
+        array([0.99, 1.01])
     """
     def __init__(self, time=None, flux=None, flux_err=None, time_format=None,
                  time_scale=None, targetid=None, label=None, meta={}):
@@ -156,6 +156,49 @@ class LightCurve(object):
         The Time object will be created using the values in the ``time``,
         `time_format`, and ``time_scale`` attributes.
         For Kepler data products, the times are Barycentric.
+
+        Examples
+        --------
+        The section below demonstrates working with time values using the TESS
+        light curve of Pi Mensae as an example, which we obtained as follows::
+
+            >>> import lightkurve as lk
+            >>> lc = lk.search_lightcurvefile("Pi Mensae", mission="TESS", sector=1).download().PDCSAP_FLUX
+            >>> lc
+            TessLightCurve(TICID: 261136679)
+
+        Every `LightCurve` object has a `time` attribute, which provides access
+        to the original array of time values given in the native format and
+        scale used by the data product from which the light curve was obtained::
+
+            >>> lc.time
+            array([1325.29698328, 1325.29837215, 1325.29976102, ..., 1353.17431099,
+                   1353.17569985, 1353.17708871])
+            >>> lc.time_format
+            'btjd'
+            >>> lc.time_scale
+            'tdb'
+
+        To enable users to convert these time values to different formats or
+        scales, Lightkurve provides an easy way to access the time values
+        as an `AstroPy Time object <http://docs.astropy.org/en/stable/time/>`_::
+
+            >>> lc.astropy_time  # doctest: +SKIP
+            <Time object: scale='tdb' format='jd' value=[2458325.29698328 2458325.29837215 2458325.29976102 ... 2458353.17431099
+            2458353.17569985 2458353.17708871]>
+
+        This is convenient because AstroPy Time objects provide a lot of useful
+        features. For example, we can now obtain the Julian Day or ISO values
+        that correspond to the raw time values::
+
+            >>> lc.astropy_time.iso  # doctest: +SKIP
+            array(['2018-07-25 19:07:39.356', '2018-07-25 19:09:39.354',
+                   '2018-07-25 19:11:39.352', ..., '2018-08-22 16:11:00.470',
+                   '2018-08-22 16:13:00.467', '2018-08-22 16:15:00.464'], dtype='<U23')
+            >>> lc.astropy_time.jd   # doctest: +SKIP
+            array([2458325.29698328, 2458325.29837215, 2458325.29976102, ...,
+                   2458353.17431099, 2458353.17569985, 2458353.17708871])
+
 
         Raises
         ------
@@ -385,6 +428,37 @@ class LightCurve(object):
         Data points which occur exactly at ``t0`` or an integer multiple of
         ``t0 + n*period`` will have phase value 0.0.
 
+        Examples
+        --------
+        The example below shows a light curve with a period dip which occurs near
+        time value 1001 and has a period of 5 days. Calling the `fold` method
+        will transform the light curve into a `FoldedLightCurve` object::
+
+            >>> import lightkurve as lk
+            >>> lc = lk.LightCurve(time=range(1001, 1012), flux=[0.5, 1.0, 1.0, 1.0, 1.0, 0.5, 1.0, 1.0, 1.0, 1.0, 0.5])
+            >>> folded_lc = lc.fold(period=5., t0=1006.)
+            >>> folded_lc   # doctest: +SKIP
+            <lightkurve.lightcurve.FoldedLightCurve>
+
+        An object of type `FoldedLightCurve` is useful because it provides
+        convenient access to the phase values and the phase-folded fluxes::
+
+            >>> folded_lc.phase
+            array([-0.4, -0.4, -0.2, -0.2,  0. ,  0. ,  0. ,  0.2,  0.2,  0.4,  0.4])
+            >>> folded_lc.flux
+            array([1. , 1. , 1. , 1. , 0.5, 0.5, 0.5, 1. , 1. , 1. , 1. ])
+
+        We can still access the original time values as well::
+
+            >>> folded_lc.time_original
+            array([1004, 1009, 1005, 1010, 1001, 1006, 1011, 1002, 1007, 1003, 1008])
+
+        A `FoldedLightCurve` inherits all the features of a standard `LightCurve`
+        object. For example, we can very quickly obtain a phase-folded plot using:
+
+            >>> folded_lc.plot()    # doctest: +SKIP
+
+
         Parameters
         ----------
         period : float
@@ -447,11 +521,21 @@ class LightCurve(object):
         The normalized light curve is obtained by dividing the ``flux`` and
         ``flux_err`` object attributes by the by the median flux.
 
+        Examples
+        --------
+            >>> import lightkurve as lk
+            >>> lc = lk.LightCurve(time=[1, 2, 3], flux=[25945.7, 25901.5, 25931.2], flux_err=[6.8, 4.6, 6.2])
+            >>> normalized_lc = lc.normalize()
+            >>> normalized_lc.flux
+            array([1.00055917, 0.99885466, 1.        ])
+            >>> normalized_lc.flux_err
+            array([0.00026223, 0.00017739, 0.00023909])
+
         Returns
         -------
         normalized_lightcurve : `LightCurve`
-            A new light curve object in which ``flux`` and ``flux_err`` are divided
-            by the median.
+            A new light curve object in which ``flux`` and ``flux_err`` have
+            been divided by the median flux.
         """
         lc = self.copy()
         lc.flux_err = lc.flux_err / np.nanmedian(lc.flux)
@@ -530,6 +614,29 @@ class LightCurve(object):
             `astropy.stats.sigma_clip()` and provides the same functionality.
             Any extra arguments passed to this method will be passed on to
             ``sigma_clip``.
+
+        Examples
+        --------
+        This example generates a new light curve in which all points
+        that are more than 1 standard deviation from the median are removed::
+
+            >>> lc = LightCurve(time=[1, 2, 3, 4, 5], flux=[1, 1000, 1, -1000, 1])
+            >>> lc_clean = lc.remove_outliers(sigma=1)
+            >>> lc_clean.time
+            array([1, 3, 5])
+            >>> lc_clean.flux
+            array([1, 1, 1])
+
+        This example removes only points where the flux is larger than 1
+        standard deviation from the median, but leaves negative outliers
+        in place::
+
+            >>> lc = LightCurve(time=[1, 2, 3, 4, 5], flux=[1, 1000, 1, -1000, 1])
+            >>> lc_clean = lc.remove_outliers(sigma_lower=float('inf'), sigma_upper=1)
+            >>> lc_clean.time
+            array([1, 3, 4, 5])
+            >>> lc_clean.flux
+            array([    1,     1, -1000,     1])
 
         Parameters
         ----------
@@ -951,10 +1058,10 @@ class LightCurve(object):
         Load the light curve for Kepler-10, remove long-term trends, and
         display the BLS tool as follows:
 
-        >>> import lightkurve as lk
-        >>> lc = lk.search_lightcurvefile('kepler-10', quarter=3).download()  # doctest: +SKIP
-        >>> lc = lc.PDCSAP_FLUX.normalize().flatten()  # doctest: +SKIP
-        >>> lc.interact_bls()  # doctest: +SKIP
+            >>> import lightkurve as lk
+            >>> lc = lk.search_lightcurvefile('kepler-10', quarter=3).download()  # doctest: +SKIP
+            >>> lc = lc.PDCSAP_FLUX.normalize().flatten()  # doctest: +SKIP
+            >>> lc.interact_bls()  # doctest: +SKIP
 
         References
         ----------
