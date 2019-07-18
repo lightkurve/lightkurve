@@ -40,14 +40,14 @@ class SeismologyButler(object):
         log.info("Building a SeismologyButler object directly from a light curve "
                  "uses default periodogram parameters. For further tuneability, "
                  "create a periodogram object first, using `to_periodogram`.")
-        return SeismologyButler(periodogram=lc.to_periodogram(**kwargs))
+        return SeismologyButler(periodogram=lc.to_periodogram(**kwargs).flatten())
 
     def _validate_method(self, method, supported_methods):
         """Raises ValueError if a method is not supported."""
         if method in supported_methods:
             return method
         raise ValueError("method {} is not supported; "
-                         "must be one of {}".format(method, supported_methods))        
+                         "must be one of {}".format(method, supported_methods))
 
     def _validate_numax(self, numax):
         """Raises exception if `numax` is None and `self.numax` is not set."""
