@@ -13,9 +13,13 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 from astropy import units as u
+from astropy.units import cds
 
 from .. import MPLSTYLE
 from . import utils, stellar_estimators
+from ..periodogram import LombScarglePeriodogram, SNRPeriodogram
+
+
 
 log = logging.getLogger(__name__)
 
@@ -32,7 +36,15 @@ class SeismologyButler(object):
         self.periodogram = periodogram
 
     def __repr__(self):
-        return 'SeismologyButler(ID: {})'.format(self.periodogram.targetid)
+        attrs = np.asarray(['numax', 'deltanu', 'mass', 'radius', 'logg'])
+        tray = np.asarray([hasattr(self, attr) for attr in attrs])
+        if tray.sum() == 0:
+            tray_str = '\n\t|  Tray is empty.  |\n\t ' + '‾'*(18 + len(', '.join(attrs[tray])))
+        else:
+            tray_str = '\n\t|  On tray: ' + ', '.join(attrs[tray])+'  |\n\t '+'‾'*(13 + len(', '.join(attrs[tray])))
+
+
+        return 'SeismologyButler(ID: {})\n{}'.format(self.periodogram.targetid, tray_str)
 
     @staticmethod
     def from_lightcurve(lc, **kwargs):
@@ -108,6 +120,7 @@ class SeismologyButler(object):
         ax : matplotlib.axes._subplots.AxesSubplot
             The matplotlib axes object.
         """
+        numax = self._validate_numax(numax)
         deltanu = self._validate_deltanu(deltanu)
         freq = self.periodogram.frequency  # Makes code below more readable
 
@@ -184,12 +197,21 @@ class SeismologyButler(object):
             figsize = plt.rcParams['figure.figsize']
             a = figsize[1] / figsize[0]
             b = (extent[3] - extent[2]) / extent[1]
+            vmin = np.nanpercentile(ep.value, 1)
+            vmax = np.nanpercentile(ep.value, 99)
+            im = ax.imshow(ep.value, cmap=cmap, aspect=a/b, origin='lower',
+                      extent=extent, vmin=vmin, vmax=vmax)
+            cbar = plt.colorbar(im, ax=ax)
+            if isinstance(self.periodogram, LombScarglePeriodogram):
+                if self.periodogram.power.unit == cds.ppm:
+                    ylabel = "Amplitude [{}]".format(self.periodogram.power.unit.to_string('latex'))
+                else:
+                    ylabel = "Power Spectral Density [{}]".format(self.periodogram.power.unit.to_string('latex'))
+            elif isinstance(self.periodogram, SNRPeriodogram):
+                ylabel = 'Signal to Noise Ratio (SNR)'
 
-            ax.imshow(ep.value, cmap=cmap, aspect=a/b, origin='lower',
-                      extent=extent)
-
-            ax.set_xlabel(r'Frequency mod. {:.2f} {}'.format(deltanu,
-                                        freq.unit.to_string('latex')))
+            cbar.set_label(ylabel)
+            ax.set_xlabel(r'Frequency mod. {:.2f}'.format(deltanu))
             ax.set_ylabel(r'Frequency [{}]'.format(freq.unit.to_string('latex')))
             ax.set_title('Echelle diagram for {}'.format(self.periodogram.label))
 

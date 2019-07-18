@@ -26,7 +26,7 @@ class SeismologyQuantity(Quantity):
         return super().__repr__()
 
     def _repr_latex_(self):
-        return "{}: {} (method: {})".format(self.name,
+        return "{}: {} {} (method: {})".format(self.name,
                                     '$ {} $'.format(np.round(super().value,2)),
                                     super().unit._repr_latex_(), self.method)
 

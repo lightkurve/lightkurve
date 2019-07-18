@@ -134,8 +134,13 @@ def diagnose_numax_acf(numax, periodogram):
     """
     with plt.style.context(MPLSTYLE):
         fig, ax = plt.subplots(3, sharex=True, figsize=(8.485, 12))
-        periodogram.plot(ax=ax[0])
+        periodogram.plot(ax=ax[0], label='')
+        ax[0].axvline(numax.value, c='r', linewidth=2, alpha=.4)
+        ax[0].text(numax.value, periodogram.power.value.max()*0.75, '{:7.5}'.format(numax.value), rotation=90, ha='right', color='r', alpha=0.5)
         ax[0].set_xlabel('')
+        ax[0].text(.05, .9, 'Input Power Spectrum',
+                    horizontalalignment='left',
+                    transform=ax[0].transAxes, fontsize=15)
 
         windowarray = np.linspace(0, numax.diagnostics['window'],
                                   num=numax.diagnostics['acf2d'].shape[1])
@@ -146,20 +151,31 @@ def diagnose_numax_acf(numax, periodogram):
         figsize = [8.485, 4]
         a = figsize[1] / figsize[0]
         b = (extent[3] - extent[2]) / (extent[1] - extent[0])
-
-        ax[1].imshow(numax.diagnostics['acf2d'], cmap='Blues', aspect=a/b,
-                     origin='lower', extent=extent)
+        vmin = np.nanpercentile(numax.diagnostics['acf2d'], 5)
+        vmax = np.nanpercentile(numax.diagnostics['acf2d'], 95)
+#        print(windowarray.shape)
+#        print(numax.diagnostics['numaxs'].shape)
+#        print(numax.diagnostics['acf2d'].shape)
+#        print(periodogram.frequency.value.shape)
+        im = ax[1].pcolormesh(numax.diagnostics['numaxs'], np.linspace(0, numax.diagnostics['window'], num=numax.diagnostics['acf2d'].shape[0]),
+                                    numax.diagnostics['acf2d'], cmap='Blues', vmin=vmin, vmax=vmax)
+#        plt.colorbar(im, ax=ax[1], orientation='horizontal')
         ax[1].set_ylabel(r'Frequency lag [{}]'.format(periodogram.frequency.unit.to_string('latex')))
+        ax[1].axvline(numax.value, c='r', linewidth=2, alpha=.4)
+        ax[1].text(.05, .9, '2D AutoCorrelation',
+                    horizontalalignment='left',
+                    transform=ax[1].transAxes, fontsize=13)
 
         ax[2].plot(numax.diagnostics['numaxs'], numax.diagnostics['metric'])
-        ax[2].plot(numax.diagnostics['numaxs'], numax.diagnostics['metric_smooth'])
+        ax[2].plot(numax.diagnostics['numaxs'], numax.diagnostics['metric_smooth'], lw=2, alpha=0.7)
         ax[2].set_xlabel("Frequency [{}]".format(periodogram.frequency.unit.to_string('latex')))
         ax[2].set_ylabel(r'Correlation Metric')
-        ax[0].axvline(numax.value, c='r', linewidth=2, alpha=.4)
-        ax[1].axvline(numax.value, c='r', linewidth=2, alpha=.4)
-        ax[2].axvline(numax.value, c='r', linewidth=2, alpha=.4,
-                      label=r'{:.1f} {}'.format(
-                          numax.value,
-                          periodogram.frequency.unit.to_string('latex')))
-        ax[2].legend()
+
+
+        ax[2].axvline(numax.value, c='r', linewidth=2, alpha=.4)
+        ax[2].text(.05, .9, 'Correlation Metric',
+                            horizontalalignment='left',
+                            transform=ax[2].transAxes, fontsize=13)
+        ax[2].set_xlim(numax.diagnostics['numaxs'][0], numax.diagnostics['numaxs'][-1])
+        plt.subplots_adjust(hspace=0, wspace=0)
     return ax
