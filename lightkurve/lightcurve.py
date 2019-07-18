@@ -615,29 +615,6 @@ class LightCurve(object):
             Any extra arguments passed to this method will be passed on to
             ``sigma_clip``.
 
-        Examples
-        --------
-        This example generates a new light curve in which all points
-        that are more than 1 standard deviation from the median are removed::
-
-            >>> lc = LightCurve(time=[1, 2, 3, 4, 5], flux=[1, 1000, 1, -1000, 1])
-            >>> lc_clean = lc.remove_outliers(sigma=1)
-            >>> lc_clean.time
-            array([1, 3, 5])
-            >>> lc_clean.flux
-            array([1, 1, 1])
-
-        This example removes only points where the flux is larger than 1
-        standard deviation from the median, but leaves negative outliers
-        in place::
-
-            >>> lc = LightCurve(time=[1, 2, 3, 4, 5], flux=[1, 1000, 1, -1000, 1])
-            >>> lc_clean = lc.remove_outliers(sigma_lower=float('inf'), sigma_upper=1)
-            >>> lc_clean.time
-            array([1, 3, 4, 5])
-            >>> lc_clean.flux
-            array([    1,     1, -1000,     1])
-
         Parameters
         ----------
         sigma : float
