@@ -104,8 +104,12 @@ def diagnose_deltanu_acf(deltanu, periodogram):
         spread = int(window_width/2/frequency_spacing)                           # Find the spread in indices
 
 
-        a = periodogram.frequency.value[np.argmin(np.abs(periodogram.frequency.value - deltanu.diagnostics['numax'].value)) + spread]
-        b = periodogram.frequency.value[np.argmin(np.abs(periodogram.frequency.value - deltanu.diagnostics['numax'].value)) - spread]
+        a = np.argmin(np.abs(periodogram.frequency.value - deltanu.diagnostics['numax'].value)) + spread
+        b = np.argmin(np.abs(periodogram.frequency.value - deltanu.diagnostics['numax'].value)) - spread
+
+        a = [periodogram.frequency.value[a] if a < len(periodogram.frequency) else periodogram.frequency.value[-1]][0]
+        b = [periodogram.frequency.value[b] if b > 0 else periodogram.frequency.value[0]][0]
+
         ax.axvline(a, c='r', linewidth=2, alpha=.4, ls='--')
         ax.axvline(b, c='r', linewidth=2, alpha=.4, ls='--')
         h = periodogram.power.value.max() * 0.9
