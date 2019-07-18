@@ -81,7 +81,7 @@ def estimate_numax_acf(periodogram, numaxs=None, window=None, spacing=None):
     # of sqrt(len(numaxs) will result in a smoothing kernel that works for all
     # resolutions of numax.
     if len(numaxs) > 10:
-        g = Gaussian1DKernel(stddev=np.sqrt(len(numaxs))))
+        g = Gaussian1DKernel(stddev=np.sqrt(len(numaxs)))
         metric_smooth = convolve(metric, g, boundary='extend')
     else:
         metric_smooth = metric
