@@ -43,9 +43,9 @@ class SeismologyButler(object):
         attrs = np.asarray(['numax', 'deltanu', 'mass', 'radius', 'logg'])
         tray = np.asarray([hasattr(self, attr) for attr in attrs])
         if tray.sum() == 0:
-            tray_str = '\n\t|  Tray is empty.  |\n\t ' + '‾'*(18 + len(', '.join(attrs[tray])))
+            tray_str = '\n\t|  Tray is empty.  |\n\t ' + '-'*(18 + len(', '.join(attrs[tray])))
         else:
-            tray_str = '\n\t|  On tray: ' + ', '.join(attrs[tray])+'  |\n\t '+'‾'*(13 + len(', '.join(attrs[tray])))
+            tray_str = '\n\t|  On tray: ' + ', '.join(attrs[tray])+'  |\n\t '+'-'*(13 + len(', '.join(attrs[tray])))
 
 
         return 'SeismologyButler(ID: {})\n{}'.format(self.periodogram.targetid, tray_str)
