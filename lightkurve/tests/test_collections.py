@@ -85,13 +85,13 @@ def test_tpfcollection():
     assert(tpfc[2] == tpf2)
 
 
-def test_tpfcollection_plot_all():
+def test_tpfcollection_plot():
     tpf = KeplerTargetPixelFile(filename_tpf_all_zeros)
     tpf2 = KeplerTargetPixelFile(filename_tpf_one_center)
     # Does plotting work with 3 TPFs?
     coll = TargetPixelFileCollection([tpf, tpf2, tpf2])
-    coll.plot_all()
+    coll.plot()
     # Does plotting work with one TPF?
     coll = TargetPixelFileCollection([tpf])
-    coll.plot_all()
+    coll.plot()
     plt.close('all')
