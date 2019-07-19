@@ -125,7 +125,7 @@ def diagnose_deltanu_acf(deltanu, periodogram):
     For details on the deltanu estimation, see the `estimate_deltanu()`
     function. The calculation performed is identical.
 
-    NOTE: When plotting , we exclude the first frequency lag bin, to
+    NOTE: When plotting, we exclude the first frequency lag bin, to
     make the relevant features on the plot clearer.
 
     Parameters
@@ -144,7 +144,9 @@ def diagnose_deltanu_acf(deltanu, periodogram):
         ax = axs[0]
         periodogram.plot(ax=ax, label='')
         ax.axvline(deltanu.diagnostics['numax'].value, c='r', linewidth=1, alpha=.4, ls=':')
-        ax.text(deltanu.diagnostics['numax'].value, periodogram.power.value.max()*0.75, 'numax'+' ({0:7.5})'.format(deltanu.diagnostics['numax']), rotation=90, ha='right', color='r', alpha=0.5, fontsize=8)
+        ax.text(deltanu.diagnostics['numax'].value, periodogram.power.value.max()*0.6,
+                    '{} ({0:7.5} {})'.format(r'$\nu_{\rm max}$', deltanu.diagnostics['numax'].value, deltanu.diagnostics['numax'].unit.to_string('latex'))
+                    rotation=90, ha='right', color='r', alpha=0.5, fontsize=8)
         ax.text(.025, .9, 'Input Power Spectrum',
                     horizontalalignment='left',
                     transform=ax.transAxes, fontsize=11)
@@ -168,7 +170,7 @@ def diagnose_deltanu_acf(deltanu, periodogram):
 
         ax.annotate("", xy=(a, h), xytext=(a - (a-b), h),
                         arrowprops=dict(arrowstyle="<->", color='r', alpha=0.5), va='bottom')
-        ax.text(a - (a-b)/2, h, "FWHM", color='r', alpha=0.7, fontsize=10, va='bottom', ha='center')
+        ax.text(a - (a-b)/2, h, r"2 $\times$ FWHM", color='r', alpha=0.7, fontsize=10, va='bottom', ha='center')
         ax.set_xlim(b - ((a-b)*0.2), a + ((a-b)*0.2))
 
         ax = axs[1]
@@ -190,11 +192,11 @@ def diagnose_deltanu_acf(deltanu, periodogram):
             label=r'Measured deltanu {:.1f} {}'.format(deltanu.value,
                                       periodogram.frequency.unit.to_string('latex')))
         ax.axvline(deltanu.diagnostics['deltanu_emp'],c='b', linewidth=2,alpha=.4, ls='--',
-                    label=r'Empiracal deltanu {:.1f} {}'.format(deltanu.diagnostics['deltanu_emp'],
+                    label=r'Empirical deltanu {:.1f} {}'.format(deltanu.diagnostics['deltanu_emp'],
                                   periodogram.frequency.unit.to_string('latex')))
         axin.axvline(deltanu.value,c='r', linewidth=2,alpha=.4)
         axin.axvline(deltanu.diagnostics['deltanu_emp'],c='b', linewidth=2,alpha=.4, ls='--')
-        ax.text(.025, .9, 'Scaled Auto Correlation Within FWHM',
+        ax.text(.025, .9, 'Scaled Auto Correlation Within 2 FWHM',
                     horizontalalignment='left',
                     transform=ax.transAxes, fontsize=11)
 
