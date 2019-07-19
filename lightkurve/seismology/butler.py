@@ -208,13 +208,18 @@ class SeismologyButler(object):
             vmax = np.nanpercentile(ep.value, 99)
             im = ax.imshow(ep.value, cmap=cmap, aspect=a/b, origin='lower',
                       extent=extent, vmin=vmin, vmax=vmax)
-            cbar = plt.colorbar(im, ax=ax)
+            cbar = plt.colorbar(im, ax=ax, extend='both', pad=.01)
+
+
             if isinstance(self.periodogram, SNRPeriodogram):
                 ylabel = 'Signal to Noise Ratio (SNR)'
             elif self.periodogram.power.unit == cds.ppm:
                 ylabel = "Amplitude [{}]".format(self.periodogram.power.unit.to_string('latex'))
             else:
                 ylabel = "Power Spectral Density [{}]".format(self.periodogram.power.unit.to_string('latex'))
+
+            if scale == 'log':
+                ylabel = 'log10('+ylabel+')'
 
             cbar.set_label(ylabel)
             ax.set_xlabel(r'Frequency mod. {:.2f}'.format(deltanu))
@@ -295,7 +300,7 @@ class SeismologyButler(object):
 
     def estimate_radius(self, teff, numax=None, deltanu=None):
         """Returns a stellar radius estimate based on the scaling relations.
-        
+
         This method is implemented by the `~lightkurve.seismology.estimate_radius` function.
         For details and literature references, please read the detailed
         docstring of this function by typing ``lightkurve.seismology.estimate_radius?``.
