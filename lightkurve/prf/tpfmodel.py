@@ -1,7 +1,7 @@
 """Provides tools to model a Kepler image for PRF photometry fitting.
 
-Example use
------------
+Examples
+--------
 %matplotlib inline
 import numpy as np
 from lightkurve import KeplerTargetPixelFile, LightCurve
@@ -123,8 +123,8 @@ class PriorContainer(object):
 class StarPrior(PriorContainer):
     """Container class to capture a user's beliefs about a star's position and flux.
 
-    Example use
-    -----------
+    Examples
+    --------
     StarPrior(col=GaussianPrior(mean=col, var=err_col**2),
               row=GaussianPrior(mean=row, var=err_row**2),
               flux=GaussianPrior(mean=flux, var=err_flux**2))

@@ -2,9 +2,9 @@
 from __future__ import division
 import os
 import logging
-import numpy as np
 import warnings
 
+import numpy as np
 from astropy.table import join, Table, Row
 from astropy.coordinates import SkyCoord
 from astropy.io import ascii, fits
@@ -110,10 +110,13 @@ class SearchResult(object):
         # if the SearchResult row is a TESScut entry, then download cutout
         if 'FFI Cutout' in table[0]['description']:
             try:
+                log.debug("Started downloading TESSCut for '{}' sector {}."
+                          "".format(table[0]['target_name'], table[0]['sequence_number']))
                 path = self._fetch_tesscut_path(table[0]['target_name'],
                                                 table[0]['sequence_number'],
                                                 download_dir,
                                                 cutout_size)
+                log.debug("Finished downloading.")
             except:
                 raise SearchError('Unable to download FFI cutout. Desired target '
                                   'coordinates may be too near the edge of the FFI.')
@@ -127,9 +130,10 @@ class SearchResult(object):
                 warnings.warn('`cutout_size` can only be specified for TESS '
                               'Full Frame Image cutouts.', LightkurveWarning)
             from astroquery.mast import Observations
+            log.debug("Started downloading {}.".format(table[:1]['dataURL'][0]))
             path = Observations.download_products(table[:1], mrp_only=False,
                                                   download_dir=download_dir)['Local Path'][0]
-
+            log.debug("Finished downloading.")
             # open() will determine filetype and return
             return _open_downloaded_file(path, quality_bitmask=quality_bitmask)
 
@@ -222,6 +226,7 @@ class SearchResult(object):
             warnings.warn("Cannot download from an empty search result.",
                           LightkurveWarning)
             return None
+        log.debug("{} files will be downloaded.".format(len(self.table)))
 
         products = []
         for idx in range(len(self.table)):
@@ -551,9 +556,10 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
     -------
     SearchResult : :class:`SearchResult` object.
     """
-
     observations = _query_mast(target, project=mission, radius=radius)
-
+    log.debug("MAST found {} observations. "
+              "Now querying MAST for the corresponding data products."
+              "".format(len(observations)))
     if len(observations) == 0:
         raise SearchError('No data found for target "{}".'.format(target))
 
@@ -569,6 +575,7 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
                                          campaign=campaign, quarter=quarter,
                                          cadence=cadence, project=mission,
                                          month=month, sector=sector, limit=limit)
+        log.debug("MAST found {} matching data products.".format(len(masked_result)))
         return SearchResult(masked_result)
 
     # Full Frame Images
@@ -590,6 +597,7 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
                                 'sequence_number': s}
                                )
         if len(cutouts) > 0:
+            log.debug("Found {} matching cutouts.".format(len(cutouts)))
             masked_result = Table(cutouts)
             masked_result.sort(['distance', 'sequence_number'])
         else:
@@ -645,13 +653,15 @@ def _query_mast(target, radius=None, project=['Kepler', 'K2', 'TESS']):
             # suppress misleading AstropyWarning
             warnings.simplefilter('ignore', AstropyWarning)
             from astroquery.mast import Observations
+            log.debug("Started querying MAST for observations within {} of target_name='{}'."
+                      "".format(radius.to(u.arcsec), target_name))
             target_obs = Observations.query_criteria(target_name=target_name,
                                                      radius=str(radius.to(u.deg)),
                                                      project=project,
                                                      obs_collection=project)
 
         if len(target_obs) == 0:
-            raise ValueError("No observations found for {}.".format(target_name))
+            raise ValueError("No observations found for '{}'.".format(target_name))
 
         # check if a cone search is being performed
         # if yes, perform a cone search around coordinates of desired target
@@ -667,6 +677,8 @@ def _query_mast(target, radius=None, project=['Kepler', 'K2', 'TESS']):
                 # suppress misleading AstropyWarning
                 warnings.simplefilter('ignore', AstropyWarning)
                 from astroquery.mast import Observations
+                log.debug("Started querying MAST for observations within {} of coordinates='{} {}'."
+                          "".format(radius.to(u.arcsec), ra, dec))
                 obs = Observations.query_criteria(coordinates='{} {}'.format(ra, dec),
                                                   radius=str(radius.to(u.deg)),
                                                   project=project,
@@ -685,6 +697,8 @@ def _query_mast(target, radius=None, project=['Kepler', 'K2', 'TESS']):
             # suppress misleading AstropyWarning
             warnings.simplefilter('ignore', AstropyWarning)
             from astroquery.mast import Observations
+            log.debug("Started querying MAST for observations within {} of objectname='{}'."
+                      "".format(radius.to(u.arcsec), target))
             obs = Observations.query_criteria(objectname=target,
                                               radius=str(radius.to(u.deg)),
                                               project=project,
@@ -899,10 +913,12 @@ def open(path_or_url, **kwargs):
 
         >>> tpf = open("mytpf.fits")  # doctest: +SKIP
     """
+    log.debug("Opening {}.".format(path_or_url))
     # pass header into `detect_filetype()`
     try:
         with fits.open(path_or_url) as temp:
             filetype = detect_filetype(temp[0].header)
+            log.debug("Detected filetype: '{}'.".format(filetype))
     except OSError as e:
         filetype = None
         # Raise an explicit FileNotFoundError if file not found

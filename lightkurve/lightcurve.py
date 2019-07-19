@@ -33,16 +33,16 @@ log = logging.getLogger(__name__)
 
 
 class LightCurve(object):
-    """Generic class to work with any time series photometry data set.
+    """Generic light curve object to hold time series photometry for one target.
 
     Attributes
     ----------
     time : array-like
-        Time values
+        Time values.
     flux : array-like
-        Flux values for every time point
+        Flux values for every time point.
     flux_err : array-like
-        Uncertainty on each flux data point
+        Uncertainty on each flux data point.
     time_format : str
         String specifying how an instant of time is represented,
         e.g. 'bkjd' or 'jd'.
@@ -52,7 +52,7 @@ class LightCurve(object):
     targetid : str
         Identifier of the target.
     label : str
-        Human-friendly object label, e.g. "KIC 123456789"
+        Human-friendly object label, e.g. "KIC 123456789".
     meta : dict
         Free-form metadata associated with the LightCurve.
 
@@ -61,14 +61,14 @@ class LightCurve(object):
     Create a new `LightCurve` object, access the data,
     and apply binning as follows:
 
-    >>> import lightkurve as lk
-    >>> lc = lk.LightCurve(time=[1, 2, 3, 4], flux=[0.97, 1.01, 1.03, 0.99])
-    >>> lc.time
-    array([1, 2, 3, 4])
-    >>> lc.flux
-    array([0.97, 1.01, 1.03, 0.99])
-    >>> lc.bin(binsize=2).flux
-    array([0.99, 1.01])
+        >>> import lightkurve as lk
+        >>> lc = lk.LightCurve(time=[1, 2, 3, 4], flux=[0.97, 1.01, 1.03, 0.99])
+        >>> lc.time
+        array([1, 2, 3, 4])
+        >>> lc.flux
+        array([0.97, 1.01, 1.03, 0.99])
+        >>> lc.bin(binsize=2).flux
+        array([0.99, 1.01])
     """
     def __init__(self, time=None, flux=None, flux_err=None, time_format=None,
                  time_scale=None, targetid=None, label=None, meta={}):
@@ -150,12 +150,53 @@ class LightCurve(object):
 
     @property
     def astropy_time(self):
-        """Returns the time values as an Astropy `~astropy.time.Time` object
-        (if ``time_format`` is set).
+        """Returns the time values as an Astropy `~astropy.time.Time` object.
 
-        The Time object will be created using the values in the ``time``,
-        `time_format`, and ``time_scale`` attributes.
-        For Kepler data products, the times are Barycentric.
+        The Time object will be created based on the values of the light curve's
+        `time`, `time_format`, and `time_scale` attributes.
+
+        Examples
+        --------
+        The section below demonstrates working with time values using the TESS
+        light curve of Pi Mensae as an example, which we obtained as follows::
+
+            >>> import lightkurve as lk
+            >>> lc = lk.search_lightcurvefile("Pi Mensae", mission="TESS", sector=1).download().PDCSAP_FLUX
+            >>> lc
+            TessLightCurve(TICID: 261136679)
+
+        Every `LightCurve` object has a `time` attribute, which provides access
+        to the original array of time values given in the native format and
+        scale used by the data product from which the light curve was obtained::
+
+            >>> lc.time
+            array([1325.29698328, 1325.29837215, 1325.29976102, ..., 1353.17431099,
+                   1353.17569985, 1353.17708871])
+            >>> lc.time_format
+            'btjd'
+            >>> lc.time_scale
+            'tdb'
+
+        To enable users to convert these time values to different formats or
+        scales, Lightkurve provides an easy way to access the time values
+        as an `AstroPy Time object <http://docs.astropy.org/en/stable/time/>`_::
+
+            >>> lc.astropy_time  # doctest: +SKIP
+            <Time object: scale='tdb' format='jd' value=[2458325.29698328 2458325.29837215 2458325.29976102 ... 2458353.17431099
+            2458353.17569985 2458353.17708871]>
+
+        This is convenient because AstroPy Time objects provide a lot of useful
+        features. For example, we can now obtain the Julian Day or ISO values
+        that correspond to the raw time values::
+
+            >>> lc.astropy_time.iso  # doctest: +SKIP
+            array(['2018-07-25 19:07:39.356', '2018-07-25 19:09:39.354',
+                   '2018-07-25 19:11:39.352', ..., '2018-08-22 16:11:00.470',
+                   '2018-08-22 16:13:00.467', '2018-08-22 16:15:00.464'], dtype='<U23')
+            >>> lc.astropy_time.jd   # doctest: +SKIP
+            array([2458325.29698328, 2458325.29837215, 2458325.29976102, ...,
+                   2458353.17431099, 2458353.17569985, 2458353.17708871])
+
 
         Raises
         ------
@@ -378,12 +419,43 @@ class LightCurve(object):
         return flatten_lc
 
     def fold(self, period, t0=None, transit_midpoint=None):
-        """Folds the lightcurve at a specified ``period`` and reference time ``t0``.
+        """Folds the lightcurve at a specified `period` and reference time `t0`.
 
         This method returns a `FoldedLightCurve` object in which the time
         values range between -0.5 to +0.5 (i.e. the phase).
         Data points which occur exactly at ``t0`` or an integer multiple of
         ``t0 + n*period`` will have phase value 0.0.
+
+        Examples
+        --------
+        The example below shows a light curve with a period dip which occurs near
+        time value 1001 and has a period of 5 days. Calling the `fold` method
+        will transform the light curve into a `FoldedLightCurve` object::
+
+            >>> import lightkurve as lk
+            >>> lc = lk.LightCurve(time=range(1001, 1012), flux=[0.5, 1.0, 1.0, 1.0, 1.0, 0.5, 1.0, 1.0, 1.0, 1.0, 0.5])
+            >>> folded_lc = lc.fold(period=5., t0=1006.)
+            >>> folded_lc   # doctest: +SKIP
+            <lightkurve.lightcurve.FoldedLightCurve>
+
+        An object of type `FoldedLightCurve` is useful because it provides
+        convenient access to the phase values and the phase-folded fluxes::
+
+            >>> folded_lc.phase
+            array([-0.4, -0.4, -0.2, -0.2,  0. ,  0. ,  0. ,  0.2,  0.2,  0.4,  0.4])
+            >>> folded_lc.flux
+            array([1. , 1. , 1. , 1. , 0.5, 0.5, 0.5, 1. , 1. , 1. , 1. ])
+
+        We can still access the original time values as well::
+
+            >>> folded_lc.time_original
+            array([1004, 1009, 1005, 1010, 1001, 1006, 1011, 1002, 1007, 1003, 1008])
+
+        A `FoldedLightCurve` inherits all the features of a standard `LightCurve`
+        object. For example, we can very quickly obtain a phase-folded plot using:
+
+            >>> folded_lc.plot()    # doctest: +SKIP
+
 
         Parameters
         ----------
@@ -447,11 +519,21 @@ class LightCurve(object):
         The normalized light curve is obtained by dividing the ``flux`` and
         ``flux_err`` object attributes by the by the median flux.
 
+        Examples
+        --------
+            >>> import lightkurve as lk
+            >>> lc = lk.LightCurve(time=[1, 2, 3], flux=[25945.7, 25901.5, 25931.2], flux_err=[6.8, 4.6, 6.2])
+            >>> normalized_lc = lc.normalize()
+            >>> normalized_lc.flux
+            array([1.00055917, 0.99885466, 1.        ])
+            >>> normalized_lc.flux_err
+            array([0.00026223, 0.00017739, 0.00023909])
+
         Returns
         -------
         normalized_lightcurve : `LightCurve`
-            A new light curve object in which ``flux`` and ``flux_err`` are divided
-            by the median.
+            A new light curve object in which ``flux`` and ``flux_err`` have
+            been divided by the median flux.
         """
         lc = self.copy()
         lc.flux_err = lc.flux_err / np.nanmedian(lc.flux)
@@ -677,14 +759,6 @@ class LightCurve(object):
 
         return binned_lc
 
-    def cdpp(self, **kwargs):
-        """DEPRECATED: use `estimate_cdpp()` instead."""
-        warnings.warn('`LightCurve.cdpp()` is deprecated and will be '
-                      'removed in Lightkurve v1.0.0, '
-                      'please use `LightCurve.estimate_cdpp()` instead.',
-                      LightkurveWarning)
-        return self.estimate_cdpp(**kwargs)
-
     def estimate_cdpp(self, transit_duration=13, savgol_window=101,
                       savgol_polyorder=2, sigma=5.):
         """Estimate the CDPP noise metric using the Savitzky-Golay (SG) method.
@@ -819,7 +893,7 @@ class LightCurve(object):
         return ax
 
     def plot(self, **kwargs):
-        """Plot the light curve using Matplotlib's `~matplotlib.pyplot.plot()` method.
+        """Plot the light curve using Matplotlib's `~matplotlib.pyplot.plot` method.
 
         Parameters
         ----------
@@ -849,7 +923,7 @@ class LightCurve(object):
         return self._create_plot(method='plot', **kwargs)
 
     def scatter(self, colorbar_label='', show_colorbar=True, **kwargs):
-        """Plots the light curve using Matplotlib's `~matplotlib.pyplot.scatter()` method.
+        """Plots the light curve using Matplotlib's `~matplotlib.pyplot.scatter` method.
 
         Parameters
         ----------
@@ -884,7 +958,7 @@ class LightCurve(object):
                                  show_colorbar=show_colorbar, **kwargs)
 
     def errorbar(self, linestyle='', **kwargs):
-        """Plots the light curve using Matplotlib's `~matplotlib.pyplot.errorbar()` method.
+        """Plots the light curve using Matplotlib's `~matplotlib.pyplot.errorbar` method.
 
         Parameters
         ----------
@@ -959,10 +1033,10 @@ class LightCurve(object):
         Load the light curve for Kepler-10, remove long-term trends, and
         display the BLS tool as follows:
 
-        >>> import lightkurve as lk
-        >>> lc = lk.search_lightcurvefile('kepler-10', quarter=3).download()  # doctest: +SKIP
-        >>> lc = lc.PDCSAP_FLUX.normalize().flatten()  # doctest: +SKIP
-        >>> lc.interact_bls()  # doctest: +SKIP
+            >>> import lightkurve as lk
+            >>> lc = lk.search_lightcurvefile('kepler-10', quarter=3).download()  # doctest: +SKIP
+            >>> lc = lc.PDCSAP_FLUX.normalize().flatten()  # doctest: +SKIP
+            >>> lc.interact_bls()  # doctest: +SKIP
 
         References
         ----------
@@ -1260,7 +1334,7 @@ class LightCurve(object):
         return hdu
 
     def to_corrector(self, method="sff"):
-        """Returns a `Corrector` instance to remove systematics.
+        """Returns a corrector object to remove instrument systematics.
 
         Parameters
         ----------
@@ -1431,43 +1505,6 @@ class KeplerLightCurve(LightCurve):
 
     def __repr__(self):
         return('KeplerLightCurve(ID: {})'.format(self.targetid))
-
-    def correct(self, method='sff', **kwargs):
-        """DEPRECATED: use `to_corrector(method).correct()` instead.
-
-        Parameters
-        ----------
-        method : str
-            Method used to correct the lightcurve.
-            Right now only 'sff' (Vanderburg's Self-Flat Fielding) is supported.
-        kwargs : dict
-            Dictionary of keyword arguments to be passed to the function
-            defined by `method`.
-
-        Returns
-        -------
-        new_lc : KeplerLightCurve object
-            Corrected lightcurve
-        """
-        warnings.warn('`KeplerLightCurve.correct()` is deprecated and will be '
-                      'removed in Lightkurve v1.0.0, '
-                      'please use `LightCurve.to_corrector("sff").correct()` instead.',
-                      LightkurveWarning)
-
-        not_nan = np.isfinite(self.flux)
-        if method == 'sff':
-            from .correctors import SFFCorrector
-            self.corrector = SFFCorrector(self[not_nan])
-            corrected_lc = self.corrector.correct(centroid_col=self.centroid_col[not_nan],
-                                                  centroid_row=self.centroid_row[not_nan],
-                                                  **kwargs)
-        else:
-            raise ValueError("method {} is not available.".format(method))
-        new_lc = self[not_nan].copy()
-        new_lc.time = corrected_lc.time
-        new_lc.flux = corrected_lc.flux
-        new_lc.flux_err = self.normalize().flux_err[not_nan]
-        return new_lc
 
     def to_pandas(self, columns=['time', 'flux', 'flux_err', 'quality',
                                  'centroid_col', 'centroid_row']):
