@@ -271,7 +271,7 @@ class LightCurve(object):
                     idx += 1
         output.pprint(max_lines=-1, max_width=-1)
 
-    def append(self, others):
+    def append(self, others, inplace=False):
         """
         Append LightCurve objects.
 
@@ -287,7 +287,11 @@ class LightCurve(object):
         """
         if not hasattr(others, '__iter__'):
             others = [others]
-        new_lc = copy.copy(self)
+        if inplace:
+            new_lc = self
+        else:
+            new_lc = copy.copy(self)
+
         for i in range(len(others)):
             new_lc.time = np.append(new_lc.time, others[i].time)
             new_lc.flux = np.append(new_lc.flux, others[i].flux)
@@ -300,7 +304,8 @@ class LightCurve(object):
                 new_lc.centroid_col = np.append(new_lc.centroid_col, others[i].centroid_col)
             if hasattr(new_lc, 'centroid_row'):
                 new_lc.centroid_row = np.append(new_lc.centroid_row, others[i].centroid_row)
-        return new_lc
+        if not inplace:
+            return new_lc
 
     def copy(self):
         """Returns a copy of the LightCurve object.
