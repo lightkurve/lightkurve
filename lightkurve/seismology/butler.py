@@ -88,6 +88,7 @@ class SeismologyButler(object):
 
     def plot_echelle(self, deltanu=None, numax=None,
                      minimum_frequency=None, maximum_frequency=None,
+                     smooth_filter_width=.1,
                      scale='linear', cmap='Blues'):
         """Plots an echelle diagram of the periodogram by stacking the
         periodogram in slices of deltanu.
@@ -116,6 +117,12 @@ class SeismologyButler(object):
         maximum_frequency : float
             The maximum frequency at which to display the echelle.
             Is assumed to be in the same units as frequency if not given a unit.
+        smooth_filter_width : float
+            If given a value, will smooth periodogram used to plot the echelle
+            diagram using the periodogram.smooth(method='boxkernel') method with
+            a filter width of `smooth_filter_width`. This helps visualise the
+            echelle diagram. Is assumed to be in the same units as the
+            periodogram frequency.
         scale: str
             Set z axis to be "linear" or "log". Default is linear.
         cmap : str
@@ -128,7 +135,13 @@ class SeismologyButler(object):
         """
         numax = self._validate_numax(numax)
         deltanu = self._validate_deltanu(deltanu)
-        freq = self.periodogram.frequency  # Makes code below more readable
+
+        if smooth_filter_width:
+            freq = self.periodogram.smooth(filter_width=smooth_filter_width).frequency  # Makes code below more readable
+            power = self.periodogram.smooth(filter_width=smooth_filter_width).power     # Makes code below more readable
+        else:
+            freq = self.periodogram.frequency  # Makes code below more readable
+            power = self.periodogram.power     # Makes code below more readable
 
         fmin = freq[0]
         fmax = freq[-1]
@@ -181,7 +194,7 @@ class SeismologyButler(object):
         x0 = int(freq[0] / fs)
 
         ff = freq[int(fmin/fs)-x0:int(fmax/fs)-x0] # Selected frequency range
-        pp = self.periodogram.power[int(fmin/fs)-x0:int(fmax/fs)-x0] # Power range
+        pp = power[int(fmin/fs)-x0:int(fmax/fs)-x0] # Power range
 
         n_rows = int((ff[-1]-ff[0])/deltanu) # Number of stacks to use
         n_columns = int(deltanu/fs)          # Number of elements in each stack
