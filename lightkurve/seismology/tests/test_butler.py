@@ -93,19 +93,19 @@ def test_estimate_numax_kwargs():
         numax = butler.estimate_numax(numaxs=np.linspace(1., 5000.))
 
     #Assert we can pass a custom window in microhertz or days
-    numax = butler.estimate_numax(window=200.)
+    numax = butler.estimate_numax(window_width=200.)
     assert(np.isclose(numax.value, true_numax, atol=.1*true_numax))
-    numax = butler.estimate_numax(window=u.Quantity(200., u.microhertz).to(1/u.day))
+    numax = butler.estimate_numax(window_width=u.Quantity(200., u.microhertz).to(1/u.day))
     assert(np.isclose(numax.value, true_numax, atol=.1*true_numax))
 
-    #Assert we can't pass in windows outside functional range
+    #Assert we can't pass in window_widths outside functional range
     #Assert we can't pass custom numaxs outside a functional range
     with pytest.raises(ValueError) as err:
-        numax = butler.estimate_numax(window=-5)
+        numax = butler.estimate_numax(window_width=-5)
     with pytest.raises(ValueError) as err:
-        numax = butler.estimate_numax(window=1e6)
+        numax = butler.estimate_numax(window_width=1e6)
     with pytest.raises(ValueError) as err:
-        numax = butler.estimate_numax(window=0.001)
+        numax = butler.estimate_numax(window_width=0.001)
 
     #Assert we can pass a custom spacing in microhertz or days
     numax = butler.estimate_numax(spacing=15.)
@@ -138,7 +138,7 @@ def test_plot_numax_diagnostics():
     snr = SNRPeriodogram(f*u.microhertz, u.Quantity(p, None))
     butler = snr.to_seismology()
     numaxs = np.linspace(true_numax-2*std, true_numax+2*std, 500)
-    butler.estimate_numax(numaxs=numaxs, window=250., spacing=10.)
+    butler.estimate_numax(numaxs=numaxs, window_width=250., spacing=10.)
     butler.diagnose_numax()
     # Note: checks on the `numaxs` kwarg in `estimate_numax_kwargs` also apply
     # to this function, no need to check them twice.
@@ -156,7 +156,7 @@ def test_plot_numax_diagnostics():
     daynumaxs = u.Quantity(numaxs*u.microhertz, 1/u.day)
     numax = butler.estimate_numax(numaxs=daynumaxs)
     butler.diagnose_numax(numax)
-    numax = butler.estimate_numax(window=100.)
+    numax = butler.estimate_numax(window_width=100.)
     butler.diagnose_numax(numax)
 
     # TODO: the test below doesn't appear to pass
@@ -272,8 +272,8 @@ def test_plot_deltanu_diagnostics():
     #Check metric of appropriate length is returned
     #numax = butler.estimate_numax()
     #deltanu = butler.estimate_deltanu()
-    #window = 2*int(np.floor(snr._get_fwhm(numax.value)))
-    #assert(len(deltanu.metric) == len(snr._autocorrelate(numax.value, window)))
+    #window_width = 2*int(np.floor(snr._get_fwhm(numax.value)))
+    #assert(len(deltanu.metric) == len(snr._autocorrelate(numax.value, window_width)))
 
 
 def test_plot_echelle():
@@ -284,29 +284,29 @@ def test_plot_echelle():
     pg = Periodogram(f*u.microhertz, u.Quantity(p, None))
     butler = pg.to_seismology()
 
-    #Assert basic echelle works
-    butler.plot_echelle(deltanu)
-    butler.plot_echelle(u.Quantity(deltanu, 1/u.day))
+    # Assert basic echelle works
+    butler.plot_echelle(deltanu=deltanu, numax=numax)
+    butler.plot_echelle(u.Quantity(deltanu, 1/u.day), numax)
 
-    #Assert echelle works with numax
+    # Assert echelle works with numax
     butler.plot_echelle(deltanu, numax)
     butler.plot_echelle(deltanu, u.Quantity(numax, 1/u.day))
 
-    #Assert echelle works with minimum limit
-    butler.plot_echelle(deltanu, minimum_frequency = numax)
-    butler.plot_echelle(deltanu, maximum_frequency = numax)
-    butler.plot_echelle(deltanu, minimum_frequency = u.Quantity(numax, 1/u.day))
-    butler.plot_echelle(deltanu, maximum_frequency = u.Quantity(numax, 1/u.day))
-    butler.plot_echelle(deltanu, minimum_frequency = u.Quantity(numax-deltanu, 1/u.day),
+    # Assert echelle works with minimum limit
+    butler.plot_echelle(deltanu, numax, minimum_frequency = numax)
+    butler.plot_echelle(deltanu, numax, maximum_frequency = numax)
+    butler.plot_echelle(deltanu, numax, minimum_frequency = u.Quantity(numax, 1/u.day))
+    butler.plot_echelle(deltanu, numax, maximum_frequency = u.Quantity(numax, 1/u.day))
+    butler.plot_echelle(deltanu, numax, minimum_frequency = u.Quantity(numax-deltanu, 1/u.day),
                         maximum_frequency = numax+deltanu)
 
-    #Assert raises error if numax or either of the limits are too high
+    # Assert raises error if numax or either of the limits are too high
     with pytest.raises(ValueError) as err:
-        butler.plot_echelle(deltanu, minimum_frequency = f[-1]+10)
+        butler.plot_echelle(deltanu, numax, minimum_frequency = f[-1]+10)
     with pytest.raises(ValueError) as err:
-        butler.plot_echelle(deltanu, maximum_frequency = f[-1]+10)
+        butler.plot_echelle(deltanu, numax, maximum_frequency = f[-1]+10)
     with pytest.raises(ValueError) as err:
         butler.plot_echelle(deltanu, numax = f[-1]+10)
 
-    #Assert can pass colourmap
-    butler.plot_echelle(deltanu, cmap='viridis')
+    # Assert can pass colormap
+    butler.plot_echelle(deltanu, numax, cmap='viridis')

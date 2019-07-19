@@ -207,13 +207,12 @@ class SeismologyButler(object):
             im = ax.imshow(ep.value, cmap=cmap, aspect=a/b, origin='lower',
                       extent=extent, vmin=vmin, vmax=vmax)
             cbar = plt.colorbar(im, ax=ax)
-            if isinstance(self.periodogram, LombScarglePeriodogram):
-                if self.periodogram.power.unit == cds.ppm:
-                    ylabel = "Amplitude [{}]".format(self.periodogram.power.unit.to_string('latex'))
-                else:
-                    ylabel = "Power Spectral Density [{}]".format(self.periodogram.power.unit.to_string('latex'))
-            elif isinstance(self.periodogram, SNRPeriodogram):
+            if isinstance(self.periodogram, SNRPeriodogram):
                 ylabel = 'Signal to Noise Ratio (SNR)'
+            elif self.periodogram.power.unit == cds.ppm:
+                ylabel = "Amplitude [{}]".format(self.periodogram.power.unit.to_string('latex'))
+            else:
+                ylabel = "Power Spectral Density [{}]".format(self.periodogram.power.unit.to_string('latex'))
 
             cbar.set_label(ylabel)
             ax.set_xlabel(r'Frequency mod. {:.2f}'.format(deltanu))
