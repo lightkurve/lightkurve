@@ -112,12 +112,13 @@ def diagnose_deltanu_acf(deltanu, periodogram):
 
         ax.axvline(a, c='r', linewidth=2, alpha=.4, ls='--')
         ax.axvline(b, c='r', linewidth=2, alpha=.4, ls='--')
+
         h = periodogram.power.value.max() * 0.9
 
         ax.annotate("", xy=(a, h), xytext=(a - (a-b), h),
                         arrowprops=dict(arrowstyle="<->", color='r', alpha=0.5), va='bottom')
         ax.text(a - (a-b)/2, h, "FWHM", color='r', alpha=0.7, fontsize=10, va='bottom', ha='center')
-
+        ax.set_xlim(b - ((a-b)*0.2), a + ((a-b)*0.2))
 
         ax = axs[1]
         # ax.plot(lags, acf/acf[0])
