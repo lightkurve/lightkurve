@@ -111,6 +111,7 @@ def autocorrelate(periodogram, numax, window_width=25., frequency_spacing=None):
     x0 = int((periodogram.frequency[0].value/frequency_spacing))              # Transform in case the index isn't from 0
     xt = x - x0
     p_sel = periodogram.power[xt-spread:xt+spread].value       # Make the window selection
+    p_sel -= np.nanmean(p_sel)    #Make it so that the selection has zero mean.
 
     C = np.correlate(p_sel, p_sel, mode='full')[len(p_sel)-1:]     #Correlated the resulting SNR space with itself
     return C

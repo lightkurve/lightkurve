@@ -37,7 +37,10 @@ def estimate_deltanu_acf(periodogram, numax):
 
     where s is a window of the signal-to-noise spectrum. When shifting
     the spectrum over itself, C will increase when two mode peaks are
-    overlapping.
+    overlapping. Because of the method of this calculation, we need to first
+    rescale the power by subtracting its mean, placing its mean around 0. This
+    decreases the noise levels in the ACF, as the autocorrelation of the noise
+    with itself will be close to zero.
 
     As is done in Mosser & Appourchaux, we rescale the value of C in terms
     of the noise level in the ACF spectrum as

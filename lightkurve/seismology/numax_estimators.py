@@ -38,6 +38,11 @@ def estimate_numax_acf(periodogram, numaxs=None, window_width=None, spacing=None
     C = sum(s * s),
 
     where s is a window of the signal-to-noise spectrum.
+    Because of the method of this calculation, we need to first
+    rescale the power by subtracting its mean, placing its mean around 0. This
+    decreases the noise levels in the ACF, as the autocorrelation of the noise
+    with itself will be close to zero.
+
     In order to evaluate where the correlation power is highest (indicative
     of the power excess of the modes) we calculate the Mean Collapsed
     Correlation (MCC, see Kiefer 2013, Viani et al. 2019) as
