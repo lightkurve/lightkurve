@@ -162,8 +162,8 @@ class SeismologyButler(object):
             fwhm = utils.get_fwhm(self.periodogram, numax)
 
             fmin = numax - 2*fwhm
-            if fmin < 0.:
-                fmin = 0.
+            if fmin < freq[0]:
+                fmin = freq[0]
 
             fmax = numax + 2*fwhm
             if fmax > freq[-1].value:
@@ -216,7 +216,7 @@ class SeismologyButler(object):
             extent = (x_f[0].value, x_f[-1].value, y_f[0].value, y_f[-1].value)
             figsize = plt.rcParams['figure.figsize']
             a = figsize[1] / figsize[0]
-            b = (extent[3] - extent[2]) / extent[1]
+            b = (extent[3] - extent[2]) / (extent[1] - extent[0])
             vmin = np.nanpercentile(ep.value, 1)
             vmax = np.nanpercentile(ep.value, 99)
             im = ax.imshow(ep.value, cmap=cmap, aspect=a/b, origin='lower',
