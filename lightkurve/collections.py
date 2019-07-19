@@ -5,6 +5,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from . import MPLSTYLE
+from .utils import LightkurveWarning
+
+from .lightcurvefile import LightCurveFile
+
+import warnings
+
 
 log = logging.getLogger(__name__)
 
@@ -45,9 +51,31 @@ class Collection(object):
 
     def __repr__(self):
         result = "{} of {} objects:\n".format(self.__class__.__name__, len(self.data))
-        for obj in self.data:
-            result += obj.__repr__() + " "
-            result += "\n"
+        if (isinstance(self[0], LightCurveFile)):
+            targetids = np.asarray([lcf.SAP_FLUX.label for lcf in self])
+        else:
+            targetids = np.asarray([lcf.label for lcf in self])
+
+        for idx, targetid in enumerate(np.sort(np.unique(targetids))):
+            jdxs = np.where(targetids == targetid)[0]
+            if not hasattr(jdxs, '__iter__'):
+                jdxs = [jdxs]
+
+            mission = self[jdxs[0]].mission
+            if mission == 'Kepler':
+                subtype = 'Quarter'
+            elif mission == 'K2':
+                subtype = 'Campaign'
+            elif mission == 'TESS':
+                subtype = 'Sector'
+            objstr = str(type(self[0]))[8:-2].split('.')[-1]
+            title = '\t{} ({} {}s) {}s: '.format(targetid, len(jdxs), objstr, subtype)
+            result += title
+            result += ','.join(['{}'.format(getattr(self[jdx], subtype.lower())) for jdx in jdxs])
+            result += '\n'
+#        for obj in self.data:
+#            result += obj.__repr__() + " "
+#            result += "\n"
         return result
 
 
@@ -85,30 +113,11 @@ class LightCurveCollection(Collection):
             corrector_func = lambda x: x
 
         ## STOP IF THERE ARE MULTIPLE MISSIONS
-
-        if self[0].mission == 'Kepler':
-            # If mission is kepler, find offsets by sky group and correct them
-            # FLFRCSAP and CROWDSAP have been applied, but in some cases there is
-            # Residual multiplicative flux loss.
-
-            groups = np.asarray([lcf.quarter for lcf in self]) % 4
-            groups[np.asarray([lcf.quarter for lcf in self]) == 0] = 4
-            corr = np.zeros(5)
-            for skygroup in np.arange(5):
-                idxs = np.where(groups == skygroup)[0]
-                if not hasattr(idxs, '__iter__'):
-                    idxs = [idxs]
-                t1, f1 = [np.nanmedian(self[idx].time) for idx in idxs], [np.nanmedian(self[idx].flux) for idx in idxs]
-                if len(t1) == 1:
-                    corr[skygroup] = f1[0]
-                else:
-                    corr[skygroup] = np.polyfit(t1, f1, 1)[1]
-            corr /= np.mean(corr)
-            lcs = [corrector_func(lc/corr[groups[idx]]) for idx, lc in enumerate(self)]
-#            lcs = [corrector_func(lc) for idx, lc in enumerate(self)]
-
-        else:
-            lcs = [corrector_func(lc) for lc in self]
+        targets = np.unique([lc.label for lc in self])
+        if len(targets) > 1:
+            raise ValueError('This collection contains more than one target, '
+                            'please reduce to a single target before calling stitch.')
+        lcs = [corrector_func(lc) for lc in self]
         lc = lcs[0]
         [lc.append(lc1, inplace=True) for lc1 in lcs[1:]]
         return lc
@@ -170,9 +179,22 @@ class LightCurveFileCollection(Collection):
     def SAP_FLUX(self):
         return LightCurveCollection([lcf.SAP_FLUX for lcf in self])
 
+    def stitch(self, offset=0.1, **kwargs):
+        try:
+            warnings.warn('Stitching a `LightCurveFileCollection` which contains both SAP and '
+                         'PDCSAP_FLUX. Plotting PDCSAP_FLUX. You can remove this warning by '
+                         'using `LightCurveFileCollection.PDCSAP_FLUX.stitch()`.',
+                         LightkurveWarning)
+            return self.PDCSAP_FLUX.stitch()
+        except ValueError:
+            return self.SAP_FLUX.stitch()
 
     def plot(self, offset=0.1, **kwargs):
         try:
+            warnings.warn('Plotting a `LightCurveFileCollection` which contains both SAP and '
+                         'PDCSAP_FLUX. Plotting PDCSAP_FLUX. You can remove this warning by '
+                         'using `LightCurveFileCollection.PDCSAP_FLUX.plot()`.',
+                         LightkurveWarning)
             ax = self.PDCSAP_FLUX.plot()
             return ax
         except ValueError:

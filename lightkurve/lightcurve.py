@@ -555,13 +555,13 @@ class LightCurve(object):
         """
         return self[~np.isnan(self.flux)]  # This will return a sliced copy
 
-    def fill_gaps(lc, method='nearest'):
-        """Fill in gaps in time with linear interpolation.
+    def fill_gaps(self, method='gaussian_noise'):
+        """Fill in gaps in time.
 
         Parameters
         ----------
-        method : string {None, 'backfill'/'bfill', 'pad'/'ffill', 'nearest'}
-            Method to use for gap filling. 'nearest' by default.
+        method : string {'gaussian_noise'}
+            Method to use for gap filling. Fills with gaussian noise by default
 
         Returns
         -------
@@ -569,33 +569,54 @@ class LightCurve(object):
             A new light curve object in which NaN values and gaps in time
             have been filled.
         """
-        clc = lc.remove_nans().copy()
+        lc = self.copy().remove_nans()
+
+        # Find missing time points
+        dt = lc.time - np.median(np.diff(lc.time)) * lc.cadenceno
+        ncad = np.arange(lc.cadenceno[0], lc.cadenceno[-1] + 1, 1)
+        in_original = np.in1d(ncad, lc.cadenceno)
+        ncad = ncad[~in_original]
+        ndt = np.interp(ncad, lc.cadenceno, dt)
+
+        ncad = np.append(ncad, lc.cadenceno)
+        ndt = np.append(ndt, dt)
+        ncad, ndt = ncad[np.argsort(ncad)], ndt[np.argsort(ncad)]
+        ntime = ndt + np.median(np.diff(lc.time)) * ncad
+
+
+        # Fill in time points
         nlc = lc.copy()
+        nlc.time = ntime
+        nlc.cadenceno = ncad
 
-        # Average gap between cadences
-        dt = np.nanmedian(clc.time[1::] - clc.time[:-1:])
+        f = np.zeros(len(ntime))
+        f[in_original] = np.copy(lc.flux)
+        fe = np.zeros(len(ntime))
+        fe[in_original] = np.copy(lc.flux_err)
 
-        # Iterate over flux and flux_err
-        for idx, y in enumerate([clc.flux, clc.flux_err]):
-            # We need to ensure pandas gets the correct byteorder
-            # Background info: https://github.com/astropy/astropy/issues/1156
-            if y.dtype.byteorder == '>':
-                y = y.byteswap().newbyteorder()
-            ts = pd.Series(y, index=clc.time)
-            newindex = [clc.time[0]]
-            for t in clc.time[1::]:
-                prevtime = newindex[-1]
-                while (t - prevtime) > 1.2*dt:
-                    newindex.append(prevtime + dt)
-                    prevtime = newindex[-1]
-                newindex.append(t)
-            ts = ts.reindex(newindex, method=method)
-            if idx == 0:
-                nlc.flux = np.asarray(ts)
-            elif idx == 1:
-                nlc.flux_err = np.asarray(ts)
 
-        nlc.time = np.asarray(ts.index)
+        fe[~in_original] = np.interp(ntime[~in_original], lc.time, lc.flux_err)
+        if method == 'gaussian_noise':
+            f[~in_original] = np.random.normal(lc.flux.mean(), lc.estimate_cdpp()*1e-6, (~in_original).sum())
+            f[~in_original] += np.random.normal(0, fe[~in_original])
+        else:
+            raise NotImplementedError("No such method as {}".format(method))
+
+        nlc.flux = f
+        nlc.flux_err = fe
+
+        quality = np.zeros(len(ntime))
+        quality[in_original] = np.copy(lc.quality)
+        quality[~in_original] + 65536
+        nlc.quality = quality
+
+        col = np.zeros(len(ntime)) * np.nan
+        col[in_original] = np.copy(lc.centroid_col)
+        row = np.zeros(len(ntime)) * np.nan
+        row[in_original] = np.copy(lc.centroid_row)
+
+        nlc.centroid_col = col
+        nlc.centroid_row = row
         return nlc
 
     def remove_outliers(self, sigma=5., sigma_lower=None, sigma_upper=None,
