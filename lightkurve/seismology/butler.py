@@ -26,10 +26,10 @@ __all__ = ['SeismologyButler']
 
 
 class SeismologyButler(object):
-    """Good day, I am the Seismology Butler. I am here to help you do asteroseismology.
+    """Enables astroseismic quantities to be estimated from periodograms.
 
-    This class provides easy access to methods to estimate numax and deltanu,
-    and stores them on its tray for easy diagnostic plotting.
+    This class provides easy access to methods to estimate numax, deltanu, radius,
+    mass, and logg, and stores them on its tray for easy diagnostic plotting.
     """
     def __init__(self, periodogram):
         if not isinstance(periodogram, SNRPeriodogram):
@@ -52,7 +52,7 @@ class SeismologyButler(object):
 
     @staticmethod
     def from_lightcurve(lc, **kwargs):
-        """Returns a `SeismologyButler` given a `LightCurve` object."""
+        """Returns a `SeismologyButler` given a `~lightkurve.lightcurve.LightCurve` object."""
         log.info("Building a SeismologyButler object directly from a light curve "
                  "uses default periodogram parameters. For further tuneability, "
                  "create a periodogram object first, using `to_periodogram`.")

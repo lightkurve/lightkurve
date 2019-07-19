@@ -1,5 +1,5 @@
-Data search functions
-=====================
+Searching and downloading data
+==============================
 
 .. module:: lightkurve.search
 
