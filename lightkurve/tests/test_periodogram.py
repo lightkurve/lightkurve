@@ -2,9 +2,13 @@ import pytest
 from astropy import units as u
 import numpy as np
 from numpy.testing import assert_almost_equal, assert_array_equal
+from scipy.signal import unit_impulse as deltafn
+
 
 from ..lightcurve import LightCurve
+from ..search import search_lightcurvefile
 from ..periodogram import Periodogram
+from ..periodogram import SNRPeriodogram
 import sys
 
 
@@ -154,7 +158,6 @@ def test_smooth():
 
 
 
-
 def test_flatten():
     npts = 10000
     np.random.seed(12069424)
@@ -178,7 +181,6 @@ def test_flatten():
     str(s)
     s.plot()
 
-
 def test_index():
     """Test if you can mask out periodogram
     """
@@ -187,6 +189,7 @@ def test_index():
     p = lc.to_periodogram()
     mask = (p.frequency > 0.1*(1/u.day)) & (p.frequency < 0.2*(1/u.day))
     assert len(p[mask].frequency) == mask.sum()
+
 
 @pytest.mark.skipif(bad_optional_imports,
                     reason="requires bokeh and astropy.stats.bls")
