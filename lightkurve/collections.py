@@ -56,22 +56,35 @@ class Collection(object):
         else:
             targetids = np.asarray([lcf.label for lcf in self])
 
-        for idx, targetid in enumerate(np.sort(np.unique(targetids))):
+        try:
+            unique_targetids = np.sort(np.unique(targetids))
+        except TypeError:
+            unique_targetids = [None]
+
+        for idx, targetid in enumerate(unique_targetids):
             jdxs = np.where(targetids == targetid)[0]
             if not hasattr(jdxs, '__iter__'):
                 jdxs = [jdxs]
 
-            mission = self[jdxs[0]].mission
-            if mission == 'Kepler':
-                subtype = 'Quarter'
-            elif mission == 'K2':
-                subtype = 'Campaign'
-            elif mission == 'TESS':
-                subtype = 'Sector'
+            if hasattr(self[jdxs[0]], 'mission'):
+                mission = self[jdxs[0]].mission
+                if mission == 'Kepler':
+                    subtype = 'Quarters'
+                elif mission == 'K2':
+                    subtype = 'Campaigns'
+                elif mission == 'TESS':
+                    subtype = 'Sectors'
+                else:
+                    subtype = None
+            else:
+                subtype = None
             objstr = str(type(self[0]))[8:-2].split('.')[-1]
-            title = '\t{} ({} {}s) {}s: '.format(targetid, len(jdxs), objstr, subtype)
+            title = '\t{} ({} {}s) {}: '.format(targetid, len(jdxs), objstr, subtype)
             result += title
-            result += ','.join(['{}'.format(getattr(self[jdx], subtype.lower())) for jdx in jdxs])
+            if subtype is not None:
+                result += ','.join(['{}'.format(getattr(self[jdx], subtype[:-1].lower())) for jdx in jdxs])
+            else:
+                result += ','.join(['{}'.format(i) for i in np.arange(len(jdxs))])
             result += '\n'
 #        for obj in self.data:
 #            result += obj.__repr__() + " "
@@ -147,7 +160,11 @@ class LightCurveCollection(Collection):
                     kwargs.pop(kwarg)
 
             targetids = np.asarray([lcf.label for lcf in self])
-            for idx, targetid in enumerate(np.unique(targetids)):
+            try:
+                unique_targetids = np.sort(np.unique(targetids))
+            except TypeError:
+                unique_targetids = [None]
+            for idx, targetid in enumerate(unique_targetids):
                 jdxs = np.where(targetids == targetid)[0]
                 if not hasattr(jdxs, '__iter__'):
                     jdxs = [jdxs]
