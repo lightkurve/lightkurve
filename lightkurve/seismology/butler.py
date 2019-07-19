@@ -162,8 +162,8 @@ class SeismologyButler(object):
             fwhm = utils.get_fwhm(self.periodogram, numax)
 
             fmin = numax - 2*fwhm
-            if fmin < freq[0]:
-                fmin = freq[0]
+            if fmin < freq[0].value:
+                fmin = freq[0].value
 
             fmax = numax + 2*fwhm
             if fmax > freq[-1].value:
