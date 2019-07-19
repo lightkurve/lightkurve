@@ -32,14 +32,20 @@ class SeismologyQuantity(Quantity):
         return self
 
     def __repr__(self):
-        return "{}: {} {} (method: {})".format(
-            self.name, '{:.2f}'.format(self.value),
-            self.unit.__str__(), self.method)
+        try:
+            return "{}: {} {} (method: {})".format(
+                self.name, '{:.2f}'.format(self.value),
+                self.unit.__str__(), self.method)
+        except AttributeError:  # Math operations appear to remove Seismic attributes for now
+            return super().__repr__()
 
     def _repr_latex_(self):
-        return "{}: {} {} (method: {})".format(
-                self.name, '${:.2f}$'.format(self.value),
-                self.unit._repr_latex_(), self.method)
+        try:
+            return "{}: {} {} (method: {})".format(
+                    self.name, '${:.2f}$'.format(self.value),
+                    self.unit._repr_latex_(), self.method)
+        except AttributeError:  # Math operations appear to remove Seismic attributes for now
+            return super()._repr_latex_()
 
 
 def get_fwhm(periodogram, numax):

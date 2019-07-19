@@ -1,9 +1,4 @@
-"""Defines the Seismology class.
-
-TODO
-----
-* Consider putting Teff in repr of stellar parameters.
-"""
+"""Defines the Seismology class."""
 import logging
 import warnings
 
@@ -28,6 +23,34 @@ class Seismology(object):
 
     This class provides easy access to methods to estimate numax, deltanu, radius,
     mass, and logg, and stores them on its tray for easy diagnostic plotting.
+
+    Examples
+    --------
+    Download the TESS light curve for HIP 116158:
+
+        >>> import lightkurve as lk
+        >>> lc = lk.search_lightcurvefile("HIP 116158", sector=2).download().PDCSAP_FLUX
+        >>> lc = lc.normalize().remove_nans().remove_outliers()
+
+    Create a Lomb-Scargle periodogram:
+
+        >>> pg = lc.to_periodogram(normalization='psd', minimum_frequency=100, maximum_frequency=800)
+
+    Create a Seismology object and use it to estimate parameters:
+
+        >>> seismology = pg.flatten().to_seismology()
+        >>> seismology.estimate_numax()
+        numax: 415.00 uHz (method: ACF2D)
+        >>> seismology.estimate_deltanu()
+        deltanu: 28.78 uHz (method: ACF2D)
+        >>> seismology.estimate_radius(teff=5080)
+        radius: 2.78 solRad (method: Uncorrected Scaling Relations)
+
+    Parameters
+    ----------
+    periodogram : `~lightkurve.periodogram.Periodogram` object
+        Periodogram to be analyzed. Must be background-corrected,
+        e.g. using `periodogram.flatten()`.
     """
     def __init__(self, periodogram):
         if not isinstance(periodogram, SNRPeriodogram):
