@@ -16,12 +16,13 @@ from .. import MPLSTYLE
 from ..utils import channel_to_module_output
 from ..lightcurve import KeplerLightCurve
 from ..lightcurvefile import KeplerLightCurveFile
+from .corrector import Corrector
 
 log = logging.getLogger(__name__)
 
 __all__ = ['KeplerCBVCorrector']
 
-class KeplerCBVCorrector(object):
+class KeplerCBVCorrector(Corrector):
     r"""Remove systematic trends from Kepler light curves by fitting
     Cotrending Basis Vectors (CBVs).
 

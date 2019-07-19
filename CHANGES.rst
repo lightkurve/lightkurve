@@ -8,7 +8,12 @@
   users to select the pixels used for creating the PLD basis vectors. [#523]
 
 - Added a new unit test module (test_synthetic_data.py) which utilizes
-  synthetic Target Pixel Files to validate various Lightkurve features. [#534]
+  synthetic Target Pixel Files to validate Lightkurve features. [#534]
+
+- Added extra `log.debug` messages to `lightkurve.search` to enable users
+  to track the status of search and download operations. [#547]
+
+- Added several new usage examples to the docstrings of functions. [#516]
 
 - Removed seven methods which had been deprecated prior to v1.0: [#515]
   * removed `lc.cdpp()` in favor of `lc.estimate_cdpp()`;
@@ -30,8 +35,6 @@
 
 - Fixed a bug which prevented the `t0` argument of `lc.fold()` from being an
   AstroPy Quantity object. [#521]
-
-- Added several new usage examples to the docstrings of functions. [#516]
 
 
 

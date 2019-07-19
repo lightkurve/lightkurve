@@ -33,16 +33,16 @@ log = logging.getLogger(__name__)
 
 
 class LightCurve(object):
-    """Generic class to work with any time series photometry data set.
+    """Generic light curve object to hold time series photometry for one target.
 
     Attributes
     ----------
     time : array-like
-        Time values
+        Time values.
     flux : array-like
-        Flux values for every time point
+        Flux values for every time point.
     flux_err : array-like
-        Uncertainty on each flux data point
+        Uncertainty on each flux data point.
     time_format : str
         String specifying how an instant of time is represented,
         e.g. 'bkjd' or 'jd'.
@@ -52,7 +52,7 @@ class LightCurve(object):
     targetid : str
         Identifier of the target.
     label : str
-        Human-friendly object label, e.g. "KIC 123456789"
+        Human-friendly object label, e.g. "KIC 123456789".
     meta : dict
         Free-form metadata associated with the LightCurve.
 
@@ -150,12 +150,10 @@ class LightCurve(object):
 
     @property
     def astropy_time(self):
-        """Returns the time values as an Astropy `~astropy.time.Time` object
-        (if ``time_format`` is set).
+        """Returns the time values as an Astropy `~astropy.time.Time` object.
 
-        The Time object will be created using the values in the ``time``,
-        `time_format`, and ``time_scale`` attributes.
-        For Kepler data products, the times are Barycentric.
+        The Time object will be created based on the values of the light curve's
+        `time`, `time_format`, and `time_scale` attributes.
 
         Examples
         --------
@@ -421,7 +419,7 @@ class LightCurve(object):
         return flatten_lc
 
     def fold(self, period, t0=None, transit_midpoint=None):
-        """Folds the lightcurve at a specified ``period`` and reference time ``t0``.
+        """Folds the lightcurve at a specified `period` and reference time `t0`.
 
         This method returns a `FoldedLightCurve` object in which the time
         values range between -0.5 to +0.5 (i.e. the phase).
@@ -614,29 +612,6 @@ class LightCurve(object):
             `astropy.stats.sigma_clip()` and provides the same functionality.
             Any extra arguments passed to this method will be passed on to
             ``sigma_clip``.
-
-        Examples
-        --------
-        This example generates a new light curve in which all points
-        that are more than 1 standard deviation from the median are removed::
-
-            >>> lc = LightCurve(time=[1, 2, 3, 4, 5], flux=[1, 1000, 1, -1000, 1])
-            >>> lc_clean = lc.remove_outliers(sigma=1)
-            >>> lc_clean.time
-            array([1, 3, 5])
-            >>> lc_clean.flux
-            array([1, 1, 1])
-
-        This example removes only points where the flux is larger than 1
-        standard deviation from the median, but leaves negative outliers
-        in place::
-
-            >>> lc = LightCurve(time=[1, 2, 3, 4, 5], flux=[1, 1000, 1, -1000, 1])
-            >>> lc_clean = lc.remove_outliers(sigma_lower=float('inf'), sigma_upper=1)
-            >>> lc_clean.time
-            array([1, 3, 4, 5])
-            >>> lc_clean.flux
-            array([    1,     1, -1000,     1])
 
         Parameters
         ----------
@@ -918,7 +893,7 @@ class LightCurve(object):
         return ax
 
     def plot(self, **kwargs):
-        """Plot the light curve using Matplotlib's `~matplotlib.pyplot.plot()` method.
+        """Plot the light curve using Matplotlib's `~matplotlib.pyplot.plot` method.
 
         Parameters
         ----------
@@ -948,7 +923,7 @@ class LightCurve(object):
         return self._create_plot(method='plot', **kwargs)
 
     def scatter(self, colorbar_label='', show_colorbar=True, **kwargs):
-        """Plots the light curve using Matplotlib's `~matplotlib.pyplot.scatter()` method.
+        """Plots the light curve using Matplotlib's `~matplotlib.pyplot.scatter` method.
 
         Parameters
         ----------
@@ -983,7 +958,7 @@ class LightCurve(object):
                                  show_colorbar=show_colorbar, **kwargs)
 
     def errorbar(self, linestyle='', **kwargs):
-        """Plots the light curve using Matplotlib's `~matplotlib.pyplot.errorbar()` method.
+        """Plots the light curve using Matplotlib's `~matplotlib.pyplot.errorbar` method.
 
         Parameters
         ----------
@@ -1359,7 +1334,7 @@ class LightCurve(object):
         return hdu
 
     def to_corrector(self, method="sff"):
-        """Returns a `Corrector` instance to remove systematics.
+        """Returns a corrector object to remove instrument systematics.
 
         Parameters
         ----------

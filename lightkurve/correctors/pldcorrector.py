@@ -8,12 +8,14 @@ from itertools import combinations_with_replacement as multichoose
 
 import numpy as np
 
+from .corrector import Corrector
+
 log = logging.getLogger(__name__)
 
 __all__ = ['PLDCorrector']
 
 
-class PLDCorrector(object):
+class PLDCorrector(Corrector):
     r"""Implements the Pixel Level Decorrelation (PLD) systematics removal method.
 
         Pixel Level Decorrelation (PLD) was developed by [1]_ to remove

@@ -8,15 +8,16 @@ import warnings
 import numpy as np
 from scipy import linalg, interpolate
 from matplotlib import pyplot as plt
-
 from astropy.stats import sigma_clip
+
+from .corrector import Corrector
 
 log = logging.getLogger(__name__)
 
 __all__ = ['SFFCorrector']
 
 
-class SFFCorrector(object):
+class SFFCorrector(Corrector):
     """Implements the Self-Flat-Fielding (SFF) systematics removal method.
 
     This method is described in detail by Vanderburg and Johnson (2014).
