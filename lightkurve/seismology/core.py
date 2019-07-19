@@ -154,8 +154,9 @@ class Seismology(object):
         deltanu = self._validate_deltanu(deltanu)
 
         if smooth_filter_width:
-            freq = self.periodogram.smooth(filter_width=smooth_filter_width).frequency  # Makes code below more readable
-            power = self.periodogram.smooth(filter_width=smooth_filter_width).power     # Makes code below more readable
+            pgsmooth = self.periodogram.smooth(filter_width=smooth_filter_width)
+            freq = pgsmooth.frequency  # Makes code below more readable below
+            power = pgsmooth.power     # Makes code below more readable below
         else:
             freq = self.periodogram.frequency  # Makes code below more readable
             power = self.periodogram.power     # Makes code below more readable
