@@ -202,8 +202,8 @@ def diagnose_numax_acf(numax, periodogram):
     with plt.style.context(MPLSTYLE):
         fig, ax = plt.subplots(3, sharex=True, figsize=(8.485, 12))
         periodogram.plot(ax=ax[0], label='')
-        ax[0].axvline(numax.value, c='r', linewidth=2, alpha=.4, label='numax = {:7.5}{}'.format(numax.value, periodogram.frequency.unit.to_string('latex')))
-        ax[0].legend()
+        ax[0].axvline(numax.value, c='r', linewidth=2, alpha=.4, label=r'$\nu_{\rm max}$ = {:7.5} {}'.format(numax.value, periodogram.frequency.unit.to_string('latex')))
+        ax[0].legend(loc='upper right')
 #        ax[0].text(numax.value, periodogram.power.value.max()*0.75, '{:7.5}'.format(numax.value), rotation=90, ha='right', color='r', alpha=0.5)
         ax[0].set_xlabel('')
         ax[0].text(.05, .9, 'Input Power Spectrum',
@@ -235,7 +235,7 @@ def diagnose_numax_acf(numax, periodogram):
                     transform=ax[1].transAxes, fontsize=13)
 
         ax[2].plot(numax.diagnostics['numaxs'], numax.diagnostics['metric'])
-        ax[2].plot(numax.diagnostics['numaxs'], numax.diagnostics['metric_smooth'], lw=2, alpha=0.7)
+        ax[2].plot(numax.diagnostics['numaxs'], numax.diagnostics['metric_smooth'], lw=2, alpha=0.7, label='Smoothed Metric'))
         ax[2].set_xlabel("Frequency [{}]".format(periodogram.frequency.unit.to_string('latex')))
         ax[2].set_ylabel(r'Correlation Metric')
 
@@ -244,6 +244,7 @@ def diagnose_numax_acf(numax, periodogram):
         ax[2].text(.05, .9, 'Correlation Metric',
                             horizontalalignment='left',
                             transform=ax[2].transAxes, fontsize=13)
+        ax[2].legend(loc='upper right')
         ax[2].set_xlim(numax.diagnostics['numaxs'][0], numax.diagnostics['numaxs'][-1])
         plt.subplots_adjust(hspace=0, wspace=0)
     return ax
