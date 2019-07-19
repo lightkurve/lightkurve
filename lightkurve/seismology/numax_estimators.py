@@ -235,7 +235,7 @@ def diagnose_numax_acf(numax, periodogram):
                     transform=ax[1].transAxes, fontsize=13)
 
         ax[2].plot(numax.diagnostics['numaxs'], numax.diagnostics['metric'])
-        ax[2].plot(numax.diagnostics['numaxs'], numax.diagnostics['metric_smooth'], lw=2, alpha=0.7, label='Smoothed Metric'))
+        ax[2].plot(numax.diagnostics['numaxs'], numax.diagnostics['metric_smooth'], lw=2, alpha=0.7, label='Smoothed Metric')
         ax[2].set_xlabel("Frequency [{}]".format(periodogram.frequency.unit.to_string('latex')))
         ax[2].set_ylabel(r'Correlation Metric')
 
