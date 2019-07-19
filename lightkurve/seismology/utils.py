@@ -1,4 +1,4 @@
-"""Random utilities to aid the asteroseismology features."""
+"""Generic classes and functions which aid the asteroseismology features."""
 import numpy as np
 import copy
 from astropy import units as u
@@ -8,13 +8,20 @@ __all__ = ['SeismologyQuantity']
 
 
 class SeismologyQuantity(Quantity):
-    """Container to hold a seismological result and its meta data.
+    """Holds an asteroseismic value including its unit, error, and estimation method.
 
-    Quantity is a bit peculiar to sub-class because it inherits from `ndarray`;
-    see https://docs.astropy.org/en/stable/units/quantity.html#subclassing-quantity.
+    Compared to a traditional AstroPy `~astropy.units.Quantity` object, this
+    class has the following extra attributes:
+        * name (e.g. 'deltanu' or 'radius');
+        * error (i.e. the uncertainty);
+        * method (e.g. specifying the asteroseismic scaling relation);
+        * diagnostics;
+        * diagnostics_plot_method.
     """
     def __new__(cls, quantity, name=None, error=None, method=None,
                  diagnostics=None, diagnostics_plot_method=None):
+        # Note: Quantity is peculiar to sub-class because it inherits from numpy ndarray;
+        # see https://docs.astropy.org/en/stable/units/quantity.html#subclassing-quantity.
         self = Quantity.__new__(cls, quantity.value)
         self.__dict__ = quantity.__dict__
         self.name = name
@@ -25,12 +32,14 @@ class SeismologyQuantity(Quantity):
         return self
 
     def __repr__(self):
-        return super().__repr__()
+        return "{}: {} {} (method: {})".format(
+            self.name, '{:.2f}'.format(self.value),
+            self.unit.__str__(), self.method)
 
     def _repr_latex_(self):
-        return "{}: {} {} (method: {})".format(self.name,
-                                    '$ {} $'.format(np.round(super().value,2)),
-                                    super().unit._repr_latex_(), self.method)
+        return "{}: {} {} (method: {})".format(
+                self.name, '${:.2f}$'.format(self.value),
+                self.unit._repr_latex_(), self.method)
 
 
 def get_fwhm(periodogram, numax):

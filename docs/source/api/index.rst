@@ -70,7 +70,7 @@ Asteroseismology
 The :class:`lightkurve.seismology` sub-package provides tools to extra quick-look astroseismic parameters (numax, deltanu, radius, mass, and logg) from periodograms.
 
 .. automodsumm:: lightkurve.seismology
-    :skip: estimate_deltanu_acf, diagnose_deltanu_acf, estimate_numax_acf, diagnose_numax_acf, estimate_radius, estimate_mass, estimate_logg
+    :skip: estimate_deltanu_acf2d, diagnose_deltanu_acf2d, estimate_numax_acf2d, diagnose_numax_acf2d, estimate_radius, estimate_mass, estimate_logg
 
 
 Utilities

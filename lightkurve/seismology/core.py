@@ -1,10 +1,8 @@
-"""Defines the SeismologyButler class.
+"""Defines the Seismology class.
 
 TODO
 ----
 * Consider putting Teff in repr of stellar parameters.
-* Errors are not yet passed to stellar_estimator functions.
-* Clean up docstrings and plots.
 """
 import logging
 import warnings
@@ -22,10 +20,10 @@ from ..utils import LightkurveWarning
 
 log = logging.getLogger(__name__)
 
-__all__ = ['SeismologyButler']
+__all__ = ['Seismology']
 
 
-class SeismologyButler(object):
+class Seismology(object):
     """Enables astroseismic quantities to be estimated from periodograms.
 
     This class provides easy access to methods to estimate numax, deltanu, radius,
@@ -33,8 +31,8 @@ class SeismologyButler(object):
     """
     def __init__(self, periodogram):
         if not isinstance(periodogram, SNRPeriodogram):
-            warnings.warn("SeismologyButler received a periodogram which does not "
-                          "appear to have been background-corrected. Consider calling "
+            warnings.warn("Seismology received a periodogram which does not appear "
+                          "to have been background-corrected. Please consider calling "
                           "`periodogram.flatten()` prior to extracting seismological parameters.",
                           LightkurveWarning)
         self.periodogram = periodogram
@@ -43,20 +41,18 @@ class SeismologyButler(object):
         attrs = np.asarray(['numax', 'deltanu', 'mass', 'radius', 'logg'])
         tray = np.asarray([hasattr(self, attr) for attr in attrs])
         if tray.sum() == 0:
-            tray_str = '\n\t|  Tray is empty.  |\n\t ' + '-'*(18 + len(', '.join(attrs[tray])))
+            tray_str = " - no values have been computed so far."
         else:
-            tray_str = '\n\t|  On tray: ' + ', '.join(attrs[tray])+'  |\n\t '+'-'*(13 + len(', '.join(attrs[tray])))
-
-
-        return 'SeismologyButler(ID: {})\n{}'.format(self.periodogram.targetid, tray_str)
+            tray_str = " - computed values:\n * " + "\n * ".join([getattr(self, attr).__repr__() for attr in attrs[tray]])
+        return 'Seismology(ID: {}){}'.format(self.periodogram.targetid, tray_str)
 
     @staticmethod
     def from_lightcurve(lc, **kwargs):
-        """Returns a `SeismologyButler` given a `~lightkurve.lightcurve.LightCurve` object."""
-        log.info("Building a SeismologyButler object directly from a light curve "
+        """Returns a `Seismology` object given a `~lightkurve.lightcurve.LightCurve` object."""
+        log.info("Building a Seismology object directly from a light curve "
                  "uses default periodogram parameters. For further tuneability, "
                  "create a periodogram object first, using `to_periodogram`.")
-        return SeismologyButler(periodogram=lc.to_periodogram(**kwargs).flatten())
+        return Seismology(periodogram=lc.to_periodogram(**kwargs).flatten())
 
     def _validate_method(self, method, supported_methods):
         """Raises ValueError if a method is not supported."""
@@ -72,8 +68,7 @@ class SeismologyButler(object):
             try:
                 return self.numax
             except AttributeError:
-                raise AttributeError("You need to call `SeismologyButler"
-                                     ".estimate_numax()` first.")
+                raise AttributeError("You need to call `Seismology.estimate_numax()` first.")
         return numax
 
     def _validate_deltanu(self, deltanu):
@@ -82,8 +77,7 @@ class SeismologyButler(object):
             try:
                 return self.deltanu
             except AttributeError:
-                raise AttributeError("You need to call `SeismologyButler"
-                                     ".estimate_deltanu()` first.")
+                raise AttributeError("You need to call `Seismology.estimate_deltanu()` first.")
         return deltanu
 
     def plot_echelle(self, deltanu=None, numax=None,
@@ -242,31 +236,31 @@ class SeismologyButler(object):
         return ax
 
 
-    def estimate_numax(self, method="acf", **kwargs):
+    def estimate_numax(self, method="acf2d", **kwargs):
         """Returns the frequency of the peak of the seismic oscillation modes envelope.
 
         At present, the only method supported is based on using a
-        2D autocorrelation function (ACF).  This method is implemented by the
-        `~lightkurve.seismology.estimate_numax_acf` function which accepts
+        2D autocorrelation function (ACF2D).  This method is implemented by the
+        `~lightkurve.seismology.estimate_numax_acf2d` function which accepts
         the parameters `numaxs`, `window_width`, and `spacing`.
         For details and literature references, please read the detailed
-        docstring of this function by typing ``lightkurve.seismology.estimate_numax_acf?``
+        docstring of this function by typing ``lightkurve.seismology.estimate_numax_acf2d?``
         in a Python terminal or notebook.
 
         Parameters
         ----------
         method : str
-            Method to use. Only ``"acf"`` is supported at this time.
+            Method to use. Only ``"acf2d"`` is supported at this time.
 
         Returns
         -------
         numax : `~lightkurve.seismology.SeismologyQuantity`
             Numax of the periodogram, including details on the units and method.
         """
-        method = self._validate_method(method, supported_methods=["acf"])
-        if method == "acf":
-            from .numax_estimators import estimate_numax_acf
-            result = estimate_numax_acf(self.periodogram, **kwargs)
+        method = self._validate_method(method, supported_methods=["acf2d"])
+        if method == "acf2d":
+            from .numax_estimators import estimate_numax_acf2d
+            result = estimate_numax_acf2d(self.periodogram, **kwargs)
         self.numax = result
         return result
 
@@ -275,33 +269,33 @@ class SeismologyButler(object):
         numax = self._validate_numax(numax)
         return numax.diagnostics_plot_method(numax, self.periodogram)
 
-    def estimate_deltanu(self, method='acf', numax=None):
+    def estimate_deltanu(self, method='acf2d', numax=None):
         """Returns the average value of the large frequency spacing, DeltaNu,
         of the seismic oscillations of the target.
 
         At present, the only method supported is based on using an
-        autocorrelation function (ACF).  This method is implemented by the
-        `~lightkurve.seismology.estimate_deltanu_acf` function which requires
+        autocorrelation function (ACF2D).  This method is implemented by the
+        `~lightkurve.seismology.estimate_deltanu_acf2d` function which requires
         the parameter `numax`. For details and literature references, please
         read the detailed docstring of this function by typing
-        ``lightkurve.seismology.estimate_deltanu_acf?`` in a Python terminal or notebook.
+        ``lightkurve.seismology.estimate_deltanu_acf2d?`` in a Python terminal or notebook.
 
         Parameters
         ----------
         method : str
-            Method to use. Only ``"acf"`` is supported at this time.
+            Method to use. Only ``"acf2d"`` is supported at this time.
 
         Returns
         -------
         deltanu : `~lightkurve.seismology.SeismologyQuantity`
             DeltaNu of the periodogram, including details on the units and method.
         """
-        method = self._validate_method(method, supported_methods=["acf"])
+        method = self._validate_method(method, supported_methods=["acf2d"])
         numax = self._validate_numax(numax)
 
-        if method == "acf":
-            from .deltanu_estimators import estimate_deltanu_acf
-            result = estimate_deltanu_acf(self.periodogram, numax=numax)
+        if method == "acf2d":
+            from .deltanu_estimators import estimate_deltanu_acf2d
+            result = estimate_deltanu_acf2d(self.periodogram, numax=numax)
 
         self.deltanu = result
         return result

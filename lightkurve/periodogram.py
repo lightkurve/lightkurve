@@ -389,7 +389,7 @@ class Periodogram(object):
 
         Returns
         -------
-        table : `astropy.table.Table` object
+        table : `~astropy.table.Table` object
             An AstroPy Table with columns 'frequency', 'period', and 'power'.
         """
         return Table(data=(self.frequency, self.period, self.power),
@@ -526,15 +526,15 @@ class Periodogram(object):
         output.pprint(max_lines=-1, max_width=-1)
 
     def to_seismology(self,**kwargs):
-        """Converts the periodogram to a `lightkurve.seismology.SeismologyButler` spectrum object.
+        """Returns a `~lightkurve.seismology.Seismology` object to analyze the periodogram.
 
         Returns
         -------
-        seismologybutler : `lightkurve.seismology.SeismologyButler`
-            Helper object to run asteroseismology methods
+        seismology : `~lightkurve.seismology.Seismology`
+            Helper object to run asteroseismology methods.
         """
-        from .seismology import SeismologyButler
-        return SeismologyButler(self)
+        from .seismology import Seismology
+        return Seismology(self)
 
 
 class SNRPeriodogram(Periodogram):

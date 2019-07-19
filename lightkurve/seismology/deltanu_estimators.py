@@ -12,10 +12,10 @@ from .utils import SeismologyQuantity
 from . import utils
 from .. import MPLSTYLE
 
-__all__ = ['estimate_deltanu_acf', 'diagnose_deltanu_acf']
+__all__ = ['estimate_deltanu_acf2d', 'diagnose_deltanu_acf2d']
 
 
-def estimate_deltanu_acf(periodogram, numax):
+def estimate_deltanu_acf2d(periodogram, numax):
     """Returns the average value of the large frequency spacing, DeltaNu,
     of the seismic oscillations of the target, using an autocorrelation
     function.
@@ -112,13 +112,13 @@ def estimate_deltanu_acf(periodogram, numax):
     diagnostics = {'lags':lags, 'acf':acf, 'peaks':peaks, 'sel':sel, 'numax':numax, 'deltanu_emp':deltanu_emp}
     result = SeismologyQuantity(best_deltanu,
                                 name="deltanu",
-                                method="ACF",
+                                method="ACF2D",
                                 diagnostics=diagnostics,
-                                diagnostics_plot_method=diagnose_deltanu_acf)
+                                diagnostics_plot_method=diagnose_deltanu_acf2d)
     return result
 
 
-def diagnose_deltanu_acf(deltanu, periodogram):
+def diagnose_deltanu_acf2d(deltanu, periodogram):
     """Returns a diagnostic plot which elucidates how deltanu was estimated.
 
     [1] Scaled correlation metric vs frequecy lag of the autocorrelation
@@ -136,7 +136,7 @@ def diagnose_deltanu_acf(deltanu, periodogram):
     Parameters
     -----------
     deltanu : `SeismologyResult` object
-        The object returned by `estimate_deltanu_acf()`.
+        The object returned by `estimate_deltanu_acf2d()`.
 
     Returns
     -------

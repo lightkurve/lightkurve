@@ -151,7 +151,7 @@ def estimate_mass(numax, deltanu, teff, numax_err=None, deltanu_err=None, teff_e
     result = SeismologyQuantity(uM.n * u.solMass,
                                 error=uM.s * u.solMass,
                                 name="mass",
-                                method="Uncorected Scaling Relations")
+                                method="Uncorrected Scaling Relations")
     return result
 
 

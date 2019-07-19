@@ -9,10 +9,10 @@ from .. import MPLSTYLE
 from . import utils
 from .utils import SeismologyQuantity
 
-__all__ = ['estimate_numax_acf', 'diagnose_numax_acf']
+__all__ = ['estimate_numax_acf2d', 'diagnose_numax_acf2d']
 
 
-def estimate_numax_acf(periodogram, numaxs=None, window_width=None, spacing=None):
+def estimate_numax_acf2d(periodogram, numaxs=None, window_width=None, spacing=None):
     """Estimates the peak of the envelope of seismic oscillation modes, numax,
     using an autocorrelation function.
 
@@ -167,13 +167,13 @@ def estimate_numax_acf(periodogram, numaxs=None, window_width=None, spacing=None
                    'metric':metric, 'metric_smooth': metric_smooth}
     result = SeismologyQuantity(best_numax,
                                 name="numax",
-                                method="ACF",
+                                method="ACF2D",
                                 diagnostics=diagnostics,
-                                diagnostics_plot_method=diagnose_numax_acf)
+                                diagnostics_plot_method=diagnose_numax_acf2d)
     return result
 
 
-def diagnose_numax_acf(numax, periodogram):
+def diagnose_numax_acf2d(numax, periodogram):
     """Returns a diagnostic plot which elucidates how numax was estimated.
 
     [1] The SNRPeriodogram plotted with a red line indicating the estimated
@@ -197,7 +197,7 @@ def diagnose_numax_acf(numax, periodogram):
     Parameters:
     -----------
     numax : `SeismologyResult` object
-        The object returned by `estimate_numax_acf()`.
+        The object returned by `estimate_numax_acf2d()`.
 
     Returns:
     --------
