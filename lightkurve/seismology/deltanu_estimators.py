@@ -128,8 +128,10 @@ def diagnose_deltanu_acf(deltanu, periodogram):
     For details on the deltanu estimation, see the `estimate_deltanu()`
     function. The calculation performed is identical.
 
-    NOTE: When plotting, we exclude the first frequency lag bin, to
-    make the relevant features on the plot clearer.
+    NOTE: When plotting, we exclude the first two frequency lag bins, to
+    make the relevant features on the plot clearer, as these bins are close to
+    the spectrum correlated with itself and therefore much higher than the rest
+    of the bins.
 
     Parameters
     -----------
@@ -178,7 +180,7 @@ def diagnose_deltanu_acf(deltanu, periodogram):
 
         ax = axs[1]
         # ax.plot(lags, acf/acf[0])
-        ax.plot(deltanu.diagnostics['lags'][1:], deltanu.diagnostics['acf'][1:])
+        ax.plot(deltanu.diagnostics['lags'][2:], deltanu.diagnostics['acf'][2:])
         ax.set_xlabel("Frequency Lag [{}]".format(periodogram.frequency.unit.to_string('latex')))
         ax.set_ylabel(r'Scaled Auto Correlation', fontsize=11)
 

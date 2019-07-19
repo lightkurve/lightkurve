@@ -1,6 +1,6 @@
 """Random utilities to aid the asteroseismology features."""
 import numpy as np
-
+import copy
 from astropy import units as u
 from astropy.units import Quantity
 
@@ -113,7 +113,7 @@ def autocorrelate(periodogram, numax, window_width=25., frequency_spacing=None):
     x = int(numax / frequency_spacing)                                 # Find the index value of numax
     x0 = int((periodogram.frequency[0].value/frequency_spacing))              # Transform in case the index isn't from 0
     xt = x - x0
-    p_sel = periodogram.power[xt-spread:xt+spread].value       # Make the window selection
+    p_sel = copy.deepcopy(periodogram.power[xt-spread:xt+spread].value)       # Make the window selection
     p_sel -= np.nanmean(p_sel)    #Make it so that the selection has zero mean.
 
     C = np.correlate(p_sel, p_sel, mode='full')[len(p_sel)-1:]     #Correlated the resulting SNR space with itself
