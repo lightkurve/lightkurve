@@ -374,7 +374,7 @@ class SeismologyButler(object):
         self.deltanu = result
         return result
 
-    def diagnose_deltanu(self, method="acf", deltanu=None):
+    def diagnose_deltanu(self, deltanu=None):
         """Create diagnostic plots showing how numax was estimated."""
         deltanu = self._validate_deltanu(deltanu)
         return deltanu.diagnostics_plot_method(deltanu, self.periodogram)

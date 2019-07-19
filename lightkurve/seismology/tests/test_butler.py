@@ -59,13 +59,12 @@ def test_estimate_numax_basics():
     #Assert numax has unit equal to input frequency unit
     assert(numax.unit == u.microhertz)
 
-    # TODO: the test below doesn't appear to pass
-    #Assert you can recover numax with a chopped periodogram
-    #rsnr = snr[(snr.frequency.value>1600) & (snr.frequency.value<3200)]
-    #numax = rsnr.to_seismology().estimate_numax()
-    #assert(np.isclose(true_numax, numax.value, atol=.1*true_numax))
+    # Assert you can recover numax with a chopped periodogram
+    rsnr = snr[(snr.frequency.value>1600) & (snr.frequency.value<3200)]
+    numax = rsnr.to_seismology().estimate_numax()
+    assert(np.isclose(true_numax, numax.value, atol=.1*true_numax))
 
-    #Assert numax estimator works when input frequency is not in microhertz
+    # Assert numax estimator works when input frequency is not in microhertz
     fday = u.Quantity(f*u.microhertz, 1/u.day)
     snr = SNRPeriodogram(fday, u.Quantity(p, None))
     numax = snr.to_seismology().estimate_numax()
@@ -74,8 +73,7 @@ def test_estimate_numax_basics():
 
 
 def test_estimate_numax_kwargs():
-    """Test if we can estimate a numax using its various keyword arguments
-    """
+    """Test if we can estimate a numax using its various keyword arguments."""
     f, p, true_numax, _ = generate_test_spectrum()
     std = 0.25*true_numax/2.335  # The standard deviation of the mode envelope
     snr = SNRPeriodogram(f*u.microhertz, u.Quantity(p, None))
@@ -83,23 +81,23 @@ def test_estimate_numax_kwargs():
     numaxs = np.linspace(true_numax-2*std, true_numax+2*std, 500)
     numax = butler.estimate_numax(numaxs=numaxs)
 
-    #Assert we can recover numax using a custom numax
+    # Assert we can recover numax using a custom numax
     assert(np.isclose(numax.value, true_numax, atol=.1*true_numax))
 
-    #Assert we can't pass custom numaxs outside a functional range
+    # Assert we can't pass custom numaxs outside a functional range
     with pytest.raises(ValueError) as err:
         numax = butler.estimate_numax(numaxs=np.linspace(-5, 5.))
     with pytest.raises(ValueError) as err:
         numax = butler.estimate_numax(numaxs=np.linspace(1., 5000.))
 
-    #Assert we can pass a custom window in microhertz or days
+    # Assert we can pass a custom window in microhertz or days
     numax = butler.estimate_numax(window_width=200.)
     assert(np.isclose(numax.value, true_numax, atol=.1*true_numax))
     numax = butler.estimate_numax(window_width=u.Quantity(200., u.microhertz).to(1/u.day))
     assert(np.isclose(numax.value, true_numax, atol=.1*true_numax))
 
-    #Assert we can't pass in window_widths outside functional range
-    #Assert we can't pass custom numaxs outside a functional range
+    # Assert we can't pass in window_widths outside functional range
+    # Assert we can't pass custom numaxs outside a functional range
     with pytest.raises(ValueError) as err:
         numax = butler.estimate_numax(window_width=-5)
     with pytest.raises(ValueError) as err:
@@ -107,13 +105,13 @@ def test_estimate_numax_kwargs():
     with pytest.raises(ValueError) as err:
         numax = butler.estimate_numax(window_width=0.001)
 
-    #Assert we can pass a custom spacing in microhertz or days
+    # Assert we can pass a custom spacing in microhertz or days
     numax = butler.estimate_numax(spacing=15.)
     assert(np.isclose(numax.value, true_numax, atol=.1*true_numax))
     numax = butler.estimate_numax(spacing=u.Quantity(15., u.microhertz).to(1/u.day))
     assert(np.isclose(numax.value, true_numax, atol=.1*true_numax))
 
-    #Assert we can't pass in spacing outside functional range
+    # Assert we can't pass in spacing outside functional range
     with pytest.raises(ValueError) as err:
         numax = butler.estimate_numax(spacing=-5)
     with pytest.raises(ValueError) as err:
@@ -121,8 +119,8 @@ def test_estimate_numax_kwargs():
     with pytest.raises(ValueError) as err:
         numax = butler.estimate_numax(spacing=0.001)
 
-    #Assert it doesn't matter what units of frqeuency numaxs are passed in as
-    #Assert the output is still in the same units as the object frequencies
+    # Assert it doesn't matter what units of frqeuency numaxs are passed in as
+    # Assert the output is still in the same units as the object frequencies
     daynumaxs = u.Quantity(numaxs*u.microhertz, 1/u.day)
     numax = butler.estimate_numax(numaxs=daynumaxs)
     assert(np.isclose(numax.value, true_numax, atol=.1*true_numax))
@@ -143,9 +141,9 @@ def test_plot_numax_diagnostics():
     # Note: checks on the `numaxs` kwarg in `estimate_numax_kwargs` also apply
     # to this function, no need to check them twice.
 
-    #Assert recovers numax within 10%
+    # Assert recovers numax within 10%
     assert(np.isclose(true_numax, butler.numax.value, atol=.1*true_numax))
-    #Assert numax has unit equal to input frequency unit
+    # Assert numax has unit equal to input frequency unit
     assert(butler.numax.unit == u.microhertz)
 
     # Sanity check that plotting works under all conditions
@@ -159,12 +157,11 @@ def test_plot_numax_diagnostics():
     numax = butler.estimate_numax(window_width=100.)
     butler.diagnose_numax(numax)
 
-    # TODO: the test below doesn't appear to pass
     # Check plotting works when periodogram is sliced
-    #rsnr = snr[(snr.frequency.value>1600)&(snr.frequency.value<3200)]
-    #butler = rsnr.to_seismology()
-    #butler.estimate_numax()
-    #butler.diagnose_numax()
+    rsnr = snr[(snr.frequency.value>1600)&(snr.frequency.value<3200)]
+    butler = rsnr.to_seismology()
+    butler.estimate_numax()
+    butler.diagnose_numax()
 
     # Check metric of appropriate length is returned
     numax = butler.estimate_numax(numaxs=numaxs)
@@ -180,20 +177,19 @@ def test_estimate_deltanu_basics():
     butler.estimate_numax()
     deltanu = butler.estimate_deltanu()
 
-    #Assert recovers deltanu within 25%
+    # Assert recovers deltanu within 25%
     assert(np.isclose(true_deltanu, deltanu.value, atol=.25*true_deltanu))
-    #Assert deltanu has unit equal to input frequency unit
+    # Assert deltanu has unit equal to input frequency unit
     assert(deltanu.unit == u.microhertz)
 
-    # TODO: the test below doesn't appear to pass
-    #Assert you can recover numax with a sliced periodogram
-    #rsnr = snr[(snr.frequency.value>1600) & (snr.frequency.value<3200)]
-    #butler = rsnr.to_seismology()
-    #butler.estimate_numax()
-    #numax = butler.estimate_deltanu()
-    #assert(np.isclose(true_deltanu, deltanu.value, atol=.25*true_deltanu))
+    # Assert you can recover numax with a sliced periodogram
+    rsnr = snr[(snr.frequency.value>1600) & (snr.frequency.value<3200)]
+    butler = rsnr.to_seismology()
+    butler.estimate_numax()
+    numax = butler.estimate_deltanu()
+    assert(np.isclose(true_deltanu, deltanu.value, atol=.25*true_deltanu))
 
-    #Assert deltanu estimator works when input frequency is not in microhertz
+    # Assert deltanu estimator works when input frequency is not in microhertz
     fday = u.Quantity(f*u.microhertz, 1/u.day)
     daysnr = SNRPeriodogram(fday, u.Quantity(p, None))
     butler = daysnr.to_seismology()
@@ -254,12 +250,12 @@ def test_plot_deltanu_diagnostics():
     deltanu = butler.estimate_deltanu(numax=daynumax)
     butler.diagnose_deltanu(deltanu)
 
-    # TODO: the test below appears to fail.
     # Check plotting works when periodogram is sliced
-    #rsnr = snr[(snr.frequency.value>1600)&(snr.frequency.value<3200)]
-    #butler = rsnr.to_seismology()
-    #butler.estimate_numax()
-    #deltanu, ax = butler.diagnose_deltanu()
+    rsnr = snr[(snr.frequency.value>1600)&(snr.frequency.value<3200)]
+    butler = rsnr.to_seismology()
+    butler.estimate_numax()
+    butler.estimate_deltanu()
+    ax = butler.diagnose_deltanu()
 
     # Check it plots when frequency is in days
     fday = u.Quantity(f*u.microhertz, 1/u.day)
@@ -267,13 +263,6 @@ def test_plot_deltanu_diagnostics():
     butler = daysnr.to_seismology()
     butler.estimate_deltanu(numax=daynumax)
     butler.diagnose_deltanu()
-
-    #TODO: test below needs fixing
-    #Check metric of appropriate length is returned
-    #numax = butler.estimate_numax()
-    #deltanu = butler.estimate_deltanu()
-    #window_width = 2*int(np.floor(snr._get_fwhm(numax.value)))
-    #assert(len(deltanu.metric) == len(snr._autocorrelate(numax.value, window_width)))
 
 
 def test_plot_echelle():
