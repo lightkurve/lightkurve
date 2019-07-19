@@ -18,8 +18,7 @@ from astropy.units import cds
 from .. import MPLSTYLE
 from . import utils, stellar_estimators
 from ..periodogram import LombScarglePeriodogram, SNRPeriodogram
-
-
+from ..utils import LightkurveWarning
 
 log = logging.getLogger(__name__)
 
@@ -33,6 +32,11 @@ class SeismologyButler(object):
     and stores them on its tray for easy diagnostic plotting.
     """
     def __init__(self, periodogram):
+        if not isinstance(periodogram, SNRPeriodogram):
+            warnings.warn("SeismologyButler received a periodogram which does not "
+                          "appear to have been background-corrected. Consider calling "
+                          "`periodogram.flatten()` prior to extracting seismological parameters.",
+                          LightkurveWarning)
         self.periodogram = periodogram
 
     def __repr__(self):
@@ -129,8 +133,9 @@ class SeismologyButler(object):
 
         # Check for any superfluous input
         if (numax is not None) & (any([a is not None for a in [minimum_frequency, maximum_frequency]])):
-            warnings.warn('You have passed both a numax and a frequency limit'
-                          'The frequency limit will override the numax input')
+            warnings.warn("You have passed both a numax and a frequency limit. "
+                          "The frequency limit will override the numax input.",
+                          LightkurveWarning)
 
         # Ensure input numax is in the correct units (if there is one)
         if numax is not None:
