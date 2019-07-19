@@ -82,7 +82,10 @@ def autocorrelate(periodogram, numax, window_width=25., frequency_spacing=None):
     around a central frequency `numax` (in microhertz). The window size is
     determined based on the location of the nyquist frequency when
     estimating numax, and based on the expected width of the mode envelope
-    of the asteroseismic oscillations when calculating deltanu.
+    of the asteroseismic oscillations when calculating deltanu. The section of
+    power being autocorrelated is first resclaed by subtracting its mean, so
+    that its noise is centered around zero. If this is not done, noise will
+    appear in the ACF as a function of 1/lag.
 
     Parameters:
     ----------
