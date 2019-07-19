@@ -40,8 +40,8 @@ def estimate_deltanu_acf(periodogram, numax):
     deltanu_emp = u.Quantity((0.294 * u.Quantity(numax, u.microhertz).value ** 0.772)*u.microhertz,
                         periodogram.frequency.unit).value
 
-    window = 2*int(np.floor(utils.get_fwhm(periodogram, numax.value)))
-    aacf = utils.autocorrelate(periodogram, numax=numax.value, window=window)
+    window_width = 2*int(np.floor(utils.get_fwhm(periodogram, numax.value)))
+    aacf = utils.autocorrelate(periodogram, numax=numax.value, window_width=window_width)
     acf = (np.abs(aacf**2)/np.abs(aacf[0]**2)) / (3/(2*len(aacf)))
     fs = np.median(np.diff(periodogram.frequency.value))
     lags = np.linspace(0., len(acf)*fs, len(acf))
@@ -99,21 +99,26 @@ def diagnose_deltanu_acf(deltanu, periodogram):
                     transform=ax.transAxes, fontsize=11)
 
 
-        window = 2*int(np.floor(utils.get_fwhm(periodogram, deltanu.diagnostics['numax'].value)))
+        window_width = 2*int(np.floor(utils.get_fwhm(periodogram, deltanu.diagnostics['numax'].value)))
         frequency_spacing = np.median(np.diff(periodogram.frequency.value))
-        spread = int(window/2/frequency_spacing)                           # Find the spread in indices
+        spread = int(window_width/2/frequency_spacing)                           # Find the spread in indices
 
 
-        a = periodogram.frequency.value[np.argmin(np.abs(periodogram.frequency.value - deltanu.diagnostics['numax'].value)) + spread]
-        b = periodogram.frequency.value[np.argmin(np.abs(periodogram.frequency.value - deltanu.diagnostics['numax'].value)) - spread]
+        a = np.argmin(np.abs(periodogram.frequency.value - deltanu.diagnostics['numax'].value)) + spread
+        b = np.argmin(np.abs(periodogram.frequency.value - deltanu.diagnostics['numax'].value)) - spread
+
+        a = [periodogram.frequency.value[a] if a < len(periodogram.frequency) else periodogram.frequency.value[-1]][0]
+        b = [periodogram.frequency.value[b] if b > 0 else periodogram.frequency.value[0]][0]
+
         ax.axvline(a, c='r', linewidth=2, alpha=.4, ls='--')
         ax.axvline(b, c='r', linewidth=2, alpha=.4, ls='--')
+
         h = periodogram.power.value.max() * 0.9
 
         ax.annotate("", xy=(a, h), xytext=(a - (a-b), h),
                         arrowprops=dict(arrowstyle="<->", color='r', alpha=0.5), va='bottom')
         ax.text(a - (a-b)/2, h, "FWHM", color='r', alpha=0.7, fontsize=10, va='bottom', ha='center')
-
+        ax.set_xlim(b - ((a-b)*0.2), a + ((a-b)*0.2))
 
         ax = axs[1]
         # ax.plot(lags, acf/acf[0])

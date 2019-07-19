@@ -223,7 +223,7 @@ class SeismologyButler(object):
         return ax
 
 
-    def estimate_numax(self, method="acf", numaxs=None, window=None, spacing=None):
+    def estimate_numax(self, method="acf", numaxs=None, window_width=None, spacing=None):
         """Estimates the peak of the envelope of seismic oscillation modes,
         numax using an autocorrelation function. There are many papers on the
         topic of autocorrelation functions for estimating seismic parameters,
@@ -277,7 +277,7 @@ class SeismologyButler(object):
             none is given, a sensible range will be chosen. If no units are
             given it is assumed to be in the same units as the periodogram
             frequency.
-        window : int or float
+        window_width : int or float
             The width of the autocorrelation window around each central
             frequency in 'numaxs'. If none is given, a sensible value will be
             chosen. If no units are given it is assumed to be in the same units
@@ -298,7 +298,7 @@ class SeismologyButler(object):
         if method == "acf":
             from .numax_estimators import estimate_numax_acf
             result = estimate_numax_acf(self.periodogram, numaxs=numaxs,
-                                        window=window, spacing=spacing)
+                                        window_width=window_width, spacing=spacing)
         self.numax = result
         return result
 

@@ -13,18 +13,18 @@ from . import utils
 from .utils import SeismologyQuantity
 
 
-def estimate_numax_acf(periodogram, numaxs=None, window=None, spacing=None):
+def estimate_numax_acf(periodogram, numaxs=None, window_width=None, spacing=None):
     """Estimate the frequency at maximum power from a periodogram using
     the autocorrelation method.
     """
-    # Calculate the window size
+    # Calculate the window_width size
 
     #C: What is this doing? Why have these values been picked? This function is slow.
-    if window is None:
+    if window_width is None:
         if u.Quantity(periodogram.frequency[-1], u.microhertz) > u.Quantity(500., u.microhertz):
-            window = u.Quantity(250., u.microhertz).to(periodogram.frequency.unit).value
+            window_width = u.Quantity(250., u.microhertz).to(periodogram.frequency.unit).value
         else:
-            window = u.Quantity(25., u.microhertz).to(periodogram.frequency.unit).value
+            window_width = u.Quantity(25., u.microhertz).to(periodogram.frequency.unit).value
 
     # Calculate the spacing size
     if spacing is None:
@@ -34,20 +34,20 @@ def estimate_numax_acf(periodogram, numaxs=None, window=None, spacing=None):
             spacing = u.Quantity(1., u.microhertz).to(periodogram.frequency.unit).value
 
     # Run some checks on the inputs
-    window = u.Quantity(window, periodogram.frequency.unit).value
+    window_width = u.Quantity(window_width, periodogram.frequency.unit).value
     spacing = u.Quantity(spacing, periodogram.frequency.unit).value
     if numaxs is None:
-        numaxs = np.arange(np.ceil(np.nanmin(periodogram.frequency.value)) + window/2,
-                    np.floor(np.nanmax(periodogram.frequency.value)) - window/2,
+        numaxs = np.arange(np.ceil(np.nanmin(periodogram.frequency.value)) + window_width/2,
+                    np.floor(np.nanmax(periodogram.frequency.value)) - window_width/2,
                     spacing)
     numaxs = u.Quantity(numaxs, periodogram.frequency.unit).value
     if not hasattr(numaxs, '__iter__'):
         numaxs = np.asarray([numaxs])
 
     fs = np.median(np.diff(periodogram.frequency.value))
-    # Perform checks on spacing and window
-    for var, label in zip([np.asarray(window), np.asarray(spacing)],
-                          ['window', 'spacing']):
+    # Perform checks on spacing and window_width
+    for var, label in zip([np.asarray(window_width), np.asarray(spacing)],
+                          ['window_width', 'spacing']):
         if (var < fs).any():
             raise ValueError("You can't have {} smaller than the "
                             "frequency separation!".format(label))
@@ -70,9 +70,9 @@ def estimate_numax_acf(periodogram, numaxs=None, window=None, spacing=None):
     fs = np.median(np.diff(periodogram.frequency.value))
 
     metric = np.zeros(len(numaxs))
-    acf2d = np.zeros([int(window/2/fs)*2,len(numaxs)])
+    acf2d = np.zeros([int(window_width/2/fs)*2,len(numaxs)])
     for idx, numax in enumerate(numaxs):
-        acf = utils.autocorrelate(periodogram, numax, window=window, frequency_spacing=fs)      #Return the acf at this numax
+        acf = utils.autocorrelate(periodogram, numax, window_width=window_width, frequency_spacing=fs)      #Return the acf at this numax
         acf2d[:, idx] = acf                                     #Store the 2D acf
         metric[idx] = (np.sum(np.abs(acf)) - 1 ) / len(acf)  #Store the max acf power normalised by the length
 
@@ -91,7 +91,7 @@ def estimate_numax_acf(periodogram, numaxs=None, window=None, spacing=None):
     best_numax = u.Quantity(best_numax, periodogram.frequency.unit)
 
     # Create and return the object containing the result and diagnostics
-    diagnostics = {'numaxs':numaxs, 'acf2d':acf2d, 'window':window,
+    diagnostics = {'numaxs':numaxs, 'acf2d':acf2d, 'window_width':window_width,
                    'metric':metric, 'metric_smooth': metric_smooth}
     result = SeismologyQuantity(best_numax,
                                 name="numax",
@@ -109,7 +109,7 @@ def diagnose_numax_acf(numax, periodogram):
 
     [2] An image showing the 2D autocorrelation. On the y-axis is the
     frequency lag of the autocorrelation window. The width of the window is
-    equal to `window`, and the spacing between lags is equal to
+    equal to `window_width`, and the spacing between lags is equal to
     `numax_spacing`. On the x-axis is the central frequency at which the
     autocorrelation was calculated. In the z-axis is the unitless
     autocorrelation power. Shown in red is the estimated numax.
@@ -142,7 +142,7 @@ def diagnose_numax_acf(numax, periodogram):
                     horizontalalignment='left',
                     transform=ax[0].transAxes, fontsize=15)
 
-        windowarray = np.linspace(0, numax.diagnostics['window'],
+        windowarray = np.linspace(0, numax.diagnostics['window_width'],
                                   num=numax.diagnostics['acf2d'].shape[1])
         extent = (numax.diagnostics['numaxs'][0],
                   numax.diagnostics['numaxs'][-1],
@@ -157,7 +157,7 @@ def diagnose_numax_acf(numax, periodogram):
 #        print(numax.diagnostics['numaxs'].shape)
 #        print(numax.diagnostics['acf2d'].shape)
 #        print(periodogram.frequency.value.shape)
-        im = ax[1].pcolormesh(numax.diagnostics['numaxs'], np.linspace(0, numax.diagnostics['window'], num=numax.diagnostics['acf2d'].shape[0]),
+        im = ax[1].pcolormesh(numax.diagnostics['numaxs'], np.linspace(0, numax.diagnostics['window_width'], num=numax.diagnostics['acf2d'].shape[0]),
                                     numax.diagnostics['acf2d'], cmap='Blues', vmin=vmin, vmax=vmax)
 #        plt.colorbar(im, ax=ax[1], orientation='horizontal')
         ax[1].set_ylabel(r'Frequency lag [{}]'.format(periodogram.frequency.unit.to_string('latex')))
