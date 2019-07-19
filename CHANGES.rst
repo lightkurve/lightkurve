@@ -1,6 +1,9 @@
 1.1.0 (unreleased)
 ==================
 
+- Added the `lightkurve.seismology` sub-package, which enables quick-look
+  asteroseismic quantities to be extracted from `Periodogram` objects. [#496]
+
 - Added the `tpf.cutout()` method which enables smaller Target Pixel Files to
   be extracted from larger ones. [#537]
 
