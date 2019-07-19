@@ -42,7 +42,7 @@ def estimate_deltanu_acf(periodogram, numax):
     As is done in Mosser & Appourchaux, we rescale the value of C in terms
     of the noise level in the ACF spectrum as
 
-    A = |C^2| / |C[0]^2|) * (2 * len(C) / 3) .
+    A = (|C^2| / |C[0]^2|) * (2 * len(C) / 3) .
 
     The method will autocorrelate the region around the estimated numax
     expected to contain seismic oscillation modes. Repeating peaks in the
@@ -144,8 +144,8 @@ def diagnose_deltanu_acf(deltanu, periodogram):
         ax = axs[0]
         periodogram.plot(ax=ax, label='')
         ax.axvline(deltanu.diagnostics['numax'].value, c='r', linewidth=1, alpha=.4, ls=':')
-        ax.text(deltanu.diagnostics['numax'].value, periodogram.power.value.max()*0.6,
-                    '{} ({0:7.5} {})'.format(r'$\nu_{\rm max}$', deltanu.diagnostics['numax'].value, deltanu.diagnostics['numax'].unit.to_string('latex'))
+        ax.text(deltanu.diagnostics['numax'].value, periodogram.power.value.max()*0.45,
+                    '{} ({:.1f} {})'.format(r'$\nu_{\rm max}$', deltanu.diagnostics['numax'].value, deltanu.diagnostics['numax'].unit.to_string('latex')),
                     rotation=90, ha='right', color='r', alpha=0.5, fontsize=8)
         ax.text(.025, .9, 'Input Power Spectrum',
                     horizontalalignment='left',
