@@ -8,12 +8,14 @@ import warnings
 
 import numpy as np
 from matplotlib import pyplot as plt
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+
 
 import astropy
 from astropy.table import Table
 from astropy import units as u
 from astropy.units import cds
-from astropy.convolution import convolve, Box1DKernel
+from astropy.convolution import convolve, Box1DKernel, Gaussian1DKernel
 
 # LombScargle was moved from astropy.stats to astropy.timeseries in AstroPy v3.2
 try:
@@ -21,8 +23,13 @@ try:
 except ImportError:
     from astropy.stats import LombScargle
 
+from scipy.optimize import curve_fit
+from scipy.signal import find_peaks
+
 from . import MPLSTYLE
+
 from .utils import LightkurveWarning
+from .lightcurve import LightCurve
 
 log = logging.getLogger(__name__)
 
@@ -331,6 +338,7 @@ class Periodogram(object):
             ax.set_title(title)
         return ax
 
+
     def flatten(self, method='logmedian', filter_width=0.01, return_trend=False):
         """Estimates the Signal-To-Noise (SNR) spectrum by dividing out an
         estimate of the noise background.
@@ -381,7 +389,7 @@ class Periodogram(object):
 
         Returns
         -------
-        table : `astropy.table.Table` object
+        table : `~astropy.table.Table` object
             An AstroPy Table with columns 'frequency', 'period', and 'power'.
         """
         return Table(data=(self.frequency, self.period, self.power),
@@ -517,6 +525,17 @@ class Periodogram(object):
         print('lightkurve.Periodogram properties:')
         output.pprint(max_lines=-1, max_width=-1)
 
+    def to_seismology(self,**kwargs):
+        """Returns a `~lightkurve.seismology.Seismology` object to analyze the periodogram.
+
+        Returns
+        -------
+        seismology : `~lightkurve.seismology.Seismology`
+            Helper object to run asteroseismology methods.
+        """
+        from .seismology import Seismology
+        return Seismology(self)
+
 
 class SNRPeriodogram(Periodogram):
     """Defines a Signal-to-Noise Ratio (SNR) Periodogram class.
@@ -549,12 +568,14 @@ class SNRPeriodogram(Periodogram):
             ax.set_ylabel("Signal to Noise Ratio (SNR)")
         return ax
 
-
 class LombScarglePeriodogram(Periodogram):
     """Subclass of :class:`Periodogram <lightkurve.periodogram.Periodogram>`
     representing a power spectrum generated using the Lomb Scargle method.
     """
     def __init__(self, *args, **kwargs):
+        self._LS_object = kwargs.pop("ls_obj", None)
+        self.nterms = kwargs.pop("nterms", 1)
+        self.ls_method = kwargs.pop("ls_method", 'fastchi2')
         super(LombScarglePeriodogram, self).__init__(*args, **kwargs)
 
     def __repr__(self):
@@ -565,7 +586,7 @@ class LombScarglePeriodogram(Periodogram):
                         minimum_period=None, maximum_period=None,
                         frequency=None, period=None,
                         nterms=1, nyquist_factor=1, oversample_factor=None,
-                        freq_unit=None, normalization="amplitude",
+                        freq_unit=None, normalization="amplitude", ls_method='fast',
                         **kwargs):
         """Creates a Periodogram from a LightCurve using the Lomb-Scargle method.
 
@@ -726,7 +747,10 @@ class LombScarglePeriodogram(Periodogram):
             maximum_frequency = kwargs.pop("max_frequency", None)
 
         # Make sure the lightcurve object is normalized
-        lc = lc.normalize()
+        if not np.in1d(lc.flux, lc.normalize().flux).all():
+            warnings.warn("Input light curve will be normalized.",
+                          LightkurveWarning)
+            lc = lc.normalize()
 
         # Check if any values of period have been passed and set format accordingly
         if not all(b is None for b in [period, minimum_period, maximum_period]):
@@ -744,8 +768,10 @@ class LombScarglePeriodogram(Periodogram):
             raise ValueError('Lightcurve contains NaN values. Use lc.remove_nans()'
                              ' to remove NaN values from a LightCurve.')
 
-        # Hard coding that time is in days.
-        time = lc.time.copy() * u.day
+        if lc.time_format in ['bkjd', 'btjd', 'd', 'days', 'day', None]:
+            time = lc.time.copy() * u.day
+        else:
+            raise NotImplementedError('time in format {} is not supported.'.format(lc.time_format))
 
         # Approximate Nyquist Frequency and frequency bin width in terms of days
         nyquist = 0.5 * (1./(np.median(np.diff(time))))
@@ -800,25 +826,33 @@ class LombScarglePeriodogram(Periodogram):
         # Convert to desired units
         frequency = u.Quantity(frequency, freq_unit)
 
-        if nterms > 1:
-            raise NotImplementedError('Increasing the number of terms is not implemented yet.')
-        else:
-            method = 'fast'
-
         if period is not None:
-            method = 'slow'
+            if ls_method is 'fastchi2':
+                ls_method = 'chi2'
+            elif ls_method is 'fast':
+                ls_method = 'slow'
+
             log.warning("You have passed an evenly-spaced grid of periods. "
                         "These are not evenly spaced in frequency space.\n"
-                        "Method has been set to 'slow' to allow for this.")
-        flux_scaling = 1e6               
+                        "Method has been set to '{}' to allow for this.".format(ls_method))
+
+        if (nterms > 1) and (ls_method not in ['fastchi2', 'chi2']):
+            warnings.warn("Building a Lomb Scargle Periodogram using the `slow` method. "
+                            "`nterms` has been set to >1, however this is not supported under the `{}` method. "
+                            "To run with higher nterms, set `ls_method` to either 'fastchi2', or 'chi2'. "
+                            "Please refer to the `astropy.timeseries.periodogram.LombScargle` documentation.".format(ls_method),
+                          LightkurveWarning)
+            nterms = 1
+
+        flux_scaling = 1e6
         if float(astropy.__version__[0]) >= 3:
             LS = LombScargle(time, lc.flux * flux_scaling,
                              nterms=nterms, normalization='psd', **kwargs)
-            power = LS.power(frequency, method=method)
+            power = LS.power(frequency, method=ls_method)
         else:
             LS = LombScargle(time, lc.flux * flux_scaling,
                              nterms=nterms, **kwargs)
-            power = LS.power(frequency, method=method, normalization='psd')
+            power = LS.power(frequency, method=ls_method, normalization='psd')
 
         # Power spectral density
         if normalization == 'psd':
@@ -837,7 +871,31 @@ class LombScarglePeriodogram(Periodogram):
         # Periodogram needs properties
         return LombScarglePeriodogram(frequency=frequency, power=power, nyquist=nyquist,
                                       targetid=lc.targetid, label=lc.label,
-                                      default_view=default_view)
+                                      default_view=default_view, ls_obj=LS,
+                                      nterms=nterms, ls_method=ls_method)
+
+    def model(self, time, frequency=None):
+        """Obtain the flux model for a given frequency and time
+
+        Parameters
+        ----------
+        time : np.ndarray
+            Time points to evaluate model.
+        frequency : frequency to evaluate model. Default is the frequency at
+                    max power.
+
+        Returns
+        -------
+        result : lightkurve.LightCurve
+            Model object with the time and flux model
+        """
+        if self._LS_object is None:
+            raise ValueError('No `astropy` Lomb Scargle object exists.')
+        if frequency is None:
+            frequency = self.frequency_at_max_power
+        f = self._LS_object.model(time, frequency)
+        return LightCurve(time, f, label='LS Model', meta={'frequency':frequency},
+                            targetid='{} LS Model'.format(self.targetid)).normalize()
 
 
 class BoxLeastSquaresPeriodogram(Periodogram):
