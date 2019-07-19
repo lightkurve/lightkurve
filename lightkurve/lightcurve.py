@@ -570,53 +570,69 @@ class LightCurve(object):
             have been filled.
         """
         lc = self.copy().remove_nans()
+        nlc = lc.copy()
 
         # Find missing time points
-        dt = lc.time - np.median(np.diff(lc.time)) * lc.cadenceno
-        ncad = np.arange(lc.cadenceno[0], lc.cadenceno[-1] + 1, 1)
-        in_original = np.in1d(ncad, lc.cadenceno)
-        ncad = ncad[~in_original]
-        ndt = np.interp(ncad, lc.cadenceno, dt)
+        # Most precise method, taking into account time variation due to orbit
+        if hasattr(lc, 'cadenceno'):
+            dt = lc.time - np.median(np.diff(lc.time)) * lc.cadenceno
+            ncad = np.arange(lc.cadenceno[0], lc.cadenceno[-1] + 1, 1)
+            in_original = np.in1d(ncad, lc.cadenceno)
+            ncad = ncad[~in_original]
+            ndt = np.interp(ncad, lc.cadenceno, dt)
 
-        ncad = np.append(ncad, lc.cadenceno)
-        ndt = np.append(ndt, dt)
-        ncad, ndt = ncad[np.argsort(ncad)], ndt[np.argsort(ncad)]
-        ntime = ndt + np.median(np.diff(lc.time)) * ncad
-
-
+            ncad = np.append(ncad, lc.cadenceno)
+            ndt = np.append(ndt, dt)
+            ncad, ndt = ncad[np.argsort(ncad)], ndt[np.argsort(ncad)]
+            ntime = ndt + np.median(np.diff(lc.time)) * ncad
+            nlc.cadenceno = ncad
+        else:
+            # Less precise method
+            dt = np.nanmedian(lc.time[1::] - lc.time[:-1:])
+            ntime = [lc.time[0]]
+            for t in lc.time[1::]:
+                prevtime = ntime[-1]
+                while (t - prevtime) > 1.2*dt:
+                    ntime.append(prevtime + dt)
+                    prevtime = ntime[-1]
+                ntime.append(t)
+            ntime = np.asarray(ntime, float)
+            in_original = np.in1d(ntime, lc.time)
         # Fill in time points
-        nlc = lc.copy()
-        nlc.time = ntime
-        nlc.cadenceno = ncad
 
+        nlc.time = ntime
         f = np.zeros(len(ntime))
         f[in_original] = np.copy(lc.flux)
         fe = np.zeros(len(ntime))
         fe[in_original] = np.copy(lc.flux_err)
 
-
         fe[~in_original] = np.interp(ntime[~in_original], lc.time, lc.flux_err)
         if method == 'gaussian_noise':
-            f[~in_original] = np.random.normal(lc.flux.mean(), lc.estimate_cdpp()*1e-6, (~in_original).sum())
-            f[~in_original] += np.random.normal(0, fe[~in_original])
+            try:
+                std = lc.estimate_cdpp()*1e-6
+            except:
+                std = lc.flux.std()
+            f[~in_original] = np.random.normal(lc.flux.mean(), std, (~in_original).sum())
         else:
             raise NotImplementedError("No such method as {}".format(method))
 
         nlc.flux = f
         nlc.flux_err = fe
 
-        quality = np.zeros(len(ntime))
-        quality[in_original] = np.copy(lc.quality)
-        quality[~in_original] + 65536
-        nlc.quality = quality
+        if hasattr(lc, 'quality'):
+            quality = np.zeros(len(ntime))
+            quality[in_original] = np.copy(lc.quality)
+            quality[~in_original] + 65536
+            nlc.quality = quality
+        if hasattr(lc, 'centroid_col'):
+            col = np.zeros(len(ntime)) * np.nan
+            col[in_original] = np.copy(lc.centroid_col)
+            nlc.centroid_col = col
+        if hasattr(lc, 'centroid_row'):
+            row = np.zeros(len(ntime)) * np.nan
+            row[in_original] = np.copy(lc.centroid_row)
+            nlc.centroid_row = row
 
-        col = np.zeros(len(ntime)) * np.nan
-        col[in_original] = np.copy(lc.centroid_col)
-        row = np.zeros(len(ntime)) * np.nan
-        row[in_original] = np.copy(lc.centroid_row)
-
-        nlc.centroid_col = col
-        nlc.centroid_row = row
         return nlc
 
     def remove_outliers(self, sigma=5., sigma_lower=None, sigma_upper=None,
