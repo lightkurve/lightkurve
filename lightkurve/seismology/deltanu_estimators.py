@@ -194,10 +194,10 @@ def diagnose_deltanu_acf(deltanu, periodogram):
                      deltanu.diagnostics['acf'][deltanu.diagnostics['sel']][deltanu.diagnostics['peaks']],
                      c='r', s=5)
         ax.axvline(deltanu.value,c='r', linewidth=2,alpha=.4,
-            label=r'Measured deltanu {:.1f} {}'.format(deltanu.value,
+            label=r'Measured {} {:.1f} {}'.format(r'$\Delta\nu$', deltanu.value,
                                       periodogram.frequency.unit.to_string('latex')))
         ax.axvline(deltanu.diagnostics['deltanu_emp'],c='b', linewidth=2,alpha=.4, ls='--',
-                    label=r'Empirical deltanu {:.1f} {}'.format(deltanu.diagnostics['deltanu_emp'],
+                    label=r'Empirical {} {:.1f} {}'.format(r'$\Delta\nu$', deltanu.diagnostics['deltanu_emp'],
                                   periodogram.frequency.unit.to_string('latex')))
         axin.axvline(deltanu.value,c='r', linewidth=2,alpha=.4)
         axin.axvline(deltanu.diagnostics['deltanu_emp'],c='b', linewidth=2,alpha=.4, ls='--')
