@@ -135,8 +135,9 @@ def diagnose_numax_acf(numax, periodogram):
     with plt.style.context(MPLSTYLE):
         fig, ax = plt.subplots(3, sharex=True, figsize=(8.485, 12))
         periodogram.plot(ax=ax[0], label='')
-        ax[0].axvline(numax.value, c='r', linewidth=2, alpha=.4)
-        ax[0].text(numax.value, periodogram.power.value.max()*0.75, '{:7.5}'.format(numax.value), rotation=90, ha='right', color='r', alpha=0.5)
+        ax[0].axvline(numax.value, c='r', linewidth=2, alpha=.4, label='numax = {:7.5}{}'.format(numax.value, periodogram.frequency.unit.to_string('latex')))
+        ax[0].legend()
+#        ax[0].text(numax.value, periodogram.power.value.max()*0.75, '{:7.5}'.format(numax.value), rotation=90, ha='right', color='r', alpha=0.5)
         ax[0].set_xlabel('')
         ax[0].text(.05, .9, 'Input Power Spectrum',
                     horizontalalignment='left',
