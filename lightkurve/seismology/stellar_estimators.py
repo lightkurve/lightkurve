@@ -8,6 +8,8 @@ from astropy import constants as const
 
 from .utils import SeismologyQuantity
 
+__all__ = ['estimate_radius', 'estimate_mass', 'estimate_logg']
+
 
 """Global parameters for the sun"""
 NUMAX_SOL = ufloat(3090, 30) # microhertz | Huber et al. 2011

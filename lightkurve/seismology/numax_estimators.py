@@ -1,7 +1,4 @@
-"""Helper functions for estimating numax from periodograms.
-
-Functions in this module should be named "estimate_numax_methodname()".
-"""
+"""Helper functions for estimating numax from periodograms."""
 import numpy as np
 from matplotlib import pyplot as plt
 
@@ -12,10 +9,80 @@ from .. import MPLSTYLE
 from . import utils
 from .utils import SeismologyQuantity
 
+__all__ = ['estimate_numax_acf', 'diagnose_numax_acf']
+
 
 def estimate_numax_acf(periodogram, numaxs=None, window_width=None, spacing=None):
-    """Estimate the frequency at maximum power from a periodogram using
-    the autocorrelation method.
+    """Estimates the peak of the envelope of seismic oscillation modes, numax,
+    using an autocorrelation function.
+
+    There are many papers on the topic of autocorrelation functions for
+    estimating seismic parameters, including but not limited to:
+    Roxburgh & Vorontsov (2006), Roxburgh (2009), Mosser & Appourchaux (2009),
+    Huber et al. (2009), Verner & Roxburgh (2011) & Viani et al. (2019).
+
+    We base this approach first and foremost off the 2D ACF numax estimation
+    presented in Viani et al. (2019) and other papers above. A window of
+    fixed width (either given by the user, 25 microhertz for Red Giants or
+    250 microhertz for Main Sequence stars) is moved along the power
+    spectrum, where the central frequency of the window moves in steps of 1
+    microhertz (or given by the user as `spacing`) and evaluates the
+    autocorrelation at each step.
+
+    The correlation (numpy.correlate) is typically given as:
+
+    C[x, y] = sum( x * conj(y) ) .
+
+    The autocorrelation power of a full spectrum with itself is then
+
+    C = sum(s * s),
+
+    where s is a window of the signal-to-noise spectrum.
+    In order to evaluate where the correlation power is highest (indicative
+    of the power excess of the modes) we calculate the Mean Collapsed
+    Correlation (MCC, see Kiefer 2013, Viani et al. 2019) as
+
+    MCC = (sum(|C|) - 1) / nlags ,
+
+    where C is the autocorrelation power at a given central freqeuncy, and
+    nlags is the number of lags in the autocorrelation.
+
+    The MCC metric is covolved with an Astropy Gaussian 1D Kernel with a
+    standard deviation of 1/5th of the window size to smooth it. The
+    frequency that results in the highest value of the smoothed MCC is the
+    detected numax.
+
+    NOTE: This method is not robust against large peaks in the spectrum (due
+    to e.g. spacecraft rotation), nor is it robust in the case of low signal
+    to noise (such as for single sector TESS data). Exercise caution when
+    using this module!
+
+    NOTE: This function is intended for use with solar like Main Sequence
+    and Red Giant Branch oscillators only.
+
+    Parameters
+    ----------
+    numaxs : array-like
+        An array of numaxs at which to evaluate the autocorrelation. If
+        none is given, a sensible range will be chosen. If no units are
+        given it is assumed to be in the same units as the periodogram
+        frequency.
+    window_width : int or float
+        The width of the autocorrelation window around each central
+        frequency in 'numaxs'. If none is given, a sensible value will be
+        chosen. If no units are given it is assumed to be in the same units
+        as the periodogram frequency.
+    spacing : int or float
+        The spacing between central frequencies (numaxs) at which the
+        autocorrelation is evaluated. If none is given, a sensible value
+        will be assumed. If no units are given it is assumed to be in the
+        same units as the periodogram frequency.
+
+    Returns
+    -------
+    numax : `SeismologyQuantity`
+        The numax of the periodogram. In the units of the periodogram object
+        frequency.
     """
     # Calculate the window_width size
 

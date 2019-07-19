@@ -1,7 +1,4 @@
-"""Helper functions for estimating deltanu from periodograms.
-
-Functions in this module should be named "estimate_deltanu_methodname()".
-"""
+"""Helper functions for estimating deltanu from periodograms."""
 from __future__ import division, print_function
 
 import numpy as np
@@ -15,13 +12,67 @@ from .utils import SeismologyQuantity
 from . import utils
 from .. import MPLSTYLE
 
+__all__ = ['estimate_deltanu_acf', 'diagnose_deltanu_acf']
+
 
 def estimate_deltanu_acf(periodogram, numax):
-    """
-    Helper function to perform the deltanu estimation for both the
-    `estimate_deltanu()` and `plot_deltanu_diagnostics()` functions.
+    """Returns the average value of the large frequency spacing, DeltaNu,
+    of the seismic oscillations of the target, using an autocorrelation
+    function.
 
-    For details, see the `estimate_deltanu()` function.
+    There are many papers on the topic of autocorrelation functions for
+    estimating seismic parameters, including but not limited to:
+    Roxburgh & Vorontsov (2006), Roxburgh (2009), Mosser & Appourchaux (2009),
+    Huber et al. (2009), Verner & Roxburgh (2011) & Viani et al. (2019).
+
+    We base this approach first and foremost off the approach taken in
+    Mosser & Appourchaux (2009). Given a known numax, a window around this
+    numax is taken of one estimated full-width-half-maximum (FWHM) of the
+    seismic mode envelope either side of numax. This width is chosen so that
+    the autocorrelation includes all of the visible mode peaks.
+
+    The autocorrelation (numpy.correlate) is given as:
+
+    C = sum(s * s)
+
+    where s is a window of the signal-to-noise spectrum. When shifting
+    the spectrum over itself, C will increase when two mode peaks are
+    overlapping.
+
+    As is done in Mosser & Appourchaux, we rescale the value of C in terms
+    of the noise level in the ACF spectrum as
+
+    A = |C^2| / |C[0]^2|) * (2 * len(C) / 3) .
+
+    The method will autocorrelate the region around the estimated numax
+    expected to contain seismic oscillation modes. Repeating peaks in the
+    autocorrelation implies an evenly spaced structure of modes.
+    The peak closest to an empirical estimate of deltanu is taken as the true
+    value. The peak finding algorithm is limited by a minimum spacing
+    between peaks of 0.5 times the empirical value for deltanu.
+
+    Our empirical estimate for numax is taken from Stello et al. (2009) as
+
+    deltanu = 0.294 * numax^0.772
+
+    If `numax` is None, a numax is calculated using the estimate_numax()
+    function with default settings.
+
+    NOTE: This function is intended for use with solar like Main Sequence
+    and Red Giant Branch oscillators only.
+
+    Parameters:
+    ----------
+    numax : float
+        An estimated numax value of the mode envelope in the periodogram. If
+        not given units it is assumed to be in units of the periodogram
+        frequency attribute.
+
+    Returns:
+    -------
+    deltanu : `SeismologyQuantity`
+        The average large frequency spacing of the seismic oscillation modes.
+        In units of the periodogram frequency attribute.
     """
 
     # Run some checks on the passed in numaxs

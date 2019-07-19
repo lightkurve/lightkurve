@@ -28,6 +28,7 @@ Searching and downloading data
 The :class:`lightkurve.search` module provides functions which make it easy to load and search data files produced by the Kepler and TESS missions.
 
 .. automodsumm:: lightkurve.search
+    :skip: SearchResult
 
 
 Data product objects
@@ -38,6 +39,7 @@ The :class:`lightkurve.lightcurvefile` module provides classes which represent F
 These classes provide methods to read in  :class:`LightCurve <lightkurve.lightcurve.LightCurve>` objects and access various metadata.
 
 .. automodsumm:: lightkurve.lightcurvefile
+    :skip: LightCurveFile
 
 
 The :class:`lightkurve.targetpixelfile` module provides classes which represent FITS files that store the original pixel data (images) obtained by the Kepler or TESS telescopes.
@@ -65,9 +67,10 @@ The :class:`lightkurve.periodogram` module provides classes to help find periodi
 Asteroseismology
 ----------------
 
-The :class:`lightkurve.seismology` sub-package provides tools to extra astroseismic parameters (numax, deltanu, radius, mass, and logg) from `Periodogram` objects.
+The :class:`lightkurve.seismology` sub-package provides tools to extra quick-look astroseismic parameters (numax, deltanu, radius, mass, and logg) from periodograms.
 
 .. automodsumm:: lightkurve.seismology
+    :skip: estimate_deltanu_acf, diagnose_deltanu_acf, estimate_numax_acf, diagnose_numax_acf, estimate_radius, estimate_mass, estimate_logg
 
 
 Utilities
@@ -76,6 +79,7 @@ Utilities
 The :class:`lightkurve.utils` module provides a range of common helper functions and classes.
 
 .. automodsumm:: lightkurve.utils
+    :skip: LightkurveWarning, bkjd_to_astropy_time, btjd_to_astropy_time
 
 
 Can't find what you're looking for?

@@ -4,6 +4,8 @@ import numpy as np
 from astropy import units as u
 from astropy.units import Quantity
 
+__all__ = ['SeismologyQuantity']
+
 
 class SeismologyQuantity(Quantity):
     """Container to hold a seismological result and its meta data.

@@ -60,6 +60,7 @@ class SeismologyButler(object):
 
     def _validate_method(self, method, supported_methods):
         """Raises ValueError if a method is not supported."""
+        method = method.lower()
         if method in supported_methods:
             return method
         raise ValueError("method {} is not supported; "
@@ -89,10 +90,11 @@ class SeismologyButler(object):
                      minimum_frequency=None, maximum_frequency=None,
                      scale='linear', cmap='Blues'):
         """Plots an echelle diagram of the periodogram by stacking the
-        periodogram in slices of deltanu. Modes of equal radial degree should
-        appear approximately vertically aligned. If no structure is present,
-        you are likely dealing with a faulty deltanu value or a low signal to noise
-        case.
+        periodogram in slices of deltanu.
+
+        Modes of equal radial degree should appear approximately vertically aligned.
+        If no structure is present, you are likely dealing with a faulty deltanu
+        value or a low signal to noise case.
 
         This method is adapted from work by Daniel Hey & Guy Davies.
 
@@ -222,82 +224,31 @@ class SeismologyButler(object):
         return ax
 
 
-    def estimate_numax(self, method="acf", numaxs=None, window_width=None, spacing=None):
-        """Estimates the peak of the envelope of seismic oscillation modes,
-        numax using an autocorrelation function. There are many papers on the
-        topic of autocorrelation functions for estimating seismic parameters,
-        including but not limited to: Roxburgh & Vorontsov (2006),
-        Roxburgh (2009), Mosser & Appourchaux (2009), Huber et al. (2009),
-        Verner & Roxburgh (2011) & Viani et al. (2019).
+    def estimate_numax(self, method="acf", **kwargs):
+        """Returns the frequency of the peak of the seismic oscillation modes envelope.
 
-        We base this approach first and foremost off the 2D ACF numax estimation
-        presented in Viani et al. (2019) and other papers above. A window of
-        fixed width (either given by the user, 25 microhertz for Red Giants or
-        250 microhertz for Main Sequence stars) is moved along the power
-        spectrum, where the central frequency of the window moves in steps of 1
-        microhertz (or given by the user as `spacing`) and evaluates the
-        autocorrelation at each step.
-
-        The correlation (numpy.correlate) is typically given as:
-
-        C[x, y] = sum( x * conj(y) ) .
-
-        The autocorrelation power of a full spectrum with itself is then
-
-        C = sum(s * s),
-
-        where s is a window of the signal-to-noise spectrum.
-        In order to evaluate where the correlation power is highest (indicative
-        of the power excess of the modes) we calculate the Mean Collapsed
-        Correlation (MCC, see Kiefer 2013, Viani et al. 2019) as
-
-        MCC = (sum(|C|) - 1) / nlags ,
-
-        where C is the autocorrelation power at a given central freqeuncy, and
-        nlags is the number of lags in the autocorrelation.
-
-        The MCC metric is covolved with an Astropy Gaussian 1D Kernel with a
-        standard deviation of 1/5th of the window size to smooth it. The
-        frequency that results in the highest value of the smoothed MCC is the
-        detected numax.
-
-        NOTE: This method is not robust against large peaks in the spectrum (due
-        to e.g. spacecraft rotation), nor is it robust in the case of low signal
-        to noise (such as for single sector TESS data). Exercise caution when
-        using this module!
-
-        NOTE: This function is intended for use with solar like Main Sequence
-        and Red Giant Branch oscillators only.
+        At present, the only method supported is based on using a
+        2D autocorrelation function (ACF).  This method is implemented by the
+        `~lightkurve.seismology.estimate_numax_acf` function which accepts
+        the parameters `numaxs`, `window_width`, and `spacing`.
+        For details and literature references, please read the detailed
+        docstring of this function by typing ``lightkurve.seismology.estimate_numax_acf?``
+        in a Python terminal or notebook.
 
         Parameters
         ----------
-        numaxs : array-like
-            An array of numaxs at which to evaluate the autocorrelation. If
-            none is given, a sensible range will be chosen. If no units are
-            given it is assumed to be in the same units as the periodogram
-            frequency.
-        window_width : int or float
-            The width of the autocorrelation window around each central
-            frequency in 'numaxs'. If none is given, a sensible value will be
-            chosen. If no units are given it is assumed to be in the same units
-            as the periodogram frequency.
-        spacing : int or float
-            The spacing between central frequencies (numaxs) at which the
-            autocorrelation is evaluated. If none is given, a sensible value
-            will be assumed. If no units are given it is assumed to be in the
-            same units as the periodogram frequency.
+        method : str
+            Method to use. Only ``"acf"`` is supported at this time.
 
         Returns
         -------
-        numax : `SeismologyQuantity`
-            The numax of the periodogram. In the units of the periodogram object
-            frequency.
+        numax : `~lightkurve.seismology.SeismologyQuantity`
+            Numax of the periodogram, including details on the units and method.
         """
         method = self._validate_method(method, supported_methods=["acf"])
         if method == "acf":
             from .numax_estimators import estimate_numax_acf
-            result = estimate_numax_acf(self.periodogram, numaxs=numaxs,
-                                        window_width=window_width, spacing=spacing)
+            result = estimate_numax_acf(self.periodogram, **kwargs)
         self.numax = result
         return result
 
@@ -307,62 +258,25 @@ class SeismologyButler(object):
         return numax.diagnostics_plot_method(numax, self.periodogram)
 
     def estimate_deltanu(self, method='acf', numax=None):
-        """Estimates the average value of the large frequency spacing, DeltaNu,
-        of the seismic oscillations of the target, using an autocorrelation
-        function. There are many papers on the topic of autocorrelation
-        functions for estimating seismic parameters, including but not limited
-        to: Roxburgh & Vorontsov (2006), Roxburgh (2009),
-        Mosser & Appourchaux (2009), Huber et al. (2009),
-        Verner & Roxburgh (2011) & Viani et al. (2019).
+        """Returns the average value of the large frequency spacing, DeltaNu,
+        of the seismic oscillations of the target.
 
-        We base this approach first and foremost off the approach taken in
-        Mosser & Appourchaux (2009). Given a known numax, a window around this
-        numax is taken of one estimated full-width-half-maximum (FWHM) of the
-        seismic mode envelope either side of numax. This width is chosen so that
-        the autocorrelation includes all of the visible mode peaks.
+        At present, the only method supported is based on using an
+        autocorrelation function (ACF).  This method is implemented by the
+        `~lightkurve.seismology.estimate_deltanu_acf` function which requires
+        the parameter `numax`. For details and literature references, please
+        read the detailed docstring of this function by typing
+        ``lightkurve.seismology.estimate_deltanu_acf?`` in a Python terminal or notebook.
 
-        The autocorrelation (numpy.correlate) is given as:
-
-        C = sum(s * s)
-
-        where s is a window of the signal-to-noise spectrum. When shifting
-        the spectrum over itself, C will increase when two mode peaks are
-        overlapping.
-
-        As is done in Mosser & Appourchaux, we rescale the value of C in terms
-        of the noise level in the ACF spectrum as
-
-        A = |C^2| / |C[0]^2|) * (2 * len(C) / 3) .
-
-        The method will autocorrelate the region around the estimated numax
-        expected to contain seismic oscillation modes. Repeating peaks in the
-        autocorrelation implies an evenly spaced structure of modes.
-        The peak closest to an empirical estimate of deltanu is taken as the true
-        value. The peak finding algorithm is limited by a minimum spacing
-        between peaks of 0.5 times the empirical value for deltanu.
-
-        Our empirical estimate for numax is taken from Stello et al. (2009) as
-
-        deltanu = 0.294 * numax^0.772
-
-        If `numax` is None, a numax is calculated using the estimate_numax()
-        function with default settings.
-
-        NOTE: This function is intended for use with solar like Main Sequence
-        and Red Giant Branch oscillators only.
-
-        Parameters:
+        Parameters
         ----------
-        numax : float
-            An estimated numax value of the mode envelope in the periodogram. If
-            not given units it is assumed to be in units of the periodogram
-            frequency attribute.
+        method : str
+            Method to use. Only ``"acf"`` is supported at this time.
 
-        Returns:
+        Returns
         -------
-        deltanu : `SeismologyQuantity`
-            The average large frequency spacing of the seismic oscillation modes.
-            In units of the periodogram frequency attribute.
+        deltanu : `~lightkurve.seismology.SeismologyQuantity`
+            DeltaNu of the periodogram, including details on the units and method.
         """
         method = self._validate_method(method, supported_methods=["acf"])
         numax = self._validate_numax(numax)
@@ -380,7 +294,17 @@ class SeismologyButler(object):
         return deltanu.diagnostics_plot_method(deltanu, self.periodogram)
 
     def estimate_radius(self, teff, numax=None, deltanu=None):
-        """Returns a stellar radius estimate based on the scaling relations."""
+        """Returns a stellar radius estimate based on the scaling relations.
+        
+        This method is implemented by the `~lightkurve.seismology.estimate_radius` function.
+        For details and literature references, please read the detailed
+        docstring of this function by typing ``lightkurve.seismology.estimate_radius?``.
+
+        Returns
+        -------
+        radius : `~lightkurve.seismology.SeismologyQuantity`
+            Stellar radius estimate.
+        """
         numax = self._validate_numax(numax)
         deltanu = self._validate_deltanu(deltanu)
         result = stellar_estimators.estimate_radius(numax, deltanu, teff)
@@ -388,7 +312,17 @@ class SeismologyButler(object):
         return result
 
     def estimate_mass(self, teff, numax=None, deltanu=None):
-        """Returns a stellar mass estimate based on the scaling relations."""
+        """Returns a stellar mass estimate based on the scaling relations.
+
+        This method is implemented by the `~lightkurve.seismology.estimate_mass` function.
+        For details and literature references, please read the detailed
+        docstring of this function by typing ``lightkurve.seismology.estimate_mass?``.
+
+        Returns
+        -------
+        mass : `~lightkurve.seismology.SeismologyQuantity`
+            Stellar mass estimate.
+        """
         numax = self._validate_numax(numax)
         deltanu = self._validate_deltanu(deltanu)
         result = stellar_estimators.estimate_mass(numax, deltanu, teff)
@@ -396,7 +330,17 @@ class SeismologyButler(object):
         return result
 
     def estimate_logg(self, teff, numax=None):
-        """Returns a surface gravity estimate based on the scaling relations."""
+        """Returns a surface gravity estimate based on the scaling relations.
+
+        This method is implemented by the `~lightkurve.seismology.estimate_logg` function.
+        For details and literature references, please read the detailed
+        docstring of this function by typing ``lightkurve.seismology.estimate_logg?``.
+
+        Returns
+        -------
+        logg : `~lightkurve.seismology.SeismologyQuantity`
+            Stellar surface gravity estimate.
+        """
         numax = self._validate_numax(numax)
         result = stellar_estimators.estimate_logg(numax, teff)
         self.logg = result
