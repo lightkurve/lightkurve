@@ -271,7 +271,7 @@ class LightCurve(object):
                     idx += 1
         output.pprint(max_lines=-1, max_width=-1)
 
-    def append(self, others):
+    def append(self, others, inplace=False):
         """
         Append LightCurve objects.
 
@@ -287,7 +287,11 @@ class LightCurve(object):
         """
         if not hasattr(others, '__iter__'):
             others = [others]
-        new_lc = copy.copy(self)
+        if inplace:
+            new_lc = self
+        else:
+            new_lc = copy.copy(self)
+
         for i in range(len(others)):
             new_lc.time = np.append(new_lc.time, others[i].time)
             new_lc.flux = np.append(new_lc.flux, others[i].flux)
@@ -550,13 +554,13 @@ class LightCurve(object):
         """
         return self[~np.isnan(self.flux)]  # This will return a sliced copy
 
-    def fill_gaps(lc, method='nearest'):
-        """Fill in gaps in time with linear interpolation.
+    def fill_gaps(self, method='gaussian_noise'):
+        """Fill in gaps in time.
 
         Parameters
         ----------
-        method : string {None, 'backfill'/'bfill', 'pad'/'ffill', 'nearest'}
-            Method to use for gap filling. 'nearest' by default.
+        method : string {'gaussian_noise'}
+            Method to use for gap filling. Fills with gaussian noise by default
 
         Returns
         -------
@@ -564,33 +568,70 @@ class LightCurve(object):
             A new light curve object in which NaN values and gaps in time
             have been filled.
         """
-        clc = lc.remove_nans().copy()
+        lc = self.copy().remove_nans()
         nlc = lc.copy()
 
-        # Average gap between cadences
-        dt = np.nanmedian(clc.time[1::] - clc.time[:-1:])
+        # Find missing time points
+        # Most precise method, taking into account time variation due to orbit
+        if hasattr(lc, 'cadenceno'):
+            dt = lc.time - np.median(np.diff(lc.time)) * lc.cadenceno
+            ncad = np.arange(lc.cadenceno[0], lc.cadenceno[-1] + 1, 1)
+            in_original = np.in1d(ncad, lc.cadenceno)
+            ncad = ncad[~in_original]
+            ndt = np.interp(ncad, lc.cadenceno, dt)
 
-        # Iterate over flux and flux_err
-        for idx, y in enumerate([clc.flux, clc.flux_err]):
-            # We need to ensure pandas gets the correct byteorder
-            # Background info: https://github.com/astropy/astropy/issues/1156
-            if y.dtype.byteorder == '>':
-                y = y.byteswap().newbyteorder()
-            ts = pd.Series(y, index=clc.time)
-            newindex = [clc.time[0]]
-            for t in clc.time[1::]:
-                prevtime = newindex[-1]
+            ncad = np.append(ncad, lc.cadenceno)
+            ndt = np.append(ndt, dt)
+            ncad, ndt = ncad[np.argsort(ncad)], ndt[np.argsort(ncad)]
+            ntime = ndt + np.median(np.diff(lc.time)) * ncad
+            nlc.cadenceno = ncad
+        else:
+            # Less precise method
+            dt = np.nanmedian(lc.time[1::] - lc.time[:-1:])
+            ntime = [lc.time[0]]
+            for t in lc.time[1::]:
+                prevtime = ntime[-1]
                 while (t - prevtime) > 1.2*dt:
-                    newindex.append(prevtime + dt)
-                    prevtime = newindex[-1]
-                newindex.append(t)
-            ts = ts.reindex(newindex, method=method)
-            if idx == 0:
-                nlc.flux = np.asarray(ts)
-            elif idx == 1:
-                nlc.flux_err = np.asarray(ts)
+                    ntime.append(prevtime + dt)
+                    prevtime = ntime[-1]
+                ntime.append(t)
+            ntime = np.asarray(ntime, float)
+            in_original = np.in1d(ntime, lc.time)
+        # Fill in time points
 
-        nlc.time = np.asarray(ts.index)
+        nlc.time = ntime
+        f = np.zeros(len(ntime))
+        f[in_original] = np.copy(lc.flux)
+        fe = np.zeros(len(ntime))
+        fe[in_original] = np.copy(lc.flux_err)
+
+        fe[~in_original] = np.interp(ntime[~in_original], lc.time, lc.flux_err)
+        if method == 'gaussian_noise':
+            try:
+                std = lc.estimate_cdpp()*1e-6
+            except:
+                std = lc.flux.std()
+            f[~in_original] = np.random.normal(lc.flux.mean(), std, (~in_original).sum())
+        else:
+            raise NotImplementedError("No such method as {}".format(method))
+
+        nlc.flux = f
+        nlc.flux_err = fe
+
+        if hasattr(lc, 'quality'):
+            quality = np.zeros(len(ntime))
+            quality[in_original] = np.copy(lc.quality)
+            quality[~in_original] + 65536
+            nlc.quality = quality
+        if hasattr(lc, 'centroid_col'):
+            col = np.zeros(len(ntime)) * np.nan
+            col[in_original] = np.copy(lc.centroid_col)
+            nlc.centroid_col = col
+        if hasattr(lc, 'centroid_row'):
+            row = np.zeros(len(ntime)) * np.nan
+            row[in_original] = np.copy(lc.centroid_row)
+            nlc.centroid_row = row
+
         return nlc
 
     def remove_outliers(self, sigma=5., sigma_lower=None, sigma_upper=None,
@@ -1192,6 +1233,20 @@ class LightCurve(object):
         else:
             from . import LombScarglePeriodogram
             return LombScarglePeriodogram.from_lightcurve(lc=self, **kwargs)
+
+    def to_seismology(self, **kwargs):
+        """Returns a `~lightkurve.seismology.Seismology` object for estimating
+        quick-look asteroseismic quantities.
+
+        All **kwargs will be passed to the `to_periodogram()` method.
+
+        Returns
+        -------
+        seismology : `~lightkurve.seismology.Seismology` object
+            Object which can be used to estimate quick-look asteroseismic quantities.
+        """
+        from .seismology import Seismology
+        return Seismology.from_lightcurve(self, **kwargs)
 
     def _boolean_mask_to_bitmask(self, aperture_mask):
         """Takes in an aperture_mask and returns a Kepler-style bitmask

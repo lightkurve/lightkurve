@@ -109,7 +109,7 @@ def test_KeplerLightCurveFile(path, mission):
     hdu = pyfits.open(path)
     assert lc.label == hdu[0].header['OBJECT']
     assert_array_equal(lc.time, hdu[1].data['TIME'])
-    assert_array_equal(lc.flux, hdu[1].data['SAP_FLUX'])
+    assert_array_equal(lc.flux, hdu[1].data['SAP_FLUX'] / ((hdu[1].header['CROWDSAP'] * hdu[1].header['FLFRCSAP'])))
 
     with pytest.raises(KeyError):
         lcf.get_lightcurve('BLABLA')

@@ -193,12 +193,22 @@ class KeplerLightCurveFile(LightCurveFile):
         if flux_type in self._flux_types():
             # We did not import lightcurve at the top to prevent circular imports
             from .lightcurve import KeplerLightCurve
+
+            f = self.hdu[1].data[flux_type][self.quality_mask]
+            fe = self.hdu[1].data[flux_type + "_ERR"][self.quality_mask]
+
+            if flux_type == 'SAP_FLUX':
+                f /= self.hdu[1].header['FLFRCSAP']
+                fe /= self.hdu[1].header['FLFRCSAP']
+                f /= self.hdu[1].header['CROWDSAP']
+                fe /= self.hdu[1].header['CROWDSAP']
+                
             return KeplerLightCurve(
                 time=self.hdu[1].data['TIME'][self.quality_mask],
                 time_format='bkjd',
                 time_scale='tdb',
-                flux=self.hdu[1].data[flux_type][self.quality_mask],
-                flux_err=self.hdu[1].data[flux_type + "_ERR"][self.quality_mask],
+                flux=f,
+                flux_err=fe,
                 centroid_col=centroid_col,
                 centroid_row=centroid_row,
                 quality=self._get_quality()[self.quality_mask],
