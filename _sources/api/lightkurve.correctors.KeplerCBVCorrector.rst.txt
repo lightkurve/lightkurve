@@ -11,7 +11,7 @@ KeplerCBVCorrector
    .. autosummary::
 
       ~KeplerCBVCorrector.coeffs
-      ~KeplerCBVCorrector.lc_file
+      ~KeplerCBVCorrector.lc
       ~KeplerCBVCorrector.opt_result
 
    .. rubric:: Methods Summary
@@ -19,19 +19,23 @@ KeplerCBVCorrector
    .. autosummary::
 
       ~KeplerCBVCorrector.correct
+      ~KeplerCBVCorrector.diagnose
       ~KeplerCBVCorrector.get_cbv_url
       ~KeplerCBVCorrector.get_cbvs_list
+      ~KeplerCBVCorrector.interact
       ~KeplerCBVCorrector.plot_cbvs
 
    .. rubric:: Attributes Documentation
 
    .. autoattribute:: coeffs
-   .. autoattribute:: lc_file
+   .. autoattribute:: lc
    .. autoattribute:: opt_result
 
    .. rubric:: Methods Documentation
 
    .. automethod:: correct
+   .. automethod:: diagnose
    .. automethod:: get_cbv_url
    .. automethod:: get_cbvs_list
+   .. automethod:: interact
    .. automethod:: plot_cbvs

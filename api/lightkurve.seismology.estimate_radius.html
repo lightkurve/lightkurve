@@ -1,0 +1,140 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>estimate_radius &#8212; Lightkurve</title>
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-69171-9');
+    </script>
+
+  </head><body>
+<header>
+<nav class="navbar navbar-expand-lg navbar-light border-bottom">
+  <div class="container">
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.1.0</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarsExample07">
+      <ul class="navbar-nav mr-auto">
+        
+            
+            <li class="nav-item">
+            
+              <a class="nav-link" href="../quickstart.html">Quickstart</a>
+            </li>
+            
+            <li class="nav-item">
+            
+              <a class="nav-link" href="../tutorials/index.html">Tutorials</a>
+            </li>
+            
+            <li class="nav-item">
+            
+              <a class="nav-link" href="index.html">API</a>
+            </li>
+            
+            <li class="nav-item">
+            
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+        
+      </ul>
+        <form class="form-inline my-2 my-md-0" action="../search.html" method="get">
+            <input class="form-control" type="text" placeholder="Search" aria-label="Search" name="q" />
+        </form>
+    </div>
+  </div>
+</nav>
+</header>
+
+<div class="container">
+    
+  <div class="section" id="estimate-radius">
+<h1>estimate_radius<a class="headerlink" href="#estimate-radius" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="lightkurve.seismology.estimate_radius">
+<code class="descclassname">lightkurve.seismology.</code><code class="descname">estimate_radius</code><span class="sig-paren">(</span><em>numax</em>, <em>deltanu</em>, <em>teff</em>, <em>numax_err=None</em>, <em>deltanu_err=None</em>, <em>teff_err=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.seismology.estimate_radius" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a stellar radius estimate based on the scaling relations.</p>
+<p>The two global observable seismic parameters, numax and deltanu, along with
+temperature, scale with fundamental stellar properties (Brown et al. 1991;
+Kjeldsen &amp; Bedding 1995). These scaling relations can be rearranged to
+calculate a stellar radius as</p>
+<p>R = Rsol * (numax/numax_sol)(deltanu/deltanusol)^-2(Teff/Teffsol)^0.5</p>
+<p>where R is the radius and Teff is the effective temperature, and the suffix
+‘sol’ indicates a solar value. In this method we use the solar values for
+numax and deltanu as given in Huber et al. (2011) and for Teff as given in
+Prsa et al. (2016).</p>
+<p>This code structure borrows from work done in Bellinger et al. (2019), which
+also functions as an accessible explanation of seismic scaling relations.</p>
+<p>NOTE: These scaling relations are scaled to the Sun, and therefore do not
+always produce an entirely accurate result for more evolved stars.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>numax</strong><span class="classifier">float</span></dt><dd><p>The frequency of maximum power of the seismic mode envelope. If not
+given an astropy unit, assumed to be in units of microhertz.</p>
+</dd>
+<dt><strong>deltanu</strong><span class="classifier">float</span></dt><dd><p>The frequency spacing between two consecutive overtones of equal radial
+degree. If not given an astropy unit, assumed to be in units of
+microhertz.</p>
+</dd>
+<dt><strong>teff</strong><span class="classifier">float</span></dt><dd><p>The effective temperature of the star. In units of Kelvin.</p>
+</dd>
+<dt><strong>numax_err</strong><span class="classifier">float</span></dt><dd><p>Error on numax. Assumed to be same units as numax</p>
+</dd>
+<dt><strong>deltanu_err</strong><span class="classifier">float</span></dt><dd><p>Error on deltanu. Assumed to be same units as deltanu</p>
+</dd>
+<dt><strong>teff_err</strong><span class="classifier">float</span></dt><dd><p>Error on Teff. Assumed to be same units as Teff.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>radius</strong><span class="classifier">SeismologyQuantity</span></dt><dd><p>An estimate of the stellar radius in solar radii.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+</div>
+<div class="container" style="padding-top: 2em;">
+    <hr>
+    <p class="text-center">
+        Created with ♥ by the Lightkurve collaboration.
+        Please <a href="../about/citing.html">cite us</a> or <a href="https://github.com/KeplerGO/lightkurve">join us on GitHub.</a>
+    </p>
+</div>
+  </body>
+</html>

@@ -37,7 +37,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.0.1</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.1.0</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -87,7 +87,7 @@
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>path</strong><span class="classifier">str or <a class="reference external" href="http://docs.astropy.org/en/latest/io/fits/api/hdulists.html#astropy.io.fits.HDUList" title="(in Astropy v4.0.dev558)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.io.fits.HDUList</span></code></a> object</span></dt><dd><p>Local path or remote url of a lightcurve FITS file.
+<dt><strong>path</strong><span class="classifier">str or <a class="reference external" href="https://docs.astropy.org/en/latest/io/fits/api/hdulists.html#astropy.io.fits.HDUList" title="(in Astropy v4.0.dev762)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.io.fits.HDUList</span></code></a> object</span></dt><dd><p>Local path or remote url of a lightcurve FITS file.
 Also accepts a FITS file object already opened using AstroPy.</p>
 </dd>
 <dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Keyword arguments to be passed to astropy.io.fits.open.</p>
@@ -129,13 +129,10 @@ Also accepts a FITS file object already opened using AstroPy.</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.from_fits" title="lightkurve.lightcurvefile.LightCurveFile.from_fits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_fits</span></code></a>(path_or_url, \*\*kwargs)</p></td>
-<td><p>WARNING: THIS FUNCTION IS DEPRECATED AND WILL BE REMOVED VERY SOON.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.header" title="lightkurve.lightcurvefile.LightCurveFile.header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">header</span></code></a>(self[, ext])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.header" title="lightkurve.lightcurvefile.LightCurveFile.header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">header</span></code></a>(self[, ext])</p></td>
 <td><p>Header of the object at extension <code class="xref py py-obj docutils literal notranslate"><span class="pre">ext</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.plot" title="lightkurve.lightcurvefile.LightCurveFile.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(self[, flux_types, style])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.LightCurveFile.plot" title="lightkurve.lightcurvefile.LightCurveFile.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(self[, flux_types, style])</p></td>
 <td><p>Plot all the light curves contained in this light curve file.</p></td>
 </tr>
 </tbody>
@@ -178,13 +175,6 @@ Also accepts a FITS file object already opened using AstroPy.</p>
 </dd></dl>
 
 <p class="rubric">Methods Documentation</p>
-<dl class="classmethod">
-<dt id="lightkurve.lightcurvefile.LightCurveFile.from_fits">
-<em class="property">classmethod </em><code class="descname">from_fits</code><span class="sig-paren">(</span><em>path_or_url</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurvefile.LightCurveFile.from_fits" title="Permalink to this definition">¶</a></dt>
-<dd><p>WARNING: THIS FUNCTION IS DEPRECATED AND WILL BE REMOVED VERY SOON.</p>
-<p>Please use <code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.open()</span></code> instead.</p>
-</dd></dl>
-
 <dl class="method">
 <dt id="lightkurve.lightcurvefile.LightCurveFile.header">
 <code class="descname">header</code><span class="sig-paren">(</span><em>self</em>, <em>ext=0</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurvefile.LightCurveFile.header" title="Permalink to this definition">¶</a></dt>

@@ -18,24 +18,28 @@ LightCurve
 
       ~LightCurve.append
       ~LightCurve.bin
-      ~LightCurve.cdpp
       ~LightCurve.copy
       ~LightCurve.errorbar
       ~LightCurve.estimate_cdpp
       ~LightCurve.fill_gaps
       ~LightCurve.flatten
       ~LightCurve.fold
+      ~LightCurve.from_timeseries
+      ~LightCurve.interact_bls
       ~LightCurve.normalize
       ~LightCurve.plot
       ~LightCurve.remove_nans
       ~LightCurve.remove_outliers
       ~LightCurve.scatter
       ~LightCurve.show_properties
+      ~LightCurve.to_corrector
       ~LightCurve.to_csv
       ~LightCurve.to_fits
       ~LightCurve.to_pandas
       ~LightCurve.to_periodogram
+      ~LightCurve.to_seismology
       ~LightCurve.to_table
+      ~LightCurve.to_timeseries
 
    .. rubric:: Attributes Documentation
 
@@ -45,21 +49,25 @@ LightCurve
 
    .. automethod:: append
    .. automethod:: bin
-   .. automethod:: cdpp
    .. automethod:: copy
    .. automethod:: errorbar
    .. automethod:: estimate_cdpp
    .. automethod:: fill_gaps
    .. automethod:: flatten
    .. automethod:: fold
+   .. automethod:: from_timeseries
+   .. automethod:: interact_bls
    .. automethod:: normalize
    .. automethod:: plot
    .. automethod:: remove_nans
    .. automethod:: remove_outliers
    .. automethod:: scatter
    .. automethod:: show_properties
+   .. automethod:: to_corrector
    .. automethod:: to_csv
    .. automethod:: to_fits
    .. automethod:: to_pandas
    .. automethod:: to_periodogram
+   .. automethod:: to_seismology
    .. automethod:: to_table
+   .. automethod:: to_timeseries

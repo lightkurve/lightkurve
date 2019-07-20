@@ -37,7 +37,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.0.1</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.1.0</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -145,16 +145,13 @@ following meaning:</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.TessLightCurveFile.from_fits" title="lightkurve.lightcurvefile.TessLightCurveFile.from_fits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_fits</span></code></a>(path_or_url, \*\*kwargs)</p></td>
-<td><p>WARNING: THIS FUNCTION IS DEPRECATED AND WILL BE REMOVED VERY SOON.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.TessLightCurveFile.get_lightcurve" title="lightkurve.lightcurvefile.TessLightCurveFile.get_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_lightcurve</span></code></a>(self, flux_type[, centroid_type])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.TessLightCurveFile.get_lightcurve" title="lightkurve.lightcurvefile.TessLightCurveFile.get_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_lightcurve</span></code></a>(self, flux_type[, centroid_type])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.TessLightCurveFile.header" title="lightkurve.lightcurvefile.TessLightCurveFile.header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">header</span></code></a>(self[, ext])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.TessLightCurveFile.header" title="lightkurve.lightcurvefile.TessLightCurveFile.header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">header</span></code></a>(self[, ext])</p></td>
 <td><p>Header of the object at extension <code class="xref py py-obj docutils literal notranslate"><span class="pre">ext</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.TessLightCurveFile.plot" title="lightkurve.lightcurvefile.TessLightCurveFile.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(self[, flux_types, style])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.TessLightCurveFile.plot" title="lightkurve.lightcurvefile.TessLightCurveFile.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(self[, flux_types, style])</p></td>
 <td><p>Plot all the light curves contained in this light curve file.</p></td>
 </tr>
 </tbody>
@@ -197,13 +194,6 @@ following meaning:</p>
 </dd></dl>
 
 <p class="rubric">Methods Documentation</p>
-<dl class="classmethod">
-<dt id="lightkurve.lightcurvefile.TessLightCurveFile.from_fits">
-<em class="property">classmethod </em><code class="descname">from_fits</code><span class="sig-paren">(</span><em>path_or_url</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurvefile.TessLightCurveFile.from_fits" title="Permalink to this definition">¶</a></dt>
-<dd><p>WARNING: THIS FUNCTION IS DEPRECATED AND WILL BE REMOVED VERY SOON.</p>
-<p>Please use <code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.open()</span></code> instead.</p>
-</dd></dl>
-
 <dl class="method">
 <dt id="lightkurve.lightcurvefile.TessLightCurveFile.get_lightcurve">
 <code class="descname">get_lightcurve</code><span class="sig-paren">(</span><em>self</em>, <em>flux_type</em>, <em>centroid_type='MOM_CENTR'</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurvefile.TessLightCurveFile.get_lightcurve" title="Permalink to this definition">¶</a></dt>

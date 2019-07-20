@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>channel_to_module_output &#8212; Lightkurve</title>
+    <title>estimate_logg &#8212; Lightkurve</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -37,7 +37,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.0.1</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.1.0</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -77,22 +77,46 @@
 
 <div class="container">
     
-  <div class="section" id="channel-to-module-output">
-<h1>channel_to_module_output<a class="headerlink" href="#channel-to-module-output" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="estimate-logg">
+<h1>estimate_logg<a class="headerlink" href="#estimate-logg" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
-<dt id="lightkurve.utils.channel_to_module_output">
-<code class="descclassname">lightkurve.utils.</code><code class="descname">channel_to_module_output</code><span class="sig-paren">(</span><em>channel</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.utils.channel_to_module_output" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a (module, output) pair given a CCD channel number.</p>
+<dt id="lightkurve.seismology.estimate_logg">
+<code class="descclassname">lightkurve.seismology.</code><code class="descname">estimate_logg</code><span class="sig-paren">(</span><em>numax</em>, <em>teff</em>, <em>numax_err=None</em>, <em>teff_err=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.seismology.estimate_logg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the log of the surface gravity using the asteroseismic scaling
+relations.
+The two global observable seismic parameters, numax and deltanu, along with
+temperature, scale with fundamental stellar properties (Brown et al. 1991;
+Kjeldsen &amp; Bedding 1995). These scaling relations can be rearranged to
+calculate a stellar surface gravity as</p>
+<p>g = gsol * (numax/numax_sol)(Teff/Teffsol)^0.5</p>
+<p>where g is the surface gravity and Teff is the effective temperature,
+and the suffix ‘sol’ indicates a solar value. In this method we use the
+solar values for numax as given in Huber et al. (2011) and for Teff as given
+in Prsa et al. (2016). The solar surface gravity is calcluated from the
+astropy constants for solar mass and radius and does not have an error.</p>
+<p>The solar surface gravity is returned as log10(g) with units in dex, as is
+common in the astrophysics literature.</p>
+<p>This code structure borrows from work done in Bellinger et al. (2019), which
+also functions as an accessible explanation of seismic scaling relations.</p>
+<p>NOTE: These scaling relations are scaled to the Sun, and therefore do not
+always produce an entirely accurate result for more evolved stars.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>channel</strong><span class="classifier">int</span></dt><dd><p>Channel number</p>
+<dt><strong>numax</strong><span class="classifier">float</span></dt><dd><p>The frequency of maximum power of the seismic mode envelope. If not
+given an astropy unit, assumed to be in units of microhertz.</p>
+</dd>
+<dt><strong>teff</strong><span class="classifier">float</span></dt><dd><p>The effective temperature of the star. In units of Kelvin.</p>
+</dd>
+<dt><strong>numax_err</strong><span class="classifier">float</span></dt><dd><p>Error on numax. Assumed to be same units as numax</p>
+</dd>
+<dt><strong>teff_err</strong><span class="classifier">float</span></dt><dd><p>Error on teff. Assumed to be same units as teff.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl class="simple">
-<dt><strong>module, output</strong><span class="classifier">tuple of ints</span></dt><dd><p>Module and Output number</p>
+<dt><strong>logg</strong><span class="classifier">SeismologyQuantity</span></dt><dd><p>The log10 of the surface gravity of the star.</p>
 </dd>
 </dl>
 </dd>

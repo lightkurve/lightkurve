@@ -37,7 +37,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.0.1</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.1.0</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -284,35 +284,25 @@ div.rendered_html tbody tr:hover {
 </div>
 <br style="clear:both;"><div class="section" id="How-to-recover-a-known-planet-in-Kepler-data?">
 <h1>How to recover a known planet in Kepler data?<a class="headerlink" href="#How-to-recover-a-known-planet-in-Kepler-data?" title="Permalink to this headline">¶</a></h1>
-<p>This tutorial demonstrates the basic steps required to recover a transiting planet candidate in the Kepler data.</p>
-<p>We will show how you can recover the signal of <a class="reference external" href="https://en.wikipedia.org/wiki/Kepler-10b">Kepler-10b</a>, the first rocky planet that was discovered by Kepler!</p>
-<div class="nbinput docutils container">
+<p>This tutorial will demonstrate the basic steps required to recover the signal of <a class="reference external" href="https://en.wikipedia.org/wiki/Kepler-10b">Kepler-10b</a>, the first rocky planet that was discovered by Kepler!</p>
+<p>Let’s start by downloading the pixel data for this target for one of Kepler’s observing quarters:</p>
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">lightkurve</span> <span class="k">import</span> <span class="n">search_targetpixelfile</span>
-<span class="n">tpf</span> <span class="o">=</span> <span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s2">&quot;Kepler-10&quot;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
-<span class="n">tpf</span><span class="o">.</span><span class="n">shape</span>
+<span></span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
+<span class="n">tpf</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s2">&quot;Kepler-10&quot;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
-</pre></div>
-</div>
-<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
-<span></span>(4140, 10, 11)
-</pre></div>
-</div>
-</div>
-<p>Let’s use the <code class="docutils literal notranslate"><span class="pre">plot</span></code> method and pass along an aperture mask and a few plotting arguments.</p>
+<p>Let’s use the <code class="docutils literal notranslate"><span class="pre">plot</span></code> method to show the pixel data at one point in time (frame index 100). We’ll also pass along a few plotting arguments.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">);</span>
+<span></span><span class="n">tpf</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">frame</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">,</span> <span class="n">show_colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
@@ -323,7 +313,7 @@ div.rendered_html tbody tr:hover {
 <img alt="../_images/tutorials_02-recover-a-planet_4_0.png" src="../_images/tutorials_02-recover-a-planet_4_0.png" />
 </div>
 </div>
-<p>The target pixel file contains one bright star with approximately 50,000 counts.</p>
+<p>The target pixel file appears to show one bright star with a core brightness of approximately 50,000 electrons/seconds.</p>
 <p>Now, we will use the <code class="docutils literal notranslate"><span class="pre">to_lightcurve</span></code> method to create a simple aperture photometry lightcurve using the mask defined by the pipeline which is stored in <code class="docutils literal notranslate"><span class="pre">tpf.pipeline_mask</span></code>.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
@@ -351,7 +341,7 @@ div.rendered_html tbody tr:hover {
 <img alt="../_images/tutorials_02-recover-a-planet_9_0.png" src="../_images/tutorials_02-recover-a-planet_9_0.png" />
 </div>
 </div>
-<p>Now let’s use the <code class="docutils literal notranslate"><span class="pre">flatten</span></code> method, removes long-term variability that we are not interested in.</p>
+<p>Now let’s use the <code class="docutils literal notranslate"><span class="pre">flatten</span></code> method, which removes long-term variability that we are not interested in using a high-pass filter called <em>Savitzky-Golay</em>.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
@@ -361,14 +351,14 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
-<p>Let’s plot the trend estimated by the Savitzky-Golay filter:</p>
+<p>Let’s plot the trend estimated in red:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">errorbar</span><span class="p">()</span>                              <span class="c1"># plot() returns a matplotlib axes ...</span>
-<span class="n">trend</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Trend&#39;</span><span class="p">);</span>  <span class="c1"># which we can pass to the next plot() to use the same axes</span>
+<span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;Kepler-10&quot;</span><span class="p">)</span>                   <span class="c1"># plot() returns a matplotlib axes ...</span>
+<span class="n">trend</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Trend&#39;</span><span class="p">);</span>  <span class="c1"># which we can pass to the next plot() to use the same axes</span>
 </pre></div>
 </div>
 </div>
@@ -385,7 +375,7 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">flat</span><span class="o">.</span><span class="n">errorbar</span><span class="p">();</span>
+<span></span><span class="n">flat</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;Kepler-10&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
@@ -396,39 +386,16 @@ div.rendered_html tbody tr:hover {
 <img alt="../_images/tutorials_02-recover-a-planet_15_0.png" src="../_images/tutorials_02-recover-a-planet_15_0.png" />
 </div>
 </div>
-<p>Now, let’s run a period search function using the <a class="reference external" href="http://docs.astropy.org/en/latest/stats/bls.html">Box-Least Squares algorithm</a>, which was added to the <a class="reference external" href="http://docs.astropy.org">AstroPy package</a> in version 3.1.</p>
-<div class="nbinput nblast docutils container">
+<p>Now, let’s run a period search function using the well-known Box-Least Squares algorithm (BLS), which was added to the <a class="reference external" href="http://docs.astropy.org">AstroPy package</a> in version 3.1.</p>
+<p>We will use the BLS algorithm to search a pre-defined grid of transit periods:</p>
+<div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">astropy.stats</span> <span class="k">import</span> <span class="n">BoxLeastSquares</span>
-<span class="n">bls</span> <span class="o">=</span> <span class="n">BoxLeastSquares</span><span class="p">(</span><span class="n">flat</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">flat</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="n">flat</span><span class="o">.</span><span class="n">flux_err</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<p>We will use the BLS algorithm to search a pre-defined grid of transit periods and durations:</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="n">periods</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">)</span>
-<span class="n">durations</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.005</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">)</span>
-<span class="n">periodogram</span> <span class="o">=</span> <span class="n">bls</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">periods</span><span class="p">,</span> <span class="n">durations</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">periodogram</span><span class="o">.</span><span class="n">period</span><span class="p">,</span> <span class="n">periodogram</span><span class="o">.</span><span class="n">power</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Power&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Period [day]&quot;</span><span class="p">);</span>
+<span class="n">periodogram</span> <span class="o">=</span> <span class="n">flat</span><span class="o">.</span><span class="n">to_periodogram</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;bls&quot;</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">))</span>
+<span class="n">periodogram</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
 </pre></div>
 </div>
 </div>
@@ -436,16 +403,17 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_02-recover-a-planet_20_0.png" src="../_images/tutorials_02-recover-a-planet_20_0.png" />
+<img alt="../_images/tutorials_02-recover-a-planet_17_0.png" src="../_images/tutorials_02-recover-a-planet_17_0.png" />
 </div>
 </div>
+<p>It looks like we found a strong signal with a periodicity of 0.8 days!</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">best_fit</span> <span class="o">=</span> <span class="n">periods</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">periodogram</span><span class="o">.</span><span class="n">power</span><span class="p">)]</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Best Fit Period: </span><span class="si">{:0.4f}</span><span class="s1"> days&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">best_fit</span><span class="p">))</span>
+<span></span><span class="n">best_fit_period</span> <span class="o">=</span> <span class="n">periodogram</span><span class="o">.</span><span class="n">period_at_max_power</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Best fit period: </span><span class="si">{:.3f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">best_fit_period</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -454,15 +422,15 @@ div.rendered_html tbody tr:hover {
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Best Fit Period: 0.8380 days
+Best fit period: 0.837 d
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">flat</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">best_fit</span><span class="p">)</span><span class="o">.</span><span class="n">errorbar</span><span class="p">();</span>
+<span></span><span class="n">flat</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="n">best_fit_period</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="n">periodogram</span><span class="o">.</span><span class="n">transit_time_at_max_power</span><span class="p">)</span><span class="o">.</span><span class="n">errorbar</span><span class="p">();</span>
 </pre></div>
 </div>
 </div>
@@ -470,7 +438,7 @@ Best Fit Period: 0.8380 days
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_02-recover-a-planet_22_0.png" src="../_images/tutorials_02-recover-a-planet_22_0.png" />
+<img alt="../_images/tutorials_02-recover-a-planet_20_0.png" src="../_images/tutorials_02-recover-a-planet_20_0.png" />
 </div>
 </div>
 <p>We successfully recovered the planet!</p>

@@ -37,7 +37,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.0.1</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.1.0</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -125,14 +125,20 @@ representing a power spectrum generated using the Lomb Scargle method.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve" title="lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_lightcurve</span></code></a>(lc[, minimum_frequency, …])</p></td>
 <td><p>Creates a Periodogram from a LightCurve using the Lomb-Scargle method.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.periodogram.LombScarglePeriodogram.plot" title="lightkurve.periodogram.LombScarglePeriodogram.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(self[, scale, ax, xlabel, ylabel, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.periodogram.LombScarglePeriodogram.model" title="lightkurve.periodogram.LombScarglePeriodogram.model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">model</span></code></a>(self, time[, frequency])</p></td>
+<td><p>Obtain the flux model for a given frequency and time</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.periodogram.LombScarglePeriodogram.plot" title="lightkurve.periodogram.LombScarglePeriodogram.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(self[, scale, ax, xlabel, ylabel, …])</p></td>
 <td><p>Plots the Periodogram.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.periodogram.LombScarglePeriodogram.show_properties" title="lightkurve.periodogram.LombScarglePeriodogram.show_properties"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_properties</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.periodogram.LombScarglePeriodogram.show_properties" title="lightkurve.periodogram.LombScarglePeriodogram.show_properties"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_properties</span></code></a>(self)</p></td>
 <td><p>Prints a summary of the non-callable attributes of the Periodogram object.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.periodogram.LombScarglePeriodogram.smooth" title="lightkurve.periodogram.LombScarglePeriodogram.smooth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">smooth</span></code></a>(self[, method, filter_width])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.periodogram.LombScarglePeriodogram.smooth" title="lightkurve.periodogram.LombScarglePeriodogram.smooth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">smooth</span></code></a>(self[, method, filter_width])</p></td>
 <td><p>Smooths the power spectrum using the ‘boxkernel’ or ‘logmedian’ method.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.periodogram.LombScarglePeriodogram.to_seismology" title="lightkurve.periodogram.LombScarglePeriodogram.to_seismology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_seismology</span></code></a>(self, \*\*kwargs)</p></td>
+<td><p>Returns a <a class="reference internal" href="lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology" title="lightkurve.seismology.Seismology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Seismology</span></code></a> object to analyze the periodogram.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.periodogram.LombScarglePeriodogram.to_table" title="lightkurve.periodogram.LombScarglePeriodogram.to_table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_table</span></code></a>(self)</p></td>
 <td><p>Exports the Periodogram as an Astropy Table.</p></td>
@@ -249,7 +255,7 @@ returned if <code class="xref py py-obj docutils literal notranslate"><span clas
 
 <dl class="staticmethod">
 <dt id="lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve">
-<em class="property">static </em><code class="descname">from_lightcurve</code><span class="sig-paren">(</span><em>lc</em>, <em>minimum_frequency=None</em>, <em>maximum_frequency=None</em>, <em>minimum_period=None</em>, <em>maximum_period=None</em>, <em>frequency=None</em>, <em>period=None</em>, <em>nterms=1</em>, <em>nyquist_factor=1</em>, <em>oversample_factor=None</em>, <em>freq_unit=None</em>, <em>normalization='amplitude'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">from_lightcurve</code><span class="sig-paren">(</span><em>lc</em>, <em>minimum_frequency=None</em>, <em>maximum_frequency=None</em>, <em>minimum_period=None</em>, <em>maximum_period=None</em>, <em>frequency=None</em>, <em>period=None</em>, <em>nterms=1</em>, <em>nyquist_factor=1</em>, <em>oversample_factor=None</em>, <em>freq_unit=None</em>, <em>normalization='amplitude'</em>, <em>ls_method='fast'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a Periodogram from a LightCurve using the Lomb-Scargle method.</p>
 <p>By default, the periodogram will be created for a regular grid of
 frequencies from one frequency separation to the Nyquist frequency,
@@ -376,6 +382,28 @@ Can be either power spectral density (<code class="xref py py-obj docutils liter
 </dd></dl>
 
 <dl class="method">
+<dt id="lightkurve.periodogram.LombScarglePeriodogram.model">
+<code class="descname">model</code><span class="sig-paren">(</span><em>self</em>, <em>time</em>, <em>frequency=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.LombScarglePeriodogram.model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Obtain the flux model for a given frequency and time</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>time</strong><span class="classifier">np.ndarray</span></dt><dd><p>Time points to evaluate model.</p>
+</dd>
+<dt><strong>frequency</strong><span class="classifier">frequency to evaluate model. Default is the frequency at</span></dt><dd><p>max power.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>result</strong><span class="classifier">lightkurve.LightCurve</span></dt><dd><p>Model object with the time and flux model</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
 <dt id="lightkurve.periodogram.LombScarglePeriodogram.plot">
 <code class="descname">plot</code><span class="sig-paren">(</span><em>self</em>, <em>scale='linear'</em>, <em>ax=None</em>, <em>xlabel=None</em>, <em>ylabel=None</em>, <em>title=''</em>, <em>style='lightkurve'</em>, <em>view=None</em>, <em>unit=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.LombScarglePeriodogram.plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots the Periodogram.</p>
@@ -401,7 +429,7 @@ Lightkurve’s custom stylesheet is used by default.</p>
 units will be frequency. If ‘period’, the x-axis units will be
 period and ‘log’ scale.</p>
 </dd>
-<dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of arguments to be passed to <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.1.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib.pyplot.plot</span></code></a>.</p>
+<dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of arguments to be passed to <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.1.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib.pyplot.plot</span></code></a>.</p>
 </dd>
 </dl>
 </dd>
@@ -478,13 +506,27 @@ has been smoothed.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="lightkurve.periodogram.LombScarglePeriodogram.to_seismology">
+<code class="descname">to_seismology</code><span class="sig-paren">(</span><em>self</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.LombScarglePeriodogram.to_seismology" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a <a class="reference internal" href="lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology" title="lightkurve.seismology.Seismology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Seismology</span></code></a> object to analyze the periodogram.</p>
+<dl class="field-list">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl>
+<dt><strong>seismology</strong><span class="classifier"><a class="reference internal" href="lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology" title="lightkurve.seismology.Seismology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Seismology</span></code></a></span></dt><dd><p>Helper object to run asteroseismology methods.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
 <dt id="lightkurve.periodogram.LombScarglePeriodogram.to_table">
 <code class="descname">to_table</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.LombScarglePeriodogram.to_table" title="Permalink to this definition">¶</a></dt>
 <dd><p>Exports the Periodogram as an Astropy Table.</p>
 <dl class="field-list">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><dl>
-<dt><strong>table</strong><span class="classifier"><a class="reference external" href="http://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v4.0.dev558)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.table.Table</span></code></a> object</span></dt><dd><p>An AstroPy Table with columns ‘frequency’, ‘period’, and ‘power’.</p>
+<dt><strong>table</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v4.0.dev762)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> object</span></dt><dd><p>An AstroPy Table with columns ‘frequency’, ‘period’, and ‘power’.</p>
 </dd>
 </dl>
 </dd>

@@ -37,7 +37,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.0.1</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.1.0</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -82,7 +82,7 @@
 <dl class="class">
 <dt id="lightkurve.correctors.PLDCorrector">
 <em class="property">class </em><code class="descclassname">lightkurve.correctors.</code><code class="descname">PLDCorrector</code><span class="sig-paren">(</span><em>tpf</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.PLDCorrector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">lightkurve.correctors.corrector.Corrector</span></code></p>
 <p>Implements the Pixel Level Decorrelation (PLD) systematics removal method.</p>
 <blockquote>
 <div><p>Pixel Level Decorrelation (PLD) was developed by <a class="reference internal" href="#r333fd99d762c-1" id="id1"><span>[R333fd99d762c-1]</span></a> to remove
@@ -160,18 +160,24 @@ It is necessary to mask the transits using <code class="xref py py-obj docutils 
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.correctors.PLDCorrector.correct" title="lightkurve.correctors.PLDCorrector.correct"><code class="xref py py-obj docutils literal notranslate"><span class="pre">correct</span></code></a>(self[, aperture_mask, cadence_mask, …])</p></td>
 <td><p>Returns a PLD systematics-corrected LightCurve.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.correctors.PLDCorrector.diagnose" title="lightkurve.correctors.PLDCorrector.diagnose"><code class="xref py py-obj docutils literal notranslate"><span class="pre">diagnose</span></code></a>(self)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.correctors.PLDCorrector.interact" title="lightkurve.correctors.PLDCorrector.interact"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interact</span></code></a>(self)</p></td>
+<td><p></p></td>
+</tr>
 </tbody>
 </table>
 <p class="rubric">Methods Documentation</p>
 <dl class="method">
 <dt id="lightkurve.correctors.PLDCorrector.correct">
-<code class="descname">correct</code><span class="sig-paren">(</span><em>self</em>, <em>aperture_mask=None</em>, <em>cadence_mask=None</em>, <em>gp_timescale=30</em>, <em>use_gp=True</em>, <em>pld_order=2</em>, <em>n_pca_terms=10</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.PLDCorrector.correct" title="Permalink to this definition">¶</a></dt>
+<code class="descname">correct</code><span class="sig-paren">(</span><em>self</em>, <em>aperture_mask=None</em>, <em>cadence_mask=None</em>, <em>gp_timescale=30</em>, <em>use_gp=True</em>, <em>pld_order=2</em>, <em>n_pca_terms=10</em>, <em>pld_aperture_mask=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.PLDCorrector.correct" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a PLD systematics-corrected LightCurve.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>aperture_mask</strong><span class="classifier">array-like, ‘pipeline’, ‘all’, ‘threshold’, or None</span></dt><dd><p>A boolean array describing the aperture such that <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> means
-that the pixel will be used.
+that the pixel will be used to generate the raw flux light curve.
 If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> or ‘all’ are passed, all pixels will be used.
 If ‘pipeline’ is passed, the mask suggested by the official pipeline
 will be returned.
@@ -203,6 +209,14 @@ when performing Principal Component Analysis for models higher than
 first order. Increasing this value may provide higher precision at
 the expense of computational time.</p>
 </dd>
+<dt><strong>pld_aperture_mask</strong><span class="classifier">array-like, ‘pipeline’, ‘all’, ‘threshold’, or None</span></dt><dd><p>A boolean array describing the aperture such that <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> means
+that the pixel will be used when selecting the PLD basis vectors.
+If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#all" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">all</span></code></a> are passed in, all pixels will be used.
+If ‘pipeline’ is passed, the mask suggested by the official pipeline
+will be returned.
+If ‘threshold’ is passed, all pixels brighter than 3-sigma above
+the median flux will be used.</p>
+</dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -215,6 +229,16 @@ general <code class="xref py py-obj docutils literal notranslate"><span class="p
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="method">
+<dt id="lightkurve.correctors.PLDCorrector.diagnose">
+<code class="descname">diagnose</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.PLDCorrector.diagnose" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lightkurve.correctors.PLDCorrector.interact">
+<code class="descname">interact</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.PLDCorrector.interact" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 

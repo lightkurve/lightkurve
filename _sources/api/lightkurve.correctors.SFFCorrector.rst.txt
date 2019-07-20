@@ -14,7 +14,9 @@ SFFCorrector
       ~SFFCorrector.bin_and_interpolate
       ~SFFCorrector.breakpoints
       ~SFFCorrector.correct
+      ~SFFCorrector.diagnose
       ~SFFCorrector.fit_bspline
+      ~SFFCorrector.interact
       ~SFFCorrector.rotate_centroids
 
    .. rubric:: Methods Documentation
@@ -23,5 +25,7 @@ SFFCorrector
    .. automethod:: bin_and_interpolate
    .. automethod:: breakpoints
    .. automethod:: correct
+   .. automethod:: diagnose
    .. automethod:: fit_bspline
+   .. automethod:: interact
    .. automethod:: rotate_centroids

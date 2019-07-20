@@ -1,0 +1,114 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>diagnose_numax_acf2d &#8212; Lightkurve</title>
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-69171-9');
+    </script>
+
+  </head><body>
+<header>
+<nav class="navbar navbar-expand-lg navbar-light border-bottom">
+  <div class="container">
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.1.0</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarsExample07">
+      <ul class="navbar-nav mr-auto">
+        
+            
+            <li class="nav-item">
+            
+              <a class="nav-link" href="../quickstart.html">Quickstart</a>
+            </li>
+            
+            <li class="nav-item">
+            
+              <a class="nav-link" href="../tutorials/index.html">Tutorials</a>
+            </li>
+            
+            <li class="nav-item">
+            
+              <a class="nav-link" href="index.html">API</a>
+            </li>
+            
+            <li class="nav-item">
+            
+              <a class="nav-link" href="../about/index.html">About</a>
+            </li>
+        
+      </ul>
+        <form class="form-inline my-2 my-md-0" action="../search.html" method="get">
+            <input class="form-control" type="text" placeholder="Search" aria-label="Search" name="q" />
+        </form>
+    </div>
+  </div>
+</nav>
+</header>
+
+<div class="container">
+    
+  <div class="section" id="diagnose-numax-acf2d">
+<h1>diagnose_numax_acf2d<a class="headerlink" href="#diagnose-numax-acf2d" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="lightkurve.seismology.diagnose_numax_acf2d">
+<code class="descclassname">lightkurve.seismology.</code><code class="descname">diagnose_numax_acf2d</code><span class="sig-paren">(</span><em>numax</em>, <em>periodogram</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.seismology.diagnose_numax_acf2d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a diagnostic plot which elucidates how numax was estimated.</p>
+<p>[1] The SNRPeriodogram plotted with a red line indicating the estimated
+numax value.</p>
+<p>[2] An image showing the 2D autocorrelation. On the y-axis is the
+frequency lag of the autocorrelation window. The width of the window is
+equal to <code class="xref py py-obj docutils literal notranslate"><span class="pre">window_width</span></code>, and the spacing between lags is equal to
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">numax_spacing</span></code>. On the x-axis is the central frequency at which the
+autocorrelation was calculated. In the z-axis is the unitless
+autocorrelation power. Shown in red is the estimated numax.</p>
+<p>[3] The Mean Collapsed Correlation (MCC, see Viani et al. 2019) against
+central frequency at which the MCC was calculated. Shown in red is the
+estimated numax. Shown in blue is the MCC convolved with a Gaussian
+smoothing kernel with a standard deviation of 1/5th the window size.</p>
+<p>For details on the numax estimation, see the <code class="xref py py-obj docutils literal notranslate"><span class="pre">estimate_numax()</span></code> function.
+The calculation performed is identical</p>
+</dd></dl>
+
+</div>
+
+
+</div>
+<div class="container" style="padding-top: 2em;">
+    <hr>
+    <p class="text-center">
+        Created with ♥ by the Lightkurve collaboration.
+        Please <a href="../about/citing.html">cite us</a> or <a href="https://github.com/KeplerGO/lightkurve">join us on GitHub.</a>
+    </p>
+</div>
+  </body>
+</html>

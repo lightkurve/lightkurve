@@ -37,7 +37,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.0.1</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.1.0</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -104,14 +104,8 @@ $ git commit -m <span class="s2">&quot;Finalizing changelog for v&lt;version&gt;
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ python setup.py release
 </pre></div>
 </div>
-<ol class="arabic simple" start="8">
-<li><p>Increment the version number on the <a class="reference external" href="https://github.com/conda-forge/lightkurve-feedstock">lightkurve conda feedstock</a>.  Navigate to the <code class="code docutils literal notranslate"><span class="pre">meta.yaml</span></code> file in the <code class="code docutils literal notranslate"><span class="pre">recipe</span></code> directory and change two lines:</p></li>
-</ol>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span>{% set version = &quot;1.0b20&quot; %}
-{% set sha256 = &quot;b65f556362b64d9fcc8aa4b0e89991c2b8f7fc059dfa22269b0877a8b758b255&quot; %}
-</pre></div>
-</div>
-<p>Replace the <code class="xref py py-obj docutils literal notranslate"><span class="pre">version</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">sha256</span></code> values with the most recent release info in <a class="reference external" href="https://pypi.org/project/lightkurve/">the lightkurve PyPI</a>.  Submit your update as a Pull Request, which offers a checklist to guide programmatic spot-checking of your code.</p>
+<p>8. Update the version number on the <a class="reference external" href="https://github.com/conda-forge/lightkurve-feedstock">Lightkurve conda feedstock</a>.
+A friendly robot will tend to open a PR to make this change within 1-2 hours, so all we need to do is review any necessary changes in the dependencies and make sure the PR is merged.</p>
 <ol class="arabic simple" start="9">
 <li><p>Edit <code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve/version.py</span></code> to contain the next version number with suffix <code class="xref py py-obj docutils literal notranslate"><span class="pre">dev</span></code>.</p></li>
 </ol>

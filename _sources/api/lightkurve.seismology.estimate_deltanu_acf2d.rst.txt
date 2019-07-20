@@ -1,0 +1,6 @@
+estimate_deltanu_acf2d
+======================
+
+.. currentmodule:: lightkurve.seismology
+
+.. autofunction:: estimate_deltanu_acf2d

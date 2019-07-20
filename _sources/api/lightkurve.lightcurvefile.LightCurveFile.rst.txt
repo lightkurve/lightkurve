@@ -21,7 +21,6 @@ LightCurveFile
 
    .. autosummary::
 
-      ~LightCurveFile.from_fits
       ~LightCurveFile.header
       ~LightCurveFile.plot
 
@@ -36,6 +35,5 @@ LightCurveFile
 
    .. rubric:: Methods Documentation
 
-   .. automethod:: from_fits
    .. automethod:: header
    .. automethod:: plot

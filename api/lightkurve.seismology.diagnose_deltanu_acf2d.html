@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>running_mean &#8212; Lightkurve</title>
+    <title>diagnose_deltanu_acf2d &#8212; Lightkurve</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -37,7 +37,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.0.1</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.1.0</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -77,18 +77,31 @@
 
 <div class="container">
     
-  <div class="section" id="running-mean">
-<h1>running_mean<a class="headerlink" href="#running-mean" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="diagnose-deltanu-acf2d">
+<h1>diagnose_deltanu_acf2d<a class="headerlink" href="#diagnose-deltanu-acf2d" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
-<dt id="lightkurve.utils.running_mean">
-<code class="descclassname">lightkurve.utils.</code><code class="descname">running_mean</code><span class="sig-paren">(</span><em>data</em>, <em>window_size</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.utils.running_mean" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the moving average of an array <code class="xref py py-obj docutils literal notranslate"><span class="pre">data</span></code>.</p>
-<dl class="field-list simple">
+<dt id="lightkurve.seismology.diagnose_deltanu_acf2d">
+<code class="descclassname">lightkurve.seismology.</code><code class="descname">diagnose_deltanu_acf2d</code><span class="sig-paren">(</span><em>deltanu</em>, <em>periodogram</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.seismology.diagnose_deltanu_acf2d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a diagnostic plot which elucidates how deltanu was estimated.</p>
+<p>[1] Scaled correlation metric vs frequecy lag of the autocorrelation
+window, with inset close up on the determined deltanu and a line
+indicating the determined deltanu.</p>
+<p>For details on the deltanu estimation, see the <code class="xref py py-obj docutils literal notranslate"><span class="pre">estimate_deltanu()</span></code>
+function. The calculation performed is identical.</p>
+<p>NOTE: When plotting, we exclude the first two frequency lag bins, to
+make the relevant features on the plot clearer, as these bins are close to
+the spectrum correlated with itself and therefore much higher than the rest
+of the bins.</p>
+<dl class="field-list">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>data</strong><span class="classifier">array of numbers</span></dt><dd><p>The running mean will be computed on this data.</p>
+<dd class="field-odd"><dl>
+<dt><strong>deltanu</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SeismologyResult</span></code> object</span></dt><dd><p>The object returned by <a class="reference internal" href="lightkurve.seismology.estimate_deltanu_acf2d.html#lightkurve.seismology.estimate_deltanu_acf2d" title="lightkurve.seismology.estimate_deltanu_acf2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">estimate_deltanu_acf2d()</span></code></a>.</p>
 </dd>
-<dt><strong>window_size</strong><span class="classifier">int</span></dt><dd><p>Window length used to compute the running mean.</p>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>ax</strong><span class="classifier">matplotlib.axes._subplots.AxesSubplot</span></dt><dd><p>The matplotlib axes object.</p>
 </dd>
 </dl>
 </dd>

@@ -37,7 +37,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.0.1</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.1.0</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -172,12 +172,6 @@ following meaning:</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.compute_cotrended_lightcurve" title="lightkurve.lightcurvefile.KeplerLightCurveFile.compute_cotrended_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_cotrended_lightcurve</span></code></a>(self[, cbvs])</p></td>
 <td><p>Returns a LightCurve object after cotrending the SAP_FLUX against the cotrending basis vectors.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.from_archive" title="lightkurve.lightcurvefile.KeplerLightCurveFile.from_archive"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_archive</span></code></a>(target[, cadence, quarter, …])</p></td>
-<td><p>WARNING: THIS FUNCTION IS DEPRECATED AND WILL BE REMOVED VERY SOON.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.from_fits" title="lightkurve.lightcurvefile.KeplerLightCurveFile.from_fits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_fits</span></code></a>(path_or_url, \*\*kwargs)</p></td>
-<td><p>WARNING: THIS FUNCTION IS DEPRECATED AND WILL BE REMOVED VERY SOON.</p></td>
-</tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.get_lightcurve" title="lightkurve.lightcurvefile.KeplerLightCurveFile.get_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_lightcurve</span></code></a>(self, flux_type[, centroid_type])</p></td>
 <td><p></p></td>
 </tr>
@@ -298,59 +292,6 @@ KeplerCBVCorrector.correct.</p>
 </dl>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="staticmethod">
-<dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.from_archive">
-<em class="property">static </em><code class="descname">from_archive</code><span class="sig-paren">(</span><em>target</em>, <em>cadence='long'</em>, <em>quarter=None</em>, <em>month=None</em>, <em>campaign=None</em>, <em>quality_bitmask='default'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.from_archive" title="Permalink to this definition">¶</a></dt>
-<dd><p>WARNING: THIS FUNCTION IS DEPRECATED AND WILL BE REMOVED VERY SOON.
-Use <code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.search_lightcurvefile()</span></code> instead.</p>
-<dl class="field-list">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl>
-<dt><strong>target</strong><span class="classifier">str or int</span></dt><dd><p>KIC/EPIC ID or object name.</p>
-</dd>
-<dt><strong>cadence</strong><span class="classifier">str</span></dt><dd><p>‘long’ or ‘short’.</p>
-</dd>
-<dt><strong>quarter, campaign</strong><span class="classifier">int, list of ints, or ‘all’</span></dt><dd><p>Kepler Quarter or K2 Campaign number.</p>
-</dd>
-<dt><strong>month</strong><span class="classifier">1, 2, 3, list of int, or ‘all’</span></dt><dd><p>For Kepler’s prime mission, there are three short-cadence
-LightCurveFile objects for each quarter, each covering one month.
-Hence, if cadence=’short’ you need to specify month=1, 2, or 3.</p>
-</dd>
-<dt><strong>quality_bitmask</strong><span class="classifier">str or int</span></dt><dd><p>Bitmask (integer) which identifies the quality flag bitmask that should
-be used to mask out bad cadences. If a string is passed, it has the
-following meaning:</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>“none”: no cadences will be ignored (<code class="xref py py-obj docutils literal notranslate"><span class="pre">quality_bitmask=0</span></code>).</p></li>
-<li><p>“default”: cadences with severe quality issues will be ignored
-(<code class="xref py py-obj docutils literal notranslate"><span class="pre">quality_bitmask=1130799</span></code>).</p></li>
-<li><p>“hard”: more conservative choice of flags to ignore
-(<code class="xref py py-obj docutils literal notranslate"><span class="pre">quality_bitmask=1664431</span></code>). This is known to remove good data.</p></li>
-<li><p>“hardest”: removes all data that has been flagged
-(<code class="xref py py-obj docutils literal notranslate"><span class="pre">quality_bitmask=2096639</span></code>). This mask is not recommended.</p></li>
-</ul>
-</div></blockquote>
-<p>See the <code class="xref py py-class docutils literal notranslate"><span class="pre">KeplerQualityFlags</span></code> class for details on the bitmasks.</p>
-</dd>
-<dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Keywords arguments passed to <a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile" title="lightkurve.lightcurvefile.KeplerLightCurveFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerLightCurveFile</span></code></a>.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><dl class="simple">
-<dt><strong>lcf</strong><span class="classifier">KeplerLightCurveFile or LightCurveFileCollection</span></dt><dd></dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="classmethod">
-<dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.from_fits">
-<em class="property">classmethod </em><code class="descname">from_fits</code><span class="sig-paren">(</span><em>path_or_url</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.from_fits" title="Permalink to this definition">¶</a></dt>
-<dd><p>WARNING: THIS FUNCTION IS DEPRECATED AND WILL BE REMOVED VERY SOON.</p>
-<p>Please use <code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.open()</span></code> instead.</p>
 </dd></dl>
 
 <dl class="method">

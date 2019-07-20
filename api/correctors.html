@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Systematics correction classes &#8212; Lightkurve</title>
+    <title>Correcting systematics &#8212; Lightkurve</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -37,7 +37,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.0.1</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.1.0</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -78,10 +78,19 @@
 <div class="container">
     
   <div class="section" id="module-lightkurve.correctors">
-<span id="systematics-correction-classes"></span><h1>Systematics correction classes<a class="headerlink" href="#module-lightkurve.correctors" title="Permalink to this headline">¶</a></h1>
-<span class="target" id="module-lightkurve.correctors"></span><p>Defines KeplerCBVCorrector, SFFCorrector, and PLDCorrector.</p>
-<p>These classes are intended to help remove instrument systematics from
-time series photometry data.</p>
+<span id="correcting-systematics"></span><h1>Correcting systematics<a class="headerlink" href="#module-lightkurve.correctors" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-lightkurve.correctors"></span><p>This sub-package defines classes which help remove instrument systematics
+or variability from time series photometry data.</p>
+<p>Classes provided by this package should inherit from an abstract <code class="xref py py-obj docutils literal notranslate"><span class="pre">Corrector</span></code>
+class, which provides three key methods:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Corrector</span><span class="p">(</span><span class="o">**</span><span class="n">data_required</span><span class="p">):</span>
+    <span class="o">.</span><span class="n">correct</span><span class="p">(</span><span class="o">**</span><span class="n">options</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Returns</span> <span class="n">a</span> <span class="n">systematics</span><span class="o">-</span><span class="n">corrected</span> <span class="n">LightCurve</span><span class="o">.</span>
+    <span class="o">.</span><span class="n">diagnose</span><span class="p">(</span><span class="o">**</span><span class="n">options</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Returns</span> <span class="n">figures</span> <span class="n">which</span> <span class="n">elucidate</span> <span class="n">the</span> <span class="n">correction</span><span class="o">.</span>
+    <span class="o">.</span><span class="n">interact</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Returns</span> <span class="n">a</span> <span class="n">widget</span> <span class="n">to</span> <span class="n">tune</span> <span class="n">the</span> <span class="n">options</span> <span class="n">interactively</span> <span class="p">(</span><span class="n">optional</span><span class="p">)</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>Classes currently provided are <a class="reference internal" href="lightkurve.correctors.KeplerCBVCorrector.html#lightkurve.correctors.KeplerCBVCorrector" title="lightkurve.correctors.KeplerCBVCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerCBVCorrector</span></code></a>, <a class="reference internal" href="lightkurve.correctors.SFFCorrector.html#lightkurve.correctors.SFFCorrector" title="lightkurve.correctors.SFFCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SFFCorrector</span></code></a>, and
+<a class="reference internal" href="lightkurve.correctors.PLDCorrector.html#lightkurve.correctors.PLDCorrector" title="lightkurve.correctors.PLDCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PLDCorrector</span></code></a>.</p>
 <div class="section" id="classes">
 <h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
 <table class="longtable docutils align-center">
@@ -90,26 +99,22 @@ time series photometry data.</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.correctors.SFFCorrector.html#lightkurve.correctors.SFFCorrector" title="lightkurve.correctors.SFFCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SFFCorrector</span></code></a>(lightcurve)</p></td>
-<td><p>Implements the Self-Flat-Fielding (SFF) systematics removal method.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.correctors.KeplerCBVCorrector.html#lightkurve.correctors.KeplerCBVCorrector" title="lightkurve.correctors.KeplerCBVCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerCBVCorrector</span></code></a>(lc[, cbv_array, …])</p></td>
+<td><p>Remove systematic trends from Kepler light curves by fitting Cotrending Basis Vectors (CBVs).</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="lightkurve.correctors.PLDCorrector.html#lightkurve.correctors.PLDCorrector" title="lightkurve.correctors.PLDCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PLDCorrector</span></code></a>(tpf)</p></td>
 <td><p>Implements the Pixel Level Decorrelation (PLD) systematics removal method.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.correctors.KeplerCBVCorrector.html#lightkurve.correctors.KeplerCBVCorrector" title="lightkurve.correctors.KeplerCBVCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerCBVCorrector</span></code></a>(lc[, cbv_array, …])</p></td>
-<td><p>Remove systematic trends from Kepler light curves by fitting Cotrending Basis Vectors (CBVs).</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.correctors.SFFCorrector.html#lightkurve.correctors.SFFCorrector" title="lightkurve.correctors.SFFCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SFFCorrector</span></code></a>(lightcurve)</p></td>
+<td><p>Implements the Self-Flat-Fielding (SFF) systematics removal method.</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="section" id="class-inheritance-diagram">
 <h2>Class Inheritance Diagram<a class="headerlink" href="#class-inheritance-diagram" title="Permalink to this headline">¶</a></h2>
-<div class="graphviz"><img src="../_images/inheritance-8504cbf1f73df5c500129733bf3f55ea9df060c2.png" alt="Inheritance diagram of lightkurve.correctors.SFFCorrector, lightkurve.correctors.PLDCorrector, lightkurve.correctors.KeplerCBVCorrector" usemap="#inheritance30f0516e8c" class="inheritance graphviz" /></div>
-<map id="inheritance30f0516e8c" name="inheritance30f0516e8c">
-<area shape="rect" id="node1" href="lightkurve.correctors.KeplerCBVCorrector.html#lightkurve.correctors.KeplerCBVCorrector" target="_top" title="Remove systematic trends from Kepler light curves by fitting" alt="" coords="5,104,156,129"/>
-<area shape="rect" id="node2" href="lightkurve.correctors.PLDCorrector.html#lightkurve.correctors.PLDCorrector" target="_top" title="Implements the Pixel Level Decorrelation (PLD) systematics removal method." alt="" coords="27,55,134,80"/>
-<area shape="rect" id="node3" href="lightkurve.correctors.SFFCorrector.html#lightkurve.correctors.SFFCorrector" target="_top" title="Implements the Self&#45;Flat&#45;Fielding (SFF) systematics removal method." alt="" coords="29,5,133,31"/>
-</map></div>
+<div class="graphviz"><img src="../_images/inheritance-bfd9ed78b63d9ba9c73c1f3cb8f08040696bc195.png" alt="Inheritance diagram of lightkurve.correctors.cbvcorrector.KeplerCBVCorrector, lightkurve.correctors.pldcorrector.PLDCorrector, lightkurve.correctors.sffcorrector.SFFCorrector" class="inheritance graphviz" /></div>
+</div>
 </div>
 
 

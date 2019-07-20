@@ -42,13 +42,11 @@ KeplerTargetPixelFile
 
    .. autosummary::
 
-      ~KeplerTargetPixelFile.centroids
       ~KeplerTargetPixelFile.create_threshold_mask
+      ~KeplerTargetPixelFile.cutout
       ~KeplerTargetPixelFile.estimate_centroids
       ~KeplerTargetPixelFile.extract_aperture_photometry
       ~KeplerTargetPixelFile.extract_prf_photometry
-      ~KeplerTargetPixelFile.from_archive
-      ~KeplerTargetPixelFile.from_fits
       ~KeplerTargetPixelFile.from_fits_images
       ~KeplerTargetPixelFile.get_bkg_lightcurve
       ~KeplerTargetPixelFile.get_coordinates
@@ -56,9 +54,11 @@ KeplerTargetPixelFile
       ~KeplerTargetPixelFile.get_model
       ~KeplerTargetPixelFile.get_prf_model
       ~KeplerTargetPixelFile.interact
+      ~KeplerTargetPixelFile.interact_sky
       ~KeplerTargetPixelFile.plot
       ~KeplerTargetPixelFile.prf_lightcurve
       ~KeplerTargetPixelFile.show_properties
+      ~KeplerTargetPixelFile.to_corrector
       ~KeplerTargetPixelFile.to_fits
       ~KeplerTargetPixelFile.to_lightcurve
 
@@ -94,13 +94,11 @@ KeplerTargetPixelFile
 
    .. rubric:: Methods Documentation
 
-   .. automethod:: centroids
    .. automethod:: create_threshold_mask
+   .. automethod:: cutout
    .. automethod:: estimate_centroids
    .. automethod:: extract_aperture_photometry
    .. automethod:: extract_prf_photometry
-   .. automethod:: from_archive
-   .. automethod:: from_fits
    .. automethod:: from_fits_images
    .. automethod:: get_bkg_lightcurve
    .. automethod:: get_coordinates
@@ -108,8 +106,10 @@ KeplerTargetPixelFile
    .. automethod:: get_model
    .. automethod:: get_prf_model
    .. automethod:: interact
+   .. automethod:: interact_sky
    .. automethod:: plot
    .. automethod:: prf_lightcurve
    .. automethod:: show_properties
+   .. automethod:: to_corrector
    .. automethod:: to_fits
    .. automethod:: to_lightcurve

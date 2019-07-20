@@ -37,7 +37,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.0.1</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.1.0</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -84,6 +84,12 @@
 <em class="property">class </em><code class="descclassname">lightkurve.prf.</code><code class="descname">StarPrior</code><span class="sig-paren">(</span><em>col, row, flux=&lt;UniformPrior(lb=[0], ub=[1.e+10])&gt;, targetid=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.StarPrior" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">lightkurve.prf.tpfmodel.PriorContainer</span></code></p>
 <p>Container class to capture a user’s beliefs about a star’s position and flux.</p>
+<p class="rubric">Examples</p>
+<dl class="simple">
+<dt>StarPrior(col=GaussianPrior(mean=col, var=err_col**2),</dt><dd><p>row=GaussianPrior(mean=row, var=err_row**2),
+flux=GaussianPrior(mean=flux, var=err_flux**2))</p>
+</dd>
+</dl>
 <p class="rubric">Methods Summary</p>
 <table class="longtable docutils align-center">
 <colgroup>
