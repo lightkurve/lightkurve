@@ -16,7 +16,8 @@ __all__ = ['LightCurveCollection', 'LightCurveFileCollection',
 
 
 class Collection(object):
-    """Base class for `LightCurveCollection` and `TargetPixelFileCollection`.
+    """Base class for `LightCurveCollection`, `LightCurveFileCollection`,
+    and `TargetPixelFileCollection`.
 
     Attributes
     ----------
