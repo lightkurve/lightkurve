@@ -32,6 +32,13 @@ def test_collection_append():
     lcc.append(lc2)
     assert(len(lcc) == 2)
 
+def test_collection_stitch():
+    """Does Collection.append() work?"""
+    lc = LightCurve(time=np.arange(1, 5), flux=np.ones(4))
+    lc2 = LightCurve(time=np.arange(5, 16), flux=np.ones(11))
+    lcc = LightCurveCollection([lc, lc2])
+    lc = lcc.stitch()
+    assert(len(lc.flux) == 15)
 
 def test_collection_getitem():
     """Tests Collection.__getitem__"""

@@ -126,7 +126,11 @@ class LightCurveCollection(Collection):
             corrector_func = lambda x: x
 
         ## STOP IF THERE ARE MULTIPLE MISSIONS
-        targets = np.unique([lc.label for lc in self])
+        try:
+            targets = np.unique([lc.label for lc in self])
+        except TypeError:
+            targets = [None]
+
         if len(targets) > 1:
             raise ValueError('This collection contains more than one target, '
                             'please reduce to a single target before calling stitch.')
