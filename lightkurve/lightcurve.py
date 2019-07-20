@@ -1234,6 +1234,20 @@ class LightCurve(object):
             from . import LombScarglePeriodogram
             return LombScarglePeriodogram.from_lightcurve(lc=self, **kwargs)
 
+    def to_seismology(self, **kwargs):
+        """Returns a `~lightkurve.seismology.Seismology` object for estimating
+        quick-look asteroseismic quantities.
+
+        All **kwargs will be passed to the `to_periodogram()` method.
+
+        Returns
+        -------
+        seismology : `~lightkurve.seismology.Seismology` object
+            Object which can be used to estimate quick-look asteroseismic quantities.
+        """
+        from .seismology import Seismology
+        return Seismology.from_lightcurve(self, **kwargs)
+
     def _boolean_mask_to_bitmask(self, aperture_mask):
         """Takes in an aperture_mask and returns a Kepler-style bitmask
 
