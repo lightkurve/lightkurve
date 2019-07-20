@@ -200,7 +200,11 @@ class LightCurveFileCollection(Collection):
     def SAP_FLUX(self):
         return LightCurveCollection([lcf.SAP_FLUX for lcf in self])
 
-    def stitch(self, offset=0.1, **kwargs):
+    def stitch(self):
+        """ Stitch all PDCSAP_FLUX extensions in the collection into a single lk.LightCurve
+
+        Note: if SAP flux is required, use lcfs.SAP_FLUX.stitch() instead.
+        """
         try:
             warnings.warn('Stitching a `LightCurveFileCollection` which contains both SAP and '
                          'PDCSAP_FLUX. Plotting PDCSAP_FLUX. You can remove this warning by '

@@ -304,8 +304,7 @@ class LightCurve(object):
                 new_lc.centroid_col = np.append(new_lc.centroid_col, others[i].centroid_col)
             if hasattr(new_lc, 'centroid_row'):
                 new_lc.centroid_row = np.append(new_lc.centroid_row, others[i].centroid_row)
-        if not inplace:
-            return new_lc
+        return new_lc
 
     def copy(self):
         """Returns a copy of the LightCurve object.
