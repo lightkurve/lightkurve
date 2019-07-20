@@ -1,11 +1,17 @@
 1.1.0 (unreleased)
 ==================
 
-- Added the `lightkurve.seismology` sub-package, which enables quick-look
+- Added the `lightkurve.seismology` sub-package which enables quick-look
   asteroseismic quantities to be extracted from `Periodogram` objects. [#496]
 
-- Added the `tpf.cutout()` method which enables smaller Target Pixel Files to
-  be extracted from larger ones. [#537]
+- Added the `stitch()` method to `LightCurveCollection` and `LightCurveFileCollection`
+  to enable multi-sector/multi-quarter data to be combined more easily. [#548]
+
+- Improved the `LightCurve.fill_gaps()` method to fill gaps in a light curve
+  with Gaussian noise proportional to the light curve's CDPP. [#548]
+
+- Added the `TargetPixelFile.cutout()` method which enables smaller Target Pixel
+  Files to be extracted from larger ones. [#537]
 
 - Added the `pld_aperture_mask` argument to `PLDCorrector.correct()` to enable
   users to select the pixels used for creating the PLD basis vectors. [#523]
