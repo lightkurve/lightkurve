@@ -1,32 +1,28 @@
 """Defines collections of data products."""
-from abc import ABCMeta
 import logging
+import warnings
+
 import matplotlib.pyplot as plt
 import numpy as np
 
 from . import MPLSTYLE
 from .utils import LightkurveWarning
-
 from .lightcurvefile import LightCurveFile
-
-import warnings
-
 
 log = logging.getLogger(__name__)
 
-__all__ = ['LightCurveCollection', 'TargetPixelFileCollection']
+__all__ = ['LightCurveCollection', 'LightCurveFileCollection',
+           'TargetPixelFileCollection']
 
 
 class Collection(object):
-    """Abstract Base Class for LightCurveCollection and TargetPixelFileCollection.
+    """Base class for `LightCurveCollection` and `TargetPixelFileCollection`.
 
     Attributes
     ----------
     data: array-like
         List of data objects.
     """
-#    __metaclass__ = ABCMeta  # Needs to be set for Python 2.x to work properly
-
     def __init__(self, data):
         self.data = data
 
@@ -52,17 +48,17 @@ class Collection(object):
     def __repr__(self):
         result = "{} of {} objects:\n".format(self.__class__.__name__, len(self.data))
         if (isinstance(self[0], LightCurveFile)):
-            targetids = np.asarray([lcf.SAP_FLUX.label for lcf in self])
+            labels = np.asarray([lcf.SAP_FLUX.label for lcf in self])
         else:
-            targetids = np.asarray([lcf.label for lcf in self])
+            labels = np.asarray([lcf.label for lcf in self])
 
         try:
-            unique_targetids = np.sort(np.unique(targetids))
+            unique_labels = np.sort(np.unique(labels))
         except TypeError:
-            unique_targetids = [None]
+            unique_labels = [None]
 
-        for idx, targetid in enumerate(unique_targetids):
-            jdxs = np.where(targetids == targetid)[0]
+        for idx, targetid in enumerate(unique_labels):
+            jdxs = np.where(labels == targetid)[0]
             if not hasattr(jdxs, '__iter__'):
                 jdxs = [jdxs]
 
@@ -86,9 +82,6 @@ class Collection(object):
             else:
                 result += ','.join(['{}'.format(i) for i in np.arange(len(jdxs))])
             result += '\n'
-#        for obj in self.data:
-#            result += obj.__repr__() + " "
-#            result += "\n"
         return result
 
 
@@ -113,19 +106,19 @@ class LightCurveCollection(Collection):
 
         Parameters
         ----------
-        corrector_func : function taking in a lk.LightCurve and returning a lk.Lightcurve
-            Corrector function that applies some correction to each light curve before
-            stitching. Default is to normalize each light curve.
+        corrector_func : function
+            Function that accepts and returns a `~lightkurve.lightcurve.LightCurve`.
+            This function is applied to each light curve in the collection
+            prior to stitching. The default is to normalize each light curve.
 
         Returns
         -------
-        lc : lk.LightCurve
-            Stitched Light Curve
+        lc : `~lightkurve.lightcurve.LightCurve`
+            Stitched light curve.
         """
         if corrector_func is None:
             corrector_func = lambda x: x
 
-        ## STOP IF THERE ARE MULTIPLE MISSIONS
         try:
             targets = np.unique([lc.label for lc in self])
         except TypeError:
@@ -133,27 +126,27 @@ class LightCurveCollection(Collection):
 
         if len(targets) > 1:
             raise ValueError('This collection contains more than one target, '
-                            'please reduce to a single target before calling stitch.')
+                             'please reduce to a single target before calling `stitch()`.')
         lcs = [corrector_func(lc) for lc in self]
         lc = lcs[0]
         [lc.append(lc1, inplace=True) for lc1 in lcs[1:]]
         return lc
 
     def plot(self, ax=None, offset=0.1, **kwargs):
-        """Plots all lightcurves in the collection on a single plot.
+        """Plots all light curves in the collection on a single plot.
 
         Parameters
         ----------
-        ax : matplotlib.axes._subplots.AxesSubplot
+        ax : `~matplotlib.axes._subplots.AxesSubplot`
             A matplotlib axes object to plot into. If no axes is provided,
             a new one will be created.
 
         **kwargs : dict
-            Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
+            Dictionary of arguments to be passed to matplotlib's `~matplotlib.pyplot.plot`.
 
         Returns
         -------
-        ax : matplotlib.axes._subplots.AxesSubplot
+        ax : `~matplotlib.axes._subplots.AxesSubplot`
             The matplotlib axes object.
         """
         with plt.style.context(MPLSTYLE):
@@ -163,13 +156,13 @@ class LightCurveCollection(Collection):
                 if kwarg in kwargs:
                     kwargs.pop(kwarg)
 
-            targetids = np.asarray([lcf.label for lcf in self])
+            labels = np.asarray([lcf.label for lcf in self])
             try:
-                unique_targetids = np.sort(np.unique(targetids))
+                unique_labels = np.sort(np.unique(labels))
             except TypeError:
-                unique_targetids = [None]
-            for idx, targetid in enumerate(unique_targetids):
-                jdxs = np.where(targetids == targetid)[0]
+                unique_labels = [None]
+            for idx, targetid in enumerate(unique_labels):
+                jdxs = np.where(labels == targetid)[0]
                 if not hasattr(jdxs, '__iter__'):
                     jdxs = [jdxs]
                 for jdx in jdxs:
@@ -201,38 +194,56 @@ class LightCurveFileCollection(Collection):
         return LightCurveCollection([lcf.SAP_FLUX for lcf in self])
 
     def stitch(self):
-        """ Stitch all PDCSAP_FLUX extensions in the collection into a single lk.LightCurve
+        """Combine all `PDCSAP_FLUX` extensions in the collection into a single
+        `lightkurve.lightcurve.LightCurve` object.
 
-        Note: if SAP flux is required, use lcfs.SAP_FLUX.stitch() instead.
+        This is a shorthand for `LightCurveFileCollection.PDCSAP_FLUX.stitch()`.
+        If you want to combine SAP_FLUX light curves instead, use
+        `LightCurveFileCollection.SAP_FLUX.stitch()`.
         """
         try:
             warnings.warn('Stitching a `LightCurveFileCollection` which contains both SAP and '
-                         'PDCSAP_FLUX. Plotting PDCSAP_FLUX. You can remove this warning by '
-                         'using `LightCurveFileCollection.PDCSAP_FLUX.stitch()`.',
+                          'PDCSAP_FLUX. Plotting PDCSAP_FLUX. You can remove this warning by '
+                          'using `LightCurveFileCollection.PDCSAP_FLUX.stitch()`.',
                          LightkurveWarning)
             return self.PDCSAP_FLUX.stitch()
         except ValueError:
             return self.SAP_FLUX.stitch()
 
-    def plot(self, offset=0.1, **kwargs):
+    def plot(self, ax=None, **kwargs):
+        """Plot all PDCSAP_FLUX light curves in the collection on a single axes.
+
+        This a shorthand for `LightCurveFileCollection.PDCSAP_FLUX.plot()`.
+
+        Parameters
+        ----------
+        ax : `~matplotlib.axes._subplots.AxesSubplot`
+            A matplotlib axes object to plot into. If no axes is provided,
+            a new one will be created.
+
+        Returns
+        -------
+        ax : `~matplotlib.axes._subplots.AxesSubplot`
+            The matplotlib axes object.
+        """
         try:
             warnings.warn('Plotting a `LightCurveFileCollection` which contains both SAP and '
-                         'PDCSAP_FLUX. Plotting PDCSAP_FLUX. You can remove this warning by '
-                         'using `LightCurveFileCollection.PDCSAP_FLUX.plot()`.',
+                          'PDCSAP_FLUX. Plotting PDCSAP_FLUX. You can remove this warning by '
+                          'using `LightCurveFileCollection.PDCSAP_FLUX.plot()`.',
                          LightkurveWarning)
-            ax = self.PDCSAP_FLUX.plot()
-            return ax
+            ax = self.PDCSAP_FLUX.plot(ax=ax)
         except ValueError:
-            ax = self.SAP_FLUX.plot()
-            return ax
+            ax = self.SAP_FLUX.plot(ax=ax)
+        return ax
+
 
 class TargetPixelFileCollection(Collection):
-    """Class to hold a collection of TargetPixelFile objects.
+    """Class to hold a collection of `~lightkurve.targetpixelfile.TargetPixelFile` objects.
 
     Parameters
     ----------
-    tpfs : array-like
-        List of TargetPixelFile objects.
+    tpfs : list or iterable
+        List of `~lightkurve.targetpixelfile.TargetPixelFile` objects.
     """
     def __init__(self, tpfs):
         super(TargetPixelFileCollection, self).__init__(tpfs)
@@ -243,20 +254,18 @@ class TargetPixelFileCollection(Collection):
 
         Parameters
         ----------
-        ax : matplotlib.axes._subplots.AxesSubplot
+        ax : `~matplotlib.axes._subplots.AxesSubplot`
             A matplotlib axes object to plot into. If no axes is provided,
             a new one will be created.
 
         Returns
         -------
-        ax : matplotlib.axes._subplots.AxesSubplot
+        ax : `~matplotlib.axes._subplots.AxesSubplot`
             The matplotlib axes object.
         """
-
         if ax is None:
             _, ax = plt.subplots(len(self.data), 1,
                                  figsize=(7, (7*len(self.data))))
-
         if len(self.data) == 1:
             self.data[0].plot(ax=ax)
         else:

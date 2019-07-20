@@ -2,6 +2,7 @@ import pytest
 from astropy.utils.data import get_pkg_data_filename
 import matplotlib.pyplot as plt
 import numpy as np
+from numpy.testing import assert_array_equal
 
 from ..lightcurve import LightCurve
 from ..targetpixelfile import KeplerTargetPixelFile
@@ -33,12 +34,14 @@ def test_collection_append():
     assert(len(lcc) == 2)
 
 def test_collection_stitch():
-    """Does Collection.append() work?"""
+    """Does Collection.stitch() work?"""
     lc = LightCurve(time=np.arange(1, 5), flux=np.ones(4))
     lc2 = LightCurve(time=np.arange(5, 16), flux=np.ones(11))
     lcc = LightCurveCollection([lc, lc2])
-    lc = lcc.stitch()
-    assert(len(lc.flux) == 15)
+    lc_stitched = lcc.stitch()
+    assert(len(lc_stitched.flux) == 15)
+    lc_stitched2 = lcc.stitch(corrector_func=lambda x: x*2)
+    assert_array_equal(lc_stitched.flux*2, lc_stitched2.flux)
 
 def test_collection_getitem():
     """Tests Collection.__getitem__"""
