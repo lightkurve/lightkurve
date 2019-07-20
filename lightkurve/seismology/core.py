@@ -75,7 +75,7 @@ class Seismology(object):
         log.info("Building a Seismology object directly from a light curve "
                  "uses default periodogram parameters. For further tuneability, "
                  "create a periodogram object first, using `to_periodogram`.")
-        return Seismology(periodogram=lc.to_periodogram(**kwargs).flatten())
+        return Seismology(periodogram=lc.normalize().remove_nans().fill_gaps().to_periodogram(**kwargs).flatten())
 
     def _validate_method(self, method, supported_methods):
         """Raises ValueError if a method is not supported."""
