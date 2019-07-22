@@ -50,7 +50,7 @@ author = 'Kepler/K2 Guest Observer Office'
 # built documents.
 #
 # The short X.Y version.
-version = lightkurve.__version__.split('.dev')[0]
+version = ".".join(lightkurve.__version__.split('.')[:2])
 # The full version, including alpha/beta/rc tags.
 release = lightkurve.__version__
 
