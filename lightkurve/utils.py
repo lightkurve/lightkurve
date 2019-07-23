@@ -85,8 +85,17 @@ class QualityFlags(object):
                                  "".format(bitmask, valid_options))
         # The bitmask is applied using the bitwise AND operator
         quality_mask = (quality_array & bitmask) == 0
-        log.info("{} cadences will be ignored (bitmask={})"
-                 "".format((~quality_mask).sum(), bitmask))
+        # Log the quality masking as info or warning
+        n_cadences = len(quality_array)
+        n_cadences_masked = (~quality_mask).sum()
+        percent_masked = 100. * n_cadences_masked / n_cadences
+        logmsg = "{:.0f}% ({}/{}) of the cadences will be ignored due to the " \
+                 "quality mask (quality_bitmask={})." \
+                 "".format(percent_masked, n_cadences_masked, n_cadences, bitmask)
+        if percent_masked > 20:
+            log.warning("Warning: " + logmsg)
+        else:
+            log.info(logmsg)
         return quality_mask
 
 
@@ -484,7 +493,11 @@ def detect_filetype(header):
     try:
         # use `telescop` keyword to determine mission
         # and `creator` to determine tpf or lc
-        telescop = header['telescop'].lower()
+        if 'TELESCOP' in header.keys():
+            telescop = header['telescop'].lower()
+        else:
+            # Some old custom TESS data did not define the `TELESCOP` card
+            telescop = header['mission'].lower()
         creator = header['creator'].lower()
         origin = header['origin'].lower()
         if telescop == 'kepler':
@@ -492,7 +505,8 @@ def detect_filetype(header):
             if 'targetpixel' in creator:
                 return 'KeplerTargetPixelFile'
             # Kepler LCFs will contain "FluxExporter2PipelineModule"
-            elif 'fluxexporter' in creator or 'lightcurve' in creator:
+            elif ('fluxexporter' in creator or 'lightcurve' in creator
+                or 'lightcurve' in creator):
                 return 'KeplerLightCurveFile'
         elif telescop == 'tess':
             # TESS TPFs will contain "TargetPixelExporterPipelineModule"

@@ -4,6 +4,7 @@ import os
 import sys
 from astropy.utils.data import get_pkg_data_filename
 from astropy.io.fits.verify import VerifyWarning
+from astropy.coordinates import SkyCoord
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy.testing import assert_array_equal
@@ -346,15 +347,16 @@ def test_tpf_from_images():
 
         # Can we read in a list of file names or a list of HDUlists?
         hdus = []
+        tmpfile_names = []
         for idx, im in enumerate(images):
+            tmpfile = tempfile.NamedTemporaryFile(delete=False)
+            tmpfile_names.append(tmpfile.name)
             hdu = fits.HDUList([fits.PrimaryHDU(), im])
-            hdu.writeto(get_pkg_data_filename('data/test_factory{}.fits'.format(idx)), overwrite=True)
+            hdu.writeto(tmpfile.name)
             hdus.append(hdu)
 
-        fnames = [get_pkg_data_filename('data/test_factory{}.fits'.format(i)) for i in range(5)]
-
         # Should be able to run with a list of file names
-        tpf_fnames = KeplerTargetPixelFile.from_fits_images(fnames,
+        tpf_tmpfiles = KeplerTargetPixelFile.from_fits_images(tmpfile_names,
                                                             size=(3, 3),
                                                             position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
 
@@ -363,6 +365,64 @@ def test_tpf_from_images():
                                                           size=(3, 3),
                                                           position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
 
+        # Clean up the temporary files we created
+        for filename in tmpfile_names:
+            try:
+                os.remove(filename)
+            except PermissionError:
+                pass  # This appears to happen on Windows
+
+
+def test_tpf_wcs_from_images():
+    """Test to see if tpf.from_fits_images() output a tpf with WCS in the header"""
+    from astropy.io import fits
+    from astropy import wcs
+    import astropy.units as u
+    from astropy.coordinates import SkyCoord
+    from astropy.io.fits.card import UNDEFINED
+
+    # Can we read in a load of images?
+    header = fits.Header()
+    images = []
+    for i in range(5):
+        header['TSTART'] = i
+        header['TSTOP'] = i + 1
+        images.append(fits.ImageHDU(data=np.ones((5, 5)), header=header))
+
+    # Not without a wcs...
+    with pytest.raises(Exception):
+        KeplerTargetPixelFile.from_fits_images(images, size=(3, 3),
+                                               position=SkyCoord(-234.75, 8.3393, unit='deg'))
+
+    # Make a fake WCS based on astropy.docs...
+    w = wcs.WCS(naxis=2)
+    w.wcs.crpix = [0., 0.]
+    w.wcs.cdelt = np.array([0.001111, 0.001111])
+    w.wcs.crval = [23.2334, 45.2333]
+    w.wcs.ctype = ["RA---TAN", "DEC--TAN"]
+    header = w.to_header()
+    header['CRVAL1P'] = 10
+    header['CRVAL2P'] = 20
+    ra, dec = 23.2336, 45.235
+
+    # Add that header to our images...
+    images = []
+    for i in range(5):
+        header['TSTART'] = i
+        header['TSTOP'] = i + 1
+        images.append(fits.ImageHDU(data=np.ones((5, 5)), header=header))
+
+    # Now this should work.
+    tpf = KeplerTargetPixelFile.from_fits_images(images, size=(3, 3),
+                                                 position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
+    assert tpf.hdu[1].header['1CRPX5'] != UNDEFINED
+    assert tpf.hdu[1].header['1CTYP5'] == 'RA---TAN'
+    assert tpf.hdu[1].header['2CTYP5'] == 'DEC--TAN'
+    assert tpf.hdu[1].header['1CRPX5'] != UNDEFINED
+    assert tpf.hdu[1].header['2CRPX5'] != UNDEFINED
+    assert tpf.hdu[1].header['1CUNI5'] == 'deg'
+    assert tpf.hdu[1].header['2CUNI5'] == 'deg'
+    assert tpf.wcs.to_header()['CDELT1'] == w.wcs.cdelt[0]
 
 def test_tpf_wcs_from_images():
     """Test to see if tpf.from_fits_images() output a tpf with WCS in the header"""
@@ -512,10 +572,19 @@ def test_get_keyword():
     assert tpf.get_keyword("DOESNOTEXIST", default=5) == 5
 
 
-@pytest.mark.skipif(('celerite' not in sys.modules) or ('sklearn' not in sys.modules),
-                    reason="PLD requires celerite and scikit-learn")
-def test_to_corrector():
-    """Does the tpf.pld() convenience method work?"""
-    tpf = KeplerTargetPixelFile(TABBY_TPF)
-    lc = tpf.to_corrector("pld").correct()
-    assert len(lc.flux) == len(tpf.time)
+def test_cutout():
+    """Test tpf.cutout() function."""
+    for tpf in [KeplerTargetPixelFile(filename_tpf_one_center),
+                TessTargetPixelFile(filename_tess, quality_bitmask=None)]:
+        ntpf = tpf.cutout(size=2)
+        assert ntpf.flux[0].shape == (2, 2)
+        assert ntpf.flux_err[0].shape == (2, 2)
+        assert ntpf.flux_bkg[0].shape == (2, 2)
+        ntpf = tpf.cutout((0, 0), size=3)
+        ntpf = tpf.cutout(size=(1, 2))
+        assert ntpf.flux.shape[1] == 2
+        assert ntpf.flux.shape[2] == 1
+        ntpf = tpf.cutout(SkyCoord(tpf.ra, tpf.dec, unit='deg'), size=2)
+        ntpf = tpf.cutout(size=2)
+        assert np.product(ntpf.flux.shape[1:]) == 4
+        assert ntpf.targetid == '{}_CUTOUT'.format(tpf.targetid)

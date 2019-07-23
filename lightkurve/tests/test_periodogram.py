@@ -1,18 +1,22 @@
 import pytest
 from astropy import units as u
 import numpy as np
-from numpy.testing import assert_almost_equal
+from numpy.testing import assert_almost_equal, assert_array_equal
+from scipy.signal import unit_impulse as deltafn
+
 
 from ..lightcurve import LightCurve
+from ..search import search_lightcurvefile
 from ..periodogram import Periodogram
+from ..periodogram import SNRPeriodogram
 import sys
 
+
+bad_optional_imports = False
 try:
     from astropy.stats.bls import BoxLeastSquares
-except:
-    print('no bls, tests will be skipped')
-
-bad_optional_imports = np.any([('astropy.stats.bls' not in sys.modules)])
+except ImportError:
+    bad_optional_imports = True
 
 
 def test_periodogram_basics():
@@ -26,22 +30,33 @@ def test_periodogram_basics():
     pg.to_table()
     str(pg)
 
+def test_periodogram_normalization():
+    """Tests the normalization options"""
+    lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000),
+                    flux_err=np.zeros(1000)+0.1)
+    # Test amplitude normalization and correct units
+    pg = lc.to_periodogram(normalization='amplitude')
+    assert pg.power.unit == u.cds.ppm
+
+    # Test PSD normalization and correct units
+    pg = lc.to_periodogram(freq_unit=u.microhertz, normalization='psd')
+    assert pg.power.unit == u.cds.ppm**2 / u.microhertz
 
 def test_periodogram_units():
     """Tests whether periodogram has correct units"""
     # Fake, noisy data
     lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000),
                     flux_err=np.zeros(1000)+0.1)
-    p = lc.to_periodogram()
+    p = lc.to_periodogram(normalization='amplitude')
     # Has units
     assert hasattr(p.frequency, 'unit')
 
     # Has the correct units
     assert p.frequency.unit == 1./u.day
-    assert p.power.unit == u.cds.ppm**2*u.day
+    assert p.power.unit == u.cds.ppm
     assert p.period.unit == u.day
     assert p.frequency_at_max_power.unit == 1./u.day
-    assert p.max_power.unit == u.cds.ppm**2*u.day
+    assert p.max_power.unit == u.cds.ppm
 
 
 def test_periodogram_can_find_periods():
@@ -51,7 +66,7 @@ def test_periodogram_can_find_periods():
                     flux_err=np.zeros(1000)+0.1)
     # Add a 100 day period signal
     lc.flux *= np.sin((lc.time/float(lc.time.max())) * 20 * np.pi)
-    p = lc.to_periodogram()
+    p = lc.to_periodogram(normalization='amplitude')
     assert np.isclose(p.period_at_max_power.value, 100, rtol=1e-3)
 
 
@@ -110,7 +125,7 @@ def test_smooth():
     lc = LightCurve(time=np.arange(1000),
                     flux=np.random.normal(1, 0.1, 1000),
                     flux_err=np.zeros(1000)+0.1)
-    p = lc.to_periodogram()
+    p = lc.to_periodogram(normalization='psd', freq_unit=u.microhertz)
     # Test boxkernel and logmedian methods
     assert all(p.smooth(method='boxkernel').frequency == p.frequency)
     assert all(p.smooth(method='logmedian').frequency == p.frequency)
@@ -143,14 +158,13 @@ def test_smooth():
 
 
 
-
 def test_flatten():
     npts = 10000
     np.random.seed(12069424)
     lc = LightCurve(time=np.arange(npts),
                     flux=np.random.normal(1, 0.1, npts),
                     flux_err=np.zeros(npts)+0.1)
-    p = lc.to_periodogram()
+    p = lc.to_periodogram(normalization='psd', freq_unit=1/u.day)
 
     # Check method returns equal frequency
     assert all(p.flatten(method='logmedian').frequency == p.frequency)
@@ -167,7 +181,6 @@ def test_flatten():
     str(s)
     s.plot()
 
-
 def test_index():
     """Test if you can mask out periodogram
     """
@@ -176,6 +189,7 @@ def test_index():
     p = lc.to_periodogram()
     mask = (p.frequency > 0.1*(1/u.day)) & (p.frequency < 0.2*(1/u.day))
     assert len(p[mask].frequency) == mask.sum()
+
 
 @pytest.mark.skipif(bad_optional_imports,
                     reason="requires bokeh and astropy.stats.bls")
@@ -204,24 +218,24 @@ def test_bls(caplog):
     p.compute_stats()
     for record in caplog.records:
         assert record.levelname == 'WARNING'
-    assert len(caplog.records) == 4
+    assert len(caplog.records) == 3
     assert 'No period specified.' in caplog.text
 
     # No more errors
     stats = p.compute_stats(1, 0.1, 0)
-    assert len(caplog.records) == 4
+    assert len(caplog.records) == 3
     assert isinstance(stats, dict)
 
     # Some errors should occur
     p.get_transit_model()
     for record in caplog.records:
         assert record.levelname == 'WARNING'
-    assert len(caplog.records) == 7
+    assert len(caplog.records) == 6
     assert 'No period specified.' in caplog.text
 
     model = p.get_transit_model(1, 0.1, 0)
     # No more errors
-    assert len(caplog.records) == 7
+    assert len(caplog.records) == 6
     # Model is LC
     assert isinstance(model, LightCurve)
     # Model is otherwise identical to LC
@@ -234,7 +248,7 @@ def test_bls(caplog):
     assert mask.sum() > (~mask).sum()
 
     assert isinstance(p.period_at_max_power, u.Quantity)
-    assert isinstance(p.duration_at_max_power, float)
+    assert isinstance(p.duration_at_max_power, u.Quantity)
     assert isinstance(p.transit_time_at_max_power, float)
     assert isinstance(p.depth_at_max_power, float)
 
@@ -300,44 +314,56 @@ def test_error_messages():
         lc_with_nans = lc.copy()
         lc_with_nans.flux[0] = np.nan
         lc_with_nans.to_periodogram()
-        assert('Lightcurve contains NaN values.' in err.value.args[0])
+    assert('Lightcurve contains NaN values.' in err.value.args[0])
 
     # No unitless periodograms
     with pytest.raises(ValueError) as err:
         Periodogram([0], [1])
-        assert err.value.args[0] == 'frequency must be an `astropy.units.Quantity` object.'
+    assert err.value.args[0] == 'frequency must be an `astropy.units.Quantity` object.'
 
     # No unitless periodograms
     with pytest.raises(ValueError) as err:
         Periodogram([0]*u.Hz, [1])
-        assert err.value.args[0] == 'power must be an `astropy.units.Quantity` object.'
+    assert err.value.args[0] == 'power must be an `astropy.units.Quantity` object.'
 
     # No single value periodograms
     with pytest.raises(ValueError) as err:
         Periodogram([0]*u.Hz, [1]*u.K)
-        assert err.value.args[0] == 'frequency and power must have a length greater than 1.'
+    assert err.value.args[0] == 'frequency and power must have a length greater than 1.'
 
     # No uneven arrays
     with pytest.raises(ValueError) as err:
         Periodogram([0, 1, 2, 3]*u.Hz, [1, 1]*u.K)
-        assert err.value.args[0] == 'frequency and power must have the same length.'
+    assert err.value.args[0] == 'frequency and power must have the same length.'
 
     # Bad frequency units
     with pytest.raises(ValueError) as err:
         Periodogram([0, 1, 2]*u.K, [1, 1, 1]*u.K)
-        assert err.value.args[0] == 'Frequency must be in units of 1/time.'
+    assert err.value.args[0] == 'Frequency must be in units of 1/time.'
 
     # Bad binning
     with pytest.raises(ValueError) as err:
         Periodogram([0, 1, 2]*u.Hz, [1, 1, 1]*u.K).bin(binsize=-2)
-        assert err.value.args[0] == 'binsize must be larger than or equal to 1'
+    assert err.value.args[0] == 'binsize must be larger than or equal to 1'
 
     # Bad binning method
     with pytest.raises(ValueError) as err:
         Periodogram([0, 1, 2]*u.Hz, [1, 1, 1]*u.K).bin(method='not-implemented')
-        assert("is not a valid method, must be 'mean' or 'median'" in err.value.args[0])
+    assert("is not a valid method, must be 'mean' or 'median'" in err.value.args[0])
 
     # Bad smooth method
     with pytest.raises(ValueError) as err:
         Periodogram([0, 1, 2]*u.Hz, [1, 1, 1]*u.K).smooth(method="not-implemented")
-        assert("parameter must be one 'boxkernel' or 'logmedian'" in err.value.args[0])
+    assert("parameter must be one of 'boxkernel' or 'logmedian'" in err.value.args[0])
+
+
+@pytest.mark.skipif(bad_optional_imports, reason="requires astropy.stats.bls")
+def test_bls_period():
+    """Regression test for #514."""
+    lc = LightCurve(time=[1, 2, 3], flux=[4, 5, 6])
+    period = [1, 2, 3, 4, 5]
+    pg = lc.to_periodogram(method="bls", period=period)
+    assert_array_equal(pg.period.value, period)
+    with pytest.raises(ValueError) as err:  # NaNs should raise a nice error message
+        lc.to_periodogram(method="bls", period=[1, 2, 3, np.nan, 4])
+    assert("period" in err.value.args[0])

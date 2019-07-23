@@ -3,17 +3,19 @@ Lightkurve
 
 **A friendly package for Kepler & TESS time series analysis in Python.**
 
-|pypi-badge| |ci-badge| |appveyor-badge| |cov-badge| |doi-badge| |astropy-badge|
+**Documentation: https://docs.lightkurve.org**
+
+|pypi-badge| |conda-badge| |azure-badge| |cov-badge| |doi-badge| |astropy-badge|
 
 .. |pypi-badge| image:: https://img.shields.io/pypi/v/lightkurve.svg
                 :target: https://pypi.python.org/pypi/lightkurve
-.. |ci-badge| image:: https://travis-ci.org/KeplerGO/lightkurve.svg?branch=master
-              :target: https://travis-ci.org/KeplerGO/lightkurve
-.. |appveyor-badge| image:: https://ci.appveyor.com/api/projects/status/6jvv5d7a142gwm8a/branch/master?svg=true
-                    :target: https://ci.appveyor.com/project/mirca/lightkurve
+.. |conda-badge| image:: https://img.shields.io/conda/vn/conda-forge/lightkurve.svg
+                 :target: https://anaconda.org/conda-forge/lightkurve
+.. |azure-badge| image:: https://dev.azure.com/KeplerGO/Lightkurve/_apis/build/status/Lightkurve-PyTest?branchName=master
+                 :target: https://dev.azure.com/KeplerGO/Lightkurve/_build/latest?definitionId=1&branchName=master
 .. |cov-badge| image:: https://codecov.io/gh/KeplerGO/lightkurve/branch/master/graph/badge.svg
               :target: https://codecov.io/gh/KeplerGO/lightkurve
-.. |astropy-badge| image:: https://img.shields.io/badge/powered_by-AstroPy-EB5368.svg?style=flat
+.. |astropy-badge| image:: https://img.shields.io/badge/powered%20by-AstroPy-orange.svg?style=flat
                    :target: http://www.astropy.org
 .. |doi-badge| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.1181928.svg
               :target: https://doi.org/10.5281/zenodo.1181928
@@ -35,31 +37,27 @@ which enable both hand-tailored data analyses and advanced automated pipelines.
 Documentation
 -------------
 
-Read the documentation at `http://docs.lightkurve.org <http://docs.lightkurve.org>`_.
+Read the documentation at `https://docs.lightkurve.org <https://docs.lightkurve.org>`_.
 
 
 Quickstart
 ----------
-If you have a working version of Python 2 or 3 on your system, you can simply install this package using `pip`:
-::
 
-  pip install lightkurve
-
-Once installed, visit our quickstart guide at `http://docs.lightkurve.org/quickstart.html <http://docs.lightkurve.org/quickstart.html>`_.
+Please visit our quickstart guide at `https://docs.lightkurve.org/quickstart.html <https://docs.lightkurve.org/quickstart.html>`_.
 
 
 Contributing
 ------------
 
-We welcome community contributions from everyone!
-Please read the contribution guidelines at `http://docs.lightkurve.org/about/contributing.html <http://docs.lightkurve.org/about/contributing.html>`_.
+We welcome community contributions!
+Please read the  guidelines at `https://docs.lightkurve.org/about/contributing.html <https://docs.lightkurve.org/about/contributing.html>`_.
 
 
 Citing
 ------
 
 If you find Lightkurve useful in your research, please cite it and give us a GitHub star!
-Please read the citation instructions at `http://docs.lightkurve.org/about/citing.html <http://docs.lightkurve.org/about/citing.html>`_.
+Please read the citation instructions at `https://docs.lightkurve.org/about/citing.html <https://docs.lightkurve.org/about/citing.html>`_.
 
 
 Contact

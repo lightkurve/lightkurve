@@ -2,15 +2,16 @@
 from __future__ import division
 import os
 import logging
-import numpy as np
 import warnings
 
+import numpy as np
 from astropy.table import join, Table, Row
 from astropy.coordinates import SkyCoord
 from astropy.io import ascii, fits
 from astropy import units as u
 from astropy.utils.exceptions import AstropyWarning
 
+from .targetpixelfile import TargetPixelFile
 from .collections import TargetPixelFileCollection, LightCurveFileCollection
 from .utils import suppress_stdout, LightkurveWarning, detect_filetype
 from . import PACKAGEDIR
@@ -94,6 +95,48 @@ class SearchResult(object):
         """Returns an array of dec values for targets in search"""
         return self.table['s_dec'].data.data
 
+    def _download_one(self, table, quality_bitmask, download_dir, cutout_size):
+        """Private method used by `download()` and `download_all()` to download
+        exactly one file from the MAST archive.
+
+        Always returns a `TargetPixelFile` or `LightCurveFile` object.
+        """
+        # Make sure astroquery uses the same level of verbosity
+        logging.getLogger('astropy').setLevel(log.getEffectiveLevel())
+
+        if download_dir is None:
+            download_dir = self._default_download_dir()
+
+        # if the SearchResult row is a TESScut entry, then download cutout
+        if 'FFI Cutout' in table[0]['description']:
+            try:
+                log.debug("Started downloading TESSCut for '{}' sector {}."
+                          "".format(table[0]['target_name'], table[0]['sequence_number']))
+                path = self._fetch_tesscut_path(table[0]['target_name'],
+                                                table[0]['sequence_number'],
+                                                download_dir,
+                                                cutout_size)
+                log.debug("Finished downloading.")
+            except:
+                raise SearchError('Unable to download FFI cutout. Desired target '
+                                  'coordinates may be too near the edge of the FFI.')
+
+            return _open_downloaded_file(path,
+                                         quality_bitmask=quality_bitmask,
+                                         targetid=table[0]['targetid'])
+
+        else:
+            if cutout_size is not None:
+                warnings.warn('`cutout_size` can only be specified for TESS '
+                              'Full Frame Image cutouts.', LightkurveWarning)
+            from astroquery.mast import Observations
+            log.debug("Started downloading {}.".format(table[:1]['dataURL'][0]))
+            path = Observations.download_products(table[:1], mrp_only=False,
+                                                  download_dir=download_dir)['Local Path'][0]
+            log.debug("Finished downloading.")
+            # open() will determine filetype and return
+            return _open_downloaded_file(path, quality_bitmask=quality_bitmask)
+
     @suppress_stdout
     def download(self, quality_bitmask='default', download_dir=None, cutout_size=None):
         """Returns a single `KeplerTargetPixelFile` or `KeplerLightCurveFile` object.
@@ -141,37 +184,10 @@ class SearchResult(object):
                           'to limit your search.'.format(len(self.table)),
                           LightkurveWarning)
 
-        # Make sure astroquery uses the same level of verbosity
-        logging.getLogger('astropy').setLevel(log.getEffectiveLevel())
-
-        # download first product in table
-        if download_dir is None:
-            download_dir = self._default_download_dir()
-
-        # if table contains TESScut search results, download cutout
-        if 'FFI Cutout' in self.table[0]['description']:
-            try:
-                path = self._fetch_tesscut_path(self.table[0]['target_name'],
-                                                self.table[0]['sequence_number'],
-                                                download_dir, cutout_size)
-            except:
-                raise SearchError('Unable to download FFI cutout. Desired target '
-                                  'coordinates may be too near the edge of the FFI.')
-
-            return open(path,
-                        quality_bitmask=quality_bitmask,
-                        targetid=self.table[0]['targetid'])
-
-        else:
-            if cutout_size is not None:
-                warnings.warn('`cutout_size` can only be specified for TESS '
-                              'Full Frame Image cutouts.', LightkurveWarning)
-            from astroquery.mast import Observations
-            path = Observations.download_products(self.table[:1], mrp_only=False,
-                                                  download_dir=download_dir)['Local Path'][0]
-
-            # open() will determine filetype and return
-            return open(path, quality_bitmask=quality_bitmask)
+        return self._download_one(table=self.table[:1],
+                                  quality_bitmask=quality_bitmask,
+                                  download_dir=download_dir,
+                                  cutout_size=cutout_size)
 
     @suppress_stdout
     def download_all(self, quality_bitmask='default', download_dir=None, cutout_size=None):
@@ -210,34 +226,18 @@ class SearchResult(object):
             warnings.warn("Cannot download from an empty search result.",
                           LightkurveWarning)
             return None
+        log.debug("{} files will be downloaded.".format(len(self.table)))
 
-        # Make sure astroquery uses the same level of verbosity
-        logging.getLogger('astropy').setLevel(log.getEffectiveLevel())
-
-        # download all products listed in self.products
-        if download_dir is None:
-            download_dir = self._default_download_dir()
-
-        # if table contains TESScut search results, download cutouts
-        if 'FFI Cutout' in self.table[0]['description']:
-            path = [self._fetch_tesscut_path(t, s, download_dir, cutout_size)
-                    for t,s in zip(self.table['target_name'], self.table['sequence_number'])]
+        products = []
+        for idx in range(len(self.table)):
+            products.append(self._download_one(table=self.table[idx:idx+1],
+                                               quality_bitmask=quality_bitmask,
+                                               download_dir=download_dir,
+                                               cutout_size=cutout_size))
+        if isinstance(products[0], TargetPixelFile):
+            return TargetPixelFileCollection(products)
         else:
-            if cutout_size is not None:
-                warnings.warn('`cutout_size` can only be specified for TESS '
-                              'Full Frame Image cutouts.', LightkurveWarning)
-            from astroquery.mast import Observations
-            path = Observations.download_products(self.table, mrp_only=False,
-                                                  download_dir=download_dir)['Local Path']
-
-        # open() will determine filetype and return
-        # return a collection containing opened files
-        tpf_extensions = ['lpd-targ.fits', 'spd-targ.fits', '_tp.fits', 'n/a']
-        lcf_extensions = ['llc.fits', 'slc.fits', '_lc.fits']
-        if any(e in self.table['productFilename'][0] for e in tpf_extensions):
-            return TargetPixelFileCollection([open(p) for p in path])
-        elif any(e in self.table['productFilename'][0] for e in lcf_extensions):
-            return LightCurveFileCollection([open(p) for p in path])
+            return LightCurveFileCollection(products)
 
     def _default_download_dir(self):
         """Returns the default path to the directory where files will be downloaded.
@@ -491,6 +491,11 @@ def search_lightcurvefile(target, radius=None, cadence='long',
 def search_tesscut(target, sector=None):
     """Searches MAST for TESS Full Frame Image cutouts containing a desired target or region.
 
+    This feature uses the `TESScut service <https://mast.stsci.edu/tesscut/>`_
+    provided by the TESS data archive at MAST.  If you use this service in
+    your work, please `cite TESScut <https://ascl.net/code/v/2239>`_ in your
+    publications.
+
     Parameters
     ----------
     target : str, int, or `astropy.coordinates.SkyCoord` object
@@ -551,9 +556,10 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
     -------
     SearchResult : :class:`SearchResult` object.
     """
-
     observations = _query_mast(target, project=mission, radius=radius)
-
+    log.debug("MAST found {} observations. "
+              "Now querying MAST for the corresponding data products."
+              "".format(len(observations)))
     if len(observations) == 0:
         raise SearchError('No data found for target "{}".'.format(target))
 
@@ -569,6 +575,7 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
                                          campaign=campaign, quarter=quarter,
                                          cadence=cadence, project=mission,
                                          month=month, sector=sector, limit=limit)
+        log.debug("MAST found {} matching data products.".format(len(masked_result)))
         return SearchResult(masked_result)
 
     # Full Frame Images
@@ -590,6 +597,7 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
                                 'sequence_number': s}
                                )
         if len(cutouts) > 0:
+            log.debug("Found {} matching cutouts.".format(len(cutouts)))
             masked_result = Table(cutouts)
             masked_result.sort(['distance', 'sequence_number'])
         else:
@@ -645,13 +653,15 @@ def _query_mast(target, radius=None, project=['Kepler', 'K2', 'TESS']):
             # suppress misleading AstropyWarning
             warnings.simplefilter('ignore', AstropyWarning)
             from astroquery.mast import Observations
+            log.debug("Started querying MAST for observations within {} of target_name='{}'."
+                      "".format(radius.to(u.arcsec), target_name))
             target_obs = Observations.query_criteria(target_name=target_name,
                                                      radius=str(radius.to(u.deg)),
                                                      project=project,
                                                      obs_collection=project)
 
         if len(target_obs) == 0:
-            raise ValueError("No observations found for {}.".format(target_name))
+            raise ValueError("No observations found for '{}'.".format(target_name))
 
         # check if a cone search is being performed
         # if yes, perform a cone search around coordinates of desired target
@@ -667,6 +677,8 @@ def _query_mast(target, radius=None, project=['Kepler', 'K2', 'TESS']):
                 # suppress misleading AstropyWarning
                 warnings.simplefilter('ignore', AstropyWarning)
                 from astroquery.mast import Observations
+                log.debug("Started querying MAST for observations within {} of coordinates='{} {}'."
+                          "".format(radius.to(u.arcsec), ra, dec))
                 obs = Observations.query_criteria(coordinates='{} {}'.format(ra, dec),
                                                   radius=str(radius.to(u.deg)),
                                                   project=project,
@@ -685,6 +697,8 @@ def _query_mast(target, radius=None, project=['Kepler', 'K2', 'TESS']):
             # suppress misleading AstropyWarning
             warnings.simplefilter('ignore', AstropyWarning)
             from astroquery.mast import Observations
+            log.debug("Started querying MAST for observations within {} of objectname='{}'."
+                      "".format(radius.to(u.arcsec), target))
             obs = Observations.query_criteria(objectname=target,
                                               radius=str(radius.to(u.deg)),
                                               project=project,
@@ -899,9 +913,17 @@ def open(path_or_url, **kwargs):
 
         >>> tpf = open("mytpf.fits")  # doctest: +SKIP
     """
+    log.debug("Opening {}.".format(path_or_url))
     # pass header into `detect_filetype()`
-    with fits.open(path_or_url) as temp:
-        filetype = detect_filetype(temp[0].header)
+    try:
+        with fits.open(path_or_url) as temp:
+            filetype = detect_filetype(temp[0].header)
+            log.debug("Detected filetype: '{}'.".format(filetype))
+    except OSError as e:
+        filetype = None
+        # Raise an explicit FileNotFoundError if file not found
+        if 'No such file' in str(e):
+            raise e
 
     # if the filetype is recognized, instantiate a class of that name
     if filetype is not None:
@@ -910,3 +932,15 @@ def open(path_or_url, **kwargs):
         # if these keywords don't exist, raise `ValueError`
         raise ValueError("Not recognized as a Kepler or TESS data product: "
                          "{}".format(path_or_url))
+
+
+def _open_downloaded_file(path, **kwargs):
+    """Wrapper around `open()` which yields a more clear error message when
+    the file was downloaded from MAST but corrupted, e.g. due to the
+    download having been interrupted."""
+    try:
+        return open(path, **kwargs)
+    except ValueError:
+        raise SearchError("Failed to open the downloaded file ({}). "
+                          "The file was likely only partially downloaded. "
+                          "Please remove it from your disk and try again.".format(path))

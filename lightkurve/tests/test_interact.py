@@ -6,10 +6,15 @@ import sys
 
 from .. import LightkurveWarning
 from ..targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
+from .test_targetpixelfile import TABBY_TPF
+
+bad_optional_imports = False
+try:
+    import bokeh
+except ImportError:
+    bad_optional_imports = True
 
 example_tpf = get_pkg_data_filename("data/tess25155310-s01-first-cadences.fits.gz")
-TABBY_TPF = ("https://archive.stsci.edu/missions/kepler/target_pixel_files"
-             "/0084/008462852/kplr008462852-2011073133259_lpd-targ.fits.gz")
 
 
 def test_bokeh_import_error(caplog):
@@ -23,7 +28,7 @@ def test_bokeh_import_error(caplog):
         assert "requires the `bokeh` Python package" in caplog.text
 
 
-@pytest.mark.skipif('bokeh' not in sys.modules, reason="requires bokeh")
+@pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 def test_malformed_notebook_url():
     """Test if malformed notebook_urls raise proper exceptions."""
     import bokeh
@@ -36,7 +41,7 @@ def test_malformed_notebook_url():
     assert('object has no attribute' in exc.value.args[0])
 
 
-@pytest.mark.skipif('bokeh' not in sys.modules, reason="requires bokeh")
+@pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 def test_graceful_exit_outside_notebook():
     """Test if running interact outside of a notebook does fails gracefully."""
     import bokeh
@@ -45,7 +50,7 @@ def test_graceful_exit_outside_notebook():
     assert(result is None)
 
 
-@pytest.mark.skipif('bokeh' not in sys.modules, reason="requires bokeh")
+@pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 def test_custom_aperture_mask():
     """Can we provide a custom lightcurve to show?"""
     with warnings.catch_warnings():
@@ -63,7 +68,7 @@ def test_custom_aperture_mask():
         tpf.interact(aperture_mask=mask)
 
 
-@pytest.mark.skipif('bokeh' not in sys.modules, reason="requires bokeh")
+@pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 def test_custom_exported_filename():
     """Can we provide a custom lightcurve to show?"""
     import bokeh
@@ -84,7 +89,7 @@ def test_custom_exported_filename():
         tpf[mask].interact()
 
 
-@pytest.mark.skipif('bokeh' not in sys.modules, reason="requires bokeh")
+@pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 def test_max_cadences():
     """Can we provide a custom lightcurve to show?"""
     import bokeh
@@ -99,7 +104,7 @@ def test_max_cadences():
             assert('Interact cannot display more than' in exc.value.args[0])
 
 
-@pytest.mark.skipif('bokeh' not in sys.modules, reason="requires bokeh")
+@pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 def test_interact_functions():
     """Do the helper functions in the interact module run without syntax error?"""
     import bokeh
@@ -117,7 +122,7 @@ def test_interact_functions():
     show_interact_widget(tpf)
 
 
-@pytest.mark.skipif('bokeh' not in sys.modules, reason="requires bokeh")
+@pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 def test_interact_sky_functions():
     """Do the helper functions in the interact module run without syntax error?"""
     import bokeh

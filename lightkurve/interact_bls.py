@@ -7,10 +7,16 @@ from astropy.convolution import convolve, Box1DKernel
 log = logging.getLogger(__name__)
 
 # Import the optional AstroPy dependency, or print a friendly error otherwise.
+# BoxLeastSquares was added to `astropy.stats` in AstroPy v3.1 and then
+# moved to `astropy.timeseries` in v3.2, which makes the import below
+# somewhat complicated.
 try:
-    from astropy.stats.bls import BoxLeastSquares
+    from astropy.timeseries import BoxLeastSquares
 except ImportError:
-    pass  # we will print an error message in `show_interact_widget` instead
+    try:
+        from astropy.stats import BoxLeastSquares
+    except ImportError:
+        pass  # we will print an error message in `show_interact_widget` instead
 
 # Import the optional Bokeh dependency, or print a friendly error otherwise.
 try:
@@ -415,10 +421,12 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
         return None
 
     try:
-        from astropy.stats.bls import BoxLeastSquares
+        from astropy.timeseries import BoxLeastSquares
     except ImportError:
-        log.error("The `interact_bls()` tool requires the `astropy.stats.bls` module; "
-                  "this requires AstroPy v3.1 or later.")
+        try:
+            from astropy.stats import BoxLeastSquares
+        except ImportError:
+            log.error("The `interact_bls()` tool requires AstroPy v3.1 or later.")
 
     def _create_interact_ui(doc, minp=minimum_period, maxp=maximum_period, resolution=resolution):
         """Create BLS interact user interface."""
