@@ -168,7 +168,8 @@ class PLDCorrector(object):
         self._lc_flux = np.asarray(self.raw_lc.flux, np.float64)
         self._lc_flux_err = np.asarray(self.raw_lc.flux_err, np.float64)
 
-        self._s2_mu = np.var(self._lc_flux.flatten())
+        # Multiply by the mean of the raw flux because flatten returns a normalized light curve
+        self._s2_mu = np.var(self.raw_lc.flatten().flux * np.mean(self._lc_flux))
 
         # For user-friendliness, we will track the most recently used model and solution:
         self.most_recent_model = None
@@ -346,7 +347,7 @@ class PLDCorrector(object):
         return dt
 
     def create_pymc_model(self, design_matrix, cadence_mask=None,
-                          gp_timescale_prior=150, fractional_prior_width=.05, **kwargs):
+                          gp_timescale_prior=50, fractional_prior_width=.05, **kwargs):
         r"""Returns a PYMC3 model.
 
         Parameters
@@ -401,7 +402,7 @@ class PLDCorrector(object):
             kernel = xo.gp.terms.Matern32Term(log_sigma=logsigma, log_rho=logrho)
 
             # Store the GP and cadence mask to aid debugging
-            model.gp = xo.gp.GP(kernel, self._lc_time, diag + tt.exp(logs2))
+            model.gp = xo.gp.GP(kernel, self._lc_time, diag)
             model.cadence_mask = cadence_mask
 
             # The motion model regresses against the design matrix
@@ -427,7 +428,7 @@ class PLDCorrector(object):
         self.most_recent_model = model
         return model
 
-    # @suppress_stdout
+    @suppress_stdout
     def optimize(self, model=None, start=None, robust=False, **kwargs):
         """Returns the maximum likelihood solution.
 
@@ -699,9 +700,13 @@ class PLDCorrector(object):
         return corrected_lc, motion_lc, gp_lc
 
     def plot_distributions(self):
-        varnames = ['logrho', 'logsigma', 'mean']
+        varnames = ['rho', 'sigma', 'mean']
+        # varnames = ['A', 'lam', 'tau', 'mean']
         model = self.most_recent_model
         map_soln = self.most_recent_solution
+
+        init = []
+        map_out = []
 
         with plt.style.context(MPLSTYLE):
             fig, ax = plt.subplots(1, len(varnames), figsize=(len(varnames)*5, 5), sharey=True)
@@ -728,13 +733,17 @@ class PLDCorrector(object):
                     raise ValueError("I don't understand this distribution: {}, {}".format(var, model[var].distribution.__class__))
 
                 ax[idx].set_title(var, fontsize=12)
-                ax[idx].axvline(tv, ls='--', c='r', label='Init: {0:4.4}'.format(tv), lw=2)
-                ax[idx].axvline(map_soln[var], ls='--', c='g', label='MAP: {0:4.4}'.format(map_soln[var]), lw=2)
-                ax[idx].fill_between([tv, map_soln[var]], 0, 1, color='b', alpha=0.2, label='diff: {0:4.4}'.format(tv - map_soln[var]))
+                ax[idx].axvline(tv, ls='--', c='r', label='Init: {}'.format(tv), lw=2)
+                ax[idx].axvline(map_soln[var], ls='--', c='g', label='MAP: {}'.format(map_soln[var]), lw=2)
+                ax[idx].fill_between([tv, map_soln[var]], 0, 1, color='b', alpha=0.2, label='diff: {}'.format(tv - map_soln[var]))
                 ax[idx].legend()
                 ax[idx].set_yticks([]);
+                init.append(float(tv))
+                map_out.append(float(map_soln[var]))
 
-        return fig
+
+        print(map_out)
+        return ax
 
 
 
@@ -761,16 +770,28 @@ class PLDCorrector(object):
         # Plot the corrected light curve over the raw flux
         self.raw_lc.scatter(c='r', alpha=0.3, ax=ax[0], label='Raw Flux', normalize=False)
         corrected_lc.scatter(c='k', ax=ax[0], label='Corrected Flux', normalize=False)
+
+        # Plot the following diagnostics on separate axes from the raw flux
+        ax1 = ax[1].twinx()
+        y_range = 5 * np.std(self.raw_lc.flux)
+        ax[1].set_ylim([np.mean(self.raw_lc.flux) - y_range, np.mean(self.raw_lc.flux) + y_range])
+        ax1.set_ylim([np.mean(gp_lc.flux) - y_range, np.mean(gp_lc.flux) + y_range])
+
         # Plot the stellar model over the raw flux, indicating masked cadences
-        self.raw_lc.scatter(c='r', alpha=0.3, ax=ax[1], label='Raw Flux', normalize=False)
-        gp_lc.plot(c='k', ax=ax[1], label='GP Model', normalize=False)
+        self.raw_lc.scatter(c='r', alpha=0.3, ax=ax[1], label='Raw Flux', ylabel='Raw Flux', normalize=False)
+        gp_lc.plot(c='k', ax=ax1, label='GP Model', ylabel='GP Model Flux', normalize=False)
         if len(gp_lc[~self.most_recent_model.cadence_mask].flux) > 0:
             gp_lc[~self.most_recent_model.cadence_mask].scatter(ax=ax[1], label='Masked Cadences',
                                                                 marker='d', normalize=False)
+
         # Plot the motion model over the raw light curve
-        self.raw_lc.scatter(c='r', alpha=0.3, ax=ax[2], label='Raw Flux', normalize=False)
+        ax2 = ax[2].twinx()
+        ax[2].set_ylim([np.mean(self.raw_lc.flux) - y_range, np.mean(self.raw_lc.flux) + y_range])
+        ax2.set_ylim([np.mean(motion_lc.flux) - y_range, np.mean(motion_lc.flux) + y_range])
+
+        self.raw_lc.scatter(c='r', alpha=0.3, ax=ax[2], label='Raw Flux', ylabel='Raw Flux', normalize=False)
         # Add the mean of the raw flux to plot them at the same y-value
-        motion_lc.scatter(c='k', ax=ax[2], label='Noise Model', normalize=False)
+        motion_lc.scatter(c='k', ax=ax2, label='Noise Model', ylabel='Motion Model Flux', normalize=False)
 
         return ax
 
@@ -862,9 +883,9 @@ class PLDCorrector(object):
             fig, ax = plt.subplots(2, figsize=(8.485, 8.485), sharex=True, gridspec_kw={'height_ratios': [1, 2]})
             ax[0].plot(weights)
             ax[0].set_ylabel('Weight')
-            ax[1].imshow(np.log(design_matrix), aspect='auto')
+            ax[1].imshow(design_matrix, aspect='auto')
             ax[1].set_ylabel('Cadence Number')
-            ax[1].set_xlabel('Regressors (log intensity)')
+            ax[1].set_xlabel('Regressors')
             fig.subplots_adjust(wspace=0)
             fig.tight_layout()
         return ax
