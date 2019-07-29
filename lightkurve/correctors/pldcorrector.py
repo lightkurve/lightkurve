@@ -389,24 +389,15 @@ class PLDCorrector(object):
             mean = pm.Normal("mean", mu=np.nanmean(self._lc_flux), sd=np.std(self._lc_flux))
             # Create a Gaussian Process to model the long-term stellar variability
             # log(sigma) is the amplitude of variability, estimated from the raw flux scatter
-            # logsigma = pm.Normal("logsigma", mu=np.log(np.std(self._lc_flux)), sd=2)
-            logsigma = pm.Uniform("logsigma", testval=np.log(np.std(self._lc_flux)),
-                                  lower=np.log(np.std(self._lc_flux))-10,
-                                  upper=np.log(np.std(self._lc_flux))+10)
+            logsigma = pm.Normal("logsigma", mu=np.log(np.std(self._lc_flux)), sd=2)
             # log(rho) is the timescale of variability with a user-defined prior
             # Enforce that the scale of variability should be no shorter than 0.5 days
-            # logrho = pm.Normal("logrho", mu=np.log(gp_timescale_prior),
-            #                    sd=2)
-            logrho = pm.Uniform("logrho", testval=np.log(gp_timescale_prior),
-                                lower=np.log(0.5),
-                                upper=np.log(gp_timescale_prior)+10)
+            logrho = pm.Normal("logrho", mu=np.log(gp_timescale_prior),
+                               sd=2)
             # log(s2) is a jitter term to compensate for underestimated flux errors
             # We estimate the magnitude of jitter from the CDPP (normalized to the flux)
-            # logs2 = pm.Normal("logs2", mu=np.log(self._s2_mu), sd=2)
-            logs2 = pm.Uniform("logs2", testval=np.log(self._s2_mu),
-                               lower=np.log(self._s2_mu)-5,
-                               upper=np.log(self._s2_mu)+5)
-            # logs2 = pm.Constant("logs2", np.log(self._s2_mu))
+            logs2 = pm.Normal("logs2", mu=np.log(self._s2_mu), sd=2)
+            # Create the GP kernel, fixed (for now) as a Matern-3/2 for its flexibility
             kernel = xo.gp.terms.Matern32Term(log_sigma=logsigma, log_rho=logrho)
 
             # Store the GP and cadence mask to aid debugging
@@ -415,16 +406,14 @@ class PLDCorrector(object):
 
             # The motion model regresses against the design matrix
             A = tt.dot(design_matrix.T, model.gp.apply_inverse(design_matrix))
-            # To ensure the weights can be solved for, we need to perform L2 normalization
+            # To ensure the weights can be solved for, we need to perform L2 regularization
             # to avoid an ill-conditioned matrix A. Here we define the size of the diagonal
             # along which we will add small values
-            diag_inds = np.array(range(design_matrix.shape[1]))
-            # Cast the diagonal indices into tensor space
-            diag_inds = tt.cast(diag_inds, 'int64')
+            diag_inds = tt.cast(np.array(range(design_matrix.shape[1])), 'int64')
             # Add small numbers along the diagonal
             A = tt.set_subtensor(A[diag_inds, diag_inds], A[diag_inds, diag_inds] + 1e-8)
-
             B = tt.dot(design_matrix.T, model.gp.apply_inverse(self._lc_flux[:, None]))
+            
             weights = tt.slinalg.solve(A, B)
             motion_model = pm.Deterministic("motion_model", tt.dot(design_matrix, weights)[:, 0])
             pm.Deterministic("weights", weights)
@@ -470,12 +459,13 @@ class PLDCorrector(object):
         with model:
             # If a solution cannot be found, fail with an informative LightkurveError
             try:
-                # solution = xo.optimize(start=start, vars=[model.logrho, model.mean])
+                solution = xo.optimize(start=start, vars=[model.mean])
+                solution = xo.optimize(start=solution, vars=[model.logrho, model.mean])
                 # Optimizing parameters separately appears to make finding a solution more likely
                 if robust:
                     solution = xo.optimize(start=solution, vars=[model.logrho, model.logsigma, model.mean])
-                    solution = xo.optimize(start=solution, vars=[model.logrho, model.logsigma])#, model.logs2])
-                solution = xo.optimize(start=start)  # Optimize all parameters
+                    solution = xo.optimize(start=solution, vars=[model.logrho, model.logsigma, model.logs2])
+                solution = xo.optimize(start=solution)  # Optimize all parameters
             except ValueError:
                 raise LightkurveError('Unable to find a noise model solution for the given '
                                       'target pixel file. Try increasing the PLD order or '
@@ -511,10 +501,10 @@ class PLDCorrector(object):
             start = self.optimize(model=model)
 
         # Initialize the sampler
-        sampler = xo.PyMC3Sampler()
+        sampler = xo.PyMC3Sampler(start=50, window=150, finish=300)
         with model:
             # Burn in the sampler
-            sampler.tune(tune=np.max([int(draws*0.3), 150]),
+            sampler.tune(tune=np.max([int(draws*0.3), 500]),
                          start=start,
                          step_kwargs=dict(target_accept=0.9),
                          chains=chains)
