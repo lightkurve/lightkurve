@@ -533,7 +533,7 @@ def validate_method(method, supported_methods):
         The method specified by the user.
     supported_methods : list of str
         The methods supported.  All method names must be lowercase.
-    
+
     Returns
     -------
     method : str
