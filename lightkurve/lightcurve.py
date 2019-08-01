@@ -515,6 +515,8 @@ class LightCurve(object):
                                 time_original=self.time[sorted_args],
                                 targetid=self.targetid,
                                 label=self.label,
+                                period=period,
+                                t0=t0,
                                 meta=self.meta)
 
     def normalize(self):
@@ -1424,14 +1426,105 @@ class FoldedLightCurve(LightCurve):
     """
     def __init__(self, *args, **kwargs):
         self.time_original = kwargs.pop("time_original", None)
+        self.period = kwargs.pop("period", np.nan)
+        self.t0 = kwargs.pop("t0", np.nan)
         super(FoldedLightCurve, self).__init__(*args, **kwargs)
 
     @property
     def phase(self):
         return self.time
 
+    def waterfall(self, ax=None, bin=1, phmin=-0.5, phmax=0.5, bin_type='mean',
+                        waterfall_type='average', **kwargs):
+        """Plot the folded light curve as a waterfall plot. Keywords are passed
+        to matplotlib.
+
+        Parameters
+        ----------
+        kwargs : dict
+            Dictionary of arguments to be passed to `LightCurve.plot`.
+
+        Returns
+        -------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            The matplotlib axes object.
+        """
+
+        if bin_type.lower() == 'mean':
+            bin_func = np.nanmean
+        elif bin_type.lower() == 'median':
+            bin_func = np.nanmedian
+        else:
+            raise ValueError('`bin_type` not understood.')
+
+        if waterfall_type == 'sigma':
+            waterfall_func = lambda y, e: (y - 1)/e
+        elif waterfall_type == 'average':
+            waterfall_func = lambda y, e: y
+        else:
+            raise ValueError('`waterfall_type` not understood.')
+
+        x, y, e = self.time_original[np.argsort(self.time_original)], self.flux[np.argsort(self.time_original)], self.flux_err[np.argsort(self.time_original)]
+        e /= np.nanmedian(y)
+        y /= np.nanmedian(y)
+
+        n = int(self.period/np.median(np.diff(x)) * (phmax - phmin)/bin)
+        ph = x/self.period % 1
+        cyc = np.asarray((x - x % self.period)/self.period, int)
+        cyc -= np.min(cyc)
+
+        phase = (self.t0 % self.period) / self.period
+        ph = ((x - (phase * self.period)) / self.period) % 1
+        cyc = np.asarray((x - ((x - phase * self.period) % self.period))/self.period, int)
+        cyc -= np.min(cyc)
+        ph[ph > 0.5] -= 1
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            ar = np.zeros((n, np.max(cyc) + 1)) * np.nan
+            bs = np.linspace(phmin, phmax, n)
+            cycs = np.arange(0, np.max(cyc) + 1)
+            for cyc1 in np.unique(cyc):
+                k = cyc == cyc1
+                for jdx in range(n-1):
+                    j = (ph[k] > bs[jdx]) & (ph[k] <= bs[jdx+1])
+                    if j.sum() == 0:
+                        ar[jdx, cyc1] = np.nan
+                    else:
+                        ar[jdx, cyc1] = bin_func(waterfall_func(y[k][j], e[k][j]))
+
+
+        d = np.max([np.abs(np.nanmedian(ar) - np.nanpercentile(ar, 5)), np.abs(np.nanmedian(ar) - np.nanpercentile(ar, 95))])
+        vmin = kwargs.pop('vmin', np.nanmedian(ar) - d)
+        vmax = kwargs.pop('vmax', np.nanmedian(ar) + d)
+        if waterfall_type == 'average':
+            cmap = kwargs.pop('cmap', 'viridis')
+        if waterfall_type == 'sigma':
+            cmap = kwargs.pop('cmap', 'coolwarm')
+
+
+        with plt.style.context(MPLSTYLE):
+            if ax is None:
+                _, ax = plt.subplots(figsize=(12, cyc.max()*0.1))
+
+            im = ax.pcolormesh(bs, cycs, ar.T, vmin=vmin, vmax=vmax, cmap=cmap, **kwargs)
+            cbar = plt.colorbar(im, ax=ax)
+            if waterfall_type == 'average':
+                cbar.set_label("Average Flux in Bin")
+            if waterfall_type == 'sigma':
+                cbar.set_label("Average $\sigma$ in Bin")
+
+            ax.set_xlabel("Phase")
+            ax.set_ylabel("Cycle")
+            ax.set_ylim(cyc.max(), 0)
+            ax.set_title(self.targetid)
+            a = cyc.max()*0.1/12
+            b = (cyc.max() - cyc.min()) / (bs.max() - bs.min())
+            ax.set_aspect(a/b)
+        return ax
+
     def plot(self, **kwargs):
-        """Plot the folded light curve usng matplotlib's `plot` method.
+        """Plot the folded light curve using matplotlib's `plot` method.
 
         See `LightCurve.plot` for details on the accepted arguments.
 
