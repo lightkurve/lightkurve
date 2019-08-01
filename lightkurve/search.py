@@ -556,6 +556,10 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
     -------
     SearchResult : :class:`SearchResult` object.
     """
+    if isinstance(target, int) and (200000000 < target) and (target < 300000000):
+        log.warning("Warning: {} is an ambiguous target identifier. "
+                    "Please add the prefix 'TIC' or 'EPIC' to ensure you are "
+                    "searching for the correct target.".format(target))
     observations = _query_mast(target, project=mission, radius=radius)
     log.debug("MAST found {} observations. "
               "Now querying MAST for the corresponding data products."
