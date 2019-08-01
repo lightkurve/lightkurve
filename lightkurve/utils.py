@@ -526,7 +526,7 @@ def detect_filetype(header):
 
 def validate_method(method, supported_methods):
     """Raises a `ValueError` if a method is not supported.
-    
+
     Parameters
     ----------
     method : str
