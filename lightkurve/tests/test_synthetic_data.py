@@ -173,7 +173,7 @@ def test_detrending_residuals():
     anderson_threshold = 1.57
 
     resid_n_sigmas = (cor_lc.flux - np.mean(cor_lc.flux))/cor_lc.flux_err
-    A_value, crit, _ = stats.anderson(resid_n_sigmas)
+    A_value, _, _ = stats.anderson(resid_n_sigmas)
     assert A_value**2 < anderson_threshold
 
     n_sigma = np.std(resid_n_sigmas)

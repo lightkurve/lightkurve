@@ -1,6 +1,5 @@
 from astropy import units as u
 import numpy as np
-from numpy.testing import assert_almost_equal
 from uncertainties import ufloat
 
 from ..stellar_estimators import (NUMAX_SOL, DELTANU_SOL, TEFF_SOL, G_SOL,
