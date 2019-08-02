@@ -1,24 +1,10 @@
-import pytest
 from astropy import units as u
 import numpy as np
-from numpy.testing import assert_almost_equal, assert_array_equal
-from astropy import units as u
-import astropy.constants as const
+from numpy.testing import assert_almost_equal
 from uncertainties import ufloat
 
-from ...lightcurve import LightCurve
-from ...search import search_lightcurvefile
-from .. import *
 from ..stellar_estimators import (NUMAX_SOL, DELTANU_SOL, TEFF_SOL, G_SOL,
                                   estimate_radius, estimate_mass, estimate_logg)
-import sys
-
-
-bad_optional_imports = False
-try:
-    from astropy.stats.bls import BoxLeastSquares
-except ImportError:
-    bad_optional_imports = True
 
 
 cM = ufloat(1.30, 0.09)

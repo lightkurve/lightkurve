@@ -331,7 +331,7 @@ class TargetPixelFile(object):
                         attrs[attr]['print'] = '{}'.format(res)
                     attrs[attr]['type'] = 'str'
                 elif attr == 'wcs':
-                    attrs[attr]['print'] = 'astropy.wcs.wcs.WCS'.format(attr)
+                    attrs[attr]['print'] = 'astropy.wcs.wcs.WCS'
                     attrs[attr]['type'] = 'other'
                 else:
                     attrs[attr]['print'] = '{}'.format(type(res))
@@ -1157,8 +1157,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
             column, row = int(column), int(row)
         except Exception as e:
             raise e
-            raise FactoryError("Images must have a valid WCS astrometric solution.")
-            return None
 
         # Create a factory and set default keyword values based on the middle image
         factory = KeplerTargetPixelFileFactory(n_cadences=len(images),
