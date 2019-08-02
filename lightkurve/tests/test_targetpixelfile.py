@@ -32,10 +32,10 @@ TESS_SIM = ("https://archive.stsci.edu/missions/tess/ete-6/tid/00/000"
 @pytest.mark.remote_data
 def test_load_bad_file():
     '''Test if a light curve can be opened without exception.'''
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError) as exc:
         KeplerTargetPixelFile(TABBY_Q8)
     assert('is this a target pixel file?' in exc.value.args[0])
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError) as exc:
         TessTargetPixelFile(TABBY_Q8)
     assert('is this a target pixel file?' in exc.value.args[0])
 
