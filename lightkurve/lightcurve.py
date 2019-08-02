@@ -24,7 +24,7 @@ from astropy import units as u
 from . import PACKAGEDIR, MPLSTYLE
 from .utils import (
     running_mean, bkjd_to_astropy_time, btjd_to_astropy_time,
-    LightkurveWarning
+    LightkurveWarning, validate_method
 )
 
 __all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve']
@@ -759,9 +759,7 @@ class LightCurve(object):
         - If the original lightcurve contains a quality attribute, then the
           bitwise OR of the quality flags will be returned per bin.
         """
-        available_methods = ['mean', 'median']
-        if method not in available_methods:
-            raise ValueError("method must be one of: {}".format(available_methods))
+        method = validate_method(method, supported_methods=['mean', 'median'])
         methodf = np.__dict__['nan' + method]
 
         n_bins = self.flux.size // binsize
@@ -1221,13 +1219,9 @@ class LightCurve(object):
         Periodogram : `~lightkurve.periodogram.Periodogram` object
             The power spectrum object extracted from the light curve.
         """
-        method_clean = method.replace(' ', '').lower()
-        allowed_methods = ["ls", "bls", "lombscargle", "boxleastsquares"]
-        if method_clean not in allowed_methods:
-            raise ValueError(("Unrecognized method '{0}'\n"
-                              "allowed methods are: {1}")
-                             .format(method, allowed_methods))
-        if method_clean in ["bls", "boxleastsquares"]:
+        supported_methods = ["ls", "bls", "lombscargle", "boxleastsquares"]
+        method = validate_method(method.replace(' ', ''), supported_methods)
+        if method in ["bls", "boxleastsquares"]:
             from . import BoxLeastSquaresPeriodogram
             return BoxLeastSquaresPeriodogram.from_lightcurve(lc=self, **kwargs)
         else:

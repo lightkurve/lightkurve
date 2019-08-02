@@ -28,7 +28,7 @@ from scipy.signal import find_peaks
 
 from . import MPLSTYLE
 
-from .utils import LightkurveWarning
+from .utils import LightkurveWarning, validate_method
 from .lightcurve import LightCurve
 
 log = logging.getLogger(__name__)
@@ -143,8 +143,7 @@ class Periodogram(object):
         # Input validation
         if binsize < 1:
             raise ValueError('binsize must be larger than or equal to 1')
-        if method not in ('mean', 'median'):
-            raise ValueError("{} is not a valid method, must be 'mean' or 'median'.".format(method))
+        method = validate_method(method, ['mean', 'median'])
 
         m = int(len(self.power) / binsize)  # length of the binned arrays
         if method == 'mean':
@@ -213,10 +212,7 @@ class Periodogram(object):
             Returns a new `Periodogram` object in which the power spectrum
             has been smoothed.
         """
-        # Input validation
-        if method not in ('boxkernel', 'logmedian'):
-            raise ValueError("the `method` parameter must be one of "
-                             "'boxkernel' or 'logmedian'.")
+        method = validate_method(method, ['boxkernel', 'logmedian'])
 
         if method == 'boxkernel':
             if filter_width <= 0.:

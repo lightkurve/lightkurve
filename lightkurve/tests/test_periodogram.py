@@ -349,12 +349,12 @@ def test_error_messages():
     # Bad binning method
     with pytest.raises(ValueError) as err:
         Periodogram([0, 1, 2]*u.Hz, [1, 1, 1]*u.K).bin(method='not-implemented')
-    assert("is not a valid method, must be 'mean' or 'median'" in err.value.args[0])
+    assert("method 'not-implemented' is not supported" in err.value.args[0])
 
     # Bad smooth method
     with pytest.raises(ValueError) as err:
         Periodogram([0, 1, 2]*u.Hz, [1, 1, 1]*u.K).smooth(method="not-implemented")
-    assert("parameter must be one of 'boxkernel' or 'logmedian'" in err.value.args[0])
+    assert("method 'not-implemented' is not supported" in err.value.args[0])
 
 
 @pytest.mark.skipif(bad_optional_imports, reason="requires astropy.stats.bls")
