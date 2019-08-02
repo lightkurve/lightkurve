@@ -131,7 +131,7 @@ def test_wcs():
     """Test the wcs property."""
     for tpf in [KeplerTargetPixelFile(filename_tpf_one_center),
                 TessTargetPixelFile(filename_tess)]:
-        tpf.wcs
+        w = tpf.wcs
         ra, dec = tpf.get_coordinates()
         assert ra.shape == tpf.shape
         assert dec.shape == tpf.shape
@@ -290,7 +290,6 @@ def test_tpf_from_images():
     from astropy.io import fits
     from astropy import wcs
     import astropy.units as u
-    from astropy.coordinates import SkyCoord
 
     # Can we read in a load of images?
     header = fits.Header()
