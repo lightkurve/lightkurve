@@ -16,11 +16,11 @@ steps:
 
 - script: python-codacy-coverage -r coverage.xml
   displayName: 'Upload coverage.xml'
-  condition: eq(variables['Agent.JobName'], 'Python37_RemoteData')
+  condition: eq(variables['Agent.JobName'], 'Linux Python37_WithRemoteData')
 
 - script: bash <(curl https://codecov.io/bash)
   displayName: 'Run codecov'
-  condition: eq(variables['Agent.JobName'], 'Python37_RemoteData')
+  condition: eq(variables['Agent.JobName'], 'Linux Python37_WithRemoteData')
 
 - task: PublishTestResults@2
   condition: succeededOrFailed()
