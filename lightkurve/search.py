@@ -556,6 +556,16 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
     -------
     SearchResult : :class:`SearchResult` object.
     """
+    if isinstance(target, int):
+        if (0 < target) and (target < 13161030):
+            log.warning("Warning: {} may refer to a different Kepler or TESS target. "
+                        "Please add the prefix 'KIC' or 'TIC' to disambiguate."
+                        "".format(target))
+        elif (0 < 200000000) and (target < 251813739):
+            log.warning("Warning: {} may refer to a different K2 or TESS target. "
+                        "Please add the prefix 'EPIC' or 'TIC' to disambiguate."
+                        "".format(target))
+
     observations = _query_mast(target, project=mission, radius=radius)
     log.debug("MAST found {} observations. "
               "Now querying MAST for the corresponding data products."
