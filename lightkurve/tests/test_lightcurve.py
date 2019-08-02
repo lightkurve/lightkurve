@@ -510,6 +510,9 @@ def test_to_fits():
         lc = tpf.to_lightcurve(aperture_mask=random_mask)
         lc.to_fits(path=tempfile.NamedTemporaryFile().name, aperture_mask=random_mask)
 
+        lc.to_fits(path=tempfile.NamedTemporaryFile().name, overwrite=True,
+                  flux_label='SAP_FLUX')
+
         lc = tpf[0:2].to_lightcurve(aperture_mask=thresh_mask)
         lc.to_fits(aperture_mask=thresh_mask, path=tempfile.NamedTemporaryFile().name)
 
