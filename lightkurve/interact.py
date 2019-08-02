@@ -170,7 +170,7 @@ def make_lightcurve_figure_elements(lc, lc_source):
             fig.xaxis.axis_label = 'Time - 2457000 (days)'
     except AttributeError:  # no mission keyword available
       pass
-        
+
 
     ylims = get_lightcurve_y_limits(lc_source)
     fig.y_range = Range1d(start=ylims[0], end=ylims[1])
@@ -519,6 +519,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
                 selected_mask = np.isin(pixel_index_array, selected_indices)
                 lc_new = tpf.to_lightcurve(aperture_mask=selected_mask)
                 lc_new.to_fits(exported_filename, overwrite=True,
+                               flux_column_name='SAP_FLUX',
                                aperture_mask=selected_mask.astype(np.int),
                                SOURCE='lightkurve interact',
                                NOTE='custom mask',
