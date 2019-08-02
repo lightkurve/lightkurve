@@ -519,7 +519,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
                 selected_mask = np.isin(pixel_index_array, selected_indices)
                 lc_new = tpf.to_lightcurve(aperture_mask=selected_mask)
                 lc_new.to_fits(exported_filename, overwrite=True,
-                               flux_label='SAP_FLUX',
+                               flux_column_name='SAP_FLUX',
                                aperture_mask=selected_mask.astype(np.int),
                                SOURCE='lightkurve interact',
                                NOTE='custom mask',

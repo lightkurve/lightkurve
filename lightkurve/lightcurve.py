@@ -1287,7 +1287,7 @@ class LightCurve(object):
             out_mask = None
         return out_mask
 
-    def to_fits(self, path=None, overwrite=False, flux_label='FLUX', **extra_data):
+    def to_fits(self, path=None, overwrite=False, flux_column_name='FLUX', **extra_data):
         """Writes the light curve to a FITS file.
 
         Parameters
@@ -1296,7 +1296,7 @@ class LightCurve(object):
             If set, location where the FITS file will be written.
         overwrite : bool
             Whether or not to overwrite the file
-        flux_label : str
+        flux_column_name : str
             The name of the label for the FITS extension, e.g. SAP_FLUX or FLUX
         extra_data : dict
             Extra keywords or columns to include in the FITS file.
@@ -1353,8 +1353,8 @@ class LightCurve(object):
             if ~np.asarray(['TIME' in k.upper() for k in extra_data.keys()]).any():
                 cols.append(fits.Column(name='TIME', format='D', unit=self.time_format,
                                         array=self.time))
-            if ~np.asarray([flux_label in k.upper() for k in extra_data.keys()]).any():
-                cols.append(fits.Column(name=flux_label, format='E',
+            if ~np.asarray([flux_column_name in k.upper() for k in extra_data.keys()]).any():
+                cols.append(fits.Column(name=flux_column_name, format='E',
                                         unit='counts', array=self.flux))
             if 'flux_err' in dir(self):
                 if ~np.asarray(['FLUX_ERR' in k.upper() for k in extra_data.keys()]).any():
@@ -1581,7 +1581,7 @@ class KeplerLightCurve(LightCurve):
         """
         return super(KeplerLightCurve, self).to_pandas(columns=columns)
 
-    def to_fits(self, path=None, overwrite=False, flux_label='FLUX',
+    def to_fits(self, path=None, overwrite=False, flux_column_name='FLUX',
                 aperture_mask=None,**extra_data):
         """Writes the KeplerLightCurve to a FITS file.
 
@@ -1591,7 +1591,7 @@ class KeplerLightCurve(LightCurve):
             File path, if `None` returns an astropy.io.fits.HDUList object.
         overwrite : bool
             Whether or not to overwrite the file
-        flux_label : str
+        flux_column_name : str
             The name of the label for the FITS extension, e.g. SAP_FLUX or FLUX
         aperture_mask : array-like
             Optional 2D aperture mask to save with this lightcurve object, if
@@ -1716,7 +1716,7 @@ class TessLightCurve(LightCurve):
         return('TessLightCurve(TICID: {})'.format(self.targetid))
 
 
-    def to_fits(self, path=None, overwrite=False, flux_label='FLUX',
+    def to_fits(self, path=None, overwrite=False, flux_column_name='FLUX',
                 aperture_mask=None, **extra_data):
         """Writes the KeplerLightCurve to a FITS file.
 
@@ -1726,7 +1726,7 @@ class TessLightCurve(LightCurve):
             File path, if `None` returns an astropy.io.fits.HDUList object.
         overwrite : bool
             Whether or not to overwrite the file
-        flux_label : str
+        flux_column_name : str
             The name of the label for the FITS extension, e.g. SAP_FLUX or FLUX
         aperture_mask : array-like
             Optional 2D aperture mask to save with this lightcurve object, if
