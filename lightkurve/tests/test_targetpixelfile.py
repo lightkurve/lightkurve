@@ -1,7 +1,6 @@
 from __future__ import division, print_function
 
 import os
-import sys
 from astropy.utils.data import get_pkg_data_filename
 from astropy.io.fits.verify import VerifyWarning
 from astropy.coordinates import SkyCoord
@@ -34,10 +33,10 @@ TESS_SIM = ("https://archive.stsci.edu/missions/tess/ete-6/tid/00/000"
 def test_load_bad_file():
     '''Test if a light curve can be opened without exception.'''
     with pytest.raises(ValueError) as exc:
-        tpf = KeplerTargetPixelFile(TABBY_Q8)
+        KeplerTargetPixelFile(TABBY_Q8)
     assert('is this a target pixel file?' in exc.value.args[0])
     with pytest.raises(ValueError) as exc:
-        tpf = TessTargetPixelFile(TABBY_Q8)
+        TessTargetPixelFile(TABBY_Q8)
     assert('is this a target pixel file?' in exc.value.args[0])
 
 
@@ -61,7 +60,7 @@ def test_tpf_plot():
         tpfs = [KeplerTargetPixelFile(filename_tpf_one_center),
                 TessTargetPixelFile(filename_tpf_one_center)]
     for tpf in tpfs:
-        ax = tpf.plot()
+        tpf.plot()
         tpf.plot(aperture_mask=tpf.pipeline_mask)
         tpf.plot(aperture_mask='all')
         tpf.plot(frame=3)
@@ -142,7 +141,7 @@ def test_wcs():
 def test_wcs_tabby():
     '''Test the centroids from Tabby's star against simbad values'''
     tpf = KeplerTargetPixelFile(TABBY_TPF)
-    w = tpf.wcs
+    tpf.wcs
     ra, dec = tpf.get_coordinates(0)
     col, row = tpf.estimate_centroids()
     col -= tpf.column
@@ -271,13 +270,13 @@ def test_tpf_factory():
 
     # Can you add the WRONG sized frame?
     flux_wrong = 3 * np.ones((6, 9))
-    with pytest.raises(FactoryError) as exc:
+    with pytest.raises(FactoryError):
         factory.add_cadence(frameno=2, flux=flux_wrong,
                             header={'TSTART': 90, 'TSTOP': 100})
 
     # Can you add the WRONG cadence?
     flux_wrong = 3 * np.ones((6, 8))
-    with pytest.raises(FactoryError) as exc:
+    with pytest.raises(FactoryError):
         factory.add_cadence(frameno=11, flux=flux_wrong,
                             header={'TSTART': 90, 'TSTOP': 100})
 
@@ -291,7 +290,6 @@ def test_tpf_from_images():
     from astropy.io import fits
     from astropy import wcs
     import astropy.units as u
-    from astropy.coordinates import SkyCoord
 
     # Can we read in a load of images?
     header = fits.Header()
@@ -348,7 +346,7 @@ def test_tpf_from_images():
         # Can we read in a list of file names or a list of HDUlists?
         hdus = []
         tmpfile_names = []
-        for idx, im in enumerate(images):
+        for im in images:
             tmpfile = tempfile.NamedTemporaryFile(delete=False)
             tmpfile_names.append(tmpfile.name)
             hdu = fits.HDUList([fits.PrimaryHDU(), im])

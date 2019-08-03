@@ -15,7 +15,6 @@ These synthetic data were generated from the [scope package](https://github.com/
 - Rotation period 5.0 days
 - Sine fractional amplitude 0.001 (i.e. 0.1% or 1000 ppm), so peak-to-valley 0.002.
 
-
 The level of roll motion was mimicked from the K2 source EPIC 205998445, for a hypothetical 12th magnitude star.  1000 cadences were simulated.
 
 The noise-free signals are housed in the HDU extension 3 "SIMULATED_SIGNAL", with a single data vector "NOISELESS_INPUT".

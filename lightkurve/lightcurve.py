@@ -6,7 +6,6 @@ import copy
 import os
 import datetime
 import logging
-import pandas as pd
 import warnings
 
 import numpy as np
@@ -204,7 +203,6 @@ class LightCurve(object):
             If the ``time_format`` attribute is not set or not one of the formats
             allowed by AstroPy.
         """
-        from astropy.time import Time
         if self.time_format is None:
             raise ValueError("To retrieve a `Time` object the `time_format` "
                              "attribute must be set on the LightCurve object, "
@@ -256,7 +254,7 @@ class LightCurve(object):
                         attrs[attr]['print'] = '{}'.format(res)
                     attrs[attr]['type'] = 'str'
                 elif attr == 'wcs':
-                    attrs[attr]['print'] = 'astropy.wcs.wcs.WCS'.format(attr)
+                    attrs[attr]['print'] = 'astropy.wcs.wcs.WCS'
                     attrs[attr]['type'] = 'other'
                 else:
                     attrs[attr]['print'] = '{}'.format(type(res))
@@ -621,7 +619,7 @@ class LightCurve(object):
         if hasattr(lc, 'quality'):
             quality = np.zeros(len(ntime))
             quality[in_original] = np.copy(lc.quality)
-            quality[~in_original] + 65536
+            quality[~in_original] += 65536
             nlc.quality = quality
         if hasattr(lc, 'centroid_col'):
             col = np.zeros(len(ntime)) * np.nan

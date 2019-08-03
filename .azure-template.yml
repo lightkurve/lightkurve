@@ -14,9 +14,13 @@ steps:
 - script: pytest $(pytest.options) --doctest-modules --junitxml=junit/test-results.xml --cov-report=xml --cov-report=html
   displayName: 'Run pytest'
 
+- script: python-codacy-coverage -r coverage.xml --token $CODACY_PROJECT_TOKEN
+  displayName: 'Upload coverage.xml'
+  condition: eq(variables['Agent.JobName'], 'Linux Python37_WithRemoteData')
+
 - script: bash <(curl https://codecov.io/bash)
   displayName: 'Run codecov'
-  condition: eq(variables['Agent.JobName'], 'Python37_RemoteData')
+  condition: eq(variables['Agent.JobName'], 'Linux Python37_WithRemoteData')
 
 - task: PublishTestResults@2
   condition: succeededOrFailed()
