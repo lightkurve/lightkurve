@@ -15,3 +15,4 @@ Classes currently provided are `KeplerCBVCorrector`, `SFFCorrector`, and
 from .pldcorrector import *
 from .sffcorrector import *
 from .cbvcorrector import *
+from .gpcorrector import *
