@@ -113,15 +113,6 @@ class GPCorrector(Corrector):
         self.optimize()
         return self._predict_lightcurves()['corrected_lc']
 
-    """
-    def diagnose(self):
-        mu = self.gp.predict(self.lc.flux, self.lc.time,
-                             return_var=False, return_cov=False)
-        ax = self.lc.plot(label="Light curve", normalize=False) 
-        ax.plot(self.lc.time, mu, label="GP", lw=10, c='red')
-        ax.legend()
-        return ax
-    """
     def diagnose(self, ax=None, fast=False):
         """Show a diagnostic plot of the GP. Returns a matplotlib.pyplot.axes object.
             
@@ -166,7 +157,7 @@ class GPCorrector(Corrector):
             label = 'Optimized\n' + '\n'.join(['{}: {}'.format(key, k[key])
                                         for key in k.keys()])
             ax.plot(self.lc.time, mu, c='b', lw=1, zorder=2, label=label)
-        
+
         ax.legend()
 
         return ax
