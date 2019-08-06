@@ -1355,9 +1355,9 @@ class LightCurve(object):
 
         Parameters
         ----------
-        methods : string
-            Currently, only "sff" is supported.  This will return a
-            `SFFCorrector` class instance.
+        methods : "sff" or "gp"
+            Determines whether a `SFFCorrector` or `GPCorrector` class instance
+            is returned.
 
         Returns
         -------
@@ -1365,17 +1365,16 @@ class LightCurve(object):
             Instance of a Corrector class, which typically provides `correct()`
             and `diagnose()` methods.
         """
-        allowed_methods = ["sff"]
+        method = validate_method(method, ["sff", "gp"])
         if method == "pld":
             raise ValueError("The 'pld' method can only be used on "
                              "`TargetPixelFile` objects, not `LightCurve` objects.")
-        if method not in allowed_methods:
-            raise ValueError(("Unrecognized method '{0}'\n"
-                              "allowed methods are: {1}")
-                             .format(method, allowed_methods))
         if method == "sff":
             from .correctors import SFFCorrector
             return SFFCorrector(self)
+        elif method == "gp":
+            from .correctors import GPCorrector
+            return GPCorrector(self)
 
 
 class FoldedLightCurve(LightCurve):
