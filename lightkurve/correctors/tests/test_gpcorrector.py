@@ -6,7 +6,7 @@ from .. import GPCorrector
 
 @pytest.mark.remote_data
 def test_gpcorrector():
-    lc = search_lightcurvefile("Kepler-10", quarter=4).download().PDCSAP_FLUX
+    lc = search_lightcurvefile("Kepler-10", quarter=10).download().PDCSAP_FLUX
     # Try Matern
     gpc = GPCorrector(lc, kernel="matern32")
     gpc.diagnose()
