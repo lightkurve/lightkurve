@@ -139,7 +139,7 @@ class GPCorrector(Corrector):
         with plt.style.context(MPLSTYLE):
             if ax is None:
                 _, ax = plt.subplots()
-            self.lc.errorbar(ax=ax, zorder=1, label='Data')
+            self.lc.errorbar(ax=ax, zorder=1, label='Data', normalize=False)
 
         # Initial Guess
         gp = celerite.GP(self.initial_kernel, mean=np.nanmean(self.lc.flux))
