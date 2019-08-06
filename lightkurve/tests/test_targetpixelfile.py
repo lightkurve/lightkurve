@@ -3,6 +3,7 @@ from __future__ import division, print_function
 import os
 from astropy.utils.data import get_pkg_data_filename
 from astropy.io.fits.verify import VerifyWarning
+from astropy.coordinates import SkyCoord
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy.testing import assert_array_equal
@@ -32,10 +33,10 @@ TESS_SIM = ("https://archive.stsci.edu/missions/tess/ete-6/tid/00/000"
 def test_load_bad_file():
     '''Test if a light curve can be opened without exception.'''
     with pytest.raises(ValueError) as exc:
-        tpf = KeplerTargetPixelFile(TABBY_Q8)
+        KeplerTargetPixelFile(TABBY_Q8)
     assert('is this a target pixel file?' in exc.value.args[0])
     with pytest.raises(ValueError) as exc:
-        tpf = TessTargetPixelFile(TABBY_Q8)
+        TessTargetPixelFile(TABBY_Q8)
     assert('is this a target pixel file?' in exc.value.args[0])
 
 
@@ -59,7 +60,7 @@ def test_tpf_plot():
         tpfs = [KeplerTargetPixelFile(filename_tpf_one_center),
                 TessTargetPixelFile(filename_tpf_one_center)]
     for tpf in tpfs:
-        ax = tpf.plot()
+        tpf.plot()
         tpf.plot(aperture_mask=tpf.pipeline_mask)
         tpf.plot(aperture_mask='all')
         tpf.plot(frame=3)
@@ -140,7 +141,7 @@ def test_wcs():
 def test_wcs_tabby():
     '''Test the centroids from Tabby's star against simbad values'''
     tpf = KeplerTargetPixelFile(TABBY_TPF)
-    w = tpf.wcs
+    tpf.wcs
     ra, dec = tpf.get_coordinates(0)
     col, row = tpf.estimate_centroids()
     col -= tpf.column
@@ -215,6 +216,7 @@ def test_aperture_photometry():
         tpf.extract_aperture_photometry(aperture_mask='all')
         tpf.extract_aperture_photometry(aperture_mask='pipeline')
 
+
 def test_tpf_to_fits():
     """Can we write a TPF back to a fits file?"""
     for tpf in [KeplerTargetPixelFile(filename_tpf_all_zeros),
@@ -268,13 +270,13 @@ def test_tpf_factory():
 
     # Can you add the WRONG sized frame?
     flux_wrong = 3 * np.ones((6, 9))
-    with pytest.raises(FactoryError) as exc:
+    with pytest.raises(FactoryError):
         factory.add_cadence(frameno=2, flux=flux_wrong,
                             header={'TSTART': 90, 'TSTOP': 100})
 
     # Can you add the WRONG cadence?
     flux_wrong = 3 * np.ones((6, 8))
-    with pytest.raises(FactoryError) as exc:
+    with pytest.raises(FactoryError):
         factory.add_cadence(frameno=11, flux=flux_wrong,
                             header={'TSTART': 90, 'TSTOP': 100})
 
@@ -288,7 +290,6 @@ def test_tpf_from_images():
     from astropy.io import fits
     from astropy import wcs
     import astropy.units as u
-    from astropy.coordinates import SkyCoord
 
     # Can we read in a load of images?
     header = fits.Header()
@@ -312,6 +313,8 @@ def test_tpf_from_images():
     w.wcs.set_pv([(2, 1, 45.0)])
     pixcrd = np.array([[0, 0], [24, 38], [45, 98]], np.float_)
     header = w.to_header()
+    header['CRVAL1P'] = 10
+    header['CRVAL2P'] = 20
     ra, dec = 268.21686048, -73.66991904
 
     # Add that header to our images...
@@ -325,6 +328,7 @@ def test_tpf_from_images():
     tpf = KeplerTargetPixelFile.from_fits_images(images, size=(3, 3),
                                                  position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
     assert isinstance(tpf, KeplerTargetPixelFile)
+
 
     with warnings.catch_warnings():
         # Some cards are too long -- to be investigated.
@@ -341,15 +345,16 @@ def test_tpf_from_images():
 
         # Can we read in a list of file names or a list of HDUlists?
         hdus = []
-        for idx, im in enumerate(images):
+        tmpfile_names = []
+        for im in images:
+            tmpfile = tempfile.NamedTemporaryFile(delete=False)
+            tmpfile_names.append(tmpfile.name)
             hdu = fits.HDUList([fits.PrimaryHDU(), im])
-            hdu.writeto(get_pkg_data_filename('data/test_factory{}.fits'.format(idx)), overwrite=True)
+            hdu.writeto(tmpfile.name)
             hdus.append(hdu)
 
-        fnames = [get_pkg_data_filename('data/test_factory{}.fits'.format(i)) for i in range(5)]
-
         # Should be able to run with a list of file names
-        tpf_fnames = KeplerTargetPixelFile.from_fits_images(fnames,
+        tpf_tmpfiles = KeplerTargetPixelFile.from_fits_images(tmpfile_names,
                                                             size=(3, 3),
                                                             position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
 
@@ -358,6 +363,64 @@ def test_tpf_from_images():
                                                           size=(3, 3),
                                                           position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
 
+        # Clean up the temporary files we created
+        for filename in tmpfile_names:
+            try:
+                os.remove(filename)
+            except PermissionError:
+                pass  # This appears to happen on Windows
+
+
+def test_tpf_wcs_from_images():
+    """Test to see if tpf.from_fits_images() output a tpf with WCS in the header"""
+    from astropy.io import fits
+    from astropy import wcs
+    import astropy.units as u
+    from astropy.coordinates import SkyCoord
+    from astropy.io.fits.card import UNDEFINED
+
+    # Can we read in a load of images?
+    header = fits.Header()
+    images = []
+    for i in range(5):
+        header['TSTART'] = i
+        header['TSTOP'] = i + 1
+        images.append(fits.ImageHDU(data=np.ones((5, 5)), header=header))
+
+    # Not without a wcs...
+    with pytest.raises(Exception):
+        KeplerTargetPixelFile.from_fits_images(images, size=(3, 3),
+                                               position=SkyCoord(-234.75, 8.3393, unit='deg'))
+
+    # Make a fake WCS based on astropy.docs...
+    w = wcs.WCS(naxis=2)
+    w.wcs.crpix = [0., 0.]
+    w.wcs.cdelt = np.array([0.001111, 0.001111])
+    w.wcs.crval = [23.2334, 45.2333]
+    w.wcs.ctype = ["RA---TAN", "DEC--TAN"]
+    header = w.to_header()
+    header['CRVAL1P'] = 10
+    header['CRVAL2P'] = 20
+    ra, dec = 23.2336, 45.235
+
+    # Add that header to our images...
+    images = []
+    for i in range(5):
+        header['TSTART'] = i
+        header['TSTOP'] = i + 1
+        images.append(fits.ImageHDU(data=np.ones((5, 5)), header=header))
+
+    # Now this should work.
+    tpf = KeplerTargetPixelFile.from_fits_images(images, size=(3, 3),
+                                                 position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
+    assert tpf.hdu[1].header['1CRPX5'] != UNDEFINED
+    assert tpf.hdu[1].header['1CTYP5'] == 'RA---TAN'
+    assert tpf.hdu[1].header['2CTYP5'] == 'DEC--TAN'
+    assert tpf.hdu[1].header['1CRPX5'] != UNDEFINED
+    assert tpf.hdu[1].header['2CRPX5'] != UNDEFINED
+    assert tpf.hdu[1].header['1CUNI5'] == 'deg'
+    assert tpf.hdu[1].header['2CUNI5'] == 'deg'
+    assert tpf.wcs.to_header()['CDELT1'] == w.wcs.cdelt[0]
 
 def test_properties2(capfd):
     '''Test if the describe function produces an output.
@@ -374,6 +437,12 @@ def test_interact():
                 TessTargetPixelFile(filename_tess)]:
         tpf.interact()
 
+@pytest.mark.remote_data
+def test_interact_sky():
+    """Test the Jupyter notebook interact() widget."""
+    for tpf in [KeplerTargetPixelFile(filename_tpf_one_center),
+                TessTargetPixelFile(filename_tess)]:
+        tpf.interact_sky()
 
 def test_get_models():
     """Can we obtain PRF and TPF models?"""
@@ -408,6 +477,9 @@ def test_threshold_aperture_mask():
     assert tpf.create_threshold_mask(threshold=2., reference_pixel='center').sum() == 25
     assert tpf.create_threshold_mask(threshold=2., reference_pixel=None).sum() == 28
     assert tpf.create_threshold_mask(threshold=2., reference_pixel=(5, 0)).sum() == 2
+    # A mask which contains zero pixels should work without crashing
+    tpf = KeplerTargetPixelFile(filename_tpf_all_zeros)
+    assert tpf.create_threshold_mask().sum() == 0
 
 
 def test_tpf_tess():
@@ -449,3 +521,21 @@ def test_get_keyword():
     assert tpf.get_keyword("TELESCOP") == "Kepler"
     assert tpf.get_keyword("TTYPE1", hdu=1) == "TIME"
     assert tpf.get_keyword("DOESNOTEXIST", default=5) == 5
+
+
+def test_cutout():
+    """Test tpf.cutout() function."""
+    for tpf in [KeplerTargetPixelFile(filename_tpf_one_center),
+                TessTargetPixelFile(filename_tess, quality_bitmask=None)]:
+        ntpf = tpf.cutout(size=2)
+        assert ntpf.flux[0].shape == (2, 2)
+        assert ntpf.flux_err[0].shape == (2, 2)
+        assert ntpf.flux_bkg[0].shape == (2, 2)
+        ntpf = tpf.cutout((0, 0), size=3)
+        ntpf = tpf.cutout(size=(1, 2))
+        assert ntpf.flux.shape[1] == 2
+        assert ntpf.flux.shape[2] == 1
+        ntpf = tpf.cutout(SkyCoord(tpf.ra, tpf.dec, unit='deg'), size=2)
+        ntpf = tpf.cutout(size=2)
+        assert np.product(ntpf.flux.shape[1:]) == 4
+        assert ntpf.targetid == '{}_CUTOUT'.format(tpf.targetid)

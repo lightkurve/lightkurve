@@ -2,24 +2,25 @@ from __future__ import division, print_function
 
 from astropy.io import fits as pyfits
 from astropy.utils.data import get_pkg_data_filename
+from astropy import units as u
 import matplotlib.pyplot as plt
 import numpy as np
 
 from numpy.testing import (assert_almost_equal, assert_array_equal,
                            assert_allclose)
 import pytest
+import tempfile
 import warnings
 
 from ..lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
 from ..lightcurvefile import LightCurveFile, KeplerLightCurveFile, TessLightCurveFile
 from ..targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
 from ..utils import LightkurveWarning
+from .test_targetpixelfile import TABBY_TPF
 
 # 8th Quarter of Tabby's star
 TABBY_Q8 = ("https://archive.stsci.edu/missions/kepler/lightcurves"
             "/0084/008462852/kplr008462852-2011073133259_llc.fits")
-TABBY_TPF = ("https://archive.stsci.edu/missions/kepler/target_pixel_files"
-             "/0084/008462852/kplr008462852-2011073133259_lpd-targ.fits.gz")
 K2_C08 = ("https://archive.stsci.edu/missions/k2/lightcurves/c8/"
           "220100000/39000/ktwo220139473-c08_llc.fits")
 KEPLER10 = ("https://archive.stsci.edu/missions/kepler/lightcurves/"
@@ -27,6 +28,8 @@ KEPLER10 = ("https://archive.stsci.edu/missions/kepler/lightcurves/"
 TESS_SIM = ("https://archive.stsci.edu/missions/tess/ete-6/tid/00/000/"
             "004/104/tess2019128220341-0000000410458113-0016-s_lc.fits")
 filename_tess = get_pkg_data_filename("data/tess25155310-s01-first-cadences.fits.gz")
+filename_tess_custom = get_pkg_data_filename("data/test_TESS_interact_generated_custom-lc.fits")
+filename_K2_custom = get_pkg_data_filename("data/test_K2_interact_generated_custom-lc.fits")
 
 
 def test_invalid_lightcurve():
@@ -106,7 +109,7 @@ def test_KeplerLightCurveFile(path, mission):
     hdu = pyfits.open(path)
     assert lc.label == hdu[0].header['OBJECT']
     assert_array_equal(lc.time, hdu[1].data['TIME'])
-    assert_array_equal(lc.flux, hdu[1].data['SAP_FLUX'])
+    assert_array_equal(lc.flux, hdu[1].data['SAP_FLUX'] / ((hdu[1].header['CROWDSAP'] * hdu[1].header['FLFRCSAP'])))
 
     with pytest.raises(KeyError):
         lcf.get_lightcurve('BLABLA')
@@ -163,10 +166,15 @@ def test_lightcurve_fold():
     assert fold.meta == lc.meta
     assert_array_equal(np.sort(fold.time_original), lc.time)
     assert len(fold.time_original) == len(lc.time)
-    fold = lc.fold(period=1, transit_midpoint=-0.1)
+    fold = lc.fold(period=1, t0=-0.1)
     assert_almost_equal(fold.time[0], -0.5, 2)
     assert_almost_equal(np.min(fold.phase), -0.5, 2)
     assert_almost_equal(np.max(fold.phase), 0.5, 2)
+    with warnings.catch_warnings():
+        # `transit_midpoint` is deprecated and its use will emit a warning
+        warnings.simplefilter("ignore", LightkurveWarning)
+        fold = lc.fold(period=1, transit_midpoint=-0.1)
+    assert_almost_equal(fold.time[0], -0.5, 2)
     ax = fold.plot()
     assert (ax.get_xlabel() == 'Phase')
     ax = fold.scatter()
@@ -180,6 +188,10 @@ def test_lightcurve_fold():
     with pytest.warns(LightkurveWarning, match='appears to be given in JD'):
         lc.fold(10, 2456600)
 
+def test_lightcurve_fold_issue520():
+    """Regression test for #520; accept quantities in `fold()`."""
+    lc = LightCurve(time=np.linspace(0, 10, 100), flux=np.zeros(100)+1)
+    lc.fold(period=1*u.day, t0=5*u.day)
 
 def test_lightcurve_append():
     """Test ``LightCurve.append()``."""
@@ -228,11 +240,11 @@ def test_lightcurve_copy():
     # By changing 1 of the 4 data points in the new lightcurve's array-like
     # attributes, we expect assert_array_equal to raise an AssertionError
     # indicating a mismatch of 1/4 (or 25%).
-    with pytest.raises(AssertionError, match='(mismatch 25.0%)'):
+    with pytest.raises(AssertionError, match=r'ismatch.* 25'):
         assert_array_equal(lc.time, nlc.time)
-    with pytest.raises(AssertionError, match='(mismatch 25.0%)'):
+    with pytest.raises(AssertionError, match=r'ismatch.* 25'):
         assert_array_equal(lc.flux, nlc.flux)
-    with pytest.raises(AssertionError, match='(mismatch 25.0%)'):
+    with pytest.raises(AssertionError, match=r'ismatch.* 25'):
         assert_array_equal(lc.flux_err, nlc.flux_err)
 
     # KeplerLightCurve has extra data
@@ -258,18 +270,56 @@ def test_lightcurve_copy():
     # with a repeating decimal. However, float precision for python 2.7 is 10
     # decimal digits, while python 3.6's is 13 decimal digits. Therefore,
     # a regular expression is needed for both versions.
-    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
+    with pytest.raises(AssertionError, match=r'ismatch.* 33\.3+'):
         assert_array_equal(lc.time, nlc.time)
-    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
+    with pytest.raises(AssertionError, match=r'ismatch.* 33\.3+'):
         assert_array_equal(lc.flux, nlc.flux)
-    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
+    with pytest.raises(AssertionError, match=r'ismatch.* 33\.3+'):
         assert_array_equal(lc.centroid_col, nlc.centroid_col)
-    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
+    with pytest.raises(AssertionError, match=r'ismatch.* 33\.3+'):
         assert_array_equal(lc.centroid_row, nlc.centroid_row)
-    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
+    with pytest.raises(AssertionError, match=r'ismatch.* 33\.3+'):
         assert_array_equal(lc.cadenceno, nlc.cadenceno)
-    with pytest.raises(AssertionError, match=r'\(mismatch 33\.3+%\)'):
+    with pytest.raises(AssertionError, match=r'ismatch.* 33\.3+'):
         assert_array_equal(lc.quality, nlc.quality)
+
+@pytest.mark.parametrize("path, mission", [(filename_tess_custom, "TESS"),
+                                           (filename_K2_custom, "K2")])
+def test_custom_lightcurve_file(path, mission):
+    """Test whether we can read in custom interact()-produced lightcurvefiles"""
+    if mission == "K2":
+        lcf_custom = KeplerLightCurveFile(path)
+    elif mission == "TESS":
+        lcf_custom = TessLightCurveFile(path)
+    assert lcf_custom.hdu[2].name == 'APERTURE'
+    assert lcf_custom.cadenceno[0] >= 0
+    assert lcf_custom.dec == lcf_custom.dec
+    assert lcf_custom.time[-1] > lcf_custom.time[0]
+    # .interact() files currently define FLUX, and not SAP_FLUX nor PDCSAP_FLUX
+    lc = lcf_custom.get_lightcurve('FLUX')
+    assert len(lc.flux) > 0
+    with pytest.raises(KeyError):
+        lcf_custom.get_lightcurve('BLABLA')
+    with pytest.raises(KeyError):
+        lcf_custom.SAP_FLUX
+    with pytest.raises(KeyError):
+        lcf_custom.PDCSAP_FLUX
+
+    assert lc.mission.lower() == mission.lower()
+    # Does the data match what one would obtain using pyfits.open?
+    hdu = pyfits.open(path)
+    assert lc.label == hdu[0].header['OBJECT']
+    assert_array_equal(lc.time, hdu[1].data['TIME'])
+    assert_array_equal(lc.flux, hdu[1].data['FLUX'])
+
+    # TESS has QUALITY while Kepler/K2 has SAP_QUALITY:
+    if mission == "TESS":
+        assert "QUALITY" in lcf_custom.hdu[1].columns.names
+        assert_array_equal(lc.quality, hdu[1].data['QUALITY'])
+    if mission in ["K2", "Kepler"]:
+        assert "SAP_QUALITY" in lcf_custom.hdu[1].columns.names
+        assert_array_equal(lc.quality, hdu[1].data['SAP_QUALITY'])
+
 
 
 @pytest.mark.remote_data
@@ -354,6 +404,10 @@ def test_bin():
                           flux=1*np.ones(1000) + np.random.normal(0, 1e-6, 1000),
                           cadenceno=np.arange(1000))
     assert np.isclose(lc.bin(2).estimate_cdpp(), 1, rtol=1)
+    # Regression test for #500
+    lc = LightCurve(time=np.arange(2000),
+                    flux=np.random.normal(loc=42, scale=0.01, size=2000))
+    assert np.round(lc.bin(2000).flux_err[0], 2) == 0.01
 
 
 def test_bin_quality():
@@ -419,7 +473,7 @@ def test_to_csv():
     time, flux, flux_err = range(3), np.ones(3), np.zeros(3)
     try:
         lc = LightCurve(time, flux, flux_err)
-        assert(lc.to_csv(index=False) == 'time,flux,flux_err\n0,1.0,0.0\n1,1.0,0.0\n2,1.0,0.0\n')
+        assert(lc.to_csv(index=False, line_terminator='\n') == 'time,flux,flux_err\n0,1.0,0.0\n1,1.0,0.0\n2,1.0,0.0\n')
     except ImportError:
         # pandas is an optional dependency
         pass
@@ -449,25 +503,28 @@ def test_to_fits():
     assert hdu[1].header['TTYPE2'] == 'FLUX'
 
     # Test aperture mask support in to_fits
-    for tpf in [KeplerTargetPixelFile(TABBY_TPF),TessTargetPixelFile(filename_tess)]:
-        random_mask = np.random.randint(0, 2,size=tpf.flux[0].shape, dtype=bool)
+    for tpf in [KeplerTargetPixelFile(TABBY_TPF), TessTargetPixelFile(filename_tess)]:
+        random_mask = np.random.randint(0, 2, size=tpf.flux[0].shape, dtype=bool)
         thresh_mask = tpf.create_threshold_mask(threshold=3)
 
         lc = tpf.to_lightcurve(aperture_mask=random_mask)
-        lc.to_fits(path='out1.fits', aperture_mask=random_mask, overwrite=True)
+        lc.to_fits(path=tempfile.NamedTemporaryFile().name, aperture_mask=random_mask)
+
+        lc.to_fits(path=tempfile.NamedTemporaryFile().name, overwrite=True,
+                  flux_column_name='SAP_FLUX')
 
         lc = tpf[0:2].to_lightcurve(aperture_mask=thresh_mask)
-        lc.to_fits(aperture_mask=thresh_mask, path='out2.fits', overwrite=True)
+        lc.to_fits(aperture_mask=thresh_mask, path=tempfile.NamedTemporaryFile().name)
 
         # Test the extra data kwargs
         bkg_mask = ~tpf.create_threshold_mask(threshold=0.1)
         bkg_lc = tpf.to_lightcurve(aperture_mask=bkg_mask)
         lc = tpf.to_lightcurve(aperture_mask=tpf.hdu['APERTURE'].data)
-        #lc = tpf.to_lightcurve(aperture_mask=None) ## will error
+        lc = tpf.to_lightcurve(aperture_mask=None)
         lc = tpf.to_lightcurve(aperture_mask=thresh_mask)
         lc_out = lc - bkg_lc.flux * (thresh_mask.sum()/bkg_mask.sum())
-        lc_out.to_fits(aperture_mask=thresh_mask, path='out2.fits',
-                   overwrite=True, extra_data={'BKG':bkg_lc.flux})
+        lc_out.to_fits(aperture_mask=thresh_mask, path=tempfile.NamedTemporaryFile().name,
+                       overwrite=True, extra_data={'BKG': bkg_lc.flux})
 
 
 @pytest.mark.remote_data
@@ -692,4 +749,18 @@ def test_targetid():
 def test_regression_346():
     """Regression test for https://github.com/KeplerGO/lightkurve/issues/346"""
     # This previously triggered an IndexError:
-    KeplerLightCurveFile(K2_C08).PDCSAP_FLUX.correct().estimate_cdpp()
+    KeplerLightCurveFile(K2_C08).PDCSAP_FLUX.to_corrector().correct().estimate_cdpp()
+
+
+def test_to_timeseries():
+    """Test the `LightCurve.to_timeseries()` method."""
+    time, flux, flux_err = range(3), np.ones(3), np.zeros(3)
+    lc = LightCurve(time, flux, flux_err, time_format="jd")
+    try:
+        ts = lc.to_timeseries()
+        assert_allclose(ts['time'].value, time)
+        assert_allclose(ts['flux'], flux)
+        assert_allclose(ts['flux_err'], flux_err)
+    except ImportError:
+        # Requires AstroPy v3.2 or later
+        pass

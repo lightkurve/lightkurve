@@ -17,9 +17,7 @@ log = logging.getLogger(__name__)
 
 __all__ = ['LightkurveWarning',
            'KeplerQualityFlags', 'TessQualityFlags',
-           'bkjd_to_astropy_time', 'btjd_to_astropy_time',
-           'channel_to_module_output', 'module_output_to_channel',
-           'running_mean']
+           'bkjd_to_astropy_time', 'btjd_to_astropy_time']
 
 
 class QualityFlags(object):
@@ -87,8 +85,17 @@ class QualityFlags(object):
                                  "".format(bitmask, valid_options))
         # The bitmask is applied using the bitwise AND operator
         quality_mask = (quality_array & bitmask) == 0
-        log.info("{} cadences will be ignored (bitmask={})"
-                 "".format((~quality_mask).sum(), bitmask))
+        # Log the quality masking as info or warning
+        n_cadences = len(quality_array)
+        n_cadences_masked = (~quality_mask).sum()
+        percent_masked = 100. * n_cadences_masked / n_cadences
+        logmsg = "{:.0f}% ({}/{}) of the cadences will be ignored due to the " \
+                 "quality mask (quality_bitmask={})." \
+                 "".format(percent_masked, n_cadences_masked, n_cadences, bitmask)
+        if percent_masked > 20:
+            log.warning("Warning: " + logmsg)
+        else:
+            log.info(logmsg)
         return quality_mask
 
 
@@ -414,9 +421,9 @@ def plot_image(image, ax=None, scale='linear', origin='lower',
     norm = None
     if scale is not None:
         if scale == 'linear':
-            norm = ImageNormalize(vmin=vmin, vmax=vmax, stretch=LinearStretch())
+            norm = ImageNormalize(vmin=vmin, vmax=vmax, stretch=LinearStretch(), clip=False)
         elif scale == 'sqrt':
-            norm = ImageNormalize(vmin=vmin, vmax=vmax, stretch=SqrtStretch())
+            norm = ImageNormalize(vmin=vmin, vmax=vmax, stretch=SqrtStretch(), clip=False)
         elif scale == 'log':
             # To use log scale we need to guarantee that vmin > 0, so that
             # we avoid division by zero and/or negative values.
@@ -424,7 +431,6 @@ def plot_image(image, ax=None, scale='linear', origin='lower',
                            clip=True)
         else:
             raise ValueError("scale {} is not available.".format(scale))
-
     cax = ax.imshow(image, origin=origin, norm=norm, **kwargs)
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
@@ -487,7 +493,11 @@ def detect_filetype(header):
     try:
         # use `telescop` keyword to determine mission
         # and `creator` to determine tpf or lc
-        telescop = header['telescop'].lower()
+        if 'TELESCOP' in header.keys():
+            telescop = header['telescop'].lower()
+        else:
+            # Some old custom TESS data did not define the `TELESCOP` card
+            telescop = header['mission'].lower()
         creator = header['creator'].lower()
         origin = header['origin'].lower()
         if telescop == 'kepler':
@@ -495,7 +505,8 @@ def detect_filetype(header):
             if 'targetpixel' in creator:
                 return 'KeplerTargetPixelFile'
             # Kepler LCFs will contain "FluxExporter2PipelineModule"
-            elif 'fluxexporter' in creator or 'lightcurve' in creator:
+            elif ('fluxexporter' in creator or 'lightcurve' in creator
+                or 'lightcurve' in creator):
                 return 'KeplerLightCurveFile'
         elif telescop == 'tess':
             # TESS TPFs will contain "TargetPixelExporterPipelineModule"
@@ -511,3 +522,25 @@ def detect_filetype(header):
     # if one of them is Undefined we expect `.lower()` to yield an AttributeError.
     except (KeyError, AttributeError):
         return None
+
+
+def validate_method(method, supported_methods):
+    """Raises a `ValueError` if a method is not supported.
+
+    Parameters
+    ----------
+    method : str
+        The method specified by the user.
+    supported_methods : list of str
+        The methods supported.  All method names must be lowercase.
+
+    Returns
+    -------
+    method : str
+        Will return the method name if it is supported.
+    """
+    method = method.lower()
+    if method in supported_methods:
+        return method
+    raise ValueError("method '{}' is not supported; "
+                     "must be one of {}".format(method, supported_methods))

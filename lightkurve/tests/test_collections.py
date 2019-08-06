@@ -2,6 +2,7 @@ import pytest
 from astropy.utils.data import get_pkg_data_filename
 import matplotlib.pyplot as plt
 import numpy as np
+from numpy.testing import assert_array_equal
 
 from ..lightcurve import LightCurve
 from ..targetpixelfile import KeplerTargetPixelFile
@@ -32,6 +33,15 @@ def test_collection_append():
     lcc.append(lc2)
     assert(len(lcc) == 2)
 
+def test_collection_stitch():
+    """Does Collection.stitch() work?"""
+    lc = LightCurve(time=np.arange(1, 5), flux=np.ones(4))
+    lc2 = LightCurve(time=np.arange(5, 16), flux=np.ones(11))
+    lcc = LightCurveCollection([lc, lc2])
+    lc_stitched = lcc.stitch()
+    assert(len(lc_stitched.flux) == 15)
+    lc_stitched2 = lcc.stitch(corrector_func=lambda x: x*2)
+    assert_array_equal(lc_stitched.flux*2, lc_stitched2.flux)
 
 def test_collection_getitem():
     """Tests Collection.__getitem__"""
@@ -85,13 +95,13 @@ def test_tpfcollection():
     assert(tpfc[2] == tpf2)
 
 
-def test_tpfcollection_plot_all():
+def test_tpfcollection_plot():
     tpf = KeplerTargetPixelFile(filename_tpf_all_zeros)
     tpf2 = KeplerTargetPixelFile(filename_tpf_one_center)
     # Does plotting work with 3 TPFs?
     coll = TargetPixelFileCollection([tpf, tpf2, tpf2])
-    coll.plot_all()
+    coll.plot()
     # Does plotting work with one TPF?
     coll = TargetPixelFileCollection([tpf])
-    coll.plot_all()
+    coll.plot()
     plt.close('all')

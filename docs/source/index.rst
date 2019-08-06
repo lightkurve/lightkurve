@@ -1,54 +1,54 @@
-..
+.. title:: Lightkurve docs
 
-======================
-Welcome to lightkurve!
-======================
+.. raw:: html
 
-The **lightkurve** Python package offers a beautiful and user-friendly way
-to analyze astronomical flux time series data,
-in particular the pixels and lightcurves obtained by
-**NASA's Kepler, K2, and TESS missions**.
+  <div class="container text-center" style="padding-top:1em; padding-bottom: 2em;">
+    <h1 style="font-size: 4rem;">Lightkurve</h1>
+    <p class="lead" style="font-size: 1.5rem;">
+        A friendly package for Kepler & TESS time series analysis in Python.
+    </p>
+    <p>
+        <a href="quickstart.html" class="btn btn-primary my-2" style="font-size: 1.25rem;">Quickstart →</a>
+    </p>
+  </div>
 
-.. image:: _static/images/lightkurve-teaser.gif
-   :target: _static/images/lightkurve-teaser.gif
+  <div class="container">
+    <hr>
+    <div class="row">
+      <div class="col-md-6">
+        <p style="font-size: 1.2em; font-weight: 700;">
+         Time domain astronomy made easy
+        </p>
+        <p>
+          Lightkurve offers a user-friendly way
+          to analyze time series data obtained by telescopes,
+          in particular NASA’s Kepler and TESS exoplanet missions.
+        </p>
+        <p>
+          It intends to lowers the barrier for <i>anyone</i> to analyze
+          NASA data by providing a well-tested, well-documented, and fluent <a href="api/index.html">API</a> and <a href="tutorials/index.html">tutorials</a>.
+        </p>
+      </div> 
 
-This package aims to lower the barrier for both students, astronomers,
-and citizen scientists interested in analyzing Kepler and TESS space telescope data.
-It does this by providing **high-quality building blocks and tutorials**
-which enable both hand-tailored data analyses and advanced automated pipelines.
-
-Lightkurve is an **open source community project** owned by
-`the authors <https://github.com/KeplerGO/lightkurve/blob/master/AUTHORS.rst>`_
-and supported by
-`NASA's Kepler/K2 Guest Observer Office <https://keplerscience.arc.nasa.gov>`_.
-The development `takes place on GitHub <https://github.com/KeplerGO/lightkurve>`_
-and everyone is :ref:`invited to contribute<contributing>`.
+      <div class="col-md-6">
 
 
-.. _user-docs:
+.. code-block:: python
 
-.. toctree::
-   :caption: Getting started
-   :maxdepth: 1
+    import lightkurve as lk
 
-   tutorials/quickstart.ipynb
-   install
-   api/index
+    pixels = lk.search_targetpixelfile("Kepler-10").download()
+    pixels.plot()
 
-.. toctree::
-    :caption: Tutorials
-    :maxdepth: 2
+    lightcurve = pixels.to_lightcurve()
+    lightcurve.plot()
 
-    tutorials/section1.rst
-    tutorials/section2.rst
-    tutorials/section3.rst
-    tutorials/section4.rst
+    exoplanet = lightcurve.flatten().fold(period=0.838)
+    exoplanet.plot()
 
-.. toctree::
-    :caption: About lightkurve
-    :maxdepth: 1
 
-    contributing
-    developer
-    citing
-    other_software
+.. raw:: html
+
+      </div>
+    </div>
+  </div>

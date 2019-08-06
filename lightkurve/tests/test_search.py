@@ -5,12 +5,12 @@ with the `@pytest.mark.remote_data` decorator below will only run if the
 `--remote-data` argument is passed to py.test.  This allows tests to pass
 if no internet connection is available.
 """
-from __future__ import division, print_function
-
 import os
+import sys
 import pytest
 import numpy as np
 from numpy.testing import assert_almost_equal, assert_array_equal
+import tempfile
 import warnings
 
 from astropy.coordinates import SkyCoord
@@ -18,7 +18,8 @@ import astropy.units as u
 from astropy.table import Table
 
 from ..utils import LightkurveWarning
-from ..search import search_lightcurvefile, search_targetpixelfile, SearchResult, open
+from ..search import search_lightcurvefile, search_targetpixelfile, \
+                     search_tesscut, SearchResult, SearchError, open
 from .. import KeplerLightCurveFile
 from .. import KeplerTargetPixelFile, TessTargetPixelFile, TargetPixelFileCollection
 
@@ -49,13 +50,14 @@ def test_search_targetpixelfile():
         cc = search_targetpixelfile(idx, campaign=c[2]).table
         assert(len(cc) == 2)
     search_targetpixelfile(11904151, quarter=11).download()
-
     # with mission='TESS', it should return TESS observations
-    tic = 273985862
-    assert(len(search_targetpixelfile(tic, mission='TESS').table) == 1)
-    assert(len(search_targetpixelfile(tic, mission='TESS', radius=100).table) == 2)
-    search_targetpixelfile(tic, mission='TESS').download()
+    tic = 273985862  # Has been observed in multiple sectors including 1
+    assert(len(search_targetpixelfile(tic, mission='TESS').table) > 1)
+    assert(len(search_targetpixelfile(tic, mission='TESS', sector=1, radius=100).table) == 2)
+    search_targetpixelfile(tic, mission='TESS', sector=1).download()
     assert(len(search_targetpixelfile("pi Mensae", sector=1).table) == 1)
+    # Issue #445: indexing with -1 should return the last index of the search result
+    assert(len(search_targetpixelfile("pi Men")[-1]) == 1)
 
 
 @pytest.mark.remote_data
@@ -79,10 +81,62 @@ def test_search_lightcurvefile(caplog):
     search_lightcurvefile(c, quarter=6).download()
     # with mission='TESS', it should return TESS observations
     tic = 273985862
-    assert(len(search_lightcurvefile(tic, mission='TESS').table) == 1)
-    assert(len(search_lightcurvefile(tic, mission='TESS', radius=100).table) == 2)
-    search_lightcurvefile(tic, mission='TESS').download()
+    assert(len(search_lightcurvefile(tic, mission='TESS').table) > 1)
+    assert(len(search_lightcurvefile(tic, mission='TESS', sector=1, radius=100).table) == 2)
+    search_lightcurvefile(tic, mission='TESS', sector=1).download()
     assert(len(search_lightcurvefile("pi Mensae", sector=1).table) == 1)
+
+
+@pytest.mark.remote_data
+def test_search_tesscut():
+    # Cutout by target name
+    assert(len(search_tesscut("pi Mensae", sector=1).table) == 1)
+    assert(len(search_tesscut("pi Mensae").table) > 1)
+    # Cutout by TIC ID
+    assert(len(search_tesscut('TIC 206669860', sector=2).table) == 1)
+    # Cutout by RA, dec string
+    search_string = search_tesscut('30.578761, -83.210593')
+    # Cutout by SkyCoord
+    c = SkyCoord('30.578761 -83.210593', unit=(u.deg, u.deg))
+    search_coords = search_tesscut(c)
+    # These should be identical
+    assert(len(search_string.table) == len(search_coords.table))
+    # Test cutout at edge of FFI
+    search_edge = search_tesscut('30.578761, 6.210593')
+    assert(len(search_edge.table) == 1)
+    try:
+        # This is too near the FFI edge and should fail to download
+        search_edge.download()
+    except SearchError:
+        pass
+
+
+@pytest.mark.remote_data
+def test_search_tesscut_download():
+    """Can we download TESS cutouts via `search_cutout().download()?"""
+    ra, dec = 30.578761, -83.210593
+    search_string = search_tesscut('{}, {}'.format(ra, dec))
+    # Make sure they can be downloaded with default size
+    tpf = search_string.download()
+    # Ensure the correct object has been read in
+    assert(isinstance(tpf, TessTargetPixelFile))
+    # Ensure default size is 5x5
+    assert(tpf.flux[0].shape == (5, 5))
+    # Ensure the tpf has a targetid (#473 regression test)
+    assert(len(tpf.targetid) > 0)
+    # Ensure the WCS is valid (#434 regression test)
+    center_ra, center_dec = tpf.wcs.all_pix2world([[2.5, 2.5]], 1)[0]
+    assert_almost_equal(ra, center_ra, decimal=1)
+    assert_almost_equal(dec, center_dec, decimal=1)
+    # Download with different dimensions
+    tpfc = search_string.download_all(cutout_size=4, quality_bitmask='hard')
+    assert(isinstance(tpfc, TargetPixelFileCollection))
+    assert(tpfc[0].quality_bitmask == 'hard')  # Regression test for #494
+    # Ensure correct dimensions
+    assert(tpfc[0].flux[0].shape == (4, 4))
+    # Download with rectangular dimennsions?
+    rect_tpf = search_string.download(cutout_size=(3, 5))
+    assert(rect_tpf.flux[0].shape == (3, 5))
 
 
 @pytest.mark.remote_data
@@ -167,65 +221,6 @@ def test_empty_searchresult():
         sr.download_all()
 
 
-###
-# DEPRECATED TESTS
-# The tests below verify the DEPRECATED `from_archive` methods.
-# These can be removed once `from_archive` is removed.
-###
-
-@pytest.mark.remote_data
-@pytest.mark.filterwarnings('ignore:Query returned no results')
-def test_kepler_tpf_from_archive_DEPRECATED():
-    # Ignore all deprecation warnings
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", LightkurveWarning)
-        # Request an object name that does not exist
-        with pytest.raises(ValueError):
-            KeplerTargetPixelFile.from_archive("LightKurve_Unit_Test_Invalid_Target")
-        # Request an EPIC ID that was not observed
-        with pytest.raises(ValueError):
-            KeplerTargetPixelFile.from_archive(246000000)
-        KeplerTargetPixelFile.from_archive('Kepler-10', quarter=11)
-        KeplerTargetPixelFile.from_archive('Kepler-10', quarter=11, cadence='short')
-        KeplerTargetPixelFile.from_archive('Kepler-10', quarter=11, month=1, cadence='short')
-        # If we request 2 quarters it should give a list of two TPFs, ordered by quarter
-        tpfs = KeplerTargetPixelFile.from_archive(5728079, cadence='long', quarter=[1, 2])
-        assert(isinstance(tpfs, TargetPixelFileCollection))
-        assert(isinstance(tpfs[0], KeplerTargetPixelFile))
-        assert(tpfs[0].quarter == 1)
-
-
-@pytest.mark.remote_data
-@pytest.mark.filterwarnings('ignore:Query returned no results')
-def test_kepler_lightcurve_from_archive_DEPRECATED():
-    # Ignore all deprecation warnings
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", LightkurveWarning)
-        # Request an object name that does not exist
-        with pytest.raises(ValueError):
-            KeplerLightCurveFile.from_archive("LightKurve_Unit_Test_Invalid_Target")
-        # Request an EPIC ID that was not observed
-        with pytest.raises(ValueError):
-            KeplerLightCurveFile.from_archive(246000000)
-        KeplerLightCurveFile.from_archive('Kepler-10', quarter=11)
-        KeplerLightCurveFile.from_archive('Kepler-10', quarter=11, cadence='short')
-        KeplerLightCurveFile.from_archive('Kepler-10', quarter=11, month=1, cadence='short')
-
-
-@pytest.mark.remote_data
-def test_source_confusion_DEPRECATED():
-    # Regression test for issue #148.
-    # When obtaining the TPF for target 6507433, @benmontet noticed that
-    # a target 4 arcsec away was returned instead.
-    # See https://github.com/KeplerGO/lightkurve/issues/148
-    # Ignore all deprecation warnings
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", LightkurveWarning)
-        desired_target = 6507433
-        tpf = KeplerTargetPixelFile.from_archive(desired_target, quarter=8)
-        assert tpf.targetid == desired_target
-
-
 def test_open():
     # define paths to k2 and  tess data
     k2_path = os.path.join(PACKAGEDIR, "tests", "data", "test-tpf-star.fits")
@@ -237,11 +232,55 @@ def test_open():
     assert(isinstance(tesstpf, TessTargetPixelFile))
     # Open should fail if the filetype is not recognized
     try:
-        open(os.path.join(PACKAGEDIR, "tests", "data", "test_factory0.fits"))
-    except ValueError:
+        open(os.path.join(PACKAGEDIR, "data", "lightkurve.mplstyle"))
+    except (ValueError, IOError):
         pass
     # Can you instantiate with a path?
     assert(isinstance(KeplerTargetPixelFile(k2_path), KeplerTargetPixelFile))
     assert(isinstance(TessTargetPixelFile(tess_path), TessTargetPixelFile))
     # Can open take a quality_bitmask argument?
     assert(open(k2_path, quality_bitmask='hard').quality_bitmask == 'hard')
+
+
+@pytest.mark.remote_data
+def test_issue_472():
+    """Regression test for https://github.com/KeplerGO/lightkurve/issues/472"""
+    # The line below previously threw an exception because the target was not
+    # observed in Sector 2; we're expecting an empty SearchResult instead.
+    search = search_tesscut("TIC41336498", sector=2)
+    assert isinstance(search, SearchResult)
+    len(search) == 0
+
+
+@pytest.mark.remote_data
+def test_corrupt_download_handling():
+    """When a corrupt file exists in the cache, make sure the user receives
+    a helpful error message.
+
+    This is a regression test for #511.
+    """
+    from builtins import open  # Because open is imported as lightkurve.open at the top
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        # Pretend a corrupt file exists at the expected cache location
+        expected_dir = os.path.join(tmpdirname,
+                                   "mastDownload",
+                                   "Kepler",
+                                   "kplr011904151_lc_Q111111110111011101")
+        expected_fn = os.path.join(expected_dir, "kplr011904151-2010009091648_lpd-targ.fits.gz")
+        os.makedirs(expected_dir)
+        open(expected_fn, 'w').close()  # create "corrupt" i.e. empty file
+        with pytest.raises(SearchError) as err:
+            search_targetpixelfile("Kepler-10", quarter=4).download(download_dir=tmpdirname)
+        assert "The file was likely only partially downloaded." in err.value.args[0]
+
+
+def test_filenotfound():
+    """Regression test for #540; ensure lk.open() yields `FileNotFoundError`."""
+    # Python 2 uses IOError instead of FileNotFoundError;
+    # the block below can be removed when we drop Python 2 support.
+    try:
+        FileNotFoundError
+    except NameError:
+        FileNotFoundError = IOError
+    with pytest.raises(FileNotFoundError):
+        open("DOESNOTEXIST")
