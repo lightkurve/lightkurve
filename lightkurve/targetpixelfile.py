@@ -557,7 +557,6 @@ class TargetPixelFile(object):
             raise ValueError("frame {} is out of bounds, must be in the range "
                              "0-{}.".format(frame, self.shape[0]))
         with plt.style.context(style):
-          
             if showcadencenum:
                     img_title = 'Target ID: {}, frame: {}'.format(self.targetid, frame)
             else:
