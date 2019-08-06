@@ -40,7 +40,7 @@ class GPCorrector(Corrector):
     def _build_matern32_kernel(self, matern_bounds=None, jitter_bounds=None):
         log_sigma = np.log(np.nanstd(self.lc.flux))
         log_rho = np.log(self.lc.to_periodogram(minimum_period=0.5, maximum_period=50).period_at_max_power.value)
-        log_sigma2 = np.log(self.lc.estimate_cdpp() * 1e-6)
+        log_sigma2 = np.log(np.nanmedian(self.lc.flux_err))
 
         if matern_bounds is None:
             matern_bounds = {'log_sigma': (-2 + log_sigma, 2 + log_sigma),
@@ -56,7 +56,7 @@ class GPCorrector(Corrector):
         log_omega0 = np.log(2*np.pi / self.lc.to_periodogram(minimum_period=0.5, maximum_period=50).period_at_max_power.value)
         log_S0 = np.log(np.nanstd(self.lc.flux)**2)
         log_Q = np.log(10)
-        log_sigma = np.log(self.lc.estimate_cdpp() * 1e-6)
+        log_sigma = np.log(np.nanmedian(self.lc.flux_err))
 
         if sho_bounds is None:
             sho_bounds = {'log_S0': (-2 + log_S0, 2 + log_S0),
@@ -148,8 +148,8 @@ class GPCorrector(Corrector):
             if fast:
                 mu = gp.predict(self.lc.flux, self.lc.time, return_cov=False, return_var=False)
             else:
-                mu, std = gp.predict(self.lc.flux, self.lc.time, return_cov=False, return_var=True)
-                ax.fill_between(self.lc.time, mu - std, mu + std, alpha=0.3, color='r', label='')
+                mu, var = gp.predict(self.lc.flux, self.lc.time, return_cov=False, return_var=True)
+                ax.fill_between(self.lc.time, mu - var**0.5, mu + var**0.5, alpha=0.3, color='r', label='')
             k = self.initial_kernel.get_parameter_dict()
             label = 'Initial Guess\n' + '\n'.join(['{}: {}'.format(key, np.round(k[key], 3))
                                         for key in k.keys()])
@@ -159,8 +159,8 @@ class GPCorrector(Corrector):
             if fast:
                 mu = self.gp.predict(self.lc.flux, self.lc.time, return_cov=False, return_var=False)
             else:
-                mu, std = self.gp.predict(self.lc.flux, self.lc.time, return_cov=False, return_var=True)
-                ax.fill_between(self.lc.time, mu - std, mu + std, alpha=0.3, color='b', label='')
+                mu, var = self.gp.predict(self.lc.flux, self.lc.time, return_cov=False, return_var=True)
+                ax.fill_between(self.lc.time, mu - var**0.5, mu + var**0.5, alpha=0.3, color='b', label='')
             k = self.kernel.get_parameter_dict()
             label = 'Optimized\n' + '\n'.join(['{}: {}'.format(key, np.round(k[key], 3))
                                         for key in k.keys()])
