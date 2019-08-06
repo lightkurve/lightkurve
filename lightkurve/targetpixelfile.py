@@ -560,7 +560,7 @@ class TargetPixelFile(object):
           
             if showcadencenum:
                     img_title = 'Target ID: {}, frame: {}'.format(self.targetid, frame)
-            else:                   
+            else:
                 img_title = 'Target ID: {}'.format(self.targetid)
                 
             img_extent = (self.column, self.column + self.shape[2],
