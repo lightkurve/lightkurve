@@ -347,7 +347,8 @@ class PLDCorrector(object):
         return dt
 
     def create_pymc_model(self, design_matrix, cadence_mask=None,
-                          gp_timescale_prior=50, fractional_prior_width=.05, **kwargs):
+                          gp_timescale_prior=50, fractional_prior_width=.05,
+                          optimize_gp=False, **kwargs):
         r"""Returns a PYMC3 model.
 
         Parameters
@@ -388,6 +389,8 @@ class PLDCorrector(object):
         with pm.Model() as model:
             # The mean baseline flux value for the star
             mean = pm.Normal("mean", mu=np.nanmean(self._lc_flux), sd=np.std(self._lc_flux))
+
+            # if optimize_gp:
             # Create a Gaussian Process to model the long-term stellar variability
             # log(sigma) is the amplitude of variability, estimated from the raw flux scatter
             logsigma = pm.Normal("logsigma", mu=np.log(np.std(self._lc_flux)), sd=2)
@@ -398,6 +401,13 @@ class PLDCorrector(object):
             # log(s2) is a jitter term to compensate for underestimated flux errors
             # We estimate the magnitude of jitter from the CDPP (normalized to the flux)
             logs2 = pm.Normal("logs2", mu=np.log(self._s2_mu), sd=2)
+
+            '''else:
+                # If not optimizing the GP hyperparmaters, fix them as deterministic variables
+                logsigma = tt.log(np.std(self._lc_flux))
+                logrho = tt.log(gp_timescale_prior)
+                logs2 = tt.log(self._s2_mu)'''
+
             # Create the GP kernel, fixed (for now) as a Matern-3/2 for its flexibility
             kernel = xo.gp.terms.Matern32Term(log_sigma=logsigma, log_rho=logrho)
 
@@ -461,7 +471,7 @@ class PLDCorrector(object):
             # If a solution cannot be found, fail with an informative LightkurveError
             try:
                 solution = xo.optimize(start=start, vars=[model.mean])
-                solution = xo.optimize(start=solution, vars=[model.logrho, model.mean])
+                # solution = xo.optimize(start=solution, vars=[model.logrho, model.mean])
                 # Optimizing parameters separately appears to make finding a solution more likely
                 if robust:
                     solution = xo.optimize(start=solution, vars=[model.logrho, model.logsigma, model.mean])
