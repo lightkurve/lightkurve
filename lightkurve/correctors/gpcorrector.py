@@ -24,10 +24,9 @@ class GPCorrector(Corrector):
         else:
             self.cadence_mask = cadence_mask
         self.diag = np.copy(self.lc.flux_err)
-        bad_cadences = np.copy(~self.cadence_mask)
-        bad_cadences |= self.lc.flatten(21).remove_outliers(sigma=sigma, return_mask=True)[1]
-        print(bad_cadences.sum())
-        self.diag[bad_cadences] *= 1e10  # This is faster than masking out flux values
+        self._bad_cadences = np.copy(~self.cadence_mask)
+        self._bad_cadences |= self.lc.flatten().remove_outliers(sigma=sigma, return_mask=True)[1]
+        self.diag[self._bad_cadences] *= 1e10  # This is faster than masking out flux values
 
         if isinstance(kernel, celerite.terms.Term):
             self.kernel = kernel
@@ -134,6 +133,8 @@ class GPCorrector(Corrector):
             if ax is None:
                 _, ax = plt.subplots()
             self.lc.errorbar(ax=ax, zorder=1, label='Data', normalize=False)
+            self.lc[self._bad_cadences].scatter(ax=ax, zorder=2, color='r', marker='x', s=20, label='Rejected Outliers', normalize=False)
+
 
         # Initial Guess
         if not self.optimized:
