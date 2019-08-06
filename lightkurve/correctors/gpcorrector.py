@@ -41,7 +41,7 @@ class GPCorrector(Corrector):
 
     def _build_matern32_kernel(self, matern_bounds=None, jitter_bounds=None):
         log_sigma = np.log(np.nanstd(self.lc.flux))
-        log_rho = np.log(self.lc.to_periodogram(minimum_period=0.5, maximum_period=50).period_at_max_power.value)
+        log_rho = np.log(self.lc.normalize().to_periodogram(minimum_period=0.5, maximum_period=50).period_at_max_power.value)
         log_sigma2 = np.log(np.nanmedian(self.lc.flux_err))
 
         if matern_bounds is None:
@@ -55,7 +55,7 @@ class GPCorrector(Corrector):
         return kernel
 
     def _build_sho_kernel(self, sho_bounds=None, jitter_bounds=None):
-        log_omega0 = np.log(2*np.pi / self.lc.to_periodogram(minimum_period=0.5, maximum_period=50).period_at_max_power.value)
+        log_omega0 = np.log(2*np.pi / self.lc.normalize().to_periodogram(minimum_period=0.5, maximum_period=50).period_at_max_power.value)
         log_S0 = np.log(np.nanstd(self.lc.flux)**2)
         log_Q = np.log(10)
         log_sigma = np.log(np.nanmedian(self.lc.flux_err))
