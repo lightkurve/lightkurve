@@ -41,13 +41,13 @@ class GPCorrector(Corrector):
         log_sigma = np.log(np.nanstd(self.lc.flux))
         log_rho = np.log(self.lc.to_periodogram(minimum_period=0.5, maximum_period=50).period_at_max_power.value)
         log_sigma2 = np.log(self.lc.estimate_cdpp() * 1e-6)
-        
+
         if matern_bounds is None:
             matern_bounds = {'log_sigma': (-2 + log_sigma, 2 + log_sigma),
                             'log_rho': (np.log(0.5), np.log(50))}
         if jitter_bounds is None:
             jitter_bounds = {'log_sigma':(-2 + log_sigma2, 2 + log_sigma2)}
-        
+
         kernel = celerite.terms.Matern32Term(log_sigma=log_sigma, log_rho=log_rho)
         kernel += celerite.terms.JitterTerm(log_sigma=log_sigma2, bounds=jitter_bounds)
         return kernel
@@ -115,14 +115,14 @@ class GPCorrector(Corrector):
 
     def diagnose(self, ax=None, fast=False):
         """Show a diagnostic plot of the GP. Returns a matplotlib.pyplot.axes object.
-            
+
         Parameters
         ----------
         ax : matplotlib.pyplot.axes object, default None
             Plot window to use
         kwargs: dict
             Keywords to pass to matplotlib.pyplot
-            
+
         Returns
         -------
         ax : matplotlib.pyplot.axes object, default None
@@ -133,31 +133,29 @@ class GPCorrector(Corrector):
             self.lc.errorbar(ax=ax, zorder=1, label='Data', normalize=False)
 
         # Initial Guess
-        gp = celerite.GP(self.initial_kernel, mean=np.nanmean(self.lc.flux))
-        gp.compute(self.lc.time, self.diag)
-        if fast:
-            mu = gp.predict(self.lc.flux, self.lc.time, return_cov=False, return_var=False)
-        else:
-            mu, std = gp.predict(self.lc.flux, self.lc.time, return_cov=False, return_var=True)
-            ax.fill_between(self.lc.time, mu - std, mu + std, alpha=0.3, color='r', label='')
-        
-        k = self.initial_kernel.get_parameter_dict()
-        label = 'Initial Guess\n' + '\n'.join(['{}: {}'.format(key, k[key])
-                                    for key in k.keys()])
-        ax.plot(self.lc.time, mu, c='r', lw=1, zorder=2, label=label)
-        
+        if not self.optimized:
+            gp = celerite.GP(self.initial_kernel, mean=np.nanmean(self.lc.flux))
+            gp.compute(self.lc.time, self.diag)
+            if fast:
+                mu = gp.predict(self.lc.flux, self.lc.time, return_cov=False, return_var=False)
+            else:
+                mu, std = gp.predict(self.lc.flux, self.lc.time, return_cov=False, return_var=True)
+                ax.fill_between(self.lc.time, mu - std, mu + std, alpha=0.3, color='r', label='')
+            k = self.initial_kernel.get_parameter_dict()
+            label = 'Initial Guess\n' + '\n'.join(['{}: {}'.format(key, np.round(k[key], 3))
+                                        for key in k.keys()])
+            ax.plot(self.lc.time, mu, c='r', lw=1, zorder=2, label=label)
+
         if self.optimized:
             if fast:
                 mu = self.gp.predict(self.lc.flux, self.lc.time, return_cov=False, return_var=False)
             else:
                 mu, std = self.gp.predict(self.lc.flux, self.lc.time, return_cov=False, return_var=True)
                 ax.fill_between(self.lc.time, mu - std, mu + std, alpha=0.3, color='b', label='')
-
             k = self.kernel.get_parameter_dict()
-            label = 'Optimized\n' + '\n'.join(['{}: {}'.format(key, k[key])
+            label = 'Optimized\n' + '\n'.join(['{}: {}'.format(key, np.round(k[key], 3))
                                         for key in k.keys()])
             ax.plot(self.lc.time, mu, c='b', lw=1, zorder=2, label=label)
 
         ax.legend()
-
         return ax
