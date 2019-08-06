@@ -146,9 +146,10 @@ class GPCorrector(Corrector):
                 mu, var = gp.predict(self.lc.flux, self.lc.time, return_cov=False, return_var=True)
                 ax.fill_between(self.lc.time, mu - var**0.5, mu + var**0.5, alpha=0.3, color='r', label='')
             k = self.initial_kernel.get_parameter_dict()
-            label = 'Initial Guess\n' + '\n'.join(['{}: {}'.format(key, np.round(k[key], 3))
+            label = '\n'.join(['{}: {}'.format(key.split(':')[-1], np.round(k[key], 3))
                                         for key in k.keys()])
             ax.plot(self.lc.time, mu, c='r', lw=1, zorder=2, label=label)
+            ax.set_title('Initial Guess')
 
         if self.optimized:
             if fast:
@@ -157,9 +158,11 @@ class GPCorrector(Corrector):
                 mu, var = self.gp.predict(self.lc.flux, self.lc.time, return_cov=False, return_var=True)
                 ax.fill_between(self.lc.time, mu - var**0.5, mu + var**0.5, alpha=0.3, color='b', label='')
             k = self.kernel.get_parameter_dict()
-            label = 'Optimized\n' + '\n'.join(['{}: {}'.format(key, np.round(k[key], 3))
+            label = '\n'.join(['{}: {}'.format(key.split(':')[-1], np.round(k[key], 3))
                                         for key in k.keys()])
             ax.plot(self.lc.time, mu, c='b', lw=1, zorder=2, label=label)
+            ax.set_title('Optimized')
+        ax.legend(bbox_to_anchor=(1.05, 1.05), loc='upper center', fancybox=True)
 
-        ax.legend()
+        plt.tight_layout()
         return ax
