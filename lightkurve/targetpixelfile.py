@@ -503,7 +503,7 @@ class TargetPixelFile(object):
         return col_centr, row_centr
 
     def plot(self, ax=None, frame=0, cadenceno=None, bkg=False, aperture_mask=None,
-             show_colorbar=True, mask_color='pink', style='lightkurve', **kwargs):
+             show_colorbar=True, mask_color='pink', style='lightkurve', showcadencenum=False **kwargs):
         """Plot the pixel data for a single frame (i.e. at a single time).
 
         The time can be specified by frame index number (`frame=0` will show the
@@ -558,8 +558,7 @@ class TargetPixelFile(object):
                              "0-{}.".format(frame, self.shape[0]))
         with plt.style.context(style):
           
-            if 'showcadencenum' in kwargs:
-                if kwargs['showcadencenum'] == True:
+            if showcadencenum:
                     img_title = 'TID: {}, frame: {}'.format(self.targetid, frame)
             else:                   
                 img_title = 'Target ID: {}'.format(self.targetid)
