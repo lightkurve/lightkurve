@@ -19,6 +19,89 @@ log = logging.getLogger(__name__)
 __all__ = ['PLDCorrector']
 
 class PLDCorrector(Corrector):
+    r"""Implements the Pixel Level Decorrelation (PLD) systematics removal method.
+        Pixel Level Decorrelation (PLD) was developed by [1]_ to remove
+        systematic noise caused by spacecraft jitter for the Spitzer
+        Space Telescope. It was adapted to K2 data by [2]_ and [3]_
+        for the EVEREST pipeline [4]_.
+
+        For a detailed description and implementation of PLD, please refer to
+        these references. Lightkurve provides a reference implementation
+        of PLD that is less sophisticated than EVEREST, but is suitable
+        for quick-look analyses and detrending experiments.
+
+        Background
+        ----------
+        Our implementation of PLD is performed by first calculating the noise
+        model for each cadence in time. This function goes up to arbitrary
+        order, and is represented by
+        .. math::
+
+            m_i = \sum_l a_l \frac{f_{il}}{\sum_k f_{ik}} + \sum_l \sum_m b_{lm} \frac{f_{il}f_{im}}{\left( \sum_k f_{ik} \right)^2} + ...
+
+        where
+
+          - :math:`m_i` is the noise model at time :math:`t_i`
+          - :math:`f_{il}` is the flux in the :math:`l^\text{th}` pixel at time :math:`t_i`
+          - :math:`a_l` is the first-order PLD coefficient on the linear term
+          - :math:`b_{lm}` is the second-order PLD coefficient on the :math:`l^\text{th}`,
+            :math:`m^\text{th}` pixel pair
+
+         We perform Principal Component Analysis (PCA) to reduce the number of
+        vectors in our final model to limit the set to best capture instrumental
+        noise. With a PCA-reduced set of vectors, we can construct a design matrix
+        containing fractional pixel fluxes.
+
+        To capture long-term variability, we simultaneously fit a Gaussian Process
+        model ([5]_) to the underlying stellar signal.
+
+        To solve for the PLD model, we need to minimize the difference squared
+
+        .. math::
+
+            \chi^2 = \sum_i \frac{(y_i - m_i)^2}{\sigma_i^2},
+
+        where :math:`y_i` is the observed flux value at time :math:`t_i`, by solving
+
+        .. math::
+
+            \frac{\partial \chi^2}{\partial a_l} = 0.
+
+    Examples
+    --------
+    Download the pixel data for GJ 9827 and obtain a PLD-corrected light curve:
+
+    >>> import lightkurve as lk
+    >>> tpf = lk.search_targetpixelfile("GJ9827").download() # doctest: +SKIP
+    >>> corrector = lk.PLDCorrector(tpf) # doctest: +SKIP
+    >>> lc = corrector.correct() # doctest: +SKIP
+    >>> lc.plot() # doctest: +SKIP
+
+    However, the above example will over-fit the small transits!
+    It is necessary to mask the transits using `corrector.correct(cadence_mask=...)`.
+
+    References
+    ----------
+    .. [1] Deming et al. (2015), ads:2015ApJ...805..132D.
+        (arXiv:1411.7404)
+    .. [2] Luger et al. (2016), ads:2016AJ....152..100L
+        (arXiv:1607.00524)
+    .. [3] Luger et al. (2018), ads:2018AJ....156...99L
+        (arXiv:1702.05488)
+    .. [4] EVEREST pipeline webpage, https://rodluger.github.io/everest
+    .. [5] Celerite documentation, https://celerite.readthedocs.io/en/stable/
+
+    Parameters
+    ----------
+    tpf : `TargetPixelFile` object
+        The pixel data from which a light curve will be extracted.
+    aperture_mask : 2D boolean array or str
+        The pixel aperture mask that will be used to extract the raw light curve.
+    design_matrix_aperture_mask : 2D boolean array or str
+        The pixel aperture mask that will be used to create the regression matrix
+        (i.e. the design matrix) used to model the systematics.  If `None`,
+        then the `aperture_mask` value will be used.
+    """
 
     def __init__(self, tpf, aperture_mask=None, design_matrix_aperture_mask='all'):
         # Use pipeline_mask by default
@@ -148,39 +231,48 @@ class PLDCorrector(Corrector):
 
         return design_matrix
 
-    def _neg_log_like(self, params, design_matrix):
+    def _solve_weights(self, gp, design_matrix):
         """ """
         X = design_matrix
-        self.gp.set_parameter_vector(params)
         A = np.dot(X.T, self.gp.apply_inverse(X))
         B = np.dot(X.T, self.gp.apply_inverse(self.raw_lc.flux[:, None])[:, 0])
         w = np.linalg.solve(A, B)
         m = np.dot(X, w)
 
+        return m
+
+    def _neg_log_like(self, params, design_matrix):
+        """ """
+        self.gp.set_parameter_vector(params)
+        m = self._solve_weights(self.gp, design_matrix)
         return -self.gp.log_likelihood(self.raw_lc.flux - m)
 
+    def _grad_neg_log_like(self, params, design_matrix):
+        """ """
+        self.gp.set_parameter_vector(params)
+        m = self._solve_weights(self.gp, design_matrix)
+        return -self.gp.grad_log_likelihood(self.raw_lc.flux - m)[1]
+
     def optimize(self, design_matrix, method="L-BFGS-B"):
+        """ """
         self.optimized = True
         solution = minimize(self._neg_log_like, self.gp.get_parameter_vector(),
                             method=method, bounds=self.gp.get_parameter_bounds(),
-                            args=(design_matrix))
+                            jac=self._grad_neg_log_like, args=(design_matrix))
         self.gp.set_parameter_vector(solution.x)
         return solution
 
-    def _create_gp_model(self, cadence_mask=[]):
+    def create_gp_model(self, cadence_mask=[]):
+        """ """
         gpc = GPCorrector(self.raw_lc, kernel="matern32")
         return gpc.gp
 
-    def _find_weights(self):
-        pass
-
     def correct(self, aperture_mask=None, **kwargs):
+        """ """
         # Create final optimized model
         X = self.create_design_matrix()
-        self.gp = self._create_gp_model()
+        self.gp = self.create_gp_model()
         self.optimize(X)
-
-        self.gp.compute(self.raw_lc.time, self.raw_lc.flux_err)
 
         A = np.dot(X.T, self.gp.apply_inverse(X))
         B = np.dot(X.T, self.gp.apply_inverse(self.raw_lc.flux))
