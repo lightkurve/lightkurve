@@ -7,8 +7,10 @@ import warnings
 from itertools import combinations_with_replacement as multichoose
 
 import numpy as np
+from scipy.optimize import minimize
 
 from .corrector import Corrector
+from .gpcorrector import GPCorrector
 from .. import MPLSTYLE
 from ..utils import LightkurveWarning, suppress_stdout
 
@@ -146,14 +148,47 @@ class PLDCorrector(Corrector):
 
         return design_matrix
 
-    def _create_gp_model(self, cadence_mask):
-        pass
+    def _neg_log_like(self, params, design_matrix):
+        """ """
+        X = design_matrix
+        self.gp.set_parameter_vector(params)
+        A = np.dot(X.T, self.gp.apply_inverse(X))
+        B = np.dot(X.T, self.gp.apply_inverse(self.raw_lc.flux[:, None])[:, 0])
+        w = np.linalg.solve(A, B)
+        m = np.dot(X, w)
+
+        return -self.gp.log_likelihood(self.raw_lc.flux - m)
+
+    def optimize(self, design_matrix, method="L-BFGS-B"):
+        self.optimized = True
+        solution = minimize(self._neg_log_like, self.gp.get_parameter_vector(),
+                            method=method, bounds=self.gp.get_parameter_bounds(),
+                            args=(design_matrix))
+        self.gp.set_parameter_vector(solution.x)
+        return solution
+
+    def _create_gp_model(self, cadence_mask=[]):
+        gpc = GPCorrector(self.raw_lc, kernel="matern32")
+        return gpc.gp
 
     def _find_weights(self):
         pass
 
     def correct(self, aperture_mask=None, **kwargs):
-        pass
+        # Create final optimized model
+        X = self.create_design_matrix()
+        self.gp = self._create_gp_model()
+        self.optimize(X)
 
-    def optimize(self):
-        pass
+        self.gp.compute(self.raw_lc.time, self.raw_lc.flux_err)
+
+        A = np.dot(X.T, self.gp.apply_inverse(X))
+        B = np.dot(X.T, self.gp.apply_inverse(self.raw_lc.flux))
+        w = np.linalg.solve(A, B)
+        m = np.dot(X, w).T[0]
+
+        corrected_lc = self.raw_lc.copy()
+        corrected_lc.flux -= m
+        corrected_lc.flux += np.nanmean(m)
+
+        return corrected_lc
