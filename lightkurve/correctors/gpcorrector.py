@@ -12,7 +12,7 @@ class GPCorrector(Corrector):
     Accepted kernels are:
     "matern32", "shoterm"
     """
-    def __init__(self, lc, kernel="matern32", cadence_mask=None):
+    def __init__(self, lc, kernel="matern32", cadence_mask=None, sigma=5):
         if np.any([~np.isfinite(lc.flux), ~np.isfinite(lc.flux_err)]):
             log.warning("NaNs have been removed from the light curve.")
             self.lc = lc.remove_nans()
@@ -23,8 +23,10 @@ class GPCorrector(Corrector):
             self.cadence_mask = np.ones(len(self.lc.time), dtype=bool)
         else:
             self.cadence_mask = cadence_mask
-        self.diag = self.lc.flux_err
-        self.diag[~self.cadence_mask] *= 1e10  # This is faster than masking out flux values
+        self.diag = np.copy(self.lc.flux_err)
+        self._bad_cadences = np.copy(~self.cadence_mask)
+        self._bad_cadences |= self.lc.flatten().remove_outliers(sigma=sigma, return_mask=True)[1]
+        self.diag[self._bad_cadences] *= 1e10  # This is faster than masking out flux values
 
         if isinstance(kernel, celerite.terms.Term):
             self.kernel = kernel
@@ -131,6 +133,8 @@ class GPCorrector(Corrector):
             if ax is None:
                 _, ax = plt.subplots()
             self.lc.errorbar(ax=ax, zorder=1, label='Data', normalize=False)
+            self.lc[self._bad_cadences].scatter(ax=ax, zorder=2, color='r', marker='x', s=20, label='Rejected Outliers', normalize=False)
+
 
         # Initial Guess
         if not self.optimized:
