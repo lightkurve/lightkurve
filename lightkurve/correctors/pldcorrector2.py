@@ -3,10 +3,10 @@
 from __future__ import division, print_function
 
 import logging
-import warnings
 from itertools import combinations_with_replacement as multichoose
 
 import numpy as np
+import matplotlib.pyplot as plt
 from scipy.optimize import minimize
 
 from .corrector import Corrector
@@ -118,6 +118,7 @@ class PLDCorrector(Corrector):
         # It is critical to remove all cadences with NaNs or the linear algebra below will crash
         self.raw_lc, self.nan_mask = raw_lc.remove_nans(return_mask=True)
         self.tpf = tpf[~self.nan_mask]
+        self.optimized = False
 
     def _create_first_order_matrix(self, normalize=True):
         """Returns a matrix which encodes the fractional pixel fluxes as a function
@@ -279,8 +280,23 @@ class PLDCorrector(Corrector):
         w = np.linalg.solve(A, B)
         m = np.dot(X, w).T[0]
 
-        corrected_lc = self.raw_lc.copy()
-        corrected_lc.flux -= m
-        corrected_lc.flux += np.nanmean(m)
+        self.corrected_lc = self.raw_lc.copy()
+        self.corrected_lc.flux -= m
+        self.corrected_lc.flux += np.nanmean(m)
 
-        return corrected_lc
+        return self.corrected_lc
+
+    def diagnose(self, ax=None):
+        """ """
+        with plt.style.context(MPLSTYLE):
+            if ax is None:
+                _, ax = plt.subplots()
+
+        if not self.optimized:
+            log.warning("You need to call the `correct` method before diagnosing.")
+            return ax
+
+        self.raw_lc.scatter(ax=ax, c='r', label='{} (Raw Light Curve)'.format(self.raw_lc.label))
+        self.corrected_lc.scatter(ax=ax, c='k', label='{} (PLD-Corrected)'.format(self.raw_lc.label))
+
+        return ax
