@@ -12,7 +12,7 @@ class GPCorrector(Corrector):
     Accepted kernels are:
     "matern32", "shoterm"
     """
-    def __init__(self, lc, kernel="matern32", cadence_mask=None):
+    def __init__(self, lc, kernel="matern32", cadence_mask=None, sigma=5):
         if np.any([~np.isfinite(lc.flux), ~np.isfinite(lc.flux_err)]):
             log.warning("NaNs have been removed from the light curve.")
             self.lc = lc.remove_nans()
@@ -23,8 +23,11 @@ class GPCorrector(Corrector):
             self.cadence_mask = np.ones(len(self.lc.time), dtype=bool)
         else:
             self.cadence_mask = cadence_mask
-        self.diag = self.lc.flux_err
-        self.diag[~self.cadence_mask] *= 1e10  # This is faster than masking out flux values
+        self.diag = np.copy(self.lc.flux_err)
+        bad_cadences = np.copy(~self.cadence_mask)
+        bad_cadences |= self.lc.flatten(21).remove_outliers(sigma=sigma, return_mask=True)[1]
+        print(bad_cadences.sum())
+        self.diag[bad_cadences] *= 1e10  # This is faster than masking out flux values
 
         if isinstance(kernel, celerite.terms.Term):
             self.kernel = kernel
