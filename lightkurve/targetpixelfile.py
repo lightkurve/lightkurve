@@ -559,7 +559,7 @@ class TargetPixelFile(object):
         with plt.style.context(style):
           
             if showcadencenum:
-                    img_title = 'TID: {}, frame: {}'.format(self.targetid, frame)
+                    img_title = 'Target ID: {}, frame: {}'.format(self.targetid, frame)
             else:                   
                 img_title = 'Target ID: {}'.format(self.targetid)
                 
