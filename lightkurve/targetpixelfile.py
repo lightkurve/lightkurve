@@ -562,7 +562,6 @@ class TargetPixelFile(object):
                     img_title = 'Target ID: {}, frame: {}'.format(self.targetid, frame)
             else:
                 img_title = 'Target ID: {}'.format(self.targetid)
-                
             img_extent = (self.column, self.column + self.shape[2],
                           self.row, self.row + self.shape[1])
             ax = plot_image(pflux, ax=ax, title=img_title, extent=img_extent,
