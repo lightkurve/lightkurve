@@ -95,7 +95,7 @@ class GPCorrector(Corrector):
         self.optimized = True
         solution = minimize(self._neg_log_like, self.gp.get_parameter_vector(),
                             method=method, bounds=self.gp.get_parameter_bounds(),
-                            args=(self.lc.flux))
+                            jac=self._grad_neg_log_like, args=(self.lc.flux))
         self.gp.set_parameter_vector(solution.x)
         return solution
 
@@ -103,7 +103,7 @@ class GPCorrector(Corrector):
         gp_flux, gp_flux_var = self.gp.predict(self.lc.flux, self.lc.time)
 
         corrected_lc = self.lc.copy()
-        corrected_lc.flux -= gp_flux
+        corrected_lc.flux -= (gp_flux - np.mean(gp_flux))
         corrected_lc.flux_err = np.hypot(corrected_lc.flux_err, np.std(gp_flux_var))
 
         gp_lc = self.lc.copy()
