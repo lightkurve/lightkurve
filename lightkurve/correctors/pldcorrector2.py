@@ -268,33 +268,36 @@ class PLDCorrector(Corrector):
         gpc = GPCorrector(self.raw_lc, kernel="matern32")
         return gpc.gp
 
-    def correct(self, aperture_mask=None, **kwargs):
+    def correct(self, aperture_mask=None, remove_gp_trend=False, **kwargs):
         """ """
         # Create final optimized model
         X = self.create_design_matrix()
         self.gp = self.create_gp_model()
         self.optimize(X)
+        m = self._solve_weights(self.gp, X)
 
-        A = np.dot(X.T, self.gp.apply_inverse(X))
-        B = np.dot(X.T, self.gp.apply_inverse(self.raw_lc.flux))
-        w = np.linalg.solve(A, B)
-        m = np.dot(X, w).T[0]
-
+        # Store in `~lightkurve.LightCurve` object
         self.corrected_lc = self.raw_lc.copy()
         self.corrected_lc.flux -= m
         self.corrected_lc.flux += np.nanmean(m)
+
+        # Optionally remove long term trend fit by GP
+        if remove_gp_trend:
+            mu = self.gp.predict(self.corrected_lc.flux, self.corrected_lc.time,
+                                 return_cov=False, return_var=False)
+            self.corrected_lc.flux -= (mu - np.nanmean(mu))
 
         return self.corrected_lc
 
     def diagnose(self, ax=None):
         """ """
+        if not self.optimized:
+            log.warning("You need to call the `correct` method before diagnosing.")
+            return None
+
         with plt.style.context(MPLSTYLE):
             if ax is None:
                 _, ax = plt.subplots()
-
-        if not self.optimized:
-            log.warning("You need to call the `correct` method before diagnosing.")
-            return ax
 
         self.raw_lc.scatter(ax=ax, c='r', label='{} (Raw Light Curve)'.format(self.raw_lc.label))
         self.corrected_lc.scatter(ax=ax, c='k', label='{} (PLD-Corrected)'.format(self.raw_lc.label))
