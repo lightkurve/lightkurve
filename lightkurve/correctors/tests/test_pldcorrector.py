@@ -1,9 +1,8 @@
 import pytest
 import celerite
-import matplotlib.pyplot as pl
 
 from ... import search_targetpixelfile
-from ..pldcorrector2 import PLDCorrector # change this lol
+from .. import PLDCorrector # change this lol
 
 @pytest.mark.remote_data
 def test_create_design_matrix():
