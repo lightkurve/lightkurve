@@ -233,44 +233,135 @@ class PLDCorrector(Corrector):
         return design_matrix
 
     def _solve_weights(self, gp, design_matrix):
-        """ """
+        """Function to perform the analytic computation of the PLD algorithm.
+        Returns a noise model light curve.
+
+        Parameters
+        ----------
+        gp : celerite.GP object
+            Celerite Gaussian Process object used to estimate long-term astrophysical
+            trend in the observation
+        design_matrix : 2D numpy array
+            Matrix containing suitable regressors for the systematics noise model
+            with shape (n_cadences, n_pca_terms*pld_order)
+
+        Returns
+        -------
+        m : numpy array
+            1D numpy array for the noise model light curve
+        """
         X = design_matrix
         A = np.dot(X.T, self.gp.apply_inverse(X))
+        # apply prior to design matrix weights for numerical stability
+        A[np.diag_indices_from(A)] += 1e-8
         B = np.dot(X.T, self.gp.apply_inverse(self.raw_lc.flux[:, None])[:, 0])
+        # Solve for the weights and compute the final model
         w = np.linalg.solve(A, B)
         m = np.dot(X, w)
 
         return m
 
     def _neg_log_like(self, params, design_matrix):
-        """ """
+        """Loss function for likelihood of gp given a noise model."""
         self.gp.set_parameter_vector(params)
         m = self._solve_weights(self.gp, design_matrix)
         return -self.gp.log_likelihood(self.raw_lc.flux - m)
 
     def _grad_neg_log_like(self, params, design_matrix):
-        """ """
+        """Gradient of loss function to improve model optimization."""
         self.gp.set_parameter_vector(params)
         m = self._solve_weights(self.gp, design_matrix)
         return -self.gp.grad_log_likelihood(self.raw_lc.flux - m)[1]
 
     def optimize(self, design_matrix, method="L-BFGS-B"):
-        """ """
+        """Function to optimize GP hyperparameters simultaneously with fitting
+        the PLD noise model.
+
+        Parameters
+        ----------
+        design_matrix : 2D numpy array
+            Matrix containing suitable regressors for the systematics noise model
+            with shape (n_cadences, n_pca_terms*pld_order)
+        method : str
+            Optimization method passed into `scipy.optimize.minimize`, default of
+            "L-BFGS-B"
+
+        Returns
+        -------
+        solution : scipy.optimize.optimize.OptimizeResult
+            Breakdown of optimization results and performance
+        """
         self.optimized = True
+        # ensure a GP object has been made
+        self.create_gp_model()
+        # find a maximum-likelihood solution
         solution = minimize(self._neg_log_like, self.gp.get_parameter_vector(),
                             method=method, bounds=self.gp.get_parameter_bounds(),
                             jac=self._grad_neg_log_like, args=(design_matrix))
+        # set the GP parameters to the optimization output
         self.gp.set_parameter_vector(solution.x)
         return solution
 
-    def create_gp_model(self, cadence_mask=None):
-        """ """
-        gpc = GPCorrector(self.raw_lc, kernel="matern32", cadence_mask=cadence_mask)
+    def create_gp_model(self, kernel="matern32", cadence_mask=None, sigma=5):
+        """Helper function to create a GP object for the given light curve using
+        the `~lightkurve.correctors.GPCorrector` object.
+
+        Parameters
+        ----------
+        kernel : "matern32" or "sho" or celerite.terms.Term
+            Kernel to be used in Gaussian Process initializaiton. Accepted values
+            are "matern32" for a Matern-3/2 kernel, "sho" for a Simple Harmonic
+            Oscillator, or a `celerite.terms.Term` object for a custom kernel
+        cadence_mask : array-like
+            A mask that will be applied to the cadences prior to constructing
+            the detrending model. For example, you can pass a boolean array
+            of length `n_cadences` where `True` means that the cadence will be
+            included in the noise model. You may also pass an array of indices.
+            This option enables signals of interest (e.g. planet transits)
+            to be excluded from the noise model, which will prevent over-fitting.
+            By default, no cadences will be masked.
+        sigma : int
+            Sigma value for outliers to be removed from GP fit. Default is 5
+
+        Returns
+        -------
+        gp : celerite.GP object
+            Celerite Gaussian Process object used to estimate long-term astrophysical
+            trend in the observation
+        """
+        gpc = GPCorrector(self.raw_lc, kernel=kernel, cadence_mask=cadence_mask, sigma=sigma)
         self.gp = gpc.gp
         return self.gp
 
-    def correct(self, aperture_mask=None, remove_gp_trend=False, cadence_mask=None, **kwargs):
-        """ """
+    def correct(self, aperture_mask=None, cadence_mask=None, remove_gp_trend=False, **kwargs):
+        """Returns a `lightkurve.LightCurve` object with model for motion noise
+        removed.
+
+        Parameters
+        ----------
+        aperture_mask : array-like, 'pipeline', 'all', 'threshold', or None
+            A boolean array describing the aperture such that `True` means
+            that the pixel will be used to generate the raw flux light curve.
+            If `None` or 'all' are passed, all pixels will be used.
+            If 'pipeline' is passed, the mask suggested by the official pipeline
+            will be returned.
+            If 'threshold' is passed, all pixels brighter than 3-sigma above
+            the median flux will be used.
+        cadence_mask : array-like
+            A mask that will be applied to the cadences prior to constructing
+            the detrending model. For example, you can pass a boolean array
+            of length `n_cadences` where `True` means that the cadence will be
+            included in the noise model. You may also pass an array of indices.
+            This option enables signals of interest (e.g. planet transits)
+            to be excluded from the noise model, which will prevent over-fitting.
+            By default, no cadences will be masked.
+        remove_gp_trend : bool
+            Option to remove long-term trend fit by GP. By default, the
+            astrophysical signal is preserved, but can be subtracted out to
+            robustly flatten the output light curve.
+        **kwargs : dict
+            Keyword arguments accepted by the `create_design_matrix` method.
+        """
         # Create final optimized model
         X = self.create_design_matrix(**kwargs)
         self.gp = self.create_gp_model(cadence_mask=cadence_mask)
@@ -291,7 +382,7 @@ class PLDCorrector(Corrector):
         return self.corrected_lc
 
     def diagnose(self, ax=None):
-        """ """
+        """Diagnostic plotting function to assess performance of the PLD de-trending."""
         if not self.optimized:
             log.warning("You need to call the `correct` method before diagnosing.")
             return None

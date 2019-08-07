@@ -32,7 +32,9 @@ def test_gp_model():
 def test_correct():
     tpf = search_targetpixelfile('k2-199')[0].download()
     pld = PLDCorrector(tpf)
+    # does the correct function run smoothly?
     clc = pld.correct()
+    # does it improve the cdpp?
     assert clc.estimate_cdpp() < tpf.to_lightcurve().estimate_cdpp()
 
 @pytest.mark.remote_data
@@ -40,4 +42,5 @@ def test_diagnose():
     tpf = search_targetpixelfile('k2-199')[0].download()
     pld = PLDCorrector(tpf)
     clc = pld.correct()
+    # does the diagnose function run smoothly?
     pld.diagnose()
