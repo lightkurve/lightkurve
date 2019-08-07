@@ -12,7 +12,7 @@ from scipy.optimize import minimize
 from .corrector import Corrector
 from .gpcorrector import GPCorrector
 from .. import MPLSTYLE
-from ..utils import LightkurveWarning, suppress_stdout
+from ..utils import LightkurveWarning
 
 log = logging.getLogger(__name__)
 
@@ -166,7 +166,7 @@ class PLDCorrector(Corrector):
           components.
 
         Thus, the shape of the design matrix will be
-        (n_cadences, n_pld_mask_pixels + n_pca_terms*(pld_order-1))
+        (n_cadences, n_pca_terms*pld_order)
 
         Returns
         -------
@@ -266,7 +266,8 @@ class PLDCorrector(Corrector):
     def create_gp_model(self, cadence_mask=None):
         """ """
         gpc = GPCorrector(self.raw_lc, kernel="matern32", cadence_mask=cadence_mask)
-        return gpc.gp
+        self.gp = gpc.gp
+        return self.gp
 
     def correct(self, aperture_mask=None, remove_gp_trend=False, cadence_mask=None, **kwargs):
         """ """
