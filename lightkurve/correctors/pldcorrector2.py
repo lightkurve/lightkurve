@@ -263,16 +263,16 @@ class PLDCorrector(Corrector):
         self.gp.set_parameter_vector(solution.x)
         return solution
 
-    def create_gp_model(self, cadence_mask=[]):
+    def create_gp_model(self, cadence_mask=None):
         """ """
-        gpc = GPCorrector(self.raw_lc, kernel="matern32")
+        gpc = GPCorrector(self.raw_lc, kernel="matern32", cadence_mask=cadence_mask)
         return gpc.gp
 
-    def correct(self, aperture_mask=None, remove_gp_trend=False, **kwargs):
+    def correct(self, aperture_mask=None, remove_gp_trend=False, cadence_mask=None, **kwargs):
         """ """
         # Create final optimized model
-        X = self.create_design_matrix()
-        self.gp = self.create_gp_model()
+        X = self.create_design_matrix(**kwargs)
+        self.gp = self.create_gp_model(cadence_mask=cadence_mask)
         self.optimize(X)
         m = self._solve_weights(self.gp, X)
 
