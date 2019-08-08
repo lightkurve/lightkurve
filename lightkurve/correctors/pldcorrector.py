@@ -430,8 +430,24 @@ class PLDCorrector(Corrector):
 
         return self.corrected_lc
 
-    def get_diagnostic_lightcurves(self, design_matrix=None, gp=None):
-        """ """
+    def get_diagnostic_lightcurves(self, design_matrix, gp):
+        """Returns a LightCurveCollection containing corrected_lc, noise_lc, gp_lc.
+
+        Parameters
+        ----------
+        design_matrix : 2D numpy array or None
+            Matrix containing suitable regressors for the systematics noise model
+            with shape (n_cadences, n_pca_terms*pld_order)
+        gp : celerite.GP object or None
+            Celerite Gaussian Process object used to estimate long-term astrophysical
+            trend in the observation
+
+        Returns
+        -------
+        LightCurveCollection : lightkurve.LightCurveCollection object
+            `~lightkurve.collections.LightCurveCollection` object containing
+            corrected_lc, noise_lc, gp_lc
+        """
         # Create noise model LightCurve
         noise_lc = self.raw_lc.copy()
         noise_lc.flux = self._solve_weights(design_matrix, gp)
