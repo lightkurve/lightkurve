@@ -246,7 +246,7 @@ class PLDCorrector(Corrector):
 
         return design_matrix
 
-    def _solve_weights(self, design_matrix, gp_corrector):
+    def _solve_weights(self, design_matrix, gp_corrector, l2_term=1e-8):
         """Function to perform the analytic computation of the PLD algorithm.
         Returns a noise model light curve.
 
@@ -258,6 +258,8 @@ class PLDCorrector(Corrector):
         gp_corrector : lightkurve.GPCorrector object or None
             Lightkurve GPCorrector object used to estimate long-term astrophysical
             trend in the observation
+        l2_term : float
+            It's complicated
 
         Returns
         -------
@@ -267,8 +269,11 @@ class PLDCorrector(Corrector):
         gp = gp_corrector.gp
         X = design_matrix
         A = np.dot(X.T, gp.apply_inverse(X))
-        # apply prior to design matrix weights for numerical stability
-        A[np.diag_indices_from(A)] += 1e-8
+        # To ensure the weights can be solved for, we need to perform L2 regularization
+        # to avoid an ill-conditioned matrix A. Here we add small values along the
+        # diagonal of matrix A to reduce its condition number and  improve its
+        # numerical stability
+        A[np.diag_indices_from(A)] += l2_term
         B = np.dot(X.T, gp.apply_inverse(self.raw_lc.flux[:, None])[:, 0])
         # Solve for the weights and compute the final model
         w = np.linalg.solve(A, B)
@@ -276,20 +281,20 @@ class PLDCorrector(Corrector):
 
         return noise_model
 
-    def _neg_log_like(self, params, design_matrix, gp_corrector):
+    def _neg_log_like(self, params, design_matrix, gp_corrector, l2_term=1e-8):
         """Loss function for likelihood of gp given a noise model.
         """
         gp_corrector.gp.set_parameter_vector(params)
-        noise_model = self._solve_weights(design_matrix, gp_corrector)
+        noise_model = self._solve_weights(design_matrix, gp_corrector, l2_term=l2_term)
         return -gp_corrector.gp.log_likelihood(self.raw_lc.flux - noise_model)
 
-    def _grad_neg_log_like(self, params, design_matrix, gp_corrector):
+    def _grad_neg_log_like(self, params, design_matrix, gp_corrector, l2_term=1e-8):
         """Gradient of loss function to improve model optimization."""
         gp_corrector.gp.set_parameter_vector(params)
-        noise_model = self._solve_weights(design_matrix, gp_corrector)
+        noise_model = self._solve_weights(design_matrix, gp_corrector, l2_term=l2_term)
         return -gp_corrector.gp.grad_log_likelihood(self.raw_lc.flux - noise_model)[1]
 
-    def optimize(self, design_matrix, gp_corrector, method="L-BFGS-B"):
+    def optimize(self, design_matrix, gp_corrector, method="L-BFGS-B", l2_term=1e-8):
         """Function to optimize GP hyperparameters simultaneously with fitting
         the PLD noise model.
 
@@ -317,13 +322,13 @@ class PLDCorrector(Corrector):
         # find a maximum-likelihood solution
         solution = minimize(self._neg_log_like, gp_corrector.gp.get_parameter_vector(),
                             method=method, bounds=gp_corrector.gp.get_parameter_bounds(),
-                            jac=self._grad_neg_log_like, args=(design_matrix, gp_corrector))
+                            jac=self._grad_neg_log_like, args=(design_matrix, gp_corrector, l2_term))
         # set the GP parameters to the optimization output
         gp_corrector.gp.set_parameter_vector(solution.x)
         return gp_corrector
 
     def correct(self, cadence_mask=None, remove_gp_trend=False, design_matrix=None,
-                gp_corrector=None, pld_order=2, n_pca_terms=10, **kwargs):
+                gp_corrector=None, pld_order=2, n_pca_terms=10, l2_term=1e-8, **kwargs):
         """Returns a `lightkurve.LightCurve` object with model for motion noise
         removed.
 
@@ -377,7 +382,7 @@ class PLDCorrector(Corrector):
 
         # Optimize the GP
         if not self.optimized:
-            gp_corrector = self.optimize(design_matrix, gp_corrector)
+            gp_corrector = self.optimize(design_matrix, gp_corrector, l2_term=l2_term)
 
         # Make the LightCurve objects
         lcs = self.get_diagnostic_lightcurves(design_matrix=design_matrix, gp_corrector=gp_corrector)
