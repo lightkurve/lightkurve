@@ -93,7 +93,7 @@ def test_tpfcollection():
     assert(tpfc[1] == tpf3)
     tpfc.append(tpf2)
     assert(tpfc[2] == tpf2)
-    str(tpfc)  # Does repr work?
+    str(tpfc)  # Regression test for #564
 
 
 def test_tpfcollection_plot():
