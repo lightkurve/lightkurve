@@ -2,9 +2,17 @@ import pytest
 import celerite
 
 from ... import search_targetpixelfile
-from .. import PLDCorrector # change this lol
+from .. import PLDCorrector
+
+bad_optional_imports = False
+try:
+    import celerite
+    import fbpca
+except ImportError:
+    bad_optional_imports = True
 
 @pytest.mark.remote_data
+@pytest.mark.skipif(bad_optional_imports, reason="PLD requires celerite and fbpca")
 def test_create_design_matrix():
     tpf = search_targetpixelfile('k2-199')[0].download()
     pld = PLDCorrector(tpf)
@@ -17,6 +25,7 @@ def test_create_design_matrix():
     assert so_matrix.shape == (len(tpf.flux), 16)
 
 @pytest.mark.remote_data
+@pytest.mark.skipif(bad_optional_imports, reason="PLD requires celerite and fbpca")
 def test_gp_model():
     tpf = search_targetpixelfile('k2-199')[0].download()
     pld = PLDCorrector(tpf)
@@ -28,6 +37,7 @@ def test_gp_model():
     soln = pld.optimize(matrix)
 
 @pytest.mark.remote_data
+@pytest.mark.skipif(bad_optional_imports, reason="PLD requires celerite and fbpca")
 def test_correct():
     tpf = search_targetpixelfile('k2-199')[0].download()
     pld = PLDCorrector(tpf)
@@ -37,6 +47,7 @@ def test_correct():
     assert clc.estimate_cdpp() < tpf.to_lightcurve().estimate_cdpp()
 
 @pytest.mark.remote_data
+@pytest.mark.skipif(bad_optional_imports, reason="PLD requires celerite and fbpca")
 def test_diagnose():
     tpf = search_targetpixelfile('k2-199')[0].download()
     pld = PLDCorrector(tpf)

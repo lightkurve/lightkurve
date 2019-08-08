@@ -12,7 +12,8 @@ from scipy.optimize import minimize
 from .corrector import Corrector
 from .gpcorrector import GPCorrector
 from .. import MPLSTYLE
-from ..utils import LightkurveWarning
+from ..collections import LightCurveCollection
+from ..utils import LightkurveWarning, LightkurveError
 
 log = logging.getLogger(__name__)
 
@@ -170,6 +171,16 @@ class PLDCorrector(Corrector):
 
         Parameters
         ----------
+        pld_order : int
+            The order of Pixel Level De-correlation to be performed. First order
+            (`n=1`) uses only the pixel fluxes to construct the design matrix.
+            Higher order populates the design matrix with columns constructed
+            from the products of pixel fluxes.
+        n_pca_terms : int
+            Number of terms added to the design matrix from each order of PLD
+            when performing Principal Component Analysis for models higher than
+            first order. Increasing this value may provide higher precision at
+            the expense of computational time.
 
         Returns
         -------
@@ -235,7 +246,7 @@ class PLDCorrector(Corrector):
 
         return design_matrix
 
-    def _solve_weights(self, gp, design_matrix):
+    def _solve_weights(self, design_matrix, gp):
         """Function to perform the analytic computation of the PLD algorithm.
         Returns a noise model light curve.
 
@@ -254,30 +265,30 @@ class PLDCorrector(Corrector):
             1D numpy array for the noise model light curve
         """
         X = design_matrix
-        A = np.dot(X.T, self.gp.apply_inverse(X))
+        A = np.dot(X.T, gp.apply_inverse(X))
         # apply prior to design matrix weights for numerical stability
         A[np.diag_indices_from(A)] += 1e-8
-        B = np.dot(X.T, self.gp.apply_inverse(self.raw_lc.flux[:, None])[:, 0])
+        B = np.dot(X.T, gp.apply_inverse(self.raw_lc.flux[:, None])[:, 0])
         # Solve for the weights and compute the final model
         w = np.linalg.solve(A, B)
         m = np.dot(X, w)
 
         return m
 
-    def _neg_log_like(self, params, design_matrix):
+    def _neg_log_like(self, params, design_matrix, gp):
         """Loss function for likelihood of gp given a noise model.
 
         # REPLACE WITH GP IMPLIMENTATION OF LOGLIKE
         """
-        self.gp.set_parameter_vector(params)
-        m = self._solve_weights(self.gp, design_matrix)
-        return -self.gp.log_likelihood(self.raw_lc.flux - m)
+        gp.set_parameter_vector(params)
+        m = self._solve_weights(design_matrix, gp)
+        return -gp.log_likelihood(self.raw_lc.flux - m)
 
-    def _grad_neg_log_like(self, params, design_matrix):
+    def _grad_neg_log_like(self, params, design_matrix, gp):
         """Gradient of loss function to improve model optimization."""
-        self.gp.set_parameter_vector(params)
-        m = self._solve_weights(self.gp, design_matrix)
-        return -self.gp.grad_log_likelihood(self.raw_lc.flux - m)[1]
+        gp.set_parameter_vector(params)
+        m = self._solve_weights(design_matrix, gp)
+        return -gp.grad_log_likelihood(self.raw_lc.flux - m)[1]
 
     def optimize(self, design_matrix=None, gp=None, method="L-BFGS-B"):
         """Function to optimize GP hyperparameters simultaneously with fitting
@@ -285,9 +296,14 @@ class PLDCorrector(Corrector):
 
         Parameters
         ----------
-        design_matrix : 2D numpy array
+        design_matrix : 2D numpy array or None
             Matrix containing suitable regressors for the systematics noise model
-            with shape (n_cadences, n_pca_terms*pld_order)
+            with shape (n_cadences, n_pca_terms*pld_order). If set to None, a
+            design matrix will be generated with default values
+        gp : celerite.GP object or None
+            Celerite Gaussian Process object used to estimate long-term astrophysical
+            trend in the observation. If set to None, a GP will be generated with
+            default values
         method : str
             Optimization method passed into `scipy.optimize.minimize`, default of
             "L-BFGS-B"
@@ -298,17 +314,19 @@ class PLDCorrector(Corrector):
             Breakdown of optimization results and performance
         """
         self.optimized = True
-        # ensure design_matrix GP object has been made
+        # ensure design_matrix and GP object has been made
+        if design_matrix is None:
+            design_matrix = self.create_design_matrix()
         if gp is None:
             gp = self.create_gp_model()
 
         # find a maximum-likelihood solution
-        solution = minimize(self._neg_log_like, self.gp.get_parameter_vector(),
-                            method=method, bounds=self.gp.get_parameter_bounds(),
-                            jac=self._grad_neg_log_like, args=(design_matrix))
+        solution = minimize(self._neg_log_like, gp.get_parameter_vector(),
+                            method=method, bounds=gp.get_parameter_bounds(),
+                            jac=self._grad_neg_log_like, args=(design_matrix, gp))
         # set the GP parameters to the optimization output
-        self.gp.set_parameter_vector(solution.x)
-        return solution
+        gp.set_parameter_vector(solution.x)
+        return gp
 
     def create_gp_model(self, kernel="matern32", cadence_mask=None, sigma=5):
         """Helper function to create a GP object for the given light curve using
@@ -338,11 +356,10 @@ class PLDCorrector(Corrector):
             trend in the observation
         """
         gpc = GPCorrector(self.raw_lc, kernel=kernel, cadence_mask=cadence_mask, sigma=sigma)
-        self.gp = gpc.gp
-        return self.gp
+        return gpc.gp
 
     def correct(self, aperture_mask=None, cadence_mask=None, remove_gp_trend=False,
-                design_matrix=None, pld_order=2, n_pca_terms=10, **kwargs):
+                design_matrix=None, gp=None, pld_order=2, n_pca_terms=10, **kwargs):
         """Returns a `lightkurve.LightCurve` object with model for motion noise
         removed.
 
@@ -368,34 +385,73 @@ class PLDCorrector(Corrector):
             Option to remove long-term trend fit by GP. By default, the
             astrophysical signal is preserved, but can be subtracted out to
             robustly flatten the output light curve.
-        **kwargs : dict
-            Keyword arguments accepted by the `create_design_matrix` method.
+        design_matrix : 2D numpy array or None
+            Matrix containing suitable regressors for the systematics noise model
+            with shape (n_cadences, n_pca_terms*pld_order). If set to None, a
+            design matrix will be generated
+        gp : celerite.GP object or None
+            Celerite Gaussian Process object used to estimate long-term astrophysical
+            trend in the observation. If set to None, a GP will be generated
+        pld_order : int
+            The order of Pixel Level De-correlation to be performed. First order
+            (`n=1`) uses only the pixel fluxes to construct the design matrix.
+            Higher order populates the design matrix with columns constructed
+            from the products of pixel fluxes.
+        n_pca_terms : int
+            Number of terms added to the design matrix from each order of PLD
+            when performing Principal Component Analysis for models higher than
+            first order. Increasing this value may provide higher precision at
+            the expense of computational time.
+
+        Returns
+        -------
+        corrected_lc : lightkurve.LightCurve object
+            A `~lightkurve.LightCurve` object with the noise model subtracted
+            from the flux array
         """
         # Create final optimized model
         if design_matrix is None:
             design_matrix = self.create_design_matrix(pld_order=pld_order, n_pca_terms=n_pca_terms)
-        self.gp = self.create_gp_model(**kwargs)
-        self.optimize(design_matrix)
-        m = self._solve_weights(self.gp, design_matrix)
+        if gp is None:
+            gp = self.create_gp_model(cadence_mask=cadence_mask)
 
-        # Store in `~lightkurve.LightCurve` object
-        self.corrected_lc = self.raw_lc.copy()
-        self.corrected_lc.flux -= m
-        self.corrected_lc.flux += np.nanmean(m)
+        # Optimize the GP
+        if not self.optimized:
+            gp = self.optimize(design_matrix=design_matrix, gp=gp)
+
+        # Make the LightCurve objects
+        lcs = self.get_diagnostic_lightcurves(design_matrix=design_matrix, gp=gp)
+        self.corrected_lc = lcs[0]
 
         # Optionally remove long term trend fit by GP
         if remove_gp_trend:
-            mu = self.gp.predict(self.corrected_lc.flux, self.corrected_lc.time,
-                                 return_cov=False, return_var=False)
-            self.corrected_lc.flux -= (mu - np.nanmean(mu))
+            gp_flux = lcs[2].flux
+            self.corrected_lc.flux -= (gp_flux - np.nanmean(gp_flux))
 
         return self.corrected_lc
+
+    def get_diagnostic_lightcurves(self, design_matrix=None, gp=None):
+        """ """
+        # Create noise model LightCurve
+        noise_lc = self.raw_lc.copy()
+        noise_lc.flux = self._solve_weights(design_matrix, gp)
+
+        # Create corrected LightCurve
+        corrected_lc = self.raw_lc.copy()
+        corrected_lc.flux -= noise_lc.flux
+        corrected_lc.flux += np.nanmean(noise_lc.flux)
+
+        # Create GP LightCurve
+        gp_lc = self.raw_lc.copy()
+        gp_lc.flux = gp.predict(corrected_lc.flux, corrected_lc.time,
+                                return_cov=False, return_var=False)
+
+        return LightCurveCollection([corrected_lc, noise_lc, gp_lc])
 
     def diagnose(self, ax=None):
         """Diagnostic plotting function to assess performance of the PLD de-trending."""
         if not self.optimized:
-            log.warning("You need to call the `correct` method before diagnosing.")
-            return None # NOTE: raise exception
+            raise LightkurveError("You need to call the `optimize` or `correct` method before diagnosing.")
 
         with plt.style.context(MPLSTYLE):
             if ax is None:
