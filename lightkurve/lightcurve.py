@@ -1622,16 +1622,6 @@ class KeplerLightCurve(LightCurve):
             'DATE-OBS': Time(self.time[0]+2454833., format=('jd')).isot,
             'SAP_QUALITY': self.quality}
 
-        def _make_aperture_extension(hdu_list, aperture_mask):
-            """Create the 'APERTURE' extension (e.g. extension #2)."""
-
-            if aperture_mask is not None:
-                bitmask = self._boolean_mask_to_bitmask(aperture_mask)
-                hdu = fits.ImageHDU(bitmask)
-                hdu.header['EXTNAME'] = 'APERTURE'
-                hdu_list.append(hdu)
-            return hdu_list
-
         for kw in kepler_specific_data:
             if ~np.asarray([kw.lower == k.lower() for k in extra_data]).any():
                 extra_data[kw] = kepler_specific_data[kw]
@@ -1755,16 +1745,6 @@ class TessLightCurve(LightCurve):
             'TARGETID': self.targetid,
             'DEC_OBJ': self.dec}
 
-        def _make_aperture_extension(hdu_list, aperture_mask):
-            """Create the 'APERTURE' extension (e.g. extension #2)."""
-
-            if aperture_mask is not None:
-                bitmask = self._boolean_mask_to_bitmask(aperture_mask)
-                hdu = fits.ImageHDU(bitmask)
-                hdu.header['EXTNAME'] = 'APERTURE'
-                hdu_list.append(hdu)
-            return hdu_list
-
         for kw in tess_specific_data:
             if ~np.asarray([kw.lower == k.lower() for k in extra_data]).any():
                 extra_data[kw] = tess_specific_data[kw]
@@ -1782,3 +1762,14 @@ class TessLightCurve(LightCurve):
             hdu.writeto(path, overwrite=overwrite, checksum=True)
         else:
             return hdu
+
+
+def _make_aperture_extension(hdu_list, aperture_mask):
+    """Returns an `ImageHDU` object containing the 'APERTURE' extension
+    of a light curve file."""
+    if aperture_mask is not None:
+        bitmask = self._boolean_mask_to_bitmask(aperture_mask)
+        hdu = fits.ImageHDU(bitmask)
+        hdu.header['EXTNAME'] = 'APERTURE'
+        hdu_list.append(hdu)
+    return hdu_list
