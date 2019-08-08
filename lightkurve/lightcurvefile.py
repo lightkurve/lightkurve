@@ -153,7 +153,8 @@ class LightCurveFile(object):
         ax : matplotlib.axes._subplots.AxesSubplot
             The matplotlib axes object.
         """
-        return self._create_plot(method='plot', **kwargs)
+        return self._create_plot(method='plot', flux_types=flux_types,
+                                 style=style, **kwargs)
 
 
     def scatter(self, flux_types=None, style='lightkurve', **kwargs):
@@ -188,7 +189,8 @@ class LightCurveFile(object):
         ax : matplotlib.axes._subplots.AxesSubplot
             The matplotlib axes object.
         """
-        return self._create_plot(method='scatter', **kwargs)
+        return self._create_plot(method='scatter', flux_types=flux_types,
+                                 style=style, **kwargs)
 
     def errorbar(self, flux_types=None, style='lightkurve', **kwargs):
         """Plot the light curve file using matplotlib's `errorbar` method.
@@ -222,7 +224,8 @@ class LightCurveFile(object):
         ax : matplotlib.axes._subplots.AxesSubplot
             The matplotlib axes object.
         """
-        return self._create_plot(method='errorbar', **kwargs)
+        return self._create_plot(method='errorbar', flux_types=flux_types,
+                                 style=style, **kwargs)
 
 
 class KeplerLightCurveFile(LightCurveFile):
