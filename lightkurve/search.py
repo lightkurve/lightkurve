@@ -312,7 +312,7 @@ class SearchResult(object):
 
 
 def search_targetpixelfile(target, radius=None, cadence='long',
-                           mission=['Kepler', 'K2', 'TESS'], quarter=None,
+                           mission=('Kepler', 'K2', 'TESS'), quarter=None,
                            month=None, campaign=None, sector=None, limit=None):
     """Searches the `public data archive at MAST <https://archive.stsci.edu>`_ for a Kepler or TESS
     :class:`TargetPixelFile <lightkurve.targetpixelfile.TargetPixelFile>`.
@@ -400,7 +400,7 @@ def search_targetpixelfile(target, radius=None, cadence='long',
 
 
 def search_lightcurvefile(target, radius=None, cadence='long',
-                          mission=['Kepler', 'K2', 'TESS'], quarter=None,
+                          mission=('Kepler', 'K2', 'TESS'), quarter=None,
                           month=None, campaign=None, sector=None, limit=None):
     """Searches the `public data archive at MAST <https://archive.stsci.edu>`_ for a Kepler or TESS
     :class:`LightCurveFile <lightkurve.lightcurvefile.LightCurveFile>`.
@@ -523,7 +523,7 @@ def search_tesscut(target, sector=None):
 
 
 def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
-                     mission=['Kepler', 'K2', 'TESS'], quarter=None, month=None,
+                     mission=('Kepler', 'K2', 'TESS'), quarter=None, month=None,
                      campaign=None, sector=None, limit=None):
     """Helper function which returns a SearchResult object containing MAST
     products that match several criteria.
@@ -615,7 +615,7 @@ def _search_products(target, radius=None, filetype="Lightcurve", cadence='long',
         return SearchResult(masked_result)
 
 
-def _query_mast(target, radius=None, project=['Kepler', 'K2', 'TESS']):
+def _query_mast(target, radius=None, project=('Kepler', 'K2', 'TESS')):
     """Helper function which wraps `astroquery.mast.Observations.query_criteria()`
     to returns a table of all Kepler or K2 observations of a given target.
 
@@ -721,7 +721,7 @@ def _query_mast(target, radius=None, project=['Kepler', 'K2', 'TESS']):
 
 def _filter_products(products, campaign=None, quarter=None, month=None,
                      sector=None, cadence='long', limit=None,
-                     project=['Kepler', 'K2', 'TESS'], filetype='Target Pixel'):
+                     project=('Kepler', 'K2', 'TESS'), filetype='Target Pixel'):
     """Helper function which filters a SearchResult's products table by one or
     more criteria.
 

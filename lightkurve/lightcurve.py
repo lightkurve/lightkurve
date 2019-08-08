@@ -70,7 +70,7 @@ class LightCurve(object):
         array([0.99, 1.01])
     """
     def __init__(self, time=None, flux=None, flux_err=None, time_format=None,
-                 time_scale=None, targetid=None, label=None, meta={}):
+                 time_scale=None, targetid=None, label=None, meta=None):
         if time is None and flux is None:
             raise ValueError('either time or flux must be given')
         if time is None:
@@ -86,7 +86,10 @@ class LightCurve(object):
         self.time_scale = time_scale
         self.targetid = targetid
         self.label = label
-        self.meta = meta
+        if meta is None:
+            self.meta = {}
+        else:
+            self.meta = meta
 
     def _validate_array(self, arr, name='array'):
         """Ensure the input arrays have the same length as `self.time`."""
@@ -1128,7 +1131,7 @@ class LightCurve(object):
         """
         return LightCurve(time=ts['time'].value, flux=ts['flux'], flux_err=ts['flux_err'])
 
-    def to_pandas(self, columns=['time', 'flux', 'flux_err']):
+    def to_pandas(self, columns=('time', 'flux', 'flux_err')):
         """Converts the light curve to a Pandas `~pandas.DataFrame` object.
 
         Parameters
@@ -1311,8 +1314,10 @@ class LightCurve(object):
                                        "lc-ext{}-header.txt".format(extension))
             return fits.Header.fromtextfile(template_fn)
 
-        def _make_primary_hdu(extra_data={}):
+        def _make_primary_hdu(extra_data=None):
             """Returns the primary extension (#0)."""
+            if extra_data is None:
+                extra_data = {}
             hdu = fits.PrimaryHDU()
             # Copy the default keywords from a template file from the MAST archive
             tmpl = _header_template(0)
@@ -1338,9 +1343,11 @@ class LightCurve(object):
                         log.warning('Value for {} is None.'.format(kw))
             return hdu
 
-        def _make_lightcurve_extension(extra_data={}):
+        def _make_lightcurve_extension(extra_data=None):
             """Create the 'LIGHTCURVE' extension (i.e. extension #1)."""
             # Turn the data arrays into fits columns and initialize the HDU
+            if extra_data is None:
+                extra_data = {}
             cols = []
             if ~np.asarray(['TIME' in k.upper() for k in extra_data.keys()]).any():
                 cols.append(fits.Column(name='TIME', format='D', unit=self.time_format,
@@ -1527,7 +1534,7 @@ class KeplerLightCurve(LightCurve):
     def __init__(self, time=None, flux=None, flux_err=None, time_format=None, time_scale=None,
                  centroid_col=None, centroid_row=None, quality=None, quality_bitmask=None,
                  channel=None, campaign=None, quarter=None, mission=None,
-                 cadenceno=None, targetid=None, ra=None, dec=None, label=None, meta={}):
+                 cadenceno=None, targetid=None, ra=None, dec=None, label=None, meta=None):
         super(KeplerLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err,
                                                time_format=time_format, time_scale=time_scale,
                                                targetid=targetid, label=label, meta=meta)
@@ -1555,8 +1562,8 @@ class KeplerLightCurve(LightCurve):
     def __repr__(self):
         return('KeplerLightCurve(ID: {})'.format(self.targetid))
 
-    def to_pandas(self, columns=['time', 'flux', 'flux_err', 'quality',
-                                 'centroid_col', 'centroid_row']):
+    def to_pandas(self, columns=('time', 'flux', 'flux_err', 'quality',
+                                 'centroid_col', 'centroid_row')):
         """Converts the light curve to a Pandas `~pandas.DataFrame` object.
 
         Parameters
@@ -1679,7 +1686,7 @@ class TessLightCurve(LightCurve):
     def __init__(self, time=None, flux=None, flux_err=None, time_format=None, time_scale=None,
                  centroid_col=None, centroid_row=None, quality=None, quality_bitmask=None,
                  cadenceno=None, sector=None, camera=None, ccd=None,
-                 targetid=None, ra=None, dec=None, label=None, meta={}):
+                 targetid=None, ra=None, dec=None, label=None, meta=None):
         super(TessLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err,
                                              time_format=time_format, time_scale=time_scale,
                                              targetid=targetid, label=label, meta=meta)

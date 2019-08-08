@@ -2,7 +2,6 @@
 
 from __future__ import division, print_function
 
-import os
 import logging
 import warnings
 
@@ -202,7 +201,7 @@ class KeplerLightCurveFile(LightCurveFile):
                 fe /= self.hdu[1].header['FLFRCSAP']
                 f /= self.hdu[1].header['CROWDSAP']
                 fe /= self.hdu[1].header['CROWDSAP']
-                
+
             return KeplerLightCurve(
                 time=self.hdu[1].data['TIME'][self.quality_mask],
                 time_format='bkjd',
@@ -270,15 +269,15 @@ class KeplerLightCurveFile(LightCurveFile):
         except KeyError:
             return None
 
-    def compute_cotrended_lightcurve(self, cbvs=[1, 2], **kwargs):
+    def compute_cotrended_lightcurve(self, cbvs=(1, 2), **kwargs):
         """Returns a LightCurve object after cotrending the SAP_FLUX
         against the cotrending basis vectors.
 
         Parameters
         ----------
-        cbvs : list of ints
+        cbvs : tuple or list of ints
             The list of cotrending basis vectors to fit to the data. For example,
-            [1, 2] will fit the first two basis vectors.
+            (1, 2) will fit the first two basis vectors.
         kwargs : dict
             Dictionary of keyword arguments to be passed to
             KeplerCBVCorrector.correct.

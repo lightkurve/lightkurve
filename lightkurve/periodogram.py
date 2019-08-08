@@ -8,14 +8,12 @@ import warnings
 
 import numpy as np
 from matplotlib import pyplot as plt
-from mpl_toolkits.axes_grid1.inset_locator import inset_axes
-
 
 import astropy
 from astropy.table import Table
 from astropy import units as u
 from astropy.units import cds
-from astropy.convolution import convolve, Box1DKernel, Gaussian1DKernel
+from astropy.convolution import convolve, Box1DKernel
 
 # LombScargle was moved from astropy.stats to astropy.timeseries in AstroPy v3.2
 try:
@@ -23,11 +21,8 @@ try:
 except ImportError:
     from astropy.stats import LombScargle
 
-from scipy.optimize import curve_fit
-from scipy.signal import find_peaks
 
 from . import MPLSTYLE
-
 from .utils import LightkurveWarning, validate_method
 from .lightcurve import LightCurve
 
@@ -503,7 +498,7 @@ class Periodogram(object):
                         attrs[attr]['print'] = '{}'.format(res)
                     attrs[attr]['type'] = 'str'
                 elif attr == 'wcs':
-                    attrs[attr]['print'] = 'astropy.wcs.wcs.WCS'.format(attr)
+                    attrs[attr]['print'] = 'astropy.wcs.wcs.WCS'
                     attrs[attr]['type'] = 'other'
                 else:
                     attrs[attr]['print'] = '{}'.format(type(res))

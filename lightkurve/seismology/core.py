@@ -10,7 +10,7 @@ from astropy.units import cds
 
 from .. import MPLSTYLE
 from . import utils, stellar_estimators
-from ..periodogram import LombScarglePeriodogram, SNRPeriodogram
+from ..periodogram import SNRPeriodogram
 from ..utils import LightkurveWarning, validate_method
 
 log = logging.getLogger(__name__)

@@ -376,7 +376,6 @@ def test_tpf_wcs_from_images():
     from astropy.io import fits
     from astropy import wcs
     import astropy.units as u
-    from astropy.coordinates import SkyCoord
     from astropy.io.fits.card import UNDEFINED
 
     # Can we read in a load of images?
