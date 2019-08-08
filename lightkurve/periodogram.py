@@ -13,7 +13,7 @@ import astropy
 from astropy.table import Table
 from astropy import units as u
 from astropy.units import cds
-from astropy.convolution import convolve, Box1DKernel, Gaussian1DKernel
+from astropy.convolution import convolve, Box1DKernel
 
 # LombScargle was moved from astropy.stats to astropy.timeseries in AstroPy v3.2
 try:
@@ -21,11 +21,8 @@ try:
 except ImportError:
     from astropy.stats import LombScargle
 
-from scipy.optimize import curve_fit
-from scipy.signal import find_peaks
 
 from . import MPLSTYLE
-
 from .utils import LightkurveWarning, validate_method
 from .lightcurve import LightCurve
 

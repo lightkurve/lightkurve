@@ -124,7 +124,7 @@ class KeplerCBVCorrector(Corrector):
 
         return cbv_array, time
 
-    def correct(self, cbvs=(1, 2), method='powell', options={}):
+    def correct(self, cbvs=(1, 2), method='powell', options=None):
         """
         Correct the SAP_FLUX by fitting a number of cotrending basis vectors
         `cbvs`.
@@ -140,7 +140,8 @@ class KeplerCBVCorrector(Corrector):
         options : dict
             Dictionary of options to be passed to scipy.optimize.minimize.
         """
-
+        if options is None:
+            options = {}
         median_flux = np.nanmedian(self.lc.flux)
         norm_flux = self.lc.flux / median_flux - 1
         norm_err_flux = self.lc.flux_err / median_flux

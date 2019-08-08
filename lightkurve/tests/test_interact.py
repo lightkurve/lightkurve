@@ -2,7 +2,6 @@
 from astropy.utils.data import get_pkg_data_filename
 import pytest
 import warnings
-import sys
 
 from .. import LightkurveWarning
 from ..targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
