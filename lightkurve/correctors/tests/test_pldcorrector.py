@@ -1,5 +1,6 @@
 import pytest
 import celerite
+import numpy as np
 
 from ... import search_targetpixelfile
 from .. import PLDCorrector
@@ -26,15 +27,20 @@ def test_create_design_matrix():
 
 @pytest.mark.remote_data
 @pytest.mark.skipif(bad_optional_imports, reason="PLD requires celerite and fbpca")
-def test_gp_model():
+def test_custom_gp_params():
     tpf = search_targetpixelfile('k2-199')[0].download()
     pld = PLDCorrector(tpf)
-    # can we create a celerite GP object for our light curve?
-    gp = pld.create_gp_model()
-    assert isinstance(gp, celerite.GP)
-    # can we optimize our GP for a given design matrix?
-    matrix = pld.create_design_matrix(pld_order=1)
-    soln = pld.optimize(matrix)
+    # can we make GP objects with custom kernels?
+    clc = pld.correct(kernel="sho")
+    # can we pass in our own celerite GP kernel?
+    log_omega0=np.log(2*np.pi / 30)
+    log_S0=np.log(10000)
+    log_Q=np.log(10)
+    kernel = celerite.terms.SHOTerm(log_omega0=log_omega0, log_S0=log_S0, log_Q=log_Q,
+                                    bounds={'log_S0': (-2 + log_S0, 2 + log_S0),
+                                            'log_Q': (0.2, 7),
+                                            'log_w0': (np.log(2*np.pi/150), np.log(2*np.pi/0.1))})
+    clc = pld.correct(kernel=kernel)
 
 @pytest.mark.remote_data
 @pytest.mark.skipif(bad_optional_imports, reason="PLD requires celerite and fbpca")

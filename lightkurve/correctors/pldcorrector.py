@@ -246,24 +246,25 @@ class PLDCorrector(Corrector):
 
         return design_matrix
 
-    def _solve_weights(self, design_matrix, gp):
+    def _solve_weights(self, design_matrix, gp_corrector):
         """Function to perform the analytic computation of the PLD algorithm.
         Returns a noise model light curve.
 
         Parameters
         ----------
-        gp : celerite.GP object
-            Celerite Gaussian Process object used to estimate long-term astrophysical
-            trend in the observation
         design_matrix : 2D numpy array
             Matrix containing suitable regressors for the systematics noise model
             with shape (n_cadences, n_pca_terms*pld_order)
+        gp_corrector : lightkurve.GPCorrector object or None
+            Lightkurve GPCorrector object used to estimate long-term astrophysical
+            trend in the observation
 
         Returns
         -------
-        m : numpy array
+        noise_model : numpy array
             1D numpy array for the noise model light curve
         """
+        gp = gp_corrector.gp
         X = design_matrix
         A = np.dot(X.T, gp.apply_inverse(X))
         # apply prior to design matrix weights for numerical stability
@@ -271,26 +272,24 @@ class PLDCorrector(Corrector):
         B = np.dot(X.T, gp.apply_inverse(self.raw_lc.flux[:, None])[:, 0])
         # Solve for the weights and compute the final model
         w = np.linalg.solve(A, B)
-        m = np.dot(X, w)
+        noise_model = np.dot(X, w)
 
-        return m
+        return noise_model
 
-    def _neg_log_like(self, params, design_matrix, gp):
+    def _neg_log_like(self, params, design_matrix, gp_corrector):
         """Loss function for likelihood of gp given a noise model.
-
-        # REPLACE WITH GP IMPLIMENTATION OF LOGLIKE
         """
-        gp.set_parameter_vector(params)
-        m = self._solve_weights(design_matrix, gp)
-        return -gp.log_likelihood(self.raw_lc.flux - m)
+        gp_corrector.gp.set_parameter_vector(params)
+        noise_model = self._solve_weights(design_matrix, gp_corrector)
+        return -gp_corrector.gp.log_likelihood(self.raw_lc.flux - noise_model)
 
-    def _grad_neg_log_like(self, params, design_matrix, gp):
+    def _grad_neg_log_like(self, params, design_matrix, gp_corrector):
         """Gradient of loss function to improve model optimization."""
-        gp.set_parameter_vector(params)
-        m = self._solve_weights(design_matrix, gp)
-        return -gp.grad_log_likelihood(self.raw_lc.flux - m)[1]
+        gp_corrector.gp.set_parameter_vector(params)
+        noise_model = self._solve_weights(design_matrix, gp_corrector)
+        return -gp_corrector.gp.grad_log_likelihood(self.raw_lc.flux - noise_model)[1]
 
-    def optimize(self, design_matrix=None, gp=None, method="L-BFGS-B"):
+    def optimize(self, design_matrix, gp_corrector, method="L-BFGS-B"):
         """Function to optimize GP hyperparameters simultaneously with fitting
         the PLD noise model.
 
@@ -300,79 +299,36 @@ class PLDCorrector(Corrector):
             Matrix containing suitable regressors for the systematics noise model
             with shape (n_cadences, n_pca_terms*pld_order). If set to None, a
             design matrix will be generated with default values
-        gp : celerite.GP object or None
-            Celerite Gaussian Process object used to estimate long-term astrophysical
-            trend in the observation. If set to None, a GP will be generated with
-            default values
+        gp_corrector : lightkurve.GPCorrector object or None
+            Lightkurve GPCorrector object used to estimate long-term astrophysical
+            trend in the observation
         method : str
             Optimization method passed into `scipy.optimize.minimize`, default of
             "L-BFGS-B"
 
         Returns
         -------
-        solution : scipy.optimize.optimize.OptimizeResult
-            Breakdown of optimization results and performance
+        gp_corrector : lightkurve.GPCorrector object or None
+            Lightkurve GPCorrector object used to estimate long-term astrophysical
+            trend in the observation with optimized hyperparameters
         """
         self.optimized = True
-        # ensure design_matrix and GP object has been made
-        if design_matrix is None:
-            design_matrix = self.create_design_matrix()
-        if gp is None:
-            gp = self.create_gp_model()
 
         # find a maximum-likelihood solution
-        solution = minimize(self._neg_log_like, gp.get_parameter_vector(),
-                            method=method, bounds=gp.get_parameter_bounds(),
-                            jac=self._grad_neg_log_like, args=(design_matrix, gp))
+        solution = minimize(self._neg_log_like, gp_corrector.gp.get_parameter_vector(),
+                            method=method, bounds=gp_corrector.gp.get_parameter_bounds(),
+                            jac=self._grad_neg_log_like, args=(design_matrix, gp_corrector))
         # set the GP parameters to the optimization output
-        gp.set_parameter_vector(solution.x)
-        return gp
+        gp_corrector.gp.set_parameter_vector(solution.x)
+        return gp_corrector
 
-    def create_gp_model(self, kernel="matern32", cadence_mask=None, sigma=5):
-        """Helper function to create a GP object for the given light curve using
-        the `~lightkurve.correctors.GPCorrector` object.
-
-        Parameters
-        ----------
-        kernel : "matern32" or "sho" or celerite.terms.Term
-            Kernel to be used in Gaussian Process initializaiton. Accepted values
-            are "matern32" for a Matern-3/2 kernel, "sho" for a Simple Harmonic
-            Oscillator, or a `celerite.terms.Term` object for a custom kernel
-        cadence_mask : array-like
-            A mask that will be applied to the cadences prior to constructing
-            the detrending model. For example, you can pass a boolean array
-            of length `n_cadences` where `True` means that the cadence will be
-            included in the noise model. You may also pass an array of indices.
-            This option enables signals of interest (e.g. planet transits)
-            to be excluded from the noise model, which will prevent over-fitting.
-            By default, no cadences will be masked.
-        sigma : int
-            Sigma value for outliers to be removed from GP fit. Default is 5
-
-        Returns
-        -------
-        gp : celerite.GP object
-            Celerite Gaussian Process object used to estimate long-term astrophysical
-            trend in the observation
-        """
-        gpc = GPCorrector(self.raw_lc, kernel=kernel, cadence_mask=cadence_mask, sigma=sigma)
-        return gpc.gp
-
-    def correct(self, aperture_mask=None, cadence_mask=None, remove_gp_trend=False,
-                design_matrix=None, gp=None, pld_order=2, n_pca_terms=10, **kwargs):
+    def correct(self, cadence_mask=None, remove_gp_trend=False, design_matrix=None,
+                gp_corrector=None, pld_order=2, n_pca_terms=10, **kwargs):
         """Returns a `lightkurve.LightCurve` object with model for motion noise
         removed.
 
         Parameters
         ----------
-        aperture_mask : array-like, 'pipeline', 'all', 'threshold', or None
-            A boolean array describing the aperture such that `True` means
-            that the pixel will be used to generate the raw flux light curve.
-            If `None` or 'all' are passed, all pixels will be used.
-            If 'pipeline' is passed, the mask suggested by the official pipeline
-            will be returned.
-            If 'threshold' is passed, all pixels brighter than 3-sigma above
-            the median flux will be used.
         cadence_mask : array-like
             A mask that will be applied to the cadences prior to constructing
             the detrending model. For example, you can pass a boolean array
@@ -389,8 +345,8 @@ class PLDCorrector(Corrector):
             Matrix containing suitable regressors for the systematics noise model
             with shape (n_cadences, n_pca_terms*pld_order). If set to None, a
             design matrix will be generated
-        gp : celerite.GP object or None
-            Celerite Gaussian Process object used to estimate long-term astrophysical
+        gp_corrector : lightkurve.GPCorrector object or None
+            Lightkurve GPCorrector object used to estimate long-term astrophysical
             trend in the observation. If set to None, a GP will be generated
         pld_order : int
             The order of Pixel Level De-correlation to be performed. First order
@@ -402,6 +358,8 @@ class PLDCorrector(Corrector):
             when performing Principal Component Analysis for models higher than
             first order. Increasing this value may provide higher precision at
             the expense of computational time.
+        **kwargs : dict
+            Keyword arguments for the `~lightkurve.GPCorrector` object
 
         Returns
         -------
@@ -412,15 +370,17 @@ class PLDCorrector(Corrector):
         # Create final optimized model
         if design_matrix is None:
             design_matrix = self.create_design_matrix(pld_order=pld_order, n_pca_terms=n_pca_terms)
-        if gp is None:
-            gp = self.create_gp_model(cadence_mask=cadence_mask)
+        if gp_corrector is None:
+            gp_corrector = GPCorrector(self.raw_lc, cadence_mask=cadence_mask, **kwargs)
+        elif isinstance(gp_corrector, celerite.GP):
+            gp_corrector = GPCorrector(self.raw_lc, cadence_mask=cadence_mask, kernel=gp_corrector.kernel, **kwargs)
 
         # Optimize the GP
         if not self.optimized:
-            gp = self.optimize(design_matrix=design_matrix, gp=gp)
+            gp_corrector = self.optimize(design_matrix, gp_corrector)
 
         # Make the LightCurve objects
-        lcs = self.get_diagnostic_lightcurves(design_matrix=design_matrix, gp=gp)
+        lcs = self.get_diagnostic_lightcurves(design_matrix=design_matrix, gp_corrector=gp_corrector)
         self.corrected_lc = lcs[0]
 
         # Optionally remove long term trend fit by GP
@@ -430,7 +390,7 @@ class PLDCorrector(Corrector):
 
         return self.corrected_lc
 
-    def get_diagnostic_lightcurves(self, design_matrix, gp):
+    def get_diagnostic_lightcurves(self, design_matrix, gp_corrector):
         """Returns a LightCurveCollection containing corrected_lc, noise_lc, gp_lc.
 
         Parameters
@@ -438,8 +398,8 @@ class PLDCorrector(Corrector):
         design_matrix : 2D numpy array or None
             Matrix containing suitable regressors for the systematics noise model
             with shape (n_cadences, n_pca_terms*pld_order)
-        gp : celerite.GP object or None
-            Celerite Gaussian Process object used to estimate long-term astrophysical
+        gp_corrector : lightkurve.GPCorrector object or None
+            Lightkurve GPCorrector object used to estimate long-term astrophysical
             trend in the observation
 
         Returns
@@ -450,7 +410,7 @@ class PLDCorrector(Corrector):
         """
         # Create noise model LightCurve
         noise_lc = self.raw_lc.copy()
-        noise_lc.flux = self._solve_weights(design_matrix, gp)
+        noise_lc.flux = self._solve_weights(design_matrix, gp_corrector)
 
         # Create corrected LightCurve
         corrected_lc = self.raw_lc.copy()
@@ -459,8 +419,8 @@ class PLDCorrector(Corrector):
 
         # Create GP LightCurve
         gp_lc = self.raw_lc.copy()
-        gp_lc.flux = gp.predict(corrected_lc.flux, corrected_lc.time,
-                                return_cov=False, return_var=False)
+        gp_lc.flux = gp_corrector.gp.predict(corrected_lc.flux, corrected_lc.time,
+                                             return_cov=False, return_var=False)
 
         return LightCurveCollection([corrected_lc, noise_lc, gp_lc])
 
