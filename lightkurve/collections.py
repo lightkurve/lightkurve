@@ -8,6 +8,7 @@ import numpy as np
 from . import MPLSTYLE
 from .utils import LightkurveWarning
 from .lightcurvefile import LightCurveFile
+from .targetpixelfile import TargetPixelFile
 
 log = logging.getLogger(__name__)
 
@@ -50,6 +51,8 @@ class Collection(object):
         result = "{} of {} objects:\n".format(self.__class__.__name__, len(self.data))
         if (isinstance(self[0], LightCurveFile)):
             labels = np.asarray([lcf.SAP_FLUX.label for lcf in self])
+        elif (isinstance(self[0], TargetPixelFile)):
+            labels = np.asarray([tpf.targetid for tpf in self])
         else:
             labels = np.asarray([lcf.label for lcf in self])
 
