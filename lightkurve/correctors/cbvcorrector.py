@@ -110,9 +110,8 @@ class KeplerCBVCorrector(Corrector):
         """
         return self._opt_result
 
-    def _get_cbv_data(self, cbvs=[1, 2]):
-        '''Gets the CBV data for a channel and module
-        '''
+    def _get_cbv_data(self, cbvs=(1, 2)):
+        """Returns the CBV data for a channel and module."""
         module, output = channel_to_module_output(self.lc.channel)
         cbv_file = pyfits.open(self.get_cbv_url())
         cbv_data = cbv_file['MODOUT_{0}_{1}'.format(module, output)].data
@@ -125,7 +124,7 @@ class KeplerCBVCorrector(Corrector):
 
         return cbv_array, time
 
-    def correct(self, cbvs=[1, 2], method='powell', options={}):
+    def correct(self, cbvs=(1, 2), method='powell', options={}):
         """
         Correct the SAP_FLUX by fitting a number of cotrending basis vectors
         `cbvs`.
@@ -223,7 +222,7 @@ class KeplerCBVCorrector(Corrector):
                     break
         return self.cbv_base_url + cbv_file
 
-    def plot_cbvs(self, cbvs=[1, 2], ax=None):
+    def plot_cbvs(self, cbvs=(1, 2), ax=None):
         '''Plot the CBVs for a given list of CBVs
 
         Parameters

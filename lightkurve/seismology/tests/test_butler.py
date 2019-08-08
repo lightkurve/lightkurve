@@ -1,10 +1,9 @@
 import pytest
 from astropy import units as u
 import numpy as np
-from numpy.testing import assert_almost_equal, assert_array_equal
+from numpy.testing import assert_almost_equal
 from scipy.signal import unit_impulse as deltafn
 
-from ...lightcurve import LightCurve
 from ...search import search_lightcurvefile
 from ...periodogram import Periodogram
 from ...periodogram import SNRPeriodogram
@@ -85,9 +84,9 @@ def test_estimate_numax_kwargs():
     assert(np.isclose(numax.value, true_numax, atol=.1*true_numax))
 
     # Assert we can't pass custom numaxs outside a functional range
-    with pytest.raises(ValueError) as err:
+    with pytest.raises(ValueError):
         numax = butler.estimate_numax(numaxs=np.linspace(-5, 5.))
-    with pytest.raises(ValueError) as err:
+    with pytest.raises(ValueError):
         numax = butler.estimate_numax(numaxs=np.linspace(1., 5000.))
 
     # Assert we can pass a custom window in microhertz or days
@@ -98,11 +97,11 @@ def test_estimate_numax_kwargs():
 
     # Assert we can't pass in window_widths outside functional range
     # Assert we can't pass custom numaxs outside a functional range
-    with pytest.raises(ValueError) as err:
+    with pytest.raises(ValueError):
         numax = butler.estimate_numax(window_width=-5)
-    with pytest.raises(ValueError) as err:
+    with pytest.raises(ValueError):
         numax = butler.estimate_numax(window_width=1e6)
-    with pytest.raises(ValueError) as err:
+    with pytest.raises(ValueError):
         numax = butler.estimate_numax(window_width=0.001)
 
     # Assert we can pass a custom spacing in microhertz or days
@@ -112,11 +111,11 @@ def test_estimate_numax_kwargs():
     assert(np.isclose(numax.value, true_numax, atol=.1*true_numax))
 
     # Assert we can't pass in spacing outside functional range
-    with pytest.raises(ValueError) as err:
+    with pytest.raises(ValueError):
         numax = butler.estimate_numax(spacing=-5)
-    with pytest.raises(ValueError) as err:
+    with pytest.raises(ValueError):
         numax = butler.estimate_numax(spacing=1e6)
-    with pytest.raises(ValueError) as err:
+    with pytest.raises(ValueError):
         numax = butler.estimate_numax(spacing=0.001)
 
     # Assert it doesn't matter what units of frqeuency numaxs are passed in as
@@ -212,9 +211,9 @@ def test_estimate_deltanu_kwargs():
     assert(np.isclose(deltanu.value, true_deltanu, atol=.25*true_deltanu))
 
     # Assert you can't pass custom numax outside of appropriate range
-    with pytest.raises(ValueError) as err:
+    with pytest.raises(ValueError):
         deltanu = butler.estimate_deltanu(numax= -5.)
-    with pytest.raises(ValueError) as err:
+    with pytest.raises(ValueError):
         deltanu = butler.estimate_deltanu(numax=5000)
 
     # Assert it doesn't matter what units of frequency numax is passed in as
@@ -290,11 +289,11 @@ def test_plot_echelle():
                         maximum_frequency = numax+deltanu)
 
     # Assert raises error if numax or either of the limits are too high
-    with pytest.raises(ValueError) as err:
+    with pytest.raises(ValueError):
         butler.plot_echelle(deltanu, numax, minimum_frequency = f[-1]+10)
-    with pytest.raises(ValueError) as err:
+    with pytest.raises(ValueError):
         butler.plot_echelle(deltanu, numax, maximum_frequency = f[-1]+10)
-    with pytest.raises(ValueError) as err:
+    with pytest.raises(ValueError):
         butler.plot_echelle(deltanu, numax = f[-1]+10)
 
     # Assert can pass colormap

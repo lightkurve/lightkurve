@@ -11,7 +11,6 @@ import pytest
 import numpy as np
 from numpy.testing import assert_almost_equal, assert_array_equal
 import tempfile
-import warnings
 
 from astropy.coordinates import SkyCoord
 import astropy.units as u
@@ -249,7 +248,7 @@ def test_issue_472():
     # observed in Sector 2; we're expecting an empty SearchResult instead.
     search = search_tesscut("TIC41336498", sector=2)
     assert isinstance(search, SearchResult)
-    len(search) == 0
+    assert len(search) == 0
 
 
 @pytest.mark.remote_data

@@ -2,7 +2,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-from astropy.convolution import convolve, Box1DKernel, Gaussian1DKernel
+from astropy.convolution import convolve, Gaussian1DKernel
 from astropy import units as u
 
 from .. import MPLSTYLE
@@ -222,18 +222,15 @@ def diagnose_numax_acf2d(numax, periodogram):
                   numax.diagnostics['numaxs'][-1],
                   windowarray[0],
                   windowarray[-1])
-        figsize = [8.485, 4]
-        a = figsize[1] / figsize[0]
-        b = (extent[3] - extent[2]) / (extent[1] - extent[0])
         vmin = np.nanpercentile(numax.diagnostics['acf2d'], 5)
         vmax = np.nanpercentile(numax.diagnostics['acf2d'], 95)
-#        print(windowarray.shape)
-#        print(numax.diagnostics['numaxs'].shape)
-#        print(numax.diagnostics['acf2d'].shape)
-#        print(periodogram.frequency.value.shape)
-        im = ax[1].pcolormesh(numax.diagnostics['numaxs'], np.linspace(0, numax.diagnostics['window_width'], num=numax.diagnostics['acf2d'].shape[0]),
-                                    numax.diagnostics['acf2d'], cmap='Blues', vmin=vmin, vmax=vmax)
-#        plt.colorbar(im, ax=ax[1], orientation='horizontal')
+        ax[1].pcolormesh(numax.diagnostics['numaxs'],
+                         np.linspace(0, numax.diagnostics['window_width'],
+                         num=numax.diagnostics['acf2d'].shape[0]),
+                         numax.diagnostics['acf2d'],
+                         cmap='Blues',
+                         vmin=vmin,
+                         vmax=vmax)
         ax[1].set_ylabel(r'Frequency lag [{}]'.format(periodogram.frequency.unit.to_string('latex')))
         ax[1].axvline(numax.value, c='r', linewidth=2, alpha=.4)
         ax[1].text(.05, .9, '2D AutoCorrelation',
@@ -241,10 +238,10 @@ def diagnose_numax_acf2d(numax, periodogram):
                     transform=ax[1].transAxes, fontsize=13)
 
         ax[2].plot(numax.diagnostics['numaxs'], numax.diagnostics['metric'])
-        ax[2].plot(numax.diagnostics['numaxs'], numax.diagnostics['metric_smooth'], lw=2, alpha=0.7, label='Smoothed Metric')
+        ax[2].plot(numax.diagnostics['numaxs'], numax.diagnostics['metric_smooth'],
+                   lw=2, alpha=0.7, label='Smoothed Metric')
         ax[2].set_xlabel("Frequency [{}]".format(periodogram.frequency.unit.to_string('latex')))
         ax[2].set_ylabel(r'Correlation Metric')
-
 
         ax[2].axvline(numax.value, c='r', linewidth=2, alpha=.4)
         ax[2].text(.05, .9, 'Correlation Metric',
