@@ -218,10 +218,6 @@ def diagnose_numax_acf2d(numax, periodogram):
 
         windowarray = np.linspace(0, numax.diagnostics['window_width'],
                                   num=numax.diagnostics['acf2d'].shape[1])
-        extent = (numax.diagnostics['numaxs'][0],
-                  numax.diagnostics['numaxs'][-1],
-                  windowarray[0],
-                  windowarray[-1])
         vmin = np.nanpercentile(numax.diagnostics['acf2d'], 5)
         vmax = np.nanpercentile(numax.diagnostics['acf2d'], 95)
         ax[1].pcolormesh(numax.diagnostics['numaxs'],
