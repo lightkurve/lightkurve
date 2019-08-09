@@ -9,6 +9,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import minimize
 
+import celerite
+
 from .corrector import Corrector
 from .gpcorrector import GPCorrector
 from .. import MPLSTYLE

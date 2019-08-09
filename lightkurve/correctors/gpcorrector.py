@@ -7,18 +7,20 @@ from .corrector import Corrector
 from ..utils import validate_method
 from .. import log, MPLSTYLE
 
+from .. import log
+
 class GPCorrector(Corrector):
     """
     Accepted kernels are:
     "matern32", "shoterm"
     """
     def __init__(self, lc, kernel="matern32", cadence_mask=None, sigma=5):
+        log.debug('Initializing')
         if np.any([~np.isfinite(lc.flux), ~np.isfinite(lc.flux_err)]):
             log.warning("NaNs have been removed from the light curve.")
             self.lc = lc.remove_nans()
         else:
             self.lc = lc
-
         if cadence_mask is None:
             self.cadence_mask = np.ones(len(self.lc.time), dtype=bool)
         else:
@@ -28,11 +30,16 @@ class GPCorrector(Corrector):
         self._bad_cadences |= self.lc.flatten().remove_outliers(sigma=sigma, return_mask=True)[1]
         self.diag[self._bad_cadences] *= 1e10  # This is faster than masking out flux values
 
+        log.debug("Building kernels")
+
         if isinstance(kernel, celerite.terms.Term):
             self.kernel = kernel
         else:
             kernel_str = validate_method(kernel, ["matern32", "sho"])
             self.kernel = self._build_kernel(kernel_str)
+
+        log.debug("Built kernels")
+
 
         self.gp = celerite.GP(self.kernel, mean=np.nanmean(lc.flux))
         self.gp.compute(self.lc.time, self.diag)
@@ -40,9 +47,11 @@ class GPCorrector(Corrector):
         self.optimized = False
 
     def _build_matern32_kernel(self, matern_bounds=None, jitter_bounds=None):
+        log.debug('Building Matern3/2 Kernel')
         log_sigma = np.log(np.nanstd(self.lc.flux))
         log_rho = np.log(self.lc.normalize().to_periodogram(minimum_period=0.5, maximum_period=50).period_at_max_power.value)
         log_sigma2 = np.log(np.nanmedian(self.lc.flux_err))
+        log.debug('Created starting guesses')
 
         if matern_bounds is None:
             matern_bounds = {'log_sigma': (-2 + log_sigma, 2 + log_sigma),
@@ -55,10 +64,12 @@ class GPCorrector(Corrector):
         return kernel
 
     def _build_sho_kernel(self, sho_bounds=None, jitter_bounds=None):
+        log.debug('Building SHO Kernel')
         log_omega0 = np.log(2*np.pi / self.lc.normalize().to_periodogram(minimum_period=0.5, maximum_period=50).period_at_max_power.value)
         log_S0 = np.log(np.nanstd(self.lc.flux)**2)
         log_Q = np.log(10)
         log_sigma = np.log(np.nanmedian(self.lc.flux_err))
+        log.debug('Created starting guesses')
 
         if sho_bounds is None:
             sho_bounds = {'log_S0': (-2 + log_S0, 2 + log_S0),
@@ -91,31 +102,48 @@ class GPCorrector(Corrector):
         return -self.gp.grad_log_likelihood(y)[1]
 
     def optimize(self, method="L-BFGS-B"):
-        self.optimized = True
+        log.debug('Optimizing')
         solution = minimize(self._neg_log_like, self.gp.get_parameter_vector(),
                             method=method, bounds=self.gp.get_parameter_bounds(),
                             jac=self._grad_neg_log_like, args=(self.lc.flux))
+        self.optimized = True
+        log.debug('Optimized')
         self.gp.set_parameter_vector(solution.x)
         return solution
 
-    def _predict_lightcurves(self):
-        gp_flux, gp_flux_var = self.gp.predict(self.lc.flux, self.lc.time)
+    def _predict_lightcurves(self, propagate_errors=False):
+        log.debug('Predicting...')
+        if propagate_errors:
+            log.debug('Propagating errors')
+            gp_flux, gp_flux_var = self.gp.predict(self.lc.flux, self.lc.time)
+            log.debug('Predicted.')
 
-        corrected_lc = self.lc.copy()
-        corrected_lc.flux -= (gp_flux - np.mean(gp_flux))
-        corrected_lc.flux_err = np.hypot(corrected_lc.flux_err, np.std(gp_flux_var))
+            corrected_lc = self.lc.copy()
+            corrected_lc.flux -= (gp_flux - np.mean(gp_flux))
+            corrected_lc.flux_err = np.hypot(corrected_lc.flux_err, np.std(gp_flux_var))
 
-        gp_lc = self.lc.copy()
-        gp_lc.flux = gp_flux
-        gp_lc.flux_err = np.std(gp_flux_var)
+            gp_lc = self.lc.copy()
+            gp_lc.flux = gp_flux
+            gp_lc.flux_err = np.std(gp_flux_var)
+        else:
+            log.debug('Not propagating errors')
+            gp_flux = self.gp.predict(self.lc.flux, self.lc.time, return_var=False, return_cov=False)
+            log.debug('Predicted.')
+            corrected_lc = self.lc.copy()
+            corrected_lc.flux -= (gp_flux - np.mean(gp_flux))
+
+            gp_lc = self.lc.copy()
+            gp_lc.flux_err = 0
+            gp_lc.flux = gp_flux
+
         return {'corrected_lc': corrected_lc,
                 'gp_lc': gp_lc}
 
-    def correct(self):
+    def correct(self, propagate_errors=False):
         self.optimize()
-        return self._predict_lightcurves()['corrected_lc']
+        return self._predict_lightcurves(propagate_errors=propagate_errors)['corrected_lc']
 
-    def diagnose(self, ax=None, fast=False):
+    def diagnose(self, ax=None, propagate_errors=False):
         """Show a diagnostic plot of the GP. Returns a matplotlib.pyplot.axes object.
 
         Parameters
@@ -135,34 +163,21 @@ class GPCorrector(Corrector):
             self.lc.errorbar(ax=ax, zorder=1, label='Data', normalize=False)
             self.lc[self._bad_cadences].scatter(ax=ax, zorder=2, color='r', marker='x', s=20, label='Rejected Outliers', normalize=False)
 
-
-        # Initial Guess
-        if not self.optimized:
-            gp = celerite.GP(self.initial_kernel, mean=np.nanmean(self.lc.flux))
-            gp.compute(self.lc.time, self.diag)
-            if fast:
-                mu = gp.predict(self.lc.flux, self.lc.time, return_cov=False, return_var=False)
+            if self.optimized:
+                color = 'green'
             else:
-                mu, var = gp.predict(self.lc.flux, self.lc.time, return_cov=False, return_var=True)
-                ax.fill_between(self.lc.time, mu - var**0.5, mu + var**0.5, alpha=0.3, color='r', label='')
+                color='blue'
+
+            # Initial Guess
+            res = self._predict_lightcurves(propagate_errors=propagate_errors)
+            if propagate_errors:
+                ax.fill_between(res['gp_lc'].time, res['gp_lc'].flux - res['gp_lc'].flux_err, res['gp_lc'].flux + res['gp_lc'].flux_err, color=color)
             k = self.initial_kernel.get_parameter_dict()
             label = '\n'.join(['{}: {}'.format(key.split(':')[-1], np.round(k[key], 3))
                                         for key in k.keys()])
-            ax.plot(self.lc.time, mu, c='r', lw=1, zorder=2, label=label)
-            ax.set_title('Initial Guess')
+            res['gp_lc'].plot(ax=ax, color=color, label=label)
 
-        if self.optimized:
-            if fast:
-                mu = self.gp.predict(self.lc.flux, self.lc.time, return_cov=False, return_var=False)
-            else:
-                mu, var = self.gp.predict(self.lc.flux, self.lc.time, return_cov=False, return_var=True)
-                ax.fill_between(self.lc.time, mu - var**0.5, mu + var**0.5, alpha=0.3, color='b', label='')
-            k = self.kernel.get_parameter_dict()
-            label = '\n'.join(['{}: {}'.format(key.split(':')[-1], np.round(k[key], 3))
-                                        for key in k.keys()])
-            ax.plot(self.lc.time, mu, c='b', lw=1, zorder=2, label=label)
-            ax.set_title('Optimized')
-        ax.legend(bbox_to_anchor=(1.05, 1.05), loc='upper center', fancybox=True)
+            ax.legend(bbox_to_anchor=(1.05, 1.05), loc='upper center', fancybox=True)
 
-        plt.tight_layout()
+            plt.tight_layout()
         return ax
