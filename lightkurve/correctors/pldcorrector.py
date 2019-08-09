@@ -13,7 +13,7 @@ from .corrector import Corrector
 from .gpcorrector import GPCorrector
 from .. import MPLSTYLE
 from ..collections import LightCurveCollection
-from ..utils import LightkurveWarning, LightkurveError
+from ..utils import LightkurveError
 
 log = logging.getLogger(__name__)
 

@@ -1,5 +1,4 @@
 import pytest
-import celerite
 import numpy as np
 
 from ... import search_targetpixelfile
@@ -8,7 +7,6 @@ from .. import PLDCorrector
 bad_optional_imports = False
 try:
     import celerite
-    import fbpca
 except ImportError:
     bad_optional_imports = True
 
@@ -29,9 +27,11 @@ def test_create_design_matrix():
 @pytest.mark.skipif(bad_optional_imports, reason="PLD requires celerite and fbpca")
 def test_custom_gp_params():
     tpf = search_targetpixelfile('k2-199')[0].download()
+    raw_cdpp = tpf.to_lightcurve().estimate_cdpp()
     pld = PLDCorrector(tpf)
     # can we make GP objects with custom kernels?
     clc = pld.correct(kernel="sho")
+    assert clc.estimate_cdpp() < raw_cdpp
     # can we pass in our own celerite GP kernel?
     log_omega0=np.log(2*np.pi / 30)
     log_S0=np.log(10000)
@@ -41,6 +41,7 @@ def test_custom_gp_params():
                                             'log_Q': (0.2, 7),
                                             'log_w0': (np.log(2*np.pi/150), np.log(2*np.pi/0.1))})
     clc = pld.correct(kernel=kernel)
+    assert clc.estimate_cdpp() < raw_cdpp
 
 @pytest.mark.remote_data
 @pytest.mark.skipif(bad_optional_imports, reason="PLD requires celerite and fbpca")
@@ -57,6 +58,6 @@ def test_correct():
 def test_diagnose():
     tpf = search_targetpixelfile('k2-199')[0].download()
     pld = PLDCorrector(tpf)
-    clc = pld.correct()
+    pld.correct()
     # does the diagnose function run smoothly?
     pld.diagnose()
