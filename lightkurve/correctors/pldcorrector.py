@@ -248,7 +248,7 @@ class PLDCorrector(Corrector):
 
         return design_matrix
 
-    def _solve_weights(self, design_matrix, gp_corrector, l2_term=1e-1):
+    def _solve_weights(self, design_matrix, gp_corrector, l2_term):
         """Function to perform the analytic computation of the PLD algorithm.
         Returns a noise model light curve.
 
@@ -283,20 +283,20 @@ class PLDCorrector(Corrector):
 
         return noise_model
 
-    def _neg_log_like(self, params, design_matrix, gp_corrector, l2_term=1e-8):
+    def _neg_log_like(self, params, design_matrix, gp_corrector, l2_term):
         """Loss function for likelihood of gp given a noise model.
         """
         gp_corrector.gp.set_parameter_vector(params)
         noise_model = self._solve_weights(design_matrix, gp_corrector, l2_term=l2_term)
         return -gp_corrector.gp.log_likelihood(self.raw_lc.flux - noise_model)
 
-    def _grad_neg_log_like(self, params, design_matrix, gp_corrector, l2_term=1e-8):
+    def _grad_neg_log_like(self, params, design_matrix, gp_corrector, l2_term):
         """Gradient of loss function to improve model optimization."""
         gp_corrector.gp.set_parameter_vector(params)
         noise_model = self._solve_weights(design_matrix, gp_corrector, l2_term=l2_term)
         return -gp_corrector.gp.grad_log_likelihood(self.raw_lc.flux - noise_model)[1]
 
-    def optimize(self, design_matrix, gp_corrector, method="L-BFGS-B", l2_term=1e-8):
+    def optimize(self, design_matrix, gp_corrector, l2_term, method="L-BFGS-B"):
         """Function to optimize GP hyperparameters simultaneously with fitting
         the PLD noise model.
 
@@ -330,7 +330,7 @@ class PLDCorrector(Corrector):
         return gp_corrector
 
     def correct(self, cadence_mask=None, remove_gp_trend=False, design_matrix=None,
-                gp_corrector=None, pld_order=2, n_pca_terms=10, l2_term=1e-8, **kwargs):
+                gp_corrector=None, pld_order=2, n_pca_terms=10, l2_term=None, **kwargs):
         """Returns a `lightkurve.LightCurve` object with model for motion noise
         removed.
 
@@ -382,54 +382,36 @@ class PLDCorrector(Corrector):
         elif isinstance(gp_corrector, celerite.GP):
             gp_corrector = GPCorrector(self.raw_lc, cadence_mask=cadence_mask, kernel=gp_corrector.kernel, **kwargs)
 
+        # The L2 regularization term should roughly be equal to the inverse of
+        # the amplitude of the signals we want the noise model to fit
+        if l2_term is None:
+            l2_term = 1 / (np.nanmedian(self.raw_lc.flux) * self.raw_lc.estimate_cdpp() * 1e-6)**2
+            log.debug("Setting l2_term to {}".format(l2_term))
+
         # Optimize the GP
         if not self.optimized:
             gp_corrector = self.optimize(design_matrix, gp_corrector, l2_term=l2_term)
 
-        # Make the LightCurve objects
-        lcs = self.get_diagnostic_lightcurves(design_matrix=design_matrix, gp_corrector=gp_corrector)
-        self.corrected_lc = lcs[0]
 
-        # Optionally remove long term trend fit by GP
-        if remove_gp_trend:
-            gp_flux = lcs[2].flux
-            self.corrected_lc.flux -= (gp_flux - np.nanmean(gp_flux))
-
-        return self.corrected_lc
-
-    def get_diagnostic_lightcurves(self, design_matrix, gp_corrector):
-        """Returns a LightCurveCollection containing corrected_lc, noise_lc, gp_lc.
-
-        Parameters
-        ----------
-        design_matrix : 2D numpy array or None
-            Matrix containing suitable regressors for the systematics noise model
-            with shape (n_cadences, n_pca_terms*pld_order)
-        gp_corrector : lightkurve.GPCorrector object or None
-            Lightkurve GPCorrector object used to estimate long-term astrophysical
-            trend in the observation
-
-        Returns
-        -------
-        LightCurveCollection : lightkurve.LightCurveCollection object
-            `~lightkurve.collections.LightCurveCollection` object containing
-            corrected_lc, noise_lc, gp_lc
-        """
         # Create noise model LightCurve
         noise_lc = self.raw_lc.copy()
-        noise_lc.flux = self._solve_weights(design_matrix, gp_corrector)
-
+        noise_lc.flux = self._solve_weights(design_matrix, gp_corrector, l2_term)
         # Create corrected LightCurve
         corrected_lc = self.raw_lc.copy()
         corrected_lc.flux -= noise_lc.flux
         corrected_lc.flux += np.nanmean(noise_lc.flux)
-
         # Create GP LightCurve
         gp_lc = self.raw_lc.copy()
         gp_lc.flux = gp_corrector.gp.predict(corrected_lc.flux, corrected_lc.time,
                                              return_cov=False, return_var=False)
+        # Optionally remove long term trend fit by GP
+        if remove_gp_trend:
+            self.corrected_lc.flux -= (gp_lc.flux - np.nanmean(gp_flux))
 
-        return LightCurveCollection([corrected_lc, noise_lc, gp_lc])
+        self.diagnostic_lightcurves = {'noise': noise_lc,
+                                       'corrected': corrected_lc,
+                                       'gp': gp_lc}
+        return self.diagnostic_lightcurves['corrected']
 
     def diagnose(self, ax=None):
         """Diagnostic plotting function to assess performance of the PLD de-trending."""
@@ -441,6 +423,6 @@ class PLDCorrector(Corrector):
                 _, ax = plt.subplots()
 
         self.raw_lc.scatter(ax=ax, c='r', label='{} (Raw Light Curve)'.format(self.raw_lc.label))
-        self.corrected_lc.scatter(ax=ax, c='k', label='{} (PLD-Corrected)'.format(self.raw_lc.label))
-
+        self.diagnostic_lightcurves['corrected'].scatter(ax=ax, c='k',
+                                                        label='{} (PLD-Corrected)'.format(self.raw_lc.label))
         return ax
