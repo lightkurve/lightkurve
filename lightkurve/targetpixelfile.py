@@ -557,12 +557,10 @@ class TargetPixelFile(object):
             raise ValueError("frame {} is out of bounds, must be in the range "
                              "0-{}.".format(frame, self.shape[0]))
         with plt.style.context(style):
-          
             if showcadencenum:
                     img_title = 'Target ID: {}, frame: {}'.format(self.targetid, frame)
-            else:                   
+            else:
                 img_title = 'Target ID: {}'.format(self.targetid)
-                
             img_extent = (self.column, self.column + self.shape[2],
                           self.row, self.row + self.shape[1])
             ax = plot_image(pflux, ax=ax, title=img_title, extent=img_extent,
