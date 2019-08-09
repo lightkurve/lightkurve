@@ -248,7 +248,7 @@ class PLDCorrector(Corrector):
 
         return design_matrix
 
-    def _solve_weights(self, design_matrix, gp_corrector, l2_term=1e-8):
+    def _solve_weights(self, design_matrix, gp_corrector, l2_term=1e-1):
         """Function to perform the analytic computation of the PLD algorithm.
         Returns a noise model light curve.
 

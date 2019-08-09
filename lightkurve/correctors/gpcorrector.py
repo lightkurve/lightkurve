@@ -165,10 +165,11 @@ class GPCorrector(Corrector):
 
             if self.optimized:
                 color = 'green'
+                ax.set_title('Optimized')
             else:
                 color='blue'
+                ax.set_title('Pre-Optimization')
 
-            # Initial Guess
             res = self._predict_lightcurves(propagate_errors=propagate_errors)
             if propagate_errors:
                 ax.fill_between(res['gp_lc'].time, res['gp_lc'].flux - res['gp_lc'].flux_err, res['gp_lc'].flux + res['gp_lc'].flux_err, color=color)
@@ -176,8 +177,6 @@ class GPCorrector(Corrector):
             label = '\n'.join(['{}: {}'.format(key.split(':')[-1], np.round(k[key], 3))
                                         for key in k.keys()])
             res['gp_lc'].plot(ax=ax, color=color, label=label)
-
             ax.legend(bbox_to_anchor=(1.05, 1.05), loc='upper center', fancybox=True)
-
             plt.tight_layout()
         return ax
