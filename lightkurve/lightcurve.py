@@ -70,7 +70,7 @@ class LightCurve(object):
         array([0.99, 1.01])
     """
     def __init__(self, time=None, flux=None, flux_err=None, time_format=None,
-                 time_scale=None, targetid=None, label=None, meta={}):
+                 time_scale=None, targetid=None, label=None, meta=None):
         if time is None and flux is None:
             raise ValueError('either time or flux must be given')
         if time is None:
@@ -86,7 +86,10 @@ class LightCurve(object):
         self.time_scale = time_scale
         self.targetid = targetid
         self.label = label
-        self.meta = meta
+        if meta is None:
+            self.meta = {}
+        else:
+            self.meta = meta
 
     def _validate_array(self, arr, name='array'):
         """Ensure the input arrays have the same length as `self.time`."""
@@ -1142,7 +1145,7 @@ class LightCurve(object):
         """
         return LightCurve(time=ts['time'].value, flux=ts['flux'], flux_err=ts['flux_err'])
 
-    def to_pandas(self, columns=['time', 'flux', 'flux_err']):
+    def to_pandas(self, columns=('time', 'flux', 'flux_err')):
         """Converts the light curve to a Pandas `~pandas.DataFrame` object.
 
         Parameters
@@ -1254,45 +1257,6 @@ class LightCurve(object):
         from .seismology import Seismology
         return Seismology.from_lightcurve(self, **kwargs)
 
-    def _boolean_mask_to_bitmask(self, aperture_mask):
-        """Takes in an aperture_mask and returns a Kepler-style bitmask
-
-        Parameters
-        ----------
-        aperture_mask : array-like
-            2D aperture mask. The mask can be either a boolean mask or an integer
-            mask mimicking the Kepler/TESS convention; boolean or boolean-like masks
-            are converted to the Kepler/TESS conventions.  Kepler bitmasks are
-            returned unchanged except for possible datatype conversion.
-
-        Returns
-        -------
-        bitmask : numpy uint8 array
-            A bitmask incompletely mimicking the Kepler/TESS convention: Bit 2,
-            value = 3, means "pixel was part of the custom aperture".  The other
-            bits have no meaning and are currently assigned a value of 1.
-        """
-        # Masks can either be boolean input or Kepler pipeline style
-        clean_mask = np.nan_to_num(aperture_mask)
-
-        contains_bit2 = (clean_mask.astype(np.int) & 2).any()
-        all_zeros_or_ones = ( (clean_mask.dtype in ['float', 'int']) &
-                              ((set(np.unique(clean_mask)) - {0,1}) == set()) )
-        is_bool_mask = ( (aperture_mask.dtype == 'bool') | all_zeros_or_ones )
-
-
-        if is_bool_mask:
-            out_mask = np.ones(aperture_mask.shape, dtype=np.uint8)
-            out_mask[aperture_mask == 1] = 3
-            out_mask = out_mask.astype(np.uint8)
-        elif contains_bit2:
-            out_mask = aperture_mask.astype(np.uint8)
-        else:
-            log.warn("The input aperture mask must be boolean or follow the \
-                    Kepler-pipeline standard; returning None.")
-            out_mask = None
-        return out_mask
-
     def to_fits(self, path=None, overwrite=False, flux_column_name='FLUX', **extra_data):
         """Writes the light curve to a FITS file.
 
@@ -1325,8 +1289,10 @@ class LightCurve(object):
                                        "lc-ext{}-header.txt".format(extension))
             return fits.Header.fromtextfile(template_fn)
 
-        def _make_primary_hdu(extra_data={}):
+        def _make_primary_hdu(extra_data=None):
             """Returns the primary extension (#0)."""
+            if extra_data is None:
+                extra_data = {}
             hdu = fits.PrimaryHDU()
             # Copy the default keywords from a template file from the MAST archive
             tmpl = _header_template(0)
@@ -1352,9 +1318,11 @@ class LightCurve(object):
                         log.warning('Value for {} is None.'.format(kw))
             return hdu
 
-        def _make_lightcurve_extension(extra_data={}):
+        def _make_lightcurve_extension(extra_data=None):
             """Create the 'LIGHTCURVE' extension (i.e. extension #1)."""
             # Turn the data arrays into fits columns and initialize the HDU
+            if extra_data is None:
+                extra_data = {}
             cols = []
             if ~np.asarray(['TIME' in k.upper() for k in extra_data.keys()]).any():
                 cols.append(fits.Column(name='TIME', format='D', unit=self.time_format,
@@ -1540,7 +1508,7 @@ class KeplerLightCurve(LightCurve):
     def __init__(self, time=None, flux=None, flux_err=None, time_format=None, time_scale=None,
                  centroid_col=None, centroid_row=None, quality=None, quality_bitmask=None,
                  channel=None, campaign=None, quarter=None, mission=None,
-                 cadenceno=None, targetid=None, ra=None, dec=None, label=None, meta={}):
+                 cadenceno=None, targetid=None, ra=None, dec=None, label=None, meta=None):
         super(KeplerLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err,
                                                time_format=time_format, time_scale=time_scale,
                                                targetid=targetid, label=label, meta=meta)
@@ -1568,8 +1536,8 @@ class KeplerLightCurve(LightCurve):
     def __repr__(self):
         return('KeplerLightCurve(ID: {})'.format(self.targetid))
 
-    def to_pandas(self, columns=['time', 'flux', 'flux_err', 'quality',
-                                 'centroid_col', 'centroid_row']):
+    def to_pandas(self, columns=('time', 'flux', 'flux_err', 'quality',
+                                 'centroid_col', 'centroid_row')):
         """Converts the light curve to a Pandas `~pandas.DataFrame` object.
 
         Parameters
@@ -1628,16 +1596,6 @@ class KeplerLightCurve(LightCurve):
             'DATE-OBS': Time(self.time[0]+2454833., format=('jd')).isot,
             'SAP_QUALITY': self.quality}
 
-        def _make_aperture_extension(hdu_list, aperture_mask):
-            """Create the 'APERTURE' extension (e.g. extension #2)."""
-
-            if aperture_mask is not None:
-                bitmask = self._boolean_mask_to_bitmask(aperture_mask)
-                hdu = fits.ImageHDU(bitmask)
-                hdu.header['EXTNAME'] = 'APERTURE'
-                hdu_list.append(hdu)
-            return hdu_list
-
         for kw in kepler_specific_data:
             if ~np.asarray([kw.lower == k.lower() for k in extra_data]).any():
                 extra_data[kw] = kepler_specific_data[kw]
@@ -1692,7 +1650,7 @@ class TessLightCurve(LightCurve):
     def __init__(self, time=None, flux=None, flux_err=None, time_format=None, time_scale=None,
                  centroid_col=None, centroid_row=None, quality=None, quality_bitmask=None,
                  cadenceno=None, sector=None, camera=None, ccd=None,
-                 targetid=None, ra=None, dec=None, label=None, meta={}):
+                 targetid=None, ra=None, dec=None, label=None, meta=None):
         super(TessLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err,
                                              time_format=time_format, time_scale=time_scale,
                                              targetid=targetid, label=label, meta=meta)
@@ -1761,16 +1719,6 @@ class TessLightCurve(LightCurve):
             'TARGETID': self.targetid,
             'DEC_OBJ': self.dec}
 
-        def _make_aperture_extension(hdu_list, aperture_mask):
-            """Create the 'APERTURE' extension (e.g. extension #2)."""
-
-            if aperture_mask is not None:
-                bitmask = self._boolean_mask_to_bitmask(aperture_mask)
-                hdu = fits.ImageHDU(bitmask)
-                hdu.header['EXTNAME'] = 'APERTURE'
-                hdu_list.append(hdu)
-            return hdu_list
-
         for kw in tess_specific_data:
             if ~np.asarray([kw.lower == k.lower() for k in extra_data]).any():
                 extra_data[kw] = tess_specific_data[kw]
@@ -1788,3 +1736,54 @@ class TessLightCurve(LightCurve):
             hdu.writeto(path, overwrite=overwrite, checksum=True)
         else:
             return hdu
+
+
+# Helper functions
+
+def _boolean_mask_to_bitmask(aperture_mask):
+    """Takes in an aperture_mask and returns a Kepler-style bitmask
+
+    Parameters
+    ----------
+    aperture_mask : array-like
+        2D aperture mask. The mask can be either a boolean mask or an integer
+        mask mimicking the Kepler/TESS convention; boolean or boolean-like masks
+        are converted to the Kepler/TESS conventions.  Kepler bitmasks are
+        returned unchanged except for possible datatype conversion.
+
+    Returns
+    -------
+    bitmask : numpy uint8 array
+        A bitmask incompletely mimicking the Kepler/TESS convention: Bit 2,
+        value = 3, means "pixel was part of the custom aperture".  The other
+        bits have no meaning and are currently assigned a value of 1.
+    """
+    # Masks can either be boolean input or Kepler pipeline style
+    clean_mask = np.nan_to_num(aperture_mask)
+
+    contains_bit2 = (clean_mask.astype(np.int) & 2).any()
+    all_zeros_or_ones = ( (clean_mask.dtype in ['float', 'int']) &
+                            ((set(np.unique(clean_mask)) - {0,1}) == set()) )
+    is_bool_mask = ( (aperture_mask.dtype == 'bool') | all_zeros_or_ones )
+
+    if is_bool_mask:
+        out_mask = np.ones(aperture_mask.shape, dtype=np.uint8)
+        out_mask[aperture_mask == 1] = 3
+        out_mask = out_mask.astype(np.uint8)
+    elif contains_bit2:
+        out_mask = aperture_mask.astype(np.uint8)
+    else:
+        log.warn("The input aperture mask must be boolean or follow the \
+                Kepler-pipeline standard; returning None.")
+        out_mask = None
+    return out_mask
+
+def _make_aperture_extension(hdu_list, aperture_mask):
+    """Returns an `ImageHDU` object containing the 'APERTURE' extension
+    of a light curve file."""
+    if aperture_mask is not None:
+        bitmask = _boolean_mask_to_bitmask(aperture_mask)
+        hdu = fits.ImageHDU(bitmask)
+        hdu.header['EXTNAME'] = 'APERTURE'
+        hdu_list.append(hdu)
+    return hdu_list

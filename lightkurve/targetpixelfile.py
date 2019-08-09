@@ -557,7 +557,7 @@ class TargetPixelFile(object):
             raise ValueError("frame {} is out of bounds, must be in the range "
                              "0-{}.".format(frame, self.shape[0]))
         with plt.style.context(style):
-            img_title = 'Target ID: {}'.format(self.targetid)
+            img_title = 'Target ID: {}, Cadence: {}'.format(self.targetid, self.cadenceno[frame])
             img_extent = (self.column, self.column + self.shape[2],
                           self.row, self.row + self.shape[1])
             ax = plot_image(pflux, ax=ax, title=img_title, extent=img_extent,
@@ -648,7 +648,7 @@ class TargetPixelFile(object):
         return show_skyview_widget(self, notebook_url=notebook_url,
                                    magnitude_limit=magnitude_limit)
 
-    def to_corrector(self, method="pld"):
+    def to_corrector(self, method="pld", **kwargs):
         """Returns a `Corrector` instance to remove systematics.
 
         Parameters
@@ -674,7 +674,7 @@ class TargetPixelFile(object):
                              .format(method, allowed_methods))
         if method == "pld":
             from .correctors import PLDCorrector
-            return PLDCorrector(self)
+            return PLDCorrector(self, **kwargs)
 
 
     def cutout(self, center=None, size=5):

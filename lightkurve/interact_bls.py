@@ -351,14 +351,20 @@ def make_bls_figure_elements(result, bls_source, help_source):
     fig.x_range = Range1d(start=result.period.min(), end=result.period.max())
 
     # Add circles for the selection of new period. These are always hidden
-    circ = fig.circle('period', 'power', source=bls_source, fill_alpha=0., size=6,
-                      line_color=None, selection_color="white",
-                      nonselection_fill_alpha=0.0,
-                      nonselection_fill_color='white',
-                      nonselection_line_color=None,
-                      nonselection_line_alpha=0.0,
-                      fill_color=None, hover_fill_color="white",
-                      hover_alpha=0., hover_line_color="white")
+    fig.circle('period', 'power',
+               source=bls_source,
+               fill_alpha=0.,
+               size=6,
+               line_color=None,
+               selection_color="white",
+               nonselection_fill_alpha=0.0,
+               nonselection_fill_color='white',
+               nonselection_line_color=None,
+               nonselection_line_alpha=0.0,
+               fill_color=None,
+               hover_fill_color="white",
+               hover_alpha=0.,
+               hover_line_color="white")
 
     # Add line for the BLS power
     fig.line('period', 'power', line_width=1, color='#191919',

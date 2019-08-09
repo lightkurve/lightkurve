@@ -328,6 +328,8 @@ def test_lightcurve_plots():
     for lcf in [KeplerLightCurveFile(TABBY_Q8), TessLightCurveFile(TESS_SIM)]:
         lcf.plot()
         lcf.plot(flux_types=['SAP_FLUX', 'PDCSAP_FLUX'])
+        lcf.scatter()
+        lcf.errorbar()
         lcf.SAP_FLUX.plot()
         lcf.SAP_FLUX.plot(normalize=False, title="Not the default")
         lcf.SAP_FLUX.scatter()

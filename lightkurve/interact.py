@@ -36,7 +36,6 @@ try:
     from bokeh.models.tools import HoverTool
     from bokeh.models.widgets import Button, Div
     from bokeh.models.formatters import PrintfTickFormatter
-    import ipywidgets as widgets
 except ImportError:
     # We will print a nice error message in the `show_interact_widget` function
     pass

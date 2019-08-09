@@ -20,6 +20,7 @@ Direct code contributions:
 - `Anand Sundaram <https://github.com/anand-sundaram-zocdoc>`_
 - `Zachory K. Berta-Thompson <https://github.com/zkbt>`_
 - `Peter Williams <https://github.com/pkgw>`_
+- `Szabo Pal <https://github.com/zabop>`_
 
 
 Comments, corrections & suggestions:
