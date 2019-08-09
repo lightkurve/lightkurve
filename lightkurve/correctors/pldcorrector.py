@@ -326,7 +326,8 @@ class PLDCorrector(Corrector):
                             jac=self._grad_neg_log_like, args=(design_matrix, gp_corrector, l2_term))
         # set the GP parameters to the optimization output
         gp_corrector.gp.set_parameter_vector(solution.x)
-        return gp_corrector
+        self.gp_corrector = gp_corrector
+        return self.gp_corrector
 
     def correct(self, cadence_mask=None, remove_gp_trend=False, design_matrix=None,
                 gp_corrector=None, pld_order=2, n_pca_terms=10, l2_term=None, **kwargs):
@@ -388,8 +389,7 @@ class PLDCorrector(Corrector):
             log.debug("Setting l2_term to {}".format(l2_term))
 
         # Optimize the GP
-        if not self.optimized:
-            gp_corrector = self.optimize(design_matrix, gp_corrector, l2_term=l2_term)
+        gp_corrector = self.optimize(design_matrix, gp_corrector, l2_term=l2_term)
 
 
         # Create noise model LightCurve
@@ -419,9 +419,24 @@ class PLDCorrector(Corrector):
 
         with plt.style.context(MPLSTYLE):
             if ax is None:
-                _, ax = plt.subplots()
+                _, ax = plt.subplots(3, figsize=(8.485, 12))
 
-        self.raw_lc.scatter(ax=ax, c='r', label='{} (Raw Light Curve)'.format(self.raw_lc.label))
-        self.diagnostic_lightcurves['corrected'].scatter(ax=ax, c='k',
-                                                        label='{} (PLD-Corrected)'.format(self.raw_lc.label))
+        # raw and corrected
+        self.raw_lc.scatter(ax=ax[0], c='r', label='{} (Raw Light Curve)'.format(self.raw_lc.label),
+                            normalize=False, alpha=0.5)
+        self.diagnostic_lightcurves['corrected'].scatter(ax=ax[0], c='k',
+                                                         label='{} (PLD-Corrected)'.format(self.raw_lc.label),
+                                                         normalize=False)
+
+        # raw and gp
+        self.raw_lc.scatter(ax=ax[1], c='r', label='{} (Raw Light Curve)'.format(self.raw_lc.label),
+                            normalize=False, alpha=0.5)
+        self.diagnostic_lightcurves['gp'].plot(ax=ax[1], c='k', lw=1,
+                                               label='{} (GP Trend)'.format(self.raw_lc.label),
+                                               normalize=False)
+
+        # raw and corrected
+        self.diagnostic_lightcurves['noise'].scatter(ax=ax[2], c='k',
+                                                     label='{} (Noise Model)'.format(self.raw_lc.label),
+                                                     normalize=False)
         return ax
