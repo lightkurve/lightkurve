@@ -1,5 +1,4 @@
 import pytest
-import matplotlib.pyplot as pl
 
 from ... import search_lightcurvefile
 from .. import GPCorrector

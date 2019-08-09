@@ -7,7 +7,6 @@ from .corrector import Corrector
 from ..utils import validate_method
 from .. import log, MPLSTYLE
 
-from .. import log
 
 class GPCorrector(Corrector):
     """
@@ -59,7 +58,7 @@ class GPCorrector(Corrector):
         if jitter_bounds is None:
             jitter_bounds = {'log_sigma':(-2 + log_sigma2, 2 + log_sigma2)}
 
-        kernel = celerite.terms.Matern32Term(log_sigma=log_sigma, log_rho=log_rho)
+        kernel = celerite.terms.Matern32Term(log_sigma=log_sigma, log_rho=log_rho, bounds=matern_bounds)
         kernel += celerite.terms.JitterTerm(log_sigma=log_sigma2, bounds=jitter_bounds)
         return kernel
 
@@ -161,7 +160,9 @@ class GPCorrector(Corrector):
             if ax is None:
                 _, ax = plt.subplots()
             self.lc.errorbar(ax=ax, zorder=1, label='Data', normalize=False)
-            self.lc[self._bad_cadences].scatter(ax=ax, zorder=2, color='r', marker='x', s=20, label='Rejected Outliers', normalize=False)
+            self.lc[self._bad_cadences].scatter(ax=ax, zorder=2, color='r',
+                                                marker='x', s=20, label='Rejected Outliers',
+                                                normalize=False)
 
             if self.optimized:
                 color = 'green'
@@ -176,7 +177,7 @@ class GPCorrector(Corrector):
             k = self.initial_kernel.get_parameter_dict()
             label = '\n'.join(['{}: {}'.format(key.split(':')[-1], np.round(k[key], 3))
                                         for key in k.keys()])
-            res['gp_lc'].plot(ax=ax, color=color, label=label)
+            res['gp_lc'].plot(ax=ax, color=color, label=label, normalize=False)
             ax.legend(bbox_to_anchor=(1.05, 1.05), loc='upper center', fancybox=True)
             plt.tight_layout()
         return ax
