@@ -406,7 +406,7 @@ class PLDCorrector(Corrector):
                                              return_cov=False, return_var=False)
         # Optionally remove long term trend fit by GP
         if remove_gp_trend:
-            self.corrected_lc.flux -= (gp_lc.flux - np.nanmean(gp_flux))
+            corrected_lc.flux -= (gp_lc.flux - np.nanmean(gp_flux))
 
         self.diagnostic_lightcurves = {'noise': noise_lc,
                                        'corrected': corrected_lc,
