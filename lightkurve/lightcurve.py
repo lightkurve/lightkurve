@@ -1318,6 +1318,36 @@ class LightCurve(object):
         """
         return LightCurve(time=ts['time'].value, flux=ts['flux'], flux_err=ts['flux_err'])
 
+    def to_stingray(self):
+        """Returns a `stingray.Lightcurve` object.
+
+        This feature requires Stingray to be installed.
+        An `ImportError` will be raised if this version is not available.
+
+        Returns
+        -------
+        lightcurve : `stingray.Lightcurve`
+            An stingray Lightcurve object.
+        """
+        try:
+            from stingray import Lightcurve as StingrayLightcurve
+        except ImportError:
+            raise ImportError("You need to install Stingray to use "
+                              "the LightCurve.to_stringray() method.")
+        return StingrayLightcurve(time=self.time, counts=self.flux,
+                                  err=self.flux_err, input_counts=False)
+
+    @staticmethod
+    def from_stingray(lc):
+        """Create a new `~lightkurve.lightcurve.LightCurve` from a `stingray.Lightcurve`.
+
+        Parameters
+        ----------
+        ts : `stingray.Lightcurve`
+            A stingray Lightcurve object.
+        """
+        return LightCurve(time=ts.time, flux=ts.counts, flux_err=ts.err)
+
     def to_pandas(self, columns=('time', 'flux', 'flux_err')):
         """Converts the light curve to a Pandas `~pandas.DataFrame` object.
 

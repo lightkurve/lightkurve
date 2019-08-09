@@ -922,3 +922,17 @@ def test_normalize_unit():
     lc = LightCurve(flux=[1, 2, 3])
     for unit in ['percent', 'ppt', 'ppm']:
         assert lc.normalize(unit=unit).flux_unit.name == unit
+
+
+def test_to_stingray():
+    """Test the `LightCurve.to_stingray()` method."""
+    time, flux, flux_err = range(3), np.ones(3), np.zeros(3)
+    lc = LightCurve(time, flux, flux_err, time_format="jd")
+    try:
+        sr = lc.to_stingray()
+        assert_allclose(sr.time, time)
+        assert_allclose(sr.counts, flux)
+        assert_allclose(sr.err, flux_err)
+    except ImportError:
+        # Requires Stingray
+        pass
