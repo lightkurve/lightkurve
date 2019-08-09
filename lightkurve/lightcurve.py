@@ -1243,45 +1243,6 @@ class LightCurve(object):
         from .seismology import Seismology
         return Seismology.from_lightcurve(self, **kwargs)
 
-    def _boolean_mask_to_bitmask(self, aperture_mask):
-        """Takes in an aperture_mask and returns a Kepler-style bitmask
-
-        Parameters
-        ----------
-        aperture_mask : array-like
-            2D aperture mask. The mask can be either a boolean mask or an integer
-            mask mimicking the Kepler/TESS convention; boolean or boolean-like masks
-            are converted to the Kepler/TESS conventions.  Kepler bitmasks are
-            returned unchanged except for possible datatype conversion.
-
-        Returns
-        -------
-        bitmask : numpy uint8 array
-            A bitmask incompletely mimicking the Kepler/TESS convention: Bit 2,
-            value = 3, means "pixel was part of the custom aperture".  The other
-            bits have no meaning and are currently assigned a value of 1.
-        """
-        # Masks can either be boolean input or Kepler pipeline style
-        clean_mask = np.nan_to_num(aperture_mask)
-
-        contains_bit2 = (clean_mask.astype(np.int) & 2).any()
-        all_zeros_or_ones = ( (clean_mask.dtype in ['float', 'int']) &
-                              ((set(np.unique(clean_mask)) - {0,1}) == set()) )
-        is_bool_mask = ( (aperture_mask.dtype == 'bool') | all_zeros_or_ones )
-
-
-        if is_bool_mask:
-            out_mask = np.ones(aperture_mask.shape, dtype=np.uint8)
-            out_mask[aperture_mask == 1] = 3
-            out_mask = out_mask.astype(np.uint8)
-        elif contains_bit2:
-            out_mask = aperture_mask.astype(np.uint8)
-        else:
-            log.warn("The input aperture mask must be boolean or follow the \
-                    Kepler-pipeline standard; returning None.")
-            out_mask = None
-        return out_mask
-
     def to_fits(self, path=None, overwrite=False, flux_column_name='FLUX', **extra_data):
         """Writes the light curve to a FITS file.
 
@@ -1622,16 +1583,6 @@ class KeplerLightCurve(LightCurve):
             'DATE-OBS': Time(self.time[0]+2454833., format=('jd')).isot,
             'SAP_QUALITY': self.quality}
 
-        def _make_aperture_extension(hdu_list, aperture_mask):
-            """Create the 'APERTURE' extension (e.g. extension #2)."""
-
-            if aperture_mask is not None:
-                bitmask = self._boolean_mask_to_bitmask(aperture_mask)
-                hdu = fits.ImageHDU(bitmask)
-                hdu.header['EXTNAME'] = 'APERTURE'
-                hdu_list.append(hdu)
-            return hdu_list
-
         for kw in kepler_specific_data:
             if ~np.asarray([kw.lower == k.lower() for k in extra_data]).any():
                 extra_data[kw] = kepler_specific_data[kw]
@@ -1755,16 +1706,6 @@ class TessLightCurve(LightCurve):
             'TARGETID': self.targetid,
             'DEC_OBJ': self.dec}
 
-        def _make_aperture_extension(hdu_list, aperture_mask):
-            """Create the 'APERTURE' extension (e.g. extension #2)."""
-
-            if aperture_mask is not None:
-                bitmask = self._boolean_mask_to_bitmask(aperture_mask)
-                hdu = fits.ImageHDU(bitmask)
-                hdu.header['EXTNAME'] = 'APERTURE'
-                hdu_list.append(hdu)
-            return hdu_list
-
         for kw in tess_specific_data:
             if ~np.asarray([kw.lower == k.lower() for k in extra_data]).any():
                 extra_data[kw] = tess_specific_data[kw]
@@ -1782,3 +1723,54 @@ class TessLightCurve(LightCurve):
             hdu.writeto(path, overwrite=overwrite, checksum=True)
         else:
             return hdu
+
+
+# Helper functions
+
+def _boolean_mask_to_bitmask(aperture_mask):
+    """Takes in an aperture_mask and returns a Kepler-style bitmask
+
+    Parameters
+    ----------
+    aperture_mask : array-like
+        2D aperture mask. The mask can be either a boolean mask or an integer
+        mask mimicking the Kepler/TESS convention; boolean or boolean-like masks
+        are converted to the Kepler/TESS conventions.  Kepler bitmasks are
+        returned unchanged except for possible datatype conversion.
+
+    Returns
+    -------
+    bitmask : numpy uint8 array
+        A bitmask incompletely mimicking the Kepler/TESS convention: Bit 2,
+        value = 3, means "pixel was part of the custom aperture".  The other
+        bits have no meaning and are currently assigned a value of 1.
+    """
+    # Masks can either be boolean input or Kepler pipeline style
+    clean_mask = np.nan_to_num(aperture_mask)
+
+    contains_bit2 = (clean_mask.astype(np.int) & 2).any()
+    all_zeros_or_ones = ( (clean_mask.dtype in ['float', 'int']) &
+                            ((set(np.unique(clean_mask)) - {0,1}) == set()) )
+    is_bool_mask = ( (aperture_mask.dtype == 'bool') | all_zeros_or_ones )
+
+    if is_bool_mask:
+        out_mask = np.ones(aperture_mask.shape, dtype=np.uint8)
+        out_mask[aperture_mask == 1] = 3
+        out_mask = out_mask.astype(np.uint8)
+    elif contains_bit2:
+        out_mask = aperture_mask.astype(np.uint8)
+    else:
+        log.warn("The input aperture mask must be boolean or follow the \
+                Kepler-pipeline standard; returning None.")
+        out_mask = None
+    return out_mask
+
+def _make_aperture_extension(hdu_list, aperture_mask):
+    """Returns an `ImageHDU` object containing the 'APERTURE' extension
+    of a light curve file."""
+    if aperture_mask is not None:
+        bitmask = _boolean_mask_to_bitmask(aperture_mask)
+        hdu = fits.ImageHDU(bitmask)
+        hdu.header['EXTNAME'] = 'APERTURE'
+        hdu_list.append(hdu)
+    return hdu_list

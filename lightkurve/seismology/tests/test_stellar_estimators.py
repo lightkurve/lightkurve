@@ -17,6 +17,13 @@ cnumax = 46.12
 cdeltanu = 4.934
 
 
+def assert_correct_answer(quantity, reference):
+    """Standard way we'll compare results against reference values below;
+    wrapped in a function to reduce code duplication."""
+    assert(np.isclose(quantity.value, reference.n, atol=reference.s))
+    assert(np.isclose(quantity.error.value, reference.s, atol=.1))
+
+
 def test_constants():
     """Assert the basic solar parameters are still loaded in and have
     appopriate units where necessary"""
@@ -75,32 +82,27 @@ def test_estimate_radius_kwargs():
     assert R.error.unit == u.solRad
 
     # Check returns right answer
-    assert(np.isclose(R.value, cR.n, atol=cR.s))
-    assert(np.isclose(R.error.value, cR.s, atol=.1))
+    assert_correct_answer(R, cR)
 
     # Check units on parameters
     R = estimate_radius(cnumax, cdeltanu, cteff,
                         u.Quantity(cenumax, u.microhertz), cedeltanu, ceteff)
-    assert(np.isclose(R.value, cR.n, rtol=cR.s))
-    assert(np.isclose(R.error.value, cR.s, atol=.1))
+    assert_correct_answer(R, cR)
 
     R = estimate_radius(cnumax, cdeltanu, cteff,
                         cenumax, u.Quantity(cedeltanu, u.microhertz), ceteff)
-    assert(np.isclose(R.value, cR.n, rtol=cR.s))
-    assert(np.isclose(R.error.value, cR.s, atol=.1))
+    assert_correct_answer(R, cR)
 
     R = estimate_radius(cnumax, cdeltanu, cteff,
                         cenumax, cedeltanu, u.Quantity(ceteff, u.Kelvin))
-    assert(np.isclose(R.value, cR.n, rtol=cR.s))
-    assert(np.isclose(R.error.value, cR.s, atol=.1))
+    assert_correct_answer(R, cR)
 
     #Check works with a random selection of appropriate units
     R = estimate_radius(cnumax, cdeltanu, cteff,
                         u.Quantity(cenumax, u.microhertz).to(1/u.day),
                         u.Quantity(cedeltanu, u.microhertz).to(u.hertz),
                         ceteff)
-    assert(np.isclose(R.value, cR.n, rtol=cR.s))
-    assert(np.isclose(R.error.value, cR.s, atol=.1))
+    assert_correct_answer(R, cR)
 
 
 def test_estimate_mass_basic():
@@ -136,32 +138,27 @@ def test_estimate_mass_kwargs():
     assert M.error.unit == u.solMass
 
     # Check returns right answer
-    assert(np.isclose(M.value, cM.n, atol=cM.s))
-    assert(np.isclose(M.error.value, cM.s, atol=.1))
+    assert_correct_answer(M, cM)
 
     # Check units on parameters
     M = estimate_mass(cnumax, cdeltanu, cteff,
                       u.Quantity(cenumax, u.microhertz), cedeltanu, ceteff)
-    assert(np.isclose(M.value, cM.n, rtol=cM.s))
-    assert(np.isclose(M.error.value, cM.s, atol=.1))
+    assert_correct_answer(M, cM)
 
     M = estimate_mass(cnumax, cdeltanu, cteff,
                       cenumax, u.Quantity(cedeltanu, u.microhertz), ceteff)
-    assert(np.isclose(M.value, cM.n, rtol=cM.s))
-    assert(np.isclose(M.error.value, cM.s, atol=.1))
+    assert_correct_answer(M, cM)
 
     M = estimate_mass(cnumax, cdeltanu, cteff,
                       cenumax, cedeltanu, u.Quantity(ceteff, u.Kelvin))
-    assert(np.isclose(M.value, cM.n, rtol=cM.s))
-    assert(np.isclose(M.error.value, cM.s, atol=.1))
+    assert_correct_answer(M, cM)
 
     #Check works with a random selection of appropriate units
     M = estimate_mass(cnumax, cdeltanu, cteff,
                       u.Quantity(cenumax, u.microhertz).to(1/u.day),
                       u.Quantity(cedeltanu, u.microhertz).to(u.hertz),
                       ceteff)
-    assert(np.isclose(M.value, cM.n, rtol=cM.s))
-    assert(np.isclose(M.error.value, cM.s, atol=.1))
+    assert_correct_answer(M, cM)
 
 
 def test_estimate_logg_basic():
@@ -190,21 +187,17 @@ def test_estimate_logg_kwargs():
     assert logg.error.unit == u.dex
 
     # Check returns right answer
-    assert(np.isclose(logg.value, clogg.n, atol=clogg.s))
-    assert(np.isclose(logg.error.value, clogg.s, atol=.1))
+    assert_correct_answer(logg, clogg)
 
     # Check units on parameters
     logg = estimate_logg(cnumax, cteff, u.Quantity(cenumax, u.microhertz), ceteff)
-    assert(np.isclose(logg.value, clogg.n, rtol=clogg.s))
-    assert(np.isclose(logg.error.value, clogg.s, atol=.1))
+    assert_correct_answer(logg, clogg)
 
     logg = estimate_logg(cnumax, cteff, cenumax, u.Quantity(ceteff, u.Kelvin))
-    assert(np.isclose(logg.value, clogg.n, rtol=clogg.s))
-    assert(np.isclose(logg.error.value, clogg.s, atol=.1))
+    assert_correct_answer(logg, clogg)
 
     #Check works with a random selection of appropriate units
     logg = estimate_logg(cnumax, cteff,
                          u.Quantity(cenumax, u.microhertz).to(1/u.day),
                          ceteff)
-    assert(np.isclose(logg.value, clogg.n, rtol=clogg.s))
-    assert(np.isclose(logg.error.value, clogg.s, atol=.1))
+    assert_correct_answer(logg, clogg)
