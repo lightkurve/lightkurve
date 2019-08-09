@@ -14,7 +14,6 @@ import celerite
 from .corrector import Corrector
 from .gpcorrector import GPCorrector
 from .. import MPLSTYLE
-from ..collections import LightCurveCollection
 from ..utils import LightkurveError
 
 log = logging.getLogger(__name__)
@@ -406,7 +405,7 @@ class PLDCorrector(Corrector):
                                              return_cov=False, return_var=False)
         # Optionally remove long term trend fit by GP
         if remove_gp_trend:
-            corrected_lc.flux -= (gp_lc.flux - np.nanmean(gp_flux))
+            corrected_lc.flux -= (gp_lc.flux - np.nanmean(gp_lc.flux))
 
         self.diagnostic_lightcurves = {'noise': noise_lc,
                                        'corrected': corrected_lc,

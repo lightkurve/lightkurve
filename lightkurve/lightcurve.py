@@ -813,8 +813,8 @@ class LightCurve(object):
 
         return binned_lc
 
-    def estimate_cdpp(self, transit_duration=6.5/24, window=2,
-                      savgol_polyorder=2, sigma=5.):
+    def estimate_cdpp(self, transit_duration=6.5/24, window=2., polyorder=2,
+                      sigma=5.):
         """Estimate the CDPP noise metric using the Savitzky-Golay (SG) method.
 
         A common estimate of the noise in a lightcurve is the scatter that
@@ -842,13 +842,14 @@ class LightCurve(object):
         Parameters
         ----------
         transit_duration : float, optional
-            The transit duration in units of dats. This is the
-            length of the window used to compute the running mean. The default is
-            a 6.5 hour transit.
+            The transit duration in the same units as `lc.time`, which is
+            days in the case of Kepler and TESS data.  This is the length
+            of the window used to compute the running mean. The default is
+            a 6.5/24 i.e. a 6.5-hour transit.
         window : float, optional
-            Width of Savitsky-Golay filter in days.
-            Default value is 2 days.
-        savgol_polyorder : int, optional
+            Width of Savitsky-Golay filter in the same units as `lc.time`,
+            which is days in the case of Kepler and TESS data.
+        polyorder : int, optional
             Polynomial order of the Savitsky-Golay filter.
             The recommended value is 2.
         sigma : float, optional
@@ -862,22 +863,21 @@ class LightCurve(object):
 
         Notes
         -----
-        This implementation is adapted from the Matlab version used by
-        Jeff van Cleve but lacks the normalization factor used there:
+        This implementation is adapted from the Matlab version developed for
+        Kepler by Jeff van Cleve but lacks the normalization factor used there:
         svn+ssh://murzim/repo/so/trunk/Develop/jvc/common/compute_SG_noise.m
         """
-
-        # Number of cadences to use for the savgol window
-        nb = int(window/np.median(np.diff(self.time)))
-        nb = [nb if nb % 2 == 1 else nb + 1][0]
-        detrended_lc = self.flatten(window_length=nb,
+        # Number of cadences (ncad) to use for the savgol window
+        ncad = int(window / np.median(np.diff(self.time)))
+        ncad = ncad if ncad % 2 == 1 else ncad + 1  # make sure ncad is odd
+        detrended_lc = self.flatten(window_length=ncad,
                                     polyorder=savgol_polyorder)
         cleaned_lc = detrended_lc.remove_outliers(sigma=sigma)
 
         # Number of cadences to use for the transit duration
-        nb = int(transit_duration/np.median(np.diff(self.time)))
-        nb = [nb if nb % 2 == 1 else nb + 1][0]
-        mean = running_mean(data=cleaned_lc.flux, window_size=nb)
+        ncad = int(transit_duration / np.median(np.diff(self.time)))
+        ncad = ncad if ncad % 2 == 1 else ncad + 1  # make sure ncad is odd
+        mean = running_mean(data=cleaned_lc.flux, window_size=ncad)
         cdpp_ppm = np.std(mean) * 1e6
         return cdpp_ppm
 
