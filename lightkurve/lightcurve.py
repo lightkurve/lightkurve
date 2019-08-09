@@ -813,7 +813,7 @@ class LightCurve(object):
 
         return binned_lc
 
-    def estimate_cdpp(self, transit_duration=13, savgol_window=101,
+    def estimate_cdpp(self, transit_duration=6.5/24, window=2,
                       savgol_polyorder=2, sigma=5.):
         """Estimate the CDPP noise metric using the Savitzky-Golay (SG) method.
 
@@ -841,14 +841,13 @@ class LightCurve(object):
 
         Parameters
         ----------
-        transit_duration : int, optional
-            The transit duration in units of number of cadences. This is the
-            length of the window used to compute the running mean. The default
-            is 13, which corresponds to a 6.5 hour transit in data sampled at
-            30-min cadence.
-        savgol_window : int, optional
-            Width of Savitsky-Golay filter in cadences (odd number).
-            Default value 101 (2.0 days in Kepler Long Cadence mode).
+        transit_duration : float, optional
+            The transit duration in units of dats. This is the
+            length of the window used to compute the running mean. The default is
+            a 6.5 hour transit.
+        window : float, optional
+            Width of Savitsky-Golay filter in days.
+            Default value is 2 days.
         savgol_polyorder : int, optional
             Polynomial order of the Savitsky-Golay filter.
             The recommended value is 2.
@@ -867,14 +866,18 @@ class LightCurve(object):
         Jeff van Cleve but lacks the normalization factor used there:
         svn+ssh://murzim/repo/so/trunk/Develop/jvc/common/compute_SG_noise.m
         """
-        if not isinstance(transit_duration, int):
-            raise ValueError("transit_duration must be an integer in units "
-                             "number of cadences, got {}.".format(transit_duration))
 
-        detrended_lc = self.flatten(window_length=savgol_window,
+        # Number of cadences to use for the savgol window
+        nb = int(window/np.median(np.diff(self.time)))
+        nb = [nb if nb % 2 == 1 else nb + 1][0]
+        detrended_lc = self.flatten(window_length=nb,
                                     polyorder=savgol_polyorder)
         cleaned_lc = detrended_lc.remove_outliers(sigma=sigma)
-        mean = running_mean(data=cleaned_lc.flux, window_size=transit_duration)
+
+        # Number of cadences to use for the transit duration
+        nb = int(transit_duration/np.median(np.diff(self.time)))
+        nb = [nb if nb % 2 == 1 else nb + 1][0]
+        mean = running_mean(data=cleaned_lc.flux, window_size=nb)
         cdpp_ppm = np.std(mean) * 1e6
         return cdpp_ppm
 

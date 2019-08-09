@@ -363,13 +363,16 @@ def test_lightcurve_scatter():
 def test_cdpp():
     """Test the basics of the CDPP noise metric."""
     # A flat lightcurve should have a CDPP close to zero
-    assert_almost_equal(LightCurve(np.arange(200), np.ones(200)).estimate_cdpp(), 0)
+    assert LightCurve(np.arange(0, 10, 0.01), np.ones(1000)).estimate_cdpp() < 1e-6
+#    assert_almost_equal(LightCurve(np.arange(200), np.ones(200)).estimate_cdpp(), 0)
     # An artificial lightcurve with sigma=100ppm should have cdpp=100ppm
-    lc = LightCurve(np.arange(10000), np.random.normal(loc=1, scale=100e-6, size=10000))
-    assert_almost_equal(lc.estimate_cdpp(transit_duration=1), 100, decimal=-0.5)
+    # time of 0 to 100 in 30 minutes
+    x = np.arange(0, 100, 1/48)
+    lc = LightCurve(x, np.random.normal(loc=1, scale=100*1e-6, size=len(x)))
+    assert_almost_equal(lc.estimate_cdpp(transit_duration=1/48), 100, decimal=-0.5)
     # Transit_duration must be an integer (cadences)
-    with pytest.raises(ValueError):
-        lc.estimate_cdpp(transit_duration=6.5)
+#    with pytest.raises(ValueError):
+#        lc.estimate_cdpp(transit_duration=6.5)
 
 
 @pytest.mark.remote_data
@@ -711,13 +714,13 @@ def test_fill_gaps():
     nlc = lc.fill_gaps()
     assert(len(lc.time) < len(nlc.time))
     assert(np.any(nlc.time == 5))
-    assert(np.all(nlc.flux == 1))
+    assert(np.isclose(nlc.flux, 1).all())
 
     lc = LightCurve([1,2,3,4,6,7,8], [1,1,np.nan,1,1,1,1])
     nlc = lc.fill_gaps()
     assert(len(lc.time) < len(nlc.time))
     assert(np.any(nlc.time == 5))
-    assert(np.all(nlc.flux == 1))
+    assert(np.isclose(nlc.flux, 1).all())
     assert(np.all(np.isfinite(nlc.flux)))
 
     # Because fill_gaps() uses pandas, check that it works regardless of endianness
