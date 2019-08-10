@@ -82,7 +82,7 @@ class TargetPixelFile(object):
         return self._hdu
 
     @hdu.setter
-    def hdu(self, value, keys=['FLUX', 'QUALITY']):
+    def hdu(self, value, keys=('FLUX', 'QUALITY')):
         """Verify the file format when setting the value of `self.hdu`.
 
         Raises a ValueError if `value` does not appear to be a Target Pixel File.
@@ -92,8 +92,7 @@ class TargetPixelFile(object):
                          for ttype in value[1].header['TTYPE*']])):
                 raise ValueError("File {} does not have a {} column, "
                                  "is this a target pixel file?".format(self.path, key))
-        else:
-            self._hdu = value
+        self._hdu = value
 
     def get_keyword(self, keyword, hdu=0, default=None):
         """Returns a header keyword value.
@@ -1088,7 +1087,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
     @staticmethod
     def from_fits_images(images, position, size=(11, 11), extension=1,
-                         target_id="unnamed-target", hdu0_keywords={}, **kwargs):
+                         target_id="unnamed-target", hdu0_keywords=None, **kwargs):
         """Creates a new Target Pixel File from a set of images.
 
         This method is intended to make it easy to cut out targets from
@@ -1122,6 +1121,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
             raise ValueError('One or more images must be passed.')
         if not isinstance(position, SkyCoord):
             raise ValueError('Position must be an astropy.coordinates.SkyCoord.')
+        if hdu0_keywords is None:
+            hdu0_keywords = {}
 
         basic_keywords = ['MISSION', 'TELESCOP', 'INSTRUME', 'QUARTER',
                           'CAMPAIGN', 'CHANNEL', 'MODULE', 'OUTPUT']
@@ -1229,12 +1230,15 @@ class KeplerTargetPixelFileFactory(object):
     """Class to create a KeplerTargetPixelFile."""
 
     def __init__(self, n_cadences, n_rows, n_cols, target_id="unnamed-target",
-                 keywords={}):
+                 keywords=None):
         self.n_cadences = n_cadences
         self.n_rows = n_rows
         self.n_cols = n_cols
         self.target_id = target_id
-        self.keywords = keywords
+        if keywords is None:
+            self.keywords = {}
+        else:
+            self.keywords = keywords
 
         # Initialize the 3D data structures
         self.raw_cnts = np.empty((n_cadences, n_rows, n_cols), dtype='int')
@@ -1263,10 +1267,12 @@ class KeplerTargetPixelFileFactory(object):
 
     def add_cadence(self, frameno, raw_cnts=None, flux=None, flux_err=None,
                     flux_bkg=None, flux_bkg_err=None, cosmic_rays=None,
-                    header={}):
+                    header=None):
         """Populate the data for a single cadence."""
         if frameno >= self.n_cadences:
             raise FactoryError('Can not add cadence {}, n_cadences set to {}'.format(frameno, self.n_cadences))
+        if header is None:
+            header = {}
 
         # 2D-data
         for col in ['raw_cnts', 'flux', 'flux_err', 'flux_bkg',
@@ -1303,14 +1309,18 @@ class KeplerTargetPixelFileFactory(object):
             warnings.warn('The factory-created TPF does not appear to contain '
                           'non-zero flux values.', LightkurveWarning)
 
-    def get_tpf(self, hdu0_keywords={}, ext_info={}, **kwargs):
+    def get_tpf(self, hdu0_keywords=None, ext_info=None, **kwargs):
         """Returns a KeplerTargetPixelFile object."""
+        if hdu0_keywords is None:
+            hdu0_keywords = {}
+        if ext_info is None:
+            ext_info = {}
         self._check_data()
         return KeplerTargetPixelFile(self._hdulist(hdu0_keywords=hdu0_keywords,
                                                    ext_info=ext_info),
                                      **kwargs)
 
-    def _hdulist(self, hdu0_keywords={}, ext_info={}):
+    def _hdulist(self, hdu0_keywords, ext_info):
         """Returns an astropy.io.fits.HDUList object."""
         return fits.HDUList([self._make_primary_hdu(hdu0_keywords=hdu0_keywords),
                              self._make_target_extension(ext_info=ext_info),
@@ -1322,7 +1332,7 @@ class KeplerTargetPixelFileFactory(object):
                                    "tpf-ext{}-header.txt".format(extension))
         return fits.Header.fromtextfile(template_fn)
 
-    def _make_primary_hdu(self, hdu0_keywords={}):
+    def _make_primary_hdu(self, hdu0_keywords):
         """Returns the primary extension (#0)."""
         hdu = fits.PrimaryHDU()
         # Copy the default keywords from a template file from the MAST archive
@@ -1355,7 +1365,7 @@ class KeplerTargetPixelFileFactory(object):
                 hdu.header.append((kw, val))
         return hdu
 
-    def _make_target_extension(self, ext_info={}):
+    def _make_target_extension(self, ext_info):
         """Create the 'TARGETTABLES' extension (i.e. extension #1)."""
         # Turn the data arrays into fits columns and initialize the HDU
         coldim = '({},{})'.format(self.n_cols, self.n_rows)
