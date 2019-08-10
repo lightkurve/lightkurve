@@ -1,4 +1,4 @@
-"""Defines PLDCorrector
+"""Defines the `PLDCorrector` for Pixel Level Decorrelation Systematics Removal.
 """
 from __future__ import division, print_function
 
@@ -329,7 +329,7 @@ class PLDCorrector(Corrector):
         self.gp_corrector = gp_corrector
         return self.gp_corrector
 
-    def correct(self, cadence_mask=None, remove_gp_trend=False, design_matrix=None,
+    def correct(self, cadence_mask=None, preserve_trend=True, design_matrix=None,
                 gp_corrector=None, pld_order=2, n_pca_terms=10, l2_term=None, **kwargs):
         """Returns a `lightkurve.LightCurve` object with model for motion noise
         removed.
@@ -344,7 +344,7 @@ class PLDCorrector(Corrector):
             This option enables signals of interest (e.g. planet transits)
             to be excluded from the noise model, which will prevent over-fitting.
             By default, no cadences will be masked.
-        remove_gp_trend : bool
+        preserve_trend : bool
             Option to remove long-term trend fit by GP. By default, the
             astrophysical signal is preserved, but can be subtracted out to
             robustly flatten the output light curve.
@@ -405,7 +405,7 @@ class PLDCorrector(Corrector):
         gp_lc.flux = gp_corrector.gp.predict(corrected_lc.flux, corrected_lc.time,
                                              return_cov=False, return_var=False)
         # Optionally remove long term trend fit by GP
-        if remove_gp_trend:
+        if not preserve_trend:
             corrected_lc.flux -= (gp_lc.flux - np.nanmean(gp_lc.flux))
 
         self.diagnostic_lightcurves = {'noise': noise_lc,

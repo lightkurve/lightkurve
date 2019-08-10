@@ -100,12 +100,12 @@ def test_transit_pld():
 
     # Run the PLD algorithm on a first pass
     corrector = PLDCorrector(tpf)
-    cor_lc = corrector.correct(use_gp=False)
+    cor_lc = corrector.correct()
     pg = cor_lc.to_periodogram(method='bls', minimum_period=1, maximum_period=9,
                                frequency_factor=0.05, duration=np.arange(0.1, 0.6, 0.1))
 
     # Re-do PLD with the suspected transits masked
-    cor_lc = corrector.correct(use_gp=False, cadence_mask=pg.get_transit_mask()).normalize()
+    cor_lc = corrector.correct(cadence_mask=pg.get_transit_mask()).normalize()
     pg = cor_lc.to_periodogram(method='bls', minimum_period=1, maximum_period=9,
                                frequency_factor=0.05, duration=np.arange(0.1, 0.6, 0.1))
 
@@ -129,7 +129,7 @@ def test_sine_pld():
 
     # Run the PLD algorithm
     corrector = PLDCorrector(tpf)
-    cor_lc = corrector.correct(use_gp=False)
+    cor_lc = corrector.correct()
 
     # Verify that we get the period within ~20%
     pg = cor_lc.to_periodogram(method='lombscargle', minimum_period=1,
@@ -180,7 +180,7 @@ def test_detrending_residuals():
     assert n_sigma < 2.0
 
     corrector = PLDCorrector(tpf)
-    cor_lc = corrector.correct(use_gp=False)
+    cor_lc = corrector.correct()
 
     cdpp_improvement = lc.estimate_cdpp()/cor_lc.estimate_cdpp()
     assert cdpp_improvement > 10.0
