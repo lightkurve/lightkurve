@@ -54,9 +54,14 @@ class GPCorrector(Corrector):
 
         if matern_bounds is None:
             matern_bounds = {'log_sigma': (-2 + log_sigma, 2 + log_sigma),
-                            'log_rho': (np.log(0.5), np.log(50))}
+                            'log_rho': (np.log(20.), np.log(50.))}
         if jitter_bounds is None:
             jitter_bounds = {'log_sigma':(-2 + log_sigma2, 2 + log_sigma2)}
+
+        self.init_matern_bounds = matern_bounds
+        self.init_jitter_bounds = jitter_bounds
+        self.init_vals = {'log_sigma': log_sigma, 'log_rho': log_rho,
+                          'log_sigma2': log_sigma2}
 
         kernel = celerite.terms.Matern32Term(log_sigma=log_sigma, log_rho=log_rho, bounds=matern_bounds)
         kernel += celerite.terms.JitterTerm(log_sigma=log_sigma2, bounds=jitter_bounds)
@@ -77,6 +82,11 @@ class GPCorrector(Corrector):
         if jitter_bounds is None:
             jitter_bounds = {'log_sigma':(-2 + log_sigma, 2 + log_sigma)}
 
+        self.init_sho_bounds = sho_bounds
+        self.init_jitter_bounds = jitter_bounds
+        self.init_vals = {'log_omega0': log_omega0, 'log_S0': log_S0,
+                          'log_Q': log_Q, 'log_sigma': log_sigma}
+
         kernel = celerite.terms.SHOTerm(log_omega0=log_omega0, log_S0=log_S0,
                                         log_Q=log_Q, bounds=sho_bounds)
         kernel += celerite.terms.JitterTerm(log_sigma=log_sigma, bounds=jitter_bounds)
@@ -86,6 +96,7 @@ class GPCorrector(Corrector):
         """Returns a `celerite.terms.Term` object with reasonable initialization
         values.
         """
+        self.kernel_str = kernel_str
         if kernel_str == "matern32":
             kernel = self._build_matern32_kernel()
         elif kernel_str == "sho":
@@ -108,6 +119,8 @@ class GPCorrector(Corrector):
         self.optimized = True
         log.debug('Optimized')
         self.gp.set_parameter_vector(solution.x)
+
+        self.solution_x = solution.x
         return solution
 
     def _predict_lightcurves(self, propagate_errors=False):
@@ -180,4 +193,27 @@ class GPCorrector(Corrector):
             res['gp_lc'].plot(ax=ax, color=color, label=label, normalize=False)
             ax.legend(bbox_to_anchor=(1.05, 1.05), loc='upper center', fancybox=True)
             plt.tight_layout()
+        return ax
+
+    def plot_distributions(self):
+        """ """
+        start = self.init_vals
+        if self.kernel_str == 'matern32':
+            finish = {'log_sigma':self.solution_x[0], 'log_rho':self.solution_x[1], 'log_sigma2':self.solution_x[2]}
+            self.init_jitter_bounds['log_sigma2'] = self.init_jitter_bounds.pop('log_sigma')
+            bounds = {**self.init_matern_bounds, **self.init_jitter_bounds}
+        elif self.kernel_str == 'sho':
+            finish = {'log_omega0':self.solution_x[0], 'log_S0':self.solution_x[1], 'log_Q':self.solution_x[2], 'log_sigma': self.solution_x[3]}
+            bounds = {**self.init_sho_bounds, **self.init_jitter_bounds}
+
+        with plt.style.context(MPLSTYLE):
+            fig, ax = plt.subplots(1, len(bounds), figsize=(15,3))
+            for i, thing in enumerate(bounds):
+                ax[i].set_title(thing)
+                ax[i].set_yticks([])
+                ax[i].axvline(bounds[str(thing)][0], c='b', label='Bounds', lw=3)
+                ax[i].axvline(bounds[str(thing)][1], c='b', lw=3)
+                ax[i].axvline(start[str(thing)], c='k', label='Initial Guess', lw=2)
+                ax[i].axvline(finish[str(thing)], c='r', label='Solution', lw=2)
+
         return ax
