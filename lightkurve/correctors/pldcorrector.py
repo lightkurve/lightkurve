@@ -389,8 +389,8 @@ class PLDCorrector(Corrector):
             log.debug("Setting l2_term to {}".format(l2_term))
 
         # Optimize the GP
-        if not self.optimized:
-            gp_corrector = self.optimize(design_matrix, gp_corrector, l2_term=l2_term)
+#        if not self.optimized:
+        gp_corrector = self.optimize(design_matrix, gp_corrector, l2_term=l2_term)
 
 
         # Create noise model LightCurve

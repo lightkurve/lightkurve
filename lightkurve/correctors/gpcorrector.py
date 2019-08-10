@@ -59,7 +59,7 @@ class GPCorrector(Corrector):
         if jitter_bounds is None:
             jitter_bounds = {'log_sigma':(-2 + log_sigma2, 2 + log_sigma2)}
 
-        kernel = celerite.terms.Matern32Term(log_sigma=log_sigma, log_rho=log_rho)
+        kernel = celerite.terms.Matern32Term(log_sigma=log_sigma, log_rho=log_rho, bounds=matern32)
         kernel += celerite.terms.JitterTerm(log_sigma=log_sigma2, bounds=jitter_bounds)
         return kernel
 
