@@ -645,7 +645,7 @@ class PRFPhotometry(object):
             `model.motion_prior.shift_col` and `model.motion_prior.shift_row`
             for each cadence.
         parallel : boolean
-            If `True`, cadences will be fit in parallel using Python's `multiprocessing` module. 
+            If `True`, cadences will be fit in parallel using Python's `multiprocessing` module.
         """
         if cadences is None:  # By default, fit all cadences.
             cadences = np.arange(len(tpf_flux))
@@ -659,7 +659,7 @@ class PRFPhotometry(object):
             args = zip([self.model]*len(cadences),
                       tpf_flux[cadences],
                        pos_corr1[cadences],
-                       pos_corr2[cadences])            
+                       pos_corr2[cadences])
         # Set up a mapping function
         if parallel:
             import multiprocessing
