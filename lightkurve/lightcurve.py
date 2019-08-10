@@ -870,8 +870,8 @@ class LightCurve(object):
         # Number of cadences (ncad) to use for the savgol window
         ncad = int(window / np.median(np.diff(self.time)))
         ncad = ncad if ncad % 2 == 1 else ncad + 1  # make sure ncad is odd
-        detrended_lc = self.flatten(window_length=ncad,
-                                    polyorder=savgol_polyorder)
+        ncad = ncad if ncad > 4 else 5
+        detrended_lc = self.flatten(window_length=ncad, polyorder=polyorder)
         cleaned_lc = detrended_lc.remove_outliers(sigma=sigma)
 
         # Number of cadences to use for the transit duration
