@@ -7,6 +7,7 @@ from .corrector import Corrector
 from ..utils import validate_method
 from .. import log, MPLSTYLE
 
+from .. import log
 
 class GPCorrector(Corrector):
     """
@@ -148,12 +149,13 @@ class GPCorrector(Corrector):
             gp_lc.flux_err = 0
             gp_lc.flux = gp_flux
 
-        return {'corrected_lc': corrected_lc,
-                'gp_lc': gp_lc}
+        return {'corrected': corrected_lc,
+                'gp': gp_lc}
 
     def correct(self, propagate_errors=False):
         self.optimize()
-        return self._predict_lightcurves(propagate_errors=propagate_errors)['corrected_lc']
+        self.diagnostic_lightcurves = self._predict_lightcurves(propagate_errors=propagate_errors)
+        return self.diagnostic_lightcurves['corrected_lc']
 
     def diagnose(self, ax=None, propagate_errors=False):
         """Show a diagnostic plot of the GP. Returns a matplotlib.pyplot.axes object.
@@ -173,9 +175,7 @@ class GPCorrector(Corrector):
             if ax is None:
                 _, ax = plt.subplots()
             self.lc.errorbar(ax=ax, zorder=1, label='Data', normalize=False)
-            self.lc[self._bad_cadences].scatter(ax=ax, zorder=2, color='r',
-                                                marker='x', s=20, label='Rejected Outliers',
-                                                normalize=False)
+            self.lc[self._bad_cadences].scatter(ax=ax, zorder=2, color='r', marker='x', s=20, label='Rejected Outliers', normalize=False)
 
             if self.optimized:
                 color = 'green'
@@ -184,13 +184,13 @@ class GPCorrector(Corrector):
                 color='blue'
                 ax.set_title('Pre-Optimization')
 
-            res = self._predict_lightcurves(propagate_errors=propagate_errors)
+            gp = self.diagnostic_lightcurves['gp']
             if propagate_errors:
-                ax.fill_between(res['gp_lc'].time, res['gp_lc'].flux - res['gp_lc'].flux_err, res['gp_lc'].flux + res['gp_lc'].flux_err, color=color)
+                ax.fill_between(gp.time, gp.flux - gp.flux_err, gp.flux + gp.flux_err, color=color)
             k = self.initial_kernel.get_parameter_dict()
             label = '\n'.join(['{}: {}'.format(key.split(':')[-1], np.round(k[key], 3))
                                         for key in k.keys()])
-            res['gp_lc'].plot(ax=ax, color=color, label=label, normalize=False)
+            gp.plot(ax=ax, color=color, label=label)
             ax.legend(bbox_to_anchor=(1.05, 1.05), loc='upper center', fancybox=True)
             plt.tight_layout()
         return ax

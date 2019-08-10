@@ -14,7 +14,6 @@ import celerite
 from .corrector import Corrector
 from .gpcorrector import GPCorrector
 from .. import MPLSTYLE
-from ..collections import LightCurveCollection
 from ..utils import LightkurveError
 
 log = logging.getLogger(__name__)
@@ -390,6 +389,7 @@ class PLDCorrector(Corrector):
             log.debug("Setting l2_term to {}".format(l2_term))
 
         # Optimize the GP
+#        if not self.optimized:
         gp_corrector = self.optimize(design_matrix, gp_corrector, l2_term=l2_term)
 
 
