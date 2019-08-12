@@ -45,6 +45,8 @@ class GPCorrector(Corrector):
         self.gp.compute(self.lc.time, self.diag)
         self.initial_kernel = self.kernel
         self.optimized = False
+        self.diagnostic_lightcurves = self._predict_lightcurves(propagate_errors=False)
+
 
     def _build_matern32_kernel(self, matern_bounds=None, jitter_bounds=None):
         log.debug('Building Matern3/2 Kernel')
@@ -155,7 +157,7 @@ class GPCorrector(Corrector):
     def correct(self, propagate_errors=False):
         self.optimize()
         self.diagnostic_lightcurves = self._predict_lightcurves(propagate_errors=propagate_errors)
-        return self.diagnostic_lightcurves['corrected_lc']
+        return self.diagnostic_lightcurves['corrected']
 
     def diagnose(self, ax=None, propagate_errors=False):
         """Show a diagnostic plot of the GP. Returns a matplotlib.pyplot.axes object.
@@ -190,7 +192,7 @@ class GPCorrector(Corrector):
             k = self.initial_kernel.get_parameter_dict()
             label = '\n'.join(['{}: {}'.format(key.split(':')[-1], np.round(k[key], 3))
                                         for key in k.keys()])
-            gp.plot(ax=ax, color=color, label=label)
+            gp.plot(ax=ax, color=color, label=label, normalize=False)
             ax.legend(bbox_to_anchor=(1.05, 1.05), loc='upper center', fancybox=True)
             plt.tight_layout()
         return ax
