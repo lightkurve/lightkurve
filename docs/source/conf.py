@@ -50,7 +50,7 @@ author = 'Kepler/K2 Guest Observer Office'
 # built documents.
 #
 # The short X.Y version.
-version = lightkurve.__version__.split('.dev')[0]
+version = ".".join(lightkurve.__version__.split('.')[:2])
 # The full version, including alpha/beta/rc tags.
 release = lightkurve.__version__
 
@@ -81,19 +81,14 @@ nbsphinx_prolog = r"""
 
 .. only:: html
 
-    .. role:: raw-html(raw)
-        :format: html
+    .. raw:: html
 
-    .. nbinfo::
-        **This page is a static version of an interactive Jupyter notebook**
-
-        - Try the interactive version: :raw-html:`<a href="https://mybinder.org/v2/gh/KeplerGO/lightkurve/master?filepath=docs/source/{{ docname }}"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg" style="vertical-align:text-bottom"></a>`
-
-        - Download the source file: `{{ docname }}`__
-
-    __ https://github.com/KeplerGO/lightkurve/blob/master/docs/source/
-        {{ docname }}
-
+        <div style="float:right; margin-top:1em; margin-bottom:-1em;">
+            <a href="https://github.com/KeplerGO/lightkurve/tree/master/docs/source/{{ docname }}"><img src="https://img.shields.io/badge/Jupyter%20Notebook-Download-blue.svg"></a>
+            <a href=" https://colab.research.google.com/github/KeplerGO/lightkurve/blob/master/docs/source/{{ docname }}"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
+            <a href="https://mybinder.org/v2/gh/KeplerGO/lightkurve/master?filepath=docs/source/{{ docname }}"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
+        </div>
+        <br style="clear:both;">
 """
 
 # -- Options for HTML output ----------------------------------------------
@@ -126,10 +121,10 @@ rawfiles = ['CNAME', '.nojekyll']
 default_role = 'py:obj'
 
 # intersphinx enables links to classes/functions in the packages defined here:
-intersphinx_mapping = {'python': ('https://docs.python.org/', None),
-                       'numpy': ('http://docs.scipy.org/doc/numpy/', None),
-                       'scipy': ('http://docs.scipy.org/doc/scipy/reference', None),
-                       'matplotlib': ('http://matplotlib.sourceforge.net/', None),
-                       'pandas': ('http://pandas.pydata.org/pandas-docs/stable/', None),
+intersphinx_mapping = {'python': ('https://docs.python.org/3/', None),
+                       'numpy': ('https://docs.scipy.org/doc/numpy/', None),
+                       'scipy': ('https://docs.scipy.org/doc/scipy/reference', None),
+                       'matplotlib': ('https://matplotlib.org', None),
+                       'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
                        'oktopus': ('https://keplergo.github.io/oktopus', None),
-                       'astropy': ('http://docs.astropy.org/en/latest/', None)}
+                       'astropy': ('https://docs.astropy.org/en/latest/', None)}

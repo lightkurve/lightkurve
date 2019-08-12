@@ -17,7 +17,7 @@
     <div class="row">
       <div class="col-md-6">
         <p style="font-size: 1.2em; font-weight: 700;">
-          Building blocks for science
+         Time domain astronomy made easy
         </p>
         <p>
           Lightkurve offers a user-friendly way

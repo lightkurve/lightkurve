@@ -13,7 +13,8 @@ import lightkurve
 #### Expected behavior
 <!-- Describe the behavior you expected and how it differs from the behavior observed in the example. -->
 
-#### Environment:
-- platform (e.g. Linux, OSX, Windows):
-- lightkurve version (e.g. 1.0b6):
-- installation method (e.g. pip, conda, source):
+#### Environment
+
+-  platform (e.g. Linux, OSX, Windows):
+-  lightkurve version (e.g. 1.0b6):
+-  installation method (e.g. pip, conda, source):

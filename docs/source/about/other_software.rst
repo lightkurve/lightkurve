@@ -8,13 +8,14 @@ Lightkurve provides general purpose tools for interacting with astronomical ligh
 Many other tools have been developed to solve related scientific and data analysis problems.
 On this page we list community-produced software that may complement lightkurve.
 
-If your software is not listed, please `open a Pull Request <https://github.com/KeplerGO/lightkurve/blob/master/docs/source/other_software.rst>`_ to add it!
+If your software is not listed, please `open a Pull Request <https://github.com/KeplerGO/lightkurve/blob/master/docs/source/other_software.rst>`_ to add it, we aim to be inclusive of all Kepler- and TESS-related tools!
 
 
 Detrending & Analysis
 ~~~~~~~~~~~~~~~~~~~~~~
 
-- `PyKE <http://github.com/KeplerGO/PyKE>`_ : Kepler, K2 & TESS Data Analysis Tools
+- `VARTOOLS <https://www.astro.princeton.edu/~jhartman/vartools.html>`_ : a command line utility to analyze light curves from Hartman and Bakos (2016).
+- `PyKE <http://github.com/KeplerGO/PyKE>`_ : Kepler, K2 & TESS Data Analysis Tools (the precursor to Lightkurve)
 - `everest <http://github.com/rodluger/everest>`_ : De-trending of K2 Light curves
 - `k2sc <http://github.com/OxES/k2sc>`_ : K2 systematics correction using Gaussian processes
 - `nutella <http://github.com/benmontet/nutella>`_ : Great (point) spreads for beautiful Kepler/K2 inference

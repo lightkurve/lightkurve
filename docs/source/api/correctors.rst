@@ -1,5 +1,5 @@
-Systematics correction classes
-==============================
+Correcting systematics
+======================
 
 .. module:: lightkurve.correctors
 

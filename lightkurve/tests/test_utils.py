@@ -9,9 +9,8 @@ import os
 
 from ..utils import KeplerQualityFlags, TessQualityFlags
 from ..utils import module_output_to_channel, channel_to_module_output
-from ..utils import running_mean
 from ..utils import LightkurveWarning
-from ..utils import detect_filetype
+from ..utils import running_mean, detect_filetype, validate_method
 from ..lightcurve import LightCurve
 
 from .. import PACKAGEDIR
@@ -87,9 +86,17 @@ def test_lightkurve_warning():
         lc = LightCurve(time=time, flux=flux)
         assert len(warns) == 0
 
+
 def test_detect_filetype():
     """Can we detect the correct filetype?"""
     k2_path = os.path.join(PACKAGEDIR, "tests", "data", "test-tpf-star.fits")
     tess_path = os.path.join(PACKAGEDIR, "tests", "data", "tess25155310-s01-first-cadences.fits.gz")
     assert detect_filetype(fits.open(k2_path)[0].header) == 'KeplerTargetPixelFile'
     assert detect_filetype(fits.open(tess_path)[0].header) == 'TessTargetPixelFile'
+
+
+def test_validate_method():
+    assert validate_method("foo", ["foo", "bar"]) == "foo"
+    assert validate_method("FOO", ["foo", "bar"]) == "foo"
+    with pytest.raises(ValueError):
+          validate_method("foo", ["bar"])

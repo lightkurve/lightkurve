@@ -7,10 +7,16 @@ from astropy.convolution import convolve, Box1DKernel
 log = logging.getLogger(__name__)
 
 # Import the optional AstroPy dependency, or print a friendly error otherwise.
+# BoxLeastSquares was added to `astropy.stats` in AstroPy v3.1 and then
+# moved to `astropy.timeseries` in v3.2, which makes the import below
+# somewhat complicated.
 try:
-    from astropy.stats.bls import BoxLeastSquares
+    from astropy.timeseries import BoxLeastSquares
 except ImportError:
-    pass  # we will print an error message in `show_interact_widget` instead
+    try:
+        from astropy.stats import BoxLeastSquares
+    except ImportError:
+        pass  # we will print an error message in `show_interact_widget` instead
 
 # Import the optional Bokeh dependency, or print a friendly error otherwise.
 try:
@@ -345,14 +351,20 @@ def make_bls_figure_elements(result, bls_source, help_source):
     fig.x_range = Range1d(start=result.period.min(), end=result.period.max())
 
     # Add circles for the selection of new period. These are always hidden
-    circ = fig.circle('period', 'power', source=bls_source, fill_alpha=0., size=6,
-                      line_color=None, selection_color="white",
-                      nonselection_fill_alpha=0.0,
-                      nonselection_fill_color='white',
-                      nonselection_line_color=None,
-                      nonselection_line_alpha=0.0,
-                      fill_color=None, hover_fill_color="white",
-                      hover_alpha=0., hover_line_color="white")
+    fig.circle('period', 'power',
+               source=bls_source,
+               fill_alpha=0.,
+               size=6,
+               line_color=None,
+               selection_color="white",
+               nonselection_fill_alpha=0.0,
+               nonselection_fill_color='white',
+               nonselection_line_color=None,
+               nonselection_line_alpha=0.0,
+               fill_color=None,
+               hover_fill_color="white",
+               hover_alpha=0.,
+               hover_line_color="white")
 
     # Add line for the BLS power
     fig.line('period', 'power', line_width=1, color='#191919',
@@ -415,10 +427,12 @@ def show_interact_widget(lc, notebook_url='localhost:8888', minimum_period=None,
         return None
 
     try:
-        from astropy.stats.bls import BoxLeastSquares
+        from astropy.timeseries import BoxLeastSquares
     except ImportError:
-        log.error("The `interact_bls()` tool requires the `astropy.stats.bls` module; "
-                  "this requires AstroPy v3.1 or later.")
+        try:
+            from astropy.stats import BoxLeastSquares
+        except ImportError:
+            log.error("The `interact_bls()` tool requires AstroPy v3.1 or later.")
 
     def _create_interact_ui(doc, minp=minimum_period, maxp=maximum_period, resolution=resolution):
         """Create BLS interact user interface."""

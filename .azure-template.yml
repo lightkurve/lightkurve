@@ -1,0 +1,35 @@
+steps:
+
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '$(python.version)'
+  displayName: 'Use Python $(python.version)'
+
+- script: |
+    python -m pip install --upgrade pip setuptools wheel
+    pip install numpy  # celerite needs numpy to build, so we install it first
+    $(pip.command)
+  displayName: 'Install Lightkurve & dependencies'
+
+- script: pytest $(pytest.options) --doctest-modules --junitxml=junit/test-results.xml --cov-report=xml --cov-report=html
+  displayName: 'Run pytest'
+
+- script: python-codacy-coverage -r coverage.xml --token $CODACY_PROJECT_TOKEN
+  displayName: 'Upload coverage.xml'
+  condition: eq(variables['Agent.JobName'], 'Linux Python37_WithRemoteData')
+
+- script: bash <(curl https://codecov.io/bash)
+  displayName: 'Run codecov'
+  condition: eq(variables['Agent.JobName'], 'Linux Python37_WithRemoteData')
+
+- task: PublishTestResults@2
+  condition: succeededOrFailed()
+  inputs:
+    testResultsFiles: '**/test-*.xml'
+    testRunTitle: 'Publish test results for Python $(python.version)'
+
+- task: PublishCodeCoverageResults@1
+  inputs:
+    codeCoverageTool: Cobertura
+    summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
+    reportDirectory: '$(System.DefaultWorkingDirectory)/**/htmlcov'
