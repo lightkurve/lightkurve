@@ -57,7 +57,7 @@ class GPCorrector(Corrector):
 
         if matern_bounds is None:
             matern_bounds = {'log_sigma': (-2 + log_sigma, 2 + log_sigma),
-                            'log_rho': (np.log(20.), np.log(50.))}
+                            'log_rho': (np.log(2.), np.log(50.))}
         if jitter_bounds is None:
             jitter_bounds = {'log_sigma':(-2 + log_sigma2, 2 + log_sigma2)}
 
@@ -80,7 +80,7 @@ class GPCorrector(Corrector):
 
         if sho_bounds is None:
             sho_bounds = {'log_S0': (-2 + log_S0, 2 + log_S0),
-                          'log_Q': (0.2, 7),
+                          'log_Q': (np.log(7.), np.log(40.)),
                           'log_w0': (np.log(2*np.pi/150), np.log(2*np.pi/0.1))}
         if jitter_bounds is None:
             jitter_bounds = {'log_sigma':(-2 + log_sigma, 2 + log_sigma)}
