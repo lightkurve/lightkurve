@@ -5,7 +5,7 @@ Lightkurve
 
 **Documentation: https://docs.lightkurve.org**
 
-|pypi-badge| |conda-badge| |azure-badge| |cov-badge| |doi-badge| |astropy-badge|
+|pypi-badge| |conda-badge| |codacy-badge| |codacy-coverage-badge| |azure-badge| |doi-badge| |astropy-badge|
 
 .. |pypi-badge| image:: https://img.shields.io/pypi/v/lightkurve.svg
                 :target: https://pypi.python.org/pypi/lightkurve
@@ -13,13 +13,14 @@ Lightkurve
                  :target: https://anaconda.org/conda-forge/lightkurve
 .. |azure-badge| image:: https://dev.azure.com/KeplerGO/Lightkurve/_apis/build/status/Lightkurve-PyTest?branchName=master
                  :target: https://dev.azure.com/KeplerGO/Lightkurve/_build/latest?definitionId=1&branchName=master
-.. |cov-badge| image:: https://codecov.io/gh/KeplerGO/lightkurve/branch/master/graph/badge.svg
-              :target: https://codecov.io/gh/KeplerGO/lightkurve
 .. |astropy-badge| image:: https://img.shields.io/badge/powered%20by-AstroPy-orange.svg?style=flat
                    :target: http://www.astropy.org
 .. |doi-badge| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.1181928.svg
-              :target: https://doi.org/10.5281/zenodo.1181928
-
+              :target: https://docs.lightkurve.org/about/citing.html
+.. |codacy-badge| image:: https://api.codacy.com/project/badge/Grade/48d6ceb73b604845bb7735de650945df
+              :target: https://www.codacy.com/app/barentsen/lightkurve
+.. |codacy-coverage-badge| image:: https://api.codacy.com/project/badge/Coverage/48d6ceb73b604845bb7735de650945df
+              :target: https://www.codacy.com/app/barentsen/lightkurve              
 
 **Lightkurve** is a community-developed, open-source Python package which offers a beautiful and user-friendly way
 to analyze astronomical flux time series data,
