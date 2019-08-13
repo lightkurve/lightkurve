@@ -737,12 +737,6 @@ class LombScarglePeriodogram(Periodogram):
                           LightkurveWarning)
             maximum_frequency = kwargs.pop("max_frequency", None)
 
-        # Make sure the lightcurve object is normalized
-        if not np.in1d(lc.flux, lc.normalize().flux).all():
-            warnings.warn("Input light curve will be normalized.",
-                          LightkurveWarning)
-            lc = lc.normalize()
-
         # Check if any values of period have been passed and set format accordingly
         if not all(b is None for b in [period, minimum_period, maximum_period]):
             default_view = 'period'
