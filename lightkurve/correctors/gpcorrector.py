@@ -41,7 +41,7 @@ class GPCorrector(Corrector):
         log.debug("Built kernels")
 
 
-        self.gp = celerite.GP(self.kernel, mean=np.nanmean(lc.flux))
+        self.gp = celerite.GP(self.kernel, mean=np.nanmean(lc.flux), fit_mean=True)
         self.gp.compute(self.lc.time, self.diag)
         self.initial_kernel = self.kernel
         self.optimized = False
@@ -51,13 +51,13 @@ class GPCorrector(Corrector):
     def _build_matern32_kernel(self, matern_bounds=None, jitter_bounds=None):
         log.debug('Building Matern3/2 Kernel')
         log_sigma = np.log(np.nanstd(self.lc.flux))
-        log_rho = np.log(50.) #np.log(self.lc.normalize().to_periodogram(minimum_period=0.5, maximum_period=50).period_at_max_power.value)
+        log_rho = np.log(self.lc.normalize().to_periodogram(minimum_period=0.5, maximum_period=50).period_at_max_power.value)
         log_sigma2 = np.log(np.nanmedian(self.lc.flux_err))
         log.debug('Created starting guesses')
 
         if matern_bounds is None:
             matern_bounds = {'log_sigma': (-2 + log_sigma, 2 + log_sigma),
-                            'log_rho': (np.log(40.), np.log(60.))}
+                            'log_rho': (np.log(20.), np.log(50.))}
         if jitter_bounds is None:
             jitter_bounds = {'log_sigma':(-2 + log_sigma2, 2 + log_sigma2)}
 
@@ -74,13 +74,13 @@ class GPCorrector(Corrector):
         log.debug('Building SHO Kernel')
         log_omega0 = np.log(2*np.pi / self.lc.normalize().to_periodogram(minimum_period=0.5, maximum_period=50).period_at_max_power.value)
         log_S0 = np.log(np.nanstd(self.lc.flux)**2)
-        log_Q = np.log(50.)
+        log_Q = np.log(10)
         log_sigma = np.log(np.nanmedian(self.lc.flux_err))
         log.debug('Created starting guesses')
 
         if sho_bounds is None:
             sho_bounds = {'log_S0': (-2 + log_S0, 2 + log_S0),
-                          'log_Q': (np.log(20.), np.log(60.)),
+                          'log_Q': (0.2, 7),
                           'log_w0': (np.log(2*np.pi/150), np.log(2*np.pi/0.1))}
         if jitter_bounds is None:
             jitter_bounds = {'log_sigma':(-2 + log_sigma, 2 + log_sigma)}

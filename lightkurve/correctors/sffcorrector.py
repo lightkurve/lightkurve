@@ -122,6 +122,7 @@ class SFFCorrector(Corrector):
         std[std == 0] = 1
         components /= np.atleast_2d(std)
         components *= self.lc.estimate_cdpp() * 1e-6
+        components /= np.nanmedian(np.nansum(components == 0, axis=1))
         components += 1
         components *= self.lc.flux.mean()
         return np.nan_to_num(components)
@@ -196,7 +197,7 @@ class SFFCorrector(Corrector):
 
         # find a maximum-likelihood solution
         solution = minimize(self._grad_neg_log_like, gp_corrector.gp.get_parameter_vector(),
-                            method=method, bounds=gp_corrector.gp.get_parameter_bounds(),
+                            method=method,#, bounds=gp_corrector.gp.get_parameter_bounds(),
                             jac=True, args=(design_matrix, gp_corrector, l2_term))
         # set the GP parameters to the optimization output
         gp_corrector.gp.set_parameter_vector(solution.x)
@@ -258,10 +259,14 @@ class SFFCorrector(Corrector):
         thrusters[self.breakindex] = True
         thrusters = np.where(thrusters)[0]
 
-        window_points = np.append(np.linspace(0, self.breakindex + 1, windows//2 + 1, dtype=int)[1:],
-                              np.linspace(self.breakindex + 1, len(self.arc), windows//2 + 1, dtype=int)[1:-1])
-        window_points[np.argmin((window_points - self.breakindex + 1)**2)] = self.breakindex + 1
+        if self.breakindex != 0:
+            window_points = np.append(np.linspace(0, self.breakindex + 1, windows//2 + 1, dtype=int)[1:],
+                                  np.linspace(self.breakindex + 1, len(self.arc), windows//2 + 1, dtype=int)[1:-1])
+            window_points[np.argmin((window_points - self.breakindex + 1)**2)] = self.breakindex + 1
+        else:
+            window_points = np.linspace(0, len(self.flux) + 1, windows)
         window_points = [thrusters[np.argmin(np.abs(wp - thrusters))] + 1 for wp in window_points]
+        window_points[0] = 0
         return window_points
 
     def correct(self, cadence_mask=None, preserve_trend=True, design_matrix=None,
