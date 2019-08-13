@@ -210,14 +210,11 @@ def diagnose_numax_acf2d(numax, periodogram):
         ax[0].axvline(numax.value, c='r', linewidth=2, alpha=.4,
                 label='{} = {:7.5} {}'.format(r'$\nu_{\rm max}$', numax.value, periodogram.frequency.unit.to_string('latex')))
         ax[0].legend(loc='upper right')
-#        ax[0].text(numax.value, periodogram.power.value.max()*0.75, '{:7.5}'.format(numax.value), rotation=90, ha='right', color='r', alpha=0.5)
         ax[0].set_xlabel('')
         ax[0].text(.05, .9, 'Input Power Spectrum',
                     horizontalalignment='left',
                     transform=ax[0].transAxes, fontsize=15)
 
-        windowarray = np.linspace(0, numax.diagnostics['window_width'],
-                                  num=numax.diagnostics['acf2d'].shape[1])
         vmin = np.nanpercentile(numax.diagnostics['acf2d'], 5)
         vmax = np.nanpercentile(numax.diagnostics['acf2d'], 95)
         ax[1].pcolormesh(numax.diagnostics['numaxs'],
