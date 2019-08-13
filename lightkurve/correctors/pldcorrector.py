@@ -321,11 +321,11 @@ class PLDCorrector(Corrector):
         self.optimized = True
 
         # find a maximum-likelihood solution
-        solution = minimize(self._neg_log_like, gp_corrector.gp.get_parameter_vector(),
-                            method=method, bounds=gp_corrector.gp.get_parameter_bounds(),
-                            jac=self._grad_neg_log_like, args=(design_matrix, gp_corrector, l2_term))
+        self.solution = minimize(self._neg_log_like, gp_corrector.gp.get_parameter_vector(),
+                                 method=method, bounds=gp_corrector.gp.get_parameter_bounds(),
+                                 jac=self._grad_neg_log_like, args=(design_matrix, gp_corrector, l2_term))
         # set the GP parameters to the optimization output
-        gp_corrector.gp.set_parameter_vector(solution.x)
+        gp_corrector.gp.set_parameter_vector(self.solution.x)
         self.gp_corrector = gp_corrector
         return self.gp_corrector
 
@@ -392,7 +392,7 @@ class PLDCorrector(Corrector):
         # Optimize the GP. l2_term will be set to 0 to avoid fitting out motion noise with
         # the GP
         if optimize_gp:
-            gp_corrector = self.optimize(design_matrix, gp_corrector, l2_term=0)
+            gp_corrector = self.optimize(design_matrix, gp_corrector, l2_term=l2_term)
 
         # Create noise model LightCurve
         noise_lc = self.raw_lc.copy()
