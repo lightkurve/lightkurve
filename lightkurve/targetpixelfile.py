@@ -1196,7 +1196,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
             if position is None:
                 cutout = hdu
             else:
-                cutout = Cutout2D(hdu.data, position, wcs=WCS(hdu.header),
+                cutout = Cutout2D(hdu.data, position, wcs=wcs_ref,
                                   size=size, mode='partial')
             factory.add_cadence(frameno=idx, flux=cutout.data, header=hdu.header)
 
