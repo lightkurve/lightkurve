@@ -7,269 +7,392 @@ import warnings
 
 import numpy as np
 from scipy import linalg, interpolate
+from scipy.optimize import minimize
 from matplotlib import pyplot as plt
 from astropy.stats import sigma_clip
+from astropy.modeling import models, fitting
 
 from .corrector import Corrector
+from .gpcorrector import GPCorrector
 
 log = logging.getLogger(__name__)
 
 __all__ = ['SFFCorrector']
 
+import celerite
+from .. import MPLSTYLE
+from ..utils import LightkurveError
 
 class SFFCorrector(Corrector):
-    """Implements the Self-Flat-Fielding (SFF) systematics removal method.
 
-    This method is described in detail by Vanderburg and Johnson (2014).
-    Briefly, the algorithm implemented in this class can be described
-    as follows
+    def __init__(self, lc, centroid_col=None, centroid_row=None, breakpoint=None):
+        self.lc = lc.remove_nans()
+        self.optimized = False
+        self.flux = np.copy(self.lc.flux)
+        self.flux_err = np.copy(self.lc.flux_err)
+        self.time = np.copy(self.lc.time)
+        self.model = np.ones(len(self.flux))
+        self.type = type
 
-       (1) Rotate the centroid measurements onto the subspace spanned by the
-           eigenvectors of the centroid covariance matrix
-       (2) Fit a polynomial to the rotated centroids
-       (3) Compute the arclength of such polynomial
-       (4) Fit a BSpline of the raw flux as a function of time
-       (5) Normalize the raw flux by the fitted BSpline computed in step (4)
-       (6) Bin and interpolate the normalized flux as a function of the arclength
-       (7) Divide the raw flux by the piecewise linear interpolation done in step (6)
-       (8) Set raw flux as the flux computed in step (7) and repeat
-       (9) Multiply back the fitted BSpline
+        # Campaign break point in cadence number
+        if breakpoint is None:
+            self.breakpoint = self._get_break_point(self.lc.campaign)
+        else:
+            self.breakpoint = breakpoint
 
-    Parameters
-    ----------
-    lightcurve : `~lightkurve.lightcurve.LightCurve`
-        The light curve object on which the SFF algorithm will be applied.
-
-    Examples
-    --------
-    >>> lc = LightCurve(time, flux)   # doctest: +SKIP
-    >>> corrector = SFFCorrector(lc)   # doctest: +SKIP
-    >>> new_lc = corrector.correct(centroid_col, centroid_row)   # doctest: +SKIP
-    """
-    def __init__(self, lightcurve):
-        self.lc = lightcurve
-
-    def correct(self, centroid_col=None, centroid_row=None,
-                polyorder=5, niters=3, bins=15, windows=10, sigma_1=3.,
-                sigma_2=5., restore_trend=False):
-        """Returns a systematics-corrected LightCurve.
-
-        Parameters
-        ----------
-        centroid_col, centroid_row : array-like, array-like
-            Centroid column and row coordinates as a function of time.
-            If `None`, then the `centroid_col` and `centroid_row` attributes
-            of the `LightCurve` passed to the constructor of this class
-            will be used, if present.
-        polyorder : int
-            Degree of the polynomial which will be used to fit one
-            centroid as a function of the other.
-        niters : int
-            Number of iterations of the aforementioned algorithm.
-        bins : int
-            Number of bins to be used in step (6) to create the
-            piece-wise interpolation of arclength vs flux correction.
-        windows : int
-            Number of windows to subdivide the data.  The SFF algorithm
-            is ran independently in each window.
-        sigma_1, sigma_2 : float, float
-            Sigma values which will be used to reject outliers
-            in steps (6) and (2), respectivelly.
-        restore_trend : bool
-            If `True`, the long-term trend will be added back into the
-            lightcurve.
-
-        Returns
-        -------
-        corrected_lightcurve : `~lightkurve.lightcurve.LightCurve`
-            Returns a corrected light curve.
-        """
-        # `new_lc` is the object we will return at the end of this function;
-        # SFF does not work on cadences with flux=NaN so we remove them here.
-        new_lc = self.lc.remove_nans().copy()
-
+        # Campaign break point in index
+        self.breakindex = np.argmin(np.abs(self.lc.cadenceno - self.breakpoint))
         # Input validation
         if centroid_col is None:
             try:
-                centroid_col = new_lc.centroid_col
+                self.centroid_col = self.lc.centroid_col
             except AttributeError:
                 raise ValueError('`centroid_col` must be passed to `correct()` '
                                  'because it is not a property of the LightCurve.')
+        else:
+            self.centroid_col = centroid_col
+
         if centroid_row is None:
             try:
-                centroid_row = new_lc.centroid_row
+                self.centroid_row = self.lc.centroid_row
             except AttributeError:
                 raise ValueError('`centroid_row` must be passed to `correct()` '
                                  'because it is not a property of the LightCurve.')
+        else:
+            self.centroid_row = centroid_row
+        c, r = self.centroid_col - np.min(self.centroid_col) + 1, self.centroid_row - np.min(self.centroid_row) + 1
+        self.arc = (c**2 + r**2)**0.5
+#        self.arc += 1
 
-        # Split the data into windows
-        time = np.array_split(new_lc.time, windows)
-        flux = np.array_split(new_lc.flux, windows)
-        centroid_col = np.array_split(centroid_col, windows)
-        centroid_row = np.array_split(centroid_row, windows)
-        self.trend = np.array_split(np.ones(len(new_lc.time)), windows)
+    def create_design_matrix(self, window_points=None):
+        if window_points is None:
+            if hasattr(self, 'window_points'):
+                window_points = self.window_points
+            elif hasattr(self, 'breakindex'):
+                window_points = [self.breakindex]
+            else:
+                raise ValueError('Please pass window points.')
 
-        # Apply the correction iteratively
-        for n in range(niters):
-            # First, fit a spline to capture the long-term varation
-            # We don't want to fit the long-term trend because we know
-            # that the K2 motion noise is a high-frequency effect.
-            tempflux = np.asarray([item for sublist in flux for item in sublist])
-            flux_outliers = sigma_clip(data=tempflux, sigma=sigma_1).mask
-            self.bspline = self.fit_bspline(new_lc.time[~flux_outliers], tempflux[~flux_outliers])
 
-            # The SFF algorithm is going to be run on each window independently
-            for i in range(windows):
-                # To make it easier (and more numerically stable) to fit a
-                # characteristic polynomial that describes the spacecraft motion,
-                # we rotate the centroids to a new coordinate frame in which
-                # the dominant direction of motion is aligned with the x-axis.
-                self.rot_col, self.rot_row = self.rotate_centroids(centroid_col[i],
-                                                                   centroid_row[i])
-                # Next, we fit the motion polynomial after removing outliers
-                self.outlier_cent = sigma_clip(data=self.rot_col,
-                                               sigma=sigma_2).mask
-                with warnings.catch_warnings():
-                    # ignore warning messages related to polyfit being poorly conditioned
-                    warnings.simplefilter("ignore", category=np.RankWarning)
-                    coeffs = np.polyfit(self.rot_row[~self.outlier_cent],
-                                        self.rot_col[~self.outlier_cent], polyorder)
+        if not hasattr(window_points, '__iter__'):
+            window_points = [window_points]
 
-                self.poly = np.poly1d(coeffs)
-                self.polyprime = np.poly1d(coeffs).deriv()
 
-                # Compute the arclength s.  It is the length of the polynomial
-                # (fitted above) that describes the typical motion.
-                x = np.linspace(np.min(self.rot_row[~self.outlier_cent]),
-                                np.max(self.rot_row[~self.outlier_cent]), 10000)
-                self.s = np.array([self.arclength(x1=xp, x=x) for xp in self.rot_row])
+        build_components = lambda X, Y, T: np.array([
+                                             ((X - np.min(X) + 1)**2 + (Y - np.min(Y) + 1)**2)**0.5,
+                                             ((X - np.min(X) + 1)**2 + (Y - np.min(Y) + 1)**2),
+                                             ((X - np.min(X) + 1)**2 + (Y - np.min(Y) + 1)**2)**1.5,
+                                             X**4, X**3, X**2, X,
+                                             Y**4, Y**3, Y**2, Y,
+                                             X**4*Y**3, X**4*Y**2, X**4*Y, X**3*Y**2, X**3*Y, X**2*Y, X*Y,
+                                             Y**4*X**3, Y**4*X**2, Y**4*X, Y**3*X**2, Y**3*X, Y**2*X, np.ones(len(T))]).T
 
-                # Remove the long-term variation by dividing the flux by the spline
-                iter_trend = self.bspline(time[i])
-                self.normflux = flux[i] / iter_trend
-                self.trend[i] = iter_trend
-                # Bin and interpolate normalized flux to capture the dependency
-                # of the flux as a function of arclength
-                self.interp = self.bin_and_interpolate(self.s, self.normflux, bins,
-                                                       sigma=sigma_1)
-                # Correct the raw flux
-                corrected_flux = self.normflux / self.interp(self.s)
-                flux[i] = corrected_flux
-                if restore_trend:
-                    flux[i] *= self.trend[i]
+        # whiten
+        c, r, t = np.copy(self.centroid_col), np.copy(self.centroid_row), np.copy(self.time)
+        c, r, t = c - c.mean(), r - r.mean(), t - t.mean()
+        c, r, t = c / c.std(), r / r.std(), t / t.std()
 
-        new_lc.flux = np.asarray([item for sublist in flux for item in sublist])
-        return new_lc
+        components = build_components(c, r, t)
+        stack = []
+        for idx in np.array_split(np.arange(len(self.time)), [self.breakindex]):
+            mask = np.in1d(np.arange(len(self.time)), idx)
+            if mask.sum() == 0:
+                continue
+            window = np.copy(components)
+            window[~mask] *= np.nan
+            stack.append(window)
 
-    def rotate_centroids(self, centroid_col, centroid_row):
-        """Rotate the coordinate frame of the (col, row) centroids to a new (x,y)
-        frame in which the dominant motion of the spacecraft is aligned with
-        the x axis.  This makes it easier to fit a characteristic polynomial
-        that describes the motion."""
-        centroids = np.array([centroid_col, centroid_row])
-        _, eig_vecs = linalg.eigh(np.cov(centroids))
-        return np.dot(eig_vecs, centroids)
 
-    def _plot_rotated_centroids(self):
-        fig = plt.figure()
-        ax = fig.add_subplot(111)
-        ax.plot(self.rot_row[~self.outlier_cent], self.rot_col[~self.outlier_cent],
-                'ko', markersize=3)
-        ax.plot(self.rot_row[~self.outlier_cent], self.rot_col[~self.outlier_cent],
-                'bo', markersize=2)
-        ax.plot(self.rot_row[self.outlier_cent], self.rot_col[self.outlier_cent],
-                'ko', markersize=3)
-        ax.plot(self.rot_row[self.outlier_cent], self.rot_col[self.outlier_cent],
-                'ro', markersize=2)
-        x = np.linspace(min(self.rot_row), max(self.rot_row), 200)
-        ax.plot(x, self.poly(x), '--')
-        plt.xlabel("Rotated row centroid")
-        plt.ylabel("Rotated column centroid")
-        return ax
+        arcstack = []
+        for idx in np.array_split(np.arange(len(self.time)), window_points):
+            mask = np.in1d(np.arange(len(self.time)), idx)
+            if mask.sum() == 0:
+                continue
+            arc_masked = np.copy(self.arc)
+            arc_masked[~mask] *= np.nan
+            ones = np.ones(len(self.time))
+            ones[~mask] *= np.nan
+            window = np.asarray([ones, arc_masked, arc_masked**2, arc_masked**3, arc_masked**4]).T
+            arcstack.append(window)
 
-    def _plot_normflux_arclength(self):
-        idx = np.argsort(self.s)
-        s_srtd = self.s[idx]
-        normflux_srtd = self.normflux[idx]
+        stack.append(np.hstack(arcstack))
+        components = np.hstack(stack)
+        components -= np.atleast_2d(np.nanmean(components, axis=0))
+        std = np.nanstd(components, axis=0)
+        std[std == 0] = 1
+        components /= np.atleast_2d(std)
+        components *= self.lc.estimate_cdpp() * 1e-6
+        components += 1
+        components *= self.lc.flux.mean()
+        return np.nan_to_num(components)
 
-        fig = plt.figure()
-        ax = fig.add_subplot(111)
-        ax.plot(s_srtd[~self.outlier_mask], normflux_srtd[~self.outlier_mask],
-                'ko', markersize=3)
-        ax.plot(s_srtd[~self.outlier_mask], normflux_srtd[~self.outlier_mask],
-                'bo', markersize=2)
-        ax.plot(s_srtd[self.outlier_mask], normflux_srtd[self.outlier_mask],
-                'ko', markersize=3)
-        ax.plot(s_srtd[self.outlier_mask], normflux_srtd[self.outlier_mask],
-                'ro', markersize=2)
-        ax.plot(s_srtd, self.interp(s_srtd), '--')
-        plt.xlabel(r"Arclength $(s)$")
-        plt.ylabel(r"Flux $(e^{-}s^{-1})$")
-        return ax
-
-    def arclength(self, x1, x):
-        """Compute the arclength of the polynomial used to fit the centroid
-        measurements.
+    def _solve_weights(self, design_matrix, gp_corrector, l2_term):
+        """Function to perform the analytic computation of the PLD algorithm.
+        Returns a noise model light curve.
 
         Parameters
         ----------
-        x1 : float
-            Upper limit of the integration domain.
-        x : ndarray
-            Domain at which the arclength integrand is defined.
+        design_matrix : 2D numpy array
+            Matrix containing suitable regressors for the systematics noise model
+            with shape (n_cadences, n_pca_terms*pld_order)
+        gp_corrector : lightkurve.GPCorrector object or None
+            Lightkurve GPCorrector object used to estimate long-term astrophysical
+            trend in the observation
+        l2_term : float
+            It's complicated
 
         Returns
         -------
-        arclength : float
-            Result of the arclength integral from x[0] to x1.
+        noise_model : numpy array
+            1D numpy array for the noise model light curve
         """
-        mask = x < x1
-        return np.trapz(y=np.sqrt(1 + self.polyprime(x[mask]) ** 2), x=x[mask])
+        gp = gp_corrector.gp
+        X = design_matrix
+        A = np.dot(X.T, gp.apply_inverse(X))
+        # To ensure the weights can be solved for, we need to perform L2 regularization
+        # to avoid an ill-conditioned matrix A. Here we add small values along the
+        # diagonal of matrix A to reduce its condition number and  improve its
+        # numerical stability
+        A[np.diag_indices_from(A)] += l2_term
+        B = np.dot(X.T, gp.apply_inverse(self.lc.flux[:, None])[:, 0])
+        # Solve for the weights and compute the final model
+        w = np.linalg.solve(A, B)
+        noise_model = np.dot(X, w)
 
-    def fit_bspline(self, time, flux, knotspacing=1.5):
-        """Returns a `scipy.interpolate.BSpline` object to interpolate flux as a function of time."""
-        # By default, bspline knots are placed 1.5 days apart
-        knots = np.arange(time[0], time[-1], knotspacing)
+        return noise_model
 
-        # If the light curve has breaks larger than the spacing between knots,
-        # we must remove the knots that fall in the breaks.
-        # This is necessary for e.g. K2 Campaigns 0 and 10.
-        bad_knots = []
-        a = time[:-1][np.diff(time) > knotspacing]  # times marking the start of a gap
-        b = time[1:][np.diff(time) > knotspacing]  # times marking the end of a gap
-        for a1, b1 in zip(a, b):
-            bad = np.where((knots > a1) & (knots < b1))[0][1:-1]
-            [bad_knots.append(b) for b in bad]
-        good_knots = list(set(list(np.arange(len(knots)))) - set(bad_knots))
-        knots = knots[good_knots]
 
-        # Now fit and return the spline
-        t, c, k = interpolate.splrep(time, flux, t=knots[1:])
-        return interpolate.BSpline(t, c, k)
+    def _grad_neg_log_like(self, params, design_matrix, gp_corrector, l2_term):
+        """Gradient of loss function to improve model optimization."""
+        gp_corrector.gp.set_parameter_vector(params)
+        noise_model = self._solve_weights(design_matrix, gp_corrector, l2_term=l2_term)
+        ll, gll = gp_corrector.gp.grad_log_likelihood(self.lc.flux - noise_model)
+        return -ll, -gll
 
-    def bin_and_interpolate(self, s, normflux, bins, sigma):
-        idx = np.argsort(s)
-        s_srtd = s[idx]
-        normflux_srtd = normflux[idx]
+    def optimize(self, design_matrix, gp_corrector, l2_term, method="L-BFGS-B"):
+        """Function to optimize GP hyperparameters simultaneously with fitting
+        the PLD noise model.
 
-        self.outlier_mask = sigma_clip(data=normflux_srtd, sigma=sigma).mask
-        normflux_srtd = normflux_srtd[~self.outlier_mask]
-        s_srtd = s_srtd[~self.outlier_mask]
+        Parameters
+        ----------
+        design_matrix : 2D numpy array or None
+            Matrix containing suitable regressors for the systematics noise model
+            with shape (n_cadences, n_pca_terms*pld_order). If set to None, a
+            design matrix will be generated with default values
+        gp_corrector : lightkurve.GPCorrector object or None
+            Lightkurve GPCorrector object used to estimate long-term astrophysical
+            trend in the observation
+        method : str
+            Optimization method passed into `scipy.optimize.minimize`, default of
+            "L-BFGS-B"
 
-        knots = np.array([np.min(s_srtd)]
-                         + [np.median(split) for split in np.array_split(s_srtd, bins)]
-                         + [np.max(s_srtd)])
-        bin_means = np.array([normflux_srtd[0]]
-                             + [np.mean(split) for split in np.array_split(normflux_srtd, bins)]
-                             + [normflux_srtd[-1]])
-        return interpolate.interp1d(knots, bin_means, bounds_error=False,
-                                    fill_value='extrapolate')
-
-    def breakpoints(self, campaign):
-        """Return a break point as a function of the campaign number.
-
-        The intention of this function is to implement a smart way to determine
-        the boundaries of the windows on which the SFF algorithm is applied
-        independently. However, this is not implemented yet in this version.
+        Returns
+        -------
+        gp_corrector : lightkurve.GPCorrector object or None
+            Lightkurve GPCorrector object used to estimate long-term astrophysical
+            trend in the observation with optimized hyperparameters
         """
-        raise NotImplementedError()
+        self.optimized = True
+
+        # find a maximum-likelihood solution
+        solution = minimize(self._grad_neg_log_like, gp_corrector.gp.get_parameter_vector(),
+                            method=method, bounds=gp_corrector.gp.get_parameter_bounds(),
+                            jac=True, args=(design_matrix, gp_corrector, l2_term))
+        # set the GP parameters to the optimization output
+        gp_corrector.gp.set_parameter_vector(solution.x)
+        self.gp_corrector = gp_corrector
+        self._gp_solution = solution
+        return self.gp_corrector
+
+    def _get_window_points(self, windows):
+        ''' Build window points, based on where thrusters are fired. '''
+
+        def _get_thruster_firings(arc):
+            ''' Find locations where K2 fired thrusters
+            Parameters:
+            ----------
+            arc : np.ndarray
+                arclength as a function of time
+            Returns:
+            -------
+            thrusters: np.ndarray of bools
+                True at times where thrusters were fired.
+            '''
+            # Rate of change of rate of change of arclength wrt time
+            d2adt2 = (np.gradient(np.gradient(arc)))
+            # Fit a nice Gaussian, most points lie in a tight region, thruster firings are outliers
+            g = models.Gaussian1D(amplitude=100, mean=0, stddev=0.01)
+            fitter = fitting.LevMarLSQFitter()
+            h = np.histogram(d2adt2, np.arange(-0.5, 0.5, 0.0001), density=True);
+            xbins = h[1][1:] - np.median(np.diff(h[1]))
+            g = fitter(g, xbins, h[0], weights=h[0]**0.5)
+
+            def _start_and_end(type):
+                ''' Find points at the start or end of a roll
+                '''
+                if type == 'start':
+                    thrusters = d2adt2 < (g.stddev * -5)
+                if type == 'end':
+                    thrusters = d2adt2 > (g.stddev * 5)
+                # Pick the best thruster in each cluster
+                idx = np.array_split(np.arange(len(thrusters)), np.where(np.gradient(np.asarray(thrusters, int)) == 0)[0])
+                m = np.array_split(thrusters, np.where(np.gradient(np.asarray(thrusters, int)) == 0)[0])
+                th = []
+                for jdx in range(len(idx)):
+                    if m[jdx].sum() == 0:
+                        th.append(m[jdx])
+                    else:
+                        th.append((np.abs(np.gradient(arc)[idx[jdx]]) == np.abs(np.gradient(arc)[idx[jdx]][m[jdx]]).max()) & m[jdx])
+                thrusters = np.hstack(th)
+                return thrusters
+
+            # Get the start and end points
+            thrusters = np.asarray([_start_and_end('start'), _start_and_end('end')])
+            thrusters = thrusters.any(axis=0)
+
+            # Take just the first point.
+            thrusters = (np.gradient(np.asarray(thrusters, int)) >= 0) & thrusters
+            return thrusters
+
+        thrusters = _get_thruster_firings(self.arc)
+        thrusters[self.breakindex] = True
+        thrusters = np.where(thrusters)[0]
+
+        window_points = np.append(np.linspace(0, self.breakindex + 1, windows//2 + 1, dtype=int)[1:],
+                              np.linspace(self.breakindex + 1, len(self.arc), windows//2 + 1, dtype=int)[1:-1])
+        window_points[np.argmin((window_points - self.breakindex + 1)**2)] = self.breakindex + 1
+        window_points = [thrusters[np.argmin(np.abs(wp - thrusters))] + 1 for wp in window_points]
+        return window_points
+
+    def correct(self, cadence_mask=None, preserve_trend=True, design_matrix=None,
+                gp_corrector=None, l2_term=None, windows=20, bins=10, window_points=None, **kwargs):
+        """Returns a `lightkurve.LightCurve` object with model for motion noise
+        removed.
+
+        Parameters
+        ----------
+        cadence_mask : array-like
+            A mask that will be applied to the cadences prior to constructing
+            the detrending model. For example, you can pass a boolean array
+            of length `n_cadences` where `True` means that the cadence will be
+            included in the noise model. You may also pass an array of indices.
+            This option enables signals of interest (e.g. planet transits)
+            to be excluded from the noise model, which will prevent over-fitting.
+            By default, no cadences will be masked.
+        preserve_trend : bool
+            Option to remove long-term trend fit by GP. By default, the
+            astrophysical signal is preserved, but can be subtracted out to
+            robustly flatten the output light curve.
+        design_matrix : 2D numpy array or None
+            Matrix containing suitable regressors for the systematics noise model
+            with shape (n_cadences, n_pca_terms*pld_order). If set to None, a
+            design matrix will be generated
+        gp_corrector : lightkurve.GPCorrector object or None
+            Lightkurve GPCorrector object used to estimate long-term astrophysical
+            trend in the observation. If set to None, a GP will be generated
+        **kwargs : dict
+            Keyword arguments for the `~lightkurve.GPCorrector` object
+
+        Returns
+        -------
+        corrected_lc : lightkurve.LightCurve object
+            A `~lightkurve.LightCurve` object with the noise model subtracted
+            from the flux array
+        """
+        # Create final optimized model
+        if gp_corrector is None:
+            gp_corrector = GPCorrector(self.lc, cadence_mask=cadence_mask, sigma=1e10, **kwargs)
+        elif isinstance(gp_corrector, celerite.GP):
+            gp_corrector = GPCorrector(self.lc, cadence_mask=cadence_mask, sigma=1e10, kernel=gp_corrector.kernel, **kwargs)
+
+        self.windows = windows
+        self.bins = bins
+
+        if window_points is None:
+            if self.windows <= 1:
+                self.window_points = [self.breakindex + 1]
+            else:
+                self.window_points = self._get_window_points(windows)
+        else:
+            self.window_points = window_points
+
+
+        if design_matrix is None:
+            design_matrix = self.create_design_matrix(self.window_points)
+
+
+        # The L2 regularization term should roughly be equal to the inverse of
+        # the amplitude of the signals we want the noise model to fit
+        if l2_term is None:
+            l2_term = 1 / (np.nanmedian(self.lc.flux) * self.lc.estimate_cdpp() * 1e-6)**2
+            log.debug("Setting l2_term to {}".format(l2_term))
+
+        # Optimize the GP
+#        if not self.optimized:
+        niters = 3
+        for count in range(niters):
+            gp_corrector = self.optimize(design_matrix, gp_corrector, l2_term=l2_term)
+
+
+            # Create noise model LightCurve
+            noise_lc = self.lc.copy()
+            noise_lc.flux = self._solve_weights(design_matrix, gp_corrector, l2_term)
+            # Create corrected LightCurve
+            corrected_lc = self.lc.copy()
+            corrected_lc.flux -= noise_lc.flux
+            corrected_lc.flux += np.nanmean(noise_lc.flux)
+            # Create GP LightCurve
+            gp_lc = self.lc.copy()
+            if count <= niters - 1:
+                mu = gp_corrector.gp.predict(corrected_lc.flux, corrected_lc.time,
+                                             return_cov=False, return_var=False)
+                gp_lc.flux = mu
+                outliers = (corrected_lc - (gp_lc.flux - np.nanmean(gp_lc.flux))).remove_outliers(sigma=5, return_mask=True)[1]
+                gp_corrector.diag[outliers] *= 1e10
+            else:
+                mu, var = gp_corrector.gp.predict(corrected_lc.flux, corrected_lc.time,
+                                             return_cov=True, return_var=False)
+                gp_lc.flux = mu
+                gp_lc.flux_err = var**0.5
+                corrected_lc.flux_err = (corrected_lc.flux_err**2 + gp_lc.flux_err**2)**0.5
+        # Optionally remove long term trend fit by GP
+        if not preserve_trend:
+            corrected_lc.flux -= (gp_lc.flux - np.nanmean(gp_lc.flux))
+
+        self.diagnostic_lightcurves = {'noise': noise_lc,
+                                       'corrected': corrected_lc,
+                                       'gp': gp_lc}
+        return self.diagnostic_lightcurves['corrected']
+
+    def diagnose(self, ax=None):
+        """Diagnostic plotting function to assess performance of the PLD de-trending."""
+        if not self.optimized:
+            raise LightkurveError("You need to call the `optimize` or `correct` method before diagnosing.")
+
+        with plt.style.context(MPLSTYLE):
+            if ax is None:
+                _, ax = plt.subplots(3, figsize=(8.485, 12))
+
+        # raw and corrected
+        self.lc.scatter(ax=ax[0], c='k', label='{} (Raw Light Curve)'.format(self.lc.label),
+                            normalize=False, alpha=0.2, s=0.5)
+
+        for idx in np.array_split(np.arange(len(self.time)), self.window_points):
+            self.lc[idx].scatter(ax=ax[0], label='', normalize=False, alpha=0.4, s=0.5)
+
+        self.diagnostic_lightcurves['corrected'].scatter(ax=ax[0], c='k',
+                                                         label='{} (PLD-Corrected)'.format(self.lc.label),
+                                                         normalize=False, s=0.5)
+
+        # raw and gp
+        self.lc.scatter(ax=ax[1], c='r', label='{} (Raw Light Curve)'.format(self.lc.label),
+                            normalize=False, alpha=0.5)
+        self.diagnostic_lightcurves['gp'].plot(ax=ax[1], c='k', lw=1,
+                                               label='{} (GP Trend)'.format(self.lc.label),
+                                               normalize=False)
+
+        # raw and corrected
+        self.diagnostic_lightcurves['noise'].scatter(ax=ax[2], c='k',
+                                                     label='{} (Noise Model)'.format(self.lc.label),
+                                                     normalize=False)
+        return ax
