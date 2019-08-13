@@ -1,15 +1,21 @@
 from __future__ import division, print_function
 
 import os
-from astropy.utils.data import get_pkg_data_filename
-from astropy.io.fits.verify import VerifyWarning
-from astropy.coordinates import SkyCoord
+import tempfile
+import warnings
+
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy.testing import assert_array_equal
 import pytest
-import tempfile
-import warnings
+
+from astropy.utils.data import get_pkg_data_filename
+from astropy.io.fits.verify import VerifyWarning
+from astropy.coordinates import SkyCoord
+from astropy.io import fits
+from astropy import wcs
+from astropy.io.fits.card import UNDEFINED
+import astropy.units as u
 
 from ..targetpixelfile import KeplerTargetPixelFile, KeplerTargetPixelFileFactory
 from ..targetpixelfile import TessTargetPixelFile
@@ -285,23 +291,24 @@ def test_tpf_factory():
     assert tpf.header['CREATOR'] == 'Christina TargetPixelFileWriter'
 
 
-def test_tpf_from_images():
-    """Basic tests of tpf.from_fits_images()"""
-    from astropy.io import fits
-    from astropy import wcs
-    import astropy.units as u
-
-    # Can we read in a load of images?
-    header = fits.Header()
+def _create_image_array(header, shape=(5, 5)):
+    """Helper function for tests below."""
+    if header is None:
+        header = fits.Header()
     images = []
     for i in range(5):
         header['TSTART'] = i
         header['TSTOP'] = i + 1
-        images.append(fits.ImageHDU(data=np.ones((5, 5)), header=header))
+        images.append(fits.ImageHDU(data=np.ones(shape), header=header))
+    return images
+
+def test_tpf_from_images():
+    """Basic tests of tpf.from_fits_images()"""
+    import astropy.units as u
 
     # Not without a wcs...
     with pytest.raises(Exception):
-        KeplerTargetPixelFile.from_fits_images(images, size=(3, 3),
+        KeplerTargetPixelFile.from_fits_images(_create_image_array(), size=(3, 3),
                                                position=SkyCoord(-234.75, 8.3393, unit='deg'))
 
     # Make a fake WCS based on astropy.docs...
@@ -317,14 +324,8 @@ def test_tpf_from_images():
     header['CRVAL2P'] = 20
     ra, dec = 268.21686048, -73.66991904
 
-    # Add that header to our images...
-    images = []
-    for i in range(5):
-        header['TSTART'] = i
-        header['TSTOP'] = i + 1
-        images.append(fits.ImageHDU(data=np.ones((5, 5)), header=header))
-
     # Now this should work.
+    images = _create_image_array(header=header)
     tpf = KeplerTargetPixelFile.from_fits_images(images, size=(3, 3),
                                                  position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
     assert isinstance(tpf, KeplerTargetPixelFile)
@@ -355,13 +356,13 @@ def test_tpf_from_images():
 
         # Should be able to run with a list of file names
         tpf_tmpfiles = KeplerTargetPixelFile.from_fits_images(tmpfile_names,
-                                                            size=(3, 3),
-                                                            position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
+                            size=(3, 3),
+                            position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
 
         # Should be able to run with a list of HDUlists
         tpf_hdus = KeplerTargetPixelFile.from_fits_images(hdus,
-                                                          size=(3, 3),
-                                                          position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
+                            size=(3, 3),
+                            position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
 
         # Clean up the temporary files we created
         for filename in tmpfile_names:
@@ -373,22 +374,9 @@ def test_tpf_from_images():
 
 def test_tpf_wcs_from_images():
     """Test to see if tpf.from_fits_images() output a tpf with WCS in the header"""
-    from astropy.io import fits
-    from astropy import wcs
-    import astropy.units as u
-    from astropy.io.fits.card import UNDEFINED
-
-    # Can we read in a load of images?
-    header = fits.Header()
-    images = []
-    for i in range(5):
-        header['TSTART'] = i
-        header['TSTOP'] = i + 1
-        images.append(fits.ImageHDU(data=np.ones((5, 5)), header=header))
-
     # Not without a wcs...
     with pytest.raises(Exception):
-        KeplerTargetPixelFile.from_fits_images(images, size=(3, 3),
+        KeplerTargetPixelFile.from_fits_images(_create_image_array(), size=(3, 3),
                                                position=SkyCoord(-234.75, 8.3393, unit='deg'))
 
     # Make a fake WCS based on astropy.docs...
@@ -402,15 +390,8 @@ def test_tpf_wcs_from_images():
     header['CRVAL2P'] = 20
     ra, dec = 23.2336, 45.235
 
-    # Add that header to our images...
-    images = []
-    for i in range(5):
-        header['TSTART'] = i
-        header['TSTOP'] = i + 1
-        images.append(fits.ImageHDU(data=np.ones((5, 5)), header=header))
-
     # Now this should work.
-    tpf = KeplerTargetPixelFile.from_fits_images(images, size=(3, 3),
+    tpf = KeplerTargetPixelFile.from_fits_images(_create_image_array(header=header), size=(3, 3),
                                                  position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
     assert tpf.hdu[1].header['1CRPX5'] != UNDEFINED
     assert tpf.hdu[1].header['1CTYP5'] == 'RA---TAN'
@@ -420,6 +401,7 @@ def test_tpf_wcs_from_images():
     assert tpf.hdu[1].header['1CUNI5'] == 'deg'
     assert tpf.hdu[1].header['2CUNI5'] == 'deg'
     assert tpf.wcs.to_header()['CDELT1'] == w.wcs.cdelt[0]
+
 
 def test_properties2(capfd):
     '''Test if the describe function produces an output.

@@ -112,7 +112,7 @@ def test_search_tesscut():
 def test_search_tesscut_download():
     """Can we download TESS cutouts via `search_cutout().download()?"""
     ra, dec = 30.578761, -83.210593
-    search_string = search_tesscut('{}, {}'.format(ra, dec))
+    search_string = search_tesscut('{}, {}'.format(ra, dec), sector=[1, 12])
     # Make sure they can be downloaded with default size
     tpf = search_string.download()
     # Ensure the correct object has been read in
