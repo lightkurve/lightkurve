@@ -291,7 +291,7 @@ def test_tpf_factory():
     assert tpf.header['CREATOR'] == 'Christina TargetPixelFileWriter'
 
 
-def _create_image_array(header, shape=(5, 5)):
+def _create_image_array(header=None, shape=(5, 5)):
     """Helper function for tests below."""
     if header is None:
         header = fits.Header()
@@ -304,8 +304,6 @@ def _create_image_array(header, shape=(5, 5)):
 
 def test_tpf_from_images():
     """Basic tests of tpf.from_fits_images()"""
-    import astropy.units as u
-
     # Not without a wcs...
     with pytest.raises(Exception):
         KeplerTargetPixelFile.from_fits_images(_create_image_array(), size=(3, 3),
