@@ -321,16 +321,17 @@ class PLDCorrector(Corrector):
         self.optimized = True
 
         # find a maximum-likelihood solution
-        solution = minimize(self._neg_log_like, gp_corrector.gp.get_parameter_vector(),
-                            method=method, bounds=gp_corrector.gp.get_parameter_bounds(),
-                            jac=self._grad_neg_log_like, args=(design_matrix, gp_corrector, l2_term))
+        self.solution = minimize(self._neg_log_like, gp_corrector.gp.get_parameter_vector(),
+                                 method=method, bounds=gp_corrector.gp.get_parameter_bounds(),
+                                 jac=self._grad_neg_log_like, args=(design_matrix, gp_corrector, l2_term))
         # set the GP parameters to the optimization output
-        gp_corrector.gp.set_parameter_vector(solution.x)
+        gp_corrector.gp.set_parameter_vector(self.solution.x)
         self.gp_corrector = gp_corrector
         return self.gp_corrector
 
     def correct(self, cadence_mask=None, preserve_trend=True, design_matrix=None,
-                gp_corrector=None, pld_order=2, n_pca_terms=10, l2_term=None, **kwargs):
+                gp_corrector=None, pld_order=2, n_pca_terms=10, optimize_gp=True,
+                l2_term=None, **kwargs):
         """Returns a `lightkurve.LightCurve` object with model for motion noise
         removed.
 
@@ -388,10 +389,10 @@ class PLDCorrector(Corrector):
             l2_term = 1 / (np.nanmedian(self.raw_lc.flux) * self.raw_lc.estimate_cdpp() * 1e-6)**2
             log.debug("Setting l2_term to {}".format(l2_term))
 
-        # Optimize the GP
-#        if not self.optimized:
-        gp_corrector = self.optimize(design_matrix, gp_corrector, l2_term=l2_term)
-
+        # Optimize the GP. l2_term will be set to 0 to avoid fitting out motion noise with
+        # the GP
+        if optimize_gp:
+            gp_corrector = self.optimize(design_matrix, gp_corrector, l2_term=l2_term)
 
         # Create noise model LightCurve
         noise_lc = self.raw_lc.copy()
