@@ -28,7 +28,13 @@ class GPCorrector(Corrector):
         self.diag = np.copy(self.lc.flux_err)
         self._bad_cadences = np.copy(~self.cadence_mask)
         self._bad_cadences |= self.lc.flatten().remove_outliers(sigma=sigma, return_mask=True)[1]
-        self.diag[self._bad_cadences] *= 1e10  # This is faster than masking out flux values
+        self.diag[self._bad_cadences] *= 1e10  # This is faster than masking out flux values during the predict step
+
+        self._unmasked_lc = self.lc.copy()
+        self._unmasked_diag = np.copy(self.diag)
+
+        self.lc = self.lc[~self._bad_cadences]
+        self.diag = self.diag[~self._bad_cadences]
 
         log.debug("Building kernels")
 
@@ -41,23 +47,24 @@ class GPCorrector(Corrector):
         log.debug("Built kernels")
 
 
-        self.gp = celerite.GP(self.kernel, mean=np.nanmean(lc.flux), fit_mean=True)
+        self.gp = celerite.GP(self.kernel, mean=np.nanmean(self.lc.flux), fit_mean=True)
         self.gp.compute(self.lc.time, self.diag)
         self.initial_kernel = self.kernel
         self.optimized = False
-        self.diagnostic_lightcurves = self._predict_lightcurves(propagate_errors=False)
+        # self.diagnostic_lightcurves = self._predict_lightcurves(propagate_errors=False)
 
 
     def _build_matern32_kernel(self, matern_bounds=None, jitter_bounds=None):
         log.debug('Building Matern3/2 Kernel')
         log_sigma = np.log(np.nanstd(self.lc.flux))
-        log_rho = np.log(self.lc.normalize().to_periodogram(minimum_period=0.5, maximum_period=50).period_at_max_power.value)
+        # log_rho = np.log(self.lc.normalize().to_periodogram(minimum_period=0.5, maximum_period=50).period_at_max_power.value)
+        log_rho = np.log(50.)
         log_sigma2 = np.log(np.nanmedian(self.lc.flux_err))
         log.debug('Created starting guesses')
 
         if matern_bounds is None:
             matern_bounds = {'log_sigma': (-2 + log_sigma, 2 + log_sigma),
-                            'log_rho': (np.log(20.), np.log(50.))}
+                             'log_rho': (np.log(20.), np.log(75.))}
         if jitter_bounds is None:
             jitter_bounds = {'log_sigma':(-2 + log_sigma2, 2 + log_sigma2)}
 
@@ -81,7 +88,7 @@ class GPCorrector(Corrector):
         if sho_bounds is None:
             sho_bounds = {'log_S0': (-2 + log_S0, 2 + log_S0),
                           'log_Q': (0.2, 7),
-                          'log_w0': (np.log(2*np.pi/150), np.log(2*np.pi/0.1))}
+                          'log_omega0': (np.log(2*np.pi/150), np.log(2*np.pi/0.1))}
         if jitter_bounds is None:
             jitter_bounds = {'log_sigma':(-2 + log_sigma, 2 + log_sigma)}
 
@@ -123,31 +130,32 @@ class GPCorrector(Corrector):
         log.debug('Optimized')
         self.gp.set_parameter_vector(solution.x)
 
-        self.solution_x = solution.x
+        self.solution = solution
         return solution
 
     def _predict_lightcurves(self, propagate_errors=False):
         log.debug('Predicting...')
+        self.gp.compute(self._unmasked_lc.time, self._unmasked_diag)
         if propagate_errors:
             log.debug('Propagating errors')
-            gp_flux, gp_flux_var = self.gp.predict(self.lc.flux, self.lc.time)
+            gp_flux, gp_flux_var = self.gp.predict(self._unmasked_lc.flux, self._unmasked_lc.time)
             log.debug('Predicted.')
 
-            corrected_lc = self.lc.copy()
+            corrected_lc = self._unmasked_lc.copy()
             corrected_lc.flux -= (gp_flux - np.mean(gp_flux))
             corrected_lc.flux_err = np.hypot(corrected_lc.flux_err, np.std(gp_flux_var))
 
-            gp_lc = self.lc.copy()
+            gp_lc = self._unmasked_lc.copy()
             gp_lc.flux = gp_flux
             gp_lc.flux_err = np.std(gp_flux_var)
         else:
             log.debug('Not propagating errors')
-            gp_flux = self.gp.predict(self.lc.flux, self.lc.time, return_var=False, return_cov=False)
+            gp_flux = self.gp.predict(self._unmasked_lc.flux, self._unmasked_lc.time, return_var=False, return_cov=False)
             log.debug('Predicted.')
-            corrected_lc = self.lc.copy()
+            corrected_lc = self._unmasked_lc.copy()
             corrected_lc.flux -= (gp_flux - np.mean(gp_flux))
 
-            gp_lc = self.lc.copy()
+            gp_lc = self._unmasked_lc.copy()
             gp_lc.flux_err = 0
             gp_lc.flux = gp_flux
 
@@ -176,8 +184,8 @@ class GPCorrector(Corrector):
         with plt.style.context(MPLSTYLE):
             if ax is None:
                 _, ax = plt.subplots()
-            self.lc.errorbar(ax=ax, zorder=1, label='Data', normalize=False)
-            self.lc[self._bad_cadences].scatter(ax=ax, zorder=2, color='r', marker='x', s=20, label='Rejected Outliers', normalize=False)
+            self._unmasked_lc.errorbar(ax=ax, zorder=1, label='Data', normalize=False)
+            self._unmasked_lc[self._bad_cadences].scatter(ax=ax, zorder=2, color='r', marker='x', s=20, label='Rejected Outliers', normalize=False)
 
             if self.optimized:
                 color = 'green'
@@ -201,11 +209,11 @@ class GPCorrector(Corrector):
         """ """
         start = self.init_vals
         if self.kernel_str == 'matern32':
-            finish = {'log_sigma':self.solution_x[0], 'log_rho':self.solution_x[1], 'log_sigma2':self.solution_x[2]}
+            finish = {'log_sigma':self.solution.x[0], 'log_rho':self.solution.x[1], 'log_sigma2':self.solution.x[2]}
             self.init_jitter_bounds['log_sigma2'] = self.init_jitter_bounds.pop('log_sigma')
             bounds = {**self.init_matern_bounds, **self.init_jitter_bounds}
         elif self.kernel_str == 'sho':
-            finish = {'log_omega0':self.solution_x[0], 'log_S0':self.solution_x[1], 'log_Q':self.solution_x[2], 'log_sigma': self.solution_x[3]}
+            finish = {'log_omega0':self.solution.x[0], 'log_S0':self.solution.x[1], 'log_Q':self.solution.x[2], 'log_sigma': self.solution.x[3]}
             bounds = {**self.init_sho_bounds, **self.init_jitter_bounds}
 
         with plt.style.context(MPLSTYLE):
