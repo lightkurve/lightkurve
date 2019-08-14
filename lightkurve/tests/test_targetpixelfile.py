@@ -426,7 +426,7 @@ def test_tpf_wcs_from_images():
         images.append(fits.ImageHDU(data=np.ones((5, 5)), header=header))
 
     # Now this should work.
-    tpf = KeplerTargetPixelFile.from_fits_images(_create_image_array(header=header, size=(3, 3),
+    tpf = KeplerTargetPixelFile.from_fits_images(_create_image_array(header=header, size=(3, 3)),
                                                  position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
     assert tpf.hdu[1].header['1CRPX5'] != UNDEFINED
     assert tpf.hdu[1].header['1CTYP5'] == 'RA---TAN'

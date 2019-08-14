@@ -685,7 +685,7 @@ class TargetPixelFile(object):
         Parameters
         ----------
         center : (int, int) tuple or `astropy.SkyCoord`
-            Center of the cutout.  If an (int, int) tuple is passed, it wil be
+            Center of the cutout.  If an (int, int) tuple is passed, it will be
             interpreted as the (column, row) coordinates relative to
             the bottom-left corner of the TPF.  If an `astropy.SkyCoord` is
             passed then the sky coordinate will be used instead.
@@ -1155,7 +1155,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
             column, row = wcs_ref.wcs_world2pix(
                             np.asarray([[position.ra.deg], [position.dec.deg]]).T,
                             0)[0]
-            column, row = int(column), int(row)
         except Exception as e:
             raise e
 
@@ -1213,10 +1212,12 @@ class KeplerTargetPixelFile(TargetPixelFile):
             # Compute location of TPF lower left corner
             # Int statement contains modulus so that .5 values always round up.
             # We cannot use numpy.round() as it rounds to the even number.
-            half_tpfsize_col = int((size[0] - 1) / 2 + (size[0] + 1) % 2)
-            half_tpfsize_row = int((size[1] - 1) / 2 + (size[1] + 1) % 2)
-            ext_info['1CRV{}P'.format(m)] = column - half_tpfsize_col + factory.keywords['CRVAL1P']
-            ext_info['2CRV{}P'.format(m)] = row - half_tpfsize_row + factory.keywords['CRVAL2P']
+
+            half_tpfsize_col = int((size[0] - 1) / 2.) + round(column) - int(column)
+            half_tpfsize_row = int((size[1] - 1) / 2.) + round(row) - int(row)
+
+            ext_info['1CRV{}P'.format(m)] = round(column) - half_tpfsize_col + factory.keywords['CRVAL1P'] 
+            ext_info['2CRV{}P'.format(m)] = round(row) - half_tpfsize_row + factory.keywords['CRVAL2P']
 
         return factory.get_tpf(hdu0_keywords=allkeys, ext_info=ext_info, **kwargs)
 
