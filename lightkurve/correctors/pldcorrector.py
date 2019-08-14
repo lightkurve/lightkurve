@@ -282,18 +282,12 @@ class PLDCorrector(Corrector):
 
         return noise_model
 
-    def _neg_log_like(self, params, design_matrix, gp_corrector, l2_term):
-        """Loss function for likelihood of gp given a noise model.
-        """
-        gp_corrector.gp.set_parameter_vector(params)
-        noise_model = self._solve_weights(design_matrix, gp_corrector, l2_term=l2_term)
-        return -gp_corrector.gp.log_likelihood(self.raw_lc.flux - noise_model)
-
     def _grad_neg_log_like(self, params, design_matrix, gp_corrector, l2_term):
-        """Gradient of loss function to improve model optimization."""
+        """Loss function and its gradient for likelihood of gp given a noise model."""
         gp_corrector.gp.set_parameter_vector(params)
         noise_model = self._solve_weights(design_matrix, gp_corrector, l2_term=l2_term)
-        return -gp_corrector.gp.grad_log_likelihood(self.raw_lc.flux - noise_model)[1]
+        ll, gll = gp_corrector.gp.grad_log_likelihood(self.raw_lc.flux - noise_model)
+        return -ll, -gll
 
     def optimize(self, design_matrix, gp_corrector, l2_term, method="L-BFGS-B"):
         """Function to optimize GP hyperparameters simultaneously with fitting
@@ -321,9 +315,9 @@ class PLDCorrector(Corrector):
         self.optimized = True
 
         # find a maximum-likelihood solution
-        self.solution = minimize(self._neg_log_like, gp_corrector.gp.get_parameter_vector(),
+        self.solution = minimize(self._grad_neg_log_like, gp_corrector.gp.get_parameter_vector(),
                                  method=method, bounds=gp_corrector.gp.get_parameter_bounds(),
-                                 jac=self._grad_neg_log_like, args=(design_matrix, gp_corrector, l2_term))
+                                 jac=True, args=(design_matrix, gp_corrector, l2_term))
         # set the GP parameters to the optimization output
         gp_corrector.gp.set_parameter_vector(self.solution.x)
         self.gp_corrector = gp_corrector

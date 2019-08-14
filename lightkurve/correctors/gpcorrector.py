@@ -1,3 +1,5 @@
+"""Defines the `GPCorrector` for Gaussian Process fitting and removal.
+"""
 import celerite
 import numpy as np
 from scipy.optimize import minimize
@@ -10,9 +12,39 @@ from .. import log, MPLSTYLE
 from .. import log
 
 class GPCorrector(Corrector):
-    """
-    Accepted kernels are:
-    "matern32", "shoterm"
+    r"""An object to fit a Gaussian Process (GP) to trends in light curves using
+    the celerite implimentation [1]_.
+
+    Accepted values for kernels are:
+     - `"matern32"`: fits a Matérn-3/2 kernel
+     - `"sho"`: fits a Simple Harmonic Oscillator kernel
+
+    Alternately, a `celerite.terms.Term` object can be passed in a custom kernel.
+    For more information about constructing the kernel, see celerite's
+    documentation.
+
+    References
+    ----------
+    .. [1] Celerite documentation, https://celerite.readthedocs.io/en/stable/
+
+    Parameters
+    ----------
+    lc : Lightkurve.LightCurve object
+        The input `~lightkurve.LightCurve` object
+    kernel : "matern32" or "sho" or celerite.terms.Term object
+        Kernel object to be fit to the light curve. Can be passed in as a string
+        ("matern32" for a Matérn-3/2 or "sho" for a Simple Harmonic Oscillator),
+        or a `celerite.terms.Term` can be passed in as a custom kernel
+    cadence_mask : array-like
+        A mask that will be applied to the cadences prior to constructing the GP
+        model. For example, you can pass a boolean array of length `n_cadences`
+        where `True` means that the cadence will be included in the noise model.
+        You may also pass an array of indices. This option enables signals of
+        interest (e.g. planet transits) to be excluded from the noise model,
+        which will prevent over-fitting. By default, no cadences will be masked.
+    sigma : int
+        Number of sigma above which to remove outliers from the light curve
+        when building the model
     """
     def __init__(self, lc, kernel="matern32", cadence_mask=None, sigma=5):
         log.debug('Initializing')
@@ -21,43 +53,62 @@ class GPCorrector(Corrector):
             self.lc = lc.remove_nans()
         else:
             self.lc = lc
+
+        # Build cadence mask
         if cadence_mask is None:
             self.cadence_mask = np.ones(len(self.lc.time), dtype=bool)
         else:
             self.cadence_mask = cadence_mask
-        self.diag = np.copy(self.lc.flux_err)
+
+        # Add outliers to cadence mask
         self._bad_cadences = np.copy(~self.cadence_mask)
         self._bad_cadences |= self.lc.flatten().remove_outliers(sigma=sigma, return_mask=True)[1]
+        self.diag = np.copy(self.lc.flux_err)
         self.diag[self._bad_cadences] *= 1e10  # This is faster than masking out flux values during the predict step
 
+        # Store the unmasked light curve to fit later
         self._unmasked_lc = self.lc.copy()
         self._unmasked_diag = np.copy(self.diag)
 
+        # Mask outlier cadences
         self.lc = self.lc[~self._bad_cadences]
         self.diag = self.diag[~self._bad_cadences]
 
+        # Build the kernel
         log.debug("Building kernels")
-
         if isinstance(kernel, celerite.terms.Term):
             self.kernel = kernel
         else:
             kernel_str = validate_method(kernel, ["matern32", "sho"])
             self.kernel = self._build_kernel(kernel_str)
 
+        # Compute the GP
         log.debug("Built kernels")
-
-
         self.gp = celerite.GP(self.kernel, mean=np.nanmean(self.lc.flux), fit_mean=True)
         self.gp.compute(self.lc.time, self.diag)
         self.initial_kernel = self.kernel
         self.optimized = False
-        # self.diagnostic_lightcurves = self._predict_lightcurves(propagate_errors=False)
-
 
     def _build_matern32_kernel(self, matern_bounds=None, jitter_bounds=None):
+        """Helper function to construct the Matérn-3/2 kernel and set its starting
+        values and bounds.
+
+        Parameters
+        ----------
+        matern_bounds : dict
+            Bounds for the Matern-3/2 kernel parameters (`log_sigma`, and
+            `log_rho`)
+        jitter_bounds : dict
+            Bounds for the parameters of the jitter component of the kernel
+            (`log_sigma`)
+
+        Returns
+        -------
+        kernel : celerite.terms.Term
+            Celerite kernel object (`celerite.terms.Term`)
+        """
         log.debug('Building Matern3/2 Kernel')
         log_sigma = np.log(np.nanstd(self.lc.flux))
-        # log_rho = np.log(self.lc.normalize().to_periodogram(minimum_period=0.5, maximum_period=50).period_at_max_power.value)
         log_rho = np.log(50.)
         log_sigma2 = np.log(np.nanmedian(self.lc.flux_err))
         log.debug('Created starting guesses')
@@ -78,6 +129,23 @@ class GPCorrector(Corrector):
         return kernel
 
     def _build_sho_kernel(self, sho_bounds=None, jitter_bounds=None):
+        """Helper function to construct the Simple Harmonic Oscillator kernel
+        and set its starting values and bounds.
+
+        Parameters
+        ----------
+        sho_bounds : dict
+            Bounds for the Simple Harmonic Oscillator kernel parameters
+            (`log_omega0`, `logS0`, and `logQ`)
+        jitter_bounds : dict
+            Bounds for the parameters of the jitter component of the kernel
+            (`log_sigma`)
+
+        Returns
+        -------
+        kernel : celerite.terms.Term
+            Celerite kernel object (`celerite.terms.Term`)
+        """
         log.debug('Building SHO Kernel')
         log_omega0 = np.log(2*np.pi / self.lc.normalize().to_periodogram(minimum_period=0.5, maximum_period=50).period_at_max_power.value)
         log_S0 = np.log(np.nanstd(self.lc.flux)**2)
@@ -105,6 +173,16 @@ class GPCorrector(Corrector):
     def _build_kernel(self, kernel_str="matern32"):
         """Returns a `celerite.terms.Term` object with reasonable initialization
         values.
+
+        Parameters
+        ----------
+        kernel_str : str
+            "matern32" for a Matérn-3/2 or "sho" for a Simple Harmonic Oscillator
+
+        Returns
+        -------
+        kernel : celerite.terms.Term
+            Celerite kernel object (`celerite.terms.Term`)
         """
         self.kernel_str = kernel_str
         if kernel_str == "matern32":
@@ -113,19 +191,30 @@ class GPCorrector(Corrector):
             kernel = self._build_sho_kernel()
         return kernel
 
-    def _neg_log_like(self, params, y):
-        self.gp.set_parameter_vector(params)
-        return -self.gp.log_likelihood(y)
-
     def _grad_neg_log_like(self, params, y):
+        """Loss function and its gradient for likelihood of gp given a light curve."""
         self.gp.set_parameter_vector(params)
-        return -self.gp.grad_log_likelihood(y)[1]
+        ll, gll = self.gp.grad_log_likelihood(y)
+        return -ll, -gll
 
     def optimize(self, method="L-BFGS-B"):
+        """Function to optimize GP hyperparameters.
+
+        Parameters
+        ----------
+        method : str
+            Optimization method passed into `scipy.optimize.minimize`, default of
+            "L-BFGS-B"
+
+        Returns
+        -------
+        solution : scipy.optimize.optimize.OptimizeResult
+            Output of optimizer
+        """
         log.debug('Optimizing')
-        solution = minimize(self._neg_log_like, self.gp.get_parameter_vector(),
+        solution = minimize(self._grad_neg_log_like, self.gp.get_parameter_vector(),
                             method=method, bounds=self.gp.get_parameter_bounds(),
-                            jac=self._grad_neg_log_like, args=(self.lc.flux))
+                            jac=True, args=(self.lc.flux))
         self.optimized = True
         log.debug('Optimized')
         self.gp.set_parameter_vector(solution.x)
@@ -134,6 +223,20 @@ class GPCorrector(Corrector):
         return solution
 
     def _predict_lightcurves(self, propagate_errors=False):
+        """Returns dictonary of light curves.
+
+        Parameters
+        ----------
+        propagate_errors : bool
+            Boolean to optionally predict variance of the GP to probabilisticly
+            estimate errors.
+
+        Returns
+        -------
+        lightcurves : dict
+            Dictionary of `~lightkurve.LightCurve` objects including
+            `corrected_lc` and `gp_lc`
+        """
         log.debug('Predicting...')
         self.gp.compute(self._unmasked_lc.time, self._unmasked_diag)
         if propagate_errors:
@@ -163,23 +266,41 @@ class GPCorrector(Corrector):
                 'gp': gp_lc}
 
     def correct(self, propagate_errors=False):
+        """Returns a `lightkurve.LightCurve` object with GP model for long-term
+        trend removed.
+
+        Parameters
+        ----------
+        propagate_errors : bool
+            Boolean to optionally predict variance of the GP to probabilisticly
+            estimate errors.
+
+        Returns
+        -------
+        corrected_lc : lightkurve.LightCurve object
+            A `~lightkurve.LightCurve` object with the long-term trend subtracted
+            from the flux array
+        """
         self.optimize()
         self.diagnostic_lightcurves = self._predict_lightcurves(propagate_errors=propagate_errors)
         return self.diagnostic_lightcurves['corrected']
 
-    def diagnose(self, ax=None, propagate_errors=False):
+    def diagnose(self, ax=None, propagate_errors=False, **kwargs):
         """Show a diagnostic plot of the GP. Returns a matplotlib.pyplot.axes object.
 
         Parameters
         ----------
         ax : matplotlib.pyplot.axes object, default None
             Plot window to use
+        propagate_errors : bool
+            Boolean to optionally predict variance of the GP to probabilisticly
+            estimate errors.
         kwargs: dict
             Keywords to pass to matplotlib.pyplot
 
         Returns
         -------
-        ax : matplotlib.pyplot.axes object, default None
+        ax : matplotlib.pyplot.axes object
         """
         with plt.style.context(MPLSTYLE):
             if ax is None:
@@ -205,25 +326,42 @@ class GPCorrector(Corrector):
             plt.tight_layout()
         return ax
 
-    def plot_distributions(self):
-        """ """
-        start = self.init_vals
-        if self.kernel_str == 'matern32':
-            finish = {'log_sigma':self.solution.x[0], 'log_rho':self.solution.x[1], 'log_sigma2':self.solution.x[2]}
-            self.init_jitter_bounds['log_sigma2'] = self.init_jitter_bounds.pop('log_sigma')
-            bounds = {**self.init_matern_bounds, **self.init_jitter_bounds}
-        elif self.kernel_str == 'sho':
-            finish = {'log_omega0':self.solution.x[0], 'log_S0':self.solution.x[1], 'log_Q':self.solution.x[2], 'log_sigma': self.solution.x[3]}
-            bounds = {**self.init_sho_bounds, **self.init_jitter_bounds}
+    def plot_distributions(self, ax=None, **kwargs):
+        """Show a diagnostic plot to visualize the effect of optimization on the
+        value of GP hyperparameters. Only works for default kernel options
+        ("mater32" or "sho").
 
+        Parameters
+        ----------
+        ax : matplotlib.pyplot.axes object, default None
+            Plot window to use
+        kwargs: dict
+            Keywords to pass to matplotlib.pyplot
+
+        Returns
+        -------
+        ax : matplotlib.pyplot.axes object
+        """
         with plt.style.context(MPLSTYLE):
-            fig, ax = plt.subplots(1, len(bounds), figsize=(15,3))
-            for i, thing in enumerate(bounds):
-                ax[i].set_title(thing)
-                ax[i].set_yticks([])
-                ax[i].axvline(bounds[str(thing)][0], c='b', label='Bounds', lw=3)
-                ax[i].axvline(bounds[str(thing)][1], c='b', lw=3)
-                ax[i].axvline(start[str(thing)], c='k', label='Initial Guess', lw=2)
-                ax[i].axvline(finish[str(thing)], c='r', label='Solution', lw=2)
+            if ax is None:
+                _, ax = plt.subplots()
+            start = self.init_vals
+            if self.kernel_str == 'matern32':
+                finish = {'log_sigma':self.solution.x[0], 'log_rho':self.solution.x[1], 'log_sigma2':self.solution.x[2]}
+                self.init_jitter_bounds['log_sigma2'] = self.init_jitter_bounds.pop('log_sigma')
+                bounds = {**self.init_matern_bounds, **self.init_jitter_bounds}
+            elif self.kernel_str == 'sho':
+                finish = {'log_omega0':self.solution.x[0], 'log_S0':self.solution.x[1], 'log_Q':self.solution.x[2], 'log_sigma': self.solution.x[3]}
+                bounds = {**self.init_sho_bounds, **self.init_jitter_bounds}
+
+            with plt.style.context(MPLSTYLE):
+                fig, ax = plt.subplots(1, len(bounds), figsize=(15,3))
+                for i, thing in enumerate(bounds):
+                    ax[i].set_title(thing)
+                    ax[i].set_yticks([])
+                    ax[i].axvline(bounds[str(thing)][0], c='b', label='Bounds', lw=3)
+                    ax[i].axvline(bounds[str(thing)][1], c='b', lw=3)
+                    ax[i].axvline(start[str(thing)], c='k', label='Initial Guess', lw=2)
+                    ax[i].axvline(finish[str(thing)], c='r', label='Solution', lw=2)
 
         return ax
