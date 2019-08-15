@@ -369,12 +369,11 @@ class GPCorrector(Corrector):
         return ax
 
     def _fetch_bounds_dict(self):
-        """ """
+        """Returns dictionary of initial GP hyperparameter bounds."""
         if self.kernel_str == 'matern32':
             jitter = {}
             jitter['log_sigma2'] = self.init_jitter_bounds['log_sigma']
             bounds = {**self.init_matern_bounds, **jitter}
         elif self.kernel_str == 'sho':
             bounds = {**self.init_sho_bounds, **self.init_jitter_bounds}
-
         return bounds
