@@ -1210,11 +1210,11 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 ext_info["TFORM{}".format(m)] = '{}E'.format(size[0] * size[1])
                 ext_info['TDIM{}'.format(m)] = '({},{})'.format(size[0], size[1])
             # Compute location of TPF lower left corner
-            # Int statement contains modulus so that .5 values always round up.
-            # We cannot use numpy.round() as it rounds to the even number.
+            # Int statement contains modulus so that .5 values always round down.
 
-            half_tpfsize_col = int((size[0] - 1) / 2.) + round(column) - int(column)
-            half_tpfsize_row = int((size[1] - 1) / 2.) + round(row) - int(row)
+            half_tpfsize_col = int((size[0] - 1) / 2.) + int(round(column)) - int(column)
+            half_tpfsize_row = int((size[1] - 1) / 2.) + int(round(row)) - int(row)
+            print(int((size[0] - 1) / 2.), round(column), int(column))
 
             ext_info['1CRV{}P'.format(m)] = round(column) - half_tpfsize_col + factory.keywords['CRVAL1P'] 
             ext_info['2CRV{}P'.format(m)] = round(row) - half_tpfsize_row + factory.keywords['CRVAL2P']
