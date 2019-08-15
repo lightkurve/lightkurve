@@ -84,7 +84,7 @@ class GPCorrector(Corrector):
 
         # Compute the GP
         log.debug("Built kernels")
-        self.gp = celerite.GP(self.kernel, mean=np.nanmean(self.lc.flux), fit_mean=True)
+        self.gp = celerite.GP(self.kernel, mean=np.nanmean(self.lc.flux))#, fit_mean=True)
         self.gp.compute(self.lc.time, self.diag)
         self.initial_kernel = self.kernel
         self.optimized = False
@@ -195,6 +195,12 @@ class GPCorrector(Corrector):
         """Loss function and its gradient for likelihood of gp given a light curve."""
         self.gp.set_parameter_vector(params)
         ll, gll = self.gp.grad_log_likelihood(y)
+        # Enforce bounds
+        bounds = self._fetch_bounds_dict()
+        for i, param in enumerate(params):
+            bound_vals = list(bounds.values())[i]
+            if param < bound_vals[0] or param > bound_vals[1]:
+                return 1e25
         return -ll, -gll
 
     def optimize(self, method="L-BFGS-B"):
@@ -222,7 +228,7 @@ class GPCorrector(Corrector):
         self.solution = solution
         return solution
 
-    def _predict_lightcurves(self, propagate_errors=False):
+    def get_diagnostic_lightcurves(self, propagate_errors=False):
         """Returns dictonary of light curves.
 
         Parameters
@@ -282,7 +288,7 @@ class GPCorrector(Corrector):
             from the flux array
         """
         self.optimize()
-        self.diagnostic_lightcurves = self._predict_lightcurves(propagate_errors=propagate_errors)
+        self.diagnostic_lightcurves = self.get_diagnostic_lightcurves(propagate_errors=propagate_errors)
         return self.diagnostic_lightcurves['corrected']
 
     def diagnose(self, ax=None, propagate_errors=False, **kwargs):
@@ -342,26 +348,33 @@ class GPCorrector(Corrector):
         -------
         ax : matplotlib.pyplot.axes object
         """
+        start = self.init_vals
+        bounds = self._fetch_bounds_dict()
+        if self.kernel_str == 'matern32':
+            finish = {'log_sigma':self.solution.x[0], 'log_rho':self.solution.x[1], 'log_sigma2':self.solution.x[2]}
+        elif self.kernel_str == 'sho':
+            finish = {'log_omega0':self.solution.x[0], 'log_S0':self.solution.x[1], 'log_Q':self.solution.x[2], 'log_sigma': self.solution.x[3]}
+
         with plt.style.context(MPLSTYLE):
             if ax is None:
-                _, ax = plt.subplots()
-            start = self.init_vals
-            if self.kernel_str == 'matern32':
-                finish = {'log_sigma':self.solution.x[0], 'log_rho':self.solution.x[1], 'log_sigma2':self.solution.x[2]}
-                self.init_jitter_bounds['log_sigma2'] = self.init_jitter_bounds.pop('log_sigma')
-                bounds = {**self.init_matern_bounds, **self.init_jitter_bounds}
-            elif self.kernel_str == 'sho':
-                finish = {'log_omega0':self.solution.x[0], 'log_S0':self.solution.x[1], 'log_Q':self.solution.x[2], 'log_sigma': self.solution.x[3]}
-                bounds = {**self.init_sho_bounds, **self.init_jitter_bounds}
-
-            with plt.style.context(MPLSTYLE):
-                fig, ax = plt.subplots(1, len(bounds), figsize=(15,3))
-                for i, thing in enumerate(bounds):
-                    ax[i].set_title(thing)
-                    ax[i].set_yticks([])
-                    ax[i].axvline(bounds[str(thing)][0], c='b', label='Bounds', lw=3)
-                    ax[i].axvline(bounds[str(thing)][1], c='b', lw=3)
-                    ax[i].axvline(start[str(thing)], c='k', label='Initial Guess', lw=2)
-                    ax[i].axvline(finish[str(thing)], c='r', label='Solution', lw=2)
+                _, ax = plt.subplots(1, len(bounds), figsize=(15,3))
+            for i, param in enumerate(bounds):
+                ax[i].set_title(param)
+                ax[i].set_yticks([])
+                ax[i].axvline(bounds[str(param)][0], c='b', label='Bounds', lw=3)
+                ax[i].axvline(bounds[str(param)][1], c='b', lw=3)
+                ax[i].axvline(start[str(param)], c='k', label='Initial Guess', lw=2)
+                ax[i].axvline(finish[str(param)], c='r', label='Solution', lw=2)
 
         return ax
+
+    def _fetch_bounds_dict(self):
+        """ """
+        if self.kernel_str == 'matern32':
+            jitter = {}
+            jitter['log_sigma2'] = self.init_jitter_bounds['log_sigma']
+            bounds = {**self.init_matern_bounds, **jitter}
+        elif self.kernel_str == 'sho':
+            bounds = {**self.init_sho_bounds, **self.init_jitter_bounds}
+
+        return bounds
