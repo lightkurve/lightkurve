@@ -275,6 +275,10 @@ def test_plot_echelle():
     butler.plot_echelle(deltanu=deltanu, numax=numax)
     butler.plot_echelle(u.Quantity(deltanu, 1/u.day), numax)
 
+    # Assert accepts dimensionless input
+    butler.plot_echelle(deltanu=deltanu.value*1.001, numax=numax)
+    butler.plot_echelle(deltanu=deltanu, numax=numax.value/1.001)
+
     # Assert echelle works with numax
     butler.plot_echelle(deltanu, numax)
     butler.plot_echelle(deltanu, u.Quantity(numax, 1/u.day))
