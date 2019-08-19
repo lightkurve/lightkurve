@@ -120,7 +120,7 @@ class LightCurve(object):
         return self.__add__(other)
 
     def __sub__(self, other):
-        return self.__add__(-other)
+        return self.__add__(-1*other)
 
     def __rsub__(self, other):
         copy_self = copy.copy(self)
