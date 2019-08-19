@@ -1211,7 +1211,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 ext_info['TDIM{}'.format(m)] = '({},{})'.format(size[0], size[1])
             # Compute the distance from the star to the TPF lower left corner
             # That is approximately half the TPF size, with an adjustment factor if the star's pixel
-            # position gets rounded up or not. 
+            #    position gets rounded up or not.
             # The first int is there so that even sizes always round to one less than half of their value
 
             half_tpfsize_col = int((size[0] - 1) / 2.) + (int(round(column)) - int(column)) * ((size[0] + 1) % 2)
