@@ -143,7 +143,11 @@ class Seismology(object):
             The matplotlib axes object.
         """
         numax = self._validate_numax(numax)
+        if not hasattr(numax, 'unit'):
+            numax = numax * self.periodogram.frequency.unit
         deltanu = self._validate_deltanu(deltanu)
+        if not hasattr(deltanu, 'unit'):
+            deltanu = deltanu * self.periodogram.frequency.unit
 
         if smooth_filter_width:
             pgsmooth = self.periodogram.smooth(filter_width=smooth_filter_width)
