@@ -67,7 +67,7 @@ class Seismology(object):
             tray_str = " - no values have been computed so far."
         else:
             tray_str = " - computed values:\n * " + "\n * ".join([getattr(self, attr).__repr__() for attr in attrs[tray]])
-        return 'Seismology(ID: {}){}'.format(self.periodogram.targetid, tray_str)
+        return 'Seismology(Source: {}){}'.format(self.periodogram.label, tray_str)
 
     @staticmethod
     def from_lightcurve(lc, **kwargs):
