@@ -400,43 +400,6 @@ def test_tpf_wcs_from_images():
     assert tpf.hdu[1].header['2CUNI5'] == 'deg'
     assert tpf.wcs.to_header()['CDELT1'] == w.wcs.cdelt[0]
 
-def test_tpf_wcs_from_images():
-    """Test to see if tpf.from_fits_images() output a tpf with WCS in the header"""
-    # Not without a wcs...
-    with pytest.raises(Exception):
-        KeplerTargetPixelFile.from_fits_images(images, size=(3, 3),
-                                               position=SkyCoord(-234.75, 8.3393, unit='deg'))
-
-    # Make a fake WCS based on astropy.docs...
-    w = wcs.WCS(naxis=2)
-    w.wcs.crpix = [0., 0.]
-    w.wcs.cdelt = np.array([0.001111, 0.001111])
-    w.wcs.crval = [23.2334, 45.2333]
-    w.wcs.ctype = ["RA---TAN", "DEC--TAN"]
-    header = w.to_header()
-    header['CRVAL1P'] = 10
-    header['CRVAL2P'] = 20
-    ra, dec = 23.2336, 45.235
-
-    # Add that header to our images...
-    images = []
-    for i in range(5):
-        header['TSTART'] = i
-        header['TSTOP'] = i + 1
-        images.append(fits.ImageHDU(data=np.ones((5, 5)), header=header))
-
-    # Now this should work.
-    tpf = KeplerTargetPixelFile.from_fits_images(_create_image_array(header=header), size=(3, 3),
-                                                 position=SkyCoord(ra, dec, unit=(u.deg, u.deg)))
-    assert tpf.hdu[1].header['1CRPX5'] != UNDEFINED
-    assert tpf.hdu[1].header['1CTYP5'] == 'RA---TAN'
-    assert tpf.hdu[1].header['2CTYP5'] == 'DEC--TAN'
-    assert tpf.hdu[1].header['1CRPX5'] != UNDEFINED
-    assert tpf.hdu[1].header['2CRPX5'] != UNDEFINED
-    assert tpf.hdu[1].header['1CUNI5'] == 'deg'
-    assert tpf.hdu[1].header['2CUNI5'] == 'deg'
-    assert tpf.wcs.to_header()['CDELT1'] == w.wcs.cdelt[0]
-
 def test_properties2(capfd):
     '''Test if the describe function produces an output.
     The output is 1870 characters at the moment, but we might add more properties.'''
