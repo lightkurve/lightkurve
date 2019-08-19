@@ -401,7 +401,7 @@ class Periodogram(object):
         return copy.deepcopy(self)
 
     def __repr__(self):
-        return('Periodogram(Source: {})'.format(self.label))
+        return('Periodogram(ID: {})'.format(self.label))
 
     def __getitem__(self, key):
         copy_self = self.copy()
@@ -538,7 +538,7 @@ class SNRPeriodogram(Periodogram):
         super(SNRPeriodogram, self).__init__(*args, **kwargs)
 
     def __repr__(self):
-        return('SNRPeriodogram(Source: {})'.format(self.label))
+        return('SNRPeriodogram(ID: {})'.format(self.label))
 
     def plot(self, **kwargs):
         """Plot the SNR spectrum using matplotlib's `plot` method.
@@ -570,8 +570,8 @@ class LombScarglePeriodogram(Periodogram):
         super(LombScarglePeriodogram, self).__init__(*args, **kwargs)
 
     def __repr__(self):
-        return('LombScarglePeriodogram(Source: {})'.format(self.label))
-        
+        return('LombScarglePeriodogram(ID: {})'.format(self.label))
+
 
     @staticmethod
     def from_lightcurve(lc, minimum_frequency=None, maximum_frequency=None,
@@ -908,7 +908,7 @@ class BoxLeastSquaresPeriodogram(Periodogram):
         super(BoxLeastSquaresPeriodogram, self).__init__(*args, **kwargs)
 
     def __repr__(self):
-        return('BoxLeastSquaresPeriodogram(Source: {})'.format(self.label))
+        return('BoxLeastSquaresPeriodogram(ID: {})'.format(self.label))
 
     @staticmethod
     def from_lightcurve(lc, **kwargs):
