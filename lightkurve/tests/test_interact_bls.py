@@ -1,7 +1,5 @@
 """Tests the features of the lightkurve.interact_bls module."""
 import pytest
-import sys
-import numpy as np
 
 from ..lightcurvefile import KeplerLightCurveFile, TessLightCurveFile
 from .test_lightcurve import KEPLER10, TESS_SIM
@@ -63,9 +61,9 @@ def test_helper_functions():
     f_help = prepare_f_help_source(lc.fold(1))
     bls_help = prepare_bls_help_source(bls_source, 1)
 
-    fig_lc = make_lightcurve_figure_elements(lc, lc, lc_source, lc_source, lc_help)
-    fig_fold = make_folded_figure_elements(lc.fold(1), lc.fold(1), f_source, f_source, f_help)
-    fig_bls = make_bls_figure_elements(result, bls_source, bls_help)
+    make_lightcurve_figure_elements(lc, lc, lc_source, lc_source, lc_help)
+    make_folded_figure_elements(lc.fold(1), lc.fold(1), f_source, f_source, f_help)
+    make_bls_figure_elements(result, bls_source, bls_help)
 
 @pytest.mark.remote_data
 @pytest.mark.skipif(bad_optional_imports,
@@ -74,10 +72,10 @@ def test_full_widget():
     '''Test if we can run the widget with the keywords'''
     lcf = KeplerLightCurveFile(KEPLER10)
     lc = lcf.PDCSAP_FLUX.normalize().remove_nans().flatten()
-    result = lc.interact_bls()
-    result = lc.interact_bls(minimum_period=4)
-    result = lc.interact_bls(maximum_period=5)
-    result = lc.interact_bls(resolution=1000)
+    lc.interact_bls()
+    lc.interact_bls(minimum_period=4)
+    lc.interact_bls(maximum_period=5)
+    lc.interact_bls(resolution=1000)
 
 @pytest.mark.remote_data
 @pytest.mark.skipif(bad_optional_imports,
@@ -86,7 +84,7 @@ def test_tess_widget():
     '''Test if we can run the widget with the keywords'''
     lcf = TessLightCurveFile(TESS_SIM)
     lc = lcf.PDCSAP_FLUX.normalize().remove_nans().flatten()
-    result = lc.interact_bls()
-    result = lc.interact_bls(minimum_period=4)
-    result = lc.interact_bls(maximum_period=5)
-    result = lc.interact_bls(resolution=1000)
+    lc.interact_bls()
+    lc.interact_bls(minimum_period=4)
+    lc.interact_bls(maximum_period=5)
+    lc.interact_bls(resolution=1000)

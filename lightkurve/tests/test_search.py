@@ -6,12 +6,10 @@ with the `@pytest.mark.remote_data` decorator below will only run if the
 if no internet connection is available.
 """
 import os
-import sys
 import pytest
 import numpy as np
 from numpy.testing import assert_almost_equal, assert_array_equal
 import tempfile
-import warnings
 
 from astropy.coordinates import SkyCoord
 import astropy.units as u
@@ -20,7 +18,6 @@ from astropy.table import Table
 from ..utils import LightkurveWarning
 from ..search import search_lightcurvefile, search_targetpixelfile, \
                      search_tesscut, SearchResult, SearchError, open
-from .. import KeplerLightCurveFile
 from .. import KeplerTargetPixelFile, TessTargetPixelFile, TargetPixelFileCollection
 
 from .. import PACKAGEDIR
@@ -115,7 +112,7 @@ def test_search_tesscut():
 def test_search_tesscut_download():
     """Can we download TESS cutouts via `search_cutout().download()?"""
     ra, dec = 30.578761, -83.210593
-    search_string = search_tesscut('{}, {}'.format(ra, dec))
+    search_string = search_tesscut('{}, {}'.format(ra, dec), sector=[1, 12])
     # Make sure they can be downloaded with default size
     tpf = search_string.download()
     # Ensure the correct object has been read in
@@ -249,7 +246,7 @@ def test_issue_472():
     # observed in Sector 2; we're expecting an empty SearchResult instead.
     search = search_tesscut("TIC41336498", sector=2)
     assert isinstance(search, SearchResult)
-    len(search) == 0
+    assert len(search) == 0
 
 
 @pytest.mark.remote_data

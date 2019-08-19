@@ -10,8 +10,8 @@ from astropy.units import cds
 
 from .. import MPLSTYLE
 from . import utils, stellar_estimators
-from ..periodogram import LombScarglePeriodogram, SNRPeriodogram
-from ..utils import LightkurveWarning
+from ..periodogram import SNRPeriodogram
+from ..utils import LightkurveWarning, validate_method
 
 log = logging.getLogger(__name__)
 
@@ -76,14 +76,6 @@ class Seismology(object):
                  "uses default periodogram parameters. For further tuneability, "
                  "create a periodogram object first, using `to_periodogram`.")
         return Seismology(periodogram=lc.normalize().remove_nans().fill_gaps().to_periodogram(**kwargs).flatten())
-
-    def _validate_method(self, method, supported_methods):
-        """Raises ValueError if a method is not supported."""
-        method = method.lower()
-        if method in supported_methods:
-            return method
-        raise ValueError("method {} is not supported; "
-                         "must be one of {}".format(method, supported_methods))
 
     def _validate_numax(self, numax):
         """Raises exception if `numax` is None and `self.numax` is not set."""
@@ -281,7 +273,7 @@ class Seismology(object):
         numax : `~lightkurve.seismology.SeismologyQuantity`
             Numax of the periodogram, including details on the units and method.
         """
-        method = self._validate_method(method, supported_methods=["acf2d"])
+        method = validate_method(method, supported_methods=["acf2d"])
         if method == "acf2d":
             from .numax_estimators import estimate_numax_acf2d
             result = estimate_numax_acf2d(self.periodogram, **kwargs)
@@ -314,7 +306,7 @@ class Seismology(object):
         deltanu : `~lightkurve.seismology.SeismologyQuantity`
             DeltaNu of the periodogram, including details on the units and method.
         """
-        method = self._validate_method(method, supported_methods=["acf2d"])
+        method = validate_method(method, supported_methods=["acf2d"])
         numax = self._validate_numax(numax)
 
         if method == "acf2d":

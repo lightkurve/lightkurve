@@ -55,7 +55,7 @@ def test_lc_nan_time():
     time = np.array([1, 2, 3, np.nan])
     flux = np.array([1, 2, 3, 4])
     with pytest.warns(LightkurveWarning, match='contains NaN times'):
-        lc = LightCurve(time=time, flux=flux)
+        LightCurve(time=time, flux=flux)
 
 
 def test_math_operators():
@@ -328,6 +328,8 @@ def test_lightcurve_plots():
     for lcf in [KeplerLightCurveFile(TABBY_Q8), TessLightCurveFile(TESS_SIM)]:
         lcf.plot()
         lcf.plot(flux_types=['SAP_FLUX', 'PDCSAP_FLUX'])
+        lcf.scatter()
+        lcf.errorbar()
         lcf.SAP_FLUX.plot()
         lcf.SAP_FLUX.plot(normalize=False, title="Not the default")
         lcf.SAP_FLUX.scatter()
@@ -484,7 +486,7 @@ def test_to_fits():
     """Test the KeplerLightCurve.to_fits() method"""
     lcf = KeplerLightCurveFile(TABBY_Q8)
     hdu = lcf.PDCSAP_FLUX.to_fits()
-    lcf_new = KeplerLightCurveFile(hdu)  # Regression test for #233
+    KeplerLightCurveFile(hdu)  # Regression test for #233
     assert type(hdu).__name__ is 'HDUList'
     assert len(hdu) == 2
     assert hdu[0].header['EXTNAME'] == 'PRIMARY'
@@ -509,6 +511,9 @@ def test_to_fits():
 
         lc = tpf.to_lightcurve(aperture_mask=random_mask)
         lc.to_fits(path=tempfile.NamedTemporaryFile().name, aperture_mask=random_mask)
+
+        lc.to_fits(path=tempfile.NamedTemporaryFile().name, overwrite=True,
+                  flux_column_name='SAP_FLUX')
 
         lc = tpf[0:2].to_lightcurve(aperture_mask=thresh_mask)
         lc.to_fits(aperture_mask=thresh_mask, path=tempfile.NamedTemporaryFile().name)
@@ -643,7 +648,7 @@ def test_properties(capfd):
     lcf = KeplerLightCurveFile(TABBY_Q8)
     kplc = lcf.get_lightcurve('SAP_FLUX')
     kplc.show_properties()
-    out, err = capfd.readouterr()
+    out, _ = capfd.readouterr()
     assert len(out) > 500
 
 

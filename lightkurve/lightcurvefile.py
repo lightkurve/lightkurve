@@ -2,7 +2,6 @@
 
 from __future__ import division, print_function
 
-import os
 import logging
 import warnings
 
@@ -91,20 +90,14 @@ class LightCurveFile(object):
             quality_vector = np.zeros(len(self.hdu[1].data['TIME']))
         return quality_vector
 
+    def _create_plot(self, method='plot', flux_types=None, style='lightkurve',
+                     **kwargs):
+        """Implements `plot()`, `scatter()`, and `errorbar()` to avoid code duplication.
 
-    def plot(self, flux_types=None, style='lightkurve', **kwargs):
-        """Plot all the light curves contained in this light curve file.
-
-        Parameters
-        ----------
-        flux_types : str or list of str
-            List of flux types to plot. Default is to plot all available.
-            (For Kepler the default fluxes are 'SAP_FLUX' and 'PDCSAP_FLUX'.
-        style : str
-            matplotlib.pyplot.style.context, default is 'fast'
-        kwargs : dict
-            Dictionary of keyword arguments to be passed to
-            `KeplerLightCurve.plot()`.
+        Returns
+        -------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            The matplotlib axes object.
         """
         if style is None or style == 'lightkurve':
             style = MPLSTYLE
@@ -119,7 +112,119 @@ class LightCurveFile(object):
             for idx, ft in enumerate(flux_types):
                 lc = self.get_lightcurve(ft)
                 kwargs['color'] = np.asarray(mpl.rcParams['axes.prop_cycle'])[idx]['color']
-                lc.plot(label=ft, **kwargs)
+                if method == 'plot':
+                    lc.plot(label=ft, **kwargs)
+                elif method == 'scatter':
+                    lc.scatter(label=ft, **kwargs)
+                elif method == 'errorbar':
+                    lc.errorbar(label=ft, **kwargs)
+
+
+    def plot(self, flux_types=None, style='lightkurve', **kwargs):
+        """Plot the light curve file using matplotlib's `plot` method.
+
+        Parameters
+        ----------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            A matplotlib axes object to plot into. If no axes is provided,
+            a new one will be generated.
+        flux_types : list or None
+            Which fluxes in the LCF to plot. Default is lcf._flux_types().
+            For Kepler this is PDCSAP and SAP flux. Pass a list to change flux
+            types.
+        normalize : bool
+            Normalize the lightcurve before plotting?
+        xlabel : str
+            Plot x axis label
+        ylabel : str
+            Plot y axis label
+        title : str
+            Plot set_title
+        style : str
+            Path or URL to a matplotlib style file, or name of one of
+            matplotlib's built-in stylesheets (e.g. 'ggplot').
+            Lightkurve's custom stylesheet is used by default.
+        kwargs : dict
+            Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
+
+        Returns
+        -------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            The matplotlib axes object.
+        """
+        return self._create_plot(method='plot', flux_types=flux_types,
+                                 style=style, **kwargs)
+
+
+    def scatter(self, flux_types=None, style='lightkurve', **kwargs):
+        """Plot the light curve file using matplotlib's `scatter` method.
+
+        Parameters
+        ----------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            A matplotlib axes object to plot into. If no axes is provided,
+            a new one will be generated.
+        flux_types : list or None
+            Which fluxes in the LCF to plot. Default is lcf._flux_types().
+            For Kepler this is PDCSAP and SAP flux. Pass a list to change flux
+            types.
+        normalize : bool
+            Normalize the lightcurve before plotting?
+        xlabel : str
+            Plot x axis label
+        ylabel : str
+            Plot y axis label
+        title : str
+            Plot set_title
+        style : str
+            Path or URL to a matplotlib style file, or name of one of
+            matplotlib's built-in stylesheets (e.g. 'ggplot').
+            Lightkurve's custom stylesheet is used by default.
+        kwargs : dict
+            Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
+
+        Returns
+        -------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            The matplotlib axes object.
+        """
+        return self._create_plot(method='scatter', flux_types=flux_types,
+                                 style=style, **kwargs)
+
+    def errorbar(self, flux_types=None, style='lightkurve', **kwargs):
+        """Plot the light curve file using matplotlib's `errorbar` method.
+
+        Parameters
+        ----------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            A matplotlib axes object to plot into. If no axes is provided,
+            a new one will be generated.
+        flux_types : list or None
+            Which fluxes in the LCF to plot. Default is lcf._flux_types().
+            For Kepler this is PDCSAP and SAP flux. Pass a list to change flux
+            types.
+        normalize : bool
+            Normalize the lightcurve before plotting?
+        xlabel : str
+            Plot x axis label
+        ylabel : str
+            Plot y axis label
+        title : str
+            Plot set_title
+        style : str
+            Path or URL to a matplotlib style file, or name of one of
+            matplotlib's built-in stylesheets (e.g. 'ggplot').
+            Lightkurve's custom stylesheet is used by default.
+        kwargs : dict
+            Dictionary of arguments to be passed to `matplotlib.pyplot.plot`.
+
+        Returns
+        -------
+        ax : matplotlib.axes._subplots.AxesSubplot
+            The matplotlib axes object.
+        """
+        return self._create_plot(method='errorbar', flux_types=flux_types,
+                                 style=style, **kwargs)
 
 
 class KeplerLightCurveFile(LightCurveFile):
@@ -202,7 +307,7 @@ class KeplerLightCurveFile(LightCurveFile):
                 fe /= self.hdu[1].header['FLFRCSAP']
                 f /= self.hdu[1].header['CROWDSAP']
                 fe /= self.hdu[1].header['CROWDSAP']
-                
+
             return KeplerLightCurve(
                 time=self.hdu[1].data['TIME'][self.quality_mask],
                 time_format='bkjd',
@@ -270,15 +375,15 @@ class KeplerLightCurveFile(LightCurveFile):
         except KeyError:
             return None
 
-    def compute_cotrended_lightcurve(self, cbvs=[1, 2], **kwargs):
+    def compute_cotrended_lightcurve(self, cbvs=(1, 2), **kwargs):
         """Returns a LightCurve object after cotrending the SAP_FLUX
         against the cotrending basis vectors.
 
         Parameters
         ----------
-        cbvs : list of ints
+        cbvs : tuple or list of ints
             The list of cotrending basis vectors to fit to the data. For example,
-            [1, 2] will fit the first two basis vectors.
+            (1, 2) will fit the first two basis vectors.
         kwargs : dict
             Dictionary of keyword arguments to be passed to
             KeplerCBVCorrector.correct.

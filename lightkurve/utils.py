@@ -522,3 +522,25 @@ def detect_filetype(header):
     # if one of them is Undefined we expect `.lower()` to yield an AttributeError.
     except (KeyError, AttributeError):
         return None
+
+
+def validate_method(method, supported_methods):
+    """Raises a `ValueError` if a method is not supported.
+
+    Parameters
+    ----------
+    method : str
+        The method specified by the user.
+    supported_methods : list of str
+        The methods supported.  All method names must be lowercase.
+
+    Returns
+    -------
+    method : str
+        Will return the method name if it is supported.
+    """
+    method = method.lower()
+    if method in supported_methods:
+        return method
+    raise ValueError("method '{}' is not supported; "
+                     "must be one of {}".format(method, supported_methods))

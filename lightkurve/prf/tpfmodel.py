@@ -290,8 +290,10 @@ class TPFModelParameters(object):
     motion : ``MotionParameters`` object
         Parameters related to the telescope motion.
     """
-    def __init__(self, stars=[], background=BackgroundParameters(),
+    def __init__(self, stars=None, background=BackgroundParameters(),
                  focus=FocusParameters(), motion=MotionParameters()):
+        if stars is None:
+            stars = []
         self.stars = stars
         self.background = background
         self.focus = focus
@@ -402,12 +404,14 @@ class TPFModel(object):
     fit_motion : bool
         If False, the telescope motion parameters will be kept fixed.
     """
-    def __init__(self, star_priors=[],
+    def __init__(self, star_priors=None,
                  background_prior=BackgroundPrior(),
                  focus_prior=FocusPrior(),
                  motion_prior=MotionPrior(),
                  prfmodel=None,
                  fit_background=True, fit_focus=False, fit_motion=False):
+        if star_priors is None:
+            star_priors = []
         if prfmodel is None:
             prfmodel = KeplerPRF(1, shape=(10, 10), column=0, row=0)
         self.star_priors = star_priors
@@ -595,21 +599,17 @@ class TPFModel(object):
         """Plots an image of the model for a given point in the parameter space."""
         fig, ax = plt.subplots(nrows=1, ncols=3, figsize=figsize)
         fit = self.fit(data)
+        extent = (self.prfmodel.column, self.prfmodel.column + self.prfmodel.shape[1],
+                  self.prfmodel.row, self.prfmodel.row + self.prfmodel.shape[0])
         plot_image(data, ax=ax[0],
                    title='Observed Data, Channel: {}'.format(self.prfmodel.channel),
-                   extent=(self.prfmodel.column, self.prfmodel.column + self.prfmodel.shape[1],
-                           self.prfmodel.row, self.prfmodel.row + self.prfmodel.shape[0]),
-                   **kwargs)
+                   extent=extent, **kwargs)
         plot_image(fit.predicted_image, ax=ax[1],
                    title='Predicted Image, Channel: {}'.format(self.prfmodel.channel),
-                   extent=(self.prfmodel.column, self.prfmodel.column + self.prfmodel.shape[1],
-                           self.prfmodel.row, self.prfmodel.row + self.prfmodel.shape[0]),
-                   **kwargs)
+                   extent=extent, **kwargs)
         plot_image(fit.residual_image, ax=ax[2],
                    title='Residual Image, Channel: {}'.format(self.prfmodel.channel),
-                   extent=(self.prfmodel.column, self.prfmodel.column + self.prfmodel.shape[1],
-                           self.prfmodel.row, self.prfmodel.row + self.prfmodel.shape[0]),
-                   **kwargs)
+                   extent=extent, **kwargs)
         return fit
 
 
@@ -645,7 +645,7 @@ class PRFPhotometry(object):
             `model.motion_prior.shift_col` and `model.motion_prior.shift_row`
             for each cadence.
         parallel : boolean
-            If `True`, cadences will be fit in parallel using Python's `multiprocessing` module. 
+            If `True`, cadences will be fit in parallel using Python's `multiprocessing` module.
         """
         if cadences is None:  # By default, fit all cadences.
             cadences = np.arange(len(tpf_flux))
@@ -659,7 +659,7 @@ class PRFPhotometry(object):
             args = zip([self.model]*len(cadences),
                       tpf_flux[cadences],
                        pos_corr1[cadences],
-                       pos_corr2[cadences])            
+                       pos_corr2[cadences])
         # Set up a mapping function
         if parallel:
             import multiprocessing
