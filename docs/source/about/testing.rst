@@ -28,7 +28,7 @@ Note that here we're using the master branch. If you want to run the tests on a 
 
 In this directory you should find several tests labeled `test_xxx.py`. You can run a test using `pytest`. For example, to test the `lightkurve.targetpixelfile` module you would execute::
 
-    pytest test_targetpixelfile.py 
+    pytest test_targetpixelfile.py
 
 
 If the tests are successful, you should see a green success message such as
@@ -65,7 +65,7 @@ If your test fails, don't worry, this is what tests are for. Take a look at the 
 .. image:: https://user-images.githubusercontent.com/14965634/53128031-b396c300-3518-11e9-9083-d12efef46043.png
     :width: 500 px
 
-Underneath, you will then see the traceback of the test that failed. For example, the traceback below shows that there is an `AssertionError`. 
+Underneath, you will then see the traceback of the test that failed. For example, the traceback below shows that there is an `AssertionError`.
 
 .. image:: https://user-images.githubusercontent.com/14965634/53127788-38cda800-3518-11e9-866b-b7eee448041e.png
     :width: 500 px
@@ -78,7 +78,7 @@ However in the traceback we can see that these two arrays are not actually equal
 .. image:: https://user-images.githubusercontent.com/14965634/53128140-ff496c80-3518-11e9-95ca-3c2a06eddad8.png
     :width: 500 px
 
-Use this information to correct the code you're developing until the tests pass. In rare cases (such as the case above) it is the test itself that is incorrect, not the lightkurve code. If you believe there is an error in one of the tests, point it out in your PR for everyone to comment and discuss. 
+Use this information to correct the code you're developing until the tests pass. In rare cases (such as the case above) it is the test itself that is incorrect, not the lightkurve code. If you believe there is an error in one of the tests, point it out in your PR for everyone to comment and discuss.
 
 
 When should I run tests?
@@ -93,9 +93,13 @@ Can I write my own test?
 Ideally, any PR opened to *Lightkurve* with new functionality should include some tests. These tests check that the basic functionality of your PR works. That way, if in future people create new features that break your PR, we will be alerted. Read through the `pytest` documentation and take a look at our existing tests to get an idea of how to write your own.
 
 
-I can't run any tests. 
+I can't run any tests.
 ----------------------
 
-We run our unit tests using `pytest`. This should have been installed when you installed *Lightkurve*. However, if your tests don't run, you may want to check all the test dependencies are installed by running::
+We run our unit tests using `pytest`. This should have been installed when you installed *Lightkurve*. However, if your tests don't run, you may want to check all the test dependencies are installed by running (with `pip`)::
 
     pip install pytest pytest-cov pytest-remotedata
+
+or equivalently if you are managing your Python environment using `conda`::
+
+    conda install pytest pytest-cov pytest-remotedata
