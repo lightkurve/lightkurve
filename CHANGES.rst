@@ -1,3 +1,28 @@
+1.1.1 (2019-08-19)
+==================
+
+- Changed `search_targetpixelfile()` and `search_lightcurvefile()` to emit a
+  helpful warning if an ambigous target identifier is used, i.e. if a number is
+  entered in the range where the K2 EPIC and TESS TIC catalogs overlap. [#558]
+
+- Changed `TargetPixelFile.plot()` to always display the cadence number. [#562]
+
+- Changed `TargetPixelFile.interact()` to store light curves created using the
+  tool in the `SAP_FLUX` column rather than the `FLUX` column of the new light
+  curve file, for consistency with pipeline products. [#559]
+
+- Added `scatter()` and `errorbar()` methods to the `LightCurveFile` class to make
+  it consistent with the plotting methods provided by `LightCurve` objects. [#382]
+
+- Fixed a bug in `KeplerTargetPixelFile.from_fits_images()` to ensure the correct
+  pixels are selected in cutout mode. [#571]
+
+- Fixed a series of minor documentation and code quality issues to enable
+  Lightkurve to receive the "code quality A" certification by codacy.com.
+  [#557, #560, #564, #565, #566, #568, #573, #574, #575]
+
+
+
 1.1.0 (2019-07-19)
 ==================
 
