@@ -1317,8 +1317,8 @@ class LightCurve(object):
                 cols.append(fits.Column(name=flux_column_name, format='E',
                                         unit='counts', array=self.flux))
             if 'flux_err' in dir(self):
-                if ~np.asarray(['FLUX_ERR' in k.upper() for k in extra_data.keys()]).any():
-                    cols.append(fits.Column(name='FLUX_ERR', format='E',
+                if ~np.asarray([flux_column_name.lower() + '_err' in k.upper() for k in extra_data.keys()]).any():
+                    cols.append(fits.Column(name=flux_column_name.lower() + '_err', format='E',
                                             unit='counts', array=self.flux_err))
             if 'cadenceno' in dir(self):
                 if ~np.asarray(['CADENCENO' in k.upper() for k in extra_data.keys()]).any():
@@ -1581,7 +1581,9 @@ class KeplerLightCurve(LightCurve):
             'DEC_OBJ': self.dec,
             'EQUINOX': 2000,
             'DATE-OBS': Time(self.time[0]+2454833., format=('jd')).isot,
-            'SAP_QUALITY': self.quality}
+            'SAP_QUALITY': self.quality,
+            'MOM_CENTR1': self.centroid_col,
+            'MOM_CENTR2': self.centroid_row}
 
         for kw in kepler_specific_data:
             if ~np.asarray([kw.lower == k.lower() for k in extra_data]).any():
