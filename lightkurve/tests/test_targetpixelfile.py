@@ -400,7 +400,6 @@ def test_tpf_wcs_from_images():
     assert tpf.hdu[1].header['2CUNI5'] == 'deg'
     assert tpf.wcs.to_header()['CDELT1'] == w.wcs.cdelt[0]
 
-
 def test_properties2(capfd):
     '''Test if the describe function produces an output.
     The output is 1870 characters at the moment, but we might add more properties.'''

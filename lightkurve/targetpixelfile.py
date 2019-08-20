@@ -685,7 +685,7 @@ class TargetPixelFile(object):
         Parameters
         ----------
         center : (int, int) tuple or `astropy.SkyCoord`
-            Center of the cutout.  If an (int, int) tuple is passed, it wil be
+            Center of the cutout.  If an (int, int) tuple is passed, it will be
             interpreted as the (column, row) coordinates relative to
             the bottom-left corner of the TPF.  If an `astropy.SkyCoord` is
             passed then the sky coordinate will be used instead.
@@ -1152,10 +1152,9 @@ class KeplerTargetPixelFile(TargetPixelFile):
         try:
             mid_hdu = _open_image(images[int(len(images) / 2) - 1], extension)
             wcs_ref = WCS(mid_hdu)
-            column, row = wcs_ref.wcs_world2pix(
+            column, row = wcs_ref.all_world2pix(
                             np.asarray([[position.ra.deg], [position.dec.deg]]).T,
                             0)[0]
-            column, row = int(column), int(row)
         except Exception as e:
             raise e
 
@@ -1185,9 +1184,9 @@ class KeplerTargetPixelFile(TargetPixelFile):
 
             # Get positional shift of the image compared to the reference WCS
             wcs_current = WCS(hdu.header)
-            column_current, row_current = wcs_current.wcs_world2pix(
+            column_current, row_current = wcs_current.all_world2pix(
                           np.asarray([[position.ra.deg], [position.dec.deg]]).T,0)[0]
-            column_ref, row_ref = wcs_ref.wcs_world2pix(
+            column_ref, row_ref = wcs_ref.all_world2pix(
                           np.asarray([[position.ra.deg], [position.dec.deg]]).T,0)[0]
 
             hdu.header['POS_CORR1'] = column_current - column_ref
@@ -1196,7 +1195,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
             if position is None:
                 cutout = hdu
             else:
-                cutout = Cutout2D(hdu.data, position, wcs=WCS(hdu.header),
+                cutout = Cutout2D(hdu.data, position, wcs=wcs_ref,
                                   size=size, mode='partial')
             factory.add_cadence(frameno=idx, flux=cutout.data, header=hdu.header)
 
@@ -1210,13 +1209,16 @@ class KeplerTargetPixelFile(TargetPixelFile):
             if m > 4:
                 ext_info["TFORM{}".format(m)] = '{}E'.format(size[0] * size[1])
                 ext_info['TDIM{}'.format(m)] = '({},{})'.format(size[0], size[1])
-            # Compute location of TPF lower left corner
-            # Int statement contains modulus so that .5 values always round up.
-            # We cannot use numpy.round() as it rounds to the even number.
-            half_tpfsize_col = int((size[0] - 1) / 2 + (size[0] + 1) % 2)
-            half_tpfsize_row = int((size[1] - 1) / 2 + (size[1] + 1) % 2)
-            ext_info['1CRV{}P'.format(m)] = column - half_tpfsize_col + factory.keywords['CRVAL1P']
-            ext_info['2CRV{}P'.format(m)] = row - half_tpfsize_row + factory.keywords['CRVAL2P']
+            # Compute the distance from the star to the TPF lower left corner
+            # That is approximately half the TPF size, with an adjustment factor if the star's pixel
+            #    position gets rounded up or not.
+            # The first int is there so that even sizes always round to one less than half of their value
+
+            half_tpfsize_col = int((size[0] - 1) / 2.) + (int(round(column)) - int(column)) * ((size[0] + 1) % 2)
+            half_tpfsize_row = int((size[1] - 1) / 2.) + (int(round(row)) - int(row)) * ((size[1] + 1) % 2)
+
+            ext_info['1CRV{}P'.format(m)] = int(round(column)) - half_tpfsize_col + factory.keywords['CRVAL1P'] - 1
+            ext_info['2CRV{}P'.format(m)] = int(round(row)) - half_tpfsize_row + factory.keywords['CRVAL2P'] - 1
 
         return factory.get_tpf(hdu0_keywords=allkeys, ext_info=ext_info, **kwargs)
 
