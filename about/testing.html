@@ -37,7 +37,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.1.0</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.1</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -134,8 +134,12 @@
 </div>
 <div class="section" id="i-can-t-run-any-tests">
 <h2>I can’t run any tests.<a class="headerlink" href="#i-can-t-run-any-tests" title="Permalink to this headline">¶</a></h2>
-<p>We run our unit tests using <code class="xref py py-obj docutils literal notranslate"><span class="pre">pytest</span></code>. This should have been installed when you installed <em>Lightkurve</em>. However, if your tests don’t run, you may want to check all the test dependencies are installed by running:</p>
+<p>We run our unit tests using <code class="xref py py-obj docutils literal notranslate"><span class="pre">pytest</span></code>. This should have been installed when you installed <em>Lightkurve</em>. However, if your tests don’t run, you may want to check all the test dependencies are installed by running (with <code class="xref py py-obj docutils literal notranslate"><span class="pre">pip</span></code>):</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">pytest</span> <span class="n">pytest</span><span class="o">-</span><span class="n">cov</span> <span class="n">pytest</span><span class="o">-</span><span class="n">remotedata</span>
+</pre></div>
+</div>
+<p>or equivalently if you are managing your Python environment using <code class="xref py py-obj docutils literal notranslate"><span class="pre">conda</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="n">pytest</span> <span class="n">pytest</span><span class="o">-</span><span class="n">cov</span> <span class="n">pytest</span><span class="o">-</span><span class="n">remotedata</span>
 </pre></div>
 </div>
 </div>

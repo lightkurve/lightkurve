@@ -37,7 +37,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.1.0</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.1</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -179,7 +179,7 @@ following meaning:</p>
 <td><p>Header of the object at extension <code class="xref py py-obj docutils literal notranslate"><span class="pre">ext</span></code></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.plot" title="lightkurve.lightcurvefile.KeplerLightCurveFile.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(self[, flux_types, style])</p></td>
-<td><p>Plot all the light curves contained in this light curve file.</p></td>
+<td><p>Plot the light curve file using matplotlib’s <a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.plot" title="lightkurve.lightcurvefile.KeplerLightCurveFile.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a> method.</p></td>
 </tr>
 </tbody>
 </table>
@@ -271,14 +271,14 @@ following meaning:</p>
 <p class="rubric">Methods Documentation</p>
 <dl class="method">
 <dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.compute_cotrended_lightcurve">
-<code class="descname">compute_cotrended_lightcurve</code><span class="sig-paren">(</span><em>self, cbvs=[1, 2], **kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.compute_cotrended_lightcurve" title="Permalink to this definition">¶</a></dt>
+<code class="descname">compute_cotrended_lightcurve</code><span class="sig-paren">(</span><em>self</em>, <em>cbvs=(1</em>, <em>2)</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.compute_cotrended_lightcurve" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a LightCurve object after cotrending the SAP_FLUX
 against the cotrending basis vectors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>cbvs</strong><span class="classifier">list of ints</span></dt><dd><p>The list of cotrending basis vectors to fit to the data. For example,
-[1, 2] will fit the first two basis vectors.</p>
+<dt><strong>cbvs</strong><span class="classifier">tuple or list of ints</span></dt><dd><p>The list of cotrending basis vectors to fit to the data. For example,
+(1, 2) will fit the first two basis vectors.</p>
 </dd>
 <dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of keyword arguments to be passed to
 KeplerCBVCorrector.correct.</p>
@@ -308,17 +308,36 @@ KeplerCBVCorrector.correct.</p>
 <dl class="method">
 <dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.plot">
 <code class="descname">plot</code><span class="sig-paren">(</span><em>self</em>, <em>flux_types=None</em>, <em>style='lightkurve'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.plot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot all the light curves contained in this light curve file.</p>
+<dd><p>Plot the light curve file using matplotlib’s <a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.plot" title="lightkurve.lightcurvefile.KeplerLightCurveFile.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a> method.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>flux_types</strong><span class="classifier">str or list of str</span></dt><dd><p>List of flux types to plot. Default is to plot all available.
-(For Kepler the default fluxes are ‘SAP_FLUX’ and ‘PDCSAP_FLUX’.</p>
+<dt><strong>ax</strong><span class="classifier">matplotlib.axes._subplots.AxesSubplot</span></dt><dd><p>A matplotlib axes object to plot into. If no axes is provided,
+a new one will be generated.</p>
 </dd>
-<dt><strong>style</strong><span class="classifier">str</span></dt><dd><p>matplotlib.pyplot.style.context, default is ‘fast’</p>
+<dt><strong>flux_types</strong><span class="classifier">list or None</span></dt><dd><p>Which fluxes in the LCF to plot. Default is lcf._flux_types().
+For Kepler this is PDCSAP and SAP flux. Pass a list to change flux
+types.</p>
 </dd>
-<dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of keyword arguments to be passed to
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerLightCurve.plot()</span></code>.</p>
+<dt><strong>normalize</strong><span class="classifier">bool</span></dt><dd><p>Normalize the lightcurve before plotting?</p>
+</dd>
+<dt><strong>xlabel</strong><span class="classifier">str</span></dt><dd><p>Plot x axis label</p>
+</dd>
+<dt><strong>ylabel</strong><span class="classifier">str</span></dt><dd><p>Plot y axis label</p>
+</dd>
+<dt><strong>title</strong><span class="classifier">str</span></dt><dd><p>Plot set_title</p>
+</dd>
+<dt><strong>style</strong><span class="classifier">str</span></dt><dd><p>Path or URL to a matplotlib style file, or name of one of
+matplotlib’s built-in stylesheets (e.g. ‘ggplot’).
+Lightkurve’s custom stylesheet is used by default.</p>
+</dd>
+<dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of arguments to be passed to <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.1.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib.pyplot.plot</span></code></a>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>ax</strong><span class="classifier">matplotlib.axes._subplots.AxesSubplot</span></dt><dd><p>The matplotlib axes object.</p>
 </dd>
 </dl>
 </dd>

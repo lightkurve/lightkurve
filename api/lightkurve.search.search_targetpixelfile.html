@@ -37,7 +37,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.1.0</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.1</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -81,7 +81,7 @@
 <h1>search_targetpixelfile<a class="headerlink" href="#search-targetpixelfile" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="lightkurve.search.search_targetpixelfile">
-<code class="descclassname">lightkurve.search.</code><code class="descname">search_targetpixelfile</code><span class="sig-paren">(</span><em>target, radius=None, cadence='long', mission=['Kepler', 'K2', 'TESS'], quarter=None, month=None, campaign=None, sector=None, limit=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.search.search_targetpixelfile" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">lightkurve.search.</code><code class="descname">search_targetpixelfile</code><span class="sig-paren">(</span><em>target</em>, <em>radius=None</em>, <em>cadence='long'</em>, <em>mission=('Kepler'</em>, <em>'K2'</em>, <em>'TESS')</em>, <em>quarter=None</em>, <em>month=None</em>, <em>campaign=None</em>, <em>sector=None</em>, <em>limit=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.search.search_targetpixelfile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Searches the <a class="reference external" href="https://archive.stsci.edu">public data archive at MAST</a> for a Kepler or TESS
 <code class="xref py py-class docutils literal notranslate"><span class="pre">TargetPixelFile</span></code>.</p>
 <p>This function fetches a data table that lists the Target Pixel Files (TPFs)
@@ -91,18 +91,18 @@ only a single target will be returned.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>target</strong><span class="classifier">str, int, or <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.coordinates.SkyCoord.html#astropy.coordinates.SkyCoord" title="(in Astropy v4.0.dev762)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.coordinates.SkyCoord</span></code></a> object</span></dt><dd><p>Target around which to search. Valid inputs include:</p>
+<dt><strong>target</strong><span class="classifier">str, int, or <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.coordinates.SkyCoord.html#astropy.coordinates.SkyCoord" title="(in Astropy v4.0.dev1308)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.coordinates.SkyCoord</span></code></a> object</span></dt><dd><p>Target around which to search. Valid inputs include:</p>
 <blockquote>
 <div><ul class="simple">
 <li><p>The name of the object as a string, e.g. “Kepler-10”.</p></li>
 <li><p>The KIC or EPIC identifier as an integer, e.g. 11904151.</p></li>
 <li><p>A coordinate string in decimal format, e.g. “285.67942179 +50.24130576”.</p></li>
 <li><p>A coordinate string in sexagesimal format, e.g. “19:02:43.1 +50:14:28.7”.</p></li>
-<li><p>An <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.coordinates.SkyCoord.html#astropy.coordinates.SkyCoord" title="(in Astropy v4.0.dev762)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.coordinates.SkyCoord</span></code></a> object.</p></li>
+<li><p>An <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.coordinates.SkyCoord.html#astropy.coordinates.SkyCoord" title="(in Astropy v4.0.dev1308)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.coordinates.SkyCoord</span></code></a> object.</p></li>
 </ul>
 </div></blockquote>
 </dd>
-<dt><strong>radius</strong><span class="classifier">float or <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.0.dev762)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.units.Quantity</span></code></a> object</span></dt><dd><p>Conesearch radius.  If a float is given it will be assumed to be in
+<dt><strong>radius</strong><span class="classifier">float or <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.0.dev1308)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.units.Quantity</span></code></a> object</span></dt><dd><p>Conesearch radius.  If a float is given it will be assumed to be in
 units of arcseconds.  If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> then we default to 0.0001 arcsec.</p>
 </dd>
 <dt><strong>cadence</strong><span class="classifier">str</span></dt><dd><p>‘long’ or ‘short’.</p>

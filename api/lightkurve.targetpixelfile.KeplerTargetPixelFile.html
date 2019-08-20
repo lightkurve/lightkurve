@@ -37,7 +37,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.1.0</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.1</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -88,7 +88,7 @@
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>path</strong><span class="classifier">str or <a class="reference external" href="https://docs.astropy.org/en/latest/io/fits/api/hdulists.html#astropy.io.fits.HDUList" title="(in Astropy v4.0.dev762)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.io.fits.HDUList</span></code></a></span></dt><dd><p>Path to a Kepler Target Pixel (FITS) File or a <code class="xref py py-obj docutils literal notranslate"><span class="pre">HDUList</span></code> object.</p>
+<dt><strong>path</strong><span class="classifier">str or <a class="reference external" href="https://docs.astropy.org/en/latest/io/fits/api/hdulists.html#astropy.io.fits.HDUList" title="(in Astropy v4.0.dev1308)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.io.fits.HDUList</span></code></a></span></dt><dd><p>Path to a Kepler Target Pixel (FITS) File or a <code class="xref py py-obj docutils literal notranslate"><span class="pre">HDUList</span></code> object.</p>
 </dd>
 <dt><strong>quality_bitmask</strong><span class="classifier">str or int</span></dt><dd><p>Bitmask (integer) which identifies the quality flag bitmask that should
 be used to mask out bad cadences. If a string is passed, it has the
@@ -493,7 +493,7 @@ rectangle of a given <code class="docutils literal notranslate"><span class="pre
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>center</strong><span class="classifier">(int, int) tuple or <code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.SkyCoord</span></code></span></dt><dd><p>Center of the cutout.  If an (int, int) tuple is passed, it wil be
+<dt><strong>center</strong><span class="classifier">(int, int) tuple or <code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.SkyCoord</span></code></span></dt><dd><p>Center of the cutout.  If an (int, int) tuple is passed, it will be
 interpreted as the (column, row) coordinates relative to
 the bottom-left corner of the TPF.  If an <code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.SkyCoord</span></code> is
 passed then the sky coordinate will be used instead.
@@ -597,7 +597,7 @@ various diagnostics.</p>
 
 <dl class="staticmethod">
 <dt id="lightkurve.targetpixelfile.KeplerTargetPixelFile.from_fits_images">
-<em class="property">static </em><code class="descname">from_fits_images</code><span class="sig-paren">(</span><em>images</em>, <em>position</em>, <em>size=(11</em>, <em>11)</em>, <em>extension=1</em>, <em>target_id='unnamed-target'</em>, <em>hdu0_keywords={}</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.from_fits_images" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">from_fits_images</code><span class="sig-paren">(</span><em>images</em>, <em>position</em>, <em>size=(11</em>, <em>11)</em>, <em>extension=1</em>, <em>target_id='unnamed-target'</em>, <em>hdu0_keywords=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.KeplerTargetPixelFile.from_fits_images" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a new Target Pixel File from a set of images.</p>
 <p>This method is intended to make it easy to cut out targets from
 Kepler/K2 “superstamp” regions or TESS FFI images.</p>
