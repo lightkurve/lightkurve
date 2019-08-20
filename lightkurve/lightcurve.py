@@ -1706,7 +1706,9 @@ class TessLightCurve(LightCurve):
             'CCD': self.ccd,
             'SECTOR': self.sector,
             'TARGETID': self.targetid,
-            'DEC_OBJ': self.dec}
+            'DEC_OBJ': self.dec,
+            'MOM_CENTR1': self.centroid_col,
+            'MOM_CENTR2': self.centroid_row}
 
         for kw in tess_specific_data:
             if ~np.asarray([kw.lower == k.lower() for k in extra_data]).any():
