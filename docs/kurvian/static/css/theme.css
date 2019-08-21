@@ -154,3 +154,9 @@ code.descname {
     font-weight: bold;
     font-size: 1.2em;
 }
+
+.github-icon {
+    margin-left: 1em;
+    vertical-align: middle;
+    fill: #495057;
+}
