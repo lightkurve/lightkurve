@@ -30,8 +30,20 @@ def test_init():
 def test_correct():
     lc = open(filename_test).get_lightcurve('FLUX')
     r = RegressionCorrector(lc)
-
     r.correct()
 
-    design_matrix = np.vstack([lc.centroid_col, lc.centroid_row]).T
-    r.correct(design_matrix)
+    design_matrix = np.vstack([lc.centroid_col, lc.centroid_row])
+    with pytest.raises(LightkurveError) as err:
+        r.correct(design_matrix)
+    assert 'Design matrix must have shape' in err.value.args[0]
+
+    r.correct(design_matrix.T)
+    r.correct(design_matrix.T, method='lombscargle')
+    cadence_mask = ~lc.remove_outliers(return_mask=True)[1]
+    r.correct(design_matrix.T, preserve_trend=True, cadence_mask=cadence_mask)
+
+def test_diagnose():
+    lc = open(filename_test).get_lightcurve('FLUX')
+    r = RegressionCorrector(lc)
+    r.correct()
+    r.diagnose()

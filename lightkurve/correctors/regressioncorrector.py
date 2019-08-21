@@ -290,6 +290,8 @@ class RegressionCorrector(Corrector):
         if design_matrix is None:
             design_matrix = self._normalize_and_split_design_matrix(self._basic_design_matrix(), self.breakindex, **kwargs)
         elif normalize_and_split:
+            if design_matrix.shape[0] != len(self.flux):
+                raise LightkurveError('Design matrix must have shape ncadences x nvectors. ({} x n)'.format(len(self.flux)))
             design_matrix = self._normalize_and_split_design_matrix(np.copy(design_matrix), self.breakindex, **kwargs)
         dm = np.copy(design_matrix)
         if cadence_mask is None:
