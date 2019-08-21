@@ -59,6 +59,11 @@ class LightCurveFile(object):
         return self.hdu[0].header['DEC_OBJ']
 
     @property
+    def FLUX(self):
+        """Returns a LightCurve object for FLUX"""
+        return self.get_lightcurve('FLUX')
+
+    @property
     def SAP_FLUX(self):
         """Returns a LightCurve object for SAP_FLUX"""
         return self.get_lightcurve('SAP_FLUX')
