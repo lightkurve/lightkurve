@@ -149,9 +149,18 @@ p.rubric {
     font-weight: bold;
 }
 
-code.descname {
+code {
+    color: black;
+    padding: 0.15em;
+    background: #f5f5f5;
+}
+
+code.descname, code.descclassname {
     background-color: transparent;
     font-weight: bold;
+}
+
+code.descname {
     font-size: 1.2em;
 }
 
