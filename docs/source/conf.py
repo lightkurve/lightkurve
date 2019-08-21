@@ -103,6 +103,10 @@ html_theme_options = {
         ("API", "api/index"),
         ("About", "about/index"),
     ],
+    "github_link": "https://github.com/KeplerGO/Lightkurve",
+    "footer_text": """Created with ♥ by the Lightkurve collaboration.
+                      Please <a href="about/citing.html">cite us</a> or
+                      <a href="https://github.com/KeplerGO/Lightkurve">join us on GitHub.</a>"""
 }
 
 html_title = "Lightkurve"
