@@ -4,7 +4,7 @@
 
   <div class="container text-center" style="padding-top:1em; padding-bottom: 2em;">
     <h1 style="font-size: 4rem;">Lightkurve</h1>
-    <p class="lead" style="font-size: 1.5rem;">
+    <p class="lead">
         A friendly package for Kepler & TESS time series analysis in Python.
     </p>
     <p>
