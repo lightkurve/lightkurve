@@ -1317,8 +1317,8 @@ class LightCurve(object):
                 cols.append(fits.Column(name=flux_column_name, format='E',
                                         unit='counts', array=self.flux))
             if 'flux_err' in dir(self):
-                if ~np.asarray([flux_column_name.lower() + '_err' in k.upper() for k in extra_data.keys()]).any():
-                    cols.append(fits.Column(name=flux_column_name.lower() + '_err', format='E',
+                if ~(flux_column_name.upper() + '_ERR' in extra_data.keys()):
+                    cols.append(fits.Column(name=flux_column_name.upper() + '_ERR', format='E',
                                             unit='counts', array=self.flux_err))
             if 'cadenceno' in dir(self):
                 if ~np.asarray(['CADENCENO' in k.upper() for k in extra_data.keys()]).any():
