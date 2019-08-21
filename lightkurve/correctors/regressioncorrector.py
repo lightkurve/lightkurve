@@ -1,20 +1,16 @@
 """Defines RegressionCorrector"""
 from __future__ import division, print_function
 
-import logging
-import warnings
 from tqdm import tqdm
 
 import numpy as np
 from scipy.optimize import minimize
-from matplotlib import pyplot as plt
 from patsy import dmatrix
 
 from astropy.stats import sigma_clip
 from astropy.timeseries import LombScargle
 
 from .corrector import Corrector
-from .. import MPLSTYLE
 from ..utils import LightkurveError, validate_method
 from .. import LightCurve
 
@@ -99,7 +95,7 @@ class RegressionCorrector(Corrector):
 
         return np.nan_to_num(components)
 
-    def _solve_weights(self, X, flux, cadence_mask=None):
+    def _solve_weights(self, X, cadence_mask=None):
         """Compute the weights of a given input matrix using np.linalg.solve
 
         Parameters:
@@ -121,7 +117,7 @@ class RegressionCorrector(Corrector):
         if cadence_mask is None:
             cadence_mask = np.ones(len(flux), bool)
         A = np.dot(X[cadence_mask].T, X[cadence_mask])
-        B = np.dot(X[cadence_mask].T, (flux[cadence_mask] - np.median(flux[cadence_mask])))
+        B = np.dot(X[cadence_mask].T, (self.flux[cadence_mask] - np.median(self.flux[cadence_mask])))
         w = np.linalg.solve(A, B)
         model = np.dot(X, w)
         return w, model
@@ -170,7 +166,7 @@ class RegressionCorrector(Corrector):
             Design matrix, with dimensions time x nvectors
         cadence_mask : np.ndarray of bools (optional)
             Mask, where True indicates a cadence that should be used.
-        start : float (optional)
+        period : float (optional)
             Period to fit the sinusoids at. If None, the optimum period will be found
         nterms : int (default 3)
             Number of terms to fit the sinusoids. More terms are more flexible,
@@ -207,7 +203,7 @@ class RegressionCorrector(Corrector):
             """Function to optimize period"""
             ls_dm = ls.design_matrix(1/params[0])[:, 1:]
             dm = np.hstack([design_matrix, ls_dm, np.atleast_2d(np.ones(len(self.flux))).T])
-            w, model = self._solve_weights(dm, self.flux, cadence_mask=cadence_mask)
+            w, model = self._solve_weights(dm, cadence_mask=cadence_mask)
             if return_model:
                 return w, dm, model
             resids = self.flux - (model + 1)
@@ -253,7 +249,7 @@ class RegressionCorrector(Corrector):
             cadence_mask = np.ones(len(lc.flux), bool)
         spline_dm = np.asarray(dmatrix("bs(x, df={}, degree=3, include_intercept=False) - 1".format(n_knots), {"x": self.time}))
         dm = np.hstack([design_matrix, spline_dm, np.atleast_2d(np.ones(len(self.flux))).T])
-        w, model = self._solve_weights(dm, self.flux, cadence_mask=cadence_mask)
+        w, model = self._solve_weights(dm, cadence_mask=cadence_mask)
         return w, dm, model
 
     def correct(self, design_matrix=None, cadence_mask=None, method='spline', preserve_trend=True, sigma=5, niters=5, timescale=3, normalize_and_split=True, **kwargs):
@@ -303,12 +299,12 @@ class RegressionCorrector(Corrector):
 
         n_knots = int((self.time[-1] - self.time[0])/timescale)
         n_knots = np.max([n_knots, 3])
-        for iter in range(niters):
+        for count in range(niters):
             if self.method == 'spline':
                 w, dm2, model = self._optimize_spline(dm, cadence_mask=mask, n_knots=n_knots)
             if self.method == 'lombscargle':
-                w, dm2, model = self._optimize_lomb_scargle(dm, cadence_mask=mask, n_knots=n_knots, start=self.period)
-            if iter != niters - 1:
+                w, dm2, model = self._optimize_lomb_scargle(dm, cadence_mask=mask, n_knots=n_knots, period=self.period)
+            if count != niters - 1:
                 mask &= ~sigma_clip(self.flux - model, sigma=sigma).mask
 
         noise = LightCurve(self.time, np.dot(w[:len(dm.T)], dm.T))

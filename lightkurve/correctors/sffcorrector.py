@@ -16,7 +16,7 @@ from astropy.modeling import models, fitting
 from .corrector import Corrector
 from .regressioncorrector import RegressionCorrector
 
-from ..utils import LightkurveError, validate_method
+from ..utils import validate_method
 from .. import LightCurve
 
 
@@ -80,18 +80,18 @@ class SFFCorrector(RegressionCorrector):
             xbins = h[1][1:] - np.median(np.diff(h[1]))
             g = fitter(g, xbins, h[0], weights=h[0]**0.5)
 
-            def _start_and_end(type):
+            def _start_and_end(method):
                 ''' Find points at the start or end of a roll
                 '''
-                if type == 'start':
+                if method == 'start':
                     thrusters = d2adt2 < (g.stddev * -5)
-                if type == 'end':
+                if method == 'end':
                     thrusters = d2adt2 > (g.stddev * 5)
                 # Pick the best thruster in each cluster
                 idx = np.array_split(np.arange(len(thrusters)), np.where(np.gradient(np.asarray(thrusters, int)) == 0)[0])
                 m = np.array_split(thrusters, np.where(np.gradient(np.asarray(thrusters, int)) == 0)[0])
                 th = []
-                for jdx in range(len(idx)):
+                for jdx, idx in enumerate(idx):
                     if m[jdx].sum() == 0:
                         th.append(m[jdx])
                     else:
@@ -176,12 +176,12 @@ class SFFCorrector(RegressionCorrector):
 
         n_knots = int((self.time[-1] - self.time[0])/timescale)
         n_knots = np.max([n_knots, 3])
-        for iter in range(niters):
+        for count in range(niters):
             if self.method == 'spline':
                 w, dm2, model = self._optimize_spline(dm, cadence_mask=mask, n_knots=n_knots)
             if self.method == 'lombscargle':
-                w, dm2, model = self._optimize_lomb_scargle(dm, cadence_mask=mask, n_knots=n_knots, start=self.period)
-            if iter != niters - 1:
+                w, dm2, model = self._optimize_lomb_scargle(dm, cadence_mask=mask, n_knots=n_knots, period=self.period)
+            if count != niters - 1:
                 mask &= ~sigma_clip(self.flux - model, sigma=sigma).mask
 
         noise = LightCurve(self.time, np.dot(w[:len(dm.T)], dm.T))
