@@ -79,11 +79,9 @@
     
   <div class="section" id="full-changelog">
 <span id="changelog"></span><h1>Full changelog<a class="headerlink" href="#full-changelog" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="unreleased">
-<h2>1.2.0 (unreleased)<a class="headerlink" href="#unreleased" title="Permalink to this headline">¶</a></h2>
-</div>
 <div class="section" id="id1">
 <h2>1.1.1 (2019-08-19)<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>Lightkurve v1.1.1 is a bugfix release which includes the following changes:</p>
 <ul class="simple">
 <li><p>Changed <code class="xref py py-obj docutils literal notranslate"><span class="pre">search_targetpixelfile()</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">search_lightcurvefile()</span></code> to emit a
 helpful warning if an ambigous target identifier is used, i.e. if a number is
@@ -144,15 +142,11 @@ AstroPy Quantity object. [#521]</p></li>
 <li><p>Fixed minor bugs in <code class="docutils literal notranslate"><span class="pre">PLDCorrector.correct()</span></code> [#498],
 <code class="docutils literal notranslate"><span class="pre">TargetPixelFile.create_threshold_mask()</span></code> [#502],
 and <code class="docutils literal notranslate"><span class="pre">LightCurve.bin()</span></code> [#503].</p></li>
-<li><p>Ensure users are alerted if a large number of cadences are masked out by</p></li>
-</ul>
-<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">quality_bitmask</span></code> when opening data products. [#495]</p>
-<ul class="simple">
+<li><p>Ensure users are alerted if a large number of cadences are masked out by
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">quality_bitmask</span></code> when opening data products. [#495]</p></li>
 <li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">CBVCorrector</span></code> now accepts a <code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> as input. [#504]</p></li>
-<li><p>The <a class="reference internal" href="../api/search.html#module-lightkurve.search" title="lightkurve.search"><code class="xref py py-obj docutils literal notranslate"><span class="pre">search</span></code></a> functions now provide a more helpful error message</p></li>
-</ul>
-<p>if the download cache contains a corrupt file. [#512]</p>
-<ul class="simple">
+<li><p>The <a class="reference internal" href="../api/search.html#module-lightkurve.search" title="lightkurve.search"><code class="xref py py-obj docutils literal notranslate"><span class="pre">search</span></code></a> functions now provide a more helpful error message
+if the download cache contains a corrupt file. [#512]</p></li>
 <li><p>Switched continuous integration from Travis/Appveyor to Azure pipelines. [#497]</p></li>
 </ul>
 </div>

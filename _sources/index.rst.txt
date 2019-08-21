@@ -15,7 +15,7 @@
   <div class="container">
     <hr>
     <div class="row">
-      <div class="col-md-6">
+      <div class="col-lg-6">
         <p style="font-size: 1.2em; font-weight: 700;">
          Time domain astronomy made easy
         </p>
@@ -32,7 +32,7 @@
         </p>
       </div> 
 
-      <div class="col-md-6">
+      <div class="col-lg-6">
 
 
 .. code-block:: python
