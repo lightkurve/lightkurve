@@ -20,7 +20,8 @@ extensions = [
     'sphinx.ext.intersphinx',
     'nbsphinx',
     'numpydoc',
-    'sphinx_automodapi.automodapi']
+    'sphinx_automodapi.automodapi',
+    'sphinxcontrib.rawfiles']
 
 numpydoc_show_class_members = False
 
@@ -113,12 +114,9 @@ html_title = "Lightkurve"
 
 html_static_path = ['_static']
 
-sys.path += ['exts']
-extensions += ['sphinxcontrib_rawfiles']
-
-# Files we want to copy
-# CNAME tells GitHub the domain name to use for hosting the docs
-# .nojekyll prevents GitHub from hiding the `_static` dir
+# Raw files we want to copy using the sphinxcontrib-rawfiles extension:
+# - CNAME tells GitHub the domain name to use for hosting the docs
+# - .nojekyll prevents GitHub from hiding the `_static` dir
 rawfiles = ['CNAME', '.nojekyll']
 
 # Make sure text marked up `like this` will be interpreted as Python objects

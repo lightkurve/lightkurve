@@ -25,6 +25,7 @@ Building the *lightkurve* documentation requires a few extra packages:
 - amunra-sphinx-theme
 - sphinx
 - sphinx-automodapi
+- sphinxcontrib-rawfiles
 - nbsphinx
 - ghp-import
 - graphviz
