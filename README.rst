@@ -5,12 +5,14 @@ Lightkurve
 
 **Documentation: https://docs.lightkurve.org**
 
-|pypi-badge| |conda-badge| |codacy-badge| |codacy-coverage-badge| |azure-badge| |doi-badge| |astropy-badge|
+|conda-badge| |pypi-badge| |pypi-downloads| |codacy-badge| |codacy-coverage-badge| |azure-badge| |doi-badge| |astropy-badge|
 
-.. |pypi-badge| image:: https://img.shields.io/pypi/v/lightkurve.svg
-                :target: https://pypi.python.org/pypi/lightkurve
 .. |conda-badge| image:: https://img.shields.io/conda/vn/conda-forge/lightkurve.svg
                  :target: https://anaconda.org/conda-forge/lightkurve
+.. |pypi-badge| image:: https://img.shields.io/pypi/v/lightkurve.svg
+                :target: https://pypi.python.org/pypi/lightkurve
+.. |pypi-downloads| image:: https://pepy.tech/badge/lightkurve/month
+                :target: https://pepy.tech/project/lightkurve/month
 .. |azure-badge| image:: https://dev.azure.com/KeplerGO/Lightkurve/_apis/build/status/Lightkurve-PyTest?branchName=master
                  :target: https://dev.azure.com/KeplerGO/Lightkurve/_build/latest?definitionId=1&branchName=master
 .. |astropy-badge| image:: https://img.shields.io/badge/powered%20by-AstroPy-orange.svg?style=flat
