@@ -6,7 +6,7 @@ from astropy.utils.data import get_pkg_data_filename
 from ..regressioncorrector import RegressionCorrector
 from ...lightcurve import KeplerLightCurve, LightCurve
 from ...utils import LightkurveError
-from ...search import open
+from ...search import open as lkopen
 
 filename_test = get_pkg_data_filename("data/test_lc_k2-18.fits")
 
@@ -24,11 +24,18 @@ def test_init():
     with pytest.raises(LightkurveError) as err:
         RegressionCorrector(lc)
     assert err_string in err.value.args[0]
+
+    lc = KeplerLightCurve(np.arange(10), np.ones(10)*np.nan, centroid_col=np.ones(10), centroid_row=np.ones(10))
+    err_string = ("Input light curve has NaNs")
+    with pytest.raises(LightkurveError) as err:
+        RegressionCorrector(lc)
+    assert err_string in err.value.args[0]
+
     lc = KeplerLightCurve(np.arange(10), np.ones(10), centroid_col=np.ones(10), centroid_row=np.ones(10))
     RegressionCorrector(lc)
 
 def test_correct():
-    lc = open(filename_test).get_lightcurve('FLUX')
+    lc = lkopen(filename_test).get_lightcurve('FLUX')
     r = RegressionCorrector(lc)
     r.correct()
 
@@ -43,7 +50,7 @@ def test_correct():
     r.correct(design_matrix.T, preserve_trend=True, cadence_mask=cadence_mask)
 
 def test_diagnose():
-    lc = open(filename_test).get_lightcurve('FLUX')
+    lc = lkopen(filename_test).get_lightcurve('FLUX')
     r = RegressionCorrector(lc)
     r.correct()
     r.diagnose()

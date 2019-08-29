@@ -6,13 +6,18 @@ from tqdm import tqdm
 import numpy as np
 from scipy.optimize import minimize
 from patsy import dmatrix
+import warnings
 
-from astropy.stats import sigma_clip
+from astropy.stats import sigma_clip, sigma_clipped_stats
 from astropy.timeseries import LombScargle
 
 from .corrector import Corrector
 from ..utils import LightkurveError, validate_method
 from .. import LightCurve
+
+
+
+import matplotlib.pyplot as plt
 
 class RegressionCorrector(Corrector):
     """Corrector class for regressing against input vectors.
@@ -30,9 +35,14 @@ class RegressionCorrector(Corrector):
         self.time = np.copy(self.lc.time)
         self.model = np.ones(len(self.flux))
         self.period = period
+
+        if np.any([~np.isfinite(self.time), ~np.isfinite(self.flux), ~np.isfinite(self.flux_err)]):
+            raise LightkurveError('Input light curve has NaNs in time, flux, and/or flux_err. '
+                                  'Please remove NaNs before correcting.')
+
         # Campaign break point in index
         if breakindex is None:
-            self.breakindex = -1
+            self.breakindex = 0
         else:
             self.breakindex = breakindex
 
@@ -50,10 +60,8 @@ class RegressionCorrector(Corrector):
             else:
                 setattr(self, var, locals()[var])
 
-
-
-    def _normalize_and_split_design_matrix(self, design_matrix, breakindex):
-        """ Split a design matrix at a breakindex, and normalize all vectors.
+    def _split_design_matrix(self, design_matrix, breakindex):
+        """ Split a design matrix at a breakindex
 
         Parameters
         ----------
@@ -65,35 +73,43 @@ class RegressionCorrector(Corrector):
 
         Returns
         -------
-        normalized_design_matrix : np.ndarray
-            Normalized and split design matrix
+        split_design_matrix : np.ndarray
+            Split design matrix
         """
         components = np.copy(design_matrix)
-        components -= np.atleast_2d(np.nanmean(components, axis=0))
-        components /= np.atleast_2d(np.nanstd(components, axis=0))
-        components *= self.lc.flux.std()
-
-    #        components /= len(components) * 2
-
-
-        stack = []
-        for idx in np.array_split(np.arange(len(components)), [breakindex]):
-            mask = np.in1d(np.arange(len(components)), idx)
-            if mask.sum() == 0:
-                continue
-            window = np.copy(components)
-            window[~mask] *= np.nan
-            stack.append(window)
-            zeros = np.atleast_2d(np.zeros(len(components))).T
-            zeros[~mask] *= np.nan
-            stack.append(zeros)
-        #mean = np.atleast_2d(np.ones(len(components))).T * mean
-        #stack.append(mean)
-        components = np.hstack(stack)
-        components /= len(components.T)
-        components += 1
-
+        if breakindex != 0:
+            stack = []
+            for idx in np.array_split(np.arange(len(components)), [breakindex]):
+                mask = np.in1d(np.arange(len(components)), idx)
+                if mask.sum() == 0:
+                    continue
+                window = np.copy(components)
+                window[~mask] *= np.nan
+                stack.append(window)
+                zeros = np.atleast_2d(np.zeros(len(components))).T
+                zeros[~mask] *= np.nan
+                stack.append(zeros + 1)
+            components = np.hstack(stack)
         return np.nan_to_num(components)
+
+
+    # def _whiten(self, design_matrix):
+    #     """ Whiten a design matrix
+    #
+    #     Parameters
+    #     ----------
+    #     design_matrix : np.ndarray
+    #         Design matrix, with dimensions time x nvectors
+    #
+    #     Returns
+    #     -------
+    #     white_design_matrix : np.ndarray
+    #         Whitened design matrix
+    #     """
+    #     components = np.copy(design_matrix)
+    #     components -= np.atleast_2d(np.nanmean(components, axis=0))
+    #     components /= np.atleast_2d(np.nanstd(components, axis=0))
+    #     return np.nan_to_num(components)
 
     def _solve_weights(self, X, cadence_mask=None):
         """Compute the weights of a given input matrix using np.linalg.solve
@@ -116,11 +132,18 @@ class RegressionCorrector(Corrector):
         """
         if cadence_mask is None:
             cadence_mask = np.ones(len(flux), bool)
-        A = np.dot(X[cadence_mask].T, X[cadence_mask])
-        B = np.dot(X[cadence_mask].T, (self.flux[cadence_mask] - np.median(self.flux[cadence_mask])))
+        weights = self.flux_err[cadence_mask]**2
+        f = self.flux[cadence_mask] #- self.flux[cadence_mask].mean()
+
+        A = np.dot(X[cadence_mask].T, X[cadence_mask]/weights[:, None])
+        B = np.dot(X[cadence_mask].T, f/weights)
         w = np.linalg.solve(A, B)
+        sigma_w = np.linalg.inv(A)
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            var = np.diag(sigma_w)**0.5
         model = np.dot(X, w)
-        return w, model
+        return w, model, var
 
     def _basic_design_matrix(self):
         """Build a basic design matrix based on the PSF position.
@@ -203,9 +226,9 @@ class RegressionCorrector(Corrector):
             """Function to optimize period"""
             ls_dm = ls.design_matrix(1/params[0])[:, 1:]
             dm = np.hstack([design_matrix, ls_dm, np.atleast_2d(np.ones(len(self.flux))).T])
-            w, model = self._solve_weights(dm, cadence_mask=cadence_mask)
+            w, model, var = self._solve_weights(dm, cadence_mask=cadence_mask)
             if return_model:
-                return w, dm, model
+                return w, var, dm, model
             resids = self.flux - (model + 1)
             return np.sum(((resids)**2/self.flux_err**2))/len(resids)
 
@@ -219,9 +242,9 @@ class RegressionCorrector(Corrector):
         else:
             res = minimize(func, [period], method='Powell', args=cadence_mask)
             best_period = res.x
-        w, dm, model = func([best_period], cadence_mask=cadence_mask, return_model=True)
+        w, var, dm, model = func([best_period], cadence_mask=cadence_mask, return_model=True)
         self.period = best_period
-        return w, dm, model
+        return w, var, dm, model
 
     def _optimize_spline(self, design_matrix, cadence_mask=None, n_knots=10):
         """Find the best fitting bspline to the long term trends in the light curve.
@@ -249,10 +272,50 @@ class RegressionCorrector(Corrector):
             cadence_mask = np.ones(len(lc.flux), bool)
         spline_dm = np.asarray(dmatrix("bs(x, df={}, degree=3, include_intercept=False) - 1".format(n_knots), {"x": self.time}))
         dm = np.hstack([design_matrix, spline_dm, np.atleast_2d(np.ones(len(self.flux))).T])
-        w, model = self._solve_weights(dm, cadence_mask=cadence_mask)
-        return w, dm, model
+        w, model, var = self._solve_weights(dm, cadence_mask=cadence_mask)
+        return w, var, dm, model
 
-    def correct(self, design_matrix=None, cadence_mask=None, method='spline', preserve_trend=True, sigma=5, niters=5, timescale=3, normalize_and_split=True, **kwargs):
+    def _clip_outliers(self, model, sigma=5, boxwidth=2):
+        ''' Somewhat intelligently get rid of outliers'''
+        all_outliers = sigma_clip(self.flux - model, sigma=sigma).mask
+        _, med, std = sigma_clipped_stats(self.flux - model, sigma=sigma)
+
+        def flare_mask():
+            """Remove groups of upwards outliers that are probably flares """
+            m = (self.flux - model - med) > std * sigma
+            if not np.any(m):
+                return np.zeros(len(self.flux), dtype=bool)
+            ms = np.array_split(m, np.where(np.diff(m))[0] + 1)
+            idxs = np.array_split(np.arange(len(m)), np.where(np.diff(m))[0] + 1)
+            hits = [idx for idx, i in enumerate(ms) if i.sum() > 1]
+            if len(hits) > 0:
+                flares = np.hstack(np.asarray([idxs[idx] for idx, i in enumerate(ms) if i.sum() > 1]))
+                flares = (np.hstack(np.asarray([np.arange(f, f+boxwidth, dtype=int) for f in flares])))
+                flares = flares[(flares > 0) & (flares < len(m))]
+                flares = np.in1d(np.arange(len(m)), flares)
+                return flares
+            else:
+                return np.zeros(len(self.flux), dtype=bool)
+
+        def eclipse_mask():
+            """Remove groups of downwards outliers that are probably transits """
+            m = (self.flux - model - med) < (std * -sigma)
+            if not np.any(m):
+                return np.zeros(len(self.flux), dtype=bool)
+            ms = np.array_split(m, np.where(np.diff(m))[0] + 1)
+            idxs = np.array_split(np.arange(len(m)), np.where(np.diff(m))[0] + 1)
+            hits = [idx for idx, i in enumerate(ms) if i.sum() > 1]
+            if len(hits) > 0:
+                eclipses = np.hstack(np.asarray([idxs[idx] for idx, i in enumerate(ms) if i.sum() > 1]))
+                eclipses = (np.hstack(np.asarray([np.arange(f-boxwidth, f+boxwidth, dtype=int) for f in eclipses])))
+                eclipses = eclipses[(eclipses > 0) & (eclipses < len(m))]
+                eclipses = np.in1d(np.arange(len(m)), eclipses)
+                return eclipses
+            else:
+                return np.zeros(len(self.flux), dtype=bool)
+        return ~all_outliers & ~flare_mask() & ~eclipse_mask()
+
+    def correct(self, design_matrix=None, cadence_mask=None, method='spline', preserve_trend=True, sigma=5, niters=5, timescale=3, split=True, **kwargs):
         """Find the best fit correction for the light curve.
 
         Parameters:
@@ -288,11 +351,11 @@ class RegressionCorrector(Corrector):
         self.method = validate_method(method, ['spline', 'lombscargle'])
 
         if design_matrix is None:
-            design_matrix = self._normalize_and_split_design_matrix(self._basic_design_matrix(), self.breakindex, **kwargs)
-        elif normalize_and_split:
+            design_matrix = self._split_design_matrix(self._basic_design_matrix(), self.breakindex, **kwargs)
+        elif split:
             if design_matrix.shape[0] != len(self.flux):
                 raise LightkurveError('Design matrix must have shape ncadences x nvectors. ({} x n)'.format(len(self.flux)))
-            design_matrix = self._normalize_and_split_design_matrix(np.copy(design_matrix), self.breakindex, **kwargs)
+            design_matrix = self._split_design_matrix(np.copy(design_matrix), self.breakindex, **kwargs)
         dm = np.copy(design_matrix)
         if cadence_mask is None:
             mask = np.ones(len(self.time), bool)
@@ -303,11 +366,11 @@ class RegressionCorrector(Corrector):
         n_knots = np.max([n_knots, 3])
         for count in range(niters):
             if self.method == 'spline':
-                w, dm2, model = self._optimize_spline(dm, cadence_mask=mask, n_knots=n_knots)
+                w, var, dm2, model = self._optimize_spline(dm, cadence_mask=mask, n_knots=n_knots)
             if self.method == 'lombscargle':
-                w, dm2, model = self._optimize_lomb_scargle(dm, cadence_mask=mask, n_knots=n_knots, period=self.period)
+                w, var, dm2, model = self._optimize_lomb_scargle(dm, cadence_mask=mask, n_knots=n_knots, period=self.period)
             if count != niters - 1:
-                mask &= ~sigma_clip(self.flux - model, sigma=sigma).mask
+                mask &= self._clip_outliers(model, sigma=sigma)
 
         noise = LightCurve(self.time, np.dot(w[:len(dm.T)], dm.T))
         noise.flux -= np.median(noise.flux)
@@ -316,7 +379,7 @@ class RegressionCorrector(Corrector):
         if preserve_trend:
             corrected = self.lc - noise.flux
         else:
-            corrected = self.lc - model
+            corrected = self.lc - model + np.median(model)
         self.diagnostic_lightcurves = {'noise':noise, 'long_term':long_term, 'corrected':corrected}
         self.cadence_mask = mask
         self.design_matrix = dm2
@@ -332,6 +395,7 @@ class RegressionCorrector(Corrector):
         if self.method == 'lombscargle':
             label = 'LS Period : {:5.2f}'.format(self.period)
         (self.diagnostic_lightcurves['long_term'] + 1).plot(ax=ax, c='r', lw=1, label='Long Term Trend ({})'.format(label))
+        ax.axvline(self.time[self.breakindex], ls='--', c='k')
 
         ax = self.lc.plot(normalize=False, alpha=0.2, label='Original')
         self.lc[~self.cadence_mask].scatter(normalize=False, c='r', marker='x', s=10, label='Outliers', ax=ax)

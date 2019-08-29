@@ -54,13 +54,14 @@ class SFFCorrector(RegressionCorrector):
     """
     def __init__(self, *args, **kwargs):
         super(SFFCorrector, self).__init__(*args, **kwargs)
-        self.arc = ((self.centroid_col - self.centroid_col.min())**2 + (self.centroid_row - self.centroid_row.min())**2)**0.5
+        self.arc = ((self.centroid_col)**2 + (self.centroid_row)**2)**0.5
+        self.arc -= np.nanmin(self.arc)
         self.arc += 1
 
     def _get_window_points(self, windows):
         ''' Build window points, based on where thrusters are fired. '''
 
-        def _get_thruster_firings(arc):
+        def _get_thruster_firings(arclength):
             ''' Find locations where K2 fired thrusters
             Parameters:
             ----------
@@ -71,12 +72,13 @@ class SFFCorrector(RegressionCorrector):
             thrusters: np.ndarray of bools
                 True at times where thrusters were fired.
             '''
+            arc = np.copy(arclength)
             # Rate of change of rate of change of arclength wrt time
             d2adt2 = (np.gradient(np.gradient(arc)))
             # Fit a nice Gaussian, most points lie in a tight region, thruster firings are outliers
             g = models.Gaussian1D(amplitude=100, mean=0, stddev=0.01)
             fitter = fitting.LevMarLSQFitter()
-            h = np.histogram(d2adt2, np.arange(-0.5, 0.5, 0.0001), density=True);
+            h = np.histogram(d2adt2[np.isfinite(d2adt2)], np.arange(-0.5, 0.5, 0.0001), density=True);
             xbins = h[1][1:] - np.median(np.diff(h[1]))
             g = fitter(g, xbins, h[0], weights=h[0]**0.5)
 
@@ -84,14 +86,14 @@ class SFFCorrector(RegressionCorrector):
                 ''' Find points at the start or end of a roll
                 '''
                 if method == 'start':
-                    thrusters = d2adt2 < (g.stddev * -5)
+                    thrusters = (d2adt2 < (g.stddev * -5)) & np.isfinite(d2adt2)
                 if method == 'end':
-                    thrusters = d2adt2 > (g.stddev * 5)
+                    thrusters = (d2adt2 > (g.stddev * 5)) & np.isfinite(d2adt2)
                 # Pick the best thruster in each cluster
                 idx = np.array_split(np.arange(len(thrusters)), np.where(np.gradient(np.asarray(thrusters, int)) == 0)[0])
                 m = np.array_split(thrusters, np.where(np.gradient(np.asarray(thrusters, int)) == 0)[0])
                 th = []
-                for jdx, idx in enumerate(idx):
+                for jdx in range(len(idx)):
                     if m[jdx].sum() == 0:
                         th.append(m[jdx])
                     else:
@@ -118,48 +120,52 @@ class SFFCorrector(RegressionCorrector):
         else:
             window_points = np.linspace(0, len(self.flux) + 1, windows)
         window_points = [thrusters[np.argmin(np.abs(wp - thrusters))] + 1 for wp in window_points]
-        if window_points[0] < 10:
-            window_points[0] = 0
+
+        if window_points[0] < (np.median(np.diff(window_points)) * 0.4):
+            window_points = window_points[1:]
         return window_points
 
 
-    def _get_window_design_matrix(self):
-        stack = []
-        for idx in np.array_split(np.arange(len(self.arc)), self.window_points):
-            mask = np.in1d(np.arange(len(self.arc)), idx)
-            if mask.sum() == 0:
-                continue
-            window = np.zeros((len(self.arc), self.bins)) * np.nan
-            window[mask] = np.asarray(dmatrix("bs(x, df={}, degree=2, include_intercept=True) - 1".format(self.bins), {"x": self.arc[mask]}))
-            stack.append(window)
-        window_dm = np.hstack(stack)
-        return np.nan_to_num(window_dm + 1)
+    # def _get_window_design_matrix(self):
+    #     stack = []
+    #     for idx in np.array_split(np.arange(len(self.arc)), self.window_points):
+    #         mask = np.in1d(np.arange(len(self.arc)), idx)
+    #         if mask.sum() == 0:
+    #             continue
+    #         window = np.zeros((len(self.arc), self.bins)) * np.nan
+    #         window[mask] = np.asarray(dmatrix("bs(x, df={}, degree=2, include_intercept=True) - 1".format(self.bins), {"x": self.arc[mask]}))
+    #         stack.append(window)
+    #     window_dm = np.hstack(stack)
+    #     return np.nan_to_num(window_dm + 1)
 
 
     def _get_window_design_matrix(self):
         stack = []
         window = np.zeros((len(self.arc), self.bins)) * np.nan
         window = np.asarray(dmatrix("bs(x, df={}, degree=3, include_intercept=True) - 1".format(self.windows), {"x": self.arc}))
-        stack.append(window)
+#        stack.append(window)
 
         for idx in np.array_split(np.arange(len(self.arc)), self.window_points):
             mask = np.in1d(np.arange(len(self.arc)), idx)
             if mask.sum() == 0:
                 continue
             window = np.zeros((len(self.arc), self.bins)) * np.nan
-            window[mask] = np.asarray(dmatrix("bs(x, df={}, degree=2, include_intercept=True) - 1".format(self.bins), {"x": self.arc[mask]}))
+            window[mask] = np.asarray(dmatrix("bs(x, df={}, degree=2, include_intercept=True) - 1".format(self.bins), {"x": np.copy(self.arc)[mask]}))
             stack.append(window)
         window_dm = np.hstack(stack)
 
         window_dm = np.hstack(stack)
         return np.nan_to_num(window_dm + 1)
 
-    def correct(self, design_matrix=None, cadence_mask=None, method='spline', preserve_trend=True, sigma=5, niters=5, timescale=3, bins=10, windows=20):
+    def correct(self, design_matrix=None, cadence_mask=None, method='spline', preserve_trend=True, sigma=5, niters=5, timescale=3, bins=10, windows=20, split=True):
         self.method = validate_method(method, ['spline', 'lombscargle'])
 
         if design_matrix is None:
-            design_matrix = self._normalize_and_split_design_matrix(self._basic_design_matrix(), self.breakindex)
-        dm = np.copy(design_matrix)
+            dm = self._basic_design_matrix()
+        else:
+            dm = np.copy(design_matrix)
+        if split:
+            dm = self._split_design_matrix(dm, self.breakindex)
         if cadence_mask is None:
             mask = np.ones(len(self.time), bool)
         else:
@@ -178,11 +184,11 @@ class SFFCorrector(RegressionCorrector):
         n_knots = np.max([n_knots, 3])
         for count in range(niters):
             if self.method == 'spline':
-                w, dm2, model = self._optimize_spline(dm, cadence_mask=mask, n_knots=n_knots)
+                w, var, dm2, model = self._optimize_spline(dm, cadence_mask=mask, n_knots=n_knots)
             if self.method == 'lombscargle':
-                w, dm2, model = self._optimize_lomb_scargle(dm, cadence_mask=mask, n_knots=n_knots, period=self.period)
+                w, var, dm2, model = self._optimize_lomb_scargle(dm, cadence_mask=mask, n_knots=n_knots, period=self.period)
             if count != niters - 1:
-                mask &= ~sigma_clip(self.flux - model, sigma=sigma).mask
+                mask &= self._clip_outliers(model, sigma=sigma)
 
         noise = LightCurve(self.time, np.dot(w[:len(dm.T)], dm.T))
         noise.flux -= np.median(noise.flux)
@@ -191,7 +197,7 @@ class SFFCorrector(RegressionCorrector):
         if preserve_trend:
             corrected = self.lc - noise.flux
         else:
-            corrected = self.lc - model
+            corrected = self.lc - model + np.median(model)
         self.diagnostic_lightcurves = {'noise':noise, 'long_term':long_term, 'corrected':corrected}
         self.cadence_mask = mask
         self.design_matrix = dm2
