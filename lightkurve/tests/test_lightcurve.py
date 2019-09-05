@@ -15,7 +15,7 @@ import warnings
 from ..lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
 from ..lightcurvefile import LightCurveFile, KeplerLightCurveFile, TessLightCurveFile
 from ..targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
-from ..utils import LightkurveWarning
+from ..utils import LightkurveWarning, LightkurveError
 from .test_targetpixelfile import TABBY_TPF
 
 # 8th Quarter of Tabby's star
@@ -430,6 +430,27 @@ def test_normalize():
     lc = LightCurve(time=np.arange(10), flux=5*np.ones(10), flux_err=0.05*np.ones(10))
     assert_allclose(np.median(lc.normalize().flux), 1)
     assert_allclose(np.median(lc.normalize().flux_err), 0.05/5)
+
+
+def test_invalid_normalize():
+    """Normalization makes no sense if the light curve is negative or zero-centered."""
+    # zero-centered light curve
+    lc = LightCurve(time=np.arange(10), flux=np.zeros(10))
+    with pytest.raises(LightkurveError) as err:
+        lc.normalize()
+    assert "zero-centered" in err.value.args[0]
+
+    # zero-centered light curve with flux errors
+    lc = LightCurve(time=np.arange(10), flux=np.zeros(10), flux_err=0.05*np.ones(10))
+    with pytest.raises(LightkurveError) as err:
+        lc.normalize()
+    assert "zero-centered" in err.value.args[0]
+
+    # negative light curve
+    lc = LightCurve(time=np.arange(10), flux=-np.ones(10), flux_err=0.05*np.ones(10))
+    with pytest.raises(LightkurveError) as err:
+        lc.normalize()
+    assert "negative" in err.value.args[0]
 
 
 def test_to_pandas():

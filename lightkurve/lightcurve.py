@@ -23,7 +23,7 @@ from astropy import units as u
 from . import PACKAGEDIR, MPLSTYLE
 from .utils import (
     running_mean, bkjd_to_astropy_time, btjd_to_astropy_time,
-    LightkurveWarning, validate_method
+    LightkurveWarning, LightkurveError, validate_method
 )
 
 __all__ = ['LightCurve', 'KeplerLightCurve', 'TessLightCurve']
@@ -539,10 +539,32 @@ class LightCurve(object):
         normalized_lightcurve : `LightCurve`
             A new light curve object in which ``flux`` and ``flux_err`` have
             been divided by the median flux.
+
+        Raises
+        ------
+        LightkurveError
+            If the median flux is negative or within one standard deviation
+            from zero.
         """
+        median_flux = np.nanmedian(self.flux)
+        std_flux = np.nanstd(self.flux)
+
+        # If the median flux is separated from zero by less than one standard
+        # deviation, the light curve is likely zero-centered and normalization
+        # makes no sense.
+        if (median_flux == 0) or (np.isfinite(std_flux) and (np.abs(median_flux) < std_flux)):
+            raise LightkurveError("The light curve appears to be zero-centered and cannot be normalized"
+                                  " (median_flux={}, std_flux={}).".format(median_flux, std_flux))
+        # If the median flux is negative, normalization will invert the light
+        # curve and makes no sense.
+        if median_flux < 0:
+            raise LightkurveError("The light curve has a negative median flux and cannot be normalized"
+                                  " (median_flux={}).".format(median_flux))
+        
+        # Create a new light curve instance and normalize its values
         lc = self.copy()
-        lc.flux_err = lc.flux_err / np.nanmedian(lc.flux)
-        lc.flux = lc.flux / np.nanmedian(lc.flux)
+        lc.flux_err = lc.flux_err / median_flux
+        lc.flux = lc.flux / median_flux
         return lc
 
     def remove_nans(self):
