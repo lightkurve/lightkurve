@@ -555,14 +555,14 @@ class LightCurve(object):
             warnings.warn("The light curve appears to be zero-centered; "
                           "`normalize()` will divide the light curve by zero "
                           "or a value close to zero. "
-                          "(median_flux={}, std_flux={}).".format(median_flux, std_flux),
+                          "(median_flux={:.2e}, std_flux={:.2e}).".format(median_flux, std_flux),
                           LightkurveWarning)
         # If the median flux is negative, normalization will invert the light
         # curve and makes no sense.
         if median_flux < 0:
             warnings.warn("The light curve has a negative median flux; "
                           "`normalize()` will invert the light curve. "
-                          "(median_flux={})".format(median_flux),
+                          "(median_flux={:.2e})".format(median_flux),
                           LightkurveWarning)
         
         # Create a new light curve instance and normalize its values
