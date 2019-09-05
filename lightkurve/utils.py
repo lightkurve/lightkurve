@@ -15,7 +15,7 @@ from functools import wraps
 
 log = logging.getLogger(__name__)
 
-__all__ = ['LightkurveWarning', 'LightkurveError',
+__all__ = ['LightkurveWarning',
            'KeplerQualityFlags', 'TessQualityFlags',
            'bkjd_to_astropy_time', 'btjd_to_astropy_time']
 
@@ -443,12 +443,7 @@ def plot_image(image, ax=None, scale='linear', origin='lower',
 
 
 class LightkurveWarning(Warning):
-    """Class for Lightkurve warnings."""
-    pass
-
-
-class LightkurveError(Exception):
-    """Class for Lightkurve exceptions."""
+    """Class for all Lightkurve warnings."""
     pass
 
 
