@@ -190,15 +190,26 @@ class SFFCorrector(RegressionCorrector):
             if count != niters - 1:
                 mask &= self._clip_outliers(model, sigma=sigma)
 
-        noise = LightCurve(self.time, np.dot(w[:len(dm.T)], dm.T))
+        s = (len(dm.T) - len(window_dm.T))
+        basic = LightCurve(self.time, np.dot(w[:s], dm[:, :s].T))
+        plt.figure()
+        plt.pcolormesh(dm[:, :s])
+        noise = LightCurve(self.time, np.dot(w[s:len(dm.T)], dm[:, s:].T))
+        plt.figure()
+        plt.pcolormesh(dm[:, s:len(dm.T)])
+        basic.flux -= np.median(basic.flux)
         noise.flux -= np.median(noise.flux)
         long_term = LightCurve(self.time, np.dot(w[len(dm.T):], dm2[:, len(dm.T):].T))
         long_term.flux -= np.median(long_term.flux)
+
+        plt.figure()
+        plt.pcolormesh(dm2[:, len(dm.T):])
+
         if preserve_trend:
             corrected = self.lc - noise.flux
         else:
             corrected = self.lc - model + np.median(model)
-        self.diagnostic_lightcurves = {'noise':noise, 'long_term':long_term, 'corrected':corrected}
+        self.diagnostic_lightcurves = {'basic':basic, 'noise':noise, 'long_term':long_term, 'corrected':corrected}
         self.cadence_mask = mask
         self.design_matrix = dm2
         self.weights = w
@@ -241,3 +252,34 @@ class SFFCorrector(RegressionCorrector):
 #
 # #            break
         return
+
+    def interact(self, notebook_url='localhost:8888', postprocessing=None):
+        """Display an interactive Jupyter Notebook widget to inspect the pixel data.
+
+        The widget will show both the lightcurve and pixel data.  By default,
+        the lightcurve shown is obtained by calling the `to_lightcurve()` method,
+        unless the user supplies a custom `LightCurve` object.
+        This feature requires an optional dependency, bokeh (v0.12.15 or later).
+        This dependency can be installed using e.g. `conda install bokeh`.
+
+        At this time, this feature only works inside an active Jupyter
+        Notebook, and tends to be too slow when more than ~30,000 cadences
+        are contained in the TPF (e.g. short cadence data).
+
+        Parameters
+        ----------
+        notebook_url: str
+            Location of the Jupyter notebook page (default: "localhost:8888")
+            When showing Bokeh applications, the Bokeh server must be
+            explicitly configured to allow connections originating from
+            different URLs. This parameter defaults to the standard notebook
+            host and port. If you are running on a different location, you
+            will need to supply this value for the application to display
+            properly. If no protocol is supplied in the URL, e.g. if it is
+            of the form "localhost:8888", then "http" will be used.
+        """
+        from .interact import show_SFF_interact_widget
+        with warnings.catch_warnings():
+            warnings.simplefilter(action='ignore', category=FutureWarning)
+            return show_SFF_interact_widget(self, notebook_url=notebook_url,
+                                        postprocessing=postprocessing)
