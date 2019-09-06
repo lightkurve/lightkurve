@@ -830,12 +830,18 @@ class LombScarglePeriodogram(Periodogram):
                           LightkurveWarning)
             nterms = 1
 
+        # If the light curve is normalized, scale to ppm for readability
+        if lc.flux_quantity.unit == u.dimensionless_unscaled:
+            flux_quantity = lc.flux_quantity * 1e6 * u.cds.ppm
+        else:
+            flux_quantity = lc.flux_quantity
+
         if float(astropy.__version__[0]) >= 3:
-            LS = LombScargle(time, lc.flux_quantity,
+            LS = LombScargle(time, flux_quantity,
                              nterms=nterms, normalization='psd', **kwargs)
             power = LS.power(frequency, method=ls_method)
         else:
-            LS = LombScargle(time, lc.flux_quantity,
+            LS = LombScargle(time, flux_quantity,
                              nterms=nterms, **kwargs)
             power = LS.power(frequency, method=ls_method, normalization='psd')
 
@@ -844,14 +850,11 @@ class LombScarglePeriodogram(Periodogram):
             # Rescale from the unnormalized  power output by Astropy's
             # Lomb-Scargle function to units of ppm^2 / [frequency unit]
             # that may be of more interest for asteroseismology.
-            power *=  2./(len(time)*oversample_factor*fs) #* (cds.ppm**2)
+            power *=  2. / (len(time) * oversample_factor * fs)
 
         # Amplitude spectrum
         elif normalization == 'amplitude':
-            factor = np.sqrt(4./len(lc.time))
-            power = np.sqrt(power) * factor
-            # Units of ppm
-            #power *= cds.ppm
+            power = np.sqrt(power) * np.sqrt(4./len(lc.time))
 
         # Periodogram needs properties
         return LombScarglePeriodogram(frequency=frequency, power=power, nyquist=nyquist,
