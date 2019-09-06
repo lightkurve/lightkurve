@@ -42,6 +42,8 @@ class LightCurve(object):
         Flux values for every time point.
     flux_err : array-like
         Uncertainty on each flux data point.
+    flux_unit : astropy.units.Unit
+        Unit of the flux values.
     time_format : str
         String specifying how an instant of time is represented,
         e.g. 'bkjd' or 'jd'.
@@ -69,8 +71,9 @@ class LightCurve(object):
         >>> lc.bin(binsize=2).flux
         array([0.99, 1.01])
     """
-    def __init__(self, time=None, flux=None, flux_err=None, time_format=None,
-                 time_scale=None, targetid=None, label=None, meta=None):
+    def __init__(self, time=None, flux=None, flux_err=None, flux_unit=None,
+                 time_format=None, time_scale=None, targetid=None, label=None,
+                 meta=None):
         if time is None and flux is None:
             raise ValueError('either time or flux must be given')
         if time is None:
@@ -82,6 +85,7 @@ class LightCurve(object):
                 warnings.warn('LightCurve object contains NaN times', LightkurveWarning)
         self.flux = self._validate_array(flux, name='flux')
         self.flux_err = self._validate_array(flux_err, name='flux_err')
+        self.flux_unit = flux_unit
         self.time_format = time_format
         self.time_scale = time_scale
         self.targetid = targetid
@@ -567,8 +571,9 @@ class LightCurve(object):
         
         # Create a new light curve instance and normalize its values
         lc = self.copy()
-        lc.flux_err = lc.flux_err / median_flux
         lc.flux = lc.flux / median_flux
+        lc.flux_err = lc.flux_err / median_flux
+        lc.flux_unit = u.dimensionless_unscaled
         return lc
 
     def remove_nans(self):
@@ -918,8 +923,10 @@ class LightCurve(object):
         if ylabel is None:
             if normalize:
                 ylabel = 'Normalized Flux'
+            elif self.flux_unit is None:
+                ylabel = 'Flux'
             else:
-                ylabel = 'Flux [e$^-$s$^{-1}$]'
+                ylabel = 'Flux [{}]'.format(self.flux_unit.to_string("latex_inline"))
         # Default legend label
         if ('label' not in kwargs):
             kwargs['label'] = self.label
@@ -1491,6 +1498,8 @@ class KeplerLightCurve(LightCurve):
         Data flux for every time point
     flux_err : array-like
         Uncertainty on each flux data point
+    flux_unit : astropy.units.Unit
+        Unit of the flux values.
     time_format : str
         String specifying how an instant of time is represented,
         e.g. 'bkjd' or 'jd'.
@@ -1518,11 +1527,12 @@ class KeplerLightCurve(LightCurve):
     targetid : int
         Kepler ID number
     """
-    def __init__(self, time=None, flux=None, flux_err=None, time_format=None, time_scale=None,
+    def __init__(self, time=None, flux=None, flux_err=None,
+                 flux_unit=u.Unit('electron/second'), time_format='bkjd', time_scale='tdb',
                  centroid_col=None, centroid_row=None, quality=None, quality_bitmask=None,
                  channel=None, campaign=None, quarter=None, mission=None,
                  cadenceno=None, targetid=None, ra=None, dec=None, label=None, meta=None):
-        super(KeplerLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err,
+        super(KeplerLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err, flux_unit=flux_unit,
                                                time_format=time_format, time_scale=time_scale,
                                                targetid=targetid, label=label, meta=meta)
         self.centroid_col = self._validate_array(centroid_col, name='centroid_col')
@@ -1645,6 +1655,8 @@ class TessLightCurve(LightCurve):
         Data flux for every time point
     flux_err : array-like
         Uncertainty on each flux data point
+    flux_unit : astropy.units.Unit
+        Unit of the flux values.
     time_format : str
         String specifying how an instant of time is represented,
         e.g. 'bkjd' or 'jd'.
@@ -1662,11 +1674,12 @@ class TessLightCurve(LightCurve):
     targetid : int
         Tess Input Catalog ID number
     """
-    def __init__(self, time=None, flux=None, flux_err=None, time_format=None, time_scale=None,
+    def __init__(self, time=None, flux=None, flux_err=None,
+                 flux_unit=u.Unit('electron/second'), time_format='btjd', time_scale='tdb',
                  centroid_col=None, centroid_row=None, quality=None, quality_bitmask=None,
                  cadenceno=None, sector=None, camera=None, ccd=None,
                  targetid=None, ra=None, dec=None, label=None, meta=None):
-        super(TessLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err,
+        super(TessLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err, flux_unit=flux_unit,
                                              time_format=time_format, time_scale=time_scale,
                                              targetid=targetid, label=label, meta=meta)
         self.centroid_col = self._validate_array(centroid_col, name='centroid_col')
