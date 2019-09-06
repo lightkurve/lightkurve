@@ -539,10 +539,36 @@ class LightCurve(object):
         normalized_lightcurve : `LightCurve`
             A new light curve object in which ``flux`` and ``flux_err`` have
             been divided by the median flux.
+
+        Warns
+        -----
+        LightkurveWarning
+            If the median flux is negative or within half a standard deviation
+            from zero.
         """
+        median_flux = np.nanmedian(self.flux)
+        std_flux = np.nanstd(self.flux)
+
+        # If the median flux is within half a standard deviation from zero, the
+        # light curve is likely zero-centered and normalization makes no sense.
+        if (median_flux == 0) or (np.isfinite(std_flux) and (np.abs(median_flux) < 0.5*std_flux)):
+            warnings.warn("The light curve appears to be zero-centered; "
+                          "`normalize()` will divide the light curve by zero "
+                          "or a value close to zero. "
+                          "(median_flux={:.2e}, std_flux={:.2e}).".format(median_flux, std_flux),
+                          LightkurveWarning)
+        # If the median flux is negative, normalization will invert the light
+        # curve and makes no sense.
+        if median_flux < 0:
+            warnings.warn("The light curve has a negative median flux; "
+                          "`normalize()` will invert the light curve. "
+                          "(median_flux={:.2e})".format(median_flux),
+                          LightkurveWarning)
+        
+        # Create a new light curve instance and normalize its values
         lc = self.copy()
-        lc.flux_err = lc.flux_err / np.nanmedian(lc.flux)
-        lc.flux = lc.flux / np.nanmedian(lc.flux)
+        lc.flux_err = lc.flux_err / median_flux
+        lc.flux = lc.flux / median_flux
         return lc
 
     def remove_nans(self):

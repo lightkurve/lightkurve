@@ -432,6 +432,24 @@ def test_normalize():
     assert_allclose(np.median(lc.normalize().flux_err), 0.05/5)
 
 
+def test_invalid_normalize():
+    """Normalization makes no sense if the light curve is negative or zero-centered."""
+    # zero-centered light curve
+    lc = LightCurve(time=np.arange(10), flux=np.zeros(10))
+    with pytest.warns(LightkurveWarning, match='zero-centered'):
+        lc.normalize()
+
+    # zero-centered light curve with flux errors
+    lc = LightCurve(time=np.arange(10), flux=np.zeros(10), flux_err=0.05*np.ones(10))
+    with pytest.warns(LightkurveWarning, match='zero-centered'):
+        lc.normalize()
+
+    # negative light curve
+    lc = LightCurve(time=np.arange(10), flux=-np.ones(10), flux_err=0.05*np.ones(10))
+    with pytest.warns(LightkurveWarning, match='negative'):
+        lc.normalize()
+
+
 def test_to_pandas():
     """Test the `LightCurve.to_pandas()` method."""
     time, flux, flux_err = range(3), np.ones(3), np.zeros(3)
