@@ -1,3 +1,10 @@
+1.2.0 (unreleased)
+==================
+
+- Changed `LightCurve.normalize()` to emit a warning if the light curve appears
+  to be zero-centered. [#589]
+
+
 1.1.1 (2019-08-19)
 ==================
 
