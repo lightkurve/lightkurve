@@ -738,12 +738,6 @@ class LombScarglePeriodogram(Periodogram):
                           LightkurveWarning)
             maximum_frequency = kwargs.pop("max_frequency", None)
 
-        # Make sure the lightcurve object is normalized
-        if not np.in1d(lc.flux, lc.normalize().flux).all():
-            warnings.warn("Input light curve will be normalized.",
-                          LightkurveWarning)
-            lc = lc.normalize()
-
         # Check if any values of period have been passed and set format accordingly
         if not all(b is None for b in [period, minimum_period, maximum_period]):
             default_view = 'period'
@@ -836,13 +830,12 @@ class LombScarglePeriodogram(Periodogram):
                           LightkurveWarning)
             nterms = 1
 
-        flux_scaling = 1e6
         if float(astropy.__version__[0]) >= 3:
-            LS = LombScargle(time, lc.flux * flux_scaling,
+            LS = LombScargle(time, lc.flux_quantity,
                              nterms=nterms, normalization='psd', **kwargs)
             power = LS.power(frequency, method=ls_method)
         else:
-            LS = LombScargle(time, lc.flux * flux_scaling,
+            LS = LombScargle(time, lc.flux_quantity,
                              nterms=nterms, **kwargs)
             power = LS.power(frequency, method=ls_method, normalization='psd')
 
@@ -851,14 +844,14 @@ class LombScarglePeriodogram(Periodogram):
             # Rescale from the unnormalized  power output by Astropy's
             # Lomb-Scargle function to units of ppm^2 / [frequency unit]
             # that may be of more interest for asteroseismology.
-            power *=  2./(len(time)*oversample_factor*fs) * (cds.ppm**2)
+            power *=  2./(len(time)*oversample_factor*fs) #* (cds.ppm**2)
 
         # Amplitude spectrum
         elif normalization == 'amplitude':
             factor = np.sqrt(4./len(lc.time))
             power = np.sqrt(power) * factor
             # Units of ppm
-            power *= cds.ppm
+            #power *= cds.ppm
 
         # Periodogram needs properties
         return LombScarglePeriodogram(frequency=frequency, power=power, nyquist=nyquist,

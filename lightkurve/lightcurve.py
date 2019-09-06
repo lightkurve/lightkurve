@@ -155,6 +155,14 @@ class LightCurve(object):
         return self.__rtruediv__(other)
 
     @property
+    def flux_quantity(self):
+        """Returns the flux as an astropy.units.Quantity object."""
+        if isinstance(self.flux_unit, u.UnitBase):
+            return (self.flux * self.flux_unit)
+        else:
+            return (self.flux * u.dimensionless_unscaled)
+
+    @property
     def astropy_time(self):
         """Returns the time values as an Astropy `~astropy.time.Time` object.
 
@@ -921,7 +929,7 @@ class LightCurve(object):
                 xlabel = 'Time'
         # Default ylabel
         if ylabel is None:
-            if normalize:
+            if normalize or (self.flux_unit == u.dimensionless_unscaled):
                 ylabel = 'Normalized Flux'
             elif self.flux_unit is None:
                 ylabel = 'Flux'
