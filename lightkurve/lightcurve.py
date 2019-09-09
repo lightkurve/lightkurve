@@ -566,11 +566,16 @@ class LightCurve(object):
                                 label=self.label,
                                 meta=self.meta)
 
-    def normalize(self):
+    def normalize(self, unit='unscaled'):
         """Returns a normalized version of the light curve.
 
         The normalized light curve is obtained by dividing the ``flux`` and
         ``flux_err`` object attributes by the by the median flux.
+
+        Parameters
+        ----------
+        unit : 'unscaled', 'percent', 'ppt', 'ppm'
+            The desired relative units of the normalized light curve.
 
         Examples
         --------
@@ -594,6 +599,7 @@ class LightCurve(object):
             If the median flux is negative or within half a standard deviation
             from zero.
         """
+        validate_method(unit, ['unscaled', 'percent', 'ppt', 'ppm'])
         median_flux = np.nanmedian(self.flux)
         std_flux = np.nanstd(self.flux)
 
@@ -612,12 +618,30 @@ class LightCurve(object):
                           "`normalize()` will invert the light curve. "
                           "(median_flux={:.2e})".format(median_flux),
                           LightkurveWarning)
-        
+
         # Create a new light curve instance and normalize its values
         lc = self.copy()
         lc.flux = lc.flux / median_flux
         lc.flux_err = lc.flux_err / median_flux
         lc.flux_unit = u.dimensionless_unscaled
+
+        # Set the desired relative (dimensionless) units
+        if unit == 'unscaled':
+            lc.flux_unit = u.dimensionless_unscaled
+        elif unit == 'percent':
+            lc.flux_unit = u.percent
+            lc.flux *= 100
+            lc.flux_err *= 100
+        elif unit == 'ppt':
+            # ppt is not supported out of the box by astropy
+            lc.flux_unit = u.def_unit(['ppt', 'parts per thousand'], u.Unit(1e-3))
+            lc.flux *= 1000
+            lc.flux_err *= 1000
+        elif unit == 'ppm':
+            lc.flux_unit = u.cds.ppm
+            lc.flux *= 1e6
+            lc.flux_err *= 1e6
+
         return lc
 
     def remove_nans(self):

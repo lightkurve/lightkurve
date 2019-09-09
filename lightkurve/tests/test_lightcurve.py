@@ -823,3 +823,10 @@ def test_astropy_time_initialization():
     assert lc.time_scale == 'utc'
     assert lc.astropy_time.format == 'jd'
     assert lc.astropy_time.scale == 'utc'
+
+
+def test_normalize_unit():
+    """Can the units of a normalized light curve be set?"""
+    lc = LightCurve(flux=[1, 2, 3])
+    for unit in ['percent', 'ppt', 'ppm']:
+        assert lc.normalize(unit='ppm').flux_unit.name == 'ppm'
