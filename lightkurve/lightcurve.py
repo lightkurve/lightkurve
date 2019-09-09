@@ -85,13 +85,17 @@ class LightCurve(object):
         if time is None:
             self.time = np.arange(len(flux))
         else:
-            self.time = np.asarray(time)
-            # Trigger warning if time=NaN are present
-            if np.isnan(self.time).any():
-                warnings.warn('LightCurve object contains NaN times', LightkurveWarning)
+            self.time = self._validate_time(time)
         self.flux = self._validate_array(flux, name='flux')
         self.flux_err = self._validate_array(flux_err, name='flux_err')
-        self.flux_unit = flux_unit  # @flux_unit.setter will validate input
+        # If `time` or `flux` are astropy objects, we will retrieve
+        # `time_format`, `time_scale,` and `flux_unit` from them.
+        if isinstance(flux, u.Quantity):
+            flux_unit = flux.unit
+        if isinstance(time, Time):
+            time_format = time.format
+            time_scale = time.scale
+        self.flux_unit = flux_unit  # @flux_unit.setter will validate this
         self.time_format = time_format
         self.time_scale = time_scale
         self.targetid = targetid
@@ -101,12 +105,23 @@ class LightCurve(object):
         else:
             self.meta = meta
 
+    def _validate_time(self, time):
+        """Ensure the `time` user input is valid."""
+        if isinstance(time, Time):  # Support Astropy Time objects
+            time = time.value
+        time = np.asarray(time)
+        # Trigger warning if time=NaN are present
+        if np.isnan(time).any():
+            warnings.warn('LightCurve object contains NaN times', LightkurveWarning)
+        return time
+
     def _validate_array(self, arr, name='array'):
-        """Ensure the input arrays have the same length as `self.time`."""
-        if arr is not None:
-            arr = np.asarray(arr)
-        else:
+        """Ensure the input flux/centroid/quality/etc arrays are valid and have
+        the exact same length as `self.time`."""
+        if arr is None:  # arrays default to NaN arrays of length time
             arr = np.nan * np.ones_like(self.time)
+        else:
+            arr = np.asarray(arr)
 
         if not (len(self.time) == len(arr)):
             raise ValueError("Input arrays have different lengths."
@@ -1527,8 +1542,9 @@ class KeplerLightCurve(LightCurve):
         Data flux for every time point
     flux_err : array-like
         Uncertainty on each flux data point
-    flux_unit : astropy.units.Unit
-        Unit of the flux values.
+    flux_unit : `~astropy.units.Unit` or str
+        Unit of the flux values.  If a string is passed, it will be passed
+        on the the constructor of `~astropy.units.Unit`.
     time_format : str
         String specifying how an instant of time is represented,
         e.g. 'bkjd' or 'jd'.
@@ -1684,8 +1700,9 @@ class TessLightCurve(LightCurve):
         Data flux for every time point
     flux_err : array-like
         Uncertainty on each flux data point
-    flux_unit : astropy.units.Unit
-        Unit of the flux values.
+    flux_unit : `~astropy.units.Unit` or str
+        Unit of the flux values.  If a string is passed, it will be passed
+        on the the constructor of `~astropy.units.Unit`.
     time_format : str
         String specifying how an instant of time is represented,
         e.g. 'bkjd' or 'jd'.

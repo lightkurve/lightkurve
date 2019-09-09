@@ -3,6 +3,7 @@ from __future__ import division, print_function
 from astropy.io import fits as pyfits
 from astropy.utils.data import get_pkg_data_filename
 from astropy import units as u
+from astropy.time import Time
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -789,17 +790,36 @@ def test_to_timeseries():
 
 def test_flux_unit():
     """Checks the use of lc.flux_unit and lc.flux_quantity."""
+    unit_obj = u.Unit("electron/second")
     # Can we set flux units using a Unit object?
     time, flux = range(3), np.ones(3)
-    lc = LightCurve(time, flux, flux_unit=u.Unit("electron/second"))
-    assert lc.flux_unit == u.Unit("electron/second")
+    lc = LightCurve(time, flux, flux_unit=unit_obj)
+    assert lc.flux_unit == unit_obj
     # Can we set flux units using a string?
     lc = LightCurve(time, flux, flux_unit="electron/second")
-    assert lc.flux_unit == u.Unit("electron/second")
+    assert lc.flux_unit == unit_obj
+    # Can we pass a quantity to flux?
+    lc = LightCurve(time, flux*unit_obj)
+    assert lc.flux_unit == unit_obj
     # Can we retrieve correct flux quantities?
-    assert lc.flux_quantity.unit == u.Unit("electron/second")
+    assert lc.flux_quantity.unit ==unit_obj
     assert_array_equal(lc.flux_quantity.value, flux)
     # Is invalid user input validated?
     with pytest.raises(ValueError) as err:
         lc = LightCurve(time, flux, flux_unit="blablabla")
     assert "invalid `flux_unit`" in err.value.args[0]
+
+
+def test_astropy_time_initialization():
+    """Does the `LightCurve` constructor accept Astropy time objects?"""
+    time = [1, 2, 3]
+    lc = LightCurve(time=Time(time, format='jd', scale='utc'))
+    assert lc.time_format == 'jd'
+    assert lc.time_scale == 'utc'
+    assert lc.astropy_time.format == 'jd'
+    assert lc.astropy_time.scale == 'utc'
+    lc = LightCurve(time=time, time_format='jd', time_scale='utc')
+    assert lc.time_format == 'jd'
+    assert lc.time_scale == 'utc'
+    assert lc.astropy_time.format == 'jd'
+    assert lc.astropy_time.scale == 'utc'
