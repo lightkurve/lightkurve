@@ -36,7 +36,7 @@ class Periodogram(object):
 
     The Periodogram class represents a power spectrum, with values of
     frequency on the x-axis (in any frequency units) and values of power on the
-    y-axis (in units of ppm^2 / [frequency units]).
+    y-axis (in units of flux^2 / [frequency units]).
 
     Attributes
     ----------
@@ -44,7 +44,7 @@ class Periodogram(object):
         Array of frequencies with associated astropy unit.
     power : `astropy.units.Quantity` object
         Array of power-spectral-densities. The Quantity array must have units
-        of `ppm^2 / freq_unit`, where freq_unit is the unit of the frequency
+        of `flux^2 / freq_unit`, where freq_unit is the unit of the frequency
         attribute.
     nyquist : float, optional
         The Nyquist frequency of the lightcurve. In units of freq_unit, where
@@ -296,10 +296,9 @@ class Periodogram(object):
         if style is None or style == 'lightkurve':
             style = MPLSTYLE
         if ylabel is None:
-            if self.power.unit == cds.ppm:
-                ylabel = "Amplitude [{}]".format(self.power.unit.to_string('latex'))
-            else:
-                ylabel = "Power Spectral Density [{}]".format(self.power.unit.to_string('latex'))
+            ylabel = "Power"
+            if self.power.unit.to_string() != '':
+                ylabel += " [{}]".format(self.power.unit.to_string('latex'))
 
         # This will need to be fixed with housekeeping. Self.label currently doesnt exist.
         if ('label' not in kwargs) and ('label' in dir(self)):
@@ -636,8 +635,8 @@ class LombScarglePeriodogram(Periodogram):
         space beyond the Nyquist frequency, which may introduce aliasing.
 
         The `freq_unit` parameter allows a request for alternative units in frequency
-        space. By default frequency is in (1/day) and power in (amplitude
-        (ppm)). Asteroseismologists for example may want frequency in (microHz)
+        space. By default frequency is in (1/day) and power in (amplitude).
+        Asteroseismologists for example may want frequency in (microHz)
         in which case they would pass `freq_unit=u.microhertz`.
 
         By default this method uses the LombScargle 'fast' method, which assumes
@@ -704,10 +703,8 @@ class LombScarglePeriodogram(Periodogram):
         Periodogram : `Periodogram` object
             Returns a Periodogram object extracted from the lightcurve.
         """
-        # Input validation for spectrum type
-        if normalization not in ('psd', 'amplitude'):
-            raise ValueError("The `normalization` parameter must be one of "
-                             "either 'psd' or 'amplitude'.")
+        # Input validation
+        normalization = validate_method(normalization, ['psd', 'amplitude'])
 
         # Setting default frequency units
         if freq_unit is None:
@@ -830,29 +827,20 @@ class LombScarglePeriodogram(Periodogram):
                           LightkurveWarning)
             nterms = 1
 
-        # If the light curve is normalized, scale to ppm for readability
-        if lc.flux_quantity.unit == u.dimensionless_unscaled:
-            flux_quantity = lc.flux_quantity * 1e6 * u.cds.ppm
-        else:
-            flux_quantity = lc.flux_quantity
-
         if float(astropy.__version__[0]) >= 3:
-            LS = LombScargle(time, flux_quantity,
+            LS = LombScargle(time, lc.flux_quantity,
                              nterms=nterms, normalization='psd', **kwargs)
             power = LS.power(frequency, method=ls_method)
         else:
-            LS = LombScargle(time, flux_quantity,
+            LS = LombScargle(time, lc.flux_quantity,
                              nterms=nterms, **kwargs)
             power = LS.power(frequency, method=ls_method, normalization='psd')
 
-        # Power spectral density
-        if normalization == 'psd':
-            # Rescale from the unnormalized  power output by Astropy's
-            # Lomb-Scargle function to units of ppm^2 / [frequency unit]
+        if normalization == 'psd':  # Power spectral density
+            # Rescale from the unnormalized power output by Astropy's
+            # Lomb-Scargle function to units of flux_variance / [frequency unit]
             # that may be of more interest for asteroseismology.
             power *=  2. / (len(time) * oversample_factor * fs)
-
-        # Amplitude spectrum
         elif normalization == 'amplitude':
             power = np.sqrt(power) * np.sqrt(4./len(lc.time))
 
