@@ -42,8 +42,9 @@ class LightCurve(object):
         Flux values for every time point.
     flux_err : array-like
         Uncertainty on each flux data point.
-    flux_unit : astropy.units.Unit
-        Unit of the flux values.
+    flux_unit : astropy.units.Unit or str
+        Unit of the flux values.  If a string is passed, it will be passed
+        on the the constructor of `~astropy.units.Unit`.
     time_format : str
         String specifying how an instant of time is represented,
         e.g. 'bkjd' or 'jd'.
@@ -56,6 +57,11 @@ class LightCurve(object):
         Human-friendly object label, e.g. "KIC 123456789".
     meta : dict
         Free-form metadata associated with the LightCurve.
+
+    Raises
+    ------
+    ValueError
+        If `flux_unit` is not a valid astropy Unit object or string.
 
     Examples
     --------
@@ -85,7 +91,7 @@ class LightCurve(object):
                 warnings.warn('LightCurve object contains NaN times', LightkurveWarning)
         self.flux = self._validate_array(flux, name='flux')
         self.flux_err = self._validate_array(flux_err, name='flux_err')
-        self.flux_unit = flux_unit
+        self.flux_unit = flux_unit  # @flux_unit.setter will validate input
         self.time_format = time_format
         self.time_scale = time_scale
         self.targetid = targetid
@@ -153,6 +159,21 @@ class LightCurve(object):
 
     def __rdiv__(self, other):
         return self.__rtruediv__(other)
+
+    @property
+    def flux_unit(self):
+        return self._flux_unit
+
+    @flux_unit.setter
+    def flux_unit(self, flux_unit):
+        # Validate user input for `flux_unit`
+        if flux_unit is None:
+            self._flux_unit = None
+        else:
+            try:
+                self._flux_unit = u.Unit(flux_unit)
+            except ValueError as e:
+                raise ValueError("invalid `flux_unit`: {}".format(e))
 
     @property
     def flux_quantity(self):

@@ -785,3 +785,21 @@ def test_to_timeseries():
     except ImportError:
         # Requires AstroPy v3.2 or later
         pass
+
+
+def test_flux_unit():
+    """Checks the use of lc.flux_unit and lc.flux_quantity."""
+    # Can we set flux units using a Unit object?
+    time, flux = range(3), np.ones(3)
+    lc = LightCurve(time, flux, flux_unit=u.Unit("electron/second"))
+    assert lc.flux_unit == u.Unit("electron/second")
+    # Can we set flux units using a string?
+    lc = LightCurve(time, flux, flux_unit="electron/second")
+    assert lc.flux_unit == u.Unit("electron/second")
+    # Can we retrieve correct flux quantities?
+    assert lc.flux_quantity.unit == u.Unit("electron/second")
+    assert_array_equal(lc.flux_quantity.value, flux)
+    # Is invalid user input validated?
+    with pytest.raises(ValueError) as err:
+        lc = LightCurve(time, flux, flux_unit="blablabla")
+    assert "invalid `flux_unit`" in err.value.args[0]
