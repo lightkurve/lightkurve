@@ -4,6 +4,7 @@ from __future__ import division, print_function
 import copy
 import logging
 import math
+import re
 import warnings
 
 import numpy as np
@@ -298,7 +299,10 @@ class Periodogram(object):
         if ylabel is None:
             ylabel = "Power"
             if self.power.unit.to_string() != '':
-                ylabel += " [{}]".format(self.power.unit.to_string('latex'))
+                unit_label = self.power.unit.to_string('latex')
+                # See https://github.com/astropy/astropy/pull/9218
+                unit_label = re.sub(r"\^{([^}]+)}\^{([^}]+)}", r"^{\g<1>^{\g<2>}}", unit_label)
+                ylabel += " [{}]".format(unit_label)
 
         # This will need to be fixed with housekeeping. Self.label currently doesnt exist.
         if ('label' not in kwargs) and ('label' in dir(self)):
