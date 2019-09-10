@@ -284,20 +284,20 @@ def test_plot_echelle():
     butler.plot_echelle(deltanu, u.Quantity(numax, 1/u.day))
 
     # Assert echelle works with minimum limit
-    butler.plot_echelle(deltanu, numax, minimum_frequency = numax)
-    butler.plot_echelle(deltanu, numax, maximum_frequency = numax)
-    butler.plot_echelle(deltanu, numax, minimum_frequency = u.Quantity(numax, 1/u.day))
-    butler.plot_echelle(deltanu, numax, maximum_frequency = u.Quantity(numax, 1/u.day))
-    butler.plot_echelle(deltanu, numax, minimum_frequency = u.Quantity(numax-deltanu, 1/u.day),
-                        maximum_frequency = numax+deltanu)
+    butler.plot_echelle(deltanu, numax, minimum_frequency=numax)
+    butler.plot_echelle(deltanu, numax, maximum_frequency=numax)
+    butler.plot_echelle(deltanu, numax, minimum_frequency=u.Quantity(numax, 1/u.day))
+    butler.plot_echelle(deltanu, numax, maximum_frequency=u.Quantity(numax, 1/u.day))
+    butler.plot_echelle(deltanu, numax, minimum_frequency=u.Quantity(numax-deltanu, 1/u.day),
+                        maximum_frequency=numax+deltanu)
 
     # Assert raises error if numax or either of the limits are too high
     with pytest.raises(ValueError):
-        butler.plot_echelle(deltanu, numax, minimum_frequency = f[-1]+10)
+        butler.plot_echelle(deltanu, numax, minimum_frequency=f[-1]+10)
     with pytest.raises(ValueError):
-        butler.plot_echelle(deltanu, numax, maximum_frequency = f[-1]+10)
+        butler.plot_echelle(deltanu, numax, maximum_frequency=f[-1]+10)
     with pytest.raises(ValueError):
-        butler.plot_echelle(deltanu, numax = f[-1]+10)
+        butler.plot_echelle(deltanu, numax=f[-1]+10)
 
     # Assert can pass colormap
     butler.plot_echelle(deltanu, numax, cmap='viridis')
