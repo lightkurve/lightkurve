@@ -105,7 +105,8 @@ class LightCurve(object):
         else:
             self.meta = meta
 
-    def _validate_time(self, time):
+    @classmethod
+    def _validate_time(cls, time):
         """Ensure the `time` user input is valid."""
         if isinstance(time, Time):  # Support Astropy Time objects
             time = time.value

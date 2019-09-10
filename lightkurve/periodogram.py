@@ -300,6 +300,8 @@ class Periodogram(object):
             ylabel = "Power"
             if self.power.unit.to_string() != '':
                 unit_label = self.power.unit.to_string('latex')
+                # The line below is a workaround for AstroPy bug #9218.
+                # It can be removed once the fix for that issue is widespread.
                 # See https://github.com/astropy/astropy/pull/9218
                 unit_label = re.sub(r"\^{([^}]+)}\^{([^}]+)}", r"^{\g<1>^{\g<2>}}", unit_label)
                 ylabel += " [{}]".format(unit_label)
