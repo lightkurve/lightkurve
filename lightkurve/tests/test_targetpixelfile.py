@@ -16,6 +16,7 @@ from astropy.io import fits
 from astropy import wcs
 from astropy.io.fits.card import UNDEFINED
 import astropy.units as u
+from astropy.utils.exceptions import AstropyWarning
 
 from ..targetpixelfile import KeplerTargetPixelFile, KeplerTargetPixelFileFactory
 from ..targetpixelfile import TessTargetPixelFile
@@ -398,7 +399,10 @@ def test_tpf_wcs_from_images():
     assert tpf.hdu[1].header['2CRPX5'] != UNDEFINED
     assert tpf.hdu[1].header['1CUNI5'] == 'deg'
     assert tpf.hdu[1].header['2CUNI5'] == 'deg'
-    assert tpf.wcs.to_header()['CDELT1'] == w.wcs.cdelt[0]
+    with warnings.catch_warnings():
+        # Ignore the warning: "PC1_1 = a floating-point value was expected."
+        warnings.simplefilter("ignore", AstropyWarning)
+        assert tpf.wcs.to_header()['CDELT1'] == w.wcs.cdelt[0]
 
 def test_properties2(capfd):
     '''Test if the describe function produces an output.

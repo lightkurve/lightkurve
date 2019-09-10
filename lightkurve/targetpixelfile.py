@@ -11,14 +11,16 @@ from astropy.io.fits import Undefined
 from astropy.nddata import Cutout2D
 from astropy.table import Table
 from astropy.wcs import WCS
+from astropy.utils.exceptions import AstropyWarning
+from astropy.coordinates import SkyCoord
+from astropy.stats.funcs import median_absolute_deviation as MAD
+
 from matplotlib import patches
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.ndimage import label
 from tqdm import tqdm
 from copy import deepcopy
-from astropy.coordinates import SkyCoord
-from astropy.stats.funcs import median_absolute_deviation as MAD
 
 from . import PACKAGEDIR, MPLSTYLE
 from .lightcurve import KeplerLightCurve, TessLightCurve
@@ -1185,12 +1187,17 @@ class KeplerTargetPixelFile(TargetPixelFile):
             # Get positional shift of the image compared to the reference WCS
             wcs_current = WCS(hdu.header)
             column_current, row_current = wcs_current.all_world2pix(
-                          np.asarray([[position.ra.deg], [position.dec.deg]]).T,0)[0]
+                np.asarray([[position.ra.deg], [position.dec.deg]]).T, 0)[0]
             column_ref, row_ref = wcs_ref.all_world2pix(
-                          np.asarray([[position.ra.deg], [position.dec.deg]]).T,0)[0]
+                np.asarray([[position.ra.deg], [position.dec.deg]]).T, 0)[0]
 
-            hdu.header['POS_CORR1'] = column_current - column_ref
-            hdu.header['POS_CORR2'] = row_current - row_ref
+            with warnings.catch_warnings():
+                # Using `POS_CORR1` as a header keyword violates the FITS
+                # standard for being too long, but we use it for consistency
+                # with the TPF column name.  Hence we ignore the warning.
+                warnings.simplefilter("ignore", AstropyWarning)
+                hdu.header['POS_CORR1'] = column_current - column_ref
+                hdu.header['POS_CORR2'] = row_current - row_ref
 
             if position is None:
                 cutout = hdu
