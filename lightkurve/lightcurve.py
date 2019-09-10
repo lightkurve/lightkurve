@@ -195,9 +195,9 @@ class LightCurve(object):
     def flux_quantity(self):
         """Returns the flux as an astropy.units.Quantity object."""
         if isinstance(self.flux_unit, u.UnitBase):
-            return (self.flux * self.flux_unit)
+            return self.flux * self.flux_unit
         else:
-            return (self.flux * u.dimensionless_unscaled)
+            return self.flux * u.dimensionless_unscaled
 
     @property
     def astropy_time(self):
