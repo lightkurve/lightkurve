@@ -290,17 +290,17 @@ def test_error_messages():
 
     # Can't specify period range and frequency range
     with pytest.raises(ValueError) as err:
-        lc.to_periodogram(max_frequency=0.1, min_period=10)
+        lc.to_periodogram(maximum_frequency=0.1, minimum_period=10)
 
     # Can't have a minimum frequency > maximum frequency
     with pytest.raises(ValueError) as err:
-        lc.to_periodogram(max_frequency=0.1, min_frequency=10)
-        assert err.value.args[0] == 'min_frequency cannot be larger than max_frequency'
+        lc.to_periodogram(maximum_frequency=0.1, minimum_frequency=10)
+    assert err.value.args[0] == 'minimum_frequency cannot be larger than maximum_frequency'
 
     # Can't have a minimum period > maximum period
     with pytest.raises(ValueError) as err:
-        lc.to_periodogram(max_period=0.1, min_period=10)
-        assert err.value.args[0] == 'min_period cannot be larger than max_period'
+        lc.to_periodogram(maximum_period=0.1, minimum_period=10)
+    assert err.value.args[0] == 'minimum_period cannot be larger than maximum_period'
 
     # Can't specify periods and frequencies
     with pytest.raises(ValueError) as err:
