@@ -91,12 +91,7 @@ class Periodogram(object):
         """
         if view is None and hasattr(self, 'default_view'):
             view = self.default_view
-        allowed_views = ["frequency", "period"]
-        if view not in allowed_views:
-            raise ValueError(("'{}' is an invalid value for view, "
-                              "allowed values are: {}.")
-                             .format(view, allowed_views))
-        return view
+        return validate_method(view, ["frequency", "period"])
 
     @property
     def period(self):
@@ -543,7 +538,7 @@ class SNRPeriodogram(Periodogram):
         super(SNRPeriodogram, self).__init__(*args, **kwargs)
 
     def __repr__(self):
-        return('SNRPeriodogram(ID: {})'.format(self.label))
+        return 'SNRPeriodogram(ID: {})'.format(self.label)
 
     def plot(self, **kwargs):
         """Plot the SNR spectrum using matplotlib's `plot` method.
