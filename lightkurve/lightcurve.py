@@ -636,15 +636,15 @@ class LightCurve(object):
             lc.flux_unit = u.percent
             lc.flux *= 100
             lc.flux_err *= 100
-        elif unit == 'ppt':
-            # ppt is not supported out of the box by astropy
+        elif unit == 'ppt':  # parts per thousand
+            # ppt is not included in astropy, so we define it here
             lc.flux_unit = u.def_unit(['ppt', 'parts per thousand'], u.Unit(1e-3))
             lc.flux *= 1000
             lc.flux_err *= 1000
-        elif unit == 'ppm':
+        elif unit == 'ppm':  # parts per million
             lc.flux_unit = u.cds.ppm
-            lc.flux *= 1e6
-            lc.flux_err *= 1e6
+            lc.flux *= 1000000
+            lc.flux_err *= 1000000
 
         return lc
 
@@ -967,7 +967,7 @@ class LightCurve(object):
         cdpp_ppm = np.std(mean) * 1e6
         return cdpp_ppm
 
-    def _create_plot(self, method='plot', ax=None, normalize=True,
+    def _create_plot(self, method='plot', ax=None, normalize=False,
                      xlabel=None, ylabel=None, title='', style='lightkurve',
                      show_colorbar=True, colorbar_label='',
                      **kwargs):
