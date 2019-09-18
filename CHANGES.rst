@@ -1,8 +1,22 @@
 1.2.0 (unreleased)
 ==================
 
+- Added `flux_unit` and `flux_quantity` properties to the `LightCurve` class
+  to enable users to keep track of a light curve's flux units. [#591]
+
+- Changed the default behavior of `LightCurve.plot()` to use `normalize=False`,
+  ie. plots now display a light curve in its intrinsic units by default. [#591]
+
+- Added an optional `unit` argument to `LightCurve.normalize()` to make it
+  convenient to obtain a relative light curve in percent (`unit='percent'`),
+  parts per thousand (`unit='ppt'`) or parts per million (`unit='ppm'`). [#591]
+
+- Changed `LombScarglePeriodogram.from_lightcurve()` to not normalize the input
+  light curve by default. [#591]
+
 - Changed `LightCurve.normalize()` to emit a warning if the light curve appears
   to be zero-centered. [#589]
+
 
 
 1.1.1 (2019-08-19)
