@@ -285,8 +285,7 @@ class SearchResult(object):
             Path to locally downloaded cutout file
         """
         from astroquery.mast import TesscutClass
-        from astroquery.mast.core import MastClass
-        coords = MastClass()._resolve_object(target)
+        coords = _resolve_object(target)
 
         # Set cutout_size defaults
         if cutout_size is None:
@@ -303,7 +302,7 @@ class SearchResult(object):
                 tesscut_dir = download_dir
 
         # Resolve SkyCoord of given target
-        coords = MastClass()._resolve_object(target)
+        coords = _resolve_object(target)
         cutout_path = TesscutClass().download_cutouts(coords, size=cutout_size,
                                                       sector=sector, path=tesscut_dir)
 
@@ -954,3 +953,13 @@ def _open_downloaded_file(path, **kwargs):
         raise SearchError("Failed to open the downloaded file ({}). "
                           "The file was likely only partially downloaded. "
                           "Please remove it from your disk and try again.".format(path))
+
+
+def _resolve_object(target):
+    """Ask MAST to resolve an object string to a set of coordinates."""
+    from astroquery.mast.core import MastClass
+    # `_resolve_object` was renamed `resolve_object` in astroquery 0.3.10 (2019)
+    try:
+        return MastClass().resolve_object(target)
+    except AttributeError:
+        return MastClass()._resolve_object(target)
