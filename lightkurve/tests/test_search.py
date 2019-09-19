@@ -36,7 +36,7 @@ def test_search_targetpixelfile():
     assert(len(search_targetpixelfile('KIC 11904151', mission='Kepler', quarter=12).table) == 0)
     # should work for all split campaigns
     campaigns = [[91, 92, 9], [101, 102, 10], [111, 112, 11]]
-    ids = ['EPIC 200068780', 'EPIC 200071712', 'EPIC 202975993']
+    ids = ['EPIC 228162462', 'EPIC 228726301', 'EPIC 202975993']
     for c, idx in zip(campaigns, ids):
         ca = search_targetpixelfile(idx, campaign=c[0]).table
         cb = search_targetpixelfile(idx, campaign=c[1]).table
