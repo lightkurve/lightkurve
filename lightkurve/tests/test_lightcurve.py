@@ -290,7 +290,8 @@ def test_custom_lightcurve_file(path, mission):
     if mission == "K2":
         lcf_custom = KeplerLightCurveFile(path)
     elif mission == "TESS":
-        lcf_custom = TessLightCurveFile(path)
+        with pytest.warns(LightkurveWarning):
+            lcf_custom = TessLightCurveFile(path)
     assert lcf_custom.hdu[2].name == 'APERTURE'
     assert lcf_custom.cadenceno[0] >= 0
     assert lcf_custom.dec == lcf_custom.dec
@@ -774,7 +775,7 @@ def test_regression_346():
 
 def test_to_timeseries():
     """Test the `LightCurve.to_timeseries()` method."""
-    time, flux, flux_err = range(3), np.ones(3), np.zeros(3)
+    time, flux, flux_err = np.arange(3)+2457576.4, np.ones(3), np.ones(3)*0.01
     lc = LightCurve(time, flux, flux_err, time_format="jd")
     try:
         ts = lc.to_timeseries()

@@ -114,7 +114,7 @@ def test_search_tesscut_download():
     ra, dec = 30.578761, -83.210593
     search_string = search_tesscut('{}, {}'.format(ra, dec), sector=[1, 12])
     # Make sure they can be downloaded with default size
-    tpf = search_string.download()
+    tpf = search_string[0].download()
     # Ensure the correct object has been read in
     assert(isinstance(tpf, TessTargetPixelFile))
     # Ensure default size is 5x5
@@ -132,26 +132,26 @@ def test_search_tesscut_download():
     # Ensure correct dimensions
     assert(tpfc[0].flux[0].shape == (4, 4))
     # Download with rectangular dimennsions?
-    rect_tpf = search_string.download(cutout_size=(3, 5))
+    rect_tpf = search_string[0].download(cutout_size=(3, 5))
     assert(rect_tpf.flux[0].shape == (3, 5))
 
 
 @pytest.mark.remote_data
 def test_search_with_skycoord():
     """Can we pass both names, SkyCoord objects, and coordinate strings?"""
-    sr_name = search_targetpixelfile("Kepler-10")
+    sr_name = search_targetpixelfile("Kepler-10", mission='Kepler')
     assert len(sr_name) == 15  # Kepler-10 as observed during 15 quarters in long cadence
     # Can we search using a SkyCoord objects?
-    sr_skycoord = search_targetpixelfile(SkyCoord.from_name("Kepler_10"))
+    sr_skycoord = search_targetpixelfile(SkyCoord.from_name("Kepler_10"), mission='Kepler')
     assert_array_equal(sr_name.table['productFilename'], sr_skycoord.table['productFilename'])
     # Can we search using a string of "ra dec" decimals?
-    sr_decimal = search_targetpixelfile("285.67942179 +50.24130576")
+    sr_decimal = search_targetpixelfile("285.67942179 +50.24130576", mission='Kepler')
     assert_array_equal(sr_name.table['productFilename'], sr_decimal.table['productFilename'])
     # Can we search using a sexagesimal string?
-    sr_sexagesimal = search_targetpixelfile("19:02:43.1 +50:14:28.7")
+    sr_sexagesimal = search_targetpixelfile("19:02:43.1 +50:14:28.7", mission='Kepler')
     assert_array_equal(sr_name.table['productFilename'], sr_sexagesimal.table['productFilename'])
     # Can we search using the KIC ID?
-    sr_kic = search_targetpixelfile('KIC 11904151')
+    sr_kic = search_targetpixelfile('KIC 11904151', mission='Kepler')
     assert_array_equal(sr_name.table['productFilename'], sr_kic.table['productFilename'])
 
 
