@@ -90,7 +90,7 @@ def test_custom_exported_filename():
 
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 def test_max_cadences():
-    """Can we provide a custom lightcurve to show?"""
+    """Test what is the max number of cadences allowed"""
     import bokeh
     with warnings.catch_warnings():
         # Ignore the "TELESCOP is not equal to TESS" warning

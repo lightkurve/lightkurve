@@ -6,6 +6,7 @@ from numpy.testing import assert_almost_equal, assert_array_equal
 from ..lightcurve import LightCurve
 from ..search import search_lightcurvefile
 from ..periodogram import Periodogram
+from ..utils import LightkurveWarning
 import sys
 
 
@@ -20,6 +21,7 @@ def test_periodogram_basics():
     """Sanity check to verify that periodogram plotting works"""
     lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000),
                     flux_err=np.zeros(1000)+0.1)
+    lc = lc.normalize()
     pg = lc.to_periodogram()
     pg.plot()
     pg.plot(view='period')
@@ -32,6 +34,7 @@ def test_periodogram_normalization():
     lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000),
                     flux_err=np.zeros(1000)+0.1)
     # Test amplitude normalization and correct units
+    lc = lc.normalize()
     pg = lc.to_periodogram(normalization='amplitude')
     assert pg.power.unit == u.cds.ppm
 
@@ -39,12 +42,25 @@ def test_periodogram_normalization():
     pg = lc.to_periodogram(freq_unit=u.microhertz, normalization='psd')
     assert pg.power.unit == u.cds.ppm**2 / u.microhertz
 
+def test_periodogram_warnings():
+    """Tests if warnings are raised for non-normalized periodogram input"""
+    lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000),
+                    flux_err=np.zeros(1000)+0.1)
+    # Test amplitude normalization and correct units
+    with pytest.warns(LightkurveWarning):
+        pg = lc.to_periodogram(normalization='amplitude')
+        assert pg.power.unit == u.cds.ppm
+
+    with pytest.warns(LightkurveWarning):
+        pg = lc.to_periodogram(freq_unit=u.microhertz, normalization='psd')
+        assert pg.power.unit == u.cds.ppm**2 / u.microhertz
+
 def test_periodogram_units():
     """Tests whether periodogram has correct units"""
     # Fake, noisy data
     lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000),
                     flux_err=np.zeros(1000)+0.1)
-    p = lc.to_periodogram(normalization='amplitude')
+    p = lc.normalize().to_periodogram(normalization='amplitude')
     # Has units
     assert hasattr(p.frequency, 'unit')
 
@@ -63,6 +79,7 @@ def test_periodogram_can_find_periods():
                     flux_err=np.zeros(1000)+0.1)
     # Add a 100 day period signal
     lc.flux += np.sin((lc.time/float(lc.time.max())) * 20 * np.pi)
+    lc = lc.normalize()
     p = lc.to_periodogram(normalization='amplitude')
     assert np.isclose(p.period_at_max_power.value, 100, rtol=1e-3)
 
@@ -72,6 +89,7 @@ def test_periodogram_slicing():
     # Fake, noisy data
     lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000),
                     flux_err=np.zeros(1000)+0.1)
+    lc = lc.normalize()
     p = lc.to_periodogram()
     assert len(p[0:200].frequency) == 200
 
@@ -98,6 +116,7 @@ def test_assign_periods():
     lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000),
                     flux_err=np.zeros(1000) + 0.1)
     periods = np.arange(1, 100) * u.day
+    lc = lc.normalize()
     p = lc.to_periodogram(period=periods)
     # Get around the floating point error
     assert np.isclose(np.sum(periods - p.period).value, 0, rtol=1e-14)
@@ -110,6 +129,7 @@ def test_bin():
     """Test if you can bin the periodogram."""
     lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000),
                     flux_err=np.zeros(1000) + 0.1)
+    lc = lc.normalize()
     p = lc.to_periodogram()
     assert len(p.bin(binsize=10, method='mean').frequency) == len(p.frequency)//10
     assert len(p.bin(binsize=10, method='median').frequency) == len(p.frequency)//10
@@ -122,6 +142,7 @@ def test_smooth():
     lc = LightCurve(time=np.arange(1000),
                     flux=np.random.normal(1, 0.1, 1000),
                     flux_err=np.zeros(1000)+0.1)
+    lc = lc.normalize()
     p = lc.to_periodogram(normalization='psd', freq_unit=u.microhertz)
     # Test boxkernel and logmedian methods
     assert all(p.smooth(method='boxkernel').frequency == p.frequency)
@@ -161,6 +182,7 @@ def test_flatten():
     lc = LightCurve(time=np.arange(npts),
                     flux=np.random.normal(1, 0.1, npts),
                     flux_err=np.zeros(npts)+0.1)
+    lc = lc.normalize()
     p = lc.to_periodogram(normalization='psd', freq_unit=1/u.day)
 
     # Check method returns equal frequency
@@ -183,6 +205,7 @@ def test_index():
     """
     lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000),
                     flux_err=np.zeros(1000)+0.1)
+    lc = lc.normalize()
     p = lc.to_periodogram()
     mask = (p.frequency > 0.1*(1/u.day)) & (p.frequency < 0.2*(1/u.day))
     assert len(p[mask].frequency) == mask.sum()
