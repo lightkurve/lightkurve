@@ -4,7 +4,6 @@ import numpy as np
 from numpy.testing import assert_almost_equal, assert_array_equal
 
 from ..lightcurve import LightCurve
-from ..search import search_lightcurvefile
 from ..periodogram import Periodogram
 from ..utils import LightkurveWarning
 import sys
@@ -29,47 +28,51 @@ def test_periodogram_basics():
     pg.to_table()
     str(pg)
 
+
 def test_periodogram_normalization():
     """Tests the normalization options"""
     lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000),
-                    flux_err=np.zeros(1000)+0.1)
+                    flux_err=np.zeros(1000)+0.1, flux_unit='electron/second')
     # Test amplitude normalization and correct units
-    lc = lc.normalize()
     pg = lc.to_periodogram(normalization='amplitude')
+    assert pg.power.unit == u.electron / u.second
+    pg = lc.normalize(unit='ppm').to_periodogram(normalization='amplitude')
     assert pg.power.unit == u.cds.ppm
 
     # Test PSD normalization and correct units
     pg = lc.to_periodogram(freq_unit=u.microhertz, normalization='psd')
+    assert pg.power.unit ==  (u.electron/u.second)**2 / u.microhertz
+    pg = lc.normalize(unit='ppm').to_periodogram(freq_unit=u.microhertz, normalization='psd')
     assert pg.power.unit == u.cds.ppm**2 / u.microhertz
+
 
 def test_periodogram_warnings():
     """Tests if warnings are raised for non-normalized periodogram input"""
     lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000),
                     flux_err=np.zeros(1000)+0.1)
+    lc = lc.normalize(unit='ppm')
     # Test amplitude normalization and correct units
-    with pytest.warns(LightkurveWarning):
-        pg = lc.to_periodogram(normalization='amplitude')
-        assert pg.power.unit == u.cds.ppm
+    pg = lc.to_periodogram(normalization='amplitude')
+    assert pg.power.unit == u.cds.ppm
+    pg = lc.to_periodogram(freq_unit=u.microhertz, normalization='psd')
+    assert pg.power.unit == u.cds.ppm**2 / u.microhertz
 
-    with pytest.warns(LightkurveWarning):
-        pg = lc.to_periodogram(freq_unit=u.microhertz, normalization='psd')
-        assert pg.power.unit == u.cds.ppm**2 / u.microhertz
 
 def test_periodogram_units():
     """Tests whether periodogram has correct units"""
     # Fake, noisy data
     lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000),
-                    flux_err=np.zeros(1000)+0.1)
-    p = lc.normalize().to_periodogram(normalization='amplitude')
+                    flux_err=np.zeros(1000)+0.1, flux_unit='electron/second')
+    p = lc.to_periodogram(normalization='amplitude')
     # Has units
     assert hasattr(p.frequency, 'unit')
 
     # Has the correct units
     assert p.frequency.unit == 1./u.day
-    assert p.power.unit == u.cds.ppm
+    assert p.power.unit == u.electron / u.second
     assert p.period.unit == u.day
     assert p.frequency_at_max_power.unit == 1./u.day
-    assert p.max_power.unit == u.cds.ppm
+    assert p.max_power.unit == u.electron / u.second
 
 
 def test_periodogram_can_find_periods():

@@ -966,8 +966,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 'label': self.header['OBJECT'],
                 'targetid': self.targetid}
         return KeplerLightCurve(time=self.time,
-                                time_format='bkjd',
-                                time_scale='tdb',
                                 flux=np.nansum(self.flux[:, aperture_mask], axis=1),
                                 flux_err=flux_err,
                                 **keys)
@@ -990,8 +988,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 'label': self.header['OBJECT'],
                 'targetid': self.targetid}
         return KeplerLightCurve(time=self.time,
-                                time_format='bkjd',
-                                time_scale='tdb',
                                 flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
                                 flux_err=flux_bkg_err,
                                 **keys)
@@ -1083,8 +1079,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 'targetid': self.targetid}
         return KeplerLightCurve(time=self.time,
                                 flux=lc.flux,
-                                time_format='bkjd',
-                                time_scale='tdb',
                                 **keys)
 
     @staticmethod
@@ -1585,8 +1579,6 @@ class TessTargetPixelFile(TargetPixelFile):
                 'label': self.get_keyword('OBJECT'),
                 'targetid': self.targetid}
         return TessLightCurve(time=self.time,
-                              time_format='btjd',
-                              time_scale='tdb',
                               flux=np.nansum(self.flux[:, aperture_mask], axis=1),
                               flux_err=flux_err,
                               **keys)
@@ -1607,8 +1599,6 @@ class TessTargetPixelFile(TargetPixelFile):
                 'label': self.header['OBJECT'],
                 'targetid': self.targetid}
         return TessLightCurve(time=self.time,
-                              time_format='btjd',
-                              time_scale='tdb',
                               flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
                               flux_err=flux_bkg_err,
                               **keys)

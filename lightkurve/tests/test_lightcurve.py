@@ -3,6 +3,7 @@ from __future__ import division, print_function
 from astropy.io import fits as pyfits
 from astropy.utils.data import get_pkg_data_filename
 from astropy import units as u
+from astropy.time import Time
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -104,6 +105,7 @@ def test_KeplerLightCurveFile(path, mission):
     assert lc.time_format == 'bkjd'
     assert lc.time_scale == 'tdb'
     assert lc.astropy_time.scale == 'tdb'
+    assert lc.flux_unit == u.electron / u.second
 
     # Does the data match what one would obtain using pyfits.open?
     hdu = pyfits.open(path)
@@ -128,6 +130,7 @@ def test_TessLightCurveFile(quality_bitmask):
     assert lc.label == hdu[0].header['OBJECT']
     assert lc.time_format == 'btjd'
     assert lc.time_scale == 'tdb'
+    assert lc.flux_unit == u.electron / u.second
 
     assert_array_equal(lc.time[0:10], hdu[1].data['TIME'][0:10])
     assert_array_equal(lc.flux[0:10], hdu[1].data['SAP_FLUX'][0:10])
@@ -785,3 +788,47 @@ def test_to_timeseries():
     except ImportError:
         # Requires AstroPy v3.2 or later
         pass
+
+
+def test_flux_unit():
+    """Checks the use of lc.flux_unit and lc.flux_quantity."""
+    unit_obj = u.Unit("electron/second")
+    # Can we set flux units using a Unit object?
+    time, flux = range(3), np.ones(3)
+    lc = LightCurve(time, flux, flux_unit=unit_obj)
+    assert lc.flux_unit == unit_obj
+    # Can we set flux units using a string?
+    lc = LightCurve(time, flux, flux_unit="electron/second")
+    assert lc.flux_unit == unit_obj
+    # Can we pass a quantity to flux?
+    lc = LightCurve(time, flux*unit_obj)
+    assert lc.flux_unit == unit_obj
+    # Can we retrieve correct flux quantities?
+    assert lc.flux_quantity.unit ==unit_obj
+    assert_array_equal(lc.flux_quantity.value, flux)
+    # Is invalid user input validated?
+    with pytest.raises(ValueError) as err:
+        lc = LightCurve(time, flux, flux_unit="blablabla")
+    assert "invalid `flux_unit`" in err.value.args[0]
+
+
+def test_astropy_time_initialization():
+    """Does the `LightCurve` constructor accept Astropy time objects?"""
+    time = [1, 2, 3]
+    lc = LightCurve(time=Time(time, format='jd', scale='utc'))
+    assert lc.time_format == 'jd'
+    assert lc.time_scale == 'utc'
+    assert lc.astropy_time.format == 'jd'
+    assert lc.astropy_time.scale == 'utc'
+    lc = LightCurve(time=time, time_format='jd', time_scale='utc')
+    assert lc.time_format == 'jd'
+    assert lc.time_scale == 'utc'
+    assert lc.astropy_time.format == 'jd'
+    assert lc.astropy_time.scale == 'utc'
+
+
+def test_normalize_unit():
+    """Can the units of a normalized light curve be set?"""
+    lc = LightCurve(flux=[1, 2, 3])
+    for unit in ['percent', 'ppt', 'ppm']:
+        assert lc.normalize(unit=unit).flux_unit.name == unit

@@ -42,6 +42,9 @@ class LightCurve(object):
         Flux values for every time point.
     flux_err : array-like
         Uncertainty on each flux data point.
+    flux_unit : astropy.units.Unit or str
+        Unit of the flux values.  If a string is passed, it will be passed
+        on the the constructor of `~astropy.units.Unit`.
     time_format : str
         String specifying how an instant of time is represented,
         e.g. 'bkjd' or 'jd'.
@@ -54,6 +57,11 @@ class LightCurve(object):
         Human-friendly object label, e.g. "KIC 123456789".
     meta : dict
         Free-form metadata associated with the LightCurve.
+
+    Raises
+    ------
+    ValueError
+        If `flux_unit` is not a valid astropy Unit object or string.
 
     Examples
     --------
@@ -69,19 +77,25 @@ class LightCurve(object):
         >>> lc.bin(binsize=2).flux
         array([0.99, 1.01])
     """
-    def __init__(self, time=None, flux=None, flux_err=None, time_format=None,
-                 time_scale=None, targetid=None, label=None, meta=None):
+    def __init__(self, time=None, flux=None, flux_err=None, flux_unit=None,
+                 time_format=None, time_scale=None, targetid=None, label=None,
+                 meta=None):
         if time is None and flux is None:
             raise ValueError('either time or flux must be given')
         if time is None:
             self.time = np.arange(len(flux))
         else:
-            self.time = np.asarray(time)
-            # Trigger warning if time=NaN are present
-            if np.isnan(self.time).any():
-                warnings.warn('LightCurve object contains NaN times', LightkurveWarning)
+            self.time = self._validate_time(time)
         self.flux = self._validate_array(flux, name='flux')
         self.flux_err = self._validate_array(flux_err, name='flux_err')
+        # If `time` or `flux` are astropy objects, we will retrieve
+        # `time_format`, `time_scale,` and `flux_unit` from them.
+        if isinstance(flux, u.Quantity):
+            flux_unit = flux.unit
+        if isinstance(time, Time):
+            time_format = time.format
+            time_scale = time.scale
+        self.flux_unit = flux_unit  # @flux_unit.setter will validate this
         self.time_format = time_format
         self.time_scale = time_scale
         self.targetid = targetid
@@ -91,12 +105,24 @@ class LightCurve(object):
         else:
             self.meta = meta
 
+    @classmethod
+    def _validate_time(cls, time):
+        """Ensure the `time` user input is valid."""
+        if isinstance(time, Time):  # Support Astropy Time objects
+            time = time.value
+        time = np.asarray(time)
+        # Trigger warning if time=NaN are present
+        if np.isnan(time).any():
+            warnings.warn('LightCurve object contains NaN times', LightkurveWarning)
+        return time
+
     def _validate_array(self, arr, name='array'):
-        """Ensure the input arrays have the same length as `self.time`."""
-        if arr is not None:
-            arr = np.asarray(arr)
-        else:
+        """Ensure the input flux/centroid/quality/etc arrays are valid and have
+        the exact same length as `self.time`."""
+        if arr is None:  # arrays default to NaN arrays of length time
             arr = np.nan * np.ones_like(self.time)
+        else:
+            arr = np.asarray(arr)
 
         if not (len(self.time) == len(arr)):
             raise ValueError("Input arrays have different lengths."
@@ -149,6 +175,29 @@ class LightCurve(object):
 
     def __rdiv__(self, other):
         return self.__rtruediv__(other)
+
+    @property
+    def flux_unit(self):
+        return self._flux_unit
+
+    @flux_unit.setter
+    def flux_unit(self, flux_unit):
+        # Validate user input for `flux_unit`
+        if flux_unit is None:
+            self._flux_unit = None
+        else:
+            try:
+                self._flux_unit = u.Unit(flux_unit)
+            except ValueError as e:
+                raise ValueError("invalid `flux_unit`: {}".format(e))
+
+    @property
+    def flux_quantity(self):
+        """Returns the flux as an astropy.units.Quantity object."""
+        if isinstance(self.flux_unit, u.UnitBase):
+            return self.flux * self.flux_unit
+        else:
+            return self.flux * u.dimensionless_unscaled
 
     @property
     def astropy_time(self):
@@ -518,11 +567,19 @@ class LightCurve(object):
                                 label=self.label,
                                 meta=self.meta)
 
-    def normalize(self):
+    def normalize(self, unit='unscaled'):
         """Returns a normalized version of the light curve.
 
         The normalized light curve is obtained by dividing the ``flux`` and
         ``flux_err`` object attributes by the by the median flux.
+        Optionally, the result will be multiplied by 1e2 (if `unit='percent'`),
+        1e3 (`unit='ppt'`), or 1e6 (`unit='ppm'`).
+
+        Parameters
+        ----------
+        unit : 'unscaled', 'percent', 'ppt', 'ppm'
+            The desired relative units of the normalized light curve;
+            'ppt' means 'parts per thousand', 'ppm' means 'parts per million'.
 
         Examples
         --------
@@ -546,6 +603,7 @@ class LightCurve(object):
             If the median flux is negative or within half a standard deviation
             from zero.
         """
+        validate_method(unit, ['unscaled', 'percent', 'ppt', 'ppm'])
         median_flux = np.nanmedian(self.flux)
         std_flux = np.nanstd(self.flux)
 
@@ -564,11 +622,30 @@ class LightCurve(object):
                           "`normalize()` will invert the light curve. "
                           "(median_flux={:.2e})".format(median_flux),
                           LightkurveWarning)
-        
+
         # Create a new light curve instance and normalize its values
         lc = self.copy()
-        lc.flux_err = lc.flux_err / median_flux
         lc.flux = lc.flux / median_flux
+        lc.flux_err = lc.flux_err / median_flux
+        lc.flux_unit = u.dimensionless_unscaled
+
+        # Set the desired relative (dimensionless) units
+        if unit == 'unscaled':
+            lc.flux_unit = u.dimensionless_unscaled
+        elif unit == 'percent':
+            lc.flux_unit = u.percent
+            lc.flux *= 100
+            lc.flux_err *= 100
+        elif unit == 'ppt':  # parts per thousand
+            # ppt is not included in astropy, so we define it here
+            lc.flux_unit = u.def_unit(['ppt', 'parts per thousand'], u.Unit(1e-3))
+            lc.flux *= 1000
+            lc.flux_err *= 1000
+        elif unit == 'ppm':  # parts per million
+            lc.flux_unit = u.cds.ppm
+            lc.flux *= 1000000
+            lc.flux_err *= 1000000
+
         return lc
 
     def remove_nans(self):
@@ -890,7 +967,7 @@ class LightCurve(object):
         cdpp_ppm = np.std(mean) * 1e6
         return cdpp_ppm
 
-    def _create_plot(self, method='plot', ax=None, normalize=True,
+    def _create_plot(self, method='plot', ax=None, normalize=False,
                      xlabel=None, ylabel=None, title='', style='lightkurve',
                      show_colorbar=True, colorbar_label='',
                      **kwargs):
@@ -916,10 +993,12 @@ class LightCurve(object):
                 xlabel = 'Time'
         # Default ylabel
         if ylabel is None:
-            if normalize:
+            if normalize or (self.flux_unit == u.dimensionless_unscaled):
                 ylabel = 'Normalized Flux'
+            elif self.flux_unit is None:
+                ylabel = 'Flux'
             else:
-                ylabel = 'Flux [e$^-$s$^{-1}$]'
+                ylabel = 'Flux [{}]'.format(self.flux_unit.to_string("latex_inline"))
         # Default legend label
         if ('label' not in kwargs):
             kwargs['label'] = self.label
@@ -1491,6 +1570,9 @@ class KeplerLightCurve(LightCurve):
         Data flux for every time point
     flux_err : array-like
         Uncertainty on each flux data point
+    flux_unit : `~astropy.units.Unit` or str
+        Unit of the flux values.  If a string is passed, it will be passed
+        on the the constructor of `~astropy.units.Unit`.
     time_format : str
         String specifying how an instant of time is represented,
         e.g. 'bkjd' or 'jd'.
@@ -1518,11 +1600,12 @@ class KeplerLightCurve(LightCurve):
     targetid : int
         Kepler ID number
     """
-    def __init__(self, time=None, flux=None, flux_err=None, time_format=None, time_scale=None,
+    def __init__(self, time=None, flux=None, flux_err=None,
+                 flux_unit=u.Unit('electron/second'), time_format='bkjd', time_scale='tdb',
                  centroid_col=None, centroid_row=None, quality=None, quality_bitmask=None,
                  channel=None, campaign=None, quarter=None, mission=None,
                  cadenceno=None, targetid=None, ra=None, dec=None, label=None, meta=None):
-        super(KeplerLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err,
+        super(KeplerLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err, flux_unit=flux_unit,
                                                time_format=time_format, time_scale=time_scale,
                                                targetid=targetid, label=label, meta=meta)
         self.centroid_col = self._validate_array(centroid_col, name='centroid_col')
@@ -1645,6 +1728,9 @@ class TessLightCurve(LightCurve):
         Data flux for every time point
     flux_err : array-like
         Uncertainty on each flux data point
+    flux_unit : `~astropy.units.Unit` or str
+        Unit of the flux values.  If a string is passed, it will be passed
+        on the the constructor of `~astropy.units.Unit`.
     time_format : str
         String specifying how an instant of time is represented,
         e.g. 'bkjd' or 'jd'.
@@ -1662,11 +1748,12 @@ class TessLightCurve(LightCurve):
     targetid : int
         Tess Input Catalog ID number
     """
-    def __init__(self, time=None, flux=None, flux_err=None, time_format=None, time_scale=None,
+    def __init__(self, time=None, flux=None, flux_err=None,
+                 flux_unit=u.Unit('electron/second'), time_format='btjd', time_scale='tdb',
                  centroid_col=None, centroid_row=None, quality=None, quality_bitmask=None,
                  cadenceno=None, sector=None, camera=None, ccd=None,
                  targetid=None, ra=None, dec=None, label=None, meta=None):
-        super(TessLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err,
+        super(TessLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err, flux_unit=flux_unit,
                                              time_format=time_format, time_scale=time_scale,
                                              targetid=targetid, label=label, meta=meta)
         self.centroid_col = self._validate_array(centroid_col, name='centroid_col')
