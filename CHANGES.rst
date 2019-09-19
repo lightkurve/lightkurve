@@ -17,6 +17,8 @@
 - Changed `LightCurve.normalize()` to emit a warning if the light curve appears
   to be zero-centered. [#589]
 
+- Fixed an issue which caused the search functions to be incompatible with the
+  current development version of astroquery (v0.3.10). [#598]
 
 
 1.1.1 (2019-08-19)
