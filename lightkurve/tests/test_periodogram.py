@@ -28,12 +28,12 @@ def test_periodogram_basics():
     pg.to_table()
     str(pg)
 
+
 def test_periodogram_normalization():
     """Tests the normalization options"""
     lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000),
                     flux_err=np.zeros(1000)+0.1, flux_unit='electron/second')
     # Test amplitude normalization and correct units
-    lc = lc.normalize()
     pg = lc.to_periodogram(normalization='amplitude')
     assert pg.power.unit == u.electron / u.second
     pg = lc.normalize(unit='ppm').to_periodogram(normalization='amplitude')
@@ -45,25 +45,25 @@ def test_periodogram_normalization():
     pg = lc.normalize(unit='ppm').to_periodogram(freq_unit=u.microhertz, normalization='psd')
     assert pg.power.unit == u.cds.ppm**2 / u.microhertz
 
+
 def test_periodogram_warnings():
     """Tests if warnings are raised for non-normalized periodogram input"""
     lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000),
                     flux_err=np.zeros(1000)+0.1)
+    lc = lc.normalize(unit='ppm')
     # Test amplitude normalization and correct units
-    with pytest.warns(LightkurveWarning):
-        pg = lc.to_periodogram(normalization='amplitude')
-        assert pg.power.unit == u.cds.ppm
+    pg = lc.to_periodogram(normalization='amplitude')
+    assert pg.power.unit == u.cds.ppm
+    pg = lc.to_periodogram(freq_unit=u.microhertz, normalization='psd')
+    assert pg.power.unit == u.cds.ppm**2 / u.microhertz
 
-    with pytest.warns(LightkurveWarning):
-        pg = lc.to_periodogram(freq_unit=u.microhertz, normalization='psd')
-        assert pg.power.unit == u.cds.ppm**2 / u.microhertz
 
 def test_periodogram_units():
     """Tests whether periodogram has correct units"""
     # Fake, noisy data
     lc = LightCurve(time=np.arange(1000), flux=np.random.normal(1, 0.1, 1000),
                     flux_err=np.zeros(1000)+0.1, flux_unit='electron/second')
-    p = lc.normalize().to_periodogram(normalization='amplitude')
+    p = lc.to_periodogram(normalization='amplitude')
     # Has units
     assert hasattr(p.frequency, 'unit')
 
