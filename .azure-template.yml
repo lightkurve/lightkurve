@@ -11,7 +11,7 @@ steps:
     $(pip.command)
   displayName: 'Install Lightkurve & dependencies'
 
-- script: pytest $(pytest.options) --doctest-modules --junitxml=junit/test-results.xml --cov-report=xml --cov-report=html
+- script: pytest $(pytest.options) --cov=lightkurve --doctest-modules --junitxml=junit/test-results.xml --cov-report=xml --cov-report=html
   displayName: 'Run pytest'
 
 - script: python-codacy-coverage -r coverage.xml --token $CODACY_PROJECT_TOKEN
