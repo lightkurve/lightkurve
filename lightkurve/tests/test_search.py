@@ -26,17 +26,17 @@ from .. import PACKAGEDIR
 @pytest.mark.remote_data
 def test_search_targetpixelfile():
     # EPIC 210634047 was observed twice in long cadence
-    assert(len(search_targetpixelfile(210634047).table) == 2)
+    assert(len(search_targetpixelfile('EPIC 210634047', mission='K2').table) == 2)
     # ...including Campaign 4
-    assert(len(search_targetpixelfile(210634047, campaign=4).table) == 1)
+    assert(len(search_targetpixelfile('EPIC 210634047', mission='K2', campaign=4).table) == 1)
     # KIC 11904151 (Kepler-10) was observed in LC in 15 Quarters
-    assert(len(search_targetpixelfile(11904151).table) == 15)
+    assert(len(search_targetpixelfile('KIC 11904151', mission='Kepler').table) == 15)
     # ...including quarter 11 but not 12:
-    assert(len(search_targetpixelfile(11904151, quarter=11).unique_targets) == 1)
-    assert(len(search_targetpixelfile(11904151, quarter=12).table) == 0)
+    assert(len(search_targetpixelfile('KIC 11904151', mission='Kepler', quarter=11).unique_targets) == 1)
+    assert(len(search_targetpixelfile('KIC 11904151', mission='Kepler', quarter=12).table) == 0)
     # should work for all split campaigns
     campaigns = [[91, 92, 9], [101, 102, 10], [111, 112, 11]]
-    ids = [200068780, 200071712, 202975993]
+    ids = ['EPIC 200068780', 'EPIC 200071712', 'EPIC 202975993']
     for c, idx in zip(campaigns, ids):
         ca = search_targetpixelfile(idx, campaign=c[0]).table
         cb = search_targetpixelfile(idx, campaign=c[1]).table
@@ -46,9 +46,9 @@ def test_search_targetpixelfile():
         # If you specify the whole campaign, both split parts must be returned.
         cc = search_targetpixelfile(idx, campaign=c[2]).table
         assert(len(cc) == 2)
-    search_targetpixelfile(11904151, quarter=11).download()
+    search_targetpixelfile('KIC 11904151', quarter=11).download()
     # with mission='TESS', it should return TESS observations
-    tic = 273985862  # Has been observed in multiple sectors including 1
+    tic = 'TIC 273985862'  # Has been observed in multiple sectors including 1
     assert(len(search_targetpixelfile(tic, mission='TESS').table) > 1)
     assert(len(search_targetpixelfile(tic, mission='TESS', sector=1, radius=100).table) == 2)
     search_targetpixelfile(tic, mission='TESS', sector=1).download()
@@ -60,16 +60,16 @@ def test_search_targetpixelfile():
 @pytest.mark.remote_data
 def test_search_lightcurvefile(caplog):
     # We should also be able to resolve it by its name instead of KIC ID
-    assert(len(search_lightcurvefile('Kepler-10').table) == 15)
+    assert(len(search_lightcurvefile('Kepler-10', mission='Kepler').table) == 15)
     # An invalid KIC/EPIC ID or target name should be dealt with gracefully
     search_lightcurvefile(-999)
     assert "Could not resolve" in caplog.text
     search_lightcurvefile("DOES_NOT_EXIST (UNIT TEST)")
     assert "Could not resolve" in caplog.text
     # If we ask for all cadence types, there should be four Kepler files given
-    assert(len(search_lightcurvefile(4914423, quarter=6, cadence='any').table) == 4)
+    assert(len(search_lightcurvefile('KIC 4914423', quarter=6, cadence='any').table) == 4)
     # ...and only one should have long cadence
-    assert(len(search_lightcurvefile(4914423, quarter=6, cadence='long').table) == 1)
+    assert(len(search_lightcurvefile('KIC 4914423', quarter=6, cadence='long').table) == 1)
     # Should be able to resolve an ra/dec
     assert(len(search_lightcurvefile('297.5835, 40.98339', quarter=6).table) == 1)
     # Should be able to resolve a SkyCoord
@@ -77,7 +77,7 @@ def test_search_lightcurvefile(caplog):
     assert(len(search_lightcurvefile(c, quarter=6).table) == 1)
     search_lightcurvefile(c, quarter=6).download()
     # with mission='TESS', it should return TESS observations
-    tic = 273985862
+    tic = 'TIC 273985862'
     assert(len(search_lightcurvefile(tic, mission='TESS').table) > 1)
     assert(len(search_lightcurvefile(tic, mission='TESS', sector=1, radius=100).table) == 2)
     search_lightcurvefile(tic, mission='TESS', sector=1).download()
@@ -151,13 +151,13 @@ def test_search_with_skycoord():
     sr_sexagesimal = search_targetpixelfile("19:02:43.1 +50:14:28.7")
     assert_array_equal(sr_name.table['productFilename'], sr_sexagesimal.table['productFilename'])
     # Can we search using the KIC ID?
-    sr_kic = search_targetpixelfile(11904151)
+    sr_kic = search_targetpixelfile('KIC 11904151')
     assert_array_equal(sr_name.table['productFilename'], sr_kic.table['productFilename'])
 
 
 @pytest.mark.remote_data
 def test_searchresult():
-    sr = search_lightcurvefile('Kepler-10')
+    sr = search_lightcurvefile('Kepler-10', mission='Kepler')
     assert len(sr) == len(sr.table)  # Tests SearchResult.__len__
     assert len(sr[2:7]) == 5  # Tests SearchResult.__get__
     assert len(sr[2]) == 1
@@ -176,14 +176,14 @@ def test_month():
 @pytest.mark.remote_data
 def test_collections():
     # TargetPixelFileCollection class
-    assert(len(search_targetpixelfile(205998445, radius=900).table) == 4)
+    assert(len(search_targetpixelfile('EPIC 205998445', mission='K2',radius=900).table) == 4)
     # LightCurveFileCollection class with set targetlimit
-    assert(len(search_lightcurvefile(205998445, radius=900, limit=3).download_all()) == 3)
+    assert(len(search_lightcurvefile('EPIC 205998445', mission='K2', radius=900, limit=3).download_all()) == 3)
     # if fewer targets are found than targetlimit, should still download all available
-    assert(len(search_targetpixelfile(205998445, radius=900, limit=6).table) == 4)
+    assert(len(search_targetpixelfile('EPIC 205998445', mission='K2', radius=900, limit=6).table) == 4)
     # if download() is used when multiple files are available, should only download 1
     with pytest.warns(LightkurveWarning, match='4 files available to download'):
-        assert(isinstance(search_targetpixelfile(205998445, radius=900).download(),
+        assert(isinstance(search_targetpixelfile('EPIC 205998445', mission='K2', radius=900).download(),
                           KeplerTargetPixelFile))
 
 
