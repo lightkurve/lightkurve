@@ -52,13 +52,13 @@ class DesignMatrix():
         This method will return a new design matrix containing
         n_columns*len(row_indices) regressors.  This is useful in situations
         where the linear regression can be improved by fitting separate
-        coefficients for different contiguous parts of a regressor.
+        coefficients for different contiguous parts of the regressors.
 
         Parameters
         ----------
         row_indices : iterable of integers
             Every regressor (i.e. column) in the design matrix will be split
-            up over multiple columns separated by the indices provided.
+            up over multiple columns separated at the indices provided.
 
         Returns
         -------
@@ -76,7 +76,19 @@ class DesignMatrix():
                                     for val in list(self.df.columns))
             dfs.append(self.df[a:b].rename(columns=new_columns))
         new_df = pd.concat(dfs, axis=1).fillna(0)
-        return DesignMatrix(new_df)
+        return DesignMatrix(new_df, name=self.name)
+
+    def whiten(self):
+        """ subtracts median, and divides by standard deviation """
+        ar = np.asarray(np.copy(self.df))
+        # If any column is all constants, it will be zero'd! Watch out
+        consts = np.nanstd(ar, axis=0) == 0
+
+        ar[ar == 0] = np.nan
+        ar[:, ~consts] = (ar[:, ~consts] - np.atleast_2d(np.nanmedian(ar, axis=0)[~consts]))/np.atleast_2d(np.nanstd(ar, axis=0)[~consts])
+        ar[:, consts] = 1
+        new_df = pd.DataFrame(ar, columns=self.columns).fillna(0)
+        return DesignMatrix(new_df, name=self.name)
 
     @property
     def columns(self):
@@ -96,6 +108,7 @@ class DesignMatrix():
     def __repr__(self):
         return '{} DesignMatrix {}'.format(self.name, self.shape)
 
+
 class DesignMatrixCollection():
     """A set of design matrices."""
     def __init__(self, matrices):
@@ -105,14 +118,21 @@ class DesignMatrixCollection():
     def values(self):
         return np.hstack((m.values for m in self.matrices))
 
-    def plot(self, ax=None):
+    def plot(self, ax=None, **kwargs):
         temp_dm = DesignMatrix(pd.concat([d.df for d in self], axis=1))
-        ax = temp_dm.plot()
+        ax = temp_dm.plot(**kwargs)
         ax.set_title("Design Matrix Collection")
-        return
+        return ax
 
     def split(self, row_indices):
         return DesignMatrixCollection([d.split(row_indices) for d in self])
+
+    def whiten(self):
+        return DesignMatrixCollection([d.whiten() for d in self])
+
+    @property
+    def columns(self):
+        return np.hstack([d.columns for d in self])
 
     def __getitem__(self, key):
         try:
@@ -122,4 +142,4 @@ class DesignMatrixCollection():
             return self.matrices[arg[0][0]]
 
     def __repr__(self):
-        return 'DesginMatrixCollection:\n' + ''.join(['\t{}\n'.format(i.__repr__()) for i in self])
+        return 'DesignMatrixCollection:\n' + ''.join(['\t{}\n'.format(i.__repr__()) for i in self])
