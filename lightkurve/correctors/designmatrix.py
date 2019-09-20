@@ -38,8 +38,9 @@ class DesignMatrix():
             ax.set_xlabel('Component')
             ax.set_ylabel('X')
             ax.set_title(self.name)
-            ax.set_xticks(np.arange(self.shape[1]))
-            ax.set_xticklabels([r'${}$'.format(i) for i in self.columns], rotation=40)
+            if self.shape[1] <= 40:
+                ax.set_xticks(np.arange(self.shape[1]))
+                ax.set_xticklabels([r'${}$'.format(i) for i in self.columns], rotation=90, fontsize=8)
             if show_colorbar:
                 cbar = plt.colorbar(im, ax=ax)
                 cbar.set_label('Component Value')
@@ -81,14 +82,19 @@ class DesignMatrix():
     def whiten(self):
         """ subtracts median, and divides by standard deviation """
         ar = np.asarray(np.copy(self.df))
+        ar[ar == 0] = np.nan
         # If any column is all constants, it will be zero'd! Watch out
         consts = np.nanstd(ar, axis=0) == 0
 
-        ar[ar == 0] = np.nan
         ar[:, ~consts] = (ar[:, ~consts] - np.atleast_2d(np.nanmedian(ar, axis=0)[~consts]))/np.atleast_2d(np.nanstd(ar, axis=0)[~consts])
-        ar[:, consts] = 1
         new_df = pd.DataFrame(ar, columns=self.columns).fillna(0)
         return DesignMatrix(new_df, name=self.name)
+
+
+    def validate():
+        ## we should check that all the DM components are UNIQUE
+        # This would be run before a corrector.
+        pass
 
     @property
     def columns(self):
@@ -140,6 +146,10 @@ class DesignMatrixCollection():
         except Exception:
             arg = np.argwhere([m.name == key for m in self.matrices])
             return self.matrices[arg[0][0]]
+
+    def validate():
+        # Where names are duplicated a suffix should automatically be added...
+        pass
 
     def __repr__(self):
         return 'DesignMatrixCollection:\n' + ''.join(['\t{}\n'.format(i.__repr__()) for i in self])
