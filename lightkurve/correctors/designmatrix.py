@@ -103,7 +103,7 @@ class DesignMatrixCollection():
 
     @property
     def values(self):
-        return np.hstack((m.values for m in self.matrices))
+        return np.hstack(tuple(m.values for m in self.matrices))
 
     def plot(self, ax=None):
         temp_dm = DesignMatrix(pd.concat([d.df for d in self], axis=1))
