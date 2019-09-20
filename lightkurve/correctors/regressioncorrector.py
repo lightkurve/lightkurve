@@ -147,63 +147,6 @@ class RegressionCorrector(Corrector):
             (self.diagnostic_lightcurves[key] + np.median(self.lc.flux)).plot(ax=ax)
 
         ax = self.lc.plot(normalize=False, alpha=0.2, label='Original')
-        self.lc[~self.cadence_mask].scatter(normalize=False, c='r', marker='x', s=10, label='Outliers', ax=ax)
+        self.corrected_lc[~self.cadence_mask].scatter(normalize=False, c='r', marker='x', s=10, label='Outliers', ax=ax)
         self.corrected_lc.plot(normalize=False, label='Corrected', ax=ax, c='k')
         return
-
-
-def build_k2_design_matrix(lc):
-    """Build a basic design matrix based on the centroid position.
-
-    Builds a design matrix of:
-
-        arclength, arclength**2, arclength**3, darclength/dt
-        Column**4, Column**3, Column**2, Column
-        Row**4, Row**3, Row**2, Row
-        Column**4 Row**3, Column**4 Row **2, Column**4 Row, Column**3 Row**2, Column**2 Row, Column Row
-        Row**4 Column**3, Row**4 Column**2, Row**4 Column, Row**3 Column**2, Row**3 Column, Row**2 Column
-        Vector Of Ones
-    """
-    col = lc.centroid_col - lc.centroid_col.min()
-    row = lc.centroid_row - lc.centroid_row.min()
-    build_components = lambda X, Y: np.array([
-                                                ((X - np.min(X) + 1)**2 + (Y - np.min(Y) + 1)**2)**0.5,
-                                                ((X - np.min(X) + 1)**2 + (Y - np.min(Y) + 1)**2),
-                                                ((X - np.min(X) + 1)**2 + (Y - np.min(Y) + 1)**2)**1.5,
-                                                np.gradient(((X - np.min(X) + 1)**2 + (Y - np.min(Y) + 1)**2)**0.5),
-                                                X**4, X**3, X**2, X,
-                                                Y**4, Y**3, Y**2, Y,
-                                                X**4*Y**3, X**4*Y**2, X**4*Y, X**3*Y**2, X**3*Y, X**2*Y, X*Y,
-                                                Y**4*X**3, Y**4*X**2, Y**4*X, Y**3*X**2, Y**3*X, Y**2*X]).T
-
-    return build_components(col, row)
-
-    def _optimize_spline(self, design_matrix, cadence_mask=None, n_knots=10):
-        """Find the best fitting bspline to the long term trends in the light curve.
-
-        The optimization here is done with a simple linear regression using np.linalg.solve.
-
-        Parameters:
-        -----------
-        design_matrix : np.ndarray
-            Design matrix, with dimensions time x nvectors
-        cadence_mask : np.ndarray of bools (optional)
-            Mask, where True indicates a cadence that should be used.
-        n_knots : int
-            Number of knots to use for the spline. These will be evenly spaced.
-
-        Returns:
-        --------
-        w : np.ndarray
-            Best fit weights of each vector.
-        dm : np.ndarray
-            The input design matrix contatinated with the lomb-scargle design matrix.
-        model : np.ndarray
-            The best fit model to the data (X dot w)
-        """
-        if cadence_mask is None:
-            cadence_mask = np.ones(len(lc.flux), bool)
-        spline_dm = np.asarray(dmatrix("bs(x, df={}, degree=3, include_intercept=False) - 1".format(n_knots), {"x": self.time}))
-        dm = np.hstack([design_matrix, spline_dm, np.atleast_2d(np.ones(len(self.flux))).T])
-        w, model, var = self._solve_weights(dm, cadence_mask=cadence_mask)
-        return w, var, dm, model
