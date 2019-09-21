@@ -54,6 +54,17 @@ def test_split():
     assert len(set(dm.split(2).columns)) == 4
 
 
+def test_standardize():
+    """Verifies DesignMatrix.standardize()"""
+    # A column with zero standard deviation remains unchanged
+    dm = DesignMatrix({'const': np.ones(10)})
+    assert (dm.standardize()['const'].values == dm['const'].values).all()
+    # Normally-distributed columns will become Normal(0, 1)
+    dm = DesignMatrix({'normal': np.random.normal(loc=5, scale=3, size=100)})
+    assert dm.standardize()['normal'].median().round(3) == 0
+    assert dm.standardize()['normal'].std().round(1) == 1
+
+
 def test_collection_basics():
     """Can we create a design matrix collection?"""
     size = 5
