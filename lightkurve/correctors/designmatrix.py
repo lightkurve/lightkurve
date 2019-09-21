@@ -1,4 +1,4 @@
-"""
+"""Defines `DesignMatrix` and `DesignMatrixCollection`.
 
 TODO
 ----
@@ -123,16 +123,27 @@ class DesignMatrix():
     def pca(self, nterms=6):
         """Returns a new DesignMatrix with a smaller number of regressors.
 
-        This method will apply Principal Components Analysis.
+        This method will use Principal Components Analysis (PCA) to reduce
+        the number of columns in the matrix.
+
+        Parameters
+        ----------
+        nterms : int
+            Number of columns in the new matrix.
+
+        Returns
+        -------
+        `~lightkurve.correctors.DesignMatrix`
+            A new design matrix with PCA applied.
         """
         # nterms cannot be langer than the number of columns in the matrix
         if nterms > self.shape[1]:
             nterms = self.shape[1]
+        # `fbpca.pca` is faster than `np.linalg.svd` but an optional dependency
         try:
             from fbpca import pca
             new_values, _, _ = pca(self.values, nterms)
         except ImportError:
-            # np.linalg.svd is slower than fbpca, but always available
             new_values, _, _ = np.linalg.svd(self.values)[:, :nterms]
         return DesignMatrix(new_values, name=self.name)
 
@@ -141,11 +152,10 @@ class DesignMatrix():
         return DesignMatrix(new_df, name=self.name)
 
     def _validate(self):
-        """ Check whether the design matrix contains columns that are duplicated. """
-
+        """Raises a `DesignMatrixException` if the matrix contains identical columns."""
         for idx in range(self.shape[1]):
-            jdx = idx + 1
-            dupes = np.any([np.allclose(self.values[:, idx], self.values[:, jdx]) for jdx in np.arange(idx + 1, self.shape[1])])
+            dupes = np.any([np.allclose(self.values[:, idx], self.values[:, jdx])
+                            for jdx in np.arange(idx + 1, self.shape[1])])
             if dupes:
                 raise DesignMatrixException("Design Matrix contains duplicate columns.")
 
