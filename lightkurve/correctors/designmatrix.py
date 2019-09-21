@@ -55,7 +55,6 @@ class DesignMatrix():
                 cbar.set_label('Component Value')
         return ax
 
-
     def split(self, row_indices):
         """Returns a new matrix with the regressors split over multiple columns.
 
@@ -121,6 +120,21 @@ class DesignMatrix():
         new_df = pd.DataFrame(ar, columns=self.columns).fillna(0)
         return DesignMatrix(new_df, name=self.name)
 
+    def pca(self, nterms=6):
+        """Returns a new DesignMatrix with a smaller number of regressors.
+        
+        This method will apply Principal Components Analysis.
+        """
+        # nterms cannot be langer than the number of columns in the matrix
+        if nterms > self.shape[1]:
+            nterms = self.shape[1]
+        try:
+            from fbpca import pca
+            new_values, _, _ = pca(self.values, nterms)
+        except ImportError:
+            # np.linalg.svd is slower than fbpca, but always available
+            new_values, _, _ = np.linalg.svd(self.values)[:, :nterms]
+        return DesignMatrix(new_values, name=self.name)
 
     def _validate(self):
         """ Check whether the design matrix contains columns that are duplicated. """
