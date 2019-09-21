@@ -84,7 +84,7 @@ class DesignMatrix():
         upper_idx = np.append(row_indices, len(self.df))
         dfs = []
         for idx, a, b in zip(range(len(lower_idx)), lower_idx, upper_idx):
-            new_columns = dict((val, val + ' {}'.format(idx + 1))
+            new_columns = dict(('{}'.format(val), '{}'.format(val) + ' {}'.format(idx + 1))
                                 for val in list(self.df.columns))
             dfs.append(self.df[a:b].rename(columns=new_columns))
         new_df = pd.concat(dfs, axis=1).fillna(0)
@@ -146,6 +146,10 @@ class DesignMatrix():
         except ImportError:
             new_values, _, _ = np.linalg.svd(self.values)[:, :nterms]
         return DesignMatrix(new_values, name=self.name)
+
+    def append_constant(self):
+        new_df = pd.concat([self.df, pd.DataFrame(np.atleast_2d(np.ones(self.shape[0])).T, columns=['offset'])], axis=1)
+        return DesignMatrix(new_df, name=self.name)
 
     def _validate(self):
         """Raises a `DesignMatrixException` if the matrix contains identical columns."""
