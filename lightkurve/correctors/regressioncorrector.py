@@ -49,6 +49,7 @@ class RegressionCorrector(Corrector):
             raise ValueError('Input light curve has NaNs in time, flux, and/or flux_err. '
                              'Please remove NaNs before correcting.')
         self.lc = lc
+        design_matrix_collection._validate()
         self.X = design_matrix_collection
 
         # The following properties will be set when correct() is called:
@@ -142,6 +143,9 @@ class RegressionCorrector(Corrector):
 
     def diagnose(self):
         """ Produce diagnostic plots to assess the effectiveness of the correction. """
+
+
+        # SHOULD NOT BE CALLABLE BEFORE CORRECT
         ax = self.lc.plot(normalize=False, label='Original', alpha=0.4)
         for key in self.diagnostic_lightcurves.keys():
             (self.diagnostic_lightcurves[key] + np.median(self.lc.flux)).plot(ax=ax)
