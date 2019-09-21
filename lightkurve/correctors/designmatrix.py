@@ -68,8 +68,11 @@ class DesignMatrix():
         `~lightkurve.correctors.DesignMatrix`
             A new design matrix with shape (n_rows, len(row_indices)*n_columns).
         """
+
         if isinstance(row_indices, int):
             row_indices = [row_indices]
+        if (len(row_indices) == 0) | (row_indices == [0]) | (row_indices == None) :
+            return self
         # Where do the submatrices begin and end?
         lower_idx = np.append(0, row_indices)
         upper_idx = np.append(row_indices, len(self.df))
