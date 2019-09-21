@@ -1,16 +1,5 @@
-"""Defines RegressionCorrector
-
-Example API
-===========
-rc = RegressionCorrector(lc, design_matrix=DesignMatrix(...))
-lc_corrected = rc.correct()
-rc.diagnose()  # returns matplotlib plot
-rc.design_matrix.plot()  # returns matplotlib plot
-rc.diagnose_weights()  # returns matplotlib plot
-rc.coefficients  # numpy array
-"""
+"""Defines RegressionCorrector."""
 import logging
-import warnings
 
 import numpy as np
 from astropy.stats import sigma_clip

@@ -69,8 +69,8 @@ def test_pca():
     """Verifies DesignMatrix.pca()"""
     size = 10
     dm = DesignMatrix({'a':np.random.normal(10, 20, size),
-                    'b':np.random.normal(40, 10, size),
-                    'c':np.random.normal(60, 5, size)})
+                       'b':np.random.normal(40, 10, size),
+                       'c':np.random.normal(60, 5, size)})
     for nterms in [1, 2, 3]:
         assert dm.pca(nterms=nterms).shape == (size, nterms)
 
