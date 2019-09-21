@@ -104,6 +104,8 @@ class RegressionCorrector(Corrector):
         """
         if cadence_mask is None:
             cadence_mask = np.ones(len(self.lc.time), bool)
+        else:
+            cadence_mask = np.copy(cadence_mask)
 
         # Iterative sigma clipping
         for count in range(niters):
