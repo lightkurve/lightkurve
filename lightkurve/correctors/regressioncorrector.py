@@ -49,6 +49,7 @@ class RegressionCorrector(Corrector):
             raise ValueError('Input light curve has NaNs in time, flux, and/or flux_err. '
                              'Please remove NaNs before correcting.')
         self.lc = lc
+        design_matrix_collection._validate()
         self.X = design_matrix_collection
 
         # The following properties will be set when correct() is called:

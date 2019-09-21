@@ -6,6 +6,8 @@ from .. import MPLSTYLE
 
 __all__ = ['DesignMatrix', 'DesignMatrixCollection']
 
+class DesignMatrixException(Exception):
+    pass
 
 class DesignMatrix():
     """A matrix of column vectors for use in linear regression.
@@ -91,10 +93,14 @@ class DesignMatrix():
         return DesignMatrix(new_df, name=self.name)
 
 
-    def validate():
-        ## we should check that all the DM components are UNIQUE
-        # This would be run before a corrector.
-        pass
+    def _validate(self):
+        """ Check whether the design matrix contains columns that are duplicated. """
+
+        for idx in range(self.shape[1]):
+            jdx = idx + 1
+            dupes = np.any([np.allclose(self.values[:, idx], self.values[:, jdx]) for jdx in np.arange(idx + 1, self.shape[1])])
+            if dupes:
+                raise DesignMatrixException("Design Matrix contains duplicate columns.")
 
     @property
     def columns(self):
@@ -147,9 +153,8 @@ class DesignMatrixCollection():
             arg = np.argwhere([m.name == key for m in self.matrices])
             return self.matrices[arg[0][0]]
 
-    def validate():
-        # Where names are duplicated a suffix should automatically be added...
-        pass
+    def _validate(self):
+        [d._validate() for d in self]
 
     def __repr__(self):
         return 'DesignMatrixCollection:\n' + ''.join(['\t{}\n'.format(i.__repr__()) for i in self])
