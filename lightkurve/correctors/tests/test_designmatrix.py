@@ -34,7 +34,7 @@ def test_designmatrix_from_dict():
     size = 10
     dm = DesignMatrix({'centroid_col': np.ones(size),
                        'centroid_row': np.ones(size)},
-                       name='motion_systematics')
+                      name='motion_systematics')
     assert dm.shape == (size, 2)
     assert (dm['centroid_col'] == np.ones(size)).all()
 

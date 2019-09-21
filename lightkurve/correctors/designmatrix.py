@@ -84,14 +84,33 @@ class DesignMatrix():
         new_df = pd.concat(dfs, axis=1).fillna(0)
         return DesignMatrix(new_df, name=self.name)
 
-    def whiten(self):
-        """ subtracts median, and divides by standard deviation """
+    def standardize(self):
+        """Returns a new matrix with median-subtracted & sigma-divided columns.
+
+        For each column in the matrix, this method will subtract the median of
+        the column and divide by the column's standard deviation, i.e. it
+        will compute the column's so-called "standard scores" or "z-values".
+
+        This operation is useful because it will make the matrix easier to
+        visualize and makes fitted coefficients easier to interpret.
+
+        Notes:
+        * Standardizing a spline design matrix will break the splines.
+        * Columns with constant values (i.e. zero standard deviation) will be
+        left unchanged.
+
+        Returns
+        -------
+        `~lightkurve.correctors.DesignMatrix`
+            A new design matrix with median-subtracted & sigma-divided columns.
+        """
         ar = np.asarray(np.copy(self.df))
         ar[ar == 0] = np.nan
-        # If any column is all constants, it will be zero'd! Watch out
-        consts = np.nanstd(ar, axis=0) == 0
-
-        ar[:, ~consts] = (ar[:, ~consts] - np.atleast_2d(np.nanmedian(ar, axis=0)[~consts]))/np.atleast_2d(np.nanstd(ar, axis=0)[~consts])
+        # If a column has zero standard deviation, it will not change!
+        is_const = np.nanstd(ar, axis=0) == 0
+        median = np.atleast_2d(np.nanmedian(ar, axis=0)[~is_const])
+        std = np.atleast_2d(np.nanstd(ar, axis=0)[~is_const])
+        ar[:, ~is_const] = (ar[:, ~is_const] - median) / std
         new_df = pd.DataFrame(ar, columns=self.columns).fillna(0)
         return DesignMatrix(new_df, name=self.name)
 
@@ -142,8 +161,8 @@ class DesignMatrixCollection():
     def split(self, row_indices):
         return DesignMatrixCollection([d.split(row_indices) for d in self])
 
-    def whiten(self):
-        return DesignMatrixCollection([d.whiten() for d in self])
+    def standardize(self):
+        return DesignMatrixCollection([d.standardize() for d in self])
 
     @property
     def columns(self):
