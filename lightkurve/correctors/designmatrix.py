@@ -1,3 +1,10 @@
+"""
+
+TODO
+----
+* Improve user input validation and error checking.
+* Add a pca() method and have `RegressionCorrector` use it?
+"""
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
