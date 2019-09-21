@@ -34,7 +34,7 @@ def test_designmatrix_from_dict():
     size = 10
     dm = DesignMatrix({'centroid_col': np.ones(size),
                        'centroid_row': np.ones(size)},
-                       name='motion_systematics')
+                      name='motion_systematics')
     assert dm.shape == (size, 2)
     assert (dm['centroid_col'] == np.ones(size)).all()
 
@@ -52,6 +52,17 @@ def test_split():
     assert (dm.split([2,8]).values[:8, 4:] == 0).all()
     # Are all the column names unique?
     assert len(set(dm.split(2).columns)) == 4
+
+
+def test_standardize():
+    """Verifies DesignMatrix.standardize()"""
+    # A column with zero standard deviation remains unchanged
+    dm = DesignMatrix({'const': np.ones(10)})
+    assert (dm.standardize()['const'].values == dm['const'].values).all()
+    # Normally-distributed columns will become Normal(0, 1)
+    dm = DesignMatrix({'normal': np.random.normal(loc=5, scale=3, size=100)})
+    assert dm.standardize()['normal'].median().round(3) == 0
+    assert dm.standardize()['normal'].std().round(1) == 1
 
 
 def test_collection_basics():
