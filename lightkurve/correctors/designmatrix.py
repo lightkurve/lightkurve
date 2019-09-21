@@ -84,8 +84,8 @@ class DesignMatrix():
         upper_idx = np.append(row_indices, len(self.df))
         dfs = []
         for idx, a, b in zip(range(len(lower_idx)), lower_idx, upper_idx):
-            new_columns = d = dict(('{}'.format(val), '{}'.format(val) + ' {}'.format(idx + 1))
-                                    for val in list(self.df.columns))
+            new_columns = dict(('{}'.format(val), '{}'.format(val) + ' {}'.format(idx + 1))
+                                for val in list(self.df.columns))
             dfs.append(self.df[a:b].rename(columns=new_columns))
         new_df = pd.concat(dfs, axis=1).fillna(0)
         return DesignMatrix(new_df, name=self.name)
