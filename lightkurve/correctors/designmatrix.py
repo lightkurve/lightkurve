@@ -4,6 +4,8 @@ TODO
 ----
 * Improve user input validation and error checking.
 * Add a pca() method and have `RegressionCorrector` use it?
+* Add a warning if the column rank of the matrix is bad, i.e. if the matrix has
+  tightly-correlated regressors?
 """
 import numpy as np
 import pandas as pd
@@ -84,8 +86,8 @@ class DesignMatrix():
         upper_idx = np.append(row_indices, len(self.df))
         dfs = []
         for idx, a, b in zip(range(len(lower_idx)), lower_idx, upper_idx):
-            new_columns = d = dict(('{}'.format(val), '{}'.format(val) + ' {}'.format(idx + 1))
-                                    for val in list(self.df.columns))
+            new_columns = dict(('{}'.format(val), '{}'.format(val) + ' {}'.format(idx + 1))
+                                for val in list(self.df.columns))
             dfs.append(self.df[a:b].rename(columns=new_columns))
         new_df = pd.concat(dfs, axis=1).fillna(0)
         return DesignMatrix(new_df, name=self.name)
