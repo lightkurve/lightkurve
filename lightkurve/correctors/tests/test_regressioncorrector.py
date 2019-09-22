@@ -14,6 +14,9 @@ def test_sinusoid_noise():
     noisy_lc = LightCurve(time, true_lc.flux+noise, true_lc.flux_err)
     dm = DesignMatrix({'noise': noise, 'offset': np.ones(len(time))},
                       name='noise_model')
-    rc = RegressionCorrector(noisy_lc, dm)
-    corrected_lc = rc.correct()
-    assert_almost_equal(corrected_lc.normalize().flux, true_lc.flux)
+    for model in ['LinearRegression', 'Ridge']:
+        # Ridge with alpha=0 should equal ordinary least squares
+        rc = RegressionCorrector(noisy_lc, dm, model=model, alpha=0)
+        corrected_lc = rc.correct()
+        assert_almost_equal(corrected_lc.normalize().flux, true_lc.flux)
+
