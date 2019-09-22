@@ -85,9 +85,9 @@ def test_math_operators_on_objects():
     assert_array_equal((lc2 / lc1).flux, lc2.flux / lc1.flux)
     # LightCurve objects can only be added or multiplied if they have equal length
     with pytest.raises(ValueError):
-        lc1 + lc1[0:-5]
+        lc = lc1 + lc1[0:-5]
     with pytest.raises(ValueError):
-        lc1 * lc1[0:-5]
+        lc = lc1 * lc1[0:-5]
 
 
 def test_rmath_operators():
