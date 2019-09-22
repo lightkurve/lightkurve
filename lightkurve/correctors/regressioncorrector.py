@@ -1,4 +1,9 @@
-"""Defines RegressionCorrector."""
+"""Defines RegressionCorrector.
+TO DO
+-----
+- Work when flux_err not available
+- add regularization
+"""
 import logging
 
 import numpy as np
@@ -68,6 +73,7 @@ class RegressionCorrector(Corrector):
         dm = self.X.values
         flux = self.lc.flux[cadence_mask]
         flux_weights = self.lc.flux_err[cadence_mask]**2
+        flux_weights /= flux_weights.mean()
 
         A = np.dot(dm[cadence_mask].T, dm[cadence_mask] / flux_weights[:, None])
         B = np.dot(dm[cadence_mask].T, flux / flux_weights)
