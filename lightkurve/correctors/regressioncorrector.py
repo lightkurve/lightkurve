@@ -87,17 +87,6 @@ class RegressionCorrector(Corrector):
         # Default cadence mask
         if cadence_mask is None:
             cadence_mask = np.ones(len(self.lc.flux), bool)
-<<<<<<< HEAD
-        dm = self.X.values
-        flux = self.lc.flux[cadence_mask]
-        flux_weights = self.lc.flux_err[cadence_mask]**2
-        flux_weights /= flux_weights.mean()
-
-        A = np.dot(dm[cadence_mask].T, dm[cadence_mask] / flux_weights[:, None])
-        B = np.dot(dm[cadence_mask].T, flux / flux_weights)
-        coefficients = np.linalg.solve(A, B)
-        return coefficients
-=======
 
         # `Lasso` does not support `sample_weight` at the time of coding
         # (sklearn v0.21), so we can not pass weights in all cases.
@@ -116,7 +105,6 @@ class RegressionCorrector(Corrector):
         # B = np.dot(X[cadence_mask].T, flux / flux_weights)
         # coefficients = np.linalg.solve(A, B)
         # return coefficients
->>>>>>> d9c4dcfb88dcfa85a095ef200ad1666743fe23b1
 
     def correct(self, cadence_mask=None, sigma=5, niters=5):
         """Find the best fit correction for the light curve.
