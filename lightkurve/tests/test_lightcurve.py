@@ -71,6 +71,25 @@ def test_math_operators():
     assert_array_equal(lc_div.flux, lc.flux / 2)
 
 
+def test_math_operators_on_objects():
+    lc1 = LightCurve(time=np.arange(1, 5), flux=np.arange(1, 5), flux_err=np.arange(1, 5))
+    lc2 = LightCurve(time=np.arange(1, 5), flux=np.arange(11, 15), flux_err=np.arange(1, 5))
+    assert_array_equal((lc1 + lc2).flux, lc1.flux + lc2.flux)
+    assert_array_equal((lc1 - lc2).flux, lc1.flux - lc2.flux)
+    assert_array_equal((lc1 * lc2).flux, lc1.flux * lc2.flux)
+    assert_array_equal((lc1 / lc2).flux, lc1.flux / lc2.flux)
+    # Change order
+    assert_array_equal((lc2 + lc1).flux, lc2.flux + lc1.flux)
+    assert_array_equal((lc2 - lc1).flux, lc2.flux - lc1.flux)
+    assert_array_equal((lc2 * lc1).flux, lc2.flux * lc1.flux)
+    assert_array_equal((lc2 / lc1).flux, lc2.flux / lc1.flux)
+    # LightCurve objects can only be added or multiplied if they have equal length
+    with pytest.raises(ValueError):
+        lc = lc1 + lc1[0:-5]
+    with pytest.raises(ValueError):
+        lc = lc1 * lc1[0:-5]
+
+
 def test_rmath_operators():
     lc = LightCurve(time=np.arange(1, 5), flux=np.arange(1, 5), flux_err=np.arange(1, 5))
     lc_add = 1 + lc
