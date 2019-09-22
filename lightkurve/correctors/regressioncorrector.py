@@ -1,12 +1,15 @@
 """Defines RegressionCorrector."""
+import inspect
 import logging
 
 import numpy as np
 from astropy.stats import sigma_clip
+from sklearn import linear_model
 
 from .corrector import Corrector
 from .designmatrix import DesignMatrix, DesignMatrixCollection
 from ..lightcurve import LightCurve
+from ..utils import validate_method
 
 __all__ = ['RegressionCorrector']
 
@@ -14,7 +17,7 @@ log = logging.getLogger(__name__)
 
 
 class RegressionCorrector(Corrector):
-    """Remove noise using a linear fit of the light curve against a design matrix of regressors.
+    """Remove noise using linear regression against a design matrix.
 
     This method will use weighted linear least squares regression to find the
     parameter vector \beta which minimizes lc.flux - np.dot(X, beta)
@@ -29,13 +32,31 @@ class RegressionCorrector(Corrector):
         collection must have a shape of (time, regressors).
         The columns contained in each matrix must be known to correlate with
         the signals or noise we want to remove from the light curve.
+    model : str {'LinearRegression', 'Ridge', 'Lasso'}
+            or a ~`sklearn.linear_model.base.LinearModel` instance
+        Linear model to use.
+    alpha : float
+        Regularization strength. Only used if `model` equals 'Ridge' or 'Lasso'.
     """
-    def __init__(self, lc, design_matrix_collection):
+    def __init__(self, lc, design_matrix_collection, model='LinearRegression', alpha=1.0):
         if isinstance(design_matrix_collection, DesignMatrix):
             design_matrix_collection = DesignMatrixCollection([design_matrix_collection])
+
+        if isinstance(model, str):
+            model = validate_method(model, ['linearregression', 'ridge', 'lasso'])
+            if model == 'linearregression':
+                # `fit_intercept=False` because we want the user to explicitely
+                # include it as a column of ones in the design matrix
+                model = linear_model.LinearRegression(fit_intercept=False)
+            elif model == 'ridge':
+                model = linear_model.Ridge(fit_intercept=False, alpha=alpha)
+            elif model == 'lasso':
+                model = linear_model.Lasso(fit_intercept=False, alpha=alpha)
+        self.model = model
+
         # Validate user input
-        if np.any([~np.isfinite(lc.time), ~np.isfinite(lc.flux), ~np.isfinite(lc.flux_err)]):
-            raise ValueError('Input light curve has NaNs in time, flux, and/or flux_err. '
+        if np.any([~np.isfinite(lc.time), ~np.isfinite(lc.flux)]):
+            raise ValueError('Input light curve has NaNs in time or flux. '
                              'Please remove NaNs before correcting.')
         self.lc = lc
         design_matrix_collection._validate()
@@ -55,7 +76,7 @@ class RegressionCorrector(Corrector):
 
         Parameters
         ----------
-        cadence_mask : np.ndarray of bools (optional)
+        cadence_mask : np.ndarray of bool
             Mask, where True indicates a cadence that should be used.
 
         Returns
@@ -63,16 +84,27 @@ class RegressionCorrector(Corrector):
         coefficients : np.ndarray
             The best fit model coefficients to the data.
         """
+        # Default cadence mask
         if cadence_mask is None:
             cadence_mask = np.ones(len(self.lc.flux), bool)
-        dm = self.X.values
-        flux = self.lc.flux[cadence_mask]
-        flux_weights = self.lc.flux_err[cadence_mask]**2
 
-        A = np.dot(dm[cadence_mask].T, dm[cadence_mask] / flux_weights[:, None])
-        B = np.dot(dm[cadence_mask].T, flux / flux_weights)
-        coefficients = np.linalg.solve(A, B)
-        return coefficients
+        # `Lasso` does not support `sample_weight` at the time of coding
+        # (sklearn v0.21), so we can not pass weights in all cases.
+        args = {}
+        if 'sample_weight' in inspect.getargspec(self.model.fit).args \
+            and np.isfinite(self.lc.flux_err[cadence_mask]).all():
+            args['sample_weight'] = 1. / self.lc.flux_err[cadence_mask]**2
+
+        self.model.fit(X=self.X.values,
+                       y=self.lc.flux[cadence_mask],
+                       **args)
+        return self.model.coef_
+
+        # Previous numpy approach:
+        # A = np.dot(X[cadence_mask].T, X[cadence_mask] / flux_weights[:, None])
+        # B = np.dot(X[cadence_mask].T, flux / flux_weights)
+        # coefficients = np.linalg.solve(A, B)
+        # return coefficients
 
     def correct(self, cadence_mask=None, sigma=5, niters=5):
         """Find the best fit correction for the light curve.
