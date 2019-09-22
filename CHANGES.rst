@@ -20,6 +20,9 @@
 - Fixed an issue which caused the search functions to be incompatible with the
   current development version of astroquery (v0.3.10). [#598]
 
+- Added support for performing mathematical operations involving `LightCurve`
+  objects, e.g. two `LightCurve` objects can now be added together. [#532]
+
 
 1.1.1 (2019-08-19)
 ==================
