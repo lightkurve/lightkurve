@@ -17,22 +17,24 @@
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
+    <!-- Load Bootstrap CSS and Javascript (Javascript is needed for the navbar toggle) -->
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+    <!-- Load the theme's CSS. -->
+    <link rel="stylesheet" href="../_static/css/amunra.css" type="text/css" />
 
-
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'UA-69171-9');
-    </script>
+    
+      <!-- Google Analytics -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-69171-9');
+      </script>
+    
 
   </head><body>
 <header>
@@ -44,32 +46,34 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarsExample07">
-      <ul class="navbar-nav mr-auto">
-        
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="../quickstart.html">Quickstart</a>
-            </li>
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="../tutorials/index.html">Tutorials</a>
-            </li>
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="index.html">API</a>
-            </li>
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="../about/index.html">About</a>
-            </li>
-        
-      </ul>
 
-        <form class="form-inline my-2 my-md-0" action="../search.html" method="get">
+    
+      <!-- Custom navbar -->
+      <ul class="navbar-nav mr-auto">
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="../quickstart.html">Quickstart</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="../tutorials/index.html">Tutorials</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="index.html">API</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="../about/index.html">About</a>
+          </li>
+      </ul>
+    
+
+        <form class="form-inline my-2 my-md-0 ml-auto" action="../search.html" method="get">
             <input class="form-control" type="text" placeholder="Search" aria-label="Search" name="q" />
         </form>
 
@@ -90,7 +94,7 @@
 <h1>KeplerLightCurveFile<a class="headerlink" href="#keplerlightcurvefile" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="lightkurve.lightcurvefile.KeplerLightCurveFile">
-<em class="property">class </em><code class="descclassname">lightkurve.lightcurvefile.</code><code class="descname">KeplerLightCurveFile</code><span class="sig-paren">(</span><em>path</em>, <em>quality_bitmask='default'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">lightkurve.lightcurvefile.</code><code class="sig-name descname">KeplerLightCurveFile</code><span class="sig-paren">(</span><em class="sig-param">path</em>, <em class="sig-param">quality_bitmask='default'</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="lightkurve.lightcurvefile.LightCurveFile.html#lightkurve.lightcurvefile.LightCurveFile" title="lightkurve.lightcurvefile.LightCurveFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">lightkurve.lightcurvefile.LightCurveFile</span></code></a></p>
 <p>Subclass of <a class="reference internal" href="lightkurve.lightcurvefile.LightCurveFile.html#lightkurve.lightcurvefile.LightCurveFile" title="lightkurve.lightcurvefile.LightCurveFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">LightCurveFile</span></code></a>
 to represent files generated by NASA’s Kepler pipeline.</p>
@@ -121,58 +125,61 @@ following meaning:</p>
 </dd>
 </dl>
 <p class="rubric">Attributes Summary</p>
-<table class="longtable docutils align-center">
+<table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.PDCSAP_FLUX" title="lightkurve.lightcurvefile.KeplerLightCurveFile.PDCSAP_FLUX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PDCSAP_FLUX</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.FLUX" title="lightkurve.lightcurvefile.KeplerLightCurveFile.FLUX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FLUX</span></code></a></p></td>
+<td><p>Returns a LightCurve object for FLUX</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.PDCSAP_FLUX" title="lightkurve.lightcurvefile.KeplerLightCurveFile.PDCSAP_FLUX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PDCSAP_FLUX</span></code></a></p></td>
 <td><p>Returns a LightCurve object for PDCSAP_FLUX</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.SAP_FLUX" title="lightkurve.lightcurvefile.KeplerLightCurveFile.SAP_FLUX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SAP_FLUX</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.SAP_FLUX" title="lightkurve.lightcurvefile.KeplerLightCurveFile.SAP_FLUX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SAP_FLUX</span></code></a></p></td>
 <td><p>Returns a LightCurve object for SAP_FLUX</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.astropy_time" title="lightkurve.lightcurvefile.KeplerLightCurveFile.astropy_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy_time</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.astropy_time" title="lightkurve.lightcurvefile.KeplerLightCurveFile.astropy_time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy_time</span></code></a></p></td>
 <td><p>Returns an AstroPy Time object for all good-quality cadences.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.cadenceno" title="lightkurve.lightcurvefile.KeplerLightCurveFile.cadenceno"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cadenceno</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.cadenceno" title="lightkurve.lightcurvefile.KeplerLightCurveFile.cadenceno"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cadenceno</span></code></a></p></td>
 <td><p>Cadence number</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.campaign" title="lightkurve.lightcurvefile.KeplerLightCurveFile.campaign"><code class="xref py py-obj docutils literal notranslate"><span class="pre">campaign</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.campaign" title="lightkurve.lightcurvefile.KeplerLightCurveFile.campaign"><code class="xref py py-obj docutils literal notranslate"><span class="pre">campaign</span></code></a></p></td>
 <td><p>K2 Campaign number.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.channel" title="lightkurve.lightcurvefile.KeplerLightCurveFile.channel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">channel</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.channel" title="lightkurve.lightcurvefile.KeplerLightCurveFile.channel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">channel</span></code></a></p></td>
 <td><p>Kepler CCD channel number.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.dec" title="lightkurve.lightcurvefile.KeplerLightCurveFile.dec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dec</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.dec" title="lightkurve.lightcurvefile.KeplerLightCurveFile.dec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dec</span></code></a></p></td>
 <td><p>Declination of the target.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.mission" title="lightkurve.lightcurvefile.KeplerLightCurveFile.mission"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mission</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.mission" title="lightkurve.lightcurvefile.KeplerLightCurveFile.mission"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mission</span></code></a></p></td>
 <td><p>‘Kepler’ or ‘K2’.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.obsmode" title="lightkurve.lightcurvefile.KeplerLightCurveFile.obsmode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">obsmode</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.obsmode" title="lightkurve.lightcurvefile.KeplerLightCurveFile.obsmode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">obsmode</span></code></a></p></td>
 <td><p>‘short cadence’ or ‘long cadence’.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.pos_corr1" title="lightkurve.lightcurvefile.KeplerLightCurveFile.pos_corr1"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pos_corr1</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.pos_corr1" title="lightkurve.lightcurvefile.KeplerLightCurveFile.pos_corr1"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pos_corr1</span></code></a></p></td>
 <td><p>Returns the column position correction.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.pos_corr2" title="lightkurve.lightcurvefile.KeplerLightCurveFile.pos_corr2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pos_corr2</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.pos_corr2" title="lightkurve.lightcurvefile.KeplerLightCurveFile.pos_corr2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pos_corr2</span></code></a></p></td>
 <td><p>Returns the row position correction.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.quarter" title="lightkurve.lightcurvefile.KeplerLightCurveFile.quarter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">quarter</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.quarter" title="lightkurve.lightcurvefile.KeplerLightCurveFile.quarter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">quarter</span></code></a></p></td>
 <td><p>Kepler quarter number.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.ra" title="lightkurve.lightcurvefile.KeplerLightCurveFile.ra"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ra</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.ra" title="lightkurve.lightcurvefile.KeplerLightCurveFile.ra"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ra</span></code></a></p></td>
 <td><p>Right Ascension of the target.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.time" title="lightkurve.lightcurvefile.KeplerLightCurveFile.time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">time</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.time" title="lightkurve.lightcurvefile.KeplerLightCurveFile.time"><code class="xref py py-obj docutils literal notranslate"><span class="pre">time</span></code></a></p></td>
 <td><p>Time measurements</p></td>
 </tr>
 </tbody>
 </table>
 <p class="rubric">Methods Summary</p>
-<table class="longtable docutils align-center">
+<table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -181,106 +188,118 @@ following meaning:</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.compute_cotrended_lightcurve" title="lightkurve.lightcurvefile.KeplerLightCurveFile.compute_cotrended_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_cotrended_lightcurve</span></code></a>(self[, cbvs])</p></td>
 <td><p>Returns a LightCurve object after cotrending the SAP_FLUX against the cotrending basis vectors.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.get_lightcurve" title="lightkurve.lightcurvefile.KeplerLightCurveFile.get_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_lightcurve</span></code></a>(self, flux_type[, centroid_type])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.errorbar" title="lightkurve.lightcurvefile.KeplerLightCurveFile.errorbar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar</span></code></a>(self[, flux_types, style])</p></td>
+<td><p>Plot the light curve file using matplotlib’s <a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.errorbar" title="lightkurve.lightcurvefile.KeplerLightCurveFile.errorbar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar</span></code></a> method.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.get_lightcurve" title="lightkurve.lightcurvefile.KeplerLightCurveFile.get_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_lightcurve</span></code></a>(self, flux_type[, centroid_type])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.header" title="lightkurve.lightcurvefile.KeplerLightCurveFile.header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">header</span></code></a>(self[, ext])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.header" title="lightkurve.lightcurvefile.KeplerLightCurveFile.header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">header</span></code></a>(self[, ext])</p></td>
 <td><p>Header of the object at extension <code class="xref py py-obj docutils literal notranslate"><span class="pre">ext</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.plot" title="lightkurve.lightcurvefile.KeplerLightCurveFile.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(self[, flux_types, style])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.plot" title="lightkurve.lightcurvefile.KeplerLightCurveFile.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>(self[, flux_types, style])</p></td>
 <td><p>Plot the light curve file using matplotlib’s <a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.plot" title="lightkurve.lightcurvefile.KeplerLightCurveFile.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a> method.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.scatter" title="lightkurve.lightcurvefile.KeplerLightCurveFile.scatter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a>(self[, flux_types, style])</p></td>
+<td><p>Plot the light curve file using matplotlib’s <a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.scatter" title="lightkurve.lightcurvefile.KeplerLightCurveFile.scatter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a> method.</p></td>
 </tr>
 </tbody>
 </table>
 <p class="rubric">Attributes Documentation</p>
 <dl class="attribute">
+<dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.FLUX">
+<code class="sig-name descname">FLUX</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.FLUX" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a LightCurve object for FLUX</p>
+</dd></dl>
+
+<dl class="attribute">
 <dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.PDCSAP_FLUX">
-<code class="descname">PDCSAP_FLUX</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.PDCSAP_FLUX" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">PDCSAP_FLUX</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.PDCSAP_FLUX" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a LightCurve object for PDCSAP_FLUX</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.SAP_FLUX">
-<code class="descname">SAP_FLUX</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.SAP_FLUX" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">SAP_FLUX</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.SAP_FLUX" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a LightCurve object for SAP_FLUX</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.astropy_time">
-<code class="descname">astropy_time</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.astropy_time" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">astropy_time</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.astropy_time" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an AstroPy Time object for all good-quality cadences.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.cadenceno">
-<code class="descname">cadenceno</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.cadenceno" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">cadenceno</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.cadenceno" title="Permalink to this definition">¶</a></dt>
 <dd><p>Cadence number</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.campaign">
-<code class="descname">campaign</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.campaign" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">campaign</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.campaign" title="Permalink to this definition">¶</a></dt>
 <dd><p>K2 Campaign number. (‘CAMPAIGN’ header keyword)</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.channel">
-<code class="descname">channel</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.channel" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">channel</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.channel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Kepler CCD channel number. (‘CHANNEL’ header keyword)</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.dec">
-<code class="descname">dec</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.dec" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">dec</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.dec" title="Permalink to this definition">¶</a></dt>
 <dd><p>Declination of the target.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.mission">
-<code class="descname">mission</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.mission" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">mission</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.mission" title="Permalink to this definition">¶</a></dt>
 <dd><p>‘Kepler’ or ‘K2’. (‘MISSION’ header keyword)</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.obsmode">
-<code class="descname">obsmode</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.obsmode" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">obsmode</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.obsmode" title="Permalink to this definition">¶</a></dt>
 <dd><p>‘short cadence’ or ‘long cadence’. (‘OBSMODE’ header keyword)</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.pos_corr1">
-<code class="descname">pos_corr1</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.pos_corr1" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">pos_corr1</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.pos_corr1" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the column position correction.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.pos_corr2">
-<code class="descname">pos_corr2</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.pos_corr2" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">pos_corr2</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.pos_corr2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the row position correction.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.quarter">
-<code class="descname">quarter</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.quarter" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">quarter</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.quarter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Kepler quarter number. (‘QUARTER’ header keyword)</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.ra">
-<code class="descname">ra</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.ra" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">ra</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.ra" title="Permalink to this definition">¶</a></dt>
 <dd><p>Right Ascension of the target.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.time">
-<code class="descname">time</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.time" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">time</code><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.time" title="Permalink to this definition">¶</a></dt>
 <dd><p>Time measurements</p>
 </dd></dl>
 
 <p class="rubric">Methods Documentation</p>
 <dl class="method">
 <dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.compute_cotrended_lightcurve">
-<code class="descname">compute_cotrended_lightcurve</code><span class="sig-paren">(</span><em>self</em>, <em>cbvs=(1</em>, <em>2)</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.compute_cotrended_lightcurve" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">compute_cotrended_lightcurve</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">cbvs=(1</em>, <em class="sig-param">2)</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.compute_cotrended_lightcurve" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a LightCurve object after cotrending the SAP_FLUX
 against the cotrending basis vectors.</p>
 <dl class="field-list simple">
@@ -304,20 +323,98 @@ KeplerCBVCorrector.correct.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.errorbar">
+<code class="sig-name descname">errorbar</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">flux_types=None</em>, <em class="sig-param">style='lightkurve'</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.errorbar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the light curve file using matplotlib’s <a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.errorbar" title="lightkurve.lightcurvefile.KeplerLightCurveFile.errorbar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar</span></code></a> method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>ax</strong><span class="classifier">matplotlib.axes._subplots.AxesSubplot</span></dt><dd><p>A matplotlib axes object to plot into. If no axes is provided,
+a new one will be generated.</p>
+</dd>
+<dt><strong>flux_types</strong><span class="classifier">list or None</span></dt><dd><p>Which fluxes in the LCF to plot. Default is lcf._flux_types().
+For Kepler this is PDCSAP and SAP flux. Pass a list to change flux
+types.</p>
+</dd>
+<dt><strong>normalize</strong><span class="classifier">bool</span></dt><dd><p>Normalize the lightcurve before plotting?</p>
+</dd>
+<dt><strong>xlabel</strong><span class="classifier">str</span></dt><dd><p>Plot x axis label</p>
+</dd>
+<dt><strong>ylabel</strong><span class="classifier">str</span></dt><dd><p>Plot y axis label</p>
+</dd>
+<dt><strong>title</strong><span class="classifier">str</span></dt><dd><p>Plot set_title</p>
+</dd>
+<dt><strong>style</strong><span class="classifier">str</span></dt><dd><p>Path or URL to a matplotlib style file, or name of one of
+matplotlib’s built-in stylesheets (e.g. ‘ggplot’).
+Lightkurve’s custom stylesheet is used by default.</p>
+</dd>
+<dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of arguments to be passed to <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.1.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib.pyplot.plot</span></code></a>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>ax</strong><span class="classifier">matplotlib.axes._subplots.AxesSubplot</span></dt><dd><p>The matplotlib axes object.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
 <dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.get_lightcurve">
-<code class="descname">get_lightcurve</code><span class="sig-paren">(</span><em>self</em>, <em>flux_type</em>, <em>centroid_type='MOM_CENTR'</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.get_lightcurve" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_lightcurve</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">flux_type</em>, <em class="sig-param">centroid_type='MOM_CENTR'</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.get_lightcurve" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.header">
-<code class="descname">header</code><span class="sig-paren">(</span><em>self</em>, <em>ext=0</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.header" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">header</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">ext=0</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.header" title="Permalink to this definition">¶</a></dt>
 <dd><p>Header of the object at extension <code class="xref py py-obj docutils literal notranslate"><span class="pre">ext</span></code></p>
 </dd></dl>
 
 <dl class="method">
 <dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.plot">
-<code class="descname">plot</code><span class="sig-paren">(</span><em>self</em>, <em>flux_types=None</em>, <em>style='lightkurve'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.plot" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">flux_types=None</em>, <em class="sig-param">style='lightkurve'</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the light curve file using matplotlib’s <a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.plot" title="lightkurve.lightcurvefile.KeplerLightCurveFile.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a> method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>ax</strong><span class="classifier">matplotlib.axes._subplots.AxesSubplot</span></dt><dd><p>A matplotlib axes object to plot into. If no axes is provided,
+a new one will be generated.</p>
+</dd>
+<dt><strong>flux_types</strong><span class="classifier">list or None</span></dt><dd><p>Which fluxes in the LCF to plot. Default is lcf._flux_types().
+For Kepler this is PDCSAP and SAP flux. Pass a list to change flux
+types.</p>
+</dd>
+<dt><strong>normalize</strong><span class="classifier">bool</span></dt><dd><p>Normalize the lightcurve before plotting?</p>
+</dd>
+<dt><strong>xlabel</strong><span class="classifier">str</span></dt><dd><p>Plot x axis label</p>
+</dd>
+<dt><strong>ylabel</strong><span class="classifier">str</span></dt><dd><p>Plot y axis label</p>
+</dd>
+<dt><strong>title</strong><span class="classifier">str</span></dt><dd><p>Plot set_title</p>
+</dd>
+<dt><strong>style</strong><span class="classifier">str</span></dt><dd><p>Path or URL to a matplotlib style file, or name of one of
+matplotlib’s built-in stylesheets (e.g. ‘ggplot’).
+Lightkurve’s custom stylesheet is used by default.</p>
+</dd>
+<dt><strong>kwargs</strong><span class="classifier">dict</span></dt><dd><p>Dictionary of arguments to be passed to <a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="(in Matplotlib v3.1.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib.pyplot.plot</span></code></a>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>ax</strong><span class="classifier">matplotlib.axes._subplots.AxesSubplot</span></dt><dd><p>The matplotlib axes object.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lightkurve.lightcurvefile.KeplerLightCurveFile.scatter">
+<code class="sig-name descname">scatter</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">flux_types=None</em>, <em class="sig-param">style='lightkurve'</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.scatter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the light curve file using matplotlib’s <a class="reference internal" href="#lightkurve.lightcurvefile.KeplerLightCurveFile.scatter" title="lightkurve.lightcurvefile.KeplerLightCurveFile.scatter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter</span></code></a> method.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
@@ -359,12 +456,14 @@ Lightkurve’s custom stylesheet is used by default.</p>
 
 
 </div>
-<div class="container" style="padding-top: 2em;">
+<div class="container footer">
     <hr>
     <p class="text-center">
-      Created with ♥ by the Lightkurve collaboration.
+      
+        Created with ♥ by the Lightkurve collaboration.
                       Please <a href="about/citing.html">cite us</a> or
                       <a href="https://github.com/KeplerGO/Lightkurve">join us on GitHub.</a>
+      
     </p>
 </div>
   </body>

@@ -17,22 +17,24 @@
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
+    <!-- Load Bootstrap CSS and Javascript (Javascript is needed for the navbar toggle) -->
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+    <!-- Load the theme's CSS. -->
+    <link rel="stylesheet" href="../_static/css/amunra.css" type="text/css" />
 
-
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'UA-69171-9');
-    </script>
+    
+      <!-- Google Analytics -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-69171-9');
+      </script>
+    
 
   </head><body>
 <header>
@@ -44,32 +46,34 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarsExample07">
-      <ul class="navbar-nav mr-auto">
-        
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="../quickstart.html">Quickstart</a>
-            </li>
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="../tutorials/index.html">Tutorials</a>
-            </li>
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="index.html">API</a>
-            </li>
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="../about/index.html">About</a>
-            </li>
-        
-      </ul>
 
-        <form class="form-inline my-2 my-md-0" action="../search.html" method="get">
+    
+      <!-- Custom navbar -->
+      <ul class="navbar-nav mr-auto">
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="../quickstart.html">Quickstart</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="../tutorials/index.html">Tutorials</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="index.html">API</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="../about/index.html">About</a>
+          </li>
+      </ul>
+    
+
+        <form class="form-inline my-2 my-md-0 ml-auto" action="../search.html" method="get">
             <input class="form-control" type="text" placeholder="Search" aria-label="Search" name="q" />
         </form>
 
@@ -90,7 +94,7 @@
 <h1>SearchResult<a class="headerlink" href="#searchresult" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="lightkurve.search.SearchResult">
-<em class="property">class </em><code class="descclassname">lightkurve.search.</code><code class="descname">SearchResult</code><span class="sig-paren">(</span><em>table=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.search.SearchResult" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">lightkurve.search.</code><code class="sig-name descname">SearchResult</code><span class="sig-paren">(</span><em class="sig-param">table=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.search.SearchResult" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Container for the results returned by <a class="reference internal" href="lightkurve.search.search_targetpixelfile.html#lightkurve.search.search_targetpixelfile" title="lightkurve.search.search_targetpixelfile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_targetpixelfile</span></code></a>,
 <a class="reference internal" href="lightkurve.search.search_lightcurvefile.html#lightkurve.search.search_lightcurvefile" title="lightkurve.search.search_lightcurvefile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_lightcurvefile</span></code></a>, and <a class="reference internal" href="lightkurve.search.search_tesscut.html#lightkurve.search.search_tesscut" title="lightkurve.search.search_tesscut"><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_tesscut</span></code></a>.</p>
@@ -100,14 +104,14 @@ functions.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>table</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v4.0.dev1149)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.table.Table</span></code></a> object</span></dt><dd><p>Astropy table returned by a join of the astroquery <code class="xref py py-obj docutils literal notranslate"><span class="pre">Observations.query_criteria()</span></code>
+<dt><strong>table</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v4.0.dev527)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.table.Table</span></code></a> object</span></dt><dd><p>Astropy table returned by a join of the astroquery <code class="xref py py-obj docutils literal notranslate"><span class="pre">Observations.query_criteria()</span></code>
 and <code class="xref py py-obj docutils literal notranslate"><span class="pre">Observations.get_product_list()</span></code> methods.</p>
 </dd>
 </dl>
 </dd>
 </dl>
 <p class="rubric">Attributes Summary</p>
-<table class="longtable docutils align-center">
+<table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -131,7 +135,7 @@ and <code class="xref py py-obj docutils literal notranslate"><span class="pre">
 </tbody>
 </table>
 <p class="rubric">Methods Summary</p>
-<table class="longtable docutils align-center">
+<table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -141,45 +145,45 @@ and <code class="xref py py-obj docutils literal notranslate"><span class="pre">
 <td><p>Returns a single <code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerLightCurveFile</span></code> object.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.search.SearchResult.download_all" title="lightkurve.search.SearchResult.download_all"><code class="xref py py-obj docutils literal notranslate"><span class="pre">download_all</span></code></a>(self[, quality_bitmask, …])</p></td>
-<td><p>Returns a <code class="xref py py-obj docutils literal notranslate"><span class="pre">TargetPixelFileCollection</span> <span class="pre">or</span> <span class="pre">`LightCurveFileCollection</span></code>.</p></td>
+<td><p>Returns a <a class="reference internal" href="lightkurve.collections.TargetPixelFileCollection.html#lightkurve.collections.TargetPixelFileCollection" title="lightkurve.collections.TargetPixelFileCollection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TargetPixelFileCollection</span></code></a> or <a class="reference internal" href="lightkurve.collections.LightCurveFileCollection.html#lightkurve.collections.LightCurveFileCollection" title="lightkurve.collections.LightCurveFileCollection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurveFileCollection</span></code></a>.</p></td>
 </tr>
 </tbody>
 </table>
 <p class="rubric">Attributes Documentation</p>
 <dl class="attribute">
 <dt id="lightkurve.search.SearchResult.dec">
-<code class="descname">dec</code><a class="headerlink" href="#lightkurve.search.SearchResult.dec" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">dec</code><a class="headerlink" href="#lightkurve.search.SearchResult.dec" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an array of dec values for targets in search</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.search.SearchResult.obsid">
-<code class="descname">obsid</code><a class="headerlink" href="#lightkurve.search.SearchResult.obsid" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">obsid</code><a class="headerlink" href="#lightkurve.search.SearchResult.obsid" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an array of MAST observation IDs</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.search.SearchResult.ra">
-<code class="descname">ra</code><a class="headerlink" href="#lightkurve.search.SearchResult.ra" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">ra</code><a class="headerlink" href="#lightkurve.search.SearchResult.ra" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an array of RA values for targets in search</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.search.SearchResult.target_name">
-<code class="descname">target_name</code><a class="headerlink" href="#lightkurve.search.SearchResult.target_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">target_name</code><a class="headerlink" href="#lightkurve.search.SearchResult.target_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an array of target names</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.search.SearchResult.unique_targets">
-<code class="descname">unique_targets</code><a class="headerlink" href="#lightkurve.search.SearchResult.unique_targets" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">unique_targets</code><a class="headerlink" href="#lightkurve.search.SearchResult.unique_targets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a table of targets and their RA &amp; dec values produced by search</p>
 </dd></dl>
 
 <p class="rubric">Methods Documentation</p>
 <dl class="method">
 <dt id="lightkurve.search.SearchResult.download">
-<code class="descname">download</code><span class="sig-paren">(</span><em>self</em>, <em>quality_bitmask='default'</em>, <em>download_dir=None</em>, <em>cutout_size=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.search.SearchResult.download" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">download</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">quality_bitmask='default'</em>, <em class="sig-param">download_dir=None</em>, <em class="sig-param">cutout_size=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.search.SearchResult.download" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a single <code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code> or <code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerLightCurveFile</span></code> object.</p>
 <p>If multiple files are present in <code class="xref py py-obj docutils literal notranslate"><span class="pre">SearchResult.table</span></code>, only the first
 will be downloaded.</p>
@@ -221,8 +225,9 @@ Default size is (5, 5)</p>
 
 <dl class="method">
 <dt id="lightkurve.search.SearchResult.download_all">
-<code class="descname">download_all</code><span class="sig-paren">(</span><em>self</em>, <em>quality_bitmask='default'</em>, <em>download_dir=None</em>, <em>cutout_size=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.search.SearchResult.download_all" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a <code class="xref py py-obj docutils literal notranslate"><span class="pre">TargetPixelFileCollection</span> <span class="pre">or</span> <span class="pre">`LightCurveFileCollection</span></code>.</p>
+<code class="sig-name descname">download_all</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">quality_bitmask='default'</em>, <em class="sig-param">download_dir=None</em>, <em class="sig-param">cutout_size=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.search.SearchResult.download_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a <a class="reference internal" href="lightkurve.collections.TargetPixelFileCollection.html#lightkurve.collections.TargetPixelFileCollection" title="lightkurve.collections.TargetPixelFileCollection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TargetPixelFileCollection</span></code></a> or
+<a class="reference internal" href="lightkurve.collections.LightCurveFileCollection.html#lightkurve.collections.LightCurveFileCollection" title="lightkurve.collections.LightCurveFileCollection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurveFileCollection</span></code></a>.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
@@ -252,7 +257,8 @@ Default size is (5, 5)</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl>
-<dt><strong>collection</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.Collection</span></code> object</span></dt><dd><p>Returns a <code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurveFileCollection</span></code>  or <code class="xref py py-obj docutils literal notranslate"><span class="pre">TargetPixelFileCollection</span></code>,
+<dt><strong>collection</strong><span class="classifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Collection</span></code> object</span></dt><dd><p>Returns a <a class="reference internal" href="lightkurve.collections.LightCurveFileCollection.html#lightkurve.collections.LightCurveFileCollection" title="lightkurve.collections.LightCurveFileCollection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurveFileCollection</span></code></a> or
+<a class="reference internal" href="lightkurve.collections.TargetPixelFileCollection.html#lightkurve.collections.TargetPixelFileCollection" title="lightkurve.collections.TargetPixelFileCollection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TargetPixelFileCollection</span></code></a>,
 containing all entries in the products table</p>
 </dd>
 </dl>
@@ -266,12 +272,14 @@ containing all entries in the products table</p>
 
 
 </div>
-<div class="container" style="padding-top: 2em;">
+<div class="container footer">
     <hr>
     <p class="text-center">
-      Created with ♥ by the Lightkurve collaboration.
+      
+        Created with ♥ by the Lightkurve collaboration.
                       Please <a href="about/citing.html">cite us</a> or
                       <a href="https://github.com/KeplerGO/Lightkurve">join us on GitHub.</a>
+      
     </p>
 </div>
   </body>

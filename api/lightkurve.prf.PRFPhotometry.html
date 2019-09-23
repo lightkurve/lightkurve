@@ -17,22 +17,24 @@
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
+    <!-- Load Bootstrap CSS and Javascript (Javascript is needed for the navbar toggle) -->
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+    <!-- Load the theme's CSS. -->
+    <link rel="stylesheet" href="../_static/css/amunra.css" type="text/css" />
 
-
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'UA-69171-9');
-    </script>
+    
+      <!-- Google Analytics -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-69171-9');
+      </script>
+    
 
   </head><body>
 <header>
@@ -44,32 +46,34 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarsExample07">
-      <ul class="navbar-nav mr-auto">
-        
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="../quickstart.html">Quickstart</a>
-            </li>
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="../tutorials/index.html">Tutorials</a>
-            </li>
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="index.html">API</a>
-            </li>
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="../about/index.html">About</a>
-            </li>
-        
-      </ul>
 
-        <form class="form-inline my-2 my-md-0" action="../search.html" method="get">
+    
+      <!-- Custom navbar -->
+      <ul class="navbar-nav mr-auto">
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="../quickstart.html">Quickstart</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="../tutorials/index.html">Tutorials</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="index.html">API</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="../about/index.html">About</a>
+          </li>
+      </ul>
+    
+
+        <form class="form-inline my-2 my-md-0 ml-auto" action="../search.html" method="get">
             <input class="form-control" type="text" placeholder="Search" aria-label="Search" name="q" />
         </form>
 
@@ -90,7 +94,7 @@
 <h1>PRFPhotometry<a class="headerlink" href="#prfphotometry" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="lightkurve.prf.PRFPhotometry">
-<em class="property">class </em><code class="descclassname">lightkurve.prf.</code><code class="descname">PRFPhotometry</code><span class="sig-paren">(</span><em>model</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.PRFPhotometry" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">lightkurve.prf.</code><code class="sig-name descname">PRFPhotometry</code><span class="sig-paren">(</span><em class="sig-param">model</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.PRFPhotometry" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>This class performs PRF Photometry on TPF-like data given a <code class="docutils literal notranslate"><span class="pre">TPFModel</span></code>.</p>
 <p>This class exists because a <code class="docutils literal notranslate"><span class="pre">TPFModel</span></code> object is designed to fit only
@@ -105,7 +109,7 @@ of cadences and obtain the resulting LightCurve.</p>
 </dd>
 </dl>
 <p class="rubric">Methods Summary</p>
-<table class="longtable docutils align-center">
+<table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -122,13 +126,13 @@ of cadences and obtain the resulting LightCurve.</p>
 <p class="rubric">Methods Documentation</p>
 <dl class="method">
 <dt id="lightkurve.prf.PRFPhotometry.plot_results">
-<code class="descname">plot_results</code><span class="sig-paren">(</span><em>self</em>, <em>star_idx=0</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.PRFPhotometry.plot_results" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">plot_results</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">star_idx=0</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.PRFPhotometry.plot_results" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot all the TPF model parameters over time.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="lightkurve.prf.PRFPhotometry.run">
-<code class="descname">run</code><span class="sig-paren">(</span><em>self</em>, <em>tpf_flux</em>, <em>cadences=None</em>, <em>pos_corr1=None</em>, <em>pos_corr2=None</em>, <em>parallel=True</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.PRFPhotometry.run" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">tpf_flux</em>, <em class="sig-param">cadences=None</em>, <em class="sig-param">pos_corr1=None</em>, <em class="sig-param">pos_corr2=None</em>, <em class="sig-param">parallel=True</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.PRFPhotometry.run" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fits the model to the flux data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -156,12 +160,14 @@ for each cadence.</p>
 
 
 </div>
-<div class="container" style="padding-top: 2em;">
+<div class="container footer">
     <hr>
     <p class="text-center">
-      Created with ♥ by the Lightkurve collaboration.
+      
+        Created with ♥ by the Lightkurve collaboration.
                       Please <a href="about/citing.html">cite us</a> or
                       <a href="https://github.com/KeplerGO/Lightkurve">join us on GitHub.</a>
+      
     </p>
 </div>
   </body>

@@ -17,22 +17,24 @@
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
+    <!-- Load Bootstrap CSS and Javascript (Javascript is needed for the navbar toggle) -->
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+    <!-- Load the theme's CSS. -->
+    <link rel="stylesheet" href="../_static/css/amunra.css" type="text/css" />
 
-
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'UA-69171-9');
-    </script>
+    
+      <!-- Google Analytics -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-69171-9');
+      </script>
+    
 
   </head><body>
 <header>
@@ -44,32 +46,34 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarsExample07">
-      <ul class="navbar-nav mr-auto">
-        
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="../quickstart.html">Quickstart</a>
-            </li>
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="../tutorials/index.html">Tutorials</a>
-            </li>
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="../api/index.html">API</a>
-            </li>
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="index.html">About</a>
-            </li>
-        
-      </ul>
 
-        <form class="form-inline my-2 my-md-0" action="../search.html" method="get">
+    
+      <!-- Custom navbar -->
+      <ul class="navbar-nav mr-auto">
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="../quickstart.html">Quickstart</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="../tutorials/index.html">Tutorials</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="../api/index.html">API</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="index.html">About</a>
+          </li>
+      </ul>
+    
+
+        <form class="form-inline my-2 my-md-0 ml-auto" action="../search.html" method="get">
             <input class="form-control" type="text" placeholder="Search" aria-label="Search" name="q" />
         </form>
 
@@ -88,6 +92,26 @@
     
   <div class="section" id="full-changelog">
 <span id="changelog"></span><h1>Full changelog<a class="headerlink" href="#full-changelog" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="unreleased">
+<h2>1.2.0 (unreleased)<a class="headerlink" href="#unreleased" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Added <code class="xref py py-obj docutils literal notranslate"><span class="pre">flux_unit</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">flux_quantity</span></code> properties to the <code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code> class
+to enable users to keep track of a light curve’s flux units. [#591]</p></li>
+<li><p>Changed the default behavior of <code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.plot()</span></code> to use <code class="xref py py-obj docutils literal notranslate"><span class="pre">normalize=False</span></code>,
+ie. plots now display a light curve in its intrinsic units by default. [#591]</p></li>
+<li><p>Added an optional <code class="xref py py-obj docutils literal notranslate"><span class="pre">unit</span></code> argument to <code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.normalize()</span></code> to make it
+convenient to obtain a relative light curve in percent (<code class="xref py py-obj docutils literal notranslate"><span class="pre">unit='percent'</span></code>),
+parts per thousand (<code class="xref py py-obj docutils literal notranslate"><span class="pre">unit='ppt'</span></code>) or parts per million (<code class="xref py py-obj docutils literal notranslate"><span class="pre">unit='ppm'</span></code>). [#591]</p></li>
+<li><p>Changed <code class="xref py py-obj docutils literal notranslate"><span class="pre">LombScarglePeriodogram.from_lightcurve()</span></code> to not normalize the input
+light curve by default. [#591]</p></li>
+<li><p>Changed <code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.normalize()</span></code> to emit a warning if the light curve appears
+to be zero-centered. [#589]</p></li>
+<li><p>Fixed an issue which caused the search functions to be incompatible with the
+current development version of astroquery (v0.3.10). [#598]</p></li>
+<li><p>Added support for performing mathematical operations involving <code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code>
+objects, e.g. two <code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code> objects can now be added together. [#532]</p></li>
+</ul>
+</div>
 <div class="section" id="id1">
 <h2>1.1.1 (2019-08-19)<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>Lightkurve v1.1.1 is a bugfix release which includes the following changes:</p>
@@ -361,12 +385,14 @@ properties must be a noun [#286].  As a result, we renamed the following methods
 
 
 </div>
-<div class="container" style="padding-top: 2em;">
+<div class="container footer">
     <hr>
     <p class="text-center">
-      Created with ♥ by the Lightkurve collaboration.
+      
+        Created with ♥ by the Lightkurve collaboration.
                       Please <a href="about/citing.html">cite us</a> or
                       <a href="https://github.com/KeplerGO/Lightkurve">join us on GitHub.</a>
+      
     </p>
 </div>
   </body>

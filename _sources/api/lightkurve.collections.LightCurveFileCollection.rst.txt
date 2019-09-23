@@ -1,0 +1,33 @@
+LightCurveFileCollection
+========================
+
+.. currentmodule:: lightkurve.collections
+
+.. autoclass:: LightCurveFileCollection
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~LightCurveFileCollection.PDCSAP_FLUX
+      ~LightCurveFileCollection.SAP_FLUX
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~LightCurveFileCollection.append
+      ~LightCurveFileCollection.plot
+      ~LightCurveFileCollection.stitch
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: PDCSAP_FLUX
+   .. autoattribute:: SAP_FLUX
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: append
+   .. automethod:: plot
+   .. automethod:: stitch

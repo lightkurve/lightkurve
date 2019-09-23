@@ -1,16 +1,17 @@
 .. title:: Lightkurve docs
 
-.. raw:: html
+.. container:: lead
 
-  <div class="container text-center" style="padding-top:1em; padding-bottom: 2em;">
-    <h1 style="font-size: 4rem;">Lightkurve</h1>
-    <p class="lead">
-        A friendly package for Kepler & TESS time series analysis in Python.
-    </p>
-    <p>
-        <a href="quickstart.html" class="btn btn-primary my-2" style="font-size: 1.25rem;">Quickstart →</a>
-    </p>
-  </div>
+    Lightkurve
+
+    A friendly package for Kepler & TESS time series analysis in Python.
+
+    .. raw:: html
+
+        <a href="quickstart.html" class="btn btn-primary">Quickstart →</a>
+
+
+.. raw:: html
 
   <div class="container">
     <hr>

@@ -17,22 +17,24 @@
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
+    <!-- Load Bootstrap CSS and Javascript (Javascript is needed for the navbar toggle) -->
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+    <!-- Load the theme's CSS. -->
+    <link rel="stylesheet" href="../_static/css/amunra.css" type="text/css" />
 
-
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'UA-69171-9');
-    </script>
+    
+      <!-- Google Analytics -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-69171-9');
+      </script>
+    
 
   </head><body>
 <header>
@@ -44,32 +46,34 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarsExample07">
-      <ul class="navbar-nav mr-auto">
-        
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="../quickstart.html">Quickstart</a>
-            </li>
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="../tutorials/index.html">Tutorials</a>
-            </li>
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="index.html">API</a>
-            </li>
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="../about/index.html">About</a>
-            </li>
-        
-      </ul>
 
-        <form class="form-inline my-2 my-md-0" action="../search.html" method="get">
+    
+      <!-- Custom navbar -->
+      <ul class="navbar-nav mr-auto">
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="../quickstart.html">Quickstart</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="../tutorials/index.html">Tutorials</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="index.html">API</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="../about/index.html">About</a>
+          </li>
+      </ul>
+    
+
+        <form class="form-inline my-2 my-md-0 ml-auto" action="../search.html" method="get">
             <input class="form-control" type="text" placeholder="Search" aria-label="Search" name="q" />
         </form>
 
@@ -90,7 +94,7 @@
 <h1>KeplerQualityFlags<a class="headerlink" href="#keplerqualityflags" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="lightkurve.utils.KeplerQualityFlags">
-<em class="property">class </em><code class="descclassname">lightkurve.utils.</code><code class="descname">KeplerQualityFlags</code><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">lightkurve.utils.</code><code class="sig-name descname">KeplerQualityFlags</code><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">lightkurve.utils.QualityFlags</span></code></p>
 <p>This class encodes the meaning of the various Kepler QUALITY bitmask flags,
 as documented in the Kepler Archive Manual (Ref. [1], Table 2.3).</p>
@@ -102,7 +106,7 @@ as documented in the Kepler Archive Manual (Ref. [1], Table 2.3).</p>
 </dd>
 </dl>
 <p class="rubric">Attributes Summary</p>
-<table class="longtable docutils align-center">
+<table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -186,7 +190,7 @@ as documented in the Kepler Archive Manual (Ref. [1], Table 2.3).</p>
 </tbody>
 </table>
 <p class="rubric">Methods Summary</p>
-<table class="longtable docutils align-center">
+<table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -203,138 +207,138 @@ as documented in the Kepler Archive Manual (Ref. [1], Table 2.3).</p>
 <p class="rubric">Attributes Documentation</p>
 <dl class="attribute">
 <dt id="lightkurve.utils.KeplerQualityFlags.ApertureCosmic">
-<code class="descname">ApertureCosmic</code><em class="property"> = 128</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.ApertureCosmic" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">ApertureCosmic</code><em class="property"> = 128</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.ApertureCosmic" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.utils.KeplerQualityFlags.Argabrightening">
-<code class="descname">Argabrightening</code><em class="property"> = 64</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.Argabrightening" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">Argabrightening</code><em class="property"> = 64</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.Argabrightening" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.utils.KeplerQualityFlags.ArgabrighteningOnCCD">
-<code class="descname">ArgabrighteningOnCCD</code><em class="property"> = 4096</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.ArgabrighteningOnCCD" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">ArgabrighteningOnCCD</code><em class="property"> = 4096</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.ArgabrighteningOnCCD" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.utils.KeplerQualityFlags.AttitudeTweak">
-<code class="descname">AttitudeTweak</code><em class="property"> = 1</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.AttitudeTweak" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">AttitudeTweak</code><em class="property"> = 1</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.AttitudeTweak" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.utils.KeplerQualityFlags.CoarsePoint">
-<code class="descname">CoarsePoint</code><em class="property"> = 4</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.CoarsePoint" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">CoarsePoint</code><em class="property"> = 4</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.CoarsePoint" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.utils.KeplerQualityFlags.CollateralCosmic">
-<code class="descname">CollateralCosmic</code><em class="property"> = 8192</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.CollateralCosmic" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">CollateralCosmic</code><em class="property"> = 8192</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.CollateralCosmic" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.utils.KeplerQualityFlags.DEFAULT_BITMASK">
-<code class="descname">DEFAULT_BITMASK</code><em class="property"> = 1130799</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.DEFAULT_BITMASK" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">DEFAULT_BITMASK</code><em class="property"> = 1130799</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.DEFAULT_BITMASK" title="Permalink to this definition">¶</a></dt>
 <dd><p>DEFAULT bitmask identifies all cadences which are definitely useless.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.utils.KeplerQualityFlags.Desat">
-<code class="descname">Desat</code><em class="property"> = 32</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.Desat" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">Desat</code><em class="property"> = 32</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.Desat" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.utils.KeplerQualityFlags.DetectorAnomaly">
-<code class="descname">DetectorAnomaly</code><em class="property"> = 16384</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.DetectorAnomaly" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">DetectorAnomaly</code><em class="property"> = 16384</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.DetectorAnomaly" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.utils.KeplerQualityFlags.EarthPoint">
-<code class="descname">EarthPoint</code><em class="property"> = 8</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.EarthPoint" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">EarthPoint</code><em class="property"> = 8</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.EarthPoint" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.utils.KeplerQualityFlags.HARDEST_BITMASK">
-<code class="descname">HARDEST_BITMASK</code><em class="property"> = 2096639</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.HARDEST_BITMASK" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">HARDEST_BITMASK</code><em class="property"> = 2096639</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.HARDEST_BITMASK" title="Permalink to this definition">¶</a></dt>
 <dd><p>HARDEST bitmask identifies cadences with any flag set. Its use is not recommended.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.utils.KeplerQualityFlags.HARD_BITMASK">
-<code class="descname">HARD_BITMASK</code><em class="property"> = 1664431</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.HARD_BITMASK" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">HARD_BITMASK</code><em class="property"> = 1664431</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.HARD_BITMASK" title="Permalink to this definition">¶</a></dt>
 <dd><p>HARD bitmask is conservative and may identify cadences which are useful.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.utils.KeplerQualityFlags.ImpulsiveOutlier">
-<code class="descname">ImpulsiveOutlier</code><em class="property"> = 2048</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.ImpulsiveOutlier" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">ImpulsiveOutlier</code><em class="property"> = 2048</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.ImpulsiveOutlier" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.utils.KeplerQualityFlags.ManualExclude">
-<code class="descname">ManualExclude</code><em class="property"> = 256</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.ManualExclude" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">ManualExclude</code><em class="property"> = 256</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.ManualExclude" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.utils.KeplerQualityFlags.NoData">
-<code class="descname">NoData</code><em class="property"> = 65536</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.NoData" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">NoData</code><em class="property"> = 65536</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.NoData" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.utils.KeplerQualityFlags.NoFinePoint">
-<code class="descname">NoFinePoint</code><em class="property"> = 32768</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.NoFinePoint" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">NoFinePoint</code><em class="property"> = 32768</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.NoFinePoint" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.utils.KeplerQualityFlags.OPTIONS">
-<code class="descname">OPTIONS</code><em class="property"> = {'default': 1130799, 'hard': 1664431, 'hardest': 2096639, 'none': 0}</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.OPTIONS" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">OPTIONS</code><em class="property"> = {'default': 1130799, 'hard': 1664431, 'hardest': 2096639, 'none': 0}</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.OPTIONS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dictionary which provides friendly names for the various bitmasks.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.utils.KeplerQualityFlags.PossibleThrusterFiring">
-<code class="descname">PossibleThrusterFiring</code><em class="property"> = 524288</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.PossibleThrusterFiring" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">PossibleThrusterFiring</code><em class="property"> = 524288</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.PossibleThrusterFiring" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.utils.KeplerQualityFlags.RollingBandInAperture">
-<code class="descname">RollingBandInAperture</code><em class="property"> = 131072</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.RollingBandInAperture" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">RollingBandInAperture</code><em class="property"> = 131072</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.RollingBandInAperture" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.utils.KeplerQualityFlags.RollingBandInMask">
-<code class="descname">RollingBandInMask</code><em class="property"> = 262144</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.RollingBandInMask" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">RollingBandInMask</code><em class="property"> = 262144</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.RollingBandInMask" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.utils.KeplerQualityFlags.STRINGS">
-<code class="descname">STRINGS</code><em class="property"> = {1: 'Attitude tweak', 2: 'Safe mode', 4: 'Coarse point', 8: 'Earth point', 16: 'Zero crossing', 32: 'Desaturation event', 64: 'Argabrightening', 128: 'Cosmic ray in optimal aperture', 256: 'Manual exclude', 1024: 'Sudden sensitivity dropout', 2048: 'Impulsive outlier', 4096: 'Argabrightening on CCD', 8192: 'Cosmic ray in collateral data', 16384: 'Detector anomaly', 32768: 'No fine point', 65536: 'No data', 131072: 'Rolling band in optimal aperture', 262144: 'Rolling band in full mask', 524288: 'Possible thruster firing', 1048576: 'Thruster firing'}</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.STRINGS" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">STRINGS</code><em class="property"> = {1: 'Attitude tweak', 2: 'Safe mode', 4: 'Coarse point', 8: 'Earth point', 16: 'Zero crossing', 32: 'Desaturation event', 64: 'Argabrightening', 128: 'Cosmic ray in optimal aperture', 256: 'Manual exclude', 1024: 'Sudden sensitivity dropout', 2048: 'Impulsive outlier', 4096: 'Argabrightening on CCD', 8192: 'Cosmic ray in collateral data', 16384: 'Detector anomaly', 32768: 'No fine point', 65536: 'No data', 131072: 'Rolling band in optimal aperture', 262144: 'Rolling band in full mask', 524288: 'Possible thruster firing', 1048576: 'Thruster firing'}</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.STRINGS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Pretty string descriptions for each flag</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.utils.KeplerQualityFlags.SafeMode">
-<code class="descname">SafeMode</code><em class="property"> = 2</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.SafeMode" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">SafeMode</code><em class="property"> = 2</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.SafeMode" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.utils.KeplerQualityFlags.SensitivityDropout">
-<code class="descname">SensitivityDropout</code><em class="property"> = 1024</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.SensitivityDropout" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">SensitivityDropout</code><em class="property"> = 1024</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.SensitivityDropout" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.utils.KeplerQualityFlags.ThrusterFiring">
-<code class="descname">ThrusterFiring</code><em class="property"> = 1048576</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.ThrusterFiring" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">ThrusterFiring</code><em class="property"> = 1048576</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.ThrusterFiring" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.utils.KeplerQualityFlags.ZeroCrossing">
-<code class="descname">ZeroCrossing</code><em class="property"> = 16</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.ZeroCrossing" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">ZeroCrossing</code><em class="property"> = 16</em><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.ZeroCrossing" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <p class="rubric">Methods Documentation</p>
-<dl class="classmethod">
+<dl class="method">
 <dt id="lightkurve.utils.KeplerQualityFlags.create_quality_mask">
-<em class="property">classmethod </em><code class="descname">create_quality_mask</code><span class="sig-paren">(</span><em>quality_array</em>, <em>bitmask=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.create_quality_mask" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">create_quality_mask</code><span class="sig-paren">(</span><em class="sig-param">quality_array</em>, <em class="sig-param">bitmask=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.create_quality_mask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a boolean array which flags good cadences given a bitmask.</p>
 <p>This method is used by the constructors of <code class="xref py py-class docutils literal notranslate"><span class="pre">KeplerTargetPixelFile</span></code>
 and <code class="xref py py-class docutils literal notranslate"><span class="pre">KeplerLightCurveFile</span></code> to initialize their <code class="xref py py-obj docutils literal notranslate"><span class="pre">quality_mask</span></code>
@@ -357,9 +361,9 @@ class attribute which is used to ignore bad-quality data.</p>
 </dl>
 </dd></dl>
 
-<dl class="classmethod">
+<dl class="method">
 <dt id="lightkurve.utils.KeplerQualityFlags.decode">
-<em class="property">classmethod </em><code class="descname">decode</code><span class="sig-paren">(</span><em>quality</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.decode" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">decode</code><span class="sig-paren">(</span><em class="sig-param">quality</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.utils.KeplerQualityFlags.decode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts a Kepler QUALITY value into a list of human-readable strings.</p>
 <p>This function takes the QUALITY bitstring that can be found for each
 cadence in Kepler/K2’s pixel and light curve files and converts into
@@ -387,12 +391,14 @@ quality flags raised.  Returns an empty list if no flags raised.</p>
 
 
 </div>
-<div class="container" style="padding-top: 2em;">
+<div class="container footer">
     <hr>
     <p class="text-center">
-      Created with ♥ by the Lightkurve collaboration.
+      
+        Created with ♥ by the Lightkurve collaboration.
                       Please <a href="about/citing.html">cite us</a> or
                       <a href="https://github.com/KeplerGO/Lightkurve">join us on GitHub.</a>
+      
     </p>
 </div>
   </body>

@@ -17,22 +17,24 @@
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
+    <!-- Load Bootstrap CSS and Javascript (Javascript is needed for the navbar toggle) -->
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+    <!-- Load the theme's CSS. -->
+    <link rel="stylesheet" href="../_static/css/amunra.css" type="text/css" />
 
-
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'UA-69171-9');
-    </script>
+    
+      <!-- Google Analytics -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-69171-9');
+      </script>
+    
 
   </head><body>
 <header>
@@ -44,32 +46,34 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarsExample07">
-      <ul class="navbar-nav mr-auto">
-        
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="../quickstart.html">Quickstart</a>
-            </li>
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="../tutorials/index.html">Tutorials</a>
-            </li>
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="index.html">API</a>
-            </li>
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="../about/index.html">About</a>
-            </li>
-        
-      </ul>
 
-        <form class="form-inline my-2 my-md-0" action="../search.html" method="get">
+    
+      <!-- Custom navbar -->
+      <ul class="navbar-nav mr-auto">
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="../quickstart.html">Quickstart</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="../tutorials/index.html">Tutorials</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="index.html">API</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="../about/index.html">About</a>
+          </li>
+      </ul>
+    
+
+        <form class="form-inline my-2 my-md-0 ml-auto" action="../search.html" method="get">
             <input class="form-control" type="text" placeholder="Search" aria-label="Search" name="q" />
         </form>
 
@@ -90,12 +94,12 @@
 <h1>BoxLeastSquaresPeriodogram<a class="headerlink" href="#boxleastsquaresperiodogram" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="lightkurve.periodogram.BoxLeastSquaresPeriodogram">
-<em class="property">class </em><code class="descclassname">lightkurve.periodogram.</code><code class="descname">BoxLeastSquaresPeriodogram</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">lightkurve.periodogram.</code><code class="sig-name descname">BoxLeastSquaresPeriodogram</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-class docutils literal notranslate"><span class="pre">lightkurve.periodogram.Periodogram</span></code></a></p>
 <p>Subclass of <a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram" title="lightkurve.periodogram.Periodogram"><code class="xref py py-class docutils literal notranslate"><span class="pre">Periodogram</span></code></a>
 representing a power spectrum generated using the Box Least Squares (BLS) method.</p>
 <p class="rubric">Attributes Summary</p>
-<table class="longtable docutils align-center">
+<table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -125,7 +129,7 @@ representing a power spectrum generated using the Box Least Squares (BLS) method
 </tbody>
 </table>
 <p class="rubric">Methods Summary</p>
-<table class="longtable docutils align-center">
+<table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -172,50 +176,50 @@ representing a power spectrum generated using the Box Least Squares (BLS) method
 <p class="rubric">Attributes Documentation</p>
 <dl class="attribute">
 <dt id="lightkurve.periodogram.BoxLeastSquaresPeriodogram.depth_at_max_power">
-<code class="descname">depth_at_max_power</code><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.depth_at_max_power" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">depth_at_max_power</code><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.depth_at_max_power" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the depth corresponding to the highest peak in the periodogram.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.periodogram.BoxLeastSquaresPeriodogram.duration_at_max_power">
-<code class="descname">duration_at_max_power</code><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.duration_at_max_power" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">duration_at_max_power</code><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.duration_at_max_power" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the duration corresponding to the highest peak in the periodogram.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.periodogram.BoxLeastSquaresPeriodogram.frequency_at_max_power">
-<code class="descname">frequency_at_max_power</code><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.frequency_at_max_power" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">frequency_at_max_power</code><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.frequency_at_max_power" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the frequency corresponding to the highest peak in the periodogram.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.periodogram.BoxLeastSquaresPeriodogram.max_power">
-<code class="descname">max_power</code><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.max_power" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">max_power</code><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.max_power" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the power of the highest peak in the periodogram.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.periodogram.BoxLeastSquaresPeriodogram.period">
-<code class="descname">period</code><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.period" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">period</code><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.period" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the array of periods, i.e. 1/frequency.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.periodogram.BoxLeastSquaresPeriodogram.period_at_max_power">
-<code class="descname">period_at_max_power</code><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.period_at_max_power" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">period_at_max_power</code><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.period_at_max_power" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the period corresponding to the highest peak in the periodogram.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.periodogram.BoxLeastSquaresPeriodogram.transit_time_at_max_power">
-<code class="descname">transit_time_at_max_power</code><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.transit_time_at_max_power" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">transit_time_at_max_power</code><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.transit_time_at_max_power" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the transit time corresponding to the highest peak in the periodogram.</p>
 </dd></dl>
 
 <p class="rubric">Methods Documentation</p>
 <dl class="method">
 <dt id="lightkurve.periodogram.BoxLeastSquaresPeriodogram.bin">
-<code class="descname">bin</code><span class="sig-paren">(</span><em>self</em>, <em>binsize=10</em>, <em>method='mean'</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.bin" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">bin</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">binsize=10</em>, <em class="sig-param">method='mean'</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.bin" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bins the power spectrum.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -240,7 +244,7 @@ frequency array. Defaults to 10.</p>
 
 <dl class="method">
 <dt id="lightkurve.periodogram.BoxLeastSquaresPeriodogram.compute_stats">
-<code class="descname">compute_stats</code><span class="sig-paren">(</span><em>self</em>, <em>period=None</em>, <em>duration=None</em>, <em>transit_time=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.compute_stats" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">compute_stats</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">period=None</em>, <em class="sig-param">duration=None</em>, <em class="sig-param">transit_time=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.compute_stats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes commonly used vetting statistics for a transit model.</p>
 <p>See astropy.stats.bls docs for further details.</p>
 <dl class="field-list simple">
@@ -265,7 +269,7 @@ frequency array. Defaults to 10.</p>
 
 <dl class="method">
 <dt id="lightkurve.periodogram.BoxLeastSquaresPeriodogram.copy">
-<code class="descname">copy</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.copy" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">copy</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.copy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a copy of the Periodogram object.</p>
 <p>This method uses the <a class="reference external" href="https://docs.python.org/3/library/copy.html#copy.deepcopy" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy.deepcopy</span></code></a> function to ensure that all
 objects stored within the Periodogram are copied.</p>
@@ -281,7 +285,7 @@ objects stored within the Periodogram are copied.</p>
 
 <dl class="method">
 <dt id="lightkurve.periodogram.BoxLeastSquaresPeriodogram.flatten">
-<code class="descname">flatten</code><span class="sig-paren">(</span><em>self</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.flatten" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">flatten</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.flatten" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimates the Signal-To-Noise (SNR) spectrum by dividing out an
 estimate of the noise background.</p>
 <p>This method divides the power spectrum by a background estimated
@@ -320,15 +324,15 @@ returned if <code class="xref py py-obj docutils literal notranslate"><span clas
 </dl>
 </dd></dl>
 
-<dl class="staticmethod">
+<dl class="method">
 <dt id="lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve">
-<em class="property">static </em><code class="descname">from_lightcurve</code><span class="sig-paren">(</span><em>lc</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">from_lightcurve</code><span class="sig-paren">(</span><em class="sig-param">lc</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a Periodogram from a LightCurve using the Box Least Squares (BLS) method.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="lightkurve.periodogram.BoxLeastSquaresPeriodogram.get_transit_mask">
-<code class="descname">get_transit_mask</code><span class="sig-paren">(</span><em>self</em>, <em>period=None</em>, <em>duration=None</em>, <em>transit_time=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.get_transit_mask" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_transit_mask</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">period=None</em>, <em class="sig-param">duration=None</em>, <em class="sig-param">transit_time=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.get_transit_mask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the transit mask using the BLS, returns a lightkurve.LightCurve</p>
 <p>True where there are no transits.</p>
 <dl class="field-list simple">
@@ -353,7 +357,7 @@ returned if <code class="xref py py-obj docutils literal notranslate"><span clas
 
 <dl class="method">
 <dt id="lightkurve.periodogram.BoxLeastSquaresPeriodogram.get_transit_model">
-<code class="descname">get_transit_model</code><span class="sig-paren">(</span><em>self</em>, <em>period=None</em>, <em>duration=None</em>, <em>transit_time=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.get_transit_model" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_transit_model</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">period=None</em>, <em class="sig-param">duration=None</em>, <em class="sig-param">transit_time=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.get_transit_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the transit model using the BLS, returns a lightkurve.LightCurve</p>
 <p>See astropy.stats.bls docs for further details.</p>
 <dl class="field-list simple">
@@ -378,7 +382,7 @@ returned if <code class="xref py py-obj docutils literal notranslate"><span clas
 
 <dl class="method">
 <dt id="lightkurve.periodogram.BoxLeastSquaresPeriodogram.plot">
-<code class="descname">plot</code><span class="sig-paren">(</span><em>self</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.plot" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the BoxLeastSquaresPeriodogram spectrum using matplotlib’s <a class="reference internal" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.plot" title="lightkurve.periodogram.BoxLeastSquaresPeriodogram.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a> method.
 See <a class="reference internal" href="lightkurve.periodogram.Periodogram.html#lightkurve.periodogram.Periodogram.plot" title="lightkurve.periodogram.Periodogram.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram.plot</span></code></a> for details on the accepted arguments.</p>
 <dl class="field-list simple">
@@ -399,7 +403,7 @@ See <a class="reference internal" href="lightkurve.periodogram.Periodogram.html#
 
 <dl class="method">
 <dt id="lightkurve.periodogram.BoxLeastSquaresPeriodogram.show_properties">
-<code class="descname">show_properties</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.show_properties" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">show_properties</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.show_properties" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prints a summary of the non-callable attributes of the Periodogram object.</p>
 <p>Prints in order of type (ints, strings, lists, arrays and others).
 Prints in alphabetical order.</p>
@@ -407,7 +411,7 @@ Prints in alphabetical order.</p>
 
 <dl class="method">
 <dt id="lightkurve.periodogram.BoxLeastSquaresPeriodogram.smooth">
-<code class="descname">smooth</code><span class="sig-paren">(</span><em>self</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.smooth" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">smooth</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.smooth" title="Permalink to this definition">¶</a></dt>
 <dd><p>Smooths the power spectrum using the ‘boxkernel’ or ‘logmedian’ method.</p>
 <p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">method</span></code> is set to ‘boxkernel’, this method will smooth the power
 spectrum by convolving with a numpy Box1DKernel with a width of
@@ -462,7 +466,7 @@ has been smoothed.</p>
 
 <dl class="method">
 <dt id="lightkurve.periodogram.BoxLeastSquaresPeriodogram.to_seismology">
-<code class="descname">to_seismology</code><span class="sig-paren">(</span><em>self</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.to_seismology" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">to_seismology</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.to_seismology" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a <a class="reference internal" href="lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology" title="lightkurve.seismology.Seismology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Seismology</span></code></a> object to analyze the periodogram.</p>
 <dl class="field-list">
 <dt class="field-odd">Returns</dt>
@@ -476,12 +480,12 @@ has been smoothed.</p>
 
 <dl class="method">
 <dt id="lightkurve.periodogram.BoxLeastSquaresPeriodogram.to_table">
-<code class="descname">to_table</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.to_table" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">to_table</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.BoxLeastSquaresPeriodogram.to_table" title="Permalink to this definition">¶</a></dt>
 <dd><p>Exports the Periodogram as an Astropy Table.</p>
 <dl class="field-list">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><dl>
-<dt><strong>table</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v4.0.dev1149)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> object</span></dt><dd><p>An AstroPy Table with columns ‘frequency’, ‘period’, and ‘power’.</p>
+<dt><strong>table</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v4.0.dev527)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> object</span></dt><dd><p>An AstroPy Table with columns ‘frequency’, ‘period’, and ‘power’.</p>
 </dd>
 </dl>
 </dd>
@@ -494,12 +498,14 @@ has been smoothed.</p>
 
 
 </div>
-<div class="container" style="padding-top: 2em;">
+<div class="container footer">
     <hr>
     <p class="text-center">
-      Created with ♥ by the Lightkurve collaboration.
+      
+        Created with ♥ by the Lightkurve collaboration.
                       Please <a href="about/citing.html">cite us</a> or
                       <a href="https://github.com/KeplerGO/Lightkurve">join us on GitHub.</a>
+      
     </p>
 </div>
   </body>

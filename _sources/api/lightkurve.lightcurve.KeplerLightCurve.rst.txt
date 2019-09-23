@@ -11,6 +11,8 @@ KeplerLightCurve
    .. autosummary::
 
       ~KeplerLightCurve.astropy_time
+      ~KeplerLightCurve.flux_quantity
+      ~KeplerLightCurve.flux_unit
 
    .. rubric:: Methods Summary
 
@@ -44,6 +46,8 @@ KeplerLightCurve
    .. rubric:: Attributes Documentation
 
    .. autoattribute:: astropy_time
+   .. autoattribute:: flux_quantity
+   .. autoattribute:: flux_unit
 
    .. rubric:: Methods Documentation
 

@@ -18,22 +18,24 @@
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="#" />
     <link rel="search" title="Search" href="search.html" />
-    <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
+    <!-- Load Bootstrap CSS and Javascript (Javascript is needed for the navbar toggle) -->
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <!-- Load the theme's CSS. -->
+    <link rel="stylesheet" href="_static/css/amunra.css" type="text/css" />
 
-
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'UA-69171-9');
-    </script>
+    
+      <!-- Google Analytics -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-69171-9');
+      </script>
+    
 
   </head><body>
 <header>
@@ -45,32 +47,34 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarsExample07">
-      <ul class="navbar-nav mr-auto">
-        
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="quickstart.html">Quickstart</a>
-            </li>
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="tutorials/index.html">Tutorials</a>
-            </li>
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="api/index.html">API</a>
-            </li>
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="about/index.html">About</a>
-            </li>
-        
-      </ul>
 
-        <form class="form-inline my-2 my-md-0" action="search.html" method="get">
+    
+      <!-- Custom navbar -->
+      <ul class="navbar-nav mr-auto">
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="quickstart.html">Quickstart</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="tutorials/index.html">Tutorials</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="api/index.html">API</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="about/index.html">About</a>
+          </li>
+      </ul>
+    
+
+        <form class="form-inline my-2 my-md-0 ml-auto" action="search.html" method="get">
             <input class="form-control" type="text" placeholder="Search" aria-label="Search" name="q" />
         </form>
 
@@ -154,9 +158,15 @@
         <li><a href="api/lightkurve.utils.TessQualityFlags.html#lightkurve.utils.TessQualityFlags.ApertureCosmic">(lightkurve.utils.TessQualityFlags attribute)</a>
 </li>
       </ul></li>
-      <li><a href="api/lightkurve.lightcurve.KeplerLightCurve.html#lightkurve.lightcurve.KeplerLightCurve.append">append() (lightkurve.lightcurve.KeplerLightCurve method)</a>
+      <li><a href="api/lightkurve.collections.LightCurveCollection.html#lightkurve.collections.LightCurveCollection.append">append() (lightkurve.collections.LightCurveCollection method)</a>
 
       <ul>
+        <li><a href="api/lightkurve.collections.LightCurveFileCollection.html#lightkurve.collections.LightCurveFileCollection.append">(lightkurve.collections.LightCurveFileCollection method)</a>
+</li>
+        <li><a href="api/lightkurve.collections.TargetPixelFileCollection.html#lightkurve.collections.TargetPixelFileCollection.append">(lightkurve.collections.TargetPixelFileCollection method)</a>
+</li>
+        <li><a href="api/lightkurve.lightcurve.KeplerLightCurve.html#lightkurve.lightcurve.KeplerLightCurve.append">(lightkurve.lightcurve.KeplerLightCurve method)</a>
+</li>
         <li><a href="api/lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve.append">(lightkurve.lightcurve.LightCurve method)</a>
 </li>
         <li><a href="api/lightkurve.lightcurve.TessLightCurve.html#lightkurve.lightcurve.TessLightCurve.append">(lightkurve.lightcurve.TessLightCurve method)</a>
@@ -170,12 +180,12 @@
         <li><a href="api/lightkurve.utils.TessQualityFlags.html#lightkurve.utils.TessQualityFlags.Argabrightening">(lightkurve.utils.TessQualityFlags attribute)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/lightkurve.utils.KeplerQualityFlags.html#lightkurve.utils.KeplerQualityFlags.ArgabrighteningOnCCD">ArgabrighteningOnCCD (lightkurve.utils.KeplerQualityFlags attribute)</a>
 </li>
       <li><a href="api/lightkurve.seismology.SeismologyQuantity.html#lightkurve.seismology.SeismologyQuantity.argmax">argmax() (lightkurve.seismology.SeismologyQuantity method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/lightkurve.seismology.SeismologyQuantity.html#lightkurve.seismology.SeismologyQuantity.argmin">argmin() (lightkurve.seismology.SeismologyQuantity method)</a>
 </li>
       <li><a href="api/lightkurve.seismology.SeismologyQuantity.html#lightkurve.seismology.SeismologyQuantity.argpartition">argpartition() (lightkurve.seismology.SeismologyQuantity method)</a>
@@ -479,6 +489,12 @@
 </li>
         <li><a href="api/lightkurve.lightcurve.TessLightCurve.html#lightkurve.lightcurve.TessLightCurve.errorbar">(lightkurve.lightcurve.TessLightCurve method)</a>
 </li>
+        <li><a href="api/lightkurve.lightcurvefile.KeplerLightCurveFile.html#lightkurve.lightcurvefile.KeplerLightCurveFile.errorbar">(lightkurve.lightcurvefile.KeplerLightCurveFile method)</a>
+</li>
+        <li><a href="api/lightkurve.lightcurvefile.LightCurveFile.html#lightkurve.lightcurvefile.LightCurveFile.errorbar">(lightkurve.lightcurvefile.LightCurveFile method)</a>
+</li>
+        <li><a href="api/lightkurve.lightcurvefile.TessLightCurveFile.html#lightkurve.lightcurvefile.TessLightCurveFile.errorbar">(lightkurve.lightcurvefile.TessLightCurveFile method)</a>
+</li>
       </ul></li>
       <li><a href="api/lightkurve.lightcurve.KeplerLightCurve.html#lightkurve.lightcurve.KeplerLightCurve.estimate_cdpp">estimate_cdpp() (lightkurve.lightcurve.KeplerLightCurve method)</a>
 
@@ -498,14 +514,14 @@
 </li>
       <li><a href="api/lightkurve.seismology.estimate_deltanu_acf2d.html#lightkurve.seismology.estimate_deltanu_acf2d">estimate_deltanu_acf2d() (in module lightkurve.seismology)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/lightkurve.seismology.estimate_logg.html#lightkurve.seismology.estimate_logg">estimate_logg() (in module lightkurve.seismology)</a>
 
       <ul>
         <li><a href="api/lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology.estimate_logg">(lightkurve.seismology.Seismology method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/lightkurve.seismology.estimate_mass.html#lightkurve.seismology.estimate_mass">estimate_mass() (in module lightkurve.seismology)</a>
 
       <ul>
@@ -592,6 +608,14 @@
         <li><a href="api/lightkurve.seismology.SeismologyQuantity.html#lightkurve.seismology.SeismologyQuantity.flatten">(lightkurve.seismology.SeismologyQuantity method)</a>
 </li>
       </ul></li>
+      <li><a href="api/lightkurve.lightcurvefile.KeplerLightCurveFile.html#lightkurve.lightcurvefile.KeplerLightCurveFile.FLUX">FLUX (lightkurve.lightcurvefile.KeplerLightCurveFile attribute)</a>
+
+      <ul>
+        <li><a href="api/lightkurve.lightcurvefile.LightCurveFile.html#lightkurve.lightcurvefile.LightCurveFile.FLUX">(lightkurve.lightcurvefile.LightCurveFile attribute)</a>
+</li>
+        <li><a href="api/lightkurve.lightcurvefile.TessLightCurveFile.html#lightkurve.lightcurvefile.TessLightCurveFile.FLUX">(lightkurve.lightcurvefile.TessLightCurveFile attribute)</a>
+</li>
+      </ul></li>
       <li><a href="api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.flux">flux (lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
 
       <ul>
@@ -604,18 +628,34 @@
         <li><a href="api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile.flux_bkg">(lightkurve.targetpixelfile.TessTargetPixelFile attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.flux_bkg_err">flux_bkg_err (lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
 
       <ul>
         <li><a href="api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile.flux_bkg_err">(lightkurve.targetpixelfile.TessTargetPixelFile attribute)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile.flux_err">flux_err (lightkurve.targetpixelfile.KeplerTargetPixelFile attribute)</a>
 
       <ul>
         <li><a href="api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile.flux_err">(lightkurve.targetpixelfile.TessTargetPixelFile attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/lightkurve.lightcurve.KeplerLightCurve.html#lightkurve.lightcurve.KeplerLightCurve.flux_quantity">flux_quantity (lightkurve.lightcurve.KeplerLightCurve attribute)</a>
+
+      <ul>
+        <li><a href="api/lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve.flux_quantity">(lightkurve.lightcurve.LightCurve attribute)</a>
+</li>
+        <li><a href="api/lightkurve.lightcurve.TessLightCurve.html#lightkurve.lightcurve.TessLightCurve.flux_quantity">(lightkurve.lightcurve.TessLightCurve attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/lightkurve.lightcurve.KeplerLightCurve.html#lightkurve.lightcurve.KeplerLightCurve.flux_unit">flux_unit (lightkurve.lightcurve.KeplerLightCurve attribute)</a>
+
+      <ul>
+        <li><a href="api/lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve.flux_unit">(lightkurve.lightcurve.LightCurve attribute)</a>
+</li>
+        <li><a href="api/lightkurve.lightcurve.TessLightCurve.html#lightkurve.lightcurve.TessLightCurve.flux_unit">(lightkurve.lightcurve.TessLightCurve attribute)</a>
 </li>
       </ul></li>
       <li><a href="api/lightkurve.prf.FocusParameters.html#lightkurve.prf.FocusParameters">FocusParameters (class in lightkurve.prf)</a>
@@ -842,7 +882,13 @@
 </li>
       <li><a href="api/lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve">LightCurve (class in lightkurve.lightcurve)</a>
 </li>
+      <li><a href="api/lightkurve.collections.LightCurveCollection.html#lightkurve.collections.LightCurveCollection">LightCurveCollection (class in lightkurve.collections)</a>
+</li>
       <li><a href="api/lightkurve.lightcurvefile.LightCurveFile.html#lightkurve.lightcurvefile.LightCurveFile">LightCurveFile (class in lightkurve.lightcurvefile)</a>
+</li>
+      <li><a href="api/lightkurve.collections.LightCurveFileCollection.html#lightkurve.collections.LightCurveFileCollection">LightCurveFileCollection (class in lightkurve.collections)</a>
+</li>
+      <li><a href="api/collections.html#module-lightkurve.collections">lightkurve.collections (module)</a>, <a href="api/collections.html#module-lightkurve.collections">[1]</a>
 </li>
       <li><a href="api/correctors.html#module-lightkurve.correctors">lightkurve.correctors (module)</a>, <a href="api/correctors.html#module-lightkurve.correctors">[1]</a>
 </li>
@@ -850,10 +896,10 @@
 </li>
       <li><a href="api/lightcurvefile.html#module-lightkurve.lightcurvefile">lightkurve.lightcurvefile (module)</a>, <a href="api/lightcurvefile.html#module-lightkurve.lightcurvefile">[1]</a>
 </li>
-      <li><a href="api/periodogram.html#module-lightkurve.periodogram">lightkurve.periodogram (module)</a>, <a href="api/periodogram.html#module-lightkurve.periodogram">[1]</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/periodogram.html#module-lightkurve.periodogram">lightkurve.periodogram (module)</a>, <a href="api/periodogram.html#module-lightkurve.periodogram">[1]</a>
+</li>
       <li><a href="api/prf.html#module-lightkurve.prf">lightkurve.prf (module)</a>, <a href="api/prf.html#module-lightkurve.prf">[1]</a>
 </li>
       <li><a href="api/search.html#module-lightkurve.search">lightkurve.search (module)</a>, <a href="api/search.html#module-lightkurve.search">[1]</a>
@@ -990,9 +1036,11 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/lightkurve.seismology.SeismologyQuantity.html#lightkurve.seismology.SeismologyQuantity.partition">partition() (lightkurve.seismology.SeismologyQuantity method)</a>
 </li>
-      <li><a href="api/lightkurve.lightcurvefile.KeplerLightCurveFile.html#lightkurve.lightcurvefile.KeplerLightCurveFile.PDCSAP_FLUX">PDCSAP_FLUX (lightkurve.lightcurvefile.KeplerLightCurveFile attribute)</a>
+      <li><a href="api/lightkurve.collections.LightCurveFileCollection.html#lightkurve.collections.LightCurveFileCollection.PDCSAP_FLUX">PDCSAP_FLUX (lightkurve.collections.LightCurveFileCollection attribute)</a>
 
       <ul>
+        <li><a href="api/lightkurve.lightcurvefile.KeplerLightCurveFile.html#lightkurve.lightcurvefile.KeplerLightCurveFile.PDCSAP_FLUX">(lightkurve.lightcurvefile.KeplerLightCurveFile attribute)</a>
+</li>
         <li><a href="api/lightkurve.lightcurvefile.LightCurveFile.html#lightkurve.lightcurvefile.LightCurveFile.PDCSAP_FLUX">(lightkurve.lightcurvefile.LightCurveFile attribute)</a>
 </li>
         <li><a href="api/lightkurve.lightcurvefile.TessLightCurveFile.html#lightkurve.lightcurvefile.TessLightCurveFile.PDCSAP_FLUX">(lightkurve.lightcurvefile.TessLightCurveFile attribute)</a>
@@ -1024,9 +1072,15 @@
       </ul></li>
       <li><a href="api/lightkurve.correctors.PLDCorrector.html#lightkurve.correctors.PLDCorrector">PLDCorrector (class in lightkurve.correctors)</a>
 </li>
-      <li><a href="api/lightkurve.lightcurve.KeplerLightCurve.html#lightkurve.lightcurve.KeplerLightCurve.plot">plot() (lightkurve.lightcurve.KeplerLightCurve method)</a>
+      <li><a href="api/lightkurve.collections.LightCurveCollection.html#lightkurve.collections.LightCurveCollection.plot">plot() (lightkurve.collections.LightCurveCollection method)</a>
 
       <ul>
+        <li><a href="api/lightkurve.collections.LightCurveFileCollection.html#lightkurve.collections.LightCurveFileCollection.plot">(lightkurve.collections.LightCurveFileCollection method)</a>
+</li>
+        <li><a href="api/lightkurve.collections.TargetPixelFileCollection.html#lightkurve.collections.TargetPixelFileCollection.plot">(lightkurve.collections.TargetPixelFileCollection method)</a>
+</li>
+        <li><a href="api/lightkurve.lightcurve.KeplerLightCurve.html#lightkurve.lightcurve.KeplerLightCurve.plot">(lightkurve.lightcurve.KeplerLightCurve method)</a>
+</li>
         <li><a href="api/lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve.plot">(lightkurve.lightcurve.LightCurve method)</a>
 </li>
         <li><a href="api/lightkurve.lightcurve.TessLightCurve.html#lightkurve.lightcurve.TessLightCurve.plot">(lightkurve.lightcurve.TessLightCurve method)</a>
@@ -1190,9 +1244,11 @@
         <li><a href="api/lightkurve.utils.TessQualityFlags.html#lightkurve.utils.TessQualityFlags.SafeMode">(lightkurve.utils.TessQualityFlags attribute)</a>
 </li>
       </ul></li>
-      <li><a href="api/lightkurve.lightcurvefile.KeplerLightCurveFile.html#lightkurve.lightcurvefile.KeplerLightCurveFile.SAP_FLUX">SAP_FLUX (lightkurve.lightcurvefile.KeplerLightCurveFile attribute)</a>
+      <li><a href="api/lightkurve.collections.LightCurveFileCollection.html#lightkurve.collections.LightCurveFileCollection.SAP_FLUX">SAP_FLUX (lightkurve.collections.LightCurveFileCollection attribute)</a>
 
       <ul>
+        <li><a href="api/lightkurve.lightcurvefile.KeplerLightCurveFile.html#lightkurve.lightcurvefile.KeplerLightCurveFile.SAP_FLUX">(lightkurve.lightcurvefile.KeplerLightCurveFile attribute)</a>
+</li>
         <li><a href="api/lightkurve.lightcurvefile.LightCurveFile.html#lightkurve.lightcurvefile.LightCurveFile.SAP_FLUX">(lightkurve.lightcurvefile.LightCurveFile attribute)</a>
 </li>
         <li><a href="api/lightkurve.lightcurvefile.TessLightCurveFile.html#lightkurve.lightcurvefile.TessLightCurveFile.SAP_FLUX">(lightkurve.lightcurvefile.TessLightCurveFile attribute)</a>
@@ -1204,6 +1260,12 @@
         <li><a href="api/lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve.scatter">(lightkurve.lightcurve.LightCurve method)</a>
 </li>
         <li><a href="api/lightkurve.lightcurve.TessLightCurve.html#lightkurve.lightcurve.TessLightCurve.scatter">(lightkurve.lightcurve.TessLightCurve method)</a>
+</li>
+        <li><a href="api/lightkurve.lightcurvefile.KeplerLightCurveFile.html#lightkurve.lightcurvefile.KeplerLightCurveFile.scatter">(lightkurve.lightcurvefile.KeplerLightCurveFile method)</a>
+</li>
+        <li><a href="api/lightkurve.lightcurvefile.LightCurveFile.html#lightkurve.lightcurvefile.LightCurveFile.scatter">(lightkurve.lightcurvefile.LightCurveFile method)</a>
+</li>
+        <li><a href="api/lightkurve.lightcurvefile.TessLightCurveFile.html#lightkurve.lightcurvefile.TessLightCurveFile.scatter">(lightkurve.lightcurvefile.TessLightCurveFile method)</a>
 </li>
       </ul></li>
       <li><a href="api/lightkurve.search.search_lightcurvefile.html#lightkurve.search.search_lightcurvefile">search_lightcurvefile() (in module lightkurve.search)</a>
@@ -1242,6 +1304,8 @@
       </ul></li>
       <li><a href="api/lightkurve.seismology.SeismologyQuantity.html#numpy.core._internal.SeismologyQuantity._ctypes.shape_as">shape_as() (numpy.core._internal.SeismologyQuantity._ctypes method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/lightkurve.lightcurve.KeplerLightCurve.html#lightkurve.lightcurve.KeplerLightCurve.show_properties">show_properties() (lightkurve.lightcurve.KeplerLightCurve method)</a>
 
       <ul>
@@ -1260,8 +1324,6 @@
         <li><a href="api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile.show_properties">(lightkurve.targetpixelfile.TessTargetPixelFile method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/lightkurve.seismology.SeismologyQuantity.html#lightkurve.seismology.SeismologyQuantity.si">si (lightkurve.seismology.SeismologyQuantity attribute)</a>
 </li>
       <li><a href="api/lightkurve.prf.SimpleKeplerPRF.html#lightkurve.prf.SimpleKeplerPRF">SimpleKeplerPRF (class in lightkurve.prf)</a>
@@ -1286,6 +1348,12 @@
 </li>
       <li><a href="api/lightkurve.seismology.SeismologyQuantity.html#lightkurve.seismology.SeismologyQuantity.std">std() (lightkurve.seismology.SeismologyQuantity method)</a>
 </li>
+      <li><a href="api/lightkurve.collections.LightCurveCollection.html#lightkurve.collections.LightCurveCollection.stitch">stitch() (lightkurve.collections.LightCurveCollection method)</a>
+
+      <ul>
+        <li><a href="api/lightkurve.collections.LightCurveFileCollection.html#lightkurve.collections.LightCurveFileCollection.stitch">(lightkurve.collections.LightCurveFileCollection method)</a>
+</li>
+      </ul></li>
       <li><a href="api/lightkurve.utils.TessQualityFlags.html#lightkurve.utils.TessQualityFlags.Straylight">Straylight (lightkurve.utils.TessQualityFlags attribute)</a>
 </li>
       <li><a href="api/lightkurve.seismology.SeismologyQuantity.html#lightkurve.seismology.SeismologyQuantity.strides">strides (lightkurve.seismology.SeismologyQuantity attribute)</a>
@@ -1317,6 +1385,8 @@
       <li><a href="api/lightkurve.seismology.SeismologyQuantity.html#lightkurve.seismology.SeismologyQuantity.take">take() (lightkurve.seismology.SeismologyQuantity method)</a>
 </li>
       <li><a href="api/lightkurve.search.SearchResult.html#lightkurve.search.SearchResult.target_name">target_name (lightkurve.search.SearchResult attribute)</a>
+</li>
+      <li><a href="api/lightkurve.collections.TargetPixelFileCollection.html#lightkurve.collections.TargetPixelFileCollection">TargetPixelFileCollection (class in lightkurve.collections)</a>
 </li>
       <li><a href="api/lightkurve.lightcurve.TessLightCurve.html#lightkurve.lightcurve.TessLightCurve">TessLightCurve (class in lightkurve.lightcurve)</a>
 </li>
@@ -1382,6 +1452,8 @@
         <li><a href="api/lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile.to_lightcurve">(lightkurve.targetpixelfile.TessTargetPixelFile method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/lightkurve.lightcurve.KeplerLightCurve.html#lightkurve.lightcurve.KeplerLightCurve.to_pandas">to_pandas() (lightkurve.lightcurve.KeplerLightCurve method)</a>
 
       <ul>
@@ -1390,8 +1462,6 @@
         <li><a href="api/lightkurve.lightcurve.TessLightCurve.html#lightkurve.lightcurve.TessLightCurve.to_pandas">(lightkurve.lightcurve.TessLightCurve method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/lightkurve.lightcurve.KeplerLightCurve.html#lightkurve.lightcurve.KeplerLightCurve.to_periodogram">to_periodogram() (lightkurve.lightcurve.KeplerLightCurve method)</a>
 
       <ul>
@@ -1512,12 +1582,14 @@
 
 
 </div>
-<div class="container" style="padding-top: 2em;">
+<div class="container footer">
     <hr>
     <p class="text-center">
-      Created with ♥ by the Lightkurve collaboration.
+      
+        Created with ♥ by the Lightkurve collaboration.
                       Please <a href="about/citing.html">cite us</a> or
                       <a href="https://github.com/KeplerGO/Lightkurve">join us on GitHub.</a>
+      
     </p>
 </div>
   </body>

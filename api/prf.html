@@ -17,22 +17,24 @@
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
+    <!-- Load Bootstrap CSS and Javascript (Javascript is needed for the navbar toggle) -->
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+    <!-- Load the theme's CSS. -->
+    <link rel="stylesheet" href="../_static/css/amunra.css" type="text/css" />
 
-
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'UA-69171-9');
-    </script>
+    
+      <!-- Google Analytics -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-69171-9');
+      </script>
+    
 
   </head><body>
 <header>
@@ -44,32 +46,34 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarsExample07">
-      <ul class="navbar-nav mr-auto">
-        
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="../quickstart.html">Quickstart</a>
-            </li>
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="../tutorials/index.html">Tutorials</a>
-            </li>
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="index.html">API</a>
-            </li>
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="../about/index.html">About</a>
-            </li>
-        
-      </ul>
 
-        <form class="form-inline my-2 my-md-0" action="../search.html" method="get">
+    
+      <!-- Custom navbar -->
+      <ul class="navbar-nav mr-auto">
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="../quickstart.html">Quickstart</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="../tutorials/index.html">Tutorials</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="index.html">API</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="../about/index.html">About</a>
+          </li>
+      </ul>
+    
+
+        <form class="form-inline my-2 my-md-0 ml-auto" action="../search.html" method="get">
             <input class="form-control" type="text" placeholder="Search" aria-label="Search" name="q" />
         </form>
 
@@ -90,7 +94,7 @@
 <span id="prf-photometry-classes"></span><h1>PRF photometry classes<a class="headerlink" href="#module-lightkurve.prf" title="Permalink to this headline">¶</a></h1>
 <span class="target" id="module-lightkurve.prf"></span><div class="section" id="classes">
 <h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
-<table class="longtable docutils align-center">
+<table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -108,7 +112,7 @@
 <tr class="row-even"><td><p><a class="reference internal" href="lightkurve.prf.FocusParameters.html#lightkurve.prf.FocusParameters" title="lightkurve.prf.FocusParameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FocusParameters</span></code></a>([scale_col, scale_row, …])</p></td>
 <td><p>Container class to hold the parameters of the telescope focus in a <code class="docutils literal notranslate"><span class="pre">TPFModel</span></code>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.prf.FocusPrior.html#lightkurve.prf.FocusPrior" title="lightkurve.prf.FocusPrior"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FocusPrior</span></code></a>([scale_col, var, scale_row, var, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.prf.FocusPrior.html#lightkurve.prf.FocusPrior" title="lightkurve.prf.FocusPrior"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FocusPrior</span></code></a>([scale_col, scale_row, …])</p></td>
 <td><p>Container class to capture a user’s beliefs about the telescope focus.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">GaussianPrior</span></code>(mean, var[, name])</p></td>
@@ -120,7 +124,7 @@
 <tr class="row-even"><td><p><a class="reference internal" href="lightkurve.prf.MotionParameters.html#lightkurve.prf.MotionParameters" title="lightkurve.prf.MotionParameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MotionParameters</span></code></a>([shift_col, shift_row, fitted])</p></td>
 <td><p>Container class to hold the parameters of the telescope motion in a <code class="docutils literal notranslate"><span class="pre">TPFModel</span></code>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.prf.MotionPrior.html#lightkurve.prf.MotionPrior" title="lightkurve.prf.MotionPrior"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MotionPrior</span></code></a>([shift_col, var, shift_row, var])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.prf.MotionPrior.html#lightkurve.prf.MotionPrior" title="lightkurve.prf.MotionPrior"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MotionPrior</span></code></a>([shift_col, shift_row])</p></td>
 <td><p>Container class to capture a user’s beliefs about the telescope motion.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="lightkurve.prf.PRFPhotometry.html#lightkurve.prf.PRFPhotometry" title="lightkurve.prf.PRFPhotometry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PRFPhotometry</span></code></a>(model)</p></td>
@@ -132,7 +136,7 @@
 <tr class="row-even"><td><p><a class="reference internal" href="lightkurve.prf.StarParameters.html#lightkurve.prf.StarParameters" title="lightkurve.prf.StarParameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StarParameters</span></code></a>(col, row, flux[, err_col, …])</p></td>
 <td><p>Container class to hold the parameters of a star in a <code class="docutils literal notranslate"><span class="pre">TPFModel</span></code>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.prf.StarPrior.html#lightkurve.prf.StarPrior" title="lightkurve.prf.StarPrior"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StarPrior</span></code></a>(col, row[, flux, ub, targetid])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.prf.StarPrior.html#lightkurve.prf.StarPrior" title="lightkurve.prf.StarPrior"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StarPrior</span></code></a>(col, row[, flux, targetid])</p></td>
 <td><p>Container class to capture a user’s beliefs about a star’s position and flux.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="lightkurve.prf.TPFModel.html#lightkurve.prf.TPFModel" title="lightkurve.prf.TPFModel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TPFModel</span></code></a>([star_priors, background_prior, …])</p></td>
@@ -155,12 +159,14 @@
 
 
 </div>
-<div class="container" style="padding-top: 2em;">
+<div class="container footer">
     <hr>
     <p class="text-center">
-      Created with ♥ by the Lightkurve collaboration.
+      
+        Created with ♥ by the Lightkurve collaboration.
                       Please <a href="about/citing.html">cite us</a> or
                       <a href="https://github.com/KeplerGO/Lightkurve">join us on GitHub.</a>
+      
     </p>
 </div>
   </body>

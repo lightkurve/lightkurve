@@ -11,6 +11,8 @@ TessLightCurve
    .. autosummary::
 
       ~TessLightCurve.astropy_time
+      ~TessLightCurve.flux_quantity
+      ~TessLightCurve.flux_unit
 
    .. rubric:: Methods Summary
 
@@ -44,6 +46,8 @@ TessLightCurve
    .. rubric:: Attributes Documentation
 
    .. autoattribute:: astropy_time
+   .. autoattribute:: flux_quantity
+   .. autoattribute:: flux_unit
 
    .. rubric:: Methods Documentation
 

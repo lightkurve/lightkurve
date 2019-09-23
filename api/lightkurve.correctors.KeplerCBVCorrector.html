@@ -17,22 +17,24 @@
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
+    <!-- Load Bootstrap CSS and Javascript (Javascript is needed for the navbar toggle) -->
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+    <!-- Load the theme's CSS. -->
+    <link rel="stylesheet" href="../_static/css/amunra.css" type="text/css" />
 
-
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'UA-69171-9');
-    </script>
+    
+      <!-- Google Analytics -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-69171-9');
+      </script>
+    
 
   </head><body>
 <header>
@@ -44,32 +46,34 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarsExample07">
-      <ul class="navbar-nav mr-auto">
-        
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="../quickstart.html">Quickstart</a>
-            </li>
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="../tutorials/index.html">Tutorials</a>
-            </li>
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="index.html">API</a>
-            </li>
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="../about/index.html">About</a>
-            </li>
-        
-      </ul>
 
-        <form class="form-inline my-2 my-md-0" action="../search.html" method="get">
+    
+      <!-- Custom navbar -->
+      <ul class="navbar-nav mr-auto">
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="../quickstart.html">Quickstart</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="../tutorials/index.html">Tutorials</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="index.html">API</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="../about/index.html">About</a>
+          </li>
+      </ul>
+    
+
+        <form class="form-inline my-2 my-md-0 ml-auto" action="../search.html" method="get">
             <input class="form-control" type="text" placeholder="Search" aria-label="Search" name="q" />
         </form>
 
@@ -90,7 +94,7 @@
 <h1>KeplerCBVCorrector<a class="headerlink" href="#keplercbvcorrector" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="lightkurve.correctors.KeplerCBVCorrector">
-<em class="property">class </em><code class="descclassname">lightkurve.correctors.</code><code class="descname">KeplerCBVCorrector</code><span class="sig-paren">(</span><em>lc</em>, <em>cbv_array=None</em>, <em>cbv_cadenceno=None</em>, <em>likelihood=&lt;class 'oktopus.likelihood.LaplacianLikelihood'&gt;</em>, <em>prior=&lt;class 'oktopus.prior.LaplacianPrior'&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">lightkurve.correctors.</code><code class="sig-name descname">KeplerCBVCorrector</code><span class="sig-paren">(</span><em class="sig-param">lc</em>, <em class="sig-param">cbv_array=None</em>, <em class="sig-param">cbv_cadenceno=None</em>, <em class="sig-param">likelihood=&lt;class 'oktopus.likelihood.LaplacianLikelihood'&gt;</em>, <em class="sig-param">prior=&lt;class 'oktopus.prior.LaplacianPrior'&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">lightkurve.correctors.corrector.Corrector</span></code></p>
 <p>Remove systematic trends from Kepler light curves by fitting
 Cotrending Basis Vectors (CBVs).</p>
@@ -125,7 +129,7 @@ to the L1 norm.</p>
 </dd>
 </dl>
 <p class="rubric">Attributes Summary</p>
-<table class="longtable docutils align-center">
+<table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -143,7 +147,7 @@ to the L1 norm.</p>
 </tbody>
 </table>
 <p class="rubric">Methods Summary</p>
-<table class="longtable docutils align-center">
+<table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -172,25 +176,25 @@ to the L1 norm.</p>
 <p class="rubric">Attributes Documentation</p>
 <dl class="attribute">
 <dt id="lightkurve.correctors.KeplerCBVCorrector.coeffs">
-<code class="descname">coeffs</code><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector.coeffs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">coeffs</code><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector.coeffs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the fitted coefficients.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.correctors.KeplerCBVCorrector.lc">
-<code class="descname">lc</code><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector.lc" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">lc</code><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector.lc" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.correctors.KeplerCBVCorrector.opt_result">
-<code class="descname">opt_result</code><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector.opt_result" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">opt_result</code><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector.opt_result" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the result of the optimization process.</p>
 </dd></dl>
 
 <p class="rubric">Methods Documentation</p>
 <dl class="method">
 <dt id="lightkurve.correctors.KeplerCBVCorrector.correct">
-<code class="descname">correct</code><span class="sig-paren">(</span><em>self</em>, <em>cbvs=(1</em>, <em>2)</em>, <em>method='powell'</em>, <em>options=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector.correct" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">correct</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">cbvs=(1</em>, <em class="sig-param">2)</em>, <em class="sig-param">method='powell'</em>, <em class="sig-param">options=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector.correct" title="Permalink to this definition">¶</a></dt>
 <dd><p>Correct the SAP_FLUX by fitting a number of cotrending basis vectors
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">cbvs</span></code>.</p>
 <dl class="field-list simple">
@@ -211,17 +215,17 @@ full list of methods.</p>
 
 <dl class="method">
 <dt id="lightkurve.correctors.KeplerCBVCorrector.diagnose">
-<code class="descname">diagnose</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector.diagnose" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">diagnose</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector.diagnose" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="lightkurve.correctors.KeplerCBVCorrector.get_cbv_url">
-<code class="descname">get_cbv_url</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector.get_cbv_url" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_cbv_url</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector.get_cbv_url" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="lightkurve.correctors.KeplerCBVCorrector.get_cbvs_list">
-<code class="descname">get_cbvs_list</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector.get_cbvs_list" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_cbvs_list</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector.get_cbvs_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the subsequence of subsequent CBVs that maximizes
 Bayes’ factor <a class="reference internal" href="#r327af9fd7ac9-1" id="id2">[1]</a>.</p>
 <dl class="field-list simple">
@@ -242,12 +246,12 @@ Bayes’ factor <a class="reference internal" href="#r327af9fd7ac9-1" id="id2">[
 
 <dl class="method">
 <dt id="lightkurve.correctors.KeplerCBVCorrector.interact">
-<code class="descname">interact</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector.interact" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">interact</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector.interact" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="lightkurve.correctors.KeplerCBVCorrector.plot_cbvs">
-<code class="descname">plot_cbvs</code><span class="sig-paren">(</span><em>self</em>, <em>cbvs=(1</em>, <em>2)</em>, <em>ax=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector.plot_cbvs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">plot_cbvs</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">cbvs=(1</em>, <em class="sig-param">2)</em>, <em class="sig-param">ax=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.KeplerCBVCorrector.plot_cbvs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the CBVs for a given list of CBVs</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -274,12 +278,14 @@ Bayes’ factor <a class="reference internal" href="#r327af9fd7ac9-1" id="id2">[
 
 
 </div>
-<div class="container" style="padding-top: 2em;">
+<div class="container footer">
     <hr>
     <p class="text-center">
-      Created with ♥ by the Lightkurve collaboration.
+      
+        Created with ♥ by the Lightkurve collaboration.
                       Please <a href="about/citing.html">cite us</a> or
                       <a href="https://github.com/KeplerGO/Lightkurve">join us on GitHub.</a>
+      
     </p>
 </div>
   </body>

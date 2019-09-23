@@ -1,0 +1,21 @@
+LightCurveCollection
+====================
+
+.. currentmodule:: lightkurve.collections
+
+.. autoclass:: LightCurveCollection
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~LightCurveCollection.append
+      ~LightCurveCollection.plot
+      ~LightCurveCollection.stitch
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: append
+   .. automethod:: plot
+   .. automethod:: stitch

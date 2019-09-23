@@ -17,22 +17,24 @@
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
+    <!-- Load Bootstrap CSS and Javascript (Javascript is needed for the navbar toggle) -->
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+    <!-- Load the theme's CSS. -->
+    <link rel="stylesheet" href="../_static/css/amunra.css" type="text/css" />
 
-
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'UA-69171-9');
-    </script>
+    
+      <!-- Google Analytics -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-69171-9');
+      </script>
+    
 
   </head><body>
 <header>
@@ -44,32 +46,34 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarsExample07">
-      <ul class="navbar-nav mr-auto">
-        
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="../quickstart.html">Quickstart</a>
-            </li>
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="index.html">Tutorials</a>
-            </li>
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="../api/index.html">API</a>
-            </li>
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="../about/index.html">About</a>
-            </li>
-        
-      </ul>
 
-        <form class="form-inline my-2 my-md-0" action="../search.html" method="get">
+    
+      <!-- Custom navbar -->
+      <ul class="navbar-nav mr-auto">
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="../quickstart.html">Quickstart</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="index.html">Tutorials</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="../api/index.html">API</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="../about/index.html">About</a>
+          </li>
+      </ul>
+    
+
+        <form class="form-inline my-2 my-md-0 ml-auto" action="../search.html" method="get">
             <input class="form-control" type="text" placeholder="Search" aria-label="Search" name="q" />
         </form>
 
@@ -293,15 +297,14 @@ div.rendered_html tbody tr:hover {
 </div>
 <br style="clear:both;"><div class="section" id="What-is-the-Periodogram-class?">
 <h1>What is the Periodogram class?<a class="headerlink" href="#What-is-the-Periodogram-class?" title="Permalink to this headline">¶</a></h1>
-<p><em>lightkurve</em> has a class specifically for dealing with periodograms of time series data. This can be useful for finding the periods of variable stars. Below is a quick example of how to find the period of an eclipsing binary star using <em>lightkurve</em>.</p>
-<p>Firstly lets grab a light curve file from mast. We’ll use KIC 10030943, which is an eclipsing binary observed by the original Kepler mission. We’re just going to use one quarter for this demo.</p>
+<p><em>Lightkurve</em> has a class specifically for dealing with periodograms of time series data. This can be useful for finding the periods of variable stars. Below is a quick example of how to find the period of an <a class="reference external" href="https://en.wikipedia.org/wiki/Binary_star#Eclipsing_binaries">eclipsing binary star</a>.</p>
+<p>First, let’s grab a light curve file from the Kepler data archive. We’ll use the object named KIC 10030943, which is an eclipsing binary observed by the original Kepler mission. We’re just going to use one quarter of data for this demo.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># Obtain the data</span>
-<span class="kn">from</span> <span class="nn">lightkurve</span> <span class="k">import</span> <span class="n">search_lightcurvefile</span>
+<span></span><span class="kn">from</span> <span class="nn">lightkurve</span> <span class="k">import</span> <span class="n">search_lightcurvefile</span>
 <span class="n">lc</span> <span class="o">=</span> <span class="n">search_lightcurvefile</span><span class="p">(</span><span class="s1">&#39;10264202&#39;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span><span class="o">.</span><span class="n">PDCSAP_FLUX</span><span class="o">.</span><span class="n">remove_nans</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -323,7 +326,7 @@ div.rendered_html tbody tr:hover {
 <img alt="../_images/tutorials_01-using-the-periodogram-class_4_0.png" src="../_images/tutorials_01-using-the-periodogram-class_4_0.png" />
 </div>
 </div>
-<p>This light curve looks like it has some structure in it! Let’s use the periodogram class to find the rotation period. You can create a periodogram from the <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> object by using the <code class="docutils literal notranslate"><span class="pre">periodogram</span></code> method.</p>
+<p>This light curve looks like it has some structure in it! Let’s use the periodogram class to find the rotation period. You can create a periodogram from the <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> object by using the <code class="docutils literal notranslate"><span class="pre">to_periodogram</span></code> method.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
@@ -367,109 +370,144 @@ div.rendered_html tbody tr:hover {
 <img alt="../_images/tutorials_01-using-the-periodogram-class_10_0.png" src="../_images/tutorials_01-using-the-periodogram-class_10_0.png" />
 </div>
 </div>
-<p>This looks like a very fast period. Let’s find the period with the highest power and fold out light curve.</p>
+<p>This looks like a very fast period. We can access the full period and power data as follows:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">period</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">period_at_max_power</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Best period: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">period</span><span class="p">))</span>
-<span class="n">lc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">.</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">scatter</span><span class="p">();</span>
+<span></span><span class="n">pg</span><span class="o">.</span><span class="n">period</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Best period: 0.2587311606278735 d
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_01-using-the-periodogram-class_12_1.png" src="../_images/tutorials_01-using-the-periodogram-class_12_1.png" />
+<div class="math notranslate nohighlight">
+$[93.401949,~46.700974,~31.133983,~\dots,~0.040911936,~0.040894023,~0.040876126] \; \mathrm{d}$</div></div>
 </div>
-</div>
-<p>As is quite common for eclipsing binaries with deep secondary eclipses, we have found a harmonic of the period of the eclipsing binary. Let’s plot it again with quadruple the period.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">period</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">period_at_max_power</span> <span class="o">*</span> <span class="mi">4</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Best period: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">period</span><span class="p">))</span>
-<span class="n">lc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">.</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">scatter</span><span class="p">();</span>
+<span></span><span class="n">pg</span><span class="o">.</span><span class="n">power</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Best period: 1.034924642511494 d
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_01-using-the-periodogram-class_14_1.png" src="../_images/tutorials_01-using-the-periodogram-class_14_1.png" />
+<div class="math notranslate nohighlight">
+$[3.0812345,~4.0491002,~1.1168632,~\dots,~0.38587616,~0.17210997,~0.42668004] \; \mathrm{\frac{e^{-}}{s}}$</div></div>
 </div>
-</div>
-<p>It looks like we could probably get a better fit than this. Let’s try increasing the number of points in our periodogram by increasing the <code class="docutils literal notranslate"><span class="pre">oversample_factor</span></code> parameter.</p>
-<div class="nbinput nblast docutils container">
+<p>In this case we simply want to know the period that corresponds to the highest peak in the periodogram. We can directly access this value using the convenient <code class="docutils literal notranslate"><span class="pre">period_at_max_power</span></code> property:</p>
+<div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># We set the period range below to slightly reduce the computational time</span>
-<span class="kn">import</span> <span class="nn">astropy.units</span> <span class="k">as</span> <span class="nn">u</span>
-<span class="n">pg</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">to_periodogram</span><span class="p">(</span><span class="n">minimum_period</span><span class="o">=</span><span class="mf">0.9</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">day</span><span class="p">,</span> <span class="n">maximum_period</span><span class="o">=</span><span class="mf">1.2</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">day</span><span class="p">,</span> <span class="n">oversample_factor</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span></span><span class="n">pg</span><span class="o">.</span><span class="n">period_at_max_power</span>
 </pre></div>
 </div>
 </div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="math notranslate nohighlight">
+$0.25873116 \; \mathrm{d}$</div></div>
+</div>
+<p>We can then use this period to fold our light curve:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">period</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">period_at_max_power</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Best period: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">period</span><span class="p">))</span>
-<span class="n">lc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">.</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">scatter</span><span class="p">();</span>
+<span></span><span class="n">lc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">pg</span><span class="o">.</span><span class="n">period_at_max_power</span><span class="p">)</span><span class="o">.</span><span class="n">scatter</span><span class="p">();</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Best period: 1.0350971683913832 d
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_01-using-the-periodogram-class_17_1.png" src="../_images/tutorials_01-using-the-periodogram-class_17_1.png" />
+<img alt="../_images/tutorials_01-using-the-periodogram-class_17_0.png" src="../_images/tutorials_01-using-the-periodogram-class_17_0.png" />
 </div>
 </div>
-<p>This has improved our fit! It looks like this eclipsing binary has a period of approximately 1 day.</p>
+<p>Oops, the eclipses do not line up nicely. This does not look like the correct period of this eclipsing binary!</p>
+<p>As is quite common for eclipsing binaries with deep secondary eclipses, we have found a harmonic of the period of the eclipsing binary. Let’s plot it again with quadruple the period.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">lc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">pg</span><span class="o">.</span><span class="n">period_at_max_power</span><span class="p">)</span><span class="o">.</span><span class="n">scatter</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_01-using-the-periodogram-class_19_0.png" src="../_images/tutorials_01-using-the-periodogram-class_19_0.png" />
+</div>
+</div>
+<p>That looks better, but the eclipses still don’t seem to line up as well as they could.</p>
+<p>Let’s try to get a more precise period by increasing the number of points in our periodogram using the <code class="docutils literal notranslate"><span class="pre">oversample_factor</span></code> parameter and by constraining the range of the period value:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">astropy.units</span> <span class="k">as</span> <span class="nn">u</span>
+<span class="n">pg</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">to_periodogram</span><span class="p">(</span><span class="n">minimum_period</span><span class="o">=</span><span class="mf">0.9</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">day</span><span class="p">,</span> <span class="n">maximum_period</span><span class="o">=</span><span class="mf">1.2</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">day</span><span class="p">,</span> <span class="n">oversample_factor</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">pg</span><span class="o">.</span><span class="n">period_at_max_power</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="math notranslate nohighlight">
+$1.0350972 \; \mathrm{d}$</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">lc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">pg</span><span class="o">.</span><span class="n">period_at_max_power</span><span class="p">)</span><span class="o">.</span><span class="n">scatter</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/tutorials_01-using-the-periodogram-class_22_0.png" src="../_images/tutorials_01-using-the-periodogram-class_22_0.png" />
+</div>
+</div>
+<p>This has improved our fit. It looks like this eclipsing binary has a period of approximately 1 day.</p>
 </div>
 
 
 </div>
-<div class="container" style="padding-top: 2em;">
+<div class="container footer">
     <hr>
     <p class="text-center">
-      Created with ♥ by the Lightkurve collaboration.
+      
+        Created with ♥ by the Lightkurve collaboration.
                       Please <a href="about/citing.html">cite us</a> or
                       <a href="https://github.com/KeplerGO/Lightkurve">join us on GitHub.</a>
+      
     </p>
 </div>
   </body>

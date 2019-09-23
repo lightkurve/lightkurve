@@ -17,22 +17,24 @@
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
+    <!-- Load Bootstrap CSS and Javascript (Javascript is needed for the navbar toggle) -->
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+    <!-- Load the theme's CSS. -->
+    <link rel="stylesheet" href="../_static/css/amunra.css" type="text/css" />
 
-
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'UA-69171-9');
-    </script>
+    
+      <!-- Google Analytics -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-69171-9');
+      </script>
+    
 
   </head><body>
 <header>
@@ -44,32 +46,34 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarsExample07">
-      <ul class="navbar-nav mr-auto">
-        
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="../quickstart.html">Quickstart</a>
-            </li>
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="../tutorials/index.html">Tutorials</a>
-            </li>
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="index.html">API</a>
-            </li>
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="../about/index.html">About</a>
-            </li>
-        
-      </ul>
 
-        <form class="form-inline my-2 my-md-0" action="../search.html" method="get">
+    
+      <!-- Custom navbar -->
+      <ul class="navbar-nav mr-auto">
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="../quickstart.html">Quickstart</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="../tutorials/index.html">Tutorials</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="index.html">API</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="../about/index.html">About</a>
+          </li>
+      </ul>
+    
+
+        <form class="form-inline my-2 my-md-0 ml-auto" action="../search.html" method="get">
             <input class="form-control" type="text" placeholder="Search" aria-label="Search" name="q" />
         </form>
 
@@ -90,7 +94,7 @@
 <h1>SFFCorrector<a class="headerlink" href="#sffcorrector" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="lightkurve.correctors.SFFCorrector">
-<em class="property">class </em><code class="descclassname">lightkurve.correctors.</code><code class="descname">SFFCorrector</code><span class="sig-paren">(</span><em>lightcurve</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">lightkurve.correctors.</code><code class="sig-name descname">SFFCorrector</code><span class="sig-paren">(</span><em class="sig-param">lightcurve</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">lightkurve.correctors.corrector.Corrector</span></code></p>
 <p>Implements the Self-Flat-Fielding (SFF) systematics removal method.</p>
 <p>This method is described in detail by Vanderburg and Johnson (2014).
@@ -125,7 +129,7 @@ eigenvectors of the centroid covariance matrix</p></li>
 </pre></div>
 </div>
 <p class="rubric">Methods Summary</p>
-<table class="longtable docutils align-center">
+<table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -160,7 +164,7 @@ eigenvectors of the centroid covariance matrix</p></li>
 <p class="rubric">Methods Documentation</p>
 <dl class="method">
 <dt id="lightkurve.correctors.SFFCorrector.arclength">
-<code class="descname">arclength</code><span class="sig-paren">(</span><em>self</em>, <em>x1</em>, <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.arclength" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">arclength</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">x1</em>, <em class="sig-param">x</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.arclength" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute the arclength of the polynomial used to fit the centroid
 measurements.</p>
 <dl class="field-list simple">
@@ -183,12 +187,12 @@ measurements.</p>
 
 <dl class="method">
 <dt id="lightkurve.correctors.SFFCorrector.bin_and_interpolate">
-<code class="descname">bin_and_interpolate</code><span class="sig-paren">(</span><em>self</em>, <em>s</em>, <em>normflux</em>, <em>bins</em>, <em>sigma</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.bin_and_interpolate" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">bin_and_interpolate</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">s</em>, <em class="sig-param">normflux</em>, <em class="sig-param">bins</em>, <em class="sig-param">sigma</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.bin_and_interpolate" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="lightkurve.correctors.SFFCorrector.breakpoints">
-<code class="descname">breakpoints</code><span class="sig-paren">(</span><em>self</em>, <em>campaign</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.breakpoints" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">breakpoints</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">campaign</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.breakpoints" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a break point as a function of the campaign number.</p>
 <p>The intention of this function is to implement a smart way to determine
 the boundaries of the windows on which the SFF algorithm is applied
@@ -197,7 +201,7 @@ independently. However, this is not implemented yet in this version.</p>
 
 <dl class="method">
 <dt id="lightkurve.correctors.SFFCorrector.correct">
-<code class="descname">correct</code><span class="sig-paren">(</span><em>self</em>, <em>centroid_col=None</em>, <em>centroid_row=None</em>, <em>polyorder=5</em>, <em>niters=3</em>, <em>bins=15</em>, <em>windows=10</em>, <em>sigma_1=3.0</em>, <em>sigma_2=5.0</em>, <em>restore_trend=False</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.correct" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">correct</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">centroid_col=None</em>, <em class="sig-param">centroid_row=None</em>, <em class="sig-param">polyorder=5</em>, <em class="sig-param">niters=3</em>, <em class="sig-param">bins=15</em>, <em class="sig-param">windows=10</em>, <em class="sig-param">sigma_1=3.0</em>, <em class="sig-param">sigma_2=5.0</em>, <em class="sig-param">restore_trend=False</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.correct" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a systematics-corrected LightCurve.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -237,23 +241,23 @@ lightcurve.</p>
 
 <dl class="method">
 <dt id="lightkurve.correctors.SFFCorrector.diagnose">
-<code class="descname">diagnose</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.diagnose" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">diagnose</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.diagnose" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="lightkurve.correctors.SFFCorrector.fit_bspline">
-<code class="descname">fit_bspline</code><span class="sig-paren">(</span><em>self</em>, <em>time</em>, <em>flux</em>, <em>knotspacing=1.5</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.fit_bspline" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fit_bspline</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">time</em>, <em class="sig-param">flux</em>, <em class="sig-param">knotspacing=1.5</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.fit_bspline" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.BSpline.html#scipy.interpolate.BSpline" title="(in SciPy v1.3.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scipy.interpolate.BSpline</span></code></a> object to interpolate flux as a function of time.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="lightkurve.correctors.SFFCorrector.interact">
-<code class="descname">interact</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.interact" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">interact</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.interact" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="lightkurve.correctors.SFFCorrector.rotate_centroids">
-<code class="descname">rotate_centroids</code><span class="sig-paren">(</span><em>self</em>, <em>centroid_col</em>, <em>centroid_row</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.rotate_centroids" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">rotate_centroids</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">centroid_col</em>, <em class="sig-param">centroid_row</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.rotate_centroids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rotate the coordinate frame of the (col, row) centroids to a new (x,y)
 frame in which the dominant motion of the spacecraft is aligned with
 the x axis.  This makes it easier to fit a characteristic polynomial
@@ -266,12 +270,14 @@ that describes the motion.</p>
 
 
 </div>
-<div class="container" style="padding-top: 2em;">
+<div class="container footer">
     <hr>
     <p class="text-center">
-      Created with ♥ by the Lightkurve collaboration.
+      
+        Created with ♥ by the Lightkurve collaboration.
                       Please <a href="about/citing.html">cite us</a> or
                       <a href="https://github.com/KeplerGO/Lightkurve">join us on GitHub.</a>
+      
     </p>
 </div>
   </body>

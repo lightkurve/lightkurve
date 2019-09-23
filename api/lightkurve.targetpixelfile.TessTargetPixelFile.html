@@ -17,22 +17,24 @@
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
+    <!-- Load Bootstrap CSS and Javascript (Javascript is needed for the navbar toggle) -->
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+    <!-- Load the theme's CSS. -->
+    <link rel="stylesheet" href="../_static/css/amunra.css" type="text/css" />
 
-
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'UA-69171-9');
-    </script>
+    
+      <!-- Google Analytics -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-69171-9');
+      </script>
+    
 
   </head><body>
 <header>
@@ -44,32 +46,34 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarsExample07">
-      <ul class="navbar-nav mr-auto">
-        
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="../quickstart.html">Quickstart</a>
-            </li>
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="../tutorials/index.html">Tutorials</a>
-            </li>
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="index.html">API</a>
-            </li>
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="../about/index.html">About</a>
-            </li>
-        
-      </ul>
 
-        <form class="form-inline my-2 my-md-0" action="../search.html" method="get">
+    
+      <!-- Custom navbar -->
+      <ul class="navbar-nav mr-auto">
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="../quickstart.html">Quickstart</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="../tutorials/index.html">Tutorials</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="index.html">API</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="../about/index.html">About</a>
+          </li>
+      </ul>
+    
+
+        <form class="form-inline my-2 my-md-0 ml-auto" action="../search.html" method="get">
             <input class="form-control" type="text" placeholder="Search" aria-label="Search" name="q" />
         </form>
 
@@ -90,7 +94,7 @@
 <h1>TessTargetPixelFile<a class="headerlink" href="#tesstargetpixelfile" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile">
-<em class="property">class </em><code class="descclassname">lightkurve.targetpixelfile.</code><code class="descname">TessTargetPixelFile</code><span class="sig-paren">(</span><em>path</em>, <em>quality_bitmask='default'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">lightkurve.targetpixelfile.</code><code class="sig-name descname">TessTargetPixelFile</code><span class="sig-paren">(</span><em class="sig-param">path</em>, <em class="sig-param">quality_bitmask='default'</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">lightkurve.targetpixelfile.TargetPixelFile</span></code></p>
 <p>Represents pixel data products created by NASA’s TESS pipeline.</p>
 <p>This class enables extraction of custom light curves and centroid positions.</p>
@@ -107,7 +111,7 @@
 </dd>
 </dl>
 <p class="rubric">Attributes Summary</p>
-<table class="longtable docutils align-center">
+<table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -191,7 +195,7 @@
 </tbody>
 </table>
 <p class="rubric">Methods Summary</p>
-<table class="longtable docutils align-center">
+<table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -244,148 +248,148 @@
 <p class="rubric">Attributes Documentation</p>
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.astropy_time">
-<code class="descname">astropy_time</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.astropy_time" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">astropy_time</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.astropy_time" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an AstroPy Time object for all good-quality cadences.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.background_mask">
-<code class="descname">background_mask</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.background_mask" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">background_mask</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.background_mask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the background mask used by the TESS pipeline.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.cadenceno">
-<code class="descname">cadenceno</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.cadenceno" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">cadenceno</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.cadenceno" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the cadence number for all good-quality cadences.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.camera">
-<code class="descname">camera</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.camera" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">camera</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.camera" title="Permalink to this definition">¶</a></dt>
 <dd><p>TESS Camera number (‘CAMERA’ header keyword).</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.ccd">
-<code class="descname">ccd</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.ccd" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">ccd</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.ccd" title="Permalink to this definition">¶</a></dt>
 <dd><p>TESS CCD number (‘CCD’ header keyword).</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.column">
-<code class="descname">column</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.column" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">column</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.column" title="Permalink to this definition">¶</a></dt>
 <dd><p>CCD pixel column number (‘1CRV5P’ header keyword).</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.dec">
-<code class="descname">dec</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.dec" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">dec</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.dec" title="Permalink to this definition">¶</a></dt>
 <dd><p>Declination of target (‘DEC_OBJ’ header keyword).</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.flux">
-<code class="descname">flux</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.flux" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">flux</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.flux" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the flux for all good-quality cadences.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.flux_bkg">
-<code class="descname">flux_bkg</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.flux_bkg" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">flux_bkg</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.flux_bkg" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the background flux for all good-quality cadences.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.flux_bkg_err">
-<code class="descname">flux_bkg_err</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.flux_bkg_err" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">flux_bkg_err</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.flux_bkg_err" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.flux_err">
-<code class="descname">flux_err</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.flux_err" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">flux_err</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.flux_err" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the flux uncertainty for all good-quality cadences.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.hdu">
-<code class="descname">hdu</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.hdu" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">hdu</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.hdu" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.header">
-<code class="descname">header</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.header" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">header</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.header" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the header of the primary extension.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.mission">
-<code class="descname">mission</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.mission" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">mission</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.mission" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.nan_time_mask">
-<code class="descname">nan_time_mask</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.nan_time_mask" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">nan_time_mask</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.nan_time_mask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a boolean mask flagging cadences whose time is <code class="xref py py-obj docutils literal notranslate"><span class="pre">nan</span></code>.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.pipeline_mask">
-<code class="descname">pipeline_mask</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.pipeline_mask" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">pipeline_mask</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.pipeline_mask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the optimal aperture mask used by the pipeline.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.pos_corr1">
-<code class="descname">pos_corr1</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.pos_corr1" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">pos_corr1</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.pos_corr1" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the column position correction.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.pos_corr2">
-<code class="descname">pos_corr2</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.pos_corr2" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">pos_corr2</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.pos_corr2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the row position correction.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.quality">
-<code class="descname">quality</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.quality" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">quality</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.quality" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the quality flag integer of every good cadence.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.ra">
-<code class="descname">ra</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.ra" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">ra</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.ra" title="Permalink to this definition">¶</a></dt>
 <dd><p>Right Ascension of target (‘RA_OBJ’ header keyword).</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.row">
-<code class="descname">row</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.row" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">row</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.row" title="Permalink to this definition">¶</a></dt>
 <dd><p>CCD pixel row number (‘2CRV5P’ header keyword).</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.sector">
-<code class="descname">sector</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.sector" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">sector</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.sector" title="Permalink to this definition">¶</a></dt>
 <dd><p>TESS Sector number (‘SECTOR’ header keyword).</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.shape">
-<code class="descname">shape</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.shape" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">shape</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.shape" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the cube dimension shape.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.time">
-<code class="descname">time</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.time" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">time</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.time" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the time for all good-quality cadences.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.wcs">
-<code class="descname">wcs</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.wcs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">wcs</code><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.wcs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an astropy.wcs.WCS object with the World Coordinate System
 solution for the target pixel file.</p>
 <dl class="field-list simple">
@@ -401,7 +405,7 @@ solution for the target pixel file.</p>
 <p class="rubric">Methods Documentation</p>
 <dl class="method">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.create_threshold_mask">
-<code class="descname">create_threshold_mask</code><span class="sig-paren">(</span><em>self</em>, <em>threshold=3</em>, <em>reference_pixel='center'</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.create_threshold_mask" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">create_threshold_mask</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">threshold=3</em>, <em class="sig-param">reference_pixel='center'</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.create_threshold_mask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an aperture mask creating using the thresholding method.</p>
 <p>This method will identify the pixels in the TargetPixelFile which show
 a median flux that is brighter than <code class="xref py py-obj docutils literal notranslate"><span class="pre">threshold</span></code> times the standard
@@ -440,7 +444,7 @@ threshold.</p>
 
 <dl class="method">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.cutout">
-<code class="descname">cutout</code><span class="sig-paren">(</span><em>self</em>, <em>center=None</em>, <em>size=5</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.cutout" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">cutout</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">center=None</em>, <em class="sig-param">size=5</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.cutout" title="Permalink to this definition">¶</a></dt>
 <dd><p>Cut a rectangle out of the Target Pixel File.</p>
 <p>This methods returns a new <code class="xref py py-obj docutils literal notranslate"><span class="pre">TargetPixelFile</span></code> object containing a
 rectangle of a given <code class="docutils literal notranslate"><span class="pre">size</span></code> cut out around a given <code class="docutils literal notranslate"><span class="pre">center</span></code>.</p>
@@ -471,7 +475,7 @@ cut out.</p>
 
 <dl class="method">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.estimate_centroids">
-<code class="descname">estimate_centroids</code><span class="sig-paren">(</span><em>self</em>, <em>aperture_mask='pipeline'</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.estimate_centroids" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">estimate_centroids</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">aperture_mask='pipeline'</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.estimate_centroids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns centroid positions estimated using sample moments.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -497,7 +501,7 @@ the median flux will be used.</p>
 
 <dl class="method">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.extract_aperture_photometry">
-<code class="descname">extract_aperture_photometry</code><span class="sig-paren">(</span><em>self</em>, <em>aperture_mask='pipeline'</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.extract_aperture_photometry" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">extract_aperture_photometry</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">aperture_mask='pipeline'</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.extract_aperture_photometry" title="Permalink to this definition">¶</a></dt>
 <dd><p>Performs aperture photometry.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -518,12 +522,12 @@ The default behaviour is to use the TESS pipeline mask.</p>
 
 <dl class="method">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.get_bkg_lightcurve">
-<code class="descname">get_bkg_lightcurve</code><span class="sig-paren">(</span><em>self</em>, <em>aperture_mask=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.get_bkg_lightcurve" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_bkg_lightcurve</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">aperture_mask=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.get_bkg_lightcurve" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.get_coordinates">
-<code class="descname">get_coordinates</code><span class="sig-paren">(</span><em>self</em>, <em>cadence='all'</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.get_coordinates" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_coordinates</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">cadence='all'</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.get_coordinates" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns two 3D arrays of RA and Dec values in decimal degrees.</p>
 <p>If cadence number is given, returns 2D arrays for that cadence. If
 cadence is ‘all’ returns one RA, Dec value for each pixel in every cadence.
@@ -548,7 +552,7 @@ Uses the WCS solution and the POS_CORR data from TPF header.</p>
 
 <dl class="method">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.get_keyword">
-<code class="descname">get_keyword</code><span class="sig-paren">(</span><em>self</em>, <em>keyword</em>, <em>hdu=0</em>, <em>default=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.get_keyword" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_keyword</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">keyword</em>, <em class="sig-param">hdu=0</em>, <em class="sig-param">default=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.get_keyword" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a header keyword value.</p>
 <p>If the keyword is Undefined or does not exist,
 then return <code class="docutils literal notranslate"><span class="pre">default</span></code> instead.</p>
@@ -556,7 +560,7 @@ then return <code class="docutils literal notranslate"><span class="pre">default
 
 <dl class="method">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.interact">
-<code class="descname">interact</code><span class="sig-paren">(</span><em>self</em>, <em>notebook_url='localhost:8888'</em>, <em>max_cadences=30000</em>, <em>aperture_mask='pipeline'</em>, <em>exported_filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.interact" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">interact</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">notebook_url='localhost:8888'</em>, <em class="sig-param">max_cadences=30000</em>, <em class="sig-param">aperture_mask='pipeline'</em>, <em class="sig-param">exported_filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.interact" title="Permalink to this definition">¶</a></dt>
 <dd><p>Display an interactive Jupyter Notebook widget to inspect the pixel data.</p>
 <p>The widget will show both the lightcurve and pixel data.  By default,
 the lightcurve shown is obtained by calling the <a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.to_lightcurve" title="lightkurve.targetpixelfile.TessTargetPixelFile.to_lightcurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_lightcurve()</span></code></a> method,
@@ -601,7 +605,7 @@ TargetPixelFile basename.</p>
 
 <dl class="method">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.interact_sky">
-<code class="descname">interact_sky</code><span class="sig-paren">(</span><em>self</em>, <em>notebook_url='localhost:8888'</em>, <em>magnitude_limit=18</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.interact_sky" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">interact_sky</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">notebook_url='localhost:8888'</em>, <em class="sig-param">magnitude_limit=18</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.interact_sky" title="Permalink to this definition">¶</a></dt>
 <dd><p>Display a Jupyter Notebook widget showing Gaia DR2 positions on top of the pixels.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -624,7 +628,7 @@ of the form “localhost:8888”, then “http” will be used.</p>
 
 <dl class="method">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.plot">
-<code class="descname">plot</code><span class="sig-paren">(</span><em>self</em>, <em>ax=None</em>, <em>frame=0</em>, <em>cadenceno=None</em>, <em>bkg=False</em>, <em>aperture_mask=None</em>, <em>show_colorbar=True</em>, <em>mask_color='pink'</em>, <em>style='lightkurve'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.plot" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">ax=None</em>, <em class="sig-param">frame=0</em>, <em class="sig-param">cadenceno=None</em>, <em class="sig-param">bkg=False</em>, <em class="sig-param">aperture_mask=None</em>, <em class="sig-param">show_colorbar=True</em>, <em class="sig-param">mask_color='pink'</em>, <em class="sig-param">style='lightkurve'</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the pixel data for a single frame (i.e. at a single time).</p>
 <p>The time can be specified by frame index number (<code class="xref py py-obj docutils literal notranslate"><span class="pre">frame=0</span></code> will show the
 first frame) or absolute cadence number (<a class="reference internal" href="#lightkurve.targetpixelfile.TessTargetPixelFile.cadenceno" title="lightkurve.targetpixelfile.TessTargetPixelFile.cadenceno"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cadenceno</span></code></a>).</p>
@@ -666,14 +670,14 @@ Lightkurve’s custom stylesheet is used by default.</p>
 
 <dl class="method">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.show_properties">
-<code class="descname">show_properties</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.show_properties" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">show_properties</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.show_properties" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prints a description of all non-callable attributes.</p>
 <p>Prints in order of type (ints, strings, lists, arrays, others).</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.to_corrector">
-<code class="descname">to_corrector</code><span class="sig-paren">(</span><em>self</em>, <em>method='pld'</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.to_corrector" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">to_corrector</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">method='pld'</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.to_corrector" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a <code class="xref py py-obj docutils literal notranslate"><span class="pre">Corrector</span></code> instance to remove systematics.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -695,13 +699,13 @@ and <code class="xref py py-obj docutils literal notranslate"><span class="pre">
 
 <dl class="method">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.to_fits">
-<code class="descname">to_fits</code><span class="sig-paren">(</span><em>self</em>, <em>output_fn=None</em>, <em>overwrite=False</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.to_fits" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">to_fits</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">output_fn=None</em>, <em class="sig-param">overwrite=False</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.to_fits" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes the TPF to a FITS file on disk.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="lightkurve.targetpixelfile.TessTargetPixelFile.to_lightcurve">
-<code class="descname">to_lightcurve</code><span class="sig-paren">(</span><em>self</em>, <em>method='aperture'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.to_lightcurve" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">to_lightcurve</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">method='aperture'</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.targetpixelfile.TessTargetPixelFile.to_lightcurve" title="Permalink to this definition">¶</a></dt>
 <dd><p>Performs photometry on the pixel data and returns a LightCurve object.</p>
 <p>See the docstring of <code class="xref py py-obj docutils literal notranslate"><span class="pre">aperture_photometry()</span></code> for valid
 arguments if the method is ‘aperture’.  Otherwise, see the docstring
@@ -731,12 +735,14 @@ of <code class="xref py py-obj docutils literal notranslate"><span class="pre">p
 
 
 </div>
-<div class="container" style="padding-top: 2em;">
+<div class="container footer">
     <hr>
     <p class="text-center">
-      Created with ♥ by the Lightkurve collaboration.
+      
+        Created with ♥ by the Lightkurve collaboration.
                       Please <a href="about/citing.html">cite us</a> or
                       <a href="https://github.com/KeplerGO/Lightkurve">join us on GitHub.</a>
+      
     </p>
 </div>
   </body>

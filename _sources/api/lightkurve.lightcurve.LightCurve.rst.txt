@@ -11,6 +11,8 @@ LightCurve
    .. autosummary::
 
       ~LightCurve.astropy_time
+      ~LightCurve.flux_quantity
+      ~LightCurve.flux_unit
 
    .. rubric:: Methods Summary
 
@@ -44,6 +46,8 @@ LightCurve
    .. rubric:: Attributes Documentation
 
    .. autoattribute:: astropy_time
+   .. autoattribute:: flux_quantity
+   .. autoattribute:: flux_unit
 
    .. rubric:: Methods Documentation
 

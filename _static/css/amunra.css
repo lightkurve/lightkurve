@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Lato:300,300i,400,400i,500,500i,600,600i,700,700i"');
+@import url('https://fonts.googleapis.com/css?family=Lato:100,100i,300,300i,400,400i,700,700i,900,900i&display=swap');
 
 body {
     font-family: 'Lato', sans-serif;
@@ -10,31 +10,22 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-    font-size: 2.5rem;
+    font-size: 2.5em;
 }
 
 h2 {
-    font-size: 1.8rem;
+    font-size: 1.8em;
 }
 
 h3, h4, h5, h6 {
-    font-size: 1.5rem;
+    font-size: 1.5em;
 }
 
 p {
-    line-height: 1.5rem;
+    line-height: 1.5em;
     margin: 0;
-    margin-top: 1.5rem;
-    margin-bottom: 1.5rem;
-}
-
-.lead {
-    font-size: 1.45rem;
-    line-height: 2rem;
-}
-
-.nav-item {
-    margin-left: 0.4em;
+    margin-top: 1.5em;
+    margin-bottom: 1.5em;
 }
 
 .btn-primary {
@@ -47,6 +38,50 @@ p {
     vertical-align: super;
     color: rgba(0, 0, 0, .5);
 }
+
+.nav-item {
+    margin-left: 0.4em;
+}
+
+.github-icon {
+    margin-left: 1em;
+    vertical-align: middle;
+    fill: #495057;
+}
+
+div.footer {
+    padding-top: 2em;
+    font-weight: 300;
+}
+
+
+/* Index page lead text */
+.lead {
+    text-align: center!important;
+    padding-top: 4.4em;
+    padding-bottom: 4em;
+}
+
+.lead p:nth-of-type(1) {
+    font-size: 3.2em;
+    font-weight: 500;
+    line-height: 0.95em;
+    margin: 0;
+}
+
+.lead p:nth-of-type(2) {
+    font-size: 1.2em;
+    font-weight: 300;
+    line-height: 1.2em;
+    padding-top: 1.5em;
+    margin: 0;
+}
+
+.lead .btn {
+    font-size: 1em;
+    margin-top: 1.5em;
+}
+
 
 /* Info boxes */
 div.admonition {
@@ -163,10 +198,4 @@ code.descname, code.descclassname {
 
 code.descname {
     font-size: 1.2em;
-}
-
-.github-icon {
-    margin-left: 1em;
-    vertical-align: middle;
-    fill: #495057;
 }

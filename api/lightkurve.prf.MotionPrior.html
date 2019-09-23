@@ -17,22 +17,24 @@
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <!-- Load bootstrap css and js (the js is needed for the navbar toggle) -->
+    <!-- Load Bootstrap CSS and Javascript (Javascript is needed for the navbar toggle) -->
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+    <!-- Load the theme's CSS. -->
+    <link rel="stylesheet" href="../_static/css/amunra.css" type="text/css" />
 
-
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'UA-69171-9');
-    </script>
+    
+      <!-- Google Analytics -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-69171-9"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-69171-9');
+      </script>
+    
 
   </head><body>
 <header>
@@ -44,32 +46,34 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarsExample07">
-      <ul class="navbar-nav mr-auto">
-        
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="../quickstart.html">Quickstart</a>
-            </li>
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="../tutorials/index.html">Tutorials</a>
-            </li>
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="index.html">API</a>
-            </li>
-            
-            <li class="nav-item">
-            
-              <a class="nav-link" href="../about/index.html">About</a>
-            </li>
-        
-      </ul>
 
-        <form class="form-inline my-2 my-md-0" action="../search.html" method="get">
+    
+      <!-- Custom navbar -->
+      <ul class="navbar-nav mr-auto">
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="../quickstart.html">Quickstart</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="../tutorials/index.html">Tutorials</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="index.html">API</a>
+          </li>
+          
+          <li class="nav-item">
+          
+            <a class="nav-link" href="../about/index.html">About</a>
+          </li>
+      </ul>
+    
+
+        <form class="form-inline my-2 my-md-0 ml-auto" action="../search.html" method="get">
             <input class="form-control" type="text" placeholder="Search" aria-label="Search" name="q" />
         </form>
 
@@ -90,11 +94,11 @@
 <h1>MotionPrior<a class="headerlink" href="#motionprior" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="lightkurve.prf.MotionPrior">
-<em class="property">class </em><code class="descclassname">lightkurve.prf.</code><code class="descname">MotionPrior</code><span class="sig-paren">(</span><em>shift_col=&lt;GaussianPrior(mean=[0], var=[1.])&gt;, shift_row=&lt;GaussianPrior(mean=[0], var=[1.])&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.MotionPrior" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">lightkurve.prf.</code><code class="sig-name descname">MotionPrior</code><span class="sig-paren">(</span><em class="sig-param">shift_col=&lt;GaussianPrior(mean=[0], var=[1.])&gt;, shift_row=&lt;GaussianPrior(mean=[0], var=[1.])&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.MotionPrior" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">lightkurve.prf.tpfmodel.PriorContainer</span></code></p>
 <p>Container class to capture a user’s beliefs about the telescope motion.</p>
 <p class="rubric">Methods Summary</p>
-<table class="longtable docutils align-center">
+<table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -111,13 +115,13 @@
 <p class="rubric">Methods Documentation</p>
 <dl class="method">
 <dt id="lightkurve.prf.MotionPrior.__call__">
-<code class="descname">__call__</code><span class="sig-paren">(</span><em>self</em>, <em>*params</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.MotionPrior.__call__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__call__</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">*params</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.MotionPrior.__call__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calls <a class="reference internal" href="#lightkurve.prf.MotionPrior.evaluate" title="lightkurve.prf.MotionPrior.evaluate"><code class="xref py py-func docutils literal notranslate"><span class="pre">evaluate()</span></code></a></p>
 </dd></dl>
 
 <dl class="method">
 <dt id="lightkurve.prf.MotionPrior.evaluate">
-<code class="descname">evaluate</code><span class="sig-paren">(</span><em>self</em>, <em>shift_col</em>, <em>shift_row</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.MotionPrior.evaluate" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">evaluate</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">shift_col</em>, <em class="sig-param">shift_row</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.MotionPrior.evaluate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the prior probability for a gien set of motion parameters.</p>
 </dd></dl>
 
@@ -127,12 +131,14 @@
 
 
 </div>
-<div class="container" style="padding-top: 2em;">
+<div class="container footer">
     <hr>
     <p class="text-center">
-      Created with ♥ by the Lightkurve collaboration.
+      
+        Created with ♥ by the Lightkurve collaboration.
                       Please <a href="about/citing.html">cite us</a> or
                       <a href="https://github.com/KeplerGO/Lightkurve">join us on GitHub.</a>
+      
     </p>
 </div>
   </body>
