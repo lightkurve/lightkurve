@@ -698,15 +698,20 @@ class LightCurve(object):
     def fill_gaps(self, method='gaussian_noise'):
         """Fill in gaps in time.
 
+        By default, the gaps will be filled with random white Gaussian noise
+        distributed according to
+        :math:`\mathcal{N} (\mu=\overline{\mathrm{flux}}, \sigma=\mathrm{CDPP})`.
+        No other methods are supported at this time.
+
         Parameters
         ----------
         method : string {'gaussian_noise'}
-            Method to use for gap filling. Fills with gaussian noise by default
+            Method to use for gap filling. Fills with Gaussian noise by default.
 
         Returns
         -------
         filled_lightcurve : `LightCurve`
-            A new light curve object in which NaN values and gaps in time
+            A new light curve object in which all NaN values and gaps in time
             have been filled.
         """
         lc = self.copy().remove_nans()
