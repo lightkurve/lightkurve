@@ -512,8 +512,8 @@ class LightCurve(object):
     def fold(self, period, t0=None, transit_midpoint=None):
         """Folds the lightcurve at a specified `period` and reference time `t0`.
 
-        This method returns a `FoldedLightCurve` object in which the time
-        values range between -0.5 to +0.5 (i.e. the phase).
+        This method returns a `~lightkurve.lightcurve.FoldedLightCurve` object
+        in which the time values range between -0.5 to +0.5 (i.e. the phase).
         Data points which occur exactly at ``t0`` or an integer multiple of
         ``t0 + n*period`` will have phase value 0.0.
 
@@ -521,7 +521,8 @@ class LightCurve(object):
         --------
         The example below shows a light curve with a period dip which occurs near
         time value 1001 and has a period of 5 days. Calling the `fold` method
-        will transform the light curve into a `FoldedLightCurve` object::
+        will transform the light curve into a
+        `~lightkurve.lightcurve.FoldedLightCurve` object::
 
             >>> import lightkurve as lk
             >>> lc = lk.LightCurve(time=range(1001, 1012), flux=[0.5, 1.0, 1.0, 1.0, 1.0, 0.5, 1.0, 1.0, 1.0, 1.0, 0.5])
@@ -529,8 +530,9 @@ class LightCurve(object):
             >>> folded_lc   # doctest: +SKIP
             <lightkurve.lightcurve.FoldedLightCurve>
 
-        An object of type `FoldedLightCurve` is useful because it provides
-        convenient access to the phase values and the phase-folded fluxes::
+        An object of type `~lightkurve.lightcurve.FoldedLightCurve` is useful
+        because it provides convenient access to the phase values and the
+        phase-folded fluxes::
 
             >>> folded_lc.phase
             array([-0.4, -0.4, -0.2, -0.2,  0. ,  0. ,  0. ,  0.2,  0.2,  0.4,  0.4])
@@ -542,8 +544,9 @@ class LightCurve(object):
             >>> folded_lc.time_original
             array([1004, 1009, 1005, 1010, 1001, 1006, 1011, 1002, 1007, 1003, 1008])
 
-        A `FoldedLightCurve` inherits all the features of a standard `LightCurve`
-        object. For example, we can very quickly obtain a phase-folded plot using:
+        A `~lightkurve.lightcurve.FoldedLightCurve` inherits all the features
+        of a standard `LightCurve` object. For example, we can very quickly
+        obtain a phase-folded plot using:
 
             >>> folded_lc.plot()    # doctest: +SKIP
 
@@ -561,7 +564,7 @@ class LightCurve(object):
 
         Returns
         -------
-        folded_lightcurve : `FoldedLightCurve`
+        folded_lightcurve : `~lightkurve.lightcurve.FoldedLightCurve`
             A new light curve object in which the data are folded and sorted by
             phase. The object contains an extra ``phase`` attribute.
         """
@@ -1017,7 +1020,7 @@ class LightCurve(object):
 
         Returns
         -------
-        ax : matplotlib.axes._subplots.AxesSubplot
+        ax : `~matplotlib.axes._subplots.AxesSubplot`
             The matplotlib axes object.
         """
         # Configure the default style
@@ -1084,9 +1087,9 @@ class LightCurve(object):
 
         Parameters
         ----------
-        ax : matplotlib.axes._subplots.AxesSubplot
+        ax : `~matplotlib.axes._subplots.AxesSubplot`
             A matplotlib axes object to plot into. If no axes is provided,
-            a new one will be generated.
+            a new one will be created.
         normalize : bool
             Normalize the lightcurve before plotting?
         xlabel : str
@@ -1104,7 +1107,7 @@ class LightCurve(object):
 
         Returns
         -------
-        ax : matplotlib.axes._subplots.AxesSubplot
+        ax : `~matplotlib.axes._subplots.AxesSubplot`
             The matplotlib axes object.
         """
         return self._create_plot(method='plot', **kwargs)
@@ -1114,7 +1117,7 @@ class LightCurve(object):
 
         Parameters
         ----------
-        ax : matplotlib.axes._subplots.AxesSubplot
+        ax : `~matplotlib.axes._subplots.AxesSubplot`
             A matplotlib axes object to plot into. If no axes is provided,
             a new one will be generated.
         normalize : bool
@@ -1138,7 +1141,7 @@ class LightCurve(object):
 
         Returns
         -------
-        ax : matplotlib.axes._subplots.AxesSubplot
+        ax : `~matplotlib.axes._subplots.AxesSubplot`
             The matplotlib axes object.
         """
         return self._create_plot(method='scatter', colorbar_label=colorbar_label,
@@ -1149,7 +1152,7 @@ class LightCurve(object):
 
         Parameters
         ----------
-        ax : matplotlib.axes._subplots.AxesSubplot
+        ax : `~matplotlib.axes._subplots.AxesSubplot`
             A matplotlib axes object to plot into. If no axes is provided,
             a new one will be generated.
         normalize : bool
@@ -1171,7 +1174,7 @@ class LightCurve(object):
 
         Returns
         -------
-        ax : matplotlib.axes._subplots.AxesSubplot
+        ax : `~matplotlib.axes._subplots.AxesSubplot`
             The matplotlib axes object.
         """
         if 'ls' not in kwargs:
@@ -1268,12 +1271,13 @@ class LightCurve(object):
 
     @staticmethod
     def from_timeseries(ts):
-        """Create a new `LightCurve` from an `~astropy.timeseries.TimeSeries`.
+        """Creates a new `LightCurve` from an AstroPy
+        `~astropy.timeseries.TimeSeries` object.
 
         Parameters
         ----------
         ts : `~astropy.timeseries.TimeSeries`
-            An AstroPy TimeSeries object.  The object must contain columns
+            The AstroPy TimeSeries object.  The object must contain columns
             named 'time', 'flux', and 'flux_err'.
         """
         return LightCurve(time=ts['time'].value, flux=ts['flux'], flux_err=ts['flux_err'])
@@ -1314,21 +1318,25 @@ class LightCurve(object):
         return df
 
     def to_csv(self, path_or_buf=None, **kwargs):
-        """Writes the light curve to a csv file.
+        """Writes the light curve to a CSV file.
+
+        This method will convert the light curve into the Comma-Separated Values
+        (CSV) text format. By default this method will return the result as a
+        string, but you can also write the string directly to disk by providing
+        a file name or handle via the `path_or_buf` parameter.
 
         Parameters
         ----------
-        path_or_buf : string or file handle, default None
-            File path or object, if None is provided the result is returned as
-            a string.
+        path_or_buf : string or file handle
+            File path or object. By default, the result is returned as a string.
         **kwargs : dict
             Dictionary of arguments to be passed to `pandas.DataFrame.to_csv()`.
 
         Returns
         -------
         csv : str or None
-            Returns a csv-formatted string if ``path_or_buf=None``,
-            returns None otherwise.
+            Returns a csv-formatted string if ``path_or_buf=None``.
+            Returns `None` otherwise.
         """
         return self.to_pandas().to_csv(path_or_buf=path_or_buf, **kwargs)
 
@@ -1336,8 +1344,9 @@ class LightCurve(object):
         """Converts the light curve to a `~lightkurve.periodogram.Periodogram`
         power spectrum object.
 
-        This method will call either `lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve()`
-        or `lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve()`,
+        This method will call either
+        `lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve()` or
+        `lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve()`,
         which in turn wrap `astropy.stats.LombScargle` and `astropy.stats.BoxLeastSquares`.
 
         Optional keywords accepted if ``method='lombscargle'`` are:
@@ -1380,7 +1389,7 @@ class LightCurve(object):
         """Returns a `~lightkurve.seismology.Seismology` object for estimating
         quick-look asteroseismic quantities.
 
-        All **kwargs will be passed to the `to_periodogram()` method.
+        All `**kwargs` will be passed to the `to_periodogram()` method.
 
         Returns
         -------
@@ -1528,8 +1537,8 @@ class LightCurve(object):
 class FoldedLightCurve(LightCurve):
     """Generic class to store and plot phase-folded light curves.
 
-    Compared to the standard `LightCurve` class, this class offers an extra
-    `phase` property and implements different plotting defaults.
+    Compared to the `~lightkurve.lightcurve.LightCurve` base class, this class
+    offers an extra `phase` property and implements different plotting defaults.
     """
     def __init__(self, *args, **kwargs):
         self.time_original = kwargs.pop("time_original", None)
@@ -1540,7 +1549,8 @@ class FoldedLightCurve(LightCurve):
         return self.time
 
     def plot(self, **kwargs):
-        """Plot the folded light curve usng matplotlib's `plot` method.
+        """Plot the folded light curve using matplotlib's
+        `~matplotlib.pyplot.plot` method.
 
         See `LightCurve.plot` for details on the accepted arguments.
 
@@ -1551,7 +1561,7 @@ class FoldedLightCurve(LightCurve):
 
         Returns
         -------
-        ax : matplotlib.axes._subplots.AxesSubplot
+        ax : `~matplotlib.axes._subplots.AxesSubplot`
             The matplotlib axes object.
         """
         ax = super(FoldedLightCurve, self).plot(**kwargs)
@@ -1560,7 +1570,7 @@ class FoldedLightCurve(LightCurve):
         return ax
 
     def scatter(self, **kwargs):
-        """Plot the folded light curve usng matplotlib's `~matplotlib.pyplot.scatter` method.
+        """Plot the folded light curve using matplotlib's `~matplotlib.pyplot.scatter` method.
 
         See `LightCurve.scatter` for details on the accepted arguments.
 
@@ -1571,7 +1581,7 @@ class FoldedLightCurve(LightCurve):
 
         Returns
         -------
-        ax : matplotlib.axes._subplots.AxesSubplot
+        ax : `~matplotlib.axes._subplots.AxesSubplot`
             The matplotlib axes object.
         """
         ax = super(FoldedLightCurve, self).scatter(**kwargs)
@@ -1580,7 +1590,8 @@ class FoldedLightCurve(LightCurve):
         return ax
 
     def errorbar(self, **kwargs):
-        """Plot the folded light curve usng matplotlib's `errorbar` method.
+        """Plot the folded light curve using matplotlib's
+        `~matplotlib.pyplot.errorbar` method.
 
         See `LightCurve.scatter` for details on the accepted arguments.
 
@@ -1591,7 +1602,7 @@ class FoldedLightCurve(LightCurve):
 
         Returns
         -------
-        ax : matplotlib.axes._subplots.AxesSubplot
+        ax : `~matplotlib.axes._subplots.AxesSubplot`
             The matplotlib axes object.
         """
         ax = super(FoldedLightCurve, self).errorbar(**kwargs)
