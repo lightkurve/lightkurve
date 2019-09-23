@@ -139,7 +139,7 @@ class Seismology(object):
 
         Returns
         -------
-        ax : matplotlib.axes._subplots.AxesSubplot
+        ax : `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
         numax = self._validate_numax(numax)

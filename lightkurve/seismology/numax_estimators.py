@@ -201,7 +201,7 @@ def diagnose_numax_acf2d(numax, periodogram):
 
     Returns:
     --------
-    ax : matplotlib.axes._subplots.AxesSubplot
+    ax : `~matplotlib.axes.Axes`
         The matplotlib axes object.
     """
     with plt.style.context(MPLSTYLE):

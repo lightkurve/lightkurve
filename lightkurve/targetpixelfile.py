@@ -512,7 +512,7 @@ class TargetPixelFile(object):
 
         Parameters
         ----------
-        ax : matplotlib.axes._subplots.AxesSubplot
+        ax : `~matplotlib.axes.Axes`
             A matplotlib axes object to plot into. If no axes is provided,
             a new one will be generated.
         frame : int
@@ -537,7 +537,7 @@ class TargetPixelFile(object):
 
         Returns
         -------
-        ax : matplotlib.axes._subplots.AxesSubplot
+        ax : `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
         if style == 'lightkurve' or style is None:

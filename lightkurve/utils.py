@@ -382,7 +382,7 @@ def plot_image(image, ax=None, scale='linear', origin='lower',
     ----------
     image : 2d array
         Image data.
-    ax : matplotlib.axes._subplots.AxesSubplot
+    ax : `~matplotlib.axes.Axes`
         A matplotlib axes object to plot into. If no axes is provided,
         a new one will be generated.
     scale : str
@@ -405,7 +405,7 @@ def plot_image(image, ax=None, scale='linear', origin='lower',
 
     Returns
     -------
-    ax : matplotlib.axes._subplots.AxesSubplot
+    ax : `~matplotlib.axes.Axes`
         The matplotlib axes object.
     """
     if ax is None:
