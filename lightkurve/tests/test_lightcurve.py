@@ -456,7 +456,8 @@ def test_normalize():
 
 
 def test_invalid_normalize():
-    """Normalization makes no sense if the light curve is negative or zero-centered."""
+    """Normalization makes no sense if the light curve is negative,
+    zero-centered, or already in relative units."""
     # zero-centered light curve
     lc = LightCurve(time=np.arange(10), flux=np.zeros(10))
     with pytest.warns(LightkurveWarning, match='zero-centered'):
@@ -472,6 +473,10 @@ def test_invalid_normalize():
     with pytest.warns(LightkurveWarning, match='negative'):
         lc.normalize()
 
+    # already in relative units
+    lc = LightCurve(time=np.arange(10), flux=np.ones(10))
+    with pytest.warns(LightkurveWarning, match='relative'):
+        lc.normalize().normalize()
 
 def test_to_pandas():
     """Test the `LightCurve.to_pandas()` method."""

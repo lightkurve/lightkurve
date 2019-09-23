@@ -642,17 +642,27 @@ class LightCurve(object):
         # If the median flux is within half a standard deviation from zero, the
         # light curve is likely zero-centered and normalization makes no sense.
         if (median_flux == 0) or (np.isfinite(std_flux) and (np.abs(median_flux) < 0.5*std_flux)):
-            warnings.warn("The light curve appears to be zero-centered; "
-                          "`normalize()` will divide the light curve by zero "
-                          "or a value close to zero. "
-                          "(median_flux={:.2e}, std_flux={:.2e}).".format(median_flux, std_flux),
+            warnings.warn("The light curve appears to be zero-centered "
+                          "(median={:.2e} ±{:.2e}); `normalize()` will divide "
+                          "the light curve by a value close to zero, which is "
+                          "probably not what you want."
+                          "".format(median_flux, std_flux),
                           LightkurveWarning)
         # If the median flux is negative, normalization will invert the light
         # curve and makes no sense.
         if median_flux < 0:
-            warnings.warn("The light curve has a negative median flux; "
-                          "`normalize()` will invert the light curve. "
-                          "(median_flux={:.2e})".format(median_flux),
+            warnings.warn("The light curve has a negative median flux ({:.2e});"
+                          " `normalize()` will therefore divide by a negative "
+                          "number and invert the light curve, which is probably"
+                          "not what you want".format(median_flux),
+                          LightkurveWarning)
+        # Warn if the light curve is already in relative units.
+        if isinstance(self._flux_unit, u.UnitBase) and \
+            self._flux_unit.is_equivalent(u.dimensionless_unscaled):
+            warnings.warn("The light curve already appears to be in relative "
+                          "units; `normalize()` will convert the light curve "
+                          "into relative units for a second time, which is "
+                          "probably not what you want.".format(self._flux_unit),
                           LightkurveWarning)
 
         # Create a new light curve instance and normalize its values
