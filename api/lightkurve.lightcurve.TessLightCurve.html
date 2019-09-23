@@ -179,7 +179,7 @@ e.g. tdb’, ‘tt’, ‘ut1’, or ‘utc’.</p>
 <td><p>Folds the lightcurve at a specified <code class="xref py py-obj docutils literal notranslate"><span class="pre">period</span></code> and reference time <code class="xref py py-obj docutils literal notranslate"><span class="pre">t0</span></code>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.lightcurve.TessLightCurve.from_timeseries" title="lightkurve.lightcurve.TessLightCurve.from_timeseries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_timeseries</span></code></a>(ts)</p></td>
-<td><p>Create a new <a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> from an <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v4.0.dev527)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeSeries</span></code></a>.</p></td>
+<td><p>Creates a new <a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> from an AstroPy <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v4.0.dev527)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeSeries</span></code></a> object.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.lightcurve.TessLightCurve.interact_bls" title="lightkurve.lightcurve.TessLightCurve.interact_bls"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interact_bls</span></code></a>(self[, notebook_url, …])</p></td>
 <td><p>Display an interactive Jupyter Notebook widget to find planets.</p></td>
@@ -471,16 +471,20 @@ svn+ssh://murzim/repo/so/trunk/Develop/jvc/common/compute_SG_noise.m</p>
 <dt id="lightkurve.lightcurve.TessLightCurve.fill_gaps">
 <code class="sig-name descname">fill_gaps</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">method='gaussian_noise'</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.fill_gaps" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fill in gaps in time.</p>
+<p>By default, the gaps will be filled with random white Gaussian noise
+distributed according to
+<span class="math notranslate nohighlight">\(\mathcal{N} (\mu=\overline{\mathrm{flux}}, \sigma=\mathrm{CDPP})\)</span>.
+No other methods are supported at this time.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>method</strong><span class="classifier">string {‘gaussian_noise’}</span></dt><dd><p>Method to use for gap filling. Fills with gaussian noise by default</p>
+<dt><strong>method</strong><span class="classifier">string {‘gaussian_noise’}</span></dt><dd><p>Method to use for gap filling. Fills with Gaussian noise by default.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><dl>
-<dt><strong>filled_lightcurve</strong><span class="classifier"><a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a></span></dt><dd><p>A new light curve object in which NaN values and gaps in time
+<dt><strong>filled_lightcurve</strong><span class="classifier"><a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a></span></dt><dd><p>A new light curve object in which all NaN values and gaps in time
 have been filled.</p>
 </dd>
 </dl>
@@ -541,8 +545,8 @@ data you want to preserve, e.g. transits.</p>
 <dt id="lightkurve.lightcurve.TessLightCurve.fold">
 <code class="sig-name descname">fold</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">period</em>, <em class="sig-param">t0=None</em>, <em class="sig-param">transit_midpoint=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.fold" title="Permalink to this definition">¶</a></dt>
 <dd><p>Folds the lightcurve at a specified <code class="xref py py-obj docutils literal notranslate"><span class="pre">period</span></code> and reference time <code class="xref py py-obj docutils literal notranslate"><span class="pre">t0</span></code>.</p>
-<p>This method returns a <code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve</span></code> object in which the time
-values range between -0.5 to +0.5 (i.e. the phase).
+<p>This method returns a <code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve</span></code> object
+in which the time values range between -0.5 to +0.5 (i.e. the phase).
 Data points which occur exactly at <code class="docutils literal notranslate"><span class="pre">t0</span></code> or an integer multiple of
 <code class="docutils literal notranslate"><span class="pre">t0</span> <span class="pre">+</span> <span class="pre">n*period</span></code> will have phase value 0.0.</p>
 <dl class="field-list">
@@ -569,7 +573,8 @@ phase. The object contains an extra <code class="docutils literal notranslate"><
 <p class="rubric">Examples</p>
 <p>The example below shows a light curve with a period dip which occurs near
 time value 1001 and has a period of 5 days. Calling the <a class="reference internal" href="#lightkurve.lightcurve.TessLightCurve.fold" title="lightkurve.lightcurve.TessLightCurve.fold"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fold</span></code></a> method
-will transform the light curve into a <code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve</span></code> object:</p>
+will transform the light curve into a
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve</span></code> object:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">lc</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">LightCurve</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">1001</span><span class="p">,</span> <span class="mi">1012</span><span class="p">),</span> <span class="n">flux</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">folded_lc</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mf">5.</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mf">1006.</span><span class="p">)</span>
@@ -577,8 +582,9 @@ will transform the light curve into a <code class="xref py py-obj docutils liter
 <span class="go">&lt;lightkurve.lightcurve.FoldedLightCurve&gt;</span>
 </pre></div>
 </div>
-<p>An object of type <code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve</span></code> is useful because it provides
-convenient access to the phase values and the phase-folded fluxes:</p>
+<p>An object of type <code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve</span></code> is useful
+because it provides convenient access to the phase values and the
+phase-folded fluxes:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">folded_lc</span><span class="o">.</span><span class="n">phase</span>
 <span class="go">array([-0.4, -0.4, -0.2, -0.2,  0. ,  0. ,  0. ,  0.2,  0.2,  0.4,  0.4])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">folded_lc</span><span class="o">.</span><span class="n">flux</span>
@@ -590,8 +596,9 @@ convenient access to the phase values and the phase-folded fluxes:</p>
 <span class="go">array([1004, 1009, 1005, 1010, 1001, 1006, 1011, 1002, 1007, 1003, 1008])</span>
 </pre></div>
 </div>
-<p>A <code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve</span></code> inherits all the features of a standard <a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a>
-object. For example, we can very quickly obtain a phase-folded plot using:</p>
+<p>A <code class="xref py py-obj docutils literal notranslate"><span class="pre">FoldedLightCurve</span></code> inherits all the features
+of a standard <a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> object. For example, we can very quickly
+obtain a phase-folded plot using:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">folded_lc</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>    <span class="c1"># doctest: +SKIP</span>
 </pre></div>
 </div>
@@ -600,11 +607,12 @@ object. For example, we can very quickly obtain a phase-folded plot using:</p>
 <dl class="method">
 <dt id="lightkurve.lightcurve.TessLightCurve.from_timeseries">
 <em class="property">static </em><code class="sig-name descname">from_timeseries</code><span class="sig-paren">(</span><em class="sig-param">ts</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.lightcurve.TessLightCurve.from_timeseries" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a new <a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> from an <a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v4.0.dev527)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeSeries</span></code></a>.</p>
+<dd><p>Creates a new <a class="reference internal" href="lightkurve.lightcurve.LightCurve.html#lightkurve.lightcurve.LightCurve" title="lightkurve.lightcurve.LightCurve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code></a> from an AstroPy
+<a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v4.0.dev527)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeSeries</span></code></a> object.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>ts</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v4.0.dev527)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeSeries</span></code></a></span></dt><dd><p>An AstroPy TimeSeries object.  The object must contain columns
+<dt><strong>ts</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.timeseries.TimeSeries.html#astropy.timeseries.TimeSeries" title="(in Astropy v4.0.dev527)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TimeSeries</span></code></a></span></dt><dd><p>The AstroPy TimeSeries object.  The object must contain columns
 named ‘time’, ‘flux’, and ‘flux_err’.</p>
 </dd>
 </dl>
