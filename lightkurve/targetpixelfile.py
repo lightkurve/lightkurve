@@ -638,7 +638,7 @@ class TargetPixelFile(object):
 
     def interact(self, notebook_url='localhost:8888', max_cadences=30000,
                  aperture_mask='pipeline', exported_filename=None,
-                 transform_func=None):
+                 transform_func=None, ylim_func=None):
         """Display an interactive Jupyter Notebook widget to inspect the pixel data.
 
         The widget will show both the lightcurve and pixel data.  By default,
@@ -690,13 +690,22 @@ class TargetPixelFile(object):
             inspection of the transformed lightcurve.  See the tutorial for some
             limitations. The transform_func is applied before saving a fits file.
             Default: None (no transform is applied).
+        ylim_func: function
+            A function that returns ylimits (low, high) given a LightCurve object.
+            To see the full dynamic range of your lightcurve, for example:
+
+                ylim_func = lambda lc: (0.0, lc.flux.max())
+
+            The default is to return an expanded window around the 10-90th percentile
+            of lightcurve flux values.
         """
         from .interact import show_interact_widget
         return show_interact_widget(self, notebook_url=notebook_url,
                                     max_cadences=max_cadences,
                                     aperture_mask=aperture_mask,
                                     exported_filename=exported_filename,
-                                    transform_func=transform_func)
+                                    transform_func=transform_func,
+                                    ylim_func=ylim_func)
 
     def interact_sky(self, notebook_url='localhost:8888', magnitude_limit=18):
         """Display a Jupyter Notebook widget showing Gaia DR2 positions on top of the pixels.

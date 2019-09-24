@@ -378,7 +378,8 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
                          max_cadences=30000,
                          aperture_mask='pipeline',
                          exported_filename=None,
-                         transform_func=None):
+                         transform_func=None,
+                         ylim_func=None):
     """Display an interactive Jupyter Notebook widget to inspect the pixel data.
 
     The widget will show both the lightcurve and pixel data.  The pixel data
@@ -402,7 +403,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
         will need to supply this value for the application to display
         properly. If no protocol is supplied in the URL, e.g. if it is
         of the form "localhost:8888", then "http" will be used.
-    max_cadences : int
+    max_cadences: int
         Raise a RuntimeError if the number of cadences shown is larger than
         this value. This limit helps keep browsers from becoming unresponsive.
     transform_func: function
@@ -417,6 +418,15 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
         inspection of the transformed lightcurve.  See the tutorial for some
         limitations. The transform_func is applied before saving a fits file.
         Default: None (no transform is applied).
+    ylim_func: function
+        A function that returns ylimits (low, high) given a LightCurve object.
+        To see the full dynamic range of your lightcurve, for example:
+
+            ylim_func = lambda lc: (0.0, lc.flux.max())
+
+        The default is to return an expanded window around the 10-90th percentile
+        of lightcurve flux values.
+
     """
     try:
         import bokeh
@@ -440,6 +450,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
         exported_filename += '.fits'
 
     lc = tpf.to_lightcurve(aperture_mask=aperture_mask)
+    lc.meta['aperture_mask'] = aperture_mask
     if transform_func is not None:
         lc = transform_func(lc)
 
@@ -494,10 +505,15 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
                 selected_indices = np.array(new)
                 selected_mask = np.isin(pixel_index_array, selected_indices)
                 lc_new = tpf.to_lightcurve(aperture_mask=selected_mask)
+                lc_new.meta['aperture_mask'] = selected_mask
                 if transform_func is not None:
                     lc_new = transform_func(lc_new)
                 lc_source.data['flux'] = lc_new.flux
-                ylims = get_lightcurve_y_limits(lc_source)
+
+                if ylim_func is None:
+                    ylims = get_lightcurve_y_limits(lc_source)
+                else:
+                    ylims = ylim_func(lc_new)
                 fig_lc.y_range.start = ylims[0]
                 fig_lc.y_range.end = ylims[1]
             else:
