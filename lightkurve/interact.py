@@ -364,7 +364,7 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=None, fiducial_frame=None
 
 
 def make_default_export_name(tpf, suffix='custom-lc'):
-    """makes the default name to save a custom intetract mask"""
+    """makes the default name to save a custom interact mask"""
     fn = tpf.hdu.filename()
     if fn is None:
         outname = "{}_{}_{}.fits".format(tpf.mission, tpf.targetid, suffix)
@@ -377,7 +377,8 @@ def make_default_export_name(tpf, suffix='custom-lc'):
 def show_interact_widget(tpf, notebook_url='localhost:8888',
                          max_cadences=30000,
                          aperture_mask='pipeline',
-                         exported_filename=None):
+                         exported_filename=None,
+                         transform_func=None):
     """Display an interactive Jupyter Notebook widget to inspect the pixel data.
 
     The widget will show both the lightcurve and pixel data.  The pixel data
@@ -404,6 +405,18 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
     max_cadences : int
         Raise a RuntimeError if the number of cadences shown is larger than
         this value. This limit helps keep browsers from becoming unresponsive.
+    transform_func: function
+        A function that transforms the lightcurve.  The function takes in a
+        LightCurve object as input and returns a LightCurve object as output.
+        For example, the function could be to normalize the lightcurve:
+
+            transform_func = lambda lc: lc.normalize()
+
+        Or it could be more complex, such as detrending the lightcurve.  In this
+        way, the interactive selection of aperture mask can be evaluated after
+        inspection of the transformed lightcurve.  See the tutorial for some
+        limitations. The transform_func is applied before saving a fits file.
+        Default: None (no transform is applied).
     """
     try:
         import bokeh
@@ -427,6 +440,8 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
         exported_filename += '.fits'
 
     lc = tpf.to_lightcurve(aperture_mask=aperture_mask)
+    if transform_func is not None:
+        lc = transform_func(lc)
 
     npix = tpf.flux[0, :, :].size
     pixel_index_array = np.arange(0, npix, 1).reshape(tpf.flux[0].shape)
@@ -479,6 +494,8 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
                 selected_indices = np.array(new)
                 selected_mask = np.isin(pixel_index_array, selected_indices)
                 lc_new = tpf.to_lightcurve(aperture_mask=selected_mask)
+                if transform_func is not None:
+                    lc_new = transform_func(lc_new)
                 lc_source.data['flux'] = lc_new.flux
                 ylims = get_lightcurve_y_limits(lc_source)
                 fig_lc.y_range.start = ylims[0]
@@ -521,6 +538,8 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
                 selected_indices = np.array(tpf_source.selected.indices)
                 selected_mask = np.isin(pixel_index_array, selected_indices)
                 lc_new = tpf.to_lightcurve(aperture_mask=selected_mask)
+                if transform_func is not None:
+                    lc_new = transform_func(lc_new)
                 lc_new.to_fits(exported_filename, overwrite=True,
                                flux_column_name='SAP_FLUX',
                                aperture_mask=selected_mask.astype(np.int),
