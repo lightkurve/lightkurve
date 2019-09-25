@@ -127,7 +127,7 @@ def get_lightcurve_y_limits(lc_source):
     return low - margin, high + margin
 
 
-def make_lightcurve_figure_elements(lc, lc_source):
+def make_lightcurve_figure_elements(lc, lc_source, ylim_func=None):
     """Make the lightcurve figure elements.
 
     Parameters
@@ -171,7 +171,10 @@ def make_lightcurve_figure_elements(lc, lc_source):
       pass
 
 
-    ylims = get_lightcurve_y_limits(lc_source)
+    if ylim_func is None:
+        ylims = get_lightcurve_y_limits(lc_source)
+    else:
+        ylims = ylim_func(lc)
     fig.y_range = Range1d(start=ylims[0], end=ylims[1])
 
     # Add step lines, circles, and hover-over tooltips
@@ -351,6 +354,7 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=None, fiducial_frame=None
                                  direction='ltr',
                                  show_value=True,
                                  sizing_mode='fixed',
+                                 height=15,
                                  name='tpfstretch')
 
     def stretch_change_callback(attr, old, new):
@@ -469,7 +473,8 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
         tpf_source = prepare_tpf_datasource(tpf, aperture_mask)
 
         # Create the lightcurve figure and its vertical marker
-        fig_lc, vertical_line = make_lightcurve_figure_elements(lc, lc_source)
+        fig_lc, vertical_line = make_lightcurve_figure_elements(lc, lc_source,
+                                                            ylim_func=ylim_func)
 
         # Create the TPF figure and its stretch slider
         pedestal = -np.nanmin(tpf.flux) + 1
@@ -494,6 +499,24 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
         message_on_save = Div(text=' ',width=600, height=15)
 
         # Callbacks
+        def _create_lightcurve_from_pixels(tpf, selected_pixel_indices,
+                                            transform_func=transform_func):
+            """Create the lightcurve from the selected pixel index list"""
+            selected_indices = np.array(selected_pixel_indices)
+            selected_mask = np.isin(pixel_index_array, selected_indices)
+            lc_new = tpf.to_lightcurve(aperture_mask=selected_mask)
+            lc_new.meta['aperture_mask'] = selected_mask
+            if transform_func is not None:
+                lc_transformed = transform_func(lc_new)
+                if (len(lc_transformed) != len(lc_new)):
+                    warnings.warn('Dropping cadences in `transform_func` is not '
+                                  'yet supported due to fixed time coordinates.'
+                            'Skipping the transformation...', LightkurveWarning)
+                else:
+                    lc_new = lc_transformed
+                    lc_new.meta['aperture_mask'] = selected_mask
+            return lc_new
+
         def update_upon_pixel_selection(attr, old, new):
             """Callback to take action when pixels are selected."""
             # Check if a selection was "re-clicked", then de-select
@@ -502,12 +525,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
                 tpf_source.selected.indices = new[1:]
 
             if new != []:
-                selected_indices = np.array(new)
-                selected_mask = np.isin(pixel_index_array, selected_indices)
-                lc_new = tpf.to_lightcurve(aperture_mask=selected_mask)
-                lc_new.meta['aperture_mask'] = selected_mask
-                if transform_func is not None:
-                    lc_new = transform_func(lc_new)
+                lc_new = _create_lightcurve_from_pixels(tpf, new, transform_func=transform_func)
                 lc_source.data['flux'] = lc_new.flux
 
                 if ylim_func is None:
@@ -551,17 +569,14 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
         def save_lightcurve():
             """Save the lightcurve as a fits file with mask as HDU extension"""
             if tpf_source.selected.indices != []:
-                selected_indices = np.array(tpf_source.selected.indices)
-                selected_mask = np.isin(pixel_index_array, selected_indices)
-                lc_new = tpf.to_lightcurve(aperture_mask=selected_mask)
-                if transform_func is not None:
-                    lc_new = transform_func(lc_new)
+                lc_new = _create_lightcurve_from_pixels(tpf, tpf_source.selected.indices,
+                                                    transform_func=transform_func)
                 lc_new.to_fits(exported_filename, overwrite=True,
                                flux_column_name='SAP_FLUX',
-                               aperture_mask=selected_mask.astype(np.int),
+                               aperture_mask=lc_new.meta['aperture_mask'].astype(np.int),
                                SOURCE='lightkurve interact',
                                NOTE='custom mask',
-                               MASKNPIX=np.nansum(selected_mask))
+                               MASKNPIX=np.nansum(lc_new.meta['aperture_mask']))
                 if message_on_save.text == " ":
                     text = '<font color="black"><i>Saved file {} </i></font>'
                     message_on_save.text = text.format(exported_filename)

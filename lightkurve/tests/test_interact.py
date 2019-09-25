@@ -89,6 +89,22 @@ def test_custom_exported_filename():
 
 
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
+def test_transform_and_ylim_funcs():
+    """Test the transform_func and ylim_func"""
+    import bokeh
+    with warnings.catch_warnings():
+        # Ignore the "TELESCOP is not equal to TESS" warning
+        warnings.simplefilter("ignore", LightkurveWarning)
+        tpfs = [KeplerTargetPixelFile(TABBY_TPF),
+                TessTargetPixelFile(example_tpf)]
+    for tpf in tpfs:
+        tpf.interact(transform_func=lambda lc:lc.normalize())
+        tpf.interact(transform_func=lambda lc:lc.flatten().normalize())
+        tpf.interact(transform_func=lambda lc:lc, ylim_func=lambda lc: (0, 2))
+        tpf.interact(ylim_func=lambda lc: (0, lc.flux.max()))
+
+
+@pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 def test_max_cadences():
     """Test what is the max number of cadences allowed"""
     import bokeh
