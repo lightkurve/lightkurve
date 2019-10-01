@@ -35,6 +35,7 @@ setup(name='lightkurve',
       long_description=open('README.rst').read(),
       author='KeplerGO',
       author_email='keplergo@mail.arc.nasa.gov',
+      url='https://docs.lightkurve.org',
       license='MIT',
       package_dir={
             'lightkurve': 'lightkurve',
