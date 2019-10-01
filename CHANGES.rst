@@ -1,4 +1,4 @@
-1.2.0 (unreleased)
+1.2.0 (2019-10-01)
 ==================
 
 - Added `flux_unit` and `flux_quantity` properties to the `LightCurve` class
@@ -18,10 +18,13 @@
   to be zero-centered. [#589]
 
 - Fixed an issue which caused the search functions to be incompatible with the
-  current development version of astroquery (v0.3.10). [#598]
+  latest version of astroquery (v0.3.10). [#598]
 
 - Added support for performing mathematical operations involving `LightCurve`
   objects, e.g. two `LightCurve` objects can now be added together. [#532]
+
+- Updated the online tutorials (https://docs.lightkurve.org/tutorials) to
+  take all recent Lightkurve API changes into account. [#596]
 
 
 1.1.1 (2019-08-19)
