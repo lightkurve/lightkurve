@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.1</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.2</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -297,7 +297,7 @@ div.rendered_html tbody tr:hover {
 </div>
 <br style="clear:both;"><div class="section" id="How-to-recover-the-first-TESS-planet-candidate-with-Lightkurve?">
 <h1>How to recover the first TESS planet candidate with <em>Lightkurve</em>?<a class="headerlink" href="#How-to-recover-the-first-TESS-planet-candidate-with-Lightkurve?" title="Permalink to this headline">¶</a></h1>
-<p>Recently, the first public pixel data from the TESS mission have become <a class="reference external" href="https://archive.stsci.edu/prepds/tess-data-alerts/">available from the data archive at MAST</a>. This tutorial demonstrates how the <a class="reference external" href="http://lightkurve.keplerscience.org">Lightkurve Python package</a> can be used to read in these data and create your own TESS light curves with different aperture masks.</p>
+<p>Data from the TESS mission are <a class="reference external" href="https://archive.stsci.edu/prepds/tess-data-alerts/">available from the data archive at MAST</a>. This tutorial demonstrates how the <a class="reference external" href="http://lightkurve.keplerscience.org">Lightkurve Python package</a> can be used to read in these data and create your own TESS light curves with different aperture masks.</p>
 <p>Below is a quick tutorial on how to get started using <em>Lightkurve</em> and TESS data. We’ll use the nearby, bright target Pi Mensae (ID 261136679), around which the mission team recently discovered a short period planet candidate on a 6.27 day orbit. See the <a class="reference external" href="https://arxiv.org/abs/1809.05967">pre-print paper by Huang et al (2018)</a> for more details.</p>
 <p>TESS data is stored in a binary file format which is documented in the <a class="reference external" href="https://archive.stsci.edu/missions/tess/doc/EXP-TESS-ARC-ICD-TM-0014.pdf">TESS Science Data Products Description Document</a>. <em>Lightkurve</em> provides a <code class="docutils literal notranslate"><span class="pre">TessTargetPixelFile</span></code> class which allows you to interact with the data easily.</p>
 <div class="nbinput nblast docutils container">
@@ -305,14 +305,71 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">lightkurve</span> <span class="k">import</span> <span class="n">TessTargetPixelFile</span>
-<span class="n">tpf</span> <span class="o">=</span> <span class="n">TessTargetPixelFile</span><span class="p">(</span><span class="s1">&#39;https://archive.stsci.edu/hlsps/tess-data-alerts/hlsp_tess-data-alerts_tess_phot_00261136679-s01_tess_v1_tp.fits&#39;</span><span class="p">)</span>
+<span></span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">search_result</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s1">&#39;Pi Mensae&#39;</span><span class="p">,</span> <span class="n">mission</span><span class="o">=</span><span class="s1">&#39;TESS&#39;</span><span class="p">,</span> <span class="n">sector</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">search_result</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>SearchResult containing 1 data products.
+
+target_name                     productFilename                        description     distance
+----------- ------------------------------------------------------- ------------------ --------
+  261136679 tess2018206045859-s0001-0000000261136679-0120-s_tp.fits Target pixel files      0.0
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">tpf</span> <span class="o">=</span> <span class="n">search_result</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">quality_bitmask</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">tpf</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>TessTargetPixelFile(TICID: 261136679)
 </pre></div>
 </div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">TessTargetPixelFile</span></code>’s have many helpful methods and attributes. For example, you can access basic meta data on the target easily:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -321,7 +378,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -330,7 +387,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -339,7 +396,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -348,7 +405,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -357,7 +414,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -366,7 +423,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -375,7 +432,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -384,7 +441,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -393,7 +450,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -403,7 +460,7 @@ div.rendered_html tbody tr:hover {
 </div>
 <p>We might want to plot the data, we can do this with the <code class="docutils literal notranslate"><span class="pre">plot()</span></code> method. You can add the keyword <code class="docutils literal notranslate"><span class="pre">aperture_mask</span></code> to plot an aperture on top of the image. In this case we’ve used the <code class="docutils literal notranslate"><span class="pre">pipeline_mask</span></code> which is stored in the original .fits file, but you can use any aperture you like.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -416,12 +473,12 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_11_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_11_0.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_15_0.png"><img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_15_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_15_0.png" style="width: 516px; height: 401px;" /></a>
 </div>
 </div>
 <p>If you want to access the original fits file that generated the data you can use the <code class="docutils literal notranslate"><span class="pre">hdu</span></code> attribute of the tpf. This will return an <code class="docutils literal notranslate"><span class="pre">astropy.io.fits</span></code> object, for example</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -430,17 +487,17 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
-<span></span>[&lt;astropy.io.fits.hdu.image.PrimaryHDU object at 0x7f8bb363ee80&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x7f8bb3663ef0&gt;, &lt;astropy.io.fits.hdu.image.ImageHDU object at 0x7f8badca7400&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x7f8badbbc320&gt;]
+<span></span>[&lt;astropy.io.fits.hdu.image.PrimaryHDU object at 0x1c19e27240&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x1c1c3c7d30&gt;, &lt;astropy.io.fits.hdu.image.ImageHDU object at 0x1c1b54ef28&gt;, &lt;astropy.io.fits.hdu.table.BinTableHDU object at 0x1c1b827be0&gt;]
 </pre></div>
 </div>
 </div>
 <p>You can access each extension and the data inside it in the same way you’d use <code class="docutils literal notranslate"><span class="pre">astropy.io.fits</span></code>. If you want to access data held in the TPF, such as the time of the observations, you can do that easily by using</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -449,19 +506,19 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
-<span></span>array([1325.29698328, 1325.29837215, 1325.29976102, ..., 1353.17292214,
-       1353.17431099, 1353.17569985])
+<span></span>array([1325.29698328, 1325.29837215, 1325.29976102, ..., 1353.17431099,
+       1353.17569985, 1353.17708871])
 </pre></div>
 </div>
 </div>
 <p>This returns the time in units of days counted since <a class="reference external" href="https://en.wikipedia.org/wiki/Julian_day">Julian Day</a> 2457000.</p>
 <p>You can access the corresponding flux values using</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -470,7 +527,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -518,20 +575,6 @@ div.rendered_html tbody tr:hover {
 
        ...,
 
-       [[  15.500299 ,  -32.484245 ,  -88.58714  , ...,  -99.75848  ,
-          -93.617775 , -129.5383   ],
-        [-122.93883  , -117.40679  , -105.49079  , ..., -108.75932  ,
-         -120.350716 , -129.25839  ],
-        [-143.43176  , -138.72139  , -131.21268  , ...,  -97.953094 ,
-         -113.65763  , -118.00191  ],
-        ...,
-        [-130.2462   , -133.78702  , -140.91888  , ...,  -68.20146  ,
-          -99.546646 , -132.0319   ],
-        [-137.01523  , -137.3937   , -141.48993  , ..., -112.68788  ,
-         -125.11879  , -128.38521  ],
-        [-125.543655 , -129.38873  , -144.37961  , ..., -122.12083  ,
-          -89.26432  , -107.87084  ]],
-
        [[  18.095486 ,  -34.98728  ,  -91.17793  , ...,  -99.494095 ,
           -93.221954 , -128.76079  ],
         [-124.04631  , -116.41686  , -102.980415 , ..., -107.50661  ,
@@ -558,13 +601,27 @@ div.rendered_html tbody tr:hover {
         [-138.18147  , -138.7651   , -144.7824   , ..., -116.421265 ,
          -125.88614  , -129.6993   ],
         [-126.65554  , -130.70747  , -144.31444  , ..., -124.7908   ,
-          -86.73392  , -112.15379  ]]], dtype=float32)
+          -86.73392  , -112.15379  ]],
+
+       [[  16.255512 ,  -31.703304 ,  -88.93622  , ...,  -96.80196  ,
+          -88.44054  , -128.90186  ],
+        [-123.1205   , -115.64475  , -102.827774 , ..., -105.912766 ,
+         -116.543015 , -125.83007  ],
+        [-143.50493  , -135.33545  , -131.393    , ...,  -96.0497   ,
+         -111.65795  , -116.42823  ],
+        ...,
+        [-130.41649  , -130.36017  , -142.79881  , ...,  -68.48361  ,
+          -99.568924 , -132.27666  ],
+        [-134.51385  , -135.7366   , -139.90646  , ..., -111.81407  ,
+         -125.028984 , -127.74584  ],
+        [-122.92239  , -129.48557  , -142.0298   , ..., -121.2471   ,
+          -87.20575  , -107.23206  ]]], dtype=float32)
 </pre></div>
 </div>
 </div>
 <p>Flux is a <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> with a shape of (TIME x PIXELS x PIXELS). If you want to access just the first frame you can use</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -573,7 +630,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
@@ -670,7 +727,7 @@ div.rendered_html tbody tr:hover {
 <p>We can use the <code class="docutils literal notranslate"><span class="pre">to_lightcurve()</span></code> method to turn this TPF into a light curve using <em>Simple Aperture Photometry</em>. This will put an aperture on the target, and sum up the flux in all the pixels inside the aperture.</p>
 <p>The default for <code class="docutils literal notranslate"><span class="pre">to_lightcurve()</span></code> is to use the mask generated by the TESS pipeline.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -680,7 +737,7 @@ div.rendered_html tbody tr:hover {
 </div>
 <p>Now we can use the plot function to take a look at the data.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -692,22 +749,16 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_24_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_24_0.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_28_0.png"><img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_28_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_28_0.png" style="width: 755px; height: 368px;" /></a>
 </div>
 </div>
 <p>This looks pretty good, but maybe we can improve things by creating a new aperture.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-
-<span class="c1"># Create a median image of the source over time</span>
-<span class="n">median_image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">tpf</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-
-<span class="c1"># Select pixels which are brighter than the 85th percentile of the median image</span>
-<span class="n">aperture_mask</span> <span class="o">=</span> <span class="n">median_image</span> <span class="o">&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">nanpercentile</span><span class="p">(</span><span class="n">median_image</span><span class="p">,</span> <span class="mi">85</span><span class="p">)</span>
+<span></span><span class="n">aperture_mask</span> <span class="o">=</span> <span class="n">tpf</span><span class="o">.</span><span class="n">create_threshold_mask</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 
 <span class="c1"># Plot that aperture</span>
 <span class="n">tpf</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">aperture_mask</span><span class="o">=</span><span class="n">aperture_mask</span><span class="p">);</span>
@@ -718,11 +769,11 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_26_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_26_0.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_30_0.png"><img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_30_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_30_0.png" style="width: 516px; height: 401px;" /></a>
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -731,7 +782,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -743,12 +794,12 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_28_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_28_0.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_32_0.png"><img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_32_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_32_0.png" style="width: 755px; height: 368px;" /></a>
 </div>
 </div>
 <p>There’s a long term trend in this dataset, which we can remove with a simple smoothing filter. You can use the <code class="docutils literal notranslate"><span class="pre">lc.flatten()</span></code> method to apply and divide the <a class="reference external" href="https://en.wikipedia.org/wiki/Savitzky%E2%80%93Golay_filter">Savitzky-Golay smoothing filter</a>. Here we’ll use a <code class="docutils literal notranslate"><span class="pre">window_length</span></code> of 1001 cadences, which is roughly a 5% of the full length of the light curve.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -766,7 +817,7 @@ div.rendered_html tbody tr:hover {
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -779,12 +830,12 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_31_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_31_0.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_35_0.png"><img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_35_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_35_0.png" style="width: 755px; height: 368px;" /></a>
 </div>
 </div>
 <p>The light curve looks much flatter. Unfortunately there is a portion of the light curve that is very noisy, due to a jitter in the TESS spacecraft. We can remove this simply by masking the light curve. First we’ll select the times that had the jitter.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -795,7 +846,7 @@ div.rendered_html tbody tr:hover {
 </div>
 <p>Then we can just clip those times out.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -808,12 +859,12 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_35_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_35_0.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_39_0.png"><img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_39_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_39_0.png" style="width: 766px; height: 368px;" /></a>
 </div>
 </div>
 <p>We can use <em>Lightkurve</em> to plot these two light curves over each other to see the difference.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -821,7 +872,7 @@ div.rendered_html tbody tr:hover {
 <span class="n">ax</span> <span class="o">=</span> <span class="n">flat_lc</span><span class="o">.</span><span class="n">errorbar</span><span class="p">()</span>
 
 <span class="c1"># Pass that axis to the next plot</span>
-<span class="n">masked_lc</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">);</span>
+<span class="n">masked_lc</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;masked&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
@@ -829,12 +880,12 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_37_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_37_0.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_41_0.png"><img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_41_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_41_0.png" style="width: 755px; height: 368px;" /></a>
 </div>
 </div>
 <p>This looks much better. Now we might want to clip out some outliers from the light curve. We can do that with a simple lightkurve function <code class="docutils literal notranslate"><span class="pre">remove_outliers()</span></code></p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -847,12 +898,12 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_39_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_39_0.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_43_0.png"><img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_43_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_43_0.png" style="width: 776px; height: 368px;" /></a>
 </div>
 </div>
 <p>It’s a little hard to see these data because of the plotting style. Let’s use a scatter plot instead. We can do this with the <code class="docutils literal notranslate"><span class="pre">lc.scatter()</span></code> method. This method works in the same way that <code class="docutils literal notranslate"><span class="pre">matplotlib.pyplot.scatter</span></code> works, and takes in the same keyword arguments.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -864,12 +915,12 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_41_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_41_0.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_45_0.png"><img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_45_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_45_0.png" style="width: 766px; height: 369px;" /></a>
 </div>
 </div>
 <p>We can also add errorbars using the <code class="docutils literal notranslate"><span class="pre">lc.errorbar()</span></code> method.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -882,12 +933,12 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_43_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_43_0.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_47_0.png"><img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_47_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_47_0.png" style="width: 766px; height: 369px;" /></a>
 </div>
 </div>
 <p>Finally let’s use <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> to fold the data at the exoplanet orbital period and see if we can see the transit.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -900,12 +951,12 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_45_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_45_0.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_49_0.png"><img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_49_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_49_0.png" style="width: 776px; height: 368px;" /></a>
 </div>
 </div>
 <p>It looks like there’s something there, but it’s hard to see. Let’s bin the light curve to reduce the number of points, but also reduce the uncertainty of those points.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -918,13 +969,13 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_47_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_47_0.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_51_0.png"><img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_51_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_51_0.png" style="width: 779px; height: 386px;" /></a>
 </div>
 </div>
 <p>And now we can see the transit of Pi Men c!</p>
 <p>Note that you can actually do all these steps in just a few lines:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -938,7 +989,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_49_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_49_0.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_53_0.png"><img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_53_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_53_0.png" style="width: 779px; height: 386px;" /></a>
 </div>
 </div>
 </div>
@@ -946,7 +997,7 @@ div.rendered_html tbody tr:hover {
 <h2>Comparing two apertures<a class="headerlink" href="#Comparing-two-apertures" title="Permalink to this headline">¶</a></h2>
 <p>In the above tutorial we used our own aperture instead of the pipeline aperture. Let’s compare the results from using these two different apertures.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -961,7 +1012,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -974,7 +1025,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_52_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_52_0.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_56_0.png"><img alt="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_56_0.png" src="../_images/tutorials_02-how-to-recover-the-first-tess-candidate_56_0.png" style="width: 790px; height: 386px;" /></a>
 </div>
 </div>
 <p>The importance of using different aperture masks is clearly visible in the figure above. Note however that the data archive at MAST also contains lightcurve products which have more advanced systematics removal methods applied. We will explore those in a future tutorial!</p>
@@ -988,7 +1039,7 @@ div.rendered_html tbody tr:hover {
     <p class="text-center">
       
         Created with ♥ by the Lightkurve collaboration.
-                      Please <a href="about/citing.html">cite us</a> or
+                      Please <a href="/about/citing.html">cite us</a> or
                       <a href="https://github.com/KeplerGO/Lightkurve">join us on GitHub.</a>
       
     </p>

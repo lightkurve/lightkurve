@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.1</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.2</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -301,7 +301,7 @@ div.rendered_html tbody tr:hover {
 <p>The background flux level of Kepler pixel data is not static. In particular, certain CCD channels occasionally experience the ‘rolling band’ effect, where the background has a strong time varying component of a ‘band’ moving up the detector. You can read more about rolling band in the <a class="reference external" href="https://archive.stsci.edu/kepler/manuals/KSCI-19033-001.pdf">Kepler Instrument Handbook</a>. An example of the rolling band artifact is shown in the video below. You can see the band move through the superstamp at
 the 2 second mark, leaving the bottom of the screen at the 6 second mark.</p>
 <p><img alt="image0" src="../_images/rollingband.gif" /></p>
-<p>The rolling band artifact is small, up to about 20 counts per pixel. However, this can add up for large apertures containing many pixels or for faint, quiet targets.</p>
+<p>The rolling band artifact is small, up to about 20 counts per pixel. However, this signal can add up to significant levels for large apertures containing many pixels or for faint, quiet targets.</p>
 <p>Rolling band can often add spurious signals into your data which look like real astrophysical variability. The best way to spot rolling band is to vary your aperture size. If the signal strength increases as you increase the number of background pixels in the aperture, the effect is likely to be an additive background component.</p>
 <p>Below we will show you how to check for rolling band. First let’s import <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> and download a target.</p>
 <div class="nbinput nblast docutils container">
@@ -321,7 +321,7 @@ the 2 second mark, leaving the bottom of the screen at the 6 second mark.</p>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpf</span> <span class="o">=</span> <span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s1">&#39;7691027&#39;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<span></span><span class="n">tpf</span> <span class="o">=</span> <span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s1">&#39;KIC 7691027&#39;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -338,7 +338,7 @@ the 2 second mark, leaving the bottom of the screen at the 6 second mark.</p>
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_04-identify-rolling-band_6_0.png"><img alt="../_images/tutorials_04-identify-rolling-band_6_0.png" src="../_images/tutorials_04-identify-rolling-band_6_0.png" style="width: 523px; height: 401px;" /></a>
+<a class="reference internal image-reference" href="../_images/tutorials_04-identify-rolling-band_6_0.png"><img alt="../_images/tutorials_04-identify-rolling-band_6_0.png" src="../_images/tutorials_04-identify-rolling-band_6_0.png" style="width: 526px; height: 401px;" /></a>
 </div>
 </div>
 <p>This looks like a fairly normal Target Pixel File. Let’s take a look at the light curve.</p>
@@ -384,7 +384,7 @@ the 2 second mark, leaving the bottom of the screen at the 6 second mark.</p>
 </pre></div>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
-<span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x1c27eb0f98&gt;
+<span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x1c1d040a58&gt;
 </pre></div>
 </div>
 </div>
@@ -392,7 +392,7 @@ the 2 second mark, leaving the bottom of the screen at the 6 second mark.</p>
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_04-identify-rolling-band_10_1.png"><img alt="../_images/tutorials_04-identify-rolling-band_10_1.png" src="../_images/tutorials_04-identify-rolling-band_10_1.png" style="width: 523px; height: 401px;" /></a>
+<a class="reference internal image-reference" href="../_images/tutorials_04-identify-rolling-band_10_1.png"><img alt="../_images/tutorials_04-identify-rolling-band_10_1.png" src="../_images/tutorials_04-identify-rolling-band_10_1.png" style="width: 526px; height: 401px;" /></a>
 </div>
 </div>
 <p>The mask avoids the center pixels. Let’s create a light curve the same way as above. However, this time we’re going to divide by the number of pixels in the aperture to give the the <strong>average background flux per pixel.</strong></p>
@@ -405,16 +405,7 @@ the 2 second mark, leaving the bottom of the screen at the 6 second mark.</p>
 <span class="n">bkg_lc</span> <span class="o">/=</span> <span class="n">npix</span>  <span class="c1"># Convert to electrons per second per pixel</span>
 
 <span class="n">ax</span> <span class="o">=</span> <span class="n">bkg_lc</span><span class="o">.</span><span class="n">remove_outliers</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Average Flux Per Background Pixel&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
-</pre></div>
-</div>
-<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
-<span></span>Text(0.5, 1.0, &#39;Average Flux Per Background Pixel&#39;)
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Average Flux Per Background Pixel&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
@@ -422,28 +413,19 @@ the 2 second mark, leaving the bottom of the screen at the 6 second mark.</p>
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_04-identify-rolling-band_12_1.png"><img alt="../_images/tutorials_04-identify-rolling-band_12_1.png" src="../_images/tutorials_04-identify-rolling-band_12_1.png" style="width: 737px; height: 390px;" /></a>
+<a class="reference internal image-reference" href="../_images/tutorials_04-identify-rolling-band_12_0.png"><img alt="../_images/tutorials_04-identify-rolling-band_12_0.png" src="../_images/tutorials_04-identify-rolling-band_12_0.png" style="width: 737px; height: 390px;" /></a>
 </div>
 </div>
 <p>It looks like the signal is still there in the background pixels. Unfortunately this means the signal is not astrophysical.</p>
 <p>We can perform another test by looking at the background in a nearby source. Using the <code class="docutils literal notranslate"><span class="pre">search_targetpixelfile</span></code> function we can get the nearest neighbor to our target. We first set a search radius in arcseconds and a limit on the number of targets to return. In this case we only want our target and the nearest neighbour within 60 arcseconds, so we’ll set <code class="docutils literal notranslate"><span class="pre">radius</span></code> to 60 and <code class="docutils literal notranslate"><span class="pre">limit</span></code> to 2 targets.</p>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpfs</span> <span class="o">=</span> <span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s1">&#39;7691027&#39;</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">download_all</span><span class="p">()</span>
+<span></span><span class="n">tpfs</span> <span class="o">=</span> <span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s1">&#39;KIC 7691027&#39;</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">download_all</span><span class="p">()</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-/Users/obsidian/anaconda3/envs/lightkurve_base/lib/python3.6/site-packages/astroquery/utils/commons.py:171: UserWarning: Coordinate string is being interpreted as an ICRS coordinate provided in degrees.
-  warnings.warn(&#34;Coordinate string is being interpreted as an &#34;
-</pre></div></div>
 </div>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
@@ -460,8 +442,8 @@ the 2 second mark, leaving the bottom of the screen at the 6 second mark.</p>
 </div>
 <div class="output_area highlight-none notranslate"><div class="highlight"><pre>
 <span></span>TargetPixelFileCollection of 2 objects:
-KeplerTargetPixelFile Object (ID: 7691027)
-KeplerTargetPixelFile Object (ID: 7691061)
+    7691027 (1 KeplerTargetPixelFiles) Quarters: 16
+    7691061 (1 KeplerTargetPixelFiles) Quarters: 16
 </pre></div>
 </div>
 </div>
@@ -526,7 +508,7 @@ TPFs are 9.5 Pixels Apart
     <p class="text-center">
       
         Created with ♥ by the Lightkurve collaboration.
-                      Please <a href="about/citing.html">cite us</a> or
+                      Please <a href="/about/citing.html">cite us</a> or
                       <a href="https://github.com/KeplerGO/Lightkurve">join us on GitHub.</a>
       
     </p>

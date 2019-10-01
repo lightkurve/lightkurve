@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.1</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.2</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -297,14 +297,10 @@ div.rendered_html tbody tr:hover {
 </div>
 <br style="clear:both;"><div class="section" id="Interactively-inspecting-Target-Pixel-Files-and-Lightcurves">
 <h1>Interactively inspecting Target Pixel Files and Lightcurves<a class="headerlink" href="#Interactively-inspecting-Target-Pixel-Files-and-Lightcurves" title="Permalink to this headline">¶</a></h1>
-<p>One of the most common questions we get at the Kepler/K2 Guest Observer Office is “I see a noise blip in my K2 lightcurve. Is it real or instrumental?” Answering the question usually entails ticking through our (long, incomplete) mental list of conceivable, sometimes exotic instrumental artifacts. Space-craft induced periodic motion. Rolling band. Cosmic Rays. Collateral cosmic rays. Smear. Sudden pixel sensitivity dropouts. Fine-guidance-sensor cross talk. Regular cross talk. <a class="reference external" href="https://twitter.com/gully_/status/941707161058586624">Sweater
-fuzzy</a>.</p>
-<p>In this tutorial we introduce and explain the <code class="docutils literal notranslate"><span class="pre">tpf.interact()</span></code> tool that accomplishes the goal of interactively inspecting the TPFs and lightcurve simultaneously.</p>
-<div class="section" id="Pixel-selection">
-<h2>Pixel selection<a class="headerlink" href="#Pixel-selection" title="Permalink to this headline">¶</a></h2>
-<p>We have recently extended <code class="docutils literal notranslate"><span class="pre">.interact()</span></code> to offer instantaneous interactive selection of the pixel mask. You can now click on individual pixels and the aperture photometry updates. The mask can be defined with either individual clicking of pixels, or clicking and dragging a box over a rectangular set of pixels. <em>De</em>selection of individual pixels also works– simply re-click a pixel that you wish to take away from your mask.</p>
+<p><code class="docutils literal notranslate"><span class="pre">.interact()</span></code> offers instantaneous interactive selection of the pixel mask, and instantaneous generation of the resulting lightcurve. You can click on individual pixels and the aperture photometry seamlessly updates. The mask can be defined with either individual clicking of pixels, or clicking and dragging a box over a rectangular set of pixels. <em>De</em>selection of individual pixels also works– simply re-click a pixel that you wish to take away from your mask. Finally, you can save your mask
+and lightcurve as a fits file by clicking on the <code class="docutils literal notranslate"><span class="pre">Save</span> <span class="pre">Lightcurve</span></code> button.</p>
 <p>The default mask is the Kepler “pipeline” mask, and can be modified as described above.</p>
-</div>
+<p>In this tutorial we introduce and explain the <code class="docutils literal notranslate"><span class="pre">tpf.interact()</span></code> tool that accomplishes the goal of interactively inspecting the TPFs and lightcurve simultaneously.</p>
 <div class="section" id="The-.interact()-method-applies-to-target-pixel-files.">
 <h2>The <code class="docutils literal notranslate"><span class="pre">.interact()</span></code> method applies to target pixel files.<a class="headerlink" href="#The-.interact()-method-applies-to-target-pixel-files." title="Permalink to this headline">¶</a></h2>
 <p>Using interact should be as simple as downloading a Kepler Target Pixel File (TPF) and running the method <code class="docutils literal notranslate"><span class="pre">.interact()</span></code>. This method can only be run in a Jupyter Notebook at the moment, and is limited to lightcurves with fewer than 30000 cadences.</p>
@@ -315,7 +311,7 @@ fuzzy</a>.</p>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">lightkurve</span> <span class="k">import</span> <span class="n">search_targetpixelfile</span>
-<span class="n">tpf</span> <span class="o">=</span> <span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s2">&quot;HL Tau&quot;</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="mi">13</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<span class="n">tpf</span> <span class="o">=</span> <span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s2">&quot;HL Tau&quot;</span><span class="p">,</span> <span class="n">mission</span><span class="o">=</span><span class="s1">&#39;K2&#39;</span><span class="p">,</span> <span class="n">campaign</span><span class="o">=</span><span class="mi">13</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -344,7 +340,7 @@ fuzzy</a>.</p>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">tpf</span> <span class="o">=</span> <span class="n">search_targetpixelfile</span><span class="p">(</span><span class="mi">3248033</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
+<span></span><span class="n">tpf</span> <span class="o">=</span> <span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s1">&#39;KIC 3248033&#39;</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -385,7 +381,7 @@ var element = document.currentScript.previousSibling.previousSibling;
 
   var force = true;
 
-  if (typeof (root._bokeh_onload_callbacks) === "undefined" || force === true) {
+  if (typeof root._bokeh_onload_callbacks === "undefined" || force === true) {
     root._bokeh_onload_callbacks = [];
     root._bokeh_is_loading = undefined;
   }
@@ -552,47 +548,76 @@ var element = document.currentScript.previousSibling.previousSibling;
 
   function run_callbacks() {
     try {
-      root._bokeh_onload_callbacks.forEach(function(callback) { callback() });
-    }
-    finally {
+      root._bokeh_onload_callbacks.forEach(function(callback) {
+        if (callback != null)
+          callback();
+      });
+    } finally {
       delete root._bokeh_onload_callbacks
     }
-    console.info("Bokeh: all callbacks have finished");
+    console.debug("Bokeh: all callbacks have finished");
   }
 
-  function load_libs(js_urls, callback) {
+  function load_libs(css_urls, js_urls, callback) {
+    if (css_urls == null) css_urls = [];
+    if (js_urls == null) js_urls = [];
+
     root._bokeh_onload_callbacks.push(callback);
     if (root._bokeh_is_loading > 0) {
-      console.log("Bokeh: BokehJS is being loaded, scheduling callback at", now());
+      console.debug("Bokeh: BokehJS is being loaded, scheduling callback at", now());
       return null;
     }
     if (js_urls == null || js_urls.length === 0) {
       run_callbacks();
       return null;
     }
-    console.log("Bokeh: BokehJS not loaded, scheduling load and callback at", now());
-    root._bokeh_is_loading = js_urls.length;
+    console.debug("Bokeh: BokehJS not loaded, scheduling load and callback at", now());
+    root._bokeh_is_loading = css_urls.length + js_urls.length;
+
+    function on_load() {
+      root._bokeh_is_loading--;
+      if (root._bokeh_is_loading === 0) {
+        console.debug("Bokeh: all BokehJS libraries/stylesheets loaded");
+        run_callbacks()
+      }
+    }
+
+    function on_error() {
+      console.error("failed to load " + url);
+    }
+
+    for (var i = 0; i < css_urls.length; i++) {
+      var url = css_urls[i];
+      const element = document.createElement("link");
+      element.onload = on_load;
+      element.onerror = on_error;
+      element.rel = "stylesheet";
+      element.type = "text/css";
+      element.href = url;
+      console.debug("Bokeh: injecting link tag for BokehJS stylesheet: ", url);
+      document.body.appendChild(element);
+    }
+
     for (var i = 0; i < js_urls.length; i++) {
       var url = js_urls[i];
-      var s = document.createElement('script');
-      s.src = url;
-      s.async = false;
-      s.onreadystatechange = s.onload = function() {
-        root._bokeh_is_loading--;
-        if (root._bokeh_is_loading === 0) {
-          console.log("Bokeh: all BokehJS libraries loaded");
-          run_callbacks()
-        }
-      };
-      s.onerror = function() {
-        console.warn("failed to load library " + url);
-      };
-      console.log("Bokeh: injecting script tag for BokehJS library: ", url);
-      document.getElementsByTagName("head")[0].appendChild(s);
+      var element = document.createElement('script');
+      element.onload = on_load;
+      element.onerror = on_error;
+      element.async = false;
+      element.src = url;
+      console.debug("Bokeh: injecting script tag for BokehJS library: ", url);
+      document.head.appendChild(element);
     }
   };
 
-  var js_urls = ["https://cdn.pydata.org/bokeh/release/bokeh-1.0.2.min.js", "https://cdn.pydata.org/bokeh/release/bokeh-widgets-1.0.2.min.js", "https://cdn.pydata.org/bokeh/release/bokeh-tables-1.0.2.min.js", "https://cdn.pydata.org/bokeh/release/bokeh-gl-1.0.2.min.js"];
+  function inject_raw_css(css) {
+    const element = document.createElement("style");
+    element.appendChild(document.createTextNode(css));
+    document.body.appendChild(element);
+  }
+
+  var js_urls = ["https://cdn.pydata.org/bokeh/release/bokeh-1.3.4.min.js", "https://cdn.pydata.org/bokeh/release/bokeh-widgets-1.3.4.min.js", "https://cdn.pydata.org/bokeh/release/bokeh-tables-1.3.4.min.js", "https://cdn.pydata.org/bokeh/release/bokeh-gl-1.3.4.min.js"];
+  var css_urls = [];
 
   var inline_js = [
     function(Bokeh) {
@@ -602,14 +627,7 @@ var element = document.currentScript.previousSibling.previousSibling;
     function(Bokeh) {
 
     },
-    function(Bokeh) {
-      console.log("Bokeh: injecting CSS: https://cdn.pydata.org/bokeh/release/bokeh-1.0.2.min.css");
-      Bokeh.embed.inject_css("https://cdn.pydata.org/bokeh/release/bokeh-1.0.2.min.css");
-      console.log("Bokeh: injecting CSS: https://cdn.pydata.org/bokeh/release/bokeh-widgets-1.0.2.min.css");
-      Bokeh.embed.inject_css("https://cdn.pydata.org/bokeh/release/bokeh-widgets-1.0.2.min.css");
-      console.log("Bokeh: injecting CSS: https://cdn.pydata.org/bokeh/release/bokeh-tables-1.0.2.min.css");
-      Bokeh.embed.inject_css("https://cdn.pydata.org/bokeh/release/bokeh-tables-1.0.2.min.css");
-    }
+    function(Bokeh) {} // ensure no trailing comma for IE
   ];
 
   function run_inline_js() {
@@ -630,11 +648,11 @@ var element = document.currentScript.previousSibling.previousSibling;
   }
 
   if (root._bokeh_is_loading === 0) {
-    console.log("Bokeh: BokehJS loaded, going straight to plotting");
+    console.debug("Bokeh: BokehJS loaded, going straight to plotting");
     run_inline_js();
   } else {
-    load_libs(js_urls, function() {
-      console.log("Bokeh: BokehJS plotting callback run at", now());
+    load_libs(css_urls, js_urls, function() {
+      console.debug("Bokeh: BokehJS plotting callback run at", now());
       run_inline_js();
     });
   }
@@ -645,19 +663,24 @@ var element = document.currentScript.previousSibling.previousSibling;
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area rendered_html docutils container">
-<script src="http://localhost:55190/autoload.js?bokeh-autoload-element=1001&bokeh-absolute-url=http://localhost:55190&resources=none" id="1001"></script></div>
+<script src="http://localhost:57766/autoload.js?bokeh-autoload-element=1001&bokeh-absolute-url=http://localhost:57766&resources=none" id="1001"></script></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-ERROR:bokeh.server.views.ws:Refusing websocket connection from Origin &#39;http://localhost:8888&#39;;                       use --allow-websocket-origin=localhost:8888 to permit this; currently we allow origins {&#39;localhost:4321&#39;}
-WARNING:tornado.access:403 GET /ws?bokeh-protocol-version=1.0&amp;bokeh-session-id=KSh6DrNHkfFp6F1GHhvqu0BGG2pP54LZ54sKSnaazovo (::1) 6.41ms
+WARNING:bokeh.core.validation.check:W-1005 (FIXED_SIZING_MODE): &#39;fixed&#39; sizing mode requires width and height to be set: RangeSlider(id=&#39;1100&#39;, ...)
+ERROR:bokeh.server.views.ws:Refusing websocket connection from Origin &#39;http://localhost:8888&#39;;                       use --allow-websocket-origin=localhost:8888 or set BOKEH_ALLOW_WS_ORIGIN=localhost:8888 to permit this; currently we allow origins {&#39;localhost:4321&#39;}
+WARNING:tornado.access:403 GET /ws?bokeh-protocol-version=1.0&amp;bokeh-session-id=ardZrnrfsd8q5MzWfkALHMpa0NqWPgoPKIpLsuHEoqVJ (::1) 1.16ms
 </pre></div></div>
 </div>
-<p>Other unexpected behaviors can occur in interact. For example, when resetting the image views the revised plot scaling may not display the data. Attempting to de-select with a box will cause unexpected toggling of pixels. De-selection only works with the tap tool, so box-selections should use caution not to overlap with existing pixels. Short cadence lightcurves do not work with interact at the moment. There is no way to save the generated mask at the moment. If you would like to see a way to
-export masks, please upvote our <a class="reference external" href="https://github.com/KeplerGO/lightkurve/issues/265">GitHub Issue about mask generation with interact</a>.</p>
+<p>Other unexpected behaviors can occur in interact. For example, when resetting the image views the revised plot scaling may not display the data. Attempting to de-select with a box will cause unexpected toggling of pixels. De-selection only works with the tap tool, so box-selections should use caution not to overlap with existing pixels. Surprisingly, de-selection does not work for the most-recently added pixel. Lightcurves with more than 30,000 cadences require either an increase in the
+<code class="docutils literal notranslate"><span class="pre">max_cadences</span></code> kwarg, or slicing of your input TPF like so:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tpf</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1000</span><span class="p">,]</span><span class="o">.</span><span class="n">interact</span><span class="p">()</span>
+<span class="n">tpf</span><span class="o">.</span><span class="n">interact</span><span class="p">(</span><span class="n">max_cadences</span><span class="o">=</span><span class="mi">40000</span><span class="p">)</span>
+</pre></div>
+</div>
 <p>We are continuing to improve interact. We welcome any feedback about the tool or feature requests. You can <a class="reference external" href="https://keplerscience.arc.nasa.gov/helpdesk.html">email us</a> or <a class="reference external" href="https://github.com/KeplerGO/lightkurve/issues">open an Issue on our lightkurve GitHub repository</a>.</p>
 <p>Finally, we’d like to thank the developers of <a class="reference external" href="https://bokeh.pydata.org/en/latest/">Bokeh</a>, upon which interact relies.</p>
 </div>
@@ -670,7 +693,7 @@ export masks, please upvote our <a class="reference external" href="https://gith
     <p class="text-center">
       
         Created with ♥ by the Lightkurve collaboration.
-                      Please <a href="about/citing.html">cite us</a> or
+                      Please <a href="/about/citing.html">cite us</a> or
                       <a href="https://github.com/KeplerGO/Lightkurve">join us on GitHub.</a>
       
     </p>

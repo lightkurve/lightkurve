@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.1</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.2</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -92,8 +92,8 @@
     
   <div class="section" id="full-changelog">
 <span id="changelog"></span><h1>Full changelog<a class="headerlink" href="#full-changelog" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="unreleased">
-<h2>1.2.0 (unreleased)<a class="headerlink" href="#unreleased" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h2>1.2.0 (2019-10-01)<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Added <code class="xref py py-obj docutils literal notranslate"><span class="pre">flux_unit</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">flux_quantity</span></code> properties to the <code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code> class
 to enable users to keep track of a light curve’s flux units. [#591]</p></li>
@@ -107,13 +107,15 @@ light curve by default. [#591]</p></li>
 <li><p>Changed <code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.normalize()</span></code> to emit a warning if the light curve appears
 to be zero-centered. [#589]</p></li>
 <li><p>Fixed an issue which caused the search functions to be incompatible with the
-current development version of astroquery (v0.3.10). [#598]</p></li>
+latest version of astroquery (v0.3.10). [#598]</p></li>
 <li><p>Added support for performing mathematical operations involving <code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code>
 objects, e.g. two <code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code> objects can now be added together. [#532]</p></li>
+<li><p>Updated the online tutorials (<a class="reference external" href="https://docs.lightkurve.org/tutorials">https://docs.lightkurve.org/tutorials</a>) to
+take all recent Lightkurve API changes into account. [#596]</p></li>
 </ul>
 </div>
-<div class="section" id="id1">
-<h2>1.1.1 (2019-08-19)<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id2">
+<h2>1.1.1 (2019-08-19)<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>Lightkurve v1.1.1 is a bugfix release which includes the following changes:</p>
 <ul class="simple">
 <li><p>Changed <code class="xref py py-obj docutils literal notranslate"><span class="pre">search_targetpixelfile()</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">search_lightcurvefile()</span></code> to emit a
@@ -132,8 +134,8 @@ Lightkurve to receive the “code quality A” certification by codacy.com.
 [#557, #560, #564, #565, #566, #568, #573, #574, #575]</p></li>
 </ul>
 </div>
-<div class="section" id="id2">
-<h2>1.1.0 (2019-07-19)<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id3">
+<h2>1.1.0 (2019-07-19)<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Added the <a class="reference internal" href="../api/seismology.html#module-lightkurve.seismology" title="lightkurve.seismology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.seismology</span></code></a> sub-package which enables quick-look
 asteroseismic quantities to be extracted from <code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code> objects. [#496]</p></li>
@@ -168,8 +170,8 @@ parameter. [#514]</p></li>
 AstroPy Quantity object. [#521]</p></li>
 </ul>
 </div>
-<div class="section" id="id3">
-<h2>1.0.1 (2019-05-20)<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id4">
+<h2>1.0.1 (2019-05-20)<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <p>This is a minor bugfix release containing the following improvements:</p>
 <ul class="simple">
 <li><p>Fixed minor bugs in <code class="docutils literal notranslate"><span class="pre">PLDCorrector.correct()</span></code> [#498],
@@ -183,8 +185,8 @@ if the download cache contains a corrupt file. [#512]</p></li>
 <li><p>Switched continuous integration from Travis/Appveyor to Azure pipelines. [#497]</p></li>
 </ul>
 </div>
-<div class="section" id="id4">
-<h2>1.0.0 (2019-04-08)<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id5">
+<h2>1.0.0 (2019-04-08)<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
 <p>This is the first stable release of Lightkurve.  It was prepared with the help
 of 45 contributors!</p>
 <p>This release contains major changes to the <code class="docutils literal notranslate"><span class="pre">LombScarglePeriodogram</span></code> class:</p>
@@ -264,7 +266,7 @@ MAST TessCut service. [#434]</p></li>
 <h2>1.0b26 (2019-02-04)<a class="headerlink" href="#b26-2019-02-04" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Introduced a new layout for the
-<a href="#id5"><span class="problematic" id="id6">``</span></a>online documentation &lt;<a class="reference external" href="https://docs.lightkurve.org">https://docs.lightkurve.org</a>&gt;``_. [#360, #400, #406]</p></li>
+<a href="#id6"><span class="problematic" id="id7">``</span></a>online documentation &lt;<a class="reference external" href="https://docs.lightkurve.org">https://docs.lightkurve.org</a>&gt;``_. [#360, #400, #406]</p></li>
 <li><p>Added <code class="docutils literal notranslate"><span class="pre">LightCurve.interact_bls()</span></code>: an interactive Bokeh widget to find
 planets using the Box Least Squares (BLS) method. [#401]</p></li>
 <li><p>Added <code class="docutils literal notranslate"><span class="pre">LombScarglePeriodogram</span></code> and <code class="docutils literal notranslate"><span class="pre">BoxLeastSquarePeriodogam</span></code> sub-classes
@@ -390,7 +392,7 @@ properties must be a noun [#286].  As a result, we renamed the following methods
     <p class="text-center">
       
         Created with ♥ by the Lightkurve collaboration.
-                      Please <a href="about/citing.html">cite us</a> or
+                      Please <a href="/about/citing.html">cite us</a> or
                       <a href="https://github.com/KeplerGO/Lightkurve">join us on GitHub.</a>
       
     </p>

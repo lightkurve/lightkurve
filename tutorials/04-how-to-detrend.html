@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.1</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.2</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -305,7 +305,7 @@ div.rendered_html tbody tr:hover {
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">lightkurve</span> <span class="k">import</span> <span class="n">search_lightcurvefile</span>
-<span class="n">lcf</span> <span class="o">=</span> <span class="n">search_lightcurvefile</span><span class="p">(</span><span class="mi">247887989</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>  <span class="c1"># returns a KeplerLightCurveFile</span>
+<span class="n">lcf</span> <span class="o">=</span> <span class="n">search_lightcurvefile</span><span class="p">(</span><span class="s1">&#39;EPIC 247887989&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span>  <span class="c1"># returns a KeplerLightCurveFile</span>
 <span class="n">lc</span> <span class="o">=</span> <span class="n">lcf</span><span class="o">.</span><span class="n">PDCSAP_FLUX</span>                               <span class="c1"># returns a KeplerLightCurve</span>
 
 <span class="c1">#Remove nans and outliers</span>
@@ -329,7 +329,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_04-how-to-detrend_3_0.png" src="../_images/tutorials_04-how-to-detrend_3_0.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_04-how-to-detrend_3_0.png"><img alt="../_images/tutorials_04-how-to-detrend_3_0.png" src="../_images/tutorials_04-how-to-detrend_3_0.png" style="width: 760px; height: 373px;" /></a>
 </div>
 </div>
 <p>This light curve is of the object <a class="reference external" href="https://exoplanetarchive.ipac.caltech.edu/cgi-bin/DisplayOverview/nph-DisplayOverview?objname=K2-133+b&amp;type=CONFIRMED_PLANET">K2-133b</a>, which has a period of 3.0712 days. Let’s plot the folded version of it to see what it looks like.</p>
@@ -346,19 +346,19 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_04-how-to-detrend_5_0.png" src="../_images/tutorials_04-how-to-detrend_5_0.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_04-how-to-detrend_5_0.png"><img alt="../_images/tutorials_04-how-to-detrend_5_0.png" src="../_images/tutorials_04-how-to-detrend_5_0.png" style="width: 755px; height: 373px;" /></a>
 </div>
 </div>
-<p>We can see the hint of an exoplanet transit close to the center, but the motion of the spacecraft has made it difficult to make out above the noise. We can use the <code class="docutils literal notranslate"><span class="pre">correct</span></code> function on the lightcurve to remove this motion. An in-depth look into how the algorithm works can be found <a class="reference external" href="http://lightkurve.keplerscience.org/tutorials/motion-correction/replicate-vanderburg-2014-k2sff.html">here</a>. You can pass the following keywords to the <code class="docutils literal notranslate"><span class="pre">correct</span></code> function:</p>
+<p>We can see the hint of an exoplanet transit close to the center, but the motion of the spacecraft has made it difficult to make out above the noise. We can use the <code class="docutils literal notranslate"><span class="pre">correct</span></code> function on the lightcurve to remove this motion. An in-depth look into how the algorithm works can be found <a class="reference external" href="https://docs.lightkurve.org/tutorials/04-replicate-vanderburg-2014-k2sff.html">here</a>. You can pass the following keywords to the <code class="docutils literal notranslate"><span class="pre">correct</span></code> function:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">polyorder</span></code> : <em>int</em> Degree of the polynomial which will be used to fit one centroid as a function of the other.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">niters</span></code> : <em>int</em> Number of iterations</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">bins</span></code> : <em>int</em> Number of bins to be used to create the piece-wise interpolation of arclength vs flux correction.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">windows</span></code> : <em>int</em> Number of windows to subdivide the data. The SFF algorithm is run independently in each window.</p></li>
 </ul>
-<p>This <a class="reference external" href="gully-tutorial">tutorial</a> will teach you more about how to tune these parameters. For this problem, we will use the defaults, but increase the number of windows to 20.</p>
+<p>This <a class="reference external" href="https://docs.lightkurve.org/tutorials/04-replicate-vanderburg-2014-lightkurve.html">tutorial</a> will teach you more about how to tune these parameters. For this problem, we will use the defaults, but increase the number of windows to 20.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -368,7 +368,7 @@ div.rendered_html tbody tr:hover {
 </div>
 <p>Now when we compare the two light curves we can see the clear signal from the exoplanet.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -381,9 +381,10 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_04-how-to-detrend_9_0.png" src="../_images/tutorials_04-how-to-detrend_9_0.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_04-how-to-detrend_9_0.png"><img alt="../_images/tutorials_04-how-to-detrend_9_0.png" src="../_images/tutorials_04-how-to-detrend_9_0.png" style="width: 755px; height: 373px;" /></a>
 </div>
 </div>
+<p>Voilà! Correcting motion systematics can vastly improve the signal-to-noise ratio in your lightcurve.</p>
 </div>
 
 
@@ -393,7 +394,7 @@ div.rendered_html tbody tr:hover {
     <p class="text-center">
       
         Created with ♥ by the Lightkurve collaboration.
-                      Please <a href="about/citing.html">cite us</a> or
+                      Please <a href="/about/citing.html">cite us</a> or
                       <a href="https://github.com/KeplerGO/Lightkurve">join us on GitHub.</a>
       
     </p>

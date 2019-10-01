@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.1</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.2</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -420,12 +420,12 @@ Can be either power spectral density (<code class="xref py py-obj docutils liter
 <dt id="lightkurve.periodogram.LombScarglePeriodogram.plot">
 <code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">scale='linear'</em>, <em class="sig-param">ax=None</em>, <em class="sig-param">xlabel=None</em>, <em class="sig-param">ylabel=None</em>, <em class="sig-param">title=''</em>, <em class="sig-param">style='lightkurve'</em>, <em class="sig-param">view=None</em>, <em class="sig-param">unit=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.periodogram.LombScarglePeriodogram.plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots the Periodogram.</p>
-<dl class="field-list simple">
+<dl class="field-list">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><dl class="simple">
+<dd class="field-odd"><dl>
 <dt><strong>scale: str</strong></dt><dd><p>Set x,y axis to be “linear” or “log”. Default is linear.</p>
 </dd>
-<dt><strong>ax</strong><span class="classifier">matplotlib.axes._subplots.AxesSubplot</span></dt><dd><p>A matplotlib axes object to plot into. If no axes is provided,
+<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.1.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>A matplotlib axes object to plot into. If no axes is provided,
 a new one will be generated.</p>
 </dd>
 <dt><strong>xlabel</strong><span class="classifier">str</span></dt><dd><p>Plot x axis label</p>
@@ -447,8 +447,8 @@ period and ‘log’ scale.</p>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><dl class="simple">
-<dt><strong>ax</strong><span class="classifier">matplotlib.axes._subplots.AxesSubplot</span></dt><dd><p>The matplotlib axes object.</p>
+<dd class="field-even"><dl>
+<dt><strong>ax</strong><span class="classifier"><a class="reference external" href="https://matplotlib.org/api/axes_api.html#matplotlib.axes.Axes" title="(in Matplotlib v3.1.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Axes</span></code></a></span></dt><dd><p>The matplotlib axes object.</p>
 </dd>
 </dl>
 </dd>
@@ -539,7 +539,7 @@ has been smoothed.</p>
 <dl class="field-list">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><dl>
-<dt><strong>table</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v4.0.dev527)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> object</span></dt><dd><p>An AstroPy Table with columns ‘frequency’, ‘period’, and ‘power’.</p>
+<dt><strong>table</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v4.0.dev919)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Table</span></code></a> object</span></dt><dd><p>An AstroPy Table with columns ‘frequency’, ‘period’, and ‘power’.</p>
 </dd>
 </dl>
 </dd>
@@ -557,7 +557,7 @@ has been smoothed.</p>
     <p class="text-center">
       
         Created with ♥ by the Lightkurve collaboration.
-                      Please <a href="about/citing.html">cite us</a> or
+                      Please <a href="/about/citing.html">cite us</a> or
                       <a href="https://github.com/KeplerGO/Lightkurve">join us on GitHub.</a>
       
     </p>

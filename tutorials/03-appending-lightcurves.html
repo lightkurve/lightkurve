@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.1</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.2</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -297,19 +297,22 @@ div.rendered_html tbody tr:hover {
 </div>
 <br style="clear:both;"><div class="section" id="How-to-combine-lightcurves-from-different-Kepler-quarters">
 <h1>How to combine lightcurves from different Kepler quarters<a class="headerlink" href="#How-to-combine-lightcurves-from-different-Kepler-quarters" title="Permalink to this headline">¶</a></h1>
-<p>The Kepler mission took 17 quarters of continuous observations on the same targets. For applications such as finding long period planets or asteroseismology it is useful to be able to turn these quarters into one long light curve. We can do this using lightkurve’s <code class="docutils literal notranslate"><span class="pre">append</span></code> function. The append function is called by doing</p>
+<p>The Kepler mission took 17 quarters of continuous observations on the same targets. For applications such as finding long period planets or asteroseismology it is useful to be able to turn these quarters into one long light curve. For a small number of pre-processed lightcurves you can simply append lightcurves together, which returns a <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">stitched_lc</span> <span class="o">=</span> <span class="n">lc1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lc2</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>It works in the same way as appending a list in python.</p>
+<p>For a larger number of lightcurve quarters or sectors, you can use a convenience method <code class="docutils literal notranslate"><span class="pre">.stitch()</span></code> that operates on a <code class="docutils literal notranslate"><span class="pre">LightCurveCollection</span></code> object:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lc_collection</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">LightCurveCollection</span><span class="p">([</span><span class="n">lc1</span><span class="p">,</span> <span class="n">lc2</span><span class="p">])</span>
+<span class="n">stitched_lc</span> <span class="o">=</span> <span class="n">lc_collection</span><span class="o">.</span><span class="n">stitch</span><span class="p">()</span>
+</pre></div>
+</div>
 <p>Below is an example of how to stitch together all the quarters for the exoplanet target Kepler-8b.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">lightkurve</span> <span class="k">import</span> <span class="n">search_lightcurvefile</span>
-<span class="n">target</span> <span class="o">=</span> <span class="s1">&#39;Kepler-8b&#39;</span>
+<span></span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
 </pre></div>
 </div>
 </div>
@@ -318,92 +321,123 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lc</span> <span class="o">=</span> <span class="n">search_lightcurvefile</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span><span class="o">.</span><span class="n">PDCSAP_FLUX</span>
-<span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">17</span><span class="p">):</span>
-    <span class="n">lc</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">search_lightcurvefile</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="n">q</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span><span class="o">.</span><span class="n">PDCSAP_FLUX</span><span class="p">)</span>
+<span></span><span class="n">lcfs</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_lightcurvefile</span><span class="p">(</span><span class="s1">&#39;Kepler-8b&#39;</span><span class="p">,</span> <span class="n">mission</span><span class="o">=</span><span class="s1">&#39;Kepler&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">download_all</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
-<p>Above we have created a <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> object from the first quarter of the data, choosing to use the PDCSAP_FLUX. Then we have looped through all the quarters, appending each new light curve to the fist one. We can plot this new <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code> using the <code class="docutils literal notranslate"><span class="pre">plot</span></code> function (and all the other functions from previous tutorials will work too!)</p>
+<p>We downloaded all the quarters in one fell swoop, resulting in a collection of <code class="docutils literal notranslate"><span class="pre">LightCurveFile</span></code> objects</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lc</span><span class="o">.</span><span class="n">scatter</span><span class="p">();</span>
+<span></span><span class="n">lcfs</span>
 </pre></div>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
 </div>
-<div class="output_area docutils container">
-<img alt="../_images/tutorials_03-appending-lightcurves_5_0.png" src="../_images/tutorials_03-appending-lightcurves_5_0.png" />
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>LightCurveFileCollection of 18 objects:
+    KIC 6922244 (18 KeplerLightCurveFiles) Quarters: 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17
+</pre></div>
 </div>
 </div>
-<p>Unfortunately, as the light fell on difference pixels in each quarter and the spacecraft changed temperature during observation, these light curves all have difference offsets. We can remove them by normalizing each light curve before we append it. We can do this with the lightkurve function <code class="docutils literal notranslate"><span class="pre">normalize</span></code>.</p>
-<div class="nbinput nblast docutils container">
+<p>Each of those <code class="docutils literal notranslate"><span class="pre">LightCurveFile</span></code> objects also has PDCSAP and SAP data products available:</p>
+<div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lc</span> <span class="o">=</span> <span class="n">search_lightcurvefile</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span><span class="o">.</span><span class="n">PDCSAP_FLUX</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
-<span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">8</span><span class="p">):</span>
-    <span class="n">lc</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">search_lightcurvefile</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="n">q</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span><span class="o">.</span><span class="n">PDCSAP_FLUX</span><span class="o">.</span><span class="n">normalize</span><span class="p">())</span>
+<span></span><span class="n">lcfs</span><span class="o">.</span><span class="n">PDCSAP_FLUX</span>
 </pre></div>
 </div>
 </div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>LightCurveCollection of 18 objects:
+    KIC 6922244 (18 KeplerLightCurves) Quarters: 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17
+</pre></div>
+</div>
+</div>
+<p>We can stitch all the lightcurves in the <code class="docutils literal notranslate"><span class="pre">LightCurveCollection</span></code> using the <code class="docutils literal notranslate"><span class="pre">stitch()</span></code> method:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lc</span><span class="o">.</span><span class="n">scatter</span><span class="p">();</span>
+<span></span><span class="n">stitched_lc</span> <span class="o">=</span> <span class="n">lcfs</span><span class="o">.</span><span class="n">PDCSAP_FLUX</span><span class="o">.</span><span class="n">stitch</span><span class="p">()</span>
+<span class="n">stitched_lc</span>
 </pre></div>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
 </div>
-<div class="output_area docutils container">
-<img alt="../_images/tutorials_03-appending-lightcurves_8_0.png" src="../_images/tutorials_03-appending-lightcurves_8_0.png" />
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>KeplerLightCurve(ID: 6922244)
+</pre></div>
 </div>
 </div>
-<p>Now that the light curves are normalized they don’t have significant offsets. However, there are clear long term trends in some of the early quarters of the data. We can remove this using lightkurve’s <code class="docutils literal notranslate"><span class="pre">flatten</span></code> method before appending each object.</p>
-<div class="nbinput nblast docutils container">
+<div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lc</span> <span class="o">=</span> <span class="n">search_lightcurvefile</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span><span class="o">.</span><span class="n">PDCSAP_FLUX</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">window_length</span><span class="o">=</span><span class="mi">401</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">8</span><span class="p">):</span>
-    <span class="n">lc</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">search_lightcurvefile</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">quarter</span><span class="o">=</span><span class="n">q</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span><span class="o">.</span><span class="n">PDCSAP_FLUX</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">window_length</span><span class="o">=</span><span class="mi">401</span><span class="p">))</span>
+<span></span><span class="n">stitched_lc</span><span class="o">.</span><span class="n">scatter</span><span class="p">();</span>
 </pre></div>
 </div>
 </div>
-<div class="nbinput docutils container">
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<a class="reference internal image-reference" href="../_images/tutorials_03-appending-lightcurves_10_0.png"><img alt="../_images/tutorials_03-appending-lightcurves_10_0.png" src="../_images/tutorials_03-appending-lightcurves_10_0.png" style="width: 755px; height: 375px;" /></a>
+</div>
+</div>
+<p>The early quarters of the data show some clear long term wiggle-like trends. We can remove those wiggles by applying a “corrector function” to each lightcurve segment before stitching.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">corrector_func</span></code> input is a lightcurve and the output is an optionally processed lightcurve.</p>
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lc</span><span class="o">.</span><span class="n">scatter</span><span class="p">();</span>
+<span></span><span class="k">def</span> <span class="nf">my_custom_corrector_func</span><span class="p">(</span><span class="n">lc</span><span class="p">):</span>
+    <span class="n">corrected_lc</span> <span class="o">=</span> <span class="n">lc</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">window_length</span><span class="o">=</span><span class="mi">401</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">corrected_lc</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../_images/tutorials_03-appending-lightcurves_11_0.png" src="../_images/tutorials_03-appending-lightcurves_11_0.png" />
-</div>
-</div>
-<p>Now all of the light curves stitch together with no visible join. We can use the <code class="docutils literal notranslate"><span class="pre">fold</span></code> and <code class="docutils literal notranslate"><span class="pre">bin</span></code> methods to form a planet transit out of all of the data for Kepler-8b.</p>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mf">3.52254</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mf">1.35</span><span class="p">)</span><span class="o">.</span><span class="n">bin</span><span class="p">()</span><span class="o">.</span><span class="n">scatter</span><span class="p">();</span>
+<span></span><span class="n">stitched_lc</span> <span class="o">=</span> <span class="n">lcfs</span><span class="o">.</span><span class="n">PDCSAP_FLUX</span><span class="o">.</span><span class="n">stitch</span><span class="p">(</span><span class="n">corrector_func</span><span class="o">=</span><span class="n">my_custom_corrector_func</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">stitched_lc</span><span class="o">.</span><span class="n">scatter</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x1c212daa90&gt;
 </pre></div>
 </div>
 </div>
@@ -411,9 +445,54 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/tutorials_03-appending-lightcurves_13_0.png" src="../_images/tutorials_03-appending-lightcurves_13_0.png" />
+<a class="reference internal image-reference" href="../_images/tutorials_03-appending-lightcurves_14_1.png"><img alt="../_images/tutorials_03-appending-lightcurves_14_1.png" src="../_images/tutorials_03-appending-lightcurves_14_1.png" style="width: 755px; height: 368px;" /></a>
 </div>
 </div>
+<p>Nice! The wiggle systematic is gone and all of the light curves stitch together with no visible join. We can use the <code class="docutils literal notranslate"><span class="pre">fold</span></code> and <code class="docutils literal notranslate"><span class="pre">bin</span></code> methods to form a planet transit out of all of the data for Kepler-8b.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">stitched_lc</span><span class="o">.</span><span class="n">fold</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="mf">3.52254</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mf">1.35</span><span class="p">)</span><span class="o">.</span><span class="n">bin</span><span class="p">()</span><span class="o">.</span><span class="n">scatter</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<a class="reference internal image-reference" href="../_images/tutorials_03-appending-lightcurves_16_0.png"><img alt="../_images/tutorials_03-appending-lightcurves_16_0.png" src="../_images/tutorials_03-appending-lightcurves_16_0.png" style="width: 755px; height: 368px;" /></a>
+</div>
+</div>
+<p>Wow! The high quality transit lightcurve looks almost like a theoretical planet transit model.</p>
+<p>Just out of curiosity, we can see what the raw <code class="docutils literal notranslate"><span class="pre">SAP</span></code> flux looks like in comparison by passing a corrector function that returns the raw input lightcurve unchanged.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">lcfs</span><span class="o">.</span><span class="n">SAP_FLUX</span><span class="o">.</span><span class="n">stitch</span><span class="p">(</span><span class="n">corrector_func</span><span class="o">=</span><span class="k">lambda</span> <span class="n">lc</span><span class="p">:</span><span class="n">lc</span><span class="p">)</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x1c21ae4da0&gt;
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<a class="reference internal image-reference" href="../_images/tutorials_03-appending-lightcurves_19_1.png"><img alt="../_images/tutorials_03-appending-lightcurves_19_1.png" src="../_images/tutorials_03-appending-lightcurves_19_1.png" style="width: 764px; height: 368px;" /></a>
+</div>
+</div>
+<p>The raw simple aperture photometry contains many uncorrected systematic effects.</p>
 </div>
 
 
@@ -423,7 +502,7 @@ div.rendered_html tbody tr:hover {
     <p class="text-center">
       
         Created with ♥ by the Lightkurve collaboration.
-                      Please <a href="about/citing.html">cite us</a> or
+                      Please <a href="/about/citing.html">cite us</a> or
                       <a href="https://github.com/KeplerGO/Lightkurve">join us on GitHub.</a>
       
     </p>

@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.1</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.2</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -308,6 +308,7 @@ div.rendered_html tbody tr:hover {
 <span></span><span class="o">%</span><span class="k">matplotlib</span> inline
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">astropy.io</span> <span class="k">import</span> <span class="n">fits</span>
 </pre></div>
 </div>
 </div>
@@ -331,13 +332,14 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
-<p>We saved the mask for this target in <a class="reference external" href="replicate-vanderburg-2014-k2sff.ipynb">our previous notebook</a>, so we can just load it directly.</p>
+<p>We chose the preferred mask for this target in <a class="reference external" href="replicate-vanderburg-2014-k2sff.ipynb">our previous notebook</a>, so we can just use a condensed version of the same code we saw there.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">VDB_J_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;VDB_J_2014_mask.npy&#39;</span><span class="p">)</span>
+<span></span><span class="n">path</span> <span class="o">=</span> <span class="s1">&#39;http://archive.stsci.edu/hlsps/k2sff/cet/060000000/21426/hlsp_k2sff_k2_lightcurve_060021426-cet_kepler_v1_llc.fits&#39;</span>
+<span class="n">VDB_J_mask</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">)[</span><span class="s1">&#39;PRF_APER_TBL&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">7</span><span class="p">,:,</span> <span class="p">:]</span> <span class="o">==</span> <span class="kc">True</span>
 </pre></div>
 </div>
 </div>
@@ -356,7 +358,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_04-replicate-vanderburg-2014-lightkurve_7_0.png"><img alt="../_images/tutorials_04-replicate-vanderburg-2014-lightkurve_7_0.png" src="../_images/tutorials_04-replicate-vanderburg-2014-lightkurve_7_0.png" style="width: 496px; height: 401px;" /></a>
+<a class="reference internal image-reference" href="../_images/tutorials_04-replicate-vanderburg-2014-lightkurve_7_0.png"><img alt="../_images/tutorials_04-replicate-vanderburg-2014-lightkurve_7_0.png" src="../_images/tutorials_04-replicate-vanderburg-2014-lightkurve_7_0.png" style="width: 524px; height: 401px;" /></a>
 </div>
 </div>
 <p>The Vanderburg and Johnson mask is slightly bigger than the Kepler pipeline mask.</p>
@@ -412,7 +414,7 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">sff</span> <span class="o">=</span> <span class="n">SFFCorrector</span><span class="p">()</span>
+<span></span><span class="n">sff</span> <span class="o">=</span> <span class="n">SFFCorrector</span><span class="p">(</span><span class="n">lc</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -421,8 +423,7 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">lc_corrected</span> <span class="o">=</span> <span class="n">sff</span><span class="o">.</span><span class="n">correct</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">lc</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="n">lc</span><span class="o">.</span><span class="n">centroid_col</span><span class="p">,</span> <span class="n">lc</span><span class="o">.</span><span class="n">centroid_row</span><span class="p">,</span>
-                           <span class="n">niters</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">windows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">polyorder</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span></span><span class="n">lc_corrected</span> <span class="o">=</span> <span class="n">sff</span><span class="o">.</span><span class="n">correct</span><span class="p">(</span><span class="n">lc</span><span class="o">.</span><span class="n">centroid_col</span><span class="p">,</span> <span class="n">lc</span><span class="o">.</span><span class="n">centroid_row</span><span class="p">,</span> <span class="n">niters</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">windows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">polyorder</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -431,7 +432,7 @@ div.rendered_html tbody tr:hover {
 <div class="line">Future <code class="docutils literal notranslate"><span class="pre">lightkurve</span></code> releases may return the trend by default.</div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -440,7 +441,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -469,7 +470,7 @@ div.rendered_html tbody tr:hover {
 <p>Neat! The raw flux slope looks steeper than the publication figure, perhaps owing to different choices in aperture mask, background subtraction, or other subtle differences. But overall the corrected flux looks very similar to the result obtained in <strong>Figure 5</strong>.</p>
 <p>You can look at other diagnostics of the SFF correction with some convenience functions.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -481,24 +482,15 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_04-replicate-vanderburg-2014-lightkurve_23_0.png"><img alt="../_images/tutorials_04-replicate-vanderburg-2014-lightkurve_23_0.png" src="../_images/tutorials_04-replicate-vanderburg-2014-lightkurve_23_0.png" style="width: 409px; height: 265px;" /></a>
+<a class="reference internal image-reference" href="../_images/tutorials_04-replicate-vanderburg-2014-lightkurve_23_0.png"><img alt="../_images/tutorials_04-replicate-vanderburg-2014-lightkurve_23_0.png" src="../_images/tutorials_04-replicate-vanderburg-2014-lightkurve_23_0.png" style="width: 407px; height: 263px;" /></a>
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">sff</span><span class="o">.</span><span class="n">_plot_rotated_centroids</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
-</pre></div>
-</div>
-<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
-<span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x1c29d26358&gt;
+<span></span><span class="n">sff</span><span class="o">.</span><span class="n">_plot_rotated_centroids</span><span class="p">();</span>
 </pre></div>
 </div>
 </div>
@@ -506,7 +498,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<a class="reference internal image-reference" href="../_images/tutorials_04-replicate-vanderburg-2014-lightkurve_24_1.png"><img alt="../_images/tutorials_04-replicate-vanderburg-2014-lightkurve_24_1.png" src="../_images/tutorials_04-replicate-vanderburg-2014-lightkurve_24_1.png" style="width: 420px; height: 263px;" /></a>
+<a class="reference internal image-reference" href="../_images/tutorials_04-replicate-vanderburg-2014-lightkurve_24_0.png"><img alt="../_images/tutorials_04-replicate-vanderburg-2014-lightkurve_24_0.png" src="../_images/tutorials_04-replicate-vanderburg-2014-lightkurve_24_0.png" style="width: 420px; height: 261px;" /></a>
 </div>
 </div>
 <p><em>The end.</em></p>
@@ -520,7 +512,7 @@ div.rendered_html tbody tr:hover {
     <p class="text-center">
       
         Created with ♥ by the Lightkurve collaboration.
-                      Please <a href="about/citing.html">cite us</a> or
+                      Please <a href="/about/citing.html">cite us</a> or
                       <a href="https://github.com/KeplerGO/Lightkurve">join us on GitHub.</a>
       
     </p>
