@@ -13,6 +13,8 @@ from . import utils, stellar_estimators
 from ..periodogram import SNRPeriodogram
 from ..utils import LightkurveWarning, validate_method
 
+from scipy.signal import find_peaks
+
 log = logging.getLogger(__name__)
 
 __all__ = ['Seismology']
@@ -94,6 +96,7 @@ class Seismology(object):
             except AttributeError:
                 raise AttributeError("You need to call `Seismology.estimate_deltanu()` first.")
         return deltanu
+
 
     def plot_echelle(self, deltanu=None, numax=None,
                      minimum_frequency=None, maximum_frequency=None,
@@ -210,17 +213,25 @@ class Seismology(object):
         ff = freq[int(fmin/fs)-x0:int(fmax/fs)-x0] # Selected frequency range
         pp = power[int(fmin/fs)-x0:int(fmax/fs)-x0] # Power range
 
-        n_rows = int((ff[-1]-ff[0])/deltanu) # Number of stacks to use
-        n_columns = int(deltanu/fs)          # Number of elements in each stack
-
         # Reshape the power into n_rows of n_columns
-        ep = np.reshape(pp[:(n_rows*n_columns)], (n_rows, n_columns))
+        #  Must start and end where the modulus approximately equals zero,
+        #  Otherwise you get a phase shift from the correct (x,y) extents
+        # This implementation will truncate any partially-filled rows.
+
+        mod_zeros = find_peaks( -1.0*(ff % deltanu) )[0]
+        start, approx_end = mod_zeros[0], mod_zeros[-1]
+        approx_samples = (approx_end - start)
+        n_rows = len(mod_zeros) - 1
+        n_columns =  approx_samples // n_rows
+        end = start + n_columns*n_rows
+
+        ep = np.reshape(pp[start : end], (n_rows, n_columns))
 
         if scale=='log':
             ep = np.log10(ep)
 
         #Reshape the freq into n_rowss of n_columnss & create arays
-        ef = np.reshape(ff[:(n_rows*n_columns)],(n_rows,n_columns))
+        ef = np.reshape(ff[start : end], (n_rows, n_columns))
         x_f = ((ef[0,:]-ef[0,0]) % deltanu)
         y_f = (ef[:,0])
 
@@ -233,8 +244,10 @@ class Seismology(object):
             b = (extent[3] - extent[2]) / (extent[1] - extent[0])
             vmin = np.nanpercentile(ep.value, 1)
             vmax = np.nanpercentile(ep.value, 99)
+
             im = ax.imshow(ep.value, cmap=cmap, aspect=a/b, origin='lower',
-                      extent=extent, vmin=vmin, vmax=vmax)
+                        extent=extent, vmin=vmin, vmax=vmax)
+
             cbar = plt.colorbar(im, ax=ax, extend='both', pad=.01)
 
 
