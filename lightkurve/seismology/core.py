@@ -214,15 +214,28 @@ class Seismology(object):
         pp = power[int(fmin/fs)-x0:int(fmax/fs)-x0] # Power range
 
         # Reshape the power into n_rows of n_columns
-        #  Must start and end where the modulus approximately equals zero,
-        #  Otherwise you get a phase shift from the correct (x,y) extents
-        # This implementation will truncate any partially-filled rows.
-
+        #  When modulus ~ zero, deltanu divides into frequency without remainder
         mod_zeros = find_peaks( -1.0*(ff % deltanu) )[0]
-        start, approx_end = mod_zeros[0], mod_zeros[-1]
-        approx_samples = (approx_end - start)
+
+        # The bottom left corner of the plot is the lowest frequency that
+        # divides into deltanu with almost zero remainder
+        start = mod_zeros[0]
+
+        # The top left corner of the plot is the highest frequency that
+        # divides into deltanu with almost zero remainder.  This index is the
+        # approximate end, because we fix an integer number of rows and columns
+        approx_end = mod_zeros[-1]
+
+        # The number of rows is the number of times you can partition your
+        #  frequency range into chunks of size deltanu, start and ending at
+        #  frequencies that divide nearly evenly into deltanu
         n_rows = len(mod_zeros) - 1
-        n_columns =  approx_samples // n_rows
+
+        # The number of columns is the total number of frequency points divided
+        #  by the number of rows, floor divided to the nearest integer value
+        n_columns =  int( (approx_end - start) / n_rows )
+
+        # The exact end point is therefore the ncolumns*nrows away from the start
         end = start + n_columns*n_rows
 
         ep = np.reshape(pp[start : end], (n_rows, n_columns))
