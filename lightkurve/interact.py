@@ -269,7 +269,7 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
     return fig, r
 
 
-def make_tpf_figure_elements(tpf, tpf_source, pedestal=0, fiducial_frame=None,
+def make_tpf_figure_elements(tpf, tpf_source, pedestal=None, fiducial_frame=None,
                              plot_width=370, plot_height=340):
     """Returns the lightcurve figure elements.
 
@@ -279,18 +279,21 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=0, fiducial_frame=None,
         TPF to show.
     tpf_source : bokeh.plotting.ColumnDataSource
         TPF data source.
+    pedestal: float
+        A scalar value to be added to the TPF flux values, often to avoid
+        taking the log of a negative number in colorbars.
+        Defaults to `-min(tpf.flux) + 1`
     fiducial_frame: int
         The tpf slice to start with by default, it is assumed the WCS
         is exact for this frame.
-    pedestal: float
-        A scalar value to be added to the TPF flux values, often to avoid
-        taking the log of a negative number in colorbars
-
 
     Returns
     -------
     fig, stretch_slider : bokeh.plotting.figure.Figure, RangeSlider
     """
+    if pedestal is None:
+        pedestal = -np.nanmin(tpf.flux) + 1
+
     if tpf.mission in ['Kepler', 'K2']:
         title = 'Pixel data (CCD {}.{})'.format(tpf.module, tpf.output)
     elif tpf.mission == 'TESS':
@@ -308,11 +311,11 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=0, fiducial_frame=None,
     fig.yaxis.axis_label = 'Pixel Row Number'
     fig.xaxis.axis_label = 'Pixel Column Number'
 
-    vlo, lo, hi, vhi = np.nanpercentile(tpf.flux - pedestal, [0.2, 1, 95, 99.8])
+    vlo, lo, hi, vhi = np.nanpercentile(tpf.flux + pedestal, [0.2, 1, 95, 99.8])
     vstep = (np.log10(vhi) - np.log10(vlo)) / 300.0  # assumes counts >> 1.0!
     color_mapper = LogColorMapper(palette="Viridis256", low=lo, high=hi)
 
-    fig.image([tpf.flux[fiducial_frame, :, :] - pedestal], x=tpf.column, y=tpf.row,
+    fig.image([tpf.flux[fiducial_frame, :, :] + pedestal], x=tpf.column, y=tpf.row,
               dw=tpf.shape[2], dh=tpf.shape[1], dilate=True,
               color_mapper=color_mapper, name="tpfimg")
 
@@ -344,6 +347,7 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=0, fiducial_frame=None,
                                  value=(np.log10(lo), np.log10(hi)),
                                  orientation='horizontal',
                                  width=200,
+                                 height=10,
                                  direction='ltr',
                                  show_value=True,
                                  sizing_mode='fixed',
@@ -442,7 +446,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
         fig_lc, vertical_line = make_lightcurve_figure_elements(lc, lc_source)
 
         # Create the TPF figure and its stretch slider
-        pedestal = np.nanmin(tpf.flux)
+        pedestal = -np.nanmin(tpf.flux) + 1
         fig_tpf, stretch_slider = make_tpf_figure_elements(tpf, tpf_source,
                                                            pedestal=pedestal,
                                                            fiducial_frame=0)
@@ -492,7 +496,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
             if new in tpf.cadenceno:
                 frameno = tpf_index_lookup[new]
                 fig_tpf.select('tpfimg')[0].data_source.data['image'] = \
-                    [tpf.flux[frameno, :, :] - pedestal]
+                    [tpf.flux[frameno, :, :] + pedestal]
                 vertical_line.update(location=tpf.time[frameno])
             else:
                 fig_tpf.select('tpfimg')[0].data_source.data['image'] = \
@@ -603,9 +607,7 @@ def show_skyview_widget(tpf, notebook_url='localhost:8888', magnitude_limit=18):
         tpf_source = None
 
         # Create the TPF figure and its stretch slider
-        pedestal = np.nanmin(tpf.flux)
         fig_tpf, stretch_slider = make_tpf_figure_elements(tpf, tpf_source,
-                                                pedestal=pedestal,
                                                 fiducial_frame=fiducial_frame,
                                                 plot_width=640, plot_height=600)
         fig_tpf, r = add_gaia_figure_elements(tpf, fig_tpf,
