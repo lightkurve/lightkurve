@@ -472,8 +472,54 @@ class TargetPixelFile(object):
             closest_label = labels[closest_arg[0], closest_arg[1]]
             return labels == closest_label
 
-    def estimate_centroids(self, aperture_mask='pipeline'):
-        """Returns centroid positions estimated using sample moments.
+    def estimate_centroids(self, aperture_mask='pipeline', method='moments'):
+        """Returns centroid positions.
+
+        Parameters
+        ----------
+        aperture_mask : array-like, 'pipeline', or 'all'
+            A boolean array describing the aperture such that `True` means
+            that the pixel will be used.
+            If None or 'all' are passed, all pixels will be used.
+            If 'pipeline' is passed, the mask suggested by the official pipeline
+            will be returned.
+            If 'threshold' is passed, all pixels brighter than 3-sigma above
+            the median flux will be used.
+        method : str, 'moments' or 'quadratic'
+            Defines which method to use to estimate the centroids. 'moments'
+            computes the centroid based on the sample moments of the data.
+            'quadratic' approximates the data as a 2d polynomial and returns
+            the coordinate of the peak flux.  Refer to Vakili, M., & Hogg, D. W. 2016, ArXiv, 1610.05873,
+            for the details of the 'quadratic' method.
+
+        Returns
+        -------
+        col_centr, row_centr : tuple
+            Arrays containing centroids for column and row at each cadence
+        """
+        if method == 'moments':
+            aperture_mask = self._parse_aperture_mask(aperture_mask)
+            yy, xx = np.indices(self.shape[1:]) + 0.5
+            yy = self.row + yy
+            xx = self.column + xx
+            total_flux = np.nansum(self.flux[:, aperture_mask], axis=1)
+            with warnings.catch_warnings():
+                # RuntimeWarnings may occur below if total_flux contains zeros
+                warnings.simplefilter("ignore", RuntimeWarning)
+                col_centr = np.nansum(xx * aperture_mask * self.flux, axis=(1, 2)) / total_flux
+                row_centr = np.nansum(yy * aperture_mask * self.flux, axis=(1, 2)) / total_flux
+        elif method == 'quadratic':
+            col_centr, row_centr = self._estimate_centroids_via_quadratic(aperture_mask=aperture_mask)
+        else:
+            raise ValueError("centroid method {} is not supported.".format(method))
+        return col_centr, row_centr
+
+    def _estimate_centroids_via_quadratic(self, aperture_mask='pipeline'):
+        """
+        This function approximates a star profile by a second order polynomial
+        and returns the coordinate of the peak flux.  For the mathematical
+        motivation and the details around this technique, please refer to
+        Vakili, M., & Hogg, D. W. 2016, ArXiv, 1610.05873.
 
         Parameters
         ----------
@@ -492,15 +538,42 @@ class TargetPixelFile(object):
             Arrays containing centroids for column and row at each cadence
         """
         aperture_mask = self._parse_aperture_mask(aperture_mask)
-        yy, xx = np.indices(self.shape[1:]) + 0.5
-        yy = self.row + yy
-        xx = self.column + xx
-        total_flux = np.nansum(self.flux[:, aperture_mask], axis=1)
-        with warnings.catch_warnings():
-            # RuntimeWarnings may occur below if total_flux contains zeros
-            warnings.simplefilter("ignore", RuntimeWarning)
-            col_centr = np.nansum(xx * aperture_mask * self.flux, axis=(1, 2)) / total_flux
-            row_centr = np.nansum(yy * aperture_mask * self.flux, axis=(1, 2)) / total_flux
+        col_centr, row_centr = [], []
+        for i in range(len(self.time)):
+            data_mask = self.flux[i] * aperture_mask
+            arg_data_max = np.argmax(data_mask)
+            yy, xx = np.unravel_index(arg_data_max, data_mask.shape)
+            z_ = data_mask[yy-1:yy+2, xx-1:xx+2]
+            # our quadratic function is defined as
+            # f(x, y | a, b, c, d, e, f) := a + b * x + c * y + d * x^2 + e * xy + f * y^2
+            try:
+                a = (-z_[0,0] + 2*z_[0,1] - z_[0,2] + 2*z_[1,0] + 5*z_[1,1] + 2*z_[1,2] -
+                     z_[2,0] + 2*z_[2,1] - z_[2,2]) / 9
+                b = (-z_[0,0] - z_[0,1] - z_[0,2] + z_[2,0] + z_[2,1] + z_[2,2]) / 6
+                c = (-z_[0,0] + z_[0,2] - z_[1,0] + z_[1,2] - z_[2,0] + z_[2,2]) / 6
+                d = (z_[0,0] + z_[0,1] + z_[0,2] - z_[1,0]*2 - z_[1,1]*2 - z_[1,2]*2 +
+                     z_[2,0] + z_[2,1] + z_[2,2])/6
+                e = (z_[0,0] - z_[0,2] - z_[2,0] + z_[2,2]) * .25
+                f = (z_[0,0] - 2 * z_[0,1] + z_[0,2] + z_[1,0] - 2 * z_[1,1] + z_[1,2] +
+                     z_[2,0] - 2 * z_[2,1] + z_[2,2]) / 6
+            except IndexError:
+                row_centr.append(yy)
+                col_centr.append(xx)
+                continue
+            # see https://en.wikipedia.org/wiki/Quadratic_function
+            det = 4 * d * f - e ** 2
+            if abs(det) < 1e-6:
+                row_centr.append(yy)
+                col_centr.append(xx)
+                continue
+            xm = - (2 * f * b - c * e) / det
+            ym = - (2 * d * c - b * e) / det
+            col_centr.append(xx + xm)
+            row_centr.append(yy + ym)
+        # we add .5 to the arrays bellow because the convention is that
+        # pixels are centered at .5, 1.5, 2.5, ...
+        col_centr = np.asfarray(col_centr) + self.column + .5
+        row_centr = np.asfarray(row_centr) + self.row + .5
         return col_centr, row_centr
 
     def plot(self, ax=None, frame=0, cadenceno=None, bkg=False, aperture_mask=None,
@@ -924,7 +997,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         """'Kepler' or 'K2'. ('MISSION' header keyword)"""
         return self.get_keyword('MISSION')
 
-    def extract_aperture_photometry(self, aperture_mask='pipeline'):
+    def extract_aperture_photometry(self, aperture_mask='pipeline', centroid_method='moments'):
         """Returns a LightCurve obtained using aperture photometry.
 
         Parameters
@@ -937,6 +1010,9 @@ class KeplerTargetPixelFile(TargetPixelFile):
             will be returned.
             If 'threshold' is passed, all pixels brighter than 3-sigma above
             the median flux will be used.
+        centroid_method : str, 'moments' or 'quadratic'
+            For the details on this arguments, please refer to the documentation
+            for `TargetPixelFile.estimate_centroids`.
 
         Returns
         -------
@@ -947,7 +1023,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         aperture_mask = self._parse_aperture_mask(aperture_mask)
         if aperture_mask.sum() == 0:
             log.warning('Warning: aperture mask contains zero pixels.')
-        centroid_col, centroid_row = self.estimate_centroids(aperture_mask)
+        centroid_col, centroid_row = self.estimate_centroids(aperture_mask, method=centroid_method)
         # Ignore warnings related to zero or negative errors
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", RuntimeWarning)
@@ -1543,7 +1619,7 @@ class TessTargetPixelFile(TargetPixelFile):
         """Returns an AstroPy Time object for all good-quality cadences."""
         return btjd_to_astropy_time(btjd=self.time)
 
-    def extract_aperture_photometry(self, aperture_mask='pipeline'):
+    def extract_aperture_photometry(self, aperture_mask='pipeline', centroid_method='moments'):
         """Performs aperture photometry.
 
         Parameters
@@ -1553,6 +1629,9 @@ class TessTargetPixelFile(TargetPixelFile):
             that the pixel will be masked out.
             If the string 'all' is passed, all pixels will be used.
             The default behaviour is to use the TESS pipeline mask.
+        centroid_method : str, 'moments' or 'quadratic'
+            For the details on this arguments, please refer to the documentation
+            for `TargetPixelFile.estimate_centroids`.
         Returns
         -------
         lc : TessLightCurve object
@@ -1561,7 +1640,7 @@ class TessTargetPixelFile(TargetPixelFile):
         aperture_mask = self._parse_aperture_mask(aperture_mask)
         if aperture_mask.sum() == 0:
             log.warning('Warning: aperture mask contains zero pixels.')
-        centroid_col, centroid_row = self.estimate_centroids(aperture_mask)
+        centroid_col, centroid_row = self.estimate_centroids(aperture_mask, method=centroid_method)
         # Ignore warnings related to zero or negative errors
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", RuntimeWarning)
