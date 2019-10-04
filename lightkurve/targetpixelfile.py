@@ -515,11 +515,17 @@ class TargetPixelFile(object):
         return col_centr, row_centr
 
     def _estimate_centroids_via_quadratic(self, aperture_mask='pipeline'):
-        """
-        This function approximates a star profile by a second order polynomial
-        and returns the coordinate of the peak flux.  For the mathematical
-        motivation and the details around this technique, please refer to
-        Vakili, M., & Hogg, D. W. 2016, ArXiv, 1610.05873.
+        """Estimate centroids by fitting a 2D quadratic to the brightest pixels.
+
+        This method will fit a simple 2D second-order polynomial
+        $P(x, y) = a + bx + cy + dx^2 + exy + fy^2$
+        the the 3x3 patch of pixels centered on the brightest pixel within
+        the aperture mask.  This function approximates the core of the Point
+        Spread Function (PSF) using a bivariate quadratic function, and returns
+        the maximum (x, y) coordinate of the function using linear algebra.
+
+        For the motivation and the details around this technique, please refer
+        to Vakili, M., & Hogg, D. W. 2016, ArXiv, 1610.05873.
 
         Parameters
         ----------
@@ -535,32 +541,38 @@ class TargetPixelFile(object):
         Returns
         -------
         col_centr, row_centr : tuple
-            Arrays containing centroids for column and row at each cadence
+            Arrays containing centroids for column and row at each cadence.
         """
         aperture_mask = self._parse_aperture_mask(aperture_mask)
         col_centr, row_centr = [], []
         for i in range(len(self.time)):
+            # Step 1: identify the patch of 3x3 pixels (z_)
+            # that is centered on the brightest pixel (xx, yy)
             data_mask = self.flux[i] * aperture_mask
             arg_data_max = np.argmax(data_mask)
             yy, xx = np.unravel_index(arg_data_max, data_mask.shape)
             z_ = data_mask[yy-1:yy+2, xx-1:xx+2]
-            # our quadratic function is defined as
-            # f(x, y | a, b, c, d, e, f) := a + b * x + c * y + d * x^2 + e * xy + f * y^2
-            try:
-                a = (-z_[0,0] + 2*z_[0,1] - z_[0,2] + 2*z_[1,0] + 5*z_[1,1] + 2*z_[1,2] -
-                     z_[2,0] + 2*z_[2,1] - z_[2,2]) / 9
-                b = (-z_[0,0] - z_[0,1] - z_[0,2] + z_[2,0] + z_[2,1] + z_[2,2]) / 6
-                c = (-z_[0,0] + z_[0,2] - z_[1,0] + z_[1,2] - z_[2,0] + z_[2,2]) / 6
-                d = (z_[0,0] + z_[0,1] + z_[0,2] - z_[1,0]*2 - z_[1,1]*2 - z_[1,2]*2 +
-                     z_[2,0] + z_[2,1] + z_[2,2])/6
-                e = (z_[0,0] - z_[0,2] - z_[2,0] + z_[2,2]) * .25
-                f = (z_[0,0] - 2 * z_[0,1] + z_[0,2] + z_[1,0] - 2 * z_[1,1] + z_[1,2] +
-                     z_[2,0] - 2 * z_[2,1] + z_[2,2]) / 6
-            except IndexError:
-                row_centr.append(yy)
-                col_centr.append(xx)
-                continue
-            # see https://en.wikipedia.org/wiki/Quadratic_function
+
+            # Next, we fit a polynomial $P = a + bx + cy + dx^2 + exy + fy^2$
+            # using the design matrix A as defined by Equation 20 in 
+            # Vakili & Hogg (arxiv:1610.05873).  The columns in the design
+            # matrix contain the pixel coordinates: 1, x, y, x**2, xy, y**2.
+            A = np.array([[1, -1, -1, 1,  1, 1],
+                          [1,  0, -1, 0,  0, 1],
+                          [1,  1, -1, 1, -1, 1],
+                          [1, -1,  0, 1,  0, 0],
+                          [1,  0,  0, 0,  0, 0],
+                          [1,  1,  0, 1,  0, 0],
+                          [1, -1,  1, 1, -1, 1],
+                          [1,  0,  1, 0,  0, 1],
+                          [1,  1,  1, 1,  1, 1]])
+            # Next, we use the design matrix to find the best-fit polynomial
+            # coefficients using linear algebra (cf. Eqn 21 in Vakili1 & Hogg).
+            At = A.transpose()
+            X = np.linalg.inv(At @ A) @ At @ z_.flatten()
+            a, b, c, d, e, f = X
+
+            # Next, we can analytically find the function maximum:
             det = 4 * d * f - e ** 2
             if abs(det) < 1e-6:
                 row_centr.append(yy)
@@ -570,7 +582,8 @@ class TargetPixelFile(object):
             ym = - (2 * d * c - b * e) / det
             col_centr.append(xx + xm)
             row_centr.append(yy + ym)
-        # we add .5 to the arrays bellow because the convention is that
+
+        # Finally, we add .5 to the result bellow because the convention is that
         # pixels are centered at .5, 1.5, 2.5, ...
         col_centr = np.asfarray(col_centr) + self.column + .5
         row_centr = np.asfarray(row_centr) + self.row + .5

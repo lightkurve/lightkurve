@@ -22,8 +22,9 @@ from ..targetpixelfile import KeplerTargetPixelFile, KeplerTargetPixelFileFactor
 from ..targetpixelfile import TessTargetPixelFile
 from ..lightcurve import TessLightCurve
 from ..utils import LightkurveWarning
-from ..search import search_targetpixelfile
+from ..search import search_targetpixelfile, open
 
+from .test_synthetic_data import filename_synthetic_flat
 
 filename_tpf_all_zeros = get_pkg_data_filename("data/test-tpf-all-zeros.fits")
 filename_tpf_one_center = get_pkg_data_filename("data/test-tpf-non-zero-center.fits")
@@ -162,13 +163,13 @@ def test_wcs_tabby(method):
 
 
 def test_centroid_methods_consistency():
-    "Are the centroid methods consistent for a well behaved target?"
-    pixels = search_targetpixelfile("Kepler-10").download()
+    """Are the centroid methods consistent for a well behaved target?"""
+    pixels = open(filename_synthetic_flat)
     centr_moments = pixels.estimate_centroids(method='moments')
     centr_quadratic = pixels.estimate_centroids(method='quadratic')
-    # check that the maximum relative difference doesnt exceed 0.1%
-    assert np.max(np.abs(centr_moments[0] - centr_quadratic[0]) / centr_moments[0]) < 1e-3
-    assert np.max(np.abs(centr_moments[1] - centr_quadratic[1]) / centr_moments[1]) < 1e-3
+    # check that the maximum relative difference doesnt exceed 1%
+    assert np.max(np.abs(centr_moments[0] - centr_quadratic[0]) / centr_moments[0]) < 1e-2
+    assert np.max(np.abs(centr_moments[1] - centr_quadratic[1]) / centr_moments[1]) < 1e-2
 
 
 def test_astropy_time():
