@@ -519,7 +519,7 @@ class TargetPixelFile(object):
 
         This method will fit a simple 2D second-order polynomial
         $P(x, y) = a + bx + cy + dx^2 + exy + fy^2$
-        the the 3x3 patch of pixels centered on the brightest pixel within
+        the 3x3 patch of pixels centered on the brightest pixel within
         the aperture mask.  This function approximates the core of the Point
         Spread Function (PSF) using a bivariate quadratic function, and returns
         the maximum (x, y) coordinate of the function using linear algebra.
@@ -545,6 +545,25 @@ class TargetPixelFile(object):
         """
         aperture_mask = self._parse_aperture_mask(aperture_mask)
         col_centr, row_centr = [], []
+
+        # For each cadence (elow, we will fit the coefficients of the bivariate
+        # quadratic with the help of a design matrix (A) as defined by Eqn 20
+        # in Vakili & Hogg (arxiv:1610.05873). The design matrix contains a
+        # column of ones followed by pixel coordinates: x, y, x**2, xy, y**2.
+        A = np.array([[1, -1, -1, 1,  1, 1],
+                      [1,  0, -1, 0,  0, 1],
+                      [1,  1, -1, 1, -1, 1],
+                      [1, -1,  0, 1,  0, 0],
+                      [1,  0,  0, 0,  0, 0],
+                      [1,  1,  0, 1,  0, 0],
+                      [1, -1,  1, 1, -1, 1],
+                      [1,  0,  1, 0,  0, 1],
+                      [1,  1,  1, 1,  1, 1]])
+        # We also pre-compute $(A^t A)^-1 A^t$, cf. Eqn 21 in Vakili & Hogg.
+        At = A.transpose()
+        Aprime = np.linalg.inv(At @ A) @ At
+
+        # Loop through each cadence
         for i in range(len(self.time)):
             # Step 1: identify the patch of 3x3 pixels (z_)
             # that is centered on the brightest pixel (xx, yy)
@@ -553,26 +572,12 @@ class TargetPixelFile(object):
             yy, xx = np.unravel_index(arg_data_max, data_mask.shape)
             z_ = data_mask[yy-1:yy+2, xx-1:xx+2]
 
-            # Next, we fit a polynomial $P = a + bx + cy + dx^2 + exy + fy^2$
-            # using the design matrix A as defined by Equation 20 in 
-            # Vakili & Hogg (arxiv:1610.05873).  The columns in the design
-            # matrix contain the pixel coordinates: 1, x, y, x**2, xy, y**2.
-            A = np.array([[1, -1, -1, 1,  1, 1],
-                          [1,  0, -1, 0,  0, 1],
-                          [1,  1, -1, 1, -1, 1],
-                          [1, -1,  0, 1,  0, 0],
-                          [1,  0,  0, 0,  0, 0],
-                          [1,  1,  0, 1,  0, 0],
-                          [1, -1,  1, 1, -1, 1],
-                          [1,  0,  1, 0,  0, 1],
-                          [1,  1,  1, 1,  1, 1]])
-            # Next, we use the design matrix to find the best-fit polynomial
-            # coefficients using linear algebra (cf. Eqn 21 in Vakili1 & Hogg).
-            At = A.transpose()
-            X = np.linalg.inv(At @ A) @ At @ z_.flatten()
-            a, b, c, d, e, f = X
+            # Step 2: fit the polynomial $P = a + bx + cy + dx^2 + exy + fy^2$
+            # following Equation 21 in Vakili & Hogg.
+            a, b, c, d, e, f = Aprime @ z_.flatten()
 
-            # Next, we can analytically find the function maximum:
+            # Step 3: analytically find the function maximum,
+            # following https://en.wikipedia.org/wiki/Quadratic_function
             det = 4 * d * f - e ** 2
             if abs(det) < 1e-6:
                 row_centr.append(yy)
