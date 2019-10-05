@@ -22,7 +22,7 @@ from ..targetpixelfile import KeplerTargetPixelFile, KeplerTargetPixelFileFactor
 from ..targetpixelfile import TessTargetPixelFile
 from ..lightcurve import TessLightCurve
 from ..utils import LightkurveWarning
-from ..search import search_targetpixelfile, open
+from ..search import open as lkopen
 
 from .test_synthetic_data import filename_synthetic_flat
 
@@ -164,7 +164,7 @@ def test_wcs_tabby(method):
 
 def test_centroid_methods_consistency():
     """Are the centroid methods consistent for a well behaved target?"""
-    pixels = open(filename_synthetic_flat)
+    pixels = lkopen(filename_synthetic_flat)
     centr_moments = pixels.estimate_centroids(method='moments')
     centr_quadratic = pixels.estimate_centroids(method='quadratic')
     # check that the maximum relative difference doesnt exceed 1%
