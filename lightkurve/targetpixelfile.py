@@ -519,7 +519,7 @@ class TargetPixelFile(object):
 
         This method will fit a simple 2D second-order polynomial
         $P(x, y) = a + bx + cy + dx^2 + exy + fy^2$
-        the 3x3 patch of pixels centered on the brightest pixel within
+        to the 3x3 patch of pixels centered on the brightest pixel within
         the aperture mask.  This function approximates the core of the Point
         Spread Function (PSF) using a bivariate quadratic function, and returns
         the maximum (x, y) coordinate of the function using linear algebra.
