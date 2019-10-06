@@ -2,13 +2,14 @@
 import inspect
 import logging
 
+import matplotlib.pyplot as plt
 import numpy as np
 from astropy.stats import sigma_clip
 from sklearn import linear_model
 
 from .corrector import Corrector
 from .designmatrix import DesignMatrix, DesignMatrixCollection
-from ..lightcurve import LightCurve
+from ..lightcurve import LightCurve, MPLSTYLE
 from ..utils import validate_method
 
 __all__ = ['RegressionCorrector']
@@ -68,6 +69,9 @@ class RegressionCorrector(Corrector):
         self.model_lc = None
         self.diagnostic_lightcurves = None
 
+    def __repr__(self):
+        return 'RegressionCorrector (LC: {})'.format(self.lc.targetid)
+
     def _fit_coefficients(self, cadence_mask=None):
         """Fit the linear regression coefficients.
 
@@ -95,7 +99,7 @@ class RegressionCorrector(Corrector):
             and np.isfinite(self.lc.flux_err[cadence_mask]).all():
             args['sample_weight'] = 1. / self.lc.flux_err[cadence_mask]**2
 
-        self.model.fit(X=self.X.values,
+        self.model.fit(X=self.X.values[cadence_mask],
                        y=self.lc.flux[cadence_mask],
                        **args)
         return self.model.coef_
@@ -164,16 +168,24 @@ class RegressionCorrector(Corrector):
             lcs[submatrix.name] = LightCurve(self.lc.time, model_flux - np.median(model_flux), label=submatrix.name)
         return lcs
 
-    def diagnose(self):
+    def _diagnostic_plot(self):
         """ Produce diagnostic plots to assess the effectiveness of the correction. """
 
+        if not hasattr(self, 'corrected_lc'):
+            raise ValueError('Please run `correct` method before trying to diagnose.')
 
-        # SHOULD NOT BE CALLABLE BEFORE CORRECT
-        ax = self.lc.plot(normalize=False, label='Original', alpha=0.4)
-        for key in self.diagnostic_lightcurves.keys():
-            (self.diagnostic_lightcurves[key] + np.median(self.lc.flux)).plot(ax=ax)
+        with plt.style.context(MPLSTYLE):
+            fig, axs = plt.subplots(2, figsize=(10, 6), sharex=True)
+            ax = axs[0]
+            self.lc.plot(ax=ax, normalize=False, label='Original', alpha=0.4)
+            for key in self.diagnostic_lightcurves.keys():
+                (self.diagnostic_lightcurves[key] + np.median(self.lc.flux)).plot(ax=ax)
+            ax.set_xlabel('')
+            ax = axs[1]
+            self.lc.plot(ax=ax, normalize=False, alpha=0.2, label='Original')
+            self.corrected_lc[~self.cadence_mask].scatter(normalize=False, c='r', marker='x', s=10, label='Outliers', ax=ax)
+            self.corrected_lc.plot(normalize=False, label='Corrected', ax=ax, c='k')
+        return axs
 
-        ax = self.lc.plot(normalize=False, alpha=0.2, label='Original')
-        self.corrected_lc[~self.cadence_mask].scatter(normalize=False, c='r', marker='x', s=10, label='Outliers', ax=ax)
-        self.corrected_lc.plot(normalize=False, label='Corrected', ax=ax, c='k')
-        return
+    def diagnose(self):
+        self._diagnostic_plot()
