@@ -29,4 +29,3 @@ def test_sinusoid_noise():
         rc = RegressionCorrector(noisy_lc, dm, model=model, alpha=0)
         corrected_lc = rc.correct()
         assert_almost_equal(corrected_lc.normalize().flux, true_lc.flux)
-
