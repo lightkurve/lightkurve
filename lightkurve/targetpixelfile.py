@@ -27,7 +27,7 @@ from .lightcurve import KeplerLightCurve, TessLightCurve
 from .prf import KeplerPRF
 from .utils import KeplerQualityFlags, TessQualityFlags, \
                    plot_image, bkjd_to_astropy_time, btjd_to_astropy_time, \
-                   LightkurveWarning, detect_filetype
+                   LightkurveWarning, detect_filetype, validate_method
 
 __all__ = ['KeplerTargetPixelFile', 'TessTargetPixelFile']
 log = logging.getLogger(__name__)
@@ -473,49 +473,72 @@ class TargetPixelFile(object):
             return labels == closest_label
 
     def estimate_centroids(self, aperture_mask='pipeline', method='moments'):
-        """Returns centroid positions.
+        """Returns the center coordinates of an object inside ``aperture_mask``.
+
+        Telescopes tend to smear out the light from a point-like star over
+        multiple pixels.  For this reason, it is common to estimate the position
+        of a star by computing the **geometric center** of its image.
+        Astronomers refer to this position as the **centroid** of the object.
+        The term **centroid** is often used as a generic synonym to refer to the
+        measured position of an object in a telescope exposure.
+
+        This function provides two methods to estimate the position of a star:
+        * `method='moments'` will compute the "center of mass" of the light
+          based on the 2D image moments of the pixels inside ``aperture_mask``.
+        * `method='quadratic'` will fit a two-dimensional, second-order
+           polynomial to the 3x3 patch of pixels centered on the brightest pixel
+           inside the ``aperture_mask``, and return the peak of that polynomial.
+
+        For details and references on both methods, see the docstrings of
+        `_estimate_centroids_via_moments()` and
+        `_estimate_centroids_via_quadratic()`.
 
         Parameters
         ----------
-        aperture_mask : array-like, 'pipeline', or 'all'
-            A boolean array describing the aperture such that `True` means
-            that the pixel will be used.
-            If None or 'all' are passed, all pixels will be used.
-            If 'pipeline' is passed, the mask suggested by the official pipeline
-            will be returned.
+        aperture_mask : 'pipeline', 'threshold', 'all', or array-like
+            Which pixels contain the object to be measured, i.e. which pixels
+            should be used in the estimation?  If None or 'all' are passed,
+            all pixels in the pixel file will be used.  If 'pipeline' is passed,
+            the mask suggested by the official pipeline will be used.
             If 'threshold' is passed, all pixels brighter than 3-sigma above
             the median flux will be used.
-        method : str, 'moments' or 'quadratic'
+            Alternatively, users can pass a boolean array describing the
+            aperture mask such that `True` means that the pixel will be used.
+        method : 'moments' or 'quadratic'
             Defines which method to use to estimate the centroids. 'moments'
             computes the centroid based on the sample moments of the data.
-            'quadratic' approximates the data as a 2d polynomial and returns
-            the coordinate of the peak flux.  Refer to Vakili, M., & Hogg, D. W. 2016, ArXiv, 1610.05873,
-            for the details of the 'quadratic' method.
+            'quadratic' fits a 2D polynomial to the data and returns the
+            coordinate of the peak of that polynomial.
 
         Returns
         -------
-        col_centr, row_centr : tuple
-            Arrays containing centroids for column and row at each cadence
+        columns, rows : array, array
+            Arrays containing the column and row positions for the centroid
+            for each cadence.
         """
+        method = validate_method(method, ['moments', 'quadratic'])
         if method == 'moments':
-            aperture_mask = self._parse_aperture_mask(aperture_mask)
-            yy, xx = np.indices(self.shape[1:]) + 0.5
-            yy = self.row + yy
-            xx = self.column + xx
-            total_flux = np.nansum(self.flux[:, aperture_mask], axis=1)
-            with warnings.catch_warnings():
-                # RuntimeWarnings may occur below if total_flux contains zeros
-                warnings.simplefilter("ignore", RuntimeWarning)
-                col_centr = np.nansum(xx * aperture_mask * self.flux, axis=(1, 2)) / total_flux
-                row_centr = np.nansum(yy * aperture_mask * self.flux, axis=(1, 2)) / total_flux
+            return self._estimate_centroids_via_moments(aperture_mask=aperture_mask)
         elif method == 'quadratic':
-            col_centr, row_centr = self._estimate_centroids_via_quadratic(aperture_mask=aperture_mask)
-        else:
-            raise ValueError("centroid method {} is not supported.".format(method))
+            return self._estimate_centroids_via_quadratic(aperture_mask=aperture_mask)
+
+    def _estimate_centroids_via_moments(self, aperture_mask):
+        """Helper method for `estimate_centroids()`."""
+        aperture_mask = self._parse_aperture_mask(aperture_mask)
+        yy, xx = np.indices(self.shape[1:]) + 0.5
+        yy = self.row + yy
+        xx = self.column + xx
+        total_flux = np.nansum(self.flux[:, aperture_mask], axis=1)
+        with warnings.catch_warnings():
+            # RuntimeWarnings may occur below if total_flux contains zeros
+            warnings.simplefilter("ignore", RuntimeWarning)
+            col_centr = np.nansum(xx * aperture_mask * self.flux, axis=(1, 2)) / total_flux
+            row_centr = np.nansum(yy * aperture_mask * self.flux, axis=(1, 2)) / total_flux
         return col_centr, row_centr
 
-    def _estimate_centroids_via_quadratic(self, aperture_mask='pipeline'):
-        """Estimate centroids by fitting a 2D quadratic to the brightest pixels.
+    def _estimate_centroids_via_quadratic(self, aperture_mask):
+        """Estimate centroids by fitting a 2D quadratic to the brightest pixels;
+        this is a hqelper method for `estimate_centroids()`.
 
         This method will fit a simple 2D second-order polynomial
         $P(x, y) = a + bx + cy + dx^2 + exy + fy^2$
