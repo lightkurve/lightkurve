@@ -538,7 +538,7 @@ class TargetPixelFile(object):
 
     def _estimate_centroids_via_quadratic(self, aperture_mask):
         """Estimate centroids by fitting a 2D quadratic to the brightest pixels;
-        this is a hqelper method for `estimate_centroids()`.
+        this is a helper method for `estimate_centroids()`.
 
         This method will fit a simple 2D second-order polynomial
         $P(x, y) = a + bx + cy + dx^2 + exy + fy^2$
