@@ -473,25 +473,22 @@ class TargetPixelFile(object):
             return labels == closest_label
 
     def estimate_centroids(self, aperture_mask='pipeline', method='moments'):
-        """Returns the center coordinates of an object inside ``aperture_mask``.
+        """Returns the flux center of an object inside ``aperture_mask``.
 
         Telescopes tend to smear out the light from a point-like star over
         multiple pixels.  For this reason, it is common to estimate the position
-        of a star by computing the **geometric center** of its image.
-        Astronomers refer to this position as the **centroid** of the object.
-        The term **centroid** is often used as a generic synonym to refer to the
-        measured position of an object in a telescope exposure.
+        of a star by computing the *geometric center* of its image.
+        Astronomers refer to this position as the *centroid* of the object,
+        i.e. the term *centroid* is often used as a generic synonym to refer
+        to the measured position of an object in a telescope exposure.
 
         This function provides two methods to estimate the position of a star:
+
         * `method='moments'` will compute the "center of mass" of the light
           based on the 2D image moments of the pixels inside ``aperture_mask``.
         * `method='quadratic'` will fit a two-dimensional, second-order
-           polynomial to the 3x3 patch of pixels centered on the brightest pixel
-           inside the ``aperture_mask``, and return the peak of that polynomial.
-
-        For details and references on both methods, see the docstrings of
-        `_estimate_centroids_via_moments()` and
-        `_estimate_centroids_via_quadratic()`.
+          polynomial to the 3x3 patch of pixels centered on the brightest pixel
+          inside the ``aperture_mask``, and return the peak of that polynomial.
 
         Parameters
         ----------
