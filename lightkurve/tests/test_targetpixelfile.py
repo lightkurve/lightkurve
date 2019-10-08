@@ -334,6 +334,7 @@ def test_tpf_from_images():
     header = w.to_header()
     header['CRVAL1P'] = 10
     header['CRVAL2P'] = 20
+    header['MISSION'] = 'Kepler'
     ra, dec = 268.21686048, -73.66991904
 
     # Now this should work.

@@ -48,6 +48,7 @@ class TargetPixelFile(object):
             self.hdu = fits.open(self.path, **kwargs)
         self.quality_bitmask = quality_bitmask
         self.targetid = targetid
+        self.quality_mask = np.ones(len(self.hdu[1].data['QUALITY']), dtype=bool)
 
     def __getitem__(self, key):
         """Implements indexing and slicing.
@@ -414,12 +415,11 @@ class TargetPixelFile(object):
             warnings.simplefilter("ignore", RuntimeWarning)
             flux_err = np.nansum(self.flux_err[:, aperture_mask]**2, axis=1)**0.5
 
-        keys = {'centroid_col': centroid_col,
-                'centroid_row': centroid_row,
-                'quality': self.quality,
-                'channel': self.channel,
-                'ra': self.ra,
-                'dec': self.dec,
+        keys = {'meta' : {'centroid_col': centroid_col,
+                          'centroid_row': centroid_row,
+                          'quality': self.quality,
+                          'ra': self.ra,
+                          'dec': self.dec},
                 'label': self.header['OBJECT'],
                 'targetid': self.targetid}
         return LightCurve(time=self.time,
@@ -1399,8 +1399,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
             ext_info['1CRV{}P'.format(m)] = int(round(column)) - half_tpfsize_col + factory.keywords['CRVAL1P'] - 1
             ext_info['2CRV{}P'.format(m)] = int(round(row)) - half_tpfsize_row + factory.keywords['CRVAL2P'] - 1
 
-        return factory.get_tpf(hdu0_keywords=allkeys, ext_info=ext_info,
-                               mission=carry_keywords['MISSION'], **kwargs)
+
+        return factory.get_tpf(hdu0_keywords=allkeys, ext_info=ext_info, **kwargs)
 
 
 class FactoryError(Exception):
@@ -1491,13 +1491,18 @@ class TargetPixelFileFactory(object):
             warnings.warn('The factory-created TPF does not appear to contain '
                           'non-zero flux values.', LightkurveWarning)
 
-    def get_tpf(self, hdu0_keywords=None, ext_info=None, mission='Kepler', **kwargs):
+    def get_tpf(self, hdu0_keywords=None, ext_info=None, **kwargs):
         """Returns a TargetPixelFile object."""
         if hdu0_keywords is None:
             hdu0_keywords = {}
         if ext_info is None:
             ext_info = {}
         self._check_data()
+
+        mission = None
+        if 'MISSION' in hdu0_keywords.keys():
+            mission = hdu0_keywords['MISSION']
+
         if (mission=='Kepler') or (mission=='K2'):
             return KeplerTargetPixelFile(self._hdulist(hdu0_keywords=hdu0_keywords,
                                         ext_info=ext_info), **kwargs)
