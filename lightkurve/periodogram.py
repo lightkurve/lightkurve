@@ -757,7 +757,7 @@ class LombScarglePeriodogram(Periodogram):
             raise ValueError('Lightcurve contains NaN values. Use lc.remove_nans()'
                              ' to remove NaN values from a LightCurve.')
 
-        if lc.time_format in ['bkjd', 'btjd', 'd', 'days', 'day', None]:
+        if lc.time_format in ['bkjd', 'btjd', 'd', 'days', 'day', 'jd', 'mjd', None]:
             time = lc.time.copy() * u.day
         else:
             raise NotImplementedError('time in format {} is not supported.'.format(lc.time_format))
