@@ -27,7 +27,8 @@ from .lightcurve import KeplerLightCurve, TessLightCurve
 from .prf import KeplerPRF
 from .utils import KeplerQualityFlags, TessQualityFlags, \
                    plot_image, bkjd_to_astropy_time, btjd_to_astropy_time, \
-                   LightkurveWarning, detect_filetype, validate_method
+                   LightkurveWarning, detect_filetype, validate_method, \
+                   centroid_quadratic
 
 __all__ = ['KeplerTargetPixelFile', 'TessTargetPixelFile']
 log = logging.getLogger(__name__)
@@ -521,7 +522,8 @@ class TargetPixelFile(object):
             return self._estimate_centroids_via_quadratic(aperture_mask=aperture_mask)
 
     def _estimate_centroids_via_moments(self, aperture_mask):
-        """Helper method for `estimate_centroids()`."""
+        """Compute the "center of mass" of the light based on the 2D moments;
+        this is a helper method for `estimate_centroids()`."""
         aperture_mask = self._parse_aperture_mask(aperture_mask)
         yy, xx = np.indices(self.shape[1:]) + 0.5
         yy = self.row + yy
@@ -536,81 +538,13 @@ class TargetPixelFile(object):
 
     def _estimate_centroids_via_quadratic(self, aperture_mask):
         """Estimate centroids by fitting a 2D quadratic to the brightest pixels;
-        this is a helper method for `estimate_centroids()`.
-
-        This method will fit a simple 2D second-order polynomial
-        $P(x, y) = a + bx + cy + dx^2 + exy + fy^2$
-        to the 3x3 patch of pixels centered on the brightest pixel within
-        the aperture mask.  This function approximates the core of the Point
-        Spread Function (PSF) using a bivariate quadratic function, and returns
-        the maximum (x, y) coordinate of the function using linear algebra.
-
-        For the motivation and the details around this technique, please refer
-        to Vakili, M., & Hogg, D. W. 2016, ArXiv, 1610.05873.
-
-        Parameters
-        ----------
-        aperture_mask : array-like, 'pipeline', or 'all'
-            A boolean array describing the aperture such that `True` means
-            that the pixel will be used.
-            If None or 'all' are passed, all pixels will be used.
-            If 'pipeline' is passed, the mask suggested by the official pipeline
-            will be returned.
-            If 'threshold' is passed, all pixels brighter than 3-sigma above
-            the median flux will be used.
-
-        Returns
-        -------
-        col_centr, row_centr : tuple
-            Arrays containing centroids for column and row at each cadence.
-        """
+        this is a helper method for `estimate_centroids()`."""
         aperture_mask = self._parse_aperture_mask(aperture_mask)
         col_centr, row_centr = [], []
-
-        # For each cadence (elow, we will fit the coefficients of the bivariate
-        # quadratic with the help of a design matrix (A) as defined by Eqn 20
-        # in Vakili & Hogg (arxiv:1610.05873). The design matrix contains a
-        # column of ones followed by pixel coordinates: x, y, x**2, xy, y**2.
-        A = np.array([[1, -1, -1, 1,  1, 1],
-                      [1,  0, -1, 0,  0, 1],
-                      [1,  1, -1, 1, -1, 1],
-                      [1, -1,  0, 1,  0, 0],
-                      [1,  0,  0, 0,  0, 0],
-                      [1,  1,  0, 1,  0, 0],
-                      [1, -1,  1, 1, -1, 1],
-                      [1,  0,  1, 0,  0, 1],
-                      [1,  1,  1, 1,  1, 1]])
-        # We also pre-compute $(A^t A)^-1 A^t$, cf. Eqn 21 in Vakili & Hogg.
-        At = A.transpose()
-        # In Python 3 this can become `Aprime = np.linalg.inv(At @ A) @ At`
-        Aprime = np.matmul(np.linalg.inv(np.matmul(At, A)), At)
-
-        # Loop through each cadence
-        for i in range(len(self.time)):
-            # Step 1: identify the patch of 3x3 pixels (z_)
-            # that is centered on the brightest pixel (xx, yy)
-            data_mask = self.flux[i] * aperture_mask
-            arg_data_max = np.argmax(data_mask)
-            yy, xx = np.unravel_index(arg_data_max, data_mask.shape)
-            z_ = data_mask[yy-1:yy+2, xx-1:xx+2]
-
-            # Step 2: fit the polynomial $P = a + bx + cy + dx^2 + exy + fy^2$
-            # following Equation 21 in Vakili & Hogg.
-            # In Python 3 this can become `Aprime @ z_.flatten()`
-            a, b, c, d, e, f = np.matmul(Aprime, z_.flatten())
-
-            # Step 3: analytically find the function maximum,
-            # following https://en.wikipedia.org/wiki/Quadratic_function
-            det = 4 * d * f - e ** 2
-            if abs(det) < 1e-6:
-                row_centr.append(yy)
-                col_centr.append(xx)
-                continue
-            xm = - (2 * f * b - c * e) / det
-            ym = - (2 * d * c - b * e) / det
-            col_centr.append(xx + xm)
-            row_centr.append(yy + ym)
-
+        for idx in range(len(self.time)):
+            col, row = centroid_quadratic(self.flux[idx], mask=aperture_mask)
+            col_centr.append(col)
+            row_centr.append(row)
         # Finally, we add .5 to the result bellow because the convention is that
         # pixels are centered at .5, 1.5, 2.5, ...
         col_centr = np.asfarray(col_centr) + self.column + .5
