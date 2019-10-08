@@ -23,7 +23,7 @@ from tqdm import tqdm
 from copy import deepcopy
 
 from . import PACKAGEDIR, MPLSTYLE
-from .lightcurve import KeplerLightCurve, TessLightCurve
+from .lightcurve import KeplerLightCurve, TessLightCurve, LightCurve
 from .prf import KeplerPRF
 from .utils import KeplerQualityFlags, TessQualityFlags, \
                    plot_image, bkjd_to_astropy_time, btjd_to_astropy_time, \
@@ -145,6 +145,16 @@ class TargetPixelFile(object):
     def pos_corr2(self):
         """Returns the row position correction."""
         return self.hdu[1].data['POS_CORR2'][self.quality_mask]
+
+    @property
+    def mission(self):
+        """Returns the mission or telescope."""
+        mission_kw = self.get_keyword('MISSION')
+        telesco_kw = self.get_keyword('TELESCOP')
+        if mission_kw is not None:
+            return mission_kw
+        else:
+            return telesco_kw
 
     @property
     def pipeline_mask(self):
@@ -374,6 +384,48 @@ class TargetPixelFile(object):
             return self.prf_lightcurve(**kwargs)
         else:
             raise ValueError("Photometry method must be 'aperture' or 'prf'.")
+
+    def extract_aperture_photometry(self, aperture_mask='pipeline'):
+        """Returns a LightCurve obtained using aperture photometry.
+
+        Parameters
+        ----------
+        aperture_mask : array-like, 'pipeline', 'threshold' or 'all'
+            A boolean array describing the aperture such that `True` means
+            that the pixel will be used.
+            If None or 'all' are passed, all pixels will be used.
+            If 'pipeline' is passed, the mask suggested by the official pipeline
+            will be returned.
+            If 'threshold' is passed, all pixels brighter than 3-sigma above
+            the median flux will be used.
+
+        Returns
+        -------
+        lc : KeplerLightCurve object
+            Array containing the summed flux within the aperture for each
+            cadence.
+        """
+        aperture_mask = self._parse_aperture_mask(aperture_mask)
+        if aperture_mask.sum() == 0:
+            log.warning('Warning: aperture mask contains zero pixels.')
+        centroid_col, centroid_row = self.estimate_centroids(aperture_mask)
+        # Ignore warnings related to zero or negative errors
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RuntimeWarning)
+            flux_err = np.nansum(self.flux_err[:, aperture_mask]**2, axis=1)**0.5
+
+        keys = {'centroid_col': centroid_col,
+                'centroid_row': centroid_row,
+                'quality': self.quality,
+                'channel': self.channel,
+                'ra': self.ra,
+                'dec': self.dec,
+                'label': self.header['OBJECT'],
+                'targetid': self.targetid}
+        return LightCurve(time=self.time,
+                          flux=np.nansum(self.flux[:, aperture_mask], axis=1),
+                          flux_err=flux_err,**keys)
+
 
     def _parse_aperture_mask(self, aperture_mask):
         """Parse the `aperture_mask` parameter as given by a user.
@@ -1054,13 +1106,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
         """K2 Campaign number. ('CAMPAIGN' header keyword)"""
         return self.get_keyword('CAMPAIGN')
 
-    @property
-    def mission(self):
-        """'Kepler' or 'K2'. ('MISSION' header keyword)"""
-        return self.get_keyword('MISSION')
-
-    def extract_aperture_photometry(self, aperture_mask='pipeline', centroid_method='moments'):
-        """Returns a LightCurve obtained using aperture photometry.
+    def extract_aperture_photometry(self, aperture_mask='pipeline'):
+        """Returns a KeplerLightCurve obtained using aperture photometry.
 
         Parameters
         ----------
@@ -1091,7 +1138,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
                 'channel': self.channel,
                 'campaign': self.campaign,
                 'quarter': self.quarter,
-                'mission': self.mission,
                 'cadenceno': self.cadenceno,
                 'ra': self.ra,
                 'dec': self.dec,
@@ -1101,7 +1147,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
                                 flux=flux,
                                 flux_err=flux_err,
                                 **keys)
-
 
     def get_bkg_lightcurve(self, aperture_mask=None):
         aperture_mask = self._parse_aperture_mask(aperture_mask)
@@ -1286,12 +1331,6 @@ class KeplerTargetPixelFile(TargetPixelFile):
         except Exception as e:
             raise e
 
-        # Create a factory and set default keyword values based on the middle image
-        factory = KeplerTargetPixelFileFactory(n_cadences=len(images),
-                                               n_rows=size[0],
-                                               n_cols=size[1],
-                                               target_id=target_id)
-
         # Get some basic keywords
         for kw in basic_keywords:
             if kw in mid_hdu.header:
@@ -1299,6 +1338,12 @@ class KeplerTargetPixelFile(TargetPixelFile):
                     carry_keywords[kw] = mid_hdu.header[kw]
         if ('MISSION' not in carry_keywords) and ('TELESCOP' in carry_keywords):
             carry_keywords['MISSION'] = carry_keywords['TELESCOP']
+
+        # Create a factory and set default keyword values based on the middle image
+        factory = TargetPixelFileFactory(n_cadences=len(images),
+                                         n_rows=size[0],
+                                         n_cols=size[1],
+                                         target_id=target_id)
 
         allkeys = hdu0_keywords.copy()
         allkeys.update(carry_keywords)
@@ -1330,6 +1375,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
             else:
                 cutout = Cutout2D(hdu.data, position, wcs=wcs_ref,
                                   size=size, mode='partial')
+
             factory.add_cadence(frameno=idx, flux=cutout.data, header=hdu.header)
 
         ext_info = {}
@@ -1353,7 +1399,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
             ext_info['1CRV{}P'.format(m)] = int(round(column)) - half_tpfsize_col + factory.keywords['CRVAL1P'] - 1
             ext_info['2CRV{}P'.format(m)] = int(round(row)) - half_tpfsize_row + factory.keywords['CRVAL2P'] - 1
 
-        return factory.get_tpf(hdu0_keywords=allkeys, ext_info=ext_info, **kwargs)
+        return factory.get_tpf(hdu0_keywords=allkeys, ext_info=ext_info,
+                               mission=carry_keywords['MISSION'], **kwargs)
 
 
 class FactoryError(Exception):
@@ -1361,7 +1408,7 @@ class FactoryError(Exception):
     pass
 
 
-class KeplerTargetPixelFileFactory(object):
+class TargetPixelFileFactory(object):
     """Class to create a KeplerTargetPixelFile."""
 
     def __init__(self, n_cadences, n_rows, n_cols, target_id="unnamed-target",
@@ -1444,16 +1491,22 @@ class KeplerTargetPixelFileFactory(object):
             warnings.warn('The factory-created TPF does not appear to contain '
                           'non-zero flux values.', LightkurveWarning)
 
-    def get_tpf(self, hdu0_keywords=None, ext_info=None, **kwargs):
-        """Returns a KeplerTargetPixelFile object."""
+    def get_tpf(self, hdu0_keywords=None, ext_info=None, mission='Kepler', **kwargs):
+        """Returns a TargetPixelFile object."""
         if hdu0_keywords is None:
             hdu0_keywords = {}
         if ext_info is None:
             ext_info = {}
         self._check_data()
-        return KeplerTargetPixelFile(self._hdulist(hdu0_keywords=hdu0_keywords,
-                                                   ext_info=ext_info),
-                                     **kwargs)
+        if (mission=='Kepler') or (mission=='K2'):
+            return KeplerTargetPixelFile(self._hdulist(hdu0_keywords=hdu0_keywords,
+                                        ext_info=ext_info), **kwargs)
+        elif mission=='TESS':
+            return TessTargetPixelFile(self._hdulist(hdu0_keywords=hdu0_keywords,
+                                        ext_info=ext_info), **kwargs)
+        else:
+            return TargetPixelFile(self._hdulist(hdu0_keywords=hdu0_keywords,
+                                        ext_info=ext_info), **kwargs)
 
     def _hdulist(self, hdu0_keywords, ext_info):
         """Returns an astropy.io.fits.HDUList object."""
@@ -1596,6 +1649,10 @@ class KeplerTargetPixelFileFactory(object):
         hdu.header['EXTNAME'] = 'APERTURE'
         return hdu
 
+class KeplerTargetPixelFileFactory(TargetPixelFileFactory):
+    """Same as TargetPixelFileFactory."""
+    # Backwards compatibility
+    pass
 
 
 class TessTargetPixelFile(TargetPixelFile):
@@ -1665,10 +1722,6 @@ class TessTargetPixelFile(TargetPixelFile):
     def ccd(self):
         """TESS CCD number ('CCD' header keyword)."""
         return self.get_keyword('CCD')
-
-    @property
-    def mission(self):
-        return 'TESS'
 
     @property
     def astropy_time(self):
