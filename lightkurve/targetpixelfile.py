@@ -582,7 +582,8 @@ class TargetPixelFile(object):
                       [1,  1,  1, 1,  1, 1]])
         # We also pre-compute $(A^t A)^-1 A^t$, cf. Eqn 21 in Vakili & Hogg.
         At = A.transpose()
-        Aprime = np.linalg.inv(At.dot(A)).dot(At)  # np.linalg.inv(At @ A) @ At
+        # In Python 3 this can become `Aprime = np.linalg.inv(At @ A) @ At`
+        Aprime = np.matmul(np.linalg.inv(np.matmul(At, A)), At)
 
         # Loop through each cadence
         for i in range(len(self.time)):
@@ -595,7 +596,8 @@ class TargetPixelFile(object):
 
             # Step 2: fit the polynomial $P = a + bx + cy + dx^2 + exy + fy^2$
             # following Equation 21 in Vakili & Hogg.
-            a, b, c, d, e, f = Aprime.dot(z_.flatten())  # Aprime @ z_.flatten()
+            # In Python 3 this can become `Aprime @ z_.flatten()`
+            a, b, c, d, e, f = np.matmul(Aprime, z_.flatten())
 
             # Step 3: analytically find the function maximum,
             # following https://en.wikipedia.org/wiki/Quadratic_function
