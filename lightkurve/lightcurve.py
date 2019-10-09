@@ -56,6 +56,18 @@ class LightCurve(object):
         Identifier of the target.
     label : str
         Human-friendly object label, e.g. "KIC 123456789".
+    centroid_col : array-like
+        Centroid column coordinates as a function of time
+    centroid_row : array-like
+        Centroid row coordinates as a function of time
+    quality : array-like
+        Array indicating the quality of each data point
+    quality_bitmask : int
+        Bitmask specifying quality flags of cadences that should be ignored
+    mission : str
+        Mission name
+    targetid : int
+        Object Identifier
     meta : dict
         Free-form metadata associated with the LightCurve.
 
@@ -72,7 +84,9 @@ class LightCurve(object):
     """
     def __init__(self, time=None, flux=None, flux_err=None, flux_unit=None,
                  time_format=None, time_scale=None, targetid=None, label=None,
-                 meta=None):
+                 centroid_col=None, centroid_row=None, quality=None,
+                 quality_bitmask=None, mission=None,ra=None,
+                 dec=None, meta=None):
         if time is None and flux is None:
             raise ValueError('either time or flux must be given')
         if time is None:
@@ -93,6 +107,13 @@ class LightCurve(object):
         self.time_scale = time_scale
         self.targetid = targetid
         self.label = label
+        self.centroid_col = self._validate_array(centroid_col, name='centroid_col')
+        self.centroid_row = self._validate_array(centroid_row, name='centroid_row')
+        self.quality = self._validate_array(quality, name='quality')
+        self.quality_bitmask = quality_bitmask
+        self.ra = ra
+        self.dec = dec
+        self.mission = mission
         if meta is None:
             self.meta = {}
         else:
@@ -128,6 +149,9 @@ class LightCurve(object):
         copy_self.time = self.time[key]
         copy_self.flux = self.flux[key]
         copy_self.flux_err = self.flux_err[key]
+        copy_self.quality = self.quality[key]
+        copy_self.centroid_col = self.centroid_col[key]
+        copy_self.centroid_row = self.centroid_row[key]
         return copy_self
 
     def __len__(self):
@@ -1703,26 +1727,19 @@ class KeplerLightCurve(LightCurve):
                  cadenceno=None, targetid=None, ra=None, dec=None, label=None, meta=None):
         super(KeplerLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err, flux_unit=flux_unit,
                                                time_format=time_format, time_scale=time_scale,
-                                               targetid=targetid, label=label, meta=meta)
-        self.centroid_col = self._validate_array(centroid_col, name='centroid_col')
-        self.centroid_row = self._validate_array(centroid_row, name='centroid_row')
-        self.quality = self._validate_array(quality, name='quality')
+                                               targetid=targetid, label=label, centroid_col=centroid_col,
+                                               centroid_row=centroid_row, quality=quality,
+                                               quality_bitmask=quality_bitmask,ra=ra, dec=dec,meta=meta)
         self.cadenceno = self._validate_array(cadenceno, name='cadenceno')
-        self.quality_bitmask = quality_bitmask
         self.channel = channel
         self.campaign = campaign
         self.quarter = quarter
         self.mission = mission
-        self.ra = ra
-        self.dec = dec
 
     def __getitem__(self, key):
         lc = super(KeplerLightCurve, self).__getitem__(key)
         # Compared to `LightCurve`, we need to slice a few additional arrays:
-        lc.quality = self.quality[key]
         lc.cadenceno = self.cadenceno[key]
-        lc.centroid_col = self.centroid_col[key]
-        lc.centroid_row = self.centroid_row[key]
         return lc
 
     def __repr__(self):
@@ -1854,27 +1871,20 @@ class TessLightCurve(LightCurve):
                  cadenceno=None, sector=None, camera=None, ccd=None,
                  targetid=None, ra=None, dec=None, label=None, meta=None):
         super(TessLightCurve, self).__init__(time=time, flux=flux, flux_err=flux_err, flux_unit=flux_unit,
-                                             time_format=time_format, time_scale=time_scale,
-                                             targetid=targetid, label=label, meta=meta)
-        self.centroid_col = self._validate_array(centroid_col, name='centroid_col')
-        self.centroid_row = self._validate_array(centroid_row, name='centroid_row')
-        self.quality = self._validate_array(quality, name='quality')
+                                               time_format=time_format, time_scale=time_scale,
+                                               targetid=targetid, label=label, centroid_col=centroid_col,
+                                               centroid_row=centroid_row, quality=quality,
+                                               quality_bitmask=quality_bitmask,ra=ra, dec=dec,meta=meta)
         self.cadenceno = self._validate_array(cadenceno)
-        self.quality_bitmask = quality_bitmask
         self.mission = "TESS"
         self.sector = sector
         self.camera = camera
         self.ccd = ccd
-        self.ra = ra
-        self.dec = dec
 
     def __getitem__(self, key):
         lc = super(TessLightCurve, self).__getitem__(key)
         # Compared to `LightCurve`, we need to slice a few additional arrays:
-        lc.quality = self.quality[key]
         lc.cadenceno = self.cadenceno[key]
-        lc.centroid_col = self.centroid_col[key]
-        lc.centroid_row = self.centroid_row[key]
         return lc
 
     def __repr__(self):
