@@ -439,17 +439,12 @@ class TargetPixelFile(object):
             warnings.simplefilter("ignore", RuntimeWarning)
             flux_err = np.nansum(self.flux_err[:, aperture_mask]**2, axis=1)**0.5
 
-        keys = {'meta' : {'centroid_col': centroid_col,
-                          'centroid_row': centroid_row,
-                          'quality': self.quality,
-                          'ra': self.ra,
-                          'dec': self.dec},
-                'label': self.header['OBJECT'],
-                'targetid': self.targetid}
         return LightCurve(time=self.time,
-                          flux=np.nansum(self.flux[:, aperture_mask], axis=1),
-                          flux_err=flux_err,time_format=self.time_format,
-                          time_scale=self.time_scale, **keys)
+                flux=np.nansum(self.flux[:, aperture_mask], axis=1),
+                flux_err=flux_err,time_format=self.time_format,
+                time_scale=self.time_scale, centroid_col=centroid_col,
+                centroid_row=centroid_row, quality=self.quality, ra=self.ra,
+                dec=self.dec, label=self.header['OBJECT'], targetid=self.targetid)
 
 
     def _parse_aperture_mask(self, aperture_mask):
@@ -1268,21 +1263,11 @@ class KeplerTargetPixelFile(TargetPixelFile):
         """
         lc = super(KeplerTargetPixelFile, self) \
                   .extract_aperture_photometry(aperture_mask=aperture_mask)
-        key_names = ['label','targetid']
-        keys = {key:getattr(lc, key) for key in key_names}
-        kepler_keys = {'campaign': self.campaign,
-                'quarter': self.quarter,
-                'cadenceno': self.cadenceno,
-                'mission': self.mission,
-                'channel': self.channel,
-                'centroid_col':lc.meta['centroid_col'],
-                'centroid_row':lc.meta['centroid_row'],
-                'quality':lc.meta['quality'],
-                'ra':lc.meta['ra'],
-                'dec':lc.meta['dec']}
-        keys.update(kepler_keys)
         return KeplerLightCurve(time=lc.time,flux=lc.flux,flux_err=lc.flux_err,
-                                **keys)
+                label=lc.label, targetid=lc.targetid, centroid_col=lc.centroid_col,
+                centroid_row=lc.centroid_row, quality=lc.quality, ra=lc.ra,
+                dec=lc.dec, mission=lc.mission, campaign=self.campaign,
+                quarter=self.quarter, cadenceno=self.cadenceno, channel=self.channel)
 
     def get_bkg_lightcurve(self, aperture_mask=None):
         aperture_mask = self._parse_aperture_mask(aperture_mask)
@@ -1290,20 +1275,14 @@ class KeplerTargetPixelFile(TargetPixelFile):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", RuntimeWarning)
             flux_bkg_err = np.nansum(self.flux_bkg_err[:, aperture_mask]**2, axis=1)**0.5
-        keys = {'quality': self.quality,
-                'channel': self.channel,
-                'campaign': self.campaign,
-                'quarter': self.quarter,
-                'mission': self.mission,
-                'cadenceno': self.cadenceno,
-                'ra': self.ra,
-                'dec': self.dec,
-                'label': self.header['OBJECT'],
-                'targetid': self.targetid}
+            
         return KeplerLightCurve(time=self.time,
-                                flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
-                                flux_err=flux_bkg_err,
-                                **keys)
+                flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
+                flux_err=flux_bkg_err, label=self.header['OBJECT'],
+                targetid=self.targetid, quality=self.quality, ra=self.ra,
+                dec=self.dec, channel=self.channel,campaign=self.campaign,
+                cadenceno=self.cadenceno, quarter=self.quarter, mission=self.mission)
+
 
     def get_model(self, star_priors=None, **kwargs):
         """Returns a default `TPFModel` object for PRF fitting.
@@ -1754,19 +1733,11 @@ class TessTargetPixelFile(TargetPixelFile):
 
         lc = super(TessTargetPixelFile, self) \
                   .extract_aperture_photometry(aperture_mask=aperture_mask)
-        key_names = ['label','targetid']
-        keys = {key:getattr(lc, key) for key in key_names}
-        tess_keys = {'sector': self.sector,
-                    'camera': self.camera,
-                    'ccd': self.ccd,
-                    'centroid_col':lc.meta['centroid_col'],
-                    'centroid_row':lc.meta['centroid_row'],
-                    'quality':lc.meta['quality'],
-                    'ra':lc.meta['ra'],
-                    'dec':lc.meta['dec']}
-        keys.update(tess_keys)
         return TessLightCurve(time=lc.time,flux=lc.flux,flux_err=lc.flux_err,
-                                **keys)
+                label=lc.label, targetid=lc.targetid, centroid_col=lc.centroid_col,
+                centroid_row=lc.centroid_row, quality=lc.quality, ra=lc.ra,
+                dec=lc.dec, mission=lc.mission, sector=self.sector,
+                camera=self.camera, cadenceno=self.cadenceno, ccd=self.ccd)
 
     def get_bkg_lightcurve(self, aperture_mask=None):
         aperture_mask = self._parse_aperture_mask(aperture_mask)
@@ -1774,16 +1745,10 @@ class TessTargetPixelFile(TargetPixelFile):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", RuntimeWarning)
             flux_bkg_err = np.nansum(self.flux_bkg_err[:, aperture_mask]**2, axis=1)**0.5
-        keys = {'quality': self.quality,
-                'sector': self.sector,
-                'camera': self.camera,
-                'ccd': self.ccd,
-                'cadenceno': self.cadenceno,
-                'ra': self.ra,
-                'dec': self.dec,
-                'label': self.header['OBJECT'],
-                'targetid': self.targetid}
+
         return TessLightCurve(time=self.time,
-                              flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
-                              flux_err=flux_bkg_err,
-                              **keys)
+                flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
+                flux_err=flux_bkg_err, label=self.header['OBJECT'],
+                targetid=self.targetid, quality=self.quality, ra=self.ra,
+                dec=self.dec, sector=self.sector,camera=self.camera,
+                cadenceno=self.cadenceno, ccd=self.ccd)
