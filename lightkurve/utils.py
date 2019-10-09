@@ -544,3 +544,70 @@ def validate_method(method, supported_methods):
         return method
     raise ValueError("method '{}' is not supported; "
                      "must be one of {}".format(method, supported_methods))
+
+
+def centroid_quadratic(data, mask=None):
+    """Computes the quadratic estimate of the centroid in a 2d-array.
+
+    This method will fit a simple 2D second-order polynomial
+    $P(x, y) = a + bx + cy + dx^2 + exy + fy^2$
+    to the 3x3 patch of pixels centered on the brightest pixel within
+    the image.  This function approximates the core of the Point
+    Spread Function (PSF) using a bivariate quadratic function, and returns
+    the maximum (x, y) coordinate of the function using linear algebra.
+
+    For the motivation and the details around this technique, please refer
+    to Vakili, M., & Hogg, D. W. 2016, ArXiv, 1610.05873.
+
+    Parameters
+    ----------
+    data : 2D array
+        The 2D input array representing the pixel values of the image.
+    mask : array_like (bool), optional
+        A boolean mask, with the same shape as `data`, where a **True** value
+        indicates the corresponding element of data is masked.
+
+    Returns
+    -------
+    column, row : tuple
+        The coordinates of the centroid in column and row.
+    """
+    # Step 1: identify the patch of 3x3 pixels (z_)
+    # that is centered on the brightest pixel (xx, yy)
+    if mask is not None:
+        data = data * mask
+    arg_data_max = np.argmax(data)
+    yy, xx = np.unravel_index(arg_data_max, data.shape)
+    z_ = data[yy-1:yy+2, xx-1:xx+2]
+
+    # Next, we will fit the coefficients of the bivariate quadratic with the
+    # help of a design matrix (A) as defined by Eqn 20 in Vakili & Hogg
+    # (arxiv:1610.05873). The design matrix contains a
+    # column of ones followed by pixel coordinates: x, y, x**2, xy, y**2.
+    A = np.array([[1, -1, -1, 1,  1, 1],
+                  [1,  0, -1, 0,  0, 1],
+                  [1,  1, -1, 1, -1, 1],
+                  [1, -1,  0, 1,  0, 0],
+                  [1,  0,  0, 0,  0, 0],
+                  [1,  1,  0, 1,  0, 0],
+                  [1, -1,  1, 1, -1, 1],
+                  [1,  0,  1, 0,  0, 1],
+                  [1,  1,  1, 1,  1, 1]])
+    # We also pre-compute $(A^t A)^-1 A^t$, cf. Eqn 21 in Vakili & Hogg.
+    At = A.transpose()
+    # In Python 3 this can become `Aprime = np.linalg.inv(At @ A) @ At`
+    Aprime = np.matmul(np.linalg.inv(np.matmul(At, A)), At)
+
+    # Step 2: fit the polynomial $P = a + bx + cy + dx^2 + exy + fy^2$
+    # following Equation 21 in Vakili & Hogg.
+    # In Python 3 this can become `Aprime @ z_.flatten()`
+    a, b, c, d, e, f = np.matmul(Aprime, z_.flatten())
+
+    # Step 3: analytically find the function maximum,
+    # following https://en.wikipedia.org/wiki/Quadratic_function
+    det = 4 * d * f - e ** 2
+    if abs(det) < 1e-6:
+        return None, None  # No solution
+    xm = - (2 * f * b - c * e) / det
+    ym = - (2 * d * c - b * e) / det
+    return xx + xm, yy + ym

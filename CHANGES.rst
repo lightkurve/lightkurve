@@ -1,3 +1,11 @@
+1.3.0 (unreleased)
+==================
+
+- Added a `method="quadratic"` option to `tpf.estimate_centroids()` which
+  enables centroids to be estimated by fitting a bivariate polynomial to the
+  PSF core. [#544]
+
+
 1.2.0 (2019-10-01)
 ==================
 

@@ -22,7 +22,9 @@ from ..targetpixelfile import KeplerTargetPixelFile, KeplerTargetPixelFileFactor
 from ..targetpixelfile import TessTargetPixelFile
 from ..lightcurve import TessLightCurve
 from ..utils import LightkurveWarning
+from ..search import open as lkopen
 
+from .test_synthetic_data import filename_synthetic_flat
 
 filename_tpf_all_zeros = get_pkg_data_filename("data/test-tpf-all-zeros.fits")
 filename_tpf_one_center = get_pkg_data_filename("data/test-tpf-non-zero-center.fits")
@@ -103,8 +105,8 @@ def test_tpf_zeros():
     # The default QUALITY bitmask should have removed all NaNs in the TIME
     assert ~np.any(np.isnan(tpf.time))
 
-
-def test_tpf_ones():
+@pytest.mark.parametrize("centroid_method", [("moments"), ("quadratic")])
+def test_tpf_ones(centroid_method):
     """Does the LightCurve of a one-flux TPF make sense?"""
     with warnings.catch_warnings():
         # Ignore the "TELESCOP is not equal to TESS" warning
@@ -112,7 +114,7 @@ def test_tpf_ones():
         tpfs = [KeplerTargetPixelFile(filename_tpf_one_center),
                 TessTargetPixelFile(filename_tpf_one_center)]
     for tpf in tpfs:
-        lc = tpf.to_lightcurve(aperture_mask='all')
+        lc = tpf.to_lightcurve(aperture_mask='all', centroid_method=centroid_method)
         assert np.all(lc.flux == 1)
         assert np.all((lc.centroid_col < tpf.column+tpf.shape[1]).all()
                       * (lc.centroid_col > tpf.column).all())
@@ -145,18 +147,29 @@ def test_wcs():
         assert type(w).__name__ == 'WCS'
 
 
-def test_wcs_tabby():
+@pytest.mark.parametrize("method", [("moments"), ("quadratic")])
+def test_wcs_tabby(method):
     '''Test the centroids from Tabby's star against simbad values'''
     tpf = KeplerTargetPixelFile(TABBY_TPF)
     tpf.wcs
     ra, dec = tpf.get_coordinates(0)
-    col, row = tpf.estimate_centroids()
+    col, row = tpf.estimate_centroids(method=method)
     col -= tpf.column
     row -= tpf.row
     y, x = int(np.round(col[0])), int(np.round(row[1]))
     # Compare with RA and Dec from Simbad
     assert np.isclose(ra[x, y], 301.5643971, 1e-4)
     assert np.isclose(dec[x, y], 44.4568869, 1e-4)
+
+
+def test_centroid_methods_consistency():
+    """Are the centroid methods consistent for a well behaved target?"""
+    pixels = lkopen(filename_synthetic_flat)
+    centr_moments = pixels.estimate_centroids(method='moments')
+    centr_quadratic = pixels.estimate_centroids(method='quadratic')
+    # check that the maximum relative difference doesnt exceed 1%
+    assert np.max(np.abs(centr_moments[0] - centr_quadratic[0]) / centr_moments[0]) < 1e-2
+    assert np.max(np.abs(centr_moments[1] - centr_quadratic[1]) / centr_moments[1]) < 1e-2
 
 
 def test_astropy_time():
