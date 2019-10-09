@@ -1266,7 +1266,8 @@ class KeplerTargetPixelFile(TargetPixelFile):
             Array containing the summed flux within the aperture for each
             cadence.
         """
-        lc = super().extract_aperture_photometry(aperture_mask=aperture_mask)
+        lc = super(KeplerTargetPixelFile, self) \
+                  .extract_aperture_photometry(aperture_mask=aperture_mask)
         key_names = ['label','targetid']
         keys = {key:getattr(lc, key) for key in key_names}
         kepler_keys = {'campaign': self.campaign,
@@ -1650,7 +1651,13 @@ class TargetPixelFileFactory(object):
 class KeplerTargetPixelFileFactory(TargetPixelFileFactory):
     """Same as TargetPixelFileFactory."""
     # Backwards compatibility
-    pass
+    def __init__(self, n_cadences, n_rows, n_cols, target_id="unnamed-target",
+                 keywords=None):
+        msg = '`KeplerTargetPixelFileFactory` is deprecated, please use ' \
+                '`TargetPixelFileFactory` instead.'
+        warnings.warn(msg, LightkurveWarning)
+        super(KeplerTargetPixelFileFactory, self).__init__(n_cadences, n_rows, n_cols, target_id=target_id,
+                     keywords=keywords)
 
 
 class TessTargetPixelFile(TargetPixelFile):
@@ -1745,7 +1752,8 @@ class TessTargetPixelFile(TargetPixelFile):
             Contains the summed flux within the aperture for each cadence.
         """
 
-        lc = super().extract_aperture_photometry(aperture_mask=aperture_mask)
+        lc = super(TessTargetPixelFile, self) \
+                  .extract_aperture_photometry(aperture_mask=aperture_mask)
         key_names = ['label','targetid']
         keys = {key:getattr(lc, key) for key in key_names}
         tess_keys = {'sector': self.sector,
