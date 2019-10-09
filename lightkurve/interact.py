@@ -62,14 +62,18 @@ def prepare_lightcurve_datasource(lc):
 
     # Convert binary quality numbers into human readable strings
     qual_strings = []
-    for bitmask in lc.quality:
-        flag_str_list = KeplerQualityFlags.decode(bitmask)
-        if len(flag_str_list) == 0:
-            qual_strings.append(' ')
-        if len(flag_str_list) == 1:
-            qual_strings.append(flag_str_list[0])
-        if len(flag_str_list) > 1:
-            qual_strings.append("; ".join(flag_str_list))
+    if (lc.mission == 'Kepler') or (lc.mission == 'K2'):
+        for bitmask in lc.quality:
+            flag_str_list = KeplerQualityFlags.decode(bitmask)
+            if len(flag_str_list) == 0:
+                qual_strings.append(' ')
+            if len(flag_str_list) == 1:
+                qual_strings.append(flag_str_list[0])
+            if len(flag_str_list) > 1:
+                qual_strings.append("; ".join(flag_str_list))
+    else:
+        qual_strings = [' '] * len(lc.flux)
+        #TODO add TESS support
 
     if hasattr(lc, 'cadenceno'):
         cadences = lc.cadenceno
