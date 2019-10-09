@@ -1686,7 +1686,13 @@ class TargetPixelFileFactory(object):
 class KeplerTargetPixelFileFactory(TargetPixelFileFactory):
     """Same as TargetPixelFileFactory."""
     # Backwards compatibility
-    pass
+    def __init__(self, n_cadences, n_rows, n_cols, target_id="unnamed-target",
+                 keywords=None):
+        msg = '`KeplerTargetPixelFileFactory` is deprecated, please use ' \
+                '`TargetPixelFileFactory` instead.'
+        warnings.warn(msg, LightkurveWarning)
+        super(KeplerTargetPixelFileFactory, self).__init__(n_cadences, n_rows, n_cols, target_id=target_id,
+                     keywords=keywords)
 
 
 class TessTargetPixelFile(TargetPixelFile):
