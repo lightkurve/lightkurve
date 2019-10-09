@@ -1057,8 +1057,9 @@ class TargetPixelFile(object):
         if hdu0_keywords is None:
             hdu0_keywords = {}
 
-        basic_keywords = ['MISSION', 'TELESCOP', 'INSTRUME', 'QUARTER',
-                          'CAMPAIGN', 'CHANNEL', 'MODULE', 'OUTPUT']
+        header_keywords = ['MISSION', 'TELESCOP', 'INSTRUME', 'QUARTER',
+                          'CAMPAIGN', 'CHANNEL', 'MODULE', 'OUTPUT', 'BMJD_OBS',
+                          'EXPTIME', 'BUNIT']
         carry_keywords = {}
 
         # Define a helper function to accept images in a flexible way
@@ -1091,7 +1092,7 @@ class TargetPixelFile(object):
             raise e
 
         # Get some basic keywords
-        for kw in basic_keywords:
+        for kw in header_keywords:
             if kw in mid_hdu.header:
                 if not isinstance(mid_hdu.header[kw], Undefined):
                     carry_keywords[kw] = mid_hdu.header[kw]
@@ -1503,8 +1504,13 @@ class TargetPixelFileFactory(object):
             self.quality[frameno] = header['QUALITY']
         if 'POS_CORR1' in header:
             self.pos_corr1[frameno] = header['POS_CORR1']
+        elif 'PTGDIFFX' in header:
+            self.pos_corr1[frameno] = header['PTGDIFFX']
         if 'POS_CORR2' in header:
             self.pos_corr2[frameno] = header['POS_CORR2']
+        elif 'PTGDIFFY' in header:
+            self.pos_corr2[frameno] = header['PTGDIFFY']
+
 
     def _check_data(self):
         """Check the data before writing to a TPF for any obvious errors."""
