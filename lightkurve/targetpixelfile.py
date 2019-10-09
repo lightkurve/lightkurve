@@ -14,6 +14,7 @@ from astropy.wcs import WCS
 from astropy.utils.exceptions import AstropyWarning
 from astropy.coordinates import SkyCoord
 from astropy.stats.funcs import median_absolute_deviation as MAD
+from astropy.time import Time
 
 from matplotlib import patches
 import matplotlib.pyplot as plt
@@ -37,8 +38,8 @@ log = logging.getLogger(__name__)
 class TargetPixelFile(object):
     """Abstract class representing FITS files which contain time series imaging data.
 
-    You should probably not be using this abstract class directly;
-    see `KeplerTargetPixelFile` and `TessTargetPixelFile` instead.
+    You can now use this class directly to read in Generic TargetPixelFiles.
+    #TODO: Docstring
     """
     def __init__(self, path, quality_bitmask='default', targetid=None, **kwargs):
         self.path = path
@@ -158,6 +159,23 @@ class TargetPixelFile(object):
             return telesco_kw
 
     @property
+    def time_format(self):
+        """Returns the time format"""
+        #TODO: override in each base class
+        if self.mission == 'Spitzer':
+            return 'mjd'
+        else:
+            return None
+
+    @property
+    def time_scale(self):
+        """Returns the time scale"""
+        if self.mission == 'Spitzer':
+            return 'tdb' #TODO: verify
+        else:
+            return None
+
+    @property
     def pipeline_mask(self):
         """Returns the optimal aperture mask used by the pipeline."""
         # Both Kepler and TESS flag the pixels in the optimal aperture using
@@ -182,6 +200,7 @@ class TargetPixelFile(object):
     def cadenceno(self):
         """Return the cadence number for all good-quality cadences."""
         cadenceno = self.hdu[1].data['CADENCENO'][self.quality_mask]
+        #TODO move to subclass
         # The TESScut service returns an array of zeros as CADENCENO.
         # If this is the case, return frame numbers from 0 instead.
         if cadenceno[0] == 0:
@@ -216,6 +235,11 @@ class TargetPixelFile(object):
     def quality(self):
         """Returns the quality flag integer of every good cadence."""
         return self.hdu[1].data['QUALITY'][self.quality_mask]
+
+    @property
+    def astropy_time(self):
+        """Returns an AstroPy Time object for all good-quality cadences."""
+        return Time(self.time, format=self.time_format, scale=self.time_scale)
 
     @property
     def wcs(self):
@@ -424,7 +448,8 @@ class TargetPixelFile(object):
                 'targetid': self.targetid}
         return LightCurve(time=self.time,
                           flux=np.nansum(self.flux[:, aperture_mask], axis=1),
-                          flux_err=flux_err,**keys)
+                          flux_err=flux_err,time_format=self.time_format,
+                          time_scale=self.time_scale, **keys)
 
 
     def _parse_aperture_mask(self, aperture_mask):
