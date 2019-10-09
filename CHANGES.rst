@@ -5,6 +5,10 @@
   enables centroids to be estimated by fitting a bivariate polynomial to the
   PSF core. [#544]
 
+- Fixed a bug in `Seismology.plot_echelle()` which caused the Echelle diagram
+  of a power spectrum to be rendered incorrectly. [#602]
+
+
 
 1.2.0 (2019-10-01)
 ==================
@@ -33,6 +37,7 @@
 
 - Updated the online tutorials (https://docs.lightkurve.org/tutorials) to
   take all recent Lightkurve API changes into account. [#596]
+
 
 
 1.1.1 (2019-08-19)
