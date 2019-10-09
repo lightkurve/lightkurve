@@ -36,12 +36,23 @@ log = logging.getLogger(__name__)
 
 
 class TargetPixelFile(object):
-    """Abstract class representing FITS files which contain time series imaging data.
+    """Class representing FITS files which contain time series imaging data.
 
-    You can now use this class directly to read in Generic TargetPixelFiles.
-    #TODO: Docstring
+    This class enables extraction of custom light curves and centroid positions.
+
+    Parameters
+    ----------
+    path : str or `astropy.io.fits.HDUList`
+        Path to a Target Pixel (FITS) File or a `HDUList` object.
+    quality_bitmask : int or None
+        Bitmask (integer) which identifies the quality flag bitmask that should
+        be used to mask out bad cadences.  Default: None
+    targetid : str
+        Identifier/name of the target Default: None
+    kwargs : dict
+        Keyword arguments passed to `astropy.io.fits.open()`.
     """
-    def __init__(self, path, quality_bitmask='default', targetid=None, **kwargs):
+    def __init__(self, path, quality_bitmask=None, targetid=None, **kwargs):
         self.path = path
         if isinstance(path, fits.HDUList):
             self.hdu = path
@@ -49,7 +60,7 @@ class TargetPixelFile(object):
             self.hdu = fits.open(self.path, **kwargs)
         self.quality_bitmask = quality_bitmask
         self.targetid = targetid
-        self.quality_mask = np.ones(len(self.hdu[1].data['QUALITY']), dtype=bool)
+        self.quality_mask = ~(self.hdu[1].data['QUALITY'] == self.quality_bitmask)
 
     def __getitem__(self, key):
         """Implements indexing and slicing.
@@ -971,11 +982,15 @@ class TargetPixelFile(object):
 
     @staticmethod
     def from_fits_images(images, position, size=(11, 11), extension=1,
-                         target_id="unnamed-target", hdu0_keywords=None, **kwargs):
+                         targetid="unnamed-target", hdu0_keywords=None, **kwargs):
         """Creates a new Target Pixel File from a set of images.
 
-        This method is intended to make it easy to cut out targets from
-        Kepler/K2 "superstamp" regions or TESS FFI images.
+        This method is intended to make it easy to cut out targets from full
+        frame images including but not limited to those from, Kepler/K2
+        "superstamps", TESS FFIs, and Spitzer point-and-stare observations.
+        This method may work on point-and-step or "dithered" observation patterns,
+        but has not been tested, and may fail if the target leaves the frame
+        entirely.
 
         Parameters
         ----------
@@ -985,20 +1000,20 @@ class TargetPixelFile(object):
         position : astropy.SkyCoord
             Position around which to cut out pixels.
         size : (int, int)
-            Dimensions (cols, rows) to cut out around `position`.
+            Dimensions in pixels (cols, rows) to cut out around `position`.
         extension : int or str
             If `images` is a list of filenames, provide the extension number
             or name to use. Default: 0.
-        target_id : int or str
+        targetid : int or str
             Unique identifier of the target to be recorded in the TPF.
         hdu0_keywords : dict
             Additional keywords to add to the first header file.
         **kwargs : dict
-            Extra arguments to be passed to the `KeplerTargetPixelFile` constructor.
+            Extra arguments to be passed to the `TargetPixelFile` constructor.
 
         Returns
         -------
-        tpf : KeplerTargetPixelFile
+        tpf : TargetPixelFile
             A new Target Pixel File assembled from the images.
         """
         if len(images) == 0:
@@ -1035,10 +1050,9 @@ class TargetPixelFile(object):
         # Find middle image to use as a WCS reference
         try:
             mid_hdu = _open_image(images[int(len(images) / 2) - 1], extension)
-            wcs_ref = WCS(mid_hdu)
-            column, row = wcs_ref.all_world2pix(
-                            np.asarray([[position.ra.deg], [position.dec.deg]]).T,
-                            0)[0]
+            wcs_ref = WCS(mid_hdu, relax=True)
+            column_ref, row_ref = wcs_ref.all_world2pix(
+                np.asarray([[position.ra.deg], [position.dec.deg]]).T, 0)[0]
         except Exception as e:
             raise e
 
@@ -1050,27 +1064,23 @@ class TargetPixelFile(object):
         if ('MISSION' not in carry_keywords) and ('TELESCOP' in carry_keywords):
             carry_keywords['MISSION'] = carry_keywords['TELESCOP']
 
+        allkeys = hdu0_keywords.copy()
+        allkeys.update(carry_keywords)
+
         # Create a factory and set default keyword values based on the middle image
         factory = TargetPixelFileFactory(n_cadences=len(images),
                                          n_rows=size[0],
                                          n_cols=size[1],
-                                         target_id=target_id)
+                                         targetid=targetid)
 
-        allkeys = hdu0_keywords.copy()
-        allkeys.update(carry_keywords)
+        factory.keywords = mid_hdu.header
 
         for idx, img in tqdm(enumerate(images), total=len(images)):
             hdu = _open_image(img, extension)
 
-            if idx == 0:  # Get default keyword values from the first image
-                factory.keywords = hdu.header
-
-
             # Get positional shift of the image compared to the reference WCS
-            wcs_current = WCS(hdu.header)
+            wcs_current = WCS(hdu.header, relax=True)
             column_current, row_current = wcs_current.all_world2pix(
-                np.asarray([[position.ra.deg], [position.dec.deg]]).T, 0)[0]
-            column_ref, row_ref = wcs_ref.all_world2pix(
                 np.asarray([[position.ra.deg], [position.dec.deg]]).T, 0)[0]
 
             with warnings.catch_warnings():
@@ -1089,30 +1099,29 @@ class TargetPixelFile(object):
 
             factory.add_cadence(frameno=idx, flux=cutout.data, header=hdu.header)
 
+        # Add custom TPF header information needed for WCS purposes
         ext_info = {}
-        ext_info['TFORM4'] = '{}J'.format(size[0] * size[1])
-        ext_info['TDIM4'] = '({},{})'.format(size[0], size[1])
         ext_info.update(cutout.wcs.to_header())
+        TFORM_suffix = {4:'J', 5:'E', 6:'E', 7:'E', 8:'E', 9:'E'}
+
+        # Compute the distance from the star to the TPF lower left corner
+        # That is approximately half the TPF size, with an adjustment factor if the star's pixel
+        #    position gets rounded up or not.
+        # The first int is there so that even sizes always round to one less than half of their value
+
+        half_tpfsize_col = int((size[0] - 1) / 2.) + (int(round(column_ref)) - int(column_ref)) * ((size[0] + 1) % 2)
+        half_tpfsize_row = int((size[1] - 1) / 2.) + (int(round(row_ref)) - int(row_ref)) * ((size[1] + 1) % 2)
+
+        refpixels = {val:factory.keywords['CRVAL{}P'.format(val)] \
+                    if 'CRVAL{}P'.format(val) in factory.keywords.keys() \
+                    else 0 for val in [1,2]}  #TODO spot check the zero default?
 
         # TPF contains multiple data columns that require WCS
         for m in [4, 5, 6, 7, 8, 9]:
-            if m > 4:
-                ext_info["TFORM{}".format(m)] = '{}E'.format(size[0] * size[1])
-                ext_info['TDIM{}'.format(m)] = '({},{})'.format(size[0], size[1])
-            # Compute the distance from the star to the TPF lower left corner
-            # That is approximately half the TPF size, with an adjustment factor if the star's pixel
-            #    position gets rounded up or not.
-            # The first int is there so that even sizes always round to one less than half of their value
-
-            half_tpfsize_col = int((size[0] - 1) / 2.) + (int(round(column)) - int(column)) * ((size[0] + 1) % 2)
-            half_tpfsize_row = int((size[1] - 1) / 2.) + (int(round(row)) - int(row)) * ((size[1] + 1) % 2)
-
-            refpixels = {val:factory.keywords['CRVAL{}P'.format(val)] \
-                if 'CRVAL{}P'.format(val) in factory.keywords.keys() \
-                else 0 for val in [1,2]}
-
-            ext_info['1CRV{}P'.format(m)] = int(round(column)) - half_tpfsize_col + refpixels[1] - 1
-            ext_info['2CRV{}P'.format(m)] = int(round(row)) - half_tpfsize_row + refpixels[2] - 1
+            ext_info["TFORM{}".format(m)] = '{}{}'.format(size[0] * size[1], TFORM_suffix[m])
+            ext_info['TDIM{}'.format(m)] = '({},{})'.format(size[0], size[1])
+            ext_info['1CRV{}P'.format(m)] = int(round(column_ref)) - half_tpfsize_col + refpixels[1] - 1
+            ext_info['2CRV{}P'.format(m)] = int(round(row_ref)) - half_tpfsize_row + refpixels[2] - 1
 
         return factory.get_tpf(hdu0_keywords=allkeys, ext_info=ext_info, **kwargs)
 
@@ -1275,7 +1284,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", RuntimeWarning)
             flux_bkg_err = np.nansum(self.flux_bkg_err[:, aperture_mask]**2, axis=1)**0.5
-            
+
         return KeplerLightCurve(time=self.time,
                 flux=np.nansum(self.flux_bkg[:, aperture_mask], axis=1),
                 flux_err=flux_bkg_err, label=self.header['OBJECT'],
@@ -1382,12 +1391,12 @@ class FactoryError(Exception):
 class TargetPixelFileFactory(object):
     """Class to create a KeplerTargetPixelFile."""
 
-    def __init__(self, n_cadences, n_rows, n_cols, target_id="unnamed-target",
+    def __init__(self, n_cadences, n_rows, n_cols, targetid="unnamed-target",
                  keywords=None):
         self.n_cadences = n_cadences
         self.n_rows = n_rows
         self.n_cols = n_cols
-        self.target_id = target_id
+        self.targetid = targetid
         if keywords is None:
             self.keywords = {}
         else:
@@ -1460,7 +1469,7 @@ class TargetPixelFileFactory(object):
         if ~np.all(self.time == np.sort(self.time)):
             warnings.warn('Cadences in the factory-created TPF do not appear '
                           'to be sorted in chronological order.', LightkurveWarning)
-        if np.nansum(self.flux) == 0:
+        if np.sum(self.flux==self.flux) == 0:
             warnings.warn('The factory-created TPF does not appear to contain '
                           'non-zero flux values.', LightkurveWarning)
 
@@ -1510,8 +1519,8 @@ class TargetPixelFileFactory(object):
         hdu.header['DATE'] = datetime.datetime.now().strftime("%Y-%m-%d")
         hdu.header['TELESCOP'] = "Kepler"
         hdu.header['CREATOR'] = "lightkurve.KeplerTargetPixelFileFactory"
-        hdu.header['OBJECT'] = self.target_id
-        hdu.header['KEPLERID'] = self.target_id
+        hdu.header['OBJECT'] = self.targetid
+        hdu.header['KEPLERID'] = self.targetid
         # Empty a bunch of keywords rather than having incorrect info
         for kw in ["PROCVER", "FILEVER", "CHANNEL", "MODULE", "OUTPUT",
                    "TIMVERSN", "CAMPAIGN", "DATA_REL", "TTABLEID",
@@ -1630,12 +1639,12 @@ class TargetPixelFileFactory(object):
 class KeplerTargetPixelFileFactory(TargetPixelFileFactory):
     """Same as TargetPixelFileFactory."""
     # Backwards compatibility
-    def __init__(self, n_cadences, n_rows, n_cols, target_id="unnamed-target",
+    def __init__(self, n_cadences, n_rows, n_cols, targetid="unnamed-target",
                  keywords=None):
         msg = '`KeplerTargetPixelFileFactory` is deprecated, please use ' \
                 '`TargetPixelFileFactory` instead.'
         warnings.warn(msg, LightkurveWarning)
-        super(KeplerTargetPixelFileFactory, self).__init__(n_cadences, n_rows, n_cols, target_id=target_id,
+        super(KeplerTargetPixelFileFactory, self).__init__(n_cadences, n_rows, n_cols, targetid=targetid,
                      keywords=keywords)
 
 
@@ -1736,8 +1745,8 @@ class TessTargetPixelFile(TargetPixelFile):
         return TessLightCurve(time=lc.time,flux=lc.flux,flux_err=lc.flux_err,
                 label=lc.label, targetid=lc.targetid, centroid_col=lc.centroid_col,
                 centroid_row=lc.centroid_row, quality=lc.quality, ra=lc.ra,
-                dec=lc.dec, mission=lc.mission, sector=self.sector,
-                camera=self.camera, cadenceno=self.cadenceno, ccd=self.ccd)
+                dec=lc.dec, sector=self.sector, camera=self.camera,
+                cadenceno=self.cadenceno, ccd=self.ccd)
 
     def get_bkg_lightcurve(self, aperture_mask=None):
         aperture_mask = self._parse_aperture_mask(aperture_mask)
