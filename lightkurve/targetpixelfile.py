@@ -426,7 +426,7 @@ class TargetPixelFile(object):
 
         Returns
         -------
-        lc : KeplerLightCurve object
+        lc : `.LightCurve` object
             Array containing the summed flux within the aperture for each
             cadence.
         """
