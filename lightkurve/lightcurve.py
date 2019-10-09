@@ -83,7 +83,7 @@ class LightCurve(object):
     array([0.99, 1.01])
     """
     def __init__(self, time=None, flux=None, flux_err=None, flux_unit=None,
-                 time_format=None, time_scale=None, targetid=None, label=None,
+                 time_format='mjd', time_scale='tdb', targetid=None, label=None,
                  centroid_col=None, centroid_row=None, quality=None,
                  quality_bitmask=None, mission=None,ra=None,
                  dec=None, meta=None):

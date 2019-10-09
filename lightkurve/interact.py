@@ -71,11 +71,16 @@ def prepare_lightcurve_datasource(lc):
         if len(flag_str_list) > 1:
             qual_strings.append("; ".join(flag_str_list))
 
+    if hasattr(lc, 'cadenceno'):
+        cadences = lc.cadenceno
+    else:
+        cadences = np.arange(0, len(lc.time), 1)
+
     lc_source = ColumnDataSource(data=dict(
                                  time=lc.time,
                                  time_iso=human_time,
                                  flux=lc.flux,
-                                 cadence=lc.cadenceno,
+                                 cadence=cadences,
                                  quality_code=lc.quality,
                                  quality=np.array(qual_strings)))
     return lc_source
@@ -465,7 +470,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
 
     # Bokeh cannot handle many data points
     # https://github.com/bokeh/bokeh/issues/7490
-    if len(lc.cadenceno) > max_cadences:
+    if len(lc.time) > max_cadences:
         msg = 'Interact cannot display more than {} cadences.'
         raise RuntimeError(msg.format(max_cadences))
 
@@ -593,7 +598,10 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
 
         def jump_to_lightcurve_position(attr, old, new):
             if new != []:
-                cadence_slider.value = lc.cadenceno[new[0]]
+                if hasattr(lc, 'cadenceno'):
+                    cadence_slider.value = lc.cadenceno[new[0]]
+                else:
+                    cadence_slider.value = new[0]
 
         # Map changes to callbacks
         r_button.on_click(go_right_by_one)
