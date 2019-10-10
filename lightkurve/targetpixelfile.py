@@ -861,30 +861,44 @@ class TargetPixelFile(object):
 
 
 class KeplerTargetPixelFile(TargetPixelFile):
-    """Represents pixel data products created by NASA's Kepler pipeline.
+    """Class to read and interact with the pixel data products
+    ("Target Pixel Files") created by NASA's Kepler pipeline.
 
-    This class enables extraction of custom light curves and centroid positions.
+    This class offers a user-friendly way to open a Kepler Target Pixel File
+    (TPF), access its meta data, visualize its contents, extract light curves
+    with custom aperture masks, estimate centroid positions, and more.
+
+    Please consult the `TargetPixelFile tutorial 
+    <https://docs.lightkurve.org/tutorials/01-target-pixel-files.html>`_
+    in the online documentation for examples on using this class.
 
     Parameters
     ----------
-    path : str or `astropy.io.fits.HDUList`
-        Path to a Kepler Target Pixel (FITS) File or a `HDUList` object.
-    quality_bitmask : str or int
-        Bitmask (integer) which identifies the quality flag bitmask that should
-        be used to mask out bad cadences. If a string is passed, it has the
-        following meaning:
+    path : str or `~astropy.io.fits.HDUList`
+        Path to a Kepler Target Pixel file. Alternatively, you can pass a
+        `.HDUList` object, which is the AstroPy object returned by
+        the `astropy.io.fits.open` function.
+    quality_bitmask : "none", "default", "hard", "hardest", or int
+        Bitmask that should be used to ignore bad-quality cadences.
+        If a string is passed, it has the following meaning:
 
-            * "none": no cadences will be ignored (`quality_bitmask=0`).
+            * "none": no cadences will be ignored (equivalent to
+              ``quality_bitmask=0``).
             * "default": cadences with severe quality issues will be ignored
-              (`quality_bitmask=1130799`).
+              (equivalent to ``quality_bitmask=1130799``).
             * "hard": more conservative choice of flags to ignore
-              (`quality_bitmask=1664431`). This is known to remove good data.
-            * "hardest": removes all data that has been flagged
-              (`quality_bitmask=2096639`). This mask is not recommended.
+              (equivalent to ``quality_bitmask=1664431``).
+              This is known to remove good data.
+            * "hardest": remove all cadences that have one or more flags raised
+              (equivalent to ``quality_bitmask=2096639``). This mask is not
+              recommended because some quality flags can safely be ignored.
 
+        If an integer is passed, it will be used as a bitmask, i.e. it will
+        have the effect of removing cadences where
+        ``(tpf.hdu[1].data['QUALITY'] & quality_bitmask) > 0``.
         See the :class:`KeplerQualityFlags` class for details on the bitmasks.
-    kwargs : dict
-        Keyword arguments passed to `astropy.io.fits.open()`.
+    **kwargs : dict
+        Optional keyword arguments passed on to `astropy.io.fits.open`.
 
     References
     ----------
