@@ -78,7 +78,7 @@ class RegressionCorrector(Corrector):
     def __repr__(self):
         return 'RegressionCorrector (LC: {})'.format(self.lc.targetid)
 
-    def _fit_coefficients(self, cadence_mask=None):
+    def _fit_coefficients(self, cadence_mask=None, prior_mu=None, prior_sigma=None):
         """Fit the linear regression coefficients.
 
         Such that regression_model_flux = np.dot(X, beta) where X is the
@@ -94,24 +94,27 @@ class RegressionCorrector(Corrector):
         coefficients : np.ndarray
             The best fit model coefficients to the data.
         """
+        if prior_mu is not None:
+            if len(prior_mu) != len(self.X.values.T):
+                raise ValueError('Prior means must have shape {}'.format(len(self.X.values.T)))
+        if prior_sigma is not None:
+            if len(prior_sigma) != len(self.X.values.T):
+                raise ValueError('Prior sigmas must have shape {}'.format(len(self.X.values.T)))
+
+        # If prior_mu is specified, prior_sigma must be specified
+        if not ((prior_mu is None) & (prior_sigma is None)) | ((prior_mu is not None) & (prior_sigma is not None)):
+            raise ValueError("Please specify both `prior_mu` and `prior_sigma`")
+
         # Default cadence mask
         if cadence_mask is None:
             cadence_mask = np.ones(len(self.lc.flux), bool)
-
-        # # `Lasso` does not support `sample_weight` at the time of coding
-        # # (sklearn v0.21), so we can not pass weights in all cases.
-        # args = {}
-        # if 'sample_weight' in inspect.getargspec(self.model.fit).args \
-        #     and np.isfinite(self.lc.flux_err[cadence_mask]).all():
-        #     args['sample_weight'] = 1. / self.lc.flux_err[cadence_mask]**2
-        #
-        # self.model.fit(X=self.X.values[cadence_mask],
-        #                y=self.lc.flux[cadence_mask],
-        #                **args)
-        # return self.model.coef_
         X = self.X.values
         sigma_w_inv = np.dot(X[cadence_mask].T, X[cadence_mask] / self.lc.flux_err[cadence_mask, None]**2)
+        if prior_sigma is not None:
+            sigma_w_inv += 1/prior_sigma**2
         B = np.dot(X[cadence_mask].T, (self.lc.flux / self.lc.flux_err**2)[cadence_mask, None])
+        if prior_sigma is not None:
+            sigma_w_inv += prior_mu/prior_sigma**2
         w = np.linalg.solve(sigma_w_inv, B).T[0]
         w_err = np.linalg.inv(sigma_w_inv)
         return w, w_err
@@ -140,7 +143,9 @@ class RegressionCorrector(Corrector):
 
         # Iterative sigma clipping
         for count in range(niters):
-            coefficients, coefficients_err = self._fit_coefficients(cadence_mask=cadence_mask)
+            coefficients, coefficients_err = self._fit_coefficients(cadence_mask=cadence_mask,
+                                                            prior_mu=self.X.prior_mu,
+                                                            prior_sigma=self.X.prior_sigma)
             residuals = self.lc.flux - np.dot(self.X.values, coefficients)
             cadence_mask &= ~sigma_clip(residuals, sigma=sigma).mask
             log.debug("correct(): iteration {}: clipped {} cadences"

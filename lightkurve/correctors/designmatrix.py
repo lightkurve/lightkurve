@@ -32,13 +32,19 @@ class DesignMatrix():
     df : pandas `DataFrame` object
     columns : iterable of str (optional)
     """
-    def __init__(self, df, columns=None, name='unnamed_matrix'):
+    def __init__(self, df, columns=None, name='unnamed_matrix', prior_mu=None, prior_sigma=None):
         if not isinstance(df, pd.DataFrame):
             df = pd.DataFrame(df)
         if columns is not None:
             df.columns = columns
         self.df = df
         self.name = name
+        if prior_mu is None:
+            prior_mu = np.zeros(len(df.T))
+        if prior_sigma is None:
+            prior_sigma = np.ones(len(df.T)) * np.inf
+        self.prior_mu = prior_mu
+        self.prior_sigma = prior_sigma
 
     def plot(self, ax=None, show_colorbar=True, **kwargs):
         with plt.style.context(MPLSTYLE):
@@ -90,7 +96,9 @@ class DesignMatrix():
                                 for val in list(self.df.columns))
             dfs.append(self.df[a:b].rename(columns=new_columns))
         new_df = pd.concat(dfs, axis=1).fillna(0)
-        return DesignMatrix(new_df, name=self.name)
+        prior_mu = np.hstack([self.prior_mu for idx in range(len(dfs))])
+        prior_sigma = np.hstack([self.prior_sigma for idx in range(len(dfs))])
+        return DesignMatrix(new_df, name=self.name, prior_mu=prior_mu, prior_sigma=prior_sigma)
 
     def standardize(self):
         """Returns a new matrix with median-subtracted & sigma-divided columns.
@@ -149,9 +157,12 @@ class DesignMatrix():
             new_values, _, _ = np.linalg.svd(self.values)[:, :nterms]
         return DesignMatrix(new_values, name=self.name)
 
-    def append_constant(self):
+    def append_constant(self, prior_mu=0, prior_sigma=np.inf):
         new_df = pd.concat([self.df, pd.DataFrame(np.atleast_2d(np.ones(self.shape[0])).T, columns=['offset'])], axis=1)
-        return DesignMatrix(new_df, name=self.name)
+        prior_mu = np.append(self.prior_mu, prior_mu)
+        prior_sigma = np.append(self.prior_sigma, prior_sigma)
+
+        return DesignMatrix(new_df, name=self.name, prior_mu=prior_mu, prior_sigma=prior_sigma)
 
     def _validate(self):
         """Raises a `DesignMatrixException` if the matrix contains identical columns."""
@@ -188,6 +199,14 @@ class DesignMatrixCollection():
     @property
     def values(self):
         return np.hstack(tuple(m.values for m in self.matrices))
+
+    @property
+    def prior_mu(self):
+        return np.hstack([m.prior_mu for m in self])
+
+    @property
+    def prior_sigma(self):
+        return np.hstack([m.prior_sigma for m in self])
 
     def plot(self, ax=None, **kwargs):
         temp_dm = DesignMatrix(pd.concat([d.df for d in self], axis=1))

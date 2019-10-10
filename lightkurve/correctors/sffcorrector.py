@@ -221,16 +221,16 @@ class SFFCorrector(RegressionCorrector):
             stack.append(dm)
             columns.append(['window{}_bin{}'.format(idx+1, jdx+1) for jdx in range(len(dm.T))])
 
-#        sff_dm = DesignMatrix(pd.DataFrame(np.hstack([c_dm.values, np.hstack(stack)]), columns=np.append(c_dm.columns, columns)), name='sff')
         sff_dm = DesignMatrix(pd.DataFrame(np.hstack(stack)), columns=np.hstack(columns), name='sff')
+        # Have to find a way to calculate good priors....
+        #sff_dm.prior_sigma = np.ones(sff_dm.shape[1]) * lc.flux.std()*10
 
         # long term
         n_knots = int((lc.time[-1] - lc.time[0])/timescale)
         s_dm = _get_spline_dm(lc.time, n_knots=n_knots, include_intercept=True)
 
         ar = np.vstack([lc.time/lc.time.mean(), (lc.time/lc.time.mean())**2])
-
-        dm = DesignMatrixCollection([s_dm.append_constant(), sff_dm])
+        dm = DesignMatrixCollection([s_dm.append_constant(prior_mu=lc.flux.mean(), prior_sigma=lc.flux.std()), sff_dm])
         super(SFFCorrector, self).__init__(lc=lc, design_matrix_collection=dm, **kwargs)
 
 
