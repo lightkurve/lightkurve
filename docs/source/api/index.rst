@@ -51,7 +51,9 @@ These classes provide methods to visualize these data and extract custom light c
 Correcting systematics
 ----------------------
 
-Telescope data is always affected by systematic noise contributed by the detector. The :class:`lightkurve.correctors` sub-package provides classes which offer different strategies to remove such noise:
+Telescope data is always affected by systematic noise contributed by the detector. 
+The :class:`lightkurve.correctors` sub-package provides classes which offer
+different strategies to remove such noise:
 
 .. automodsumm:: lightkurve.correctors
 

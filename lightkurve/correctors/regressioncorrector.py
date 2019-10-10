@@ -1,10 +1,10 @@
 """Defines RegressionCorrector.
+
 TO DO
 -----
 - Work when flux_err not available
 - add regularization
 """
-"""Defines RegressionCorrector."""
 import inspect
 import logging
 
@@ -26,9 +26,53 @@ log = logging.getLogger(__name__)
 class RegressionCorrector(Corrector):
     """Remove noise using linear regression against a design matrix.
 
-    This method will use weighted linear least squares regression to find the
-    parameter vector \beta which minimizes lc.flux - np.dot(X, beta)
-    where X is a design matrix of regressors.
+    .. math::
+
+        \\newcommand{\\y}{\\mathbf{y}}
+        \\newcommand{\\cov}{\\boldsymbol\Sigma_\y}
+        \\newcommand{\\w}{\\mathbf{w}}
+        \\newcommand{\\covw}{\\boldsymbol\Sigma_\w}
+        \\newcommand{\\muw}{\\boldsymbol\mu_\w}
+        \\newcommand{\\sigw}{\\boldsymbol\sigma_\w}
+        \\newcommand{\\varw}{\\boldsymbol\sigma^2_\w}
+
+    Given a column vector of data :math:`\y`
+    and a design matrix of regressors :math:`A`,
+    we will find the vector of coefficients :math:`\w`
+    such that:
+
+    .. math::
+
+        \mathbf{y} = A\mathbf{w} + \mathrm{noise}
+
+    We will assume that the model fits the data within Gaussian uncertainties:
+
+    .. math::
+
+        p(\y | \w) = \mathcal{N}(A\w, \cov)
+
+
+    We make the regression robust by placing Gaussian priors on :math:`\w`:
+
+    .. math::
+
+        p(\w) = \mathcal{N}(\muw, \sigw)
+
+
+    We can then find the maximum likelihood solution of the posterior
+    distribution :math:`p(\w | \y) \propto p(\y | \w) p(\w)` by solving
+    the matrix equation:
+
+    .. math::
+
+        \w = \covw (A^\\top \cov^{-1} \y + \\boldsymbol\sigma^{-2}_\w \muw I)
+
+    Where :math:`\covw` is the covariance matrix of the coefficients:
+
+    .. math::
+
+        \covw = (A^\\top \cov^{-1} A + \\boldsymbol\sigma^{-2}_\w I)^{-1}
+
 
     Parameters
     ----------
@@ -39,32 +83,16 @@ class RegressionCorrector(Corrector):
         collection must have a shape of (time, regressors).
         The columns contained in each matrix must be known to correlate with
         the signals or noise we want to remove from the light curve.
-    model : str {'LinearRegression', 'Ridge', 'Lasso'}
-            or a ~`sklearn.linear_model.base.LinearModel` instance
-        Linear model to use.
-    alpha : float
-        Regularization strength. Only used if `model` equals 'Ridge' or 'Lasso'.
     """
-    def __init__(self, lc, design_matrix_collection, model='LinearRegression', alpha=1.0):
+    def __init__(self, lc, design_matrix_collection):
         if isinstance(design_matrix_collection, DesignMatrix):
             design_matrix_collection = DesignMatrixCollection([design_matrix_collection])
-
-        if isinstance(model, str):
-            model = validate_method(model, ['linearregression', 'ridge', 'lasso'])
-            if model == 'linearregression':
-                # `fit_intercept=False` because we want the user to explicitely
-                # include it as a column of ones in the design matrix
-                model = linear_model.LinearRegression(fit_intercept=False)
-            elif model == 'ridge':
-                model = linear_model.Ridge(fit_intercept=False, alpha=alpha)
-            elif model == 'lasso':
-                model = linear_model.Lasso(fit_intercept=False, alpha=alpha)
-        self.model = model
 
         # Validate user input
         if np.any([~np.isfinite(lc.time), ~np.isfinite(lc.flux)]):
             raise ValueError('Input light curve has NaNs in time or flux. '
-                             'Please remove NaNs before correcting.')
+                             'Please remove NaNs before correction '
+                             '(e.g. using `lc = lc.remove_nans()`).')
         self.lc = lc
         design_matrix_collection._validate()
         self.X = design_matrix_collection
@@ -76,13 +104,13 @@ class RegressionCorrector(Corrector):
         self.diagnostic_lightcurves = None
 
     def __repr__(self):
-        return 'RegressionCorrector (LC: {})'.format(self.lc.targetid)
+        return 'RegressionCorrector (ID: {})'.format(self.lc.targetid)
 
     def _fit_coefficients(self, cadence_mask=None, prior_mu=None, prior_sigma=None):
         """Fit the linear regression coefficients.
 
-        Such that regression_model_flux = np.dot(X, beta) where X is the
-        design matrix.
+        This function will solve a linear regression with Gaussian priors
+        on the coefficients.
 
         Parameters
         ----------
@@ -108,6 +136,7 @@ class RegressionCorrector(Corrector):
         # Default cadence mask
         if cadence_mask is None:
             cadence_mask = np.ones(len(self.lc.flux), bool)
+
         X = self.X.values
         sigma_w_inv = np.dot(X[cadence_mask].T, X[cadence_mask] / self.lc.flux_err[cadence_mask, None]**2)
         if prior_sigma is not None:
