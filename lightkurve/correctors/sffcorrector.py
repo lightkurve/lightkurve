@@ -147,7 +147,8 @@ def _get_window_points(lc, windows, arclength=None, breakindex=None):
     '''
     if arclength is None:
         c, r = lc.centroid_col - lc.centroid_col.min(), lc.centroid_row  - lc.centroid_row.min()
-        arclength = ((c - c.min())**2 + (r - r.min())**2)**0.5
+        arclength = (c**2 + r**2)**0.5
+#        arclength = ((c)**2 + (r)**2)**0.5
 
     # Validate break indicies
     if isinstance(breakindex, int):
@@ -194,8 +195,9 @@ class SFFCorrector(RegressionCorrector):
         self.timescale = timescale
         self.breakindex = breakindex
 
-        c, r = lc.centroid_col - lc.centroid_col.mean(), lc.centroid_row  - lc.centroid_row.mean()
-        self.arclength = ((c - c.min())**2 + (r - r.min())**2)**0.5
+        c, r = lc.centroid_col - lc.centroid_col.min(), lc.centroid_row  - lc.centroid_row.min()
+        self.arclength = (c**2 + r**2)**0.5
+
         c_dm = _get_centroid_dm(c, r)
         lower_idx = np.append(0, self.window_points)
         upper_idx = np.append(self.window_points, len(lc.time))
