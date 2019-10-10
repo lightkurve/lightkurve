@@ -147,6 +147,8 @@ def _get_window_points(lc, windows, arclength=None, breakindex=None):
     '''
     if arclength is None:
         c, r = lc.centroid_col - lc.centroid_col.min(), lc.centroid_row  - lc.centroid_row.min()
+        if (np.polyfit(c, r, 1)[0] < 0):
+            c = np.max(c) - c
         arclength = (c**2 + r**2)**0.5
 #        arclength = ((c)**2 + (r)**2)**0.5
 
@@ -195,7 +197,13 @@ class SFFCorrector(RegressionCorrector):
         self.timescale = timescale
         self.breakindex = breakindex
 
+        # We make an approximation that the arclength is simply
+        # (row**2 + col**2)**0.5
+        # However to make this work row and column must be correlated not anticorrelated
         c, r = lc.centroid_col - lc.centroid_col.min(), lc.centroid_row  - lc.centroid_row.min()
+        # Force c to be correlated not anticorrelated
+        if (np.polyfit(c, r, 1)[0] < 0):
+            c = np.max(c) - c
         self.arclength = (c**2 + r**2)**0.5
 
         c_dm = _get_centroid_dm(c, r)
