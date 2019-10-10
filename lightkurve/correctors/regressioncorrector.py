@@ -97,23 +97,23 @@ class RegressionCorrector(Corrector):
         if cadence_mask is None:
             cadence_mask = np.ones(len(self.lc.flux), bool)
 
-        # `Lasso` does not support `sample_weight` at the time of coding
-        # (sklearn v0.21), so we can not pass weights in all cases.
-        args = {}
-        if 'sample_weight' in inspect.getargspec(self.model.fit).args \
-            and np.isfinite(self.lc.flux_err[cadence_mask]).all():
-            args['sample_weight'] = 1. / self.lc.flux_err[cadence_mask]**2
-
-        self.model.fit(X=self.X.values[cadence_mask],
-                       y=self.lc.flux[cadence_mask],
-                       **args)
-        return self.model.coef_
-
-        # Previous numpy approach:
-        # A = np.dot(X[cadence_mask].T, X[cadence_mask] / flux_weights[:, None])
-        # B = np.dot(X[cadence_mask].T, flux / flux_weights)
-        # coefficients = np.linalg.solve(A, B)
-        # return coefficients
+        # # `Lasso` does not support `sample_weight` at the time of coding
+        # # (sklearn v0.21), so we can not pass weights in all cases.
+        # args = {}
+        # if 'sample_weight' in inspect.getargspec(self.model.fit).args \
+        #     and np.isfinite(self.lc.flux_err[cadence_mask]).all():
+        #     args['sample_weight'] = 1. / self.lc.flux_err[cadence_mask]**2
+        #
+        # self.model.fit(X=self.X.values[cadence_mask],
+        #                y=self.lc.flux[cadence_mask],
+        #                **args)
+        # return self.model.coef_
+        X = self.X.values
+        sigma_w_inv = np.dot(X[cadence_mask].T, X[cadence_mask] / self.lc.flux_err[cadence_mask, None]**2)
+        B = np.dot(X[cadence_mask].T, (self.lc.flux / self.lc.flux_err**2)[cadence_mask, None])
+        w = np.linalg.solve(sigma_w_inv, B).T[0]
+        w_err = np.linalg.inv(sigma_w_inv)
+        return w, w_err
 
     def correct(self, cadence_mask=None, sigma=5, niters=5):
         """Find the best fit correction for the light curve.
@@ -139,19 +139,23 @@ class RegressionCorrector(Corrector):
 
         # Iterative sigma clipping
         for count in range(niters):
-            coefficients = self._fit_coefficients(cadence_mask=cadence_mask)
+            coefficients, coefficients_err = self._fit_coefficients(cadence_mask=cadence_mask)
             residuals = self.lc.flux - np.dot(self.X.values, coefficients)
             cadence_mask &= ~sigma_clip(residuals, sigma=sigma).mask
             log.debug("correct(): iteration {}: clipped {} cadences"
                       "".format(count, cadence_mask.sum()))
         self.cadence_mask = cadence_mask
         self.coefficients = coefficients
+        self.coefficients_err = coefficients_err
 
         model_flux = np.dot(self.X.values, coefficients)
         model_flux -= np.median(model_flux)
-        self.model_lc = LightCurve(self.lc.time, model_flux)
+        samples = np.asarray([np.dot(self.X.values, np.random.multivariate_normal(coefficients, coefficients_err)) for idx in range(100)]).T
+        model_err = np.abs(np.percentile(samples, [16, 84], axis=1) - np.median(samples, axis=1)[:, None].T).mean(axis=0)
+        self.model_lc = LightCurve(self.lc.time, model_flux, model_err)
         self.corrected_lc = self.lc.copy()
         self.corrected_lc.flux = self.lc.flux - self.model_lc.flux
+        self.corrected_lc.flux_err = (self.lc.flux_err*2 + self.model_lc.flux_err**2)**0.5
         self.diagnostic_lightcurves = self._create_diagnostic_lightcurves()
         return self.corrected_lc
 
@@ -169,8 +173,11 @@ class RegressionCorrector(Corrector):
             # What is the index of the first column for the submatrix?
             firstcol_idx = sum([m.shape[1] for m in self.X.matrices[:idx]])
             submatrix_coefficients = self.coefficients[firstcol_idx:firstcol_idx+submatrix.shape[1]]
+            submatrix_coefficients_err = self.coefficients_err[firstcol_idx:firstcol_idx+submatrix.shape[1], firstcol_idx:firstcol_idx+submatrix.shape[1]]
+            samples = np.asarray([np.dot(submatrix.values, np.random.multivariate_normal(submatrix_coefficients, submatrix_coefficients_err)) for idx in range(100)]).T
+            model_err = np.abs(np.percentile(samples, [16, 84], axis=1) - np.median(samples, axis=1)[:, None].T).mean(axis=0)
             model_flux = np.dot(submatrix.values, submatrix_coefficients)
-            lcs[submatrix.name] = LightCurve(self.lc.time, model_flux - np.median(model_flux), label=submatrix.name)
+            lcs[submatrix.name] = LightCurve(self.lc.time, model_flux - np.median(model_flux), model_err, label=submatrix.name)
         return lcs
 
     def _diagnostic_plot(self):

@@ -9,6 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from astropy.modeling import models, fitting
 
+from patsy import dmatrix
 
 from . import DesignMatrix, DesignMatrixCollection
 from .regressioncorrector import RegressionCorrector
@@ -145,7 +146,7 @@ def _get_window_points(lc, windows, arclength=None, breakindex=None):
         Cadence where there is a natural break. Windows will be automatically put here.
     '''
     if arclength is None:
-        c, r = lc.centroid_col - lc.centroid_col.mean(), lc.centroid_row  - lc.centroid_row.mean()
+        c, r = lc.centroid_col - lc.centroid_col.min(), lc.centroid_row  - lc.centroid_row.min()
         arclength = ((c - c.min())**2 + (r - r.min())**2)**0.5
 
     # Validate break indicies
@@ -183,11 +184,9 @@ def _get_window_points(lc, windows, arclength=None, breakindex=None):
     return np.asarray(window_points, dtype=int)
 
 
-
-
 class SFFCorrector(RegressionCorrector):
 
-    def __init__(self, lc, windows=20, bins=10, timescale=1.5, breakindex=None, **kwargs):
+    def __init__(self, lc, windows=20, bins=10, timescale=1.5, degree=3, breakindex=None, **kwargs):
 
         self.window_points = _get_window_points(lc, windows)
         self.windows = windows
@@ -195,7 +194,9 @@ class SFFCorrector(RegressionCorrector):
         self.timescale = timescale
         self.breakindex = breakindex
 
-        c_dm = get_centroid_dm(lc.centroid_col, lc.centroid_row)
+        c, r = lc.centroid_col - lc.centroid_col.mean(), lc.centroid_row  - lc.centroid_row.mean()
+        self.arclength = ((c - c.min())**2 + (r - r.min())**2)**0.5
+        c_dm = _get_centroid_dm(c, r)
         lower_idx = np.append(0, self.window_points)
         upper_idx = np.append(self.window_points, len(lc.time))
 
@@ -203,19 +204,19 @@ class SFFCorrector(RegressionCorrector):
         columns = []
         for idx, a, b in zip(range(len(lower_idx)), lower_idx, upper_idx):
             #knots = list(np.linspace(*np.percentile(arclength[a:b], [5, 95]), bins))
-            knots = list(np.percentile(arclength[a:b], np.linspace(0, 100, bins+1)[1:-1]))
-            ar = np.copy(arclength)
+            knots = list(np.percentile(self.arclength[a:b], np.linspace(0, 100, bins+1)[1:-1]))
+            ar = np.copy(self.arclength)
             ar[~np.in1d(ar, ar[a:b])] = -1
-            dm = np.asarray(dmatrix("bs(x, knots={}, degree={}, include_intercept={}) - 1".format(knots, degree, include_intercept), {"x": ar}))
+            dm = np.asarray(dmatrix("bs(x, knots={}, degree={}, include_intercept={}) - 1".format(knots, degree, False), {"x": ar}))
             stack.append(dm)
             columns.append(['window{}_bin{}'.format(idx+1, jdx+1) for jdx in range(len(dm.T))])
 
-
-        sff_dm = DesignMatrix(pd.DataFrame(np.hstack([c_dm.values, np.hstack(stack)]), columns=np.append(c_dm.columns, columns)), name='sff')
+#        sff_dm = DesignMatrix(pd.DataFrame(np.hstack([c_dm.values, np.hstack(stack)]), columns=np.append(c_dm.columns, columns)), name='sff')
+        sff_dm = DesignMatrix(pd.DataFrame(np.hstack(stack)), columns=np.hstack(columns), name='sff')
 
         # long term
         n_knots = int((lc.time[-1] - lc.time[0])/timescale)
-        s_dm = get_spline_dm(lc.time, n_knots=n_knots, include_intercept=True)
+        s_dm = _get_spline_dm(lc.time, n_knots=n_knots, include_intercept=True)
 
         ar = np.vstack([lc.time/lc.time.mean(), (lc.time/lc.time.mean())**2])
 
@@ -242,7 +243,7 @@ class SFFCorrector(RegressionCorrector):
             plt.subplots_adjust(hspace=0, wspace=0)
 
             lower_idx = np.append(0, self.window_points)
-            upper_idx = np.append(self.window_points, len(lc.time))
+            upper_idx = np.append(self.window_points, len(self.lc.time))
             f = (self.lc.flux - self.diagnostic_lightcurves['spline'].flux)
             m = self.diagnostic_lightcurves['sff'].flux
 
@@ -252,14 +253,14 @@ class SFFCorrector(RegressionCorrector):
                 if jdx == 0:
                     ax.set_ylabel('Flux')
 
-                ax.scatter(arclength[a:b], f[a:b], s=1, label='Data')
-                ax.scatter(arclength[a:b][~self.cadence_mask[a:b]], f[a:b][~self.cadence_mask[a:b]], s=10, marker='x', c='r', label='Outliers')
+                ax.scatter(self.arclength[a:b], f[a:b], s=1, label='Data')
+                ax.scatter(self.arclength[a:b][~self.cadence_mask[a:b]], f[a:b][~self.cadence_mask[a:b]], s=10, marker='x', c='r', label='Outliers')
 
-                s = np.argsort(arclength[a:b])
-                ax.scatter(arclength[a:b][s], (m[a:b] - np.median(m[a:b]) + np.median(f[a:b]))[s], c='C2', s=0.5, label='Model')
+                s = np.argsort(self.arclength[a:b])
+                ax.scatter(self.arclength[a:b][s], (m[a:b] - np.median(m[a:b]) + np.median(f[a:b]))[s], c='C2', s=0.5, label='Model')
                 jdx += 1
                 if jdx >= max_plot:
                     jdx = 0
                     idx += 1
-                if b == len(lc.time):
+                if b == len(self.lc.time):
                     ax.legend()
