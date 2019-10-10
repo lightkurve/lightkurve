@@ -41,22 +41,22 @@ class Periodogram(object):
 
     Attributes
     ----------
-    frequency : `astropy.units.Quantity` object
-        Array of frequencies with associated astropy unit.
-    power : `astropy.units.Quantity` object
-        Array of power-spectral-densities. The Quantity array must have units
-        of `flux^2 / freq_unit`, where freq_unit is the unit of the frequency
+    frequency : `~astropy.units.Quantity`
+        Array of frequencies as an AstroPy Quantity object.
+    power : `~astropy.units.Quantity`
+        Array of power-spectral-densities. The Quantity must have units of
+        `flux^2 / freq_unit`, where freq_unit is the unit of the frequency
         attribute.
-    nyquist : float, optional
+    nyquist : float
         The Nyquist frequency of the lightcurve. In units of freq_unit, where
         freq_unit is the unit of the frequency attribute.
-    label : str, optional
+    label : str
         Human-friendly object label, e.g. "KIC 123456789".
-    targetid : str, optional
+    targetid : str
         Identifier of the target.
     default_view : "frequency" or "period"
         Should plots be shown in frequency space or period space by default?
-    meta : dict, optional
+    meta : dict
         Free-form metadata associated with the Periodogram.
     """
     def __init__(self, frequency, power, nyquist=None, label=None,
@@ -254,7 +254,7 @@ class Periodogram(object):
         ----------
         scale: str
             Set x,y axis to be "linear" or "log". Default is linear.
-        ax : matplotlib.axes._subplots.AxesSubplot
+        ax : `~matplotlib.axes.Axes`
             A matplotlib axes object to plot into. If no axes is provided,
             a new one will be generated.
         xlabel : str
@@ -276,7 +276,7 @@ class Periodogram(object):
 
         Returns
         -------
-        ax : matplotlib.axes._subplots.AxesSubplot
+        ax : `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
         if isinstance(unit, u.quantity.Quantity):
@@ -551,7 +551,7 @@ class SNRPeriodogram(Periodogram):
 
         Returns
         -------
-        ax : matplotlib.axes._subplots.AxesSubplot
+        ax : `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
         ax = super(SNRPeriodogram, self).plot(**kwargs)
@@ -1107,7 +1107,7 @@ class BoxLeastSquaresPeriodogram(Periodogram):
 
         Returns
         -------
-        ax : matplotlib.axes._subplots.AxesSubplot
+        ax : `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
         ax = super(BoxLeastSquaresPeriodogram, self).plot(**kwargs)

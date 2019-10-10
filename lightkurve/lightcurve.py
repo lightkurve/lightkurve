@@ -42,9 +42,9 @@ class LightCurve(object):
         Flux values for every time point.
     flux_err : array-like
         Uncertainty on each flux data point.
-    flux_unit : astropy.units.Unit or str
+    flux_unit : `~astropy.units.Unit` or str
         Unit of the flux values.  If a string is passed, it will be passed
-        on the the constructor of `~astropy.units.Unit`.
+        on to `~astropy.units.Unit`.
     time_format : str
         String specifying how an instant of time is represented,
         e.g. 'bkjd' or 'jd'.
@@ -58,24 +58,16 @@ class LightCurve(object):
     meta : dict
         Free-form metadata associated with the LightCurve.
 
-    Raises
-    ------
-    ValueError
-        If `flux_unit` is not a valid astropy Unit object or string.
-
     Examples
     --------
-    Create a new `LightCurve` object, access the data,
-    and apply binning as follows:
-
-        >>> import lightkurve as lk
-        >>> lc = lk.LightCurve(time=[1, 2, 3, 4], flux=[0.97, 1.01, 1.03, 0.99])
-        >>> lc.time
-        array([1, 2, 3, 4])
-        >>> lc.flux
-        array([0.97, 1.01, 1.03, 0.99])
-        >>> lc.bin(binsize=2).flux
-        array([0.99, 1.01])
+    >>> import lightkurve as lk
+    >>> lc = lk.LightCurve(time=[1, 2, 3, 4], flux=[0.97, 1.01, 1.03, 0.99])
+    >>> lc.time
+    array([1, 2, 3, 4])
+    >>> lc.flux
+    array([0.97, 1.01, 1.03, 0.99])
+    >>> lc.bin(binsize=2).flux
+    array([0.99, 1.01])
     """
     def __init__(self, time=None, flux=None, flux_err=None, flux_unit=None,
                  time_format=None, time_scale=None, targetid=None, label=None,
@@ -131,44 +123,81 @@ class LightCurve(object):
         return arr
 
     def __getitem__(self, key):
-        copy_self = copy.copy(self)
+        copy_self = self.copy()
         copy_self.time = self.time[key]
         copy_self.flux = self.flux[key]
         copy_self.flux_err = self.flux_err[key]
         return copy_self
 
+    def __len__(self):
+        return len(self.time)
+
     def __add__(self, other):
-        copy_self = copy.copy(self)
-        copy_self.flux = copy_self.flux + other
-        return copy_self
+        newlc = self.copy()
+        if isinstance(other, LightCurve):
+            if len(self) != len(other):
+                raise ValueError("Cannot add LightCurve objects because "
+                                 "they do not have equal length ({} vs {})."
+                                 "".format(len(self), len(other)))
+            if np.any(self.time != other.time):
+                warnings.warn("Two LightCurve objects with inconsistent time "
+                              "values are being added.")
+            newlc.flux = self.flux + other.flux
+            newlc.flux_err = np.hypot(self.flux_err, other.flux_err)
+        else:
+            newlc.flux = self.flux + other
+        return newlc
 
     def __radd__(self, other):
         return self.__add__(other)
 
     def __sub__(self, other):
-        return self.__add__(-other)
+        return self.__add__(-1 * other)
 
     def __rsub__(self, other):
-        copy_self = copy.copy(self)
-        copy_self.flux = other - copy_self.flux
-        return copy_self
+        return (-1 * self).__add__(other)
 
     def __mul__(self, other):
-        copy_self = copy.copy(self)
-        copy_self.flux = other * copy_self.flux
-        copy_self.flux_err = abs(other) * copy_self.flux_err
-        return copy_self
+        newlc = self.copy()
+        if isinstance(other, LightCurve):
+            if len(self) != len(other):
+                raise ValueError("Cannot multiply LightCurve objects because "
+                                 "they do not have equal length ({} vs {})."
+                                 "".format(len(self), len(other)))
+            if np.any(self.time != other.time):
+                warnings.warn("Two LightCurve objects with inconsistent time "
+                              "values are being multiplied.")
+            newlc.flux = self.flux * other.flux
+            # Applying standard uncertainty propagation, cf.
+            # https://en.wikipedia.org/wiki/Propagation_of_uncertainty#Example_formulae
+            newlc.flux_err = abs(newlc.flux) * np.hypot(self.flux_err / self.flux, other.flux_err / other.flux)
+        else:
+            newlc.flux = other * self.flux
+            newlc.flux_err = abs(other) * self.flux_err
+        return newlc
 
     def __rmul__(self, other):
         return self.__mul__(other)
 
     def __truediv__(self, other):
-        return self.__mul__(1./other)
+        return self.__mul__(1. / other)
 
     def __rtruediv__(self, other):
-        copy_self = copy.copy(self)
-        copy_self.flux = other / copy_self.flux
-        return copy_self
+        newlc = self.copy()
+        if isinstance(other, LightCurve):
+            if len(self) != len(other):
+                raise ValueError("Cannot divide LightCurve objects because "
+                                 "they do not have equal length ({} vs {})."
+                                 "".format(len(self), len(other)))
+            if np.any(self.time != other.time):
+                warnings.warn("Two LightCurve objects with inconsistent time "
+                              "values are being divided.")
+            newlc.flux = other.flux / self.flux
+            newlc.flux_err = abs(newlc.flux) * np.hypot(self.flux_err / self.flux, other.flux_err / other.flux)
+        else:
+            newlc.flux = other / self.flux
+            newlc.flux_err = abs((other * self.flux_err) / (self.flux**2))
+        return newlc
 
     def __div__(self, other):
         return self.__truediv__(other)
@@ -340,7 +369,7 @@ class LightCurve(object):
         if inplace:
             new_lc = self
         else:
-            new_lc = copy.copy(self)
+            new_lc = self.copy()
 
         for i in range(len(others)):
             new_lc.time = np.append(new_lc.time, others[i].time)
@@ -475,8 +504,8 @@ class LightCurve(object):
     def fold(self, period, t0=None, transit_midpoint=None):
         """Folds the lightcurve at a specified `period` and reference time `t0`.
 
-        This method returns a `FoldedLightCurve` object in which the time
-        values range between -0.5 to +0.5 (i.e. the phase).
+        This method returns a `~lightkurve.lightcurve.FoldedLightCurve` object
+        in which the time values range between -0.5 to +0.5 (i.e. the phase).
         Data points which occur exactly at ``t0`` or an integer multiple of
         ``t0 + n*period`` will have phase value 0.0.
 
@@ -484,7 +513,8 @@ class LightCurve(object):
         --------
         The example below shows a light curve with a period dip which occurs near
         time value 1001 and has a period of 5 days. Calling the `fold` method
-        will transform the light curve into a `FoldedLightCurve` object::
+        will transform the light curve into a
+        `~lightkurve.lightcurve.FoldedLightCurve` object::
 
             >>> import lightkurve as lk
             >>> lc = lk.LightCurve(time=range(1001, 1012), flux=[0.5, 1.0, 1.0, 1.0, 1.0, 0.5, 1.0, 1.0, 1.0, 1.0, 0.5])
@@ -492,8 +522,9 @@ class LightCurve(object):
             >>> folded_lc   # doctest: +SKIP
             <lightkurve.lightcurve.FoldedLightCurve>
 
-        An object of type `FoldedLightCurve` is useful because it provides
-        convenient access to the phase values and the phase-folded fluxes::
+        An object of type `~lightkurve.lightcurve.FoldedLightCurve` is useful
+        because it provides convenient access to the phase values and the
+        phase-folded fluxes::
 
             >>> folded_lc.phase
             array([-0.4, -0.4, -0.2, -0.2,  0. ,  0. ,  0. ,  0.2,  0.2,  0.4,  0.4])
@@ -505,8 +536,9 @@ class LightCurve(object):
             >>> folded_lc.time_original
             array([1004, 1009, 1005, 1010, 1001, 1006, 1011, 1002, 1007, 1003, 1008])
 
-        A `FoldedLightCurve` inherits all the features of a standard `LightCurve`
-        object. For example, we can very quickly obtain a phase-folded plot using:
+        A `~lightkurve.lightcurve.FoldedLightCurve` inherits all the features
+        of a standard `LightCurve` object. For example, we can very quickly
+        obtain a phase-folded plot using:
 
             >>> folded_lc.plot()    # doctest: +SKIP
 
@@ -524,7 +556,7 @@ class LightCurve(object):
 
         Returns
         -------
-        folded_lightcurve : `FoldedLightCurve`
+        folded_lightcurve : `~lightkurve.lightcurve.FoldedLightCurve`
             A new light curve object in which the data are folded and sorted by
             phase. The object contains an extra ``phase`` attribute.
         """
@@ -661,15 +693,20 @@ class LightCurve(object):
     def fill_gaps(self, method='gaussian_noise'):
         """Fill in gaps in time.
 
+        By default, the gaps will be filled with random white Gaussian noise
+        distributed according to
+        :math:`\mathcal{N} (\mu=\overline{\mathrm{flux}}, \sigma=\mathrm{CDPP})`.
+        No other methods are supported at this time.
+
         Parameters
         ----------
         method : string {'gaussian_noise'}
-            Method to use for gap filling. Fills with gaussian noise by default
+            Method to use for gap filling. Fills with Gaussian noise by default.
 
         Returns
         -------
         filled_lightcurve : `LightCurve`
-            A new light curve object in which NaN values and gaps in time
+            A new light curve object in which all NaN values and gaps in time
             have been filled.
         """
         lc = self.copy().remove_nans()
@@ -764,12 +801,12 @@ class LightCurve(object):
             The number of standard deviations to use for both the lower and
             upper clipping limit. These limits are overridden by
             ``sigma_lower`` and ``sigma_upper``, if input. Defaults to 5.
-        sigma_lower : float or `None`
+        sigma_lower : float or None
             The number of standard deviations to use as the lower bound for
             the clipping limit. Can be set to float('inf') in order to avoid
             clipping outliers below the median at all. If `None` then the
             value of ``sigma`` is used. Defaults to `None`.
-        sigma_upper : float or `None`
+        sigma_upper : float or None
             The number of standard deviations to use as the upper bound for
             the clipping limit. Can be set to float('inf') in order to avoid
             clipping outliers above the median at all. If `None` then the
@@ -975,7 +1012,7 @@ class LightCurve(object):
 
         Returns
         -------
-        ax : matplotlib.axes._subplots.AxesSubplot
+        ax : `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
         # Configure the default style
@@ -1042,9 +1079,9 @@ class LightCurve(object):
 
         Parameters
         ----------
-        ax : matplotlib.axes._subplots.AxesSubplot
+        ax : `~matplotlib.axes.Axes`
             A matplotlib axes object to plot into. If no axes is provided,
-            a new one will be generated.
+            a new one will be created.
         normalize : bool
             Normalize the lightcurve before plotting?
         xlabel : str
@@ -1062,7 +1099,7 @@ class LightCurve(object):
 
         Returns
         -------
-        ax : matplotlib.axes._subplots.AxesSubplot
+        ax : `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
         return self._create_plot(method='plot', **kwargs)
@@ -1072,7 +1109,7 @@ class LightCurve(object):
 
         Parameters
         ----------
-        ax : matplotlib.axes._subplots.AxesSubplot
+        ax : `~matplotlib.axes.Axes`
             A matplotlib axes object to plot into. If no axes is provided,
             a new one will be generated.
         normalize : bool
@@ -1096,7 +1133,7 @@ class LightCurve(object):
 
         Returns
         -------
-        ax : matplotlib.axes._subplots.AxesSubplot
+        ax : `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
         return self._create_plot(method='scatter', colorbar_label=colorbar_label,
@@ -1107,7 +1144,7 @@ class LightCurve(object):
 
         Parameters
         ----------
-        ax : matplotlib.axes._subplots.AxesSubplot
+        ax : `~matplotlib.axes.Axes`
             A matplotlib axes object to plot into. If no axes is provided,
             a new one will be generated.
         normalize : bool
@@ -1129,7 +1166,7 @@ class LightCurve(object):
 
         Returns
         -------
-        ax : matplotlib.axes._subplots.AxesSubplot
+        ax : `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
         if 'ls' not in kwargs:
@@ -1207,7 +1244,8 @@ class LightCurve(object):
         return tbl
 
     def to_timeseries(self):
-        """Converts the light curve to an `~astropy.timeseries.TimeSeries` object.
+        """Converts the light curve to an AstroPy
+        `~astropy.timeseries.TimeSeries` object.
 
         This feature requires AstroPy v3.2 or later (released in 2019).
         An `ImportError` will be raised if this version is not available.
@@ -1226,18 +1264,22 @@ class LightCurve(object):
 
     @staticmethod
     def from_timeseries(ts):
-        """Create a new `LightCurve` from an `~astropy.timeseries.TimeSeries`.
+        """Creates a new `LightCurve` from an AstroPy
+        `~astropy.timeseries.TimeSeries` object.
 
         Parameters
         ----------
         ts : `~astropy.timeseries.TimeSeries`
-            An AstroPy TimeSeries object.  The object must contain columns
+            The AstroPy TimeSeries object.  The object must contain columns
             named 'time', 'flux', and 'flux_err'.
         """
         return LightCurve(time=ts['time'].value, flux=ts['flux'], flux_err=ts['flux_err'])
 
     def to_pandas(self, columns=('time', 'flux', 'flux_err')):
         """Converts the light curve to a Pandas `~pandas.DataFrame` object.
+
+        By default, the object returned will contain the columns 'time', 'flux',
+        and 'flux_err'.  This can be changed using the `columns` parameter.
 
         Parameters
         ----------
@@ -1272,21 +1314,25 @@ class LightCurve(object):
         return df
 
     def to_csv(self, path_or_buf=None, **kwargs):
-        """Writes the light curve to a csv file.
+        """Writes the light curve to a CSV file.
+
+        This method will convert the light curve into the Comma-Separated Values
+        (CSV) text format. By default this method will return the result as a
+        string, but you can also write the string directly to disk by providing
+        a file name or handle via the `path_or_buf` parameter.
 
         Parameters
         ----------
-        path_or_buf : string or file handle, default None
-            File path or object, if None is provided the result is returned as
-            a string.
+        path_or_buf : string or file handle
+            File path or object. By default, the result is returned as a string.
         **kwargs : dict
             Dictionary of arguments to be passed to `pandas.DataFrame.to_csv()`.
 
         Returns
         -------
         csv : str or None
-            Returns a csv-formatted string if ``path_or_buf=None``,
-            returns None otherwise.
+            Returns a csv-formatted string if ``path_or_buf=None``.
+            Returns `None` otherwise.
         """
         return self.to_pandas().to_csv(path_or_buf=path_or_buf, **kwargs)
 
@@ -1294,19 +1340,20 @@ class LightCurve(object):
         """Converts the light curve to a `~lightkurve.periodogram.Periodogram`
         power spectrum object.
 
-        This method will call either `lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve()`
-        or `lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve()`,
+        This method will call either
+        `lightkurve.periodogram.LombScarglePeriodogram.from_lightcurve()` or
+        `lightkurve.periodogram.BoxLeastSquaresPeriodogram.from_lightcurve()`,
         which in turn wrap `astropy.stats.LombScargle` and `astropy.stats.BoxLeastSquares`.
 
         Optional keywords accepted if ``method='lombscargle'`` are:
-            ``minimum_frequency``, ``maximum_frequency``, ``mininum_period``,
-            ``maximum_period``, ``frequency``, ``period``, ``nterms``,
-            ``nyquist_factor``, ``oversample_factor``, ``freq_unit``,
-            ``normalization``.
+        ``minimum_frequency``, ``maximum_frequency``, ``mininum_period``,
+        ``maximum_period``, ``frequency``, ``period``, ``nterms``,
+        ``nyquist_factor``, ``oversample_factor``, ``freq_unit``,
+        ``normalization``.
 
-        Optional keywords accepted for ``method='bls'`` are:
-            ``minimum_period``, ``maximum_period``, ``period``,
-            ``frequency_factor``, ``duration``.
+        Optional keywords accepted if ``method='bls'`` are
+        ``minimum_period``, ``maximum_period``, ``period``,
+        ``frequency_factor``, ``duration``.
 
         Parameters
         ----------
@@ -1338,7 +1385,7 @@ class LightCurve(object):
         """Returns a `~lightkurve.seismology.Seismology` object for estimating
         quick-look asteroseismic quantities.
 
-        All **kwargs will be passed to the `to_periodogram()` method.
+        All `**kwargs` will be passed to the `to_periodogram()` method.
 
         Returns
         -------
@@ -1349,16 +1396,20 @@ class LightCurve(object):
         return Seismology.from_lightcurve(self, **kwargs)
 
     def to_fits(self, path=None, overwrite=False, flux_column_name='FLUX', **extra_data):
-        """Writes the light curve to a FITS file.
+        """Converts the light curve to a FITS file in the Kepler/TESS file format.
+
+        The FITS file will be returned as a `~astropy.io.fits.HDUList` object.
+        If a `path` is specified then the file will also be written to disk.
 
         Parameters
         ----------
-        path : string, default ``None``
-            If set, location where the FITS file will be written.
+        path : str or None
+            Location where the FITS file will be written, which is optional.
         overwrite : bool
-            Whether or not to overwrite the file
+            Whether or not to overwrite the file, if `path` is set.
         flux_column_name : str
-            The name of the label for the FITS extension, e.g. SAP_FLUX or FLUX
+            The column name in the FITS file where the light curve flux data
+            should be stored.  Typical values are `FLUX` or `SAP_FLUX`.
         extra_data : dict
             Extra keywords or columns to include in the FITS file.
             Arguments of type str, int, float, or bool will be stored as
@@ -1368,7 +1419,7 @@ class LightCurve(object):
 
         Returns
         -------
-        hdu : `astropy.io.fits.HDUList`
+        hdu : `~astropy.io.fits.HDUList`
             Returns an `~astropy.io.fits.HDUList` object.
         """
         typedir = {int: 'J', str: 'A', float: 'D', bool: 'L',
@@ -1486,8 +1537,8 @@ class LightCurve(object):
 class FoldedLightCurve(LightCurve):
     """Generic class to store and plot phase-folded light curves.
 
-    Compared to the standard `LightCurve` class, this class offers an extra
-    `phase` property and implements different plotting defaults.
+    Compared to the `~lightkurve.lightcurve.LightCurve` base class, this class
+    offers an extra `phase` property and implements different plotting defaults.
     """
     def __init__(self, *args, **kwargs):
         self.time_original = kwargs.pop("time_original", None)
@@ -1498,7 +1549,8 @@ class FoldedLightCurve(LightCurve):
         return self.time
 
     def plot(self, **kwargs):
-        """Plot the folded light curve usng matplotlib's `plot` method.
+        """Plot the folded light curve using matplotlib's
+        `~matplotlib.pyplot.plot` method.
 
         See `LightCurve.plot` for details on the accepted arguments.
 
@@ -1509,7 +1561,7 @@ class FoldedLightCurve(LightCurve):
 
         Returns
         -------
-        ax : matplotlib.axes._subplots.AxesSubplot
+        ax : `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
         ax = super(FoldedLightCurve, self).plot(**kwargs)
@@ -1518,7 +1570,7 @@ class FoldedLightCurve(LightCurve):
         return ax
 
     def scatter(self, **kwargs):
-        """Plot the folded light curve usng matplotlib's `~matplotlib.pyplot.scatter` method.
+        """Plot the folded light curve using matplotlib's `~matplotlib.pyplot.scatter` method.
 
         See `LightCurve.scatter` for details on the accepted arguments.
 
@@ -1529,7 +1581,7 @@ class FoldedLightCurve(LightCurve):
 
         Returns
         -------
-        ax : matplotlib.axes._subplots.AxesSubplot
+        ax : `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
         ax = super(FoldedLightCurve, self).scatter(**kwargs)
@@ -1538,7 +1590,8 @@ class FoldedLightCurve(LightCurve):
         return ax
 
     def errorbar(self, **kwargs):
-        """Plot the folded light curve usng matplotlib's `errorbar` method.
+        """Plot the folded light curve using matplotlib's
+        `~matplotlib.pyplot.errorbar` method.
 
         See `LightCurve.scatter` for details on the accepted arguments.
 
@@ -1549,7 +1602,7 @@ class FoldedLightCurve(LightCurve):
 
         Returns
         -------
-        ax : matplotlib.axes._subplots.AxesSubplot
+        ax : `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
         ax = super(FoldedLightCurve, self).errorbar(**kwargs)
@@ -1635,6 +1688,10 @@ class KeplerLightCurve(LightCurve):
     def to_pandas(self, columns=('time', 'flux', 'flux_err', 'quality',
                                  'centroid_col', 'centroid_row')):
         """Converts the light curve to a Pandas `~pandas.DataFrame` object.
+
+        By default, the object returned will contain the columns 'time', 'flux',
+        'flux_err', 'quality', 'centroid_col', and 'centroid_row'.
+        This can be changed using the `columns` parameter.
 
         Parameters
         ----------

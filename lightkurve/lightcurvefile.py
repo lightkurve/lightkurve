@@ -45,38 +45,42 @@ class LightCurveFile(object):
 
     @property
     def time(self):
-        """Time measurements"""
+        """The file's `TIME` column."""
         return self.hdu[1].data['TIME'][self.quality_mask]
 
     @property
+    def cadenceno(self):
+        """The file's `CADENCENO` column."""
+        return self.hdu[1].data['CADENCENO'][self.quality_mask]
+
+    @property
     def ra(self):
-        """Right Ascension of the target."""
+        """Right Ascension as recorded in the header's `RA_OBJ` keyword."""
         return self.hdu[0].header['RA_OBJ']
 
     @property
     def dec(self):
-        """Declination of the target."""
+        """Declination as recorded in the header's `DEC_OBJ` keyword."""
         return self.hdu[0].header['DEC_OBJ']
 
     @property
     def FLUX(self):
-        """Returns a LightCurve object for FLUX"""
+        """Returns a `~lightkurve.lightcurve.LightCurve` object based on the
+        contents of the `FLUX` column in the file, if that column exists."""
         return self.get_lightcurve('FLUX')
 
     @property
     def SAP_FLUX(self):
-        """Returns a LightCurve object for SAP_FLUX"""
+        """Returns a `~lightkurve.lightcurve.LightCurve` object based on the
+        contents of the `SAP_FLUX` column in the file, if that column exists."""
         return self.get_lightcurve('SAP_FLUX')
 
     @property
     def PDCSAP_FLUX(self):
-        """Returns a LightCurve object for PDCSAP_FLUX"""
+        """Returns a `~lightkurve.lightcurve.LightCurve` object based on the
+        contents of the `PDCSAP_FLUX` column in the file, if that column exists.
+        """
         return self.get_lightcurve('PDCSAP_FLUX')
-
-    @property
-    def cadenceno(self):
-        """Cadence number"""
-        return self.hdu[1].data['CADENCENO'][self.quality_mask]
 
     def _flux_types(self):
         """Returns a list of available flux types for this light curve file"""
@@ -101,8 +105,8 @@ class LightCurveFile(object):
 
         Returns
         -------
-        ax : matplotlib.axes._subplots.AxesSubplot
-            The matplotlib axes object.
+        ax : `~matplotlib.axes.Axes`
+            The matplotlib Axes object.
         """
         if style is None or style == 'lightkurve':
             style = MPLSTYLE
@@ -130,7 +134,7 @@ class LightCurveFile(object):
 
         Parameters
         ----------
-        ax : matplotlib.axes._subplots.AxesSubplot
+        ax : `~matplotlib.axes.Axes`
             A matplotlib axes object to plot into. If no axes is provided,
             a new one will be generated.
         flux_types : list or None
@@ -154,7 +158,7 @@ class LightCurveFile(object):
 
         Returns
         -------
-        ax : matplotlib.axes._subplots.AxesSubplot
+        ax : `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
         return self._create_plot(method='plot', flux_types=flux_types,
@@ -166,7 +170,7 @@ class LightCurveFile(object):
 
         Parameters
         ----------
-        ax : matplotlib.axes._subplots.AxesSubplot
+        ax : `~matplotlib.axes.Axes`
             A matplotlib axes object to plot into. If no axes is provided,
             a new one will be generated.
         flux_types : list or None
@@ -190,7 +194,7 @@ class LightCurveFile(object):
 
         Returns
         -------
-        ax : matplotlib.axes._subplots.AxesSubplot
+        ax : `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
         return self._create_plot(method='scatter', flux_types=flux_types,
@@ -201,7 +205,7 @@ class LightCurveFile(object):
 
         Parameters
         ----------
-        ax : matplotlib.axes._subplots.AxesSubplot
+        ax : `~matplotlib.axes.Axes`
             A matplotlib axes object to plot into. If no axes is provided,
             a new one will be generated.
         flux_types : list or None
@@ -225,7 +229,7 @@ class LightCurveFile(object):
 
         Returns
         -------
-        ax : matplotlib.axes._subplots.AxesSubplot
+        ax : `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
         return self._create_plot(method='errorbar', flux_types=flux_types,

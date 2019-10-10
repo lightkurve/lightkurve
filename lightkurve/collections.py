@@ -141,7 +141,7 @@ class LightCurveCollection(Collection):
 
         Parameters
         ----------
-        ax : `~matplotlib.axes._subplots.AxesSubplot`
+        ax : `~matplotlib.axes.Axes`
             A matplotlib axes object to plot into. If no axes is provided,
             a new one will be created.
 
@@ -150,7 +150,7 @@ class LightCurveCollection(Collection):
 
         Returns
         -------
-        ax : `~matplotlib.axes._subplots.AxesSubplot`
+        ax : `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
         with plt.style.context(MPLSTYLE):
@@ -221,13 +221,13 @@ class LightCurveFileCollection(Collection):
 
         Parameters
         ----------
-        ax : `~matplotlib.axes._subplots.AxesSubplot`
+        ax : `~matplotlib.axes.Axes`
             A matplotlib axes object to plot into. If no axes is provided,
             a new one will be created.
 
         Returns
         -------
-        ax : `~matplotlib.axes._subplots.AxesSubplot`
+        ax : `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
         try:
@@ -258,13 +258,13 @@ class TargetPixelFileCollection(Collection):
 
         Parameters
         ----------
-        ax : `~matplotlib.axes._subplots.AxesSubplot`
+        ax : `~matplotlib.axes.Axes`
             A matplotlib axes object to plot into. If no axes is provided,
             a new one will be created.
 
         Returns
         -------
-        ax : `~matplotlib.axes._subplots.AxesSubplot`
+        ax : `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
         if ax is None:

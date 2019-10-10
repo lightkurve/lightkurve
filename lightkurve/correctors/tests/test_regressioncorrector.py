@@ -5,6 +5,19 @@ from ... import LightCurve
 from .. import RegressionCorrector, DesignMatrix
 
 
+<<<<<<< HEAD
+=======
+def test_regression_corrector():
+    size = 50
+    time = np.linspace(1, 100, size)
+    flux = np.ones(size) + 2*time
+    flux = np.ones(cadences) + np.ones(cadences)
+    np.sin
+    dm = DesignMatrix({})
+    RegressionCorrector()
+
+
+>>>>>>> cf9eafda380d96482cdeaa403648b3b9d5733c84
 def test_sinusoid_noise():
     """Can we remove simple sinusoid noise added to a flat light curve?"""
     size = 100

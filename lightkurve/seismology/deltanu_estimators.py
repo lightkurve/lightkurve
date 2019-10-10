@@ -140,7 +140,7 @@ def diagnose_deltanu_acf2d(deltanu, periodogram):
 
     Returns
     -------
-    ax : matplotlib.axes._subplots.AxesSubplot
+    ax : `~matplotlib.axes.Axes`
         The matplotlib axes object.
     """
     with plt.style.context(MPLSTYLE):

@@ -1,3 +1,9 @@
+"""Defines RegressionCorrector.
+TO DO
+-----
+- Work when flux_err not available
+- add regularization
+"""
 """Defines RegressionCorrector."""
 import inspect
 import logging

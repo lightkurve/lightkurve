@@ -28,7 +28,7 @@ class SearchError(Exception):
 
 class SearchResult(object):
     """Container for the results returned by `search_targetpixelfile`,
-    `search_lightcurvefile`, and `search_tesscut`.
+    `search_lightcurvefile`, or `search_tesscut`.
 
     The purpose of this class is to provide a convenient way to inspect and
     download products that have been identified using one of the data search
@@ -191,7 +191,8 @@ class SearchResult(object):
 
     @suppress_stdout
     def download_all(self, quality_bitmask='default', download_dir=None, cutout_size=None):
-        """Returns a `TargetPixelFileCollection or `LightCurveFileCollection`.
+        """Returns a `~lightkurve.collections.TargetPixelFileCollection` or
+        `~lightkurve.collections.LightCurveFileCollection`.
 
          Parameters
          ----------
@@ -218,8 +219,9 @@ class SearchResult(object):
 
         Returns
         -------
-        collection : `lightkurve.Collection` object
-            Returns a `LightCurveFileCollection`  or `TargetPixelFileCollection`,
+        collection : `~lightkurve.collections.Collection` object
+            Returns a `~lightkurve.collections.LightCurveFileCollection` or
+            `~lightkurve.collections.TargetPixelFileCollection`,
             containing all entries in the products table
         """
         if len(self.table) == 0:
@@ -313,8 +315,8 @@ class SearchResult(object):
 def search_targetpixelfile(target, radius=None, cadence='long',
                            mission=('Kepler', 'K2', 'TESS'), quarter=None,
                            month=None, campaign=None, sector=None, limit=None):
-    """Searches the `public data archive at MAST <https://archive.stsci.edu>`_ for a Kepler or TESS
-    :class:`TargetPixelFile <lightkurve.targetpixelfile.TargetPixelFile>`.
+    """Searches the `public data archive at MAST <https://archive.stsci.edu>`_
+    for a Kepler or TESS `~lightkurve.targetpixelfile.TargetPixelFile`.
 
     This function fetches a data table that lists the Target Pixel Files (TPFs)
     that fall within a region of sky centered around the position of `target`
@@ -356,10 +358,11 @@ def search_targetpixelfile(target, radius=None, cadence='long',
 
     Examples
     --------
-    This example demonstrates how to use the `search_targetpixelfile()` function to
-    query and download data. Before instantiating a `KeplerTargetPixelFile` object or
-    downloading any science products, we can identify potential desired targets with
-    `search_targetpixelfile()`::
+    This example demonstrates how to use the `search_targetpixelfile()` function
+    to query and download data. Before instantiating a
+    `~lightkurve.targetpixelfile.KeplerTargetPixelFile` object or
+    downloading any science products, we can identify potential desired targets
+    with `search_targetpixelfile()`::
 
         >>> search_result = search_targetpixelfile('Kepler-10')  # doctest: +SKIP
         >>> print(search_result)  # doctest: +SKIP
@@ -367,25 +370,26 @@ def search_targetpixelfile(target, radius=None, cadence='long',
     The above code will query mast for Target Pixel Files (TPFs) available for
     the known planet system Kepler-10, and display a table containing the
     available science products. Because Kepler-10 was observed during 15 Quarters,
-    the table will have 15 entries. If we want to download a
-    `TargetPixelFileCollection` object containing all 15 observations, use::
+    the table will have 15 entries. To obtain a
+    `~lightkurve.collections.TargetPixelFileCollection` object containing all
+    15 observations, use::
 
         >>> search_result.download_all()  # doctest: +SKIP
 
     or we can download a single product by limiting our search::
 
-        >>> lcf = search_targetpixelfile('Kepler-10', quarter=2).download()  # doctest: +SKIP
+        >>> tpf = search_targetpixelfile('Kepler-10', quarter=2).download()  # doctest: +SKIP
 
     The above line of code will only download Quarter 2 and create a single
-    `KeplerTargetPixelFile` object called lcf.
+    `~lightkurve.targetpixelfile.KeplerTargetPixelFile` object called `tpf`.
 
     We can also pass a radius into `search_targetpixelfile` to perform a cone search::
 
         >>> search_targetpixelfile('Kepler-10', radius=100).targets  # doctest: +SKIP
 
     This will display a table containing all targets within 100 arcseconds of Kepler-10.
-    We can download a `TargetPixelFileCollection` object containing all available products
-    for these targets in Quarter 4 with::
+    We can download a `~lightkurve.collections.TargetPixelFileCollection` object
+    containing all available products for these targets in Quarter 4 with::
 
         >>> search_targetpixelfile('Kepler-10', radius=100, quarter=4).download_all()  # doctest: +SKIP
     """
@@ -457,7 +461,8 @@ def search_lightcurvefile(target, radius=None, cadence='long',
     planet system Kepler-10, and display a table containing the available
     data products. Because Kepler-10 was observed in 15 quarters, the search
     result will list 15 different files. If we want to download a
-    `LightCurveFileCollection` object containing all 15 observations, use::
+    `~lightkurve.collections.LightCurveFileCollection` object containing all
+    15 observations, use::
 
         >>> search_result.download_all()  # doctest: +SKIP
 
@@ -473,8 +478,9 @@ def search_lightcurvefile(target, radius=None, cadence='long',
         >>> search_lightcurvefile('Kepler-10', radius=100, quarter=4)  # doctest: +SKIP
 
     This will display a table containing all targets within 100 arcseconds of
-    Kepler-10 and in Quarter 4.  We can then download a `LightCurveFileCollection`
-    containing all these products using::
+    Kepler-10 and in Quarter 4.  We can then download a
+    `~lightkurve.collections.LightCurveFileCollection` containing all these
+    products using::
 
         >>> search_lightcurvefile('kepler-10', radius=100, quarter=4).download_all()  # doctest: +SKIP
     """
@@ -889,8 +895,8 @@ def _mask_tess_products(products, sector=None, filetype='Target Pixel'):
 
 def open(path_or_url, **kwargs):
     """Opens any valid Kepler or TESS data file and returns an instance of
-    :class:`LightCurveFile <lightkurve.lightcurvefile.LightCurveFile>`
-    or :class:`TargetPixelFile <lightkurve.targetpixelfile.TargetPixelFile>`.
+    `~lightkurve.lightcurvefile.LightCurveFile` or
+    `~lightkurve.targetpixelfile.TargetPixelFile`.
 
     This function will use the `detect_filetype()` function to
     automatically detect the type of the data product, and return the
@@ -908,8 +914,8 @@ def open(path_or_url, **kwargs):
 
     Returns
     -------
-    data : a subclass of :class:`TargetPixelFile` or :class:`LightCurveFile`,
-        depending on the detected file type.
+    data : a subclass of  `~lightkurve.targetpixelfile.TargetPixelFile` or
+        `~lightkurve.lightcurvefile.LightCurveFile`, depending on the detected file type.
 
     Raises
     ------
