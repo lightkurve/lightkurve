@@ -329,7 +329,7 @@ def bkjd_to_astropy_time(bkjd, bjdref=2454833.):
 
     Parameters
     ----------
-    bkjd : array of floats
+    bkjd : float or array of floats
         Barycentric Kepler Julian Day.
     bjdref : float
         BJD reference date, for Kepler this is 2454833.
@@ -339,6 +339,7 @@ def bkjd_to_astropy_time(bkjd, bjdref=2454833.):
     time : astropy.time.Time object
         Resulting time object
     """
+    bkjd = np.atleast_1d(bkjd)
     jd = bkjd + bjdref
     # Some data products have missing time values;
     # we need to set these to zero or `Time` cannot be instantiated.
@@ -357,7 +358,7 @@ def btjd_to_astropy_time(btjd, bjdref=2457000.):
 
     Parameters
     ----------
-    btjd : array of floats
+    btjd : float or array of floats
         Barycentric TESS Julian Day
     bjdref : float
         BJD reference date.
@@ -367,6 +368,7 @@ def btjd_to_astropy_time(btjd, bjdref=2457000.):
     time : astropy.time.Time object
         Resulting time object
     """
+    btjd = np.atleast_1d(btjd)
     jd = btjd + bjdref
     jd[~np.isfinite(jd)] = 0
     return Time(jd, format='jd', scale='tdb')

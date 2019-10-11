@@ -1,4 +1,4 @@
-Direct code contributions:
+Direct code contributions and bugfixes:
 
 - `Geert Barentsen <https://github.com/barentsen>`_
 - `Christina Hedges <https://github.com/christinahedges>`_
@@ -21,6 +21,7 @@ Direct code contributions:
 - `Zachory K. Berta-Thompson <https://github.com/zkbt>`_
 - `Peter Williams <https://github.com/pkgw>`_
 - `Szabo Pal <https://github.com/zabop>`_
+- `Sam Lee <https://github.com/orionlee>`_
 
 
 Comments, corrections & suggestions:
@@ -52,4 +53,3 @@ Comments, corrections & suggestions:
 - `Richard Elkins <https://github.com/texadactyl>`_
 - `Daniel Foreman-Mackey <https://github.com/dfm>`_
 - `Saeed Hojjatpanah <https://github.com/saeedm31>`_
-- `Sam Lee <https://github.com/orionlee>`_
