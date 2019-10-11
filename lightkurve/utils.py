@@ -344,6 +344,8 @@ def bkjd_to_astropy_time(bkjd, bjdref=2454833.):
     # Some data products have missing time values;
     # we need to set these to zero or `Time` cannot be instantiated.
     jd[~np.isfinite(jd)] = 0
+    if isinstance(bkjd, float):  # If user entered a float, return a float
+        jd = jd[0]
     return Time(jd, format='jd', scale='tdb')
 
 
@@ -371,6 +373,8 @@ def btjd_to_astropy_time(btjd, bjdref=2457000.):
     btjd = np.atleast_1d(btjd)
     jd = btjd + bjdref
     jd[~np.isfinite(jd)] = 0
+    if isinstance(btjd, float):  # If user entered a float, return a float
+        jd = jd[0]
     return Time(jd, format='jd', scale='tdb')
 
 

@@ -111,7 +111,11 @@ def test_import():
 
 def test_btjd_bkjd_input():
     """Regression test for #607: are the bkjd/btjd functions tolerant?"""
-    for user_input in [0, [0], np.array([0])]:
+    # Kepler
+    assert bkjd_to_astropy_time(0).value == 2454833.
+    for user_input in [[0], np.array([0])]:
         assert_array_equal(bkjd_to_astropy_time(user_input).value, np.array([2454833.]))
-    for user_input in [0, [0], np.array([0])]:
+    # TESS
+    assert btjd_to_astropy_time(0).value == 2457000.
+    for user_input in [[0], np.array([0])]:
         assert_array_equal(btjd_to_astropy_time(user_input).value, np.array([2457000.]))
