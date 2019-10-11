@@ -317,7 +317,8 @@ def running_mean(data, window_size):
 
 
 def bkjd_to_astropy_time(bkjd, bjdref=2454833.):
-    """Converts BKJD time values to an `astropy.time.Time` object.
+    """Converts Kepler Barycentric Julian Day (BKJD) time values to an
+    `astropy.time.Time` object.
 
     Kepler Barycentric Julian Day (BKJD) is a Julian day minus 2454833.0
     (UTC=January 1, 2009 12:00:00) and corrected to the arrival times
@@ -336,8 +337,8 @@ def bkjd_to_astropy_time(bkjd, bjdref=2454833.):
 
     Returns
     -------
-    time : astropy.time.Time object
-        Resulting time object
+    time : `astropy.time.Time` object
+        Resulting time object.
     """
     bkjd = np.atleast_1d(bkjd)
     jd = bkjd + bjdref
@@ -350,7 +351,8 @@ def bkjd_to_astropy_time(bkjd, bjdref=2454833.):
 
 
 def btjd_to_astropy_time(btjd, bjdref=2457000.):
-    """Converts BTJD time values to an `astropy.time.Time` object.
+    """Converts TESS Barycentric Julian Day (BTJD) values to an
+    `astropy.time.Time` object.
 
     TESS Barycentric Julian Day (BTJD) is a Julian day minus 2457000.0
     and corrected to the arrival times at the barycenter of the Solar System.
@@ -367,8 +369,8 @@ def btjd_to_astropy_time(btjd, bjdref=2457000.):
 
     Returns
     -------
-    time : astropy.time.Time object
-        Resulting time object
+    time : `astropy.time.Time` object
+        Resulting time object.
     """
     btjd = np.atleast_1d(btjd)
     jd = btjd + bjdref
