@@ -18,8 +18,8 @@ from astropy.io.fits.card import UNDEFINED
 import astropy.units as u
 from astropy.utils.exceptions import AstropyWarning
 
-from ..targetpixelfile import KeplerTargetPixelFile, KeplerTargetPixelFileFactory
-from ..targetpixelfile import TessTargetPixelFile
+from ..targetpixelfile import KeplerTargetPixelFile, TargetPixelFileFactory
+from ..targetpixelfile import TessTargetPixelFile, TargetPixelFile
 from ..lightcurve import TessLightCurve
 from ..utils import LightkurveWarning
 from ..search import open as lkopen
@@ -47,6 +47,9 @@ def test_load_bad_file():
     with pytest.raises(ValueError) as exc:
         TessTargetPixelFile(TABBY_Q8)
     assert('is this a target pixel file?' in exc.value.args[0])
+    with pytest.raises(ValueError) as exc:
+        TargetPixelFile(TABBY_Q8)
+    assert('is this a target pixel file?' in exc.value.args[0])
 
 
 def test_tpf_shapes():
@@ -54,7 +57,8 @@ def test_tpf_shapes():
     with warnings.catch_warnings():
         # Ignore the "TELESCOP is not equal to TESS" warning
         warnings.simplefilter("ignore", LightkurveWarning)
-        tpfs = [KeplerTargetPixelFile(filename_tpf_all_zeros),
+        tpfs = [TargetPixelFile(filename_tpf_all_zeros),
+                KeplerTargetPixelFile(filename_tpf_all_zeros),
                 TessTargetPixelFile(filename_tpf_all_zeros)]
     for tpf in tpfs:
         assert tpf.quality_mask.shape == tpf.hdu[1].data['TIME'].shape
@@ -66,7 +70,8 @@ def test_tpf_plot():
     with warnings.catch_warnings():
         # Ignore the "TELESCOP is not equal to TESS" warning
         warnings.simplefilter("ignore", LightkurveWarning)
-        tpfs = [KeplerTargetPixelFile(filename_tpf_one_center),
+        tpfs = [TargetPixelFile(filename_tpf_one_center),
+                KeplerTargetPixelFile(filename_tpf_one_center),
                 TessTargetPixelFile(filename_tpf_one_center)]
     for tpf in tpfs:
         tpf.plot()
@@ -111,7 +116,8 @@ def test_tpf_ones(centroid_method):
     with warnings.catch_warnings():
         # Ignore the "TELESCOP is not equal to TESS" warning
         warnings.simplefilter("ignore", LightkurveWarning)
-        tpfs = [KeplerTargetPixelFile(filename_tpf_one_center),
+        tpfs = [TargetPixelFile(filename_tpf_one_center),
+                KeplerTargetPixelFile(filename_tpf_one_center),
                 TessTargetPixelFile(filename_tpf_one_center)]
     for tpf in tpfs:
         lc = tpf.to_lightcurve(aperture_mask='all', centroid_method=centroid_method)
@@ -138,7 +144,8 @@ def test_bitmasking(quality_bitmask, answer):
 
 def test_wcs():
     """Test the wcs property."""
-    for tpf in [KeplerTargetPixelFile(filename_tpf_one_center),
+    for tpf in [TargetPixelFile(filename_tpf_one_center),
+                KeplerTargetPixelFile(filename_tpf_one_center),
                 TessTargetPixelFile(filename_tess)]:
         w = tpf.wcs
         ra, dec = tpf.get_coordinates()
@@ -207,14 +214,20 @@ def test_repr():
 
 
 def test_to_lightcurve():
-    for tpf in [KeplerTargetPixelFile(filename_tpf_all_zeros),
+    for tpf in [TargetPixelFile(filename_tpf_all_zeros),
+                KeplerTargetPixelFile(filename_tpf_all_zeros),
                 TessTargetPixelFile(filename_tess)]:
         tpf.to_lightcurve()
         tpf.to_lightcurve(aperture_mask=None)
         tpf.to_lightcurve(aperture_mask='all')
         lc = tpf.to_lightcurve(aperture_mask='pipeline')
-        assert lc.astropy_time.scale == 'tdb'
         assert lc.label == tpf.hdu[0].header['OBJECT']
+        # Generic TPFs have unknown timescales by default
+        if tpf.__class__ == TargetPixelFile:
+            assert lc.time_scale == None
+            assert lc.time_format == None
+        else:
+            assert lc.astropy_time.scale == 'tdb'
 
 
 def test_bkg_lightcurve():
@@ -229,7 +242,8 @@ def test_bkg_lightcurve():
 
 
 def test_aperture_photometry():
-    for tpf in [KeplerTargetPixelFile(filename_tpf_all_zeros),
+    for tpf in [TargetPixelFile(filename_tpf_all_zeros),
+                KeplerTargetPixelFile(filename_tpf_all_zeros),
                 TessTargetPixelFile(filename_tess)]:
         tpf.extract_aperture_photometry()
         tpf.extract_aperture_photometry(aperture_mask=None)
@@ -239,7 +253,8 @@ def test_aperture_photometry():
 
 def test_tpf_to_fits():
     """Can we write a TPF back to a fits file?"""
-    for tpf in [KeplerTargetPixelFile(filename_tpf_all_zeros),
+    for tpf in [TargetPixelFile(filename_tpf_all_zeros),
+                KeplerTargetPixelFile(filename_tpf_all_zeros),
                 TessTargetPixelFile(filename_tess)]:
         # `delete=False` is necessary to enable writing to the file on Windows
         # but it means we have to clean up the tmp file ourselves
@@ -252,10 +267,10 @@ def test_tpf_to_fits():
 
 
 def test_tpf_factory():
-    """Can we create TPFs using KeplerTargetPixelFileFactory?"""
+    """Can we create TPFs using TargetPixelFileFactory?"""
     from lightkurve.targetpixelfile import FactoryError
 
-    factory = KeplerTargetPixelFileFactory(n_cadences=10, n_rows=6, n_cols=8)
+    factory = TargetPixelFileFactory(n_cadences=10, n_rows=6, n_cols=8)
     flux_0 = np.ones((6, 8))
     factory.add_cadence(frameno=0, flux=flux_0,
                         header={'TSTART': 0, 'TSTOP': 10})
@@ -429,7 +444,8 @@ def test_properties2(capfd):
 
 def test_interact():
     """Test the Jupyter notebook interact() widget."""
-    for tpf in [KeplerTargetPixelFile(filename_tpf_one_center),
+    for tpf in [TargetPixelFile(filename_tpf_one_center),
+                KeplerTargetPixelFile(filename_tpf_one_center),
                 TessTargetPixelFile(filename_tess)]:
         tpf.interact()
 
