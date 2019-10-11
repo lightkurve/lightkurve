@@ -44,9 +44,9 @@ class TargetPixelFile(object):
     ----------
     path : str or `astropy.io.fits.HDUList`
         Path to a Target Pixel (FITS) File or a `HDUList` object.
-    quality_bitmask : int or None
-        Bitmask (integer) which identifies the quality flag bitmask that should
-        be used to mask out bad cadences.  Default: None
+    quality_bitmask : None
+        (Not implemented in base class) A bitmask (integer) which identifies the
+        quality flag bitmask that should be used to mask out bad cadences.
     targetid : str
         Identifier/name of the target Default: None
     kwargs : dict
@@ -60,7 +60,7 @@ class TargetPixelFile(object):
             self.hdu = fits.open(self.path, **kwargs)
         self.quality_bitmask = quality_bitmask
         self.targetid = targetid
-        self.quality_mask = ~(self.hdu[1].data['QUALITY'] == self.quality_bitmask)
+        self.quality_mask = np.ones(len(self.hdu[1].data['TIME']), dtype=bool)
 
     def __getitem__(self, key):
         """Implements indexing and slicing.
@@ -132,12 +132,21 @@ class TargetPixelFile(object):
     @property
     def ra(self):
         """Right Ascension of target ('RA_OBJ' header keyword)."""
-        return self.get_keyword('RA_OBJ')
+        RA_OBJ = self.get_keyword('RA_OBJ')
+        if RA_OBJ != '':
+            return RA_OBJ
+        else:
+            return self.get_keyword('RA_REF')
+
 
     @property
     def dec(self):
         """Declination of target ('DEC_OBJ' header keyword)."""
-        return self.get_keyword('DEC_OBJ')
+        DEC_OBJ = self.get_keyword('DEC_OBJ')
+        if DEC_OBJ != '':
+            return DEC_OBJ
+        else:
+            return self.get_keyword('DEC_REF')
 
     @property
     def column(self):
@@ -1059,7 +1068,7 @@ class TargetPixelFile(object):
 
         header_keywords = ['MISSION', 'TELESCOP', 'INSTRUME', 'QUARTER',
                           'CAMPAIGN', 'CHANNEL', 'MODULE', 'OUTPUT', 'BMJD_OBS',
-                          'EXPTIME', 'BUNIT']
+                          'EXPTIME', 'BUNIT', 'RA_REF', 'DEC_REF']
         carry_keywords = {}
 
         # Define a helper function to accept images in a flexible way
@@ -1079,7 +1088,7 @@ class TargetPixelFile(object):
                 extension = 1  # TESS FFIs have the image data in extension #1
 
         # If no position is given, ensure the cut-out size matches the image size
-        if position is None:
+        if size is None:
             size = _open_image(images[0], extension).data.shape
 
         # Find middle image to use as a WCS reference

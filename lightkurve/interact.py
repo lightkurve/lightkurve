@@ -229,6 +229,8 @@ def add_gaia_figure_elements(tpf, fig, magnitude_limit=18):
     pix_scale = 4.0  # arcseconds / pixel for Kepler, default
     if tpf.mission == 'TESS':
         pix_scale = 21.0
+    if tpf.mission == 'Spitzer':
+        pix_scale = 1.22
     # We are querying with a diameter as the radius, overfilling by 2x.
     from astroquery.vizier import Vizier
     Vizier.ROW_LIMIT = -1
