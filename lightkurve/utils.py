@@ -358,7 +358,7 @@ def btjd_to_astropy_time(btjd, bjdref=2457000.):
     Parameters
     ----------
     btjd : array of floats
-        Barycentric Kepler Julian Day
+        Barycentric TESS Julian Day
     bjdref : float
         BJD reference date.
 
