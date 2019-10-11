@@ -8,6 +8,9 @@
 - Fixed a bug in `Seismology.plot_echelle()` which caused the Echelle diagram
   of a power spectrum to be rendered incorrectly. [#602]
 
+- Fixed a bug which caused `lightkurve.utils` to be incorrectly resolved to
+  `lightkurve.seismology.utils`. [#606]
+
 
 
 1.2.0 (2019-10-01)
