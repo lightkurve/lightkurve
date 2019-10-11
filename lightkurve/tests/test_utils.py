@@ -100,3 +100,9 @@ def test_validate_method():
     assert validate_method("FOO", ["foo", "bar"]) == "foo"
     with pytest.raises(ValueError):
           validate_method("foo", ["bar"])
+
+
+def test_import():
+    """Regression test for #605; `lk.utils` resolved to `lk.seismology.utils`"""
+    from .. import utils
+    assert hasattr(utils, "btjd_to_astropy_time")
