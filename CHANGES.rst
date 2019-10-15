@@ -11,6 +11,9 @@
 - Fixed a bug which caused `lightkurve.utils` to be incorrectly resolved to
   `lightkurve.seismology.utils`. [#606]
 
+- Changed `bkjd_to_astropy_time()` and `btjd_to_astropy_time()` to accept
+  a single float and lists of floats in addition to numpy arrays. [#608]
+
 
 
 1.2.0 (2019-10-01)
