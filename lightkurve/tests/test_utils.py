@@ -1,7 +1,7 @@
 from __future__ import division, print_function
 
 import numpy as np
-from numpy.testing import assert_almost_equal
+from numpy.testing import assert_almost_equal, assert_array_equal
 from astropy.io import fits
 import pytest
 import warnings
@@ -11,6 +11,7 @@ from ..utils import KeplerQualityFlags, TessQualityFlags
 from ..utils import module_output_to_channel, channel_to_module_output
 from ..utils import LightkurveWarning
 from ..utils import running_mean, detect_filetype, validate_method
+from ..utils import bkjd_to_astropy_time, btjd_to_astropy_time
 from ..lightcurve import LightCurve
 
 from .. import PACKAGEDIR
@@ -106,3 +107,15 @@ def test_import():
     """Regression test for #605; `lk.utils` resolved to `lk.seismology.utils`"""
     from .. import utils
     assert hasattr(utils, "btjd_to_astropy_time")
+
+
+def test_btjd_bkjd_input():
+    """Regression test for #607: are the bkjd/btjd functions tolerant?"""
+    # Kepler
+    assert bkjd_to_astropy_time(0).value == 2454833.
+    for user_input in [[0], np.array([0])]:
+        assert_array_equal(bkjd_to_astropy_time(user_input).value, np.array([2454833.]))
+    # TESS
+    assert btjd_to_astropy_time(0).value == 2457000.
+    for user_input in [[0], np.array([0])]:
+        assert_array_equal(btjd_to_astropy_time(user_input).value, np.array([2457000.]))
