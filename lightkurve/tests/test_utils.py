@@ -123,12 +123,14 @@ def test_btjd_bkjd_input():
 
 
 def test_centroid_quadratic():
+    """Test basic operation of the quadratic centroiding function."""
     # Single bright pixel in the center
     data = np.ones((9, 9))
     data[2, 5] = 10
     col, row = centroid_quadratic(data)
     assert np.isclose(row, 2) & np.isclose(col, 5)
 
+    # Two equally-bright pixels side by side
     data = np.zeros((9, 9))
     data[5, 1] = 5
     data[5, 2] = 5
@@ -143,14 +145,17 @@ def test_centroid_quadratic():
 
 
 def test_centroid_quadratic_robustness():
+    """Test quadratic centroids in edge cases; regression test for #610."""
     # Brightest pixel in upper left
     data = np.zeros((5, 5))
     data[0, 0] = 1
     centroid_quadratic(data)
+
     # Brightest pixel in bottom right
     data = np.zeros((5, 5))
     data[-1, -1] = 1
     centroid_quadratic(data)
+
     # Data contains a NaN
     data = np.zeros((5, 5))
     data[0, 0] = np.nan
