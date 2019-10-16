@@ -123,11 +123,23 @@ def test_btjd_bkjd_input():
 
 
 def test_centroid_quadratic():
+    # Single bright pixel in the center
     data = np.ones((9, 9))
     data[2, 5] = 10
     col, row = centroid_quadratic(data)
-    assert np.isclose(row, 2)
-    assert np.isclose(col, 5)
+    assert np.isclose(row, 2) & np.isclose(col, 5)
+
+    data = np.zeros((9, 9))
+    data[5, 1] = 5
+    data[5, 2] = 5
+    col, row = centroid_quadratic(data)
+    assert np.isclose(row, 5) & np.isclose(col, 1.5)
+
+    # Single bright pixel near the edge -- FAILS
+    #data = np.ones((9, 9))
+    #data[5, 0] = 10
+    #col, row = centroid_quadratic(data)
+    #assert np.isclose(row, 5) & np.isclose(col, 0)
 
 
 def test_centroid_quadratic_robustness():
