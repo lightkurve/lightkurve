@@ -584,8 +584,18 @@ def centroid_quadratic(data, mask=None):
     # that is centered on the brightest pixel (xx, yy)
     if mask is not None:
         data = data * mask
-    arg_data_max = np.argmax(data)
+    arg_data_max = np.nanargmax(data)
     yy, xx = np.unravel_index(arg_data_max, data.shape)
+    # Make sure the 3x3 patch does not leave the TPF bounds
+    if yy < 1:
+        yy = 1
+    if xx < 1:
+        xx = 1
+    if yy > (data.shape[0] - 2):
+        yy = data.shape[0] - 2
+    if xx > (data.shape[1] - 2):
+        xx = data.shape[1] - 2
+
     z_ = data[yy-1:yy+2, xx-1:xx+2]
 
     # Next, we will fit the coefficients of the bivariate quadratic with the

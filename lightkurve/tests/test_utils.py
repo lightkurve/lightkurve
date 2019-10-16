@@ -12,6 +12,7 @@ from ..utils import module_output_to_channel, channel_to_module_output
 from ..utils import LightkurveWarning
 from ..utils import running_mean, detect_filetype, validate_method
 from ..utils import bkjd_to_astropy_time, btjd_to_astropy_time
+from ..utils import centroid_quadratic
 from ..lightcurve import LightCurve
 
 from .. import PACKAGEDIR
@@ -119,3 +120,28 @@ def test_btjd_bkjd_input():
     assert btjd_to_astropy_time(0).value == 2457000.
     for user_input in [[0], np.array([0])]:
         assert_array_equal(btjd_to_astropy_time(user_input).value, np.array([2457000.]))
+
+
+def test_centroid_quadratic():
+    data = np.ones((9, 9))
+    data[2, 5] = 10
+    col, row = centroid_quadratic(data)
+    assert np.isclose(row, 2)
+    assert np.isclose(col, 5)
+
+
+def test_centroid_quadratic_robustness():
+    # Brightest pixel in upper left
+    data = np.zeros((5, 5))
+    data[0, 0] = 1
+    centroid_quadratic(data)
+    # Brightest pixel in bottom right
+    data = np.zeros((5, 5))
+    data[-1, -1] = 1
+    centroid_quadratic(data)
+    # Data contains a NaN
+    data = np.zeros((5, 5))
+    data[0, 0] = np.nan
+    data[-1, -1] = 10
+    col, row = centroid_quadratic(data)
+    assert np.isfinite(col) & np.isfinite(row)
