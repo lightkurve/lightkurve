@@ -137,12 +137,6 @@ def test_centroid_quadratic():
     col, row = centroid_quadratic(data)
     assert np.isclose(row, 5) & np.isclose(col, 1.5)
 
-    # Single bright pixel near the edge -- FAILS
-    #data = np.ones((9, 9))
-    #data[5, 0] = 10
-    #col, row = centroid_quadratic(data)
-    #assert np.isclose(row, 5) & np.isclose(col, 0)
-
 
 def test_centroid_quadratic_robustness():
     """Test quadratic centroids in edge cases; regression test for #610."""

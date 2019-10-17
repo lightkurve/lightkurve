@@ -567,6 +567,9 @@ def centroid_quadratic(data, mask=None):
     For the motivation and the details around this technique, please refer
     to Vakili, M., & Hogg, D. W. 2016, ArXiv, 1610.05873.
 
+    Caveat: if the brightest pixel falls on the edge of the data array, the fit
+    will tend to fail or be inaccurate.
+
     Parameters
     ----------
     data : 2D array
@@ -578,7 +581,8 @@ def centroid_quadratic(data, mask=None):
     Returns
     -------
     column, row : tuple
-        The coordinates of the centroid in column and row.
+        The coordinates of the centroid in column and row.  If the fit failed,
+        then (NaN, NaN) will be returned.
     """
     # Step 1: identify the patch of 3x3 pixels (z_)
     # that is centered on the brightest pixel (xx, yy)
@@ -625,7 +629,7 @@ def centroid_quadratic(data, mask=None):
     # following https://en.wikipedia.org/wiki/Quadratic_function
     det = 4 * d * f - e ** 2
     if abs(det) < 1e-6:
-        return None, None  # No solution
+        return np.nan, np.nan  # No solution
     xm = - (2 * f * b - c * e) / det
     ym = - (2 * d * c - b * e) / det
     return xx + xm, yy + ym
