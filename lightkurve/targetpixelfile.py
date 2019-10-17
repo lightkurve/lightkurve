@@ -397,6 +397,12 @@ class TargetPixelFile(object):
         aperture_mask : ndarray
             2D boolean numpy array containing `True` for selected pixels.
         """
+        # Input validation
+        if hasattr(aperture_mask, 'shape') and (aperture_mask.shape != self.flux[0].shape):
+            raise ValueError("`aperture_mask` has shape {}, "
+                             "but the flux data has shape {}"
+                             "".format(aperture_mask.shape, self.flux[0].shape))
+
         with warnings.catch_warnings():
             # `aperture_mask` supports both arrays and string values; these yield
             # uninteresting FutureWarnings when compared, so let's ignore that.
@@ -407,7 +413,9 @@ class TargetPixelFile(object):
                 aperture_mask = self.pipeline_mask
             elif aperture_mask == 'threshold':
                 aperture_mask = self.create_threshold_mask()
-            elif ((aperture_mask & 2) == 2).any(): # Kepler-pipeline style
+            elif np.issubdtype(aperture_mask.dtype, np.integer) and \
+                ((aperture_mask & 2) == 2).any():
+                # Kepler and TESS pipeline style integer flags
                 aperture_mask = (aperture_mask & 2) == 2
         self._last_aperture_mask = aperture_mask
         return aperture_mask
@@ -513,7 +521,7 @@ class TargetPixelFile(object):
         -------
         columns, rows : array, array
             Arrays containing the column and row positions for the centroid
-            for each cadence.
+            for each cadence, or NaN for cadences where the estimation failed.
         """
         method = validate_method(method, ['moments', 'quadratic'])
         if method == 'moments':

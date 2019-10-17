@@ -567,6 +567,9 @@ def centroid_quadratic(data, mask=None):
     For the motivation and the details around this technique, please refer
     to Vakili, M., & Hogg, D. W. 2016, ArXiv, 1610.05873.
 
+    Caveat: if the brightest pixel falls on the edge of the data array, the fit
+    will tend to fail or be inaccurate.
+
     Parameters
     ----------
     data : 2D array
@@ -578,14 +581,25 @@ def centroid_quadratic(data, mask=None):
     Returns
     -------
     column, row : tuple
-        The coordinates of the centroid in column and row.
+        The coordinates of the centroid in column and row.  If the fit failed,
+        then (NaN, NaN) will be returned.
     """
     # Step 1: identify the patch of 3x3 pixels (z_)
     # that is centered on the brightest pixel (xx, yy)
     if mask is not None:
         data = data * mask
-    arg_data_max = np.argmax(data)
+    arg_data_max = np.nanargmax(data)
     yy, xx = np.unravel_index(arg_data_max, data.shape)
+    # Make sure the 3x3 patch does not leave the TPF bounds
+    if yy < 1:
+        yy = 1
+    if xx < 1:
+        xx = 1
+    if yy > (data.shape[0] - 2):
+        yy = data.shape[0] - 2
+    if xx > (data.shape[1] - 2):
+        xx = data.shape[1] - 2
+
     z_ = data[yy-1:yy+2, xx-1:xx+2]
 
     # Next, we will fit the coefficients of the bivariate quadratic with the
@@ -615,7 +629,7 @@ def centroid_quadratic(data, mask=None):
     # following https://en.wikipedia.org/wiki/Quadratic_function
     det = 4 * d * f - e ** 2
     if abs(det) < 1e-6:
-        return None, None  # No solution
+        return np.nan, np.nan  # No solution
     xm = - (2 * f * b - c * e) / det
     ym = - (2 * d * c - b * e) / det
     return xx + xm, yy + ym
