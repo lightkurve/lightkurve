@@ -3,7 +3,7 @@
 
 - Added a `method="quadratic"` option to `tpf.estimate_centroids()` which
   enables centroids to be estimated by fitting a bivariate polynomial to the
-  PSF core. [#544]
+  PSF core. [#544, #610]
 
 - Fixed a bug in `Seismology.plot_echelle()` which caused the Echelle diagram
   of a power spectrum to be rendered incorrectly. [#602]
