@@ -413,7 +413,8 @@ class TargetPixelFile(object):
                 aperture_mask = self.pipeline_mask
             elif aperture_mask == 'threshold':
                 aperture_mask = self.create_threshold_mask()
-            elif (aperture_mask.dtype == int) and ((aperture_mask & 2) == 2).any():
+            elif np.issubdtype(aperture_mask.dtype, np.integer) and \
+                ((aperture_mask & 2) == 2).any():
                 # Kepler and TESS pipeline style integer flags
                 aperture_mask = (aperture_mask & 2) == 2
         self._last_aperture_mask = aperture_mask
