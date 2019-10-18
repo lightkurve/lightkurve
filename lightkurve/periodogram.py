@@ -19,8 +19,10 @@ from astropy.convolution import convolve, Box1DKernel
 # LombScargle was moved from astropy.stats to astropy.timeseries in AstroPy v3.2
 try:
     from astropy.timeseries import LombScargle
+    from astropy.timeseries import implementations #for .main._is_regular
 except ImportError:
     from astropy.stats import LombScargle
+    from astropy.stats.lombscargle import implementations
 
 
 from . import MPLSTYLE
@@ -666,13 +668,13 @@ class LombScarglePeriodogram(Periodogram):
             If specified, use 1./maximum_period as the minimum frequency rather
             than one over the time baseline.
         frequency :  array-like
-            The regular grid of frequencies to use. If given a unit, it is
-            converted to units of freq_unit. If not, it is assumed to be in
-            units of freq_unit. This over rides any set frequency limits.
+            The grid of frequencies to use. If given a unit, it is converted to 
+            units of freq_unit. If not, it is assumed to be in units of 
+            freq_unit. This over rides any set frequency limits.
         period : array-like
-            The regular grid of periods to use (as 1/period). If given a unit,
-            it is converted to units of freq_unit. If not, it is assumed to be
-            in units of 1/freq_unit. This overrides any set period limits.
+            The grid of periods to use (as 1/period). If given a unit, it is 
+            converted to units of freq_unit. If not, it is assumed to be in 
+            units of 1/freq_unit. This overrides any set period limits.
         nterms : int
             Default 1. Number of terms to use in the Fourier fit.
         nyquist_factor : int
@@ -812,16 +814,13 @@ class LombScarglePeriodogram(Periodogram):
 
         # Convert to desired units
         frequency = u.Quantity(frequency, freq_unit)
-
-        if period is not None:
-            if ls_method == 'fastchi2':
-                ls_method = 'chi2'
-            elif ls_method == 'fast':
-                ls_method = 'slow'
-
-            log.warning("You have passed an evenly-spaced grid of periods. "
-                        "These are not evenly spaced in frequency space.\n"
-                        "Method has been set to '{}' to allow for this.".format(ls_method))
+        
+        # Change to compatible ls method if sampling not even in frequency
+        if not implementations.main._is_regular(frequency) and ls_method in ['fastchi2','fast']:
+            oldmethod = ls_method
+            ls_method = {'fastchi2':'chi2','fast':'slow'}[ls_method]
+            log.warning("The requested periodogram is not evenly sampled in frequency.\n"
+                        "Method has been changed from '{}' to '{}' to allow for this.".format(oldmethod,ls_method))
 
         if (nterms > 1) and (ls_method not in ['fastchi2', 'chi2']):
             warnings.warn("Building a Lomb Scargle Periodogram using the `slow` method. "
