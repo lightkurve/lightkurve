@@ -1,4 +1,7 @@
-"""Defines SFFCorrector
+"""Defines the `SFFCorrector` class.
+
+`SFFCorrector` enables systematics to be removed from light curves using the
+"Self Flat-Fielding" (SFF) method described in Vanderburg and Johnson (2014).
 """
 from __future__ import division, print_function
 
@@ -22,28 +25,31 @@ __all__ = ['SFFCorrector']
 
 
 def _get_spline_dm(x, n_knots=20, degree=3, name='spline', include_intercept=False):
-    """ Returns a spline design matrix
+    """Returns a spline design matrix using `patsy.dmatrix`.
 
     Parameters
     ----------
     x : np.ndarray
         vector to spline
     n_knots: int
-        Number of knots, default 20
+        Number of knots (default: 20).
     degree: int
         Polynomial degree
     name: string
-        Name to pass to lk.DesignMatrix, default 'spline'
-    include_intercept:
+        Name to pass to `.DesignMatrix` (default: 'spline').
+    include_intercept: bool
         Whether to include row of ones to find intercept. Default False.
 
     Returns
     -------
-    dm: np.ndarray
-        Design matrix with shape len(x) x n_knots*degree
+    dm: `.DesignMatrix`
+        Design matrix object with shape (len(x), n_knots*degree).
     """
-    spline_dm = np.asarray(dmatrix("bs(x, df={}, degree={}, include_intercept={}) - 1".format(n_knots, degree, include_intercept), {"x": x}))
-    df = pd.DataFrame(spline_dm, columns=['knot{}'.format(idx + 1) for idx in range(n_knots)])
+    dm_formula = "bs(x, df={}, degree={}, include_intercept={}) - 1" \
+                 "".format(n_knots, degree, include_intercept)
+    spline_dm = np.asarray(dmatrix(dm_formula, {"x": x}))
+    df = pd.DataFrame(spline_dm, columns=['knot{}'.format(idx + 1)
+                                          for idx in range(n_knots)])
     return DesignMatrix(df, name=name)
 
 def _get_centroid_dm(c, r, name='centroids'):
