@@ -3,7 +3,7 @@ import pytest
 import numpy as np
 from numpy.testing import assert_almost_equal
 
-from ... import LightCurve
+from ... import LightCurve, KeplerLightCurveFile
 from .. import SFFCorrector
 
 K2_C08 = ("https://archive.stsci.edu/missions/k2/lightcurves/c8/"
@@ -11,7 +11,7 @@ K2_C08 = ("https://archive.stsci.edu/missions/k2/lightcurves/c8/"
 
 
 @pytest.mark.remote_data
-@pytest.mark.parametrize("path", K2_C08)
+@pytest.mark.parametrize("path", [K2_C08])
 def test_remote_data(path):
     """Can we correct a simple K2 light curve?"""
     lcf = KeplerLightCurveFile(path, quality_bitmask=None)
