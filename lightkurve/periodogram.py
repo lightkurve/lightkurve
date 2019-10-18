@@ -668,12 +668,12 @@ class LombScarglePeriodogram(Periodogram):
             If specified, use 1./maximum_period as the minimum frequency rather
             than one over the time baseline.
         frequency :  array-like
-            The grid of frequencies to use. If given a unit, it is converted to 
-            units of freq_unit. If not, it is assumed to be in units of 
+            The grid of frequencies to use. If given a unit, it is converted to
+            units of freq_unit. If not, it is assumed to be in units of
             freq_unit. This over rides any set frequency limits.
         period : array-like
-            The grid of periods to use (as 1/period). If given a unit, it is 
-            converted to units of freq_unit. If not, it is assumed to be in 
+            The grid of periods to use (as 1/period). If given a unit, it is
+            converted to units of freq_unit. If not, it is assumed to be in
             units of 1/freq_unit. This overrides any set period limits.
         nterms : int
             Default 1. Number of terms to use in the Fourier fit.
@@ -814,7 +814,7 @@ class LombScarglePeriodogram(Periodogram):
 
         # Convert to desired units
         frequency = u.Quantity(frequency, freq_unit)
-        
+
         # Change to compatible ls method if sampling not even in frequency
         if not implementations.main._is_regular(frequency) and ls_method in ['fastchi2','fast']:
             oldmethod = ls_method
