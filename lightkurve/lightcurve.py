@@ -643,7 +643,7 @@ class LightCurve(object):
         # light curve is likely zero-centered and normalization makes no sense.
         if (median_flux == 0) or (np.isfinite(std_flux) and (np.abs(median_flux) < 0.5*std_flux)):
             warnings.warn("The light curve appears to be zero-centered "
-                          "(median={:.2e} ±{:.2e}); `normalize()` will divide "
+                          "(median={:.2e} +/- {:.2e}); `normalize()` will divide "
                           "the light curve by a value close to zero, which is "
                           "probably not what you want."
                           "".format(median_flux, std_flux),
