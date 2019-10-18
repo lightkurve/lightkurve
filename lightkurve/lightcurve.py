@@ -1359,7 +1359,7 @@ class LightCurve(object):
         ``minimum_frequency``, ``maximum_frequency``, ``mininum_period``,
         ``maximum_period``, ``frequency``, ``period``, ``nterms``,
         ``nyquist_factor``, ``oversample_factor``, ``freq_unit``,
-        ``normalization``.
+        ``normalization``, ``ls_method``.
 
         Optional keywords accepted if ``method='bls'`` are
         ``minimum_period``, ``maximum_period``, ``period``,

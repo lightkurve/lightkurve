@@ -696,6 +696,9 @@ class LombScarglePeriodogram(Periodogram):
             Default: `'amplitude'`. The desired normalization of the spectrum.
             Can be either power spectral density (`'psd'`) or amplitude
             (`'amplitude'`).
+        ls_method : str
+            Default: `'fast'`. Passed to the `method` keyword of 
+            `astropy.stats.LombScargle()`.
         kwargs : dict
             Keyword arguments passed to `astropy.stats.LombScargle()`
 
@@ -811,9 +814,9 @@ class LombScarglePeriodogram(Periodogram):
         frequency = u.Quantity(frequency, freq_unit)
 
         if period is not None:
-            if ls_method is 'fastchi2':
+            if ls_method == 'fastchi2':
                 ls_method = 'chi2'
-            elif ls_method is 'fast':
+            elif ls_method == 'fast':
                 ls_method = 'slow'
 
             log.warning("You have passed an evenly-spaced grid of periods. "
