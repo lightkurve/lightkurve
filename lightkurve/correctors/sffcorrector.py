@@ -4,272 +4,273 @@ from __future__ import division, print_function
 
 import logging
 import warnings
-
+import pandas as pd
 import numpy as np
-from scipy import linalg, interpolate
-from matplotlib import pyplot as plt
-from astropy.stats import sigma_clip
+import matplotlib.pyplot as plt
+from astropy.modeling import models, fitting
 
-from .corrector import Corrector
+from patsy import dmatrix
+
+from . import DesignMatrix, DesignMatrixCollection
+from .regressioncorrector import RegressionCorrector
+
+from .. import MPLSTYLE
 
 log = logging.getLogger(__name__)
 
 __all__ = ['SFFCorrector']
 
 
-class SFFCorrector(Corrector):
-    """Implements the Self-Flat-Fielding (SFF) systematics removal method.
-
-    This method is described in detail by Vanderburg and Johnson (2014).
-    Briefly, the algorithm implemented in this class can be described
-    as follows
-
-       (1) Rotate the centroid measurements onto the subspace spanned by the
-           eigenvectors of the centroid covariance matrix
-       (2) Fit a polynomial to the rotated centroids
-       (3) Compute the arclength of such polynomial
-       (4) Fit a BSpline of the raw flux as a function of time
-       (5) Normalize the raw flux by the fitted BSpline computed in step (4)
-       (6) Bin and interpolate the normalized flux as a function of the arclength
-       (7) Divide the raw flux by the piecewise linear interpolation done in step (6)
-       (8) Set raw flux as the flux computed in step (7) and repeat
-       (9) Multiply back the fitted BSpline
+def _get_spline_dm(x, n_knots=20, degree=3, name='spline', include_intercept=False):
+    """ Returns a spline design matrix
 
     Parameters
     ----------
-    lightcurve : `~lightkurve.lightcurve.LightCurve`
-        The light curve object on which the SFF algorithm will be applied.
+    x : np.ndarray
+        vector to spline
+    n_knots: int
+        Number of knots, default 20
+    degree: int
+        Polynomial degree
+    name: string
+        Name to pass to lk.DesignMatrix, default 'spline'
+    include_intercept:
+        Whether to include row of ones to find intercept. Default False.
 
-    Examples
-    --------
-    >>> lc = LightCurve(time, flux)   # doctest: +SKIP
-    >>> corrector = SFFCorrector(lc)   # doctest: +SKIP
-    >>> new_lc = corrector.correct(centroid_col, centroid_row)   # doctest: +SKIP
+    Returns
+    -------
+    dm: np.ndarray
+        Design matrix with shape len(x) x n_knots*degree
     """
-    def __init__(self, lightcurve):
-        self.lc = lightcurve
+    spline_dm = np.asarray(dmatrix("bs(x, df={}, degree={}, include_intercept={}) - 1".format(n_knots, degree, include_intercept), {"x": x}))
+    df = pd.DataFrame(spline_dm, columns=['knot{}'.format(idx + 1) for idx in range(n_knots)])
+    return DesignMatrix(df, name=name)
 
-    def correct(self, centroid_col=None, centroid_row=None,
-                polyorder=5, niters=3, bins=15, windows=10, sigma_1=3.,
-                sigma_2=5., restore_trend=False):
-        """Returns a systematics-corrected LightCurve.
+def _get_centroid_dm(c, r, name='centroids'):
+    """ Returns a centroid design matrix
 
-        Parameters
-        ----------
-        centroid_col, centroid_row : array-like, array-like
-            Centroid column and row coordinates as a function of time.
-            If `None`, then the `centroid_col` and `centroid_row` attributes
-            of the `LightCurve` passed to the constructor of this class
-            will be used, if present.
-        polyorder : int
-            Degree of the polynomial which will be used to fit one
-            centroid as a function of the other.
-        niters : int
-            Number of iterations of the aforementioned algorithm.
-        bins : int
-            Number of bins to be used in step (6) to create the
-            piece-wise interpolation of arclength vs flux correction.
-        windows : int
-            Number of windows to subdivide the data.  The SFF algorithm
-            is ran independently in each window.
-        sigma_1, sigma_2 : float, float
-            Sigma values which will be used to reject outliers
-            in steps (6) and (2), respectivelly.
-        restore_trend : bool
-            If `True`, the long-term trend will be added back into the
-            lightcurve.
+    Parameters
+    ----------
+    c : np.ndarray
+        centroid column
+    r : np.ndarray
+        centroid row
+    name : str
+        Name to pass to lk.DesignMatrix, default 'centroids'
+    Returns
+    -------
+    dm: np.ndarray
+        Design matrix with shape len(c) x 10
 
-        Returns
-        -------
-        corrected_lightcurve : `~lightkurve.lightcurve.LightCurve`
-            Returns a corrected light curve.
-        """
-        # `new_lc` is the object we will return at the end of this function;
-        # SFF does not work on cadences with flux=NaN so we remove them here.
-        new_lc = self.lc.remove_nans().copy()
+    """
+    ar = [c, r,
+          c**2, r**2,
+          c**3, r**3,
+          c*r,
+          c**2*r, c*r**2, c**2*r**2]
 
-        # Input validation
-        if centroid_col is None:
-            try:
-                centroid_col = new_lc.centroid_col
-            except AttributeError:
-                raise ValueError('`centroid_col` must be passed to `correct()` '
-                                 'because it is not a property of the LightCurve.')
-        if centroid_row is None:
-            try:
-                centroid_row = new_lc.centroid_row
-            except AttributeError:
-                raise ValueError('`centroid_row` must be passed to `correct()` '
-                                 'because it is not a property of the LightCurve.')
+    columns = [r'col', r'row',
+               r'col^2', r'row^2',
+               r'col^3', r'row^3',
+               r'col \times row', r'col^2 \times row', r'col \times row^2', r'col^2 \times row^2']
 
-        # Split the data into windows
-        time = np.array_split(new_lc.time, windows)
-        flux = np.array_split(new_lc.flux, windows)
-        centroid_col = np.array_split(centroid_col, windows)
-        centroid_row = np.array_split(centroid_row, windows)
-        self.trend = np.array_split(np.ones(len(new_lc.time)), windows)
+    df = pd.DataFrame(np.asarray(ar).T, columns=columns)
+    return DesignMatrix(df, name=name)
 
-        # Apply the correction iteratively
-        for n in range(niters):
-            # First, fit a spline to capture the long-term varation
-            # We don't want to fit the long-term trend because we know
-            # that the K2 motion noise is a high-frequency effect.
-            tempflux = np.asarray([item for sublist in flux for item in sublist])
-            flux_outliers = sigma_clip(data=tempflux, sigma=sigma_1).mask
-            self.bspline = self.fit_bspline(new_lc.time[~flux_outliers], tempflux[~flux_outliers])
 
-            # The SFF algorithm is going to be run on each window independently
-            for i in range(windows):
-                # To make it easier (and more numerically stable) to fit a
-                # characteristic polynomial that describes the spacecraft motion,
-                # we rotate the centroids to a new coordinate frame in which
-                # the dominant direction of motion is aligned with the x-axis.
-                self.rot_col, self.rot_row = self.rotate_centroids(centroid_col[i],
-                                                                   centroid_row[i])
-                # Next, we fit the motion polynomial after removing outliers
-                self.outlier_cent = sigma_clip(data=self.rot_col,
-                                               sigma=sigma_2).mask
-                with warnings.catch_warnings():
-                    # ignore warning messages related to polyfit being poorly conditioned
-                    warnings.simplefilter("ignore", category=np.RankWarning)
-                    coeffs = np.polyfit(self.rot_row[~self.outlier_cent],
-                                        self.rot_col[~self.outlier_cent], polyorder)
+def _get_thruster_firings(arclength):
+    ''' Find locations where K2 fired thrusters
 
-                self.poly = np.poly1d(coeffs)
-                self.polyprime = np.poly1d(coeffs).deriv()
+    Parameters:
+    ----------
+    arc : np.ndarray
+        arclength as a function of time
 
-                # Compute the arclength s.  It is the length of the polynomial
-                # (fitted above) that describes the typical motion.
-                x = np.linspace(np.min(self.rot_row[~self.outlier_cent]),
-                                np.max(self.rot_row[~self.outlier_cent]), 10000)
-                self.s = np.array([self.arclength(x1=xp, x=x) for xp in self.rot_row])
+    Returns:
+    -------
+    thrusters: np.ndarray of bools
+        True at times where thrusters were fired.
+    '''
+    arc = np.copy(arclength)
+    # Rate of change of rate of change of arclength wrt time
+    d2adt2 = (np.gradient(np.gradient(arc)))
+    # Fit a Gaussian, most points lie in a tight region, thruster firings are outliers
+    g = models.Gaussian1D(amplitude=100, mean=0, stddev=0.01)
+    fitter = fitting.LevMarLSQFitter()
+    h = np.histogram(d2adt2[np.isfinite(d2adt2)], np.arange(-0.5, 0.5, 0.0001), density=True);
+    xbins = h[1][1:] - np.median(np.diff(h[1]))
+    g = fitter(g, xbins, h[0], weights=h[0]**0.5)
 
-                # Remove the long-term variation by dividing the flux by the spline
-                iter_trend = self.bspline(time[i])
-                self.normflux = flux[i] / iter_trend
-                self.trend[i] = iter_trend
-                # Bin and interpolate normalized flux to capture the dependency
-                # of the flux as a function of arclength
-                self.interp = self.bin_and_interpolate(self.s, self.normflux, bins,
-                                                       sigma=sigma_1)
-                # Correct the raw flux
-                corrected_flux = self.normflux / self.interp(self.s)
-                flux[i] = corrected_flux
-                if restore_trend:
-                    flux[i] *= self.trend[i]
+    # Depending on the orientation of the roll, it is hard to return
+    # the point before the firing or the point after the firing.
+    # This makes sure we always return the same value, no matter the roll orientation.
+    def _start_and_end(start_or_end):
+        ''' Find points at the start or end of a roll
+        '''
+        if start_or_end == 'start':
+            thrusters = (d2adt2 < (g.stddev * -5)) & np.isfinite(d2adt2)
+        if start_or_end == 'end':
+            thrusters = (d2adt2 > (g.stddev * 5)) & np.isfinite(d2adt2)
+        # Pick the best thruster in each cluster
+        idx = np.array_split(np.arange(len(thrusters)), np.where(np.gradient(np.asarray(thrusters, int)) == 0)[0])
+        m = np.array_split(thrusters, np.where(np.gradient(np.asarray(thrusters, int)) == 0)[0])
+        th = []
+        for jdx in range(len(idx)):
+            if m[jdx].sum() == 0:
+                th.append(m[jdx])
+            else:
+                th.append((np.abs(np.gradient(arc)[idx[jdx]]) == np.abs(np.gradient(arc)[idx[jdx]][m[jdx]]).max()) & m[jdx])
+        thrusters = np.hstack(th)
+        return thrusters
 
-        new_lc.flux = np.asarray([item for sublist in flux for item in sublist])
-        return new_lc
+    # Get the start and end points
+    thrusters = np.asarray([_start_and_end('start'), _start_and_end('end')])
+    thrusters = thrusters.any(axis=0)
 
-    def rotate_centroids(self, centroid_col, centroid_row):
-        """Rotate the coordinate frame of the (col, row) centroids to a new (x,y)
-        frame in which the dominant motion of the spacecraft is aligned with
-        the x axis.  This makes it easier to fit a characteristic polynomial
-        that describes the motion."""
-        centroids = np.array([centroid_col, centroid_row])
-        _, eig_vecs = linalg.eigh(np.cov(centroids))
-        return np.dot(eig_vecs, centroids)
+    # Take just the first point.
+    thrusters = (np.gradient(np.asarray(thrusters, int)) >= 0) & thrusters
+    return thrusters
 
-    def _plot_rotated_centroids(self):
-        fig = plt.figure()
-        ax = fig.add_subplot(111)
-        ax.plot(self.rot_row[~self.outlier_cent], self.rot_col[~self.outlier_cent],
-                'ko', markersize=3)
-        ax.plot(self.rot_row[~self.outlier_cent], self.rot_col[~self.outlier_cent],
-                'bo', markersize=2)
-        ax.plot(self.rot_row[self.outlier_cent], self.rot_col[self.outlier_cent],
-                'ko', markersize=3)
-        ax.plot(self.rot_row[self.outlier_cent], self.rot_col[self.outlier_cent],
-                'ro', markersize=2)
-        x = np.linspace(min(self.rot_row), max(self.rot_row), 200)
-        ax.plot(x, self.poly(x), '--')
-        plt.xlabel("Rotated row centroid")
-        plt.ylabel("Rotated column centroid")
-        return ax
+def _get_window_points(lc, windows, arclength=None, breakindex=None):
+    ''' Returns indices where thrusters are fired.
 
-    def _plot_normflux_arclength(self):
-        idx = np.argsort(self.s)
-        s_srtd = self.s[idx]
-        normflux_srtd = self.normflux[idx]
+    Parameters
+    ----------
+    lc : lk.LightCurve object
+        Input light curve
+    windows: int
+        Number of windows to split the light curve into
+    arc: np.ndarray
+        Arclength for the roll motion
+    breakindex: int
+        Cadence where there is a natural break. Windows will be automatically put here.
+    '''
+    if arclength is None:
+        c, r = lc.centroid_col - lc.centroid_col.min(), lc.centroid_row  - lc.centroid_row.min()
+        if (np.polyfit(c, r, 1)[0] < 0):
+            c = np.max(c) - c
+        arclength = (c**2 + r**2)**0.5
+#        arclength = ((c)**2 + (r)**2)**0.5
 
-        fig = plt.figure()
-        ax = fig.add_subplot(111)
-        ax.plot(s_srtd[~self.outlier_mask], normflux_srtd[~self.outlier_mask],
-                'ko', markersize=3)
-        ax.plot(s_srtd[~self.outlier_mask], normflux_srtd[~self.outlier_mask],
-                'bo', markersize=2)
-        ax.plot(s_srtd[self.outlier_mask], normflux_srtd[self.outlier_mask],
-                'ko', markersize=3)
-        ax.plot(s_srtd[self.outlier_mask], normflux_srtd[self.outlier_mask],
-                'ro', markersize=2)
-        ax.plot(s_srtd, self.interp(s_srtd), '--')
-        plt.xlabel(r"Arclength $(s)$")
-        plt.ylabel(r"Flux $(e^{-}s^{-1})$")
-        return ax
+    # Validate break indicies
+    if isinstance(breakindex, int):
+        breakindexes = [breakindex]
+    elif breakindex is None:
+        breakindexes = []
+    elif breakindex == 0:
+        breakindexes = []
+    else:
+        breakindexes = breakindex
+    if not isinstance(breakindexes, list):
+        raise ValueError('`breakindex` must be an int or a list')
 
-    def arclength(self, x1, x):
-        """Compute the arclength of the polynomial used to fit the centroid
-        measurements.
+    # Find evenly spaced window points
+    dt = len(lc.flux)/windows
+    lower_idx = np.append(0, breakindexes)
+    upper_idx = np.append(breakindexes, len(lc.time))
+    window_points = np.hstack([np.asarray(np.arange(a, b, dt), int) for a, b in zip(lower_idx, upper_idx)])
 
-        Parameters
-        ----------
-        x1 : float
-            Upper limit of the integration domain.
-        x : ndarray
-            Domain at which the arclength integrand is defined.
+    # Get thruster firings
+    thrusters = _get_thruster_firings(arclength)
+    thrusters[breakindex] = True
+    thrusters = np.where(thrusters)[0]
 
-        Returns
-        -------
-        arclength : float
-            Result of the arclength integral from x[0] to x1.
-        """
-        mask = x < x1
-        return np.trapz(y=np.sqrt(1 + self.polyprime(x[mask]) ** 2), x=x[mask])
+    # Find the nearest point to each thruster firing, unless it's a user supplied break point
+    window_points = [thrusters[np.argmin(np.abs(wp - thrusters))] + 1
+                         for wp in window_points
+                         if wp not in breakindexes]
+    window_points = np.unique(np.hstack([window_points, breakindexes]))
 
-    def fit_bspline(self, time, flux, knotspacing=1.5):
-        """Returns a `scipy.interpolate.BSpline` object to interpolate flux as a function of time."""
-        # By default, bspline knots are placed 1.5 days apart
-        knots = np.arange(time[0], time[-1], knotspacing)
+    # If the first window point is very short, just ignore that one
+    if window_points[0] < (np.median(np.diff(window_points)) * 0.4):
+        window_points = window_points[1:]
+    return np.asarray(window_points, dtype=int)
 
-        # If the light curve has breaks larger than the spacing between knots,
-        # we must remove the knots that fall in the breaks.
-        # This is necessary for e.g. K2 Campaigns 0 and 10.
-        bad_knots = []
-        a = time[:-1][np.diff(time) > knotspacing]  # times marking the start of a gap
-        b = time[1:][np.diff(time) > knotspacing]  # times marking the end of a gap
-        for a1, b1 in zip(a, b):
-            bad = np.where((knots > a1) & (knots < b1))[0][1:-1]
-            [bad_knots.append(b) for b in bad]
-        good_knots = list(set(list(np.arange(len(knots)))) - set(bad_knots))
-        knots = knots[good_knots]
 
-        # Now fit and return the spline
-        t, c, k = interpolate.splrep(time, flux, t=knots[1:])
-        return interpolate.BSpline(t, c, k)
+class SFFCorrector(RegressionCorrector):
 
-    def bin_and_interpolate(self, s, normflux, bins, sigma):
-        idx = np.argsort(s)
-        s_srtd = s[idx]
-        normflux_srtd = normflux[idx]
+    def __init__(self, lc, windows=20, bins=10, timescale=1.5, degree=3, breakindex=None, **kwargs):
 
-        self.outlier_mask = sigma_clip(data=normflux_srtd, sigma=sigma).mask
-        normflux_srtd = normflux_srtd[~self.outlier_mask]
-        s_srtd = s_srtd[~self.outlier_mask]
+        self.window_points = _get_window_points(lc, windows)
+        self.windows = windows
+        self.bins = bins
+        self.timescale = timescale
+        self.breakindex = breakindex
 
-        knots = np.array([np.min(s_srtd)]
-                         + [np.median(split) for split in np.array_split(s_srtd, bins)]
-                         + [np.max(s_srtd)])
-        bin_means = np.array([normflux_srtd[0]]
-                             + [np.mean(split) for split in np.array_split(normflux_srtd, bins)]
-                             + [normflux_srtd[-1]])
-        return interpolate.interp1d(knots, bin_means, bounds_error=False,
-                                    fill_value='extrapolate')
+        # We make an approximation that the arclength is simply
+        # (row**2 + col**2)**0.5
+        # However to make this work row and column must be correlated not anticorrelated
+        c, r = lc.centroid_col - lc.centroid_col.min(), lc.centroid_row  - lc.centroid_row.min()
+        # Force c to be correlated not anticorrelated
+        if (np.polyfit(c, r, 1)[0] < 0):
+            c = np.max(c) - c
+        self.arclength = (c**2 + r**2)**0.5
 
-    def breakpoints(self, campaign):
-        """Return a break point as a function of the campaign number.
+        c_dm = _get_centroid_dm(c, r)
+        lower_idx = np.append(0, self.window_points)
+        upper_idx = np.append(self.window_points, len(lc.time))
 
-        The intention of this function is to implement a smart way to determine
-        the boundaries of the windows on which the SFF algorithm is applied
-        independently. However, this is not implemented yet in this version.
-        """
-        raise NotImplementedError()
+        stack = []
+        columns = []
+        for idx, a, b in zip(range(len(lower_idx)), lower_idx, upper_idx):
+            #knots = list(np.linspace(*np.percentile(arclength[a:b], [5, 95]), bins))
+            knots = list(np.percentile(self.arclength[a:b], np.linspace(0, 100, bins+1)[1:-1]))
+            ar = np.copy(self.arclength)
+            ar[~np.in1d(ar, ar[a:b])] = -1
+            dm = np.asarray(dmatrix("bs(x, knots={}, degree={}, include_intercept={}) - 1".format(knots, degree, False), {"x": ar}))
+            stack.append(dm)
+            columns.append(['window{}_bin{}'.format(idx+1, jdx+1) for jdx in range(len(dm.T))])
+
+        sff_dm = DesignMatrix(pd.DataFrame(np.hstack(stack)), columns=np.hstack(columns), name='sff')
+        # Have to find a way to calculate good priors....
+        #sff_dm.prior_sigma = np.ones(sff_dm.shape[1]) * lc.flux.std()*10
+
+        # long term
+        n_knots = int((lc.time[-1] - lc.time[0])/timescale)
+        s_dm = _get_spline_dm(lc.time, n_knots=n_knots, include_intercept=True)
+
+        ar = np.vstack([lc.time/lc.time.mean(), (lc.time/lc.time.mean())**2])
+        dm = DesignMatrixCollection([s_dm.append_constant(prior_mu=lc.flux.mean(), prior_sigma=lc.flux.std()), sff_dm])
+        super(SFFCorrector, self).__init__(lc=lc, design_matrix_collection=dm, **kwargs)
+
+
+    def __repr__(self):
+        return 'SFFCorrector (LC: {})'.format(self.lc.targetid)
+
+    def diagnose(self):
+        """ Shows a diagnostic plot of the fit to the light curve, and arclength"""
+        axs = self._diagnostic_plot()
+        for t in self.window_points:
+            axs[0].axvline(self.lc.time[t], color='r', ls='--', alpha=0.3)
+
+        max_plot = 5
+        with plt.style.context(MPLSTYLE):
+            fig, axs = plt.subplots(int(np.ceil(self.windows/max_plot)), max_plot,
+                                    figsize=(10, int(np.ceil(self.windows/max_plot)*2)),
+                                    sharex=True, sharey=True)
+            axs = np.atleast_2d(axs)
+            axs[0, 2].set_title('Arclength Plot/Window')
+            plt.subplots_adjust(hspace=0, wspace=0)
+
+            lower_idx = np.append(0, self.window_points)
+            upper_idx = np.append(self.window_points, len(self.lc.time))
+            f = (self.lc.flux - self.diagnostic_lightcurves['spline'].flux)
+            m = self.diagnostic_lightcurves['sff'].flux
+
+            idx, jdx = 0, 0
+            for a, b in zip(lower_idx, upper_idx):
+                ax = axs[idx, jdx]
+                if jdx == 0:
+                    ax.set_ylabel('Flux')
+
+                ax.scatter(self.arclength[a:b], f[a:b], s=1, label='Data')
+                ax.scatter(self.arclength[a:b][~self.cadence_mask[a:b]], f[a:b][~self.cadence_mask[a:b]], s=10, marker='x', c='r', label='Outliers')
+
+                s = np.argsort(self.arclength[a:b])
+                ax.scatter(self.arclength[a:b][s], (m[a:b] - np.median(m[a:b]) + np.median(f[a:b]))[s], c='C2', s=0.5, label='Model')
+                jdx += 1
+                if jdx >= max_plot:
+                    jdx = 0
+                    idx += 1
+                if b == len(self.lc.time):
+                    ax.legend()
