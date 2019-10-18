@@ -3,6 +3,7 @@ from __future__ import division
 import os
 import logging
 import warnings
+import re
 
 import numpy as np
 from astropy.table import join, Table, Row
@@ -11,15 +12,16 @@ from astropy.io import ascii, fits
 from astropy import units as u
 from astropy.utils.exceptions import AstropyWarning
 
+from .lightcurve import TessLightCurve
 from .targetpixelfile import TargetPixelFile
-from .collections import TargetPixelFileCollection, LightCurveFileCollection
+from .collections import TargetPixelFileCollection, LightCurveFileCollection, LightCurveCollection
 from .utils import suppress_stdout, LightkurveWarning, detect_filetype
 from . import PACKAGEDIR
 
 log = logging.getLogger(__name__)
 
 __all__ = ['search_targetpixelfile', 'search_lightcurvefile', 'search_tesscut',
-           'open', 'SearchResult']
+           'open', 'SearchResult', 'download_from_eleanor']
 
 
 class SearchError(Exception):
@@ -969,3 +971,72 @@ def _resolve_object(target):
         return MastClass().resolve_object(target)
     except AttributeError:
         return MastClass()._resolve_object(target)
+
+
+def download_from_eleanor(ticid):
+    """Download light curves from Eleanor for desired target. Eleanor light
+    curves include:
+    - raw : raw flux light curve
+    - corr : corrected flux light curve
+    - pca : principle component analysis light curve
+    - psf : point spread function photometry light curve
+
+    Parameters
+    ----------
+    ticid : int
+        TIC ID of desired target
+
+    Returns
+    -------
+    LightCurveCollection :
+        ~lightkurve.LightCurveCollection containing raw and corrected light curves.
+    """
+    # required imports for searching eleanor
+    try:
+        import eleanor
+    except:
+        raise SearchError('The Eleanor package is required to use this function.')
+    # search TESScut to figure out which sectors are available
+    if isinstance(ticid, int):
+        sr = search_tesscut(f'TIC {ticid}')
+    else:
+        sr = search_tesscut(ticid)
+    sectors = _find_sectors(sr)
+    # Eleanor requires only the integer TIC ID
+    if isinstance(ticid, str):
+        ticid = int(re.search(r'\d+', str(ticid)).group())
+    # download target data for the desired source for only the first available sector
+    star = eleanor.Source(tic=ticid, sector=sectors[0], tc=True)
+    data = eleanor.TargetData(star, height=15, width=15, bkg_size=31, do_psf=True, do_pca=True, try_load=True)
+    q = data.quality == 0
+    # create raw flux light curve
+    raw_lc = TessLightCurve(time=data.time[q], flux=data.raw_flux[q], flux_err=data.flux_err[q],label='Raw Flux', time_format='btjd', targetid=ticid).remove_nans().normalize()
+    corr_lc = TessLightCurve(time=data.time[q], flux=data.corr_flux[q], flux_err=data.flux_err[q], label='Corrected Flux', time_format='btjd', targetid=ticid).remove_nans().normalize()
+    pca_lc = TessLightCurve(time=data.time[q], flux=data.pca_flux[q], flux_err=data.flux_err[q],label='PCA Corrected Flux', time_format='btjd', targetid=ticid).remove_nans().normalize()
+    psf_lc = TessLightCurve(time=data.time[q], flux=data.psf_flux[q], flux_err=data.flux_err[q],label='PSF Corrected Flux', time_format='btjd', targetid=ticid).remove_nans().normalize()
+
+    # iterate through extra sectors and append the light curves
+    if len(sectors) > 1:
+        for s in sectors[1:]:
+            try: # some sectors fail randomly
+                star = eleanor.Source(tic=ticid, sector=s, tc=True)
+                data = eleanor.TargetData(star, height=15, width=15, bkg_size=31, do_psf=True, do_pca=True, try_load=True)
+                q = data.quality == 0
+
+                raw_lc = raw_lc.append(TessTessLightCurve(time=data.time[q], flux=data.raw_flux[q], flux_err=data.flux_err[q], time_format='btjd', targetid=ticid).remove_nans().normalize())
+                corr_lc = corr_lc.append(TessLightCurve(time=data.time[q], flux=data.corr_flux[q], flux_err=data.flux_err[q], time_format='btjd', targetid=ticid).remove_nans().normalize())
+                pca_lc = pca_lc.append(TessLightCurve(time=data.time[q], flux=data.pca_flux[q], flux_err=data.flux_err[q], time_format='btjd', targetid=ticid).remove_nans().normalize())
+                psf_lc = psf_lc.append(TessLightCurve(time=data.time[q], flux=data.psf_flux[q], flux_err=data.flux_err[q], time_format='btjd', targetid=ticid).remove_nans().normalize())
+
+            except:
+                continue
+    # store in a LightCurveCollection object and return
+    return LightCurveCollection([raw_lc, corr_lc, pca_lc, psf_lc])
+
+
+def _find_sectors(sr):
+    """Helper function to read sectors from a search result."""
+    sectors = []
+    for desc in sr.table['description']:
+        sectors.append(int(re.search(r'\d+', str(desc)).group()))
+    return sectors
