@@ -32,11 +32,80 @@ __all__ = ['SFFCorrector']
 
 
 class SFFCorrector(RegressionCorrector):
+    """Special case of RegressionCorrector where the design matrix is built from
+    centroid positions and a spline in time.
 
-    def __init__(self, lc, windows=20, bins=10, timescale=1.5, degree=3,
-                 breakindex=None, **kwargs):
+    See lk.correctors.RegressionCorrector for more information.
 
-        self.window_points = _get_window_points(lc, windows)
+    Parameters
+    ----------
+    lc : `~lightkurve.lightcurve.LightCurve`
+        The light curve that needs to be corrected.
+    """
+    def __init__(self, lc):
+        # Setting these values as None so we don't get a value error if the
+        # user calls before "correct()"
+        self.window_points = None
+        self.windows = None
+        self.bins = None
+        self.timescale = None
+        self.breakindex = None
+        self.centroid_col = None
+        self.centroid_row = None
+
+        super(SFFCorrector, self).__init__(lc=lc)
+
+    def __repr__(self):
+        return 'SFFCorrector (LC: {})'.format(self.lc.targetid)
+
+    def correct(self, centroid_col=None, centroid_row=None, windows=20, bins=10, timescale=1.5, breakindex=None, degree=3, restore_trend=False, **kwargs):
+        """Find the best fit correction for the light curve.
+
+        Parameters
+        ----------
+        centroid_col : np.ndarray of floats (optional)
+            Array of centroid column positions. If None, will use `centroid_col`
+            from input light curve
+        centroid_row : np.ndarray of floats (optional)
+            Array of centroid row positions. If None, will use `centroid_row`
+            from input light curve
+        windows : int
+            Number of windows to split the data into to perform the correction.
+            Default 20.
+        bins : int
+            Number of "knots" to place on the arclength spline. More bins will
+            increase the number of knots, making the spline smoother in arclength.
+            Default 10.
+        timescale: float
+            Time scale of the b-spline fit to the light curve in time, in units
+            of input light curve time.
+        breakindex : None, int or list of ints (optional)
+            Optionally the user can break the light curve into sections. Set
+            break index to either an index at which to break, or list of indicies.
+        degree : int
+            The degree of polynomials in the splines in time and arclength. Higher
+            values will create smoother splines. Default 3.
+        cadence_mask : np.ndarray of bools (optional)
+            Mask, where True indicates a cadence that should be used.
+        sigma : int (default 5)
+            Standard deviation at which to remove outliers from fitting
+        niters : int (default 5)
+            Number of iterations to fit and remove outliers
+        restore_trend : bool (default False)
+            Whether to restore the long term spline trend to the light curve
+
+        Returns
+        -------
+        corrected_lc : `~lightkurve.lightcurve.LightCurve`
+            Corrected light curve, with noise removed.
+        """
+
+        if centroid_col is None:
+            centroid_col = self.lc.centroid_col
+        if centroid_row is None:
+            centroid_row = self.lc.centroid_row
+
+        self.window_points = _get_window_points(centroid_col, centroid_row, windows)
         self.windows = windows
         self.bins = bins
         self.timescale = timescale
@@ -45,21 +114,20 @@ class SFFCorrector(RegressionCorrector):
         # We make an approximation that the arclength is simply
         # (row**2 + col**2)**0.5
         # However to make this work row and column must be correlated not anticorrelated
-        c = lc.centroid_col - np.nanmin(lc.centroid_col)
-        r = lc.centroid_row  - np.nanmin(lc.centroid_row)
+        c = centroid_col - np.nanmin(centroid_col)
+        r = centroid_row  - np.nanmin(centroid_row)
         # Force c to be correlated not anticorrelated
         if (np.polyfit(c, r, 1)[0] < 0):
             c = np.max(c) - c
         self.arclength = (c**2 + r**2)**0.5
 
         c_dm = _get_centroid_dm(c, r)
-        lower_idx = np.append(0, self.window_points)
-        upper_idx = np.append(self.window_points, len(lc.time))
+        lower_idx = np.asarray(np.append(0, self.window_points), int)
+        upper_idx = np.asarray(np.append(self.window_points, len(self.lc.time)), int)
 
         stack = []
         columns = []
         for idx, a, b in zip(range(len(lower_idx)), lower_idx, upper_idx):
-            #knots = list(np.linspace(*np.percentile(arclength[a:b], [5, 95]), bins))
             knots = list(np.percentile(self.arclength[a:b], np.linspace(0, 100, bins+1)[1:-1]))
             ar = np.copy(self.arclength)
             ar[~np.in1d(ar, ar[a:b])] = -1
@@ -72,32 +140,23 @@ class SFFCorrector(RegressionCorrector):
         sff_dm = DesignMatrix(pd.DataFrame(np.hstack(stack)),
                               columns=np.hstack(columns),
                               name='sff')
+
         # Have to find a way to calculate good priors....
         #sff_dm.prior_sigma = np.ones(sff_dm.shape[1]) * lc.flux.std()*10
 
         # long term
-        n_knots = int((lc.time[-1] - lc.time[0])/timescale)
-        s_dm = _get_spline_dm(lc.time, n_knots=n_knots, include_intercept=True)
+        n_knots = int((self.lc.time[-1] - self.lc.time[0])/timescale)
+        s_dm = _get_spline_dm(self.lc.time, n_knots=n_knots, include_intercept=True)
 
-        ar = np.vstack([lc.time/lc.time.mean(), (lc.time/lc.time.mean())**2])
-        dm = DesignMatrixCollection([s_dm.append_constant(prior_mu=lc.flux.mean(),
-                                                          prior_sigma=lc.flux.std()),
+        ar = np.vstack([self.lc.time/self.lc.time.mean(), (self.lc.time/self.lc.time.mean())**2])
+        dm = DesignMatrixCollection([s_dm.append_constant(prior_mu=self.lc.flux.mean(),
+                                                          prior_sigma=self.lc.flux.std()),
                                      sff_dm])
-        super(SFFCorrector, self).__init__(lc=lc, design_matrix_collection=dm, **kwargs)
-
-    def __repr__(self):
-        return 'SFFCorrector (LC: {})'.format(self.lc.targetid)
-
-    def correct(self, **kwargs):
-        if "centroid_col" in kwargs:
-            kwargs.pop("centroid_col")
-            warnings.warn('`centroid_col` will be ignored',
-                          LightkurveWarning)
-        if "centroid_row" in kwargs:
-            kwargs.pop("centroid_row")
-            warnings.warn('`centroid_row` will be ignored',
-                          LightkurveWarning)
-        return super(SFFCorrector, self).correct(**kwargs)
+        clc = super(SFFCorrector, self).correct(dm, **kwargs)
+        if restore_trend:
+            trend = self.diagnostic_lightcurves['spline'].flux
+            clc += trend
+        return clc
 
     def diagnose(self):
         """ Shows a diagnostic plot of the fit to the light curve, and arclength"""
@@ -114,8 +173,8 @@ class SFFCorrector(RegressionCorrector):
             axs[0, 2].set_title('Arclength Plot/Window')
             plt.subplots_adjust(hspace=0, wspace=0)
 
-            lower_idx = np.append(0, self.window_points)
-            upper_idx = np.append(self.window_points, len(self.lc.time))
+            lower_idx = np.asarray(np.append(0, self.window_points), int)
+            upper_idx = np.asarray(np.append(self.window_points, len(self.lc.time)), int)
             f = (self.lc.flux - self.diagnostic_lightcurves['spline'].flux)
             m = self.diagnostic_lightcurves['sff'].flux
 
@@ -259,7 +318,7 @@ def _get_thruster_firings(arclength):
     return thrusters
 
 
-def _get_window_points(lc, windows, arclength=None, breakindex=None):
+def _get_window_points(centroid_col, centroid_row, windows, arclength=None, breakindex=None):
     """Returns indices where thrusters are fired.
 
     Parameters
@@ -273,10 +332,13 @@ def _get_window_points(lc, windows, arclength=None, breakindex=None):
     breakindex: int
         Cadence where there is a natural break. Windows will be automatically put here.
     """
+    if windows == 1:
+        return []
+
     if arclength is None:
         # Compute arclength
-        c = lc.centroid_col - np.nanmin(lc.centroid_col)
-        r = lc.centroid_row  - np.nanmin(lc.centroid_row)
+        c = centroid_col - np.nanmin(centroid_col)
+        r = centroid_row  - np.nanmin(centroid_row)
         if (np.polyfit(c, r, 1)[0] < 0):
             c = np.max(c) - c
         arclength = (c**2 + r**2)**0.5
@@ -295,9 +357,9 @@ def _get_window_points(lc, windows, arclength=None, breakindex=None):
         raise ValueError('`breakindex` must be an int or a list')
 
     # Find evenly spaced window points
-    dt = len(lc.flux)/windows
+    dt = len(centroid_col)/windows
     lower_idx = np.append(0, breakindexes)
-    upper_idx = np.append(breakindexes, len(lc.time))
+    upper_idx = np.append(breakindexes, len(centroid_col))
     window_points = np.hstack([np.asarray(np.arange(a, b, dt), int) for a, b in zip(lower_idx, upper_idx)])
 
     # Get thruster firings

@@ -78,26 +78,24 @@ class RegressionCorrector(Corrector):
     ----------
     lc : `~lightkurve.lightcurve.LightCurve`
         The light curve that needs to be corrected.
-    design_matrix : `~lightkurve.correctors.DesignMatrixCollection`
-        A collection of one or more design matrices.  Each matrix in the
-        collection must have a shape of (time, regressors).
-        The columns contained in each matrix must be known to correlate with
-        the signals or noise we want to remove from the light curve.
     """
-    def __init__(self, lc, design_matrix_collection):
-        if isinstance(design_matrix_collection, DesignMatrix):
-            design_matrix_collection = DesignMatrixCollection([design_matrix_collection])
-
+    def __init__(self, lc):
         # Validate user input
-        if np.any([~np.isfinite(lc.time), ~np.isfinite(lc.flux)]):
-            raise ValueError('Input light curve has NaNs in time or flux. '
+
+        if np.all(~np.isfinite(lc.flux_err)):
+            raise ValueError('Input light curve has no `flux_err` set.')
+
+        if np.any([~np.isfinite(lc.time), ~np.isfinite(lc.flux), ~np.isfinite(lc.flux_err)]):
+            raise ValueError('Input light curve has NaNs in time, flux, or flux_err. '
                              'Please remove NaNs before correction '
                              '(e.g. using `lc = lc.remove_nans()`).')
         self.lc = lc
-        design_matrix_collection._validate()
-        self.X = design_matrix_collection
 
-        # The following properties will be set when correct() is called:
+
+
+        # The following properties will be set when correct() is called.
+        # We're setting them here so they do not throw value errors
+        self.X = None
         self.coefficients = None
         self.corrected_lc = None
         self.model_lc = None
@@ -148,11 +146,16 @@ class RegressionCorrector(Corrector):
         w_err = np.linalg.inv(sigma_w_inv)
         return w, w_err
 
-    def correct(self, cadence_mask=None, sigma=5, niters=5):
+    def correct(self, design_matrix_collection, cadence_mask=None, sigma=5, niters=5):
         """Find the best fit correction for the light curve.
 
         Parameters
         ----------
+        design_matrix_collection : `~lightkurve.correctors.DesignMatrixCollection`
+            A collection of one or more design matrices.  Each matrix in the
+            collection must have a shape of (time, regressors).
+            The columns contained in each matrix must be known to correlate with
+            the signals or noise we want to remove from the light curve.
         cadence_mask : np.ndarray of bools (optional)
             Mask, where True indicates a cadence that should be used.
         sigma : int (default 5)
@@ -165,6 +168,12 @@ class RegressionCorrector(Corrector):
         corrected_lc : `~lightkurve.lightcurve.LightCurve`
             Corrected light curve, with noise removed.
         """
+
+        if isinstance(design_matrix_collection, DesignMatrix):
+            design_matrix_collection = DesignMatrixCollection([design_matrix_collection])
+        design_matrix_collection._validate()
+        self.X = design_matrix_collection
+
         if cadence_mask is None:
             cadence_mask = np.ones(len(self.lc.time), bool)
         else:
@@ -180,6 +189,7 @@ class RegressionCorrector(Corrector):
             log.debug("correct(): iteration {}: clipped {} cadences"
                       "".format(count, cadence_mask.sum()))
         self.cadence_mask = cadence_mask
+
         self.coefficients = coefficients
         self.coefficients_err = coefficients_err
 

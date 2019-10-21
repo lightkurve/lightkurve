@@ -61,8 +61,8 @@ def test_standardize():
     assert (dm.standardize()['const'].values == dm['const'].values).all()
     # Normally-distributed columns will become Normal(0, 1)
     dm = DesignMatrix({'normal': np.random.normal(loc=5, scale=3, size=100)})
-    assert dm.standardize()['normal'].median().round(3) == 0
-    assert dm.standardize()['normal'].std().round(1) == 1
+    assert np.round(dm.standardize()['normal'].median(), 3) == 0
+    assert np.round(dm.standardize()['normal'].std(), 1) == 1
 
 
 def test_pca():

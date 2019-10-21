@@ -15,6 +15,9 @@ def test_sinusoid_noise():
     dm = DesignMatrix({'noise': noise, 'offset': np.ones(len(time))},
                       name='noise_model')
     # Ridge with alpha=0 should equal ordinary least squares
-    rc = RegressionCorrector(noisy_lc, dm)
-    corrected_lc = rc.correct()
+    rc = RegressionCorrector(noisy_lc)
+    corrected_lc = rc.correct(dm)
     assert_almost_equal(corrected_lc.normalize().flux, true_lc.flux)
+
+    # Can plot
+    rc.diagnose()
