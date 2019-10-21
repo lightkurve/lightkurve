@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.2</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.3</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -93,7 +93,24 @@
   <div class="section" id="full-changelog">
 <span id="changelog"></span><h1>Full changelog<a class="headerlink" href="#full-changelog" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="id1">
-<h2>1.2.0 (2019-10-01)<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<h2>1.3.0 (2019-10-21)<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Added a <code class="xref py py-obj docutils literal notranslate"><span class="pre">method=&quot;quadratic&quot;</span></code> option to <code class="xref py py-obj docutils literal notranslate"><span class="pre">tpf.estimate_centroids()</span></code> which
+enables centroids to be estimated by fitting a bivariate polynomial to the
+3x3 pixel core of the PSF. The method can also be called as a standalone
+function via <code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.utils.centroid_quadratic()</span></code>. [#544, #610]</p></li>
+<li><p>Fixed a bug in <code class="xref py py-obj docutils literal notranslate"><span class="pre">Seismology.plot_echelle()</span></code> which caused the Echelle diagram
+of a power spectrum to be rendered incorrectly. [#602]</p></li>
+<li><p>Fixed a bug which caused <a class="reference internal" href="../api/utils.html#module-lightkurve.utils" title="lightkurve.utils"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.utils</span></code></a> to be incorrectly resolved to
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.seismology.utils</span></code>. [#606]</p></li>
+<li><p>Changed <code class="xref py py-obj docutils literal notranslate"><span class="pre">bkjd_to_astropy_time()</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">btjd_to_astropy_time()</span></code> to accept
+a single float and lists of floats in addition to numpy arrays. [#608]</p></li>
+<li><p>Improved support for creating a <code class="xref py py-obj docutils literal notranslate"><span class="pre">LombScarglePeriodogram</span></code> with an unevenly
+sampled grid in frequency space. [#614]</p></li>
+</ul>
+</div>
+<div class="section" id="id2">
+<h2>1.2.0 (2019-10-01)<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Added <code class="xref py py-obj docutils literal notranslate"><span class="pre">flux_unit</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">flux_quantity</span></code> properties to the <code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code> class
 to enable users to keep track of a light curve’s flux units. [#591]</p></li>
@@ -114,8 +131,8 @@ objects, e.g. two <code class="xref py py-obj docutils literal notranslate"><spa
 take all recent Lightkurve API changes into account. [#596]</p></li>
 </ul>
 </div>
-<div class="section" id="id2">
-<h2>1.1.1 (2019-08-19)<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id3">
+<h2>1.1.1 (2019-08-19)<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <p>Lightkurve v1.1.1 is a bugfix release which includes the following changes:</p>
 <ul class="simple">
 <li><p>Changed <code class="xref py py-obj docutils literal notranslate"><span class="pre">search_targetpixelfile()</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">search_lightcurvefile()</span></code> to emit a
@@ -134,8 +151,8 @@ Lightkurve to receive the “code quality A” certification by codacy.com.
 [#557, #560, #564, #565, #566, #568, #573, #574, #575]</p></li>
 </ul>
 </div>
-<div class="section" id="id3">
-<h2>1.1.0 (2019-07-19)<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id4">
+<h2>1.1.0 (2019-07-19)<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Added the <a class="reference internal" href="../api/seismology.html#module-lightkurve.seismology" title="lightkurve.seismology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.seismology</span></code></a> sub-package which enables quick-look
 asteroseismic quantities to be extracted from <code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code> objects. [#496]</p></li>
@@ -163,15 +180,15 @@ to track the status of search and download operations. [#547]</p></li>
 <li><p>Moved the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Corrector</span></code> systematics removal classes into their own sub-package,
 named <a class="reference internal" href="../api/correctors.html#module-lightkurve.correctors" title="lightkurve.correctors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.correctors</span></code></a>. [#519]</p></li>
 <li><p>Fixed a bug which prevented <code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.open()</span></code> from raising a
-<a class="reference external" href="https://docs.python.org/3/library/exceptions.html#FileNotFoundError" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FileNotFoundError</span></code></a> when a file does not exist. [#540]</p></li>
+<a class="reference external" href="https://docs.python.org/3/library/exceptions.html#FileNotFoundError" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FileNotFoundError</span></code></a> when a file does not exist. [#540]</p></li>
 <li><p>Fixed a bug which caused <code class="xref py py-obj docutils literal notranslate"><span class="pre">BoxLeastSquaresPeriodogram</span></code> to ignore the <code class="xref py py-obj docutils literal notranslate"><span class="pre">period</span></code>
 parameter. [#514]</p></li>
 <li><p>Fixed a bug which prevented the <code class="xref py py-obj docutils literal notranslate"><span class="pre">t0</span></code> argument of <code class="xref py py-obj docutils literal notranslate"><span class="pre">lc.fold()</span></code> from being an
 AstroPy Quantity object. [#521]</p></li>
 </ul>
 </div>
-<div class="section" id="id4">
-<h2>1.0.1 (2019-05-20)<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id5">
+<h2>1.0.1 (2019-05-20)<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
 <p>This is a minor bugfix release containing the following improvements:</p>
 <ul class="simple">
 <li><p>Fixed minor bugs in <code class="docutils literal notranslate"><span class="pre">PLDCorrector.correct()</span></code> [#498],
@@ -185,8 +202,8 @@ if the download cache contains a corrupt file. [#512]</p></li>
 <li><p>Switched continuous integration from Travis/Appveyor to Azure pipelines. [#497]</p></li>
 </ul>
 </div>
-<div class="section" id="id5">
-<h2>1.0.0 (2019-04-08)<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id6">
+<h2>1.0.0 (2019-04-08)<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
 <p>This is the first stable release of Lightkurve.  It was prepared with the help
 of 45 contributors!</p>
 <p>This release contains major changes to the <code class="docutils literal notranslate"><span class="pre">LombScarglePeriodogram</span></code> class:</p>
@@ -266,7 +283,7 @@ MAST TessCut service. [#434]</p></li>
 <h2>1.0b26 (2019-02-04)<a class="headerlink" href="#b26-2019-02-04" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Introduced a new layout for the
-<a href="#id6"><span class="problematic" id="id7">``</span></a>online documentation &lt;<a class="reference external" href="https://docs.lightkurve.org">https://docs.lightkurve.org</a>&gt;``_. [#360, #400, #406]</p></li>
+<a href="#id7"><span class="problematic" id="id8">``</span></a>online documentation &lt;<a class="reference external" href="https://docs.lightkurve.org">https://docs.lightkurve.org</a>&gt;``_. [#360, #400, #406]</p></li>
 <li><p>Added <code class="docutils literal notranslate"><span class="pre">LightCurve.interact_bls()</span></code>: an interactive Bokeh widget to find
 planets using the Box Least Squares (BLS) method. [#401]</p></li>
 <li><p>Added <code class="docutils literal notranslate"><span class="pre">LombScarglePeriodogram</span></code> and <code class="docutils literal notranslate"><span class="pre">BoxLeastSquarePeriodogam</span></code> sub-classes

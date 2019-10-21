@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.2</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.3</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -95,7 +95,7 @@
 <dl class="class">
 <dt id="lightkurve.prf.KeplerPRF">
 <em class="property">class </em><code class="sig-prename descclassname">lightkurve.prf.</code><code class="sig-name descname">KeplerPRF</code><span class="sig-paren">(</span><em class="sig-param">channel</em>, <em class="sig-param">shape</em>, <em class="sig-param">column</em>, <em class="sig-param">row</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.KeplerPRF" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Kepler’s Pixel Response Function as designed by <a class="reference internal" href="#r2d3bf0a39f5d-1" id="id1"><span>[R2d3bf0a39f5d-1]</span></a>.</p>
 <p>This class provides the necessary interface to load Kepler PRF
 calibration files and to create a model that can be fit as a function
@@ -118,12 +118,12 @@ scales, and rotation around the object’s center.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">math</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">lightkurve</span> <span class="k">import</span> <span class="n">KeplerPRF</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">kepprf</span> <span class="o">=</span> <span class="n">KeplerPRF</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="mi">44</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">column</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span> <span class="c1"># doctest: +SKIP</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">kepprf</span> <span class="o">=</span> <span class="n">KeplerPRF</span><span class="p">(</span><span class="n">channel</span><span class="o">=</span><span class="mi">44</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">column</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span> 
 <span class="go">Downloading http://archive.stsci.edu/missions/kepler/fpc/prf</span>
 <span class="go">/extracted/kplr13.4_2011265_prf.fits [Done]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">prf</span> <span class="o">=</span> <span class="n">kepprf</span><span class="p">(</span><span class="n">flux</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">center_col</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">center_row</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-<span class="gp">... </span>             <span class="n">scale_row</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">scale_col</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">rotation_angle</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="c1"># doctest: +SKIP</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">prf</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">)</span> <span class="c1"># doctest: +SKIP</span>
+<span class="gp">... </span>             <span class="n">scale_row</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">scale_col</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">rotation_angle</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">prf</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">)</span> 
 </pre></div>
 </div>
 <dl class="field-list simple">

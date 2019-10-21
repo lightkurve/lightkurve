@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.2</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.3</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -104,15 +104,15 @@ Cotrending Basis Vectors (CBVs).</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">lightkurve</span> <span class="k">import</span> <span class="n">KeplerCBVCorrector</span><span class="p">,</span> <span class="n">KeplerLightCurveFile</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fn</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;https://archive.stsci.edu/missions/kepler/lightcurves/&quot;</span>
-<span class="gp">... </span>      <span class="s2">&quot;0084/008462852/kplr008462852-2011073133259_llc.fits&quot;</span><span class="p">)</span> <span class="c1"># doctest: +SKIP</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cbv</span> <span class="o">=</span> <span class="n">KeplerCBVCorrector</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span> <span class="c1"># doctest: +SKIP</span>
+<span class="gp">... </span>      <span class="s2">&quot;0084/008462852/kplr008462852-2011073133259_llc.fits&quot;</span><span class="p">)</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cbv</span> <span class="o">=</span> <span class="n">KeplerCBVCorrector</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span> 
 <span class="go">Downloading https://archive.stsci.edu/missions/kepler/lightcurves/0084/008462852/kplr008462852-2011073133259_llc.fits [Done]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cbv_lc</span> <span class="o">=</span> <span class="n">cbv</span><span class="o">.</span><span class="n">correct</span><span class="p">()</span> <span class="c1"># doctest: +SKIP</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cbv_lc</span> <span class="o">=</span> <span class="n">cbv</span><span class="o">.</span><span class="n">correct</span><span class="p">()</span> 
 <span class="go">Downloading http://archive.stsci.edu/missions/kepler/cbv/kplr2011073133259-q08-d25_lcbv.fits [Done]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sap_lc</span> <span class="o">=</span> <span class="n">KeplerLightCurveFile</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="n">SAP_FLUX</span> <span class="c1"># doctest: +SKIP</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">sap_lc</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">sap_lc</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;SAP_FLUX&#39;</span><span class="p">)</span> <span class="c1"># doctest: +SKIP</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cbv_lc</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">cbv_lc</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;CBV_FLUX&#39;</span><span class="p">)</span> <span class="c1"># doctest: +SKIP</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span> <span class="c1"># doctest: +SKIP</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sap_lc</span> <span class="o">=</span> <span class="n">KeplerLightCurveFile</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="n">SAP_FLUX</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">sap_lc</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">sap_lc</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;SAP_FLUX&#39;</span><span class="p">)</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cbv_lc</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">cbv_lc</span><span class="o">.</span><span class="n">flux</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;CBV_FLUX&#39;</span><span class="p">)</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span> 
 </pre></div>
 </div>
 <dl class="field-list simple">
@@ -259,7 +259,7 @@ Bayes’ factor <a class="reference internal" href="#r327af9fd7ac9-1" id="id2">[
 <dt><strong>cbvs</strong><span class="classifier">list of ints</span></dt><dd><p>The list of cotrending basis vectors to fit to the data. For example,
 [1, 2] will fit the first two basis vectors.</p>
 </dd>
-<dt><strong>ax</strong><span class="classifier">matplotlib.pyplot.Axes.AxesSubplot</span></dt><dd><p>Matplotlib axis object. If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, one will be generated.</p>
+<dt><strong>ax</strong><span class="classifier">matplotlib.pyplot.Axes.AxesSubplot</span></dt><dd><p>Matplotlib axis object. If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, one will be generated.</p>
 </dd>
 </dl>
 </dd>

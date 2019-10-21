@@ -1,18 +1,18 @@
-SFFCorrector
-============
+RegressionCorrector
+===================
 
 .. currentmodule:: lightkurve.correctors
 
-.. autoclass:: SFFCorrector
+.. autoclass:: RegressionCorrector
    :show-inheritance:
 
    .. rubric:: Methods Summary
 
    .. autosummary::
 
-      ~SFFCorrector.correct
-      ~SFFCorrector.diagnose
-      ~SFFCorrector.interact
+      ~RegressionCorrector.correct
+      ~RegressionCorrector.diagnose
+      ~RegressionCorrector.interact
 
    .. rubric:: Methods Documentation
 

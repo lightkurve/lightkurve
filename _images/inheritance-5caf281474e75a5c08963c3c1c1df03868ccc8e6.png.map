@@ -1,5 +1,5 @@
 <map id="inheritanced621a4b1ce" name="inheritanced621a4b1ce">
-<area shape="rect" id="node1" href="lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile" target="_top" title="Represents pixel data products created by NASA&#39;s Kepler pipeline." alt="" coords="169,5,327,31"/>
+<area shape="rect" id="node1" href="lightkurve.targetpixelfile.KeplerTargetPixelFile.html#lightkurve.targetpixelfile.KeplerTargetPixelFile" target="_top" title="Class to read and interact with the pixel data products" alt="" coords="169,5,327,31"/>
 <area shape="rect" id="node2" title="Abstract class representing FITS files which contain time series imaging data." alt="" coords="5,31,121,56"/>
 <area shape="rect" id="node3" href="lightkurve.targetpixelfile.TessTargetPixelFile.html#lightkurve.targetpixelfile.TessTargetPixelFile" target="_top" title="Represents pixel data products created by NASA&#39;s TESS pipeline." alt="" coords="176,55,320,80"/>
 </map>

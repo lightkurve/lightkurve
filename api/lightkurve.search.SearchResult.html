@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.2</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.3</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -95,7 +95,7 @@
 <dl class="class">
 <dt id="lightkurve.search.SearchResult">
 <em class="property">class </em><code class="sig-prename descclassname">lightkurve.search.</code><code class="sig-name descname">SearchResult</code><span class="sig-paren">(</span><em class="sig-param">table=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.search.SearchResult" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Container for the results returned by <a class="reference internal" href="lightkurve.search.search_targetpixelfile.html#lightkurve.search.search_targetpixelfile" title="lightkurve.search.search_targetpixelfile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_targetpixelfile</span></code></a>,
 <a class="reference internal" href="lightkurve.search.search_lightcurvefile.html#lightkurve.search.search_lightcurvefile" title="lightkurve.search.search_lightcurvefile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_lightcurvefile</span></code></a>, or <a class="reference internal" href="lightkurve.search.search_tesscut.html#lightkurve.search.search_tesscut" title="lightkurve.search.search_tesscut"><code class="xref py py-obj docutils literal notranslate"><span class="pre">search_tesscut</span></code></a>.</p>
 <p>The purpose of this class is to provide a convenient way to inspect and
@@ -104,7 +104,7 @@ functions.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl>
-<dt><strong>table</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v4.0.dev919)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.table.Table</span></code></a> object</span></dt><dd><p>Astropy table returned by a join of the astroquery <code class="xref py py-obj docutils literal notranslate"><span class="pre">Observations.query_criteria()</span></code>
+<dt><strong>table</strong><span class="classifier"><a class="reference external" href="https://docs.astropy.org/en/latest/api/astropy.table.Table.html#astropy.table.Table" title="(in Astropy v4.0.dev1179)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">astropy.table.Table</span></code></a> object</span></dt><dd><p>Astropy table returned by a join of the astroquery <code class="xref py py-obj docutils literal notranslate"><span class="pre">Observations.query_criteria()</span></code>
 and <code class="xref py py-obj docutils literal notranslate"><span class="pre">Observations.get_product_list()</span></code> methods.</p>
 </dd>
 </dl>
@@ -207,7 +207,7 @@ following meaning:</p>
 <p>See the <code class="xref py py-class docutils literal notranslate"><span class="pre">KeplerQualityFlags</span></code> class for details on the bitmasks.</p>
 </dd>
 <dt><strong>download_dir</strong><span class="classifier">str</span></dt><dd><p>Location where the data files will be stored.
-Defaults to “~/.lightkurve-cache” if <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> is passed.</p>
+Defaults to “~/.lightkurve-cache” if <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> is passed.</p>
 </dd>
 <dt><strong>cutout_size</strong><span class="classifier">int, float or tuple</span></dt><dd><p>Side length of cutout in pixels. Tuples should have dimensions (y, x).
 Default size is (5, 5)</p>
@@ -248,7 +248,7 @@ following meaning:</p>
 <p>See the <code class="xref py py-class docutils literal notranslate"><span class="pre">KeplerQualityFlags</span></code> class for details on the bitmasks.</p>
 </dd>
 <dt><strong>download_dir</strong><span class="classifier">str</span></dt><dd><p>Location where the data files will be stored.
-Defaults to “~/.lightkurve-cache” if <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> is passed.</p>
+Defaults to “~/.lightkurve-cache” if <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> is passed.</p>
 </dd>
 <dt><strong>cutout_size</strong><span class="classifier">int, float or tuple</span></dt><dd><p>Side length of cutout in pixels. Tuples should have dimensions (y, x).
 Default size is (5, 5)</p>

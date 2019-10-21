@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.2</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.3</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -155,10 +155,10 @@ containing fractional pixel fluxes.</p>
 <p class="rubric">Examples</p>
 <p>Download the pixel data for GJ 9827 and obtain a PLD-corrected light curve:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">lightkurve</span> <span class="k">as</span> <span class="nn">lk</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">tpf</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s2">&quot;GJ9827&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span> <span class="c1"># doctest: +SKIP</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">corrector</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">PLDCorrector</span><span class="p">(</span><span class="n">tpf</span><span class="p">)</span> <span class="c1"># doctest: +SKIP</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">lc</span> <span class="o">=</span> <span class="n">corrector</span><span class="o">.</span><span class="n">correct</span><span class="p">()</span> <span class="c1"># doctest: +SKIP</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">lc</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span> <span class="c1"># doctest: +SKIP</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tpf</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">search_targetpixelfile</span><span class="p">(</span><span class="s2">&quot;GJ9827&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">download</span><span class="p">()</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">corrector</span> <span class="o">=</span> <span class="n">lk</span><span class="o">.</span><span class="n">PLDCorrector</span><span class="p">(</span><span class="n">tpf</span><span class="p">)</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lc</span> <span class="o">=</span> <span class="n">corrector</span><span class="o">.</span><span class="n">correct</span><span class="p">()</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lc</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span> 
 </pre></div>
 </div>
 <p>However, the above example will over-fit the small transits!
@@ -189,9 +189,9 @@ It is necessary to mask the transits using <code class="xref py py-obj docutils 
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>aperture_mask</strong><span class="classifier">array-like, ‘pipeline’, ‘all’, ‘threshold’, or None</span></dt><dd><p>A boolean array describing the aperture such that <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> means
+<dt><strong>aperture_mask</strong><span class="classifier">array-like, ‘pipeline’, ‘all’, ‘threshold’, or None</span></dt><dd><p>A boolean array describing the aperture such that <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> means
 that the pixel will be used to generate the raw flux light curve.
-If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> or ‘all’ are passed, all pixels will be used.
+If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> or ‘all’ are passed, all pixels will be used.
 If ‘pipeline’ is passed, the mask suggested by the official pipeline
 will be returned.
 If ‘threshold’ is passed, all pixels brighter than 3-sigma above
@@ -199,7 +199,7 @@ the median flux will be used.</p>
 </dd>
 <dt><strong>cadence_mask</strong><span class="classifier">array-like</span></dt><dd><p>A mask that will be applied to the cadences prior to constructing
 the detrending model. For example, you can pass a boolean array
-of length <code class="xref py py-obj docutils literal notranslate"><span class="pre">n_cadences</span></code> where <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> means that the cadence will be
+of length <code class="xref py py-obj docutils literal notranslate"><span class="pre">n_cadences</span></code> where <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> means that the cadence will be
 included in the noise model. You may also pass an array of indices.
 This option enables signals of interest (e.g. planet transits)
 to be excluded from the noise model, which will prevent over-fitting.
@@ -222,9 +222,9 @@ when performing Principal Component Analysis for models higher than
 first order. Increasing this value may provide higher precision at
 the expense of computational time.</p>
 </dd>
-<dt><strong>pld_aperture_mask</strong><span class="classifier">array-like, ‘pipeline’, ‘all’, ‘threshold’, or None</span></dt><dd><p>A boolean array describing the aperture such that <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> means
+<dt><strong>pld_aperture_mask</strong><span class="classifier">array-like, ‘pipeline’, ‘all’, ‘threshold’, or None</span></dt><dd><p>A boolean array describing the aperture such that <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a> means
 that the pixel will be used when selecting the PLD basis vectors.
-If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#all" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">all</span></code></a> are passed in, all pixels will be used.
+If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#all" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">all</span></code></a> are passed in, all pixels will be used.
 If ‘pipeline’ is passed, the mask suggested by the official pipeline
 will be returned.
 If ‘threshold’ is passed, all pixels brighter than 3-sigma above

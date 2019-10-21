@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.2</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.3</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -95,7 +95,7 @@
 <dl class="class">
 <dt id="lightkurve.prf.PRFPhotometry">
 <em class="property">class </em><code class="sig-prename descclassname">lightkurve.prf.</code><code class="sig-name descname">PRFPhotometry</code><span class="sig-paren">(</span><em class="sig-param">model</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.prf.PRFPhotometry" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>This class performs PRF Photometry on TPF-like data given a <code class="docutils literal notranslate"><span class="pre">TPFModel</span></code>.</p>
 <p>This class exists because a <code class="docutils literal notranslate"><span class="pre">TPFModel</span></code> object is designed to fit only
 one cadence at a time.  This class makes it easy to fit a large number
@@ -141,13 +141,13 @@ of cadences and obtain the resulting LightCurve.</p>
 KeplerTargetPixelFile.flux, such that (time, row, column) represents
 the shape of <code class="docutils literal notranslate"><span class="pre">tpf_flux</span></code>.</p>
 </dd>
-<dt><strong>cadences</strong><span class="classifier">array-like</span></dt><dd><p>Cadences to fit.  If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> (default) then all cadences will be fit.</p>
+<dt><strong>cadences</strong><span class="classifier">array-like</span></dt><dd><p>Cadences to fit.  If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a> (default) then all cadences will be fit.</p>
 </dd>
 <dt><strong>pos_corr1, pos_corr2</strong><span class="classifier">array-like, array-like</span></dt><dd><p>If set, use these values to update the prior means for
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">model.motion_prior.shift_col</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">model.motion_prior.shift_row</span></code>
 for each cadence.</p>
 </dd>
-<dt><strong>parallel</strong><span class="classifier">boolean</span></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a>, cadences will be fit in parallel using Python’s <a class="reference external" href="https://docs.python.org/3/library/multiprocessing.html#module-multiprocessing" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">multiprocessing</span></code></a> module.</p>
+<dt><strong>parallel</strong><span class="classifier">boolean</span></dt><dd><p>If <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">True</span></code></a>, cadences will be fit in parallel using Python’s <a class="reference external" href="https://docs.python.org/3/library/multiprocessing.html#module-multiprocessing" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">multiprocessing</span></code></a> module.</p>
 </dd>
 </dl>
 </dd>
