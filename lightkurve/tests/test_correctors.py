@@ -55,6 +55,8 @@ def test_sff_corrector():
     correction = data[:, 6]
 
     lc = LightCurve(time=time, flux=raw_flux)
+    #lc.centroid_col = centroid_col
+    #lc.centroid_row = centroid_row
     sff = SFFCorrector(lc)
     corrected_lc = sff.correct(centroid_col=centroid_col,
                                centroid_row=centroid_row,
