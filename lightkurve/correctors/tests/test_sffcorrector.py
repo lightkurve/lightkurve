@@ -67,6 +67,7 @@ def test_sff_corrector():
                                centroid_row=centroid_row, windows=1, restore_trend=True,
                                cadence_mask=mask, breakindex=150, bins=5)
     assert (np.isclose(corrected_flux, corrected_lc.flux, atol=0.5e-3).all())
+    assert np.all((sff.lc.flux_err/sff.corrected_lc.flux_err) == 1)
 
 
     # masking and breakindex and bins and propagate_errors
@@ -74,7 +75,6 @@ def test_sff_corrector():
                                centroid_row=centroid_row, windows=1, restore_trend=True,
                                cadence_mask=mask, breakindex=150, bins=5, propagate_errors=True)
     assert (np.isclose(corrected_flux, corrected_lc.flux, atol=0.5e-3).all())
-
     assert np.all((sff.lc.flux_err/sff.corrected_lc.flux_err) < 1)
 
     # test using KeplerLightCurve interface
