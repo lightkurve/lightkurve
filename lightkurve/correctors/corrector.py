@@ -1,18 +1,21 @@
-"""Implements the abstract `Corrector` base class to demonstrate which
-standard methods the subclasses should aim to provide.
+"""Implements the abstract `Corrector` base class to document the generic
+methods the subclasses should aim to provide.
 
-The design rules of a `Corrector` class are:
-- the constructor takes all the required data;
-- `correct()` takes optional correction parameters and returns a LightCurve;
-- `diagnose()` takes the same arguments as `correct()` but returns plot(s).
+`Corrector` classes must adopt the following design:
+- `__init__()` takes the required data (e.g. LightCurve, TargetPixelFile);
+- `correct()` takes optional parameters and returns a LightCurve;
+- `diagnose()` creates plots to elucidate the user's most recent call to `correct()`.
 """
 class Corrector(object):
     """Abstract base class."""
     def correct(self):
+        """Returns a corrected LightCurve."""
         raise NotImplementedError("This is an abstract base class.")
 
     def diagnose(self):
+        """Returns plots which elucidate the most recent call to `correct()`."""
         raise NotImplementedError("This is an abstract base class.")
 
     def interact(self):
+        """Optional; returns a bokeh widget to interact with the options."""
         raise NotImplementedError("This is an abstract base class.")
