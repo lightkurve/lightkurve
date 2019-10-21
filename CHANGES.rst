@@ -1,4 +1,4 @@
-1.3.0 (unreleased)
+1.3.0 (2019-10-21)
 ==================
 
 - Added a `method="quadratic"` option to `tpf.estimate_centroids()` which
