@@ -166,11 +166,14 @@ class DesignMatrix():
 
     def _validate(self):
         """Raises a `DesignMatrixException` if the matrix contains identical columns."""
-        for idx in range(self.shape[1]):
-            dupes = np.any([np.allclose(self.values[:, idx], self.values[:, jdx])
-                            for jdx in np.arange(idx + 1, self.shape[1])])
-            if dupes:
-                raise DesignMatrixException("Design Matrix contains duplicate columns.")
+        # for idx in range(self.shape[1]):
+        #     dupes = np.any([np.allclose(self.values[:, idx], self.values[:, jdx])
+        #                     for jdx in np.arange(idx + 1, self.shape[1])])
+        #     if dupes:
+        #         raise DesignMatrixException("Design Matrix contains duplicate columns.")
+        self.rank = np.linalg.matrix_rank(self.values)
+        if self.shape[1] < (self.rank - 1):
+            warnings.warn('Matrix has low rank, matrix might contain duplicate columns', lk.LightkurveWarning)
 
     @property
     def columns(self):

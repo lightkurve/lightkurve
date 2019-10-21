@@ -93,6 +93,10 @@ class SFFCorrector(RegressionCorrector):
             Number of iterations to fit and remove outliers
         restore_trend : bool (default False)
             Whether to restore the long term spline trend to the light curve
+        propagate_errors : bool (default False)
+            Whether to propagate the uncertainties from the regression. Default is False.
+            Setting to True will increase run time, but will sample from multivariate normal
+            distribution of weights.
 
         Returns
         -------

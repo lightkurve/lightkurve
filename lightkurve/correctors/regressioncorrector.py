@@ -104,7 +104,7 @@ class RegressionCorrector(Corrector):
     def __repr__(self):
         return 'RegressionCorrector (ID: {})'.format(self.lc.targetid)
 
-    def _fit_coefficients(self, cadence_mask=None, prior_mu=None, prior_sigma=None):
+    def _fit_coefficients(self, cadence_mask=None, prior_mu=None, prior_sigma=None, propagate_errors=False):
         """Fit the linear regression coefficients.
 
         This function will solve a linear regression with Gaussian priors
@@ -143,10 +143,13 @@ class RegressionCorrector(Corrector):
         if prior_sigma is not None:
             sigma_w_inv += prior_mu/prior_sigma**2
         w = np.linalg.solve(sigma_w_inv, B).T[0]
-        w_err = np.linalg.inv(sigma_w_inv)
+        if propagate_errors:
+            w_err = np.linalg.inv(sigma_w_inv)
+        else:
+            w_err = np.zeros(len(w)) * np.nan
         return w, w_err
 
-    def correct(self, design_matrix_collection, cadence_mask=None, sigma=5, niters=5):
+    def correct(self, design_matrix_collection, cadence_mask=None, sigma=5, niters=5, propagate_errors=False):
         """Find the best fit correction for the light curve.
 
         Parameters
@@ -162,6 +165,10 @@ class RegressionCorrector(Corrector):
             Standard deviation at which to remove outliers from fitting
         niters : int (default 5)
             Number of iterations to fit and remove outliers
+        propagate_errors : bool (default False)
+            Whether to propagate the uncertainties from the regression. Default is False.
+            Setting to True will increase run time, but will sample from multivariate normal
+            distribution of weights.
 
         Returns
         -------
@@ -183,7 +190,8 @@ class RegressionCorrector(Corrector):
         for count in range(niters):
             coefficients, coefficients_err = self._fit_coefficients(cadence_mask=cadence_mask,
                                                             prior_mu=self.X.prior_mu,
-                                                            prior_sigma=self.X.prior_sigma)
+                                                            prior_sigma=self.X.prior_sigma,
+                                                            propagate_errors=propagate_errors)
             residuals = self.lc.flux - np.dot(self.X.values, coefficients)
             cadence_mask &= ~sigma_clip(residuals, sigma=sigma).mask
             log.debug("correct(): iteration {}: clipped {} cadences"
@@ -195,12 +203,15 @@ class RegressionCorrector(Corrector):
 
         model_flux = np.dot(self.X.values, coefficients)
         model_flux -= np.median(model_flux)
-        samples = np.asarray([np.dot(self.X.values, np.random.multivariate_normal(coefficients, coefficients_err)) for idx in range(100)]).T
-        model_err = np.abs(np.percentile(samples, [16, 84], axis=1) - np.median(samples, axis=1)[:, None].T).mean(axis=0)
+        if propagate_errors:
+            samples = np.asarray([np.dot(self.X.values, np.random.multivariate_normal(coefficients, coefficients_err)) for idx in range(100)]).T
+            model_err = np.abs(np.percentile(samples, [16, 84], axis=1) - np.median(samples, axis=1)[:, None].T).mean(axis=0)
+        else:
+            model_err = np.zeros(len(model_flux))
         self.model_lc = LightCurve(self.lc.time, model_flux, model_err)
         self.corrected_lc = self.lc.copy()
         self.corrected_lc.flux = self.lc.flux - self.model_lc.flux
-        self.corrected_lc.flux_err = (self.lc.flux_err*2 + self.model_lc.flux_err**2)**0.5
+        self.corrected_lc.flux_err = (self.lc.flux_err**2 + model_err**2)**0.5
         self.diagnostic_lightcurves = self._create_diagnostic_lightcurves()
         return self.corrected_lc
 
