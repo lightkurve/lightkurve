@@ -141,7 +141,7 @@ class RegressionCorrector(Corrector):
             sigma_w_inv += 1/prior_sigma**2
         B = np.dot(X[cadence_mask].T, (self.lc.flux / self.lc.flux_err**2)[cadence_mask, None])
         if prior_sigma is not None:
-            sigma_w_inv += prior_mu/prior_sigma**2
+            B += (prior_mu/prior_sigma)[:, None]**2
         w = np.linalg.solve(sigma_w_inv, B).T[0]
         if propagate_errors:
             w_err = np.linalg.inv(sigma_w_inv)
