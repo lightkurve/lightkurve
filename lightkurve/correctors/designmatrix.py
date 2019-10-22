@@ -152,7 +152,10 @@ class DesignMatrix():
         # `fbpca.pca` is faster than `np.linalg.svd` but an optional dependency
         try:
             from fbpca import pca
-            new_values, _, _ = pca(self.values, nterms)
+            # fbpca is randomized, and has n_iter=2 as default,
+            # we find this to be too few, and that n_iter=10 is still fast but
+            # produces stable results.
+            new_values, _, _ = pca(self.values, nterms, n_iter=10)
         except ImportError:
             new_values, _, _ = np.linalg.svd(self.values)[:, :nterms]
         return DesignMatrix(new_values, name=self.name)

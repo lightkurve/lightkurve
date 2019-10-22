@@ -58,7 +58,8 @@ class SFFCorrector(RegressionCorrector):
     def __repr__(self):
         return 'SFFCorrector (LC: {})'.format(self.lc.targetid)
 
-    def correct(self, centroid_col=None, centroid_row=None, windows=20, bins=10, timescale=1.5, breakindex=None, degree=3, restore_trend=False, **kwargs):
+    def correct(self, centroid_col=None, centroid_row=None, windows=20, bins=10, timescale=1.5,
+                breakindex=None, degree=3, restore_trend=False, additional_design_matrix=None, **kwargs):
         """Find the best fit correction for the light curve.
 
         Parameters
@@ -97,6 +98,8 @@ class SFFCorrector(RegressionCorrector):
             Whether to propagate the uncertainties from the regression. Default is False.
             Setting to True will increase run time, but will sample from multivariate normal
             distribution of weights.
+        additional_design_matrix : `~lightkurve.lightcurve.Correctors.DesignMatrix` (optional)
+            Additional design matrix to remove, e.g. containing background vectors.
 
         Returns
         -------
@@ -153,9 +156,19 @@ class SFFCorrector(RegressionCorrector):
         s_dm = _get_spline_dm(self.lc.time, n_knots=n_knots, include_intercept=True)
 
         ar = np.vstack([self.lc.time/self.lc.time.mean(), (self.lc.time/self.lc.time.mean())**2])
-        dm = DesignMatrixCollection([s_dm.append_constant(prior_mu=self.lc.flux.mean(),
-                                                          prior_sigma=self.lc.flux.std()),
-                                     sff_dm])
+        if additional_design_matrix is not None:
+            if not isinstance(additional_design_matrix, DesignMatrix):
+                raise ValueError('`additional_design_matrix` must be a DesignMatrix object.')
+            self.additional_design_matrix = additional_design_matrix
+            dm = DesignMatrixCollection([s_dm.append_constant(prior_mu=self.lc.flux.mean(),
+                                                              prior_sigma=self.lc.flux.std()),
+                                         additional_design_matrix,
+                                         sff_dm])
+        else:
+            dm = DesignMatrixCollection([s_dm.append_constant(prior_mu=self.lc.flux.mean(),
+                                                                      prior_sigma=self.lc.flux.std()),
+                                                 sff_dm])
+
         clc = super(SFFCorrector, self).correct(dm, **kwargs)
         if restore_trend:
             trend = self.diagnostic_lightcurves['spline'].flux
@@ -179,7 +192,13 @@ class SFFCorrector(RegressionCorrector):
 
             lower_idx = np.asarray(np.append(0, self.window_points), int)
             upper_idx = np.asarray(np.append(self.window_points, len(self.lc.time)), int)
-            f = (self.lc.flux - self.diagnostic_lightcurves['spline'].flux)
+            if hasattr(self, 'additional_design_matrix'):
+                name = self.additional_design_matrix.name
+                f = (self.lc.flux - self.diagnostic_lightcurves['spline'].flux
+                            - self.diagnostic_lightcurves[name].flux)
+            else:
+                f = (self.lc.flux - self.diagnostic_lightcurves['spline'].flux)
+
             m = self.diagnostic_lightcurves['sff'].flux
 
             idx, jdx = 0, 0
