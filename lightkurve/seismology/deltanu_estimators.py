@@ -64,30 +64,29 @@ def estimate_deltanu_acf2d(periodogram, numax):
     NOTE: This function is intended for use with solar like Main Sequence
     and Red Giant Branch oscillators only.
 
-    Parameters:
+    Parameters
     ----------
     numax : float
         An estimated numax value of the mode envelope in the periodogram. If
         not given units it is assumed to be in units of the periodogram
         frequency attribute.
 
-    Returns:
+    Returns
     -------
-    deltanu : `SeismologyQuantity`
+    deltanu : `.SeismologyQuantity`
         The average large frequency spacing of the seismic oscillation modes.
         In units of the periodogram frequency attribute.
     """
-
     # Run some checks on the passed in numaxs
     # Ensure input numax is in the correct units
     numax = u.Quantity(numax, periodogram.frequency.unit)
     fs = np.median(np.diff(periodogram.frequency.value))
     if numax.value < fs:
         raise ValueError("The input numax can not be lower than"
-                        " a single frequency bin.")
+                         " a single frequency bin.")
     if numax.value > np.nanmax(periodogram.frequency.value):
         raise ValueError("The input numax can not be higher than"
-                        "the highest frequency value in the periodogram.")
+                         "the highest frequency value in the periodogram.")
 
     # Calculate deltanu using the method by Stello et al. 2009
     # Make sure that this relation only ever happens in microhertz space
@@ -109,7 +108,8 @@ def estimate_deltanu_acf2d(periodogram, numax):
     #Select the peak closest to the empirical value
     best_deltanu_value = lags[sel][peaks][np.argmin(np.abs(lags[sel][peaks] - deltanu_emp))]
     best_deltanu = u.Quantity(best_deltanu_value, periodogram.frequency.unit)
-    diagnostics = {'lags':lags, 'acf':acf, 'peaks':peaks, 'sel':sel, 'numax':numax, 'deltanu_emp':deltanu_emp}
+    diagnostics = {'lags':lags, 'acf':acf, 'peaks':peaks, 'sel':sel,
+                   'numax':numax, 'deltanu_emp':deltanu_emp}
     result = SeismologyQuantity(best_deltanu,
                                 name="deltanu",
                                 method="ACF2D",
@@ -134,8 +134,8 @@ def diagnose_deltanu_acf2d(deltanu, periodogram):
     of the bins.
 
     Parameters
-    -----------
-    deltanu : `SeismologyResult` object
+    ----------
+    deltanu : `.SeismologyResult` object
         The object returned by `estimate_deltanu_acf2d()`.
 
     Returns
@@ -148,25 +148,25 @@ def diagnose_deltanu_acf2d(deltanu, periodogram):
 
         ax = axs[0]
         periodogram.plot(ax=ax, label='')
-        ax.axvline(deltanu.diagnostics['numax'].value, c='r', linewidth=1, alpha=.4, ls=':')
+        ax.axvline(deltanu.diagnostics['numax'].value, c='r', linewidth=1,
+                   alpha=.4, ls=':')
         ax.text(deltanu.diagnostics['numax'].value, periodogram.power.value.max()*0.45,
-                    '{} ({:.1f} {})'.format(r'$\nu_{\rm max}$', deltanu.diagnostics['numax'].value, deltanu.diagnostics['numax'].unit.to_string('latex')),
-                    rotation=90, ha='right', color='r', alpha=0.5, fontsize=8)
-        ax.text(.025, .9, 'Input Power Spectrum',
-                    horizontalalignment='left',
-                    transform=ax.transAxes, fontsize=11)
-
+                '{} ({:.1f} {})'.format(r'$\nu_{\rm max}$', deltanu.diagnostics['numax'].value, deltanu.diagnostics['numax'].unit.to_string('latex')),
+                rotation=90, ha='right', color='r', alpha=0.5, fontsize=8)
+        ax.text(.025, .9, 'Input Power Spectrum', horizontalalignment='left',
+                transform=ax.transAxes, fontsize=11)
 
         window_width = 2*int(np.floor(utils.get_fwhm(periodogram, deltanu.diagnostics['numax'].value)))
         frequency_spacing = np.median(np.diff(periodogram.frequency.value))
-        spread = int(window_width/2/frequency_spacing)                           # Find the spread in indices
-
+        spread = int(window_width/2/frequency_spacing)  # spread in indices
 
         a = np.argmin(np.abs(periodogram.frequency.value - deltanu.diagnostics['numax'].value)) + spread
         b = np.argmin(np.abs(periodogram.frequency.value - deltanu.diagnostics['numax'].value)) - spread
 
-        a = [periodogram.frequency.value[a] if a < len(periodogram.frequency) else periodogram.frequency.value[-1]][0]
-        b = [periodogram.frequency.value[b] if b > 0 else periodogram.frequency.value[0]][0]
+        a = [periodogram.frequency.value[a] if a < len(periodogram.frequency)
+             else periodogram.frequency.value[-1]][0]
+        b = [periodogram.frequency.value[b] if b > 0
+             else periodogram.frequency.value[0]][0]
 
         ax.axvline(a, c='r', linewidth=2, alpha=.4, ls='--')
         ax.axvline(b, c='r', linewidth=2, alpha=.4, ls='--')
@@ -179,12 +179,9 @@ def diagnose_deltanu_acf2d(deltanu, periodogram):
         ax.set_xlim(b - ((a-b)*0.2), a + ((a-b)*0.2))
 
         ax = axs[1]
-        # ax.plot(lags, acf/acf[0])
         ax.plot(deltanu.diagnostics['lags'][2:], deltanu.diagnostics['acf'][2:])
         ax.set_xlabel("Frequency Lag [{}]".format(periodogram.frequency.unit.to_string('latex')))
         ax.set_ylabel(r'Scaled Auto Correlation', fontsize=11)
-
-#        ax.set_title(r'Scaled Correlation vs Lag for a given $\nu_{\rm max}$')
 
         axin = inset_axes(ax, width="50%",height="50%", loc="upper right")
         axin.set_yticks([])
@@ -193,14 +190,23 @@ def diagnose_deltanu_acf2d(deltanu, periodogram):
         axin.scatter(deltanu.diagnostics['lags'][deltanu.diagnostics['sel']][deltanu.diagnostics['peaks']],
                      deltanu.diagnostics['acf'][deltanu.diagnostics['sel']][deltanu.diagnostics['peaks']],
                      c='r', s=5)
-        ax.axvline(deltanu.value,c='r', linewidth=2,alpha=.4,
-            label=r'Measured {} {:.1f} {}'.format(r'$\Delta\nu$', deltanu.value,
-                                      periodogram.frequency.unit.to_string('latex')))
-        ax.axvline(deltanu.diagnostics['deltanu_emp'],c='b', linewidth=2,alpha=.4, ls='--',
-                    label=r'Empirical {} {:.1f} {}'.format(r'$\Delta\nu$', deltanu.diagnostics['deltanu_emp'],
-                                  periodogram.frequency.unit.to_string('latex')))
-        axin.axvline(deltanu.value,c='r', linewidth=2,alpha=.4)
-        axin.axvline(deltanu.diagnostics['deltanu_emp'],c='b', linewidth=2,alpha=.4, ls='--')
+
+        mea_label = r'Measured {} {:.1f} {}'.format(
+                        r'$\Delta\nu$',
+                        deltanu.value,
+                        periodogram.frequency.unit.to_string('latex'))
+        ax.axvline(deltanu.value,c='r', linewidth=2, alpha=.4, label=mea_label)
+
+        emp_label = r'Empirical {} {:.1f} {}'.format(
+                        r'$\Delta\nu$',
+                        deltanu.diagnostics['deltanu_emp'],
+                        periodogram.frequency.unit.to_string('latex'))
+        ax.axvline(deltanu.diagnostics['deltanu_emp'], c='b', linewidth=2,
+                   alpha=.4, ls='--', label=emp_label)
+
+        axin.axvline(deltanu.value,c='r', linewidth=2, alpha=.4)
+        axin.axvline(deltanu.diagnostics['deltanu_emp'], c='b', linewidth=2,
+                     alpha=.4, ls='--')
         ax.text(.025, .9, 'Scaled Auto Correlation Within 2 FWHM',
                     horizontalalignment='left',
                     transform=ax.transAxes, fontsize=11)
