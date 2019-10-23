@@ -8,21 +8,21 @@
 1.3.0 (2019-10-21)
 ==================
 
-- Added a `method="quadratic"` option to `tpf.estimate_centroids()` which
+- Added a ``method="quadratic"`` option to ``tpf.estimate_centroids()`` which
   enables centroids to be estimated by fitting a bivariate polynomial to the
   3x3 pixel core of the PSF. The method can also be called as a standalone
-  function via `lightkurve.utils.centroid_quadratic()`. [#544, #610]
+  function via ``lightkurve.utils.centroid_quadratic()``. [#544, #610]
 
-- Fixed a bug in `Seismology.plot_echelle()` which caused the Echelle diagram
+- Fixed a bug in ``Seismology.plot_echelle()`` which caused the Echelle diagram
   of a power spectrum to be rendered incorrectly. [#602]
 
-- Fixed a bug which caused `lightkurve.utils` to be incorrectly resolved to
-  `lightkurve.seismology.utils`. [#606]
+- Fixed a bug which caused ``lightkurve.utils`` to be incorrectly resolved to
+  ``lightkurve.seismology.utils``. [#606]
 
-- Changed `bkjd_to_astropy_time()` and `btjd_to_astropy_time()` to accept
+- Changed ``bkjd_to_astropy_time()`` and ``btjd_to_astropy_time()`` to accept
   a single float and lists of floats in addition to numpy arrays. [#608]
 
-- Improved support for creating a `LombScarglePeriodogram` with an unevenly
+- Improved support for creating a ``LombScarglePeriodogram`` with an unevenly
   sampled grid in frequency space. [#614]
 
 
@@ -30,27 +30,27 @@
 1.2.0 (2019-10-01)
 ==================
 
-- Added `flux_unit` and `flux_quantity` properties to the `LightCurve` class
-  to enable users to keep track of a light curve's flux units. [#591]
+- Added ``flux_unit`` and ``flux_quantity`` properties to the ``LightCurve``
+  class to enable users to keep track of a light curve's flux units. [#591]
 
-- Changed the default behavior of `LightCurve.plot()` to use `normalize=False`,
+- Changed the default behavior of ``LightCurve.plot()`` to use ``normalize=False``,
   ie. plots now display a light curve in its intrinsic units by default. [#591]
 
-- Added an optional `unit` argument to `LightCurve.normalize()` to make it
-  convenient to obtain a relative light curve in percent (`unit='percent'`),
-  parts per thousand (`unit='ppt'`) or parts per million (`unit='ppm'`). [#591]
+- Added an optional ``unit`` argument to ``LightCurve.normalize()`` to make it
+  convenient to obtain a relative light curve in percent (``unit='percent'``),
+  parts per thousand (``unit='ppt'``) or parts per million (``unit='ppm'``). [#591]
 
-- Changed `LombScarglePeriodogram.from_lightcurve()` to not normalize the input
-  light curve by default. [#591]
+- Changed ``LombScarglePeriodogram.from_lightcurve()`` to not normalize the
+  input light curve by default. [#591]
 
-- Changed `LightCurve.normalize()` to emit a warning if the light curve appears
-  to be zero-centered. [#589]
+- Changed ``LightCurve.normalize()`` to emit a warning if the light curve
+  appears to be zero-centered. [#589]
 
 - Fixed an issue which caused the search functions to be incompatible with the
   latest version of astroquery (v0.3.10). [#598]
 
-- Added support for performing mathematical operations involving `LightCurve`
-  objects, e.g. two `LightCurve` objects can now be added together. [#532]
+- Added support for performing mathematical operations involving ``LightCurve``
+  objects, e.g. two ``LightCurve`` objects can now be added together. [#532]
 
 - Updated the online tutorials (https://docs.lightkurve.org/tutorials) to
   take all recent Lightkurve API changes into account. [#596]
@@ -62,21 +62,21 @@
 
 Lightkurve v1.1.1 is a bugfix release which includes the following changes:
 
-- Changed `search_targetpixelfile()` and `search_lightcurvefile()` to emit a
+- Changed ``search_targetpixelfile()`` and ``search_lightcurvefile()`` to emit a
   helpful warning if an ambigous target identifier is used, i.e. if a number is
   entered in the range where the K2 EPIC and TESS TIC catalogs overlap. [#558]
 
-- Changed `TargetPixelFile.plot()` to always display the cadence number. [#562]
+- Changed ``TargetPixelFile.plot()`` to always display the cadence number. [#562]
 
-- Changed `TargetPixelFile.interact()` to store light curves created using the
-  tool in the `SAP_FLUX` column rather than the `FLUX` column of the new light
-  curve file, for consistency with pipeline products. [#559]
+- Changed ``TargetPixelFile.interact()`` to store light curves created using the
+  tool in the ``SAP_FLUX`` column rather than the ``FLUX`` column of the new
+  light curve file, for consistency with pipeline products. [#559]
 
-- Added `scatter()` and `errorbar()` methods to the `LightCurveFile` class to make
-  it consistent with the plotting methods provided by `LightCurve` objects. [#382]
+- Added ``scatter()`` and ``errorbar()`` methods to the ``LightCurveFile`` class
+  to make it consistent with the ``LightCurve`` class. [#382]
 
-- Fixed a bug in `KeplerTargetPixelFile.from_fits_images()` to ensure the correct
-  pixels are selected in cutout mode. [#571]
+- Fixed a bug in ``KeplerTargetPixelFile.from_fits_images()`` to ensure the
+  correct pixels are selected in cutout mode. [#571]
 
 - Fixed a series of minor documentation and code quality issues to enable
   Lightkurve to receive the "code quality A" certification by codacy.com.
@@ -87,49 +87,49 @@ Lightkurve v1.1.1 is a bugfix release which includes the following changes:
 1.1.0 (2019-07-19)
 ==================
 
-- Added the `lightkurve.seismology` sub-package which enables quick-look
-  asteroseismic quantities to be extracted from `Periodogram` objects. [#496]
+- Added the ``lightkurve.seismology`` sub-package which enables quick-look
+  asteroseismic quantities to be extracted from ``Periodogram`` objects. [#496]
 
-- Added the `stitch()` method to `LightCurveCollection` and `LightCurveFileCollection`
+- Added the ``stitch()`` method to ``LightCurveCollection`` and ``LightCurveFileCollection``
   to enable multi-sector/multi-quarter data to be combined more easily. [#548]
 
-- Improved the `LightCurve.fill_gaps()` method to fill gaps in a light curve
+- Improved the ``LightCurve.fill_gaps()`` method to fill gaps in a light curve
   with Gaussian noise proportional to the light curve's CDPP. [#548]
 
-- Added the `TargetPixelFile.cutout()` method which enables smaller Target Pixel
-  Files to be extracted from larger ones. [#537]
+- Added the ``TargetPixelFile.cutout()`` method which enables smaller Target
+  Pixel Files to be extracted from larger ones. [#537]
 
-- Added the `pld_aperture_mask` argument to `PLDCorrector.correct()` to enable
+- Added a ``pld_aperture_mask`` argument to ``PLDCorrector.correct()`` to enable
   users to select the pixels used for creating the PLD basis vectors. [#523]
 
 - Added a new unit test module (test_synthetic_data.py) which utilizes
   synthetic Target Pixel Files to validate Lightkurve features. [#534]
 
-- Added extra `log.debug` messages to `lightkurve.search` to enable users
+- Added extra ``log.debug`` messages to ``lightkurve.search`` to enable users
   to track the status of search and download operations. [#547]
 
 - Added several new usage examples to the docstrings of functions. [#516]
 
 - Removed seven methods which had been deprecated prior to v1.0: [#515]
-  * removed `lc.cdpp()` in favor of `lc.estimate_cdpp()`;
-  * removed `lc.correct()` in favor of `lc.to_corrector().correct()`;
-  * removed `lcf.from_fits()` in favor of `lightkurve.open()`;
-  * removed `tpf.from_fits()` in favor of `lightkurve.open()`;
-  * removed `lcf.from_archive()` in favor of `search_lightcurvefile()`;
-  * removed `tpf.from_archive()` in favor of `search_targetpixelfile()`;
-  * removed `tpf.centroids()` in favor of `tpf.estimate_centroids()`.
+  * removed ``lc.cdpp()`` in favor of ``lc.estimate_cdpp()``;
+  * removed ``lc.correct()`` in favor of ``lc.to_corrector().correct()``;
+  * removed ``lcf.from_fits()`` in favor of ``lightkurve.open()``;
+  * removed ``tpf.from_fits()`` in favor of ``lightkurve.open()``;
+  * removed ``lcf.from_archive()`` in favor of ``search_lightcurvefile()``;
+  * removed ``tpf.from_archive()`` in favor of ``search_targetpixelfile()``;
+  * removed ``tpf.centroids()`` in favor of ``tpf.estimate_centroids()``.
 
-- Moved the `Corrector` systematics removal classes into their own sub-package,
-  named `lightkurve.correctors`. [#519]
+- Moved the ``Corrector`` systematics removal classes into their own
+  sub-package, named ``lightkurve.correctors``. [#519]
 
-- Fixed a bug which prevented `lightkurve.open()` from raising a
-  `FileNotFoundError` when a file does not exist. [#540]
+- Fixed a bug which prevented ``lightkurve.open()`` from raising a
+  ``FileNotFoundError`` when a file does not exist. [#540]
 
-- Fixed a bug which caused `BoxLeastSquaresPeriodogram` to ignore the `period`
-  parameter. [#514]
+- Fixed a bug which caused ``BoxLeastSquaresPeriodogram`` to ignore the
+  ``period`` parameter. [#514]
 
-- Fixed a bug which prevented the `t0` argument of `lc.fold()` from being an
-  AstroPy Quantity object. [#521]
+- Fixed a bug which prevented the ``t0`` argument of ``lc.fold()`` from being
+  an AstroPy Quantity object. [#521]
 
 
 
