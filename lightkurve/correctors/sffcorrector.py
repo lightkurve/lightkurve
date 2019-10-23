@@ -142,7 +142,7 @@ class SFFCorrector(RegressionCorrector):
 
         sff_dm = DesignMatrix(pd.DataFrame(np.hstack(stack)),
                               columns=np.hstack(columns),
-                              name='sff', prior_sigma=np.hstack(prior_sigmas))
+                              name='sff')#, prior_sigma=np.hstack(prior_sigmas))
 
 
         # long term
