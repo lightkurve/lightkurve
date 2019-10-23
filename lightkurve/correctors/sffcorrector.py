@@ -134,7 +134,7 @@ class SFFCorrector(RegressionCorrector):
             ar = np.copy(self.arclength)
             ar[~np.in1d(ar, ar[a:b])] = -1
             dm = np.asarray(dmatrix("bs(x, knots={}, degree={}, include_intercept={}) - 1"
-                                    "".format(knots, degree, False), {"x": ar}))
+                                    "".format(knots, degree, True), {"x": ar}))
             stack.append(dm)
             columns.append(['window{}_bin{}'.format(idx+1, jdx+1)
                             for jdx in range(len(dm.T))])
