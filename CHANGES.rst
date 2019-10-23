@@ -143,14 +143,14 @@ This is a minor bugfix release containing the following improvements:
   and ``LightCurve.bin()`` [#503].
 
 - Ensure users are alerted if a large number of cadences are masked out by
-  `quality_bitmask` when opening data products. [#495]
+  ``quality_bitmask`` when opening data products. [#495]
 
-- `CBVCorrector` now accepts a `KeplerLightCurve` as input. [#504]
+- ``CBVCorrector`` now accepts a ``KeplerLightCurve`` as input. [#504]
 
-- The `~lightkurve.search` functions now provide a more helpful error message
+- The ``lightkurve.search`` functions now provide a more helpful error message
   if the download cache contains a corrupt file. [#512]
 
-- Switched continuous integration from Travis/Appveyor to Azure pipelines. [#497]
+- Switched continuous integration from Travis/Appveyor to Azure. [#497]
 
 
 
