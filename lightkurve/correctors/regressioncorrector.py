@@ -124,7 +124,7 @@ class RegressionCorrector(Corrector):
             cadence_mask = np.ones(len(self.lc.flux), bool)
 
         # If flux errors are not all finite numbers, then default to array of ones
-        if np.any(~np.isfinite(self.lc.flux_err)):
+        if np.all(~np.isfinite(self.lc.flux_err)):
             flux_err = np.ones(cadence_mask.sum())
         else:
             flux_err = self.lc.flux_err[cadence_mask]

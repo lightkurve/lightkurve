@@ -52,7 +52,7 @@ class SFFCorrector(RegressionCorrector):
     def __repr__(self):
         return 'SFFCorrector (LC: {})'.format(self.lc.targetid)
 
-    def correct(self, centroid_col=None, centroid_row=None, windows=10, bins=5,
+    def correct(self, centroid_col=None, centroid_row=None, windows=20, bins=5,
                 timescale=1.5, breakindex=None, degree=3, restore_trend=False,
                 additional_design_matrix=None, **kwargs):
         """Find the best fit correction for the light curve.
