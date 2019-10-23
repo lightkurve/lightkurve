@@ -133,12 +133,13 @@ class RegressionCorrector(Corrector):
         X = self.X.values[cadence_mask]
 
         # Compute `X^T cov^-1 X + 1/prior_sigma^2`
-        sigma_w_inv = np.dot(X.T, X / flux_err[:, None]**2)
+#        sigma_w_inv = np.dot(X.T, X / flux_err[:, None]**2)
+        sigma_w_inv = np.dot(X.T, X)
         if prior_sigma is not None:
-            sigma_w_inv += 1. / prior_sigma**2
-
+            sigma_w_inv += np.diag(1. / prior_sigma**2)
         # Compute `X^T cov^-1 y + prior_mu/prior_sigma^2`
-        B = np.dot(X.T, self.lc.flux[cadence_mask] / flux_err**2)
+#        B = np.dot(X.T, self.lc.flux[cadence_mask] / flux_err**2)
+        B = np.dot(X.T, self.lc.flux[cadence_mask])
         if prior_sigma is not None:
             B += (prior_mu / prior_sigma**2)
 
@@ -240,7 +241,10 @@ class RegressionCorrector(Corrector):
         return lcs
 
     def _diagnostic_plot(self):
-        """Produce diagnostic plots to assess the effectiveness of the correction."""
+        """Produce diagnostic plots to assess the effectiveness of the correction.
+
+        Note: We need a hidden function so that other correctors can alter the plot.
+        """
         if not hasattr(self, 'corrected_lc'):
             raise ValueError('Please call the `correct()` method before trying to diagnose.')
 
@@ -260,4 +264,21 @@ class RegressionCorrector(Corrector):
         return axs
 
     def diagnose(self):
+        """Produce diagnostic plots to assess the effectiveness of the correction."""
         self._diagnostic_plot()
+
+    def diagnose_priors(self):
+        if not hasattr(self, 'corrected_lc'):
+            raise ValueError('Please call the `correct()` method before trying to diagnose.')
+
+        names = [X.name for X in self.X]
+        with plt.style.context(MPLSTYLE):
+            fig, axs = plt.subplots(1, len(names), figsize=(len(names)*4, 4), sharey=True)
+            if not hasattr(axs, '__iter__'):
+                axs = [axs]
+            for idx, ax, X in zip(range(len(names)), axs, self.X):
+                X.plot_priors(ax=ax)
+                firstcol_idx = sum([m.shape[1] for m in self.X.matrices[:idx]])
+                submatrix_coefficients = self.coefficients[firstcol_idx:firstcol_idx+X.shape[1]]
+                [ax.axvline(s, color='red', zorder=-1) for s in submatrix_coefficients]
+        return axs

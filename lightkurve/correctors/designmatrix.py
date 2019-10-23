@@ -62,6 +62,25 @@ class DesignMatrix():
                 cbar.set_label('Component Value')
         return ax
 
+    def plot_priors(self, ax=None):
+        def gauss(x, mu=0, sigma=1):
+            return np.exp(-(x - mu)**2/(2*sigma**2))
+        with plt.style.context(MPLSTYLE):
+            if ax is None:
+                _, ax = plt.subplots()
+            for m, s in zip(self.prior_mu, self.prior_sigma):
+                if ~np.isfinite(s):
+                    ax.axhline(1, color='k')
+                else:
+                    x = np.linspace(m - 5*s, m + 5*s, 1000)
+                    ax.plot(x, gauss(x, m, s), c='k')
+            ax.set_xlabel('Value')
+            ax.set_title('{} Priors'.format(self.name))
+        return ax
+
+    def sample_priors(self):
+        return np.random.normal(self.prior_mu, self.prior_sigma)
+
     def split(self, row_indices):
         """Returns a new matrix with the regressors split over multiple columns.
 
@@ -218,6 +237,13 @@ class DesignMatrixCollection():
         ax = temp_dm.plot(**kwargs)
         ax.set_title("Design Matrix Collection")
         return ax
+
+    def plot_priors(self, ax=None):
+        [dm.plot_priors() for dm in self]
+        return
+
+    def sample_priors(self):
+        return np.hstack([dm.sample_priors() for dm in self])
 
     def split(self, row_indices):
         return DesignMatrixCollection([d.split(row_indices) for d in self])

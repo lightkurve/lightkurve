@@ -144,8 +144,6 @@ class SFFCorrector(RegressionCorrector):
                               columns=np.hstack(columns),
                               name='sff', prior_sigma=np.hstack(prior_sigmas))
 
-        # Have to find a way to calculate good priors....
-        #sff_dm.prior_sigma = np.ones(sff_dm.shape[1]) * lc.flux.std()*10
 
         # long term
         n_knots = int((self.lc.time[-1] - self.lc.time[0])/timescale)
@@ -179,6 +177,10 @@ class SFFCorrector(RegressionCorrector):
         axs = self._diagnostic_plot()
         for t in self.window_points:
             axs[0].axvline(self.lc.time[t], color='r', ls='--', alpha=0.3)
+
+    def diagnose_arclength(self):
+        """Returns a diagnostic plot which visualizes arclength vs flux
+        from most recent call to `correct()`."""
 
         max_plot = 5
         with plt.style.context(MPLSTYLE):
