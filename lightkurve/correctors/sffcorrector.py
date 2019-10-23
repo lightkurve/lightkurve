@@ -58,7 +58,7 @@ class SFFCorrector(RegressionCorrector):
     def __repr__(self):
         return 'SFFCorrector (LC: {})'.format(self.lc.targetid)
 
-    def correct(self, centroid_col=None, centroid_row=None, windows=20, bins=10, timescale=1.5,
+    def correct(self, centroid_col=None, centroid_row=None, windows=20, bins=5, timescale=1.5,
                 breakindex=None, degree=3, restore_trend=False, additional_design_matrix=None, **kwargs):
         """Find the best fit correction for the light curve.
 
@@ -134,6 +134,7 @@ class SFFCorrector(RegressionCorrector):
 
         stack = []
         columns = []
+        prior_sigmas = []
         for idx, a, b in zip(range(len(lower_idx)), lower_idx, upper_idx):
             knots = list(np.percentile(self.arclength[a:b], np.linspace(0, 100, bins+1)[1:-1]))
             ar = np.copy(self.arclength)
@@ -143,10 +144,11 @@ class SFFCorrector(RegressionCorrector):
             stack.append(dm)
             columns.append(['window{}_bin{}'.format(idx+1, jdx+1)
                             for jdx in range(len(dm.T))])
+            prior_sigmas.append(np.ones(len(dm.T)) * 5 * self.lc[a:b].flux.std())
 
         sff_dm = DesignMatrix(pd.DataFrame(np.hstack(stack)),
                               columns=np.hstack(columns),
-                              name='sff')
+                              name='sff', prior_sigma=np.hstack(prior_sigmas))
 
         # Have to find a way to calculate good priors....
         #sff_dm.prior_sigma = np.ones(sff_dm.shape[1]) * lc.flux.std()*10
@@ -155,19 +157,22 @@ class SFFCorrector(RegressionCorrector):
         n_knots = int((self.lc.time[-1] - self.lc.time[0])/timescale)
         s_dm = _get_spline_dm(self.lc.time, n_knots=n_knots, include_intercept=True)
 
+        means = [np.average(self.lc.flux, weights=s_dm.values[:, idx]) for idx in range(s_dm.shape[1])]
+        s_dm.prior_mu = np.asarray(means)
+        s_dm.prior_sigma = np.ones(len(s_dm.prior_mu)) * 5 * self.lc.flux.std()
+
+
         ar = np.vstack([self.lc.time/self.lc.time.mean(), (self.lc.time/self.lc.time.mean())**2])
         if additional_design_matrix is not None:
             if not isinstance(additional_design_matrix, DesignMatrix):
                 raise ValueError('`additional_design_matrix` must be a DesignMatrix object.')
             self.additional_design_matrix = additional_design_matrix
-            dm = DesignMatrixCollection([s_dm.append_constant(prior_mu=self.lc.flux.mean(),
-                                                              prior_sigma=self.lc.flux.std()),
-                                         additional_design_matrix,
-                                         sff_dm])
+            dm = DesignMatrixCollection([s_dm,
+                                         sff_dm,
+                                         additional_design_matrix])
         else:
-            dm = DesignMatrixCollection([s_dm.append_constant(prior_mu=self.lc.flux.mean(),
-                                                                      prior_sigma=self.lc.flux.std()),
-                                                 sff_dm])
+            dm = DesignMatrixCollection([s_dm, sff_dm])
+
 
         clc = super(SFFCorrector, self).correct(dm, **kwargs)
         if restore_trend:
