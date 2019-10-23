@@ -1,11 +1,11 @@
 import pytest
 
+from astropy.utils.data import get_pkg_data_filename
 import numpy as np
 from numpy.testing import assert_almost_equal
 
 from ... import LightCurve, KeplerLightCurveFile, KeplerLightCurve
 from .. import SFFCorrector
-from astropy.utils.data import get_pkg_data_filename
 
 
 K2_C08 = ("https://archive.stsci.edu/missions/k2/lightcurves/c8/"
@@ -41,48 +41,58 @@ def test_sff_corrector():
     lc = LightCurve(time=time, flux=raw_flux, flux_err=np.ones(len(raw_flux)) * 0.0001)
     sff = SFFCorrector(lc)
     corrected_lc = sff.correct(centroid_col=centroid_col,
-                               centroid_row=centroid_row, windows=1, restore_trend=True)
-    assert (np.isclose(corrected_flux, corrected_lc.flux, atol=0.5e-3).all())
+                               centroid_row=centroid_row,
+                               windows=3,
+                               restore_trend=True)
+    assert (np.isclose(corrected_flux, corrected_lc.flux, atol=0.001).all())
 
     # masking
     corrected_lc = sff.correct(centroid_col=centroid_col,
-                               centroid_row=centroid_row, windows=1, restore_trend=True,
+                               centroid_row=centroid_row,
+                               windows=3,
+                               restore_trend=True,
                                cadence_mask=mask)
-    assert (np.isclose(corrected_flux, corrected_lc.flux, atol=0.5e-3).all())
+    assert (np.isclose(corrected_flux, corrected_lc.flux, atol=0.001).all())
 
     # masking and breakindex
     corrected_lc = sff.correct(centroid_col=centroid_col,
-                               centroid_row=centroid_row, windows=1, restore_trend=True,
-                               cadence_mask=mask, breakindex=150)
-    assert (np.isclose(corrected_flux, corrected_lc.flux, atol=0.5e-3).all())
+                               centroid_row=centroid_row,
+                               windows=3,
+                               restore_trend=True,
+                               cadence_mask=mask,
+                               breakindex=150)
+    assert (np.isclose(corrected_flux, corrected_lc.flux, atol=0.001).all())
 
     # masking and breakindex and iters
     corrected_lc = sff.correct(centroid_col=centroid_col,
-                               centroid_row=centroid_row, windows=1, restore_trend=True,
+                               centroid_row=centroid_row, windows=3, restore_trend=True,
                                cadence_mask=mask, breakindex=150, niters=3)
-    assert (np.isclose(corrected_flux, corrected_lc.flux, atol=0.5e-3).all())
+    assert (np.isclose(corrected_flux, corrected_lc.flux, atol=0.001).all())
 
     # masking and breakindex and bins
     corrected_lc = sff.correct(centroid_col=centroid_col,
-                               centroid_row=centroid_row, windows=1, restore_trend=True,
+                               centroid_row=centroid_row, windows=3, restore_trend=True,
                                cadence_mask=mask, breakindex=150, bins=5)
-    assert (np.isclose(corrected_flux, corrected_lc.flux, atol=0.5e-3).all())
+    assert (np.isclose(corrected_flux, corrected_lc.flux, atol=0.001).all())
     assert np.all((sff.lc.flux_err/sff.corrected_lc.flux_err) == 1)
 
 
     # masking and breakindex and bins and propagate_errors
     corrected_lc = sff.correct(centroid_col=centroid_col,
-                               centroid_row=centroid_row, windows=1, restore_trend=True,
+                               centroid_row=centroid_row, windows=3, restore_trend=True,
                                cadence_mask=mask, breakindex=150, bins=5, propagate_errors=True)
-    assert (np.isclose(corrected_flux, corrected_lc.flux, atol=0.5e-3).all())
+    assert (np.isclose(corrected_flux, corrected_lc.flux, atol=0.001).all())
     assert np.all((sff.lc.flux_err/sff.corrected_lc.flux_err) < 1)
 
     # test using KeplerLightCurve interface
-    klc = KeplerLightCurve(time=time, flux=raw_flux, flux_err=np.ones(len(raw_flux)) * 0.01, centroid_col=centroid_col,
+    klc = KeplerLightCurve(time=time,
+                           flux=raw_flux,
+                           flux_err=np.ones(len(raw_flux)) * 0.0001,
+                           centroid_col=centroid_col,
                            centroid_row=centroid_row)
     sff = klc.to_corrector("sff")
-    klc = sff.correct(windows=1, restore_trend=True)
-    assert (np.isclose(corrected_flux, klc.flux, atol=0.5e-3).all())
+    klc = sff.correct(windows=3, restore_trend=True)
+    assert (np.isclose(corrected_flux, klc.flux, atol=0.001).all())
 
     # Can plot
     sff.diagnose()

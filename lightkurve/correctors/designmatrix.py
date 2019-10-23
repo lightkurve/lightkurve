@@ -3,7 +3,6 @@
 TODO
 ----
 * Improve user input validation and error checking.
-* Add a pca() method and have `RegressionCorrector` use it?
 * Add a warning if the column rank of the matrix is bad, i.e. if the matrix has
   tightly-correlated regressors?
 """

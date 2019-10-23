@@ -15,7 +15,3 @@ class Corrector(object):
     def diagnose(self):
         """Returns plots which elucidate the most recent call to `correct()`."""
         raise NotImplementedError("This is an abstract base class.")
-
-    def interact(self):
-        """Optional; returns a bokeh widget to interact with the options."""
-        raise NotImplementedError("This is an abstract base class.")

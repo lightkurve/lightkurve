@@ -1,16 +1,13 @@
 """Defines the `SFFCorrector` class.
 
 `SFFCorrector` enables systematics to be removed from light curves using the
-"Self Flat-Fielding" (SFF) method described in Vanderburg and Johnson (2014).
+Self Flat-Fielding (SFF) method described in Vanderburg and Johnson (2014).
 
-Open questions:
-* Shouldn't `correct()` take all the optional parameters (e.g. `windows`)
-  instead of the constructor?
-* How to transition from old correct(centroids) API?
+TODO
+----
+* Are we sufficiently compatible wiht the old SFFCorrector?
 * Make robust if centroid values have NaNs.
 """
-from __future__ import division, print_function
-
 import logging
 import warnings
 import pandas as pd
@@ -32,14 +29,12 @@ __all__ = ['SFFCorrector']
 
 
 class SFFCorrector(RegressionCorrector):
-    """Special case of RegressionCorrector where the design matrix is built from
-    centroid positions and a spline in time.
-
-    See lk.correctors.RegressionCorrector for more information.
+    """Special case of `.RegressionCorrector` where the design matrix is built
+    from centroid positions and a spline in time.
 
     Parameters
     ----------
-    lc : `~lightkurve.lightcurve.LightCurve`
+    lc : `.LightCurve`
         The light curve that needs to be corrected.
     """
     def __init__(self, lc):
@@ -52,24 +47,24 @@ class SFFCorrector(RegressionCorrector):
         self.breakindex = None
         self.centroid_col = None
         self.centroid_row = None
-
         super(SFFCorrector, self).__init__(lc=lc)
 
     def __repr__(self):
         return 'SFFCorrector (LC: {})'.format(self.lc.targetid)
 
-    def correct(self, centroid_col=None, centroid_row=None, windows=20, bins=5, timescale=1.5,
-                breakindex=None, degree=3, restore_trend=False, additional_design_matrix=None, **kwargs):
+    def correct(self, centroid_col=None, centroid_row=None, windows=10, bins=5,
+                timescale=1.5, breakindex=None, degree=3, restore_trend=False,
+                additional_design_matrix=None, **kwargs):
         """Find the best fit correction for the light curve.
 
         Parameters
         ----------
         centroid_col : np.ndarray of floats (optional)
-            Array of centroid column positions. If None, will use `centroid_col`
-            from input light curve
+            Array of centroid column positions. If ``None``, will use the
+            `centroid_col` attribute of the input light curve by default.
         centroid_row : np.ndarray of floats (optional)
-            Array of centroid row positions. If None, will use `centroid_row`
-            from input light curve
+            Array of centroid row positions. If ``None``, will use the
+            `centroid_row` attribute of the input light curve by default.
         windows : int
             Number of windows to split the data into to perform the correction.
             Default 20.
@@ -106,7 +101,6 @@ class SFFCorrector(RegressionCorrector):
         corrected_lc : `~lightkurve.lightcurve.LightCurve`
             Corrected light curve, with noise removed.
         """
-
         if centroid_col is None:
             centroid_col = self.lc.centroid_col
         if centroid_row is None:
@@ -173,15 +167,15 @@ class SFFCorrector(RegressionCorrector):
         else:
             dm = DesignMatrixCollection([s_dm, sff_dm])
 
-
         clc = super(SFFCorrector, self).correct(dm, **kwargs)
         if restore_trend:
             trend = self.diagnostic_lightcurves['spline'].flux
-            clc += trend
+            clc += trend - np.nanmedian(trend)
         return clc
 
     def diagnose(self):
-        """ Shows a diagnostic plot of the fit to the light curve, and arclength"""
+        """Returns a diagnostic plot which visualizes what happened during the
+        most recent call to `correct()`."""
         axs = self._diagnostic_plot()
         for t in self.window_points:
             axs[0].axvline(self.lc.time[t], color='r', ls='--', alpha=0.3)
@@ -231,7 +225,7 @@ class SFFCorrector(RegressionCorrector):
 
 def _get_spline_dm(x, n_knots=20, degree=3, name='spline',
                    include_intercept=False):
-    """Returns a spline design matrix using `patsy.dmatrix`.
+    """Returns a `.DesignMatrix` which models splines using `patsy.dmatrix`.
 
     Parameters
     ----------
@@ -260,7 +254,7 @@ def _get_spline_dm(x, n_knots=20, degree=3, name='spline',
 
 
 def _get_centroid_dm(col, row, name='centroids'):
-    """Returns a design matrix containing (col, row) centroid positions
+    """Returns a `.DesignMatrix` containing (col, row) centroid positions
     and transformations thereof.
 
     Parameters

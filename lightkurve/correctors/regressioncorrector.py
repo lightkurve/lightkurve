@@ -1,22 +1,13 @@
-"""Defines RegressionCorrector.
-
-TO DO
------
-- Work when flux_err not available
-- add regularization
-"""
-import inspect
+"""Defines RegressionCorrector."""
 import logging
 
+from astropy.stats import sigma_clip
 import matplotlib.pyplot as plt
 import numpy as np
-from astropy.stats import sigma_clip
-from sklearn import linear_model
 
 from .corrector import Corrector
 from .designmatrix import DesignMatrix, DesignMatrixCollection
 from ..lightcurve import LightCurve, MPLSTYLE
-from ..utils import validate_method
 
 __all__ = ['RegressionCorrector']
 
@@ -65,7 +56,7 @@ class RegressionCorrector(Corrector):
 
     .. math::
 
-        \w = \covw (A^\\top \cov^{-1} \y + \\boldsymbol\sigma^{-2}_\w \muw I)
+        \w = \covw (A^\\top \cov^{-1} \y + \\boldsymbol\sigma^{-2}_\w I \muw)
 
     Where :math:`\covw` is the covariance matrix of the coefficients:
 
@@ -76,22 +67,16 @@ class RegressionCorrector(Corrector):
 
     Parameters
     ----------
-    lc : `~lightkurve.lightcurve.LightCurve`
+    lc : `.LightCurve`
         The light curve that needs to be corrected.
     """
     def __init__(self, lc):
         # Validate user input
-
-        if np.all(~np.isfinite(lc.flux_err)):
-            raise ValueError('Input light curve has no `flux_err` set.')
-
-        if np.any([~np.isfinite(lc.time), ~np.isfinite(lc.flux), ~np.isfinite(lc.flux_err)]):
-            raise ValueError('Input light curve has NaNs in time, flux, or flux_err. '
+        if np.any([~np.isfinite(lc.time), ~np.isfinite(lc.flux)]):
+            raise ValueError('Input light curve has NaNs in time or flux. '
                              'Please remove NaNs before correction '
                              '(e.g. using `lc = lc.remove_nans()`).')
         self.lc = lc
-
-
 
         # The following properties will be set when correct() is called.
         # We're setting them here so they do not throw value errors
@@ -104,7 +89,8 @@ class RegressionCorrector(Corrector):
     def __repr__(self):
         return 'RegressionCorrector (ID: {})'.format(self.lc.targetid)
 
-    def _fit_coefficients(self, cadence_mask=None, prior_mu=None, prior_sigma=None, propagate_errors=False):
+    def _fit_coefficients(self, cadence_mask=None, prior_mu=None, prior_sigma=None,
+                          propagate_errors=False):
         """Fit the linear regression coefficients.
 
         This function will solve a linear regression with Gaussian priors
@@ -122,10 +108,12 @@ class RegressionCorrector(Corrector):
         """
         if prior_mu is not None:
             if len(prior_mu) != len(self.X.values.T):
-                raise ValueError('Prior means must have shape {}'.format(len(self.X.values.T)))
+                raise ValueError('`prior_mu` must have shape {}'
+                                 ''.format(len(self.X.values.T)))
         if prior_sigma is not None:
             if len(prior_sigma) != len(self.X.values.T):
-                raise ValueError('Prior sigmas must have shape {}'.format(len(self.X.values.T)))
+                raise ValueError('`prior_sigma` must have shape {}'
+                                 ''.format(len(self.X.values.T)))
 
         # If prior_mu is specified, prior_sigma must be specified
         if not ((prior_mu is None) & (prior_sigma is None)) | ((prior_mu is not None) & (prior_sigma is not None)):
@@ -135,30 +123,45 @@ class RegressionCorrector(Corrector):
         if cadence_mask is None:
             cadence_mask = np.ones(len(self.lc.flux), bool)
 
-        X = self.X.values
-        sigma_w_inv = np.dot(X[cadence_mask].T, X[cadence_mask] / self.lc.flux_err[cadence_mask, None]**2)
+        # If flux errors are not all finite numbers, then default to array of ones
+        if np.any(~np.isfinite(self.lc.flux_err)):
+            flux_err = np.ones(cadence_mask.sum())
+        else:
+            flux_err = self.lc.flux_err[cadence_mask]
+
+        # Retrieve the design matrix (X) as a numpy array
+        X = self.X.values[cadence_mask]
+
+        # Compute `X^T cov^-1 X + 1/prior_sigma^2`
+        sigma_w_inv = np.dot(X.T, X / flux_err[:, None]**2)
         if prior_sigma is not None:
-            sigma_w_inv += 1/prior_sigma**2
-        B = np.dot(X[cadence_mask].T, (self.lc.flux / self.lc.flux_err**2)[cadence_mask, None])
+            sigma_w_inv += 1. / prior_sigma**2
+
+        # Compute `X^T cov^-1 y + prior_mu/prior_sigma^2`
+        B = np.dot(X.T, self.lc.flux[cadence_mask] / flux_err**2)
         if prior_sigma is not None:
-            B += (prior_mu/prior_sigma)[:, None]**2
-        w = np.linalg.solve(sigma_w_inv, B).T[0]
+            B += (prior_mu / prior_sigma**2)
+
+        # Solve for weights w
+        w = np.linalg.solve(sigma_w_inv, B).T
         if propagate_errors:
             w_err = np.linalg.inv(sigma_w_inv)
         else:
             w_err = np.zeros(len(w)) * np.nan
+
         return w, w_err
 
-    def correct(self, design_matrix_collection, cadence_mask=None, sigma=5, niters=5, propagate_errors=False):
+    def correct(self, design_matrix_collection, cadence_mask=None, sigma=5,
+                niters=5, propagate_errors=False):
         """Find the best fit correction for the light curve.
 
         Parameters
         ----------
-        design_matrix_collection : `~lightkurve.correctors.DesignMatrixCollection`
-            A collection of one or more design matrices.  Each matrix in the
-            collection must have a shape of (time, regressors).
-            The columns contained in each matrix must be known to correlate with
-            the signals or noise we want to remove from the light curve.
+        design_matrix_collection : `.DesignMatrix` or `.DesignMatrixCollection`
+            One or more design matrices.  Each matrix must have a shape of
+            (time, regressors). The columns contained in each matrix must be
+            known to correlate with additive noise components we want to remove
+            from the light curve.
         cadence_mask : np.ndarray of bools (optional)
             Mask, where True indicates a cadence that should be used.
         sigma : int (default 5)
@@ -222,36 +225,37 @@ class RegressionCorrector(Corrector):
         design matrix collection.
         """
         if self.coefficients is None:
-            raise ValueError("you need to call correct() first")
+            raise ValueError("you need to call `correct()` first")
 
         lcs = {}
         for idx, submatrix in enumerate(self.X.matrices):
             # What is the index of the first column for the submatrix?
             firstcol_idx = sum([m.shape[1] for m in self.X.matrices[:idx]])
             submatrix_coefficients = self.coefficients[firstcol_idx:firstcol_idx+submatrix.shape[1]]
-#            submatrix_coefficients_err = self.coefficients_err[firstcol_idx:firstcol_idx+submatrix.shape[1], firstcol_idx:firstcol_idx+submatrix.shape[1]]
-#            samples = np.asarray([np.dot(submatrix.values, np.random.multivariate_normal(submatrix_coefficients, submatrix_coefficients_err)) for idx in range(100)]).T
-#            model_err = np.abs(np.percentile(samples, [16, 84], axis=1) - np.median(samples, axis=1)[:, None].T).mean(axis=0)
+            # submatrix_coefficients_err = self.coefficients_err[firstcol_idx:firstcol_idx+submatrix.shape[1], firstcol_idx:firstcol_idx+submatrix.shape[1]]
+            # samples = np.asarray([np.dot(submatrix.values, np.random.multivariate_normal(submatrix_coefficients, submatrix_coefficients_err)) for idx in range(100)]).T
+            # model_err = np.abs(np.percentile(samples, [16, 84], axis=1) - np.median(samples, axis=1)[:, None].T).mean(axis=0)
             model_flux = np.dot(submatrix.values, submatrix_coefficients)
             lcs[submatrix.name] = LightCurve(self.lc.time, model_flux, label=submatrix.name)
         return lcs
 
     def _diagnostic_plot(self):
-        """ Produce diagnostic plots to assess the effectiveness of the correction. """
-
+        """Produce diagnostic plots to assess the effectiveness of the correction."""
         if not hasattr(self, 'corrected_lc'):
-            raise ValueError('Please run `correct` method before trying to diagnose.')
+            raise ValueError('Please call the `correct()` method before trying to diagnose.')
 
         with plt.style.context(MPLSTYLE):
             fig, axs = plt.subplots(2, figsize=(10, 6), sharex=True)
             ax = axs[0]
-            self.lc.plot(ax=ax, normalize=False, label='Original', alpha=0.4)
+            self.lc.plot(ax=ax, normalize=False, label='original', alpha=0.4)
             for key in self.diagnostic_lightcurves.keys():
                 (self.diagnostic_lightcurves[key] - np.median(self.diagnostic_lightcurves[key].flux) + np.median(self.lc.flux)).plot(ax=ax)
             ax.set_xlabel('')
             ax = axs[1]
             self.lc.plot(ax=ax, normalize=False, alpha=0.2, label='Original')
-            self.corrected_lc[~self.cadence_mask].scatter(normalize=False, c='r', marker='x', s=10, label='Outliers', ax=ax)
+            self.corrected_lc[~self.cadence_mask].scatter(
+                                            normalize=False, c='r', marker='x',
+                                            s=10, label='Outliers', ax=ax)
             self.corrected_lc.plot(normalize=False, label='Corrected', ax=ax, c='k')
         return axs
 
