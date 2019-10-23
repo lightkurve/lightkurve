@@ -95,38 +95,38 @@
 <div class="section" id="id1">
 <h2>1.3.0 (2019-10-21)<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p>Added a <code class="xref py py-obj docutils literal notranslate"><span class="pre">method=&quot;quadratic&quot;</span></code> option to <code class="xref py py-obj docutils literal notranslate"><span class="pre">tpf.estimate_centroids()</span></code> which
+<li><p>Added a <code class="docutils literal notranslate"><span class="pre">method=&quot;quadratic&quot;</span></code> option to <code class="docutils literal notranslate"><span class="pre">tpf.estimate_centroids()</span></code> which
 enables centroids to be estimated by fitting a bivariate polynomial to the
 3x3 pixel core of the PSF. The method can also be called as a standalone
-function via <code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.utils.centroid_quadratic()</span></code>. [#544, #610]</p></li>
-<li><p>Fixed a bug in <code class="xref py py-obj docutils literal notranslate"><span class="pre">Seismology.plot_echelle()</span></code> which caused the Echelle diagram
+function via <code class="docutils literal notranslate"><span class="pre">lightkurve.utils.centroid_quadratic()</span></code>. [#544, #610]</p></li>
+<li><p>Fixed a bug in <code class="docutils literal notranslate"><span class="pre">Seismology.plot_echelle()</span></code> which caused the Echelle diagram
 of a power spectrum to be rendered incorrectly. [#602]</p></li>
-<li><p>Fixed a bug which caused <a class="reference internal" href="../api/utils.html#module-lightkurve.utils" title="lightkurve.utils"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.utils</span></code></a> to be incorrectly resolved to
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.seismology.utils</span></code>. [#606]</p></li>
-<li><p>Changed <code class="xref py py-obj docutils literal notranslate"><span class="pre">bkjd_to_astropy_time()</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">btjd_to_astropy_time()</span></code> to accept
+<li><p>Fixed a bug which caused <code class="docutils literal notranslate"><span class="pre">lightkurve.utils</span></code> to be incorrectly resolved to
+<code class="docutils literal notranslate"><span class="pre">lightkurve.seismology.utils</span></code>. [#606]</p></li>
+<li><p>Changed <code class="docutils literal notranslate"><span class="pre">bkjd_to_astropy_time()</span></code> and <code class="docutils literal notranslate"><span class="pre">btjd_to_astropy_time()</span></code> to accept
 a single float and lists of floats in addition to numpy arrays. [#608]</p></li>
-<li><p>Improved support for creating a <code class="xref py py-obj docutils literal notranslate"><span class="pre">LombScarglePeriodogram</span></code> with an unevenly
+<li><p>Improved support for creating a <code class="docutils literal notranslate"><span class="pre">LombScarglePeriodogram</span></code> with an unevenly
 sampled grid in frequency space. [#614]</p></li>
 </ul>
 </div>
 <div class="section" id="id2">
 <h2>1.2.0 (2019-10-01)<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p>Added <code class="xref py py-obj docutils literal notranslate"><span class="pre">flux_unit</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">flux_quantity</span></code> properties to the <code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code> class
-to enable users to keep track of a light curve’s flux units. [#591]</p></li>
-<li><p>Changed the default behavior of <code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.plot()</span></code> to use <code class="xref py py-obj docutils literal notranslate"><span class="pre">normalize=False</span></code>,
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">flux_unit</span></code> and <code class="docutils literal notranslate"><span class="pre">flux_quantity</span></code> properties to the <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code>
+class to enable users to keep track of a light curve’s flux units. [#591]</p></li>
+<li><p>Changed the default behavior of <code class="docutils literal notranslate"><span class="pre">LightCurve.plot()</span></code> to use <code class="docutils literal notranslate"><span class="pre">normalize=False</span></code>,
 ie. plots now display a light curve in its intrinsic units by default. [#591]</p></li>
-<li><p>Added an optional <code class="xref py py-obj docutils literal notranslate"><span class="pre">unit</span></code> argument to <code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.normalize()</span></code> to make it
-convenient to obtain a relative light curve in percent (<code class="xref py py-obj docutils literal notranslate"><span class="pre">unit='percent'</span></code>),
-parts per thousand (<code class="xref py py-obj docutils literal notranslate"><span class="pre">unit='ppt'</span></code>) or parts per million (<code class="xref py py-obj docutils literal notranslate"><span class="pre">unit='ppm'</span></code>). [#591]</p></li>
-<li><p>Changed <code class="xref py py-obj docutils literal notranslate"><span class="pre">LombScarglePeriodogram.from_lightcurve()</span></code> to not normalize the input
-light curve by default. [#591]</p></li>
-<li><p>Changed <code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.normalize()</span></code> to emit a warning if the light curve appears
-to be zero-centered. [#589]</p></li>
+<li><p>Added an optional <code class="docutils literal notranslate"><span class="pre">unit</span></code> argument to <code class="docutils literal notranslate"><span class="pre">LightCurve.normalize()</span></code> to make it
+convenient to obtain a relative light curve in percent (<code class="docutils literal notranslate"><span class="pre">unit='percent'</span></code>),
+parts per thousand (<code class="docutils literal notranslate"><span class="pre">unit='ppt'</span></code>) or parts per million (<code class="docutils literal notranslate"><span class="pre">unit='ppm'</span></code>). [#591]</p></li>
+<li><p>Changed <code class="docutils literal notranslate"><span class="pre">LombScarglePeriodogram.from_lightcurve()</span></code> to not normalize the
+input light curve by default. [#591]</p></li>
+<li><p>Changed <code class="docutils literal notranslate"><span class="pre">LightCurve.normalize()</span></code> to emit a warning if the light curve
+appears to be zero-centered. [#589]</p></li>
 <li><p>Fixed an issue which caused the search functions to be incompatible with the
 latest version of astroquery (v0.3.10). [#598]</p></li>
-<li><p>Added support for performing mathematical operations involving <code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code>
-objects, e.g. two <code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code> objects can now be added together. [#532]</p></li>
+<li><p>Added support for performing mathematical operations involving <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code>
+objects, e.g. two <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> objects can now be added together. [#532]</p></li>
 <li><p>Updated the online tutorials (<a class="reference external" href="https://docs.lightkurve.org/tutorials">https://docs.lightkurve.org/tutorials</a>) to
 take all recent Lightkurve API changes into account. [#596]</p></li>
 </ul>
@@ -135,17 +135,17 @@ take all recent Lightkurve API changes into account. [#596]</p></li>
 <h2>1.1.1 (2019-08-19)<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <p>Lightkurve v1.1.1 is a bugfix release which includes the following changes:</p>
 <ul class="simple">
-<li><p>Changed <code class="xref py py-obj docutils literal notranslate"><span class="pre">search_targetpixelfile()</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">search_lightcurvefile()</span></code> to emit a
+<li><p>Changed <code class="docutils literal notranslate"><span class="pre">search_targetpixelfile()</span></code> and <code class="docutils literal notranslate"><span class="pre">search_lightcurvefile()</span></code> to emit a
 helpful warning if an ambigous target identifier is used, i.e. if a number is
 entered in the range where the K2 EPIC and TESS TIC catalogs overlap. [#558]</p></li>
-<li><p>Changed <code class="xref py py-obj docutils literal notranslate"><span class="pre">TargetPixelFile.plot()</span></code> to always display the cadence number. [#562]</p></li>
-<li><p>Changed <code class="xref py py-obj docutils literal notranslate"><span class="pre">TargetPixelFile.interact()</span></code> to store light curves created using the
-tool in the <code class="xref py py-obj docutils literal notranslate"><span class="pre">SAP_FLUX</span></code> column rather than the <code class="xref py py-obj docutils literal notranslate"><span class="pre">FLUX</span></code> column of the new light
-curve file, for consistency with pipeline products. [#559]</p></li>
-<li><p>Added <code class="xref py py-obj docutils literal notranslate"><span class="pre">scatter()</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">errorbar()</span></code> methods to the <code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurveFile</span></code> class to make
-it consistent with the plotting methods provided by <code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve</span></code> objects. [#382]</p></li>
-<li><p>Fixed a bug in <code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerTargetPixelFile.from_fits_images()</span></code> to ensure the correct
-pixels are selected in cutout mode. [#571]</p></li>
+<li><p>Changed <code class="docutils literal notranslate"><span class="pre">TargetPixelFile.plot()</span></code> to always display the cadence number. [#562]</p></li>
+<li><p>Changed <code class="docutils literal notranslate"><span class="pre">TargetPixelFile.interact()</span></code> to store light curves created using the
+tool in the <code class="docutils literal notranslate"><span class="pre">SAP_FLUX</span></code> column rather than the <code class="docutils literal notranslate"><span class="pre">FLUX</span></code> column of the new
+light curve file, for consistency with pipeline products. [#559]</p></li>
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">scatter()</span></code> and <code class="docutils literal notranslate"><span class="pre">errorbar()</span></code> methods to the <code class="docutils literal notranslate"><span class="pre">LightCurveFile</span></code> class
+to make it consistent with the <code class="docutils literal notranslate"><span class="pre">LightCurve</span></code> class. [#382]</p></li>
+<li><p>Fixed a bug in <code class="docutils literal notranslate"><span class="pre">KeplerTargetPixelFile.from_fits_images()</span></code> to ensure the
+correct pixels are selected in cutout mode. [#571]</p></li>
 <li><p>Fixed a series of minor documentation and code quality issues to enable
 Lightkurve to receive the “code quality A” certification by codacy.com.
 [#557, #560, #564, #565, #566, #568, #573, #574, #575]</p></li>
@@ -154,37 +154,37 @@ Lightkurve to receive the “code quality A” certification by codacy.com.
 <div class="section" id="id4">
 <h2>1.1.0 (2019-07-19)<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p>Added the <a class="reference internal" href="../api/seismology.html#module-lightkurve.seismology" title="lightkurve.seismology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.seismology</span></code></a> sub-package which enables quick-look
-asteroseismic quantities to be extracted from <code class="xref py py-obj docutils literal notranslate"><span class="pre">Periodogram</span></code> objects. [#496]</p></li>
-<li><p>Added the <code class="xref py py-obj docutils literal notranslate"><span class="pre">stitch()</span></code> method to <code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurveCollection</span></code> and <code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurveFileCollection</span></code>
+<li><p>Added the <code class="docutils literal notranslate"><span class="pre">lightkurve.seismology</span></code> sub-package which enables quick-look
+asteroseismic quantities to be extracted from <code class="docutils literal notranslate"><span class="pre">Periodogram</span></code> objects. [#496]</p></li>
+<li><p>Added the <code class="docutils literal notranslate"><span class="pre">stitch()</span></code> method to <code class="docutils literal notranslate"><span class="pre">LightCurveCollection</span></code> and <code class="docutils literal notranslate"><span class="pre">LightCurveFileCollection</span></code>
 to enable multi-sector/multi-quarter data to be combined more easily. [#548]</p></li>
-<li><p>Improved the <code class="xref py py-obj docutils literal notranslate"><span class="pre">LightCurve.fill_gaps()</span></code> method to fill gaps in a light curve
+<li><p>Improved the <code class="docutils literal notranslate"><span class="pre">LightCurve.fill_gaps()</span></code> method to fill gaps in a light curve
 with Gaussian noise proportional to the light curve’s CDPP. [#548]</p></li>
-<li><p>Added the <code class="xref py py-obj docutils literal notranslate"><span class="pre">TargetPixelFile.cutout()</span></code> method which enables smaller Target Pixel
-Files to be extracted from larger ones. [#537]</p></li>
-<li><p>Added the <code class="xref py py-obj docutils literal notranslate"><span class="pre">pld_aperture_mask</span></code> argument to <code class="xref py py-obj docutils literal notranslate"><span class="pre">PLDCorrector.correct()</span></code> to enable
+<li><p>Added the <code class="docutils literal notranslate"><span class="pre">TargetPixelFile.cutout()</span></code> method which enables smaller Target
+Pixel Files to be extracted from larger ones. [#537]</p></li>
+<li><p>Added a <code class="docutils literal notranslate"><span class="pre">pld_aperture_mask</span></code> argument to <code class="docutils literal notranslate"><span class="pre">PLDCorrector.correct()</span></code> to enable
 users to select the pixels used for creating the PLD basis vectors. [#523]</p></li>
 <li><p>Added a new unit test module (test_synthetic_data.py) which utilizes
 synthetic Target Pixel Files to validate Lightkurve features. [#534]</p></li>
-<li><p>Added extra <code class="xref py py-obj docutils literal notranslate"><span class="pre">log.debug</span></code> messages to <a class="reference internal" href="../api/search.html#module-lightkurve.search" title="lightkurve.search"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.search</span></code></a> to enable users
+<li><p>Added extra <code class="docutils literal notranslate"><span class="pre">log.debug</span></code> messages to <code class="docutils literal notranslate"><span class="pre">lightkurve.search</span></code> to enable users
 to track the status of search and download operations. [#547]</p></li>
 <li><p>Added several new usage examples to the docstrings of functions. [#516]</p></li>
 <li><p>Removed seven methods which had been deprecated prior to v1.0: [#515]
-* removed <code class="xref py py-obj docutils literal notranslate"><span class="pre">lc.cdpp()</span></code> in favor of <code class="xref py py-obj docutils literal notranslate"><span class="pre">lc.estimate_cdpp()</span></code>;
-* removed <code class="xref py py-obj docutils literal notranslate"><span class="pre">lc.correct()</span></code> in favor of <code class="xref py py-obj docutils literal notranslate"><span class="pre">lc.to_corrector().correct()</span></code>;
-* removed <code class="xref py py-obj docutils literal notranslate"><span class="pre">lcf.from_fits()</span></code> in favor of <code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.open()</span></code>;
-* removed <code class="xref py py-obj docutils literal notranslate"><span class="pre">tpf.from_fits()</span></code> in favor of <code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.open()</span></code>;
-* removed <code class="xref py py-obj docutils literal notranslate"><span class="pre">lcf.from_archive()</span></code> in favor of <code class="xref py py-obj docutils literal notranslate"><span class="pre">search_lightcurvefile()</span></code>;
-* removed <code class="xref py py-obj docutils literal notranslate"><span class="pre">tpf.from_archive()</span></code> in favor of <code class="xref py py-obj docutils literal notranslate"><span class="pre">search_targetpixelfile()</span></code>;
-* removed <code class="xref py py-obj docutils literal notranslate"><span class="pre">tpf.centroids()</span></code> in favor of <code class="xref py py-obj docutils literal notranslate"><span class="pre">tpf.estimate_centroids()</span></code>.</p></li>
-<li><p>Moved the <code class="xref py py-obj docutils literal notranslate"><span class="pre">Corrector</span></code> systematics removal classes into their own sub-package,
-named <a class="reference internal" href="../api/correctors.html#module-lightkurve.correctors" title="lightkurve.correctors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.correctors</span></code></a>. [#519]</p></li>
-<li><p>Fixed a bug which prevented <code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.open()</span></code> from raising a
-<a class="reference external" href="https://docs.python.org/3/library/exceptions.html#FileNotFoundError" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FileNotFoundError</span></code></a> when a file does not exist. [#540]</p></li>
-<li><p>Fixed a bug which caused <code class="xref py py-obj docutils literal notranslate"><span class="pre">BoxLeastSquaresPeriodogram</span></code> to ignore the <code class="xref py py-obj docutils literal notranslate"><span class="pre">period</span></code>
-parameter. [#514]</p></li>
-<li><p>Fixed a bug which prevented the <code class="xref py py-obj docutils literal notranslate"><span class="pre">t0</span></code> argument of <code class="xref py py-obj docutils literal notranslate"><span class="pre">lc.fold()</span></code> from being an
-AstroPy Quantity object. [#521]</p></li>
+* removed <code class="docutils literal notranslate"><span class="pre">lc.cdpp()</span></code> in favor of <code class="docutils literal notranslate"><span class="pre">lc.estimate_cdpp()</span></code>;
+* removed <code class="docutils literal notranslate"><span class="pre">lc.correct()</span></code> in favor of <code class="docutils literal notranslate"><span class="pre">lc.to_corrector().correct()</span></code>;
+* removed <code class="docutils literal notranslate"><span class="pre">lcf.from_fits()</span></code> in favor of <code class="docutils literal notranslate"><span class="pre">lightkurve.open()</span></code>;
+* removed <code class="docutils literal notranslate"><span class="pre">tpf.from_fits()</span></code> in favor of <code class="docutils literal notranslate"><span class="pre">lightkurve.open()</span></code>;
+* removed <code class="docutils literal notranslate"><span class="pre">lcf.from_archive()</span></code> in favor of <code class="docutils literal notranslate"><span class="pre">search_lightcurvefile()</span></code>;
+* removed <code class="docutils literal notranslate"><span class="pre">tpf.from_archive()</span></code> in favor of <code class="docutils literal notranslate"><span class="pre">search_targetpixelfile()</span></code>;
+* removed <code class="docutils literal notranslate"><span class="pre">tpf.centroids()</span></code> in favor of <code class="docutils literal notranslate"><span class="pre">tpf.estimate_centroids()</span></code>.</p></li>
+<li><p>Moved the <code class="docutils literal notranslate"><span class="pre">Corrector</span></code> systematics removal classes into their own
+sub-package, named <code class="docutils literal notranslate"><span class="pre">lightkurve.correctors</span></code>. [#519]</p></li>
+<li><p>Fixed a bug which prevented <code class="docutils literal notranslate"><span class="pre">lightkurve.open()</span></code> from raising a
+<code class="docutils literal notranslate"><span class="pre">FileNotFoundError</span></code> when a file does not exist. [#540]</p></li>
+<li><p>Fixed a bug which caused <code class="docutils literal notranslate"><span class="pre">BoxLeastSquaresPeriodogram</span></code> to ignore the
+<code class="docutils literal notranslate"><span class="pre">period</span></code> parameter. [#514]</p></li>
+<li><p>Fixed a bug which prevented the <code class="docutils literal notranslate"><span class="pre">t0</span></code> argument of <code class="docutils literal notranslate"><span class="pre">lc.fold()</span></code> from being
+an AstroPy Quantity object. [#521]</p></li>
 </ul>
 </div>
 <div class="section" id="id5">
