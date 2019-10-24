@@ -40,6 +40,9 @@ class SFFCorrector(RegressionCorrector):
     def __init__(self, lc):
         # Setting these values as None so we don't get a value error if the
         # user calls before "correct()"
+
+        self.raw_lc = lc
+        lc = lc.copy().normalize()
         self.window_points = None
         self.windows = None
         self.bins = None
@@ -106,6 +109,9 @@ class SFFCorrector(RegressionCorrector):
         if centroid_row is None:
             centroid_row = self.lc.centroid_row
 
+        if np.any([~np.isfinite(centroid_row), ~np.isfinite(centroid_col)]):
+            raise ValueError('Centroids contain NaN values.')
+
         self.window_points = _get_window_points(centroid_col, centroid_row, windows)
         self.windows = windows
         self.bins = bins
@@ -122,7 +128,6 @@ class SFFCorrector(RegressionCorrector):
             c = np.max(c) - c
         self.arclength = (c**2 + r**2)**0.5
 
-        c_dm = _get_centroid_dm(c, r)
         lower_idx = np.asarray(np.append(0, self.window_points), int)
         upper_idx = np.asarray(np.append(self.window_points, len(self.lc.time)), int)
 
@@ -132,17 +137,20 @@ class SFFCorrector(RegressionCorrector):
         for idx, a, b in zip(range(len(lower_idx)), lower_idx, upper_idx):
             knots = list(np.percentile(self.arclength[a:b], np.linspace(0, 100, bins+1)[1:-1]))
             ar = np.copy(self.arclength)
-            ar[~np.in1d(ar, ar[a:b])] = -1
+            ar[~np.in1d(ar, ar[a:b])] = 0
             dm = np.asarray(dmatrix("bs(x, knots={}, degree={}, include_intercept={}) - 1"
                                     "".format(knots, degree, True), {"x": ar}))
             stack.append(dm)
             columns.append(['window{}_bin{}'.format(idx+1, jdx+1)
                             for jdx in range(len(dm.T))])
-            prior_sigmas.append(np.ones(len(dm.T)) * 5 * self.lc[a:b].flux.std())
+
+            # I'm putting VERY weak priors on the SFF motion vectors
+            prior_sigmas.append(np.ones(len(dm.T)) * 10000 * self.lc[a:b].flux.std())
 
         sff_dm = DesignMatrix(pd.DataFrame(np.hstack(stack)),
                               columns=np.hstack(columns),
-                              name='sff')#, prior_sigma=np.hstack(prior_sigmas))
+                              name='sff',
+                              prior_sigma=np.hstack(prior_sigmas))
 
 
         # long term
@@ -151,10 +159,13 @@ class SFFCorrector(RegressionCorrector):
 
         means = [np.average(self.lc.flux, weights=s_dm.values[:, idx]) for idx in range(s_dm.shape[1])]
         s_dm.prior_mu = np.asarray(means)
-        s_dm.prior_sigma = np.ones(len(s_dm.prior_mu)) * 5 * self.lc.flux.std()
+
+        # I'm putting WEAK priors on the spline that it must be around 1
+        s_dm.prior_sigma = np.ones(len(s_dm.prior_mu)) * 1000 * self.lc.flux.std()
 
 
-        ar = np.vstack([self.lc.time/self.lc.time.mean(), (self.lc.time/self.lc.time.mean())**2])
+
+        # additional
         if additional_design_matrix is not None:
             if not isinstance(additional_design_matrix, DesignMatrix):
                 raise ValueError('`additional_design_matrix` must be a DesignMatrix object.')
@@ -165,10 +176,15 @@ class SFFCorrector(RegressionCorrector):
         else:
             dm = DesignMatrixCollection([s_dm, sff_dm])
 
+        # correct
         clc = super(SFFCorrector, self).correct(dm, **kwargs)
+
+        # clean
         if restore_trend:
             trend = self.diagnostic_lightcurves['spline'].flux
             clc += trend - np.nanmedian(trend)
+        clc *= self.raw_lc.flux.mean()
+
         return clc
 
     def diagnose(self):

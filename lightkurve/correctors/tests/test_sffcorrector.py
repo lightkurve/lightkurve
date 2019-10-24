@@ -221,5 +221,5 @@ def test_sff_priors():
 
     sff = SFFCorrector(lc)
     sff.correct()  # should not raise an exception
-    assert np.isclose(sff.diagnostic_lightcurves['spline'].flux.mean(), lc.flux.mean(), atol=1e-4)
-    assert np.isclose(sff.diagnostic_lightcurves['sff'].flux.mean(), 0, atol=1e-4)
+    assert np.isclose(sff.diagnostic_lightcurves['spline'].flux.mean(), 1, atol=1e-3)
+    assert np.isclose(sff.diagnostic_lightcurves['sff'].flux.mean(), 0, atol=1e-3)
