@@ -144,7 +144,7 @@ def test_sff_corrector():
     sff = SFFCorrector(lc)
     corrected_lc = sff.correct(centroid_col=centroid_col,
                                centroid_row=centroid_row,
-                               restore_trend=True)
+                               restore_trend=True, windows=1)
     assert (np.isclose(corrected_flux, corrected_lc.flux, atol=0.001).all())
 
     # masking

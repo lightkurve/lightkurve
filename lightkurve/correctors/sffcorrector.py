@@ -41,14 +41,20 @@ class SFFCorrector(RegressionCorrector):
         The light curve that needs to be corrected.
     """
     def __init__(self, lc):
+        self.raw_lc = lc
+        if hasattr(lc, 'flux_unit'):
+            if lc.flux_unit is None:
+                lc = lc.copy()
+            elif lc.flux_unit.to_string() == '':
+                lc = lc.copy()
+            else:
+                lc = lc.copy().normalize()
+        else:
+            lc = lc.copy().normalize()
+
         # Setting these values as None so we don't get a value error if the
         # user calls before "correct()"
 
-        self.raw_lc = lc
-        if lc.flux_unit.to_string() == '':
-            lc = lc.copy()
-        else:
-            lc = lc.copy().normalize()
         self.window_points = None
         self.windows = None
         self.bins = None
