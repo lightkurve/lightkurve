@@ -109,9 +109,13 @@ spectrum, where the central frequency of the window moves in steps of 1
 microhertz (or given by the user as <code class="xref py py-obj docutils literal notranslate"><span class="pre">spacing</span></code>) and evaluates the
 autocorrelation at each step.</p>
 <p>The correlation (numpy.correlate) is typically given as:</p>
-<p>C[x, y] = sum( x * conj(y) ) .</p>
+<blockquote>
+<div><p>C[x, y] = sum( x * conj(y) ) .</p>
+</div></blockquote>
 <p>The autocorrelation power of a full spectrum with itself is then</p>
-<p>C = sum(s * s),</p>
+<blockquote>
+<div><p>C = sum(s * s),</p>
+</div></blockquote>
 <p>where s is a window of the signal-to-noise spectrum.
 Because of the method of this calculation, we need to first
 rescale the power by subtracting its mean, placing its mean around 0. This
@@ -120,7 +124,9 @@ with itself will be close to zero.</p>
 <p>In order to evaluate where the correlation power is highest (indicative
 of the power excess of the modes) we calculate the Mean Collapsed
 Correlation (MCC, see Kiefer 2013, Viani et al. 2019) as</p>
-<p>MCC = (sum(<a href="#id1"><span class="problematic" id="id2">|C|</span></a>) - 1) / nlags ,</p>
+<blockquote>
+<div><p>MCC = (sum(<a href="#id1"><span class="problematic" id="id2">|C|</span></a>) - 1) / nlags ,</p>
+</div></blockquote>
 <p>where C is the autocorrelation power at a given central freqeuncy, and
 nlags is the number of lags in the autocorrelation.</p>
 <p>The MCC metric is covolved with an Astropy Gaussian 1D Kernel with a

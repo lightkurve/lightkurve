@@ -96,12 +96,14 @@
 <dt id="lightkurve.seismology.estimate_logg">
 <code class="sig-prename descclassname">lightkurve.seismology.</code><code class="sig-name descname">estimate_logg</code><span class="sig-paren">(</span><em class="sig-param">numax</em>, <em class="sig-param">teff</em>, <em class="sig-param">numax_err=None</em>, <em class="sig-param">teff_err=None</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.seismology.estimate_logg" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculates the log of the surface gravity using the asteroseismic scaling
-relations.
-The two global observable seismic parameters, numax and deltanu, along with
+relations.</p>
+<p>The two global observable seismic parameters, numax and deltanu, along with
 temperature, scale with fundamental stellar properties (Brown et al. 1991;
 Kjeldsen &amp; Bedding 1995). These scaling relations can be rearranged to
 calculate a stellar surface gravity as</p>
-<p>g = gsol * (numax/numax_sol)(Teff/Teffsol)^0.5</p>
+<blockquote>
+<div><p>g = gsol * (numax/numax_sol)(Teff/Teffsol)^0.5</p>
+</div></blockquote>
 <p>where g is the surface gravity and Teff is the effective temperature,
 and the suffix ‘sol’ indicates a solar value. In this method we use the
 solar values for numax as given in Huber et al. (2011) and for Teff as given
@@ -113,7 +115,7 @@ common in the astrophysics literature.</p>
 also functions as an accessible explanation of seismic scaling relations.</p>
 <p>NOTE: These scaling relations are scaled to the Sun, and therefore do not
 always produce an entirely accurate result for more evolved stars.</p>
-<dl class="field-list simple">
+<dl class="field-list">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>numax</strong><span class="classifier">float</span></dt><dd><p>The frequency of maximum power of the seismic mode envelope. If not
@@ -128,8 +130,8 @@ given an astropy unit, assumed to be in units of microhertz.</p>
 </dl>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><dl class="simple">
-<dt><strong>logg</strong><span class="classifier">SeismologyQuantity</span></dt><dd><p>The log10 of the surface gravity of the star.</p>
+<dd class="field-even"><dl>
+<dt><strong>logg</strong><span class="classifier"><a class="reference internal" href="lightkurve.seismology.SeismologyQuantity.html#lightkurve.seismology.SeismologyQuantity" title="lightkurve.seismology.SeismologyQuantity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SeismologyQuantity</span></code></a></span></dt><dd><p>The log10 of the surface gravity of the star.</p>
 </dd>
 </dl>
 </dd>

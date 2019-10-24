@@ -94,6 +94,59 @@
 <span id="asteroseismology"></span><h1>Asteroseismology<a class="headerlink" href="#module-lightkurve.seismology" title="Permalink to this headline">¶</a></h1>
 <span class="target" id="module-lightkurve.seismology"></span><p>The <a class="reference internal" href="#module-lightkurve.seismology" title="lightkurve.seismology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lightkurve.seismology</span></code></a> sub-package provides classes and functions for
 quick-look asteroseismic analyses.</p>
+<div class="section" id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.seismology.estimate_numax_acf2d.html#lightkurve.seismology.estimate_numax_acf2d" title="lightkurve.seismology.estimate_numax_acf2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">estimate_numax_acf2d</span></code></a>(periodogram[, numaxs, …])</p></td>
+<td><p>Estimates the peak of the envelope of seismic oscillation modes, numax, using an autocorrelation function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.seismology.diagnose_numax_acf2d.html#lightkurve.seismology.diagnose_numax_acf2d" title="lightkurve.seismology.diagnose_numax_acf2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">diagnose_numax_acf2d</span></code></a>(numax, periodogram)</p></td>
+<td><p>Returns a diagnostic plot which elucidates how numax was estimated.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.seismology.estimate_deltanu_acf2d.html#lightkurve.seismology.estimate_deltanu_acf2d" title="lightkurve.seismology.estimate_deltanu_acf2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">estimate_deltanu_acf2d</span></code></a>(periodogram, numax)</p></td>
+<td><p>Returns the average value of the large frequency spacing, DeltaNu, of the seismic oscillations of the target, using an autocorrelation function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.seismology.diagnose_deltanu_acf2d.html#lightkurve.seismology.diagnose_deltanu_acf2d" title="lightkurve.seismology.diagnose_deltanu_acf2d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">diagnose_deltanu_acf2d</span></code></a>(deltanu, periodogram)</p></td>
+<td><p>Returns a diagnostic plot which elucidates how deltanu was estimated.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.seismology.estimate_radius.html#lightkurve.seismology.estimate_radius" title="lightkurve.seismology.estimate_radius"><code class="xref py py-obj docutils literal notranslate"><span class="pre">estimate_radius</span></code></a>(numax, deltanu, teff[, …])</p></td>
+<td><p>Returns a stellar radius estimate based on the scaling relations.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.seismology.estimate_mass.html#lightkurve.seismology.estimate_mass" title="lightkurve.seismology.estimate_mass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">estimate_mass</span></code></a>(numax, deltanu, teff[, …])</p></td>
+<td><p>Calculates mass using the asteroseismic scaling relations.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.seismology.estimate_logg.html#lightkurve.seismology.estimate_logg" title="lightkurve.seismology.estimate_logg"><code class="xref py py-obj docutils literal notranslate"><span class="pre">estimate_logg</span></code></a>(numax, teff[, numax_err, teff_err])</p></td>
+<td><p>Calculates the log of the surface gravity using the asteroseismic scaling relations.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.seismology.Seismology.html#lightkurve.seismology.Seismology" title="lightkurve.seismology.Seismology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Seismology</span></code></a>(periodogram)</p></td>
+<td><p>Enables astroseismic quantities to be estimated from periodograms.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.seismology.SeismologyQuantity.html#lightkurve.seismology.SeismologyQuantity" title="lightkurve.seismology.SeismologyQuantity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SeismologyQuantity</span></code></a></p></td>
+<td><p>Holds an asteroseismic value including its unit, error, and estimation method.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="class-inheritance-diagram">
+<h2>Class Inheritance Diagram<a class="headerlink" href="#class-inheritance-diagram" title="Permalink to this headline">¶</a></h2>
+<div class="graphviz"><img src="../_images/inheritance-eae017d0a5c401cfd847a9bfa1d1aad24bf488be.png" alt="Inheritance diagram of lightkurve.seismology.core.Seismology, lightkurve.seismology.utils.SeismologyQuantity" class="inheritance graphviz" /></div>
+</div>
 </div>
 
 

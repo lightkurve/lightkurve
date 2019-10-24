@@ -135,18 +135,70 @@ eigenvectors of the centroid covariance matrix</p></li>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.correctors.SFFCorrector.correct" title="lightkurve.correctors.SFFCorrector.correct"><code class="xref py py-obj docutils literal notranslate"><span class="pre">correct</span></code></a>(self[, centroid_col, centroid_row, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.correctors.SFFCorrector.arclength" title="lightkurve.correctors.SFFCorrector.arclength"><code class="xref py py-obj docutils literal notranslate"><span class="pre">arclength</span></code></a>(self, x1, x)</p></td>
+<td><p>Compute the arclength of the polynomial used to fit the centroid measurements.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.correctors.SFFCorrector.bin_and_interpolate" title="lightkurve.correctors.SFFCorrector.bin_and_interpolate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bin_and_interpolate</span></code></a>(self, s, normflux, bins, …)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.correctors.SFFCorrector.breakpoints" title="lightkurve.correctors.SFFCorrector.breakpoints"><code class="xref py py-obj docutils literal notranslate"><span class="pre">breakpoints</span></code></a>(self, campaign)</p></td>
+<td><p>Return a break point as a function of the campaign number.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.correctors.SFFCorrector.correct" title="lightkurve.correctors.SFFCorrector.correct"><code class="xref py py-obj docutils literal notranslate"><span class="pre">correct</span></code></a>(self[, centroid_col, centroid_row, …])</p></td>
 <td><p>Returns a systematics-corrected LightCurve.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.correctors.SFFCorrector.diagnose" title="lightkurve.correctors.SFFCorrector.diagnose"><code class="xref py py-obj docutils literal notranslate"><span class="pre">diagnose</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.correctors.SFFCorrector.diagnose" title="lightkurve.correctors.SFFCorrector.diagnose"><code class="xref py py-obj docutils literal notranslate"><span class="pre">diagnose</span></code></a>(self)</p></td>
 <td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.correctors.SFFCorrector.fit_bspline" title="lightkurve.correctors.SFFCorrector.fit_bspline"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit_bspline</span></code></a>(self, time, flux[, knotspacing])</p></td>
+<td><p>Returns a <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.BSpline.html#scipy.interpolate.BSpline" title="(in SciPy v1.3.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scipy.interpolate.BSpline</span></code></a> object to interpolate flux as a function of time.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#lightkurve.correctors.SFFCorrector.interact" title="lightkurve.correctors.SFFCorrector.interact"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interact</span></code></a>(self)</p></td>
 <td><p></p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#lightkurve.correctors.SFFCorrector.rotate_centroids" title="lightkurve.correctors.SFFCorrector.rotate_centroids"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rotate_centroids</span></code></a>(self, centroid_col, …)</p></td>
+<td><p>Rotate the coordinate frame of the (col, row) centroids to a new (x,y) frame in which the dominant motion of the spacecraft is aligned with the x axis.</p></td>
+</tr>
 </tbody>
 </table>
 <p class="rubric">Methods Documentation</p>
+<dl class="method">
+<dt id="lightkurve.correctors.SFFCorrector.arclength">
+<code class="sig-name descname">arclength</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">x1</em>, <em class="sig-param">x</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.arclength" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the arclength of the polynomial used to fit the centroid
+measurements.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x1</strong><span class="classifier">float</span></dt><dd><p>Upper limit of the integration domain.</p>
+</dd>
+<dt><strong>x</strong><span class="classifier">ndarray</span></dt><dd><p>Domain at which the arclength integrand is defined.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>arclength</strong><span class="classifier">float</span></dt><dd><p>Result of the arclength integral from x[0] to x1.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="lightkurve.correctors.SFFCorrector.bin_and_interpolate">
+<code class="sig-name descname">bin_and_interpolate</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">s</em>, <em class="sig-param">normflux</em>, <em class="sig-param">bins</em>, <em class="sig-param">sigma</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.bin_and_interpolate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="lightkurve.correctors.SFFCorrector.breakpoints">
+<code class="sig-name descname">breakpoints</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">campaign</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.breakpoints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a break point as a function of the campaign number.</p>
+<p>The intention of this function is to implement a smart way to determine
+the boundaries of the windows on which the SFF algorithm is applied
+independently. However, this is not implemented yet in this version.</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="lightkurve.correctors.SFFCorrector.correct">
 <code class="sig-name descname">correct</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">centroid_col=None</em>, <em class="sig-param">centroid_row=None</em>, <em class="sig-param">polyorder=5</em>, <em class="sig-param">niters=3</em>, <em class="sig-param">bins=15</em>, <em class="sig-param">windows=10</em>, <em class="sig-param">sigma_1=3.0</em>, <em class="sig-param">sigma_2=5.0</em>, <em class="sig-param">restore_trend=False</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.correct" title="Permalink to this definition">¶</a></dt>
@@ -193,9 +245,24 @@ lightcurve.</p>
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="lightkurve.correctors.SFFCorrector.fit_bspline">
+<code class="sig-name descname">fit_bspline</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">time</em>, <em class="sig-param">flux</em>, <em class="sig-param">knotspacing=1.5</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.fit_bspline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.BSpline.html#scipy.interpolate.BSpline" title="(in SciPy v1.3.1)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scipy.interpolate.BSpline</span></code></a> object to interpolate flux as a function of time.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="lightkurve.correctors.SFFCorrector.interact">
 <code class="sig-name descname">interact</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.interact" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="method">
+<dt id="lightkurve.correctors.SFFCorrector.rotate_centroids">
+<code class="sig-name descname">rotate_centroids</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">centroid_col</em>, <em class="sig-param">centroid_row</em><span class="sig-paren">)</span><a class="headerlink" href="#lightkurve.correctors.SFFCorrector.rotate_centroids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rotate the coordinate frame of the (col, row) centroids to a new (x,y)
+frame in which the dominant motion of the spacecraft is aligned with
+the x axis.  This makes it easier to fit a characteristic polynomial
+that describes the motion.</p>
+</dd></dl>
 
 </dd></dl>
 
