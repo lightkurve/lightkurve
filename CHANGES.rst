@@ -254,7 +254,7 @@ Bugfixes
 ===================
 
 - Introduced a new layout for the
-  ``online documentation <https://docs.lightkurve.org>``_. [#360, #400, #406]
+  `online documentation <https://docs.lightkurve.org>`_. [#360, #400, #406]
 
 - Added ``LightCurve.interact_bls()``: an interactive Bokeh widget to find
   planets using the Box Least Squares (BLS) method. [#401]

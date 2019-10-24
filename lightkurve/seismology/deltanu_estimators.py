@@ -31,9 +31,9 @@ def estimate_deltanu_acf2d(periodogram, numax):
     seismic mode envelope either side of numax. This width is chosen so that
     the autocorrelation includes all of the visible mode peaks.
 
-    The autocorrelation (numpy.correlate) is given as:
+    The autocorrelation (numpy.correlate) is given as::
 
-    C = sum(s * s)
+        C = sum(s * s)
 
     where s is a window of the signal-to-noise spectrum. When shifting
     the spectrum over itself, C will increase when two mode peaks are
@@ -43,9 +43,9 @@ def estimate_deltanu_acf2d(periodogram, numax):
     with itself will be close to zero.
 
     As is done in Mosser & Appourchaux, we rescale the value of C in terms
-    of the noise level in the ACF spectrum as
+    of the noise level in the ACF spectrum as::
 
-    A = (|C^2| / |C[0]^2|) * (2 * len(C) / 3) .
+        A = (|C^2| / |C[0]^2|) * (2 * len(C) / 3) .
 
     The method will autocorrelate the region around the estimated numax
     expected to contain seismic oscillation modes. Repeating peaks in the
@@ -54,9 +54,9 @@ def estimate_deltanu_acf2d(periodogram, numax):
     value. The peak finding algorithm is limited by a minimum spacing
     between peaks of 0.5 times the empirical value for deltanu.
 
-    Our empirical estimate for numax is taken from Stello et al. (2009) as
+    Our empirical estimate for numax is taken from Stello et al. (2009) as::
 
-    deltanu = 0.294 * numax^0.772
+        deltanu = 0.294 * numax^0.772
 
     If `numax` is None, a numax is calculated using the estimate_numax()
     function with default settings.

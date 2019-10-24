@@ -31,11 +31,11 @@ def estimate_numax_acf2d(periodogram, numaxs=None, window_width=None, spacing=No
 
     The correlation (numpy.correlate) is typically given as:
 
-    C[x, y] = sum( x * conj(y) ) .
+        C[x, y] = sum( x * conj(y) ) .
 
     The autocorrelation power of a full spectrum with itself is then
 
-    C = sum(s * s),
+        C = sum(s * s),
 
     where s is a window of the signal-to-noise spectrum.
     Because of the method of this calculation, we need to first
@@ -47,7 +47,7 @@ def estimate_numax_acf2d(periodogram, numaxs=None, window_width=None, spacing=No
     of the power excess of the modes) we calculate the Mean Collapsed
     Correlation (MCC, see Kiefer 2013, Viani et al. 2019) as
 
-    MCC = (sum(|C|) - 1) / nlags ,
+        MCC = (sum(|C|) - 1) / nlags ,
 
     where C is the autocorrelation power at a given central freqeuncy, and
     nlags is the number of lags in the autocorrelation.
@@ -85,7 +85,7 @@ def estimate_numax_acf2d(periodogram, numaxs=None, window_width=None, spacing=No
 
     Returns
     -------
-    numax : `SeismologyQuantity`
+    numax : `.SeismologyQuantity`
         The numax of the periodogram. In the units of the periodogram object
         frequency.
     """
@@ -194,13 +194,13 @@ def diagnose_numax_acf2d(numax, periodogram):
     For details on the numax estimation, see the `estimate_numax()` function.
     The calculation performed is identical
 
-    Parameters:
-    -----------
-    numax : `SeismologyResult` object
+    Parameters
+    ----------
+    numax : `.SeismologyResult` object
         The object returned by `estimate_numax_acf2d()`.
 
-    Returns:
-    --------
+    Returns
+    -------
     ax : `~matplotlib.axes.Axes`
         The matplotlib axes object.
     """

@@ -158,12 +158,13 @@ def estimate_mass(numax, deltanu, teff, numax_err=None, deltanu_err=None, teff_e
 def estimate_logg(numax, teff, numax_err=None, teff_err=None):
     """Calculates the log of the surface gravity using the asteroseismic scaling
     relations.
+
     The two global observable seismic parameters, numax and deltanu, along with
     temperature, scale with fundamental stellar properties (Brown et al. 1991;
     Kjeldsen & Bedding 1995). These scaling relations can be rearranged to
     calculate a stellar surface gravity as
 
-    g = gsol * (numax/numax_sol)(Teff/Teffsol)^0.5
+        g = gsol * (numax/numax_sol)(Teff/Teffsol)^0.5
 
     where g is the surface gravity and Teff is the effective temperature,
     and the suffix 'sol' indicates a solar value. In this method we use the
@@ -194,7 +195,7 @@ def estimate_logg(numax, teff, numax_err=None, teff_err=None):
 
     Returns
     -------
-    logg : SeismologyQuantity
+    logg : `.SeismologyQuantity`
         The log10 of the surface gravity of the star.
     """
     numax = u.Quantity(numax, u.microhertz).value
