@@ -49,7 +49,7 @@ class DesignMatrix():
         with plt.style.context(MPLSTYLE):
             if ax is None:
                 _, ax = plt.subplots()
-            im = ax.imshow(self.values, **kwargs, origin='bottom')
+            im = ax.imshow(self.values, origin='bottom', **kwargs)
             ax.set_aspect(self.shape[1]/(1.6*self.shape[0]))
             ax.set_xlabel('Component')
             ax.set_ylabel('X')
@@ -174,7 +174,7 @@ class DesignMatrix():
             # we find this to be too few, and that n_iter=10 is still fast but
             # produces stable results.
             new_values, _, _ = pca(self.values, nterms, n_iter=10)
-        except ImportError:
+        except (ImportError, ModuleNotFoundError):
             new_values, _, _ = np.linalg.svd(self.values)[:, :nterms]
         return DesignMatrix(new_values, name=self.name)
 
