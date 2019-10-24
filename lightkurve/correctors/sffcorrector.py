@@ -45,7 +45,10 @@ class SFFCorrector(RegressionCorrector):
         # user calls before "correct()"
 
         self.raw_lc = lc
-        lc = lc.copy().normalize()
+        if lc.flux_unit.to_string() == '':
+            lc = lc.copy()
+        else:
+            lc = lc.copy().normalize()
         self.window_points = None
         self.windows = None
         self.bins = None

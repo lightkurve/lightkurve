@@ -241,7 +241,7 @@ class RegressionCorrector(Corrector):
             # samples = np.asarray([np.dot(submatrix.values, np.random.multivariate_normal(submatrix_coefficients, submatrix_coefficients_err)) for idx in range(100)]).T
             # model_err = np.abs(np.percentile(samples, [16, 84], axis=1) - np.median(samples, axis=1)[:, None].T).mean(axis=0)
             model_flux = np.dot(submatrix.values, submatrix_coefficients)
-            lcs[submatrix.name] = LightCurve(self.lc.time, model_flux, label=submatrix.name)
+            lcs[submatrix.name] = LightCurve(self.lc.time, model_flux, np.zeros(len(model_flux)), label=submatrix.name)
         return lcs
 
     def _diagnostic_plot(self):
