@@ -797,7 +797,7 @@ def test_targetid():
 def test_regression_346():
     """Regression test for https://github.com/KeplerGO/lightkurve/issues/346"""
     # This previously triggered an IndexError:
-    KeplerLightCurveFile(K2_C08).PDCSAP_FLUX.to_corrector().correct().estimate_cdpp()
+    KeplerLightCurveFile(K2_C08).PDCSAP_FLUX.remove_nans().to_corrector().correct().estimate_cdpp()
 
 
 def test_to_timeseries():
