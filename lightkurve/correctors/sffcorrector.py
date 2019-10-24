@@ -29,8 +29,11 @@ __all__ = ['SFFCorrector']
 
 
 class SFFCorrector(RegressionCorrector):
-    """Special case of `.RegressionCorrector` where the design matrix is built
-    from centroid positions and a spline in time.
+    """Special case of `.RegressionCorrector` where the `.DesignMatrix` includes
+    the target's centroid positions.
+
+    The design matrix also contains columns representing a spline in time
+    design to capture the intrinsic, long-term variability of the target.
 
     Parameters
     ----------

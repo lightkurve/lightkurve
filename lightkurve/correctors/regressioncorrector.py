@@ -15,7 +15,7 @@ log = logging.getLogger(__name__)
 
 
 class RegressionCorrector(Corrector):
-    """Remove noise using linear regression against a design matrix.
+    """Remove noise using linear regression against a `.DesignMatrix`.
 
     .. math::
 
@@ -268,8 +268,14 @@ class RegressionCorrector(Corrector):
         return axs
 
     def diagnose(self):
-        """Produce diagnostic plots to assess the effectiveness of the correction."""
-        self._diagnostic_plot()
+        """Returns diagnostic plots to assess the most recent call to `correct()`.
+
+        Returns
+        -------
+        ax : `~matplotlib.axes.Axes`
+            The matplotlib axes object.
+        """
+        return self._diagnostic_plot()
 
     def diagnose_priors(self):
         if not hasattr(self, 'corrected_lc'):
