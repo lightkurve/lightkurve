@@ -1,8 +1,7 @@
+"""Tests the `lightkurve.correctors.SFFCorrector` class."""
 import pytest
-
-from astropy.utils.data import get_pkg_data_filename
 import numpy as np
-from numpy.testing import assert_almost_equal
+from astropy.utils.data import get_pkg_data_filename
 
 from ... import LightCurve, KeplerLightCurveFile, KeplerLightCurve
 from .. import SFFCorrector
@@ -96,9 +95,10 @@ def test_sff_corrector():
     # Can plot
     sff.diagnose()
 
+
 def test_sff_knots():
     """Is SFF robust against gaps in time and irregular time sampling?
-    This test creates a random light curve with gaps in time between
+    This test creates a light curve with gaps in time between
     days 20-30 and days 78-80.  In addition, the time sampling rate changes
     in the interval between day 30 and 78.  SFF should fail without error.
     """
@@ -119,8 +119,9 @@ def test_sff_knots():
                           centroid_col=centroid_col,
                           centroid_row=centroid_row)
 
-    sff = SFFCorrector(lc)
-    sff.correct()  # should not raise an exception
+    # These calls should not raise an exception:
+    SFFCorrector(lc).correct()
+    lc.to_corrector(method="sff").correct()
 
 
 def test_sff_corrector():
@@ -198,10 +199,11 @@ def test_sff_corrector():
     # Can plot
     sff.diagnose()
 
+
 def test_sff_priors():
-    ''' SFF Spline flux mean should == lc.flux.mean()
+    """SFF Spline flux mean should == lc.flux.mean()
     SFF arclength component should have mean 0
-    '''
+    """
     n_points = 300
     fn = get_pkg_data_filename('../../tests/data/ep60021426alldiagnostics.csv')
     data = np.genfromtxt(fn, delimiter=',', skip_header=1)

@@ -15,11 +15,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from astropy.modeling import models, fitting
 
-from patsy import dmatrix
-
 from . import DesignMatrix, DesignMatrixCollection
 from .regressioncorrector import RegressionCorrector
-from ..utils import LightkurveWarning
 
 from .. import MPLSTYLE
 
@@ -116,6 +113,8 @@ class SFFCorrector(RegressionCorrector):
         corrected_lc : `~lightkurve.lightcurve.LightCurve`
             Corrected light curve, with noise removed.
         """
+        from patsy import dmatrix  # local import because it's rarely-used
+
         if centroid_col is None:
             centroid_col = self.lc.centroid_col
         if centroid_row is None:
@@ -275,6 +274,7 @@ def _get_spline_dm(x, n_knots=20, degree=3, name='spline',
     dm: `.DesignMatrix`
         Design matrix object with shape (len(x), n_knots*degree).
     """
+    from patsy import dmatrix  # local import because it's rarely-used
     dm_formula = "bs(x, df={}, degree={}, include_intercept={}) - 1" \
                  "".format(n_knots, degree, include_intercept)
     spline_dm = np.asarray(dmatrix(dm_formula, {"x": x}))
@@ -353,7 +353,7 @@ def _get_thruster_firings(arclength):
         idx = np.array_split(np.arange(len(thrusters)), np.where(np.gradient(np.asarray(thrusters, int)) == 0)[0])
         m = np.array_split(thrusters, np.where(np.gradient(np.asarray(thrusters, int)) == 0)[0])
         th = []
-        for jdx in range(len(idx)):
+        for jdx, _ in enumerate(idx):
             if m[jdx].sum() == 0:
                 th.append(m[jdx])
             else:

@@ -86,9 +86,9 @@ def test_nan_input():
            LightCurve(time=[1, np.nan], flux=[5, 10], flux_err=[1, 1])]
     for lc in lcs:
         with pytest.raises(ValueError):
-            rc = RegressionCorrector(lc)
+            RegressionCorrector(lc)
 
     # All NaNs in flux_err should be fine,
     # because it is the default when flux_err is missing.
     lc = LightCurve(flux=[5, 10], flux_err=[np.nan, np.nan])
-    rc = RegressionCorrector(lc)
+    RegressionCorrector(lc)
