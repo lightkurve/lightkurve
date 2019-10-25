@@ -119,7 +119,8 @@ class DesignMatrix():
         return DesignMatrix(new_df, name=self.name, prior_mu=prior_mu, prior_sigma=prior_sigma)
 
     def standardize(self):
-        """Returns a new matrix with median-subtracted & sigma-divided columns.
+        """Returns a new `.DesignMatrix` in which the columns have been
+        median-subtracted and sigma-divided.
 
         For each column in the matrix, this method will subtract the median of
         the column and divide by the column's standard deviation, i.e. it
@@ -149,7 +150,7 @@ class DesignMatrix():
         return DesignMatrix(new_df, name=self.name)
 
     def pca(self, nterms=6):
-        """Returns a new DesignMatrix with a smaller number of regressors.
+        """Returns a new `.DesignMatrix` with a smaller number of regressors.
 
         This method will use Principal Components Analysis (PCA) to reduce
         the number of columns in the matrix.
@@ -175,7 +176,8 @@ class DesignMatrix():
             # produces stable results.
             new_values, _, _ = pca(self.values, nterms, n_iter=10)
         except (ImportError, ModuleNotFoundError):
-            new_values, _, _ = np.linalg.svd(self.values)[:, :nterms]
+            new_values, _, _ = np.linalg.svd(self.values)
+            new_values = new_values[:, :nterms]
         return DesignMatrix(new_values, name=self.name)
 
     def append_constant(self, prior_mu=0, prior_sigma=np.inf):
