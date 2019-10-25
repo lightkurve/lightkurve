@@ -394,7 +394,6 @@ def _get_window_points(centroid_col, centroid_row, windows, arclength=None, brea
         if (np.polyfit(c, r, 1)[0] < 0):
             c = np.max(c) - c
         arclength = (c**2 + r**2)**0.5
-#        arclength = ((c)**2 + (r)**2)**0.5
 
     # Validate break indicies
     if isinstance(breakindex, int):
@@ -412,7 +411,8 @@ def _get_window_points(centroid_col, centroid_row, windows, arclength=None, brea
     dt = len(centroid_col)/windows
     lower_idx = np.append(0, breakindexes)
     upper_idx = np.append(breakindexes, len(centroid_col))
-    window_points = np.hstack([np.asarray(np.arange(a, b, dt), int) for a, b in zip(lower_idx, upper_idx)])
+    window_points = np.hstack([np.asarray(np.arange(a, b, dt), int)
+                              for a, b in zip(lower_idx, upper_idx)])
 
     # Get thruster firings
     thrusters = _get_thruster_firings(arclength)
@@ -425,7 +425,11 @@ def _get_window_points(centroid_col, centroid_row, windows, arclength=None, brea
                          if wp not in breakindexes]
     window_points = np.unique(np.hstack([window_points, breakindexes]))
 
-    # If the first window point is very short, just ignore that one
-    if window_points[0] < (np.median(np.diff(window_points)) * 0.4):
+    # If the first or last windows are very short, remove their break points
+    median_length = np.median(np.diff(window_points))
+    if window_points[0] < 0.4*median_length:
         window_points = window_points[1:]
+    if window_points[-1] > (len(centroid_col) - 0.4*median_length):
+        window_points = window_points[:-1]
+
     return np.asarray(window_points, dtype=int)
