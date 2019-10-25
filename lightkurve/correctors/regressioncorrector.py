@@ -1,4 +1,6 @@
 """Defines RegressionCorrector."""
+from __future__ import division  # necessary for math in `_fit_coefficients`
+
 import logging
 
 from astropy.stats import sigma_clip
