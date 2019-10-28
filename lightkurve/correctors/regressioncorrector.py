@@ -96,8 +96,8 @@ class RegressionCorrector(Corrector):
     def __repr__(self):
         return 'RegressionCorrector (ID: {})'.format(self.lc.targetid)
 
-    def _fit_coefficients(self, cadence_mask=None, prior_mu=None, prior_sigma=None,
-                          propagate_errors=False):
+    def _fit_coefficients(self, cadence_mask=None, prior_mu=None,
+                          prior_sigma=None, propagate_errors=False):
         """Fit the linear regression coefficients.
 
         This function will solve a linear regression with Gaussian priors
@@ -182,7 +182,7 @@ class RegressionCorrector(Corrector):
 
         Returns
         -------
-        corrected_lc : `~lightkurve.lightcurve.LightCurve`
+        `.LightCurve`
             Corrected light curve, with noise removed.
         """
 
@@ -255,7 +255,7 @@ class RegressionCorrector(Corrector):
             raise ValueError('Please call the `correct()` method before trying to diagnose.')
 
         with plt.style.context(MPLSTYLE):
-            fig, axs = plt.subplots(2, figsize=(10, 6), sharex=True)
+            _, axs = plt.subplots(2, figsize=(10, 6), sharex=True)
             ax = axs[0]
             self.lc.plot(ax=ax, normalize=False, label='original', alpha=0.4)
             for key in self.diagnostic_lightcurves.keys():
@@ -272,20 +272,35 @@ class RegressionCorrector(Corrector):
     def diagnose(self):
         """Returns diagnostic plots to assess the most recent call to `correct()`.
 
+        If `correct()` has not yet been called, a ``ValueError`` will be raised.
+
         Returns
         -------
-        ax : `~matplotlib.axes.Axes`
+        `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
         return self._diagnostic_plot()
 
     def diagnose_priors(self):
+        """Returns a diagnostic plot visualizing how the best-fit coefficients
+        compare against the priors.
+
+        The method will show the results obtained during the most recent call
+        to `correct()`.  If `correct()` has not yet been called, a
+        ``ValueError`` will be raised.
+
+        Returns
+        -------
+        `~matplotlib.axes.Axes`
+            The matplotlib axes object.
+        """
         if not hasattr(self, 'corrected_lc'):
             raise ValueError('Please call the `correct()` method before trying to diagnose.')
 
         names = [X.name for X in self.X]
         with plt.style.context(MPLSTYLE):
-            fig, axs = plt.subplots(1, len(names), figsize=(len(names)*4, 4), sharey=True)
+            _, axs = plt.subplots(1, len(names), figsize=(len(names)*4, 4),
+                                  sharey=True)
             if not hasattr(axs, '__iter__'):
                 axs = [axs]
             for idx, ax, X in zip(range(len(names)), axs, self.X):

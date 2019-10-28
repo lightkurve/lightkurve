@@ -62,8 +62,6 @@ def test_sff_corrector():
     corrected_flux = data[:, 2]
     centroid_col = data[:, 3]
     centroid_row = data[:, 4]
-    arclength = data[:, 5]
-    correction = data[:, 6]
 
     # NOTE: we need a small number of windows below because this test data set
     # is unusually short, i.e. has an unusually small number of cadences.

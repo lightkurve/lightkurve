@@ -211,9 +211,9 @@ class SFFCorrector(RegressionCorrector):
 
         max_plot = 5
         with plt.style.context(MPLSTYLE):
-            fig, axs = plt.subplots(int(np.ceil(self.windows/max_plot)), max_plot,
-                                    figsize=(10, int(np.ceil(self.windows/max_plot)*2)),
-                                    sharex=True, sharey=True)
+            _, axs = plt.subplots(int(np.ceil(self.windows/max_plot)), max_plot,
+                                  figsize=(10, int(np.ceil(self.windows/max_plot)*2)),
+                                  sharex=True, sharey=True)
             axs = np.atleast_2d(axs)
             axs[0, 2].set_title('Arclength Plot/Window')
             plt.subplots_adjust(hspace=0, wspace=0)

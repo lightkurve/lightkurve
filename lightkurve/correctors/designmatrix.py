@@ -21,9 +21,9 @@ class DesignMatrix():
 
     The purpose of this class is to provide a convenient method to interact
     with a set of one or more regressors which are known to correlate with
-    trends or systematic noise signals which we wants to remove from a light
-    curve. Specifically, this class is designed to provide the regressors
-    to Lightkurve's `~lightkurve.corrector.RegressionCorrector` class.
+    trends or systematic noise signals which we want to remove from a light
+    curve. Specifically, this class is designed to provide the design matrix
+    for use by Lightkurve's `.RegressionCorrector` class.
 
     Parameters
     ----------
@@ -41,7 +41,8 @@ class DesignMatrix():
         Prior standard deviations of the coefficients associated with each
         column in a linear regression problem.
     """
-    def __init__(self, df, columns=None, name='unnamed_matrix', prior_mu=None, prior_sigma=None):
+    def __init__(self, df, columns=None, name='unnamed_matrix', prior_mu=None,
+                 prior_sigma=None):
         if not isinstance(df, pd.DataFrame):
             df = pd.DataFrame(df)
         if columns is not None:
@@ -73,7 +74,7 @@ class DesignMatrix():
 
         Returns
         -------
-        ax : `~matplotlib.axes.Axes`
+        `~matplotlib.axes.Axes`
             The matplotlib axes object.
         """
         with plt.style.context(MPLSTYLE):
@@ -94,6 +95,19 @@ class DesignMatrix():
         return ax
 
     def plot_priors(self, ax=None):
+        """Visualize the coefficient priors.
+
+        Parameters
+        ----------
+        ax : `~matplotlib.axes.Axes`
+            A matplotlib axes object to plot into. If no axes is provided,
+            a new one will be created.
+
+        Returns
+        -------
+        `~matplotlib.axes.Axes`
+            The matplotlib axes object.
+        """
         def gauss(x, mu=0, sigma=1):
             return np.exp(-(x - mu)**2/(2*sigma**2))
         with plt.style.context(MPLSTYLE):
@@ -109,14 +123,16 @@ class DesignMatrix():
             ax.set_title('{} Priors'.format(self.name))
         return ax
 
-    def sample_priors(self):
+    def _get_prior_sample(self):
+        """Returns a random sample from the prior distribution."""
         return np.random.normal(self.prior_mu, self.prior_sigma)
 
     def split(self, row_indices):
-        """Returns a new `.DesignMatrix` with the regressors split over multiple columns.
+        """Returns a new `.DesignMatrix` with regressors split into multiple
+        columns.
 
         This method will return a new design matrix containing
-        n_columns*len(row_indices) regressors.  This is useful in situations
+        n_columns * len(row_indices) regressors.  This is useful in situations
         where the linear regression can be improved by fitting separate
         coefficients for different contiguous parts of the regressors.
 
@@ -131,18 +147,18 @@ class DesignMatrix():
         `.DesignMatrix`
             A new design matrix with shape (n_rows, len(row_indices)*n_columns).
         """
-
         if isinstance(row_indices, int):
             row_indices = [row_indices]
-        if (len(row_indices) == 0) | (row_indices == [0]) | (row_indices is None):
+        if (len(row_indices) == 0) or (row_indices == [0]) or (row_indices is None):
             return self
         # Where do the submatrices begin and end?
         lower_idx = np.append(0, row_indices)
         upper_idx = np.append(row_indices, len(self.df))
         dfs = []
         for idx, a, b in zip(range(len(lower_idx)), lower_idx, upper_idx):
-            new_columns = dict(('{}'.format(val), '{}'.format(val) + ' {}'.format(idx + 1))
-                                for val in list(self.df.columns))
+            new_columns = dict(
+                ('{}'.format(val), '{}'.format(val) + ' {}'.format(idx + 1))
+                for val in list(self.df.columns))
             dfs.append(self.df[a:b].rename(columns=new_columns))
         new_df = pd.concat(dfs, axis=1).fillna(0)
         prior_mu = np.hstack([self.prior_mu for idx in range(len(dfs))])
@@ -168,7 +184,7 @@ class DesignMatrix():
 
         Returns
         -------
-        `~lightkurve.correctors.DesignMatrix`
+        `.DesignMatrix`
             A new design matrix with median-subtracted & sigma-divided columns.
         """
         ar = np.asarray(np.copy(self.df))
@@ -242,18 +258,22 @@ class DesignMatrix():
 
     @property
     def rank(self):
+        """Matrix rank computed using `numpy.linalg.matrix_rank`."""
         return np.linalg.matrix_rank(self.values)
 
     @property
     def columns(self):
+        """List of column names."""
         return list(self.df.columns)
 
     @property
     def shape(self):
+        """Tuple specifying the shape of the matrix as (n_rows, n_columns)."""
         return self.df.shape
 
     @property
     def values(self):
+        """2D numpy array containing the matrix values."""
         return self.df.values
 
     def __getitem__(self, key):
@@ -287,10 +307,24 @@ class DesignMatrixCollection():
         return ax
 
     def plot_priors(self, ax=None):
-        [dm.plot_priors() for dm in self]
+        """Visualize the `prior_mu` and `prior_sigma` attributes.
+
+        Parameters
+        ----------
+        ax : `~matplotlib.axes.Axes`
+            A matplotlib axes object to plot into. If no axes is provided,
+            a new one will be created.
+
+        Returns
+        -------
+        `~matplotlib.axes.Axes`
+            The matplotlib axes object.
+        """
+        [dm.plot_priors(ax=ax) for dm in self]
         return
 
-    def sample_priors(self):
+    def _get_prior_sample(self):
+        """Returns a random sample from the prior distribution."""
         return np.hstack([dm.sample_priors() for dm in self])
 
     def split(self, row_indices):
@@ -314,4 +348,5 @@ class DesignMatrixCollection():
         [d._validate() for d in self]
 
     def __repr__(self):
-        return 'DesignMatrixCollection:\n' + ''.join(['\t{}\n'.format(i.__repr__()) for i in self])
+        return 'DesignMatrixCollection:\n' + \
+                    ''.join(['\t{}\n'.format(i.__repr__()) for i in self])
