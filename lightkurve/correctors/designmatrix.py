@@ -1,21 +1,17 @@
 """Defines `DesignMatrix` and `DesignMatrixCollection`.
 
-TODO
-----
-* Improve user input validation and error checking.
-* Add a warning if the column rank of the matrix is bad, i.e. if the matrix has
-  tightly-correlated regressors?
+These classes are intended to make linear regression problems with a large
+design matrix more easy.
 """
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+
 from .. import MPLSTYLE
 
 
 __all__ = ['DesignMatrix', 'DesignMatrixCollection']
 
-class DesignMatrixException(Exception):
-    pass
 
 class DesignMatrix():
     """A matrix of column vectors for use in linear regression.
@@ -28,8 +24,19 @@ class DesignMatrix():
 
     Parameters
     ----------
-    df : pandas `DataFrame` object
+    df : dict, array, or `pandas.DataFrame` object
+        Columns to include in the design matrix.  If this object is not a
+        `~pandas.DataFrame` then it will be passed to the DataFrame constructor.
     columns : iterable of str (optional)
+        Column names, if not already provided via ``df``.
+    name : str
+        Name of the matrix.
+    prior_mu : array
+        Prior means of the coefficients associated with each column in a linear
+        regression problem.
+    prior_sigma : array
+        Prior standard deviations of the coefficients associated with each
+        column in a linear regression problem.
     """
     def __init__(self, df, columns=None, name='unnamed_matrix', prior_mu=None, prior_sigma=None):
         if not isinstance(df, pd.DataFrame):
@@ -46,6 +53,26 @@ class DesignMatrix():
         self.prior_sigma = prior_sigma
 
     def plot(self, ax=None, show_colorbar=True, **kwargs):
+        """Visualize the design matrix values as an image.
+
+        Uses Matplotlib's `~matplotlib.pyplot.imshow` method to visualize the
+        matrix values.
+
+        Parameters
+        ----------
+        ax : `~matplotlib.axes.Axes`
+            A matplotlib axes object to plot into. If no axes is provided,
+            a new one will be created.
+        show_colorbar : bool
+            Whether or not to show a colorbar legend.
+        **kwargs : dict
+            Extra parameters to be passed to `~matplotlib.pyplot.imshow`.
+
+        Returns
+        -------
+        ax : `~matplotlib.axes.Axes`
+            The matplotlib axes object.
+        """
         with plt.style.context(MPLSTYLE):
             if ax is None:
                 _, ax = plt.subplots()
@@ -56,7 +83,8 @@ class DesignMatrix():
             ax.set_title(self.name)
             if self.shape[1] <= 40:
                 ax.set_xticks(np.arange(self.shape[1]))
-                ax.set_xticklabels([r'${}$'.format(i) for i in self.columns], rotation=90, fontsize=8)
+                ax.set_xticklabels([r'${}$'.format(i) for i in self.columns],
+                                   rotation=90, fontsize=8)
             if show_colorbar:
                 cbar = plt.colorbar(im, ax=ax)
                 cbar.set_label('Component Value')
@@ -82,7 +110,7 @@ class DesignMatrix():
         return np.random.normal(self.prior_mu, self.prior_sigma)
 
     def split(self, row_indices):
-        """Returns a new matrix with the regressors split over multiple columns.
+        """Returns a new `.DesignMatrix` with the regressors split over multiple columns.
 
         This method will return a new design matrix containing
         n_columns*len(row_indices) regressors.  This is useful in situations
@@ -97,13 +125,13 @@ class DesignMatrix():
 
         Returns
         -------
-        `~lightkurve.correctors.DesignMatrix`
+        `.DesignMatrix`
             A new design matrix with shape (n_rows, len(row_indices)*n_columns).
         """
 
         if isinstance(row_indices, int):
             row_indices = [row_indices]
-        if (len(row_indices) == 0) | (row_indices == [0]) | (row_indices == None) :
+        if (len(row_indices) == 0) | (row_indices == [0]) | (row_indices is None):
             return self
         # Where do the submatrices begin and end?
         lower_idx = np.append(0, row_indices)
@@ -116,7 +144,8 @@ class DesignMatrix():
         new_df = pd.concat(dfs, axis=1).fillna(0)
         prior_mu = np.hstack([self.prior_mu for idx in range(len(dfs))])
         prior_sigma = np.hstack([self.prior_sigma for idx in range(len(dfs))])
-        return DesignMatrix(new_df, name=self.name, prior_mu=prior_mu, prior_sigma=prior_sigma)
+        return DesignMatrix(new_df, name=self.name, prior_mu=prior_mu,
+                            prior_sigma=prior_sigma)
 
     def standardize(self):
         """Returns a new `.DesignMatrix` in which the columns have been
@@ -162,7 +191,7 @@ class DesignMatrix():
 
         Returns
         -------
-        `~lightkurve.correctors.DesignMatrix`
+        `.DesignMatrix`
             A new design matrix with PCA applied.
         """
         # nterms cannot be langer than the number of columns in the matrix
@@ -181,22 +210,35 @@ class DesignMatrix():
         return DesignMatrix(new_values, name=self.name)
 
     def append_constant(self, prior_mu=0, prior_sigma=np.inf):
-        new_df = pd.concat([self.df, pd.DataFrame(np.atleast_2d(np.ones(self.shape[0])).T, columns=['offset'])], axis=1)
+        """Returns a new `.DesignMatrix` with a column of ones appended.
+
+        Returns
+        -------
+        `.DesignMatrix`
+            New design matrix with a column of ones appended. This column is
+            named "offset".
+        """
+        extra_df = pd.DataFrame(np.atleast_2d(np.ones(self.shape[0])).T, columns=['offset'])
+        new_df = pd.concat([self.df, extra_df], axis=1)
         prior_mu = np.append(self.prior_mu, prior_mu)
         prior_sigma = np.append(self.prior_sigma, prior_sigma)
-
-        return DesignMatrix(new_df, name=self.name, prior_mu=prior_mu, prior_sigma=prior_sigma)
+        return DesignMatrix(new_df, name=self.name,
+                            prior_mu=prior_mu, prior_sigma=prior_sigma)
 
     def _validate(self):
-        """Raises a `DesignMatrixException` if the matrix contains identical columns."""
-        # for idx in range(self.shape[1]):
-        #     dupes = np.any([np.allclose(self.values[:, idx], self.values[:, jdx])
-        #                     for jdx in np.arange(idx + 1, self.shape[1])])
-        #     if dupes:
-        #         raise DesignMatrixException("Design Matrix contains duplicate columns.")
-        self.rank = np.linalg.matrix_rank(self.values)
+        """Raises a `LightkurveWarning` if the matrix has a low rank."""
         if self.shape[1] < (self.rank - 1):
-            warnings.warn('Matrix has low rank, matrix might contain duplicate columns', lk.LightkurveWarning)
+            warnings.warn("The design matrix has low rank ({}) compared to the "
+                          "number of columns ({}), which suggests that the "
+                          "matrix contains duplicate or correlated columns ."
+                          "This may prevent the regression from succeeding. "
+                          "Consider reducing the dimensionality by calling the "
+                          "`pca()` method.".format(self.rank, self.shape[1]),
+                          lk.LightkurveWarning)
+
+    @property
+    def rank(self):
+        return np.linalg.matrix_rank(self.values)
 
     @property
     def columns(self):
