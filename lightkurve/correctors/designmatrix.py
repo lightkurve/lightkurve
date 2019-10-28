@@ -3,11 +3,14 @@
 These classes are intended to make linear regression problems with a large
 design matrix more easy.
 """
+import warnings
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
 from .. import MPLSTYLE
+from ..utils import LightkurveWarning
 
 
 __all__ = ['DesignMatrix', 'DesignMatrixCollection']
@@ -227,14 +230,15 @@ class DesignMatrix():
 
     def _validate(self):
         """Raises a `LightkurveWarning` if the matrix has a low rank."""
-        if self.shape[1] < (self.rank - 1):
+        # Matrix rank shouldn't be smaller than the number of columns.
+        if self.rank < self.shape[1]:
             warnings.warn("The design matrix has low rank ({}) compared to the "
                           "number of columns ({}), which suggests that the "
-                          "matrix contains duplicate or correlated columns ."
+                          "matrix contains duplicate or correlated columns. "
                           "This may prevent the regression from succeeding. "
                           "Consider reducing the dimensionality by calling the "
                           "`pca()` method.".format(self.rank, self.shape[1]),
-                          lk.LightkurveWarning)
+                          LightkurveWarning)
 
     @property
     def rank(self):

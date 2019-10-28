@@ -1,8 +1,12 @@
+import pytest
+import warnings
+
 import numpy as np
 from numpy.testing import assert_array_equal
 import pandas as pd
 
 from .. import DesignMatrix, DesignMatrixCollection
+from ... import LightkurveWarning
 
 
 def test_designmatrix_basics():
@@ -86,3 +90,19 @@ def test_collection_basics():
     assert_array_equal(dmc.values, np.hstack((dm1.values, dm2.values)))
     dmc.plot()
     dmc.__repr__()
+
+
+def test_designmatrix_rank():
+    """Does DesignMatrix issue a low-rank warning when justified?"""
+    warnings.simplefilter("always")
+
+    # Good rank
+    dm = DesignMatrix({'a': [1, 2, 3]})
+    assert dm.rank == 1
+    dm._validate()  # Should not raise a warning
+
+    # Bad rank
+    dm = DesignMatrix({'a': [1, 2, 3], 'b': [1, 1, 1], 'c': [3, 4, 5]})
+    assert dm.rank == 2
+    with pytest.warns(LightkurveWarning, match='rank'):
+        dm._validate()
