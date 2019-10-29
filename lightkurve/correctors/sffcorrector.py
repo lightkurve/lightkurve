@@ -2,14 +2,8 @@
 
 `SFFCorrector` enables systematics to be removed from light curves using the
 Self Flat-Fielding (SFF) method described in Vanderburg and Johnson (2014).
-
-TODO
-----
-* Are we sufficiently compatible wiht the old SFFCorrector?
-* Make robust if centroid values have NaNs.
 """
 import logging
-import warnings
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -236,10 +230,14 @@ class SFFCorrector(RegressionCorrector):
                     ax.set_ylabel('Flux')
 
                 ax.scatter(self.arclength[a:b], f[a:b], s=1, label='Data')
-                ax.scatter(self.arclength[a:b][~self.cadence_mask[a:b]], f[a:b][~self.cadence_mask[a:b]], s=10, marker='x', c='r', label='Outliers')
+                ax.scatter(self.arclength[a:b][~self.cadence_mask[a:b]],
+                           f[a:b][~self.cadence_mask[a:b]],
+                           s=10, marker='x', c='r', label='Outliers')
 
                 s = np.argsort(self.arclength[a:b])
-                ax.scatter(self.arclength[a:b][s], (m[a:b] - np.median(m[a:b]) + np.median(f[a:b]))[s], c='C2', s=0.5, label='Model')
+                ax.scatter(self.arclength[a:b][s],
+                           (m[a:b] - np.median(m[a:b]) + np.median(f[a:b]))[s],
+                           c='C2', s=0.5, label='Model')
                 jdx += 1
                 if jdx >= max_plot:
                     jdx = 0

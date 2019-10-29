@@ -2,13 +2,12 @@ from __future__ import division, print_function
 
 import sys
 import pytest
-import numpy as np
-from numpy.testing import assert_almost_equal, assert_array_equal
-from astropy.utils.data import get_pkg_data_filename
+
+from numpy.testing import assert_almost_equal
 
 from ..lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
 from ..lightcurvefile import KeplerLightCurveFile
-from ..correctors import KeplerCBVCorrector, SFFCorrector, PLDCorrector
+from ..correctors import KeplerCBVCorrector, PLDCorrector
 from ..search import search_targetpixelfile
 
 from .test_lightcurve import TABBY_Q8
@@ -22,7 +21,7 @@ except ImportError:
 
 @pytest.mark.remote_data
 def test_kepler_cbv_fit():
-    # comparing that the two methods to do cbv fit are the nearly the same
+    """Verify that the two methods to do cbv fit are the nearly the same."""
     cbv = KeplerCBVCorrector(TABBY_Q8)
     cbv_lc = cbv.correct()
     assert_almost_equal(cbv.coeffs, [0.102, 0.006], decimal=3)
