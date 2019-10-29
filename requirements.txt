@@ -9,3 +9,4 @@ requests
 tqdm
 pandas
 uncertainties
+patsy

@@ -35,7 +35,7 @@ def test_sine_sff():
     lc = tpf.to_lightcurve()
     corrector = SFFCorrector(lc)
     cor_lc = corrector.correct(tpf.pos_corr2, tpf.pos_corr1,
-                               niters=4, windows=5, bins=7, restore_trend=True)
+                               niters=4, windows=1, bins=7, restore_trend=True, timescale=0.5)
 
     # Verify that we get the period within ~20%
     pg = cor_lc.to_periodogram(method='lombscargle', minimum_period=1,
@@ -70,10 +70,10 @@ def test_transit_sff():
     max_depth = 1-np.min(true_transit_lc)
 
     # Run the SFF algorithm
-    lc = tpf.to_lightcurve()
+    lc = tpf.to_lightcurve().normalize()
     corrector = SFFCorrector(lc)
     cor_lc = corrector.correct(tpf.pos_corr2, tpf.pos_corr1,
-                               niters=4, windows=5, bins=7, restore_trend=False)
+                               niters=4, windows=1, bins=7, restore_trend=False, timescale=0.5)
 
     # Verify that we get the transit period within 5%
     pg = cor_lc.to_periodogram(method='bls', minimum_period=1, maximum_period=9,

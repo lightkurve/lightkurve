@@ -1,7 +1,13 @@
 1.4.0 (unreleased)
 ==================
 
-- No changes yet.
+- Added the generic ``RegressionCorrector`` and ``DesignMatrix`` classes which
+  provide a user-friendly way to use linear regression to remove background or
+  systematic noise components from light curves. [#613]
+
+- Changed the ``SFFCorrector`` class to use the new ``RegressionCorrector``
+  framework. [#613]
+
 
 
 
