@@ -21,6 +21,10 @@ def test_designmatrix_basics():
     assert dm.shape == (size, 3)
     assert (dm['vector1'] == df['vector1']).all()
     dm.plot()
+    dm.plot_priors()
+    assert dm.append_constant().shape == (size, 4)  # expect one column more
+    assert dm.pca(nterms=2).shape == (size, 2)      # expect one column less
+    assert dm.split([10]).shape == (size, 6)        # expect double columns
     dm.__repr__()
 
 

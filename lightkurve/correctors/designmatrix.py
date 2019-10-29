@@ -10,7 +10,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 from .. import MPLSTYLE
-from ..utils import LightkurveWarning
+from ..utils import LightkurveWarning, plot_image
 
 
 __all__ = ['DesignMatrix', 'DesignMatrixCollection']
@@ -56,10 +56,10 @@ class DesignMatrix():
         self.prior_mu = prior_mu
         self.prior_sigma = prior_sigma
 
-    def plot(self, ax=None, show_colorbar=True, **kwargs):
+    def plot(self, ax=None, **kwargs):
         """Visualize the design matrix values as an image.
 
-        Uses Matplotlib's `~matplotlib.pyplot.imshow` method to visualize the
+        Uses Matplotlib's `~lightkurve.utils.plot_image` to visualize the
         matrix values.
 
         Parameters
@@ -67,10 +67,8 @@ class DesignMatrix():
         ax : `~matplotlib.axes.Axes`
             A matplotlib axes object to plot into. If no axes is provided,
             a new one will be created.
-        show_colorbar : bool
-            Whether or not to show a colorbar legend.
         **kwargs : dict
-            Extra parameters to be passed to `~matplotlib.pyplot.imshow`.
+            Extra parameters to be passed to `.plot_image`.
 
         Returns
         -------
@@ -78,20 +76,13 @@ class DesignMatrix():
             The matplotlib axes object.
         """
         with plt.style.context(MPLSTYLE):
-            if ax is None:
-                _, ax = plt.subplots()
-            im = ax.imshow(self.values, origin='bottom', **kwargs)
+            ax = plot_image(self.values, ax=ax, xlabel='Component', ylabel='X',
+                            clabel='Component Value', title=self.name, **kwargs)
             ax.set_aspect(self.shape[1]/(1.6*self.shape[0]))
-            ax.set_xlabel('Component')
-            ax.set_ylabel('X')
-            ax.set_title(self.name)
             if self.shape[1] <= 40:
                 ax.set_xticks(np.arange(self.shape[1]))
                 ax.set_xticklabels([r'${}$'.format(i) for i in self.columns],
                                    rotation=90, fontsize=8)
-            if show_colorbar:
-                cbar = plt.colorbar(im, ax=ax)
-                cbar.set_label('Component Value')
         return ax
 
     def plot_priors(self, ax=None):
@@ -301,6 +292,24 @@ class DesignMatrixCollection():
         return np.hstack([m.prior_sigma for m in self])
 
     def plot(self, ax=None, **kwargs):
+        """Visualize the design matrix values as an image.
+
+        Uses Matplotlib's `~lightkurve.utils.plot_image` to visualize the
+        matrix values.
+
+        Parameters
+        ----------
+        ax : `~matplotlib.axes.Axes`
+            A matplotlib axes object to plot into. If no axes is provided,
+            a new one will be created.
+        **kwargs : dict
+            Extra parameters to be passed to `.plot_image`.
+
+        Returns
+        -------
+        `~matplotlib.axes.Axes`
+            The matplotlib axes object.
+        """
         temp_dm = DesignMatrix(pd.concat([d.df for d in self], axis=1))
         ax = temp_dm.plot(**kwargs)
         ax.set_title("Design Matrix Collection")
