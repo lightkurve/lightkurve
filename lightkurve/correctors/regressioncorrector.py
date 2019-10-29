@@ -3,9 +3,9 @@ from __future__ import division  # necessary for math in `_fit_coefficients`
 
 import logging
 
-from astropy.stats import sigma_clip
 import matplotlib.pyplot as plt
 import numpy as np
+from astropy.stats import sigma_clip
 
 from .corrector import Corrector
 from .designmatrix import DesignMatrix, DesignMatrixCollection
@@ -128,7 +128,8 @@ class RegressionCorrector(Corrector):
                                  ''.format(len(self.X.values.T)))
 
         # If prior_mu is specified, prior_sigma must be specified
-        if not ((prior_mu is None) & (prior_sigma is None)) | ((prior_mu is not None) & (prior_sigma is not None)):
+        if not ((prior_mu is None) & (prior_sigma is None)) | \
+                    ((prior_mu is not None) & (prior_sigma is not None)):
             raise ValueError("Please specify both `prior_mu` and `prior_sigma`")
 
         # Default cadence mask
@@ -203,10 +204,11 @@ class RegressionCorrector(Corrector):
 
         # Iterative sigma clipping
         for count in range(niters):
-            coefficients, coefficients_err = self._fit_coefficients(cadence_mask=cadence_mask,
-                                                            prior_mu=self.X.prior_mu,
-                                                            prior_sigma=self.X.prior_sigma,
-                                                            propagate_errors=propagate_errors)
+            coefficients, coefficients_err = \
+                self._fit_coefficients(cadence_mask=cadence_mask,
+                                       prior_mu=self.X.prior_mu,
+                                       prior_sigma=self.X.prior_sigma,
+                                       propagate_errors=propagate_errors)
             residuals = self.lc.flux - np.dot(self.X.values, coefficients)
             cadence_mask &= ~sigma_clip(residuals, sigma=sigma).mask
             log.debug("correct(): iteration {}: clipped {} cadences"

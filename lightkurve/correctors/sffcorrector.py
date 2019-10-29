@@ -122,16 +122,7 @@ class SFFCorrector(RegressionCorrector):
         self.bins = bins
         self.timescale = timescale
         self.breakindex = breakindex
-
-        # We make an approximation that the arclength is simply
-        # (row**2 + col**2)**0.5
-        # However to make this work row and column must be correlated not anticorrelated
-        c = centroid_col - np.nanmin(centroid_col)
-        r = centroid_row  - np.nanmin(centroid_row)
-        # Force c to be correlated not anticorrelated
-        if (np.polyfit(c, r, 1)[0] < 0):
-            c = np.max(c) - c
-        self.arclength = (c**2 + r**2)**0.5
+        self.arclength = _estimate_arclength(centroid_col, centroid_row)
 
         lower_idx = np.asarray(np.append(0, self.window_points), int)
         upper_idx = np.asarray(np.append(self.window_points, len(self.lc.time)), int)
@@ -334,7 +325,7 @@ def _get_thruster_firings(arclength):
     # Fit a Gaussian, most points lie in a tight region, thruster firings are outliers
     g = models.Gaussian1D(amplitude=100, mean=0, stddev=0.01)
     fitter = fitting.LevMarLSQFitter()
-    h = np.histogram(d2adt2[np.isfinite(d2adt2)], np.arange(-0.5, 0.5, 0.0001), density=True);
+    h = np.histogram(d2adt2[np.isfinite(d2adt2)], np.arange(-0.5, 0.5, 0.0001), density=True)
     xbins = h[1][1:] - np.median(np.diff(h[1]))
     g = fitter(g, xbins, h[0], weights=h[0]**0.5)
 
@@ -348,7 +339,8 @@ def _get_thruster_firings(arclength):
         if start_or_end == 'end':
             thrusters = (d2adt2 > (g.stddev * 5)) & np.isfinite(d2adt2)
         # Pick the best thruster in each cluster
-        idx = np.array_split(np.arange(len(thrusters)), np.where(np.gradient(np.asarray(thrusters, int)) == 0)[0])
+        idx = np.array_split(np.arange(len(thrusters)),
+                             np.where(np.gradient(np.asarray(thrusters, int)) == 0)[0])
         m = np.array_split(thrusters, np.where(np.gradient(np.asarray(thrusters, int)) == 0)[0])
         th = []
         for jdx, _ in enumerate(idx):
@@ -386,12 +378,7 @@ def _get_window_points(centroid_col, centroid_row, windows, arclength=None, brea
         return []
 
     if arclength is None:
-        # Compute arclength
-        c = centroid_col - np.nanmin(centroid_col)
-        r = centroid_row  - np.nanmin(centroid_row)
-        if (np.polyfit(c, r, 1)[0] < 0):
-            c = np.max(c) - c
-        arclength = (c**2 + r**2)**0.5
+        arclength = _estimate_arclength(centroid_col, centroid_row)
 
     # Validate break indicies
     if isinstance(breakindex, int):
@@ -431,3 +418,20 @@ def _get_window_points(centroid_col, centroid_row, windows, arclength=None, brea
         window_points = window_points[:-1]
 
     return np.asarray(window_points, dtype=int)
+
+
+def _estimate_arclength(centroid_col, centroid_row):
+    """Estimate the arclength given column and row centroid positions.
+
+    We use the approximation that the arclength equals
+
+        (row**2 + col**2)**0.5
+
+    For this to work, row and column must be correlated not anticorrelated.
+    """
+    col = centroid_col - np.nanmin(centroid_col)
+    row = centroid_row  - np.nanmin(centroid_row)
+    # Force c to be correlated not anticorrelated
+    if np.polyfit(col, row, 1)[0] < 0:
+        col = np.nanmax(col) - col
+    return (col**2 + row**2)**0.5

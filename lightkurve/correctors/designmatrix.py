@@ -333,7 +333,7 @@ class DesignMatrixCollection():
             The matplotlib axes object.
         """
         [dm.plot_priors(ax=ax) for dm in self]
-        return
+        return ax
 
     def _get_prior_sample(self):
         """Returns a random sample from the prior distribution."""
