@@ -281,14 +281,17 @@ class DesignMatrixCollection():
 
     @property
     def values(self):
+        """2D numpy array containing the matrix values."""
         return np.hstack(tuple(m.values for m in self.matrices))
 
     @property
     def prior_mu(self):
+        """Coefficient prior means."""
         return np.hstack([m.prior_mu for m in self])
 
     @property
     def prior_sigma(self):
+        """Coefficient prior standard deviations."""
         return np.hstack([m.prior_sigma for m in self])
 
     def plot(self, ax=None, **kwargs):
@@ -337,13 +340,40 @@ class DesignMatrixCollection():
         return np.hstack([dm.sample_priors() for dm in self])
 
     def split(self, row_indices):
+        """Returns a new `.DesignMatrixCollection` with regressors split into
+        multiple columns.
+
+        This method will return a new design matrix collection by calling
+        `DesignMatrix.split` on each matrix in the collection.
+
+        Parameters
+        ----------
+        row_indices : iterable of integers
+            Every regressor (i.e. column) in the design matrix will be split
+            up over multiple columns separated at the indices provided.
+
+        Returns
+        -------
+        `.DesignMatrixCollection`
+            A new design matrix collection.
+        """
         return DesignMatrixCollection([d.split(row_indices) for d in self])
 
     def standardize(self):
+        """Returns a new `.DesignMatrixCollection` in which all the
+        matrices have been standardized using the `DesignMatrix.standardize`
+        method.
+
+        Returns
+        -------
+        `.DesignMatrixCollection`
+            The new design matrix collection.
+        """
         return DesignMatrixCollection([d.standardize() for d in self])
 
     @property
     def columns(self):
+        """List of column names."""
         return np.hstack([d.columns for d in self])
 
     def __getitem__(self, key):

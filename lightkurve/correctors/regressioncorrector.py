@@ -30,19 +30,19 @@ class RegressionCorrector(Corrector):
         \\newcommand{\\varw}{\\boldsymbol\sigma^2_\w}
 
     Given a column vector of data :math:`\y`
-    and a design matrix of regressors :math:`A`,
+    and a design matrix of regressors :math:`X`,
     we will find the vector of coefficients :math:`\w`
     such that:
 
     .. math::
 
-        \mathbf{y} = A\mathbf{w} + \mathrm{noise}
+        \mathbf{y} = X\mathbf{w} + \mathrm{noise}
 
     We will assume that the model fits the data within Gaussian uncertainties:
 
     .. math::
 
-        p(\y | \w) = \mathcal{N}(A\w, \cov)
+        p(\y | \w) = \mathcal{N}(X\w, \cov)
 
 
     We make the regression robust by placing Gaussian priors on :math:`\w`:
@@ -58,13 +58,13 @@ class RegressionCorrector(Corrector):
 
     .. math::
 
-        \w = \covw (A^\\top \cov^{-1} \y + \\boldsymbol\sigma^{-2}_\w I \muw)
+        \w = \covw (X^\\top \cov^{-1} \y + \\boldsymbol\sigma^{-2}_\w I \muw)
 
     Where :math:`\covw` is the covariance matrix of the coefficients:
 
     .. math::
 
-        \covw = (A^\\top \cov^{-1} A + \\boldsymbol\sigma^{-2}_\w I)^{-1}
+        \covw = (X^\\top \cov^{-1} X + \\boldsymbol\sigma^{-2}_\w I)^{-1}
 
 
     Parameters
@@ -87,7 +87,7 @@ class RegressionCorrector(Corrector):
 
         # The following properties will be set when correct() is called.
         # We're setting them here so they do not throw value errors
-        self.X = None
+        self.design_matrix_collection = None
         self.coefficients = None
         self.corrected_lc = None
         self.model_lc = None
@@ -95,6 +95,11 @@ class RegressionCorrector(Corrector):
 
     def __repr__(self):
         return 'RegressionCorrector (ID: {})'.format(self.lc.targetid)
+
+    @property
+    def X(self):
+        """Shorthand for self.design_matrix_collection."""
+        return self.design_matrix_collection
 
     def _fit_coefficients(self, cadence_mask=None, prior_mu=None,
                           prior_sigma=None, propagate_errors=False):
@@ -189,7 +194,7 @@ class RegressionCorrector(Corrector):
         if isinstance(design_matrix_collection, DesignMatrix):
             design_matrix_collection = DesignMatrixCollection([design_matrix_collection])
         design_matrix_collection._validate()
-        self.X = design_matrix_collection
+        self.design_matrix_collection = design_matrix_collection
 
         if cadence_mask is None:
             cadence_mask = np.ones(len(self.lc.time), bool)
