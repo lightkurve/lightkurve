@@ -407,9 +407,10 @@ def _get_window_points(centroid_col, centroid_row, windows, arclength=None, brea
     thrusters = np.where(thrusters)[0]
 
     # Find the nearest point to each thruster firing, unless it's a user supplied break point
-    window_points = [thrusters[np.argmin(np.abs(wp - thrusters))] + 1
-                         for wp in window_points
-                         if wp not in breakindexes]
+    # I think this is not necessary anymore.
+    #window_points = [thrusters[np.argmin(np.abs(wp - thrusters))] + 1
+    #                     for wp in window_points
+    #                     if wp not in breakindexes]
     window_points = np.unique(np.hstack([window_points, breakindexes]))
 
     # If the first or last windows are very short (<40% median window length),
