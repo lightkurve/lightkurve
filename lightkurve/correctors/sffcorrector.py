@@ -390,6 +390,8 @@ def _get_window_points(centroid_col, centroid_row, windows, arclength=None, brea
     if not isinstance(breakindexes, list):
         raise ValueError('`breakindex` must be an int or a list')
 
+    # If the user asks for break indices we should still return them,
+    # even if there is only 1 window.
     if windows == 1:
         return breakindexes
 
