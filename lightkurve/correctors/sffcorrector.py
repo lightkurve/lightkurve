@@ -373,8 +373,6 @@ def _get_window_points(centroid_col, centroid_row, windows, arclength=None, brea
     breakindex: int
         Cadence where there is a natural break. Windows will be automatically put here.
     """
-    if windows == 1:
-        return []
 
     if arclength is None:
         arclength = _estimate_arclength(centroid_col, centroid_row)
@@ -382,14 +380,18 @@ def _get_window_points(centroid_col, centroid_row, windows, arclength=None, brea
     # Validate break indices
     if isinstance(breakindex, int):
         breakindexes = [breakindex]
-    elif breakindex is None:
+    if breakindex is None:
         breakindexes = []
-    elif breakindex == 0:
+    elif (breakindex[0] == 0) & (len(breakindex) == 1):
         breakindexes = []
     else:
         breakindexes = breakindex
+
     if not isinstance(breakindexes, list):
         raise ValueError('`breakindex` must be an int or a list')
+
+    if windows == 1:
+        return breakindexes
 
     # Find evenly spaced window points
     dt = len(centroid_col) / windows
@@ -400,7 +402,8 @@ def _get_window_points(centroid_col, centroid_row, windows, arclength=None, brea
 
     # Get thruster firings
     thrusters = _get_thruster_firings(arclength)
-    thrusters[breakindex] = True
+    for b in breakindexes:
+        thrusters[b] = True
     thrusters = np.where(thrusters)[0]
 
     # Find the nearest point to each thruster firing, unless it's a user supplied break point
