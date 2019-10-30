@@ -373,8 +373,6 @@ def _get_window_points(centroid_col, centroid_row, windows, arclength=None, brea
     breakindex: int
         Cadence where there is a natural break. Windows will be automatically put here.
     """
-    if windows == 1:
-        return []
 
     if arclength is None:
         arclength = _estimate_arclength(centroid_col, centroid_row)
@@ -382,14 +380,20 @@ def _get_window_points(centroid_col, centroid_row, windows, arclength=None, brea
     # Validate break indices
     if isinstance(breakindex, int):
         breakindexes = [breakindex]
-    elif breakindex is None:
+    if breakindex is None:
         breakindexes = []
-    elif breakindex == 0:
+    elif (breakindex[0] == 0) & (len(breakindex) == 1):
         breakindexes = []
     else:
         breakindexes = breakindex
+
     if not isinstance(breakindexes, list):
         raise ValueError('`breakindex` must be an int or a list')
+
+    # If the user asks for break indices we should still return them,
+    # even if there is only 1 window.
+    if windows == 1:
+        return breakindexes
 
     # Find evenly spaced window points
     dt = len(centroid_col) / windows
@@ -400,13 +404,15 @@ def _get_window_points(centroid_col, centroid_row, windows, arclength=None, brea
 
     # Get thruster firings
     thrusters = _get_thruster_firings(arclength)
-    thrusters[breakindex] = True
+    for b in breakindexes:
+        thrusters[b] = True
     thrusters = np.where(thrusters)[0]
 
     # Find the nearest point to each thruster firing, unless it's a user supplied break point
-    window_points = [thrusters[np.argmin(np.abs(wp - thrusters))] + 1
-                         for wp in window_points
-                         if wp not in breakindexes]
+    if len(thrusters) > 0:
+        window_points = [thrusters[np.argmin(np.abs(thrusters - wp))] + 1
+                             for wp in window_points
+                             if wp not in breakindexes]
     window_points = np.unique(np.hstack([window_points, breakindexes]))
 
     # If the first or last windows are very short (<40% median window length),
