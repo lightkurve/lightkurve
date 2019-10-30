@@ -72,6 +72,7 @@ def test_sff_corrector():
                                restore_trend=True,
                                windows=1)
     assert (np.isclose(corrected_flux, corrected_lc.flux, atol=0.001).all())
+    assert len(sff.window_points) == 0  # expect 0 break points for 1 window
 
     # masking
     corrected_lc = sff.correct(centroid_col=centroid_col,
@@ -80,26 +81,26 @@ def test_sff_corrector():
                                restore_trend=True,
                                cadence_mask=mask)
     assert (np.isclose(corrected_flux, corrected_lc.flux, atol=0.001).all())
+    assert len(sff.window_points) == 2  # expect 2 break points for 3 windows
 
     # masking and breakindex
     corrected_lc = sff.correct(centroid_col=centroid_col,
                                centroid_row=centroid_row,
                                windows=3,
                                restore_trend=True,
-                               cadence_mask=mask,
-                               breakindex=150)
+                               cadence_mask=mask)
     assert (np.isclose(corrected_flux, corrected_lc.flux, atol=0.001).all())
 
     # masking and breakindex and iters
     corrected_lc = sff.correct(centroid_col=centroid_col,
                                centroid_row=centroid_row, windows=3, restore_trend=True,
-                               cadence_mask=mask, breakindex=150, niters=3)
+                               cadence_mask=mask, niters=3)
     assert (np.isclose(corrected_flux, corrected_lc.flux, atol=0.001).all())
 
     # masking and breakindex and bins
     corrected_lc = sff.correct(centroid_col=centroid_col,
                                centroid_row=centroid_row, windows=3, restore_trend=True,
-                               cadence_mask=mask, breakindex=150, bins=5)
+                               cadence_mask=mask, bins=5)
     assert (np.isclose(corrected_flux, corrected_lc.flux, atol=0.001).all())
     assert np.all((sff.lc.flux_err/sff.corrected_lc.flux_err) == 1)
 
@@ -107,7 +108,7 @@ def test_sff_corrector():
     # masking and breakindex and bins and propagate_errors
     corrected_lc = sff.correct(centroid_col=centroid_col,
                                centroid_row=centroid_row, windows=3, restore_trend=True,
-                               cadence_mask=mask, breakindex=150, bins=5, propagate_errors=True)
+                               cadence_mask=mask, bins=5, propagate_errors=True)
     assert (np.isclose(corrected_flux, corrected_lc.flux, atol=0.001).all())
     assert np.all((sff.lc.flux_err/sff.corrected_lc.flux_err) < 1)
 
@@ -150,3 +151,14 @@ def test_sff_priors():
     sff.correct()  # should not raise an exception
     assert np.isclose(sff.diagnostic_lightcurves['spline'].flux.mean(), 1, atol=1e-3)
     assert np.isclose(sff.diagnostic_lightcurves['sff'].flux.mean(), 0, atol=1e-3)
+
+
+def test_sff_breakindex():
+    """Regression test for #616."""
+    lc = LightCurve(flux=np.ones(20))
+    corr = SFFCorrector(lc)
+    corr.correct(breakindex=[5, 10],
+                 centroid_col=np.random.randn(20),
+                 centroid_row=np.random.randn(20))
+    assert 5 in corr.window_points
+    assert 10 in corr.window_points

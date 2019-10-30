@@ -117,7 +117,8 @@ class SFFCorrector(RegressionCorrector):
         if np.any([~np.isfinite(centroid_row), ~np.isfinite(centroid_col)]):
             raise ValueError('Centroids contain NaN values.')
 
-        self.window_points = _get_window_points(centroid_col, centroid_row, windows)
+        self.window_points = _get_window_points(centroid_col, centroid_row,
+                                                windows, breakindex=breakindex)
         self.windows = windows
         self.bins = bins
         self.timescale = timescale
@@ -158,8 +159,6 @@ class SFFCorrector(RegressionCorrector):
 
         # I'm putting WEAK priors on the spline that it must be around 1
         s_dm.prior_sigma = np.ones(len(s_dm.prior_mu)) * 1000 * self.lc.flux.std()
-
-
 
         # additional
         if additional_design_matrix is not None:
@@ -365,7 +364,7 @@ def _get_window_points(centroid_col, centroid_row, windows, arclength=None, brea
 
     Parameters
     ----------
-    lc : lk.LightCurve object
+    lc : `.LightCurve` object
         Input light curve
     windows: int
         Number of windows to split the light curve into
@@ -380,7 +379,7 @@ def _get_window_points(centroid_col, centroid_row, windows, arclength=None, brea
     if arclength is None:
         arclength = _estimate_arclength(centroid_col, centroid_row)
 
-    # Validate break indicies
+    # Validate break indices
     if isinstance(breakindex, int):
         breakindexes = [breakindex]
     elif breakindex is None:
@@ -393,7 +392,7 @@ def _get_window_points(centroid_col, centroid_row, windows, arclength=None, brea
         raise ValueError('`breakindex` must be an int or a list')
 
     # Find evenly spaced window points
-    dt = len(centroid_col)/windows
+    dt = len(centroid_col) / windows
     lower_idx = np.append(0, breakindexes)
     upper_idx = np.append(breakindexes, len(centroid_col))
     window_points = np.hstack([np.asarray(np.arange(a, b, dt), int)
@@ -410,7 +409,9 @@ def _get_window_points(centroid_col, centroid_row, windows, arclength=None, brea
                          if wp not in breakindexes]
     window_points = np.unique(np.hstack([window_points, breakindexes]))
 
-    # If the first or last windows are very short, remove their break points
+    # If the first or last windows are very short (<40% median window length),
+    # then we add them to the second or penultimate window, respectively,
+    # by removing their break points.
     median_length = np.median(np.diff(window_points))
     if window_points[0] < 0.4*median_length:
         window_points = window_points[1:]
