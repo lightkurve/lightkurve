@@ -839,19 +839,33 @@ class LombScarglePeriodogram(Periodogram):
                              nterms=nterms, **kwargs)
             power = LS.power(frequency, method=ls_method, normalization='psd')
 
-        if normalization == 'psd':  # Power spectral density
-            # Rescale from the unnormalized power output by Astropy's
-            # Lomb-Scargle function to units of flux_variance / [frequency unit]
-            # that may be of more interest for asteroseismology.
-            power *=  2. / (len(time) * oversample_factor * fs)
-        elif normalization == 'amplitude':
-            power = np.sqrt(power) * np.sqrt(4./len(lc.time))
+        meta = {}
+        # To rescale from the unnormalized power output by Astropy's
+        # Lomb-Scargle function to units of flux_variance / [frequency unit],
+        # the power needs to be multiplied by 2 / frequency_spacing.
+        # This is often called the Power Spectral Density (PSD).
+        meta['psd_factor'] = 2. / (len(time) * oversample_factor * fs)
+        # To rescale from power to amplitude, we'll need to compute
+        # sqrt(power * 4/N)
+        meta['amplitude_factor'] = np.sqrt(4./len(lc.time))
 
         # Periodogram needs properties
         return LombScarglePeriodogram(frequency=frequency, power=power, nyquist=nyquist,
                                       targetid=lc.targetid, label=lc.label,
                                       default_view=default_view, ls_obj=LS,
-                                      nterms=nterms, ls_method=ls_method)
+                                      nterms=nterms, ls_method=ls_method,
+                                      meta=meta)
+
+    @property
+    def amplitude(self):
+        """Power expressed as amplitude."""
+        return np.sqrt(self.power) * self.meta['amplitude_factor']
+
+    @property
+    def psd(self):
+        """Power expressed in units Power Spectral Density (PSD),
+        i.e. flux_variance / [frequency unit]."""
+        return (self.power * self.meta['psd_factor']).to(self.power.unit / u.Hertz)
 
     def model(self, time, frequency=None):
         """Obtain the flux model for a given frequency and time
