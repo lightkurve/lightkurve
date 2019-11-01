@@ -413,24 +413,22 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
     transform_func: function
         A function that transforms the lightcurve.  The function takes in a
         LightCurve object as input and returns a LightCurve object as output.
-        For example, the function could be to normalize the lightcurve:
+        For example, the function could be to normalize the lightcurve::
 
-            transform_func = lambda lc: lc.normalize()
+            >>> transform_func = lambda lc: lc.normalize()
 
         Or it could be more complex, such as detrending the lightcurve.  In this
         way, the interactive selection of aperture mask can be evaluated after
-        inspection of the transformed lightcurve.  See the tutorial for some
-        limitations. The transform_func is applied before saving a fits file.
-        Default: None (no transform is applied).
+        inspection of the transformed lightcurve.  The transform_func is applied
+        before saving a fits file.  Default: None (no transform is applied).
     ylim_func: function
         A function that returns ylimits (low, high) given a LightCurve object.
-        To see the full dynamic range of your lightcurve, for example:
+        To see the full dynamic range of your lightcurve, for example::
 
-            ylim_func = lambda lc: (0.0, lc.flux.max())
+            >>> ylim_func = lambda lc: (0.0, lc.flux.max())
 
         The default is to return an expanded window around the 10-90th percentile
         of lightcurve flux values.
-
     """
     try:
         import bokeh
