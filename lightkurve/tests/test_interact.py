@@ -91,7 +91,6 @@ def test_custom_exported_filename():
 @pytest.mark.skipif(bad_optional_imports, reason="requires bokeh")
 def test_transform_and_ylim_funcs():
     """Test the transform_func and ylim_func"""
-    import bokeh
     with warnings.catch_warnings():
         # Ignore the "TELESCOP is not equal to TESS" warning
         warnings.simplefilter("ignore", LightkurveWarning)
