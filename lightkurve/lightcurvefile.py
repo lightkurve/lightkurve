@@ -312,10 +312,10 @@ class KeplerLightCurveFile(LightCurveFile):
             fe = self.hdu[1].data[flux_type + "_ERR"][self.quality_mask]
 
             if flux_type == 'SAP_FLUX':
-                f /= self.hdu[1].header['FLFRCSAP']
-                fe /= self.hdu[1].header['FLFRCSAP']
-                f /= self.hdu[1].header['CROWDSAP']
-                fe /= self.hdu[1].header['CROWDSAP']
+                f /= self.hdu[1].header.get('FLFRCSAP', 1)
+                fe /= self.hdu[1].header.get('FLFRCSAP', 1)
+                f /= self.hdu[1].header.get('CROWDSAP', 1)
+                fe /= self.hdu[1].header.get('CROWDSAP', 1)
 
             return KeplerLightCurve(
                 time=self.hdu[1].data['TIME'][self.quality_mask],
