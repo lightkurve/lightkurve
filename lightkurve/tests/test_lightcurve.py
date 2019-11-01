@@ -13,6 +13,8 @@ import pytest
 import tempfile
 import warnings
 
+import lightkurve as lk
+
 from ..lightcurve import LightCurve, KeplerLightCurve, TessLightCurve
 from ..lightcurvefile import LightCurveFile, KeplerLightCurveFile, TessLightCurveFile
 from ..targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile
@@ -856,3 +858,16 @@ def test_normalize_unit():
     lc = LightCurve(flux=[1, 2, 3])
     for unit in ['percent', 'ppt', 'ppm']:
         assert lc.normalize(unit=unit).flux_unit.name == unit
+
+def test_whimsy():
+    """Test whimsical plotting"""
+    lk._whimsify('halloween')
+    lc = LightCurve(flux=[1, 2, 3])
+    ax = lc.plot()
+    background_color = (0.08627450980392157, 0.08627450980392157, 0.08627450980392157, 1.0)
+    assert_allclose(ax.get_facecolor(), background_color)
+    lk.dewhimsify()
+    lc = LightCurve(flux=[1, 2, 3])
+    ax = lc.plot()
+    background_color = (1, 1, 1, 1)
+    assert_allclose(ax.get_facecolor(), background_color)
