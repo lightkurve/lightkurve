@@ -350,7 +350,6 @@ def make_tpf_figure_elements(tpf, tpf_source, pedestal=None, fiducial_frame=None
                                  value=(np.log10(lo), np.log10(hi)),
                                  orientation='horizontal',
                                  width=200,
-                                 height=10,
                                  direction='ltr',
                                  show_value=True,
                                  sizing_mode='fixed',
