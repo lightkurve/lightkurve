@@ -29,6 +29,7 @@ In the second section we cover some data analysis tasks that astronomers might c
     02-recover-a-planet.ipynb
     02-how-to-recover-the-first-tess-candidate.ipynb
     02-how-to-use-lightkurve-for-asteroseismology.ipynb
+    02-asteroseismology.ipynb
     02-how-to-make-a-supernova-lightcurve.ipynb
 
 
