@@ -681,23 +681,31 @@ class TargetPixelFile(object):
         transform_func: function
             A function that transforms the lightcurve.  The function takes in a
             LightCurve object as input and returns a LightCurve object as output.
-            For example, the function could be to normalize the lightcurve:
-
-                transform_func = lambda lc: lc.normalize()
-
-            Or it could be more complex, such as detrending the lightcurve.  In this
+            The function can be complex, such as detrending the lightcurve.  In this
             way, the interactive selection of aperture mask can be evaluated after
-            inspection of the transformed lightcurve.  See the tutorial for some
-            limitations. The transform_func is applied before saving a fits file.
-            Default: None (no transform is applied).
+            inspection of the transformed lightcurve.  The transform_func is applied
+            before saving a fits file.  Default: None (no transform is applied).
         ylim_func: function
             A function that returns ylimits (low, high) given a LightCurve object.
-            To see the full dynamic range of your lightcurve, for example:
+            The default is to return an expanded window around the 10-90th
+            percentile of lightcurve flux values.
 
-                ylim_func = lambda lc: (0.0, lc.flux.max())
+        Examples
+        --------
+        To select an aperture mask for V827 Tau::
 
-            The default is to return an expanded window around the 10-90th percentile
-            of lightcurve flux values.
+            >>> import lightkurve as lk
+            >>> tpf = lk.search_targetpixelfile("V827 Tau", mission="K2").download()
+            >>> tpf.interact()
+
+
+        To see the full y-axis dynamic range of your lightcurve and normalize
+        the lightcurve after each pixel selection::
+
+            >>> ylim_func = lambda lc: (0.0, lc.flux.max())
+            >>> transform_func = lambda lc: lc.normalize()
+            >>> tpf.interact(ylim_func=ylim_func, transform_func=transform_func)
+
         """
         from .interact import show_interact_widget
         return show_interact_widget(self, notebook_url=notebook_url,
@@ -899,7 +907,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
     (TPF), access its meta data, visualize its contents, extract light curves
     with custom aperture masks, estimate centroid positions, and more.
 
-    Please consult the `TargetPixelFile tutorial 
+    Please consult the `TargetPixelFile tutorial
     <https://docs.lightkurve.org/tutorials/01-target-pixel-files.html>`_
     in the online documentation for examples on using this class.
 
