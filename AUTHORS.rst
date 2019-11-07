@@ -53,3 +53,4 @@ Comments, corrections & suggestions:
 - `Richard Elkins <https://github.com/texadactyl>`_
 - `Daniel Foreman-Mackey <https://github.com/dfm>`_
 - `Saeed Hojjatpanah <https://github.com/saeedm31>`_
+- `Simon J Murphy <https://github.com/SimonJMurphy>`_
