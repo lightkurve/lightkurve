@@ -412,7 +412,7 @@ def show_interact_widget(tpf, notebook_url='localhost:8888',
     transform_func: function
         A function that transforms the lightcurve.  The function takes in a
         LightCurve object as input and returns a LightCurve object as output.
-        For example, the function could be to normalize the lightcurve::
+        For example, the function could be used to normalize the lightcurve::
 
             >>> transform_func = lambda lc: lc.normalize()
 
