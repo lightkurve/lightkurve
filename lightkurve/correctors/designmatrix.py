@@ -237,8 +237,8 @@ class DesignMatrix():
 
     def _validate(self):
         """Raises a `LightkurveWarning` if the matrix has a low rank."""
-        # Matrix rank shouldn't be smaller than the number of columns.
-        if self.rank < self.shape[1]:
+        # Matrix rank shouldn't be significantly smaller than the # of columns
+        if self.rank < (0.5*self.shape[1]):
             warnings.warn("The design matrix has low rank ({}) compared to the "
                           "number of columns ({}), which suggests that the "
                           "matrix contains duplicate or correlated columns. "
