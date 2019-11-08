@@ -325,7 +325,7 @@ class Periodogram(object):
             # Show the legend if labels were set
             legend_labels = ax.get_legend_handles_labels()
             if (np.sum([len(a) for a in legend_labels]) != 0):
-                ax.legend()
+                ax.legend(loc='best')
             ax.set_yscale(scale)
             ax.set_xscale(scale)
             ax.set_title(title)
@@ -699,7 +699,7 @@ class LombScarglePeriodogram(Periodogram):
             Can be either power spectral density (`'psd'`) or amplitude
             (`'amplitude'`).
         ls_method : str
-            Default: `'fast'`. Passed to the `method` keyword of 
+            Default: `'fast'`. Passed to the `method` keyword of
             `astropy.stats.LombScargle()`.
         kwargs : dict
             Keyword arguments passed to `astropy.stats.LombScargle()`

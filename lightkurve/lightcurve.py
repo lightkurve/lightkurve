@@ -1080,7 +1080,7 @@ class LightCurve(object):
             # Show the legend if labels were set
             legend_labels = ax.get_legend_handles_labels()
             if (np.sum([len(a) for a in legend_labels]) != 0):
-                ax.legend()
+                ax.legend(loc='best')
 
         return ax
 

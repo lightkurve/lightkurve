@@ -106,7 +106,8 @@ def test_designmatrix_rank():
     dm._validate()  # Should not raise a warning
 
     # Bad rank
-    dm = DesignMatrix({'a': [1, 2, 3], 'b': [1, 1, 1], 'c': [3, 4, 5]})
+    dm = DesignMatrix({'a': [1, 2, 3], 'b': [1, 1, 1], 'c': [1, 1, 1],
+                       'd': [1, 1, 1], 'e': [3, 4, 5]})
     assert dm.rank == 2
     with pytest.warns(LightkurveWarning, match='rank'):
         dm._validate()
