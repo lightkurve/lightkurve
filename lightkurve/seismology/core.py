@@ -448,6 +448,9 @@ class Seismology(object):
         else:
             dnu = self.deltanu
 
+        if (not hasattr(dnu, 'unit')):
+            dnu = dnu * self.periodogram.frequency.unit
+
         def create_interact_ui(doc):
             fig_tpf, stretch_slider = self._make_echelle_elements(dnu,
                                                 maximum_frequency=maximum_frequency,
