@@ -23,21 +23,40 @@ The first set of tutorials cover the basics of using Lightkurve. This includes g
 
 In the second section we cover some data analysis tasks that astronomers might commonly want to do with time series data.
 
+2.1. Exoplanet science examples
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. toctree::
     :maxdepth: 1
 
     02-recover-a-planet.ipynb
     02-how-to-recover-the-first-tess-candidate.ipynb
+
+
+2.2. Asteroseismology examples
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. toctree::
+    :maxdepth: 1
+
     02-how-to-optimize-periodogram-snr.ipynb
     02-asteroseismology.ipynb
+
+
+2.3. Other examples
+~~~~~~~~~~~~~~~~~~~
+
+.. toctree::
+    :maxdepth: 1
+
     02-how-to-make-a-supernova-lightcurve.ipynb
 
 
-3. Extracting light curves
---------------------------
+3. Creating light curves
+------------------------
 
 The third section focuses on the various ways in which light curves
-can be extract from the pixel data.
+can be extracted from the pixel data.
 
 .. toctree::
     :maxdepth: 1
@@ -49,17 +68,29 @@ can be extract from the pixel data.
     03-appending-lightcurves.ipynb
 
 
-4. Correcting systematics
--------------------------
+4. Correcting instrument noise
+------------------------------
 
-The final section focuses on the removal of instrument noise.
+The final section focuses on the removal of instrument noise, which astronomers
+often refer to as *systematics*.
+
+
+4.1. Identifying instrument noise
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. toctree::
     :maxdepth: 1
 
     04-interact-with-lightcurves-and-tpf.ipynb
+    04-identify-rolling-band.ipynb
+
+
+4.2. Removing instrument noise
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. toctree::
+    :maxdepth: 1
+
     04-removing-cbvs.ipynb
     04-how-to-detrend.ipynb
     04-replicate-vanderburg-2014-k2sff.ipynb
-    04-replicate-vanderburg-2014-lightkurve.ipynb
-    04-identify-rolling-band.ipynb
