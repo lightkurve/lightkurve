@@ -4,6 +4,8 @@
 Self Flat-Fielding (SFF) method described in Vanderburg and Johnson (2014).
 """
 import logging
+import warnings
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -13,6 +15,7 @@ from . import DesignMatrix, DesignMatrixCollection
 from .regressioncorrector import RegressionCorrector
 
 from .. import MPLSTYLE
+from ..utils import LightkurveWarning
 
 log = logging.getLogger(__name__)
 
@@ -60,7 +63,7 @@ class SFFCorrector(RegressionCorrector):
 
     def correct(self, centroid_col=None, centroid_row=None, windows=20, bins=5,
                 timescale=1.5, breakindex=None, degree=3, restore_trend=False,
-                additional_design_matrix=None, **kwargs):
+                additional_design_matrix=None, polyorder=None, **kwargs):
         """Find the best fit correction for the light curve.
 
         Parameters
@@ -101,6 +104,8 @@ class SFFCorrector(RegressionCorrector):
             distribution of weights.
         additional_design_matrix : `~lightkurve.lightcurve.Correctors.DesignMatrix` (optional)
             Additional design matrix to remove, e.g. containing background vectors.
+        polyorder : int
+            Deprecated as of Lightkurve v1.4.  Use ``degree`` instead.
 
         Returns
         -------
@@ -108,6 +113,11 @@ class SFFCorrector(RegressionCorrector):
             Corrected light curve, with noise removed.
         """
         from patsy import dmatrix  # local import because it's rarely-used
+
+        if polyorder is not None: 
+            warnings.warn("`polyorder` is deprecated and no longer used, "
+                          "please use the `degree` keyword instead.",
+                          LightkurveWarning)
 
         if centroid_col is None:
             centroid_col = self.lc.centroid_col
