@@ -6,7 +6,7 @@
   systematic noise components from light curves. [#613]
 
 - Changed the ``SFFCorrector`` class to use the new ``RegressionCorrector``
-  framework. [#613]
+  framework. [#613, #617, #626]
 
 - Added a tutorial which demonstrates the use of Lightkurve's seismology module
   to measure the mass, radius, and surface gravity of a solar-like star. [#624]
