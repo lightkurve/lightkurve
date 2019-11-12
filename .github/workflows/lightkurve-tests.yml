@@ -14,7 +14,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [2.7, 3.7, 3.8]
+        include:
+          - name: 3.7
+            python-version: 3.7
+            pytest-options:
+          - name: 3.8-remote-data
+            python-version: 3.8
+            pytest-options: --remote-data
     steps:
     - uses: actions/checkout@v1
     - name: Set up Python ${{ matrix.python-version }}
@@ -26,14 +32,9 @@ jobs:
         python -m pip install --upgrade pip setuptools wheel
         pip install numpy  # celerite needs numpy to build, so we install it first
         pip install -e .[all,test]
-    - name: Test with pytest
-      if: matrix.python-version != 3.8
+    - name: Test with pytest ${{ matrix.pytest-options }}
       run: |
-        pytest
-    - name: Test with pytest --remote-data (3.8 only)
-      if: matrix.python-version == 3.8
-      run: |
-        pytest --remote-data
+        pytest ${{ matrix.pytest-options }}
 
   # Run unit tests on Windows
   pytest-windows:
