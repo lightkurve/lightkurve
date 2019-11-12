@@ -291,7 +291,7 @@ class TargetPixelFile(object):
         ra = ra.reshape((pos_corr1_pix.shape[0], self.shape[1], self.shape[2]))
         dec = dec.reshape((pos_corr2_pix.shape[0], self.shape[1], self.shape[2]))
         ra, dec = ra[self.quality_mask], dec[self.quality_mask]
-        if cadence is not 'all':
+        if cadence != 'all':
             return ra[cadence], dec[cadence]
         return ra, dec
 

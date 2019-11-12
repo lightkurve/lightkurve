@@ -4,6 +4,8 @@ import warnings
 import numpy as np
 from astropy.convolution import convolve, Box1DKernel
 
+from .utils import LightkurveWarning
+
 log = logging.getLogger(__name__)
 
 # Import the optional AstroPy dependency, or print a friendly error otherwise.
