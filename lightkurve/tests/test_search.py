@@ -10,6 +10,7 @@ import pytest
 import numpy as np
 from numpy.testing import assert_almost_equal, assert_array_equal
 import tempfile
+from requests import HTTPError
 
 from astropy.coordinates import SkyCoord
 import astropy.units as u
@@ -104,36 +105,42 @@ def test_search_tesscut():
     try:
         # This is too near the FFI edge and should fail to download
         search_edge.download()
-    except SearchError:
+    except (SearchError, HTTPError):
         pass
 
 
 @pytest.mark.remote_data
 def test_search_tesscut_download():
     """Can we download TESS cutouts via `search_cutout().download()?"""
-    ra, dec = 30.578761, -83.210593
-    search_string = search_tesscut('{}, {}'.format(ra, dec), sector=[1, 12])
-    # Make sure they can be downloaded with default size
-    tpf = search_string[0].download()
-    # Ensure the correct object has been read in
-    assert(isinstance(tpf, TessTargetPixelFile))
-    # Ensure default size is 5x5
-    assert(tpf.flux[0].shape == (5, 5))
-    # Ensure the tpf has a targetid (#473 regression test)
-    assert(len(tpf.targetid) > 0)
-    # Ensure the WCS is valid (#434 regression test)
-    center_ra, center_dec = tpf.wcs.all_pix2world([[2.5, 2.5]], 1)[0]
-    assert_almost_equal(ra, center_ra, decimal=1)
-    assert_almost_equal(dec, center_dec, decimal=1)
-    # Download with different dimensions
-    tpfc = search_string.download_all(cutout_size=4, quality_bitmask='hard')
-    assert(isinstance(tpfc, TargetPixelFileCollection))
-    assert(tpfc[0].quality_bitmask == 'hard')  # Regression test for #494
-    # Ensure correct dimensions
-    assert(tpfc[0].flux[0].shape == (4, 4))
-    # Download with rectangular dimennsions?
-    rect_tpf = search_string[0].download(cutout_size=(3, 5))
-    assert(rect_tpf.flux[0].shape == (3, 5))
+    try:
+        ra, dec = 30.578761, -83.210593
+        search_string = search_tesscut('{}, {}'.format(ra, dec), sector=[1, 12])
+        # Make sure they can be downloaded with default size
+        tpf = search_string[0].download()
+        # Ensure the correct object has been read in
+        assert(isinstance(tpf, TessTargetPixelFile))
+        # Ensure default size is 5x5
+        assert(tpf.flux[0].shape == (5, 5))
+        # Ensure the tpf has a targetid (#473 regression test)
+        assert(len(tpf.targetid) > 0)
+        # Ensure the WCS is valid (#434 regression test)
+        center_ra, center_dec = tpf.wcs.all_pix2world([[2.5, 2.5]], 1)[0]
+        assert_almost_equal(ra, center_ra, decimal=1)
+        assert_almost_equal(dec, center_dec, decimal=1)
+        # Download with different dimensions
+        tpfc = search_string.download_all(cutout_size=4, quality_bitmask='hard')
+        assert(isinstance(tpfc, TargetPixelFileCollection))
+        assert(tpfc[0].quality_bitmask == 'hard')  # Regression test for #494
+        # Ensure correct dimensions
+        assert(tpfc[0].flux[0].shape == (4, 4))
+        # Download with rectangular dimennsions?
+        rect_tpf = search_string[0].download(cutout_size=(3, 5))
+        assert(rect_tpf.flux[0].shape == (3, 5))
+    except HTTPError as exc:
+        # TESSCut will occasionally return a "504 Gateway Timeout error" when
+        # it is overloaded.  We don't want this to trigger a test failure.
+        if "504" not in str(exc):
+            raise exc
 
 
 @pytest.mark.remote_data

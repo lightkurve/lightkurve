@@ -3,6 +3,7 @@ from __future__ import division
 import os
 import logging
 import warnings
+from requests import HTTPError
 
 import numpy as np
 from astropy.table import join, Table, Row
@@ -117,9 +118,18 @@ class SearchResult(object):
                                                 download_dir,
                                                 cutout_size)
                 log.debug("Finished downloading.")
-            except:
-                raise SearchError('Unable to download FFI cutout. Desired target '
-                                  'coordinates may be too near the edge of the FFI.')
+            except Exception as exc:
+                msg = str(exc)
+                if "504" in msg:
+                    # TESSCut will occasionally return a "504 Gateway Timeout
+                    # error" when it is overloaded.
+                    raise HTTPError('The TESS FFI cutout service at MAST appears '
+                                    'to be temporarily unavailable. It returned '
+                                    'the following error: {}'.format(exc))
+                else:
+                    raise SearchError('Unable to download FFI cutout. Desired target '
+                                    'coordinates may be too near the edge of the FFI.'
+                                    'Error: {}'.format(exc))
 
             return _open_downloaded_file(path,
                                          quality_bitmask=quality_bitmask,
@@ -171,6 +181,13 @@ class SearchResult(object):
         -------
         data : `TargetPixelFile` or `LightCurveFile` object
             The first entry in the products table.
+
+        Raises
+        ------
+        HTTPError
+            If the TESSCut service times out (i.e. returns HTTP status 504).
+        SearchError
+            If any other error occurs.
         """
         if len(self.table) == 0:
             warnings.warn("Cannot download from an empty search result.",
@@ -223,6 +240,13 @@ class SearchResult(object):
             Returns a `~lightkurve.collections.LightCurveFileCollection` or
             `~lightkurve.collections.TargetPixelFileCollection`,
             containing all entries in the products table
+
+        Raises
+        ------
+        HTTPError
+            If the TESSCut service times out (i.e. returns HTTP status 504).
+        SearchError
+            If any other error occurs.
         """
         if len(self.table) == 0:
             warnings.warn("Cannot download from an empty search result.",
