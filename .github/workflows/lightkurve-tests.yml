@@ -14,8 +14,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        name: [3.7, 3.8-remote-data, 3.8-no-optional-dependencies]
+        name: [2.7, 3.7, 3.8-remote-data, 3.8-no-optional-dependencies]
         include:
+          - name: 2.7
+            python-version: 2.7
+            pip-command: pip install -e .[test]
+            pytest-command: pytest
           - name: 3.7
             python-version: 3.7
             pip-command: pip install -e .[all,test]
@@ -23,7 +27,7 @@ jobs:
           - name: 3.8-remote-data
             python-version: 3.8
             pip-command: pip install -e .[all,test]
-            pytest-command: pytest --remote-data
+            pytest-command: pytest --remote-data --doctest-modules
           - name: 3.8-no-optional-dependencies
             python-version: 3.8
             pip-command: pip install -e .[test]
@@ -46,10 +50,8 @@ jobs:
   # Run unit tests on Windows
   pytest-windows:
     runs-on: windows-latest
-    strategy:
-      matrix:
-        name: [3.7-remote-data]
-        python-version: [3.7]
+    name: 3.7-remote-data
+    python-version: 3.7
     steps:
     - uses: actions/checkout@v1
     - name: Set up Python ${{ matrix.python-version }}
@@ -67,9 +69,7 @@ jobs:
   # Run unit tests on Mac OSX
   pytest-osx:
     runs-on: macos-latest
-    strategy:
-      matrix:
-        python-version: [3.7]
+    python-version: 3.7
     steps:
     - uses: actions/checkout@v1
     - name: Set up Python ${{ matrix.python-version }}
