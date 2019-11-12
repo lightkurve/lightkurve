@@ -461,7 +461,7 @@ class Seismology(object):
             dnu_slider = Slider(start=0.01,
                                 end=maxdnu,
                                 value=dnu.value,
-                                step=0.01,
+                                step=0.001,
                                 title="Delta Nu",
                                 width=290)
             r_button = Button(label=">", button_type="default", width=30)
@@ -488,20 +488,20 @@ class Seismology(object):
                 """Step forward in time by a single cadence"""
                 existing_value = dnu_slider.value
                 if existing_value < 200:
-                    dnu_slider.value = existing_value + 0.002
+                    dnu_slider.value = existing_value + 0.01
 
             def go_left_by_one_small():
                 """Step back in time by a single cadence"""
                 existing_value = dnu_slider.value
                 if existing_value > 0:
-                    dnu_slider.value = existing_value - 0.002
+                    dnu_slider.value = existing_value - 0.01
 
 
             def go_right_by_one():
                 """Step forward in time by a single cadence"""
                 existing_value = dnu_slider.value
                 if existing_value < maxdnu:
-                    dnu_slider.value = existing_value + 0.01
+                    dnu_slider.value = existing_value + 0.1
 
             def go_left_by_one():
                 """Step back in time by a single cadence"""
