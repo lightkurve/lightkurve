@@ -32,10 +32,12 @@ jobs:
 
   flake8-linter:
     runs-on: ubuntu-latest
-    python-version: 3.7
+    strategy:
+      matrix:
+        python-version: 3.7
     steps:
     - uses: actions/checkout@v1
-    - name: Set up Python ${{ matrix.python-version }} on ${{ matrix.os }}
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v1
       with:
         python-version: ${{ matrix.python-version }}
