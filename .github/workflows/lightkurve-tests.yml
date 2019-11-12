@@ -51,8 +51,9 @@ jobs:
   pytest-windows:
     runs-on: windows-latest
     strategy:
-      name: 3.7-remote-data
-      python-version: 3.7
+      matrix:
+        name: [3.7-remote-data]
+        python-version: [3.7]
     steps:
     - uses: actions/checkout@v1
     - name: Set up Python ${{ matrix.python-version }}
@@ -71,7 +72,8 @@ jobs:
   pytest-osx:
     runs-on: macos-latest
     strategy:
-      python-version: 3.7
+      matrix:
+        python-version: [3.7]
     steps:
     - uses: actions/checkout@v1
     - name: Set up Python ${{ matrix.python-version }}
