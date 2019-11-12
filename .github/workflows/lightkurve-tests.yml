@@ -14,14 +14,17 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.7, 3.8]
+        name: [3.7, 3.8-remote-data, 3.8-no-optional-dependencies]
         include:
-          - name: 3.7
-            python-version: 3.7
+          - python-version: 3.7
             pytest-options:
-          - name: 3.8-remote-data
-            python-version: 3.8
+            pip-command: pip install -e .[all,test]
+          - python-version: 3.8
             pytest-options: --remote-data
+            pip-command: pip install -e .[all,test]
+          - python-version: 3.8
+            pytest-options:
+            pip-command: pip install -e .[test]
     steps:
     - uses: actions/checkout@v1
     - name: Set up Python ${{ matrix.python-version }}
@@ -32,7 +35,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip setuptools wheel
         pip install numpy  # celerite needs numpy to build, so we install it first
-        pip install -e .[all,test]
+        ${{ matrix.pip-command }}
     - name: Test with pytest ${{ matrix.pytest-options }}
       run: |
         pytest ${{ matrix.pytest-options }}
@@ -53,7 +56,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip setuptools wheel
         pip install -e .[test]
-    - name: Test with pytest
+    - name: Test with pytest --remote-data
       run: |
         pytest --remote-data
 
