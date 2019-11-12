@@ -3,14 +3,11 @@ name: Lightkurve-Tests
 on: [push, pull_request]
 
 jobs:
-  pytest:
-
-    runs-on: ${{ matrix.os }}
+  pytest-linux:
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
         python-version: [2.7, 3.7]
-
     steps:
     - uses: actions/checkout@v1
     - name: Set up Python ${{ matrix.python-version }} on ${{ matrix.os }}
@@ -26,6 +23,24 @@ jobs:
       run: |
         pytest
 
+  pytest-windows:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version: [3.7]
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up Python ${{ matrix.python-version }} on ${{ matrix.os }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip setuptools wheel
+        pip install -e .[test]
+    - name: Test with pytest
+      run: |
+        pytest --remote-data
 
   flake8-linter:
     runs-on: ubuntu-latest
