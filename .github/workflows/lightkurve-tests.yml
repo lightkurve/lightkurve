@@ -16,13 +16,16 @@ jobs:
       matrix:
         name: [3.7, 3.8-remote-data, 3.8-no-optional-dependencies]
         include:
-          - python-version: 3.7
+          - name: 3.7
+            python-version: 3.7
             pytest-options:
             pip-command: pip install -e .[all,test]
-          - python-version: 3.8
+          - name: 3.8-remote-data
+            python-version: 3.8
             pytest-options: --remote-data
             pip-command: pip install -e .[all,test]
-          - python-version: 3.8
+          - name: 3.8-no-optional-dependencies
+            python-version: 3.8
             pytest-options:
             pip-command: pip install -e .[test]
     steps:
