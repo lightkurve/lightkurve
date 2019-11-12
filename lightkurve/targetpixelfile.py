@@ -30,7 +30,7 @@ from .utils import KeplerQualityFlags, TessQualityFlags, \
                    LightkurveWarning, detect_filetype, validate_method, \
                    centroid_quadratic
 
-from .factory import KeplerTargetPixelFileFactory, TargetPixelFileFactory
+from .factory import TargetPixelFileFactory
 
 __all__ = ['TargetPixelFile', 'KeplerTargetPixelFile', 'TessTargetPixelFile']
 log = logging.getLogger(__name__)

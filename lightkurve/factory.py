@@ -8,10 +8,10 @@ import logging
 from astropy.io import fits
 
 import numpy as np
-from tqdm import tqdm
 
 from . import PACKAGEDIR
 from .utils import LightkurveWarning
+from .targetpixelfile import TargetPixelFile, KeplerTargetPixelFile, TessTargetPixelFile
 
 log = logging.getLogger(__name__)
 
