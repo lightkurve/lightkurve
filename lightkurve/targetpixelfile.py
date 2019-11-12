@@ -30,9 +30,9 @@ from .utils import KeplerQualityFlags, TessQualityFlags, \
                    LightkurveWarning, detect_filetype, validate_method, \
                    centroid_quadratic
 
+__all__ = ['TargetPixelFile', 'KeplerTargetPixelFile', 'TessTargetPixelFile']
 from .factory import TargetPixelFileFactory
 
-__all__ = ['TargetPixelFile', 'KeplerTargetPixelFile', 'TessTargetPixelFile']
 log = logging.getLogger(__name__)
 
 
@@ -431,7 +431,7 @@ class TargetPixelFile(object):
         else:
             raise ValueError("Photometry method must be 'aperture' or 'prf'.")
 
-    def extract_aperture_photometry(self, aperture_mask='pipeline'):
+    def extract_aperture_photometry(self, aperture_mask='pipeline', centroid_method='moments'):
         """Returns a LightCurve obtained using aperture photometry.
 
         Parameters
@@ -454,7 +454,7 @@ class TargetPixelFile(object):
         aperture_mask = self._parse_aperture_mask(aperture_mask)
         if aperture_mask.sum() == 0:
             log.warning('Warning: aperture mask contains zero pixels.')
-        centroid_col, centroid_row = self.estimate_centroids(aperture_mask)
+        centroid_col, centroid_row = self.estimate_centroids(aperture_mask,centroid_method)
         # Ignore warnings related to zero or negative errors
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", RuntimeWarning)
@@ -1292,7 +1292,7 @@ class KeplerTargetPixelFile(TargetPixelFile):
         """K2 Campaign number. ('CAMPAIGN' header keyword)"""
         return self.get_keyword('CAMPAIGN')
 
-    def extract_aperture_photometry(self, aperture_mask='pipeline'):
+    def extract_aperture_photometry(self, aperture_mask='pipeline', centroid_method='moments'):
         """Returns a KeplerLightCurve obtained using aperture photometry.
 
         Parameters
