@@ -1,8 +1,15 @@
+# This file configures the continuous integration for Lightkurve.
+# We run the unit tests on different versions of Python on Linux, but only use
+# a single version of Python on Windows and OSX in the interest of time.
+# In addition, we limit the use of the `--remote-flag` to one Linux and one
+# Windows job to avoid hammering the data archive at MAST too much.
 name: Lightkurve-tests
 
 on: [push, pull_request]
 
 jobs:
+
+  # Run unit tests on Linux
   pytest-linux:
     runs-on: ubuntu-latest
     strategy:
@@ -20,9 +27,15 @@ jobs:
         pip install numpy  # celerite needs numpy to build, so we install it first
         pip install -e .[all,test]
     - name: Test with pytest
+      if: matrix.python-version != 3.8
       run: |
         pytest
+    - name: Test with pytest --remote-data (3.8 only)
+      if: matrix.python-version == 3.8
+      run: |
+        pytest --remote-data
 
+  # Run unit tests on Windows
   pytest-windows:
     runs-on: windows-latest
     strategy:
@@ -42,6 +55,7 @@ jobs:
       run: |
         pytest --remote-data
 
+  # Run unit tests on Mac OSX
   pytest-osx:
     runs-on: macos-latest
     strategy:
@@ -61,6 +75,7 @@ jobs:
       run: |
         pytest
 
+  # Use the `flake8` tool to check for syntax errors
   flake8-linter:
     runs-on: ubuntu-latest
     strategy:
