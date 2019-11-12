@@ -20,6 +20,7 @@ from astropy.utils.exceptions import AstropyWarning
 
 from ..targetpixelfile import KeplerTargetPixelFile, TargetPixelFileFactory
 from ..targetpixelfile import TessTargetPixelFile, TargetPixelFile
+from ..factory import TargetPixelFileFactory
 from ..lightcurve import TessLightCurve
 from ..utils import LightkurveWarning
 from ..search import open as lkopen
@@ -268,7 +269,7 @@ def test_tpf_to_fits():
 
 def test_tpf_factory():
     """Can we create TPFs using TargetPixelFileFactory?"""
-    from lightkurve.targetpixelfile import FactoryError
+    from ..factory import FactoryError
 
     factory = TargetPixelFileFactory(n_cadences=10, n_rows=6, n_cols=8)
     flux_0 = np.ones((6, 8))

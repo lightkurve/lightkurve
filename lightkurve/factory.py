@@ -11,7 +11,6 @@ import numpy as np
 
 from . import PACKAGEDIR
 from .utils import LightkurveWarning
-from .targetpixelfile import TargetPixelFile, KeplerTargetPixelFile, TessTargetPixelFile
 
 log = logging.getLogger(__name__)
 
@@ -121,6 +120,8 @@ class TargetPixelFileFactory(object):
         mission = None
         if 'MISSION' in hdu0_keywords.keys():
             mission = hdu0_keywords['MISSION']
+
+        from .targetpixelfile import TargetPixelFile, KeplerTargetPixelFile, TessTargetPixelFile
 
         if (mission=='Kepler') or (mission=='K2'):
             return KeplerTargetPixelFile(self._hdulist(hdu0_keywords=hdu0_keywords,
