@@ -22,12 +22,9 @@ jobs:
         python -m pip install --upgrade pip setuptools wheel
         pip install numpy  # celerite needs numpy to build, so we install it first
         pip install -e .[all,test]
-    - name: Enable --remote-data
-      if: matrix.os == 'ubuntu-latest' && matrix.python-version == 3.7
-      run: echo "::set-env name=pytestoptions::--remote-data"
     - name: Test with pytest
       run: |
-        pytest $(pytestoptions)
+        pytest
 
 
   flake8-linter:
