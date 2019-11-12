@@ -50,8 +50,9 @@ jobs:
   # Run unit tests on Windows
   pytest-windows:
     runs-on: windows-latest
-    name: 3.7-remote-data
-    python-version: 3.7
+    strategy:
+      name: 3.7-remote-data
+      python-version: 3.7
     steps:
     - uses: actions/checkout@v1
     - name: Set up Python ${{ matrix.python-version }}
@@ -69,7 +70,8 @@ jobs:
   # Run unit tests on Mac OSX
   pytest-osx:
     runs-on: macos-latest
-    python-version: 3.7
+    strategy:
+      python-version: 3.7
     steps:
     - uses: actions/checkout@v1
     - name: Set up Python ${{ matrix.python-version }}
