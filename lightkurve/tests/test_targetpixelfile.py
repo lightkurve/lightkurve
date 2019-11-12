@@ -224,8 +224,8 @@ def test_to_lightcurve():
         assert lc.label == tpf.hdu[0].header['OBJECT']
         # Generic TPFs have unknown timescales by default
         if tpf.__class__ == TargetPixelFile:
-            assert lc.time_scale == None
-            assert lc.time_format == None
+            assert lc.time_scale is None
+            assert lc.time_format is None
         else:
             assert lc.astropy_time.scale == 'tdb'
 
