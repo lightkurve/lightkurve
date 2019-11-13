@@ -7,7 +7,10 @@ Tutorials
 1. The Lightkurve API
 ---------------------
 
-The first set of tutorials cover the basics of using Lightkurve. This includes getting to grips with the file types and how to load and work with data from the Kepler, K2, and TESS missions.
+The first set of tutorials cover the basics of using Lightkurve.
+This includes getting to grips with the file types and how to load and work
+with data from the Kepler, K2, and TESS missions. For a complete listing of
+all classes and methods, please consult the `API docs <../api/index.html>`_.
 
 .. toctree::
     :maxdepth: 1
@@ -18,45 +21,17 @@ The first set of tutorials cover the basics of using Lightkurve. This includes g
     01-using-the-periodogram-class.ipynb
 
 
-2. Science examples
--------------------
-
-In the second section we cover some data analysis tasks that astronomers might commonly want to do with time series data.
-
-2.1. Exoplanet science examples
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. toctree::
-    :maxdepth: 1
-
-    02-recover-a-planet.ipynb
-    02-how-to-recover-the-first-tess-candidate.ipynb
 
 
-2.2. Asteroseismology examples
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+2. Creating and correcting light curves
+---------------------------------------
 
-.. toctree::
-    :maxdepth: 1
+The second section focuses on the various ways in which light curves
+can be extracted from the pixel data, and on the removal of instrument noise
+("systematics") from those light curves.
 
-    02-how-to-optimize-periodogram-snr.ipynb
-    02-asteroseismology.ipynb
-
-
-2.3. Other examples
-~~~~~~~~~~~~~~~~~~~
-
-.. toctree::
-    :maxdepth: 1
-
-    02-how-to-make-a-supernova-lightcurve.ipynb
-
-
-3. Creating light curves
-------------------------
-
-The third section focuses on the various ways in which light curves
-can be extracted from the pixel data.
+2.1. Creating light curves
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. toctree::
     :maxdepth: 1
@@ -68,14 +43,7 @@ can be extracted from the pixel data.
     03-appending-lightcurves.ipynb
 
 
-4. Correcting instrument noise
-------------------------------
-
-The final section focuses on the removal of instrument noise, which astronomers
-often refer to as *systematics*.
-
-
-4.1. Identifying instrument noise
+2.2. Identifying instrument noise
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. toctree::
@@ -85,12 +53,49 @@ often refer to as *systematics*.
     04-identify-rolling-band.ipynb
 
 
-4.2. Removing instrument noise
+2.3. Removing instrument noise
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. toctree::
     :maxdepth: 1
 
-    04-removing-cbvs.ipynb
+    04-how-to-remove-tess-scattered-light-using-regressioncorrector.ipynb
     04-how-to-detrend.ipynb
-    04-replicate-vanderburg-2014-k2sff.ipynb
+    04-removing-cbvs.ipynb
+
+
+
+
+3. Science examples
+-------------------
+
+In the final section we cover some data analysis tasks that astronomers might
+commonly want to do with time series data.
+
+3.1. Exoplanet examples
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. toctree::
+    :maxdepth: 1
+
+    02-recover-a-planet.ipynb
+    02-how-to-recover-the-first-tess-candidate.ipynb
+
+
+3.2. Asteroseismology examples
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. toctree::
+    :maxdepth: 1
+
+    02-how-to-optimize-periodogram-snr.ipynb
+    02-asteroseismology.ipynb
+
+
+3.3. Other examples
+~~~~~~~~~~~~~~~~~~~
+
+.. toctree::
+    :maxdepth: 1
+
+    02-how-to-make-a-supernova-lightcurve.ipynb
