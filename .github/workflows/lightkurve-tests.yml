@@ -1,8 +1,14 @@
-# This file configures the continuous integration for Lightkurve.
-# We run the unit tests on different versions of Python on Linux, but only use
-# a single version of Python on Windows and OSX in the interest of time.
-# In addition, we limit the use of the `--remote-flag` to one Linux and one
-# Windows job to avoid hammering the data archive at MAST too much.
+# GitHub Actions workflow for Lightkurve's continuous integration.
+#
+# This file configures seven different jobs:
+# 1) pytest on Linux, Python 2.7.
+# 2) pytest on Linux, Python 3.7.
+# 3) pytest on Linux, Python 3.8, with --remote-data enabled (i.e. get data from MAST).
+# 4) pytest on Linux, Python 3.8, without installing optional dependencies.
+# 5) pytest on Windows, Python 3.8, with --remote-data enabled.
+# 6) pytest on OSX, Python 3.8.
+# 7) flake8 syntax check.
+
 name: Lightkurve-tests
 
 on: [push, pull_request]
