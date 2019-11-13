@@ -520,7 +520,7 @@ class Seismology(object):
             doc.add_root(widgets_and_figures)
 
         output_notebook(verbose=False, hide_banner=True)
-        return show(create_interact_ui, notebook_url='http://localhost:8900')
+        return show(create_interact_ui, notebook_url=notebook_url)
 
     def estimate_numax(self, method="acf2d", **kwargs):
         """Returns the frequency of the peak of the seismic oscillation modes envelope.
