@@ -180,23 +180,6 @@ class TargetPixelFile(object):
             return telesco_kw
 
     @property
-    def time_format(self):
-        """Returns the time format"""
-        #TODO: override in each base class
-        if self.mission == 'Spitzer':
-            return 'mjd'
-        else:
-            return None
-
-    @property
-    def time_scale(self):
-        """Returns the time scale"""
-        if self.mission == 'Spitzer':
-            return 'tdb' #TODO: verify
-        else:
-            return None
-
-    @property
     def pipeline_mask(self):
         """Returns the optimal aperture mask used by the pipeline."""
         # Both Kepler and TESS flag the pixels in the optimal aperture using
@@ -256,11 +239,6 @@ class TargetPixelFile(object):
     def quality(self):
         """Returns the quality flag integer of every good cadence."""
         return self.hdu[1].data['QUALITY'][self.quality_mask]
-
-    @property
-    def astropy_time(self):
-        """Returns an AstroPy Time object for all good-quality cadences."""
-        return Time(self.time, format=self.time_format, scale=self.time_scale)
 
     @property
     def wcs(self):
@@ -462,8 +440,7 @@ class TargetPixelFile(object):
 
         return LightCurve(time=self.time,
                 flux=np.nansum(self.flux[:, aperture_mask], axis=1),
-                flux_err=flux_err,time_format=self.time_format,
-                time_scale=self.time_scale, centroid_col=centroid_col,
+                flux_err=flux_err,centroid_col=centroid_col,
                 centroid_row=centroid_row, quality=self.quality, ra=self.ra,
                 dec=self.dec, label=self.header['OBJECT'], targetid=self.targetid)
 
@@ -1159,7 +1136,7 @@ class TargetPixelFile(object):
 
         refpixels = {val:factory.keywords['CRVAL{}P'.format(val)] \
                     if 'CRVAL{}P'.format(val) in factory.keywords.keys() \
-                    else 0 for val in [1,2]}  #TODO spot check the zero default?
+                    else 0 for val in [1,2]}  #TODO spot check the zero default
 
         # TPF contains multiple data columns that require WCS
         for m in [4, 5, 6, 7, 8, 9]:

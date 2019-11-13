@@ -56,11 +56,10 @@ def prepare_lightcurve_datasource(lc):
     -------
     lc_source : bokeh.plotting.ColumnDataSource
     """
-    # Convert time into human readable strings, breaks with NaN time
-    # See https://github.com/KeplerGO/lightkurve/issues/116
-    if (lc.time == lc.time).all():
+    # Convert time into human readable strings
+    try:
         human_time = lc.astropy_time.isot
-    else:
+    except:
         human_time = [' '] * len(lc.flux)
 
     # Convert binary quality numbers into human readable strings
@@ -190,6 +189,10 @@ def make_lightcurve_figure_elements(lc, lc_source, ylim_func=None):
     else:
         ylims = ylim_func(lc)
     fig.y_range = Range1d(start=ylims[0], end=ylims[1])
+    if lc.time_format is None:
+        time_format_text = ' '
+    else:
+        time_format_text = lc.time_format.upper()
 
     # Add step lines, circles, and hover-over tooltips
     fig.step('time', 'flux', line_width=1, color='gray',
@@ -203,8 +206,9 @@ def make_lightcurve_figure_elements(lc, lc_source, ylim_func=None):
                       nonselection_line_alpha=0.0,
                       fill_color=None, hover_fill_color="firebrick",
                       hover_alpha=0.9, hover_line_color="white")
+
     tooltips = [("Cadence", "@cadence"),
-                ("Time ({})".format(lc.time_format.upper()),
+                ("Time ({})".format(time_format_text),
                  "@time{0,0.000}"),
                 ("Time (ISO)", "@time_iso"),
                 ("Flux", "@flux"),
