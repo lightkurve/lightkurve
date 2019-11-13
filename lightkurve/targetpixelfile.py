@@ -13,7 +13,6 @@ from astropy.wcs import WCS
 from astropy.utils.exceptions import AstropyWarning
 from astropy.coordinates import SkyCoord
 from astropy.stats.funcs import median_absolute_deviation as MAD
-from astropy.time import Time
 
 from matplotlib import patches
 import matplotlib.pyplot as plt
