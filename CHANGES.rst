@@ -1,15 +1,23 @@
-1.4.0 (unreleased)
+1.4.0 (2019-11-12)
 ==================
 
 - Added the generic ``RegressionCorrector`` and ``DesignMatrix`` classes which
   provide a user-friendly way to use linear regression to remove background or
   systematic noise components from light curves. [#613]
 
-- Changed the ``SFFCorrector`` class to use the new ``RegressionCorrector``
-  framework. [#613, #617, #626]
+- Refactored the ``SFFCorrector`` class to use the new ``RegressionCorrector``,
+  which deprecated the ``polyorder`` keyword in favor of ``degree``.
+  [#613, #616, #617, #626]
+
+- Changed the `tutorials index page <https://docs.lightkurve.org/tutorials>`_
+  in the online docs to make the tutorials easier to navigate.
 
 - Added a tutorial which demonstrates the use of Lightkurve's seismology module
   to measure the mass, radius, and surface gravity of a solar-like star. [#624]
+
+- Changed ``SearchResult.download()`` to raise a more explicit ``HTTPError``
+  exception when MAST's TESSCut service is overloaded and times out. [#627]
+
 
 
 
