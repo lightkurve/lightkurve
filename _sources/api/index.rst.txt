@@ -48,12 +48,27 @@ These classes provide methods to visualize these data and extract custom light c
 .. automodsumm:: lightkurve.targetpixelfile
 
 
+
 Correcting systematics
 ----------------------
 
-Telescope data is always affected by systematic noise contributed by the detector. The :class:`lightkurve.correctors` sub-package provides classes which offer different strategies to remove such noise:
+Telescope data is always affected by systematic noise contributed by the detector. 
+The :class:`lightkurve.correctors` sub-package provides classes which offer
+different strategies to remove such noise.
+At the core of the package lies the generic `.RegressionCorrector` class.
+It uses linear regression to correlate a light curve against a `.DesignMatrix`
+of column vectors which are known to correlate with additive noise components:
 
 .. automodsumm:: lightkurve.correctors
+    :skip: SFFCorrector, PLDCorrector, KeplerCBVCorrector
+
+The classes below extend `.RegressionCorrector` by providing the user with
+pre-configured `.DesignMatrix` objects which are known to be effective at
+removing different types of noise:
+
+.. automodsumm:: lightkurve.correctors
+    :skip: RegressionCorrector, DesignMatrix, DesignMatrixCollection
+
 
 
 Finding periodic signals

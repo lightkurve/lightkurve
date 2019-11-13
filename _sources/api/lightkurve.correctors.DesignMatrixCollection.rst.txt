@@ -1,0 +1,39 @@
+DesignMatrixCollection
+======================
+
+.. currentmodule:: lightkurve.correctors
+
+.. autoclass:: DesignMatrixCollection
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~DesignMatrixCollection.columns
+      ~DesignMatrixCollection.prior_mu
+      ~DesignMatrixCollection.prior_sigma
+      ~DesignMatrixCollection.values
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~DesignMatrixCollection.plot
+      ~DesignMatrixCollection.plot_priors
+      ~DesignMatrixCollection.split
+      ~DesignMatrixCollection.standardize
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: columns
+   .. autoattribute:: prior_mu
+   .. autoattribute:: prior_sigma
+   .. autoattribute:: values
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: plot
+   .. automethod:: plot_priors
+   .. automethod:: split
+   .. automethod:: standardize

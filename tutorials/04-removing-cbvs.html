@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>How to remove common systematics using basis vectors (CBVs) &#8212; Lightkurve</title>
+    <title>How to remove common systematics from Kepler light curves using the KeplerCBVCorrector? &#8212; Lightkurve</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.3</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.4</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -295,8 +295,8 @@ div.rendered_html tbody tr:hover {
     <a href=" https://colab.research.google.com/github/KeplerGO/lightkurve/blob/master/docs/source/tutorials/04-removing-cbvs.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
     <a href="https://mybinder.org/v2/gh/KeplerGO/lightkurve/master?filepath=docs/source/tutorials/04-removing-cbvs.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
 </div>
-<br style="clear:both;"><div class="section" id="How-to-remove-common-systematics-using-basis-vectors-(CBVs)">
-<h1>How to remove common systematics using basis vectors (CBVs)<a class="headerlink" href="#How-to-remove-common-systematics-using-basis-vectors-(CBVs)" title="Permalink to this headline">¶</a></h1>
+<br style="clear:both;"><div class="section" id="How-to-remove-common-systematics-from-Kepler-light-curves-using-the-KeplerCBVCorrector?">
+<h1>How to remove common systematics from Kepler light curves using the <code class="docutils literal notranslate"><span class="pre">KeplerCBVCorrector</span></code>?<a class="headerlink" href="#How-to-remove-common-systematics-from-Kepler-light-curves-using-the-KeplerCBVCorrector?" title="Permalink to this headline">¶</a></h1>
 <p>Cotrending Basis Vectors are used to remove long term trends in light curves. They are built from the most common trends observed in each channel. You can read more about CBVs in <a class="reference external" href="https://arxiv.org/pdf/1207.3093.pdf">Demystifying Kepler Data</a>. They can be used to clean lightcurves of common trends experience by all targets.</p>
 <p>Below is an example workflow to remove CBVs from an light curve in Kepler; <a class="reference external" href="https://en.wikipedia.org/wiki/KIC_8462852">Tabby’s star</a>.</p>
 <div class="nbinput docutils container">

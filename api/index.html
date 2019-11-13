@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.3</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.4</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -184,7 +184,32 @@ These classes provide methods to visualize these data and extract custom light c
 </div>
 <div class="section" id="correcting-systematics">
 <h2>Correcting systematics<a class="headerlink" href="#correcting-systematics" title="Permalink to this headline">¶</a></h2>
-<p>Telescope data is always affected by systematic noise contributed by the detector. The <a class="reference internal" href="correctors.html#module-lightkurve.correctors" title="lightkurve.correctors"><code class="xref py py-class docutils literal notranslate"><span class="pre">lightkurve.correctors</span></code></a> sub-package provides classes which offer different strategies to remove such noise:</p>
+<p>Telescope data is always affected by systematic noise contributed by the detector.
+The <a class="reference internal" href="correctors.html#module-lightkurve.correctors" title="lightkurve.correctors"><code class="xref py py-class docutils literal notranslate"><span class="pre">lightkurve.correctors</span></code></a> sub-package provides classes which offer
+different strategies to remove such noise.
+At the core of the package lies the generic <a class="reference internal" href="lightkurve.correctors.RegressionCorrector.html#lightkurve.correctors.RegressionCorrector" title="lightkurve.correctors.RegressionCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RegressionCorrector</span></code></a> class.
+It uses linear regression to correlate a light curve against a <a class="reference internal" href="lightkurve.correctors.DesignMatrix.html#lightkurve.correctors.DesignMatrix" title="lightkurve.correctors.DesignMatrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DesignMatrix</span></code></a>
+of column vectors which are known to correlate with additive noise components:</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.correctors.DesignMatrix.html#lightkurve.correctors.DesignMatrix" title="lightkurve.correctors.DesignMatrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DesignMatrix</span></code></a>(df[, columns, name, prior_mu, …])</p></td>
+<td><p>A matrix of column vectors for use in linear regression.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.correctors.DesignMatrixCollection.html#lightkurve.correctors.DesignMatrixCollection" title="lightkurve.correctors.DesignMatrixCollection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DesignMatrixCollection</span></code></a>(matrices)</p></td>
+<td><p>A set of design matrices.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.correctors.RegressionCorrector.html#lightkurve.correctors.RegressionCorrector" title="lightkurve.correctors.RegressionCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RegressionCorrector</span></code></a>(lc)</p></td>
+<td><p>Remove noise using linear regression against a <a class="reference internal" href="lightkurve.correctors.DesignMatrix.html#lightkurve.correctors.DesignMatrix" title="lightkurve.correctors.DesignMatrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DesignMatrix</span></code></a>.</p></td>
+</tr>
+</tbody>
+</table>
+<p>The classes below extend <a class="reference internal" href="lightkurve.correctors.RegressionCorrector.html#lightkurve.correctors.RegressionCorrector" title="lightkurve.correctors.RegressionCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RegressionCorrector</span></code></a> by providing the user with
+pre-configured <a class="reference internal" href="lightkurve.correctors.DesignMatrix.html#lightkurve.correctors.DesignMatrix" title="lightkurve.correctors.DesignMatrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DesignMatrix</span></code></a> objects which are known to be effective at
+removing different types of noise:</p>
 <table class="longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
@@ -197,8 +222,8 @@ These classes provide methods to visualize these data and extract custom light c
 <tr class="row-even"><td><p><a class="reference internal" href="lightkurve.correctors.PLDCorrector.html#lightkurve.correctors.PLDCorrector" title="lightkurve.correctors.PLDCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PLDCorrector</span></code></a>(tpf)</p></td>
 <td><p>Implements the Pixel Level Decorrelation (PLD) systematics removal method.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.correctors.SFFCorrector.html#lightkurve.correctors.SFFCorrector" title="lightkurve.correctors.SFFCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SFFCorrector</span></code></a>(lightcurve)</p></td>
-<td><p>Implements the Self-Flat-Fielding (SFF) systematics removal method.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.correctors.SFFCorrector.html#lightkurve.correctors.SFFCorrector" title="lightkurve.correctors.SFFCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SFFCorrector</span></code></a>(lc)</p></td>
+<td><p>Special case of <a class="reference internal" href="lightkurve.correctors.RegressionCorrector.html#lightkurve.correctors.RegressionCorrector" title="lightkurve.correctors.RegressionCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RegressionCorrector</span></code></a> where the <a class="reference internal" href="lightkurve.correctors.DesignMatrix.html#lightkurve.correctors.DesignMatrix" title="lightkurve.correctors.DesignMatrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DesignMatrix</span></code></a> includes the target’s centroid positions.</p></td>
 </tr>
 </tbody>
 </table>

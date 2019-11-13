@@ -22,7 +22,6 @@ KeplerCBVCorrector
       ~KeplerCBVCorrector.diagnose
       ~KeplerCBVCorrector.get_cbv_url
       ~KeplerCBVCorrector.get_cbvs_list
-      ~KeplerCBVCorrector.interact
       ~KeplerCBVCorrector.plot_cbvs
 
    .. rubric:: Attributes Documentation
@@ -37,5 +36,4 @@ KeplerCBVCorrector
    .. automethod:: diagnose
    .. automethod:: get_cbv_url
    .. automethod:: get_cbvs_list
-   .. automethod:: interact
    .. automethod:: plot_cbvs

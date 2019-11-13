@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>How to combine lightcurves from different Kepler quarters &#8212; Lightkurve</title>
+    <title>How to combine lightcurves from different Kepler quarters? &#8212; Lightkurve</title>
     <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.3</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.4</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -295,8 +295,8 @@ div.rendered_html tbody tr:hover {
     <a href=" https://colab.research.google.com/github/KeplerGO/lightkurve/blob/master/docs/source/tutorials/03-appending-lightcurves.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
     <a href="https://mybinder.org/v2/gh/KeplerGO/lightkurve/master?filepath=docs/source/tutorials/03-appending-lightcurves.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
 </div>
-<br style="clear:both;"><div class="section" id="How-to-combine-lightcurves-from-different-Kepler-quarters">
-<h1>How to combine lightcurves from different Kepler quarters<a class="headerlink" href="#How-to-combine-lightcurves-from-different-Kepler-quarters" title="Permalink to this headline">¶</a></h1>
+<br style="clear:both;"><div class="section" id="How-to-combine-lightcurves-from-different-Kepler-quarters?">
+<h1>How to combine lightcurves from different Kepler quarters?<a class="headerlink" href="#How-to-combine-lightcurves-from-different-Kepler-quarters?" title="Permalink to this headline">¶</a></h1>
 <p>The Kepler mission took 17 quarters of continuous observations on the same targets. For applications such as finding long period planets or asteroseismology it is useful to be able to turn these quarters into one long light curve. For a small number of pre-processed lightcurves you can simply append lightcurves together, which returns a <code class="docutils literal notranslate"><span class="pre">KeplerLightCurve</span></code>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">stitched_lc</span> <span class="o">=</span> <span class="n">lc1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lc2</span><span class="p">)</span>
 </pre></div>

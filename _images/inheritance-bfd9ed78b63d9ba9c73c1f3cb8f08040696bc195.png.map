@@ -1,6 +1,0 @@
-<map id="inheritancea21c462719" name="inheritancea21c462719">
-<area shape="rect" id="node1" title="Abstract base class." alt="" coords="5,55,88,80"/>
-<area shape="rect" id="node2" title="Remove systematic trends from Kepler light curves by fitting" alt="" coords="136,5,287,31"/>
-<area shape="rect" id="node3" title="Implements the Pixel Level Decorrelation (PLD) systematics removal method." alt="" coords="158,55,265,80"/>
-<area shape="rect" id="node4" title="Implements the Self&#45;Flat&#45;Fielding (SFF) systematics removal method." alt="" coords="159,104,263,129"/>
-</map>

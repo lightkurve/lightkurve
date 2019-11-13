@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.3</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.4</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -296,7 +296,7 @@ div.rendered_html tbody tr:hover {
     <a href="https://mybinder.org/v2/gh/KeplerGO/lightkurve/master?filepath=docs/source/tutorials/01-target-pixel-files.ipynb"><img alt="Binder badge" src="https://mybinder.org/badge_logo.svg"></a>
 </div>
 <br style="clear:both;"><div class="section" id="What-are-TargetPixelFile-objects?">
-<h1>What are TargetPixelFile objects?<a class="headerlink" href="#What-are-TargetPixelFile-objects?" title="Permalink to this headline">¶</a></h1>
+<h1>What are <code class="docutils literal notranslate"><span class="pre">TargetPixelFile</span></code> objects?<a class="headerlink" href="#What-are-TargetPixelFile-objects?" title="Permalink to this headline">¶</a></h1>
 <p>Target Pixel Files (TPFs) are a file common to Kepler/K2 and the TESS mission. They contain movies of the pixel data centered on a single target star.</p>
 <p>TPFs can be thought of as stacks of images, with one image for every timestamp the telescope took data. Each timestamp is referred to as a <strong>cadence</strong>. These images are cut out ‘postage stamps’ of the full observation to make them easier to work with.</p>
 <p>TPFs are given in FITS files, which you can read more about <a class="reference external" href="https://fits.gsfc.nasa.gov/fits_primer.html">here</a>. <em>Lightkurve</em> includes tools for you to work directly with these files easily and intuitively.</p>

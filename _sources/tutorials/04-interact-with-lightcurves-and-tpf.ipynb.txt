@@ -4,7 +4,7 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "# Interactively inspecting Target Pixel Files and Lightcurves"
+    "# How to interactively inspect Target Pixel Files and Light Curves?"
    ]
   },
   {
@@ -514,7 +514,7 @@
    "name": "python",
    "nbconvert_exporter": "python",
    "pygments_lexer": "ipython3",
-   "version": "3.6.9"
+   "version": "3.7.3"
   }
  },
  "nbformat": 4,

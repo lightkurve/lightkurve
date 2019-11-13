@@ -12,10 +12,8 @@ PLDCorrector
 
       ~PLDCorrector.correct
       ~PLDCorrector.diagnose
-      ~PLDCorrector.interact
 
    .. rubric:: Methods Documentation
 
    .. automethod:: correct
    .. automethod:: diagnose
-   .. automethod:: interact

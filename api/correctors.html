@@ -40,7 +40,7 @@
 <header>
 <nav class="navbar navbar-expand-lg navbar-light border-bottom">
   <div class="container">
-    <a class="navbar-brand" href="../index.html">Lightkurve v1.3</a>
+    <a class="navbar-brand" href="../index.html">Lightkurve v1.4</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -112,21 +112,30 @@ class, which provides three key methods:</p>
 <col style="width: 90%" />
 </colgroup>
 <tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.correctors.DesignMatrix.html#lightkurve.correctors.DesignMatrix" title="lightkurve.correctors.DesignMatrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DesignMatrix</span></code></a>(df[, columns, name, prior_mu, …])</p></td>
+<td><p>A matrix of column vectors for use in linear regression.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.correctors.DesignMatrixCollection.html#lightkurve.correctors.DesignMatrixCollection" title="lightkurve.correctors.DesignMatrixCollection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DesignMatrixCollection</span></code></a>(matrices)</p></td>
+<td><p>A set of design matrices.</p></td>
+</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.correctors.KeplerCBVCorrector.html#lightkurve.correctors.KeplerCBVCorrector" title="lightkurve.correctors.KeplerCBVCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">KeplerCBVCorrector</span></code></a>(lc[, cbv_array, …])</p></td>
 <td><p>Remove systematic trends from Kepler light curves by fitting Cotrending Basis Vectors (CBVs).</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="lightkurve.correctors.PLDCorrector.html#lightkurve.correctors.PLDCorrector" title="lightkurve.correctors.PLDCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PLDCorrector</span></code></a>(tpf)</p></td>
 <td><p>Implements the Pixel Level Decorrelation (PLD) systematics removal method.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.correctors.SFFCorrector.html#lightkurve.correctors.SFFCorrector" title="lightkurve.correctors.SFFCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SFFCorrector</span></code></a>(lightcurve)</p></td>
-<td><p>Implements the Self-Flat-Fielding (SFF) systematics removal method.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="lightkurve.correctors.RegressionCorrector.html#lightkurve.correctors.RegressionCorrector" title="lightkurve.correctors.RegressionCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RegressionCorrector</span></code></a>(lc)</p></td>
+<td><p>Remove noise using linear regression against a <a class="reference internal" href="lightkurve.correctors.DesignMatrix.html#lightkurve.correctors.DesignMatrix" title="lightkurve.correctors.DesignMatrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DesignMatrix</span></code></a>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="lightkurve.correctors.SFFCorrector.html#lightkurve.correctors.SFFCorrector" title="lightkurve.correctors.SFFCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SFFCorrector</span></code></a>(lc)</p></td>
+<td><p>Special case of <a class="reference internal" href="lightkurve.correctors.RegressionCorrector.html#lightkurve.correctors.RegressionCorrector" title="lightkurve.correctors.RegressionCorrector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RegressionCorrector</span></code></a> where the <a class="reference internal" href="lightkurve.correctors.DesignMatrix.html#lightkurve.correctors.DesignMatrix" title="lightkurve.correctors.DesignMatrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DesignMatrix</span></code></a> includes the target’s centroid positions.</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="section" id="class-inheritance-diagram">
 <h2>Class Inheritance Diagram<a class="headerlink" href="#class-inheritance-diagram" title="Permalink to this headline">¶</a></h2>
-<div class="graphviz"><img src="../_images/inheritance-bfd9ed78b63d9ba9c73c1f3cb8f08040696bc195.png" alt="Inheritance diagram of lightkurve.correctors.cbvcorrector.KeplerCBVCorrector, lightkurve.correctors.pldcorrector.PLDCorrector, lightkurve.correctors.sffcorrector.SFFCorrector" class="inheritance graphviz" /></div>
+<div class="graphviz"><img src="../_images/inheritance-30035bb0bb105b705d3eb11bda117df31113c8ef.png" alt="Inheritance diagram of lightkurve.correctors.designmatrix.DesignMatrix, lightkurve.correctors.designmatrix.DesignMatrixCollection, lightkurve.correctors.cbvcorrector.KeplerCBVCorrector, lightkurve.correctors.pldcorrector.PLDCorrector, lightkurve.correctors.regressioncorrector.RegressionCorrector, lightkurve.correctors.sffcorrector.SFFCorrector" class="inheritance graphviz" /></div>
 </div>
 </div>
 

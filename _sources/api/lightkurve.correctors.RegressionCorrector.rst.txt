@@ -1,0 +1,21 @@
+RegressionCorrector
+===================
+
+.. currentmodule:: lightkurve.correctors
+
+.. autoclass:: RegressionCorrector
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~RegressionCorrector.correct
+      ~RegressionCorrector.diagnose
+      ~RegressionCorrector.diagnose_priors
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: correct
+   .. automethod:: diagnose
+   .. automethod:: diagnose_priors
