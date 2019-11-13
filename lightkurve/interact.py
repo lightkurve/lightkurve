@@ -56,7 +56,7 @@ def prepare_lightcurve_datasource(lc):
     # Convert time into human readable strings
     try:
         human_time = lc.astropy_time.isot
-    except:
+    except ValueError:
         human_time = [' '] * len(lc.flux)
 
     # Convert binary quality numbers into human readable strings
