@@ -625,6 +625,8 @@ class LightCurve(object):
                                 flux=self.flux[sorted_args],
                                 flux_err=self.flux_err[sorted_args],
                                 time_original=self.time[sorted_args],
+                                centroid_col=self.centroid_col[sorted_args],
+                                centroid_row=self.centroid_row[sorted_args],
                                 targetid=self.targetid,
                                 label=self.label,
                                 meta=self.meta)
