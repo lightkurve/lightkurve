@@ -139,7 +139,8 @@ class TargetPixelFileFactory(object):
                              self._make_target_extension(ext_info=ext_info),
                              self._make_aperture_extension()])
 
-    def _header_template(self, extension):
+    @staticmethod
+    def _header_template(extension):
         """Returns a template `fits.Header` object for a given extension."""
         template_fn = os.path.join(PACKAGEDIR, "data",
                                    "tpf-ext{}-header.txt".format(extension))
@@ -149,7 +150,7 @@ class TargetPixelFileFactory(object):
         """Returns the primary extension (#0)."""
         hdu = fits.PrimaryHDU()
         # Copy the default keywords from a template file from the MAST archive
-        tmpl = self._header_template(0)
+        tmpl = TargetPixelFileFactory._header_template(0)
         for kw in tmpl:
             hdu.header[kw] = (tmpl[kw], tmpl.comments[kw])
         # Override the defaults where necessary

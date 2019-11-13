@@ -18,8 +18,7 @@ from astropy.io.fits.card import UNDEFINED
 import astropy.units as u
 from astropy.utils.exceptions import AstropyWarning
 
-from ..targetpixelfile import KeplerTargetPixelFile, TargetPixelFileFactory
-from ..targetpixelfile import TessTargetPixelFile, TargetPixelFile
+from ..targetpixelfile import KeplerTargetPixelFile, TessTargetPixelFile, TargetPixelFile
 from ..factory import TargetPixelFileFactory
 from ..lightcurve import TessLightCurve
 from ..utils import LightkurveWarning
