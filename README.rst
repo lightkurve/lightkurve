@@ -5,7 +5,7 @@ Lightkurve
 
 **Documentation: https://docs.lightkurve.org**
 
-|conda-badge| |pypi-badge| |pypi-downloads| |test-badge| |doi-badge| |astropy-badge|
+|test-badge| |conda-badge| |pypi-badge| |pypi-downloads| |doi-badge| |astropy-badge|
 
 .. |conda-badge| image:: https://img.shields.io/conda/vn/conda-forge/lightkurve.svg
                  :target: https://anaconda.org/conda-forge/lightkurve
