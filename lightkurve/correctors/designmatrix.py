@@ -214,7 +214,7 @@ class DesignMatrix():
             # we find this to be too few, and that n_iter=10 is still fast but
             # produces stable results.
             new_values, _, _ = pca(self.values, nterms, n_iter=10)
-        except (ImportError, ModuleNotFoundError):
+        except ImportError:
             new_values, _, _ = np.linalg.svd(self.values)
             new_values = new_values[:, :nterms]
         return DesignMatrix(new_values, name=self.name)
