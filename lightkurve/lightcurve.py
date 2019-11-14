@@ -881,15 +881,22 @@ class LightCurve(object):
         return self[~outlier_mask]
 
     def bin(self, binsize=13, bins=None, method='mean'):
-        """Bins a lightcurve in blocks of size ``binsize``.
+        """Bins a lightcurve in chunks defined by `binsize` or `bins`
 
         The value of the bins will contain the mean (``method='mean'``) or the
         median (``method='median'``) of the original data.  The default is mean.
 
         Parameters
         ----------
-        binsize : int
-            Number of cadences to include in every bin.
+        binsize : int or None
+            Number of cadences to include in every bin.  Default: 13
+        bins : int or list or str (optional)
+            Instruction for how to assign bin locations grouping by the time of
+            samples rather than index.
+            If ``bins`` is an int, it is the number of bins. If it is a list
+            it is taken to be the bin edges. If it is a string, it must be one
+            of  'blocks', 'knuth', 'scott' or 'freedman'. See
+            `~astropy.stats.histogram` for a description of each method.
         method: str, one of 'mean' or 'median'
             The summary statistic to return for each bin. Default: 'mean'.
 
