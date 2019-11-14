@@ -880,7 +880,7 @@ class LightCurve(object):
             return self[~outlier_mask], outlier_mask
         return self[~outlier_mask]
 
-    def bin(self, binsize=13, method='mean'):
+    def bin(self, binsize=13, bins=None, method='mean'):
         """Bins a lightcurve in blocks of size ``binsize``.
 
         The value of the bins will contain the mean (``method='mean'``) or the
