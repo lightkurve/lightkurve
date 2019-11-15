@@ -992,8 +992,9 @@ class LightCurve(object):
                         statistic=bin_function, bins=bin_edges).statistic
                 setattr(binned_lc, attr, binned_stat)
 
-        # Replace any zeros in flux error with NaNs
-        binned_lc.flux_err[binned_lc.flux_err==0] = np.NaN
+        # Replace any zeros in flux error with NaNs?? TBD
+        # TODO: validate flux error
+        ##binned_lc.flux_err[binned_lc.flux_err==0] = np.NaN
 
         return binned_lc
 
